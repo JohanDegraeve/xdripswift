@@ -727,7 +727,6 @@ public class AlertManager:NSObject {
             
         } else {
             
-            // TODO: check this
             if !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled && UserDefaults.standard.activeSensorStartDate != nil {
                 
                 trace("in checkAlert, there's no need to raise alert %{public}@ because we're in follower mode and keep-alive is disabled", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())

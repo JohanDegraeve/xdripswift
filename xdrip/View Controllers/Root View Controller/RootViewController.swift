@@ -95,7 +95,7 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// call the screen lock alert when the button is pressed
     @IBAction func screenLockToolbarButtonAction(_ sender: UIBarButtonItem) {
-        screenLockAlert(showClock: true)
+        screenLockAlert(nightMode: true)
     }
     
     
@@ -347,6 +347,10 @@ final class RootViewController: UIViewController, ObservableObject {
     
     @IBOutlet var miniChartDoubleTapGestureRecognizer: UITapGestureRecognizer!
     
+    /// function which is triggered when hideCoverView is called
+    @objc func handleTapCoverView(_ sender: UITapGestureRecognizer) {
+        screenLockUpdate(enabled: false)
+    }
     
     // MARK: - Actions for SwiftUI Hosting Controller integration
     
@@ -509,6 +513,9 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// create the landscape view
     private var landscapeChartViewController: LandscapeChartViewController?
+    
+    /// uiview to be used for the night-mode overlay to darken the app screen
+    private var overlayView: UIView?
 
     
     // MARK: - overriden functions
@@ -535,16 +542,14 @@ final class RootViewController: UIViewController, ObservableObject {
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabelsAndChart(overrideApplicationState: true)
         
-        // show the mini-chart as required
-        if !screenIsLocked {
-            miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
+        // show the mini-chart and other info as required
+        miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
+        statisticsView.isHidden = !UserDefaults.standard.showStatistics
+        /*
+        if screenIsLocked {
+            screenLockUpdate(enabled: false)
         }
-        
-        // show the statistics view as required. If not, hide it and show the spacer view to keep segmentedControlChartHours separated a bit more away from the main Tab bar
-        if !screenIsLocked {
-            statisticsView.isHidden = !UserDefaults.standard.showStatistics
-        }
-        
+        */
         segmentedControlStatisticsDaysView.isHidden = !UserDefaults.standard.showStatistics
         
         if inRangeStatisticLabelOutlet.text == "-" {
@@ -572,7 +577,10 @@ final class RootViewController: UIViewController, ObservableObject {
         // no animation is needed as in most cases, we're just refreshing and displaying what is already shown on screen so we want to keep this refresh invisible.
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             
-            self.updateSensorInfoView(animate: false)
+            // if the user locks the screen before the update is called, then don't run the update
+            if !self.screenIsLocked {
+                self.updateSensorInfoView(animate: false)
+            }
             
             self.updateLabelsAndChart(overrideApplicationState: true)
             
@@ -830,6 +838,10 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 trace("    follower background keep-alive type: %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, UserDefaults.standard.followerBackgroundKeepAliveType.description)
                 
+            }
+            
+            if self.screenIsLocked {
+                self.screenLockUpdate(enabled: false)
             }
             
         })
@@ -2377,7 +2389,7 @@ final class RootViewController: UIViewController, ObservableObject {
         if sender.state == .began {
 
             // call the UIAlert but assume that the user wants a simple screen lock, not the full lock mode
-            screenLockAlert(overrideScreenIsLocked: true, showClock: false)
+            screenLockAlert(overrideScreenIsLocked: true, nightMode: false)
             
         }
         
@@ -2633,15 +2645,15 @@ final class RootViewController: UIViewController, ObservableObject {
     /// swaps status from locked to unlocked or vice versa, and creates alert to inform user
     /// - parameters:
     ///     - overrideScreenIsLocked : if true, then screen will be locked even if it's already locked. If false, then status swaps from locked to unlocked or unlocked to locked
-    ///     - showClock : when true this parameter will be passed to the screeLockUpdate function and this will lock the screen in the full lock mode adjusting font sizes and showing the clock as required.
-    private func screenLockAlert(overrideScreenIsLocked: Bool = false, showClock: Bool = true) {
+    ///     - nightMode : when true this parameter will be passed to the screeLockUpdate function and this will lock the screen with the screen dimming and other features activated as selected
+    private func screenLockAlert(overrideScreenIsLocked: Bool = false, nightMode: Bool = true) {
         
         if !screenIsLocked || overrideScreenIsLocked {
             
             trace("screen lock : user clicked the lock button or long pressed the value", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
             // lock and update the screen
-            self.screenLockUpdate(enabled: true, showClock: showClock)
+            self.screenLockUpdate(enabled: true, nightMode: nightMode)
             
             // only trigger the UIAlert if the user hasn't previously asked to not show it again
             if !UserDefaults.standard.lockScreenDontShowAgain {
@@ -2685,7 +2697,7 @@ final class RootViewController: UIViewController, ObservableObject {
             trace("screen lock : user clicked the unlock button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
             // this means the user has clicked the button whilst the screen look in already in place so let's turn the function off
-            self.screenLockUpdate(enabled: false, showClock: showClock)
+            self.screenLockUpdate(enabled: false, nightMode: nightMode)
             
         }
         
@@ -2695,8 +2707,8 @@ final class RootViewController: UIViewController, ObservableObject {
     /// this function will run when the user wants the screen to lock, or whenever the view appears and it will set up the screen correctly for each mode
     /// - parameters :
     ///     - enabled : when true this will force the screen to lock
-    ///     - showClock : when false, this will enable a simple screen lock without changing the UI - useful for keeping the screen open on your desk
-    private func screenLockUpdate(enabled: Bool = true, showClock: Bool = true) {
+    ///     - nightMode : when false, this will enable a simple screen lock without changing the UI - useful for keeping the screen open on your desk. True will bring the full screen lock changes to the UI
+    private func screenLockUpdate(enabled: Bool = true, nightMode: Bool = true) {
 
         if enabled {
             
@@ -2705,17 +2717,13 @@ final class RootViewController: UIViewController, ObservableObject {
             
             screenLockToolbarButtonOutlet.tintColor = UIColor.red
             
-            // vibrate so that user knows that the screen lock has been activated
-            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+            // play "peek" so that user knows that the screen lock has been activated.
+            // we use a soft, short vibration so that it isn't too noisy at night when selected.
+            AudioServicesPlaySystemSound(1519)
             
-            // check if iOS13 or newer is being used. If it is, then take advantage of SF Symbols to fill in the lock icon to make it stand out more
-            if showClock {
+            if nightMode {
 
                 screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock.fill")
-            
-            }
-            
-            if showClock {
                 
                 // set the value label font size to big
                 valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeScreenLock
@@ -2724,6 +2732,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 miniChartOutlet.isHidden = true
                 statisticsView.isHidden = true
                 segmentedControlsView.isHidden = true
+                sensorInfoViewOutlet.isHidden = true
                 
                 if UserDefaults.standard.showClockWhenScreenIsLocked {
                     
@@ -2746,6 +2755,22 @@ final class RootViewController: UIViewController, ObservableObject {
                     clockView.isHidden = true
                     
                 }
+                
+                if UserDefaults.standard.screenLockDimmingType != .disabled {
+                    
+                    // set a tap gesture so that we can remove the overlay view when the user taps it
+                    let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTapCoverView(_:)))
+                    
+                    //create a new view with the same size as the app screen
+                    overlayView = UIView(frame: UIScreen.main.bounds)
+                    overlayView?.backgroundColor = UserDefaults.standard.screenLockDimmingType.dimmingColor
+                    overlayView?.isUserInteractionEnabled = true
+                    overlayView?.addGestureRecognizer(tap)
+                    
+                    // add it to the tab bar controller so that it cover the whole app window
+                    tabBarController?.view.addSubview(overlayView!)
+                    
+                }
             
             }
 
@@ -2755,10 +2780,10 @@ final class RootViewController: UIViewController, ObservableObject {
             // prevent screen rotation
             (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
             
-            // set the private var so that we can track the screen lock activation within the RootViewController
+            // set the private var so that we can track the screen lock activation state within the RootViewController
             screenIsLocked = true
            
-            trace("screen lock : screen lock / keep-awake enabled", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            trace("screen lock : screen lock / keep-awake enabled. Night mode set to '%{public}@'. Dimming type set to '%{public}@'", log: self.log, category: ConstantsLog.categoryRootView, type: .info, nightMode.description, UserDefaults.standard.screenLockDimmingType.description)
             
         } else {
             
@@ -2775,11 +2800,10 @@ final class RootViewController: UIViewController, ObservableObject {
             // hide
             miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
             statisticsView.isHidden = !UserDefaults.standard.showStatistics
-            segmentedControlsView.isHidden = false
             
             clockView.isHidden = true
             
-            if showClock {
+            if UserDefaults.standard.showClockWhenScreenIsLocked {
                 
                 // destroy the timer instance so that it doesn't keep using resources
                 clockTimer?.invalidate()
@@ -2793,7 +2817,13 @@ final class RootViewController: UIViewController, ObservableObject {
             updateScreenRotationSettings()
             
             trace("screen lock / keep-awake disabled", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-
+            
+            if UserDefaults.standard.screenLockDimmingType != .disabled {
+                overlayView?.removeFromSuperview()
+            }
+            
+            updateSensorInfoView(animate: false)
+            
             screenIsLocked = false
             
         }
@@ -2859,7 +2889,7 @@ final class RootViewController: UIViewController, ObservableObject {
     
         let sensorMaxAgeInMinutes: Double = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
         
-        if sensorStartDate != nil && sensorMaxAgeInMinutes > 0 {
+        if (sensorStartDate != nil && sensorMaxAgeInMinutes > 0) {
             
             sensorInfoViewOutlet.isHidden = false
             
@@ -2955,7 +2985,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
         } else {
             
-            // there is no sensor start date or max days available so let's completely hide the view
+            // there is no sensor start date or max days available (or the screen is locked) so let's completely hide the view
             sensorInfoViewOutlet.isHidden = true
             
         }

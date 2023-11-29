@@ -846,7 +846,7 @@ extension LibreLinkUpFollowError: CustomStringConvertible {
         case .invalidCredentials:
             return "Invalid credentials (check 'Settings' > 'Connection Settings')"
         case .decodingError:
-            return "Error decoding JSON response)"
+            return "Error decoding JSON response"
         case .urlErrorLogin:
             return "Invalid Login URL"
         case .urlErrorConnections:

@@ -146,6 +146,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_showClockWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Show Clock when Locked?", comment: "home screen settings, should the clock also be displayed when the screen is locked?")
     }()
     
+    static let screenLockDimmingTypeWhenScreenIsLocked: String = {
+        return NSLocalizedString("settingsviews_screenLockDimmingTypeWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Dim Screen when Locked?", comment: "home screen settings, should the screen be dimmed when the screen is locked?")
+    }()
+    
     static let allowScreenRotation: String = {
         return NSLocalizedString("settingsviews_allowScreenRotation", tableName: filename, bundle: Bundle.main, value: "Allow Chart Rotation?", comment: "home screen settings, should the main glucose chart screen be allowed?")
     }()

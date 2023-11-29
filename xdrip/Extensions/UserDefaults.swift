@@ -77,6 +77,8 @@ extension UserDefaults {
         case allowScreenRotation = "allowScreenRotation"
         /// should the clock view be shown when the screen is locked?
         case showClockWhenScreenIsLocked = "showClockWhenScreenIsLocked"
+        /// how (and if) the screen should be dimmed when screen lock is enabled
+        case screenLockDimmingType = "screenLockDimmingType"
         /// show the objectives and make them display on the graph? Or just hide it all because it's too complicated to waste time with?
         case useObjectives = "useObjectives"
         /// show the objective lines in color or grey?
@@ -980,6 +982,18 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.showClockWhenScreenIsLocked.rawValue)
+        }
+    }
+    
+    /// holds the enum integer of the screen dimming type selected for the screen lock
+    /// it will default to 0 which is disabled
+    var screenLockDimmingType: ScreenLockDimmingType {
+        get {
+            let screenLockDimmingTypeAsInt = integer(forKey: Key.screenLockDimmingType.rawValue)
+            return ScreenLockDimmingType(rawValue: screenLockDimmingTypeAsInt) ?? .disabled
+        }
+        set {
+            set(newValue.rawValue, forKey: Key.screenLockDimmingType.rawValue)
         }
     }
     

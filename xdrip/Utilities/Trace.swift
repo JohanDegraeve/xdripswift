@@ -425,6 +425,9 @@ class Trace {
 
         // allow chart rotation
         traceInfo.appendStringAndNewLine("    Allow chart rotation: " + UserDefaults.standard.allowScreenRotation.description)
+        
+        // screen dimming type
+        traceInfo.appendStringAndNewLine("    Screen dimming type when locked: " + UserDefaults.standard.screenLockDimmingType.description)
 
         // is use statistics on or off
         traceInfo.appendStringAndNewLine("    Show statistics: " + UserDefaults.standard.showStatistics.description)
