@@ -189,8 +189,8 @@ public enum AlertKind:Int, CaseIterable {
                     if lastBgReading.calculatedValue == 0.0 {return (false, nil, nil, nil)}
                     // now do the actual check if alert is applicable or not
                     if lastBgReading.calculatedValue.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) < Double(currentAlertEntry.value).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
-//                        return (true, lastBgReading.unitizedDeltaString(previousBgReading: lastButOneBgReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), createAlertTitleForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), nil)
-                        return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
+//                        return (true, lastBgReading.unitizedDeltaString(previousBgReading: lastButOneBgReading, showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), createAlertTitleForBgReadingAlerts(bgReading: lastBgReading, alertKind: self, showSlope: UserDefaults.standard.showSlopeInAlarms), nil)
+                        return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self, showSlope: UserDefaults.standard.showSlopeInAlarms), createAlertTitleForBgReadingAlerts(alertKind: self, showSlope: UserDefaults.standard.showSlopeInAlarms), nil)
                     } else {return (false, nil, nil, nil)}
                 } else {return (false, nil, nil, nil)}
             
@@ -203,7 +203,7 @@ public enum AlertKind:Int, CaseIterable {
                     if lastBgReading.calculatedValue == 0.0 {return (false, nil, nil, nil)}
                     // now do the actual check if alert is applicable or not
                     if lastBgReading.calculatedValue.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl){
-                        return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
+                        return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self, showSlope: UserDefaults.standard.showSlopeInAlarms), createAlertTitleForBgReadingAlerts(alertKind: self, showSlope: UserDefaults.standard.showSlopeInAlarms), nil)
                     } else {return (false, nil, nil, nil)}
                 } else {return (false, nil, nil, nil)}
             
@@ -220,7 +220,7 @@ public enum AlertKind:Int, CaseIterable {
                         if lastBgReading.calculatedValue == 0.0 || lastButOneBgReading.calculatedValue == 0.0 {return (false, nil, nil, nil)}
                         // now do the actual check if alert is applicable or not
                         if lastButOneBgReading.calculatedValue.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) - lastBgReading.calculatedValue.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
-                            return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
+                            return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self, showSlope: UserDefaults.standard.showSlopeInAlarms), createAlertTitleForBgReadingAlerts(alertKind: self, showSlope: UserDefaults.standard.showSlopeInAlarms), nil)
                         } else {return (false, nil, nil, nil)}
 
                     } else {return (false, nil, nil, nil)}
@@ -240,7 +240,7 @@ public enum AlertKind:Int, CaseIterable {
                         if lastBgReading.calculatedValue == 0.0 || lastButOneBgReading.calculatedValue == 0.0 {return (false, nil, nil, nil)}
                         // now do the actual check if alert is applicable or not
                         if lastBgReading.calculatedValue.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) - lastButOneBgReading.calculatedValue.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
-                            return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
+                            return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self, showSlope: UserDefaults.standard.showSlopeInAlarms), createAlertTitleForBgReadingAlerts(alertKind: self, showSlope: UserDefaults.standard.showSlopeInAlarms), nil)
                         } else {return (false, nil, nil, nil)}
 
                     } else {return (false, nil, nil, nil)}
@@ -451,7 +451,12 @@ public enum AlertKind:Int, CaseIterable {
 }
 
 // specifically for high, low, very high, very low because these need the same kind of alertTitle
-fileprivate func createAlertTitleForBgReadingAlerts(alertKind: AlertKind) -> String {
+fileprivate func createAlertTitleForBgReadingAlerts(alertKind: AlertKind, showSlope:Bool) -> String {
+    guard showSlope else {
+        return ""
+    }
+    
+    var returnValue:String = ""
     // the start of the body, which says like "High Alert"
     switch alertKind {
     case .low:
@@ -472,14 +477,14 @@ fileprivate func createAlertTitleForBgReadingAlerts(alertKind: AlertKind) -> Str
 }
 
 // specifically for high, low, very high, very low because these need to show an alert body with the BG value etc
-fileprivate func createAlertBodyForBgReadingAlerts(bgReading:BgReading, alertKind:AlertKind) -> String {
+fileprivate func createAlertBodyForBgReadingAlerts(bgReading:BgReading, alertKind:AlertKind, showSlope:Bool) -> String {
     var returnValue:String = ""
     
     // add unit
     returnValue = returnValue + " " + bgReading.calculatedValue.mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
     
     // add slopeArrow
-    if !bgReading.hideSlope {
+    if showSlope && !bgReading.hideSlope {
         returnValue = returnValue + " " + bgReading.slopeArrow()
     }
     
