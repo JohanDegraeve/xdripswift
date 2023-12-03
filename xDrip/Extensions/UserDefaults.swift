@@ -274,7 +274,9 @@ extension UserDefaults {
         case snoozeAllAlertsUntilDate = "snoozeAllAlertsUntilDate"
         /// whether alert-triggered snooze sheets should use the oversized presentation
         case preferLargeSnoozeScreen = "preferLargeSnoozeScreen"
-
+        /// hide slope in alarms
+        case hideSlopeInAlarms = "hideSlopeInAlarms"
+        
         // Housekeeper settings
 
         /// For how many days should we keep Readings, Treatments and Calibrations?
@@ -1893,8 +1895,17 @@ extension UserDefaults {
             set(newValue, forKey: Key.tirChartHasDynamicYAxis.rawValue)
         }
     }
-
-
+    
+    /// - show slopes in alarms
+    var showSlopeInAlarms: Bool {
+        get {
+            return !bool(forKey: Key.hideSlopeInAlarms.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.hideSlopeInAlarms.rawValue)
+        }
+    }
+    
     // MARK: Alert Settings
 
     /// when did the user snooze all alerts. If this is nil, then the snooze all isn't activated
