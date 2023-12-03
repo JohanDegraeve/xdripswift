@@ -216,6 +216,7 @@ public enum AlertKind: Int, CaseIterable {
         // Not all input parameters in the closure are needed for every type of alert. - this is to make it generic
         
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        let showSlope = UserDefaults.standard.showSlopeInAlarms
         
         switch self {
         case .low, .verylow:
@@ -227,7 +228,7 @@ public enum AlertKind: Int, CaseIterable {
                 if lastBgReading.calculatedValue == 0.0 { return (false, nil, nil, nil) }
                 // now do the actual check if alert is applicable or not
                 if lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) < Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) {
-                    return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
+                    return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self, showSlope: showSlope), createAlertTitleForBgReadingAlerts(alertKind: self, showSlope: showSlope), nil)
                 } else { return (false, nil, nil, nil) }
             } else { return (false, nil, nil, nil) }
             
@@ -240,7 +241,7 @@ public enum AlertKind: Int, CaseIterable {
                 if lastBgReading.calculatedValue == 0.0 { return (false, nil, nil, nil) }
                 // now do the actual check if alert is applicable or not
                 if lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) {
-                    return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
+                    return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self, showSlope: showSlope), createAlertTitleForBgReadingAlerts(alertKind: self, showSlope: showSlope), nil)
                 } else { return (false, nil, nil, nil) }
             } else { return (false, nil, nil, nil) }
             
@@ -255,7 +256,7 @@ public enum AlertKind: Int, CaseIterable {
                     if lastBgReading.calculatedValue == 0.0 || lastButOneBgReading.calculatedValue == 0.0 { return (false, nil, nil, nil) }
                     // now do the actual check if alert is applicable or not. As this is fast drop, we'll only fire when *under* the trigger value
                     if (lastButOneBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) - lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl)) && (lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) < Double(currentAlertEntry.triggerValue).bgValueRounded(mgDl: isMgDl)) {
-                            return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
+                            return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self, showSlope: showSlope), createAlertTitleForBgReadingAlerts(alertKind: self, showSlope: showSlope), nil)
                     } else { return (false, nil, nil, nil) }
                 } else { return (false, nil, nil, nil) }
             } else { return (false, nil, nil, nil) }
@@ -271,7 +272,7 @@ public enum AlertKind: Int, CaseIterable {
                     if lastBgReading.calculatedValue == 0.0 || lastButOneBgReading.calculatedValue == 0.0 { return (false, nil, nil, nil) }
                     // now do the actual check if alert is applicable or not. As this is fast rise, we'll only fire when *over* the trigger value
                     if lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) - lastButOneBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) && (lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.triggerValue).bgValueRounded(mgDl: isMgDl)) {
-                            return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
+                            return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self, showSlope: showSlope), createAlertTitleForBgReadingAlerts(alertKind: self, showSlope: showSlope), nil)
                         } else { return (false, nil, nil, nil) }
                 } else { return (false, nil, nil, nil) }
             } else { return (false, nil, nil, nil) }
@@ -491,7 +492,11 @@ public enum AlertKind: Int, CaseIterable {
 }
 
 // specifically for high, low, very high, very low because these need the same kind of alertTitle
-private func createAlertTitleForBgReadingAlerts(alertKind: AlertKind) -> String {
+private func createAlertTitleForBgReadingAlerts(alertKind: AlertKind, showSlope:Bool) -> String {
+    guard showSlope else {
+        return ""
+    }
+    
     // the start of the body, which says like "High Alert"
     switch alertKind {
     case .low:
@@ -512,14 +517,14 @@ private func createAlertTitleForBgReadingAlerts(alertKind: AlertKind) -> String 
 }
 
 // specifically for high, low, very high, very low because these need to show an alert body with the BG value etc
-private func createAlertBodyForBgReadingAlerts(bgReading: BgReading, alertKind: AlertKind) -> String {
-    var returnValue = ""
+private func createAlertBodyForBgReadingAlerts(bgReading: BgReading, alertKind: AlertKind, showSlope: Bool) -> String {
+    var returnValue: String = ""
     
     // add unit
     returnValue = returnValue + " " + bgReading.calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
     
     // add slopeArrow
-    if !bgReading.hideSlope {
+    if showSlope && !bgReading.hideSlope {
         returnValue = returnValue + " " + bgReading.slopeArrow()
     }
     
