@@ -824,8 +824,6 @@ final class RootViewController: UIViewController, ObservableObject {
             UIApplication.shared.isIdleTimerDisabled = false
             
             self.screenLockUpdate(enabled: false)
-                
-            self.sensorProgressViewOutlet.setProgress(0.0, animated: false)
             
         })
         
@@ -861,7 +859,7 @@ final class RootViewController: UIViewController, ObservableObject {
         // reinitialise glucose chart and also to update labels and chart
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {
             
-            // Schedule a call to updateLabelsAndChart when the app comes to the foreground, with a delay of 0.5 seconds. Because the application state is not immediately to .active, as a result, updates may not happen - especially the synctreatments may not happen because this may depend on the application state - by making a call just half a second later, when the status is surely = .active, the treatments sync will be done.
+            // Schedule a call to updateLabelsAndChart when the app comes to the foreground, with a delay of 0.5 seconds. Because the application state is not immediately to .active, as a result, updates may not happen - especially the synctreatments may not happen because this may depend on the application state - by making a call just half a second later, when the status is surely = .active, the UI updates will be done correctly.
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 
                 self.updateLabelsAndChart(overrideApplicationState: true)
