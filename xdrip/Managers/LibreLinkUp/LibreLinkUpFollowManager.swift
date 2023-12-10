@@ -277,7 +277,7 @@ class LibreLinkUpFollowManager: NSObject {
                     // now let's tidy up the historical glucoseMeasurements into a nice array and then append the current glucoseMeasurement
                     let glucoseMeasurementsArray = (graphResponse.data?.graphData ?? []) + [graphResponse.data?.connection?.glucoseMeasurement]
                     
-                    trace("    in downloadBgValues, %{public}@ BG values downloaded", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, glucoseMeasurementsArray.count.description)
+                    trace("    in download, %{public}@ BG values downloaded", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, glucoseMeasurementsArray.count.description)
                     
                     // create an empty array of FollowerBgReading(s)
                     var followGlucoseDataArray = [FollowerBgReading]()
@@ -301,7 +301,8 @@ class LibreLinkUpFollowManager: NSObject {
                 
             } catch let error {
                 
-                trace("    in downloadBgValues, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, error.localizedDescription)
+                // log the error that was thrown. As it doesn't have a specific handler, we'll assume no further actions are needed
+                trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, error.localizedDescription)
             }
         }
     }
@@ -357,9 +358,7 @@ class LibreLinkUpFollowManager: NSObject {
                 guard let userId = requestLoginResponse.data?.user?.id, let token = requestLoginResponse.data?.authTicket?.token, let expires = requestLoginResponse.data?.authTicket?.expires
                 else {
                     
-                    trace("    in checkLoginAndConnections, either the user id or the authentication payload was missing or invalid", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
-                    
-                    throw LibreLinkUpFollowError.generalError
+                    throw LibreLinkUpFollowError.missingPayLoad
                     
                 }
                 
@@ -399,8 +398,6 @@ class LibreLinkUpFollowManager: NSObject {
                     
                     guard let patientId = connectionsResponse.data?.first(where: { $0.patientId == userId })?.patientId ?? connectionsResponse.data?.first?.patientId else {
                         
-                        trace("    in checkLoginAndConnections, patientId was missing or invalid", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
-                        
                         throw LibreLinkUpFollowError.invalidPatientId
                         
                     }
@@ -410,7 +407,6 @@ class LibreLinkUpFollowManager: NSObject {
                     self.libreLinkUpPatientId = patientId
                     
                 }
-                
                 
             } catch LibreLinkUpFollowError.reAcceptNeeded {
                 
@@ -422,7 +418,8 @@ class LibreLinkUpFollowManager: NSObject {
                 
             } catch LibreLinkUpFollowError.invalidCredentials {
                 
-                trace("    in checkLoginAndConnections, login failed with status 2 - message 'notAuthenticated'. Login preventation activated until the user updates their account details", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
+                // we could just throw/cascade the same error back to the parent function and handle it there, but let's be redundant to make it clear what we're doing
+                trace("    in checkLoginAndConnections, requestLogin threw and error and exited before login due to previous bad credentials. This will be reset when the user updates their user/password.", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
                 
                 // make sure we don't try and login again until the user updates their account info
                 UserDefaults.standard.libreLinkUpPreventLogin = true
@@ -431,7 +428,8 @@ class LibreLinkUpFollowManager: NSObject {
                 
             } catch let error {
             
-            trace("    in downloadBgValues, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, error.localizedDescription)
+                // log the error that was thrown. As it doesn't have a specific handler, we'll assume no further actions are needed
+                trace("    in checkLoginAndConnections, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, error.localizedDescription)
                 
             }
             
@@ -453,18 +451,12 @@ class LibreLinkUpFollowManager: NSObject {
         
         if UserDefaults.standard.libreLinkUpPreventLogin {
             
-            print("Exiting login as login prevention flag is true. This will reset once the user updates their username or password.")
-            
-            trace("    in requestLogin, exiting before login due to previous bad credentials. This will be reset when the user updates their user/password", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
-            
             throw LibreLinkUpFollowError.invalidCredentials
             
         }
         
         // LibreLinkUpUp username, password and URL must exist for this function to be able to run.
         guard let libreLinkUpEmail = UserDefaults.standard.libreLinkUpEmail, let libreLinkUpPassword = UserDefaults.standard.libreLinkUpPassword else {
-            
-            trace("    in requestLogin, exiting before login due to missing credentials", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
             
             throw LibreLinkUpFollowError.missingCredentials
             
@@ -476,7 +468,11 @@ class LibreLinkUpFollowManager: NSObject {
         guard let authCredentials = try? JSONSerialization.data(withJSONObject: [
             "email": libreLinkUpEmail,
             "password": libreLinkUpPassword,
-        ]) else { throw LibreLinkUpFollowError.invalidCredentials }
+        ]) else {
+            
+            throw LibreLinkUpFollowError.invalidCredentials
+            
+        }
         
         // if no region has been previously set, then use the generic login URL. This will give a valid 200 status code, but with no data payload except for a redirect flag and the correct region for the user account
         if self.libreLinkUpRegion == .notConfigured {
@@ -486,12 +482,18 @@ class LibreLinkUpFollowManager: NSObject {
         }
         
         guard let loginUrl = self.libreLinkUpRegion?.urlLogin else {
+            
             throw LibreLinkUpFollowError.urlErrorLogin
+            
         }
         
         trace("    in requestLogin, processing login request with URL: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, loginUrl)
         
-        guard let url = URL(string: loginUrl) else { throw LibreLinkUpFollowError.urlErrorLogin}
+        guard let url = URL(string: loginUrl) else { 
+            
+            throw LibreLinkUpFollowError.urlErrorLogin
+            
+        }
         
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
@@ -530,11 +532,19 @@ class LibreLinkUpFollowManager: NSObject {
         /// - Returns: Response<[RequestConnectionsResponse]>, an array of json objects with the server response to the connections request, each one will hold a patient id but we will just use the first one [0]
     private func requestConnections() async throws -> Response<[RequestConnectionsResponse]> {
         
-        guard let connectionsUrl = self.libreLinkUpRegion?.urlConnections, let token = libreLinkUpToken else { throw LibreLinkUpFollowError.urlErrorConnections }
+        guard let connectionsUrl = self.libreLinkUpRegion?.urlConnections, let token = libreLinkUpToken else {
+            
+            throw LibreLinkUpFollowError.urlErrorConnections
+            
+        }
         
         trace("    in requestConnections, processing connections request with URL: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, connectionsUrl)
         
-        guard let url = URL(string: connectionsUrl) else { throw LibreLinkUpFollowError.urlErrorConnections}
+        guard let url = URL(string: connectionsUrl) else {
+            
+            throw LibreLinkUpFollowError.urlErrorConnections
+            
+        }
         
         // this is pretty much the same request as done in requestLogin()
         var request = URLRequest(url: url)
@@ -571,16 +581,24 @@ class LibreLinkUpFollowManager: NSObject {
     private func requestGraph(patientId: String) async throws -> Response<RequestGraphResponse> {
         
         guard let token = self.libreLinkUpToken, self.libreLinkUpId != "", self.libreLinkUpPatientId != "" else {
+            
             throw LibreLinkUpFollowError.missingLoginData
+            
         }
         
         guard let graphURL = self.libreLinkUpRegion?.urlGraph(patientId: patientId) else {
+            
             throw LibreLinkUpFollowError.urlErrorGraph
+            
         }
         
         trace("    in requestGraph, URL: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, graphURL)
         
-        guard let url = URL(string: graphURL) else { throw LibreLinkUpFollowError.urlErrorGraph }
+        guard let url = URL(string: graphURL) else {
+            
+            throw LibreLinkUpFollowError.urlErrorGraph
+            
+        }
         
         // this is pretty much the same request as done in loginRequest()
         var request = URLRequest(url: url)
@@ -823,6 +841,7 @@ private enum LibreLinkUpFollowError: Error {
     case urlErrorConnections
     case urlErrorGraph
     case missingLoginData
+    case missingPayLoad
     
 }
 
@@ -855,6 +874,8 @@ extension LibreLinkUpFollowError: CustomStringConvertible {
             return "Invalid Graph URL"
         case .missingLoginData:
             return "Missing login data"
+        case .missingPayLoad:
+            return "Either the user id or the authentication payload was missing or invalid"
             
         }
         
