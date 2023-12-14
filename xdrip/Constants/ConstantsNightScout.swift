@@ -2,7 +2,7 @@ enum ConstantsNightScout {
     
     /// - default nightscout url
     /// - used in settings, when setting first time nightscout url
-    static let defaultNightScoutUrl = "https://yoursitename.herokuapp.com"
+    static let defaultNightScoutUrl = "https://"
     
     /// maximum number of days to upload
     static let maxBgReadingsDaysToUpload = TimeInterval(days: 7)
