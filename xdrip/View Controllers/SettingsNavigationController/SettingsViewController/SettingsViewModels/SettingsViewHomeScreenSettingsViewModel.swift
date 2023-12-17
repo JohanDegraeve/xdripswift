@@ -254,10 +254,10 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .urgentHighMarkValue, .highMarkValue, .lowMarkValue, .urgentLowMarkValue, .targetMarkValue:
+        case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .lowMarkValue, .urgentLowMarkValue, .targetMarkValue:
             return UITableViewCell.AccessoryType.disclosureIndicator
             
-        case .allowScreenRotation, .screenLockDimmingType, .showClockWhenScreenIsLocked, .showMiniChart, .useObjectives, .showTarget:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .useObjectives, .showTarget:
             return UITableViewCell.AccessoryType.none
             
         }
