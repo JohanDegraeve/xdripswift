@@ -27,12 +27,32 @@ public enum FollowerDataSourceType: Int, CaseIterable {
         }
     }
     
+    // this is an alternate description to be used by the UI away from the "choose a data source" context.
+    // it is basically a full description of "XXXX Follower Mode" and can be modified for available space
+    var fullDescription: String {
+        switch self {
+        case .nightscout:
+            return "Nightscout"
+        case .libreLinkUp:
+            return "LibreLinkUp"
+        }
+    }
+    
     var abbreviation: String {
         switch self {
         case .nightscout:
             return "NS"
         case .libreLinkUp:
             return "LL"
+        }
+    }
+    
+    var secondsUntilFollowerDisconnectWarning: Int {
+        switch self {
+        case .nightscout:
+            return ConstantsFollower.secondsUntilFollowerDisconnectWarningNightscout
+        case .libreLinkUp:
+            return ConstantsFollower.secondsUntilFollowerDisconnectWarningLibreLinkUp
         }
     }
 

@@ -230,6 +230,9 @@ class LibreLinkUpFollowManager: NSObject {
                 // this takes care of 1 and 2
                 try await checkLoginAndConnections()
                 
+                // store the current timestamp as a successful server connection with valid login
+                UserDefaults.standard.timeStampOfLastFollowerConnection = Date()
+                
                 // this takes care of 3
                 if (self.libreLinkUpToken != nil && self.libreLinkUpPatientId != nil) {
                     
@@ -262,9 +265,8 @@ class LibreLinkUpFollowManager: NSObject {
                             
                         }
                         
-                        UserDefaults.standard.activeSensorDescription = "LibreLinkUp (" + activeSensorDescription + ")"
-                                                   
-                        
+                        UserDefaults.standard.activeSensorDescription = UserDefaults.standard.followerDataSourceType.fullDescription + " (" + activeSensorDescription + ")"
+                                         
                     } else {
                         
                         // this will only happen if the account doesn't have an active sensor connected
@@ -293,7 +295,7 @@ class LibreLinkUpFollowManager: NSObject {
                         }
                         
                         // schedule new download
-                        self.scheduleNewDownload()
+                        //self.scheduleNewDownload()
                         
                     }
                     
@@ -303,6 +305,15 @@ class LibreLinkUpFollowManager: NSObject {
                 
                 // log the error that was thrown. As it doesn't have a specific handler, we'll assume no further actions are needed
                 trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, error.localizedDescription)
+            }
+            
+            // rescheduling the timer must be done in main thread
+            // we do it here at the end of the function so that it is always rescheduled once a valid connection is established, irrespective of whether we get values.
+            DispatchQueue.main.sync {
+                
+                // schedule new download
+                self.scheduleNewDownload()
+                
             }
         }
     }
@@ -514,7 +525,9 @@ class LibreLinkUpFollowManager: NSObject {
         trace("    in requestLogin, server response: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, String(data: data, encoding: String.Encoding.utf8) ?? "nil")
         
         if statusCode == 200 {
+            
             return try decode(Response<RequestLoginResponse>.self, data: data)
+            
         }
         
         // we shouldn't get to here but if we do it's because the login has failed, so let's ensure coredata values are nillified
@@ -563,6 +576,7 @@ class LibreLinkUpFollowManager: NSObject {
         trace("    in requestConnections, server response status code: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, statusCode.description)
         
         if statusCode == 200 {
+            
             return try decode(Response<[RequestConnectionsResponse]>.self, data: data)
         }
         
@@ -617,6 +631,7 @@ class LibreLinkUpFollowManager: NSObject {
         trace("    in requestGraph, server response status code: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, statusCode.description)
         
         if statusCode == 200 {
+            
             return try decode(Response<RequestGraphResponse>.self, data: data)
         }
         

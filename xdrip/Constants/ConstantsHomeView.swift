@@ -62,4 +62,8 @@ enum ConstantsHomeView {
     
     /// colour for the very dark screen lock overlay view
     static let screenLockDimmingOptionsVeryDark: UIColor = .black.withAlphaComponent(0.7)
+    
+    /// how many seconds the Nightscout URL (if displayed in the data source info view) should be hidden when double tapped
+    static let hideUrlDuringTimeInSeconds: Int = 20
+    
 }

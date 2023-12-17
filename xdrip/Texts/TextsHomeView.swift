@@ -176,4 +176,17 @@ enum Texts_HomeView {
         return NSLocalizedString("stopSensorConfirmation", tableName: filename, bundle: Bundle.main, value: "Are you sure you want to stop the sensor?", comment: "When user clicks stop sensor, ask confirmation")
     }()
     
+    static let noSensorData: String = {
+        return NSLocalizedString("noSensorData", tableName: filename, bundle: Bundle.main, value: "No sensor data", comment: "no sensor data is available")
+    }()
+    
+    static let noDataSourceConnected: String = {
+        return NSLocalizedString("noDataSourceConnected", tableName: filename, bundle: Bundle.main, value: "No CGM data source connected", comment: "no data source is enabled or connected")
+    }()
+    
+    // make sure any translations are less than 20-22 characters long (including the "%@")
+    static let hidingUrlForXSeconds:String = {
+        return String(format: NSLocalizedString("hidingUrlForXSeconds", tableName: filename, bundle: Bundle.main, value: "Hiding URL for %@s...", comment: "After clicking scan button, this message will appear"), String(ConstantsHomeView.hideUrlDuringTimeInSeconds))
+    }()
+    
 }

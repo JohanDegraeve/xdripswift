@@ -230,11 +230,11 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                     
                     switch newFollowerBackgroundKeepAliveType {
                     case .disabled:
-                        message += Texts_SettingsView.followerKeepAliveTypeDisabled
+                        message += Texts_SettingsView.followerKeepAliveTypeDisabledMessage
                     case .normal:
-                        message += Texts_SettingsView.followerKeepAliveTypeNormal
+                        message += Texts_SettingsView.followerKeepAliveTypeNormalMessage
                     case .aggressive:
-                        message += Texts_SettingsView.followerKeepAliveTypeAggressive
+                        message += Texts_SettingsView.followerKeepAliveTypeAggressiveMessage
                     }
                     
                     self.callMessageHandlerInMainThread(title: Texts_SettingsView.labelfollowerKeepAliveType, message: message)

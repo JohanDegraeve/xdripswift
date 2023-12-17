@@ -37,6 +37,8 @@ extension UserDefaults {
         case followerUploadDataToNightscout = "followerUploadDataToNightscout"
         /// should we try to keep the follower alive in the background? If so, which type?
         case followerBackgroundKeepAliveType = "followerBackgroundKeepAliveType"
+        /// timestamp of last successful connection to follower service
+        case timeStampOfLastFollowerConnection = "timeStampOfLastFollowerConnection"
         
         // LibreLinkUp account info
         /// LibreLinkUp username
@@ -460,6 +462,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.followerUploadDataToNightscout.rawValue)
+        }
+    }
+    
+    /// timestamp of last successful connection to follower service
+    var timeStampOfLastFollowerConnection:Date? {
+        get {
+            return object(forKey: Key.timeStampOfLastFollowerConnection.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampOfLastFollowerConnection.rawValue)
         }
     }
     

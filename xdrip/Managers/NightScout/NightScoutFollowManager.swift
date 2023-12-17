@@ -254,6 +254,9 @@ class NightScoutFollowManager: NSObject {
             if let urlResponse = urlResponse as? HTTPURLResponse {
                 if urlResponse.statusCode == 200 {
                     
+                    // store the current timestamp as a successful server response
+                    UserDefaults.standard.timeStampOfLastFollowerConnection = Date()
+                        
                     // convert data to String for logging purposes
                     var dataAsString = ""
                     if let aa = String(data: data, encoding: .utf8) {

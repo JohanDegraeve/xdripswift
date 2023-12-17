@@ -208,12 +208,57 @@ final class RootViewController: UIViewController, ObservableObject {
     @IBOutlet weak var clockLabelOutlet: UILabel!
     
     
-    /// sensor info view
-    @IBOutlet weak var sensorInfoViewOutlet: UIView!
-    @IBOutlet weak var sensorProgressViewOutlet: UIProgressView!
-    @IBOutlet weak var sensorInfoSensorLabelOutlet: UILabel!
-    @IBOutlet weak var sensorInfoSensorCurrentAgeOutlet: UILabel!
-    @IBOutlet weak var sensorInfoSensorMaxAgeOutlet: UILabel!
+    /// sensor progress view - progress view
+    @IBOutlet weak var sensorProgressViewOutlet: UIView!
+    @IBOutlet weak var sensorProgressOutlet: UIProgressView!
+    
+    /// data source info view - general info
+    @IBOutlet weak var dataSourceViewOutlet: UIView!
+    @IBOutlet weak var dataSourceConnectionStatusImage: UIImageView!
+    @IBOutlet weak var dataSourceLabelOutlet: UILabel!
+    @IBOutlet weak var dataSourceKeepAliveLabelOutlet: UILabel!
+    @IBOutlet weak var dataSourceSensorCurrentAgeOutlet: UILabel!
+    @IBOutlet weak var dataSourceSensorMaxAgeOutlet: UILabel!
+    
+    /// used to temporarily hide the Nightscout URL from the data source info view
+    /// this is to allow a user to make screenshots etc without any personal information
+    @IBAction func urlDoubleTapGestureRecognizerAction(_ sender: UITapGestureRecognizer) {
+        
+        dataSourceSensorMaxAgeOutlet.textColor = .systemYellow
+        self.dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.hidingUrlForXSeconds
+        
+        // wait and then fade out the text
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            
+            // make a animated transition with the label. Fade it out over a couple of seconds.
+            UIView.transition(with: self.miniChartHoursLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
+                
+                self.dataSourceSensorMaxAgeOutlet.alpha = 0
+                
+            }, completion: { _ in
+                
+                // wait for a some time and then put the URL back as it was
+                DispatchQueue.main.asyncAfter(deadline: .now() + Double(ConstantsHomeView.hideUrlDuringTimeInSeconds)) {
+                    
+                    // just copied directly from updateDataSourceInfo()
+                    var nightScoutUrlString: String = UserDefaults.standard.nightScoutUrl ?? ""
+                    
+                    if nightScoutUrlString.count > 36 {
+                        nightScoutUrlString = nightScoutUrlString.replacingOccurrences(of: nightScoutUrlString.dropFirst(33), with: "...")
+                    }
+                    
+                    self.dataSourceSensorMaxAgeOutlet.alpha = 1
+                    self.dataSourceSensorMaxAgeOutlet.textColor = .darkGray
+                    self.dataSourceSensorMaxAgeOutlet.text = nightScoutUrlString
+                    
+                }
+                
+            })
+            
+        }
+        
+    }
+    
     
     @IBAction func chartPanGestureRecognizerAction(_ sender: UIPanGestureRecognizer) {
         
@@ -508,6 +553,9 @@ final class RootViewController: UIViewController, ObservableObject {
     /// initiate a Timer object that we will use later to keep the clock view updated if the user activates the screen lock
     private var clockTimer: Timer?
     
+    /// initiate a Timer object that we will use keep the follower connection status updated every 30 seconds or so
+    private var followerConnectionTimer: Timer?
+    
     /// UIAlertController to use when user chooses to lock the screen. Defined here so we can dismiss it when app goes to the background
     private var screenLockAlertController: UIAlertController?
     
@@ -545,11 +593,7 @@ final class RootViewController: UIViewController, ObservableObject {
         // show the mini-chart and other info as required
         miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
         statisticsView.isHidden = !UserDefaults.standard.showStatistics
-        /*
-        if screenIsLocked {
-            screenLockUpdate(enabled: false)
-        }
-        */
+        
         segmentedControlStatisticsDaysView.isHidden = !UserDefaults.standard.showStatistics
         
         if inRangeStatisticLabelOutlet.text == "-" {
@@ -558,8 +602,8 @@ final class RootViewController: UIViewController, ObservableObject {
             activityMonitorOutlet.isHidden = false
         }
         
-        // display the sensor info view if applicable
-        updateSensorInfoView(animate: true)
+        // display the data source info view if applicable
+        updateDataSourceInfo(animate: true)
         
         // update statistics related outlets
         updateStatistics(animate: true, overrideApplicationState: true)
@@ -573,13 +617,15 @@ final class RootViewController: UIViewController, ObservableObject {
         
         updateWatchApp()
         
-        // let's run the sensor info and chart update 1 second after the root view appears. This should give time for the follower modes to download and populate the info needed.
+        // let's run the data source info and chart update 1 second after the root view appears. This should give time for the follower modes to download and populate the info needed.
         // no animation is needed as in most cases, we're just refreshing and displaying what is already shown on screen so we want to keep this refresh invisible.
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             
             // if the user locks the screen before the update is called, then don't run the update
             if !self.screenIsLocked {
-                self.updateSensorInfoView(animate: false)
+                
+                self.updateDataSourceInfo(animate: false)
+                
             }
             
             self.updateLabelsAndChart(overrideApplicationState: true)
@@ -718,8 +764,8 @@ final class RootViewController: UIViewController, ObservableObject {
             // update the mini-chart
             self.updateMiniChart()
             
-            // update sensor info
-            self.updateSensorInfoView(animate: true)
+            // update data source info
+            self.updateDataSourceInfo(animate: true)
             
             // update statistics related outlets
             self.updateStatistics(animate: true, overrideApplicationState: true)
@@ -789,7 +835,7 @@ final class RootViewController: UIViewController, ObservableObject {
         // add observer for nightScoutTreatmentsUpdateCounter, to reload the chart whenever a treatment is added or updated or deleted changes
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
         
-        // add observer for stopActiveSensor, this will reset the active sensor to nil when the user disconnects an intergrated transmitter/sensor (e.g. Libre 2 Direct). This will help ensure that the sensor info is updated/disabled until a new sensor is started.
+        // add observer for stopActiveSensor, this will reset the active sensor to nil when the user disconnects an intergrated transmitter/sensor (e.g. Libre 2 Direct). This will help ensure that the data source info is updated/disabled until a new sensor is started.
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.stopActiveSensor.rawValue, options: .new, context: nil)
 
         // setup delegate for UNUserNotificationCenter
@@ -836,6 +882,9 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 trace("    follower background keep-alive type: %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, UserDefaults.standard.followerBackgroundKeepAliveType.description)
                 
+                self.followerConnectionTimer?.invalidate()
+                self.followerConnectionTimer = nil
+                
             }
             
             if self.screenIsLocked {
@@ -859,6 +908,9 @@ final class RootViewController: UIViewController, ObservableObject {
         // reinitialise glucose chart and also to update labels and chart
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {
             
+            // update the connection status immediately (this will give the user a visual feedback that the connection was lost in the background if they have disabled keep-alive)
+            self.setFollowerConnectionStatus()
+            
             // Schedule a call to updateLabelsAndChart when the app comes to the foreground, with a delay of 0.5 seconds. Because the application state is not immediately to .active, as a result, updates may not happen - especially the synctreatments may not happen because this may depend on the application state - by making a call just half a second later, when the status is surely = .active, the UI updates will be done correctly.
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 
@@ -866,7 +918,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 self.updateMiniChart()
                 
-                self.updateSensorInfoView(animate: true)
+                self.updateDataSourceInfo(animate: true)
                 
                 // update statistics related outlets
                 self.updateStatistics(animate: true)
@@ -1326,8 +1378,8 @@ final class RootViewController: UIViewController, ObservableObject {
                     // update statistics related outlets
                     updateStatistics(animate: false)
                     
-                    // update sensor info
-                    updateSensorInfoView(animate: false)
+                    // update data source info
+                    updateDataSourceInfo(animate: false)
                     
                 }
                 
@@ -1491,7 +1543,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 UserDefaults.standard.activeSensorStartDate = nil
                 
-                updateSensorInfoView(animate: false)
+                updateDataSourceInfo(animate: false)
                 
                 UserDefaults.standard.stopActiveSensor = false
                 
@@ -2730,7 +2782,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 miniChartOutlet.isHidden = true
                 statisticsView.isHidden = true
                 segmentedControlsView.isHidden = true
-                sensorInfoViewOutlet.isHidden = true
+                sensorProgressViewOutlet.isHidden = true
+                dataSourceViewOutlet.isHidden = true
                 
                 if UserDefaults.standard.showClockWhenScreenIsLocked {
                     
@@ -2795,10 +2848,14 @@ final class RootViewController: UIViewController, ObservableObject {
 
             valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeNormal
             
-            // hide
+            // unhide as needed
+            segmentedControlsView.isHidden = false
             miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
             statisticsView.isHidden = !UserDefaults.standard.showStatistics
+            sensorProgressViewOutlet.isHidden = false
+            dataSourceViewOutlet.isHidden = false
             
+            // hide
             clockView.isHidden = true
             
             if UserDefaults.standard.showClockWhenScreenIsLocked {
@@ -2820,7 +2877,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 overlayView?.removeFromSuperview()
             }
             
-            updateSensorInfoView(animate: false)
+            updateDataSourceInfo(animate: true)
             
             screenIsLocked = false
             
@@ -2848,14 +2905,19 @@ final class RootViewController: UIViewController, ObservableObject {
 
     }
     
-    /// sensor info panel
-    private func updateSensorInfoView(animate: Bool?) {
+    /// update the data source information view and also the sensor progress view (if needed)
+    /// - Parameter animate: will animate the sensor progress view if true
+    private func updateDataSourceInfo(animate: Bool?) {
         
         let isMaster: Bool = UserDefaults.standard.isMaster
         
-        // some calls to this function (such as when bringing the homescreen to the foreground<9 can specify to animate the progress view.
+        // reset relevant labels colors just in case they were changed the previous time this function was called
+        dataSourceLabelOutlet.textColor = .lightGray
+        dataSourceSensorMaxAgeOutlet.textColor = .lightGray
+        
+        // some calls to this function (such as when bringing the homescreen to the foreground) can specify to animate the progress view.
         // normal updates such as receiving a new BG reading whilst the app is in the foreground shouldn't cause an animation
-        let animateProgressView: Bool = animate ?? false
+        let animate: Bool = animate ?? false
         
         // used to track the active sensor type if there is one connected. Initialise it as Libre just so that it is actually initialised as something. We'll update it later as needed.
         var sensorType: CGMSensorType = .Libre
@@ -2875,28 +2937,29 @@ final class RootViewController: UIViewController, ObservableObject {
             UserDefaults.standard.activeSensorMaxSensorAgeInDays = maxDays
             
             UserDefaults.standard.activeSensorDescription = cgmTransmitter.cgmTransmitterType().detailedDescription()
-        
+            
             // update the sensor type - needed to make sure we test with the correct warm-up times later
             sensorType = cgmTransmitter.cgmTransmitterType().sensorType()
-                        
+            
         }
         
         // let's just check that we've got enough information to display the view
         // with sensor start date and max age, we can display the minimum needed
         let sensorStartDate = UserDefaults.standard.activeSensorStartDate //?.addingTimeInterval(-86400*6.0)
-    
+        
         let sensorMaxAgeInMinutes: Double = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
         
         if (sensorStartDate != nil && sensorMaxAgeInMinutes > 0) {
             
-            sensorInfoViewOutlet.isHidden = false
+            sensorProgressViewOutlet.isHidden = false
+            dataSourceViewOutlet.isHidden = false
             
             let sensorAgeInMinutes: Double = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate!, to: Date()).minute!)
             
             let sensorTimeLeftInMinutes: Double = sensorMaxAgeInMinutes - sensorAgeInMinutes
             
             // blank out the current sensor age label by default. If the sensor isn't in warm-up, then it will be filled in later
-            sensorInfoSensorCurrentAgeOutlet.text = ""
+            dataSourceSensorCurrentAgeOutlet.text = ""
             
             // set-up the labels for the sensor time, total and also if still considered in warm-up
             if !isMaster && UserDefaults.standard.followerDataSourceType == .libreLinkUp && sensorAgeInMinutes < ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre {
@@ -2904,7 +2967,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 // the LibreLinkUp active sensor is still in warm-up
                 if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre * 60) {
                     
-                    sensorInfoSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                    dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
                 }
                 
             } else if isMaster && sensorType == .Libre && sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutes {
@@ -2912,7 +2975,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 // the connected Libre sensor is still in warm-up (as per defined minimum warm-up time)
                 if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutes * 60) {
                     
-                    sensorInfoSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                    dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
                     
                 }
                 
@@ -2921,70 +2984,161 @@ final class RootViewController: UIViewController, ObservableObject {
                 // the connected Dexcom sensor is still in warm-up (as per defined standard Dexcom warm-up time)
                 if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6 * 60) {
                     
-                    sensorInfoSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                    dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
                     
                 }
                 
             } else {
                 
                 // fill in the labels to show sensor time elapsed and max age
-                sensorInfoSensorCurrentAgeOutlet.text = sensorStartDate?.daysAndHoursAgo()
+                dataSourceSensorCurrentAgeOutlet.text = sensorStartDate?.daysAndHoursAgo()
                 
-                sensorInfoSensorMaxAgeOutlet.text = " / " + sensorMaxAgeInMinutes.minutesToDaysAndHours()
+                dataSourceSensorMaxAgeOutlet.text = " / " + sensorMaxAgeInMinutes.minutesToDaysAndHours()
                 
             }
             
             // set progress view colours and text colours from constants file
-            sensorProgressViewOutlet.trackTintColor = ConstantsHomeView.sensorProgressViewTrackingColor
-            sensorProgressViewOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColor
+            sensorProgressOutlet.trackTintColor = ConstantsHomeView.sensorProgressViewTrackingColor
+            sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColor
             
-            sensorInfoSensorLabelOutlet.textColor = ConstantsHomeView.sensorProgressNormalTextColor
-            sensorInfoSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressNormalTextColor
-            sensorInfoSensorMaxAgeOutlet.textColor = ConstantsHomeView.sensorProgressNormalTextColor
-            
+            dataSourceLabelOutlet.textColor = ConstantsHomeView.sensorProgressNormalTextColor
+            dataSourceSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressNormalTextColor
+            dataSourceSensorMaxAgeOutlet.textColor = ConstantsHomeView.sensorProgressNormalTextColor
             
             // irrespective of all the above, if the current sensor age is over the max age, then just set everything to the expired colour to make it clear
             if sensorTimeLeftInMinutes < 0 {
                 
-                sensorProgressViewOutlet.progressTintColor = ConstantsHomeView.sensorProgressExpired
-                sensorInfoSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressExpired
-                sensorInfoSensorMaxAgeOutlet.textColor = ConstantsHomeView.sensorProgressExpired
+                sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressExpired
+                dataSourceSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressExpired
+                dataSourceSensorMaxAgeOutlet.textColor = ConstantsHomeView.sensorProgressExpired
                 
             } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewUrgentInMinutes {
                 
                 // sensor is very close to ending
-                sensorInfoSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressViewProgressColorUrgent
-                sensorProgressViewOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColorUrgent
+                dataSourceSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressViewProgressColorUrgent
+                sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColorUrgent
                 
-                                
             } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewWarningInMinutes {
                 
                 // sensor will soon be close to ending
-                sensorInfoSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressViewProgressColorWarning
-                sensorProgressViewOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColorWarning
-                                
+                dataSourceSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressViewProgressColorWarning
+                sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColorWarning
+                
             }
             
-            
             // set the sensor/system description
-            sensorInfoSensorLabelOutlet.text = UserDefaults.standard.activeSensorDescription
-
-            // if the animatation is required, then first set the value to 0
-            if animateProgressView {
-                sensorProgressViewOutlet.setProgress(0.0, animated: false)
+            dataSourceLabelOutlet.text = UserDefaults.standard.activeSensorDescription
+            
+            // if animatation is requested, then first set the value to 0
+            if animate {
+                
+                sensorProgressOutlet.setProgress(0.0, animated: false)
+                
             }
             
             // let's run the progress update in an async thread with a really small delay so that the animation updates smoothly after the view has appeared
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 
-                self.sensorProgressViewOutlet.setProgress(Float(1 - (sensorTimeLeftInMinutes / sensorMaxAgeInMinutes)), animated: animateProgressView)
+                self.sensorProgressOutlet.setProgress(Float(1 - (sensorTimeLeftInMinutes / sensorMaxAgeInMinutes)), animated: animate)
                 
             }
             
         } else {
             
-            // there is no sensor start date or max days available (or the screen is locked) so let's completely hide the view
-            sensorInfoViewOutlet.isHidden = true
+            // there is no sensor startdate/max days so we can't report sensor progress
+            sensorProgressViewOutlet.isHidden = true
+            
+            // the above means we must be in follower mode, so let's set the connection status
+            setFollowerConnectionStatus()
+            
+            if !isMaster {
+                
+                if UserDefaults.standard.followerDataSourceType == .nightscout && UserDefaults.standard.nightScoutUrl != "" {
+                    
+                    var nightScoutUrlString: String = UserDefaults.standard.nightScoutUrl ?? ""
+                    
+                    // let's use a shortened version of the url if necessary to display it cleanly in the UI. The main reason is that some of the newer service providers (such as Northflank and Google Cloud) use really long URLs as standard.
+                    if nightScoutUrlString.count > 36 {
+                        nightScoutUrlString = nightScoutUrlString.replacingOccurrences(of: nightScoutUrlString.dropFirst(33), with: "...")
+                    }
+                    
+                    dataSourceLabelOutlet.text = UserDefaults.standard.followerDataSourceType.fullDescription
+                    dataSourceKeepAliveLabelOutlet.text = UserDefaults.standard.followerBackgroundKeepAliveType.bracketedAbbreviation
+                    dataSourceSensorCurrentAgeOutlet.text = ""
+                    dataSourceSensorMaxAgeOutlet.textColor = .darkGray
+                    dataSourceSensorMaxAgeOutlet.text = nightScoutUrlString
+                    
+                } else if UserDefaults.standard.followerDataSourceType == .libreLinkUp {
+                    
+                    dataSourceLabelOutlet.text = UserDefaults.standard.followerDataSourceType.fullDescription + " (" + Texts_HomeView.noSensorData + ")"
+                    dataSourceKeepAliveLabelOutlet.text = UserDefaults.standard.followerBackgroundKeepAliveType.bracketedAbbreviation
+                    dataSourceSensorCurrentAgeOutlet.text = ""
+                    dataSourceSensorMaxAgeOutlet.text = ""
+                    
+                }
+                
+            } else {
+                
+                dataSourceLabelOutlet.textColor = .systemRed
+                dataSourceLabelOutlet.text = " ⚠️  " + Texts_HomeView.noDataSourceConnected
+                dataSourceKeepAliveLabelOutlet.text = ""
+                dataSourceSensorCurrentAgeOutlet.text = ""
+                dataSourceSensorMaxAgeOutlet.text = ""
+                
+            }
+            
+        }
+        
+    }
+    
+    
+    /// this should be called when the data source view is refreshed or when called by the followerConnectionTimer object
+    @objc private func setFollowerConnectionStatus() {
+        
+        // if in master mode, hide the connection status and destroy the timer if it was initialized
+        // (for example if the user just changed from follower to master)
+        if UserDefaults.standard.isMaster {
+            
+            dataSourceConnectionStatusImage.isHidden = true
+            
+            if followerConnectionTimer != nil {
+                
+                followerConnectionTimer?.invalidate()
+                followerConnectionTimer = nil
+                
+            }
+            
+            return
+            
+        } else {
+            
+            dataSourceConnectionStatusImage.isHidden = false
+            
+            // we're in follower mode so if the timer isn't initialized, then let's start it
+            if followerConnectionTimer == nil {
+                
+                // set a timer instance to update the connection status for follower modes
+                followerConnectionTimer = Timer.scheduledTimer(timeInterval: ConstantsFollower.secondsUsedByFollowerConnectionTimer, target: self, selector: #selector(setFollowerConnectionStatus), userInfo: nil, repeats:true)
+                
+            }
+            
+        }
+        
+        // check when the last follower connection was and compare that to the actual time
+        if let timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection, let timeDifferenceInSeconds = Calendar.current.dateComponents([.second], from: timeStampOfLastFollowerConnection, to: Date()).second {
+            
+            // show "disconnected" if over the limit defined in the constants file
+            if timeDifferenceInSeconds >= UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning {
+                
+                dataSourceConnectionStatusImage.image = UIImage(systemName: "network.slash")
+                dataSourceConnectionStatusImage.tintColor = .gray
+                
+            } else {
+                
+                dataSourceConnectionStatusImage.image = UIImage(systemName: "network")
+                dataSourceConnectionStatusImage.tintColor = .systemGreen
+                
+            }
             
         }
         
@@ -3174,8 +3328,8 @@ final class RootViewController: UIViewController, ObservableObject {
         // asign nil to activeSensor
         self.activeSensor = nil
         
-        // now that the activeSensor object has been destroyed, update (hide) the sensor info
-        updateSensorInfoView(animate: false)
+        // now that the activeSensor object has been destroyed, update (hide) the data source info
+        updateDataSourceInfo(animate: false)
 
     }
     
@@ -3480,8 +3634,8 @@ extension RootViewController: FollowerDelegate {
                 // update statistics related outlets
                 updateStatistics(animate: false)
                 
-                // update sensor info. No need to animate for a simple update
-                updateSensorInfoView(animate: false)
+                // update data source info. No need to animate for a simple update
+                updateDataSourceInfo(animate: false)
                 
                 // if we're downloading follower data from something other
                 // than Nightscout, then let's upload it to Nightscout

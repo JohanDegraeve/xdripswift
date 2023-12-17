@@ -4,6 +4,25 @@
 "settingsviews_masterorfollower" = "Master o Seguidor?";
 "settingsviews_master" = "Master";
 "settingsviews_follower" = "Seguidor";
+
+"settingsviews_sectionTitleDataSource" = "Fuente de datos MGC";
+"settingsviews_labelFollowerDataSourceType" = "Fuente de datos de seguidor";
+"settingsviews_labelUploadFollowerDataToNightscout" = "Subir a Nightscout?";
+"settingsviews_labelfollowerKeepAliveType" = "Mantener en segundo plano";
+"settingsviews_followerKeepAliveTypeDisabled" = "Deshabilitado";
+"settingsviews_followerKeepAliveTypeNormal" = "Normal";
+"settingsviews_followerKeepAliveTypeAggressive" = "Agresivo";
+"settingsviews_followerKeepAliveTypeDisabledMessage" = "Mantener en segundo plan está deshabilitado.\n\nCuando la aplicación no está en primer plano, no habrá notificaciones, alarmas, valores de glucosa en el icono de la app ni habrá actualizaciones de los valores de glucosa.\n\nLa aplicación permanecerá durmiendo hasta que la abras de nuevo.\n\nEste modo tiene un impacto mínimo en la batería de tu dispositivo.";
+"settingsviews_followerKeepAliveTypeNormalMessage" = "Mantener en segundo plan está en modo normal.\n\nCuando la app está en segundo plano, intentaremos mantenerla funcionando para que reciba actualizaciones de los valores de glucosa y que sea posible saltar alarmas y notificaciones.\n\nEste modo consume bastante batería.";
+"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Mantener en segundo plan está en modo agresivo.\n\nCuando la app está en segundo plano, intentaremos, de forma agresiva, mantenerla funcionando para que reciba actualizaciones de los valores de glucosa y que sea posible saltar alarmas y notificaciones.\n\nEste modo consume mucha batería.";
+"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload follower BG values to Nightscout, you must enable it in the Nightscout section.";
+"settingsviews_nightscoutNotEnabledRowText" = "Deshabilitado";
+"settingsviews_labelFollowerDataSourceRegion" = "Servidor (País)";
+"settingsviews_enterUsername" = "Entrar tu usuario (e-mail)";
+"settingsviews_enterPassword" = "Entrar tu contraseña";
+"settingsviews_libreLinkUpReAcceptNeeded" = "Aceptar terminos";
+"settingsviews_libreLinkUpNoActiveSensor" = "Sin sensor activo";
+
 "settingsviews_translateOnlineHelp" = "Traducir Documentación?";
 "settingsviews_showHelpIcon" = "Mostrar icono?";
 "settingsviews_restartNeeded" = "(Pendiente reiniciar)";

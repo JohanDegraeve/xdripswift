@@ -23,12 +23,35 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
     var description: String {
         switch self {
         case .disabled:
-            return "Disabled"
+            return Texts_SettingsView.followerKeepAliveTypeDisabled
         case .normal:
-            return "Normal"
+            return Texts_SettingsView.followerKeepAliveTypeNormal
         case .aggressive:
-            return "Aggresive"
+            return Texts_SettingsView.followerKeepAliveTypeAggressive
         }
+    }
+    
+    var abbreviation: String {
+        switch self {
+        case .disabled:
+            return "D"
+        case .normal:
+            return "N"
+        case .aggressive:
+            return "A"
+        }
+    }
+    
+    var bracketedAbbreviation: String {
+        return "[" + self.abbreviation + "]"
+    }
+    
+    var bracketedKeepAliveDescription: String {
+        return "[Keep-alive: " + self.description + "]"
+    }
+    
+    var bracketedKeepAliveAbbreviation: String {
+        return "[KA: " + self.abbreviation + "]"
     }
     
 }
