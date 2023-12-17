@@ -25,7 +25,7 @@
 "settingsviews_transmitterid" = "Transmetteur ID";
 "settingsviews_transmitterid_text_for_button" = "Transmetteur ID";
 "settingsviews_givetransmitterid" = "Entrer Transmetteur ID";
-"settingsviews_resettransmitter" = "Réinitialiser Transmetteur";
+"settingsviews_resettransmitter" = "Réinitialiser Transmetteur (Anubis)";
 "settingsviews_sectiontitlealerting" = "Alarme";
 "settingsviews_row_alert_types" = "Types d'alarme";
 "settingsviews_row_alerts" = "Alarmes";

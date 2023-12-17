@@ -28,7 +28,7 @@
 "settingsviews_useIFCCA1C" = "Toon HbA1c in mmols/mol?";
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 "settingsviews_givetransmitterid" = "Voer Transmitter ID In";
-"settingsviews_resettransmitter" = "Reset Transmitter";
+"settingsviews_resettransmitter" = "Reset Transmitter (Anubis)";
 "settingsviews_nonfixedtransmitter" = "Schakel Meerpuntskalibratie In?";
 "settingsviews_labelNonFixed" = "Meerpuntskalibratie";
 "settingsviews_sectiontitlealerting" = "Alarmen";

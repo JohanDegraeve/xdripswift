@@ -130,7 +130,7 @@
 "m5stack_settingsviews_textColor" = "Text Color";
 
 /// transmitter settings, to explain that settings is about resetting the transmitter
-"settingsviews_resettransmitter" = "Reset Transmitter";
+"settingsviews_resettransmitter" = "Reset Transmitter (Anubis only)";
 
 /// general settings, should reading be multiplied with 10 yes or no
 "settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10?";

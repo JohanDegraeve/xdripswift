@@ -37,7 +37,7 @@
 "settingsviews_transmitterid" = "Transmitter ID";
 "settingsviews_transmitterid_text_for_button"  = "Transmitter ID";
 "settingsviews_givetransmitterid" = "Enter Transmitter ID";
-"settingsviews_resettransmitter" = "Reset Transmitter";
+"settingsviews_resettransmitter" = "Reset Transmitter (Anubis only)";
 "settingsviews_webooptransmitter" = "Use Transmitter Algorithm?";
 "settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration?";
 "settingsviews_labelNonFixed" = "Multi-point Calibration";
