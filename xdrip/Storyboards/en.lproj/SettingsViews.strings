@@ -34,6 +34,11 @@
 "settingsviews_allowScreenRotation" = "Allow Chart Rotation?";
 "settingsviews_showMiniChart" = "Show the Mini-Chart?";
 "settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked?";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked?";
+"settingsviews_screenLockDimmingTypeDisabled" = "Disabled";
+"settingsviews_screenLockDimmingTypeDimmed" = "Dimmed";
+"settingsviews_screenLockDimmingTypeDark" = "Dark";
+"settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
 "settingsviews_urgentHighValue" = "Urgent High Value";
 "settingsviews_highValue" = "High Value";
 "settingsviews_targetValue" = "Target Value";

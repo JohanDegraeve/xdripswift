@@ -162,6 +162,22 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_screenLockDimmingTypeWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Dim Screen when Locked?", comment: "home screen settings, should the screen be dimmed when the screen is locked?")
     }()
     
+    static let screenLockDimmingTypeDisabled: String = {
+        return NSLocalizedString("settingsviews_screenLockDimmingTypeDisabled", tableName: filename, bundle: Bundle.main, value: "Disabled", comment: "screen dimming is disabled")
+    }()
+    
+    static let screenLockDimmingTypeDimmed: String = {
+        return NSLocalizedString("settingsviews_screenLockDimmingTypeDimmed", tableName: filename, bundle: Bundle.main, value: "Dimmed", comment: "screen dimming is dimmed")
+    }()
+    
+    static let screenLockDimmingTypeDark: String = {
+        return NSLocalizedString("settingsviews_screenLockDimmingTypeDark", tableName: filename, bundle: Bundle.main, value: "Dark", comment: "screen dimming is dark")
+    }()
+    
+    static let screenLockDimmingTypeVeryDark: String = {
+        return NSLocalizedString("settingsviews_screenLockDimmingTypeVeryDark", tableName: filename, bundle: Bundle.main, value: "Very Dark", comment: "screen dimming is very dark")
+    }()
+    
     static let allowScreenRotation: String = {
         return NSLocalizedString("settingsviews_allowScreenRotation", tableName: filename, bundle: Bundle.main, value: "Allow Chart Rotation?", comment: "home screen settings, should the main glucose chart screen be allowed?")
     }()

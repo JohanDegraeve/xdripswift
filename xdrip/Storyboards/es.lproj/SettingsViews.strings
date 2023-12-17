@@ -22,7 +22,6 @@
 "settingsviews_enterPassword" = "Entrar tu contraseña";
 "settingsviews_libreLinkUpReAcceptNeeded" = "Aceptar terminos";
 "settingsviews_libreLinkUpNoActiveSensor" = "Sin sensor activo";
-
 "settingsviews_translateOnlineHelp" = "Traducir Documentación?";
 "settingsviews_showHelpIcon" = "Mostrar icono?";
 "settingsviews_restartNeeded" = "(Pendiente reiniciar)";
@@ -30,6 +29,11 @@
 "settingsviews_labelShowReadingInAppBadge" = "Mostrar en el icono de la app?";
 "settingsviews_multipleAppBadgeValueWith10" = "Multiplicar valor por 10 en el icono de la app?";
 "settingsviews_showClockWhenScreenIsLocked" = "Mostrar reloj al bloquear?";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Oscurecer pantalla?";
+"settingsviews_screenLockDimmingTypeDisabled" = "Deshabilitado";
+"settingsviews_screenLockDimmingTypeDimmed" = "Atenuado";
+"settingsviews_screenLockDimmingTypeDark" = "Oscuro";
+"settingsviews_screenLockDimmingTypeVeryDark" = "Muy oscuro";
 "settingsviews_urgentHighValue" = "Valor de Glucemia Alta (Urgente)";
 "settingsviews_highValue" = "Valor de Glucemia Alta";
 "settingsviews_targetValue" = "Valor Objectivo";
@@ -88,6 +92,8 @@
 "settingsviews_speakDelta" = "Anunciar Delta";
 "settingsviews_IntervalTitle" = "Intervalo entre notificaciones";
 "settingsviews_IntervalMessage" = "Intervalo mínimo entre dos notificaciones (mins)";
+"settingsviews_allowScreenRotation" = "Permitir rotación?";
+"settingsviews_showMiniChart" = "Mostrar la mini-gráfica?";
 "settingsviews_Version" = "Versión";
 "settingsviews_license" = "Licencia";
 "settingsviews_build" = "Compilación";

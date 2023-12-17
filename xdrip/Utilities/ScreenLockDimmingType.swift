@@ -33,13 +33,13 @@ public enum ScreenLockDimmingType: Int, CaseIterable {
         switch self {
             
         case .disabled:
-            return "Disabled"
+            return Texts_SettingsView.screenLockDimmingTypeDisabled
         case .dimmed:
-            return "Dimmed"
+            return Texts_SettingsView.screenLockDimmingTypeDimmed
         case .dark:
-            return "Dark"
+            return Texts_SettingsView.screenLockDimmingTypeDark
         case .veryDark:
-            return "Very Dark"
+            return Texts_SettingsView.screenLockDimmingTypeVeryDark
             
         }
         
