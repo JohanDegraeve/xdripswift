@@ -860,11 +860,14 @@ final class RootViewController: UIViewController, ObservableObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showClockWhenScreenIsLocked.rawValue, options: .new, context: nil)
         
         
-        // high mark , low mark , urgent high mark, urgent low mark. change requires redraw of graph
+        // high mark , low mark , urgent high mark, urgent low mark. change requires redraw of chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.urgentLowMarkValue.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.lowMarkValue.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.highMarkValue.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.urgentHighMarkValue.rawValue, options: .new, context: nil)
+        
+        // updating the offset carbs on chart requires a redraw of the chart
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.offsetCarbTreatmentsOnChart.rawValue, options: .new, context: nil)
 
         // add observer for nightScoutTreatmentsUpdateCounter, to reload the chart whenever a treatment is added or updated or deleted changes
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
@@ -1545,6 +1548,11 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // update Watch App with the new objective values
             updateWatchApp()
+            
+        case UserDefaults.Key.offsetCarbTreatmentsOnChart:
+            
+            // redraw chart is necessary
+            updateChartWithResetEndDate()
             
         case UserDefaults.Key.showMiniChart:
             

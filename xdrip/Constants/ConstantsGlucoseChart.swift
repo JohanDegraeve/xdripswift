@@ -141,7 +141,7 @@ enum ConstantsGlucoseChart {
     static let smallCarbsTreamentThreshold: CGFloat = 6.0
     
     /// The scale will determine how big the smallCarbs circle is scaled compared to the glucose point size)
-    static let smallCarbsTreamentScale: CGFloat = 2.5
+    static let smallCarbsTreamentScale: CGFloat = 2.3
     
     /// threshold below which carbs will be added to the mediumCarbs array (if not previously added to another array)
     static let mediumCarbsTreamentThreshold: CGFloat = 15.0
@@ -150,7 +150,7 @@ enum ConstantsGlucoseChart {
     static let mediumCarbsTreamentScale: CGFloat = 3.3
     
     /// threshold below which carbs will be added to the largeCarbs array (if not previously added to another array)
-    static let largeCarbsTreamentThreshold: CGFloat = 35.0
+    static let largeCarbsTreamentThreshold: CGFloat = 45.0
     
     /// The scale will determine how big the largeCarbs circle is scaled compared to the glucose point size)
     static let largeCarbsTreamentScale: CGFloat = 4.5
@@ -190,16 +190,19 @@ enum ConstantsGlucoseChart {
     static let mediumBolusLabelSeparation: Double = 8
     
     /// how far should the label be separated from the smallCarbs marker by default
-    static let smallCarbsLabelSeparation: Double = 8
+    static let smallCarbsLabelSeparation: Double = 7
     
     /// how far should the label be separated from the mediumCarbs marker by default
     static let mediumCarbsLabelSeparation: Double = 9
     
     /// how far should the label be separated from the largeCarbs marker by default
-    static let largeCarbsLabelSeparation: Double = 10
+    static let largeCarbsLabelSeparation: Double = 11
     
     /// how far should the label be separated from the veryLargeCarbs marker by default
-    static let veryLargeCarbsLabelSeparation: Double = 12
+    static let veryLargeCarbsLabelSeparation: Double = 15
+    
+    /// amount (in mg/dL) the carb marker be offset from the BG value marker if enabled
+    static let offsetCarbPositionFromBgMarker: Double = 25
     
     // chart format parameters
     

@@ -112,6 +112,8 @@ extension UserDefaults {
         case showCarbsTreatmentsInList = "showCarbsTreatmentsInList"
         /// should the BG Checks be listed in the treatment list/table?
         case showBgCheckTreatmentsInList = "showBgCheckTreatmentsInList"
+        /// should the carbs be offset in the main chart?
+        case offsetCarbTreatmentsOnChart = "offsetCarbTreatmentsOnChart"
         
         // Statistics settings
         
@@ -1051,6 +1053,17 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.showSmallBolusTreatmentsOnChart.rawValue)
+        }
+    }
+    
+    /// should the app show carb treatments with an offset?
+    @objc dynamic var offsetCarbTreatmentsOnChart: Bool {
+        // default value for bool in userdefaults is false, by default we want the app to *not* offset the carb treatments on the chart
+        get {
+            return bool(forKey: Key.offsetCarbTreatmentsOnChart.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.offsetCarbTreatmentsOnChart.rawValue)
         }
     }
     
