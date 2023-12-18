@@ -871,7 +871,7 @@
                                                 <rect key="frame" x="10" y="-49" width="370" height="128"/>
                                                 <subviews>
                                                     <stackView opaque="NO" contentMode="scaleAspectFit" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="mUG-hy-KPp">
-                                                        <rect key="frame" x="0.0" y="0.0" width="166.66666666666666" height="128"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="129" height="128"/>
                                                         <subviews>
                                                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="txf-6L-J3o">
                                                                 <rect key="frame" x="0.0" y="2.3333333333333286" width="18.666666666666668" height="125"/>
@@ -891,16 +891,10 @@
                                                                 <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                                 <nil key="highlightedColor"/>
                                                             </label>
-                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=" [KA]" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vWu-xl-jan">
-                                                                <rect key="frame" x="134" y="0.0" width="32.666666666666657" height="128"/>
-                                                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                                                <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                                <nil key="highlightedColor"/>
-                                                            </label>
                                                         </subviews>
                                                     </stackView>
                                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cCO-Da-Sim">
-                                                        <rect key="frame" x="166.66666666666666" y="0.0" width="111.99999999999997" height="128"/>
+                                                        <rect key="frame" x="129" y="0.0" width="149.66666666666663" height="128"/>
                                                     </stackView>
                                                     <stackView opaque="NO" contentMode="scaleAspectFit" translatesAutoresizingMaskIntoConstraints="NO" id="Oq3-9F-ifA">
                                                         <rect key="frame" x="278.66666666666669" y="0.0" width="91.333333333333314" height="128"/>
@@ -970,7 +964,6 @@
                         <outlet property="cvTitleLabelOutlet" destination="PZI-Ln-kfh" id="IKV-zy-dNM"/>
                         <outlet property="dataSourceConnectionStatusImage" destination="txf-6L-J3o" id="J5T-UJ-wzy"/>
                         <outlet property="dataSourceKeepAliveImageOutlet" destination="VW3-lv-4DN" id="rWr-Rl-Sdt"/>
-                        <outlet property="dataSourceKeepAliveLabelOutlet" destination="vWu-xl-jan" id="96E-vK-oPh"/>
                         <outlet property="dataSourceLabelOutlet" destination="4Ve-eo-sIm" id="YyS-Z4-Cna"/>
                         <outlet property="dataSourceSensorCurrentAgeOutlet" destination="RjD-g3-buh" id="CAs-AV-O3k"/>
                         <outlet property="dataSourceSensorMaxAgeOutlet" destination="oCH-fb-w0S" id="11E-9a-K2M"/>

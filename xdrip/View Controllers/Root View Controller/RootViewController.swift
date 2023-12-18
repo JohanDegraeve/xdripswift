@@ -217,7 +217,6 @@ final class RootViewController: UIViewController, ObservableObject {
     @IBOutlet weak var dataSourceConnectionStatusImage: UIImageView!
     @IBOutlet weak var dataSourceLabelOutlet: UILabel!
     @IBOutlet weak var dataSourceKeepAliveImageOutlet: UIImageView!
-    @IBOutlet weak var dataSourceKeepAliveLabelOutlet: UILabel!
     @IBOutlet weak var dataSourceSensorCurrentAgeOutlet: UILabel!
     @IBOutlet weak var dataSourceSensorMaxAgeOutlet: UILabel!
     
@@ -225,36 +224,41 @@ final class RootViewController: UIViewController, ObservableObject {
     /// this is to allow a user to make screenshots etc without any personal information
     @IBAction func urlDoubleTapGestureRecognizerAction(_ sender: UITapGestureRecognizer) {
         
-        dataSourceSensorMaxAgeOutlet.textColor = .systemRed
-        self.dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.hidingUrlForXSeconds
-        
-        // wait and then fade out the text
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+        // make sure we only act on the gesture if we're in Nightscout follower mode (i.e. with the URL visible)
+        if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .nightscout {
             
-            // make a animated transition with the label. Fade it out over a couple of seconds.
-            UIView.transition(with: self.miniChartHoursLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
+            dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+            dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.hidingUrlForXSeconds
+            
+            // wait and then fade out the text
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
                 
-                self.dataSourceSensorMaxAgeOutlet.alpha = 0
-                
-            }, completion: { _ in
-                
-                // wait for a some time and then put the URL back as it was
-                DispatchQueue.main.asyncAfter(deadline: .now() + Double(ConstantsHomeView.hideUrlDuringTimeInSeconds)) {
+                // make a animated transition with the label. Fade it out over a couple of seconds.
+                UIView.transition(with: self.miniChartHoursLabelOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
                     
-                    // just copied directly from updateDataSourceInfo()
-                    var nightScoutUrlString: String = UserDefaults.standard.nightScoutUrl ?? ""
+                    self.dataSourceSensorMaxAgeOutlet.alpha = 0
                     
-                    if nightScoutUrlString.count > 36 {
-                        nightScoutUrlString = nightScoutUrlString.replacingOccurrences(of: nightScoutUrlString.dropFirst(33), with: "...")
+                }, completion: { _ in
+                    
+                    // wait for a some time and then put the URL back as it was
+                    DispatchQueue.main.asyncAfter(deadline: .now() + Double(ConstantsHomeView.hideUrlDuringTimeInSeconds)) {
+                        
+                        // just copied directly from updateDataSourceInfo()
+                        var nightScoutUrlString: String = UserDefaults.standard.nightScoutUrl ?? ""
+                        
+                        if nightScoutUrlString.count > 36 {
+                            nightScoutUrlString = nightScoutUrlString.replacingOccurrences(of: nightScoutUrlString.dropFirst(33), with: "...")
+                        }
+                        
+                        self.dataSourceSensorMaxAgeOutlet.alpha = 1
+                        self.dataSourceSensorMaxAgeOutlet.textColor = .systemGray
+                        self.dataSourceSensorMaxAgeOutlet.text = nightScoutUrlString
+                        
                     }
                     
-                    self.dataSourceSensorMaxAgeOutlet.alpha = 1
-                    self.dataSourceSensorMaxAgeOutlet.textColor = .systemGray
-                    self.dataSourceSensorMaxAgeOutlet.text = nightScoutUrlString
-                    
-                }
+                })
                 
-            })
+            }
             
         }
         
@@ -2959,7 +2963,6 @@ final class RootViewController: UIViewController, ObservableObject {
         let isMaster: Bool = UserDefaults.standard.isMaster
         
         // reset relevant labels colors just in case they were changed the previous time this function was called
-        dataSourceLabelOutlet.textColor = .lightGray
         dataSourceSensorMaxAgeOutlet.textColor = .lightGray
         
         // some calls to this function (such as when bringing the homescreen to the foreground) can specify to animate the progress view.
@@ -3098,42 +3101,45 @@ final class RootViewController: UIViewController, ObservableObject {
             // the above means we must be in follower mode, so let's set the connection status
             setFollowerConnectionStatus()
             
+            // set the keep-alive image, then make it visible if in follower mode
+            dataSourceKeepAliveImageOutlet.image = UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImage
+            dataSourceKeepAliveImageOutlet.isHidden = isMaster
+            
+            dataSourceSensorCurrentAgeOutlet.text = ""
+            dataSourceSensorMaxAgeOutlet.text = ""
+            
             if !isMaster {
                 
-                if UserDefaults.standard.followerDataSourceType == .nightscout && UserDefaults.standard.nightScoutUrl != "" {
+                dataSourceLabelOutlet.text = UserDefaults.standard.followerDataSourceType.fullDescription
+                
+                switch UserDefaults.standard.followerDataSourceType {
                     
-                    var nightScoutUrlString: String = UserDefaults.standard.nightScoutUrl ?? ""
+                case .nightscout:
                     
-                    // let's use a shortened version of the url if necessary to display it cleanly in the UI. The main reason is that some of the newer service providers (such as Northflank and Google Cloud) use really long URLs as standard.
-                    if nightScoutUrlString.count > 36 {
-                        nightScoutUrlString = nightScoutUrlString.replacingOccurrences(of: nightScoutUrlString.dropFirst(33), with: "...")
+                    if UserDefaults.standard.nightScoutUrl != "" {
+                        
+                        var nightScoutUrlString: String = UserDefaults.standard.nightScoutUrl ?? ""
+                        
+                        // let's use a shortened version of the url if necessary to display it cleanly in the UI. The main reason is that some of the newer service providers (such as Northflank and Google Cloud) use really long URLs as standard.
+                        if nightScoutUrlString.count > 36 {
+                            nightScoutUrlString = nightScoutUrlString.replacingOccurrences(of: nightScoutUrlString.dropFirst(33), with: "...")
+                        }
+                        
+                        dataSourceSensorMaxAgeOutlet.textColor = .systemGray
+                        dataSourceSensorMaxAgeOutlet.text = nightScoutUrlString
+                        
                     }
+                   
+                case .libreLinkUp:
                     
-                    dataSourceLabelOutlet.text = UserDefaults.standard.followerDataSourceType.fullDescription
-                    dataSourceKeepAliveLabelOutlet.text = "" //UserDefaults.standard.followerBackgroundKeepAliveType.bracketedAbbreviation
-                    dataSourceKeepAliveImageOutlet.image = UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImage
-                    dataSourceSensorCurrentAgeOutlet.text = ""
-                    dataSourceSensorMaxAgeOutlet.textColor = .systemGray
-                    dataSourceSensorMaxAgeOutlet.text = nightScoutUrlString
-                    
-                } else if UserDefaults.standard.followerDataSourceType == .libreLinkUp {
-                    
-                    dataSourceLabelOutlet.text = UserDefaults.standard.followerDataSourceType.fullDescription + " (" + Texts_HomeView.noSensorData + ")"
-                    dataSourceKeepAliveLabelOutlet.text = "" //UserDefaults.standard.followerBackgroundKeepAliveType.bracketedAbbreviation
-                    dataSourceKeepAliveImageOutlet.image = UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImage
-                    dataSourceSensorCurrentAgeOutlet.text = ""
-                    dataSourceSensorMaxAgeOutlet.text = ""
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    dataSourceSensorMaxAgeOutlet.text = " (" + Texts_HomeView.noSensorData + ")"
                     
                 }
                 
             } else {
                 
-                dataSourceLabelOutlet.textColor = .systemRed
                 dataSourceLabelOutlet.text = " ⚠️  " + Texts_HomeView.noDataSourceConnected
-                dataSourceKeepAliveLabelOutlet.text = ""
-                dataSourceKeepAliveImageOutlet.isHidden = true
-                dataSourceSensorCurrentAgeOutlet.text = ""
-                dataSourceSensorMaxAgeOutlet.text = ""
                 
             }
             
