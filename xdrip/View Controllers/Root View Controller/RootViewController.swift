@@ -216,6 +216,7 @@ final class RootViewController: UIViewController, ObservableObject {
     @IBOutlet weak var dataSourceViewOutlet: UIView!
     @IBOutlet weak var dataSourceConnectionStatusImage: UIImageView!
     @IBOutlet weak var dataSourceLabelOutlet: UILabel!
+    @IBOutlet weak var dataSourceKeepAliveImageOutlet: UIImageView!
     @IBOutlet weak var dataSourceKeepAliveLabelOutlet: UILabel!
     @IBOutlet weak var dataSourceSensorCurrentAgeOutlet: UILabel!
     @IBOutlet weak var dataSourceSensorMaxAgeOutlet: UILabel!
@@ -224,7 +225,7 @@ final class RootViewController: UIViewController, ObservableObject {
     /// this is to allow a user to make screenshots etc without any personal information
     @IBAction func urlDoubleTapGestureRecognizerAction(_ sender: UITapGestureRecognizer) {
         
-        dataSourceSensorMaxAgeOutlet.textColor = .systemYellow
+        dataSourceSensorMaxAgeOutlet.textColor = .systemRed
         self.dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.hidingUrlForXSeconds
         
         // wait and then fade out the text
@@ -248,7 +249,7 @@ final class RootViewController: UIViewController, ObservableObject {
                     }
                     
                     self.dataSourceSensorMaxAgeOutlet.alpha = 1
-                    self.dataSourceSensorMaxAgeOutlet.textColor = .darkGray
+                    self.dataSourceSensorMaxAgeOutlet.textColor = .systemGray
                     self.dataSourceSensorMaxAgeOutlet.text = nightScoutUrlString
                     
                 }
@@ -3109,15 +3110,17 @@ final class RootViewController: UIViewController, ObservableObject {
                     }
                     
                     dataSourceLabelOutlet.text = UserDefaults.standard.followerDataSourceType.fullDescription
-                    dataSourceKeepAliveLabelOutlet.text = UserDefaults.standard.followerBackgroundKeepAliveType.bracketedAbbreviation
+                    dataSourceKeepAliveLabelOutlet.text = "" //UserDefaults.standard.followerBackgroundKeepAliveType.bracketedAbbreviation
+                    dataSourceKeepAliveImageOutlet.image = UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImage
                     dataSourceSensorCurrentAgeOutlet.text = ""
-                    dataSourceSensorMaxAgeOutlet.textColor = .darkGray
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemGray
                     dataSourceSensorMaxAgeOutlet.text = nightScoutUrlString
                     
                 } else if UserDefaults.standard.followerDataSourceType == .libreLinkUp {
                     
                     dataSourceLabelOutlet.text = UserDefaults.standard.followerDataSourceType.fullDescription + " (" + Texts_HomeView.noSensorData + ")"
-                    dataSourceKeepAliveLabelOutlet.text = UserDefaults.standard.followerBackgroundKeepAliveType.bracketedAbbreviation
+                    dataSourceKeepAliveLabelOutlet.text = "" //UserDefaults.standard.followerBackgroundKeepAliveType.bracketedAbbreviation
+                    dataSourceKeepAliveImageOutlet.image = UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImage
                     dataSourceSensorCurrentAgeOutlet.text = ""
                     dataSourceSensorMaxAgeOutlet.text = ""
                     
@@ -3128,6 +3131,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 dataSourceLabelOutlet.textColor = .systemRed
                 dataSourceLabelOutlet.text = " ⚠️  " + Texts_HomeView.noDataSourceConnected
                 dataSourceKeepAliveLabelOutlet.text = ""
+                dataSourceKeepAliveImageOutlet.isHidden = true
                 dataSourceSensorCurrentAgeOutlet.text = ""
                 dataSourceSensorMaxAgeOutlet.text = ""
                 
@@ -3177,7 +3181,7 @@ final class RootViewController: UIViewController, ObservableObject {
             if timeDifferenceInSeconds >= UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning {
                 
                 dataSourceConnectionStatusImage.image = UIImage(systemName: "network.slash")
-                dataSourceConnectionStatusImage.tintColor = .gray
+                dataSourceConnectionStatusImage.tintColor = .systemGray
                 
             } else {
                 

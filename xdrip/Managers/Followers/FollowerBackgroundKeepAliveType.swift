@@ -31,27 +31,15 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
         }
     }
     
-    var abbreviation: String {
+    var keepAliveImage: UIImage {
         switch self {
         case .disabled:
-            return "D"
+            return UIImage(systemName: "d.circle") ?? UIImage()
         case .normal:
-            return "N"
+            return UIImage(systemName: "n.circle") ?? UIImage()
         case .aggressive:
-            return "A"
+            return UIImage(systemName: "a.circle") ?? UIImage()
         }
-    }
-    
-    var bracketedAbbreviation: String {
-        return "[" + self.abbreviation + "]"
-    }
-    
-    var bracketedKeepAliveDescription: String {
-        return "[Keep-alive: " + self.description + "]"
-    }
-    
-    var bracketedKeepAliveAbbreviation: String {
-        return "[KA: " + self.abbreviation + "]"
     }
     
 }
