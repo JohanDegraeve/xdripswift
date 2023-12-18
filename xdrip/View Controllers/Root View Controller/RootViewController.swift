@@ -333,45 +333,32 @@ final class RootViewController: UIViewController, ObservableObject {
         
     }
     
-    @IBOutlet var chartDoubleTapGestureRecognizerOutlet: UITapGestureRecognizer!
-    
     
     @IBAction func miniChartDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
-        
         
         // move the days range to the next one (or back to the first one) and also set the text. We'll use "24 hours" for the first range (to make it clear it's not a full day, but the last 24 hours), but to keep the UI simpler, we'll use "x days" for the rest.
         switch UserDefaults.standard.miniChartHoursToShow {
             
         case ConstantsGlucoseChart.miniChartHoursToShow1:
-            
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow2
-            
             miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow / 24).description + " " + Texts_Common.days
             
         case ConstantsGlucoseChart.miniChartHoursToShow2:
-            
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow3
-            
             miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow / 24).description + " " + Texts_Common.days
             
         case ConstantsGlucoseChart.miniChartHoursToShow3:
-            
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow4
-            
             miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow / 24).description + " " + Texts_Common.days
             
         case ConstantsGlucoseChart.miniChartHoursToShow4:
-            
             // we're already on the last range, so roll back to the first range
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
-            
             miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow).description + " " + Texts_Common.hours
             
         // the default will never get resolved as there is always an expected value assigned, but we need to include it to keep the compiler happy
         default:
-            
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
-            
             miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow).description + " " + Texts_Common.hours
             
         }
@@ -391,6 +378,53 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     @IBOutlet var miniChartDoubleTapGestureRecognizer: UITapGestureRecognizer!
+    
+    /// can be used as a shortcut to switch between TIR and TITR calculation methods. The user will be notified of the change via UI transitions to show what has changed in the calculation limits
+    @IBAction func statisticsViewDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
+        
+        // the userdefault will be changed due to the double tap
+        let useTITR = !UserDefaults.standard.useTITRStatisticsRange
+        
+        UserDefaults.standard.useTITRStatisticsRange = useTITR
+        
+        updateStatistics(animate: false)
+        
+        let normalTitleColor: UIColor = lowTitleLabelOutlet.textColor
+        let normalLimitValueColor: UIColor = lowLabelOutlet.textColor
+        
+        inRangeTitleLabelOutlet.textColor = ConstantsStatistics.highlightColorTitles
+        
+        if ConstantsStatistics.standardisedLowValueForTIRInMgDl != ConstantsStatistics.standardisedLowValueForTITRInMgDl {
+            
+            self.lowLabelOutlet.textColor = ConstantsStatistics.labelLowColor
+        }
+        
+        
+        if ConstantsStatistics.standardisedHighValueForTIRInMgDl != ConstantsStatistics.standardisedHighValueForTITRInMgDl {
+            
+            self.highLabelOutlet.textColor = ConstantsStatistics.labelHighColor
+            
+        }
+        
+        // wait a short while and then fade the labels back out
+        // even if the label colours weren't changed, it's easier to just fade them all every time.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            
+            UIView.transition(with: self.inRangeTitleLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
+                self.inRangeTitleLabelOutlet.textColor = normalTitleColor
+            })
+            
+            UIView.transition(with: self.lowLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
+                self.lowLabelOutlet.textColor = normalLimitValueColor
+            })
+            
+            UIView.transition(with: self.highLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
+                self.highLabelOutlet.textColor = normalLimitValueColor
+            })
+            
+        }
+        
+    }
     
     /// function which is triggered when hideCoverView is called
     @objc func handleTapCoverView(_ sender: UITapGestureRecognizer) {
@@ -2497,7 +2531,8 @@ final class RootViewController: UIViewController, ObservableObject {
         
     }
     
-    // a long function just to get the timestamp of the last disconnect or reconnect. If not known then returns 1 1 1970
+    /// a long function just to get the timestamp of the last disconnect or reconnect. If not known then returns 1 1 1970
+    /// - Returns: a timestamp of the last disconnect/reconnect
     private func lastConnectionStatusChangeTimeStamp() -> Date  {
         
         // this is actually unwrapping of optionals, goal is to get date of last disconnect/reconnect - all optionals should exist so it doesn't matter what is returned true or false
@@ -2508,7 +2543,10 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     
-    // helper function to calculate the statistics and update the pie chart and label outlets
+    /// helper function to calculate the statistics and update the pie chart and label outlets
+    /// - Parameters:
+    ///   - animate: if true, will animate the drawing of the pie chart
+    ///   - overrideApplicationState: if true, it will update the statistics even if the app is, for example, in the background
     private func updateStatistics(animate: Bool = false, overrideApplicationState: Bool = false) {
         
         // don't calculate statis if app is not running in the foreground
@@ -2563,7 +2601,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // set the title labels to their correct localization
             self.lowTitleLabelOutlet.text = Texts_Common.lowStatistics
-            self.inRangeTitleLabelOutlet.text = Texts_Common.inRangeStatistics
+            self.inRangeTitleLabelOutlet.text = UserDefaults.standard.useTITRStatisticsRange ? Texts_Common.inTightRangeStatistics : Texts_Common.inRangeStatistics
             self.highTitleLabelOutlet.text = Texts_Common.highStatistics
             self.averageTitleLabelOutlet.text = Texts_Common.averageStatistics
             self.a1cTitleLabelOutlet.text = Texts_Common.a1cStatistics
@@ -2693,9 +2731,9 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     /// swaps status from locked to unlocked or vice versa, and creates alert to inform user
-    /// - parameters:
-    ///     - overrideScreenIsLocked : if true, then screen will be locked even if it's already locked. If false, then status swaps from locked to unlocked or unlocked to locked
-    ///     - nightMode : when true this parameter will be passed to the screeLockUpdate function and this will lock the screen with the screen dimming and other features activated as selected
+    /// - Parameters:
+    ///   - overrideScreenIsLocked: if true, then screen will be locked even if it's already locked. If false, then status swaps from locked to unlocked or unlocked to locked
+    ///   - nightMode: when true this parameter will be passed to the screeLockUpdate function and this will lock the screen with the screen dimming and other features activated as selected
     private func screenLockAlert(overrideScreenIsLocked: Bool = false, nightMode: Bool = true) {
         
         if !screenIsLocked || overrideScreenIsLocked {

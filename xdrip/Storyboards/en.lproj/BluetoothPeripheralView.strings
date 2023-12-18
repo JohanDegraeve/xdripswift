@@ -21,7 +21,7 @@
 "connect" = "Connect";
 "connectedAt" = "Connected At";
 "disConnectedAt" = "Disconnected At";
-"resetRequired" = "Reset Transmitter?";
+"resetRequired" = "Reset Transmitter";
 "lastReset" = "Last Reset";
 "lastResetNotKnown" = "Last Reset Timestamp is not known";
 "transmitterResultResult" = "Transmitter Reset Result";

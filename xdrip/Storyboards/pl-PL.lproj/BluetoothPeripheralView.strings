@@ -88,7 +88,7 @@
 "connectedAt" = "Connected At";
 
 /// cell text, where user can select to reset a transmitter at next connect. Only for Dexcom
-"resetRequired" = "Reset Transmitter?";
+"resetRequired" = "Reset Transmitter";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

@@ -121,8 +121,10 @@ extension UserDefaults {
         case daysToUseStatistics = "daysToUseStatistics"
         /// use IFCC way to show A1C?
         case useIFCCA1C = "useIFCCA1C"
-        /// use the "standard" range of 70-180mg/dl to calculate the statistics?
+        /// no longer used, but will leave it here to prevent compiler coredata warnings
         case useStandardStatisticsRange = "useStandardStatisticsRange"
+        /// use the newer TITR of 70-140mg/dL to calculate the statistics? If false, we will use the conventional TIR of 70-180mg/dL
+        case useTITRStatisticsRange = "useTITRStatisticsRange"
 
         // Housekeeper settings
 
@@ -1104,29 +1106,18 @@ extension UserDefaults {
     @objc dynamic var showStatistics: Bool {
         // default value for bool in userdefaults is false, by default we want the statistics view to show (true)
         get {
-            
             // check if the showStatistics key has already been previously set. If so, then just return it
             if let _ = UserDefaults.standard.object(forKey: "showStatistics") {
-                
                 return !bool(forKey: Key.showStatistics.rawValue)
-                
             } else {
-                
                 // this means that this is the first time setting the showStatistics key. To to avoid crowding the screen we want to only show the statistics view by default if the user has display zoom disabled
                 if UIScreen.main.scale < UIScreen.main.nativeScale {
-                    
                     set(true, forKey: Key.showStatistics.rawValue)
-                    
                 } else {
-                    
                     // if not, then hide it by default
-                    
                     set(false, forKey: Key.showStatistics.rawValue)
-                    
                 }
-                
                 return !bool(forKey: Key.showStatistics.rawValue)
-                
             }
         }
         set {
@@ -1155,14 +1146,25 @@ extension UserDefaults {
         }
     }
     
-    /// should the statistics view be shown on the home screen?
+    /// no longer used, but will leave it here to prevent compiler coredata warnings
     @objc dynamic var useStandardStatisticsRange: Bool {
-        // default value for bool in userdefaults is false, by default we want the statistics view to calculate using the user low+high values (false)
+        // default value for bool in userdefaults is false, by default we want the statistics view to calculate using the older-style, standardised TIR values (false)
         get {
-            return bool(forKey: Key.useStandardStatisticsRange.rawValue)
+            return bool(forKey: Key.useTITRStatisticsRange.rawValue)
         }
         set {
-            set(newValue, forKey: Key.useStandardStatisticsRange.rawValue)
+            set(newValue, forKey: Key.useTITRStatisticsRange.rawValue)
+        }
+    }
+    
+    /// use the newer TITR range of 70-140mg/dL to calculate the statistics? If false, we will use the conventional TIR range of 70-180mg/dL
+    @objc dynamic var useTITRStatisticsRange: Bool {
+        // default value for bool in userdefaults is false, by default we want the statistics view to calculate using the older-style, standardised TIR values (false)
+        get {
+            return bool(forKey: Key.useTITRStatisticsRange.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.useTITRStatisticsRange.rawValue)
         }
     }
     

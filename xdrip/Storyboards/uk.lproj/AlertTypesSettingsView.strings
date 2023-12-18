@@ -34,16 +34,16 @@
 "confirmdeletionalerttype" = "Delete Alarm Type: ";
 
 /// when editing an alert type, field title for Override Mute
-"alerttypesettingsview_overridemute" = "Override Mute?";
+"alerttypesettingsview_overridemute" = "Override Mute";
 
 /// when editing an alert type, field title for Vibrate
-"alerttypesettingsview_vibrate" = "Vibrate?";
+"alerttypesettingsview_vibrate" = "Vibrate";
 
 /// when editing an alert type, field title for Enabled
-"alerttypesettingsview_enabled" = "Enabled?";
+"alerttypesettingsview_enabled" = "Enabled";
 
 /// when editing an alert type, field title for Snooze Via Notification
-"alerttypesettingsview_snoozevianotification" = "Allow Snooze Via Notification?";
+"alerttypesettingsview_snoozevianotification" = "Allow Snooze Via Notification";
 
 /// when editing an alert type, field title for Sound
 "alerttypesettingsview_sound" = "Sound";

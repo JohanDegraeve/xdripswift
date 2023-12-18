@@ -32,8 +32,7 @@
 "settingsviews_showStatistics" = "Εμφάνιση στατιστικών;";
 "settingsviews_daysToUseStatisticsTitle" = "Μέρες για υπολογισμό;";
 "settingsviews_daysToUseStatisticsMessage" = "Μέγιστος αριθμός ημερών για στατιστικό υπολογισμό;\n\n(Εισαγάγετε 0 για υπολογισμό από σήμερα τα μεσάνυχτα)";
-"settingsviews_useStandardStatisticsRange" = "Χρήση Τυπικού εύρους;";
-"settingsviews_useIFCCA1C" = "Εμφάνιση HbA1c ως mmols/mol?";
+"settingsviews_useIFCCA1C" = "Εμφάνιση HbA1c ως mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Πομπός";
 "settingsviews_transmittertype" = "Τύπος πομπού";
 "settingsviews_transmitterid" = "Αναγνωριστικό πομπού";
@@ -58,7 +57,7 @@
 "settingsviews_giveDexcomSharePassword" = "Κοινοποίηση κωδικού πρόσβασης για κοινή χρήση Dexcom";
 "settingsviews_giveDexcomShareSerialNumber" = "Εισαγάγετε τον σειριακό αριθμό του δέκτη Dexcom";
 "settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Ενεργοποίηση του Nightscout?";
+"settingsviews_nightScoutEnabled" = "Ενεργοποίηση του Nightscout";
 "settingsviews_nightScoutUrl" = "URL";
 "settingsviews_useSchedule" = "Μεταφόρτωση με χρονοδιάγραμμα;";
 "schedule" = "Χρονοδιάγραμμα";

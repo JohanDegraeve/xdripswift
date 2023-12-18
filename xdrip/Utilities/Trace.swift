@@ -431,9 +431,6 @@ class Trace {
 
         // is use statistics on or off
         traceInfo.appendStringAndNewLine("    Show statistics: " + UserDefaults.standard.showStatistics.description)
-
-        // is statistics standard range on or off
-        traceInfo.appendStringAndNewLine("    Use standard range: " + UserDefaults.standard.useStandardStatisticsRange.description)
         
         // how many days is the user using to calculation the statistics
         traceInfo.appendStringAndNewLine("    Days to use for statistics calculations: " + UserDefaults.standard.daysToUseStatistics.description)

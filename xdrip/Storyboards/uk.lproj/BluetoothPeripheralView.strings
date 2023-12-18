@@ -70,7 +70,7 @@
 "scan" = "Scan";
 
 /// cell text, where user can select to reset a transmitter at next connect. Only for Dexcom
-"resetRequired" = "Reset Transmitter?";
+"resetRequired" = "Reset Transmitter";
 
 /// cell text, shows when last reset was done, if known. Only for Dexcom
 "lastResetNotKnown" = "Last Reset Timestamp is not known";

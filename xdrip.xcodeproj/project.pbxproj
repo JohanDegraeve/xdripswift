@@ -17,7 +17,7 @@
 		470B6199270C448100561E56 /* ExtensionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 470B6198270C448100561E56 /* ExtensionDelegate.swift */; };
 		470B619B270C448100561E56 /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 470B619A270C448100561E56 /* ComplicationController.swift */; };
 		470B619D270C448200561E56 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 470B619C270C448200561E56 /* Assets.xcassets */; };
-		470B61A1270C448200561E56 /* xDrip4iO5.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 470B6186270C448000561E56 /* xDrip4iO5.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		470B61A1270C448200561E56 /* xDrip4iO5 TEST.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 470B6186270C448000561E56 /* xDrip4iO5 TEST.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		470CE1FC246802EB00D5CB74 /* BluetoothPeripheralsView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 470CE1FE246802EB00D5CB74 /* BluetoothPeripheralsView.strings */; };
 		47150A4027F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47150A3F27F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift */; };
 		47228B152996BDD2008725DB /* BgReadingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47228B142996BDD2008725DB /* BgReadingsView.swift */; };
@@ -603,7 +603,7 @@
 			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
 			dstSubfolderSpec = 16;
 			files = (
-				470B61A1270C448200561E56 /* xDrip4iO5.app in Embed Watch Content */,
+				470B61A1270C448200561E56 /* xDrip4iO5 TEST.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -693,7 +693,7 @@
 		47046EA32A6E8BA700A6F736 /* TextsBgReadings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsBgReadings.swift; sourceTree = "<group>"; };
 		47046EA82A6E8F7B00A6F736 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BgReadings.strings; sourceTree = "<group>"; };
 		47046EAA2A6E8F8200A6F736 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/BgReadings.strings; sourceTree = "<group>"; };
-		470B6186270C448000561E56 /* xDrip4iO5.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xDrip4iO5.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		470B6186270C448000561E56 /* xDrip4iO5 TEST.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "xDrip4iO5 TEST.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		470B6189270C448000561E56 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
 		470B618B270C448100561E56 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		470B6196270C448100561E56 /* InterfaceController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InterfaceController.swift; sourceTree = "<group>"; };
@@ -2302,7 +2302,7 @@
 			children = (
 				F8AC425A21ADEBD60078C348 /* xdrip.app */,
 				F870D3D125126A49008967B0 /* xDrip4iOS Widget.appex */,
-				470B6186270C448000561E56 /* xDrip4iO5.app */,
+				470B6186270C448000561E56 /* xDrip4iO5 TEST.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3222,7 +3222,7 @@
 			);
 			name = "Watch App";
 			productName = "Watch App";
-			productReference = 470B6186270C448000561E56 /* xDrip4iO5.app */;
+			productReference = 470B6186270C448000561E56 /* xDrip4iO5 TEST.app */;
 			productType = "com.apple.product-type.application";
 		};
 		F870D3D025126A49008967B0 /* xDrip4iOS Widget */ = {

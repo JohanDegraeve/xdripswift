@@ -21,7 +21,7 @@
 "connect" = "Yhdistä";
 "connectedAt" = "Yhdistetty osoitteessa";
 "disConnectedAt" = "Yhteys katkaistu";
-"resetRequired" = "Nollaa lähetin?";
+"resetRequired" = "Nollaa lähetin";
 "lastReset" = "Viimeisin nollaus";
 "lastResetNotKnown" = "Viimeisen nollauksen aikaleima ei ole tiedossa";
 "transmitterResultResult" = "Lähettimen nollaus tulos";

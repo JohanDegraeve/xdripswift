@@ -41,6 +41,7 @@
 "invalidAccountOrPassword" = "Invalid account or password";
 "common_statistics_low" = "Low";
 "common_statistics_inRange" = "In Range";
+"common_statistics_inTightRange" = "Tight Range";
 "common_statistics_high" = "High";
 "common_statistics_average" = "Average";
 "common_statistics_a1c" = "HbA1c";

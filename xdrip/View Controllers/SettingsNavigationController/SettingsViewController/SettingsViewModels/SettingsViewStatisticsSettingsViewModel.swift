@@ -15,8 +15,8 @@ fileprivate enum Setting:Int, CaseIterable {
     //show the statistics on the home screen?
     case showStatistics = 0
     
-    //should we use the user values for High + Low, or use the standard range?
-    case useStandardStatisticsRange = 1
+    //should we use the standard range for TIR, or the newer Time in Tighter Range values?
+    case useTITRStatisticsRange = 1
     
     //urgent low value
     case useIFCCA1C = 2
@@ -35,8 +35,8 @@ struct SettingsViewStatisticsSettingsViewModel:SettingsViewModelProtocol {
         case .showStatistics:
             return UISwitch(isOn: UserDefaults.standard.showStatistics, action: {(isOn:Bool) in UserDefaults.standard.showStatistics = isOn})
                         
-        case .useStandardStatisticsRange :
-            return UISwitch(isOn: UserDefaults.standard.useStandardStatisticsRange, action: {(isOn:Bool) in UserDefaults.standard.useStandardStatisticsRange = isOn})
+        case .useTITRStatisticsRange :
+            return UISwitch(isOn: UserDefaults.standard.useTITRStatisticsRange, action: {(isOn:Bool) in UserDefaults.standard.useTITRStatisticsRange = isOn})
             
         case .useIFCCA1C :
             return UISwitch(isOn: UserDefaults.standard.useIFCCA1C, action: {(isOn:Bool) in UserDefaults.standard.useIFCCA1C = isOn})
@@ -75,12 +75,12 @@ struct SettingsViewStatisticsSettingsViewModel:SettingsViewModelProtocol {
                     }
                 })
                     
-            case .useStandardStatisticsRange:
+            case .useTITRStatisticsRange:
                 return SettingsSelectedRowAction.callFunction(function: {
-                    if UserDefaults.standard.useStandardStatisticsRange {
-                        UserDefaults.standard.useStandardStatisticsRange = false
+                    if UserDefaults.standard.useTITRStatisticsRange {
+                        UserDefaults.standard.useTITRStatisticsRange = false
                     } else {
-                        UserDefaults.standard.useStandardStatisticsRange = true
+                        UserDefaults.standard.useTITRStatisticsRange = true
                     }
                 })
                 
@@ -118,8 +118,8 @@ struct SettingsViewStatisticsSettingsViewModel:SettingsViewModelProtocol {
             case .showStatistics:
                 return Texts_SettingsView.labelShowStatistics
                     
-            case .useStandardStatisticsRange:
-                return Texts_SettingsView.labelUseStandardStatisticsRange
+            case .useTITRStatisticsRange:
+                return Texts_SettingsView.labelUseTITRStatisticsRange
                     
             case .useIFCCA1C:
                 return Texts_SettingsView.labelUseIFFCA1C
@@ -132,7 +132,7 @@ struct SettingsViewStatisticsSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .showStatistics, .useStandardStatisticsRange, .useIFCCA1C:
+        case .showStatistics, .useTITRStatisticsRange, .useIFCCA1C:
             return UITableViewCell.AccessoryType.none
             
         }
@@ -143,7 +143,7 @@ struct SettingsViewStatisticsSettingsViewModel:SettingsViewModelProtocol {
 
         switch setting {
             
-        case .showStatistics, .useStandardStatisticsRange, .useIFCCA1C:
+        case .showStatistics, .useTITRStatisticsRange, .useIFCCA1C:
             return nil
             
         }

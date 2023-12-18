@@ -20,7 +20,7 @@
 "connect" = "Conectar";
 "connectedAt" = "Conectado Desde";
 "disConnectedAt" = "Desconectado Desde";
-"resetRequired" = "Resetear Transmisor?";
+"resetRequired" = "Resetear Transmisor";
 "lastReset" = "Último Reset";
 "lastResetNotKnown" = "Fecha del Último Reset Desconocido";
 "transmitterResultResult" = "Resultado del reseteo del Transmisor";

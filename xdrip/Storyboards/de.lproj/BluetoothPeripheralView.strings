@@ -12,7 +12,7 @@
 "scan" = "Scannen";
 
 /// cell text, where user can select to reset a transmitter at next connect. Only for Dexcom
-"resetRequired" = "Transmitter zurücksetzen?";
+"resetRequired" = "Transmitter zurücksetzen";
 
 /// text in status row, when not connected and app is not scanning
 "notTryingToConnect" = "Es wird nicht gescannt";
@@ -51,7 +51,7 @@
 "bootLoader" = "Bootloader";
 
 /// Bluetooth Peripheral view, when user clicks the trash button - this is not the complete sentence, it will be followed either by 'name' or 'alias', depending on the availability of an alias
-"confirmDeletionPeripheral" = "Möchten Sie das Gerät löschen?";
+"confirmDeletionPeripheral" = "Möchten Sie das Gerät löschen";
 
 /// text in status row, if scanning ongoing
 "scanning" = "Am scannen";

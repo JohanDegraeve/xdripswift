@@ -594,7 +594,7 @@
                                             <constraint firstItem="Nhe-d1-2e7" firstAttribute="centerY" secondItem="x9u-yg-PXE" secondAttribute="centerY" id="vZU-6X-8GM"/>
                                         </constraints>
                                     </view>
-                                    <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MtJ-rx-OB9" userLabel="Statistics View">
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MtJ-rx-OB9" userLabel="Statistics View">
                                         <rect key="frame" x="0.0" y="443.66666666666669" width="390" height="90.000000000000057"/>
                                         <subviews>
                                             <stackView opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="ZF3-Ii-L0R">
@@ -813,12 +813,16 @@
                                             </stackView>
                                         </subviews>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <gestureRecognizers/>
                                         <constraints>
                                             <constraint firstItem="ZF3-Ii-L0R" firstAttribute="centerY" secondItem="MtJ-rx-OB9" secondAttribute="centerY" id="ThK-6J-pNb"/>
                                             <constraint firstItem="ZF3-Ii-L0R" firstAttribute="leading" secondItem="MtJ-rx-OB9" secondAttribute="leadingMargin" id="pfd-vL-nLE"/>
                                             <constraint firstAttribute="height" constant="90" id="tou-bG-mYJ"/>
                                             <constraint firstAttribute="trailingMargin" secondItem="ZF3-Ii-L0R" secondAttribute="trailing" id="x6Q-4Q-45y"/>
                                         </constraints>
+                                        <connections>
+                                            <outletCollection property="gestureRecognizers" destination="5Ud-6R-vpG" appends="YES" id="It3-MG-SJ8"/>
+                                        </connections>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ETk-QH-u1x">
                                         <rect key="frame" x="0.0" y="533.66666666666663" width="390" height="140"/>
@@ -1026,6 +1030,11 @@
                 <tapGestureRecognizer numberOfTapsRequired="2" id="j3a-7w-xaq">
                     <connections>
                         <action selector="urlDoubleTapGestureRecognizerAction:" destination="9pv-A4-QxB" id="zbn-KM-fUe"/>
+                    </connections>
+                </tapGestureRecognizer>
+                <tapGestureRecognizer numberOfTapsRequired="2" id="5Ud-6R-vpG">
+                    <connections>
+                        <action selector="statisticsViewDoubleTapGestureRecognizer:" destination="9pv-A4-QxB" id="Iof-ql-e0F"/>
                     </connections>
                 </tapGestureRecognizer>
             </objects>
