@@ -115,19 +115,19 @@ enum ConstantsGlucoseChart {
     static let defaultSmallBolusTreamentThreshold: Double = 1.0
     
     /// how much should we scale the size of the micro-bolus triangle compared to the bolus triangle. Should be less than 1 to make them smaller
-    static let smallBolusTreamentScale: CGFloat = 0.5
+    static let smallBolusTreamentScale: CGFloat = 0.6
     
     /// triangle size for bolus treatments with a 3h chart width. The more hours on the chart, the smaller the triangles should be.
-    static let bolusTriangleSize3h: CGFloat = 20
+    static let bolusTriangleSize3h: CGFloat = 16
     
     /// triangle size for bolus treatments with a 6h chart width. The more hours on the chart, the smaller the triangles should be.
-    static let bolusTriangleSize6h: CGFloat = 18
+    static let bolusTriangleSize6h: CGFloat = 14
     
     /// triangle size for bolus treatments with a 12h chart width. The more hours on the chart, the smaller the triangles should be.
-    static let bolusTriangleSize12h: CGFloat = 16
+    static let bolusTriangleSize12h: CGFloat = 12
     
     /// triangle size for bolus treatments with a 24h chart width. The more hours on the chart, the smaller the triangles should be.
-    static let bolusTriangleSize24h: CGFloat = 14
+    static let bolusTriangleSize24h: CGFloat = 10
     
     /// make the triangle height slightly less than the width to prevent it looking too "pointy"
     static let bolusTriangleHeightScale: CGFloat = 0.9
@@ -181,19 +181,19 @@ enum ConstantsGlucoseChart {
     static let treatmentLabelFontColor = UIColor.white
     
     /// treament label background colour (should have some transparency)
-    static let treatmentLabelBackgroundColor = UIColor.black.withAlphaComponent(0.5)
+    static let treatmentLabelBackgroundColor = UIColor.black.withAlphaComponent(0.4)
     
     /// additional label separation (in mg/dl) when using mmol/l (needed due to the scaling/conversion)
     static let treatmentLabelMmolOffset: Double = 2
     
     /// how far should the label be separated from the bolus marker by default
-    static let mediumBolusLabelSeparation: Double = 7
+    static let mediumBolusLabelSeparation: Double = 8
     
     /// how far should the label be separated from the smallCarbs marker by default
-    static let smallCarbsLabelSeparation: Double = 7
+    static let smallCarbsLabelSeparation: Double = 8
     
     /// how far should the label be separated from the mediumCarbs marker by default
-    static let mediumCarbsLabelSeparation: Double = 8
+    static let mediumCarbsLabelSeparation: Double = 9
     
     /// how far should the label be separated from the largeCarbs marker by default
     static let largeCarbsLabelSeparation: Double = 10
