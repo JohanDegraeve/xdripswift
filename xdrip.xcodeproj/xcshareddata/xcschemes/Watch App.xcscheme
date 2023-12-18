@@ -59,7 +59,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "470B6185270C448000561E56"
-            BuildableName = "xDrip4iO5.app"
+            BuildableName = "xDrip4iO5&#xa0;TEST.app"
             BlueprintName = "Watch App"
             ReferencedContainer = "container:xdrip.xcodeproj">
          </BuildableReference>
@@ -76,7 +76,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "470B6185270C448000561E56"
-            BuildableName = "xDrip4iO5.app"
+            BuildableName = "xDrip4iO5&#xa0;TEST.app"
             BlueprintName = "Watch App"
             ReferencedContainer = "container:xdrip.xcodeproj">
          </BuildableReference>
