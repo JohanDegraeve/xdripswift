@@ -43,3 +43,6 @@
 "noSensorData" = "Sin datos";
 "noDataSourceConnected" = "Sin fuente de datos MGC conectada";
 "hidingUrlForXSeconds" = "Ocultando URL durante %@s...";
+"nightscoutNotEnabled" = "Nightscout está deshabilitado";
+"nightscoutURLMissing" = "Falta la URL de Nightscout";
+"libreLinkUpAccountCredentialsMissing" = "Falta usuario/contraseña";

@@ -225,7 +225,7 @@ final class RootViewController: UIViewController, ObservableObject {
     @IBAction func urlDoubleTapGestureRecognizerAction(_ sender: UITapGestureRecognizer) {
         
         // make sure we only act on the gesture if we're in Nightscout follower mode (i.e. with the URL visible)
-        if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .nightscout {
+        if !UserDefaults.standard.isMaster && UserDefaults.standard.nightScoutEnabled && UserDefaults.standard.followerDataSourceType == .nightscout && UserDefaults.standard.nightScoutUrl != nil {
             
             dataSourceSensorMaxAgeOutlet.textColor = .systemRed
             dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.hidingUrlForXSeconds
@@ -3116,7 +3116,17 @@ final class RootViewController: UIViewController, ObservableObject {
                     
                 case .nightscout:
                     
-                    if UserDefaults.standard.nightScoutUrl != "" {
+                    if !UserDefaults.standard.nightScoutEnabled {
+                        
+                        dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                        dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.nightscoutNotEnabled
+                        
+                    } else if UserDefaults.standard.nightScoutUrl == nil {
+                        
+                        dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                        dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.nightscoutURLMissing
+                        
+                    } else {
                         
                         var nightScoutUrlString: String = UserDefaults.standard.nightScoutUrl ?? ""
                         
@@ -3133,7 +3143,15 @@ final class RootViewController: UIViewController, ObservableObject {
                 case .libreLinkUp:
                     
                     dataSourceSensorMaxAgeOutlet.textColor = .systemRed
-                    dataSourceSensorMaxAgeOutlet.text = " (" + Texts_HomeView.noSensorData + ")"
+                    
+                    if UserDefaults.standard.libreLinkUpEmail == nil || UserDefaults.standard.libreLinkUpPassword == nil {
+                        
+                        dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.libreLinkUpAccountCredentialsMissing
+                        
+                    } else {
+                        dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.noSensorData
+                        
+                    }
                     
                 }
                 

@@ -189,4 +189,16 @@ enum Texts_HomeView {
         return String(format: NSLocalizedString("hidingUrlForXSeconds", tableName: filename, bundle: Bundle.main, value: "Hiding URL for %@s...", comment: "After clicking scan button, this message will appear"), String(ConstantsHomeView.hideUrlDuringTimeInSeconds))
     }()
     
+    static let nightscoutNotEnabled: String = {
+        return NSLocalizedString("nightscoutNotEnabled", tableName: filename, bundle: Bundle.main, value: "Nightscout is disabled", comment: "nightscout is not enabled")
+    }()
+    
+    static let nightscoutURLMissing: String = {
+        return NSLocalizedString("nightscoutURLMissing", tableName: filename, bundle: Bundle.main, value: "Nightscout URL missing", comment: "nightscout is not enabled")
+    }()
+    
+    static let libreLinkUpAccountCredentialsMissing: String = {
+        return NSLocalizedString("libreLinkUpAccountCredentialsMissing", tableName: filename, bundle: Bundle.main, value: "Username/password missing", comment: "username and/or password is missing for librelinkup")
+    }()
+    
 }
