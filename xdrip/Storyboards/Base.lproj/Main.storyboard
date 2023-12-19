@@ -406,6 +406,7 @@
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="uM8-jT-s3T"/>
                                             <barButtonItem title="BgReadings" image="drop.circle" catalog="system" id="JXD-eR-ASP">
                                                 <connections>
+                                                    <action selector="bgReadingsToolbarButtonAction:" destination="9pv-A4-QxB" id="v91-uZ-GIl"/>
                                                     <segue destination="X4x-SF-9tU" kind="show" identifier="RootViewToBgReadingsView" destinationCreationSelector="segueToBgReadingsView:" id="Jf5-1H-sXY"/>
                                                 </connections>
                                             </barButtonItem>
@@ -478,7 +479,20 @@
                                             </label>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0nE-AX-r0w" customClass="BloodGlucoseChartView" customModule="xdrip" customModuleProvider="target">
                                                 <rect key="frame" x="10" y="132.66666666666666" width="380" height="156.99999999999997"/>
+                                                <subviews>
+                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Patient Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4FR-qu-yXX">
+                                                        <rect key="frame" x="0.0" y="0.0" width="112.66666666666667" height="21.666666666666668"/>
+                                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="18"/>
+                                                        <color key="textColor" systemColor="systemGrayColor"/>
+                                                        <nil key="highlightedColor"/>
+                                                    </label>
+                                                </subviews>
                                                 <gestureRecognizers/>
+                                                <constraints>
+                                                    <constraint firstItem="4FR-qu-yXX" firstAttribute="top" secondItem="0nE-AX-r0w" secondAttribute="top" id="eUY-Fv-CUz"/>
+                                                    <constraint firstItem="4FR-qu-yXX" firstAttribute="leading" secondItem="0nE-AX-r0w" secondAttribute="leading" id="gH1-zo-AgG"/>
+                                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="4FR-qu-yXX" secondAttribute="trailing" symbolic="YES" id="jtf-4M-neE"/>
+                                                </constraints>
                                                 <connections>
                                                     <outletCollection property="gestureRecognizers" destination="Fi5-iu-Usk" appends="YES" id="Rkv-hK-sLH"/>
                                                     <outletCollection property="gestureRecognizers" destination="axt-dD-sCA" appends="YES" id="Bxm-Qp-L3P"/>
@@ -954,6 +968,7 @@
                         <outlet property="activityMonitorOutlet" destination="U7P-eg-yrE" id="Otj-00-LvX"/>
                         <outlet property="averageStatisticLabelOutlet" destination="6JK-yH-Ykh" id="spm-SF-8p7"/>
                         <outlet property="averageTitleLabelOutlet" destination="na4-pU-1Ik" id="Ieo-0G-9qU"/>
+                        <outlet property="bgReadingsToolbarButtonOutlet" destination="JXD-eR-ASP" id="vZa-r9-GM4"/>
                         <outlet property="cVStatisticLabelOutlet" destination="Vdh-xP-Z0Y" id="wT9-MZ-QcV"/>
                         <outlet property="calibrateToolbarButtonOutlet" destination="u4d-bZ-Kw8" id="lSA-06-2bO"/>
                         <outlet property="chartLongPressGestureRecognizerOutlet" destination="axt-dD-sCA" id="mUZ-cu-720"/>
@@ -970,6 +985,7 @@
                         <outlet property="dataSourceViewOutlet" destination="bjv-fG-4ZY" id="uQ3-Rj-HOQ"/>
                         <outlet property="diffLabelOutlet" destination="7Wo-wd-80o" id="nnn-w9-1sX"/>
                         <outlet property="diffLabelUnitOutlet" destination="LHe-pP-hD1" id="VVb-Z0-rJZ"/>
+                        <outlet property="followerPatientNameLabelOutlet" destination="4FR-qu-yXX" id="cqb-aO-6mG"/>
                         <outlet property="helpToolbarButtonOutlet" destination="DuN-xR-xYB" id="TdW-5k-hgZ"/>
                         <outlet property="highLabelOutlet" destination="Xlz-6g-zzD" id="DyX-x0-PwZ"/>
                         <outlet property="highStatisticLabelOutlet" destination="EbR-T4-LIg" id="VZk-1K-BCq"/>
@@ -2357,16 +2373,16 @@
         <image name="questionmark.circle" catalog="system" width="128" height="123"/>
         <image name="scope" catalog="system" width="128" height="124"/>
         <systemColor name="systemBlueColor">
-            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGrayColor">
-            <color red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.5568627451" green="0.5568627451" blue="0.57647058819999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGreenColor">
-            <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemYellowColor">
             <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

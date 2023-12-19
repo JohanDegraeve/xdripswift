@@ -17,12 +17,9 @@ final class RootViewController: UIViewController, ObservableObject {
     
     private var session: WCSession?
     
-    
     @IBOutlet weak var toolbarOutlet: UIToolbar!
     
-    
     @IBOutlet weak var preSnoozeToolbarButtonOutlet: UIBarButtonItem!
-    
     @IBAction func preSnoozeToolbarButtonAction(_ sender: UIBarButtonItem) {
         // opens the SnoozeViewController, see storyboard
     }
@@ -34,7 +31,6 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     @IBOutlet weak var sensorToolbarButtonOutlet: UIBarButtonItem!
-    
     @IBAction func sensorToolbarButtonAction(_ sender: UIBarButtonItem) {
         createAndPresentSensorButtonActionSheet()
     }
@@ -98,21 +94,19 @@ final class RootViewController: UIViewController, ObservableObject {
         screenLockAlert(nightMode: true)
     }
     
-    
     /// outlet for label that shows how many minutes ago and so on
     @IBOutlet weak var minutesLabelOutlet: UILabel!
-    
     @IBOutlet weak var minutesAgoLabelOutlet: UILabel!
-    
     
     /// outlet for label that shows difference with previous reading
     @IBOutlet weak var diffLabelOutlet: UILabel!
-    
     @IBOutlet weak var diffLabelUnitOutlet: UILabel!
-    
     
     /// outlet for label that shows the current reading
     @IBOutlet weak var valueLabelOutlet: UILabel!
+    
+    /// outlet for optional patient name to show who is being followed
+    @IBOutlet weak var followerPatientNameLabelOutlet: UILabel!
     
     @IBAction func valueLabelLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
         
@@ -124,12 +118,9 @@ final class RootViewController: UIViewController, ObservableObject {
     /// outlet for chart
     @IBOutlet weak var chartOutlet: BloodGlucoseChartView!
     
-    
     /// outlet for mini-chart showing a fixed history of x hours
     @IBOutlet weak var miniChartOutlet: BloodGlucoseChartView!
-
     @IBOutlet weak var miniChartHoursLabelOutlet: UILabel!
-    
     
     @IBOutlet weak var segmentedControlsView: UIView!
     
@@ -155,7 +146,7 @@ final class RootViewController: UIViewController, ObservableObject {
         
     }
     
-    // create a view outlet (with the statistics day control inside) so that we can show/hide it as necessary
+    /// create a view outlet (with the statistics day control inside) so that we can show/hide it as necessary
     @IBOutlet weak var segmentedControlStatisticsDaysView: UIView!
     
     @IBOutlet weak var segmentedControlStatisticsDays: UISegmentedControl!
@@ -2163,6 +2154,10 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // to make the following code a bit more readable
         let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        
+        // if in follower mode, show the patient name if one has been entered
+        followerPatientNameLabelOutlet.text = UserDefaults.standard.followerPatientName ?? ""
+        followerPatientNameLabelOutlet.isHidden = UserDefaults.standard.isMaster
         
         // set minutesLabelOutlet.textColor to white, might still be red due to panning back in time
         self.minutesLabelOutlet.textColor = UIColor.white

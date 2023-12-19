@@ -1,4 +1,5 @@
 "settingsviews_settingstitle" = "Configuración";
+"settingsviews_valueIsRequired" = "⚠️ Requerido";
 "settingsviews_sectiontitlegeneral" = "General";
 "settingsviews_selectbgunit" = "Seleccionar Unidades";
 "settingsviews_masterorfollower" = "Master o Seguidor";
@@ -15,6 +16,8 @@
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Mantener en segundo plan está deshabilitado.\n\nCuando la aplicación no está en primer plano, no habrá notificaciones, alarmas, valores de glucosa en el icono de la app ni habrá actualizaciones de los valores de glucosa.\n\nLa aplicación permanecerá durmiendo hasta que la abras de nuevo.\n\nEste modo tiene un impacto mínimo en la batería de tu dispositivo.";
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Mantener en segundo plan está en modo normal.\n\nCuando la app está en segundo plano, intentaremos mantenerla funcionando para que reciba actualizaciones de los valores de glucosa y que sea posible saltar alarmas y notificaciones.\n\nEste modo consume bastante batería.";
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Mantener en segundo plan está en modo agresivo.\n\nCuando la app está en segundo plano, intentaremos, de forma agresiva, mantenerla funcionando para que reciba actualizaciones de los valores de glucosa y que sea posible saltar alarmas y notificaciones.\n\nEste modo consume mucha batería.";
+"settingsviews_followerPatientName" = "Nombre del paciente";
+"settingsviews_followerPatientNameMessage" = "Aquí puedes entrar el nombre de la persona que estás seguiendo.\n\nPuede ser útil si estás siguiendo varias personas con diferentes apps.\n\nEs opcional y lo normal sería dejarlo en blanco.";
 "settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload follower BG values to Nightscout, you must enable it in the Nightscout section.";
 "settingsviews_nightscoutNotEnabledRowText" = "Deshabilitado";
 "settingsviews_labelFollowerDataSourceRegion" = "Servidor (País)";

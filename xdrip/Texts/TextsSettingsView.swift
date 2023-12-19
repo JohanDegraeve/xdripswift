@@ -4,6 +4,12 @@ import Foundation
 class Texts_SettingsView {
     static private let filename = "SettingsViews"
     
+    // MARK: - Generic for all Settings Views
+    
+    static let valueIsRequired: String = {
+        return NSLocalizedString("settingsviews_valueIsRequired", tableName: filename, bundle: Bundle.main, value: "⚠️ Required", comment: "this setting is required")
+    }()
+    
     // MARK: - Title of the first settings screen
     
     static let screenTitle: String = {
@@ -76,6 +82,14 @@ class Texts_SettingsView {
     
     static let followerKeepAliveTypeAggressiveMessage: String = {
         return NSLocalizedString("settingsviews_followerKeepAliveTypeAggressiveMessage", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.", comment: "data source settings, keep-alive mode is set to aggressive")
+    }()
+    
+    static let followerPatientName: String = {
+        return NSLocalizedString("settingsviews_followerPatientName", tableName: filename, bundle: Bundle.main, value: "Patient Name", comment: "data source settings, the name of the person we are following")
+    }()
+    
+    static let followerPatientNameMessage: String = {
+        return NSLocalizedString("settingsviews_followerPatientNameMessage", tableName: filename, bundle: Bundle.main, value: "Here you can write the name of the person you are following.\n\nThis can be useful if you are following several different people with several different apps.\n\nThis is optional and would normally be left empty.", comment: "data source settings, ask the user to enter the name of the person we are following if they want to - it's optional")
     }()
     
     static let nightscoutNotEnabled: String = {

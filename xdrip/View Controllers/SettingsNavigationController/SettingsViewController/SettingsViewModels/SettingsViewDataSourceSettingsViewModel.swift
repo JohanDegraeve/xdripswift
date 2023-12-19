@@ -20,23 +20,26 @@ fileprivate enum Setting: Int, CaseIterable {
     /// if follower, should we try and keep the app alive in the background
     case followerKeepAliveType = 2
     
+    /// patient name/alias (optional) - useful for users who follow various people
+    case followerPatientName = 3
+    
     /// if follower data source is not Nightscout, should we upload the BG values to Nightscout?
-    case followerUploadDataToNightscout = 3
+    case followerUploadDataToNightscout = 4
     
     /// web follower username
-    case followerUserName = 4
+    case followerUserName = 5
     
     /// web follower username
-    case followerPassword = 5
+    case followerPassword = 6
     
     /// web follower sensor serial number (will not always be available)
-    case followerSensorSerialNumber = 6
+    case followerSensorSerialNumber = 7
     
     /// web follower sensor start date (will not always be available)
-    case followerSensorStartDate = 7
+    case followerSensorStartDate = 8
     
     /// web follower server region
-    case followerRegion = 8
+    case followerRegion = 9
     
 }
 
@@ -242,6 +245,14 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 }
             }, cancelHandler: nil, didSelectRowHandler: nil)
             
+        case .followerPatientName:
+            
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.followerPatientName, message:  Texts_SettingsView.followerPatientNameMessage, keyboardType: .default, text: UserDefaults.standard.followerPatientName, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(followerPatientName: String) in
+                
+                UserDefaults.standard.followerPatientName = followerPatientName.toNilIfLength0()
+                
+            }, cancelHandler: nil, inputValidator: nil)
+            
         case .followerUploadDataToNightscout:
             
             return UserDefaults.standard.nightScoutEnabled ? .nothing : SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.nightscoutNotEnabled)
@@ -339,8 +350,8 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             switch UserDefaults.standard.followerDataSourceType {
             
             case .nightscout:
-                // no need to show any extra rows/settings (beyond keep-alive) as all Nightscout required parameters are set in the Nightscout section
-                return 3
+                // no need to show any extra rows/settings (beyond patient name) as all Nightscout required parameters are set in the Nightscout section
+                return 4
             
             case .libreLinkUp:
                 // show all sections
@@ -365,6 +376,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             
         case .followerKeepAliveType:
             return Texts_SettingsView.labelfollowerKeepAliveType
+            
+        case .followerPatientName:
+            return Texts_SettingsView.followerPatientName
             
         case .followerUploadDataToNightscout:
             return Texts_SettingsView.labelUploadFollowerDataToNightscout
@@ -396,20 +410,12 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .masterFollower, .followerUploadDataToNightscout, .followerSensorSerialNumber, .followerRegion:
             return UITableViewCell.AccessoryType.none
             
-        case .followerDataSourceType, .followerKeepAliveType, .followerUserName, .followerPassword:
+        case .followerDataSourceType, .followerKeepAliveType, .followerPatientName, .followerUserName, .followerPassword:
             return UITableViewCell.AccessoryType.disclosureIndicator
             
         case .followerSensorStartDate:
             
-            if UserDefaults.standard.activeSensorStartDate != nil {
-                
-                return UITableViewCell.AccessoryType.disclosureIndicator
-                
-            } else {
-                
-                return UITableViewCell.AccessoryType.none
-                
-            }
+            return UserDefaults.standard.activeSensorStartDate != nil ? UITableViewCell.AccessoryType.disclosureIndicator : UITableViewCell.AccessoryType.none
             
         }
     }
@@ -426,8 +432,10 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             return UserDefaults.standard.followerDataSourceType.description
             
         case .followerKeepAliveType:
-            //return nil
             return UserDefaults.standard.followerBackgroundKeepAliveType.description
+            
+        case .followerPatientName:
+            return UserDefaults.standard.followerPatientName ?? "(optional)"
             
         case .followerUploadDataToNightscout:
             return UserDefaults.standard.nightScoutEnabled ? nil : Texts_SettingsView.nightscoutNotEnabledRowText
@@ -435,7 +443,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .followerUserName:
             switch UserDefaults.standard.followerDataSourceType {
             case .libreLinkUp:
-                return UserDefaults.standard.libreLinkUpEmail?.obscured() ?? ""
+                return UserDefaults.standard.libreLinkUpEmail?.obscured() ?? Texts_SettingsView.valueIsRequired
             default:
                 return ""
             }
@@ -443,7 +451,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .followerPassword:
             switch UserDefaults.standard.followerDataSourceType {
             case .libreLinkUp:
-                return UserDefaults.standard.libreLinkUpPassword?.obscured() ?? ""
+                return UserDefaults.standard.libreLinkUpPassword?.obscured() ?? Texts_SettingsView.valueIsRequired
             default:
                 return ""
             }
@@ -534,16 +542,12 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-
-        case .masterFollower, .followerDataSourceType, .followerUserName, .followerPassword, .followerSensorSerialNumber, .followerSensorStartDate, .followerRegion:
-            return nil
-            
-        case .followerKeepAliveType:
-            return nil
             
         case .followerUploadDataToNightscout:
-            
             return UserDefaults.standard.nightScoutEnabled ? UISwitch(isOn: UserDefaults.standard.followerUploadDataToNightscout, action: {(isOn:Bool) in UserDefaults.standard.followerUploadDataToNightscout = isOn}) : nil
+
+        case .masterFollower, .followerDataSourceType, .followerKeepAliveType, .followerPatientName, .followerUserName, .followerPassword, .followerSensorSerialNumber, .followerSensorStartDate, .followerRegion:
+            return nil
             
         }
 

@@ -37,6 +37,8 @@ extension UserDefaults {
         case followerUploadDataToNightscout = "followerUploadDataToNightscout"
         /// should we try to keep the follower alive in the background? If so, which type?
         case followerBackgroundKeepAliveType = "followerBackgroundKeepAliveType"
+        /// patient name (optional) - useful for users who follow various people
+        case followerPatientName = "followerPatientName"
         /// timestamp of last successful connection to follower service
         case timeStampOfLastFollowerConnection = "timeStampOfLastFollowerConnection"
         
@@ -456,6 +458,16 @@ extension UserDefaults {
         }
         set {
             set(newValue.rawValue, forKey: Key.followerBackgroundKeepAliveType.rawValue)
+        }
+    }
+    
+    /// patient name/alias (optional) - useful for users who follow various people
+    var followerPatientName: String? {
+        get {
+            return string(forKey: Key.followerPatientName.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.followerPatientName.rawValue)
         }
     }
     

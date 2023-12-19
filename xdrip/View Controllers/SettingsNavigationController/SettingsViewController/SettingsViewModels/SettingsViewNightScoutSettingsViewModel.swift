@@ -399,7 +399,7 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
         case .nightScoutEnabled:
             return nil
         case .nightScoutUrl:
-            return UserDefaults.standard.nightScoutUrl
+            return UserDefaults.standard.nightScoutUrl ?? Texts_SettingsView.valueIsRequired
         case .nightScoutAPIKey:
             return UserDefaults.standard.nightScoutAPIKey?.obscured() ?? nil
         case .port:
