@@ -8,10 +8,14 @@ class TodayViewController: UIViewController, NCWidgetProviding {
     
     
     @IBOutlet weak var minutesLabelOutlet: UILabel!
+    @IBOutlet weak var minutesAgoLabelOutlet: UILabel!
     
     @IBOutlet weak var diffLabelOutlet: UILabel!
+    @IBOutlet weak var diffLabelUnitOutlet: UILabel!
     
     @IBOutlet weak var valueLabelOutlet: UILabel!
+    
+    
     
     // MARK: - private properties
     
@@ -67,6 +71,10 @@ class TodayViewController: UIViewController, NCWidgetProviding {
         // set diffLabelOutlet.textColor to white
         self.diffLabelOutlet.textColor = UIColor.white
         
+        self.minutesAgoLabelOutlet.textColor = UIColor.lightGray
+        
+        self.diffLabelUnitOutlet.textColor = UIColor.lightGray
+        
     }
     
     /// - updates the labels
@@ -93,21 +101,29 @@ class TodayViewController: UIViewController, NCWidgetProviding {
 
         // if there's no readings, then give empty fields
         guard latestReadings.count > 0 else {
-            valueLabelOutlet.text = "---"
+            
             valueLabelOutlet.textColor = UIColor.darkGray
             minutesLabelOutlet.text = ""
+            minutesAgoLabelOutlet.text = ""
             diffLabelOutlet.text = ""
+            diffLabelUnitOutlet.text = ""
+                
+            let attributeString: NSMutableAttributedString =  NSMutableAttributedString(string: "---")
+            attributeString.addAttribute(.strikethroughStyle, value: 0, range: NSMakeRange(0, attributeString.length))
+            
+            valueLabelOutlet.attributedText = attributeString
+            
             return
         }
         
         // assign last reading
         let lastReading = latestReadings[0]
+        
         // assign last but one reading
         let lastButOneReading = latestReadings.count > 1 ? latestReadings[1]:nil
         
         // start creating text for valueLabelOutlet, first the calculated value
         var calculatedValueAsString = unitizedString(calculatedValue: Double(lastReading.glucose), unitIsMgDl: bloodGlucoseUnitIsMgDl)
-            //lastReading.unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
         
         // if latestReading is older than 11 minutes, then it should be strikethrough
         if lastReading.timestamp < Date(timeIntervalSinceNow: -60 * 11) {
@@ -143,26 +159,45 @@ class TodayViewController: UIViewController, NCWidgetProviding {
         // if not, then set color, depending on value lower than low mark or higher than high mark
         // set both HIGH and LOW BG values to red as previous yellow for hig is now not so obvious due to in-range colour of green.
         if lastReading.timestamp < Date(timeIntervalSinceNow: -60 * 11) {
+            
             valueLabelOutlet.textColor = UIColor.lightGray
+            
         } else if lastReading.glucose >= UInt16(urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgdl: bloodGlucoseUnitIsMgDl)) || lastReading.glucose <= UInt16(urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: bloodGlucoseUnitIsMgDl)) {
+            
             // BG is higher than urgentHigh or lower than urgentLow objectives
             valueLabelOutlet.textColor = UIColor.red
+            
         } else if lastReading.glucose >= UInt16(highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: bloodGlucoseUnitIsMgDl)) || lastReading.glucose <= UInt16(lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: bloodGlucoseUnitIsMgDl)) {
+            
             // BG is between urgentHigh/high and low/urgentLow objectives
             valueLabelOutlet.textColor = UIColor.yellow
+            
         } else {
+            
             // BG is between high and low objectives so considered "in range"
             valueLabelOutlet.textColor = UIColor.green
+            
         }
         
         // get minutes ago and create text for minutes ago label
         let minutesAgo = -Int(lastReading.timestamp.timeIntervalSinceNow) / 60
-        let minutesAgoText = minutesAgo.description + " " + (minutesAgo == 1 ? Texts.minute:Texts.minutes) + " " + Texts.ago
+        let minutesAgoText = minutesAgo.description // + " " + (minutesAgo == 1 ? Texts.minute:Texts.minutes) + " " + Texts.ago
         
         minutesLabelOutlet.text = minutesAgoText
         
-        // create delta text
+        // configure the localized text in the "mins ago" label
+        let minutesAgoMinAgoText = (minutesAgo == 1 ? Texts.minute : Texts.minutes) + " " + Texts.ago
+        
+        minutesAgoLabelOutlet.text = minutesAgoMinAgoText
+        
+        minutesLabelOutlet.text = minutesAgoText
+        
+        // create delta value text (without the units)
         diffLabelOutlet.text = unitizedDeltaString(bgReading: lastReading, previousBgReading: lastButOneReading, mgdl: bloodGlucoseUnitIsMgDl)
+        
+        // set the delta unit label text
+        let diffLabelUnitText = bloodGlucoseUnitIsMgDl ? Texts.mgdl : Texts.mmol
+        diffLabelUnitOutlet.text = diffLabelUnitText
         
     }
 
@@ -269,15 +304,15 @@ class TodayViewController: UIViewController, NCWidgetProviding {
         // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
         if (mgdl) {
             if (value > -1) && (value < 1) {
-                return "0" + " " + Texts.mgdl;
+                return "0"// + " " + Texts.mgdl;
             } else {
-                return deltaSign + valueAsString + " " + Texts.mgdl;
+                return deltaSign + valueAsString //+ " " + Texts.mgdl;
             }
         } else {
             if (value > -0.1) && (value < 0.1) {
-                return "0.0" + " " + Texts.mmol;
+                return "0.0" //+ " " + Texts.mmol;
             } else {
-                return deltaSign + valueAsString + " " + Texts.mmol;
+                return deltaSign + valueAsString //+ " " + Texts.mmol;
             }
         }
     }
