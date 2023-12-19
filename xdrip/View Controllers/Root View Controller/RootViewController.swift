@@ -649,7 +649,7 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // let's run the data source info and chart update 1 second after the root view appears. This should give time for the follower modes to download and populate the info needed.
         // no animation is needed as in most cases, we're just refreshing and displaying what is already shown on screen so we want to keep this refresh invisible.
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             
             // if the user locks the screen before the update is called, then don't run the update
             if !self.screenIsLocked {
