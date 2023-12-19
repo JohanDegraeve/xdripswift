@@ -21,7 +21,7 @@
 "connect" = "Conectar";
 "connectedAt" = "Conectado a";
 "disConnectedAt" = "Desconectado a";
-"resetRequired" = "Reiniciar Transmissor?";
+"resetRequired" = "Reiniciar Transmissor";
 "lastReset" = "Último Reinício";
 "lastResetNotKnown" = "Registo Desconhecido do Último Reinício";
 "transmitterResultResult" = "Resultado do Reinício do Transmissor";

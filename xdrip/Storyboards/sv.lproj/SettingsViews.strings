@@ -1,73 +1,69 @@
 "settingsviews_settingstitle" = "Inställningar";
 "settingsviews_sectiontitlegeneral" = "Allmänt";
 "settingsviews_selectbgunit" = "Blodglukosenheter";
-"settingsviews_masterorfollower" = "Användare eller Följare?";
+"settingsviews_masterorfollower" = "Användare eller Följare";
 "settingsviews_master" = "Användare";
 "settingsviews_follower" = "Följare";
-"settingsviews_showReadingInNotification" = "Visa BS som notiser?";
-"settingsviews_labelShowReadingInAppBadge" = "Visa BS i appikon?";
-"settingsviews_multipleAppBadgeValueWith10" = "Multiplicera BS med 10?";
-"settingsviews_showClockWhenScreenIsLocked" = "Visa klocka när skärmen är låst?";
+"settingsviews_showReadingInNotification" = "Visa BS som notiser";
+"settingsviews_labelShowReadingInAppBadge" = "Visa BS i appikon";
+"settingsviews_multipleAppBadgeValueWith10" = "Multiplicera BS med 10";
+"settingsviews_showClockWhenScreenIsLocked" = "Visa klocka när skärmen är låst";
 "settingsviews_urgentHighValue" = "Akut högt värde";
 "settingsviews_highValue" = "Högt värde";
 "settingsviews_targetValue" = "Målvärde";
 "settingsviews_lowValue" = "Lågt värde";
 "settingsviews_urgentLowValue" = "Akut lågt värde";
-"settingsviews_useobjectives" = "Visa målvärde i diagram?";
-"settingsviews_showcoloredobjectives" = "Visa färgade linjer?";
-"settingsviews_showtarget" = "Visa målvärdeslinje?";
+"settingsviews_useobjectives" = "Visa målvärde i diagram";
+"settingsviews_showcoloredobjectives" = "Visa färgade linjer";
+"settingsviews_showtarget" = "Visa målvärdeslinje";
 "settingsviews_sectiontitletreatments" = "Behandlingar";
-"settingsviews_showTreatmentsOnChart" = "Visa behandlingar i diagram?";
+"settingsviews_showTreatmentsOnChart" = "Visa behandlingar i diagram";
 "settingsviews_smallBolusTreatmentThreshold" = "Tröskelvärde för mikrobolus";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Under vilket värde ska det visas som en mikrobolus?\n\n(Rekommenderat värde: 1,0 IE)";
 "settingsviews_sectiontitlestatistics" = "Statistik";
-"settingsviews_showStatistics" = "Visa statistik?";
-"settingsviews_daysToUseStatisticsTitle" = "Dagar att beräkna?";
+"settingsviews_showStatistics" = "Visa statistik";
+"settingsviews_daysToUseStatisticsTitle" = "Dagar att beräkna";
 "settingsviews_daysToUseStatisticsMessage" = "Maximalt antal dagar för beräkning av statistik?\n\n(ange 0 för beräkning sedan midnatt)";
-"settingsviews_useStandardStatisticsRange" = "Använd standardintervall?";
 "settingsviews_useIFCCA1C" = "Visa HbA1c som mmol/mol (IFCC)";
-"settingsviews_sectiontitlesensorcountdown" = "Nedräkning sensortid";
-"settingsviews_showSensorCountdown" = "Visa sensordagar?";
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Visa använda dagar istället?";
 "settingsviews_sectiontitletransmitter" = "Sändare";
 "settingsviews_transmittertype" = "Typ av sändare";
 "settingsviews_transmitterid" = "Sändar-ID";
 "settingsviews_transmitterid_text_for_button"  = "Sändar-ID";
 "settingsviews_givetransmitterid" = "Ange sändar-ID";
-"settingsviews_resettransmitter" = "Återställ sändare";
-"settingsviews_nonfixedtransmitter" = "Använd flerpunktskalibrering?";
+"settingsviews_resettransmitter" = "Återställ sändare (Anubis)";
+"settingsviews_nonfixedtransmitter" = "Använd flerpunktskalibrering";
 "settingsviews_labelNonFixed" = "Flerpunktskalibrering";
 "settingsviews_sectiontitlealerting" = "Larm";
 "settingsviews_row_alert_types" = "Typ av larm";
 "settingsviews_row_alerts" = "Larm";
 "settingsviews_sectiontitlehealthkit" = "Apple Hälsa";
-"settingsviews_healthkit" = "Skriv data till Apple Hälsa?";
+"settingsviews_healthkit" = "Skriv data till Apple Hälsa";
 "settingsviews_sectiontitledexcomshare" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Ladda upp till Dexcom Share?";
+"settingsviews_uploadReadingstoDexcomShare" = "Ladda upp till Dexcom Share";
 "settingsviews_dexcomShareSerialNumber" = "Sändarens serienummer";
-"settingsviews_useUSDexcomShareurl" = "Använd Dexcom-server i USA?";
+"settingsviews_useUSDexcomShareurl" = "Använd Dexcom-server i USA";
 "settingsviews_dexcomShareAccountName" = "Användarnamn";
 "settingsviews_giveDexcomShareAccountName" = "Ange Dexcom Share användarnamn";
 "settingsviews_giveDexcomSharePassword" = "Ange Dexcom Share lösenord";
 "settingsviews_giveDexcomShareSerialNumber" = "Ange Dexcom mottagares serienummer";
 "settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Slå på Nightscout?";
+"settingsviews_nightScoutEnabled" = "Slå på Nightscout";
 "settingsviews_nightScoutUrl" = "URL";
-"settingsviews_useSchedule" = "Använd schemalagd uppladdning?";
+"settingsviews_useSchedule" = "Använd schemalagd uppladdning";
 "schedule" = "Schema";
 "settingsviews_giveNightScoutUrl" = "Ange din NightScout URL";
 "settingsviews_nightScoutAPIKey" = "API_SECRET";
 "settingsviews_giveNightScoutAPIKey" = "Ange ditt API_SECRET";
 "editScheduleTimePickerSubtitle" = "Ändra: ";
 "timeScheduleViewTitle" = "På/Av tidschema för ";
-"uploadSensorStartTime" = "Ladda upp sensorstarttid?";
-"testUrlAndAPIKey" = "Testa anslutning?";
+"uploadSensorStartTime" = "Ladda upp sensorstarttid";
+"testUrlAndAPIKey" = "Testa anslutning";
 "settingsviews_sectiontitlespeak" = "Röst";
-"settingsviews_speakBgReadings" = "Läs upp BS-avläsningar?";
+"settingsviews_speakBgReadings" = "Läs upp BS-avläsningar";
 "settingsviews_speakBgReadingslanguage" = "Språk";
 "settingsviews_speakreadingslanguageselection" = "Välj språk";
-"settingsviews_speakTrend" = "Läs upp trend?";
-"settingsviews_speakDelta" = "Läs upp delta?";
+"settingsviews_speakTrend" = "Läs upp trend";
+"settingsviews_speakDelta" = "Läs upp delta";
 "settingsviews_IntervalTitle" = "“Notisintervall";
 "settingsviews_IntervalMessage" = "Minsta intervall mellan två notiser, i minuter";
 "settingsviews_sectiontitleAbout" = "Om %@";
@@ -81,11 +77,11 @@
 "m5stack_settingsviews_giveBluetoothPassword" = "Ange Bluetooth-lösenord";
 "m5stack_settingsviews_brightness" = "Ljusstyrka";
 "appleWatchSectionTitle" = "Apple Watch";
-"createCalendarEvent" = "Skapa kalenderhändelser?";
-"calenderId" = "Kalender att använda?";
-"settingsviews_displayTrendInCalendarEvent" = "Visa trend?";
-"displayUnitInCalendarEvent" = "Visa enhet?";
-"displayDeltaInCalendarEvent" = "Visa delta?";
+"createCalendarEvent" = "Skapa kalenderhändelser";
+"calenderId" = "Kalender att använda";
+"settingsviews_displayTrendInCalendarEvent" = "Visa trend";
+"displayUnitInCalendarEvent" = "Visa enhet";
+"displayDeltaInCalendarEvent" = "Visa delta";
 "infoCalendarAccessDeniedByUser" = "Du har tidigare nekat tillgång till din kalender.\n\nFör att tillåta tillgång gå till 'Inställningar', 'Integritet', 'Kalendrar' och sätt på";
 "infoCalendarAccessRestricted" = "Du kan inte ge auktorisation till %@ att få tillgång till din kalender. Detta beror möjligtvis på inställda begränsningar i Skärmtidsinställningar.";
 "sectionTitleTrace" = "Problemrapportering";
@@ -102,7 +98,7 @@
 "warningChangeFromMasterToFollower" = "Byte från användare till följare kommer att stoppa nuvarande sensor. Vill du fortsätta?";
 "nightScoutPort" = "Port";
 "developerSettings" = "Inställningar för utvecklare";
-"smoothLibreValues" = "Utjämna Libre-värden?";
+"smoothLibreValues" = "Utjämna Libre-värden";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Hemskärm";
@@ -113,12 +109,12 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the online help be translated automatically if needed
-"settingsviews_translateOnlineHelp" = "Translate Automatically?";
-"settingsviews_showHelpIcon" = "Visa hjälpikon?";
+"settingsviews_translateOnlineHelp" = "Translate Automatically";
+"settingsviews_showHelpIcon" = "Visa hjälpikon";
 "settingsviews_restartNeeded" = "(Omstart krävs)";
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Allow Chart Rotation?";
+"settingsviews_allowScreenRotation" = "Allow Chart Rotation";
 
 /// help settings, section title
 "settingsviews_sectiontitlehelp" = "Help & Documentation";
@@ -127,14 +123,14 @@
 "calendarEventsSectionTitle" = "Calendar Events";
 
 /// help settings, open the online help
-"settingsviews_showOnlineHelp" = "Open Online Help?";
+"settingsviews_showOnlineHelp" = "Open Online Help";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm?";
+"settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
@@ -150,7 +146,7 @@
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
 
 /// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart?";
+"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart";
 
 /// When clicking the retention setting, a pop up asks for how many days should data be stored
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";

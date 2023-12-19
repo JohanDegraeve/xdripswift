@@ -1,11 +1,11 @@
 "alerttypessettingsview_screentitle" = "Tipos de Alarma";
 "alerttypesettingsview_screentitle" = "Editar Tipo de Alarma";
 "alerttypesettingsview_name" = "Nombre";
-"alerttypesettingsview_enabled" = "Habilitado?";
-"alerttypesettingsview_vibrate" = "Vibración?";
-"alerttypesettingsview_snoozevianotification" = "Permitir Silenciar Via Notificación?";
+"alerttypesettingsview_enabled" = "Habilitado";
+"alerttypesettingsview_vibrate" = "Vibración";
+"alerttypesettingsview_snoozevianotification" = "Permitir Silenciar Via Notificación";
 "alerttypesettingsview_defaultsnoozeperiod" = "Tiempo de Silencio Por Defecto (mins)";
-"alerttypesettingsview_overridemute" = "Ignorar Mode Silencio?";
+"alerttypesettingsview_overridemute" = "Ignorar Mode Silencio";
 "alerttypesettingsview_sound" = "Sonido";
 "alerttypesettingsview_defaultiossound" = "iOS Sound";
 "alerttypesettingsview_givename" = "Nombre de Alarma";

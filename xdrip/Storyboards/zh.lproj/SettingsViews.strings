@@ -31,7 +31,7 @@
 "settingsviews_speakTrend" = "语音播报趋势";
 "settingsviews_speakDelta" = "语音播报偏移量";
 "settingsviews_IntervalTitle" = "间隔时间";
-"settingsviews_masterorfollower" = "主控端或者关注者 ?";
+"settingsviews_masterorfollower" = "主控端或者关注者 ";
 "settingsviews_master" = "主控端";
 "settingsviews_follower" = "关注者";
 
@@ -55,16 +55,16 @@
 "volumeTestiOSSoundExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.";
 
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
-"settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration?";
+"settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration";
 
 /// Apple Watch Settings - text in row where user needs to say if unit should be displayed or not
-"displayUnitInCalendarEvent" = "Display Unit?";
+"displayUnitInCalendarEvent" = "Display Unit";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
 "settingsviews_IntervalMessage" = "Minimum interval between two notifications, in minutes";
 
 /// Apple Watch Settings - text in row where create event is enabled or disabled 
-"createCalendarEvent" = "Create Calendar Events?";
+"createCalendarEvent" = "Create Calendar Events";
 
 /// in Settings, section title for Trace
 "sectionTitleTrace" = "Issue Reporting";
@@ -76,13 +76,13 @@
 "debugLevel" = "Include Debug Level";
 
 /// Apple Watch Settings - text in row where user needs to say if delta should be displayed or not
-"displayDeltaInCalendarEvent" = "Display Delta?";
+"displayDeltaInCalendarEvent" = "Display Delta";
 
 /// about settings, section title
 "settingsviews_sectiontitleAbout" = "About %@";
 
 /// general settings, should reading be shown in notification yes or no
-"settingsviews_showReadingInNotification" = "Show BG in Notifications?";
+"settingsviews_showReadingInNotification" = "Show BG in Notifications";
 
 /// 
 "settingsviews_urgentLowValue" = "Urgent Low Value";
@@ -106,13 +106,13 @@
 "settingsviews_build" = "Build";
 
 /// nightscout settings, where user can select to use schedule or not
-"settingsviews_useSchedule" = "Use Upload Schedule?";
+"settingsviews_useSchedule" = "Use Upload Schedule";
 
 /// home screen settings, target value
 "settingsviews_targetValue" = "Target Value";
 
 /// home screen settings, show target line
-"settingsviews_showtarget" = "Show Target Line?";
+"settingsviews_showtarget" = "Show Target Line";
 
 /// used in settings, section Info, title of the license setting
 "settingsviews_license" = "License";
@@ -124,22 +124,22 @@
 "sendTraceFile" = "Send Issue Report";
 
 /// nightscout settings, title of row
-"uploadSensorStartTime" = "Upload Sensor Start Time?";
+"uploadSensorStartTime" = "Upload Sensor Start Time";
 
 /// name of setting for text color
 "m5stack_settingsviews_textColor" = "Text Color";
 
 /// transmitter settings, to explain that settings is about resetting the transmitter
-"settingsviews_resettransmitter" = "Reset Transmitter";
+"settingsviews_resettransmitter" = "Reset Transmitter (Anubis only)";
 
 /// general settings, should reading be multiplied with 10 yes or no
-"settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10?";
+"settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10";
 
 /// non fixed settings, title of the section
 "settingsviews_labelNonFixed" = "Multi-point Calibration";
 
 /// nightscout settings, when clicking the cell, test the url and api key
-"testUrlAndAPIKey" = "Test Connection?";
+"testUrlAndAPIKey" = "Test Connection";
 
 /// If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown
 "infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
@@ -154,13 +154,13 @@
 "settingsviews_speakreadingslanguageselection" = "Select Language";
 
 /// general settings, should reading be shown in app badge yes or no
-"settingsviews_labelShowReadingInAppBadge" = "Show BG in the App Badge?";
+"settingsviews_labelShowReadingInAppBadge" = "Show BG in the App Badge";
 
 /// In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row
 "volumeTestSoundPlayer" = "Test Volume (if Override Mute On)";
 
 /// healthkit settings, literally 'healthkit'
-"settingsviews_healthkit" = "Write Data to Apple Health?";
+"settingsviews_healthkit" = "Write Data to Apple Health";
 
 /// bluetooth settings, section title - also used in bluetooth peripheral view, eg when viewing M5Stack details. This is the title of the first section
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
@@ -178,7 +178,7 @@
 "editScheduleTimePickerSubtitle" = "Change: ";
 
 /// Apple Watch Settings - text in row where user needs to select a calendar
-"calenderId" = "Calendar To Use?";
+"calenderId" = "Calendar To Use";
 
 /// name of setting for back ground color
 "m5stack_settingsviews_backGroundColor" = "Background Color";
@@ -190,20 +190,20 @@
 "volumeTestSoundPlayerExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = On\n\n(Used for all alarms except Missed Reading alerts which always use the iOS volume.)\n\nChange the volume with the volume buttons and press OK when done.";
 
 /// home screen settings, use objectives in graph
-"settingsviews_useobjectives" = "Show Objectives in Graph?";
+"settingsviews_useobjectives" = "Show Objectives in Graph";
 
 /// Apple Watch Settings - text in row where user needs to say if trend should be displayed or not
-"settingsviews_displayTrendInCalendarEvent" = "Display Trend?";
+"settingsviews_displayTrendInCalendarEvent" = "Display Trend";
 
 /// 
-"settingsviews_showcoloredobjectives" = "Show Colored Lines?";
+"settingsviews_showcoloredobjectives" = "Show Colored Lines";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// deloper settings, row title for 'Smooth Libre Values?'
-"smoothLibreValues" = "Smooth Libre Values?";
+"smoothLibreValues" = "Smooth Libre Values";
 
 /// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
 "oslog" = "OSLog";
@@ -232,39 +232,34 @@
 "settingsviews_sectiontitlestatistics" = "Statistics";
 
 /// statistics settings, use standard range?
-"settingsviews_useStandardStatisticsRange" = "Use Standard Range?";
+"settingsviews_useTITRStatisticsRange" = "Use Time in Tight Range";
 
 /// statistics settings, use IFCC method for HbA1c?
-"settingsviews_useIFCCA1C" = "Show HbA1c in mmols/mol?";
+"settingsviews_useIFCCA1C" = "Show HbA1c in mmols/mol";
 
 /// statistics settings, show statistics on home screen
-"settingsviews_showStatistics" = "Show Statistics?";
+"settingsviews_showStatistics" = "Show Statistics";
 
 /// statistics settings, how many days to use for calculations
-"settingsviews_daysToUseStatisticsTitle" = "Days to Calculate?";
+"settingsviews_daysToUseStatisticsTitle" = "Days to Calculate";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the clock also be displayed when the screen is locked?
-"settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked?";
+"settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the online help be translated automatically if needed
-"settingsviews_translateOnlineHelp" = "Translate Automatically?";
+"settingsviews_translateOnlineHelp" = "Translate Automatically";
 
-/// sensor countdown settings, use alternative sensor countdown graphics on home screen
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Use Alternative Graphics?";
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Allow Chart Rotation?";
-
-/// sensor countdown settings, section title
-"settingsviews_sectiontitlesensorcountdown" = "Sensor Countdown";
+"settingsviews_allowScreenRotation" = "Allow Chart Rotation";
 
 /// help settings, section title
 "settingsviews_sectiontitlehelp" = "Help & Documentation";
@@ -273,17 +268,14 @@
 "calendarEventsSectionTitle" = "Calendar Events";
 
 /// help settings, open the online help
-"settingsviews_showOnlineHelp" = "Open Online Help?";
-
-/// sensor countdown settings, show sensor countdown graphic on home screen
-"settingsviews_showSensorCountdown" = "Show Sensor Countdown?";
+"settingsviews_showOnlineHelp" = "Open Online Help";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm?";
+"settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
@@ -293,7 +285,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// help settings, should the help icon be shown on the toolbar
-"settingsviews_showHelpIcon" = "Show Help Icon?";
+"settingsviews_showHelpIcon" = "Show Help Icon";
 
 /// help settings, restart needed
 "settingsviews_restartNeeded" = "(Restart required)";
@@ -312,7 +304,7 @@
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
 
 /// treatments settings, show the treatments on main chart
-"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart?";
+"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -325,7 +317,7 @@
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
 
 /// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart?";
+"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart";
 
 /// When clicking the retention setting, a pop up asks for how many days should data be stored
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";

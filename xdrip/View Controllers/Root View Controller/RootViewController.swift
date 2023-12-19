@@ -17,12 +17,9 @@ final class RootViewController: UIViewController, ObservableObject {
     
     private var session: WCSession?
     
-    
     @IBOutlet weak var toolbarOutlet: UIToolbar!
     
-    
     @IBOutlet weak var preSnoozeToolbarButtonOutlet: UIBarButtonItem!
-    
     @IBAction func preSnoozeToolbarButtonAction(_ sender: UIBarButtonItem) {
         // opens the SnoozeViewController, see storyboard
     }
@@ -34,7 +31,6 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     @IBOutlet weak var sensorToolbarButtonOutlet: UIBarButtonItem!
-    
     @IBAction func sensorToolbarButtonAction(_ sender: UIBarButtonItem) {
         createAndPresentSensorButtonActionSheet()
     }
@@ -95,24 +91,22 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// call the screen lock alert when the button is pressed
     @IBAction func screenLockToolbarButtonAction(_ sender: UIBarButtonItem) {
-        screenLockAlert(showClock: true)
+        screenLockAlert(nightMode: true)
     }
-    
     
     /// outlet for label that shows how many minutes ago and so on
     @IBOutlet weak var minutesLabelOutlet: UILabel!
-    
     @IBOutlet weak var minutesAgoLabelOutlet: UILabel!
-    
     
     /// outlet for label that shows difference with previous reading
     @IBOutlet weak var diffLabelOutlet: UILabel!
-    
     @IBOutlet weak var diffLabelUnitOutlet: UILabel!
-    
     
     /// outlet for label that shows the current reading
     @IBOutlet weak var valueLabelOutlet: UILabel!
+    
+    /// outlet for optional patient name to show who is being followed
+    @IBOutlet weak var followerPatientNameLabelOutlet: UILabel!
     
     @IBAction func valueLabelLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
         
@@ -124,12 +118,9 @@ final class RootViewController: UIViewController, ObservableObject {
     /// outlet for chart
     @IBOutlet weak var chartOutlet: BloodGlucoseChartView!
     
-    
     /// outlet for mini-chart showing a fixed history of x hours
     @IBOutlet weak var miniChartOutlet: BloodGlucoseChartView!
-
     @IBOutlet weak var miniChartHoursLabelOutlet: UILabel!
-    
     
     @IBOutlet weak var segmentedControlsView: UIView!
     
@@ -155,7 +146,7 @@ final class RootViewController: UIViewController, ObservableObject {
         
     }
     
-    // create a view outlet (with the statistics day control inside) so that we can show/hide it as necessary
+    /// create a view outlet (with the statistics day control inside) so that we can show/hide it as necessary
     @IBOutlet weak var segmentedControlStatisticsDaysView: UIView!
     
     @IBOutlet weak var segmentedControlStatisticsDays: UISegmentedControl!
@@ -206,8 +197,63 @@ final class RootViewController: UIViewController, ObservableObject {
     /// clock view
     @IBOutlet weak var clockView: UIView!
     @IBOutlet weak var clockLabelOutlet: UILabel!
+    
+    
+    /// sensor progress view - progress view
+    @IBOutlet weak var sensorProgressViewOutlet: UIView!
+    @IBOutlet weak var sensorProgressOutlet: UIProgressView!
+    
+    /// data source info view - general info
+    @IBOutlet weak var dataSourceViewOutlet: UIView!
+    @IBOutlet weak var dataSourceConnectionStatusImage: UIImageView!
+    @IBOutlet weak var dataSourceLabelOutlet: UILabel!
+    @IBOutlet weak var dataSourceKeepAliveImageOutlet: UIImageView!
+    @IBOutlet weak var dataSourceSensorCurrentAgeOutlet: UILabel!
+    @IBOutlet weak var dataSourceSensorMaxAgeOutlet: UILabel!
+    
+    /// used to temporarily hide the Nightscout URL from the data source info view
+    /// this is to allow a user to make screenshots etc without any personal information
+    @IBAction func urlDoubleTapGestureRecognizerAction(_ sender: UITapGestureRecognizer) {
         
-    @IBOutlet weak var sensorCountdownOutlet: UIImageView!
+        // make sure we only act on the gesture if we're in Nightscout follower mode (i.e. with the URL visible)
+        if !UserDefaults.standard.isMaster && UserDefaults.standard.nightScoutEnabled && UserDefaults.standard.followerDataSourceType == .nightscout && UserDefaults.standard.nightScoutUrl != nil {
+            
+            dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+            dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.hidingUrlForXSeconds
+            
+            // wait and then fade out the text
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                
+                // make a animated transition with the label. Fade it out over a couple of seconds.
+                UIView.transition(with: self.miniChartHoursLabelOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
+                    
+                    self.dataSourceSensorMaxAgeOutlet.alpha = 0
+                    
+                }, completion: { _ in
+                    
+                    // wait for a some time and then put the URL back as it was
+                    DispatchQueue.main.asyncAfter(deadline: .now() + Double(ConstantsHomeView.hideUrlDuringTimeInSeconds)) {
+                        
+                        // just copied directly from updateDataSourceInfo()
+                        var nightScoutUrlString: String = UserDefaults.standard.nightScoutUrl ?? ""
+                        
+                        if nightScoutUrlString.count > 36 {
+                            nightScoutUrlString = nightScoutUrlString.replacingOccurrences(of: nightScoutUrlString.dropFirst(33), with: "...")
+                        }
+                        
+                        self.dataSourceSensorMaxAgeOutlet.alpha = 1
+                        self.dataSourceSensorMaxAgeOutlet.textColor = .systemGray
+                        self.dataSourceSensorMaxAgeOutlet.text = nightScoutUrlString
+                        
+                    }
+                    
+                })
+                
+            }
+            
+        }
+        
+    }
     
     
     @IBAction func chartPanGestureRecognizerAction(_ sender: UIPanGestureRecognizer) {
@@ -283,45 +329,32 @@ final class RootViewController: UIViewController, ObservableObject {
         
     }
     
-    @IBOutlet var chartDoubleTapGestureRecognizerOutlet: UITapGestureRecognizer!
-    
     
     @IBAction func miniChartDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
-        
         
         // move the days range to the next one (or back to the first one) and also set the text. We'll use "24 hours" for the first range (to make it clear it's not a full day, but the last 24 hours), but to keep the UI simpler, we'll use "x days" for the rest.
         switch UserDefaults.standard.miniChartHoursToShow {
             
         case ConstantsGlucoseChart.miniChartHoursToShow1:
-            
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow2
-            
             miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow / 24).description + " " + Texts_Common.days
             
         case ConstantsGlucoseChart.miniChartHoursToShow2:
-            
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow3
-            
             miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow / 24).description + " " + Texts_Common.days
             
         case ConstantsGlucoseChart.miniChartHoursToShow3:
-            
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow4
-            
             miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow / 24).description + " " + Texts_Common.days
             
         case ConstantsGlucoseChart.miniChartHoursToShow4:
-            
             // we're already on the last range, so roll back to the first range
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
-            
             miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow).description + " " + Texts_Common.hours
             
         // the default will never get resolved as there is always an expected value assigned, but we need to include it to keep the compiler happy
         default:
-            
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
-            
             miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow).description + " " + Texts_Common.hours
             
         }
@@ -342,6 +375,57 @@ final class RootViewController: UIViewController, ObservableObject {
     
     @IBOutlet var miniChartDoubleTapGestureRecognizer: UITapGestureRecognizer!
     
+    /// can be used as a shortcut to switch between TIR and TITR calculation methods. The user will be notified of the change via UI transitions to show what has changed in the calculation limits
+    @IBAction func statisticsViewDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
+        
+        // the userdefault will be changed due to the double tap
+        let useTITR = !UserDefaults.standard.useTITRStatisticsRange
+        
+        UserDefaults.standard.useTITRStatisticsRange = useTITR
+        
+        updateStatistics(animate: false)
+        
+        let normalTitleColor: UIColor = lowTitleLabelOutlet.textColor
+        let normalLimitValueColor: UIColor = lowLabelOutlet.textColor
+        
+        inRangeTitleLabelOutlet.textColor = ConstantsStatistics.highlightColorTitles
+        
+        if ConstantsStatistics.standardisedLowValueForTIRInMgDl != ConstantsStatistics.standardisedLowValueForTITRInMgDl {
+            
+            self.lowLabelOutlet.textColor = ConstantsStatistics.labelLowColor
+        }
+        
+        
+        if ConstantsStatistics.standardisedHighValueForTIRInMgDl != ConstantsStatistics.standardisedHighValueForTITRInMgDl {
+            
+            self.highLabelOutlet.textColor = ConstantsStatistics.labelHighColor
+            
+        }
+        
+        // wait a short while and then fade the labels back out
+        // even if the label colours weren't changed, it's easier to just fade them all every time.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            
+            UIView.transition(with: self.inRangeTitleLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
+                self.inRangeTitleLabelOutlet.textColor = normalTitleColor
+            })
+            
+            UIView.transition(with: self.lowLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
+                self.lowLabelOutlet.textColor = normalLimitValueColor
+            })
+            
+            UIView.transition(with: self.highLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
+                self.highLabelOutlet.textColor = normalLimitValueColor
+            })
+            
+        }
+        
+    }
+    
+    /// function which is triggered when hideCoverView is called
+    @objc func handleTapCoverView(_ sender: UITapGestureRecognizer) {
+        screenLockUpdate(enabled: false)
+    }
     
     // MARK: - Actions for SwiftUI Hosting Controller integration
     
@@ -395,37 +479,40 @@ final class RootViewController: UIViewController, ObservableObject {
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryRootView)
     
     /// coreDataManager to be used throughout the project
-    private var coreDataManager:CoreDataManager?
+    private var coreDataManager: CoreDataManager?
     
     /// to solve problem that sometemes UserDefaults key value changes is triggered twice for just one change
-    private let keyValueObserverTimeKeeper:KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
+    private let keyValueObserverTimeKeeper: KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
     
     /// calibrator to be used for calibration, value will depend on transmitter type
-    private var calibrator:Calibrator?
+    private var calibrator: Calibrator?
     
     /// BgReadingsAccessor instance
-    private var bgReadingsAccessor:BgReadingsAccessor?
+    private var bgReadingsAccessor: BgReadingsAccessor?
     
     /// CalibrationsAccessor instance
-    private var calibrationsAccessor:CalibrationsAccessor?
+    private var calibrationsAccessor: CalibrationsAccessor?
 	
     /// NightScoutUploadManager instance
-    private var nightScoutUploadManager:NightScoutUploadManager?
+    private var nightScoutUploadManager: NightScoutUploadManager?
     
     /// AlerManager instance
-    private var alertManager:AlertManager?
+    private var alertManager: AlertManager?
     
     /// LoopManager instance
-    private var loopManager:LoopManager?
+    private var loopManager: LoopManager?
     
     /// SoundPlayer instance
-    private var soundPlayer:SoundPlayer?
+    private var soundPlayer: SoundPlayer?
     
     /// nightScoutFollowManager instance
-    private var nightScoutFollowManager:NightScoutFollowManager?
+    private var nightScoutFollowManager: NightScoutFollowManager?
+    
+    /// libreLinkUpFollowManager instance
+    private var libreLinkUpFollowManager: LibreLinkUpFollowManager?
     
     /// dexcomShareUploadManager instance
-    private var dexcomShareUploadManager:DexcomShareUploadManager?
+    private var dexcomShareUploadManager: DexcomShareUploadManager?
     
     /// WatchManager instance
     private var watchManager: WatchManager?
@@ -496,11 +583,17 @@ final class RootViewController: UIViewController, ObservableObject {
     /// initiate a Timer object that we will use later to keep the clock view updated if the user activates the screen lock
     private var clockTimer: Timer?
     
+    /// initiate a Timer object that we will use keep the follower connection status updated every 30 seconds or so
+    private var followerConnectionTimer: Timer?
+    
     /// UIAlertController to use when user chooses to lock the screen. Defined here so we can dismiss it when app goes to the background
     private var screenLockAlertController: UIAlertController?
     
     /// create the landscape view
     private var landscapeChartViewController: LandscapeChartViewController?
+    
+    /// uiview to be used for the night-mode overlay to darken the app screen
+    private var overlayView: UIView?
 
     
     // MARK: - overriden functions
@@ -527,15 +620,9 @@ final class RootViewController: UIViewController, ObservableObject {
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabelsAndChart(overrideApplicationState: true)
         
-        // show the mini-chart as required
-        if !screenIsLocked {
-            miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
-        }
-        
-        // show the statistics view as required. If not, hide it and show the spacer view to keep segmentedControlChartHours separated a bit more away from the main Tab bar
-        if !screenIsLocked {
-            statisticsView.isHidden = !UserDefaults.standard.showStatistics
-        }
+        // show the mini-chart and other info as required
+        miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
+        statisticsView.isHidden = !UserDefaults.standard.showStatistics
         
         segmentedControlStatisticsDaysView.isHidden = !UserDefaults.standard.showStatistics
         
@@ -545,11 +632,11 @@ final class RootViewController: UIViewController, ObservableObject {
             activityMonitorOutlet.isHidden = false
         }
         
-        // display the sensor countdown graphics if applicable
-        updateSensorCountdown()
+        // display the data source info view if applicable
+        updateDataSourceInfo(animate: true)
         
         // update statistics related outlets
-        updateStatistics(animatePieChart: true, overrideApplicationState: true)
+        updateStatistics(animate: true, overrideApplicationState: true)
         
     }
     
@@ -559,6 +646,21 @@ final class RootViewController: UIViewController, ObservableObject {
         self.tabBarController?.cleanTitles()
         
         updateWatchApp()
+        
+        // let's run the data source info and chart update 1 second after the root view appears. This should give time for the follower modes to download and populate the info needed.
+        // no animation is needed as in most cases, we're just refreshing and displaying what is already shown on screen so we want to keep this refresh invisible.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            
+            // if the user locks the screen before the update is called, then don't run the update
+            if !self.screenIsLocked {
+                
+                self.updateDataSourceInfo(animate: false)
+                
+            }
+            
+            self.updateLabelsAndChart(overrideApplicationState: true)
+            
+        }
         
     }
     
@@ -639,47 +741,23 @@ final class RootViewController: UIViewController, ObservableObject {
                  break
              }
         
-                
-        // format the segmented control of the chart hours if possible (should normally be ok)
-        if #available(iOS 13.0, *) {
-            
-            // set the basic formatting. We basically want it to dissapear into the background
-            segmentedControlChartHours.backgroundColor = ConstantsUI.segmentedControlBackgroundColor
-            segmentedControlChartHours.tintColor = ConstantsUI.segmentedControlBackgroundColor
-            segmentedControlChartHours.layer.borderWidth = ConstantsUI.segmentedControlBorderWidth
-
-            
-            // format the unselected segments
-            segmentedControlChartHours.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlNormalTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.normal)
-            
-            // format the selected segment
-            segmentedControlChartHours.selectedSegmentTintColor = ConstantsUI.segmentedControlSelectedTintColor
-            
-            segmentedControlChartHours.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlSelectedTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.selected)
         
-        }
+        // format the segmented control of the chart hours. We basically want it to dissapear into the background
+        segmentedControlChartHours.backgroundColor = ConstantsUI.segmentedControlBackgroundColor
+        segmentedControlChartHours.tintColor = ConstantsUI.segmentedControlBackgroundColor
+        segmentedControlChartHours.layer.borderWidth = ConstantsUI.segmentedControlBorderWidth
+        segmentedControlChartHours.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlNormalTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.normal)
+        segmentedControlChartHours.selectedSegmentTintColor = ConstantsUI.segmentedControlSelectedTintColor
+        segmentedControlChartHours.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlSelectedTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.selected)
         
+        // set the basic formatting of the chart days
+        segmentedControlStatisticsDays.backgroundColor = ConstantsUI.segmentedControlBackgroundColor
+        segmentedControlStatisticsDays.tintColor = ConstantsUI.segmentedControlBackgroundColor
+        segmentedControlStatisticsDays.layer.borderWidth = ConstantsUI.segmentedControlBorderWidth
+        segmentedControlStatisticsDays.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlNormalTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.normal)
+        segmentedControlStatisticsDays.selectedSegmentTintColor = ConstantsUI.segmentedControlSelectedTintColor
+        segmentedControlStatisticsDays.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlSelectedTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.selected)
         
-        // format the segmented control of the chart hours if possible (should normally be ok)
-        if #available(iOS 13.0, *) {
-            
-            // set the basic formatting. We basically want it to dissapear into the background
-            segmentedControlStatisticsDays.backgroundColor = ConstantsUI.segmentedControlBackgroundColor
-            
-            segmentedControlStatisticsDays.tintColor = ConstantsUI.segmentedControlBackgroundColor
-            
-            segmentedControlStatisticsDays.layer.borderWidth = ConstantsUI.segmentedControlBorderWidth
-
-            
-            // format the unselected segments
-            segmentedControlStatisticsDays.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlNormalTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.normal)
-            
-            // format the selected segment
-            segmentedControlStatisticsDays.selectedSegmentTintColor = ConstantsUI.segmentedControlSelectedTintColor
-            
-            segmentedControlStatisticsDays.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: ConstantsUI.segmentedControlSelectedTextColor, NSAttributedString.Key.font: ConstantsUI.segmentedControlFont], for:.selected)
-            
-        }
         
         // if a RTL localization is in use (such as arabic), then correctly align the low (<x) and high (>x) label outlets towards the centre of the (now reversed) horizontal stack views
         if UIView.userInterfaceLayoutDirection(for: view.semanticContentAttribute) == UIUserInterfaceLayoutDirection.rightToLeft {
@@ -698,6 +776,9 @@ final class RootViewController: UIViewController, ObservableObject {
         // enable or disable the buttons 'sensor' and 'calibrate' on top, depending on master or follower
         changeButtonsStatusTo(enabled: UserDefaults.standard.isMaster)
         
+        // nillify the active sensor start date on start-up
+        UserDefaults.standard.activeSensorStartDate = nil
+        
         // Setup Core Data Manager - setting up coreDataManager happens asynchronously
         // completion handler is called when finished. This gives the app time to already continue setup which is independent of coredata, like initializing the views
         coreDataManager = CoreDataManager(modelName: ConstantsCoreData.modelName, completion: {
@@ -713,11 +794,11 @@ final class RootViewController: UIViewController, ObservableObject {
             // update the mini-chart
             self.updateMiniChart()
             
-            // update sensor countdown
-            self.updateSensorCountdown()
+            // update data source info
+            self.updateDataSourceInfo(animate: true)
             
             // update statistics related outlets
-            self.updateStatistics(animatePieChart: true, overrideApplicationState: true)
+            self.updateStatistics(animate: true, overrideApplicationState: true)
             
             // create badge counter
             self.createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
@@ -775,16 +856,19 @@ final class RootViewController: UIViewController, ObservableObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showClockWhenScreenIsLocked.rawValue, options: .new, context: nil)
         
         
-        // high mark , low mark , urgent high mark, urgent low mark. change requires redraw of graph
+        // high mark , low mark , urgent high mark, urgent low mark. change requires redraw of chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.urgentLowMarkValue.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.lowMarkValue.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.highMarkValue.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.urgentHighMarkValue.rawValue, options: .new, context: nil)
+        
+        // updating the offset carbs on chart requires a redraw of the chart
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.offsetCarbTreatmentsOnChart.rawValue, options: .new, context: nil)
 
         // add observer for nightScoutTreatmentsUpdateCounter, to reload the chart whenever a treatment is added or updated or deleted changes
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
         
-        // add observer for stopActiveSensor, this will reset the active sensor to nil when the user disconnects an intergrated transmitter/sensor (e.g. Libre 2 Direct). This will help ensure that the sensor countdown is updated disabled until a new sensor is started.
+        // add observer for stopActiveSensor, this will reset the active sensor to nil when the user disconnects an intergrated transmitter/sensor (e.g. Libre 2 Direct). This will help ensure that the data source info is updated/disabled until a new sensor is started.
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.stopActiveSensor.rawValue, options: .new, context: nil)
 
         // setup delegate for UNUserNotificationCenter
@@ -823,7 +907,24 @@ final class RootViewController: UIViewController, ObservableObject {
         })
         
         // add tracing when app goes from foreground to background
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyTraceAppGoesToBackGround, closure: {trace("Application did enter background", log: self.log, category: ConstantsLog.categoryRootView, type: .info)})
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyTraceAppGoesToBackGround, closure: {
+            
+            trace("Application did enter background", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            
+            if !UserDefaults.standard.isMaster {
+                
+                trace("    follower background keep-alive type: %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, UserDefaults.standard.followerBackgroundKeepAliveType.description)
+                
+                self.followerConnectionTimer?.invalidate()
+                self.followerConnectionTimer = nil
+                
+            }
+            
+            if self.screenIsLocked {
+                self.screenLockUpdate(enabled: false)
+            }
+            
+        })
         
         // add tracing when app comes to foreground
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyTraceAppGoesToForeground, closure: {trace("Application will enter foreground", log: self.log, category: ConstantsLog.categoryRootView, type: .info)})
@@ -840,17 +941,22 @@ final class RootViewController: UIViewController, ObservableObject {
         // reinitialise glucose chart and also to update labels and chart
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {
             
-            // Schedule a call to updateLabelsAndChart when the app comes to the foreground, with a delay of 0.5 seconds. Because the application state is not immediately to .active, as a result, updates may not happen - especially the synctreatments may not happen because this may depend on the application state - by making a call just half a second later, when the status is surely = .active, the treatments sync will be done.
-            Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.updateLabelsAndChart), userInfo: nil, repeats:false)
-
-            self.updateLabelsAndChart(overrideApplicationState: true)
+            // update the connection status immediately (this will give the user a visual feedback that the connection was lost in the background if they have disabled keep-alive)
+            self.setFollowerConnectionStatus()
             
-            self.updateMiniChart()
-            
-            self.updateSensorCountdown()
-            
-            // update statistics related outlets
-            self.updateStatistics(animatePieChart: false)
+            // Schedule a call to updateLabelsAndChart when the app comes to the foreground, with a delay of 0.5 seconds. Because the application state is not immediately to .active, as a result, updates may not happen - especially the synctreatments may not happen because this may depend on the application state - by making a call just half a second later, when the status is surely = .active, the UI updates will be done correctly.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                
+                self.updateLabelsAndChart(overrideApplicationState: true)
+                
+                self.updateMiniChart()
+                
+                self.updateDataSourceInfo(animate: true)
+                
+                // update statistics related outlets
+                self.updateStatistics(animate: true)
+                
+            }
             
         })
         
@@ -945,7 +1051,10 @@ final class RootViewController: UIViewController, ObservableObject {
         guard let soundPlayer = soundPlayer else { fatalError("In setupApplicationData, this looks very in appropriate, shame")}
         
         // setup nightscoutmanager
-        nightScoutFollowManager = NightScoutFollowManager(coreDataManager: coreDataManager, nightScoutFollowerDelegate: self)
+        nightScoutFollowManager = NightScoutFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
+        
+        // setup nightscoutmanager
+        libreLinkUpFollowManager = LibreLinkUpFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
         
         // setup healthkitmanager
         healthKitManager = HealthKitManager(coreDataManager: coreDataManager)
@@ -1300,10 +1409,10 @@ final class RootViewController: UIViewController, ObservableObject {
                     updateMiniChart()
                     
                     // update statistics related outlets
-                    updateStatistics(animatePieChart: false)
+                    updateStatistics(animate: false)
                     
-                    // update sensor countdown graphic
-                    updateSensorCountdown()
+                    // update data source info
+                    updateDataSourceInfo(animate: false)
                     
                 }
                 
@@ -1369,9 +1478,6 @@ final class RootViewController: UIViewController, ObservableObject {
 
             }
             
-        default:
-            break
-            
         }
         
     }
@@ -1382,7 +1488,7 @@ final class RootViewController: UIViewController, ObservableObject {
         // first check keyValueObserverTimeKeeper
         switch keyPathEnum {
         
-        case UserDefaults.Key.isMaster, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.daysToUseStatistics, UserDefaults.Key.showMiniChart :
+        case UserDefaults.Key.isMaster, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.daysToUseStatistics, UserDefaults.Key.showMiniChart, UserDefaults.Key.activeSensorStartDate :
             
             // transmittertype change triggered by user, should not be done within 200 ms
             if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
@@ -1439,6 +1545,11 @@ final class RootViewController: UIViewController, ObservableObject {
             // update Watch App with the new objective values
             updateWatchApp()
             
+        case UserDefaults.Key.offsetCarbTreatmentsOnChart:
+            
+            // redraw chart is necessary
+            updateChartWithResetEndDate()
+            
         case UserDefaults.Key.showMiniChart:
             
             // show/hide mini-chart view as required
@@ -1452,7 +1563,7 @@ final class RootViewController: UIViewController, ObservableObject {
         case UserDefaults.Key.daysToUseStatistics:
             
             // refresh statistics calculations/view is necessary
-            updateStatistics(animatePieChart: true, overrideApplicationState: false)
+            updateStatistics(animate: true, overrideApplicationState: false)
             
         case UserDefaults.Key.showClockWhenScreenIsLocked:
             
@@ -1468,7 +1579,9 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 sensorStopDetected()
                 
-                updateSensorCountdown()
+                UserDefaults.standard.activeSensorStartDate = nil
+                
+                updateDataSourceInfo(animate: false)
                 
                 UserDefaults.standard.stopActiveSensor = false
                 
@@ -1951,8 +2064,8 @@ final class RootViewController: UIViewController, ObservableObject {
             // Create Notification Content
             let notificationContent = UNMutableNotificationContent()
             
-            // set value in badge if required
-            if UserDefaults.standard.showReadingInAppBadge {
+            // set value in badge if required and also only if master, or when background keep alive is enabled for followers
+            if UserDefaults.standard.showReadingInAppBadge && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster &&  UserDefaults.standard.followerBackgroundKeepAliveType != .disabled)) {
                 
                 // rescale if unit is mmol
                 if !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
@@ -1993,9 +2106,9 @@ final class RootViewController: UIViewController, ObservableObject {
         }
         else {
             
-            // notification shouldn't be shown, but maybe the badge counter. Here the badge value needs to be shown in another way
+            // notification shouldn't be shown, but maybe the badge counter. Here the badge value needs to be shown in another way and also only if master, or when background keep alive is enabled for followers
             
-            if UserDefaults.standard.showReadingInAppBadge {
+            if UserDefaults.standard.showReadingInAppBadge && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled)) {
                 
                 // rescale of unit is mmol
                 readingValueForBadge = readingValueForBadge.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
@@ -2021,7 +2134,9 @@ final class RootViewController: UIViewController, ObservableObject {
     ///     - forceReset : if true, then force the update to be done even if the main chart is panned back in time (used for the double tap gesture)
     @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
         
-        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        DispatchQueue.main.async {
+            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        }
         
         // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
         if let glucoseChartManager = glucoseChartManager  {
@@ -2039,6 +2154,10 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // to make the following code a bit more readable
         let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        
+        // if in follower mode, show the patient name if one has been entered
+        followerPatientNameLabelOutlet.text = UserDefaults.standard.followerPatientName ?? ""
+        followerPatientNameLabelOutlet.isHidden = UserDefaults.standard.isMaster
         
         // set minutesLabelOutlet.textColor to white, might still be red due to panning back in time
         self.minutesLabelOutlet.textColor = UIColor.white
@@ -2362,7 +2481,7 @@ final class RootViewController: UIViewController, ObservableObject {
         if sender.state == .began {
 
             // call the UIAlert but assume that the user wants a simple screen lock, not the full lock mode
-            screenLockAlert(overrideScreenIsLocked: true, showClock: false)
+            screenLockAlert(overrideScreenIsLocked: true, nightMode: false)
             
         }
         
@@ -2420,7 +2539,8 @@ final class RootViewController: UIViewController, ObservableObject {
         
     }
     
-    // a long function just to get the timestamp of the last disconnect or reconnect. If not known then returns 1 1 1970
+    /// a long function just to get the timestamp of the last disconnect or reconnect. If not known then returns 1 1 1970
+    /// - Returns: a timestamp of the last disconnect/reconnect
     private func lastConnectionStatusChangeTimeStamp() -> Date  {
         
         // this is actually unwrapping of optionals, goal is to get date of last disconnect/reconnect - all optionals should exist so it doesn't matter what is returned true or false
@@ -2431,8 +2551,11 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     
-    // helper function to calculate the statistics and update the pie chart and label outlets
-    private func updateStatistics(animatePieChart: Bool = false, overrideApplicationState: Bool = false) {
+    /// helper function to calculate the statistics and update the pie chart and label outlets
+    /// - Parameters:
+    ///   - animate: if true, will animate the drawing of the pie chart
+    ///   - overrideApplicationState: if true, it will update the statistics even if the app is, for example, in the background
+    private func updateStatistics(animate: Bool = false, overrideApplicationState: Bool = false) {
         
         // don't calculate statis if app is not running in the foreground
         guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
@@ -2486,7 +2609,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // set the title labels to their correct localization
             self.lowTitleLabelOutlet.text = Texts_Common.lowStatistics
-            self.inRangeTitleLabelOutlet.text = Texts_Common.inRangeStatistics
+            self.inRangeTitleLabelOutlet.text = UserDefaults.standard.useTITRStatisticsRange ? Texts_Common.inTightRangeStatistics : Texts_Common.inRangeStatistics
             self.highTitleLabelOutlet.text = Texts_Common.highStatistics
             self.averageTitleLabelOutlet.text = Texts_Common.averageStatistics
             self.a1cTitleLabelOutlet.text = Texts_Common.a1cStatistics
@@ -2541,7 +2664,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             
             // disable the chart animation if it's just a normal update, enable it if the call comes from didAppear()
-            if animatePieChart {
+            if animate {
                 self.pieChartOutlet.animDuration = ConstantsStatistics.pieChartAnimationSpeed
             } else {
                 self.pieChartOutlet.animDuration = 0
@@ -2616,17 +2739,17 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     /// swaps status from locked to unlocked or vice versa, and creates alert to inform user
-    /// - parameters:
-    ///     - overrideScreenIsLocked : if true, then screen will be locked even if it's already locked. If false, then status swaps from locked to unlocked or unlocked to locked
-    ///     - showClock : when true this parameter will be passed to the screeLockUpdate function and this will lock the screen in the full lock mode adjusting font sizes and showing the clock as required.
-    private func screenLockAlert(overrideScreenIsLocked: Bool = false, showClock: Bool = true) {
+    /// - Parameters:
+    ///   - overrideScreenIsLocked: if true, then screen will be locked even if it's already locked. If false, then status swaps from locked to unlocked or unlocked to locked
+    ///   - nightMode: when true this parameter will be passed to the screeLockUpdate function and this will lock the screen with the screen dimming and other features activated as selected
+    private func screenLockAlert(overrideScreenIsLocked: Bool = false, nightMode: Bool = true) {
         
         if !screenIsLocked || overrideScreenIsLocked {
             
             trace("screen lock : user clicked the lock button or long pressed the value", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
             // lock and update the screen
-            self.screenLockUpdate(enabled: true, showClock: showClock)
+            self.screenLockUpdate(enabled: true, nightMode: nightMode)
             
             // only trigger the UIAlert if the user hasn't previously asked to not show it again
             if !UserDefaults.standard.lockScreenDontShowAgain {
@@ -2670,7 +2793,7 @@ final class RootViewController: UIViewController, ObservableObject {
             trace("screen lock : user clicked the unlock button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
             // this means the user has clicked the button whilst the screen look in already in place so let's turn the function off
-            self.screenLockUpdate(enabled: false, showClock: showClock)
+            self.screenLockUpdate(enabled: false, nightMode: nightMode)
             
         }
         
@@ -2680,8 +2803,8 @@ final class RootViewController: UIViewController, ObservableObject {
     /// this function will run when the user wants the screen to lock, or whenever the view appears and it will set up the screen correctly for each mode
     /// - parameters :
     ///     - enabled : when true this will force the screen to lock
-    ///     - showClock : when false, this will enable a simple screen lock without changing the UI - useful for keeping the screen open on your desk
-    private func screenLockUpdate(enabled: Bool = true, showClock: Bool = true) {
+    ///     - nightMode : when false, this will enable a simple screen lock without changing the UI - useful for keeping the screen open on your desk. True will bring the full screen lock changes to the UI
+    private func screenLockUpdate(enabled: Bool = true, nightMode: Bool = true) {
 
         if enabled {
             
@@ -2690,17 +2813,13 @@ final class RootViewController: UIViewController, ObservableObject {
             
             screenLockToolbarButtonOutlet.tintColor = UIColor.red
             
-            // vibrate so that user knows that the screen lock has been activated
-            AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+            // play "peek" so that user knows that the screen lock has been activated.
+            // we use a soft, short vibration so that it isn't too noisy at night when selected.
+            AudioServicesPlaySystemSound(1519)
             
-            // check if iOS13 or newer is being used. If it is, then take advantage of SF Symbols to fill in the lock icon to make it stand out more
-            if #available(iOS 13.0, *), showClock {
+            if nightMode {
 
                 screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock.fill")
-            
-            }
-            
-            if showClock {
                 
                 // set the value label font size to big
                 valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeScreenLock
@@ -2709,7 +2828,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 miniChartOutlet.isHidden = true
                 statisticsView.isHidden = true
                 segmentedControlsView.isHidden = true
-                sensorCountdownOutlet.isHidden = true
+                sensorProgressViewOutlet.isHidden = true
+                dataSourceViewOutlet.isHidden = true
                 
                 if UserDefaults.standard.showClockWhenScreenIsLocked {
                     
@@ -2732,6 +2852,22 @@ final class RootViewController: UIViewController, ObservableObject {
                     clockView.isHidden = true
                     
                 }
+                
+                if UserDefaults.standard.screenLockDimmingType != .disabled {
+                    
+                    // set a tap gesture so that we can remove the overlay view when the user taps it
+                    let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTapCoverView(_:)))
+                    
+                    //create a new view with the same size as the app screen
+                    overlayView = UIView(frame: UIScreen.main.bounds)
+                    overlayView?.backgroundColor = UserDefaults.standard.screenLockDimmingType.dimmingColor
+                    overlayView?.isUserInteractionEnabled = true
+                    overlayView?.addGestureRecognizer(tap)
+                    
+                    // add it to the tab bar controller so that it cover the whole app window
+                    tabBarController?.view.addSubview(overlayView!)
+                    
+                }
             
             }
 
@@ -2741,10 +2877,10 @@ final class RootViewController: UIViewController, ObservableObject {
             // prevent screen rotation
             (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
             
-            // set the private var so that we can track the screen lock activation within the RootViewController
+            // set the private var so that we can track the screen lock activation state within the RootViewController
             screenIsLocked = true
            
-            trace("screen lock : screen lock / keep-awake enabled", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            trace("screen lock : screen lock / keep-awake enabled. Night mode set to '%{public}@'. Dimming type set to '%{public}@'", log: self.log, category: ConstantsLog.categoryRootView, type: .info, nightMode.description, UserDefaults.standard.screenLockDimmingType.description)
             
         } else {
             
@@ -2753,24 +2889,22 @@ final class RootViewController: UIViewController, ObservableObject {
             
             screenLockToolbarButtonOutlet.tintColor = nil
             
-            // check if iOS13 or newer is being used. If it is, then set the lock icon back to the standard SF Symbol
-            if #available(iOS 13.0, *) {
-                
-                screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock")
-            
-            }
+            // set the lock icon back to the standard SF Symbol
+            screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock")
 
             valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeNormal
             
-            // hide
+            // unhide as needed
+            segmentedControlsView.isHidden = false
             miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
             statisticsView.isHidden = !UserDefaults.standard.showStatistics
-            segmentedControlsView.isHidden = false
-            sensorCountdownOutlet.isHidden = !UserDefaults.standard.showSensorCountdown
+            sensorProgressViewOutlet.isHidden = false
+            dataSourceViewOutlet.isHidden = false
             
+            // hide
             clockView.isHidden = true
             
-            if showClock {
+            if UserDefaults.standard.showClockWhenScreenIsLocked {
                 
                 // destroy the timer instance so that it doesn't keep using resources
                 clockTimer?.invalidate()
@@ -2784,7 +2918,13 @@ final class RootViewController: UIViewController, ObservableObject {
             updateScreenRotationSettings()
             
             trace("screen lock / keep-awake disabled", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-
+            
+            if UserDefaults.standard.screenLockDimmingType != .disabled {
+                overlayView?.removeFromSuperview()
+            }
+            
+            updateDataSourceInfo(animate: true)
+            
             screenIsLocked = false
             
         }
@@ -2811,88 +2951,268 @@ final class RootViewController: UIViewController, ObservableObject {
 
     }
     
-    
-    /// this function will check if the user is using a time-sensitive sensor (such as a 14 day Libre, calculate the days remaining and then update the imageUI with the relevant svg image from the project assets.
-    private func updateSensorCountdown() {
+    /// update the data source information view and also the sensor progress view (if needed)
+    /// - Parameter animate: will animate the sensor progress view if true
+    private func updateDataSourceInfo(animate: Bool?) {
         
-        // if the user has chosen not to display the countdown graphic, then make sure the graphic is hidden and just return back without doing anything
-        if !UserDefaults.standard.showSensorCountdown {
-            sensorCountdownOutlet.isHidden = true
-            return
-        }
+        let isMaster: Bool = UserDefaults.standard.isMaster
         
-        // if there's no active sensor, there's nothing to do or show
-        guard activeSensor != nil else {
-            sensorCountdownOutlet.isHidden = true
-            return
-        }
+        // reset relevant labels colors just in case they were changed the previous time this function was called
+        dataSourceSensorMaxAgeOutlet.textColor = .lightGray
         
-        // check that the sensor start date is not nil before unwrapping it
-        guard activeSensor?.startDate != nil else {
-            return
+        // some calls to this function (such as when bringing the homescreen to the foreground) can specify to animate the progress view.
+        // normal updates such as receiving a new BG reading whilst the app is in the foreground shouldn't cause an animation
+        let animate: Bool = animate ?? false
+        
+        // used to track the active sensor type if there is one connected. Initialise it as Libre just so that it is actually initialised as something. We'll update it later as needed.
+        var sensorType: CGMSensorType = .Libre
+        
+        // check if there is an active sensor connected via cgmTransmitter in master mode
+        // if so, then use this value to override/set the coredata activeSensorStartDate
+        if let startDate = activeSensor?.startDate {
+            
+            UserDefaults.standard.activeSensorStartDate = startDate
+            
         }
         
         // check if there is a transmitter connected (needed as Dexcom will only connect briefly every 5 minutes)
         // if there is a transmitter connected, pull the current maxSensorAgeInDays and store in in UserDefaults
         if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let maxDays = cgmTransmitter.maxSensorAgeInDays() {
-            UserDefaults.standard.maxSensorAgeInDays = maxDays
+            
+            UserDefaults.standard.activeSensorMaxSensorAgeInDays = maxDays
+            
+            UserDefaults.standard.activeSensorDescription = cgmTransmitter.cgmTransmitterType().detailedDescription()
+            
+            // update the sensor type - needed to make sure we test with the correct warm-up times later
+            sensorType = cgmTransmitter.cgmTransmitterType().sensorType()
+            
         }
         
-        // pull the boolean value from UserDefaults to see if you user prefers the alternative graphics (count-up instead of count-down)
-        let showSensorCountdownAlternativeGraphics = UserDefaults.standard.showSensorCountdownAlternativeGraphics
-
-        // check if the sensor type has a hard coded maximum sensor life previously stored.
-        if let maxSensorAgeInDays = UserDefaults.standard.maxSensorAgeInDays as Int?, maxSensorAgeInDays > 0 {
+        // let's just check that we've got enough information to display the view
+        // with sensor start date and max age, we can display the minimum needed
+        let sensorStartDate = UserDefaults.standard.activeSensorStartDate //?.addingTimeInterval(-86400*6.0)
         
-            // calculate how many hours the sensor has been used for since starting. We need to use hours instead of days because during the last day we need to see how many hours are left so that we can display the warning and urgent status graphics.
-            let currentSensorAgeInHours: Int = Calendar.current.dateComponents([.hour], from: activeSensor!.startDate - 5 * 60, to: Date()).hour!
+        let sensorMaxAgeInMinutes: Double = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
+        
+        if (sensorStartDate != nil && sensorMaxAgeInMinutes > 0) {
             
-            // we need to calculate the hours so that we can see if we need to show the yellow (<12hrs remaining) or red (<6hrs remaining) graphics
-            let sensorCountdownHoursRemaining: Int = (maxSensorAgeInDays * 24) - currentSensorAgeInHours
+            sensorProgressViewOutlet.isHidden = false
+            dataSourceViewOutlet.isHidden = false
             
-            // start programatically creating the asset name that we will loaded. This is based upon the max sensor days and the days "remaining". To get the full days, we need to round up the currentSensorAgeInHours to the nearest 24 hour block
-            var sensorCountdownAssetName: String = "sensor" +  String(maxSensorAgeInDays) + "_"
-
-            // find the amount of days remaining and add it to the asset name string. If there is less than 12 hours, add the corresponding warning/urgent label. If the sensor hours remaining is 0 or less, then the sensor is either expired or in the last 12 hours of "overtime" (e.g Libre sensors have an extra 12 hours before the stop working). If this happens, then instead of appending the days left, always show the "00" graphic.
-            if sensorCountdownHoursRemaining > 0 {
+            let sensorAgeInMinutes: Double = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate!, to: Date()).minute!)
+            
+            let sensorTimeLeftInMinutes: Double = sensorMaxAgeInMinutes - sensorAgeInMinutes
+            
+            // blank out the current sensor age label by default. If the sensor isn't in warm-up, then it will be filled in later
+            dataSourceSensorCurrentAgeOutlet.text = ""
+            
+            // set-up the labels for the sensor time, total and also if still considered in warm-up
+            if !isMaster && UserDefaults.standard.followerDataSourceType == .libreLinkUp && sensorAgeInMinutes < ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre {
                 
-                sensorCountdownAssetName += String(format: "%02d", maxSensorAgeInDays - Int(round(Double(currentSensorAgeInHours / 24)) * 24) / 24)
+                // the LibreLinkUp active sensor is still in warm-up
+                if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre * 60) {
+                    
+                    dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                }
                 
-                switch sensorCountdownHoursRemaining {
-
-                    case 7...12:
-                        sensorCountdownAssetName += "_warning"
-                    case 1...6:
-                        sensorCountdownAssetName += "_urgent"
-                    default: break
-
+            } else if isMaster && sensorType == .Libre && sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutes {
+                
+                // the connected Libre sensor is still in warm-up (as per defined minimum warm-up time)
+                if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutes * 60) {
+                    
+                    dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                    
+                }
+                
+            } else if isMaster && sensorType == .Dexcom && sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6 {
+                
+                // the connected Dexcom sensor is still in warm-up (as per defined standard Dexcom warm-up time)
+                if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6 * 60) {
+                    
+                    dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                    
                 }
                 
             } else {
                 
-                sensorCountdownAssetName += "00"
+                // fill in the labels to show sensor time elapsed and max age
+                dataSourceSensorCurrentAgeOutlet.text = sensorStartDate?.daysAndHoursAgo()
+                
+                dataSourceSensorMaxAgeOutlet.text = " / " + sensorMaxAgeInMinutes.minutesToDaysAndHours()
                 
             }
             
-            // if the user prefers the alternative graphics (count-up), then append this to the end of the string
-            if showSensorCountdownAlternativeGraphics {
-                sensorCountdownAssetName += "_alt"
+            // set progress view colours and text colours from constants file
+            sensorProgressOutlet.trackTintColor = ConstantsHomeView.sensorProgressViewTrackingColor
+            sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColor
+            
+            dataSourceLabelOutlet.textColor = ConstantsHomeView.sensorProgressNormalTextColor
+            dataSourceSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressNormalTextColor
+            dataSourceSensorMaxAgeOutlet.textColor = ConstantsHomeView.sensorProgressNormalTextColor
+            
+            // irrespective of all the above, if the current sensor age is over the max age, then just set everything to the expired colour to make it clear
+            if sensorTimeLeftInMinutes < 0 {
+                
+                sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressExpired
+                dataSourceSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressExpired
+                dataSourceSensorMaxAgeOutlet.textColor = ConstantsHomeView.sensorProgressExpired
+                
+            } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewUrgentInMinutes {
+                
+                // sensor is very close to ending
+                dataSourceSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressViewProgressColorUrgent
+                sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColorUrgent
+                
+            } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewWarningInMinutes {
+                
+                // sensor will soon be close to ending
+                dataSourceSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressViewProgressColorWarning
+                sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColorWarning
+                
             }
             
-            // update the UIImage
-            sensorCountdownOutlet.image = UIImage(named: sensorCountdownAssetName)
+            // set the sensor/system description
+            dataSourceLabelOutlet.text = UserDefaults.standard.activeSensorDescription
             
-            // show the sensor countdown image
-            sensorCountdownOutlet.isHidden = false
+            // if animatation is requested, then first set the value to 0
+            if animate {
+                
+                sensorProgressOutlet.setProgress(0.0, animated: false)
+                
+            }
+            
+            // let's run the progress update in an async thread with a really small delay so that the animation updates smoothly after the view has appeared
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                
+                self.sensorProgressOutlet.setProgress(Float(1 - (sensorTimeLeftInMinutes / sensorMaxAgeInMinutes)), animated: animate)
+                
+            }
             
         } else {
-
-            // this must be a sensor without a maxSensorAge , so just make sure to hide the sensor countdown image and do nothing
-            sensorCountdownOutlet.isHidden = true
-
+            
+            // there is no sensor startdate/max days so we can't report sensor progress
+            sensorProgressViewOutlet.isHidden = true
+            
+            // the above means we must be in follower mode, so let's set the connection status
+            setFollowerConnectionStatus()
+            
+            // set the keep-alive image, then make it visible if in follower mode
+            dataSourceKeepAliveImageOutlet.image = UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImage
+            dataSourceKeepAliveImageOutlet.isHidden = isMaster
+            
+            dataSourceSensorCurrentAgeOutlet.text = ""
+            dataSourceSensorMaxAgeOutlet.text = ""
+            
+            if !isMaster {
+                
+                dataSourceLabelOutlet.text = UserDefaults.standard.followerDataSourceType.fullDescription
+                
+                switch UserDefaults.standard.followerDataSourceType {
+                    
+                case .nightscout:
+                    
+                    if !UserDefaults.standard.nightScoutEnabled {
+                        
+                        dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                        dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.nightscoutNotEnabled
+                        
+                    } else if UserDefaults.standard.nightScoutUrl == nil {
+                        
+                        dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                        dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.nightscoutURLMissing
+                        
+                    } else {
+                        
+                        var nightScoutUrlString: String = UserDefaults.standard.nightScoutUrl ?? ""
+                        
+                        // let's use a shortened version of the url if necessary to display it cleanly in the UI. The main reason is that some of the newer service providers (such as Northflank and Google Cloud) use really long URLs as standard.
+                        if nightScoutUrlString.count > 36 {
+                            nightScoutUrlString = nightScoutUrlString.replacingOccurrences(of: nightScoutUrlString.dropFirst(33), with: "...")
+                        }
+                        
+                        dataSourceSensorMaxAgeOutlet.textColor = .systemGray
+                        dataSourceSensorMaxAgeOutlet.text = nightScoutUrlString
+                        
+                    }
+                   
+                case .libreLinkUp:
+                    
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    
+                    if UserDefaults.standard.libreLinkUpEmail == nil || UserDefaults.standard.libreLinkUpPassword == nil {
+                        
+                        dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.libreLinkUpAccountCredentialsMissing
+                        
+                    } else {
+                        dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.noSensorData
+                        
+                    }
+                    
+                }
+                
+            } else {
+                
+                dataSourceLabelOutlet.text = " ⚠️  " + Texts_HomeView.noDataSourceConnected
+                
+            }
+            
         }
         
     }
+    
+    
+    /// this should be called when the data source view is refreshed or when called by the followerConnectionTimer object
+    @objc private func setFollowerConnectionStatus() {
+        
+        // if in master mode, hide the connection status and destroy the timer if it was initialized
+        // (for example if the user just changed from follower to master)
+        if UserDefaults.standard.isMaster {
+            
+            dataSourceConnectionStatusImage.isHidden = true
+            
+            if followerConnectionTimer != nil {
+                
+                followerConnectionTimer?.invalidate()
+                followerConnectionTimer = nil
+                
+            }
+            
+            return
+            
+        } else {
+            
+            dataSourceConnectionStatusImage.isHidden = false
+            
+            // we're in follower mode so if the timer isn't initialized, then let's start it
+            if followerConnectionTimer == nil {
+                
+                // set a timer instance to update the connection status for follower modes
+                followerConnectionTimer = Timer.scheduledTimer(timeInterval: ConstantsFollower.secondsUsedByFollowerConnectionTimer, target: self, selector: #selector(setFollowerConnectionStatus), userInfo: nil, repeats:true)
+                
+            }
+            
+        }
+        
+        // check when the last follower connection was and compare that to the actual time
+        if let timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection, let timeDifferenceInSeconds = Calendar.current.dateComponents([.second], from: timeStampOfLastFollowerConnection, to: Date()).second {
+            
+            // show "disconnected" if over the limit defined in the constants file
+            if timeDifferenceInSeconds >= UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning {
+                
+                dataSourceConnectionStatusImage.image = UIImage(systemName: "network.slash")
+                dataSourceConnectionStatusImage.tintColor = .systemGray
+                
+            } else {
+                
+                dataSourceConnectionStatusImage.image = UIImage(systemName: "network")
+                dataSourceConnectionStatusImage.tintColor = .systemGreen
+                
+            }
+            
+        }
+        
+    }
+    
     
     func showLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
         
@@ -3066,8 +3386,10 @@ final class RootViewController: UIViewController, ObservableObject {
         // set endDate of activeSensor to stopDate
         activeSensor.endDate = stopDate
         
-        // set the userdefaults maxSensorAgeInDays to 0 when stopping a sensor. This should prevent the bug where the countdown from still showing if the user changes to a different CGM type that doesn't use it at the present time (i.e. from Libre to Dexcom)
+        // nillify all active sensor data in userdefaults. This helps to prevent the sensor view UI from displaying old data.
         UserDefaults.standard.maxSensorAgeInDays = 0
+        UserDefaults.standard.activeSensorStartDate = nil
+        UserDefaults.standard.activeSensorDescription = nil
         
         // save changes to coreData
         coreDataManager.saveChanges()
@@ -3075,8 +3397,8 @@ final class RootViewController: UIViewController, ObservableObject {
         // asign nil to activeSensor
         self.activeSensor = nil
         
-        // now that the activeSensor object has been destroyed, update (hide) the sensor countdown graphic
-        updateSensorCountdown()
+        // now that the activeSensor object has been destroyed, update (hide) the data source info
+        updateDataSourceInfo(animate: false)
 
     }
     
@@ -3102,6 +3424,9 @@ extension RootViewController: CGMTransmitterDelegate {
         trace("sensor stop detected", log: log, category: ConstantsLog.categoryRootView, type: .info)
 
         stopSensor(cGMTransmitter: self.bluetoothPeripheralManager?.getCGMTransmitter(), sendToTransmitter: false)
+        
+        UserDefaults.standard.activeSensorStartDate = nil
+        UserDefaults.standard.activeSensorDescription = nil
 
     }
     
@@ -3117,6 +3442,8 @@ extension RootViewController: CGMTransmitterDelegate {
             
             // use sensorCode nil, in the end there will be no start sensor command sent to the transmitter because we just received the sensorStartTime from the transmitter, so it's already started
             startSensor(cGMTransmitter: self.bluetoothPeripheralManager?.getCGMTransmitter(), sensorStarDate: sensorStartDate, sensorCode: nil, coreDataManager: coreDataManager, sendToTransmitter: false)
+            
+            UserDefaults.standard.activeSensorStartDate = sensorStartDate
             
         }
         
@@ -3230,7 +3557,7 @@ extension RootViewController: UNUserNotificationCenterDelegate {
         } else if notification.request.identifier == ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected {
             
             // call completionhandler to show the notification even though the app is in the foreground, without sound
-            completionHandler([.alert])
+            completionHandler([.banner, .list])
             
         } else if notification.request.identifier == ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
             
@@ -3247,17 +3574,12 @@ extension RootViewController: UNUserNotificationCenterDelegate {
         }  else if notification.request.identifier == ConstantsNotifications.notificationIdentifierForVolumeTest {
             
             // user is testing iOS Sound volume in the settings. Only the sound should be played, the alert itself will not be shown
-            if #available(iOS 14.0, *) {
-                completionHandler([.sound, .list])
-            } else {
-                // Fallback on earlier versions
-                completionHandler([.sound])
-            }
+            completionHandler([.sound, .list])
             
         } else if notification.request.identifier == ConstantsNotifications.notificationIdentifierForxCGMTransmitterDelegatexDripError {
             
             // call completionhandler to show the notification even though the app is in the foreground, without sound
-            completionHandler([.alert])
+            completionHandler([.banner, .list])
             
         }
     }
@@ -3304,15 +3626,17 @@ extension RootViewController: UNUserNotificationCenterDelegate {
     }
 }
 
-// MARK: - conform to NightScoutFollowerDelegate protocol
+// MARK: - conform to FollowerDelegate protocol
 
-extension RootViewController:NightScoutFollowerDelegate {
+extension RootViewController: FollowerDelegate {
     
-    func nightScoutFollowerInfoReceived(followGlucoseDataArray: inout [NightScoutBgReading]) {
+    func followerInfoReceived(followGlucoseDataArray: inout [FollowerBgReading]) {
         
-        if let coreDataManager = coreDataManager, let bgReadingsAccessor = bgReadingsAccessor, let nightScoutFollowManager = nightScoutFollowManager {
+        if let coreDataManager = coreDataManager, let bgReadingsAccessor = bgReadingsAccessor { //}, let followManager = (UserDefaults.standard.followerDataSourceType == .nightscout ? self.nightScoutFollowManager : self.libreLinkUpFollowManager) {
             
-            trace("nightScoutFollowerInfoReceived", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+            let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+            
+            trace("followerInfoReceived", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
 
             // assign value of timeStampLastBgReading
             var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
@@ -3331,15 +3655,28 @@ extension RootViewController:NightScoutFollowerDelegate {
             
             // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
             for (_, followGlucoseData) in followGlucoseDataArray.enumerated().reversed() {
-
-                trace("    followGlucoseData timestamp = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, followGlucoseData.timeStamp.toString(timeStyle: .long, dateStyle: .long))
                 
                 if followGlucoseData.timeStamp > timeStampLastBgReading {
                     
-                    trace("    creating new bgreading timestamp = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, followGlucoseData.timeStamp.toString(timeStyle: .long, dateStyle: .long))
+                    trace("    creating new bgreading: value = %{public}@ %{public}@, timestamp =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info,  followGlucoseData.sgv.mgdlToMmol(mgdl: isMgDl).bgValuetoString(mgdl: isMgDl), isMgDl ? Texts_Common.mgdl : Texts_Common.mmol, followGlucoseData.timeStamp.toString(timeStyle: .long, dateStyle: .long))
                     
-                    // creata a new reading
-                    _ = nightScoutFollowManager.createBgReading(followGlucoseData: followGlucoseData)
+                    // create a new reading
+                    // we'll need to check which should be the active followerManager to know where to call the function
+                    switch UserDefaults.standard.followerDataSourceType {
+                        
+                    case .nightscout:
+                        
+                        if let followManager = nightScoutFollowManager {
+                            _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
+                        }
+                        
+                    case .libreLinkUp:
+                        
+                            if let followManager = libreLinkUpFollowManager {
+                                _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
+                            }
+                        
+                    }
                     
                     // a new reading was created
                     newReadingCreated = true
@@ -3352,7 +3689,7 @@ extension RootViewController:NightScoutFollowerDelegate {
             
             if newReadingCreated {
                 
-                trace("    new reading(s) received", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+                trace("    new reading(s) successfully created", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                 
                 // save in core data
                 coreDataManager.saveChanges()
@@ -3364,10 +3701,17 @@ extension RootViewController:NightScoutFollowerDelegate {
                 updateMiniChart()
                 
                 // update statistics related outlets
-                updateStatistics(animatePieChart: false)
+                updateStatistics(animate: false)
                 
-                // update sensor countdown
-                updateSensorCountdown()
+                // update data source info. No need to animate for a simple update
+                updateDataSourceInfo(animate: false)
+                
+                // if we're downloading follower data from something other
+                // than Nightscout, then let's upload it to Nightscout
+                // (this will only happen if we're not following Nightscout
+                // and if the user has requested to upload follower BG values
+                // to Nightscout
+                nightScoutUploadManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 // check alerts, create notification, set app badge
                 checkAlertsCreateNotificationAndSetAppBadge()
@@ -3397,6 +3741,8 @@ extension RootViewController:NightScoutFollowerDelegate {
     }
 }
 
+// MARK: - conform to UIGestureRecognizerDelegate protocol
+
 extension RootViewController: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
@@ -3415,7 +3761,9 @@ extension RootViewController: UIGestureRecognizerDelegate {
     
 }
 
-// WCSession delegate functions
+
+// MARK: - conform to WCSessionDelegate protocol
+
 extension RootViewController: WCSessionDelegate {
     
     func sessionDidBecomeInactive(_ session: WCSession) {

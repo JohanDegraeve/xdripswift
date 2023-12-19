@@ -21,7 +21,7 @@
 "connect" = "Verbind";
 "connectedAt" = "Verbonden op";
 "disConnectedAt" = "Losgekoppeld Op";
-"resetRequired" = "Transmitter resetten?";
+"resetRequired" = "Transmitter resetten";
 "lastReset" = "Laatste Reset";
 "lastResetNotKnown" = "Laatste Reset Tijdstip onbekend";
 "transmitterResultResult" = "Transmitter Reset Resultaat";

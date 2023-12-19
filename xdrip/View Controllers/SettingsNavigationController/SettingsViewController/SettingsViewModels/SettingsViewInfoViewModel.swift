@@ -53,7 +53,7 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
             return Texts_SettingsView.showGitHub
             
         case .icons8:
-            return "Icons By icons8.com"
+            return "Icons from icons8.com"
 
         }
         

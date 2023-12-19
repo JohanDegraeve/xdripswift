@@ -88,6 +88,9 @@ enum ConstantsLog {
     /// nightscout follow
     static let categoryNightScoutFollowManager =     "NightScoutFollowManager       "
     
+    /// nightscout follow
+    static let categoryLibreLinkUpFollowManager =     "LibreLinkUpFollowManager       "
+    
     /// alertmanager
     static let categoryAlertManager =                "AlertManager                  "
     
@@ -127,8 +130,8 @@ enum ConstantsLog {
     /// StatusChartsManager logging
     static let categoryGlucoseChartManager =         "GlucoseChartManager           "
     
-    /// SettingsViewAppleWatchSettingsViewModel logging
-    static let categorySettingsViewAppleWatchSettingsViewModel =         "SettingsViewAppleWatchSettingsViewModel"
+    /// SettingsViewCalendarEventsSettingsViewModel logging
+    static let categorySettingsViewCalendarEventsSettingsViewModel =         "SettingsViewCalendarEventsSettingsViewModel"
     
     /// WatchManager logging
     static let categoryWatchManager =                "WatchManager                  "
@@ -168,6 +171,9 @@ enum ConstantsLog {
     
     /// for use in Bg Readings view
     static let categoryBgReadingsView =                         "BgReadingsView           "
+    
+    /// SettingsViewCalendarEventsSettingsViewModel logging
+    static let categorySettingsViewDataSourceSettingsViewModel =         "SettingsViewDataSourceSettingsViewModel"
     
 }
 

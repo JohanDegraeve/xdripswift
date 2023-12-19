@@ -41,3 +41,9 @@
 "enterSensorCode" = "If you don't know the sensor code use 0000 but be aware that you will need to manually calibrate before you get readings.";
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 "calibrationNotNecessary" = "When using the native transmitter algorithm, manual calibration is not available.\n\nIf you want to calibrate, you can switch to the xDrip algorithm in the transmitter screen.";
+"noSensorData" = "No sensor data";
+"noDataSourceConnected" = "No CGM data source connected";
+"hidingUrlForXSeconds" = "Hiding URL for %@s...";
+"nightscoutNotEnabled" = "Nightscout is disabled";
+"nightscoutURLMissing" = "Nightscout URL missing";
+"libreLinkUpAccountCredentialsMissing" = "Username/password missing";

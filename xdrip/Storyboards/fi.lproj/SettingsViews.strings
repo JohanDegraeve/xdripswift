@@ -6,51 +6,51 @@
 "settingsviews_lowValue" = "Matala lukema";
 "settingsviews_highValue" = "Korkea lukema";
 "settingsviews_urgentHighValue" = "Erittäin korkea lukema";
-"settingsviews_masterorfollower" = "Isäntä vai seuraaja?";
+"settingsviews_masterorfollower" = "Isäntä vai seuraaja";
 "settingsviews_master" = "Isäntä";
 "settingsviews_follower" = "Seuraaja";
-"settingsviews_showReadingInNotification" = "Näytä lukema ilmoituksissa?";
-"settingsviews_labelShowReadingInAppBadge" = "Näytä lukema kuvakkeessa?";
-"settingsviews_multipleAppBadgeValueWith10" = "Kerrotaanko kuvake lukemat 10:llä?";
+"settingsviews_showReadingInNotification" = "Näytä lukema ilmoituksissa";
+"settingsviews_labelShowReadingInAppBadge" = "Näytä lukema kuvakkeessa";
+"settingsviews_multipleAppBadgeValueWith10" = "Kerrotaanko kuvake lukemat 10:llä";
 "settingsviews_sectiontitletransmitter" = "Lähetin";
 "settingsviews_transmittertype" = "Lähettimen tyyppi";
 "settingsviews_transmitterid" = "Lähettimen ID";
 "settingsviews_transmitterid_text_for_button" = "Lähettimen ID";
 "settingsviews_givetransmitterid" = "Anna lähetettimen ID";
-"settingsviews_resettransmitter" = "Nollaa lähetin";
-"settingsviews_nonfixedtransmitter" = "Käytä monipistekalibrointia?";
+"settingsviews_resettransmitter" = "Nollaa lähetin (Anubis)";
+"settingsviews_nonfixedtransmitter" = "Käytä monipistekalibrointia";
 "settingsviews_labelNonFixed" = "Monipistekalibrointi";
 "settingsviews_sectiontitlealerting" = "Hälytys";
 "settingsviews_row_alert_types" = "Hälytystyypit";
 "settingsviews_row_alerts" = "Hälytykset";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
-"settingsviews_healthkit" = "Kirjoita data Apple Healthiin?";
+"settingsviews_healthkit" = "Kirjoita data Apple Healthiin";
 "settingsviews_sectiontitledexcomshare" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Lähetä Dexcom Share palveluun?";
+"settingsviews_uploadReadingstoDexcomShare" = "Lähetä Dexcom Share palveluun";
 "settingsviews_dexcomShareSerialNumber" = "Vastaanottimen sarjanumero";
-"settingsviews_useUSDexcomShareurl" = "Käytä Dexcom US palvelimia?";
+"settingsviews_useUSDexcomShareurl" = "Käytä Dexcom US palvelimia";
 "settingsviews_dexcomShareAccountName" = "Käyttäjätunnus";
 "settingsviews_giveDexcomShareAccountName" = "Anna Dexcom Sharen käyttäjätunnus";
 "settingsviews_giveDexcomSharePassword" = "Anna Dexcom Sharen salasana";
 "settingsviews_giveDexcomShareSerialNumber" = "Anna Dexcom vastaanottimen sarjanumero";
 "settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Ota Nightscout käyttöön?";
+"settingsviews_nightScoutEnabled" = "Ota Nightscout käyttöön";
 "settingsviews_nightScoutUrl" = "URL";
-"settingsviews_useSchedule" = "Käytä lähetysaikataulua?";
+"settingsviews_useSchedule" = "Käytä lähetysaikataulua";
 "schedule" = "Aikataulu";
 "settingsviews_giveNightScoutUrl" = "Anna NightScout palvelimesi URL";
 "settingsviews_nightScoutAPIKey" = "API_SECRET";
 "settingsviews_giveNightScoutAPIKey" = "Anna API_SECRET";
 "editScheduleTimePickerSubtitle" = "Muuta: ";
 "timeScheduleViewTitle" = "Päällä/pois aikataulu ";
-"uploadSensorStartTime" = "Lähetä sensorin aloitusaika?";
-"testUrlAndAPIKey" = "Testaa Nightscout URL ja API_SECRET?";
+"uploadSensorStartTime" = "Lähetä sensorin aloitusaika";
+"testUrlAndAPIKey" = "Testaa Nightscout URL ja API_SECRET";
 "settingsviews_sectiontitlespeak" = "Ääni";
-"settingsviews_speakBgReadings" = "Puhu vs. lukemat?";
+"settingsviews_speakBgReadings" = "Puhu vs. lukemat";
 "settingsviews_speakBgReadingslanguage" = "Kieli";
 "settingsviews_speakreadingslanguageselection" = "Valitse kieli";
-"settingsviews_speakTrend" = "Puhu suunta?";
-"settingsviews_speakDelta" = "Puhu erotus?";
+"settingsviews_speakTrend" = "Puhu suunta";
+"settingsviews_speakDelta" = "Puhu erotus";
 "settingsviews_IntervalTitle" = "Intervalli";
 "settingsviews_IntervalMessage" = "Kahden lukeman välinen vähimmäisväli minuutteina";
 "settingsviews_sectiontitleAbout" = "%@ info";
@@ -64,11 +64,11 @@
 "m5stack_settingsviews_giveBluetoothPassword" = "Anna bluetooth salasana";
 "m5stack_settingsviews_brightness" = "Näytön kirkkaus";
 "appleWatchSectionTitle" = "Apple Watch";
-"createCalendarEvent" = "Luo kalenteritapahtumat?";
-"calenderId" = "Käytettävä kalenteri?";
-"settingsviews_displayTrendInCalendarEvent" = "Näytä suunta?";
-"displayUnitInCalendarEvent" = "Näytä yksikkö?";
-"displayDeltaInCalendarEvent" = "Näytä erotus?";
+"createCalendarEvent" = "Luo kalenteritapahtumat";
+"calenderId" = "Käytettävä kalenteri";
+"settingsviews_displayTrendInCalendarEvent" = "Näytä suunta";
+"displayUnitInCalendarEvent" = "Näytä yksikkö";
+"displayDeltaInCalendarEvent" = "Näytä erotus";
 "infoCalendarAccessDeniedByUser" = "Olet aiemmin kieltänyt pääsyn kalenteriin.\n\nOttaaksesi sen käyttöön, siirry laitteen asetuksiin, tietosuojaan, kalentereihin ja ota käyttöön.";
 "infoCalendarAccessRestricted" = "Et voi antaa %@:lle valtuutusta käyttää kalenteriasi. Tämä johtuu mahdollisesti aktiivisista rajoituksista, kuten vanhempien valvonnasta";
 "sectionTitleTrace" = "Ongelmien raportointi";
@@ -90,7 +90,7 @@
 "settingsviews_targetValue" = "Tavoitearvo";
 
 /// deloper settings, row title for 'Smooth Libre Values?'
-"smoothLibreValues" = "Tasaiset Libre-arvot?";
+"smoothLibreValues" = "Tasaiset Libre-arvot";
 
 /// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
 "oslog" = "OSLog";
@@ -107,32 +107,23 @@
 /// statistics settings, section title
 "settingsviews_sectiontitlestatistics" = "Tilastot";
 
-/// statistics settings, use standard range?
-"settingsviews_useStandardStatisticsRange" = "Käytä vakioaluetta?";
-
 /// statistics settings, use IFCC method for HbA1c?
-"settingsviews_useIFCCA1C" = "Näytä HbA1c mmol/mol muodossa?";
+"settingsviews_useIFCCA1C" = "Näytä HbA1c mmol/mol muodossa";
 
 /// statistics settings, show statistics on home screen
-"settingsviews_showStatistics" = "Näytä tilastot?";
+"settingsviews_showStatistics" = "Näytä tilastot";
 
 /// statistics settings, how many days to use for calculations
-"settingsviews_daysToUseStatisticsTitle" = "Päiviä laskutoimitukseen?";
+"settingsviews_daysToUseStatisticsTitle" = "Päiviä laskutoimitukseen";
 
 /// general settings, should the clock also be displayed when the screen is locked?
-"settingsviews_showClockWhenScreenIsLocked" = "Näytetäänkö kello kun näyttö on lukittuna?";
+"settingsviews_showClockWhenScreenIsLocked" = "Näytetäänkö kello kun näyttö on lukittuna";
 
 /// general settings, should the online help be translated automatically if needed
-"settingsviews_translateOnlineHelp" = "Käännä automaattisesti?";
-
-/// sensor countdown settings, use alternative sensor countdown graphics on home screen
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Käytä vaihtoehtoista grafiikkaa?";
+"settingsviews_translateOnlineHelp" = "Käännä automaattisesti";
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Salli kaavion kierto?";
-
-/// sensor countdown settings, section title
-"settingsviews_sectiontitlesensorcountdown" = "Sensorin lähtölaskenta";
+"settingsviews_allowScreenRotation" = "Salli kaavion kierto";
 
 /// help settings, section title
 "settingsviews_sectiontitlehelp" = "Ohje ja dokumentaatio";
@@ -141,19 +132,16 @@
 "calendarEventsSectionTitle" = "Kalenteritapahtumat";
 
 /// help settings, open the online help
-"settingsviews_showOnlineHelp" = "Avaa online ohje?";
-
-/// sensor countdown settings, show sensor countdown graphic on home screen
-"settingsviews_showSensorCountdown" = "Näytä sensorin lähtölaskenta?";
+"settingsviews_showOnlineHelp" = "Avaa online ohje";
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Käytä lähettimen algoritmiä?";
+"settingsviews_webooptransmitter" = "Käytä lähettimen algoritmiä";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip tai lähetin algoritmi";
 
 /// help settings, should the help icon be shown on the toolbar
-"settingsviews_showHelpIcon" = "Näytä ohjeen ikoni?";
+"settingsviews_showHelpIcon" = "Näytä ohjeen ikoni";
 
 /// help settings, restart needed
 "settingsviews_restartNeeded" = "(Uudelleenkäynnistys vaaditaan)";
@@ -168,7 +156,7 @@
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Kuinka monen yksikön alapuolella bolusta pitäisi pitää mikroboluksena?\n\n(Suositeltu arvo: 1,0 U)";
 
 /// treatments settings, show the treatments on main chart
-"settingsviews_showTreatmentsOnChart" = "Näytä hoidot kaaviossa?";
+"settingsviews_showTreatmentsOnChart" = "Näytä hoidot kaaviossa";
 
 /// Button to export all data
 "settingsviews_housekeeperExportAllData" = "Vie kaikki tiedot";
@@ -177,7 +165,7 @@
 "settingsviews_sectionTitleHousekeeper" = "Tiedon hallinta";
 
 /// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Näytä mikrobolus kaaviossa?";
+"settingsviews_showSmallBolusTreatmentsOnChart" = "Näytä mikrobolus kaaviossa";
 
 /// When clicking the retention setting, a pop up asks for how many days should data be stored
 "settingsviews_housekeeperRetentionPeriodMessage" = "Montako päivää tietoja säilytetään (90-365)?\n\n(suositus: 90 päivää)";

@@ -2,7 +2,7 @@
 "alerttypesettingsview_givesnoozeperiod" = "Schlummern bis";
 
 /// when editing an alert type, field title for Snooze Via Notification
-"alerttypesettingsview_snoozevianotification" = "Mitteilungen bei Stummmodus?";
+"alerttypesettingsview_snoozevianotification" = "Mitteilungen bei Stummmodus";
 
 /// when editing an alert type, field title for Override Mute
 "alerttypesettingsview_overridemute" = "Ruhemodus überschreiben";
@@ -14,7 +14,7 @@
 "alerttypesettingsview_sound" = "Ton";
 
 /// when editing an alert type, field title for Enabled
-"alerttypesettingsview_enabled" = "Aktiv?";
+"alerttypesettingsview_enabled" = "Aktiv";
 
 /// 
 "alertTypeNoSound" = "Kein Ton";
@@ -23,7 +23,7 @@
 "alerttypesettingsview_defaultiossound" = "iOS Ton";
 
 /// when editing an alert type, field title for Vibrate
-"alerttypesettingsview_vibrate" = "Vibrieren?";
+"alerttypesettingsview_vibrate" = "Vibrieren";
 
 /// shown on top of the screen that allows user to view all the alert types or add a new alert type
 "alerttypessettingsview_screentitle" = "Eigene Alarme";

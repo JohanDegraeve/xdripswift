@@ -29,12 +29,22 @@ enum ConstantsStatistics {
     /// pie slice color for high
     static let pieChartHighSliceColor = UIColor.systemYellow
     
-    // contstants to define the standardised TIR values in case the user prefers to use them
+    // contstants to define the standardised "Time in Range" (TIR) values in case the user prefers to use them
     // published values from here: https://care.diabetesjournals.org/content/42/8/1593
     static let standardisedLowValueForTIRInMgDl = 70.0
     static let standardisedHighValueForTIRInMgDl = 180.0
     static let standardisedLowValueForTIRInMmol = 3.9
     static let standardisedHighValueForTIRInMmol = 10.0
+    
+    // contstants to define the newer "Time in Tight Range" (TITR) values in case the user prefers to use them
+    // published values from here: https://pubmed.ncbi.nlm.nih.gov/37902743/
+    static let standardisedLowValueForTITRInMgDl = 70.0
+    static let standardisedHighValueForTITRInMgDl = 140.0
+    static let standardisedLowValueForTITRInMmol = 3.9
+    static let standardisedHighValueForTITRInMmol = 7.8
+    
+    /// highlight color when changing between TIR modes
+    static let highlightColorTitles: UIColor = .white
     
     // minimum filter time in minutes (used for Libre 2 readings)
     static let minimumFilterTimeBetweenReadings: Double = 4.5

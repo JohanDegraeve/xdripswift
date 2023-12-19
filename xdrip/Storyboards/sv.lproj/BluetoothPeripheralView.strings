@@ -21,7 +21,7 @@
 "connect" = "Anslut";
 "connectedAt" = "Ansluten kl";
 "disConnectedAt" = "Ifrånkopplad kl";
-"resetRequired" = "Återställ sändare?";
+"resetRequired" = "Återställ sändare";
 "lastReset" = "Senaste återställning";
 "lastResetNotKnown" = "Tidpunkt för senaste återställning ej känd";
 "transmitterResultResult" = "Sändaråterställningsresultat";

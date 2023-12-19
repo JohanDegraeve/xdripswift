@@ -21,6 +21,9 @@ fileprivate enum Setting:Int, CaseIterable {
     //should we show the micro-boluses on the main chart?
     case showSmallBolusTreatmentsOnChart = 2
     
+    //should we offset the carbs on the main chart?
+    case offsetCarbTreatmentsOnChart = 3
+    
     
 }
 
@@ -41,6 +44,9 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
             
         case .showSmallBolusTreatmentsOnChart:
             return UISwitch(isOn: UserDefaults.standard.showSmallBolusTreatmentsOnChart, action: {(isOn:Bool) in UserDefaults.standard.showSmallBolusTreatmentsOnChart = isOn})
+            
+        case .offsetCarbTreatmentsOnChart:
+            return UISwitch(isOn: UserDefaults.standard.offsetCarbTreatmentsOnChart, action: {(isOn:Bool) in UserDefaults.standard.offsetCarbTreatmentsOnChart = isOn})
             
         }
     }
@@ -88,6 +94,15 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
                 }
             })
             
+        case .offsetCarbTreatmentsOnChart:
+            return SettingsSelectedRowAction.callFunction(function: {
+                if UserDefaults.standard.offsetCarbTreatmentsOnChart {
+                    UserDefaults.standard.offsetCarbTreatmentsOnChart = false
+                } else {
+                    UserDefaults.standard.offsetCarbTreatmentsOnChart = true
+                }
+            })
+            
         }
     }
     
@@ -113,6 +128,9 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
         case .showSmallBolusTreatmentsOnChart:
             return Texts_SettingsView.settingsviews_showSmallBolusTreatmentsOnChart
             
+        case .offsetCarbTreatmentsOnChart:
+            return Texts_SettingsView.settingsviews_offsetCarbTreatmentsOnChart
+            
         }
     }
     
@@ -121,7 +139,7 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .showTreatmentsOnChart, .showSmallBolusTreatmentsOnChart:
+        case .showTreatmentsOnChart, .showSmallBolusTreatmentsOnChart, .offsetCarbTreatmentsOnChart:
             return UITableViewCell.AccessoryType.none
             
         case .smallBolusTreatmentThreshold:
@@ -135,7 +153,7 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .showTreatmentsOnChart, .showSmallBolusTreatmentsOnChart:
+        case .showTreatmentsOnChart, .showSmallBolusTreatmentsOnChart, .offsetCarbTreatmentsOnChart:
             return nil
             
         case .smallBolusTreatmentThreshold:

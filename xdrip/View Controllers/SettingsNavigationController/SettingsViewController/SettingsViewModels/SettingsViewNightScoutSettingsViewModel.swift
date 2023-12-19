@@ -399,13 +399,13 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
         case .nightScoutEnabled:
             return nil
         case .nightScoutUrl:
-            return UserDefaults.standard.nightScoutUrl
+            return UserDefaults.standard.nightScoutUrl ?? Texts_SettingsView.valueIsRequired
         case .nightScoutAPIKey:
-            return UserDefaults.standard.nightScoutAPIKey != nil ? obscureString(stringToObscure: UserDefaults.standard.nightScoutAPIKey) : nil
+            return UserDefaults.standard.nightScoutAPIKey?.obscured() ?? nil
         case .port:
             return UserDefaults.standard.nightScoutPort != 0 ? UserDefaults.standard.nightScoutPort.description : nil
         case .token:
-            return UserDefaults.standard.nightscoutToken != nil ? obscureString(stringToObscure: UserDefaults.standard.nightscoutToken) : nil
+            return UserDefaults.standard.nightscoutToken?.obscured() ?? nil
         case .useSchedule:
             return nil
         case .schedule:
@@ -450,48 +450,6 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
             return nil
             
         }
-    }
-    
-    /// use this to partially obscure the API-SECRET and Token values. We want the user to see that "something" is there that makes sense to them, but it won't reveal any private information if they screenshot it
-    func obscureString(stringToObscure: String?) -> String {
-        
-        // make sure that something useful has been passed to the function
-        guard var obscuredString = stringToObscure else { return "" }
-        
-        let stringLength: Int = obscuredString.count
-        
-        // in order to avoid strange layouts if somebody uses a really long API_SECRET, then let's limit the displayed string size to something more manageable
-        let maxStringSizeToShow: Int = 12
-        
-        // the characters we will use to obscure the sensitive data
-        let maskingCharacter: String = "*"
-        
-        // based upon the length of the string, we will show more, or less, of the original characters at the beginning. This gives more context whilst maintaining privacy
-        var startCharsNotToObscure: Int = 0
-        
-        switch stringLength {
-        case 0...3:
-            startCharsNotToObscure = 0
-        case 4...5:
-            startCharsNotToObscure = 1
-        case 6...7:
-            startCharsNotToObscure = 2
-        case 8...10:
-            startCharsNotToObscure = 3
-        case 11...50:
-            startCharsNotToObscure = 4
-        default:
-            startCharsNotToObscure = 0
-        }
-        
-        // remove the characters that we want to obscure
-        obscuredString.removeLast(stringLength - startCharsNotToObscure)
-        
-        // now "fill up" the string with the masking character up to the original string size. If it is longer than the maxStingSizeToShow then trim it down to make everything fit in a clean way
-        obscuredString += String(repeating: maskingCharacter, count: stringLength > maxStringSizeToShow ? maxStringSizeToShow - obscuredString.count : stringLength - obscuredString.count)
-        
-        return obscuredString
-        
     }
     
 }

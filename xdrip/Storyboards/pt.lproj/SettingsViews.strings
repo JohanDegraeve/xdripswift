@@ -1,78 +1,74 @@
 "settingsviews_settingstitle" = "Definições";
 "settingsviews_sectiontitlehelp" = "Ajuda & Documentação";
-"settingsviews_showOnlineHelp" = "Abrir Ajuda Online?";
-"settingsviews_translateOnlineHelp" = "Traduzir Automaticamente?";
-"settingsviews_showHelpIcon" = "Mostrar Ícone de Ajuda?";
+"settingsviews_showOnlineHelp" = "Abrir Ajuda Online";
+"settingsviews_translateOnlineHelp" = "Traduzir Automaticamente";
+"settingsviews_showHelpIcon" = "Mostrar Ícone de Ajuda";
 "settingsviews_restartNeeded" = "(É necessário reiniciar)";
 "settingsviews_sectiontitlegeneral" = "Geral";
 "settingsviews_selectbgunit" = "Unidades de Glicose";
-"settingsviews_masterorfollower" = "Mestre ou Seguidor?";
+"settingsviews_masterorfollower" = "Mestre ou Seguidor";
 "settingsviews_master" = "Mestre";
 "settingsviews_follower" = "Seguidor";
-"settingsviews_showReadingInNotification" = "Mostrar Glicose nas Notificações?";
-"settingsviews_labelShowReadingInAppBadge" = "Mostrar Glicose no Distintivo da App?";
-"settingsviews_multipleAppBadgeValueWith10" = "Multiplicar Distintivo da App por 10?";
-"settingsviews_allowScreenRotation" = "Permitir Rotação do Gráfico?";
+"settingsviews_showReadingInNotification" = "Mostrar Glicose nas Notificações";
+"settingsviews_labelShowReadingInAppBadge" = "Mostrar Glicose no Distintivo da App";
+"settingsviews_multipleAppBadgeValueWith10" = "Multiplicar Distintivo da App por 10";
+"settingsviews_allowScreenRotation" = "Permitir Rotação do Gráfico";
 "settingsviews_urgentHighValue" = "Valor Hiper Urgente";
 "settingsviews_highValue" = "Valor Hiper";
 "settingsviews_targetValue" = "Valor Alvo";
 "settingsviews_lowValue" = "Valor Hipo";
 "settingsviews_urgentLowValue" = "Valor Hipo Urgente";
-"settingsviews_useobjectives" = "Mostra Objectivos no Gráfico?";
-"settingsviews_showcoloredobjectives" = "Mostrar Linhas Coloridas?";
-"settingsviews_showtarget" = "Mostrar Linha Alvo?";
+"settingsviews_useobjectives" = "Mostra Objectivos no Gráfico";
+"settingsviews_showcoloredobjectives" = "Mostrar Linhas Coloridas";
+"settingsviews_showtarget" = "Mostrar Linha Alvo";
 "settingsviews_sectiontitletreatments" = "Tratamentos";
-"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart?";
+"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart";
 "settingsviews_smallBolusTreatmentThreshold" = "Limiar Micro-bolus";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Abaixo de quantas unidades devemos considerar um bolus como micro-bolus?\n\n(Valor recomendado: 1.0U)";
 "settingsviews_sectiontitlestatistics" = "Estatísticas";
-"settingsviews_showStatistics" = "Mostrar Estatísticas?";
-"settingsviews_daysToUseStatisticsTitle" = "Dias para Calcular?";
+"settingsviews_showStatistics" = "Mostrar Estatísticas";
+"settingsviews_daysToUseStatisticsTitle" = "Dias para Calcular";
 "settingsviews_daysToUseStatisticsMessage" = "Máximo de dias que devemos tentar usar para calcular as estatísticas?\n\n(Introduza 0 para calcular desde a meia-noite de hoje)";
-"settingsviews_useStandardStatisticsRange" = "Usar Intervalo Padrão?";
 "settingsviews_useIFCCA1C" = "Mostar A1C em mmols/mol";
-"settingsviews_sectiontitlesensorcountdown" = "Dias Restantes do Sensor";
-"settingsviews_showSensorCountdown" = "Mostrar Dias Restantes do Sensor?";
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Utilizar Gráficos Alternativos?";
 "settingsviews_sectiontitletransmitter" = "Transmissor";
 "settingsviews_transmittertype" = "Tipo de Transmissor";
 "settingsviews_transmitterid" = "ID de Transmissor";
 "settingsviews_transmitterid_text_for_button" = "ID de Transmissor";
 "settingsviews_givetransmitterid" = "Introduzir ID Transmissor";
-"settingsviews_resettransmitter" = "Repor Transmissor";
-"settingsviews_nonfixedtransmitter" = "Activar Calibração Multi-ponto?";
+"settingsviews_resettransmitter" = "Repor Transmissor (Anubis)";
+"settingsviews_nonfixedtransmitter" = "Activar Calibração Multi-ponto";
 "settingsviews_labelNonFixed" = "Calibração Multi-ponto";
 "settingsviews_sectiontitlealerting" = "Alarme";
 "settingsviews_row_alert_types" = "Tipos de Alarmes";
 "settingsviews_row_alerts" = "Alarmes";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
-"settingsviews_healthkit" = "Escrever Dados para Apple Health?";
+"settingsviews_healthkit" = "Escrever Dados para Apple Health";
 "settingsviews_sectiontitledexcomshare" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Enviar para Dexcom Share?";
+"settingsviews_uploadReadingstoDexcomShare" = "Enviar para Dexcom Share";
 "settingsviews_dexcomShareSerialNumber" = "Nº. de Série do Receptor";
-"settingsviews_useUSDexcomShareurl" = "Utilizar Servidores Dexcom US?";
+"settingsviews_useUSDexcomShareurl" = "Utilizar Servidores Dexcom US";
 "settingsviews_dexcomShareAccountName" = "Nome da Conta";
 "settingsviews_giveDexcomShareAccountName" = "Introduzir Nome da Conta Dexcom Share";
 "settingsviews_giveDexcomSharePassword" = "Introduzir Senha Dexcom Shared";
 "settingsviews_giveDexcomShareSerialNumber" = "Introduzir nº. de série do Receptor Dexcom";
 "settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Activar Nightscout?";
+"settingsviews_nightScoutEnabled" = "Activar Nightscout";
 "settingsviews_nightScoutUrl" = "URL";
-"settingsviews_useSchedule" = "Utilizar Agendamento de Envio?";
+"settingsviews_useSchedule" = "Utilizar Agendamento de Envio";
 "schedule" = "Agenda";
 "settingsviews_giveNightScoutUrl" = "Introduzir NightScout URL";
 "settingsviews_nightScoutAPIKey" = "API_SECRET";
 "settingsviews_giveNightScoutAPIKey" = "Introduzir API_SECRET";
 "editScheduleTimePickerSubtitle" = "Mudar: ";
 "timeScheduleViewTitle" = "Lig./Desl. Hora Agendamento por ";
-"uploadSensorStartTime" = "Enviar Hora de Início de Sensor?";
-"testUrlAndAPIKey" = "Verificar Ligação?";
+"uploadSensorStartTime" = "Enviar Hora de Início de Sensor";
+"testUrlAndAPIKey" = "Verificar Ligação";
 "settingsviews_sectiontitlespeak" = "Voz";
-"settingsviews_speakBgReadings" = "Falar Leituras Glicose?";
+"settingsviews_speakBgReadings" = "Falar Leituras Glicose";
 "settingsviews_speakBgReadingslanguage" = "Idioma";
 "settingsviews_speakreadingslanguageselection" = "Escolher Idioma";
-"settingsviews_speakTrend" = "Falar Tendência?";
-"settingsviews_speakDelta" = "Falar Delta?";
+"settingsviews_speakTrend" = "Falar Tendência";
+"settingsviews_speakDelta" = "Falar Delta";
 "settingsviews_IntervalTitle" = "Intervalo entre Notificações";
 "settingsviews_IntervalMessage" = "Intervalo minímo entre duas notificações, em minutos";
 "settingsviews_sectiontitleAbout" = "Sobre %@";
@@ -86,11 +82,11 @@
 "m5stack_settingsviews_giveBluetoothPassword" = "Introduzir Senha Bluetooth";
 "m5stack_settingsviews_brightness" = "Brilho do Ecrã";
 "appleWatchSectionTitle" = "Apple Watch";
-"createCalendarEvent" = "Criar Eventos de Calendário?";
-"calenderId" = "Calendário a Utilizar?";
-"settingsviews_displayTrendInCalendarEvent" = "Mostrar Tendência?";
-"displayUnitInCalendarEvent" = "Mostrar Unidade?";
-"displayDeltaInCalendarEvent" = "Mostrar Delta?";
+"createCalendarEvent" = "Criar Eventos de Calendário";
+"calenderId" = "Calendário a Utilizar";
+"settingsviews_displayTrendInCalendarEvent" = "Mostrar Tendência";
+"displayUnitInCalendarEvent" = "Mostrar Unidade";
+"displayDeltaInCalendarEvent" = "Mostrar Delta";
 "infoCalendarAccessDeniedByUser" = "Anteriormente negou accesso ao Calendário.\n\nPara activá-lo vá às definições do seu dispositivo, privacidade, calendários e active-o.";
 "infoCalendarAccessRestricted" = "Não pode autorizar %@ para aceder ao calendário. Possivelmente por restrições activas tais como controlo parental.";
 "sectionTitleTrace" = "Reportar Problema";
@@ -106,12 +102,12 @@
 "debugLevel" = "Incluir Nível de Depuração";
 "warningChangeFromMasterToFollower" = "Aterar de Mestre para Seguidor vai parar o actual sensor. Deseja continuar?";
 "nightScoutPort" = "Porto";
-"smoothLibreValues" = "Suavizar Valores do Libre?";
+"smoothLibreValues" = "Suavizar Valores do Libre";
 "oslog" = "OSLog";
 "nslog" = "NSLog";
 "developerSettings" = "Definições de Programador";
 "settingsviews_sectiontitlehomescreen" = "Ecrã Inicial";
-"settingsviews_showClockWhenScreenIsLocked" = "Mostrar Relógio quando Bloqueado?";
+"settingsviews_showClockWhenScreenIsLocked" = "Mostrar Relógio quando Bloqueado";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -125,7 +121,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm?";
+"settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
@@ -141,7 +137,7 @@
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
 
 /// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart?";
+"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart";
 
 /// When clicking the retention setting, a pop up asks for how many days should data be stored
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";

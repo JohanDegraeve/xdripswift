@@ -91,6 +91,7 @@ public class NightScoutUploadManager: NSObject, ObservableObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutSchedule.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutToken.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutSyncTreatmentsRequired.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerUploadDataToNightscout.rawValue, options: .new, context: nil)
     }
     
     // MARK: - public functions
@@ -106,10 +107,15 @@ public class NightScoutUploadManager: NSObject, ObservableObject {
 
         // TODO: crash here
         trace("    setting nightScoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
-        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
         
-        // check that master is enabled
-        guard UserDefaults.standard.isMaster else {return}
+        DispatchQueue.main.async {
+            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        }
+        
+        // check that either master is enabled or if we're using a follower mode other than Nightscout and the user wants to upload the BG values
+        if (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .nightscout) || (!UserDefaults.standard.isMaster && !UserDefaults.standard.followerUploadDataToNightscout) {
+            return
+        }
         
         // check that either the API_SECRET or Token exists, if both are nil then return
         if UserDefaults.standard.nightScoutAPIKey == nil && UserDefaults.standard.nightscoutToken == nil {
@@ -384,8 +390,8 @@ public class NightScoutUploadManager: NSObject, ObservableObject {
                     
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
                         
-                        // if master is set, siteURL exists and either API_SECRET or a token is entered, then test credentials
-                        if UserDefaults.standard.nightScoutUrl != nil && UserDefaults.standard.isMaster && (UserDefaults.standard.nightScoutAPIKey != nil || UserDefaults.standard.nightscoutToken != nil) {
+                        // if master is set (or if we're in follower mode other than Nightscout and we want to upload to Nightscout), siteURL exists and either API_SECRET or a token is entered, then test credentials
+                        if UserDefaults.standard.nightScoutUrl != nil && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType != .nightscout && UserDefaults.standard.followerUploadDataToNightscout)) && (UserDefaults.standard.nightScoutAPIKey != nil || UserDefaults.standard.nightscoutToken != nil) {
                             
                             testNightScoutCredentials({ (success, error) in
                                 DispatchQueue.main.async {
@@ -403,13 +409,13 @@ public class NightScoutUploadManager: NSObject, ObservableObject {
                         }
                     }
                     
-                case UserDefaults.Key.nightScoutEnabled, UserDefaults.Key.nightScoutUseSchedule, UserDefaults.Key.nightScoutSchedule :
+                case UserDefaults.Key.nightScoutEnabled, UserDefaults.Key.nightScoutUseSchedule, UserDefaults.Key.nightScoutSchedule, UserDefaults.Key.followerUploadDataToNightscout :
                     
                     // if changing to enabled, then do a credentials test and if ok start upload, in case of failure don't give warning, that's the only difference with previous cases
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {
                         
-                        // if master is set, siteURL exists and either API_SECRET or a token is entered, then test credentials
-                        if UserDefaults.standard.nightScoutUrl != nil && UserDefaults.standard.isMaster && (UserDefaults.standard.nightScoutAPIKey != nil || UserDefaults.standard.nightscoutToken != nil) {
+                        // if master is set (or if we're in follower mode other than Nightscout and we want to upload to Nightscout), siteURL exists and either API_SECRET or a token is entered, then test credentials
+                        if UserDefaults.standard.nightScoutUrl != nil && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType != .nightscout && UserDefaults.standard.followerUploadDataToNightscout)) && (UserDefaults.standard.nightScoutAPIKey != nil || UserDefaults.standard.nightscoutToken != nil) {
                             
                             testNightScoutCredentials({ (success, error) in
                                 DispatchQueue.main.async {

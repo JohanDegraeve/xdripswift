@@ -7,13 +7,13 @@
 "settingsviews_license" = "License";
 
 /// help settings, should the online help be translated automatically if needed
-"settingsviews_translateOnlineHelp" = "Translate Automatically?";
+"settingsviews_translateOnlineHelp" = "Translate Automatically";
 
 /// dexcom share settings, where user can set the dexcom share account name
 "settingsviews_dexcomShareAccountName" = "Account Name";
 
 /// 
-"settingsviews_showcoloredobjectives" = "Show Colored Lines?";
+"settingsviews_showcoloredobjectives" = "Show Colored Lines";
 
 /// transmitter settings, just the words that explain that the settings is about transmitter type
 "settingsviews_transmittertype" = "Transmitter Type";
@@ -22,10 +22,10 @@
 "settingsviews_highValue" = "High Value";
 
 /// help settings, should the help icon be shown on the toolbar
-"settingsviews_showHelpIcon" = "Show Help Icon?";
+"settingsviews_showHelpIcon" = "Show Help Icon";
 
 /// Calendar Events Settings - text in row where create event is enabled or disabled 
-"createCalendarEvent" = "Create Calendar Events?";
+"createCalendarEvent" = "Create Calendar Events";
 
 /// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
 "warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
@@ -37,7 +37,7 @@
 "m5stack_settingsviews_brightness" = "Screen Brightness";
 
 /// Calendar Events Settings - text in row where user needs to say if unit should be displayed or not
-"displayUnitInCalendarEvent" = "Display Unit?";
+"displayUnitInCalendarEvent" = "Display Unit";
 
 /// name of setting for text color
 "m5stack_settingsviews_textColor" = "Text Color";
@@ -49,7 +49,7 @@
 "settingsviews_nightScoutUrl" = "URL";
 
 /// general settings, should reading be multiplied with 10 yes or no
-"settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10?";
+"settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10";
 
 /// in Settings, section title for Trace
 "sectionTitleTrace" = "Issue Reporting";
@@ -58,13 +58,13 @@
 "settingsviews_giveDexcomSharePassword" = "Give Dexcom Share Password";
 
 /// speak settings, where user can enable or disable speak readings
-"settingsviews_speakBgReadings" = "Speak BG Readings?";
+"settingsviews_speakBgReadings" = "Speak BG Readings";
 
 /// general settings, literally master
 "settingsviews_master" = "Master";
 
 /// speak settings, where user can enable or disable speak delta
-"settingsviews_speakDelta" = "Speak Delta?";
+"settingsviews_speakDelta" = "Speak Delta";
 
 /// nightscout settings, port to use
 "nightScoutPort" = "Port";
@@ -73,7 +73,7 @@
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
 
 /// nightscout settings, title of row
-"uploadSensorStartTime" = "Upload Sensor Start Time?";
+"uploadSensorStartTime" = "Upload Sensor Start Time";
 
 /// default text in email body, when user wants to send trace file.
 "emailbodyText" = "Problem Description: ";
@@ -103,13 +103,13 @@
 "settingsviews_housekeeperExportAllData" = "Export All Data";
 
 /// nightscout settings, where user can enable or disable nightscout
-"settingsviews_nightScoutEnabled" = "Enable Nightscout?";
+"settingsviews_nightScoutEnabled" = "Enable Nightscout";
 
 /// home screen settings, urgent high value
 "settingsviews_urgentHighValue" = "Urgent High Value";
 
 /// statistics settings, use IFCC method for HbA1c?
-"settingsviews_useIFCCA1C" = "Show HbA1c in mmols/mol?";
+"settingsviews_useIFCCA1C" = "Show HbA1c in mmols/mol";
 
 /// dexcom share settings settings, where user can set dexcom serial number to be used for dexcom share upload
 "settingsviews_dexcomShareSerialNumber" = "Receiver Serial Number";
@@ -121,16 +121,16 @@
 "settingsviews_sectiontitlestatistics" = "Statistics";
 
 /// dexcom share settings, where user can choose to use US url or not
-"settingsviews_useUSDexcomShareurl" = "Use Dexcom US Servers?";
+"settingsviews_useUSDexcomShareurl" = "Use Dexcom US Servers";
 
 /// healthkit settings, literally 'healthkit'
-"settingsviews_healthkit" = "Write Data to Apple Health?";
+"settingsviews_healthkit" = "Write Data to Apple Health";
 
 /// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test
 "volumeTestiOSSoundExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.";
 
 /// statistics settings, show statistics on home screen
-"settingsviews_showStatistics" = "Show Statistics?";
+"settingsviews_showStatistics" = "Show Statistics";
 
 /// alerting settings, row alert types
 "settingsviews_row_alert_types" = "Alarm Types";
@@ -142,7 +142,7 @@
 "m5stack_settingsviews_giveBluetoothPassword" = "Enter Bluetooth Password";
 
 /// nightscout settings, where user can select to use schedule or not
-"settingsviews_useSchedule" = "Use Upload Schedule?";
+"settingsviews_useSchedule" = "Use Upload Schedule";
 
 /// speak settings, where user can select the language
 "settingsviews_speakBgReadingslanguage" = "Language";
@@ -151,10 +151,10 @@
 "settingsviews_nightScoutAPIKey" = "API_SECRET";
 
 /// transmitter settings, to explain that settings is about resetting the transmitter
-"settingsviews_resettransmitter" = "Reset Transmitter";
+"settingsviews_resettransmitter" = "Reset Transmitter (Anubis only)";
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Allow Chart Rotation?";
+"settingsviews_allowScreenRotation" = "Allow Chart Rotation";
 
 /// Calendar Events Settings - section title
 "calendarEventsSectionTitle" = "Calendar Events";
@@ -172,7 +172,7 @@
 "settingsviews_urgentLowValue" = "Urgent Low Value";
 
 /// general settings, should reading be shown in app badge yes or no
-"settingsviews_labelShowReadingInAppBadge" = "Show BG in the App Badge?";
+"settingsviews_labelShowReadingInAppBadge" = "Show BG in the App Badge";
 
 /// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for sound player volume test
 "volumeTestSoundPlayerExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = On\n\n(Used for all alarms except Missed Reading alerts which always use the iOS volume.)\n\nChange the volume with the volume buttons and press OK when done.";
@@ -193,7 +193,7 @@
 "volumeTestSoundPlayer" = "Test Volume (if Override Mute On)";
 
 /// speak settings, where enable or disable speak trend
-"settingsviews_speakTrend" = "Speak Trend?";
+"settingsviews_speakTrend" = "Speak Trend";
 
 /// dexcom share settings, pop up that asks user to enter dexcom share serial number
 "settingsviews_giveDexcomShareSerialNumber" = "Enter the Dexcom Receiver Serial Number";
@@ -205,7 +205,7 @@
 "settingsviews_IntervalMessage" = "Minimum interval between two notifications, in minutes";
 
 /// home screen settings, should the clock also be displayed when the screen is locked?
-"settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked?";
+"settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked";
 
 /// dexcom share settings, section title
 "settingsviews_sectiontitledexcomshare" = "Dexcom Share";
@@ -217,7 +217,7 @@
 "settingsviews_daysToUseStatisticsMessage" = "Maximum days we should try to use to calculate the statistics?\n\n(Enter 0 to calculate today since midnight)";
 
 /// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart?";
+"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart";
 
 /// general settings, literally follower
 "settingsviews_follower" = "Follower";
@@ -226,16 +226,13 @@
 "settingsviews_giveNightScoutAPIKey" = "Enter your API_SECRET";
 
 /// Calendar Events Settings - text in row where user needs to select a calendar
-"calenderId" = "Calendar To Use?";
+"calenderId" = "Calendar To Use";
 
 /// treatments settings, section title
 "settingsviews_sectiontitletreatments" = "Treatments";
 
-/// sensor countdown settings, section title
-"settingsviews_sectiontitlesensorcountdown" = "Sensor Countdown";
-
 /// nightscout settings, when clicking the cell, test the url and api key
-"testUrlAndAPIKey" = "Test Connection?";
+"testUrlAndAPIKey" = "Test Connection";
 
 /// in Settings, to enable debug level in trace file
 "debugLevel" = "Include Debug Level";
@@ -253,7 +250,7 @@
 "settingsviews_Version" = "Version";
 
 /// treatments settings, show the treatments on main chart
-"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart?";
+"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart";
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Settings";
@@ -262,7 +259,7 @@
 "developerSettings" = "Developer Settings";
 
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
-"settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration?";
+"settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration";
 
 /// bluetooth settings, section title - also used in bluetooth peripheral view, eg when viewing M5Stack details. This is the title of the first section
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
@@ -274,28 +271,28 @@
 "settingsviews_transmitterid_text_for_button" = "Transmitter ID";
 
 /// statistics settings, use standard range?
-"settingsviews_useStandardStatisticsRange" = "Use Standard Range?";
+"settingsviews_useTITRStatisticsRange" = "Use Time in Tight Range";
 
 /// dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no
-"settingsviews_uploadReadingstoDexcomShare" = "Upload to Dexcom Share?";
+"settingsviews_uploadReadingstoDexcomShare" = "Upload to Dexcom Share";
 
 /// nightscout or dexcom share settings, where user can select to edit the schedule
 "schedule" = "Schedule";
 
 /// general settings, should reading be shown in notification yes or no
-"settingsviews_showReadingInNotification" = "Show BG in Notifications?";
+"settingsviews_showReadingInNotification" = "Show BG in Notifications";
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm?";
+"settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
 
 /// home screen settings, show target line
-"settingsviews_showtarget" = "Show Target Line?";
+"settingsviews_showtarget" = "Show Target Line";
 
 /// nightscout  settings, pop up that asks user to enter nightscout url
 "settingsviews_giveNightScoutUrl" = "Enter your NightScout URL";
 
 /// Calendar Events Settings - text in row where user needs to say if delta should be displayed or not
-"displayDeltaInCalendarEvent" = "Display Delta?";
+"displayDeltaInCalendarEvent" = "Display Delta";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
@@ -310,25 +307,25 @@
 "settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold";
 
 /// help settings, open the online help
-"settingsviews_showOnlineHelp" = "Open Online Help?";
+"settingsviews_showOnlineHelp" = "Open Online Help";
 
 /// home screen settings, low value
 "settingsviews_lowValue" = "Low Value";
 
 /// deloper settings, row title for 'Smooth Libre Values?'
-"smoothLibreValues" = "Smooth Libre Values?";
+"smoothLibreValues" = "Smooth Libre Values";
 
 /// shown on top of the first settings screen
 "m5stack_settingsviews_settingstitle" = "M5 Stack Settings";
 
 /// statistics settings, how many days to use for calculations
-"settingsviews_daysToUseStatisticsTitle" = "Days to Calculate?";
+"settingsviews_daysToUseStatisticsTitle" = "Days to Calculate";
 
 /// home screen settings, use objectives in graph
-"settingsviews_useobjectives" = "Show Objectives in Graph?";
+"settingsviews_useobjectives" = "Show Objectives in Graph";
 
 /// Calendar Events Settings - text in row where user needs to say if trend should be displayed or not
-"settingsviews_displayTrendInCalendarEvent" = "Display Trend?";
+"settingsviews_displayTrendInCalendarEvent" = "Display Trend";
 
 /// In case user tries to send trace file via email but error occurs.
 "failedToSendEmail" = "Failed to Send Email";
@@ -352,19 +349,13 @@
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
 
 /// general settings, master or follower
-"settingsviews_masterorfollower" = "Master or Follower?";
+"settingsviews_masterorfollower" = "Master or Follower";
 
 /// deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog
 "nslog" = "NSLog";
 
 /// home screen settings, target value
 "settingsviews_targetValue" = "Target Value";
-
-/// sensor countdown settings, show sensor countdown graphic on home screen
-"settingsviews_showSensorCountdown" = "Show Sensor Countdown?";
-
-/// sensor countdown settings, use alternative sensor countdown graphics on home screen
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Use Alternative Graphics?";
 
 /// help settings, section title
 "settingsviews_sectiontitlehelp" = "Help & Documentation";

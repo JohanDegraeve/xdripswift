@@ -3,7 +3,7 @@
 "emailbodyText" = "Problem Beschreibung: ";
 
 /// dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no
-"settingsviews_uploadReadingstoDexcomShare" = "Upload zu Dexcom Share?";
+"settingsviews_uploadReadingstoDexcomShare" = "Upload zu Dexcom Share";
 
 /// for text in pop up where user can select bg unit
 "settingsviews_selectbgunit" = "Blutzucker Einheit";
@@ -12,7 +12,7 @@
 "settingsviews_transmittertype" = "Transmitter Typ";
 
 /// Apple Watch Settings - text in row where create event is enabled or disabled 
-"createCalendarEvent" = "Kalendereinträge anlegen?";
+"createCalendarEvent" = "Kalendereinträge anlegen";
 
 /// dexcom share settings, section title
 "settingsviews_sectiontitledexcomshare" = "Dexcom Share";
@@ -33,7 +33,7 @@
 "settingsviews_transmitterid" = "Transmitter ID";
 
 /// nightscout settings, title of row
-"uploadSensorStartTime" = "Sensor Startzeit hochladen?";
+"uploadSensorStartTime" = "Sensor Startzeit hochladen";
 
 /// dexcom share settings, pop up that asks user to enter dexcom share account name
 "settingsviews_giveDexcomShareAccountName" = "Eingabe Dexcom Share Account Name";
@@ -66,7 +66,7 @@
 "settingsviews_sectiontitlenightscout" = "NightScout";
 
 /// Apple Watch Settings - text in row where user needs to say if delta should be displayed or not
-"displayDeltaInCalendarEvent" = "Delta anzeigen?";
+"displayDeltaInCalendarEvent" = "Delta anzeigen";
 
 /// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test
 "volumeTestiOSSoundExplanation" = "Ein Alarm mit eingestellter Systemlautstärke wird gespielt (nicht im Stummmodus).\n\n(gilt auch bei verpasster Datenübertragung.)\n\nLautstärketaste drücken um Test abzubrechen, danach können Sie die Lautstärke wie gewünscht einstellen und noch einmal testen.";
@@ -75,16 +75,16 @@
 "settingsviews_highValue" = "Hoher Wert";
 
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
-"settingsviews_nonfixedtransmitter" = "Aktiviere Mehrpunkt-Kalibrierung?";
+"settingsviews_nonfixedtransmitter" = "Aktiviere Mehrpunkt-Kalibrierung";
 
 /// transmitter settings, to explain that settings is about resetting the transmitter
-"settingsviews_resettransmitter" = "Transmitter zurücksetzten";
+"settingsviews_resettransmitter" = "Transmitter zurücksetzten (Anubis)";
 
 /// used in settings, section Info, title of the license setting
 "settingsviews_license" = "Lizenz";
 
 /// general settings, should reading be multiplied with 10 yes or no
-"settingsviews_multipleAppBadgeValueWith10" = "mit 10 multiplizieren?";
+"settingsviews_multipleAppBadgeValueWith10" = "mit 10 multiplizieren";
 
 /// nightscout settings, pop up that asks user to enter nightscout api key
 "settingsviews_giveNightScoutAPIKey" = "API_SECRET Eingabe";
@@ -93,7 +93,7 @@
 "settingsviews_labelNonFixed" = "Mehrpunkt-Kalibrierung";
 
 /// healthkit settings, literally 'healthkit'
-"settingsviews_healthkit" = "Apple Health nutzen?";
+"settingsviews_healthkit" = "Apple Health nutzen";
 
 /// speak settings, section title
 "settingsviews_sectiontitlespeak" = "Vorlesen";
@@ -108,10 +108,10 @@
 "settingsviews_sectiontitlegeneral" = "Haupteinstellungen";
 
 /// speak settings, where enable or disable speak trend
-"settingsviews_speakTrend" = "Trend vorlesen?";
+"settingsviews_speakTrend" = "Trend vorlesen";
 
 /// Apple Watch Settings - text in row where user needs to say if trend should be displayed or not
-"settingsviews_displayTrendInCalendarEvent" = "Trend anzeigen?";
+"settingsviews_displayTrendInCalendarEvent" = "Trend anzeigen";
 
 /// If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown
 "infoCalendarAccessRestricted" = "Richtlinien auf ihrem Gerät verhindern das Sie %@ Zugang zu ihrem Kalender geben.";
@@ -138,16 +138,16 @@
 "settingsviews_targetValue" = "Zielwert";
 
 /// home screen settings, show target line
-"settingsviews_showtarget" = "Zielwert Linie anzeigen?";
+"settingsviews_showtarget" = "Zielwert Linie anzeigen";
 
 /// 
-"settingsviews_showcoloredobjectives" = "Farbige Linien anzeigen?";
+"settingsviews_showcoloredobjectives" = "Farbige Linien anzeigen";
 
 /// M5 stack bluetooth  settings, pop up that asks user to enter the password
 "m5stack_settingsviews_giveBluetoothPassword" = "Eingabe Bluetooth Passwort";
 
 /// Apple Watch Settings - text in row where user needs to say if unit should be displayed or not
-"displayUnitInCalendarEvent" = "Einheiten anzeigen?";
+"displayUnitInCalendarEvent" = "Einheiten anzeigen";
 
 /// Text in pop up shown when user wants to send the trace file
 "describeProblem" = "Helfen Sie uns in dem sie uns so viele Innformationen als möglich mitteilen. Sollten Sie das Problem schon in unsere Facebook Gruppe gemeldet haben, teilen Sie uns bitte ihren Facebook Namen per E-Mail mit.";
@@ -159,13 +159,13 @@
 "timeScheduleViewTitle" = "An/Aus für geplanten upload ";
 
 /// nightscout settings, where user can enable or disable nightscout
-"settingsviews_nightScoutEnabled" = "Nightscout aktivieren?";
+"settingsviews_nightScoutEnabled" = "Nightscout aktivieren";
 
 /// alerting settings, section title
 "settingsviews_sectiontitlealerting" = "Alarms";
 
 /// speak settings, where user can enable or disable speak readings
-"settingsviews_speakBgReadings" = "BZ Werte vorlesen?";
+"settingsviews_speakBgReadings" = "BZ Werte vorlesen";
 
 /// home screen settings, urgent high value
 "settingsviews_urgentHighValue" = "Hohe Werte dringend";
@@ -174,7 +174,7 @@
 "m5stack_settingsviews_textColor" = "Text Color";
 
 /// home screen settings, use objectives in graph
-"settingsviews_useobjectives" = "Objekte im Diagram anzeigen?";
+"settingsviews_useobjectives" = "Objekte im Diagram anzeigen";
 
 /// nightscout settings, where user can set the nightscout api key
 "settingsviews_nightScoutAPIKey" = "API_SECRET";
@@ -195,7 +195,7 @@
 "volumeTestSoundPlayerExplanation" = "Ein Alarm mit eingestellter Systemlautstärke wird gespielt (auch im Stummmodus).\n\n(Dieser Alarm gilt für alle Alarme mit Ausnahme von verpasster Datenübertragung.)\n\nMit Ok können sie den Test beenden, danach können Sie die Lautstärke wie gewünscht einstellen und noch einmal testen..";
 
 /// speak settings, where user can enable or disable speak delta
-"settingsviews_speakDelta" = "Delta vorlesen?";
+"settingsviews_speakDelta" = "Delta vorlesen";
 
 /// M5 stack setting, brightness
 "m5stack_settingsviews_brightness" = "Bildschirmhelligkeit";
@@ -216,7 +216,7 @@
 "settingsviews_row_alerts" = "Schwellwerte";
 
 /// general settings, should reading be shown in app badge yes or no
-"settingsviews_labelShowReadingInAppBadge" = "BZ Werte auf der App-Kachel anzeigen?";
+"settingsviews_labelShowReadingInAppBadge" = "BZ Werte auf der App-Kachel anzeigen";
 
 /// home screen settings, low value
 "settingsviews_lowValue" = "Niedriger Wert";
@@ -225,7 +225,7 @@
 "settingsviews_giveDexcomShareSerialNumber" = "Eingabe der Dexcom Receiver Seriennummer";
 
 /// Apple Watch Settings - text in row where user needs to select a calendar
-"calenderId" = "Kalender auswählen?";
+"calenderId" = "Kalender auswählen";
 
 /// in Settings, row title to send settings
 "sendTraceFile" = "Fehlerbericht senden";
@@ -234,7 +234,7 @@
 "settingsviews_speakBgReadingslanguage" = "Sprache";
 
 /// nightscout settings, where user can select to use schedule or not
-"settingsviews_useSchedule" = "Upload Planer nutzen?";
+"settingsviews_useSchedule" = "Upload Planer nutzen";
 
 /// about settings, section title
 "settingsviews_sectiontitleAbout" = "Über %@";
@@ -246,25 +246,25 @@
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 
 /// nightscout settings, when clicking the cell, test the url and api key
-"testUrlAndAPIKey" = "Verbindung testen?";
+"testUrlAndAPIKey" = "Verbindung testen";
 
 /// speak reading settings, text in pop up where user can select the language
 "settingsviews_speakreadingslanguageselection" = "Sprache wählen";
 
 /// general settings, should reading be shown in notification yes or no
-"settingsviews_showReadingInNotification" = "BZ in Mitteilungszentrale?";
+"settingsviews_showReadingInNotification" = "BZ in Mitteilungszentrale";
 
 /// dexcom share settings, where user can choose to use US url or not
-"settingsviews_useUSDexcomShareurl" = "Benutzung von Dexcom US Server?";
+"settingsviews_useUSDexcomShareurl" = "Benutzung von Dexcom US Server";
 
 /// general settings, master or follower
-"settingsviews_masterorfollower" = "Master or Follower?";
+"settingsviews_masterorfollower" = "Master or Follower";
 
 /// dexcom share settings settings, where user can set dexcom serial number to be used for dexcom share upload
 "settingsviews_dexcomShareSerialNumber" = "Empfänger Seriennummer";
 
 /// deloper settings, row title for 'Smooth Libre Values?'
-"smoothLibreValues" = "Libre Werte glätten?";
+"smoothLibreValues" = "Libre Werte glätten";
 
 /// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
 "oslog" = "OSLog";
@@ -283,27 +283,22 @@
 
 
 "settingsviews_sectiontitlestatistics" = "Statistik";
-"settingsviews_showStatistics" = "Zeige Verlauf?";
-"settingsviews_daysToUseStatisticsTitle" = "Tage zum berechnen?";
+"settingsviews_showStatistics" = "Zeige Verlauf";
+"settingsviews_daysToUseStatisticsTitle" = "Tage zum berechnen";
 "settingsviews_daysToUseStatisticsMessage" = "Maximale Tage anhand dessen versucht wird den Verlauf zu berechnen?\n\n(Bei 0 wird heute ab Mitternacht berechnet)";
-"settingsviews_useStandardStatisticsRange" = "Standardbereich verwenden?";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol anzeigen?";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol anzeigen";
 
-"settingsviews_showClockWhenScreenIsLocked" = "Uhr anzeigen wenn gesperrt?";
-
-"settingsviews_sectiontitlesensorcountdown" = "Zeit bis Sensorende";
-"settingsviews_showSensorCountdown" = "Zeit bis Sensorende anzeigen?";
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Alternative Symbole verwenden?";
+"settingsviews_showClockWhenScreenIsLocked" = "Uhr anzeigen wenn gesperrt";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the online help be translated automatically if needed
-"settingsviews_translateOnlineHelp" = "Translate Automatically?";
+"settingsviews_translateOnlineHelp" = "Translate Automatically";
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Allow Chart Rotation?";
+"settingsviews_allowScreenRotation" = "Allow Chart Rotation";
 
 /// help settings, section title
 "settingsviews_sectiontitlehelp" = "Help & Documentation";
@@ -312,19 +307,19 @@
 "calendarEventsSectionTitle" = "Calendar Events";
 
 /// help settings, open the online help
-"settingsviews_showOnlineHelp" = "Open Online Help?";
+"settingsviews_showOnlineHelp" = "Open Online Help";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm?";
+"settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
 
-"settingsviews_showHelpIcon" = "Hilfe-Symbol anzeigen?";
+"settingsviews_showHelpIcon" = "Hilfe-Symbol anzeigen";
 "settingsviews_restartNeeded" = "(Neustart notwendig)";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -341,7 +336,7 @@
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
 
 /// treatments settings, show the treatments on main chart
-"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart?";
+"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -354,7 +349,7 @@
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
 
 /// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart?";
+"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart";
 
 /// When clicking the retention setting, a pop up asks for how many days should data be stored
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";

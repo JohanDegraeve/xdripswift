@@ -19,13 +19,15 @@
 		470B619D270C448200561E56 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 470B619C270C448200561E56 /* Assets.xcassets */; };
 		470B61A1270C448200561E56 /* xDrip4iO5.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 470B6186270C448000561E56 /* xDrip4iO5.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		470CE1FC246802EB00D5CB74 /* BluetoothPeripheralsView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 470CE1FE246802EB00D5CB74 /* BluetoothPeripheralsView.strings */; };
-		470F021326DD515300C5D626 /* SettingsViewSensorCountdownSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 470F021226DD515300C5D626 /* SettingsViewSensorCountdownSettingsViewModel.swift */; };
 		47150A4027F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47150A3F27F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift */; };
 		47228B152996BDD2008725DB /* BgReadingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47228B142996BDD2008725DB /* BgReadingsView.swift */; };
+		4733B93E2AD17C99001D609D /* FollowerBgReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4733B93D2AD17C99001D609D /* FollowerBgReading.swift */; };
+		4733B9402AD17D15001D609D /* FollowerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4733B93F2AD17D15001D609D /* FollowerDelegate.swift */; };
 		4749EB9B25B36E010072DF8B /* LibreNFC.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4749EB9D25B36E010072DF8B /* LibreNFC.strings */; };
 		47503382247420A200D2260B /* BluetoothPeripheralView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 47503384247420A200D2260B /* BluetoothPeripheralView.strings */; };
 		4752B400263570DA0081D551 /* ConstantsStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */; };
 		4752B4062635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */; };
+		476FE8FF2B2F1D1700537E0A /* ConstantsFollower.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */; };
 		4779BCEE2974306300515714 /* ActionClosurable in Frameworks */ = {isa = PBXBuildFile; productRef = 4779BCED2974306300515714 /* ActionClosurable */; };
 		4779BCF12974307700515714 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4779BCF02974307700515714 /* CryptoSwift */; };
 		4779BCF42974308F00515714 /* PieCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 4779BCF32974308F00515714 /* PieCharts */; };
@@ -34,7 +36,15 @@
 		47ADD2DF27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47ADD2DE27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift */; };
 		47ADD2E127FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47ADD2E027FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift */; };
 		47B60F3726F389E2003198D3 /* LandscapeChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */; };
+		47B7FC722B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */; };
+		47D2DB3B2B14F6D000C8EE6B /* ScreenLockDimmingType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D2DB3A2B14F6D000C8EE6B /* ScreenLockDimmingType.swift */; };
 		47D9BC952A78498500AB85B2 /* BgReadingsDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D9BC942A78498500AB85B2 /* BgReadingsDetailView.swift */; };
+		47DB06C22A6FC02200267BE3 /* SettingsViewDataSourceSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06C12A6FC02200267BE3 /* SettingsViewDataSourceSettingsViewModel.swift */; };
+		47DB06C62A6FC72000267BE3 /* SettingsViewCalendarEventsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06C52A6FC72000267BE3 /* SettingsViewCalendarEventsSettingsViewModel.swift */; };
+		47DB06D02A70141E00267BE3 /* FollowerDataSourceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06CF2A70141E00267BE3 /* FollowerDataSourceType.swift */; };
+		47DB06E32A7137B000267BE3 /* LibreLinkUpFollowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E22A7137B000267BE3 /* LibreLinkUpFollowManager.swift */; };
+		47DB06E72A715EC500267BE3 /* ConstantsLibreLinkUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E62A715EC500267BE3 /* ConstantsLibreLinkUp.swift */; };
+		47DB06E92A715FD900267BE3 /* LibreLinkUpModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E82A715FD900267BE3 /* LibreLinkUpModels.swift */; };
 		47F8E95A2710255D00B8B02B /* ConstantsWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F8E9592710255C00B8B02B /* ConstantsWatchApp.swift */; };
 		47FB28082636B04200042FFB /* StatisticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47FB28072636B04200042FFB /* StatisticsManager.swift */; };
 		CE1B2FE025D0264B00F642F5 /* LaunchScreen.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */; };
@@ -135,7 +145,6 @@
 		F821CF66229EE68B005C1E43 /* NightScoutFollowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF65229EE68B005C1E43 /* NightScoutFollowManager.swift */; };
 		F821CF6B229FC22D005C1E43 /* Endpoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF6A229FC22D005C1E43 /* Endpoint.swift */; };
 		F821CF6F229FC280005C1E43 /* Endpoint+NightScout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF6E229FC280005C1E43 /* Endpoint+NightScout.swift */; };
-		F821CF7B22A1D359005C1E43 /* NightScoutFollowerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF7A22A1D359005C1E43 /* NightScoutFollowerDelegate.swift */; };
 		F821CF7D22A46CDD005C1E43 /* 1-millisecond-of-silence.caf in Resources */ = {isa = PBXBuildFile; fileRef = F821CF7C22A46CDD005C1E43 /* 1-millisecond-of-silence.caf */; };
 		F821CF7F22A4EDCF005C1E43 /* 20ms-of-silence.caf in Resources */ = {isa = PBXBuildFile; fileRef = F821CF7E22A4EDCF005C1E43 /* 20ms-of-silence.caf */; };
 		F821CF8122A5C814005C1E43 /* RepeatingTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */; };
@@ -323,7 +332,6 @@
 		F8A1586522EDB89D007F5B5D /* ConstantsDefaultAlertTypeSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1586422EDB89D007F5B5D /* ConstantsDefaultAlertTypeSettings.swift */; };
 		F8A1586722EDB8BF007F5B5D /* ConstantsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */; };
 		F8A1586B22EDB967007F5B5D /* ConstantsMaster.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1586A22EDB967007F5B5D /* ConstantsMaster.swift */; };
-		F8A1586D22EDB9BE007F5B5D /* ConstantsDexcomFollower.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1586C22EDB9BE007F5B5D /* ConstantsDexcomFollower.swift */; };
 		F8A1586F22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */; };
 		F8A1587122EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1587022EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift */; };
 		F8A1587322EDC893007F5B5D /* ConstantsDexcomShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1587222EDC893007F5B5D /* ConstantsDexcomShare.swift */; };
@@ -356,7 +364,6 @@
 		F8A389EB233175A10010F405 /* SettingsViewM5StackSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389EA233175A10010F405 /* SettingsViewM5StackSettingsViewModel.swift */; };
 		F8A389ED23342EB10010F405 /* ConstantsNightScout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A389EC23342EB10010F405 /* ConstantsNightScout.swift */; };
 		F8A54AAD22D6859200934E7A /* SlopeParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AAC22D6859200934E7A /* SlopeParameters.swift */; };
-		F8A54AAF22D686CD00934E7A /* NightScoutBgReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A54AAE22D686CD00934E7A /* NightScoutBgReading.swift */; };
 		F8A5EEAE25791F370085E660 /* Libre2BLEUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEAD25791F370085E660 /* Libre2BLEUtilities.swift */; };
 		F8A5EEB2257CEC290085E660 /* LibreNFC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEB1257CEC290085E660 /* LibreNFC.swift */; };
 		F8A5EEB8257CF2940085E660 /* TextsLibreNFC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEB7257CF2940085E660 /* TextsLibreNFC.swift */; };
@@ -467,7 +474,6 @@
 		F8DF766D23ED9B0900063910 /* DexcomG5BluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF766C23ED9B0900063910 /* DexcomG5BluetoothPeripheralViewModel.swift */; };
 		F8E0475E28CC8E330049D8C9 /* GlucoseData+LoopShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */; };
 		F8E3A2A323D4E7E200E5E98A /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */; };
-		F8E3A2A523D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2A423D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift */; };
 		F8E3A2A923D906C200E5E98A /* WatchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2A823D906C200E5E98A /* WatchManager.swift */; };
 		F8E3A2AB23DA520B00E5E98A /* ConstantsWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2AA23DA520B00E5E98A /* ConstantsWatch.swift */; };
 		F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */; };
@@ -696,14 +702,16 @@
 		470B619C270C448200561E56 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		470B619E270C448200561E56 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		470CE1FF246802F400D5CB74 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BluetoothPeripheralsView.strings; sourceTree = "<group>"; };
-		470F021226DD515300C5D626 /* SettingsViewSensorCountdownSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewSensorCountdownSettingsViewModel.swift; sourceTree = "<group>"; };
 		47150A3F27F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewTreatmentsSettingsViewModel.swift; sourceTree = "<group>"; };
 		47228B142996BDD2008725DB /* BgReadingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadingsView.swift; sourceTree = "<group>"; };
+		4733B93D2AD17C99001D609D /* FollowerBgReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBgReading.swift; sourceTree = "<group>"; };
+		4733B93F2AD17D15001D609D /* FollowerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerDelegate.swift; sourceTree = "<group>"; };
 		4749EB9C25B36E010072DF8B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LibreNFC.strings; sourceTree = "<group>"; };
 		47503383247420A200D2260B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BluetoothPeripheralView.strings; sourceTree = "<group>"; };
 		4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsStatistics.swift; sourceTree = "<group>"; };
 		4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewStatisticsSettingsViewModel.swift; sourceTree = "<group>"; };
 		475DED96244AF92A00F78473 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Alerts.strings; sourceTree = "<group>"; };
+		476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsFollower.swift; sourceTree = "<group>"; };
 		477F45E5285B993100AC8475 /* GlucoseMiniChartManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseMiniChartManager.swift; sourceTree = "<group>"; };
 		4798BAC727BA6AA8002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		4798BAC827BA6AA8002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Main.strings; sourceTree = "<group>"; };
@@ -733,8 +741,16 @@
 		47ADD2DE27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartPointsScatterDownTrianglesLayer.swift; sourceTree = "<group>"; };
 		47ADD2E027FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift; sourceTree = "<group>"; };
 		47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandscapeChartViewController.swift; sourceTree = "<group>"; };
+		47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBackgroundKeepAliveType.swift; sourceTree = "<group>"; };
+		47D2DB3A2B14F6D000C8EE6B /* ScreenLockDimmingType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenLockDimmingType.swift; sourceTree = "<group>"; };
 		47D9BC942A78498500AB85B2 /* BgReadingsDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BgReadingsDetailView.swift; sourceTree = "<group>"; };
 		47DB06C02A6FB3CC00267BE3 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/BgReadings.strings; sourceTree = "<group>"; };
+		47DB06C12A6FC02200267BE3 /* SettingsViewDataSourceSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewDataSourceSettingsViewModel.swift; sourceTree = "<group>"; };
+		47DB06C52A6FC72000267BE3 /* SettingsViewCalendarEventsSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewCalendarEventsSettingsViewModel.swift; sourceTree = "<group>"; };
+		47DB06CF2A70141E00267BE3 /* FollowerDataSourceType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FollowerDataSourceType.swift; sourceTree = "<group>"; };
+		47DB06E22A7137B000267BE3 /* LibreLinkUpFollowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreLinkUpFollowManager.swift; sourceTree = "<group>"; };
+		47DB06E62A715EC500267BE3 /* ConstantsLibreLinkUp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsLibreLinkUp.swift; sourceTree = "<group>"; };
+		47DB06E82A715FD900267BE3 /* LibreLinkUpModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreLinkUpModels.swift; sourceTree = "<group>"; };
 		47F8E9592710255C00B8B02B /* ConstantsWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsWatchApp.swift; sourceTree = "<group>"; };
 		47FB28072636B04200042FFB /* StatisticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsManager.swift; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xdrip/xDrip.xcconfig; sourceTree = "<group>"; };
@@ -1019,7 +1035,6 @@
 		F821CF65229EE68B005C1E43 /* NightScoutFollowManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NightScoutFollowManager.swift; sourceTree = "<group>"; };
 		F821CF6A229FC22D005C1E43 /* Endpoint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Endpoint.swift; sourceTree = "<group>"; };
 		F821CF6E229FC280005C1E43 /* Endpoint+NightScout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Endpoint+NightScout.swift"; sourceTree = "<group>"; };
-		F821CF7A22A1D359005C1E43 /* NightScoutFollowerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightScoutFollowerDelegate.swift; sourceTree = "<group>"; };
 		F821CF7C22A46CDD005C1E43 /* 1-millisecond-of-silence.caf */ = {isa = PBXFileReference; lastKnownFileType = audio.caf; path = "1-millisecond-of-silence.caf"; sourceTree = "<group>"; };
 		F821CF7E22A4EDCF005C1E43 /* 20ms-of-silence.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "20ms-of-silence.caf"; sourceTree = "<group>"; };
 		F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatingTimer.swift; sourceTree = "<group>"; };
@@ -1241,7 +1256,6 @@
 		F8A1586422EDB89D007F5B5D /* ConstantsDefaultAlertTypeSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsDefaultAlertTypeSettings.swift; sourceTree = "<group>"; };
 		F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsHomeView.swift; sourceTree = "<group>"; };
 		F8A1586A22EDB967007F5B5D /* ConstantsMaster.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsMaster.swift; sourceTree = "<group>"; };
-		F8A1586C22EDB9BE007F5B5D /* ConstantsDexcomFollower.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsDexcomFollower.swift; sourceTree = "<group>"; };
 		F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSuspensionPrevention.swift; sourceTree = "<group>"; };
 		F8A1587022EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSpeakReadingLanguages.swift; sourceTree = "<group>"; };
 		F8A1587222EDC893007F5B5D /* ConstantsDexcomShare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsDexcomShare.swift; sourceTree = "<group>"; };
@@ -1275,7 +1289,6 @@
 		F8A389EA233175A10010F405 /* SettingsViewM5StackSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewM5StackSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8A389EC23342EB10010F405 /* ConstantsNightScout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsNightScout.swift; sourceTree = "<group>"; };
 		F8A54AAC22D6859200934E7A /* SlopeParameters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SlopeParameters.swift; sourceTree = "<group>"; };
-		F8A54AAE22D686CD00934E7A /* NightScoutBgReading.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NightScoutBgReading.swift; sourceTree = "<group>"; };
 		F8A54B0A22D9215500934E7A /* xdrip-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "xdrip-Bridging-Header.h"; sourceTree = "<group>"; };
 		F8A5EEAD25791F370085E660 /* Libre2BLEUtilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre2BLEUtilities.swift; sourceTree = "<group>"; };
 		F8A5EEB1257CEC290085E660 /* LibreNFC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreNFC.swift; sourceTree = "<group>"; };
@@ -1451,7 +1464,6 @@
 		F8DF766C23ED9B0900063910 /* DexcomG5BluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG5BluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
 		F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GlucoseData+LoopShare.swift"; sourceTree = "<group>"; };
 		F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
-		F8E3A2A423D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewAppleWatchSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8E3A2A823D906C200E5E98A /* WatchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchManager.swift; sourceTree = "<group>"; };
 		F8E3A2AA23DA520B00E5E98A /* ConstantsWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsWatch.swift; sourceTree = "<group>"; };
 		F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringProtocol.swift; sourceTree = "<group>"; };
@@ -1632,6 +1644,26 @@
 				470B619C270C448200561E56 /* Assets.xcassets */,
 			);
 			path = "Watch App WatchKit Extension";
+			sourceTree = "<group>";
+		};
+		47DB06CC2A7013EF00267BE3 /* Followers */ = {
+			isa = PBXGroup;
+			children = (
+				47DB06CF2A70141E00267BE3 /* FollowerDataSourceType.swift */,
+				4733B93D2AD17C99001D609D /* FollowerBgReading.swift */,
+				4733B93F2AD17D15001D609D /* FollowerDelegate.swift */,
+				47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */,
+			);
+			path = Followers;
+			sourceTree = "<group>";
+		};
+		47DB06DB2A7136E900267BE3 /* LibreLinkUp */ = {
+			isa = PBXGroup;
+			children = (
+				47DB06E22A7137B000267BE3 /* LibreLinkUpFollowManager.swift */,
+				47DB06E82A715FD900267BE3 /* LibreLinkUpModels.swift */,
+			);
+			path = LibreLinkUp;
 			sourceTree = "<group>";
 		};
 		47FB28052636AFE700042FFB /* Statistics */ = {
@@ -1937,8 +1969,6 @@
 				F821CF53229BF43A005C1E43 /* BgReading+NightScout.swift */,
 				F8AF120024B9082000AE5BA2 /* Calibration+NightScout.swift */,
 				F821CF6E229FC280005C1E43 /* Endpoint+NightScout.swift */,
-				F8A54AAE22D686CD00934E7A /* NightScoutBgReading.swift */,
-				F821CF7A22A1D359005C1E43 /* NightScoutFollowerDelegate.swift */,
 				F821CF65229EE68B005C1E43 /* NightScoutFollowManager.swift */,
 				F821CF60229BF4A2005C1E43 /* NightScoutUploadManager.swift */,
 				F821CF52229BF43A005C1E43 /* NSDateFormatter.swift */,
@@ -2065,7 +2095,9 @@
 				F8BECB03235CE5970060DAE1 /* Charts */,
 				F821CF4D229BF43A005C1E43 /* CoreData */,
 				F81D6D4622BD5F43005EFAE2 /* DexcomShare */,
+				47DB06CC2A7013EF00267BE3 /* Followers */,
 				F821CF9122ADB064005C1E43 /* HealthKit */,
+				47DB06DB2A7136E900267BE3 /* LibreLinkUp */,
 				F8E51D5B2448D8A3001C9E5A /* Loop */,
 				F821CF4F229BF43A005C1E43 /* NightScout */,
 				F64039AE281C3F8D0051EFFE /* QuickActions */,
@@ -2533,7 +2565,8 @@
 			isa = PBXGroup;
 			children = (
 				F8B3A838227F090D004BA588 /* SettingsViewAlertSettingsViewModel.swift */,
-				F8E3A2A423D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift */,
+				47DB06C52A6FC72000267BE3 /* SettingsViewCalendarEventsSettingsViewModel.swift */,
+				47DB06C12A6FC02200267BE3 /* SettingsViewDataSourceSettingsViewModel.swift */,
 				F8A1584C22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift */,
 				F8B3A839227F090D004BA588 /* SettingsViewDexcomSettingsViewModel.swift */,
 				F8B3A83E227F090D004BA588 /* SettingsViewGeneralSettingsViewModel.swift */,
@@ -2544,7 +2577,6 @@
 				F8A1584E22ECB281007F5B5D /* SettingsViewInfoViewModel.swift */,
 				F8A389EA233175A10010F405 /* SettingsViewM5StackSettingsViewModel.swift */,
 				F8B3A83B227F090D004BA588 /* SettingsViewNightScoutSettingsViewModel.swift */,
-				470F021226DD515300C5D626 /* SettingsViewSensorCountdownSettingsViewModel.swift */,
 				F8B3A83D227F090D004BA588 /* SettingsViewSpeakSettingsViewModel.swift */,
 				4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */,
 				F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */,
@@ -2715,6 +2747,7 @@
 		F8EA6C7D21B70DEA0082976B /* Constants */ = {
 			isa = PBXGroup;
 			children = (
+				476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */,
 				F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */,
 				F8A1585022EDB597007F5B5D /* ConstantsBGGraphBuilder.swift */,
 				F8A1585222EDB602007F5B5D /* ConstantsBloodGlucose.swift */,
@@ -2723,7 +2756,6 @@
 				F8A1585622EDB754007F5B5D /* ConstantsCoreData.swift */,
 				F8A1585822EDB7C6007F5B5D /* ConstantsDefaultAlertLevels.swift */,
 				F8A1586422EDB89D007F5B5D /* ConstantsDefaultAlertTypeSettings.swift */,
-				F8A1586C22EDB9BE007F5B5D /* ConstantsDexcomFollower.swift */,
 				F8A1585A22EDB7EA007F5B5D /* ConstantsDexcomG5.swift */,
 				F8A1587222EDC893007F5B5D /* ConstantsDexcomShare.swift */,
 				F80859262364355F00F3829D /* ConstantsGlucoseChart.swift */,
@@ -2731,6 +2763,7 @@
 				F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */,
 				F8E5404B2522624800052CE5 /* ConstantsHousekeeping.swift */,
 				F8252866243E50FE0067AF77 /* ConstantsLibre.swift */,
+				47DB06E62A715EC500267BE3 /* ConstantsLibreLinkUp.swift */,
 				F85FB768255DE14600D1C39E /* ConstantsLibreSmoothing.swift */,
 				F8A1585E22EDB81E007F5B5D /* ConstantsLog.swift */,
 				F8A389C723203E3E0010F405 /* ConstantsM5Stack.swift */,
@@ -2764,6 +2797,7 @@
 				F821CF69229FC22D005C1E43 /* Network */,
 				F8F7B8E9259A7A9400C47B04 /* SavitzkyGolayFilter */,
 				F8B3A7DD226E48C1004BA588 /* SoundPlayer */,
+				47D2DB3A2B14F6D000C8EE6B /* ScreenLockDimmingType.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -3531,7 +3565,6 @@
 				F816E1282439DE55009EE65B /* CGMDexomG4TransmitterDelegate.swift in Sources */,
 				F8F1670A2727317D001AA3D8 /* DexcomTransmitterTimeRxMessage.swift in Sources */,
 				F8EA6C8221B723BC0082976B /* Date.swift in Sources */,
-				F8E3A2A523D78FBD00E5E98A /* SettingsViewAppleWatchSettingsViewModel.swift in Sources */,
 				D400F8032778BD8000B57648 /* TextsTreatmentsView.swift in Sources */,
 				47ADD2E127FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift in Sources */,
 				47228B152996BDD2008725DB /* BgReadingsView.swift in Sources */,
@@ -3567,7 +3600,6 @@
 				F898EDF6234A8A5700BFB79B /* UInt32.swift in Sources */,
 				F8B955B1258BEE9D00C06016 /* ConstantsSpeakReading.swift in Sources */,
 				F8F9723223A5915900C3F17D /* M5StackReadBlePassWordTxMessage.swift in Sources */,
-				F8A54AAF22D686CD00934E7A /* NightScoutBgReading.swift in Sources */,
 				F8DF765323E34F4500063910 /* DexcomG5+CoreDataClass.swift in Sources */,
 				F8F9720F23A5915900C3F17D /* NSData+CRC.swift in Sources */,
 				F8A1585722EDB754007F5B5D /* ConstantsCoreData.swift in Sources */,
@@ -3584,6 +3616,7 @@
 				F8B3A7FA2278E0E8004BA588 /* SettingsViewModelProtocol.swift in Sources */,
 				F8A2BC3225DB0D6D001D1E78 /* BluetoothPeripheralManaging.swift in Sources */,
 				F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */,
+				47B7FC722B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift in Sources */,
 				F816E11C2439243B009EE65B /* Droplet+CoreDataProperties.swift in Sources */,
 				F821CF56229BF43A005C1E43 /* AlertKind.swift in Sources */,
 				F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */,
@@ -3598,7 +3631,6 @@
 				F8F9721623A5915900C3F17D /* CGMG4xDripTransmitter.swift in Sources */,
 				F821CF8122A5C814005C1E43 /* RepeatingTimer.swift in Sources */,
 				F80D915C24F06A40006840B5 /* PreLibre2.swift in Sources */,
-				470F021326DD515300C5D626 /* SettingsViewSensorCountdownSettingsViewModel.swift in Sources */,
 				477F45E6285B993200AC8475 /* GlucoseMiniChartManager.swift in Sources */,
 				F64039B5281E91500051EFFE /* TextsQuickActions.swift in Sources */,
 				F8F9722223A5915900C3F17D /* CRC.swift in Sources */,
@@ -3617,6 +3649,7 @@
 				F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */,
 				F8C9784D2428052E00A09483 /* CGMSensorType.swift in Sources */,
 				F8A1586B22EDB967007F5B5D /* ConstantsMaster.swift in Sources */,
+				47DB06D02A70141E00267BE3 /* FollowerDataSourceType.swift in Sources */,
 				F8F9723923A5928D00C3F17D /* M5StackBluetoothPeripheralViewModel.swift in Sources */,
 				F8F9722B23A5915900C3F17D /* CGMTransmitterDelegate.swift in Sources */,
 				F80859292364D61B00F3829D /* UserDefaults+charts.swift in Sources */,
@@ -3677,8 +3710,10 @@
 				F816E10E2437EAC9009EE65B /* BlueReader+CoreDataProperties.swift in Sources */,
 				F8B3A830227F085A004BA588 /* SettingsTableViewCell.swift in Sources */,
 				F82436FC24BE014000BED341 /* TextsLibreStates.swift in Sources */,
+				47DB06C22A6FC02200267BE3 /* SettingsViewDataSourceSettingsViewModel.swift in Sources */,
 				F8F7B8EB259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift in Sources */,
 				D417E51C282EC8DB008DC467 /* ProgressBarViewController.swift in Sources */,
+				47DB06C62A6FC72000267BE3 /* SettingsViewCalendarEventsSettingsViewModel.swift in Sources */,
 				F830991C23C2909E005741DF /* Watlaa+CoreDataClass.swift in Sources */,
 				F808D2CC240328FA0084B5DB /* Bubble+CoreDataClass.swift in Sources */,
 				F8A1586122EDB844007F5B5D /* ConstantsNotifications.swift in Sources */,
@@ -3696,6 +3731,7 @@
 				F8EEDD6423020FAD00D2D610 /* NoCalibrator.swift in Sources */,
 				F8177023248CF78300AA3600 /* LibreSensorType.swift in Sources */,
 				F8C97859242AAE7B00A09483 /* MiaoMiao+BluetoothPeripheral.swift in Sources */,
+				476FE8FF2B2F1D1700537E0A /* ConstantsFollower.swift in Sources */,
 				F8EEDD5422FF685400D2D610 /* NSMutableURLRequest.swift in Sources */,
 				F897AAFB2201018800CDDD10 /* String.swift in Sources */,
 				F8B3A847227F090E004BA588 /* SettingsViewNightScoutSettingsViewModel.swift in Sources */,
@@ -3718,7 +3754,9 @@
 				F8AF11F324B1279500AE5BA2 /* TextsLibreErrors.swift in Sources */,
 				F8691888239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift in Sources */,
 				F8297F4F238DCAD800D74D66 /* BluetoothPeripheralNavigationController.swift in Sources */,
+				47DB06E92A715FD900267BE3 /* LibreLinkUpModels.swift in Sources */,
 				F8A1585322EDB602007F5B5D /* ConstantsBloodGlucose.swift in Sources */,
+				4733B93E2AD17C99001D609D /* FollowerBgReading.swift in Sources */,
 				F85FB769255DE14600D1C39E /* ConstantsLibreSmoothing.swift in Sources */,
 				F8F1671B272B3E4F001AA3D8 /* DexcomBackfillStream.swift in Sources */,
 				F8DF766023E38FC100063910 /* BLEPeripheral+CoreDataClass.swift in Sources */,
@@ -3746,7 +3784,6 @@
 				F8CB59C42739D1CD00BA199E /* DexcomBackfillTxMessage.swift in Sources */,
 				F8F9721823A5915900C3F17D /* CGMBlueReaderTransmitter.swift in Sources */,
 				F8252867243E50FE0067AF77 /* ConstantsLibre.swift in Sources */,
-				F8A1586D22EDB9BE007F5B5D /* ConstantsDexcomFollower.swift in Sources */,
 				F8F9720923A5915900C3F17D /* AESCrypt.m in Sources */,
 				F8CB59D3274D94AF00BA199E /* DexcomSessionStartTxMessage.swift in Sources */,
 				F80ED2ED236F68F90005C035 /* SettingsViewM5StackGeneralSettingsViewModel.swift in Sources */,
@@ -3768,7 +3805,6 @@
 				F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */,
 				F8AF361B245D93EE00B5977B /* Int16.swift in Sources */,
 				F8E3A2AB23DA520B00E5E98A /* ConstantsWatch.swift in Sources */,
-				F821CF7B22A1D359005C1E43 /* NightScoutFollowerDelegate.swift in Sources */,
 				F8F9721523A5915900C3F17D /* PairRequestTxMessage.swift in Sources */,
 				F8BECB12235CEA9B0060DAE1 /* TimeInterval.swift in Sources */,
 				F8F1670C27273774001AA3D8 /* GlucoseBackfillRxMessage.swift in Sources */,
@@ -3830,6 +3866,7 @@
 				F8A389E7232ECE7E0010F405 /* SettingsViewUtilities.swift in Sources */,
 				F8A2BC3125DB0D6D001D1E78 /* BluetoothPeripheralManager+M5StackBluetoothTransmitterDelegate.swift in Sources */,
 				F8A2BC2D25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMG5TransmitterDelegate.swift in Sources */,
+				47DB06E72A715EC500267BE3 /* ConstantsLibreLinkUp.swift in Sources */,
 				F8FDFEA9260DE1A70047597D /* DTCustomColoredAccessory.m in Sources */,
 				F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */,
 				D48E8F78278E49B300CCEE08 /* TreatmentNSResponse.swift in Sources */,
@@ -3841,6 +3878,7 @@
 				F64039B0281C3F9D0051EFFE /* QuickActionsManager.swift in Sources */,
 				F8B3A81E227DEC92004BA588 /* BgReadingsAccessor.swift in Sources */,
 				D41F32942827332000861B3D /* DataExporter.swift in Sources */,
+				4733B9402AD17D15001D609D /* FollowerDelegate.swift in Sources */,
 				F8F1671327274557001AA3D8 /* DexcomCalibrationRxMessage.swift in Sources */,
 				F8E51D63244B3386001C9E5A /* MiaoMiaoResponseType.swift in Sources */,
 				F821CF6B229FC22D005C1E43 /* Endpoint.swift in Sources */,
@@ -3859,6 +3897,7 @@
 				F816E1242439DB63009EE65B /* DexcomG4+BluetoothPeripheral.swift in Sources */,
 				F8E5404C2522624800052CE5 /* ConstantsHousekeeping.swift in Sources */,
 				F8AF120124B9082000AE5BA2 /* Calibration+NightScout.swift in Sources */,
+				47DB06E32A7137B000267BE3 /* LibreLinkUpFollowManager.swift in Sources */,
 				F808D2D2240329E80084B5DB /* Bubble+BluetoothPeripheral.swift in Sources */,
 				F8025C1321DA683400ECF0C0 /* Data.swift in Sources */,
 				F80859272364355F00F3829D /* ConstantsGlucoseChart.swift in Sources */,
@@ -3870,6 +3909,7 @@
 				F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */,
 				F8297F5A238EE14E00D74D66 /* TextsBluetoothPeripheralView.swift in Sources */,
 				F8BECB02235CE3E20060DAE1 /* BloodGlucoseChartView.swift in Sources */,
+				47D2DB3B2B14F6D000C8EE6B /* ScreenLockDimmingType.swift in Sources */,
 				F8A1584D22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift in Sources */,
 				F816E12A2439DF3A009EE65B /* DexcomG4+CoreDataClass.swift in Sources */,
 				F8F9723E23A593C000C3F17D /* M5StickCBluetoothPeripheralViewModel.swift in Sources */,

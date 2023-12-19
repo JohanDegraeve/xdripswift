@@ -25,6 +25,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
     case loopDelay = 6
     
+    /// LibreLinkUp version number that will be used for the LLU follower mode http request headers
+    case libreLinkUpVersion = 7
+    
 }
 
 struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
@@ -68,6 +71,8 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .loopDelay:
             return Texts_SettingsView.loopDelaysScreenTitle
             
+        case .libreLinkUpVersion:
+            return Texts_SettingsView.libreLinkUpVersion
         }
     }
     
@@ -80,7 +85,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .suppressLoopShare:
             return UITableViewCell.AccessoryType.none
             
-        case .loopDelay:
+        case .loopDelay, .libreLinkUpVersion:
             return UITableViewCell.AccessoryType.disclosureIndicator
             
         }
@@ -94,6 +99,9 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             
         case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .suppressLoopShare, .shareToLoopOnceEvery5Minutes, .loopDelay:
             return nil
+            
+        case .libreLinkUpVersion:
+            return UserDefaults.standard.libreLinkUpVersion
             
         }
         
@@ -153,7 +161,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
                 
             })
             
-        case .loopDelay:
+        case .loopDelay, .libreLinkUpVersion:
             return nil
             
         }
@@ -176,7 +184,18 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .loopDelay:
             return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToLoopDelaySchedule.rawValue, sender: self)
             
-
+        case .libreLinkUpVersion:
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.libreLinkUpVersion, message:  Texts_SettingsView.libreLinkUpVersionMessage, keyboardType: .default, text: UserDefaults.standard.libreLinkUpVersion, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(libreLinkUpVersion: String) in
+                
+                // check if the entered version is in the correct format before allowing it to help avoid problems with the server requests
+                if let versionNumber = libreLinkUpVersion.toNilIfLength0(), checkLibreLinkUpVersionFormat(for: libreLinkUpVersion) {
+                    
+                    UserDefaults.standard.libreLinkUpVersion = versionNumber.toNilIfLength0()
+                    
+                }
+                
+            }, cancelHandler: nil, inputValidator: nil)
+            
         }
     }
     
@@ -188,5 +207,18 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         return false
     }
     
+    // regex tested here: https://regex101.com/r/MI9vTy/2
+    /// check the LibreLinkUp version number entered to make sure it follows the required format like "4.x.x"
+    func checkLibreLinkUpVersionFormat(for text: String) -> Bool {
+        
+        let regex = try! NSRegularExpression(pattern: "^[0-9]+\\.[0-9]+\\.[0-9]+$", options: [.caseInsensitive])
+        
+        let range = NSRange(location: 0, length: text.count)
+        
+        let matches = regex.matches(in: text, options: [], range: range)
+        
+        return matches.first != nil
+        
+    }
     
 }

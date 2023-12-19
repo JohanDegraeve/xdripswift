@@ -101,6 +101,43 @@ extension Double: RawRepresentable {
         return asDate.description(with: .current)
     }
     
+    /// returns the Nightscout style string showing the days and hours for the number of minutes
+    /// Example: 9300.minutesToDaysAndHours() would return -> "6d11h"
+    /// Example: 78.minutesToDaysAndHours() would return -> "1h18m"
+    /// Example: 12.minutesToDaysAndHours() would return -> "12m"
+    func minutesToDaysAndHours() -> String {
+        
+        // set a default value assuming that we're unable to calculate the hours + days
+        var daysAndHoursString: String = "n/a"
+        
+        let days = floor(self / (24 * 60))
+        let hoursInMinutes = self.truncatingRemainder(dividingBy: 24 * 60)
+        let hours = hoursInMinutes / 60
+        let minutes = self.truncatingRemainder(dividingBy: 24 * 60 * 60)
+        
+        
+        if days == 0 && hours < 1 {
+            
+            // show just minutes for less than one hour
+            daysAndHoursString = abs(minutes).description + "m"
+            
+        } else if days == 0 && hours < 12 {
+            
+            // show just hours and minutes for less than twelve hours
+            daysAndHoursString = abs(hours).description + "h" + abs(minutes).description + "m"
+            
+        } else {
+            
+            // default show days and hours
+            daysAndHoursString = Int(days).description + "d" + Int(hours).description + "h"
+            
+        }
+        
+
+        return daysAndHoursString
+        
+    }
+    
 }
 
 

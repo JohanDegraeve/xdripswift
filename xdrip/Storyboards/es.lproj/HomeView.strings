@@ -36,23 +36,13 @@
 "failed" = "Error";
 "calibrationNotNecessary" = "Cuando estás usando el algoritmo nativo del transmisor, no se puede calibrar.\n\n Si quieres calibrar, debes cambiar al algoritmo xDrip en la pantalla del transmisor.";
 "dexcomBatteryTooLow" = "El nivel de batería del Transmisor es demasiado bajo!";
-"sensor" = "Sensor";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// When user clicks stop sensor, ask confirmation
 "stopSensorConfirmation" = "Estás seguro que quieres para el sensor?";
-
-/// When user needs to enter sensor code, to start firefly sensor
 "enterSensorCode" = "Si no tienes el código del sensor, puedes usar 0000 pero ten en cuenta que no recibirás lecturas hasta haber calibrado";
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-/////   Translation needed - remove this header after translation                       /////
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-/// status info : literally 'Sensor End'
 "sensorend" = "Fin del sensor";
-
 "sensorDuration" = "Duración Sensor";
+"noSensorData" = "Sin datos";
+"noDataSourceConnected" = "Sin fuente de datos MGC conectada";
+"hidingUrlForXSeconds" = "Ocultando URL durante %@s...";
+"nightscoutNotEnabled" = "Nightscout está deshabilitado";
+"nightscoutURLMissing" = "Falta la URL de Nightscout";
+"libreLinkUpAccountCredentialsMissing" = "Falta usuario/contraseña";

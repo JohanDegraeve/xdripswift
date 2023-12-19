@@ -22,7 +22,7 @@
 "address" = "Address";
 
 /// User tries to add a CGM or connect an already existing CGM, while in follower mode.
-"cannotActiveCGMInFollowerMode" = "You can not activate a CGM in Follower Mode";
+"cannotActiveCGMInFollowerMode" = "You cannot activate or connect to a CGM whilst in Follower Mode.";
 
 /// Bluetooth Peripheral view, when user clicks alias field
 "selectAliasText" = "Choose an alias for this bluetooth device, the name will be shown in the app and is easier for you to recognize";
@@ -88,7 +88,7 @@
 "connectedAt" = "Connected At";
 
 /// cell text, where user can select to reset a transmitter at next connect. Only for Dexcom
-"resetRequired" = "Reset Transmitter?";
+"resetRequired" = "Reset Transmitter";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

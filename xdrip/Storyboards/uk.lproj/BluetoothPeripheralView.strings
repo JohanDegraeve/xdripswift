@@ -37,7 +37,7 @@
 "connected" = "Connected";
 
 /// User tries to add a CGM or connect an already existing CGM, while in follower mode.
-"cannotActiveCGMInFollowerMode" = "You can not activate a CGM in Follower Mode";
+"cannotActiveCGMInFollowerMode" = "You cannot activate or connect to a CGM whilst in Follower Mode.";
 
 /// when Bluetooth Peripheral is shown, title of the cell with the status
 "status" = "Status";
@@ -70,7 +70,7 @@
 "scan" = "Scan";
 
 /// cell text, where user can select to reset a transmitter at next connect. Only for Dexcom
-"resetRequired" = "Reset Transmitter?";
+"resetRequired" = "Reset Transmitter";
 
 /// cell text, shows when last reset was done, if known. Only for Dexcom
 "lastResetNotKnown" = "Last Reset Timestamp is not known";

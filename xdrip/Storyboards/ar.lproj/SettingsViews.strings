@@ -12,22 +12,21 @@
 "settingsviews_targetValue" = "قيمة الهدف";
 "settingsviews_lowValue" = "القيمة الدنيا";
 "settingsviews_urgentLowValue" = "قيمة الحد الأدنى الخطر";
-"settingsviews_useobjectives" = "إظهار الأهداف في الرسم البياني?";
-"settingsviews_showcoloredobjectives" = "عرض خطوط ملونة?";
-"settingsviews_showtarget" = "عرض خط الهدف?";
+"settingsviews_useobjectives" = "إظهار الأهداف في الرسم البياني";
+"settingsviews_showcoloredobjectives" = "عرض خطوط ملونة";
+"settingsviews_showtarget" = "عرض خط الهدف";
 "settingsviews_sectiontitlestatistics" = "إحصائيات";
-"settingsviews_showStatistics" = "عرض الإحصائيات?";
-"settingsviews_daysToUseStatisticsTitle" = "عدد الأيام للاحصائيات?";
+"settingsviews_showStatistics" = "عرض الإحصائيات";
+"settingsviews_daysToUseStatisticsTitle" = "عدد الأيام للاحصائيات";
 "settingsviews_daysToUseStatisticsMessage" = "الحد الأقصى للأيام التي يجب أن نحاول استخدامها لحساب الإحصائيات?\n\n(أدخل 0 لحساب احصائيات اليوم منذ منتصف الليل)";
-"settingsviews_useStandardStatisticsRange" = "استخدم النطاق القياسي?";
-"settingsviews_useIFCCA1C" = "اعرض وحدة التراكمي  mmols/mol?";
+"settingsviews_useIFCCA1C" = "اعرض وحدة التراكمي  mmols/mol";
 "settingsviews_sectiontitletransmitter" = "جهاز الإرسال";
 "settingsviews_transmittertype" = "نوع جهاز الإرسال";
 "settingsviews_transmitterid" = "رقم هوية جهاز الإرسال";
 "settingsviews_transmitterid_text_for_button" = "رقم هوية جهاز الإرسال";
 "settingsviews_givetransmitterid" = "أدخل رقم هوية جهاز الإرسال";
 "settingsviews_resettransmitter" = "إعادة تعيين جهاز الإرسال";
-"settingsviews_nonfixedtransmitter" = "تفعيل المعايرة متعددة النقاط ?";
+"settingsviews_nonfixedtransmitter" = "تفعيل المعايرة متعددة النقاط ";
 "settingsviews_labelNonFixed" = "المعايرة متعددة النقاط";
 "settingsviews_sectiontitlealerting" = "التنبيهات";
 "settingsviews_row_alert_types" = "أنواع التنبيهات";
@@ -100,13 +99,10 @@
 "settingsviews_sectiontitlehomescreen" = "الشاشة الرئيسية";
 "settingsviews_showClockWhenScreenIsLocked" = "عرض الساعة عند القفل؟";
 "settingsviews_translateOnlineHelp" = "هل تريد الترجمة تلقائيًا؟";
-"settingsviews_showSensorCountdownAlternativeGraphics" = "استخدام الرسومات البديلة؟";
 "settingsviews_allowScreenRotation" = "السماح بإلتفاف المخطط؟";
-"settingsviews_sectiontitlesensorcountdown" = "العد التنازلي للحساس";
 "settingsviews_sectiontitlehelp" = "المساعدة والتوثيق";
 "calendarEventsSectionTitle" = "أحداث التقويم";
 "settingsviews_showOnlineHelp" = "فتح المساعدة عبر الإنترنت؟";
-"settingsviews_showSensorCountdown" = "إظهار العد التنازلي للحساس؟";
 "settingsviews_webooptransmitter" = "استخدام خوارزمية جهاز الإرسال؟";
 "settingsviews_labelWebOOP" = "خوارزمية xDrip أو جهاز الإرسال";
 "settingsviews_showHelpIcon" = "إظهار رمز المساعدة؟";
@@ -126,7 +122,7 @@
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
 
 /// treatments settings, show the treatments on main chart
-"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart?";
+"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -139,7 +135,7 @@
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
 
 /// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart?";
+"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart";
 
 /// When clicking the retention setting, a pop up asks for how many days should data be stored
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";

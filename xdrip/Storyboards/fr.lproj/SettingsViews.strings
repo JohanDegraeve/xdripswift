@@ -3,63 +3,59 @@
 "settingsviews_selectbgunit" = "Unité glycémie";
 "settingsviews_lowValue" = "Valeur faible";
 "settingsviews_highValue" = "Valeur forte";
-"settingsviews_masterorfollower" = "Utilisation Maitre ou Suiveur?";
+"settingsviews_masterorfollower" = "Utilisation Maitre ou Suiveur";
 "settingsviews_master" = "Maitre";
 "settingsviews_follower" = "Suiveur";
-"settingsviews_showReadingInNotification" = "Afficher Glyc dans notification?";
-"settingsviews_labelShowReadingInAppBadge" = "Afficher Glyc dans le badge?";
-"settingsviews_multipleAppBadgeValueWith10" = "Multiplier par 10 dans le badge?";
-"settingsviews_showClockWhenScreenIsLocked" = "Visualiser l'heure sur écran verrouillé?";
+"settingsviews_showReadingInNotification" = "Afficher Glyc dans notification";
+"settingsviews_labelShowReadingInAppBadge" = "Afficher Glyc dans le badge";
+"settingsviews_multipleAppBadgeValueWith10" = "Multiplier par 10 dans le badge";
+"settingsviews_showClockWhenScreenIsLocked" = "Visualiser l'heure sur écran verrouillé";
 "settingsviews_sectiontitletreatments" = "Traitements";
-"settingsviews_showTreatmentsOnChart" = "Visualiser les traitements?";
+"settingsviews_showTreatmentsOnChart" = "Visualiser les traitements";
 "settingsviews_smallBolusTreatmentThreshold" = "Seuil des micro-bolus";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "En dessous de combien d'unités un bolus est considéré micro-bolus?\n\n(Valeur conseillée: 1.0U)";
 "settingsviews_sectiontitlestatistics" = "Statistiques";
-"settingsviews_showStatistics" = "Visualiser les statistiques?";
-"settingsviews_daysToUseStatisticsTitle" = "Nombre de jours?";
+"settingsviews_showStatistics" = "Visualiser les statistiques";
+"settingsviews_daysToUseStatisticsTitle" = "Nombre de jours";
 "settingsviews_daysToUseStatisticsMessage" = "Nombre maximum de jours utilisés pour le calcul des statistiques?\n\n(Saisir 0 pour aujourd'hui depuis minuit)";
-"settingsviews_useStandardStatisticsRange" = "Utiliser la gamme standard?";
-"settingsviews_useIFCCA1C" = "Visualiser HbA1c en mmol/mol?";
-"settingsviews_sectiontitlesensorcountdown" = "Durée de vie du capteur";
-"settingsviews_showSensorCountdown" = "Montrer l'age du capteur?";
-"settingsviews_showSensorCountdownAlternativeGraphics" = "Autre représentation graphique?";
+"settingsviews_useIFCCA1C" = "Visualiser HbA1c en mmol/mol";
 "settingsviews_sectiontitletransmitter" = "Transmetteur";
 "settingsviews_transmittertype" = "Type de Transmetteur";
 "settingsviews_transmitterid" = "Transmetteur ID";
 "settingsviews_transmitterid_text_for_button" = "Transmetteur ID";
 "settingsviews_givetransmitterid" = "Entrer Transmetteur ID";
-"settingsviews_resettransmitter" = "Réinitialiser Transmetteur";
+"settingsviews_resettransmitter" = "Réinitialiser Transmetteur (Anubis)";
 "settingsviews_sectiontitlealerting" = "Alarme";
 "settingsviews_row_alert_types" = "Types d'alarme";
 "settingsviews_row_alerts" = "Alarmes";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
-"settingsviews_healthkit" = "Sauver les données dans Apple Health?";
+"settingsviews_healthkit" = "Sauver les données dans Apple Health";
 "settingsviews_sectiontitledexcomshare" = "Dexcom Share";
-"settingsviews_uploadReadingstoDexcomShare" = "Charger dans le Dexcom Share?";
+"settingsviews_uploadReadingstoDexcomShare" = "Charger dans le Dexcom Share";
 "settingsviews_dexcomShareSerialNumber" = "Numéro de série du receveur";
-"settingsviews_useUSDexcomShareurl" = "Utiliser les serveurs US Dexcom US?";
+"settingsviews_useUSDexcomShareurl" = "Utiliser les serveurs US Dexcom US";
 "settingsviews_dexcomShareAccountName" = "Nom du compte";
 "settingsviews_giveDexcomShareAccountName" = "Entrer le nom du compte Dexcom";
 "settingsviews_giveDexcomSharePassword" = "Entrer le mot de passe Dexcom Share";
 "settingsviews_giveDexcomShareSerialNumber" = "Entrer le numéro de série Dexcom Receiver";
 "settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Connecter à Nightscout?";
+"settingsviews_nightScoutEnabled" = "Connecter à Nightscout";
 "settingsviews_nightScoutUrl" = "URL";
-"settingsviews_useSchedule" = "Mettre à jour à heure fixe?";
+"settingsviews_useSchedule" = "Mettre à jour à heure fixe";
 "schedule" = "Heure";
 "settingsviews_giveNightScoutUrl" = "Entrer l'URL de NightScout";
 "settingsviews_nightScoutAPIKey" = "API_SECRET";
 "settingsviews_giveNightScoutAPIKey" = "Entrer votre API_SECRET";
 "editScheduleTimePickerSubtitle" = "Changer";
 "timeScheduleViewTitle" = "On/Off Time Schedule pour";
-"uploadSensorStartTime" = "Charger heure démarrage capteur?";
-"testUrlAndAPIKey" = "Tester l'URL et API_SECRET de Nightscout?";
+"uploadSensorStartTime" = "Charger heure démarrage capteur";
+"testUrlAndAPIKey" = "Tester l'URL et API_SECRET de Nightscout";
 "settingsviews_sectiontitlespeak" = "Vocal";
 "settingsviews_speakBgReadings" = "Lire les glycémies ";
 "settingsviews_speakBgReadingslanguage" = "Langue";
 "settingsviews_speakreadingslanguageselection" = "Sélectionner la langue";
-"settingsviews_speakTrend" = "Lire la tendance?";
-"settingsviews_speakDelta" = "Lire la variation?";
+"settingsviews_speakTrend" = "Lire la tendance";
+"settingsviews_speakDelta" = "Lire la variation";
 "settingsviews_IntervalTitle" = "Intervalle de Notification";
 "settingsviews_IntervalMessage" = "Intervalle minimum entre deux notifications, en minutes";
 "settingsviews_Version" = "Version";
@@ -72,11 +68,11 @@
 "m5stack_settingsviews_giveBluetoothPassword" = "Entrer le mot de passe Bluetooth";
 "m5stack_settingsviews_brightness" = "Luminosité de l'écran";
 "appleWatchSectionTitle" = "Apple Watch";
-"createCalendarEvent" = "Créer un calendrier?";
-"calenderId" = "Utiliser le calendrier?";
-"settingsviews_displayTrendInCalendarEvent" = "Afficher Tendance?";
-"displayUnitInCalendarEvent" = "Afficher Unité?";
-"displayDeltaInCalendarEvent" = "Afficher Variation?";
+"createCalendarEvent" = "Créer un calendrier";
+"calenderId" = "Utiliser le calendrier";
+"settingsviews_displayTrendInCalendarEvent" = "Afficher Tendance";
+"displayUnitInCalendarEvent" = "Afficher Unité";
+"displayDeltaInCalendarEvent" = "Afficher Variation";
 "infoCalendarAccessDeniedByUser" = "Vous avez refusé l'accès au calendrier.\n\nPour permettre cette fonctionnalités, modifiez les autorissations dans les réglages de votre iPhone.";
 "infoCalendarAccessRestricted" = "Vous n'avez pas donné les autorisations à %@ pour accéder à votre calendrier. Cela peut aussi être du à une restriction parentale.";
 "sectionTitleTrace" = "Trace";
@@ -96,7 +92,7 @@
 "volumeTestiOSSoundExplanation" =" Le son d'une alarme est joué actuellement avec le même volume que celui qui sera utilisé pour le type d'alarme avec 'Ignorer Mode Silencieux' = Off\n\n(Utilisé aussi dans le cas de l'alarme Lecture manquante).\n\n Presser l'un des boutons Volume pour arrêter, puis changer le volume avec les boutons au niveau souhaité et tester à nouveau";
 
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
-"settingsviews_nonfixedtransmitter" = "Permettre la calibration multi-point ?";
+"settingsviews_nonfixedtransmitter" = "Permettre la calibration multi-point ";
 
 /// in Settings, to enable debug level in trace file
 "debugLevel" = "Inclure le mode Debug";
@@ -111,7 +107,7 @@
 "settingsviews_targetValue" = "Valeur cible";
 
 /// home screen settings, show target line
-"settingsviews_showtarget" = "Montrer la ligne Cible?";
+"settingsviews_showtarget" = "Montrer la ligne Cible";
 
 /// non fixed settings, title of the section
 "settingsviews_labelNonFixed" = "Calibration Multi-point";
@@ -126,10 +122,10 @@
 "volumeTestSoundPlayerExplanation" = "Le son d'une alarme est joué actuellement avec le même volume que celui qui sera utilisé pour le type d'alarme avec 'Ignorer Mode Silencieux' = On\n\n(Utilisé pour toutes les alarmes à l'exception de l'alarme Lecture manquante).\n\n Presser l'un des boutons Volume pour arrêter, puis changer le volume avec les boutons au niveau souhaité et tester à nouveau";
 
 /// home screen settings, use objectives in graph
-"settingsviews_useobjectives" = "Montrer les valeurs cibles ?";
+"settingsviews_useobjectives" = "Montrer les valeurs cibles ";
 
 /// 
-"settingsviews_showcoloredobjectives" = "Montrer les lignes colorées ?";
+"settingsviews_showcoloredobjectives" = "Montrer les lignes colorées ";
 
 /// In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row
 "volumeTestiOSSound" = "Test Volume (Volume actuel iPhone)";
@@ -145,7 +141,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// deloper settings, row title for 'Smooth Libre Values?'
-"smoothLibreValues" = "Smooth Libre Values?";
+"smoothLibreValues" = "Smooth Libre Values";
 
 /// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
 "oslog" = "OSLog";
@@ -158,12 +154,12 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the online help be translated automatically if needed
-"settingsviews_translateOnlineHelp" = "Traduire automatiquement?";
-"settingsviews_showHelpIcon" = "Afficher l'icône d'aide?";
+"settingsviews_translateOnlineHelp" = "Traduire automatiquement";
+"settingsviews_showHelpIcon" = "Afficher l'icône d'aide";
 "settingsviews_restartNeeded" = "(Redémarrage requis)";
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Autoriser la rotation du graphique?";
+"settingsviews_allowScreenRotation" = "Autoriser la rotation du graphique";
 
 /// help settings, section title
 "settingsviews_sectiontitlehelp" = "Aide et documentation";
@@ -172,14 +168,14 @@
 "calendarEventsSectionTitle" = "Calendar Events";
 
 /// help settings, open the online help
-"settingsviews_showOnlineHelp" = "Ouvrir l'aide en ligne?";
+"settingsviews_showOnlineHelp" = "Ouvrir l'aide en ligne";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm?";
+"settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
@@ -195,7 +191,7 @@
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
 
 /// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart?";
+"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart";
 
 /// When clicking the retention setting, a pop up asks for how many days should data be stored
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
