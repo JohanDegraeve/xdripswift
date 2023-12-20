@@ -32,4 +32,38 @@ enum ConstantsHomeView {
 
     /// github.com repository URL for the project
     static let gitHubURL = "https://github.com/JohanDegraeve/xdripswift"
+    
+    // MARK: - Sensor Info View
+    
+    /// progress view
+    static let sensorProgressViewProgressColorInitial: UIColor = .white
+    static let sensorProgressViewProgressColor: UIColor = .gray
+    static let sensorProgressViewTrackingColor: UIColor = UIColor(white: 0.15, alpha: 1.0)
+    
+    /// warning time left / colour
+    static let sensorProgressViewWarningInMinutes: Double = 60 * 24.0 // 24 hours before the sensor reaches max age
+    static let sensorProgressViewProgressColorWarning: UIColor = .systemYellow
+    
+    /// urgent time left / colour
+    static let sensorProgressViewUrgentInMinutes: Double = 60 * 12.0 // 12 hours before the sensor reaches max age
+    static let sensorProgressViewProgressColorUrgent: UIColor = .systemRed
+    
+    /// colour for an expired sensor
+    static let sensorProgressExpired: UIColor = .systemPurple
+    
+    /// colour for an normal text
+    static let sensorProgressNormalTextColor: UIColor = .lightGray
+    
+    /// colour for the dimmed screen lock overlay view
+    static let screenLockDimmingOptionsDimmed: UIColor = .black.withAlphaComponent(0.3)
+    
+    /// colour for the dark screen lock overlay view
+    static let screenLockDimmingOptionsDark: UIColor = .black.withAlphaComponent(0.5)
+    
+    /// colour for the very dark screen lock overlay view
+    static let screenLockDimmingOptionsVeryDark: UIColor = .black.withAlphaComponent(0.7)
+    
+    /// how many seconds the Nightscout URL (if displayed in the data source info view) should be hidden when double tapped
+    static let hideUrlDuringTimeInSeconds: Int = 10
+    
 }

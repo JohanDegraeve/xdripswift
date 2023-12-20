@@ -4,6 +4,12 @@ import Foundation
 class Texts_SettingsView {
     static private let filename = "SettingsViews"
     
+    // MARK: - Generic for all Settings Views
+    
+    static let valueIsRequired: String = {
+        return NSLocalizedString("settingsviews_valueIsRequired", tableName: filename, bundle: Bundle.main, value: "⚠️ Required", comment: "this setting is required")
+    }()
+    
     // MARK: - Title of the first settings screen
     
     static let screenTitle: String = {
@@ -17,19 +23,101 @@ class Texts_SettingsView {
     }()
     
     static let showOnlineHelp: String = {
-        return NSLocalizedString("settingsviews_showOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Open Online Help?", comment: "help settings, open the online help")
+        return NSLocalizedString("settingsviews_showOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Open Online Help", comment: "help settings, open the online help")
     }()
     
     static let translateOnlineHelp: String = {
-        return NSLocalizedString("settingsviews_translateOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Translate Automatically?", comment: "help settings, should the online help be translated automatically if needed")
+        return NSLocalizedString("settingsviews_translateOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Translate Automatically", comment: "help settings, should the online help be translated automatically if needed")
     }()
     
     static let showHelpIcon: String = {
-        return NSLocalizedString("settingsviews_showHelpIcon", tableName: filename, bundle: Bundle.main, value: "Show Help Icon?", comment: "help settings, should the help icon be shown on the toolbar")
+        return NSLocalizedString("settingsviews_showHelpIcon", tableName: filename, bundle: Bundle.main, value: "Show Help Icon", comment: "help settings, should the help icon be shown on the toolbar")
     }()
     
     static let restartNeeded: String = {
         return NSLocalizedString("settingsviews_restartNeeded", tableName: filename, bundle: Bundle.main, value: "(Restart required)", comment: "help settings, restart needed")
+    }()
+    
+    // MARK: - Section Data Source
+    
+    static let sectionTitleDataSource: String = {
+        return NSLocalizedString("settingsviews_sectionTitleDataSource", tableName: filename, bundle: Bundle.main, value: "CGM Data Source", comment: "CGM data source settings, section title")
+    }()
+    
+    static let labelMasterOrFollower: String = {
+        return NSLocalizedString("settingsviews_masterorfollower", tableName: filename, bundle: Bundle.main, value: "Use as Master or Follower", comment: "data source settings, master or follower")
+    }()
+    
+    static let labelFollowerDataSourceType: String = {
+        return NSLocalizedString("settingsviews_labelFollowerDataSourceType", tableName: filename, bundle: Bundle.main, value: "Follower Data Source", comment: "data source settings, data source")
+    }()
+    
+    static let labelUploadFollowerDataToNightscout: String = {
+        return NSLocalizedString("settingsviews_labelUploadFollowerDataToNightscout", tableName: filename, bundle: Bundle.main, value: "Upload to Nightscout", comment: "data source settings, enable Nightscout upload")
+    }()
+    
+    static let labelfollowerKeepAliveType: String = {
+        return NSLocalizedString("settingsviews_labelfollowerKeepAliveType", tableName: filename, bundle: Bundle.main, value: "Background Keep-alive", comment: "data source settings, enable background keep alive")
+    }()
+    
+    static let followerKeepAliveTypeDisabled: String = {
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeDisabled", tableName: filename, bundle: Bundle.main, value: "Disabled", comment: "data source settings, keep-alive mode is set to disabled")
+    }()
+    
+    static let followerKeepAliveTypeNormal: String = {
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeNormal", tableName: filename, bundle: Bundle.main, value: "Normal", comment: "data source settings, keep-alive mode is set to normal")
+    }()
+    
+    static let followerKeepAliveTypeAggressive: String = {
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeAggressive", tableName: filename, bundle: Bundle.main, value: "Aggressive", comment: "data source settings, keep-alive mode is set to aggressive")
+    }()
+    
+    static let followerKeepAliveTypeDisabledMessage: String = {
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeDisabledMessage", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.", comment: "data source settings, keep-alive mode is set to disabled")
+    }()
+    
+    static let followerKeepAliveTypeNormalMessage: String = {
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeNormalMessage", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.", comment: "data source settings, keep-alive mode is set to normal")
+    }()
+    
+    static let followerKeepAliveTypeAggressiveMessage: String = {
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeAggressiveMessage", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.", comment: "data source settings, keep-alive mode is set to aggressive")
+    }()
+    
+    static let followerPatientName: String = {
+        return NSLocalizedString("settingsviews_followerPatientName", tableName: filename, bundle: Bundle.main, value: "Patient Name", comment: "data source settings, the name of the person we are following")
+    }()
+    
+    static let followerPatientNameMessage: String = {
+        return NSLocalizedString("settingsviews_followerPatientNameMessage", tableName: filename, bundle: Bundle.main, value: "Here you can write the name of the person you are following.\n\nThis can be useful if you are following several different people with several different apps.\n\nThis is optional and would normally be left empty.", comment: "data source settings, ask the user to enter the name of the person we are following if they want to - it's optional")
+    }()
+    
+    static let nightscoutNotEnabled: String = {
+        return NSLocalizedString("settingsviews_nightscoutNotEnabled", tableName: filename, bundle: Bundle.main, value: "Nightscout is disabled\n\nTo upload follower BG values to Nightscout, you must enable it in the Nightscout section.", comment: "data source settings, enable Nightscout in the Nightscout section")
+    }()
+    
+    static let nightscoutNotEnabledRowText: String = {
+        return NSLocalizedString("settingsviews_nightscoutNotEnabledRowText", tableName: filename, bundle: Bundle.main, value: "Disabled", comment: "data source settings, show that Nightscout is disabled")
+    }()
+    
+    static let labelFollowerDataSourceRegion: String = {
+        return NSLocalizedString("settingsviews_labelFollowerDataSourceRegion", tableName: filename, bundle: Bundle.main, value: "Server (Country)", comment: "data source settings, data source region")
+    }()
+    
+    static let enterUsername = {
+        return NSLocalizedString("settingsviews_enterUsername", tableName: filename, bundle: Bundle.main, value: "Enter your username (e-mail)", comment: "follower settings, pop up that asks user to enter their username")
+    }()
+    
+    static let enterPassword = {
+        return NSLocalizedString("settingsviews_enterPassword", tableName: filename, bundle: Bundle.main, value: "Enter your password", comment: "follower settings, pop up that asks user to enter their password")
+    }()
+    
+    static let libreLinkUpReAcceptNeeded = {
+        return NSLocalizedString("settingsviews_libreLinkUpReAcceptNeeded", tableName: filename, bundle: Bundle.main, value: "Need to accept terms", comment: "libre link up follower settings, pop up that asks user to enter their region")
+    }()
+    
+    static let libreLinkUpNoActiveSensor = {
+        return NSLocalizedString("settingsviews_libreLinkUpNoActiveSensor", tableName: filename, bundle: Bundle.main, value: "No active sensor", comment: "libre link up follower settings, no active sensor")
     }()
     
     // MARK: - Section General
@@ -42,10 +130,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_selectbgunit", tableName: filename, bundle: Bundle.main, value: "Blood Glucose Units:", comment: "for text in pop up where user can select bg unit")
     }()
     
-    static let labelMasterOrFollower: String = {
-        return NSLocalizedString("settingsviews_masterorfollower", tableName: filename, bundle: Bundle.main, value: "Use as Master or Follower?", comment: "general settings, master or follower")
-    }()
-    
     static let master: String = {
         return NSLocalizedString("settingsviews_master", tableName: filename, bundle: Bundle.main, value: "Master", comment: "general settings, literally master")
     }()
@@ -55,15 +139,15 @@ class Texts_SettingsView {
     }()
     
     static let showReadingInNotification: String = {
-        return NSLocalizedString("settingsviews_showReadingInNotification", tableName: filename, bundle: Bundle.main, value: "Show BG in Notifications?", comment: "general settings, should reading be shown in notification yes or no")
+        return NSLocalizedString("settingsviews_showReadingInNotification", tableName: filename, bundle: Bundle.main, value: "Show BG in Notifications", comment: "general settings, should reading be shown in notification yes or no")
     }()
     
     static let labelShowReadingInAppBadge: String = {
-        return NSLocalizedString("settingsviews_labelShowReadingInAppBadge", tableName: filename, bundle: Bundle.main, value: "Show BG in the App Badge?", comment: "general settings, should reading be shown in app badge yes or no")
+        return NSLocalizedString("settingsviews_labelShowReadingInAppBadge", tableName: filename, bundle: Bundle.main, value: "Show BG in the App Badge", comment: "general settings, should reading be shown in app badge yes or no")
     }()
     
     static let multipleAppBadgeValueWith10: String = {
-        return NSLocalizedString("settingsviews_multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "Multiply App Badge Reading by 10?", comment: "general settings, should reading be multiplied with 10 yes or no")
+        return NSLocalizedString("settingsviews_multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "Multiply App Badge Reading by 10", comment: "general settings, should reading be multiplied with 10 yes or no")
     }()
     
     static let warningChangeFromMasterToFollower: String = {
@@ -85,19 +169,39 @@ class Texts_SettingsView {
     }()
     
     static let showClockWhenScreenIsLocked: String = {
-        return NSLocalizedString("settingsviews_showClockWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Show Clock when Locked?", comment: "home screen settings, should the clock also be displayed when the screen is locked?")
+        return NSLocalizedString("settingsviews_showClockWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Show Clock when Locked", comment: "home screen settings, should the clock also be displayed when the screen is locked")
+    }()
+    
+    static let screenLockDimmingTypeWhenScreenIsLocked: String = {
+        return NSLocalizedString("settingsviews_screenLockDimmingTypeWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Dim Screen when Locked", comment: "home screen settings, should the screen be dimmed when the screen is locked")
+    }()
+    
+    static let screenLockDimmingTypeDisabled: String = {
+        return NSLocalizedString("settingsviews_screenLockDimmingTypeDisabled", tableName: filename, bundle: Bundle.main, value: "Disabled", comment: "screen dimming is disabled")
+    }()
+    
+    static let screenLockDimmingTypeDimmed: String = {
+        return NSLocalizedString("settingsviews_screenLockDimmingTypeDimmed", tableName: filename, bundle: Bundle.main, value: "Dimmed", comment: "screen dimming is dimmed")
+    }()
+    
+    static let screenLockDimmingTypeDark: String = {
+        return NSLocalizedString("settingsviews_screenLockDimmingTypeDark", tableName: filename, bundle: Bundle.main, value: "Dark", comment: "screen dimming is dark")
+    }()
+    
+    static let screenLockDimmingTypeVeryDark: String = {
+        return NSLocalizedString("settingsviews_screenLockDimmingTypeVeryDark", tableName: filename, bundle: Bundle.main, value: "Very Dark", comment: "screen dimming is very dark")
     }()
     
     static let allowScreenRotation: String = {
-        return NSLocalizedString("settingsviews_allowScreenRotation", tableName: filename, bundle: Bundle.main, value: "Allow Chart Rotation?", comment: "home screen settings, should the main glucose chart screen be allowed?")
+        return NSLocalizedString("settingsviews_allowScreenRotation", tableName: filename, bundle: Bundle.main, value: "Allow Chart Rotation", comment: "home screen settings, should the main glucose chart screen be allowed")
     }()
     
     static let showMiniChart: String = {
-        return NSLocalizedString("settingsviews_showMiniChart", tableName: filename, bundle: Bundle.main, value: "Show the Mini-Chart?", comment: "home screen settings, should the mini-chart be shown?")
+        return NSLocalizedString("settingsviews_showMiniChart", tableName: filename, bundle: Bundle.main, value: "Show the Mini-Chart", comment: "home screen settings, should the mini-chart be shown")
     }()
 
     static let labelUseObjectives: String = {
-        return NSLocalizedString("settingsviews_useobjectives", tableName: filename, bundle: Bundle.main, value: "Show Objectives in Graph?", comment: "home screen settings, use objectives in graph")
+        return NSLocalizedString("settingsviews_useobjectives", tableName: filename, bundle: Bundle.main, value: "Show Objectives in Graph", comment: "home screen settings, use objectives in graph")
     }()
 
     static let labelUrgentHighValue: String = {
@@ -121,7 +225,7 @@ class Texts_SettingsView {
     }()
     
     static let labelShowTarget: String = {
-        return NSLocalizedString("settingsviews_showtarget", tableName: filename, bundle: Bundle.main, value: "Show Target Line?", comment: "home screen settings, show target line")
+        return NSLocalizedString("settingsviews_showtarget", tableName: filename, bundle: Bundle.main, value: "Show Target Line", comment: "home screen settings, show target line")
     }()
     
     // MARK: - Section Treatments
@@ -131,7 +235,7 @@ class Texts_SettingsView {
     }()
 
     static let settingsviews_showTreatmentsOnChart: String = {
-        return NSLocalizedString("settingsviews_showTreatmentsOnChart", tableName: filename, bundle: Bundle.main, value: "Show Treatments on Chart?", comment: "treatments settings, show the treatments on main chart")
+        return NSLocalizedString("settingsviews_showTreatmentsOnChart", tableName: filename, bundle: Bundle.main, value: "Show Treatments on Chart", comment: "treatments settings, show the treatments on main chart")
     }()
     
     static let settingsviews_smallBolusTreatmentThreshold = {
@@ -143,7 +247,11 @@ class Texts_SettingsView {
     }()
     
     static let settingsviews_showSmallBolusTreatmentsOnChart: String = {
-        return NSLocalizedString("settingsviews_showSmallBolusTreatmentsOnChart", tableName: filename, bundle: Bundle.main, value: "Show Micro-bolus on Chart?", comment: "treatments settings, show the micro-bolus on main chart")
+        return NSLocalizedString("settingsviews_showSmallBolusTreatmentsOnChart", tableName: filename, bundle: Bundle.main, value: "Show Micro-bolus on Chart", comment: "treatments settings, show the micro-bolus on main chart")
+    }()
+    
+    static let settingsviews_offsetCarbTreatmentsOnChart: String = {
+        return NSLocalizedString("settingsviews_offsetCarbTreatmentsOnChart", tableName: filename, bundle: Bundle.main, value: "Offset Carbs on Chart", comment: "treatments settings, offset the carb treatments on main chart")
     }()
     
     // MARK: - Section Statistics
@@ -153,37 +261,23 @@ class Texts_SettingsView {
     }()
 
     static let labelShowStatistics: String = {
-        return NSLocalizedString("settingsviews_showStatistics", tableName: filename, bundle: Bundle.main, value: "Show Statistics?", comment: "statistics settings, show statistics on home screen")
+        return NSLocalizedString("settingsviews_showStatistics", tableName: filename, bundle: Bundle.main, value: "Show Statistics", comment: "statistics settings, show statistics on home screen")
     }()
 
     static let labelDaysToUseStatisticsTitle: String = {
-        return NSLocalizedString("settingsviews_daysToUseStatisticsTitle", tableName: filename, bundle: Bundle.main, value: "Days to Calculate?", comment: "statistics settings, how many days to use for calculations")
+        return NSLocalizedString("settingsviews_daysToUseStatisticsTitle", tableName: filename, bundle: Bundle.main, value: "Days to Calculate", comment: "statistics settings, how many days to use for calculations")
     }()
     
     static let labelDaysToUseStatisticsMessage: String = {
         return NSLocalizedString("settingsviews_daysToUseStatisticsMessage", tableName: filename, bundle: Bundle.main, value: "How many days should we use to calculate the statistics? (Enter 0 to calculate today since midnight)", comment: "statistics settings, how many days to use for calculations")
     }()
     
-    static let labelUseStandardStatisticsRange: String = {
-        return NSLocalizedString("settingsviews_useStandardStatisticsRange", tableName: filename, bundle: Bundle.main, value: "Use Standard Range?", comment: "statistics settings, use standard range?")
+    static let labelUseTITRStatisticsRange: String = {
+        return NSLocalizedString("settingsviews_useTITRStatisticsRange", tableName: filename, bundle: Bundle.main, value: "Use Time in Tight Range", comment: "statistics settings, prefer time in tight range")
     }()
     
     static let labelUseIFFCA1C: String = {
-        return NSLocalizedString("settingsviews_useIFCCA1C", tableName: filename, bundle: Bundle.main, value: "Show HbA1c in mmols/mol?", comment: "statistics settings, use IFCC method for HbA1c?")
-    }()
-    
-    // MARK: - Section Sensor Countdown
-    
-    static let sectionTitleSensorCountdown: String = {
-        return NSLocalizedString("settingsviews_sectiontitlesensorcountdown", tableName: filename, bundle: Bundle.main, value: "Sensor Countdown", comment: "sensor countdown settings, section title")
-    }()
-
-    static let labelShowSensorCountdown: String = {
-        return NSLocalizedString("settingsviews_showSensorCountdown", tableName: filename, bundle: Bundle.main, value: "Show Sensor Countdown?", comment: "sensor countdown settings, show sensor countdown graphic on home screen")
-    }()
-    
-    static let labelShowSensorCountdownAlternativeGraphics: String = {
-        return NSLocalizedString("settingsviews_showSensorCountdownAlternativeGraphics", tableName: filename, bundle: Bundle.main, value: "Use Alternative Graphics?", comment: "sensor countdown settings, use alternative sensor countdown graphics on home screen")
+        return NSLocalizedString("settingsviews_useIFCCA1C", tableName: filename, bundle: Bundle.main, value: "Show HbA1c in mmols/mol", comment: "statistics settings, use IFCC method for HbA1c")
     }()
     
     
@@ -210,11 +304,15 @@ class Texts_SettingsView {
     }()
     
     static let labelResetTransmitter:String = {
-        return NSLocalizedString("settingsviews_resettransmitter", tableName: filename, bundle: Bundle.main, value: "Reset Transmitter", comment: "transmitter settings, to explain that settings is about resetting the transmitter")
+        return NSLocalizedString("settingsviews_resettransmitter", tableName: filename, bundle: Bundle.main, value: "Reset Transmitter (Anubis only)", comment: "transmitter settings, to explain that settings is about resetting the transmitter")
+    }()
+    
+    static let resetDexcomTransmitterMessage: String = {
+        return NSLocalizedString("settingsviews_resetDexcomTransmitterMessage", tableName: filename, bundle: Bundle.main, value: "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or One transmitters.", comment: "transmitter settings, to explain that the reset option only works for certain transmitters")
     }()
     
     static let labelWebOOPTransmitter:String = {
-        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Use Transmitter Algorithm?", comment: "web oop settings in bluetooth peripheral view : enabled or not")
+        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Use Transmitter Algorithm", comment: "web oop settings in bluetooth peripheral view : enabled or not")
     }()
     
     static let labelWebOOP:String = {
@@ -222,7 +320,7 @@ class Texts_SettingsView {
     }()
     
     static let labelNonFixedTransmitter:String = {
-        return NSLocalizedString("settingsviews_nonfixedtransmitter", tableName: filename, bundle: Bundle.main, value: "Use Multi-point Calibration?", comment: "non fixed calibration slopes settings in bluetooth peripheral view : enabled or not")
+        return NSLocalizedString("settingsviews_nonfixedtransmitter", tableName: filename, bundle: Bundle.main, value: "Use Multi-point Calibration", comment: "non fixed calibration slopes settings in bluetooth peripheral view : enabled or not")
     }()
     
     static let labelNonFixed:String = {
@@ -250,7 +348,7 @@ class Texts_SettingsView {
     }()
     
     static let labelHealthKit:String = {
-        return NSLocalizedString("settingsviews_healthkit", tableName: filename, bundle: Bundle.main, value: "Write Data to Apple Health?", comment: "healthkit settings, literally 'healthkit'")
+        return NSLocalizedString("settingsviews_healthkit", tableName: filename, bundle: Bundle.main, value: "Write Data to Apple Health", comment: "healthkit settings, literally 'healthkit'")
     }()
     
     // MARK: - Section Dexcom Share
@@ -260,7 +358,7 @@ class Texts_SettingsView {
     }()
     
     static let labelUploadReadingstoDexcomShare = {
-        return NSLocalizedString("settingsviews_uploadReadingstoDexcomShare", tableName: filename, bundle: Bundle.main, value: "Upload to Dexcom Share?", comment: "dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no")
+        return NSLocalizedString("settingsviews_uploadReadingstoDexcomShare", tableName: filename, bundle: Bundle.main, value: "Upload to Dexcom Share", comment: "dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no")
     }()
 
     static let labelDexcomShareSerialNumber = {
@@ -268,7 +366,7 @@ class Texts_SettingsView {
     }()
     
     static let labelUseUSDexcomShareurl = {
-        return NSLocalizedString("settingsviews_useUSDexcomShareurl", tableName: filename, bundle: Bundle.main, value: "Use Dexcom US Servers?", comment: "dexcom share settings, where user can choose to use US url or not")
+        return NSLocalizedString("settingsviews_useUSDexcomShareurl", tableName: filename, bundle: Bundle.main, value: "Use Dexcom US Servers", comment: "dexcom share settings, where user can choose to use US url or not")
     }()
     
     static let labelDexcomShareAccountName = {
@@ -294,7 +392,7 @@ class Texts_SettingsView {
     }()
     
     static let labelNightScoutEnabled = {
-        return NSLocalizedString("settingsviews_nightScoutEnabled", tableName: filename, bundle: Bundle.main, value: "Enable Nightscout?", comment: "nightscout settings, where user can enable or disable nightscout")
+        return NSLocalizedString("settingsviews_nightScoutEnabled", tableName: filename, bundle: Bundle.main, value: "Enable Nightscout", comment: "nightscout settings, where user can enable or disable nightscout")
     }()
 
     static let labelNightScoutUrl = {
@@ -302,7 +400,7 @@ class Texts_SettingsView {
     }()
     
     static let useSchedule = {
-        return NSLocalizedString("settingsviews_useSchedule", tableName: filename, bundle: Bundle.main, value: "Use Upload Schedule?", comment: "nightscout settings, where user can select to use schedule or not")
+        return NSLocalizedString("settingsviews_useSchedule", tableName: filename, bundle: Bundle.main, value: "Use Upload Schedule", comment: "nightscout settings, where user can select to use schedule or not")
     }()
     
     static let schedule = {
@@ -330,11 +428,11 @@ class Texts_SettingsView {
     }()
     
     static let uploadSensorStartTime: String = {
-        return NSLocalizedString("uploadSensorStartTime", tableName: filename, bundle: Bundle.main, value: "Upload Sensor Start Time?", comment: "nightscout settings, title of row")
+        return NSLocalizedString("uploadSensorStartTime", tableName: filename, bundle: Bundle.main, value: "Upload Sensor Start Time", comment: "nightscout settings, title of row")
     }()
     
     static let testUrlAndAPIKey: String = {
-        return NSLocalizedString("testUrlAndAPIKey", tableName: filename, bundle: Bundle.main, value: "Test Connection?", comment: "nightscout settings, when clicking the cell, test the url and api key")
+        return NSLocalizedString("testUrlAndAPIKey", tableName: filename, bundle: Bundle.main, value: "Test Connection", comment: "nightscout settings, when clicking the cell, test the url and api key")
     }()
 
     static let nightScoutPort: String = {
@@ -342,7 +440,7 @@ class Texts_SettingsView {
     }()
     
     static let nightscoutToken: String = {
-        return NSLocalizedString("nightscoutToken", tableName: filename, bundle: Bundle.main, value: "Token:", comment: "nightscout settings, token to use")
+        return NSLocalizedString("nightscoutToken", tableName: filename, bundle: Bundle.main, value: "Token", comment: "nightscout settings, token to use")
     }()
 
     // MARK: - Section Speak
@@ -352,7 +450,7 @@ class Texts_SettingsView {
     }()
 
     static let labelSpeakBgReadings = {
-        return NSLocalizedString("settingsviews_speakBgReadings", tableName: filename, bundle: Bundle.main, value: "Speak BG Readings?", comment: "speak settings, where user can enable or disable speak readings")
+        return NSLocalizedString("settingsviews_speakBgReadings", tableName: filename, bundle: Bundle.main, value: "Speak BG Readings", comment: "speak settings, where user can enable or disable speak readings")
     }()
     
     static let labelSpeakLanguage = {
@@ -364,11 +462,11 @@ class Texts_SettingsView {
     }()
     
     static let labelSpeakTrend = {
-        return NSLocalizedString("settingsviews_speakTrend", tableName: filename, bundle: Bundle.main, value: "Speak Trend?", comment: "speak settings, where enable or disable speak trend")
+        return NSLocalizedString("settingsviews_speakTrend", tableName: filename, bundle: Bundle.main, value: "Speak Trend", comment: "speak settings, where enable or disable speak trend")
     }()
     
     static let labelSpeakDelta = {
-        return NSLocalizedString("settingsviews_speakDelta", tableName: filename, bundle: Bundle.main, value: "Speak Delta?", comment: "speak settings, where user can enable or disable speak delta")
+        return NSLocalizedString("settingsviews_speakDelta", tableName: filename, bundle: Bundle.main, value: "Speak Delta", comment: "speak settings, where user can enable or disable speak delta")
     }()
     
     static let settingsviews_SpeakIntervalTitle = {
@@ -445,23 +543,23 @@ class Texts_SettingsView {
     }()
     
     static let createCalendarEvent: String = {
-        return NSLocalizedString("createCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Create Calendar Events?", comment: "Calendar Events Settings - text in row where create event is enabled or disabled ")
+        return NSLocalizedString("createCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Create Calendar Events", comment: "Calendar Events Settings - text in row where create event is enabled or disabled ")
     }()
 
     static let calenderId: String = {
-        return NSLocalizedString("calenderId", tableName: filename, bundle: Bundle.main, value: "Calendar To Use?", comment: "Calendar Events Settings - text in row where user needs to select a calendar")
+        return NSLocalizedString("calenderId", tableName: filename, bundle: Bundle.main, value: "Calendar To Use", comment: "Calendar Events Settings - text in row where user needs to select a calendar")
     }()
 
     static let displayTrendInCalendarEvent: String = {
-        return NSLocalizedString("settingsviews_displayTrendInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Trend?", comment: "Calendar Events Settings - text in row where user needs to say if trend should be displayed or not")
+        return NSLocalizedString("settingsviews_displayTrendInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Trend", comment: "Calendar Events Settings - text in row where user needs to say if trend should be displayed or not")
     }()
     
     static let displayUnitInCalendarEvent: String = {
-        return NSLocalizedString("displayUnitInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Unit?", comment: "Calendar Events Settings - text in row where user needs to say if unit should be displayed or not")
+        return NSLocalizedString("displayUnitInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Unit", comment: "Calendar Events Settings - text in row where user needs to say if unit should be displayed or not")
     }()
     
     static let displayDeltaInCalendarEvent: String = {
-        return NSLocalizedString("displayDeltaInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Delta?", comment: "Calendar Events Settings - text in row where user needs to say if delta should be displayed or not")
+        return NSLocalizedString("displayDeltaInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Delta", comment: "Calendar Events Settings - text in row where user needs to say if delta should be displayed or not")
     }()
     
     static let infoCalendarAccessDeniedByUser: String = {
@@ -477,7 +575,7 @@ class Texts_SettingsView {
     }()
     
     static let displayVisualIndicatorInCalendar: String = {
-        return NSLocalizedString("settingsviews_displayVisualIndicatorInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Visual Indicator?", comment: "Calendar Events Settings - text in row where user needs to say if the visual target indicator should be displayed or not")
+        return NSLocalizedString("settingsviews_displayVisualIndicatorInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Visual Indicator", comment: "Calendar Events Settings - text in row where user needs to say if the visual target indicator should be displayed or not")
     }()
     
     static let settingsviews_CalenderIntervalTitle = {
@@ -542,7 +640,7 @@ class Texts_SettingsView {
     }()
     
     static let smoothLibreValues: String = {
-        return NSLocalizedString("smoothLibreValues", tableName: filename, bundle: Bundle.main, value: "Smooth Libre Values?", comment: "deloper settings, row title for 'Smooth Libre Values?'")
+        return NSLocalizedString("smoothLibreValues", tableName: filename, bundle: Bundle.main, value: "Smooth Libre Values", comment: "deloper settings, row title for 'Smooth Libre Values?'")
     }()
     
     static let suppressUnLockPayLoad: String = {
@@ -566,7 +664,7 @@ class Texts_SettingsView {
     }()
 
     static let loopDelaysScreenTitle: String = {
-        return NSLocalizedString("loopDelaysScreenTitle", tableName: filename, bundle: Bundle.main, value: "Loop delays", comment: "Title for screen where loop delays are configured.")
+        return NSLocalizedString("loopDelaysScreenTitle", tableName: filename, bundle: Bundle.main, value: "Loop Share Delays", comment: "Title for screen where loop delays are configured.")
     }()
 
     static let expanatoryTextSelectValue: String = {
@@ -582,11 +680,19 @@ class Texts_SettingsView {
     }()
 
     static let nsLog: String = {
-        return NSLocalizedString("nslog", tableName: filename, bundle: Bundle.main, value: "NSLog", comment: "deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog")
+        return NSLocalizedString("nslog", tableName: filename, bundle: Bundle.main, value: "NSLog", comment: "developer settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog")
     }()
     
     static let osLog: String = {
-        return NSLocalizedString("oslog", tableName: filename, bundle: Bundle.main, value: "OSLog", comment: "deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog")
+        return NSLocalizedString("oslog", tableName: filename, bundle: Bundle.main, value: "OSLog", comment: "developer settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog")
+    }()
+    
+    static let libreLinkUpVersion: String = {
+        return NSLocalizedString("libreLinkUpVersion", tableName: filename, bundle: Bundle.main, value: "LibreLinkUp version", comment: "developer settings, libre link up version number")
+    }()
+    
+    static let libreLinkUpVersionMessage = {
+        return String(format: NSLocalizedString("libreLinkUpVersionMessage", tableName: filename, bundle: Bundle.main, value: "\nSetting this value incorrectly could result in your LibreLinkUp account being locked.\n\nDo not touch this setting unless instructed by an xDrip4iOS developer.\n\nThe default version is: %@", comment: "developer settings, ask the user for the libre link up version"), ConstantsLibreLinkUp.libreLinkUpVersionDefault)        
     }()
     
     // MARK: - Section Housekeeper

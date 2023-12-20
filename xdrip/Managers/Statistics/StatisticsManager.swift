@@ -122,18 +122,15 @@ public final class StatisticsManager {
                 }
                 
                 
-                // let's set up the which values will finally be used to calculate TIR. It can be either user-specified or the standardised values
-                if UserDefaults.standard.useStandardStatisticsRange {
-                    if isMgDl {
-                        lowLimitForTIR = ConstantsStatistics.standardisedLowValueForTIRInMgDl
-                        highLimitForTIR = ConstantsStatistics.standardisedHighValueForTIRInMgDl
-                    } else {
-                        lowLimitForTIR = ConstantsStatistics.standardisedLowValueForTIRInMmol
-                        highLimitForTIR = ConstantsStatistics.standardisedHighValueForTIRInMmol
-                    }
+                // let's set up the which values will be used to calculate TIR. It can be either the standardised "Time in Range" values or the newer "Time in Tight Range" values.
+                let useTITR: Bool = UserDefaults.standard.useTITRStatisticsRange
+                
+                if isMgDl {
+                    lowLimitForTIR = useTITR ? ConstantsStatistics.standardisedLowValueForTITRInMgDl : ConstantsStatistics.standardisedLowValueForTIRInMgDl
+                    highLimitForTIR = useTITR ? ConstantsStatistics.standardisedHighValueForTITRInMgDl : ConstantsStatistics.standardisedHighValueForTIRInMgDl
                 } else {
-                    lowLimitForTIR = UserDefaults.standard.lowMarkValueInUserChosenUnit
-                    highLimitForTIR = UserDefaults.standard.highMarkValueInUserChosenUnit
+                    lowLimitForTIR = useTITR ? ConstantsStatistics.standardisedLowValueForTITRInMmol : ConstantsStatistics.standardisedLowValueForTIRInMmol
+                    highLimitForTIR = useTITR ? ConstantsStatistics.standardisedHighValueForTITRInMmol : ConstantsStatistics.standardisedHighValueForTIRInMmol
                 }
                 
                 // make sure that there exist elements in the glucoseValue array before trying to process statistics calculations or we could get a fatal divide by zero error/crash

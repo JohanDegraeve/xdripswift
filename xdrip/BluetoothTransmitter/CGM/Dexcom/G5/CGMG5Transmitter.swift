@@ -190,6 +190,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         //assign transmitterId
         self.transmitterId = transmitterID
         
+        // whilst we're at it, let's assign to userdefaults for the UI to use
+        UserDefaults.standard.activeSensorTransmitterId = transmitterID
+        
         // initalize transmitterStartDate
         self.transmitterStartDate = transmitterStartDate
         
@@ -803,6 +806,13 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     func cgmTransmitterType() -> CGMTransmitterType {
         return .dexcom
+    }
+    
+    
+    func maxSensorAgeInDays() -> Double? {
+        
+        return ConstantsDexcomG5.maxSensorAgeInDays
+        
     }
     
     func overruleIsWebOOPEnabled() -> Bool {

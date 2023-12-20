@@ -29,6 +29,9 @@ final class SettingsViewController: UIViewController {
         /// help section - open help and offer translation
         case help
         
+        /// data source settings - master or follower - if follower, data source
+        case dataSource
+        
         ///General settings - language, glucose unit
         case general
         
@@ -40,9 +43,6 @@ final class SettingsViewController: UIViewController {
         
         /// statistics settings
         case statistics
-        
-        /// sensor countdown settings
-        case sensorCountdown
         
         /// alarms
         case alarms
@@ -82,16 +82,16 @@ final class SettingsViewController: UIViewController {
                 
             case .help:
                 return SettingsViewHelpSettingsViewModel()
+            case .dataSource:
+                return SettingsViewDataSourceSettingsViewModel(coreDataManager: coreDataManager)
             case .general:
-                return SettingsViewGeneralSettingsViewModel(coreDataManager: coreDataManager)
+                return SettingsViewGeneralSettingsViewModel()
             case .homescreen:
                 return SettingsViewHomeScreenSettingsViewModel()
             case .treatments:
                 return SettingsViewTreatmentsSettingsViewModel()
             case .statistics:
                 return SettingsViewStatisticsSettingsViewModel()
-            case .sensorCountdown:
-                return SettingsViewSensorCountdownSettingsViewModel()
             case .alarms:
                 return SettingsViewAlertSettingsViewModel()
             case .nightscout:
@@ -107,7 +107,7 @@ final class SettingsViewController: UIViewController {
             case .developer:
                 return SettingsViewDevelopmentSettingsViewModel()
             case .AppleWatch:
-                return SettingsViewAppleWatchSettingsViewModel()
+                return SettingsViewCalendarEventsSettingsViewModel()
             case .housekeeper:
                 return SettingsViewHousekeeperSettingsViewModel(coreDataManager: coreDataManager)
             case .trace:

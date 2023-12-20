@@ -1006,7 +1006,7 @@ public class GlucoseChartManager {
                     
                     firstGlucoseChartPoint = (firstGlucoseChartPoint != nil ? min(firstGlucoseChartPoint!, newGlucoseChartPoint) : newGlucoseChartPoint)
                     
-                    maximumValueInGlucoseChartPoints = (maximumValueInGlucoseChartPoints != nil ? max(maximumValueInGlucoseChartPoints!, reading.calculatedValue) : reading.calculatedValue)
+                    maximumValueInGlucoseChartPoints = (maximumValueInGlucoseChartPoints != nil ? max(maximumValueInGlucoseChartPoints!, (reading.calculatedValue + (UserDefaults.standard.offsetCarbTreatmentsOnChart ? ConstantsGlucoseChart.offsetCarbPositionFromBgMarker : 0))) : reading.calculatedValue)
                     
                 }
                 
@@ -1106,7 +1106,7 @@ public class GlucoseChartManager {
             // and append it to the correct chart points list.
 			for (indexCarbsTreatment, carbsTreatment) in carbsTreatments.enumerated() {
 				// Retrieve the Y value from carbsYValues
-				let calculatedYAxisValue = carbsYValues[indexCarbsTreatment]
+                let calculatedYAxisValue = carbsYValues[indexCarbsTreatment] + (UserDefaults.standard.offsetCarbTreatmentsOnChart ? ConstantsGlucoseChart.offsetCarbPositionFromBgMarker : 0)
 				
 				// We use an extended ChartPoint class to pass the new y axis value
 				let chartPoint = ChartPoint(treatmentEntry: carbsTreatment, formatter: data().chartPointDateFormatter, newYAxisValue: calculatedYAxisValue)

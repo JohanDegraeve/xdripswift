@@ -21,7 +21,7 @@
 "connect" = "Bağla";
 "connectedAt" = "Bağlanma zamanı";
 "disConnectedAt" = "Bağlantı Kesildiği zaman";
-"resetRequired" = "Vericiyi sıfırla?";
+"resetRequired" = "Vericiyi sıfırla";
 "lastReset" = "Son Sıfırlama";
 "lastResetNotKnown" = "Son Sıfırlama Zaman Damgası bilinmiyor";
 "transmitterResultResult" = "Verici Sıfırlama Sonucu";

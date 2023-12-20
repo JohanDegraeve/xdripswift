@@ -41,6 +41,7 @@
 "invalidAccountOrPassword" = "Cuenta y/o contraseña incorrecta";
 "common_statistics_low" = "Baja";
 "common_statistics_inRange" = "En Rango";
+"common_statistics_inTightRange" = "Estrecho";
 "common_statistics_high" = "Alta";
 "common_statistics_average" = "Promedio";
 "common_statistics_a1c" = "HbA1c";

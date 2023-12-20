@@ -21,7 +21,7 @@
 "connect" = "Соединение";
 "connectedAt" = "Подключено в";
 "disConnectedAt" = "Отключено в";
-"resetRequired" = "Перезапустить Transmitter?";
+"resetRequired" = "Перезапустить Transmitter";
 "lastReset" = "Последний сброс";
 "lastResetNotKnown" = "Временная метка последнего сброса неизвестна";
 "transmitterResultResult" = "Результат сброса сенсора";

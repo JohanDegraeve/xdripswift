@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="M4Y-Lb-cyx">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="M4Y-Lb-cyx">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -11,53 +11,73 @@
         <!--Today View Controller-->
         <scene sceneID="cwh-vc-ff4">
             <objects>
-                <viewController id="M4Y-Lb-cyx" customClass="TodayViewController" customModule="xDrip4iOS" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="M4Y-Lb-cyx" customClass="TodayViewController" customModule="xDrip4iOS_Widget" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" simulatedAppContext="notificationCenter" id="S3S-Oj-5AN">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="192"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="110"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Usa-lp-vmV" userLabel="Minutes Label Outlet">
-                                <rect key="frame" x="10" y="10" width="57" height="29"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="22" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Usa-lp-vmV" userLabel="Minutes Label Outlet">
+                                <rect key="frame" x="6" y="6" width="23" height="32"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="otr-CI-Hqi" userLabel="Value Label Outlet">
-                                <rect key="frame" x="0.0" y="96.5" width="320" height="95.5"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="80"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="---" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="otr-CI-Hqi" userLabel="Value Label Outlet">
+                                <rect key="frame" x="0.0" y="30" width="320" height="84"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="70"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="chW-dl-9hs" userLabel="Diff Label Outlet">
-                                <rect key="frame" x="253" y="10" width="57" height="29"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="24"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="--" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="chW-dl-9hs" userLabel="Diff Label Outlet">
+                                <rect key="frame" x="237" y="10" width="18" height="24"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="mg/dL" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dc2-uV-AOA">
+                                <rect key="frame" x="258" y="10" width="56" height="24"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=" mins ago" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VvL-73-gv9">
+                                <rect key="frame" x="32" y="10" width="85" height="24"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="20"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="ssy-KU-ocm"/>
                         <constraints>
-                            <constraint firstItem="Usa-lp-vmV" firstAttribute="leading" secondItem="ssy-KU-ocm" secondAttribute="leading" constant="10" id="0fe-7e-MSM"/>
+                            <constraint firstItem="Usa-lp-vmV" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leading" constant="6" id="10e-qt-a6P"/>
                             <constraint firstItem="ssy-KU-ocm" firstAttribute="trailing" secondItem="otr-CI-Hqi" secondAttribute="trailing" id="2q3-jt-nac"/>
-                            <constraint firstItem="Usa-lp-vmV" firstAttribute="top" secondItem="S3S-Oj-5AN" secondAttribute="top" constant="10" id="9Ko-DH-4lo"/>
-                            <constraint firstItem="ssy-KU-ocm" firstAttribute="trailing" secondItem="chW-dl-9hs" secondAttribute="trailing" constant="10" id="QCO-md-T5H"/>
-                            <constraint firstItem="ssy-KU-ocm" firstAttribute="bottom" secondItem="otr-CI-Hqi" secondAttribute="bottom" id="XmY-eg-ME5"/>
+                            <constraint firstItem="chW-dl-9hs" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="VvL-73-gv9" secondAttribute="trailing" constant="8" symbolic="YES" id="GFv-Hl-e1J"/>
+                            <constraint firstItem="otr-CI-Hqi" firstAttribute="top" secondItem="S3S-Oj-5AN" secondAttribute="top" constant="30" id="RbK-yw-H95"/>
+                            <constraint firstItem="dc2-uV-AOA" firstAttribute="leading" secondItem="chW-dl-9hs" secondAttribute="trailing" constant="3" id="dQ7-Jh-bBV"/>
                             <constraint firstItem="chW-dl-9hs" firstAttribute="top" secondItem="S3S-Oj-5AN" secondAttribute="top" constant="10" id="gf0-6k-m7q"/>
+                            <constraint firstItem="VvL-73-gv9" firstAttribute="centerY" secondItem="Usa-lp-vmV" secondAttribute="centerY" id="kKu-xU-J6n"/>
+                            <constraint firstItem="dc2-uV-AOA" firstAttribute="centerY" secondItem="Usa-lp-vmV" secondAttribute="centerY" id="nXx-ws-ed2"/>
                             <constraint firstItem="otr-CI-Hqi" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leading" id="o82-vA-KE3"/>
+                            <constraint firstItem="VvL-73-gv9" firstAttribute="leading" secondItem="Usa-lp-vmV" secondAttribute="trailing" constant="3" id="scA-mA-b3V"/>
+                            <constraint firstItem="Usa-lp-vmV" firstAttribute="top" secondItem="S3S-Oj-5AN" secondAttribute="top" constant="6" id="uFW-5f-6C3"/>
+                            <constraint firstAttribute="trailing" secondItem="dc2-uV-AOA" secondAttribute="trailing" constant="6" id="uwn-Ft-7NL"/>
+                            <constraint firstItem="chW-dl-9hs" firstAttribute="centerY" secondItem="Usa-lp-vmV" secondAttribute="centerY" id="xKm-d1-ehM"/>
                         </constraints>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="320" height="192"/>
+                    <size key="freeformSize" width="320" height="110"/>
                     <connections>
                         <outlet property="diffLabelOutlet" destination="chW-dl-9hs" id="a3k-hb-8p3"/>
+                        <outlet property="diffLabelUnitOutlet" destination="dc2-uV-AOA" id="AjX-fD-1Vb"/>
+                        <outlet property="minutesAgoLabelOutlet" destination="VvL-73-gv9" id="qS5-nc-mBw"/>
                         <outlet property="minutesLabelOutlet" destination="Usa-lp-vmV" id="fHr-OR-VVj"/>
                         <outlet property="valueLabelOutlet" destination="otr-CI-Hqi" id="jdr-uM-EFH"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vXp-U4-Rya" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="116" y="165"/>
+            <point key="canvasLocation" x="115.94202898550725" y="164.73214285714286"/>
         </scene>
     </scenes>
 </document>

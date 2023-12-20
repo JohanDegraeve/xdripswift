@@ -7,90 +7,229 @@ on:
   #push:
   
   schedule:
-    - cron: '0 04 * * *' # Checks for updates at 04:00 UTC every day
-    - cron: '0 04 1 * *' # Builds the app on the 1th every month
+    - cron: '0 8 * * 3' # Checks for updates at 08:00 UTC every Wednesday
+    - cron: '0 6 1 * *' # Builds the app on the 1st of every month at 06:00 UTC
 
 env:
   UPSTREAM_REPO: JohanDegraeve/xdripswift
-  UPSTREAM_BRANCH: ${{ github.ref_name }} # branch on upstream repository to sync from (relpace with specific branch name if needed)
-  TARGET_BRANCH: ${{ github.ref_name }} # target branch on fork to be kept in sync, and target branch on upstream to be kept alive (relpace with specific branch name if needed)
-  SYNC_UPSTREAM: 'true' # set to 'false' or 'true' to disable / enable syncing of fork with upstream repository
-  
+  UPSTREAM_BRANCH: ${{ github.ref_name }} # branch on upstream repository to sync from (replace with specific branch name if needed)
+  TARGET_BRANCH: ${{ github.ref_name }} # target branch on fork to be kept in sync, and target branch on upstream to be kept alive (replace with specific branch name if needed)
+  ALIVE_BRANCH: alive
+
 jobs:
   validate:
     name: Validate
     uses: ./.github/workflows/validate_secrets.yml
     secrets: inherit
-    
-  check_latest_from_upstream:
+  
+  # Checks if GH_PAT holds workflow permissions
+  # Checks for existence of alive branch; if non-existent creates it
+  check_alive_and_permissions:
     needs: validate
     runs-on: ubuntu-latest
-    name: Check upstream
+    name: Check alive branch and permissions
+    permissions:
+      contents: write
+    outputs:
+      WORKFLOW_PERMISSION: ${{ steps.workflow-permission.outputs.has_permission }}
+    
+    steps:
+    - name: Check for workflow permissions
+      id: workflow-permission
+      env: 
+        TOKEN_TO_CHECK: ${{ secrets.GH_PAT }}
+      run: |
+        PERMISSIONS=$(curl -sS -f -I -H "Authorization: token ${{ env.TOKEN_TO_CHECK }}" https://api.github.com | grep ^x-oauth-scopes: | cut -d' ' -f2-);
+        
+        if [[ $PERMISSIONS =~ "workflow" || $PERMISSIONS == "" ]]; then
+          echo "GH_PAT holds workflow permissions or is fine-grained PAT."
+          echo "has_permission=true" >> $GITHUB_OUTPUT # Set WORKFLOW_PERMISSION to false.
+        else 
+          echo "GH_PAT lacks workflow permissions."
+          echo "Automated build features will be skipped!"
+          echo "has_permission=false" >> $GITHUB_OUTPUT # Set WORKFLOW_PERMISSION to false.
+        fi
+    
+    - name: Check for alive branch
+      if: steps.workflow-permission.outputs.has_permission == 'true'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        if [[ "$(gh api -H "Accept: application/vnd.github+json" /repos/${{ github.repository_owner }}/xdripswift/branches | jq --raw-output 'any(.name=="alive")')" == "true" ]]; then
+          echo "Branch 'alive' exists."
+          echo "ALIVE_BRANCH_EXISTS=true" >> $GITHUB_ENV # Set ALIVE_BRANCH_EXISTS to true
+        else
+          echo "Branch 'alive' does not exist."
+          echo "ALIVE_BRANCH_EXISTS=false" >> $GITHUB_ENV # Set ALIVE_BRANCH_EXISTS to false
+        fi
+    
+    - name: Create alive branch
+      if: env.ALIVE_BRANCH_EXISTS == 'false'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Get ref for JohanDegraeve/xdripswift:develop
+        SHA=$(curl -sS https://api.github.com/repos/${{ env.UPSTREAM_REPO }}/git/refs \
+          | jq '.[] | select(.ref == "refs/heads/develop" ) | .object.sha' \
+          | tr -d '"'
+        );
+        
+        # Create alive branch based on JohanDegraeve/xdripswift:develop
+        gh api \
+          --method POST \
+          -H "Authorization: token $GITHUB_TOKEN" \
+          -H "Accept: application/vnd.github.v3+json" \
+          /repos/${{ github.repository_owner }}/xdripswift/git/refs \
+          -f ref='refs/heads/alive' \
+          -f sha=$SHA
+  
+  # Checks for changes in upstream repository; if changes exist prompts sync for build
+  # Performs keepalive to avoid stale fork
+  check_latest_from_upstream:
+    needs: [validate, check_alive_and_permissions]
+    runs-on: ubuntu-latest
+    name: Check upstream and keep alive
     outputs: 
       NEW_COMMITS: ${{ steps.sync.outputs.has_new_commits }}
-
+    
     steps:
     - name: Checkout target repo
+      if: |
+        needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' &&
+        (vars.SCHEDULED_BUILD != 'false' || vars.SCHEDULED_SYNC != 'false')
       uses: actions/checkout@v3
       with:
-        # optional: set the branch to checkout,
-        # sync action checks out your 'target_sync_branch' anyway
-        #submodules: recursive 
-        ref: ${{ env.TARGET_BRANCH }}
-
-    # REQUIRED step
-    # Step 2: run the sync action
+        token: ${{ secrets.GH_PAT }}
+        ref: alive
+    
     - name: Sync upstream changes
-      if: ${{ env.SYNC_UPSTREAM == 'true' }} && github.repository_owner != 'JohanDegraeve' # do not run the upstream sync action on the upstream repository
+      if: | # do not run the upstream sync action on the upstream repository
+        needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' &&
+        vars.SCHEDULED_SYNC != 'false' && github.repository_owner != 'JohanDegraeve'
       id: sync
       uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
       with:
-        target_sync_branch: ${{ env.TARGET_BRANCH }}
+        target_sync_branch: ${{ env.ALIVE_BRANCH }}
         shallow_since: 6 months ago
         target_repo_token: ${{ secrets.GH_PAT }}
         upstream_sync_branch: ${{ env.UPSTREAM_BRANCH }}
         upstream_sync_repo: ${{ env.UPSTREAM_REPO }}
-      
-    # Step 3: Display a sample message based on the sync output var 'has_new_commits'
+    
+    # Display a sample message based on the sync output var 'has_new_commits'
     - name: New commits found
-      if: steps.sync.outputs.has_new_commits == 'true'
+      if: |
+        needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' &&
+        vars.SCHEDULED_SYNC != 'false' && steps.sync.outputs.has_new_commits == 'true'
       run: echo "New commits were found to sync."
     
     - name: No new commits
-      if: steps.sync.outputs.has_new_commits == 'false'
-      run: echo echo "There were no new commits."
-      
+      if: |
+        needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' && 
+        vars.SCHEDULED_SYNC != 'false' && steps.sync.outputs.has_new_commits == 'false'
+      run: echo "There were no new commits."
+    
     - name: Show value of 'has_new_commits'
+      if: needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' && vars.SCHEDULED_SYNC != 'false'
       run: |
         echo ${{ steps.sync.outputs.has_new_commits }}
         echo "NEW_COMMITS=${{ steps.sync.outputs.has_new_commits }}" >> $GITHUB_OUTPUT
-        
-    # Keep repository "alive": add empty commits to TARGET_BRANCH after "time_elapsed" days of inactivity to avoid inactivation of scheduled workflows
+    
+    # Keep repository "alive": add empty commits to ALIVE_BRANCH after "time_elapsed" days of inactivity to avoid inactivation of scheduled workflows
     - name: Keep alive
-      if: github.ref == 'refs/heads/${{ env.TARGET_BRANCH }}'
+      if: |
+        needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' &&
+        (vars.SCHEDULED_BUILD != 'false' || vars.SCHEDULED_SYNC != 'false')
       uses: gautamkrishnar/keepalive-workflow@v1 # using the workflow with default settings
       with:
-        time_elapsed: 50 # Time elapsed from the previous commit to trigger a new automated commit (in days)
-
+        time_elapsed: 20 # Time elapsed from the previous commit to trigger a new automated commit (in days)
+    
+    - name: Show scheduled build configuration message
+      if: needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION != 'true'
+      run: |
+        echo "### :calendar: Scheduled Sync and Build Disabled :mobile_phone_off:" >> $GITHUB_STEP_SUMMARY
+        echo "You have not yet configured the scheduled sync and build for xDrip4iOS' browser build." >> $GITHUB_STEP_SUMMARY
+        echo "Synchronizing your fork of <code>xdripswift</code> with the upstream repository <code>JohanDegraeve/xdripswift</code> will be skipped." >> $GITHUB_STEP_SUMMARY
+        echo "If you want to enable automatic builds and updates for your xDrip4iOS, please follow the instructions \
+              under the following path <code>xdripswift/fastlane/testflight.md</code>." >> $GITHUB_STEP_SUMMARY
+  
+  # Builds xDrip4iOS
   build:
-    needs: [validate, check_latest_from_upstream]
+    name: Build
+    needs: [validate, check_alive_and_permissions, check_latest_from_upstream]
     runs-on: macos-13
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '0 04 1 * *' || needs.check_latest_from_upstream.outputs.NEW_COMMITS == 'true' }} # runs if started manually, or if scheduled on the first each month, or if new commits were found
+    permissions:
+      contents: write
+    if: | # runs if started manually, or if sync schedule is set and enabled and scheduled on the first Saturday each month, or if sync schedule is set and enabled and new commits were found
+        github.event_name == 'workflow_dispatch' ||
+        (needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' &&
+          (vars.SCHEDULED_BUILD != 'false' && github.event.schedule == '0 6 1 * *') ||
+          (vars.SCHEDULED_SYNC != 'false' && needs.check_latest_from_upstream.outputs.NEW_COMMITS == 'true' )
+        )
     steps:
       - name: Select Xcode version
         run: "sudo xcode-select --switch /Applications/Xcode_15.0.app/Contents/Developer"
-
-      # Checks-out the repo
-      - name: Checkout Repo
-        uses: actions/checkout@v3
       
+      - name: Checkout Repo for syncing
+        if: |
+          needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' &&
+          vars.SCHEDULED_SYNC != 'false'
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_PAT }}
+          ref: ${{ env.TARGET_BRANCH }} 
+      
+      - name: Sync upstream changes
+        if: | # do not run the upstream sync action on the upstream repository
+          needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' &&
+          vars.SCHEDULED_SYNC != 'false' && github.repository_owner != 'JohanDegraeve'
+        id: sync
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+        with:
+          target_sync_branch: ${{ env.TARGET_BRANCH }}
+          shallow_since: 6 months ago
+          target_repo_token: ${{ secrets.GH_PAT }}
+          upstream_sync_branch: ${{ env.UPSTREAM_BRANCH }}
+          upstream_sync_repo: ${{ env.UPSTREAM_REPO }}
+      
+      # Display a sample message based on the sync output var 'has_new_commits'
+      - name: New commits found
+        if: |
+          needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' &&
+          vars.SCHEDULED_SYNC != 'false' && steps.sync.outputs.has_new_commits == 'true'
+        run: echo "New commits were found to sync."
+    
+      - name: No new commits
+        if: |
+          needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' && 
+          vars.SCHEDULED_SYNC != 'false' && steps.sync.outputs.has_new_commits == 'false'
+        run: echo "There were no new commits."
+      
+      - name: Show value of 'has_new_commits'
+        if: |
+          needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true'
+          && vars.SCHEDULED_SYNC != 'false'
+        run: |
+          echo ${{ steps.sync.outputs.has_new_commits }}
+          echo "NEW_COMMITS=${{ steps.sync.outputs.has_new_commits }}" >> $GITHUB_OUTPUT
+
+      - name: Checkout Repo for building
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_PAT }}
+          submodules: recursive
+          ref: ${{ env.TARGET_BRANCH }}
+
       # Patch Fastlane Match to not print tables
       - name: Patch Match Tables
         run: find /usr/local/lib/ruby/gems -name table_printer.rb | xargs sed -i "" "/puts(Terminal::Table.new(params))/d"
-
+      
       # Install project dependencies
-      - name: Install project dependencies
+      - name: Install Project Dependencies
         run: bundle install
+
+      # Sync the GitHub runner clock with the Windows time server (workaround as suggested in https://github.com/actions/runner/issues/2996)
+      - name: Sync clock
+        run: sudo sntp -sS time.windows.com
       
       # Build signed Xdrip4iOS IPA file
       - name: Fastlane Build & Archive

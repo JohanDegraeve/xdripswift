@@ -30,7 +30,11 @@ class Texts_Common {
     }()
     
     static let password = {
-        return NSLocalizedString("common_password", tableName: filename, bundle: Bundle.main, value: "Password:", comment: "literally password")
+        return NSLocalizedString("common_password", tableName: filename, bundle: Bundle.main, value: "Password", comment: "literally password")
+    }()
+    
+    static let username = {
+        return NSLocalizedString("common_username", tableName: filename, bundle: Bundle.main, value: "Username", comment: "literally username")
     }()
     
     static let default0 = {
@@ -180,6 +184,10 @@ class Texts_Common {
     
     static let inRangeStatistics = {
         return NSLocalizedString("common_statistics_inRange", tableName: filename, bundle: Bundle.main, value: "In Range", comment: "the words in range")
+    }()
+    
+    static let inTightRangeStatistics = {
+        return NSLocalizedString("common_statistics_inTightRange", tableName: filename, bundle: Bundle.main, value: "Tight Range", comment: "the words in tight range")
     }()
     
     static let highStatistics = {

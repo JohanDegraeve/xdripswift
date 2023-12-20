@@ -16,7 +16,7 @@
 "alerttypesettingsview_name" = "Name";
 
 /// when editing an alert type, field title for Override Mute
-"alerttypesettingsview_overridemute" = "Override Mute?";
+"alerttypesettingsview_overridemute" = "Override Mute";
 
 /// shown on top of the screen that allows user to edit an alert type
 "alerttypesettingsview_screentitle" = "Edit Alarm Type";
@@ -31,7 +31,7 @@
 "alerttypesettingsview_sound" = "Sound";
 
 /// when editing an alert type, field title for Enabled
-"alerttypesettingsview_enabled" = "Enabled?";
+"alerttypesettingsview_enabled" = "Enabled";
 
 /// 
 "alertTypeNoSound" = "No Sound";
@@ -46,7 +46,7 @@
 "alerttypenamealreadyexistsmessages" = "An Alarm Type with this name already exists. Use a different name";
 
 /// when editing an alert type, field title for Snooze Via Notification
-"alerttypesettingsview_snoozevianotification" = "Allow Snooze Via Notification?";
+"alerttypesettingsview_snoozevianotification" = "Allow Snooze Via Notification";
 
 /// when editing an alert type, field title for Vibrate
-"alerttypesettingsview_vibrate" = "Vibrate?";
+"alerttypesettingsview_vibrate" = "Vibrate";

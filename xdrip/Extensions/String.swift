@@ -86,8 +86,8 @@ extension String {
             return UIColor.gray
         }
         
-        var rgbValue:UInt32 = 0
-        Scanner(string: cString).scanHexInt32(&rgbValue)
+        var rgbValue: UInt64 = 0
+        Scanner(string: cString).scanHexInt64(&rgbValue)
         
         return UIColor(
             red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
@@ -245,4 +245,50 @@ extension String {
         
     }
 
+}
+
+extension String {
+    
+    /// use this to partially obscure a password, API-SECRET, token or other sensitive data. We want the user to see that something recognisable is there that makes sense to them, but it won't reveal any useful private information if they screenshot it
+    func obscured() -> String {
+        
+        var obscuredString = self
+        
+        let stringLength: Int = obscuredString.count
+        
+        // in order to avoid strange layouts if somebody uses a really long API_SECRET or token, then let's limit the displayed string size to something more manageable
+        let maxStringSizeToShow: Int = 12
+        
+        // the characters we will use to obscure the sensitive data
+        let maskingCharacter: String = "*"
+        
+        // based upon the length of the string, we will show more, or less, of the original characters at the beginning. This gives more context whilst maintaining privacy
+        var startCharsNotToObscure: Int = 0
+        
+        switch stringLength {
+        case 0...3:
+            startCharsNotToObscure = 0
+        case 4...5:
+            startCharsNotToObscure = 1
+        case 6...7:
+            startCharsNotToObscure = 2
+        case 8...10:
+            startCharsNotToObscure = 3
+        case 11...50:
+            startCharsNotToObscure = 4
+        default:
+            startCharsNotToObscure = 0
+        }
+        
+        // remove the characters that we want to obscure
+        obscuredString.removeLast(stringLength - startCharsNotToObscure)
+        
+        // now "fill up" the string with the masking character up to the original string size. If it is longer than the maxStingSizeToShow then trim it down to make everything fit in a clean way
+        obscuredString += String(repeating: maskingCharacter, count: stringLength > maxStringSizeToShow ? maxStringSizeToShow - obscuredString.count : stringLength - obscuredString.count)
+        
+        return obscuredString
+        
+    }
+    
+    
 }

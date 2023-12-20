@@ -1,11 +1,11 @@
 "alerttypessettingsview_screentitle" = "Типы тревог";
 "alerttypesettingsview_screentitle" = "Редактировать тип будильника";
 "alerttypesettingsview_name" = "Имя";
-"alerttypesettingsview_enabled" = "Включено?";
-"alerttypesettingsview_vibrate" = "Вибрация?";
-"alerttypesettingsview_snoozevianotification" = "Разрешить повтор через уведомление?";
+"alerttypesettingsview_enabled" = "Включено";
+"alerttypesettingsview_vibrate" = "Вибрация";
+"alerttypesettingsview_snoozevianotification" = "Разрешить повтор через уведомление";
 "alerttypesettingsview_defaultsnoozeperiod" = "Время повтора по умолчанию (мин)";
-"alerttypesettingsview_overridemute" = "Отменить отключение звука?";
+"alerttypesettingsview_overridemute" = "Отменить отключение звука";
 "alerttypesettingsview_sound" = "Звук";
 "alerttypesettingsview_defaultiossound" = "Звук iOS";
 "alerttypesettingsview_givename" = "Имя будильника";

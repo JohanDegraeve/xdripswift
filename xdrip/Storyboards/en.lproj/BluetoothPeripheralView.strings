@@ -21,12 +21,12 @@
 "connect" = "Connect";
 "connectedAt" = "Connected At";
 "disConnectedAt" = "Disconnected At";
-"resetRequired" = "Reset Transmitter?";
+"resetRequired" = "Reset Transmitter";
 "lastReset" = "Last Reset";
 "lastResetNotKnown" = "Last Reset Timestamp is not known";
 "transmitterResultResult" = "Transmitter Reset Result";
 "bootLoader" = "Bootloader";
-"cannotActiveCGMInFollowerMode" = "You can not activate a CGM in Follower Mode";
+"cannotActiveCGMInFollowerMode" = "You cannot activate or connect to a CGM whilst in Follower Mode.";
 "confirmDisconnectTitle" = "Confirm Disconnect";
 "confirmDisconnectMessage" = "Click 'Disconnect' to confirm that you really want to disconnect from the transmitter.";
 "transmittterStartDate" = "Transmitter Started";

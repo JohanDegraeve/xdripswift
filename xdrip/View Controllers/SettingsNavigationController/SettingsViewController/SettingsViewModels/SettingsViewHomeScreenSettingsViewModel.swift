@@ -16,29 +16,32 @@ fileprivate enum Setting:Int, CaseIterable {
     // show a clock at the bottom of the home screen when the screen lock is activated?
     case showClockWhenScreenIsLocked = 1
     
+    // type of semi-transparent dark overlay to cover the app when the screen is locked
+    case screenLockDimmingType = 2
+    
     // show a fixed scale mini-chart under the main scrollable chart?
-    case showMiniChart = 2
+    case showMiniChart = 3
     
     //urgent high value
-    case urgentHighMarkValue = 3
+    case urgentHighMarkValue = 4
     
     //high value
-    case highMarkValue = 4
+    case highMarkValue = 5
     
     //low value
-    case lowMarkValue = 5
+    case lowMarkValue = 6
     
     //urgent low value
-    case urgentLowMarkValue = 6
+    case urgentLowMarkValue = 7
     
     //use objectives in graph?
-    case useObjectives = 7
+    case useObjectives = 8
     
     //show target line?
-    case showTarget = 8
+    case showTarget = 9
     
     //target value
-    case targetMarkValue = 9
+    case targetMarkValue = 10
     
 }
 
@@ -66,7 +69,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .showTarget :
             return UISwitch(isOn: UserDefaults.standard.showTarget, action: {(isOn:Bool) in UserDefaults.standard.showTarget = isOn})
             
-        case  .urgentHighMarkValue, .highMarkValue, .targetMarkValue, .lowMarkValue, .urgentLowMarkValue:
+        case  .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .targetMarkValue, .lowMarkValue, .urgentLowMarkValue:
             return nil
             
         }
@@ -123,6 +126,40 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
                     UserDefaults.standard.showClockWhenScreenIsLocked = true
                 }
             })
+            
+        case .screenLockDimmingType:
+            
+            // data to be displayed in list from which user needs to pick a screen dimming type
+            var data = [String]()
+
+            var selectedRow: Int?
+
+            var index = 0
+            
+            let currentScreenLockDimmingType = UserDefaults.standard.screenLockDimmingType
+            
+            // get all data source types and add the description to data. Search for the type that matches the ScreenLockDimmingType that is currently stored in userdefaults.
+            for dimmingType in ScreenLockDimmingType.allCases {
+                
+                data.append(dimmingType.description)
+                
+                if dimmingType == currentScreenLockDimmingType {
+                    selectedRow = index
+                }
+                
+                index += 1
+                
+            }
+            
+            return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.screenLockDimmingTypeWhenScreenIsLocked, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
+                
+                if index != selectedRow {
+                    
+                    UserDefaults.standard.screenLockDimmingType = ScreenLockDimmingType(rawValue: index) ?? .disabled
+                    
+                }
+                
+            }, cancelHandler: nil, didSelectRowHandler: nil)
             
         case .showMiniChart:
             return SettingsSelectedRowAction.callFunction(function: {
@@ -195,6 +232,9 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .showClockWhenScreenIsLocked:
             return Texts_SettingsView.showClockWhenScreenIsLocked
             
+        case .screenLockDimmingType:
+            return Texts_SettingsView.screenLockDimmingTypeWhenScreenIsLocked
+            
         case .showMiniChart:
             return Texts_SettingsView.showMiniChart
             
@@ -214,7 +254,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .urgentHighMarkValue, .highMarkValue, .lowMarkValue, .urgentLowMarkValue, .targetMarkValue:
+        case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .lowMarkValue, .urgentLowMarkValue, .targetMarkValue:
             return UITableViewCell.AccessoryType.disclosureIndicator
             
         case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .useObjectives, .showTarget:
@@ -242,6 +282,9 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
             
         case .targetMarkValue:
             return UserDefaults.standard.targetMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            
+        case .screenLockDimmingType:
+            return UserDefaults.standard.screenLockDimmingType.description
             
         case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .useObjectives, .showTarget:
             return nil

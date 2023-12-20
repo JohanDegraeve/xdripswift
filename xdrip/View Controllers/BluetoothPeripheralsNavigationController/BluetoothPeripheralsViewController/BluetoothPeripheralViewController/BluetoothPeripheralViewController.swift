@@ -15,17 +15,14 @@ fileprivate enum Setting:Int, CaseIterable {
     /// the alias that user has given, possibly nil
     case alias = 1
     
-    /// the address
-    case address = 2
-    
     /// the current connection status
-    case connectionStatus = 3
+    case connectionStatus = 2
     
     /// timestamp when connection changed to connected or not connected
-    case connectOrDisconnectTimeStamp = 4
+    case connectOrDisconnectTimeStamp = 3
     
     /// transmitterID, only for devices that need it
-    case transmitterId = 5
+    case transmitterId = 4
 
 }
 
@@ -293,7 +290,7 @@ class BluetoothPeripheralViewController: UIViewController {
                     
                     UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
                     
-                    // we'll also take advantage to stop the active sensor session for this type of CGM. This will cause the countdown sensor to be disabled until another sensor session is started with a max sensor age value
+                    // we'll also take advantage to stop the active sensor session for this type of CGM. This will cause the sensor info to be disabled until another sensor session is started with a max sensor age value
                     UserDefaults.standard.stopActiveSensor = true
                     
                 }
@@ -337,7 +334,7 @@ class BluetoothPeripheralViewController: UIViewController {
                 
                 UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
                 
-                // we'll also take advantage to stop the active sensor session for this type of CGM. This will cause the countdown sensor to be disabled until another sensor session is started with a max sensor age value
+                // we'll also take advantage to stop the active sensor session for this type of CGM. This will cause the sensor info to be disabled until another sensor session is started with a max sensor age value
                 UserDefaults.standard.stopActiveSensor = true
                 
             }
@@ -821,21 +818,21 @@ class BluetoothPeripheralViewController: UIViewController {
         // unwrap bluetoothPeripheralManager
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
         
-        // textToAdd is either 'address' + the address, or 'alias' + the alias, depending if alias has a value
-        var textToAdd = Texts_BluetoothPeripheralView.address + " " + bluetoothPeripheral.blePeripheral.address
+        // textToAdd is either the name, or 'alias' + the alias, depending if alias has a value
+        var textToAdd = bluetoothPeripheral.blePeripheral.name
         if let alias = bluetoothPeripheral.blePeripheral.alias {
             textToAdd = Texts_BluetoothPeripheralView.bluetoothPeripheralAlias + " " + alias
         }
         
         // first ask user if ok to delete and if yes delete
-        let alert = UIAlertController(title: Texts_BluetoothPeripheralView.confirmDeletionBluetoothPeripheral + " " + textToAdd + "?", message: nil, actionHandler: {
+        let alert = UIAlertController(title: Texts_Common.delete , message: Texts_BluetoothPeripheralView.confirmDeletionBluetoothPeripheral + " " + textToAdd + "?", actionHandler: {
             
             // in case it's a Libre2 CGM, libre1DerivedAlgorithmParameters has a non nil value. When deleting the transmitter, by setting to nil, this will ensure that user first need to do a successful NFC scan.
             if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false), bluetoothTransmitter is CGMTransmitter {
                 
                 UserDefaults.standard.libre1DerivedAlgorithmParameters = nil
                 
-                // we'll also take advantage to stop the active sensor session for this type of CGM. This will cause the countdown sensor to be disabled until another sensor session is started with a max sensor age value
+                // we'll also take advantage to stop the active sensor session for this type of CGM. This will cause the sensor info to be disabled until another sensor session is started with a max sensor age value
                 UserDefaults.standard.stopActiveSensor = true
                 
             }
@@ -1265,17 +1262,6 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                 cell.detailTextLabel?.text = bluetoothPeripheral?.blePeripheral.name
                 cell.accessoryType = .none
                 
-            case .address:
-                
-                cell.textLabel?.text = Texts_BluetoothPeripheralView.address
-                cell.detailTextLabel?.text = bluetoothPeripheral?.blePeripheral.address
-                if cell.detailTextLabel?.text == nil {
-                    cell.accessoryType = .none
-                } else {
-                    cell.accessoryType = .disclosureIndicator
-                    cell.accessoryView =  disclosureAccessoryView
-                }
-                
             case .connectionStatus:
                 
                 cell.textLabel?.text = Texts_BluetoothPeripheralView.status
@@ -1477,14 +1463,6 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             guard let setting = Setting(rawValue: indexPath.row) else { fatalError("BluetoothPeripheralViewController didSelectRowAt, Unexpected setting") }
             
             switch setting {
-                
-            case .address:
-                guard let bluetoothPeripheral = bluetoothPeripheral else {return}
-                
-                let alert = UIAlertController(title: Texts_BluetoothPeripheralView.address, message: bluetoothPeripheral.blePeripheral.address, actionHandler: nil)
-                
-                // present the alert
-                self.present(alert, animated: true, completion: nil)
                 
             case .name, .connectionStatus:
                 break
