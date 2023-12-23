@@ -184,6 +184,10 @@ enum Texts_HomeView {
         return NSLocalizedString("noDataSourceConnected", tableName: filename, bundle: Bundle.main, value: "No CGM data source connected", comment: "no data source is enabled or connected")
     }()
     
+    static let reconnectLibreDataSource: String = {
+        return NSLocalizedString("reconnectLibreDataSource", tableName: filename, bundle: Bundle.main, value: "Disconnect and reconnect Libre sensor", comment: "ask the user to disconnect and reconnect the sensor")
+    }()
+    
     // make sure any translations are less than 20-22 characters long (including the "%@")
     static let hidingUrlForXSeconds:String = {
         return String(format: NSLocalizedString("hidingUrlForXSeconds", tableName: filename, bundle: Bundle.main, value: "Hiding URL for %@s...", comment: "After clicking scan button, this message will appear"), String(ConstantsHomeView.hideUrlDuringTimeInSeconds))

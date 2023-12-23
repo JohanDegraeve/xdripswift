@@ -42,6 +42,7 @@
 "sensorDuration" = "Duración Sensor";
 "noSensorData" = "Sin datos";
 "noDataSourceConnected" = "Sin fuente de datos MGC conectada";
+"reconnectLibreDataSource" = "Desconectar y reconectar sensor Libre";
 "hidingUrlForXSeconds" = "Ocultando URL durante %@s...";
 "nightscoutNotEnabled" = "Nightscout está deshabilitado";
 "nightscoutURLMissing" = "Falta la URL de Nightscout";

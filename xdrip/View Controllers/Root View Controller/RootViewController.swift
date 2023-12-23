@@ -222,9 +222,9 @@ final class RootViewController: UIViewController, ObservableObject {
             dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.hidingUrlForXSeconds
             
             // wait and then fade out the text
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 
-                // make a animated transition with the label. Fade it out over a couple of seconds.
+                // make a animated transition with the label. Fade it out
                 UIView.transition(with: self.miniChartHoursLabelOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
                     
                     self.dataSourceSensorMaxAgeOutlet.alpha = 0
@@ -3093,66 +3093,82 @@ final class RootViewController: UIViewController, ObservableObject {
             // there is no sensor startdate/max days so we can't report sensor progress
             sensorProgressViewOutlet.isHidden = true
             
-            // the above means we must be in follower mode, so let's set the connection status
-            setFollowerConnectionStatus()
-            
-            // set the keep-alive image, then make it visible if in follower mode
-            dataSourceKeepAliveImageOutlet.image = UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImage
-            dataSourceKeepAliveImageOutlet.isHidden = isMaster
-            
             dataSourceSensorCurrentAgeOutlet.text = ""
             dataSourceSensorMaxAgeOutlet.text = ""
             
-            if !isMaster {
+            if isMaster {
                 
-                dataSourceLabelOutlet.text = UserDefaults.standard.followerDataSourceType.fullDescription
-                
-                switch UserDefaults.standard.followerDataSourceType {
+                // the following is for users updating from 4.x to 5.x with a Libre 2 Direct sensor connected
+                // we just tell them to disconnect and reconnect if needed
+                // this will only need to be done once when first updated
+                if sensorType == .Libre && sensorStartDate != nil {
                     
-                case .nightscout:
+                    dataSourceLabelOutlet.text = " ⚠️  " + Texts_HomeView.reconnectLibreDataSource
                     
-                    if !UserDefaults.standard.nightScoutEnabled {
-                        
-                        dataSourceSensorMaxAgeOutlet.textColor = .systemRed
-                        dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.nightscoutNotEnabled
-                        
-                    } else if UserDefaults.standard.nightScoutUrl == nil {
-                        
-                        dataSourceSensorMaxAgeOutlet.textColor = .systemRed
-                        dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.nightscoutURLMissing
-                        
-                    } else {
-                        
-                        var nightScoutUrlString: String = UserDefaults.standard.nightScoutUrl ?? ""
-                        
-                        // let's use a shortened version of the url if necessary to display it cleanly in the UI. The main reason is that some of the newer service providers (such as Northflank and Google Cloud) use really long URLs as standard.
-                        if nightScoutUrlString.count > 36 {
-                            nightScoutUrlString = nightScoutUrlString.replacingOccurrences(of: nightScoutUrlString.dropFirst(33), with: "...")
-                        }
-                        
-                        dataSourceSensorMaxAgeOutlet.textColor = .systemGray
-                        dataSourceSensorMaxAgeOutlet.text = nightScoutUrlString
-                        
-                    }
-                   
-                case .libreLinkUp:
+                } else {
                     
-                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
-                    
-                    if UserDefaults.standard.libreLinkUpEmail == nil || UserDefaults.standard.libreLinkUpPassword == nil {
-                        
-                        dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.libreLinkUpAccountCredentialsMissing
-                        
-                    } else {
-                        dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.noSensorData
-                        
-                    }
+                    // this is where all master modes will end up if there is no CGM connected or valid sensor started
+                    dataSourceLabelOutlet.text = " ⚠️  " + Texts_HomeView.noDataSourceConnected
                     
                 }
                 
-            } else {
+            }
+            
+        }
+        
+        // the above means we must be in follower mode, so let's set the connection status
+        setFollowerConnectionStatus()
+        
+        // set the keep-alive image, then make it visible if in follower mode
+        dataSourceKeepAliveImageOutlet.image = UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImage
+        dataSourceKeepAliveImageOutlet.isHidden = isMaster
+        
+        // let's go through the specific cases for follower modes
+        if !isMaster {
+            
+            dataSourceLabelOutlet.text = UserDefaults.standard.followerDataSourceType.fullDescription
+            
+            switch UserDefaults.standard.followerDataSourceType {
                 
-                dataSourceLabelOutlet.text = " ⚠️  " + Texts_HomeView.noDataSourceConnected
+            case .nightscout:
+                
+                if !UserDefaults.standard.nightScoutEnabled {
+                    
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.nightscoutNotEnabled
+                    
+                } else if UserDefaults.standard.nightScoutUrl == nil {
+                    
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.nightscoutURLMissing
+                    
+                } else {
+                    
+                    var nightScoutUrlString: String = UserDefaults.standard.nightScoutUrl ?? ""
+                    
+                    // let's use a shortened version of the url if necessary to display it cleanly in the UI. The main reason is that some of the newer service providers (such as Northflank and Google Cloud) use really long URLs as standard.
+                    if nightScoutUrlString.count > 36 {
+                        nightScoutUrlString = nightScoutUrlString.replacingOccurrences(of: nightScoutUrlString.dropFirst(33), with: "...")
+                    }
+                    
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemGray
+                    dataSourceSensorMaxAgeOutlet.text = nightScoutUrlString
+                    
+                }
+                
+            case .libreLinkUp:
+                
+                if UserDefaults.standard.libreLinkUpEmail == nil || UserDefaults.standard.libreLinkUpPassword == nil {
+                    
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.libreLinkUpAccountCredentialsMissing
+                    
+                } else if sensorStartDate == nil || sensorMaxAgeInMinutes == 0 {
+                    
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.noSensorData
+                    
+                }
                 
             }
             
