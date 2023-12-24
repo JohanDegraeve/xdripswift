@@ -375,47 +375,61 @@ final class RootViewController: UIViewController, ObservableObject {
     
     @IBOutlet var miniChartDoubleTapGestureRecognizer: UITapGestureRecognizer!
     
-    /// can be used as a shortcut to switch between TIR and TITR calculation methods. The user will be notified of the change via UI transitions to show what has changed in the calculation limits
+    /// can be used as a shortcut to switch between different TIR calculation methods. The user will be notified of the change via UI transitions to show what has changed in the calculation limits
     @IBAction func statisticsViewDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
         
-        // the userdefault will be changed due to the double tap
-        let useTITR = !UserDefaults.standard.useTITRStatisticsRange
+        let previousTimeInRangeType = UserDefaults.standard.timeInRangeType
         
-        UserDefaults.standard.useTITRStatisticsRange = useTITR
+        var newTimeInRangeType: TimeInRangeType = previousTimeInRangeType
+        
+        // if we're at the last index in the enum, then go to the first one
+        // otherwise, just set to the next index
+        if previousTimeInRangeType == TimeInRangeType.allCases.last {
+            
+            newTimeInRangeType = .standardRange
+            
+        } else {
+            
+            newTimeInRangeType = TimeInRangeType(rawValue: previousTimeInRangeType.rawValue + 1) ?? .tightRange
+            
+        }
+        
+        // write the new index back to userdefaults (this will also trigger the observers to update the UI)
+        UserDefaults.standard.timeInRangeType = newTimeInRangeType
         
         updateStatistics(animate: false)
         
         let normalTitleColor: UIColor = lowTitleLabelOutlet.textColor
-        let normalLimitValueColor: UIColor = lowLabelOutlet.textColor
         
         inRangeTitleLabelOutlet.textColor = ConstantsStatistics.highlightColorTitles
         
-        if ConstantsStatistics.standardisedLowValueForTIRInMgDl != ConstantsStatistics.standardisedLowValueForTITRInMgDl {
+        if previousTimeInRangeType.lowerLimit != newTimeInRangeType.lowerLimit {
             
             self.lowLabelOutlet.textColor = ConstantsStatistics.labelLowColor
+            
         }
         
         
-        if ConstantsStatistics.standardisedHighValueForTIRInMgDl != ConstantsStatistics.standardisedHighValueForTITRInMgDl {
+        if previousTimeInRangeType.higherLimit != newTimeInRangeType.higherLimit {
             
             self.highLabelOutlet.textColor = ConstantsStatistics.labelHighColor
             
         }
         
         // wait a short while and then fade the labels back out
-        // even if the label colours weren't changed, it's easier to just fade them all every time.
+        // even if some of the label colours weren't changed, it's easier to just fade them all every time.
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             
-            UIView.transition(with: self.inRangeTitleLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
+            UIView.transition(with: self.inRangeTitleLabelOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
                 self.inRangeTitleLabelOutlet.textColor = normalTitleColor
             })
             
-            UIView.transition(with: self.lowLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
-                self.lowLabelOutlet.textColor = normalLimitValueColor
+            UIView.transition(with: self.lowLabelOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
+                self.lowLabelOutlet.textColor = .lightGray
             })
             
-            UIView.transition(with: self.highLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
-                self.highLabelOutlet.textColor = normalLimitValueColor
+            UIView.transition(with: self.highLabelOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
+                self.highLabelOutlet.textColor = .lightGray
             })
             
         }
@@ -2609,7 +2623,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // set the title labels to their correct localization
             self.lowTitleLabelOutlet.text = Texts_Common.lowStatistics
-            self.inRangeTitleLabelOutlet.text = UserDefaults.standard.useTITRStatisticsRange ? Texts_Common.inTightRangeStatistics : Texts_Common.inRangeStatistics
+            self.inRangeTitleLabelOutlet.text = UserDefaults.standard.timeInRangeType.title
             self.highTitleLabelOutlet.text = Texts_Common.highStatistics
             self.averageTitleLabelOutlet.text = Texts_Common.averageStatistics
             self.a1cTitleLabelOutlet.text = Texts_Common.a1cStatistics

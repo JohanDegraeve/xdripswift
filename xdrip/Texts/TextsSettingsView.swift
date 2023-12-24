@@ -272,8 +272,20 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_daysToUseStatisticsMessage", tableName: filename, bundle: Bundle.main, value: "How many days should we use to calculate the statistics? (Enter 0 to calculate today since midnight)", comment: "statistics settings, how many days to use for calculations")
     }()
     
-    static let labelUseTITRStatisticsRange: String = {
-        return NSLocalizedString("settingsviews_useTITRStatisticsRange", tableName: filename, bundle: Bundle.main, value: "Use Time in Tight Range", comment: "statistics settings, prefer time in tight range")
+    static let labelTimeInRangeType: String = {
+        return NSLocalizedString("settingsviews_labelTimeInRangeType", tableName: filename, bundle: Bundle.main, value: "Time In Range Type", comment: "statistics settings, the type of time in range selected")
+    }()
+    
+    static let timeInRangeTypeStandardRange: String = {
+        return NSLocalizedString("settingsviews_timeInRangeTypeStandardRange", tableName: filename, bundle: Bundle.main, value: "Standard Range", comment: "statistics settings, prefer standard time in range")
+    }()
+    
+    static let timeInRangeTypeTightRange: String = {
+        return NSLocalizedString("settingsviews_timeInRangeTypeTightRange", tableName: filename, bundle: Bundle.main, value: "Tight Range", comment: "statistics settings, prefer time in tight range")
+    }()
+    
+    static let timeInRangeTypeUserDefinedRange: String = {
+        return NSLocalizedString("settingsviews_timeInRangeTypeUserDefinedRange", tableName: filename, bundle: Bundle.main, value: "User Range", comment: "statistics settings, prefer user-defined range")
     }()
     
     static let labelUseIFFCA1C: String = {
