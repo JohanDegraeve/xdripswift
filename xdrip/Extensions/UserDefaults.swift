@@ -125,6 +125,8 @@ extension UserDefaults {
         case daysToUseStatistics = "daysToUseStatistics"
         /// use IFCC way to show A1C?
         case useIFCCA1C = "useIFCCA1C"
+        /// which type of TIR calculation is selected?
+        case timeInRangeType = "timeInRangeType"
         /// no longer used, but will leave it here to prevent compiler coredata warnings
         case useStandardStatisticsRange = "useStandardStatisticsRange"
         /// use the newer TITR of 70-140mg/dL to calculate the statistics? If false, we will use the conventional TIR of 70-180mg/dL
@@ -1171,25 +1173,15 @@ extension UserDefaults {
         }
     }
     
-    /// no longer used, but will leave it here to prevent compiler coredata warnings
-    @objc dynamic var useStandardStatisticsRange: Bool {
-        // default value for bool in userdefaults is false, by default we want the statistics view to calculate using the older-style, standardised TIR values (false)
+    /// holds the enum integer of the time in range calculation type
+    /// it will default to 0 which is standard
+    var timeInRangeType: TimeInRangeType {
         get {
-            return bool(forKey: Key.useTITRStatisticsRange.rawValue)
+            let timeInRangeTypeAsInt = integer(forKey: Key.timeInRangeType.rawValue)
+            return TimeInRangeType(rawValue: timeInRangeTypeAsInt) ?? .standardRange
         }
         set {
-            set(newValue, forKey: Key.useTITRStatisticsRange.rawValue)
-        }
-    }
-    
-    /// use the newer TITR range of 70-140mg/dL to calculate the statistics? If false, we will use the conventional TIR range of 70-180mg/dL
-    @objc dynamic var useTITRStatisticsRange: Bool {
-        // default value for bool in userdefaults is false, by default we want the statistics view to calculate using the older-style, standardised TIR values (false)
-        get {
-            return bool(forKey: Key.useTITRStatisticsRange.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.useTITRStatisticsRange.rawValue)
+            set(newValue.rawValue, forKey: Key.timeInRangeType.rawValue)
         }
     }
     

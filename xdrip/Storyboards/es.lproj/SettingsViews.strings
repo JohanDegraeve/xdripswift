@@ -55,7 +55,10 @@
 "settingsviews_showStatistics" = "Mostrar Estadísticas";
 "settingsviews_daysToUseStatisticsTitle" = "Días a Calcular";
 "settingsviews_daysToUseStatisticsMessage" = "Máximos días a intentar usar para calcular las estadísticas?\n\n(Entrar 0 para calcular el día de hoy desde las 00:00hrs)";
-"settingsviews_useTITRStatisticsRange" = "Usar Tiempo en Rango Estrecho";
+"settingsviews_labelTimeInRangeType" = "Tipo de Tiempo en Rango";
+"settingsviews_timeInRangeTypeStandardRange" = "Rango Estándar";
+"settingsviews_timeInRangeTypeTightRange" = "Rango Estrecho";
+"settingsviews_timeInRangeTypeUserDefinedRange" = "Rango Usuario";
 "settingsviews_useIFCCA1C" = "Ver HbA1c en mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmisor";
 "settingsviews_transmittertype" = "Tipo de Transmisor";

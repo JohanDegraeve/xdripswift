@@ -190,6 +190,10 @@ class Texts_Common {
         return NSLocalizedString("common_statistics_inTightRange", tableName: filename, bundle: Bundle.main, value: "Tight Range", comment: "the words in tight range")
     }()
     
+    static let userRangeStatistics = {
+        return NSLocalizedString("common_statistics_userRange", tableName: filename, bundle: Bundle.main, value: "User Range", comment: "the words in user range")
+    }()
+    
     static let highStatistics = {
         return NSLocalizedString("common_statistics_high", tableName: filename, bundle: Bundle.main, value: "High", comment: "the word high")
     }()

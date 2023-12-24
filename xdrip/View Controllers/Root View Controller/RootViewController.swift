@@ -222,9 +222,9 @@ final class RootViewController: UIViewController, ObservableObject {
             dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.hidingUrlForXSeconds
             
             // wait and then fade out the text
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
                 
-                // make a animated transition with the label. Fade it out over a couple of seconds.
+                // make a animated transition with the label. Fade it out
                 UIView.transition(with: self.miniChartHoursLabelOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
                     
                     self.dataSourceSensorMaxAgeOutlet.alpha = 0
@@ -375,47 +375,61 @@ final class RootViewController: UIViewController, ObservableObject {
     
     @IBOutlet var miniChartDoubleTapGestureRecognizer: UITapGestureRecognizer!
     
-    /// can be used as a shortcut to switch between TIR and TITR calculation methods. The user will be notified of the change via UI transitions to show what has changed in the calculation limits
+    /// can be used as a shortcut to switch between different TIR calculation methods. The user will be notified of the change via UI transitions to show what has changed in the calculation limits
     @IBAction func statisticsViewDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
         
-        // the userdefault will be changed due to the double tap
-        let useTITR = !UserDefaults.standard.useTITRStatisticsRange
+        let previousTimeInRangeType = UserDefaults.standard.timeInRangeType
         
-        UserDefaults.standard.useTITRStatisticsRange = useTITR
+        var newTimeInRangeType: TimeInRangeType = previousTimeInRangeType
+        
+        // if we're at the last index in the enum, then go to the first one
+        // otherwise, just set to the next index
+        if previousTimeInRangeType == TimeInRangeType.allCases.last {
+            
+            newTimeInRangeType = .standardRange
+            
+        } else {
+            
+            newTimeInRangeType = TimeInRangeType(rawValue: previousTimeInRangeType.rawValue + 1) ?? .tightRange
+            
+        }
+        
+        // write the new index back to userdefaults (this will also trigger the observers to update the UI)
+        UserDefaults.standard.timeInRangeType = newTimeInRangeType
         
         updateStatistics(animate: false)
         
         let normalTitleColor: UIColor = lowTitleLabelOutlet.textColor
-        let normalLimitValueColor: UIColor = lowLabelOutlet.textColor
         
         inRangeTitleLabelOutlet.textColor = ConstantsStatistics.highlightColorTitles
         
-        if ConstantsStatistics.standardisedLowValueForTIRInMgDl != ConstantsStatistics.standardisedLowValueForTITRInMgDl {
+        if previousTimeInRangeType.lowerLimit != newTimeInRangeType.lowerLimit {
             
             self.lowLabelOutlet.textColor = ConstantsStatistics.labelLowColor
+            
         }
         
         
-        if ConstantsStatistics.standardisedHighValueForTIRInMgDl != ConstantsStatistics.standardisedHighValueForTITRInMgDl {
+        if previousTimeInRangeType.higherLimit != newTimeInRangeType.higherLimit {
             
             self.highLabelOutlet.textColor = ConstantsStatistics.labelHighColor
             
         }
         
         // wait a short while and then fade the labels back out
-        // even if the label colours weren't changed, it's easier to just fade them all every time.
+        // even if some of the label colours weren't changed, it's easier to just fade them all every time.
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
             
-            UIView.transition(with: self.inRangeTitleLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
+            UIView.transition(with: self.inRangeTitleLabelOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
                 self.inRangeTitleLabelOutlet.textColor = normalTitleColor
             })
             
-            UIView.transition(with: self.lowLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
-                self.lowLabelOutlet.textColor = normalLimitValueColor
+            UIView.transition(with: self.lowLabelOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
+                self.lowLabelOutlet.textColor = .lightGray
             })
             
-            UIView.transition(with: self.highLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
-                self.highLabelOutlet.textColor = normalLimitValueColor
+            UIView.transition(with: self.highLabelOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
+                self.highLabelOutlet.textColor = .lightGray
             })
             
         }
@@ -2609,7 +2623,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // set the title labels to their correct localization
             self.lowTitleLabelOutlet.text = Texts_Common.lowStatistics
-            self.inRangeTitleLabelOutlet.text = UserDefaults.standard.useTITRStatisticsRange ? Texts_Common.inTightRangeStatistics : Texts_Common.inRangeStatistics
+            self.inRangeTitleLabelOutlet.text = UserDefaults.standard.timeInRangeType.title
             self.highTitleLabelOutlet.text = Texts_Common.highStatistics
             self.averageTitleLabelOutlet.text = Texts_Common.averageStatistics
             self.a1cTitleLabelOutlet.text = Texts_Common.a1cStatistics
@@ -3093,66 +3107,82 @@ final class RootViewController: UIViewController, ObservableObject {
             // there is no sensor startdate/max days so we can't report sensor progress
             sensorProgressViewOutlet.isHidden = true
             
-            // the above means we must be in follower mode, so let's set the connection status
-            setFollowerConnectionStatus()
-            
-            // set the keep-alive image, then make it visible if in follower mode
-            dataSourceKeepAliveImageOutlet.image = UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImage
-            dataSourceKeepAliveImageOutlet.isHidden = isMaster
-            
             dataSourceSensorCurrentAgeOutlet.text = ""
             dataSourceSensorMaxAgeOutlet.text = ""
             
-            if !isMaster {
+            if isMaster {
                 
-                dataSourceLabelOutlet.text = UserDefaults.standard.followerDataSourceType.fullDescription
-                
-                switch UserDefaults.standard.followerDataSourceType {
+                // the following is for users updating from 4.x to 5.x with a Libre 2 Direct sensor connected
+                // we just tell them to disconnect and reconnect if needed
+                // this will only need to be done once when first updated
+                if sensorType == .Libre && sensorStartDate != nil {
                     
-                case .nightscout:
+                    dataSourceLabelOutlet.text = " ⚠️  " + Texts_HomeView.reconnectLibreDataSource
                     
-                    if !UserDefaults.standard.nightScoutEnabled {
-                        
-                        dataSourceSensorMaxAgeOutlet.textColor = .systemRed
-                        dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.nightscoutNotEnabled
-                        
-                    } else if UserDefaults.standard.nightScoutUrl == nil {
-                        
-                        dataSourceSensorMaxAgeOutlet.textColor = .systemRed
-                        dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.nightscoutURLMissing
-                        
-                    } else {
-                        
-                        var nightScoutUrlString: String = UserDefaults.standard.nightScoutUrl ?? ""
-                        
-                        // let's use a shortened version of the url if necessary to display it cleanly in the UI. The main reason is that some of the newer service providers (such as Northflank and Google Cloud) use really long URLs as standard.
-                        if nightScoutUrlString.count > 36 {
-                            nightScoutUrlString = nightScoutUrlString.replacingOccurrences(of: nightScoutUrlString.dropFirst(33), with: "...")
-                        }
-                        
-                        dataSourceSensorMaxAgeOutlet.textColor = .systemGray
-                        dataSourceSensorMaxAgeOutlet.text = nightScoutUrlString
-                        
-                    }
-                   
-                case .libreLinkUp:
+                } else {
                     
-                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
-                    
-                    if UserDefaults.standard.libreLinkUpEmail == nil || UserDefaults.standard.libreLinkUpPassword == nil {
-                        
-                        dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.libreLinkUpAccountCredentialsMissing
-                        
-                    } else {
-                        dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.noSensorData
-                        
-                    }
+                    // this is where all master modes will end up if there is no CGM connected or valid sensor started
+                    dataSourceLabelOutlet.text = " ⚠️  " + Texts_HomeView.noDataSourceConnected
                     
                 }
                 
-            } else {
+            }
+            
+        }
+        
+        // the above means we must be in follower mode, so let's set the connection status
+        setFollowerConnectionStatus()
+        
+        // set the keep-alive image, then make it visible if in follower mode
+        dataSourceKeepAliveImageOutlet.image = UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImage
+        dataSourceKeepAliveImageOutlet.isHidden = isMaster
+        
+        // let's go through the specific cases for follower modes
+        if !isMaster {
+            
+            dataSourceLabelOutlet.text = UserDefaults.standard.followerDataSourceType.fullDescription
+            
+            switch UserDefaults.standard.followerDataSourceType {
                 
-                dataSourceLabelOutlet.text = " ⚠️  " + Texts_HomeView.noDataSourceConnected
+            case .nightscout:
+                
+                if !UserDefaults.standard.nightScoutEnabled {
+                    
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.nightscoutNotEnabled
+                    
+                } else if UserDefaults.standard.nightScoutUrl == nil {
+                    
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.nightscoutURLMissing
+                    
+                } else {
+                    
+                    var nightScoutUrlString: String = UserDefaults.standard.nightScoutUrl ?? ""
+                    
+                    // let's use a shortened version of the url if necessary to display it cleanly in the UI. The main reason is that some of the newer service providers (such as Northflank and Google Cloud) use really long URLs as standard.
+                    if nightScoutUrlString.count > 36 {
+                        nightScoutUrlString = nightScoutUrlString.replacingOccurrences(of: nightScoutUrlString.dropFirst(33), with: "...")
+                    }
+                    
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemGray
+                    dataSourceSensorMaxAgeOutlet.text = nightScoutUrlString
+                    
+                }
+                
+            case .libreLinkUp:
+                
+                if UserDefaults.standard.libreLinkUpEmail == nil || UserDefaults.standard.libreLinkUpPassword == nil {
+                    
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.libreLinkUpAccountCredentialsMissing
+                    
+                } else if sensorStartDate == nil || sensorMaxAgeInMinutes == 0 {
+                    
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.noSensorData
+                    
+                }
                 
             }
             

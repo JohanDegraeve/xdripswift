@@ -270,9 +270,6 @@
 /// transmitter settings, this is for the button, when clicked then user will be requested to give transmitter id. The only difference with settingsviews_transmitterid is that ':' is not added
 "settingsviews_transmitterid_text_for_button" = "Transmitter ID";
 
-/// statistics settings, use standard range?
-"settingsviews_useTITRStatisticsRange" = "Use Time in Tight Range";
-
 /// dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no
 "settingsviews_uploadReadingstoDexcomShare" = "Upload to Dexcom Share";
 
