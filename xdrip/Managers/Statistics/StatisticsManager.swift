@@ -121,7 +121,7 @@ public final class StatisticsManager {
                     }
                 }
                 
-                
+                /*
                 // let's set up the which values will be used to calculate TIR. It can be either the standardised "Time in Range" values or the newer "Time in Tight Range" values.
                 let useTITR: Bool = UserDefaults.standard.useTITRStatisticsRange
                 
@@ -132,6 +132,9 @@ public final class StatisticsManager {
                     lowLimitForTIR = useTITR ? ConstantsStatistics.standardisedLowValueForTITRInMmol : ConstantsStatistics.standardisedLowValueForTIRInMmol
                     highLimitForTIR = useTITR ? ConstantsStatistics.standardisedHighValueForTITRInMmol : ConstantsStatistics.standardisedHighValueForTIRInMmol
                 }
+                */
+                lowLimitForTIR = UserDefaults.standard.timeInRangeType.lowerLimit
+                highLimitForTIR = UserDefaults.standard.timeInRangeType.higherLimit
                 
                 // make sure that there exist elements in the glucoseValue array before trying to process statistics calculations or we could get a fatal divide by zero error/crash
                 if glucoseValues.count > 0 {

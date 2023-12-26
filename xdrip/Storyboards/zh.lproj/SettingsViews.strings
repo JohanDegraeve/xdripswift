@@ -231,9 +231,6 @@
 /// statistics settings, section title
 "settingsviews_sectiontitlestatistics" = "Statistics";
 
-/// statistics settings, use standard range?
-"settingsviews_useTITRStatisticsRange" = "Use Time in Tight Range";
-
 /// statistics settings, use IFCC method for HbA1c?
 "settingsviews_useIFCCA1C" = "Show HbA1c in mmols/mol";
 

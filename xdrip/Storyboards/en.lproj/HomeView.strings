@@ -43,6 +43,7 @@
 "calibrationNotNecessary" = "When using the native transmitter algorithm, manual calibration is not available.\n\nIf you want to calibrate, you can switch to the xDrip algorithm in the transmitter screen.";
 "noSensorData" = "No sensor data";
 "noDataSourceConnected" = "No CGM data source connected";
+"reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
 "hidingUrlForXSeconds" = "Hiding URL for %@s...";
 "nightscoutNotEnabled" = "Nightscout is disabled";
 "nightscoutURLMissing" = "Nightscout URL missing";

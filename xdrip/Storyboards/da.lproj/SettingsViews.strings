@@ -30,7 +30,6 @@
 "settingsviews_showStatistics" = "Show Statistics";
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate";
 "settingsviews_daysToUseStatisticsMessage" = "Maximum days we should try to use to calculate the statistics?\n\n(Enter 0 to calculate today since midnight)";
-"settingsviews_useTITRStatisticsRange" = "Use Time in Tight Range";
 "settingsviews_useIFCCA1C" = "Show HbA1c in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 "settingsviews_transmittertype" = "Transmitter Type";

@@ -60,7 +60,10 @@
 "settingsviews_showStatistics" = "Show Statistics";
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate";
 "settingsviews_daysToUseStatisticsMessage" = "Maximum days we should try to use to calculate the statistics?\n\n(Enter 0 to calculate today since midnight)";
-"settingsviews_useTITRStatisticsRange" = "Use Time in Tight Range";
+"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
+"settingsviews_timeInRangeTypeTightRange" = "Tight Range";
+"settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 "settingsviews_useIFCCA1C" = "Show HbA1c in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 "settingsviews_transmittertype" = "Transmitter Type";
@@ -139,7 +142,7 @@
 "volumeTestSoundPlayer" = "Test Volume (if Override Mute On)";
 "volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
 "debugLevel" = "Include Debug Level";
-"warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue";
+"warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
 "nightScoutPort" = "Port";
 "developerSettings" = "Developer Settings";
 "smoothLibreValues" = "Smooth Libre Values";
