@@ -884,6 +884,9 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // add observer for stopActiveSensor, this will reset the active sensor to nil when the user disconnects an intergrated transmitter/sensor (e.g. Libre 2 Direct). This will help ensure that the data source info is updated/disabled until a new sensor is started.
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.stopActiveSensor.rawValue, options: .new, context: nil)
+        
+        // add observer for followerKeepAliveType, to reset the app badge notification if in follower mode and keep-alive is set to disabled
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
 
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
@@ -1502,7 +1505,7 @@ final class RootViewController: UIViewController, ObservableObject {
         // first check keyValueObserverTimeKeeper
         switch keyPathEnum {
         
-        case UserDefaults.Key.isMaster, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.daysToUseStatistics, UserDefaults.Key.showMiniChart, UserDefaults.Key.activeSensorStartDate :
+        case UserDefaults.Key.isMaster, UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.followerBackgroundKeepAliveType, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.daysToUseStatistics, UserDefaults.Key.showMiniChart, UserDefaults.Key.activeSensorStartDate :
             
             // transmittertype change triggered by user, should not be done within 200 ms
             if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
@@ -1532,13 +1535,25 @@ final class RootViewController: UIViewController, ObservableObject {
                 
             }
             
-        case UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl:
+        case UserDefaults.Key.multipleAppBadgeValueWith10, UserDefaults.Key.showReadingInAppBadge, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.followerBackgroundKeepAliveType:
             
             // if showReadingInAppBadge = false, means user set it from true to false
-            // set applicationIconBadgeNumber to 0. This will cause removal of the badge counter, but als removal of any existing notification on the screen
-            if !UserDefaults.standard.showReadingInAppBadge {
+            // set the app badge to 0. This will cause removal of the badge counter, but also removal of any existing notification on the screen
+            if !UserDefaults.standard.showReadingInAppBadge || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled) {
                 
-                UIApplication.shared.applicationIconBadgeNumber = 0
+                // applicationIconBadgeNumber has been deprecated for iOS17 but as we currently have a minimum deployment target of iOS15, let's add a conditional check
+                if #available(iOS 16.0, *) {
+                    UNUserNotificationCenter.current().setBadgeCount(0)
+                } else {
+                    UIApplication.shared.applicationIconBadgeNumber = 0
+                }
+                
+            }
+            
+            // make sure that any pending (i.e. already scheduled in the future) missed reading notifications are removed
+            if !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
+                
+                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [ConstantsNotifications.NotificationIdentifiersForAlerts.missedReadingAlert])
                 
             }
             
