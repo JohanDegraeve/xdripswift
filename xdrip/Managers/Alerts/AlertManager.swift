@@ -171,14 +171,9 @@ public class AlertManager:NSObject {
                     }
                     
                 }
-                
-                // don't set this alert if it is in follower mode without an active sensor or if keep alive is disabled
-                if UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled && UserDefaults.standard.activeSensorStartDate != nil) {
                     
                     // the missed reading alert will be a future planned alert
                     _ = checkAlertAndFireHelper(.missedreading)
-                    
-                }
                 
             } else {
                 trace("in checkAlerts, latestBgReadings is older than %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, maxAgeOfLastBgReadingInSeconds.description)
@@ -390,12 +385,9 @@ public class AlertManager:NSObject {
         if alertKind == .missedreading {
             
             if let response = response {
-             
-                if UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType.rawValue > 0 && UserDefaults.standard.activeSensorStartDate != nil) {
                     
                     scheduleMissedReadingAlert(snoozePeriodInMinutes: snoozePeriodInMinutes, content: response.notification.request.content)
-                    
-                }
+                
             }
             
         } else {
@@ -563,7 +555,7 @@ public class AlertManager:NSObject {
             
         }
         
-        if alertNeeded && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled && UserDefaults.standard.activeSensorStartDate != nil)) {
+        if alertNeeded && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled)) {
             
             // alert needs to be raised
             
@@ -659,12 +651,12 @@ public class AlertManager:NSObject {
                         }
                     } else {
                         // mute should not be overriden, by adding the sound to the notification, we let iOS decide if the sound will be played or not
-                        content.sound = UNNotificationSound.init(named: UNNotificationSoundName.init(soundToSet))
+                        content.sound = UNNotificationSound.init(named: UNNotificationSoundName(soundToSet))
                     }
                 }
             } else {
                 // default sound to be played
-                content.sound = UNNotificationSound.init(named: UNNotificationSoundName.init(""))
+                content.sound = UNNotificationSound.init(named: UNNotificationSoundName(""))
             }
             
             // create the trigger, only for notifications with delay
@@ -699,9 +691,10 @@ public class AlertManager:NSObject {
             }
             
             // log the result
-            trace("in checkAlert, raising alert %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
-            if delayInSecondsToUse > 0 {
-                trace("   delay = %{public}@ seconds, = %{public}@ minutes - which means this is a future planned alert, it will not go off now", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, delayInSecondsToUse.description, ((round(Double(delayInSecondsToUse)/60*10))/10).description)
+            if delayInSecondsToUse == 0 {
+                trace("in checkAlert, raising alert %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
+            } else {
+                trace("in checkAlert, raising alert %{public}@ with a delay of %{public}@ minutes - this is a scheduled future alert, it will not go off now", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, ((round(Double(delayInSecondsToUse)/60*10))/10).description)
             }
 
             // check if app is allowed to send local notification and if not write info to trace
@@ -727,7 +720,7 @@ public class AlertManager:NSObject {
             
         } else {
             
-            if !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled && UserDefaults.standard.activeSensorStartDate != nil {
+            if !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
                 
                 trace("in checkAlert, there's no need to raise alert %{public}@ because we're in follower mode and keep-alive is disabled", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
                 
