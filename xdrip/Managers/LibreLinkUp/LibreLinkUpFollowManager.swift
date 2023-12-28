@@ -355,7 +355,7 @@ class LibreLinkUpFollowManager: NSObject {
                     
                     let newRegion = LibreLinkUpRegion(from: region)
                     
-                    trace("    in checkLoginAndConnections, redirect flag received. Switching region from '%{public}@' to '%{public}@' and repeating checkLogin", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, self.libreLinkUpRegion?.description ?? "nil", newRegion?.description ?? "nil")
+                    trace("    in checkLoginAndConnections, redirect flag received. Switching region from '%{public}@' to '%{public}@' and calling again checkLoginAndConnections()", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, self.libreLinkUpRegion?.description ?? "nil", newRegion?.description ?? "nil")
                     
                     self.libreLinkUpRegion = newRegion
                     

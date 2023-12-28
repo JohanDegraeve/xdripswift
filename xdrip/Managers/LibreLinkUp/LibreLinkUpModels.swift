@@ -50,7 +50,7 @@ public enum LibreLinkUpRegion: Int, CaseIterable {
             self = .de
         case "eu":
             self = .eu
-        case "gb":
+        case "eu2":
             self = .eu2
         case "fr":
             self = .fr
@@ -83,7 +83,7 @@ public enum LibreLinkUpRegion: Int, CaseIterable {
         case .eu:
             return "Europe"
         case .eu2:
-            return "United Kingdom"
+            return "Great Britain"
         case .fr:
             return "France"
         case .jp:
