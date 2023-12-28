@@ -3008,7 +3008,9 @@ final class RootViewController: UIViewController, ObservableObject {
         // if there is a transmitter connected, pull the current maxSensorAgeInDays and store in in UserDefaults
         if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let maxDays = cgmTransmitter.maxSensorAgeInDays() {
             
-            UserDefaults.standard.activeSensorMaxSensorAgeInDays = maxDays
+            if maxDays > 0 {
+                UserDefaults.standard.activeSensorMaxSensorAgeInDays = maxDays
+            }
             
             UserDefaults.standard.activeSensorDescription = cgmTransmitter.cgmTransmitterType().detailedDescription()
             
