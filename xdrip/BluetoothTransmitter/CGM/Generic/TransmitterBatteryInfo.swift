@@ -33,9 +33,9 @@ enum TransmitterBatteryInfo: Equatable {
             return ("battery" , percentage)
             
             
-        case .DexcomG5(voltageA: let voltageA, voltageB: _, resist: _, runtime: _, temperature: _):
+        case .DexcomG5(voltageA: _, voltageB: let voltageB, resist: _, runtime: _, temperature: _):
             
-            return ("batteryVoltage" , voltageA)
+            return ("batteryVoltage" , voltageB)
 
             
         case .DexcomG4(level: let level):
