@@ -355,7 +355,7 @@ class LibreLinkUpFollowManager: NSObject {
                     
                     let newRegion = LibreLinkUpRegion(from: region)
                     
-                    trace("    in checkLoginAndConnections, redirect flag received. Switching region from '%{public}@' to '%{public}@' and repeating checkLogin", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, self.libreLinkUpRegion?.description ?? "nil", newRegion?.description ?? "nil")
+                    trace("    in checkLoginAndConnections, redirect flag received. Switching region from '%{public}@' to '%{public}@' and calling again checkLoginAndConnections()", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, self.libreLinkUpRegion?.description ?? "nil", newRegion?.description ?? "nil")
                     
                     self.libreLinkUpRegion = newRegion
                     
@@ -757,7 +757,7 @@ class LibreLinkUpFollowManager: NSObject {
             trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
             
             if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                trace("playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, interval, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
+                trace("playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, interval.description, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
                 audioPlayer.play()
             }
         })
