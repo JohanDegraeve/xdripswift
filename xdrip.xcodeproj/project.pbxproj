@@ -129,7 +129,6 @@
 		F81F370325C1583400520946 /* WatlaaView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F81F370525C1583400520946 /* WatlaaView.strings */; };
 		F81F370825C1584A00520946 /* LibreStates.strings in Resources */ = {isa = PBXBuildFile; fileRef = F81F370A25C1584A00520946 /* LibreStates.strings */; };
 		F81F3C4225D1D91300520946 /* CoreNFC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F81F3C4125D1D91300520946 /* CoreNFC.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		F81F3C4325D1DA1300520946 /* CoreNFC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F81F3C4125D1D91300520946 /* CoreNFC.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		F81F9FF822861E6D0028C70F /* KeyValueObserverTimeKeeper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */; };
 		F81F9FFC2288C7530028C70F /* NewAlertSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81F9FFB2288C7530028C70F /* NewAlertSettingsViewController.swift */; };
 		F81FA0002289E4990028C70F /* AlertSettingsViewControllerData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81F9FFF2289E4990028C70F /* AlertSettingsViewControllerData.swift */; };
@@ -300,13 +299,6 @@
 		F867E2612252ADAB000FD265 /* Calibration+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F867E25D2252ADAB000FD265 /* Calibration+CoreDataProperties.swift */; };
 		F8691888239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8691887239CEEFA0065B607 /* BluetoothPeripheralViewModel.swift */; };
 		F869188C23A044340065B607 /* TextsM5StackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F869188B23A044340065B607 /* TextsM5StackView.swift */; };
-		F870D3D325126A49008967B0 /* NotificationCenter.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F870D3D225126A49008967B0 /* NotificationCenter.framework */; };
-		F870D3D625126A49008967B0 /* TodayViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3D525126A49008967B0 /* TodayViewController.swift */; };
-		F870D3D925126A49008967B0 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F870D3D725126A49008967B0 /* MainInterface.storyboard */; };
-		F870D3DD25126A49008967B0 /* xDrip4iOS Widget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F870D3D125126A49008967B0 /* xDrip4iOS Widget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		F870D3EA25129C43008967B0 /* Glucose+GlucoseKit.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3E925129C43008967B0 /* Glucose+GlucoseKit.swift */; };
-		F870D3EC25129FC2008967B0 /* XDripClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3EB25129FC2008967B0 /* XDripClient.swift */; };
-		F870D3EE2513B786008967B0 /* Trace.swift in Sources */ = {isa = PBXBuildFile; fileRef = F870D3ED2513B786008967B0 /* Trace.swift */; };
 		F8797CEA255B43960033956B /* GlucoseData+Smoothable.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8797CE9255B43960033956B /* GlucoseData+Smoothable.swift */; };
 		F889CB6F236D84AC00A81068 /* M5StackView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F889CB71236D84AC00A81068 /* M5StackView.strings */; };
 		F88EC27A260120C000DF0EAF /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
@@ -486,12 +478,6 @@
 		F8E51D65244BA790001C9E5A /* WatlaaBluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D64244BA790001C9E5A /* WatlaaBluetoothPeripheralViewModel.swift */; };
 		F8E51D67244BAE0E001C9E5A /* WatlaaBluetoothTransmitterMaster+CGMTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D66244BAE0E001C9E5A /* WatlaaBluetoothTransmitterMaster+CGMTransmitter.swift */; };
 		F8E51D6924549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */; };
-		F8E53FAB2517733700052CE5 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E53FAA2517733700052CE5 /* Double.swift */; };
-		F8E53FAF2517739700052CE5 /* ConstantsBloodGlucose.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E53FAE2517739700052CE5 /* ConstantsBloodGlucose.swift */; };
-		F8E53FB92517F79400052CE5 /* ConstantsBGGraphBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E53FB82517F79400052CE5 /* ConstantsBGGraphBuilder.swift */; };
-		F8E53FBD2517F96800052CE5 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E53FBC2517F96800052CE5 /* Date.swift */; };
-		F8E53FCE251D35FB00052CE5 /* Common.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8E53FD0251D35FB00052CE5 /* Common.strings */; };
-		F8E53FE9251F7B8800052CE5 /* Texts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E53FE8251F7B8800052CE5 /* Texts.swift */; };
 		F8E5404C2522624800052CE5 /* ConstantsHousekeeping.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E5404B2522624800052CE5 /* ConstantsHousekeeping.swift */; };
 		F8E6C78C24CDDB83007C1199 /* SnoozeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E6C78B24CDDB83007C1199 /* SnoozeViewController.swift */; };
 		F8E6C79024CEC22A007C1199 /* TextsSnooze.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E6C78F24CEC22A007C1199 /* TextsSnooze.swift */; };
@@ -577,13 +563,6 @@
 			remoteGlobalIDString = 470B6185270C448000561E56;
 			remoteInfo = "Watch App";
 		};
-		F870D3DB25126A49008967B0 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = F8AC425221ADEBD60078C348 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = F870D3D025126A49008967B0;
-			remoteInfo = "xDrip4iOS Widget";
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -615,7 +594,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				F870D3DD25126A49008967B0 /* xDrip4iOS Widget.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -645,7 +623,6 @@
 		198D44D7260A3A3400A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Snooze.strings; sourceTree = "<group>"; };
 		198D44D8260A3A3400A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/LibreNFC.strings; sourceTree = "<group>"; };
 		198D44E7260A822000A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Main.strings; sourceTree = "<group>"; };
-		2867F5C725BC209400AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/MainInterface.strings; sourceTree = "<group>"; };
 		2867F5C825BC209400AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		2867F5C925BC209500AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Main.strings; sourceTree = "<group>"; };
 		2867F5CA25BC209500AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Common.strings; sourceTree = "<group>"; };
@@ -666,7 +643,6 @@
 		2867F5D925BC209B00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/LibreErrors.strings; sourceTree = "<group>"; };
 		2867F5DA25BC209C00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Snooze.strings; sourceTree = "<group>"; };
 		2867F5DB25BC209C00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/LibreNFC.strings; sourceTree = "<group>"; };
-		4166BFB528C3501400199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/MainInterface.strings; sourceTree = "<group>"; };
 		4166BFB628C3501400199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Interface.strings; sourceTree = "<group>"; };
 		4166BFB728C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		4166BFB828C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Main.strings; sourceTree = "<group>"; };
@@ -716,7 +692,6 @@
 		477F45E5285B993100AC8475 /* GlucoseMiniChartManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseMiniChartManager.swift; sourceTree = "<group>"; };
 		4798BAC727BA6AA8002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		4798BAC827BA6AA8002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Main.strings; sourceTree = "<group>"; };
-		4798BAC927BA766A002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/MainInterface.strings; sourceTree = "<group>"; };
 		4798BACA27BA766A002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Interface.strings; sourceTree = "<group>"; };
 		4798BACB27BA7688002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Alerts.strings; sourceTree = "<group>"; };
 		4798BACC27BA7691002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
@@ -921,7 +896,6 @@
 		F81F39E925C616C000520946 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LibreStates.strings; sourceTree = "<group>"; };
 		F81F39EA25C616C500520946 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Snooze.strings; sourceTree = "<group>"; };
 		F81F39EB25C616C900520946 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LibreNFC.strings; sourceTree = "<group>"; };
-		F81F3A5F25C9E5A800520946 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/MainInterface.strings; sourceTree = "<group>"; };
 		F81F3A6025C9E5A800520946 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		F81F3A6125C9E5A800520946 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Main.strings; sourceTree = "<group>"; };
 		F81F3A6225C9E5A800520946 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Common.strings; sourceTree = "<group>"; };
@@ -1211,15 +1185,8 @@
 		F86A3C78247718C700EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/SpeakReading.strings; sourceTree = "<group>"; };
 		F86A3C79247718C800EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		F86A3C7A247718C800EE7E46 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Main.strings; sourceTree = "<group>"; };
-		F870D3D125126A49008967B0 /* xDrip4iOS Widget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "xDrip4iOS Widget.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F870D3D225126A49008967B0 /* NotificationCenter.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NotificationCenter.framework; path = System/Library/Frameworks/NotificationCenter.framework; sourceTree = SDKROOT; };
-		F870D3D525126A49008967B0 /* TodayViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodayViewController.swift; sourceTree = "<group>"; };
-		F870D3D825126A49008967B0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
-		F870D3DA25126A49008967B0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		F870D3E22512701E008967B0 /* xDrip4iOS Widget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "xDrip4iOS Widget.entitlements"; sourceTree = "<group>"; };
 		F870D3E925129C43008967B0 /* Glucose+GlucoseKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Glucose+GlucoseKit.swift"; sourceTree = "<group>"; };
-		F870D3EB25129FC2008967B0 /* XDripClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = XDripClient.swift; sourceTree = "<group>"; };
-		F870D3ED2513B786008967B0 /* Trace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Trace.swift; sourceTree = "<group>"; };
 		F8797CE9255B43960033956B /* GlucoseData+Smoothable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GlucoseData+Smoothable.swift"; sourceTree = "<group>"; };
 		F87F5EFD2560686C00FFA395 /* xdrip v15.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v15.xcdatamodel"; sourceTree = "<group>"; };
 		F889CB70236D84AC00A81068 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/M5StackView.strings; sourceTree = "<group>"; };
@@ -1470,7 +1437,6 @@
 		F8E3A2AA23DA520B00E5E98A /* ConstantsWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsWatch.swift; sourceTree = "<group>"; };
 		F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringProtocol.swift; sourceTree = "<group>"; };
 		F8E3C3AC21FE551C00907A04 /* DexcomCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomCalibrator.swift; sourceTree = "<group>"; };
-		F8E4DCD82805F7FA007CF822 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/MainInterface.strings; sourceTree = "<group>"; };
 		F8E4DCD92805F7FA007CF822 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Interface.strings; sourceTree = "<group>"; };
 		F8E4DCDA2805F7FA007CF822 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		F8E4DCDB2805F7FA007CF822 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Main.strings; sourceTree = "<group>"; };
@@ -1502,9 +1468,6 @@
 		F8E51D64244BA790001C9E5A /* WatlaaBluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatlaaBluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
 		F8E51D66244BAE0E001C9E5A /* WatlaaBluetoothTransmitterMaster+CGMTransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WatlaaBluetoothTransmitterMaster+CGMTransmitter.swift"; sourceTree = "<group>"; };
 		F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewTraceSettingsViewModel.swift; sourceTree = "<group>"; };
-		F8E53FAA2517733700052CE5 /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
-		F8E53FAE2517739700052CE5 /* ConstantsBloodGlucose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBloodGlucose.swift; sourceTree = "<group>"; };
-		F8E53FB82517F79400052CE5 /* ConstantsBGGraphBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBGGraphBuilder.swift; sourceTree = "<group>"; };
 		F8E53FBC2517F96800052CE5 /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
 		F8E53FCF251D35FB00052CE5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Common.strings; sourceTree = "<group>"; };
 		F8E53FD1251D360200052CE5 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Common.strings; sourceTree = "<group>"; };
@@ -1598,15 +1561,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F870D3CE25126A49008967B0 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F81F3C4325D1DA1300520946 /* CoreNFC.framework in Frameworks */,
-				F870D3D325126A49008967B0 /* NotificationCenter.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2191,40 +2145,15 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
-		F870D3D425126A49008967B0 /* xDrip4iOS Widget */ = {
+		F870D3EF25149EA0008967B0 /* TodayWidgetSaved */ = {
 			isa = PBXGroup;
 			children = (
-				F870D3E22512701E008967B0 /* xDrip4iOS Widget.entitlements */,
-				F870D3DA25126A49008967B0 /* Info.plist */,
-				F870D3D525126A49008967B0 /* TodayViewController.swift */,
-				F870D3D725126A49008967B0 /* MainInterface.storyboard */,
-				F870D3EF25149EA0008967B0 /* Texts */,
-				F870D3E825129C0B008967B0 /* xDripClient */,
-			);
-			path = "xDrip4iOS Widget";
-			sourceTree = "<group>";
-		};
-		F870D3E825129C0B008967B0 /* xDripClient */ = {
-			isa = PBXGroup;
-			children = (
-				F870D3EB25129FC2008967B0 /* XDripClient.swift */,
 				F870D3E925129C43008967B0 /* Glucose+GlucoseKit.swift */,
-				F870D3ED2513B786008967B0 /* Trace.swift */,
-				F8E53FAA2517733700052CE5 /* Double.swift */,
-				F8E53FAE2517739700052CE5 /* ConstantsBloodGlucose.swift */,
-				F8E53FB82517F79400052CE5 /* ConstantsBGGraphBuilder.swift */,
 				F8E53FBC2517F96800052CE5 /* Date.swift */,
-			);
-			path = xDripClient;
-			sourceTree = "<group>";
-		};
-		F870D3EF25149EA0008967B0 /* Texts */ = {
-			isa = PBXGroup;
-			children = (
 				F8E53FE8251F7B8800052CE5 /* Texts.swift */,
 				F8E53FD0251D35FB00052CE5 /* Common.strings */,
 			);
-			path = Texts;
+			path = TodayWidgetSaved;
 			sourceTree = "<group>";
 		};
 		F8A2BBFB25D9D36C001D1E78 /* Atom */ = {
@@ -2287,6 +2216,7 @@
 		F8AC425121ADEBD60078C348 = {
 			isa = PBXGroup;
 			children = (
+				F870D3EF25149EA0008967B0 /* TodayWidgetSaved */,
 				F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */,
 				666E283926F7E54C00ACE4DF /* Version.xcconfig */,
 				666E283826F7E54C00ACE4DF /* xDrip.xcconfig */,
@@ -2296,7 +2226,6 @@
 				470B6187270C448000561E56 /* Watch App */,
 				470B6195270C448100561E56 /* Watch App WatchKit Extension */,
 				F8AC425C21ADEBD60078C348 /* xdrip */,
-				F870D3D425126A49008967B0 /* xDrip4iOS Widget */,
 			);
 			sourceTree = "<group>";
 		};
@@ -2304,7 +2233,6 @@
 			isa = PBXGroup;
 			children = (
 				F8AC425A21ADEBD60078C348 /* xdrip.app */,
-				F870D3D125126A49008967B0 /* xDrip4iOS Widget.appex */,
 				470B6186270C448000561E56 /* xDrip4iO5.app */,
 			);
 			name = Products;
@@ -3228,23 +3156,6 @@
 			productReference = 470B6186270C448000561E56 /* xDrip4iO5.app */;
 			productType = "com.apple.product-type.application";
 		};
-		F870D3D025126A49008967B0 /* xDrip4iOS Widget */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = F870D3E125126A49008967B0 /* Build configuration list for PBXNativeTarget "xDrip4iOS Widget" */;
-			buildPhases = (
-				F870D3CD25126A49008967B0 /* Sources */,
-				F870D3CE25126A49008967B0 /* Frameworks */,
-				F870D3CF25126A49008967B0 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = "xDrip4iOS Widget";
-			productName = "xDrip4iOS Widget";
-			productReference = F870D3D125126A49008967B0 /* xDrip4iOS Widget.appex */;
-			productType = "com.apple.product-type.app-extension";
-		};
 		F8AC425921ADEBD60078C348 /* xdrip */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F8AC426E21ADEBD70078C348 /* Build configuration list for PBXNativeTarget "xdrip" */;
@@ -3259,7 +3170,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				F870D3DC25126A49008967B0 /* PBXTargetDependency */,
 				470B61A0270C448200561E56 /* PBXTargetDependency */,
 			);
 			name = xdrip;
@@ -3287,9 +3197,6 @@
 				TargetAttributes = {
 					470B6185270C448000561E56 = {
 						CreatedOnToolsVersion = 13.0;
-					};
-					F870D3D025126A49008967B0 = {
-						CreatedOnToolsVersion = 11.7;
 					};
 					F8AC425921ADEBD60078C348 = {
 						CreatedOnToolsVersion = 10.1;
@@ -3342,7 +3249,6 @@
 			projectRoot = "";
 			targets = (
 				F8AC425921ADEBD60078C348 /* xdrip */,
-				F870D3D025126A49008967B0 /* xDrip4iOS Widget */,
 				470B6185270C448000561E56 /* Watch App */,
 			);
 		};
@@ -3356,15 +3262,6 @@
 				470B618C270C448100561E56 /* Assets.xcassets in Resources */,
 				470B619D270C448200561E56 /* Assets.xcassets in Resources */,
 				470B618A270C448000561E56 /* Interface.storyboard in Resources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F870D3CF25126A49008967B0 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F870D3D925126A49008967B0 /* MainInterface.storyboard in Resources */,
-				F8E53FCE251D35FB00052CE5 /* Common.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3538,22 +3435,6 @@
 				470B6197270C448100561E56 /* InterfaceController.swift in Sources */,
 				470B619B270C448100561E56 /* ComplicationController.swift in Sources */,
 				47F8E95A2710255D00B8B02B /* ConstantsWatchApp.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		F870D3CD25126A49008967B0 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				F870D3D625126A49008967B0 /* TodayViewController.swift in Sources */,
-				F8E53FBD2517F96800052CE5 /* Date.swift in Sources */,
-				F8E53FAF2517739700052CE5 /* ConstantsBloodGlucose.swift in Sources */,
-				F870D3EE2513B786008967B0 /* Trace.swift in Sources */,
-				F870D3EC25129FC2008967B0 /* XDripClient.swift in Sources */,
-				F870D3EA25129C43008967B0 /* Glucose+GlucoseKit.swift in Sources */,
-				F8E53FAB2517733700052CE5 /* Double.swift in Sources */,
-				F8E53FE9251F7B8800052CE5 /* Texts.swift in Sources */,
-				F8E53FB92517F79400052CE5 /* ConstantsBGGraphBuilder.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3951,11 +3832,6 @@
 			target = 470B6185270C448000561E56 /* Watch App */;
 			targetProxy = 470B619F270C448200561E56 /* PBXContainerItemProxy */;
 		};
-		F870D3DC25126A49008967B0 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = F870D3D025126A49008967B0 /* xDrip4iOS Widget */;
-			targetProxy = F870D3DB25126A49008967B0 /* PBXContainerItemProxy */;
-		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -4144,19 +4020,6 @@
 				4166BFCB28C3501500199980 /* el */,
 			);
 			name = LibreStates.strings;
-			sourceTree = "<group>";
-		};
-		F870D3D725126A49008967B0 /* MainInterface.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				F870D3D825126A49008967B0 /* Base */,
-				2867F5C725BC209400AA1E98 /* fi */,
-				F81F3A5F25C9E5A800520946 /* es */,
-				4798BAC927BA766A002583BC /* tr */,
-				F8E4DCD82805F7FA007CF822 /* da */,
-				4166BFB528C3501400199980 /* el */,
-			);
-			name = MainInterface.storyboard;
 			sourceTree = "<group>";
 		};
 		F889CB71236D84AC00A81068 /* M5StackView.strings */ = {
@@ -4652,56 +4515,6 @@
 			};
 			name = Release;
 		};
-		F870D3DF25126A49008967B0 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				APP_GROUP_IDENTIFIER = "group.com.${DEVELOPMENT_TEAM}.loopkit.LoopGroup";
-				CODE_SIGN_ENTITLEMENTS = "$(XDRIP_WIDGET_ENTITLEMENTS_DEBUG)";
-				CODE_SIGN_IDENTITY = "$(XDRIP_CODE_SIGN_IDENTITY_DEBUG)";
-				CODE_SIGN_STYLE = "$(XDRIP_CODE_SIGN_STYLE)";
-				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
-				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
-				INFOPLIST_FILE = "xDrip4iOS Widget/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
-				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).xDrip4iOS-Widget";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		F870D3E025126A49008967B0 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				APP_GROUP_IDENTIFIER = "group.com.${DEVELOPMENT_TEAM}.loopkit.LoopGroup";
-				CODE_SIGN_ENTITLEMENTS = "$(XDRIP_WIDGET_ENTITLEMENTS_RELEASE)";
-				CODE_SIGN_IDENTITY = "$(XDRIP_CODE_SIGN_IDENTITY_RELEASE)";
-				CODE_SIGN_STYLE = "$(XDRIP_CODE_SIGN_STYLE)";
-				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
-				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
-				INFOPLIST_FILE = "xDrip4iOS Widget/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
-				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).xDrip4iOS-Widget";
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 		F8AC426C21ADEBD70078C348 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 666E283826F7E54C00ACE4DF /* xDrip.xcconfig */;
@@ -4894,15 +4707,6 @@
 			buildConfigurations = (
 				470B61A3270C448200561E56 /* Debug */,
 				470B61A4270C448200561E56 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		F870D3E125126A49008967B0 /* Build configuration list for PBXNativeTarget "xDrip4iOS Widget" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				F870D3DF25126A49008967B0 /* Debug */,
-				F870D3E025126A49008967B0 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

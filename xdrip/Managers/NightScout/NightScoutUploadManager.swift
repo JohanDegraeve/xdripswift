@@ -1,7 +1,6 @@
 import Foundation
 import os
 import UIKit
-import xDrip4iOS_Widget
 
 public class NightScoutUploadManager: NSObject, ObservableObject {
     
