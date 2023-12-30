@@ -96,5 +96,7 @@
 	<string>Light</string>
 	<key>view controller-based status bar</key>
 	<false/>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 </dict>
 </plist>
