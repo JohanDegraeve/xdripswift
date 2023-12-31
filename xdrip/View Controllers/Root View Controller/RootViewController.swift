@@ -9,6 +9,9 @@ import AVFoundation
 import PieCharts
 import WatchConnectivity
 import SwiftUI
+#if canImport(AppIntents)
+import AppIntents
+#endif
 
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController, ObservableObject {
@@ -676,6 +679,9 @@ final class RootViewController: UIViewController, ObservableObject {
             
         }
         
+        if #available(iOS 16, *) {
+            IntentDonationManager.shared.donate(intent: GlucoseIntent())
+        }
     }
     
     override func viewDidLoad() {
