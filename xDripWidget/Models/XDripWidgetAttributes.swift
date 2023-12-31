@@ -32,7 +32,6 @@ struct XDripWidgetAttributes: ActivityAttributes {
             
             var title: String {
                 switch self {
-                    
                 case .high, .highDropping, .highRising:
                     return "HIGH"
                 case .inRange, .inRangeDropping, .inRangeRising:
@@ -48,7 +47,6 @@ struct XDripWidgetAttributes: ActivityAttributes {
             
             var explanation: String {
                 switch self {
-                    
                 case .high:
                     return "You're not rising anymore"
                 case .highDropping:
@@ -81,6 +79,17 @@ struct XDripWidgetAttributes: ActivityAttributes {
                     return "You're starting to come up to range"
                 }
             }
+            
+            var bgColorInt: Int {
+                switch self {
+                case .inRange, .inRangeDropping, .inRangeRising:
+                    return 1
+                case .urgentHigh, .urgentHighDropping, .urgentHighRising, .urgentLow, .urgentLowDropping, .urgentLowRising:
+                    return 2
+                case .high, .highDropping, .highRising, .low, .lowDropping, .lowRising:
+                    return 3
+                }
+            }
         }
         
         
@@ -88,11 +97,34 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var eventType: EventType
         var trendArrow: String
         var bgValueString: String
+        var bgValueColorInt: Int
         
-        init(eventType: EventType = .lowDropping, trendArrow: String = "↘", bgValueString: String = "64") {
+        init(eventType: EventType , trendArrow: String, bgValueString: String, bgValueColorInt: Int) {
             self.eventType = eventType
             self.trendArrow = trendArrow
             self.bgValueString = bgValueString
+            self.bgValueColorInt = bgValueColorInt
+            
+            self.bgValueColorInt = getBgValueColor(bgValueString: bgValueString)
+        }
+        
+        func getBgValueColor(bgValueString: String) -> Int {
+            
+            let bgValue: Float = Float(bgValueString) ?? 1
+            
+            switch bgValue {
+            case 0..<70:
+                return 1
+            case 71..<80:
+                return 3
+            case 81..<140:
+                return 2
+            case 141...:
+                return 3
+            default:
+                return 2
+            }
+            
         }
     }
 
