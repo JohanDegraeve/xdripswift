@@ -67,6 +67,7 @@
 		D4FD899727772F9100689788 /* TreatmentEntryAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */; };
 		E4B8C71E2B3EBEE3006375E2 /* GlucoseIntentResponseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B8C71D2B3EBEE3006375E2 /* GlucoseIntentResponseView.swift */; };
 		E4C006212B3DE8EC00D59303 /* GlucoseIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C006202B3DE8EC00D59303 /* GlucoseIntent.swift */; };
+		E4D530632B418FF80018C6A4 /* AppShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D530622B418FF80018C6A4 /* AppShortcuts.swift */; };
 		F51B9F7D24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51B9F7C24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift */; };
 		F64039B0281C3F9D0051EFFE /* QuickActionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64039AF281C3F9D0051EFFE /* QuickActionsManager.swift */; };
 		F64039B2281E90CF0051EFFE /* QuickActions.strings in Resources */ = {isa = PBXBuildFile; fileRef = F64039B1281E90CF0051EFFE /* QuickActions.strings */; };
@@ -808,6 +809,7 @@
 		D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreatmentEntryAccessor.swift; sourceTree = "<group>"; };
 		E4B8C71D2B3EBEE3006375E2 /* GlucoseIntentResponseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseIntentResponseView.swift; sourceTree = "<group>"; };
 		E4C006202B3DE8EC00D59303 /* GlucoseIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseIntent.swift; sourceTree = "<group>"; };
+		E4D530622B418FF80018C6A4 /* AppShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShortcuts.swift; sourceTree = "<group>"; };
 		F51B9F7C24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre1NonFixedSlopeCalibrator.swift; sourceTree = "<group>"; };
 		F64039AF281C3F9D0051EFFE /* QuickActionsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsManager.swift; sourceTree = "<group>"; };
 		F64039B1281E90CF0051EFFE /* QuickActions.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = QuickActions.strings; sourceTree = "<group>"; };
@@ -1717,6 +1719,7 @@
 			children = (
 				E4C006202B3DE8EC00D59303 /* GlucoseIntent.swift */,
 				E4B8C71D2B3EBEE3006375E2 /* GlucoseIntentResponseView.swift */,
+				E4D530622B418FF80018C6A4 /* AppShortcuts.swift */,
 			);
 			name = AppIntents;
 			sourceTree = "<group>";
@@ -3635,6 +3638,7 @@
 				F8A2BC3225DB0D6D001D1E78 /* BluetoothPeripheralManaging.swift in Sources */,
 				F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */,
 				47B7FC722B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift in Sources */,
+				E4D530632B418FF80018C6A4 /* AppShortcuts.swift in Sources */,
 				F816E11C2439243B009EE65B /* Droplet+CoreDataProperties.swift in Sources */,
 				F821CF56229BF43A005C1E43 /* AlertKind.swift in Sources */,
 				F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */,
