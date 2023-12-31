@@ -33,6 +33,16 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
         return Texts_SettingsView.sectionTitleAbout
     }
     
+    func sectionFooter() -> String? {
+        if #available(iOS 16, *) {
+            return """
+               You can have Siri tell you you're blood glucose by saying "Siri, what is my glucose in xDrip" or "Siri, what is my xDrip glucose". You can customize this to any phrase in the shortcuts app.
+               """
+        } else {
+            return nil
+        }
+    }
+    
     func settingsRowText(index: Int) -> String {
         
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
