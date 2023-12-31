@@ -4,22 +4,22 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// literal translation needed
-"common_minute" = "min";
+"widget_minute" = "min";
 
 /// the word HIGH, in capitals
-"common_high" = "HIGH";
+"widget_high" = "HIGH";
 
 /// the word LOW, in capitals
-"common_low" = "LOW";
+"widget_low" = "LOW";
 
 /// literal translation needed
-"common_minutes" = "mins";
+"widget_minutes" = "mins";
 
 /// mmol/l
-"common_mmol" = "mmol/L";
+"widget_mmol" = "mmol/L";
 
 /// mg/dl
-"common_mgdl" = "mg/dL";
+"widget_mgdl" = "mg/dL";
 
 /// where it say how old the reading is, 'x minutes ago', literaly translation of 'ago'
 "ago" = "ago";

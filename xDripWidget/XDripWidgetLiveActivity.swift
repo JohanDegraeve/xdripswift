@@ -16,21 +16,21 @@ struct XDripWidgetLiveActivity: Widget {
             // Lock screen/banner UI goes here
             VStack {
                 HStack {
-                    Text(context.state.eventType.title).foregroundStyle(getBgColor(bgColorInt: context.state.bgValueColorInt, isTitle: true))
+                    Text(context.state.getBgTitle()).foregroundStyle(context.state.getBgColor())
                     Spacer()
-                    Text("\(context.state.bgValueString) \(context.state.trendArrow)").foregroundStyle(getBgColor(bgColorInt: context.state.bgValueColorInt, isTitle: false))
-                }.font(.largeTitle).bold().foregroundStyle(getBgColor(bgColorInt: context.state.bgValueColorInt, isTitle: false))
+                    Text("\(context.state.bgValueStringInUserChosenUnit) \(context.state.trendArrow)").foregroundStyle(context.state.getBgColor())
+                }.font(.largeTitle).bold().foregroundStyle(context.state.getBgColor())
                 HStack {
                     Text("Started \(context.attributes.eventStartDate.formatted(date: .omitted, time: .shortened))")
                     Spacer()
-                    Text(context.attributes.bgValueUnitString)
+                    Text(context.state.bgUnitString)
                         .foregroundStyle(.gray)
                 }
                 .font(.headline)
                 Spacer()
                 
                 HStack {
-                    Text(context.state.eventType.explanation)
+                    Text("Message")
                 }
                 .font(.body)
                 Spacer()
@@ -41,18 +41,20 @@ struct XDripWidgetLiveActivity: Widget {
             //.background(.ultraThinMaterial)
             //.activityBackgroundTint(Color.red)
             //.activitySystemActionForegroundColor(Color.black)
-
+            
+            
+            
         } dynamicIsland: { context in
             DynamicIsland {
                 // Expanded UI goes here.  Compose the expanded UI through
                 // various regions, like leading/trailing/center/bottom
                 DynamicIslandExpandedRegion(.leading) {
-                    Text(context.state.eventType.title)
-                        .font(.largeTitle).bold().foregroundStyle(getBgColor(bgColorInt: context.state.eventType.bgColorInt, isTitle: true))
+                    Text(context.state.getBgTitle())
+                        .font(.largeTitle).bold().foregroundStyle(context.state.getBgColor())
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    Text("\(context.state.bgValueString) \(context.state.trendArrow) ")
-                        .font(.largeTitle).bold().foregroundStyle(getBgColor(bgColorInt: context.state.eventType.bgColorInt, isTitle: false))
+                    Text("\(context.state.bgValueStringInUserChosenUnit) \(context.state.trendArrow)")
+                        .font(.largeTitle).bold().foregroundStyle(context.state.getBgColor())
                 }
                 DynamicIslandExpandedRegion(.center) {
                     EmptyView()
@@ -62,49 +64,37 @@ struct XDripWidgetLiveActivity: Widget {
                         HStack {
                                 Text("Started \(context.attributes.eventStartDate.formatted(date: .omitted, time: .shortened))")
                             Spacer()
-                            Text(context.attributes.bgValueUnitString)
+                            Text(context.state.bgUnitString)
                                 .foregroundStyle(.gray)
                         }
                         .font(.headline)
                         Spacer()
                         HStack {
-                            Text(context.state.eventType.explanation)
+                            Text("Message")
                         }
                         .font(.body)
                         Spacer()
                     }
                 }
             } compactLeading: {
-                Text(context.state.eventType.title)
+                Text(context.state.getBgTitle()).foregroundStyle(context.state.getBgColor())
             } compactTrailing: {
-                Text("\(context.state.bgValueString) \(context.state.trendArrow)")
+                Text("\(context.state.bgValueStringInUserChosenUnit) \(context.state.trendArrow)").foregroundStyle(context.state.getBgColor())
             } minimal: {
-                Text(context.state.bgValueString)
-                    .foregroundStyle(getBgColor(bgColorInt: context.state.eventType.bgColorInt, isTitle: false))
+                Text("\(context.state.bgValueStringInUserChosenUnit)")
+                    .foregroundStyle(context.state.getBgColor())
             }
             .widgetURL(URL(string: "xdripswift"))
         }
+        
     }
     
-    
-    func getBgColor(bgColorInt: Int, isTitle: Bool) -> Color {
-        switch bgColorInt {
-        case 1:
-            return .red
-        case 2:
-            return isTitle ? .primary : .green
-        case 3:
-            return .yellow
-        default:
-            return .green
-        }
-    }
 }
 
 @available(iOS 16.2, *)
 struct XDripWidgetLiveActivity_Previews: PreviewProvider {
-    static let attributes = XDripWidgetAttributes(bgValueUnitString: "mg/dL", eventStartDate: Date().addingTimeInterval(-1000))
-    static let contentState = XDripWidgetAttributes.ContentState(eventType: .inRangeDropping, trendArrow: "↘", bgValueString: "134")
+    static let attributes = XDripWidgetAttributes(eventStartDate: Date().addingTimeInterval(-1000))
+    static let contentState = XDripWidgetAttributes.ContentState(bgValueInMgDl: 75, isMgDl: true, trendArrow: "↘", deltaChangeInMgDl: -2, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180)
     
     static var previews: some View {
         attributes

@@ -1,0 +1,7 @@
+"widget_mgdl" = "mg/dL";
+"widget_mmol" = "mmol/L";
+"widget_high" = "KORKEA";
+"widget_low" = "MATALA";
+"widget_minutes" = "minuuttia";
+"widget_minute" = "min";
+"ago" = "sitten";
