@@ -33,21 +33,18 @@ struct GlucoseIntent: AppIntent {
             throw IntentError.message("No glucose data")
         }
 
-        let value = UserDefaults.standard.bloodGlucoseUnitIsMgDl ? mostRecent.calculatedValue
-        : (mostRecent.calculatedValue * ConstantsBloodGlucose.mgDlToMmoll)
+        let value = UserDefaults.standard.bloodGlucoseUnitIsMgDl ? mostRecent.calculatedValue : (mostRecent.calculatedValue * ConstantsBloodGlucose.mgDlToMmoll)
         let valueString = UserDefaults.standard.bloodGlucoseUnitIsMgDl ? value.formatted(.number.precision(.fractionLength(0))) : value.formatted(.number.precision(.fractionLength(1)))
-        let trendDescription: LocalizedStringResource = {
-            switch mostRecent.slopeOrdinal() {
-            case 7: "dropping fast"
-            case 6: "dropping"
-            case 5: "moderately dropping"
-            case 4: "stable"
-            case 3: "moderately rising"
-            case 2: "rising"
-            default: "rising fast"
-            }
-        }()
-        
+        let trendDescription: LocalizedStringResource = switch mostRecent.slopeTrend() {
+        case .droppingFast: "dropping fast"
+        case .dropping: "dropping"
+        case .moderatelyDropping: "moderately dropping"
+        case .stable: "stable"
+        case .moderatelyRising: "moderately rising"
+        case .rising: "rising"
+        case .risingFast: "rising fast"
+        }
+
         return .result(
             value: value,
             dialog: "Your blood glucose level is \(valueString) and is \(trendDescription)",
@@ -77,6 +74,30 @@ enum IntentError: Error, CustomLocalizedStringResourceConvertible {
         switch self {
         case .message(let message):
             LocalizedStringResource(stringLiteral: message)
+        }
+    }
+}
+
+private enum Trend {
+    case droppingFast
+    case dropping
+    case moderatelyDropping
+    case stable
+    case moderatelyRising
+    case rising
+    case risingFast
+}
+
+private extension BgReading {
+    func slopeTrend() -> Trend {
+        switch calculatedValueSlope * 60000 {
+        case ..<(-2): .droppingFast
+        case -2 ..< -1: .dropping
+        case -1 ..< -0.5: .moderatelyDropping
+        case -0.5 ..< 0.5: .stable
+        case 0.5 ..< 1: .moderatelyRising
+        case 1 ..< 2: .rising
+        default: .risingFast
         }
     }
 }
