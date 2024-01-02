@@ -32,20 +32,27 @@ struct GlucoseIntent: AppIntent {
         guard let mostRecent = bgReadings.last else {
             throw IntentError.message("No glucose data")
         }
-        if UserDefaults.standard.bloodGlucoseUnitIsMgDl {
-            return .result(
-                value: mostRecent.calculatedValue,
-                dialog: "Your blood glucose level is \(mostRecent.calculatedValue.formatted(.number.precision(.fractionLength(0))))",
-                view: GlucoseIntentResponseView(readings: bgReadings)
-            )
-        } else {
-            let value = mostRecent.calculatedValue * ConstantsBloodGlucose.mgDlToMmoll
-            return .result(
-                value: value,
-                dialog: "Your blood glucose level is \(value.formatted(.number.precision(.fractionLength(1))))",
-                view: GlucoseIntentResponseView(readings: bgReadings)
-            )
-        }
+
+        let value = UserDefaults.standard.bloodGlucoseUnitIsMgDl ? mostRecent.calculatedValue
+        : (mostRecent.calculatedValue * ConstantsBloodGlucose.mgDlToMmoll)
+        let valueString = UserDefaults.standard.bloodGlucoseUnitIsMgDl ? value.formatted(.number.precision(.fractionLength(0))) : value.formatted(.number.precision(.fractionLength(1)))
+        let trendDescription: LocalizedStringResource = {
+            switch mostRecent.slopeOrdinal() {
+            case 7: "dropping fast"
+            case 6: "dropping"
+            case 5: "moderately dropping"
+            case 4: "stable"
+            case 3: "moderately rising"
+            case 2: "rising"
+            default: "rising fast"
+            }
+        }()
+        
+        return .result(
+            value: value,
+            dialog: "Your blood glucose level is \(valueString) and is \(trendDescription)",
+            view: GlucoseIntentResponseView(readings: bgReadings)
+        )
     }
 }
 
