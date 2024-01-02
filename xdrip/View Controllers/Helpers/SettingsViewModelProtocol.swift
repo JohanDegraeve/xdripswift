@@ -12,6 +12,11 @@ protocol SettingsViewModelProtocol {
     /// the section title, optional, for section
     func sectionTitle() -> String?
     
+    /// what title should be shown in a section footer
+    /// - returns:
+    /// the section title, optional, for section
+    func sectionFooter() -> String?
+
     /// the text to be shown for a specific row in the Section
     /// - returns:
     ///     the text
@@ -79,6 +84,10 @@ protocol SettingsViewModelProtocol {
 // Add default implementations here so that ViewModels don't need to implement empty methods
 extension SettingsViewModelProtocol {
     func storeSectionReloadClosure(sectionReloadClosure: @escaping (() -> Void)) {}
+    
+    func sectionFooter() -> String? {
+        nil
+    }
 }
 
 /// to make the coding a bit easier, just one function defined for now, which is to get the viewModel for a specific setting
