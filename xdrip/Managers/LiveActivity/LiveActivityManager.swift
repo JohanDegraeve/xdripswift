@@ -10,7 +10,7 @@ import Foundation
 import ActivityKit
 import OSLog
 
-//@available(iOS 16.2, *)
+@available(iOS 16.2, *)
 public final class LiveActivityManager {
     
     /// for trace
@@ -27,7 +27,7 @@ public final class LiveActivityManager {
 }
 
 // MARK: - Helpers
-//@available(iOS 16.2, *)
+@available(iOS 16.2, *)
 extension LiveActivityManager {
     
     /// start or update the live activity based upon whether it currently exists or not

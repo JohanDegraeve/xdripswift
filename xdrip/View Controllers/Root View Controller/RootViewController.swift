@@ -72,23 +72,45 @@ final class RootViewController: UIViewController, ObservableObject {
         // get the 2 character language code for the App Locale (i.e. "en", "es", "nl", "fr")
         // if the user has the app in a language other than English and they have the "auto translate" option selected, then load the help pages through Google Translate
         // important to check the the URLs actually exist in ConstansHomeView before trying to open them
-        if let languageCode = NSLocale.current.language.languageCode?.identifier, languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
-            
-            guard let url = URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode + ConstantsHomeView.onlineHelpURLTranslated2) else { return }
-            
-            UIApplication.shared.open(url)
-            
+        if #available(iOS 16, *) {
+            if let languageCode = NSLocale.current.language.languageCode?.identifier, languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
+                
+                guard let url = URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode + ConstantsHomeView.onlineHelpURLTranslated2) else { return }
+                
+                UIApplication.shared.open(url)
+                
+            } else {
+                
+                // so the user is running the app in English
+                // or
+                // NSLocale.current.languageCode returned a nil value
+                // or
+                // they don't want to translate so let's just load it directly
+                guard let url = URL(string: ConstantsHomeView.onlineHelpURL) else { return }
+                
+                UIApplication.shared.open(url)
+                
+            }
         } else {
-            
-            // so the user is running the app in English
-            // or
-            // NSLocale.current.languageCode returned a nil value
-            // or
-            // they don't want to translate so let's just load it directly
-            guard let url = URL(string: ConstantsHomeView.onlineHelpURL) else { return }
-            
-            UIApplication.shared.open(url)
-        
+            // Fallback on earlier versions
+            if let languageCode = NSLocale.current.languageCode, languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
+                
+                guard let url = URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode + ConstantsHomeView.onlineHelpURLTranslated2) else { return }
+                
+                UIApplication.shared.open(url)
+                
+            } else {
+                
+                // so the user is running the app in English
+                // or
+                // NSLocale.current.languageCode returned a nil value
+                // or
+                // they don't want to translate so let's just load it directly
+                guard let url = URL(string: ConstantsHomeView.onlineHelpURL) else { return }
+                
+                UIApplication.shared.open(url)
+                
+            }
         }
         
     }
@@ -959,8 +981,10 @@ final class RootViewController: UIViewController, ObservableObject {
         // add tracing when app will terminate - this only works for non-suspended apps, probably (not tested) also works for apps that crash in the background
         ApplicationManager.shared.addClosureToRunWhenAppWillTerminate(key: applicationManagerKeyTraceAppWillTerminate, closure: {
             
-            // force the live activity to end if it exists to prevent it becoming "orphaned" and unclosable by the app
-            LiveActivityManager.shared.endAllActivities()
+            if #available(iOS 16.2, *) {
+                // force the live activity to end if it exists to prevent it becoming "orphaned" and unclosable by the app
+                LiveActivityManager.shared.endAllActivities()
+            }
             
             trace("Application will terminate - it has probably been force-closed by the user", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
@@ -3496,70 +3520,72 @@ final class RootViewController: UIViewController, ObservableObject {
     /// check if the conditions are correct to start a live activity, update it, or end it
     private func updateLiveActivity() {
         
-        // check the live activity type requested by the user
-        let liveActivityType = UserDefaults.standard.liveActivityType
-        
-        // TODO: remove the comments below for production
-        // if the user is in follower mode then don't show live activities as they will not get updated in the background
-        // also take advantage to just skip the rest of the function if they have live activities disabled
-        var showLiveActivity: Bool = true //!(!UserDefaults.standard.isMaster || UserDefaults.standard.liveActivityType == .disabled)
+        if #available(iOS 16.2, *) {
+            // check the live activity type requested by the user
+            let liveActivityType = UserDefaults.standard.liveActivityType
+            
+            // TODO: remove the comments below for production
+            // if the user is in follower mode then don't show live activities as they will not get updated in the background
+            // also take advantage to just skip the rest of the function if they have live activities disabled
+            var showLiveActivity: Bool = true //!(!UserDefaults.standard.isMaster || UserDefaults.standard.liveActivityType == .disabled)
+            
+            if let bgReadingsAccessor = bgReadingsAccessor, showLiveActivity {
                 
-        if let bgReadingsAccessor = bgReadingsAccessor, showLiveActivity {
-            
-            // get 2 last Readings, with a calculatedValue
-            let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 0)
-            
-            // there should be at least one reading
-            guard lastReading.count > 0 else {
-                print("no recent BG readings returned")
-                LiveActivityManager.shared.endAllActivities()
-                return
-            }
-            
-            let bgValueInMgDl = lastReading[0].calculatedValue
-            
-            // now that we've got the current BG value, let's refine the check to see if we should run/show the live activity
-            switch liveActivityType {
-            case .always:
-                showLiveActivity = true
-            case .disabled:
-                showLiveActivity = false
-            case .low:
-                showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.lowMarkValue) ? true : false
-            case .urgentLow:
-                showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) ? true : false
-            case .lowHigh:
-                showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.lowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.highMarkValue)) ? true : false
-            case .urgentLowHigh:
-                showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.urgentHighMarkValue)) ? true : false
-            }
-            
-            // if we should still show it, then let's continue processing the lastReading array to create a valid contentState
-            if showLiveActivity {
-                let bgReadingDate = lastReading[0].timeStamp
-                let slopeOrdinal: Int = lastReading[0].slopeOrdinal() //? "" : lastReading[0].slopeArrow()
+                // get 2 last Readings, with a calculatedValue
+                let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 0)
                 
-                var deltaChangeInMgDl: Double?
-                
-                // add delta if needed
-                if lastReading.count > 1 {
-                    
-                    deltaChangeInMgDl = lastReading[0].currentSlope(previousBgReading: lastReading[1]) * lastReading[0].timeStamp.timeIntervalSince(lastReading[1].timeStamp) * 1000;
+                // there should be at least one reading
+                guard lastReading.count > 0 else {
+                    print("no recent BG readings returned")
+                    LiveActivityManager.shared.endAllActivities()
+                    return
                 }
                 
-                // create the contentState that will update the dynamic attributes of the Live Activity Widget
-                let contentState = XDripWidgetAttributes.ContentState(bgValueInMgDl: bgValueInMgDl, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, bgReadingDate: bgReadingDate, updatedDate: Date())
+                let bgValueInMgDl = lastReading[0].calculatedValue
                 
-                LiveActivityManager.shared.runActivity(contentState: contentState)
+                // now that we've got the current BG value, let's refine the check to see if we should run/show the live activity
+                switch liveActivityType {
+                case .always:
+                    showLiveActivity = true
+                case .disabled:
+                    showLiveActivity = false
+                case .low:
+                    showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.lowMarkValue) ? true : false
+                case .urgentLow:
+                    showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) ? true : false
+                case .lowHigh:
+                    showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.lowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.highMarkValue)) ? true : false
+                case .urgentLowHigh:
+                    showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.urgentHighMarkValue)) ? true : false
+                }
                 
+                // if we should still show it, then let's continue processing the lastReading array to create a valid contentState
+                if showLiveActivity {
+                    let bgReadingDate = lastReading[0].timeStamp
+                    let slopeOrdinal: Int = lastReading[0].slopeOrdinal() //? "" : lastReading[0].slopeArrow()
+                    
+                    var deltaChangeInMgDl: Double?
+                    
+                    // add delta if needed
+                    if lastReading.count > 1 {
+                        
+                        deltaChangeInMgDl = lastReading[0].currentSlope(previousBgReading: lastReading[1]) * lastReading[0].timeStamp.timeIntervalSince(lastReading[1].timeStamp) * 1000;
+                    }
+                    
+                    // create the contentState that will update the dynamic attributes of the Live Activity Widget
+                    let contentState = XDripWidgetAttributes.ContentState(bgValueInMgDl: bgValueInMgDl, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, bgReadingDate: bgReadingDate, updatedDate: Date())
+                    
+                    LiveActivityManager.shared.runActivity(contentState: contentState)
+                    
+                }
             }
-        } 
-        
-        // try to end the activity if needed
-        if !showLiveActivity {
-            LiveActivityManager.shared.endAllActivities()
+            
+            // try to end the activity if needed
+            if !showLiveActivity {
+                LiveActivityManager.shared.endAllActivities()
+            }
+            
         }
-        
     }
     
 }

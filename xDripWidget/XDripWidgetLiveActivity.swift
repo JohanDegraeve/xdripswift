@@ -10,6 +10,7 @@ import ActivityKit
 import WidgetKit
 import SwiftUI
 
+@available(iOSApplicationExtension 16.2, *)
 struct XDripWidgetLiveActivity: Widget {
     var body: some WidgetConfiguration {
         
@@ -75,6 +76,7 @@ struct XDripWidgetLiveActivity: Widget {
     
 }
 
+@available(iOSApplicationExtension 16.2, *)
 struct LiveActivityView: View {
     
     let state: XDripWidgetAttributes.ContentState
@@ -116,7 +118,7 @@ struct LiveActivityView: View {
     }
 }
 
-//@available(iOS 16.2, *)
+@available(iOS 16.2, *)
 struct XDripWidgetLiveActivity_Previews: PreviewProvider {
     static let attributes = XDripWidgetAttributes(eventStartDate: Date().addingTimeInterval(-1000))
     static let contentState = XDripWidgetAttributes.ContentState(bgValueInMgDl: 252, isMgDl: true, slopeOrdinal:5, deltaChangeInMgDl: -2, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, bgReadingDate: Date().addingTimeInterval(-180), updatedDate: Date())
