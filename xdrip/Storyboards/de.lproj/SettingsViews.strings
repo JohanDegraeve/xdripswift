@@ -105,7 +105,7 @@
 "settingsviews_row_alert_types" = "Eigene Alarme";
 
 /// general settings, section title
-"settingsviews_sectiontitlegeneral" = "Haupteinstellungen";
+"settingsviews_sectiontitleNotifications" = "Haupteinstellungen";
 
 /// speak settings, where enable or disable speak trend
 "settingsviews_speakTrend" = "Trend vorlesen";

@@ -4,7 +4,7 @@
 "settingsviews_translateOnlineHelp" = "Αυτόματη μετάφραση;";
 "settingsviews_showHelpIcon" = "Εμφάνιση εικονιδίου βοήθειας;";
 "settingsviews_restartNeeded" = "(Απαιτείται επανεκκίνηση)";
-"settingsviews_sectiontitlegeneral" = "Γενικά";
+"settingsviews_sectiontitleNotifications" = "Γενικά";
 "settingsviews_selectbgunit" = "Μονάδες μέτρησης γλυκόζης";
 "settingsviews_masterorfollower" = "Κύριος ή ακόλουθος;";
 "settingsviews_master" = "Κύριος";

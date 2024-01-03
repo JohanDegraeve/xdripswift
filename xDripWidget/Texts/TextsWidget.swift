@@ -12,12 +12,20 @@ class Texts_Widget {
         return NSLocalizedString("widget_minute", tableName: filename, bundle: Bundle.main, value: "min", comment: "literal translation needed")
     }()
     
-    static let HIGH = {
-        return NSLocalizedString("widget_high", tableName: filename, bundle: Bundle.main, value: "HIGH", comment: "the word HIGH, in capitals")
+    static let high = {
+        return NSLocalizedString("widget_high", tableName: filename, bundle: Bundle.main, value: "High", comment: "the word HIGH, in capitals")
     }()
     
-    static let LOW = {
-        return NSLocalizedString("widget_low", tableName: filename, bundle: Bundle.main, value: "LOW", comment: "the word LOW, in capitals")
+    static let low = {
+        return NSLocalizedString("widget_low", tableName: filename, bundle: Bundle.main, value: "Low", comment: "the word LOW, in capitals")
+    }()
+    
+    static let urgentHigh = {
+        return NSLocalizedString("widget_urgentHigh", tableName: filename, bundle: Bundle.main, value: "Urgent High", comment: "the words urgent HIGH, in capitals")
+    }()
+    
+    static let urgentLow = {
+        return NSLocalizedString("widget_urgentLow", tableName: filename, bundle: Bundle.main, value: "Urgent Low", comment: "the words urgent LOW, in capitals")
     }()
         
     static let mgdl: String = {

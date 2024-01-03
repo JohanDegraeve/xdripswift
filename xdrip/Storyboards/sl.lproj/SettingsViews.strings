@@ -157,7 +157,7 @@
 "m5stack_settingsviews_textColor" = "Text Color";
 
 /// general settings, section title
-"settingsviews_sectiontitlegeneral" = "General";
+"settingsviews_sectiontitleNotifications" = "Notifications";
 
 /// in Settings, row title to send settings
 "sendTraceFile" = "Send Issue Report";

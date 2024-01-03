@@ -73,9 +73,9 @@ struct XDripWidget: Widget {
     }
 }
 
-#Preview(as: .systemSmall) {
-    XDripWidget()
-} timeline: {
-    SimpleEntry(date: .now, emoji: "😀")
-    SimpleEntry(date: .now, emoji: "🤩")
-}
+//#Preview(as: .systemSmall) {
+//    XDripWidget()
+//} timeline: {
+//    SimpleEntry(date: .now, emoji: "😀")
+//    SimpleEntry(date: .now, emoji: "🤩")
+//}

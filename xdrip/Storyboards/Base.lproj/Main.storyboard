@@ -397,7 +397,7 @@
                                             <constraint firstAttribute="height" constant="50" id="2xB-Gd-4Tz"/>
                                         </constraints>
                                         <items>
-                                            <barButtonItem title="Snooze" image="moon.zzz" catalog="system" id="f3E-Tt-LBV">
+                                            <barButtonItem title="Snooze" image="speaker.wave.2.circle" catalog="system" id="f3E-Tt-LBV">
                                                 <connections>
                                                     <action selector="preSnoozeToolbarButtonAction:" destination="9pv-A4-QxB" id="IDv-ho-TZ2"/>
                                                     <segue destination="NvR-Zh-2Zn" kind="show" identifier="RootViewToSnoozeView" id="VtQ-ZG-btn"/>
@@ -423,7 +423,13 @@
                                                 </connections>
                                             </barButtonItem>
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="SlH-A4-F18"/>
-                                            <barButtonItem title="Lock" image="lock" catalog="system" id="wfX-50-2w6">
+                                            <barButtonItem title="Live Activity" image="play.circle" catalog="system" id="tZ0-jR-Pj8">
+                                                <connections>
+                                                    <action selector="liveActivityToolbarButtonAction:" destination="9pv-A4-QxB" id="M4y-rb-WcE"/>
+                                                </connections>
+                                            </barButtonItem>
+                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="LxZ-ix-ZTU"/>
+                                            <barButtonItem title="Lock" image="lock.circle" catalog="system" id="wfX-50-2w6">
                                                 <connections>
                                                     <action selector="screenLockToolbarButtonAction:" destination="9pv-A4-QxB" id="L14-hJ-4a9"/>
                                                 </connections>
@@ -992,6 +998,7 @@
                         <outlet property="highTitleLabelOutlet" destination="bUK-pC-4bd" id="R8q-Q6-q9d"/>
                         <outlet property="inRangeStatisticLabelOutlet" destination="apa-6w-gic" id="BKd-LX-rCl"/>
                         <outlet property="inRangeTitleLabelOutlet" destination="63h-Q9-PbK" id="dG2-E8-9PT"/>
+                        <outlet property="liveActivityToolbarButtonOutlet" destination="tZ0-jR-Pj8" id="x41-u8-vm2"/>
                         <outlet property="lowLabelOutlet" destination="Ncy-6l-nO2" id="11g-UN-f9n"/>
                         <outlet property="lowStatisticLabelOutlet" destination="4LK-sw-cBS" id="0gk-05-iOl"/>
                         <outlet property="lowTitleLabelOutlet" destination="B0Q-ux-IHf" id="ATk-vB-TVw"/>
@@ -2367,22 +2374,23 @@
         <image name="drop.circle" catalog="system" width="128" height="123"/>
         <image name="drop.fill" catalog="system" width="96" height="128"/>
         <image name="ellipsis.circle" catalog="system" width="128" height="123"/>
-        <image name="lock" catalog="system" width="125" height="128"/>
-        <image name="moon.zzz" catalog="system" width="117" height="128"/>
+        <image name="lock.circle" catalog="system" width="128" height="123"/>
         <image name="network.badge.shield.half.filled" catalog="system" width="128" height="122"/>
+        <image name="play.circle" catalog="system" width="128" height="123"/>
         <image name="questionmark.circle" catalog="system" width="128" height="123"/>
         <image name="scope" catalog="system" width="128" height="124"/>
+        <image name="speaker.wave.2.circle" catalog="system" width="128" height="123"/>
         <systemColor name="systemBlueColor">
-            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGrayColor">
-            <color red="0.5568627451" green="0.5568627451" blue="0.57647058819999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGreenColor">
-            <color red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemYellowColor">
             <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

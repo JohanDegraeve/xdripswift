@@ -4,7 +4,7 @@
 "settingsviews_translateOnlineHelp" = "Переводить автоматически";
 "settingsviews_showHelpIcon" = "Показывать иконку помощи";
 "settingsviews_restartNeeded" = "(Требуется перезагрузка)";
-"settingsviews_sectiontitlegeneral" = "Общие";
+"settingsviews_sectiontitleNotifications" = "Общие";
 "settingsviews_selectbgunit" = "Единицы измерения глюкозы";
 "settingsviews_masterorfollower" = "Главный или подписчик";
 "settingsviews_master" = "Главный";

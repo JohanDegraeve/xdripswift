@@ -1,16 +1,18 @@
 import UIKit
+import OSLog
+import ActivityKit
 
 fileprivate enum Setting:Int, CaseIterable {
     
-    /// blood glucose  unit
-    case bloodGlucoseUnit = 0
-    
     /// should reading be shown in notification
-    case showReadingInNotification = 1
+    case showReadingInNotification = 0
     
     /// - minimum time between two readings, for which notification should be created (in minutes)
     /// - except if there's been a disconnect, in that case this value is not taken into account
-    case notificationInterval = 2
+    case notificationInterval = 1
+    
+    /// show live activities
+    case liveActivityType = 2
     
     /// show reading in app badge
     case showReadingInAppBadge = 3
@@ -21,7 +23,10 @@ fileprivate enum Setting:Int, CaseIterable {
 }
 
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
-class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
+class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
+    
+    /// for trace
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel)
     
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
@@ -32,10 +37,6 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
     }
     
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
-        
-        // changing follower to master or master to follower requires changing ui for nightscout settings and transmitter type settings
-        // the same applies when changing bloodGlucoseUnit, because off the seperate section with bgObjectives
-        if (index == Setting.bloodGlucoseUnit.rawValue) {return true}
         
         return false
     }
@@ -49,25 +50,68 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
 
         switch setting {
             
-        case .bloodGlucoseUnit:
-            return SettingsSelectedRowAction.callFunction(function: {
-                
-                UserDefaults.standard.bloodGlucoseUnitIsMgDl ? (UserDefaults.standard.bloodGlucoseUnitIsMgDl = false) : (UserDefaults.standard.bloodGlucoseUnitIsMgDl = true)
-                
-            })
-            
         case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
             return SettingsSelectedRowAction.nothing
             
         case .notificationInterval:
             
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_IntervalTitle, message: Texts_SettingsView.settingsviews_IntervalMessage, keyboardType: .numberPad, text: UserDefaults.standard.notificationInterval.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.notificationInterval = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
+         
+        case .liveActivityType:
             
+            // live activities can only be used in master mode as follower mode
+            // will not allow updates whilst the app is in the background
+            if UserDefaults.standard.isMaster {
+                                
+                // data to be displayed in list from which user needs to pick a live activity type
+                var data = [String]()
+                
+                var selectedRow: Int?
+                
+                var index = 0
+                
+                let currentLiveActivityType = UserDefaults.standard.liveActivityType
+                
+                // get all data source types and add the description to data. Search for the type that matches the FollowerDataSourceType that is currently stored in userdefaults.
+                for liveActivityType in LiveActivityType.allCases {
+                    
+                    data.append(liveActivityType.description)
+                    
+                    if liveActivityType == currentLiveActivityType {
+                        selectedRow = index
+                    }
+                    
+                    index += 1
+                    
+                }
+                
+                return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelLiveActivityType, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
+                    
+                    // we'll set this here so that we can use it in the else statement for logging
+                    let oldLiveActivityType = UserDefaults.standard.liveActivityType
+                    
+                    if index != selectedRow {
+                        
+                        UserDefaults.standard.liveActivityType = LiveActivityType(rawValue: index) ?? .disabled
+                        
+                        let newLiveActivityType = UserDefaults.standard.liveActivityType
+                        
+                        trace("Live activity type was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, oldLiveActivityType.description, newLiveActivityType.description)
+                        
+                    }
+                    
+                }, cancelHandler: nil, didSelectRowHandler: nil)
+                
+            } else {
+                
+                return .showInfoText(title: Texts_SettingsView.labelLiveActivityType, message: Texts_SettingsView.liveActivityDisabledInFollowerModeMessage, actionHandler: {})
+            
+            }
         }
     }
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.sectionTitleGeneral
+        return Texts_SettingsView.sectionTitleNotifications
     }
 
     func numberOfRows() -> Int {
@@ -87,14 +131,14 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
 
         switch setting {
             
-        case .bloodGlucoseUnit:
-            return Texts_SettingsView.labelSelectBgUnit
-            
         case .showReadingInNotification:
             return Texts_SettingsView.showReadingInNotification
             
         case .notificationInterval:
             return Texts_SettingsView.settingsviews_IntervalTitle
+            
+        case .liveActivityType:
+            return Texts_SettingsView.labelLiveActivityType
             
         case .showReadingInAppBadge:
             return Texts_SettingsView.labelShowReadingInAppBadge
@@ -110,14 +154,14 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .bloodGlucoseUnit:
-            return UITableViewCell.AccessoryType.none
-            
         case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
-            return UITableViewCell.AccessoryType.none
+            return .none
             
         case .notificationInterval:
-            return UITableViewCell.AccessoryType.disclosureIndicator
+            return .disclosureIndicator
+            
+        case .liveActivityType:
+            return UserDefaults.standard.isMaster ? .disclosureIndicator : .none
             
         }
     }
@@ -127,14 +171,15 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
 
         switch setting {
             
-        case .bloodGlucoseUnit:
-            return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl:Texts_Common.mmol
-            
         case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
             return nil
             
         case .notificationInterval:
             return UserDefaults.standard.notificationInterval.description
+            
+        case .liveActivityType:
+            return UserDefaults.standard.isMaster ? UserDefaults.standard.liveActivityType.description : Texts_SettingsView.liveActivityDisabledInFollowerMode
+            
         }
     }
     
@@ -156,10 +201,7 @@ class SettingsViewGeneralSettingsViewModel: SettingsViewModelProtocol {
 
             return UISwitch(isOn: UserDefaults.standard.multipleAppBadgeValueWith10, action: {(isOn:Bool) in UserDefaults.standard.multipleAppBadgeValueWith10 = isOn})
 
-        case .bloodGlucoseUnit:
-            return nil
-            
-        case .notificationInterval:
+        case .notificationInterval, .liveActivityType:
             return nil
             
         }

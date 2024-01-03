@@ -12,89 +12,114 @@ import SwiftUI
 
 struct XDripWidgetLiveActivity: Widget {
     var body: some WidgetConfiguration {
+        
         ActivityConfiguration(for: XDripWidgetAttributes.self) { context in
-            // Lock screen/banner UI goes here
-            VStack {
-                HStack {
-                    Text(context.state.getBgTitle()).foregroundStyle(context.state.getBgColor())
-                    Spacer()
-                    Text("\(context.state.bgValueStringInUserChosenUnit) \(context.state.trendArrow)").foregroundStyle(context.state.getBgColor())
-                }.font(.largeTitle).bold().foregroundStyle(context.state.getBgColor())
-                HStack {
-                    Text("Started \(context.attributes.eventStartDate.formatted(date: .omitted, time: .shortened))")
-                    Spacer()
-                    Text(context.state.bgUnitString)
-                        .foregroundStyle(.gray)
-                }
-                .font(.headline)
-                Spacer()
-                
-                HStack {
-                    Text("Message")
-                }
-                .font(.body)
-                Spacer()
-            }
-            .padding(15)
-            //.activityBackgroundTint(Color.cyan)
-            //.activitySystemActionForegroundColor(Color.black)
-            //.background(.ultraThinMaterial)
-            //.activityBackgroundTint(Color.red)
-            //.activitySystemActionForegroundColor(Color.black)
             
-            
+            LiveActivityView(state: context.state)
             
         } dynamicIsland: { context in
+            
             DynamicIsland {
-                // Expanded UI goes here.  Compose the expanded UI through
-                // various regions, like leading/trailing/center/bottom
                 DynamicIslandExpandedRegion(.leading) {
-                    Text(context.state.getBgTitle())
-                        .font(.largeTitle).bold().foregroundStyle(context.state.getBgColor())
+                    Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
+                        .font(.largeTitle)
+                        .foregroundStyle(context.state.getBgColor())
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    Text("\(context.state.bgValueStringInUserChosenUnit) \(context.state.trendArrow)")
-                        .font(.largeTitle).bold().foregroundStyle(context.state.getBgColor())
+                    Text(context.state.getBgTitle())
+                        .font(.largeTitle)
+                        .foregroundStyle(context.state.getBgColor())
                 }
-                DynamicIslandExpandedRegion(.center) {
-                    EmptyView()
-                }
+                //                DynamicIslandExpandedRegion(.center) {
+                //                    EmptyView()
+                //                }
                 DynamicIslandExpandedRegion(.bottom) {
                     VStack {
                         HStack {
-                                Text("Started \(context.attributes.eventStartDate.formatted(date: .omitted, time: .shortened))")
+                            Text("\(context.state.getDeltaChangeStringInUserChosenUnit()) \(context.state.bgUnitString)")
+                                .font(.title3)
+                                .foregroundStyle(Color(white: 0.8))
+                                .bold()
                             Spacer()
-                            Text(context.state.bgUnitString)
-                                .foregroundStyle(.gray)
+                            VStack {
+                                Text("Reading \(context.state.bgReadingDate.formatted(date: .omitted, time: .shortened))")
+                                    .font(.subheadline)
+                                    .foregroundStyle(Color(white: 0.6))
+                                    .bold()
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+
+                                Text("Updated \(context.state.updatedDate.formatted(date: .omitted, time: .shortened))")
+                                    .font(.subheadline)
+                                    .foregroundStyle(Color(white: 0.6))
+                                    .bold()
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+
+                            }
                         }
-                        .font(.headline)
-                        Spacer()
-                        HStack {
-                            Text("Message")
-                        }
-                        .font(.body)
-                        Spacer()
                     }
                 }
             } compactLeading: {
-                Text(context.state.getBgTitle()).foregroundStyle(context.state.getBgColor())
+                Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
+                    .foregroundStyle(context.state.getBgColor())
             } compactTrailing: {
-                Text("\(context.state.bgValueStringInUserChosenUnit) \(context.state.trendArrow)").foregroundStyle(context.state.getBgColor())
+                Text(context.state.getDeltaChangeStringInUserChosenUnit())
             } minimal: {
-                Text("\(context.state.bgValueStringInUserChosenUnit)")
+                Text(context.state.bgValueStringInUserChosenUnit)
                     .foregroundStyle(context.state.getBgColor())
             }
             .widgetURL(URL(string: "xdripswift"))
+            .keylineTint(context.state.getBgColor())
         }
         
     }
     
 }
 
-@available(iOS 16.2, *)
+struct LiveActivityView: View {
+    
+    let state: XDripWidgetAttributes.ContentState
+    
+    var body: some View {
+        // Lock screen/banner UI goes here
+        VStack {
+            HStack {
+                Text("\(state.bgValueStringInUserChosenUnit)\(state.trendArrow())")
+                    .font(.largeTitle).bold()
+                    .foregroundStyle(state.getBgColor())
+                Spacer()
+                Text(state.getBgTitle())
+                    .font(.title).bold()
+                    .foregroundStyle(state.getBgColor())
+            }
+            
+            HStack {
+                Text("\(state.getDeltaChangeStringInUserChosenUnit()) \(state.bgUnitString)")
+                    .font(.title3)
+                    .foregroundStyle(Color(white: 0.8))
+                    .bold()
+                Spacer()
+                VStack {
+                    Text("Reading \(state.bgReadingDate.formatted(date: .omitted, time: .shortened))")
+                        .font(.subheadline)
+                        .foregroundStyle(Color(white: 0.6))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                    .bold()
+                    Text("Updated \(state.updatedDate.formatted(date: .omitted, time: .shortened))")
+                        .font(.subheadline)
+                        .foregroundStyle(Color(white: 0.6))
+                        .frame(maxWidth: .infinity, alignment: .trailing)
+                    .bold()
+                }
+            }
+        }
+        .padding(15)
+    }
+}
+
+//@available(iOS 16.2, *)
 struct XDripWidgetLiveActivity_Previews: PreviewProvider {
     static let attributes = XDripWidgetAttributes(eventStartDate: Date().addingTimeInterval(-1000))
-    static let contentState = XDripWidgetAttributes.ContentState(bgValueInMgDl: 75, isMgDl: true, trendArrow: "↘", deltaChangeInMgDl: -2, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180)
+    static let contentState = XDripWidgetAttributes.ContentState(bgValueInMgDl: 252, isMgDl: true, slopeOrdinal:5, deltaChangeInMgDl: -2, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, bgReadingDate: Date().addingTimeInterval(-180), updatedDate: Date())
     
     static var previews: some View {
         attributes

@@ -334,7 +334,7 @@
 "appleWatchSectionTitle" = "Apple Watch";
 
 /// general settings, section title
-"settingsviews_sectiontitlegeneral" = "General";
+"settingsviews_sectiontitleNotifications" = "Notifications";
 
 /// dexcom share settings, pop up that asks user to enter dexcom share account name
 "settingsviews_giveDexcomShareAccountName" = "Enter Dexcom Share Account Name";

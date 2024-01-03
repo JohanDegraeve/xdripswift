@@ -1,6 +1,6 @@
 "settingsviews_settingstitle" = "Configuración";
 "settingsviews_valueIsRequired" = "⚠️ Requerido";
-"settingsviews_sectiontitlegeneral" = "General";
+"settingsviews_sectiontitleNotifications" = "Notifications";
 "settingsviews_selectbgunit" = "Seleccionar Unidades";
 "settingsviews_masterorfollower" = "Master o Seguidor";
 "settingsviews_master" = "Master";
