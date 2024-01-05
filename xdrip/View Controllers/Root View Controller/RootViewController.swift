@@ -11,7 +11,8 @@ import WatchConnectivity
 import SwiftUI
 
 /// viewcontroller for the home screen
-final class RootViewController: UIViewController, ObservableObject {
+final class RootViewController: UIViewController, ObservableObject, AppCover {
+    
     
     // MARK: - Properties - Outlets and Actions for buttons and labels in home screen
     
@@ -449,7 +450,8 @@ final class RootViewController: UIViewController, ObservableObject {
             
     }
     
-    
+    // MARK: - App cover completion block
+    var onAppCoverCompletion: (() -> Void)? = nil
     
     // MARK: - Constants for ApplicationManager usage
     
@@ -1660,6 +1662,10 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// Configure View, only stuff that is independent of coredata
     private func setupView() {
+        
+        onAppCoverCompletion = {
+            self.updateLabelsAndChart(overrideApplicationState: true, forceReset: true)
+        }
         
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
