@@ -83,14 +83,14 @@ final class XAxisManager {
 final class YAxisManager {
     
     /// Store the lower boundary of the chart
-    var chartLowerBound: UniversalBGLevel = UniversalBGLevel(_mmoll: 1.0) {
+    var chartLowerBound: UniversalBGLevel = UniversalBGLevel(mmoll: 1.0) {
         didSet {
             recalc()
         }
     }
     
     /// Store the upper boundary of the chart
-    var chartUpperBound: UniversalBGLevel = UniversalBGLevel(_mmoll: 30.0) {
+    var chartUpperBound: UniversalBGLevel = UniversalBGLevel(mmoll: 30.0) {
         didSet {
             recalc()
         }
@@ -129,7 +129,7 @@ final class YAxisManager {
         // Convert the yCoord to a linear mmol/l axis
         let mmollFraction = (yCoord / height) * span
         // Return a normalised (0 ... 1), value of the yCoord that lies on the response curve of the axis
-        return chartResponseCurve(for: UniversalBGLevel(_mmoll: MMOLL(mmollFraction)))
+        return chartResponseCurve(for: UniversalBGLevel(mmoll: MMOLL(mmollFraction)))
     }
     
     /// Get the y-position of a result

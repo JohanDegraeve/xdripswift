@@ -117,7 +117,7 @@ public final class StatisticsManager: ObservableObject {
                 
                 //if there are no available readings, return without doing anything
                 if readings.count == 0 {
-                    return
+                    self.setIsWorking(to: false); return
                 }
                 
                 // let's calculate the actual first day of readings in bgReadings. Although the user wants to use 60 days to calculate, maybe we only have 4 days of data. This will be returned from the method and used in the UI. To ensure we calculate the whole days used, we should subtract 5 minutes from the fromDate
@@ -159,7 +159,7 @@ public final class StatisticsManager: ObservableObject {
                                 calculatedValue = calculatedValue * ConstantsBloodGlucose.mgDlToMmoll
                             }
                             
-                            self.backgroundRangeBins[currentTimeStamp.hour].addResult(level: UniversalBGLevel(_timestamp: currentTimeStamp.AGPDate, _mgdl: MGDL(calculatedValue)))
+                            self.backgroundRangeBins[currentTimeStamp.hour].addResult(level: UniversalBGLevel(timestamp: currentTimeStamp.AGPDate, mgdl: MGDL(calculatedValue)))
                             
                             glucoseValues.append(calculatedValue)
                             
@@ -173,7 +173,7 @@ public final class StatisticsManager: ObservableObject {
                 
                 /// Calculate the quartiles for the AGP
                 for i in 0 ..< self.backgroundRangeBins.count {
-                    self.latestRangeBins[i].calcQs()
+                    self.backgroundRangeBins[i].calcQs()
                 }
                 
                 /*

@@ -12,7 +12,6 @@
 		470824D2297484B500C52317 /* SwiftCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 470824D1297484B500C52317 /* SwiftCharts */; };
 		470824D3297484B500C52317 /* SwiftCharts in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 470824D1297484B500C52317 /* SwiftCharts */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		470B618A270C448000561E56 /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 470B6188270C448000561E56 /* Interface.storyboard */; };
-		470B618C270C448100561E56 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 470B618B270C448100561E56 /* Assets.xcassets */; };
 		470B6197270C448100561E56 /* InterfaceController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 470B6196270C448100561E56 /* InterfaceController.swift */; };
 		470B6199270C448100561E56 /* ExtensionDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 470B6198270C448100561E56 /* ExtensionDelegate.swift */; };
 		470B619B270C448100561E56 /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 470B619A270C448100561E56 /* ComplicationController.swift */; };
@@ -56,8 +55,16 @@
 		9A13AEA42B4DBDAD00CA5F87 /* CGPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A13AEA32B4DBDAD00CA5F87 /* CGPoint.swift */; };
 		9A13AEA62B4DBE2F00CA5F87 /* Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A13AEA52B4DBE2F00CA5F87 /* Color.swift */; };
 		9A13AEA82B4DBE6E00CA5F87 /* Set.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A13AEA72B4DBE6E00CA5F87 /* Set.swift */; };
+		9A86D3E42B50156A000DCA1A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 470B618B270C448100561E56 /* Assets.xcassets */; };
+		9A86D3E52B50158A000DCA1A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 470B618B270C448100561E56 /* Assets.xcassets */; };
+		9A86D3E62B50158B000DCA1A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 470B618B270C448100561E56 /* Assets.xcassets */; };
 		9AAE309A2B4FC47400D8BFCC /* Bool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAE30992B4FC47400D8BFCC /* Bool.swift */; };
 		9AAE309C2B4FC54900D8BFCC /* Path.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAE309B2B4FC54900D8BFCC /* Path.swift */; };
+		9AAE309E2B4FC6AC00D8BFCC /* UniversalBGLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAE309D2B4FC6AC00D8BFCC /* UniversalBGLevel.swift */; };
+		9AAE30A02B4FC6DE00D8BFCC /* RangeBin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAE309F2B4FC6DE00D8BFCC /* RangeBin.swift */; };
+		9AAE30A52B500D5B00D8BFCC /* Quicksand-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AAE30A22B500D5B00D8BFCC /* Quicksand-Regular.ttf */; };
+		9AAE30A62B500D5B00D8BFCC /* Quicksand-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AAE30A32B500D5B00D8BFCC /* Quicksand-SemiBold.ttf */; };
+		9AAE30A72B500D5B00D8BFCC /* Quicksand-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9AAE30A42B500D5B00D8BFCC /* Quicksand-Bold.ttf */; };
 		9AD655772B4DC068004C9538 /* NSLayoutConstraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD655762B4DC068004C9538 /* NSLayoutConstraint.swift */; };
 		9AD6557B2B4DC14F004C9538 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AD6557A2B4DC14F004C9538 /* View.swift */; };
 		CE1B2FE025D0264B00F642F5 /* LaunchScreen.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */; };
@@ -779,6 +786,11 @@
 		9A13AEA72B4DBE6E00CA5F87 /* Set.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Set.swift; sourceTree = "<group>"; };
 		9AAE30992B4FC47400D8BFCC /* Bool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bool.swift; sourceTree = "<group>"; };
 		9AAE309B2B4FC54900D8BFCC /* Path.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Path.swift; sourceTree = "<group>"; };
+		9AAE309D2B4FC6AC00D8BFCC /* UniversalBGLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniversalBGLevel.swift; sourceTree = "<group>"; };
+		9AAE309F2B4FC6DE00D8BFCC /* RangeBin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RangeBin.swift; sourceTree = "<group>"; };
+		9AAE30A22B500D5B00D8BFCC /* Quicksand-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Regular.ttf"; sourceTree = "<group>"; };
+		9AAE30A32B500D5B00D8BFCC /* Quicksand-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-SemiBold.ttf"; sourceTree = "<group>"; };
+		9AAE30A42B500D5B00D8BFCC /* Quicksand-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Quicksand-Bold.ttf"; sourceTree = "<group>"; };
 		9AD655762B4DC068004C9538 /* NSLayoutConstraint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSLayoutConstraint.swift; sourceTree = "<group>"; };
 		9AD6557A2B4DC14F004C9538 /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		CE1B2FC825D0261500F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Alerts.strings; sourceTree = "<group>"; };
@@ -1719,6 +1731,16 @@
 			path = "SwiftUI Controllers";
 			sourceTree = "<group>";
 		};
+		9AAE30A12B500C9900D8BFCC /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				9AAE30A42B500D5B00D8BFCC /* Quicksand-Bold.ttf */,
+				9AAE30A22B500D5B00D8BFCC /* Quicksand-Regular.ttf */,
+				9AAE30A32B500D5B00D8BFCC /* Quicksand-SemiBold.ttf */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
 		D4028CBE2774A4B900341476 /* Treatments */ = {
 			isa = PBXGroup;
 			children = (
@@ -1811,6 +1833,7 @@
 		F8025E5A21F7AFA100ECF0C0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9AAE30A12B500C9900D8BFCC /* Fonts */,
 				F8AC426621ADEBD70078C348 /* Assets.xcassets */,
 				F8B3A7B7226CC0B7004BA588 /* sounds */,
 			);
@@ -2845,6 +2868,8 @@
 				47D2DB3A2B14F6D000C8EE6B /* ScreenLockDimmingType.swift */,
 				9A13AE9F2B4DBC5C00CA5F87 /* UnitsPrimitives.swift */,
 				9A13AEA12B4DBD5400CA5F87 /* SUIHelper.swift */,
+				9AAE309D2B4FC6AC00D8BFCC /* UniversalBGLevel.swift */,
+				9AAE309F2B4FC6DE00D8BFCC /* RangeBin.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -3397,8 +3422,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				470B618C270C448100561E56 /* Assets.xcassets in Resources */,
 				470B619D270C448200561E56 /* Assets.xcassets in Resources */,
+				9A86D3E62B50158B000DCA1A /* Assets.xcassets in Resources */,
 				470B618A270C448000561E56 /* Interface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3408,6 +3433,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F870D3D925126A49008967B0 /* MainInterface.storyboard in Resources */,
+				9A86D3E52B50158A000DCA1A /* Assets.xcassets in Resources */,
 				F8E53FCE251D35FB00052CE5 /* Common.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3439,6 +3465,7 @@
 				F82437C324CB7A9900BED341 /* Metallic.caf in Resources */,
 				F82437C224CB7A9900BED341 /* Alert_Tone_Ringtone_2.caf in Resources */,
 				F81F370325C1583400520946 /* WatlaaView.strings in Resources */,
+				9A86D3E42B50156A000DCA1A /* Assets.xcassets in Resources */,
 				F824377E24CB7A9800BED341 /* Sci-Fi_Warning.caf in Resources */,
 				F8BDD438221A0349006EAB84 /* Localizable.strings in Resources */,
 				F8B3A786225D4473004BA588 /* NightScoutTestResult.strings in Resources */,
@@ -3453,6 +3480,7 @@
 				F824377024CB7A9800BED341 /* Siri_Alert_Urgent_Low_Glucose.caf in Resources */,
 				F82437A824CB7A9900BED341 /* Sunny.caf in Resources */,
 				F8BDD448221C9D70006EAB84 /* ErrorMessages.strings in Resources */,
+				9AAE30A52B500D5B00D8BFCC /* Quicksand-Regular.ttf in Resources */,
 				F82437CE24CB7A9900BED341 /* Cartoon_Ascend_Climb_Sneaky.caf in Resources */,
 				F824379F24CB7A9900BED341 /* Sci-Fi_Incoming_Message_Alert.caf in Resources */,
 				F8B3A7C9226CC0B7004BA588 /* modern2.caf in Resources */,
@@ -3554,8 +3582,10 @@
 				F821CF7F22A4EDCF005C1E43 /* 20ms-of-silence.caf in Resources */,
 				F82437D324CB7A9900BED341 /* Soft_Marimba_Pad_Positive.caf in Resources */,
 				F824379924CB7A9900BED341 /* Magical_Twinkle.caf in Resources */,
+				9AAE30A72B500D5B00D8BFCC /* Quicksand-Bold.ttf in Resources */,
 				F8B3A7CC226CC0B7004BA588 /* shorthigh1.caf in Resources */,
 				F824377824CB7A9800BED341 /* Sci-Fi_Alarm_Loop_2.caf in Resources */,
+				9AAE30A62B500D5B00D8BFCC /* Quicksand-SemiBold.ttf in Resources */,
 				F824378424CB7A9900BED341 /* Early_Sunrise.caf in Resources */,
 				F82437C524CB7A9900BED341 /* Marching_Heavy_Footed_Fat_Elephants.caf in Resources */,
 				F824376B24CB7A9800BED341 /* Thunder_Sound_FX.caf in Resources */,
@@ -3861,6 +3891,7 @@
 				F8B3A78E22622954004BA588 /* AlertType+CoreDataClass.swift in Sources */,
 				F821CF5A229BF43A005C1E43 /* CoreDataManager.swift in Sources */,
 				F8E51D6924549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift in Sources */,
+				9AAE30A02B4FC6DE00D8BFCC /* RangeBin.swift in Sources */,
 				F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */,
 				F8AF361B245D93EE00B5977B /* Int16.swift in Sources */,
 				F8E3A2AB23DA520B00E5E98A /* ConstantsWatch.swift in Sources */,
@@ -3974,6 +4005,7 @@
 				F816E12A2439DF3A009EE65B /* DexcomG4+CoreDataClass.swift in Sources */,
 				F8F9723E23A593C000C3F17D /* M5StickCBluetoothPeripheralViewModel.swift in Sources */,
 				F8A2BC3525DB0D6D001D1E78 /* BluetoothPeripheralManager+BluetoothTransmitterDelegate.swift in Sources */,
+				9AAE309E2B4FC6AC00D8BFCC /* UniversalBGLevel.swift in Sources */,
 				F8F9722323A5915900C3F17D /* LibreDataParser.swift in Sources */,
 				F8E51D5F2448E2E8001C9E5A /* ConstantsShareWithLoop.swift in Sources */,
 				F816E0ED2432A55F009EE65B /* BluconBluetoothPeripheralViewModel.swift in Sources */,

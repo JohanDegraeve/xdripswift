@@ -88,7 +88,7 @@ public enum TimeInRangeType: Int, CaseIterable {
         case .tightRange:
             return ConstantsStatistics.standardisedUniLowValueForTITR
         case .userDefinedRange:
-            return UniversalBGLevel(_mgdl: MGDL(UserDefaults.standard.lowMarkValue))
+            return UniversalBGLevel(mgdl: MGDL(UserDefaults.standard.lowMarkValue))
         }
     }
     
@@ -100,7 +100,7 @@ public enum TimeInRangeType: Int, CaseIterable {
         case .tightRange:
             return ConstantsStatistics.standardisedUniHighValueForTITR
         case .userDefinedRange:
-            return UniversalBGLevel(_mgdl: MGDL(UserDefaults.standard.highMarkValue))
+            return UniversalBGLevel(mgdl: MGDL(UserDefaults.standard.highMarkValue))
         }
     }
     

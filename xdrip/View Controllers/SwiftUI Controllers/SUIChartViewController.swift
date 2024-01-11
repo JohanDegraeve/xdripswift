@@ -25,12 +25,6 @@ import CoreData
  */
 class SUIChartViewController: UIViewController {
     
-    var onAppCoverCompletion: (() -> Void)? = nil
-    
-    /// This is the Chart view in the sliding `UIView` on the Home screen
-    @IBOutlet weak var chartView: UIView!
-    
-    
     /// This will be the controller for the SwiftUI chart view
     var suiChartView: SUIChartView!
     
@@ -38,6 +32,7 @@ class SUIChartViewController: UIViewController {
     var suiGranularityButtons: SUIGranularityButtons!
     
     @IBOutlet weak var buttonsView: UIView!
+    @IBOutlet weak var chartView: UIView!
     
     var statisticsManager: StatisticsManager?
     

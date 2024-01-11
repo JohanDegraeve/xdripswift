@@ -373,6 +373,26 @@ final class RootViewController: UIViewController, ObservableObject {
         }
     }
     
+    // The user has long-pressed the statistics view and we can present the chart for AGP
+    @IBAction func statisticsViewLongPressGestureRecogniser(_ sender: UILongPressGestureRecognizer) {
+        
+        // Get the storyboard
+        let chartViewStoryBoard: UIStoryboard = UIStoryboard(name: "AGP", bundle: Bundle.main)
+        
+        // Send the `AppDelegate`s `StatisticsManager` down the line
+        if let appD = UIApplication.shared.delegate as? AppDelegate {
+            
+            appD.statisticManager = statisticsManager
+            
+            if let _ = appD.statisticManager, let chartViewController = chartViewStoryBoard.instantiateInitialViewController(){
+                    
+                    present(chartViewController, animated: true)
+                    
+            }
+        }
+        
+    }
+    
     @IBOutlet var miniChartDoubleTapGestureRecognizer: UITapGestureRecognizer!
     
     /// can be used as a shortcut to switch between different TIR calculation methods. The user will be notified of the change via UI transitions to show what has changed in the calculation limits
@@ -1660,6 +1680,7 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// Configure View, only stuff that is independent of coredata
     private func setupView() {
+
         
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()

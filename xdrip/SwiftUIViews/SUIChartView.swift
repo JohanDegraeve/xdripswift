@@ -69,13 +69,13 @@ public struct SUIChartView: View {
     }
     
     /// Store the users urgent low value for later use
-    let urgentLow = (UniversalBGLevel(_mgdl: MGDL(UserDefaults.standard.urgentLowMarkValue)))
+    let urgentLow = (UniversalBGLevel(mgdl: MGDL(UserDefaults.standard.urgentLowMarkValue)))
     /// Store the users  low, value for later use
-    let low = (UniversalBGLevel(_mgdl: MGDL(UserDefaults.standard.lowMarkValue)))
+    let low = (UniversalBGLevel(mgdl: MGDL(UserDefaults.standard.lowMarkValue)))
     /// Store the users high value for later use
-    let high = (UniversalBGLevel(_mgdl: MGDL(UserDefaults.standard.highMarkValue)))
+    let high = (UniversalBGLevel(mgdl: MGDL(UserDefaults.standard.highMarkValue)))
     /// Store the users urgent high value for later use
-    let urgentHigh = (UniversalBGLevel(_mgdl: MGDL(UserDefaults.standard.urgentHighMarkValue)))
+    let urgentHigh = (UniversalBGLevel(mgdl: MGDL(UserDefaults.standard.urgentHighMarkValue)))
     /// This is the colour of the AGP areas
     let rangeColour: Color = Color(red: 0.690, green: 0.944, blue: 0.981)
     
@@ -232,6 +232,7 @@ public struct SUIChartView: View {
     /// --------------------   ----------------------
     
     
+    // MARK: - Main `BODY`
     public var body: some View {
         
         if UserDefaults.standard.daysToUseStatistics < 2 {
@@ -239,7 +240,12 @@ public struct SUIChartView: View {
             // It's arguable that less than a week isn't useful, but this will cover the main issue of an incorrect graph with only one day
             ZStack {
                 VStack {
-                    Image(uiImage: UIImage(named: "Exclamation")!).resizable().frame(maxWidth: 300.0, maxHeight: 300.0)
+                    
+                    Image(uiImage: UIImage(systemName: "exclamationmark.square.fill")!)
+                        .symbolRenderingMode(.hierarchical)
+                        .foregroundStyle(Color.orange)
+                        .frame(maxWidth: 300.0, maxHeight: 300.0)
+                    
                     Text("AGP needs more than one day's data.").foregroundStyle(.white)
                 }.background(backgroundColour)
             }.frame(maxWidth: .infinity, maxHeight: .infinity).background(backgroundColour)

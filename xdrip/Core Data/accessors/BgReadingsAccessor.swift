@@ -192,8 +192,6 @@ class BgReadingsAccessor: ObservableObject {
                 
                 try managedObjectContext.save()
                 
-                print("coredata saved")
-                
             } catch {
                 
                 trace("in delete bgReading,  Unable to Save Changes, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, error.localizedDescription)

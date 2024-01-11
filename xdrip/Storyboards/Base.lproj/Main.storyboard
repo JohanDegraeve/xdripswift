@@ -836,6 +836,7 @@
                                         </constraints>
                                         <connections>
                                             <outletCollection property="gestureRecognizers" destination="5Ud-6R-vpG" appends="YES" id="It3-MG-SJ8"/>
+                                            <outletCollection property="gestureRecognizers" destination="ozP-oY-22B" appends="YES" id="Bxq-9E-onN"/>
                                         </connections>
                                     </view>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ETk-QH-u1x">
@@ -1018,41 +1019,46 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
-                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.90000000000000002" id="tYH-fG-Lky">
+                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.90000000000000002" id="tYH-fG-Lky" userLabel="Value Label Long Press Gesture Recogniser">
                     <connections>
                         <action selector="valueLabelLongPressGestureRecognizerAction:" destination="9pv-A4-QxB" id="6V0-gW-Q4f"/>
                     </connections>
                 </pongPressGestureRecognizer>
-                <panGestureRecognizer minimumNumberOfTouches="1" id="Fi5-iu-Usk">
+                <panGestureRecognizer minimumNumberOfTouches="1" id="Fi5-iu-Usk" userLabel="Chart Pan Gesture Recogniser">
                     <connections>
                         <action selector="chartPanGestureRecognizerAction:" destination="9pv-A4-QxB" id="NUY-gV-rdx"/>
                     </connections>
                 </panGestureRecognizer>
-                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="axt-dD-sCA">
+                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="axt-dD-sCA" userLabel="Chart Outlet Long Press Gesture Recogniser">
                     <connections>
                         <action selector="chartLongPressGestureRecognizerAction:" destination="9pv-A4-QxB" id="6qG-44-Nd4"/>
                     </connections>
                 </pongPressGestureRecognizer>
-                <tapGestureRecognizer numberOfTapsRequired="2" id="KGx-wX-6Ap">
+                <tapGestureRecognizer numberOfTapsRequired="2" id="KGx-wX-6Ap" userLabel="Chart Outlet Double Tap Gesture Recogniser">
                     <connections>
                         <action selector="chartDoubleTapGestureRecognizer:" destination="9pv-A4-QxB" id="KJ1-MA-2o8"/>
                     </connections>
                 </tapGestureRecognizer>
-                <tapGestureRecognizer numberOfTapsRequired="2" id="AyP-F5-KtO">
+                <tapGestureRecognizer numberOfTapsRequired="2" id="AyP-F5-KtO" userLabel="Mini Chart Outlet Tap Gesture Recogniser">
                     <connections>
                         <action selector="miniChartDoubleTapGestureRecognizer:" destination="9pv-A4-QxB" id="5IT-6c-SZi"/>
                     </connections>
                 </tapGestureRecognizer>
-                <tapGestureRecognizer numberOfTapsRequired="2" id="j3a-7w-xaq">
+                <tapGestureRecognizer numberOfTapsRequired="2" id="j3a-7w-xaq" userLabel="NightScout URL Tap Gesture Recogniser">
                     <connections>
                         <action selector="urlDoubleTapGestureRecognizerAction:" destination="9pv-A4-QxB" id="zbn-KM-fUe"/>
                     </connections>
                 </tapGestureRecognizer>
-                <tapGestureRecognizer numberOfTapsRequired="2" id="5Ud-6R-vpG">
+                <tapGestureRecognizer numberOfTapsRequired="2" id="5Ud-6R-vpG" userLabel="Statistics View Double Tap Gesture Recogniser">
                     <connections>
                         <action selector="statisticsViewDoubleTapGestureRecognizer:" destination="9pv-A4-QxB" id="Iof-ql-e0F"/>
                     </connections>
                 </tapGestureRecognizer>
+                <pongPressGestureRecognizer allowableMovement="10" minimumPressDuration="0.5" id="ozP-oY-22B" userLabel="Statistics View Long Press Gesture Recogniser">
+                    <connections>
+                        <action selector="statisticsViewLongPressGestureRecogniser:" destination="9pv-A4-QxB" id="39b-xm-9UM"/>
+                    </connections>
+                </pongPressGestureRecognizer>
             </objects>
             <point key="canvasLocation" x="744.61538461538464" y="-890.75829383886253"/>
         </scene>
@@ -2373,16 +2379,16 @@
         <image name="questionmark.circle" catalog="system" width="128" height="123"/>
         <image name="scope" catalog="system" width="128" height="124"/>
         <systemColor name="systemBlueColor">
-            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGrayColor">
-            <color red="0.5568627451" green="0.5568627451" blue="0.57647058819999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemGreenColor">
-            <color red="0.20392156859999999" green="0.78039215689999997" blue="0.34901960780000002" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.20392156862745098" green="0.7803921568627451" blue="0.34901960784313724" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemRedColor">
-            <color red="1" green="0.23137254900000001" blue="0.18823529410000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23137254901960785" blue="0.18823529411764706" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemYellowColor">
             <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

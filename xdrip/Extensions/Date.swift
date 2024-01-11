@@ -254,7 +254,7 @@ extension Date {
     }
     
     var AGPDate: Date {
-        var returnDate = Date.init(timeIntervalSinceReferenceDate: 0.0)
+        let returnDate = Date.init(timeIntervalSinceReferenceDate: 0.0)
         return Calendar.current.date(bySettingHour: self.hour, minute: 0, second: 0, of: returnDate)!
     }
 }
