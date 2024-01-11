@@ -9,6 +9,11 @@
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
+    <customFonts key="customFonts">
+        <array key="Quicksand-SemiBold.ttf">
+            <string>Quicksand-SemiBold</string>
+        </array>
+    </customFonts>
     <scenes>
         <!--Chart View Controller-->
         <scene sceneID="s0d-6b-0kx">
@@ -69,19 +74,29 @@
                                     <constraint firstAttribute="height" constant="75" id="lWm-vs-zS0"/>
                                 </constraints>
                             </view>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="AGP" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="A0M-gD-ePI">
+                                <rect key="frame" x="98.333333333333329" y="0.0" width="196.33333333333337" height="52"/>
+                                <fontDescription key="fontDescription" name="Quicksand-SemiBold" family="Quicksand" pointSize="34"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="highlightedColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="kTg-NT-Dg8" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="0rN-hm-5Kg"/>
+                            <constraint firstItem="A0M-gD-ePI" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="2sR-dU-JoV"/>
                             <constraint firstItem="kSx-3G-3u8" firstAttribute="width" secondItem="5EZ-qb-Rvc" secondAttribute="width" id="3EZ-zf-Xae"/>
                             <constraint firstItem="kTg-NT-Dg8" firstAttribute="top" secondItem="Z0b-nJ-Chb" secondAttribute="bottom" id="3Xe-X3-mod"/>
                             <constraint firstItem="vDu-zF-Fre" firstAttribute="bottom" secondItem="kSx-3G-3u8" secondAttribute="bottom" id="6eS-6l-giE"/>
+                            <constraint firstItem="kTg-NT-Dg8" firstAttribute="top" secondItem="A0M-gD-ePI" secondAttribute="bottom" id="7sJ-5M-3Bo"/>
                             <constraint firstItem="Z0b-nJ-Chb" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" constant="2" id="AAG-mS-OAa"/>
                             <constraint firstItem="kTg-NT-Dg8" firstAttribute="bottom" secondItem="kSx-3G-3u8" secondAttribute="top" constant="34" id="Dnb-iw-Q9j"/>
+                            <constraint firstItem="A0M-gD-ePI" firstAttribute="width" secondItem="5EZ-qb-Rvc" secondAttribute="width" multiplier="0.5" id="POw-8y-ewk"/>
                             <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="Z0b-nJ-Chb" secondAttribute="trailing" id="PjK-iv-ToV"/>
                             <constraint firstItem="kSx-3G-3u8" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="TPp-zo-Tug"/>
                             <constraint firstItem="kTg-NT-Dg8" firstAttribute="width" secondItem="5EZ-qb-Rvc" secondAttribute="width" id="eTC-oT-dyn"/>
+                            <constraint firstItem="A0M-gD-ePI" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" id="gVT-Bm-ewg"/>
                         </constraints>
                     </view>
                     <connections>
