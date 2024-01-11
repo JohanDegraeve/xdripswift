@@ -8,8 +8,10 @@
 
 import Foundation
 import CoreData
+import SwiftCharts
+import Combine
 
-public final class StatisticsManager {
+public final class StatisticsManager: ObservableObject {
     
     // MARK: - private properties
     
@@ -22,6 +24,42 @@ public final class StatisticsManager {
     /// a coreDataManager
     private var coreDataManager: CoreDataManager
     
+    // MARK: - Public properties
+        
+        /// Although a callback function is available in the code, SwiftUI
+        /// doesn't respond very well to this pattern. Using `Combine` framework
+        /// appears to be a better way of refreshing the view.
+
+    
+        /// Holds the hour-by-hour ranges across any 24hr period.
+        ///
+        /// To give an idea of how a user's BG fluctuates over a 24 hour period (00:00 - 23:00)
+        /// we have 24 'bins' - one for each hour of the day - and each bin stores the high,
+        /// low and average glucose levels. This is used by the SwiftUI chart view.
+        @Published var latestRangeBins: [BGRangeBin] = []
+        
+        /// To show a 'working in progress' spinner in the SwiftUI views this will hold a flag to indicate if we are in the process of calculating stuff
+        @Published var isWorking: Bool = false
+        
+        /// Used to build the `latestRangeBin` in background thread.
+        ///
+        /// In order to build the bins array for the range graph, we use a private array
+        /// we put the results into this iVar and then at the end pass it to the `latestRangeBins`.
+        /// The problem with building the array in iterated stages is that each addition would
+        /// trigger the `Publisher`.
+        private var backgroundRangeBins: [BGRangeBin] = Array(repeating: BGRangeBin(), count: 24)
+        
+        /// D.R.Y to make sure the `isWorking` flag is published on the main thread
+        private func setIsWorking(to flag: Bool) {
+            if Thread.isMainThread {
+                self.isWorking = flag
+            } else {
+                DispatchQueue.main.async {
+                    self.isWorking = flag
+                }
+            }
+        }
+    
     // MARK: - intializer
     
     init(coreDataManager: CoreDataManager) {
@@ -29,13 +67,14 @@ public final class StatisticsManager {
         // set coreDataManager and bgReadingsAccessor
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
-
+        
         // initialize operationQueue
         operationQueue = OperationQueue()
         
         // operationQueue will be queue of blocks that gets readings and updates glucoseChartPoints, startDate and endDate. To avoid race condition, the operations should be one after the other
         operationQueue.maxConcurrentOperationCount = 1
         
+        self.setIsWorking(to: false)
     }
     
     // MARK: - public functions
@@ -45,13 +84,16 @@ public final class StatisticsManager {
     ///     - callback : will be called with result of calculations in UI thread
     public func calculateStatistics(fromDate: Date, toDate: Date? = Date(), callback: @escaping (Statistics) -> Void) {
         
+        // if there's more than one operation waiting for execution, it makes no sense to execute this one
+        guard self.operationQueue.operations.count <= 1, !self.isWorking else {
+            self.setIsWorking(to: false) // << Just for "belts and braces"
+            return
+        }
+        
         // create a new operation
         let operation = BlockOperation(block: {
             
-            // if there's more than one operation waiting for execution, it makes no sense to execute this one
-            guard self.operationQueue.operations.count <= 1 else {
-                return
-            }
+            self.setIsWorking(to: true)
             
             // declare variables/constants
             let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
@@ -92,6 +134,12 @@ public final class StatisticsManager {
                 let minValidReading: Double = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
                 let maxValidReading: Double = 450
                 
+                // Reset the background range bins for the AGP
+                self.backgroundRangeBins.removeAll()
+                for i in 0 ..< 24 {
+                    self.backgroundRangeBins.append(BGRangeBin(hour: i))
+                }
+                
                 // step though all values, check them for validity, convert if necessary and append them to the glucoseValues array
                 for reading in readings {
                     
@@ -111,6 +159,8 @@ public final class StatisticsManager {
                                 calculatedValue = calculatedValue * ConstantsBloodGlucose.mgDlToMmoll
                             }
                             
+                            self.backgroundRangeBins[currentTimeStamp.hour].addResult(level: UniversalBGLevel(_timestamp: currentTimeStamp.AGPDate, _mgdl: MGDL(calculatedValue)))
+                            
                             glucoseValues.append(calculatedValue)
                             
                             // update the timestamp for the next loop
@@ -119,6 +169,11 @@ public final class StatisticsManager {
                         }
                         
                     }
+                }
+                
+                /// Calculate the quartiles for the AGP
+                for i in 0 ..< self.backgroundRangeBins.count {
+                    self.latestRangeBins[i].calcQs()
                 }
                 
                 /*
@@ -193,6 +248,12 @@ public final class StatisticsManager {
             // call callback in main thread, this callback will only update the UI when the user hasn't requested more statistics updates in the meantime (this will only apply if they are reaaaallly quick at tapping the segmented control)
             if self.operationQueue.operations.count <= 1 {
                 DispatchQueue.main.async {
+                    
+                    // Now the stats are done we can update the range bins on the main thread to trigger
+                    // a SwiftUI redraw
+                    self.latestRangeBins = self.backgroundRangeBins
+                    self.setIsWorking(to: false) // Trigger the SwiftUI AGP to update it's working animation
+                    
                     callback( Statistics(lowStatisticValue: lowStatisticValue, highStatisticValue: highStatisticValue, inRangeStatisticValue: inRangeStatisticValue, averageStatisticValue: averageStatisticValue, a1CStatisticValue: a1CStatisticValue, cVStatisticValue: cVStatisticValue, lowLimitForTIR: lowLimitForTIR, highLimitForTIR: highLimitForTIR, numberOfDaysUsed: numberOfDaysUsed))
                 }
             }

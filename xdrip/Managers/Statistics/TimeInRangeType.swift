@@ -78,4 +78,30 @@ public enum TimeInRangeType: Int, CaseIterable {
         
     }
     
+    // MARK: - highs and low values using `UniversalBGLevel`s
+    
+    var uniLowerLimit: UniversalBGLevel {
+        
+        switch self {
+        case .standardRange:
+            return ConstantsStatistics.standardisedUniLowValueForTIR
+        case .tightRange:
+            return ConstantsStatistics.standardisedUniLowValueForTITR
+        case .userDefinedRange:
+            return UniversalBGLevel(_mgdl: MGDL(UserDefaults.standard.lowMarkValue))
+        }
+    }
+    
+    var uniHigherLimit: UniversalBGLevel {
+        
+        switch self {
+        case .standardRange:
+            return ConstantsStatistics.standardisedUniHighValueForTIR
+        case .tightRange:
+            return ConstantsStatistics.standardisedUniHighValueForTITR
+        case .userDefinedRange:
+            return UniversalBGLevel(_mgdl: MGDL(UserDefaults.standard.highMarkValue))
+        }
+    }
+    
 }

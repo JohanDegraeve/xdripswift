@@ -11,6 +11,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     private let quickActionsManager = QuickActionsManager()
     
+    /// This is a 'hack' to pass the statsManager on to the statistics views
+    var statisticManager: StatisticsManager? = nil
+    
     /// allow the orientation to be changed as per the settings for each individual view controller
     var restrictRotation:UIInterfaceOrientationMask = .all
     

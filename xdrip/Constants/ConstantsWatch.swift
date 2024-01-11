@@ -15,16 +15,60 @@ enum ConstantsWatch {
     static let visualIndicatorInRange = "🟢"
 }
 
+// MARK: - Used in the AGP
 
 // Indentifiers for blood glucose range descriptions
-enum BgRangeDescription {
+public enum BgRangeDescription: Int {
     
-    /// bg range is "urgent" (either high or low)
-    case urgent
+    /// Specific case for very hgh
+    case urgentHigh = 4
     
-    /// bg range is "not urgent" (either high or low)
-    case notUrgent
+    /// Specific case for high
+    case high = 3
     
     /// bg range is "in range"
-    case inRange
+    case inRange = 2
+    
+    /// Specific case for low
+    case low = 1
+    
+    /// Specific case for very low
+    case urgentLow = 0
+    
+    /// bg range is "not urgent" (either high or low)
+    case notUrgent = 6
+    
+    // ---------------------------
+    
+    /// Case for when we need to display a special message
+    case special = -1
+    
+    /// bg range is "urgent" (either high or low)
+    case urgent = -2
+    
+    /// TBC
+    case rangeNR = -3
+    
+    var descriptions: String {
+        switch self {
+        case .urgentHigh:
+            return "Urgent High"
+        case .high:
+            return "High"
+        case .inRange:
+            return "In Range"
+        case .low:
+            return "Low"
+        case .urgentLow:
+            return "Urgent Low"
+        case .notUrgent:
+            return "Not Urgent"
+        case .special:
+            return "Special"
+        case .urgent:
+            return "Urgent"
+        case .rangeNR:
+            return "RangeNR TBC"
+        }
+    }
 }

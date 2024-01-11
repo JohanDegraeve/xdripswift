@@ -199,4 +199,62 @@ extension Date {
         
     }
     
+    /// This is a copy of the `Date` extension. However for the purposes of speed, it uses a stored `DateFormatter`. This is
+        /// because of the accumulated time taken and associated memory connected to constantly setting up and clearing a `DateFormatter`.
+        ///
+        /// date to string, with date and time as specified by one of the values in DateFormatter.Style and formatted to match the user's locale
+        /// Example return: "31/12/2022, 17:48" (spain locale)
+        /// Example return: "12/31/2022, 5:48 pm" (us locale)
+        func dateToStringInUserLocale(using dateFormatter: DateFormatter, showTimeZone: Bool? = false) -> String {
+
+            dateFormatter.amSymbol = ConstantsUI.timeFormatAM
+            dateFormatter.pmSymbol = ConstantsUI.timeFormatPM
+            
+            let showUserTimeZone = showTimeZone ?? false
+            
+            if dateFormatter.timeStyle == .none {
+                
+                dateFormatter.setLocalizedDateFormatFromTemplate("dd/MM/yyyy")
+                
+            } else if dateFormatter.dateStyle == .none {
+                
+                if showUserTimeZone {
+                
+                dateFormatter.setLocalizedDateFormatFromTemplate("jj:mm zzz")
+                    
+                } else {
+                    
+                    dateFormatter.setLocalizedDateFormatFromTemplate("jj:mm")
+                    
+                }
+                
+            } else {
+                
+                if showUserTimeZone {
+                    
+                    dateFormatter.setLocalizedDateFormatFromTemplate("dd/MM/yyyy, jj:mm zzz")
+                    
+                } else {
+                    
+                    dateFormatter.setLocalizedDateFormatFromTemplate("dd/MM/yyyy, jj:mm")
+                }
+                
+            }
+            
+            return dateFormatter.string(from: self)
+        }
+    
+    // MARK: - Convenience iVars for the AGP chart
+    
+    /// Get the hour component of `self`.
+    ///
+    /// Used in AGP charts to decide the bin in which to place `self`
+    var hour: Int {
+        return  Calendar.current.component(.hour, from: self)
+    }
+    
+    var AGPDate: Date {
+        var returnDate = Date.init(timeIntervalSinceReferenceDate: 0.0)
+        return Calendar.current.date(bySettingHour: self.hour, minute: 0, second: 0, of: returnDate)!
+    }
 }
