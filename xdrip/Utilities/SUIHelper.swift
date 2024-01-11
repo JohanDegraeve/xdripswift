@@ -333,7 +333,6 @@ struct SUIGranularityButtons: View {
     
     // The granularity buttons. The first element is 'today', then the others denote the number of days over which stats are calculated.
     private let buttons:[(days: Int, image: Image)] = [
-        (0, Image(systemName: "clock.fill")),
         (7, Image(systemName: "calendar.circle.fill")),
         (14, Image(systemName: "calendar.circle.fill")),
         (30, Image(systemName: "calendar.circle.fill")),
@@ -343,7 +342,7 @@ struct SUIGranularityButtons: View {
 
     
     /// The observed and mutated ivar of the user required days worth of statistics
-    @State var selected: Days = UserDefaults.standard.daysToUseStatistics
+    @State var selected: Days = 7
     
     // func to style and display
     private func GranularityButton(days: Days, icon: Image? = nil, onTap:(()->Void)? = nil) -> some View {
@@ -409,7 +408,7 @@ struct SUIWorkingWheeels: View {
             Image(uiImage: UIImage(named: "COGS2")!)
                 .resizable()
                 .frame(width: size - 30, height: size - 30)
-                .rotationEffect(Angle(degrees: isWorking ? Double.random(in: 0 ... 360) : 0.0))
+                .rotationEffect(Angle(degrees: isWorking ? Double.random(in: 25 ... 360) : 0.0))
                 .animation(isWorking ? .linear(duration: Double.random(in: 1...3)).repeatForever(autoreverses: false) : .linear(duration: 0.01).delay(transDuration + 0.2), value: isWorking)
                 .scaleEffect(isWorking ? 1.0 : 0.0).animation(.linear(duration: 0.2), value: isWorking)
             
@@ -417,7 +416,7 @@ struct SUIWorkingWheeels: View {
             Image(uiImage: UIImage(named: "COGS1")!)
                 .resizable()
                 .frame(width: size - 30, height: size - 30)
-                .rotationEffect(Angle(degrees: isWorking ? -Double.random(in: 0 ... 360) : 0.0))
+                .rotationEffect(Angle(degrees: isWorking ? -Double.random(in: 30 ... 360) : 0.0))
                 .animation(isWorking ? .linear(duration: Double.random(in: 1...3)).repeatForever(autoreverses: false) : .linear(duration: 0.01).delay(transDuration + 0.2), value: isWorking)
                 .scaleEffect(isWorking ? 1.0 : 0.0).animation(.linear(duration: 0.2), value: isWorking)
             

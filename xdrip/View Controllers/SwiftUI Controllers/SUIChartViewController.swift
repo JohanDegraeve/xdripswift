@@ -64,45 +64,21 @@ class SUIChartViewController: UIViewController {
             cvc.view!.translatesAutoresizingMaskIntoConstraints = false
             self.addChild(cvc)
             self.chartView.addSubview(cvc.view!)
+            cvc.view!.backgroundColor = .black
             NSLayoutConstraint.fixAllSides(of: cvc.view!, to: self.chartView)
             
             // Setup SwiftUI granularity buttons
             self.suiGranularityButtons = SUIGranularityButtons()
             let gvc = UIHostingController(rootView: self.suiGranularityButtons)
             gvc.view!.translatesAutoresizingMaskIntoConstraints = false
-            gvc.view!.backgroundColor = .clear
+            gvc.view!.backgroundColor = .black
             self.addChild(gvc)
             self.buttonsView.addSubview(gvc.view!)
             NSLayoutConstraint.fixAllSides(of: gvc.view!, to: self.buttonsView)
         }
     }
     
-    
-    /// This is the left constraint for the stats segment control
-    @IBOutlet weak var statsViewLeftConstraint: NSLayoutConstraint!
-    
-    /// This will animate the `statsViewLeftConstraint` to show the panel required
-    ///
-    /// It used the count of the segmented control contents to calculate the new constan for the constraint.
-    /// Each panel is expected to be the width of the screen and their constraints should make sure of that.
-    @IBAction func statsBarTap(_ sender: UISegmentedControl) {
-        let segment = CGFloat(sender.selectedSegmentIndex)
-        let segmentCount = CGFloat(sender.numberOfSegments)
-        
-        suiGranularityButtons.setEnabledButtons(buttons: segment == 0 ? .all : .allExceptToday)
-        
-        if segment == 1 && suiGranularityButtons.selected == Days(0) {
-            suiGranularityButtons.selected = Days(7)
-        }
-        
-        statsViewLeftConstraint.constant = -(sender.frame.width * segmentCount) * (segment / segmentCount)
-        UIView.animate(withDuration: 0.25) {
-            self.view.layoutIfNeeded()
-        }
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
+    @IBAction func close(_ sender: UIButton) {
+        self.dismiss(animated: true)
     }
 }

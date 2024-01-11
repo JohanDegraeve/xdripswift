@@ -199,7 +199,7 @@ public struct SUIChartView: View {
             Text(axisManager.xMarkerText(for: date)).modifier(axisLabelModifier(textColour: .white, isMajor: true)).rotationEffect(Angle(degrees: 90))
             
             if let information = information {
-                infoBox(information: information).offset(x: (size.width - value - 100.0)  < $infoTabWidth.wrappedValue ? (-$infoTabWidth.wrappedValue / 2) - width: ($infoTabWidth.wrappedValue / 2) + width)
+                infoBox(information: information).offset(x: (size.width - value - 100.0)  < $infoTabWidth.wrappedValue ? (-$infoTabWidth.wrappedValue / 2) - width: ($infoTabWidth.wrappedValue / 2) + width, y: 40.0)
             }
             
         }).position(x: value + halfWidth, y: 50.0)
@@ -241,145 +241,148 @@ public struct SUIChartView: View {
             ZStack {
                 VStack {
                     
-                    Image(uiImage: UIImage(systemName: "exclamationmark.square.fill")!)
-                        .symbolRenderingMode(.hierarchical)
-                        .foregroundStyle(Color.orange)
+                    Image(systemName: "clock.badge.exclamationmark.fill").font(.system(size: 60.0))
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(.red, .yellow, .blue)
                         .frame(maxWidth: 300.0, maxHeight: 300.0)
                     
-                    Text("AGP needs more than one day's data.").foregroundStyle(.white)
+                    Text("AGP needs more than one day's data.").foregroundStyle(.white).font(Font(ConstantsUI.SmallFont))
                 }.background(backgroundColour)
             }.frame(maxWidth: .infinity, maxHeight: .infinity).background(backgroundColour)
-        } else {
-            GeometryReader { proxy in
-                
-                // We can only easily set the view size in the helper class like this.
-                //It returns an `EmprtyView()` so  will take no part in the final render.
-                updateAxisManager(with: proxy.size)
-                
-                ZStack {
+        }  else {
+            ZStack {
+                GeometryReader { proxy in
                     
-                    axisManager.xManager.setAGPBounds()
+                    // We can only easily set the view size in the helper class like this.
+                    //It returns an `EmprtyView()` so  will take no part in the final render.
+                    updateAxisManager(with: proxy.size)
                     
-                    renderRanges(with: 0.9, in: proxy.size)
-                    
-                    // Render range lines
-                    yAxisLabels(in: proxy.size.height)
-                    
-                    if statMan.latestRangeBins.count > 0 {
-                        // Chart
-                        ZStack  {
-                            
-                            if chartType == .AGP {
-                                // ------ Draw an Ambulatory Glucose Profile graph
+                    ZStack {
+                        
+                        axisManager.xManager.setAGPBounds()
+                        
+                        renderRanges(with: 0.9, in: proxy.size)
+                        
+                        // Render range lines
+                        yAxisLabels(in: proxy.size.height)
+                        
+                        if statMan.latestRangeBins.count > 0 {
+                            // Chart
+                            ZStack  {
                                 
-                                
-                                ZStack {
+                                if chartType == .AGP {
+                                    // ------ Draw an Ambulatory Glucose Profile graph
                                     
-                                    var q2575: Path = Path()
                                     
-                                    var q1090: Path = Path()
-                                    
-                                    let width = (proxy.size.width / CGFloat(statMan.latestRangeBins.count))
-                                    let halfWidth = width / 2
-                                    
-                                    let q50 = Path { q50path in
+                                    ZStack {
                                         
-                                        q1090.move(to: axisManager.coords(for: statMan.latestRangeBins.first!.quartiles.Q10))
+                                        var q2575: Path = Path()
                                         
-                                        q2575.move(to: axisManager.coords(for: statMan.latestRangeBins.first!.quartiles.Q25))
+                                        var q1090: Path = Path()
                                         
-                                        q50path.move(to: axisManager.coords(for: statMan.latestRangeBins.first!.quartiles.Q50).offset(dx: (halfWidth), dy: 0.0))
+                                        let width = (proxy.size.width / CGFloat(statMan.latestRangeBins.count))
+                                        let halfWidth = width / 2
                                         
-                                        
-                                        var q10points:[CGPoint] = Array(repeating: CGPoint.zero, count: statMan.latestRangeBins.count)
-                                        var q25points:[CGPoint] = Array(repeating: CGPoint.zero, count: statMan.latestRangeBins.count)
-                                        var q75points:[CGPoint] = Array(repeating: CGPoint.zero, count: statMan.latestRangeBins.count)
-                                        var q90points:[CGPoint] = Array(repeating: CGPoint.zero, count: statMan.latestRangeBins.count)
-                                        
-                                        // Draw lower bound of quartiles
-                                        for bin in statMan.latestRangeBins.enumerated() {
+                                        let q50 = Path { q50path in
                                             
-                                            let newQ50 = axisManager.coords(for: bin.element.quartiles.Q50).offset(dx: halfWidth)
+                                            q1090.move(to: axisManager.coords(for: statMan.latestRangeBins.first!.quartiles.Q10))
                                             
-                                            q50path.addCurveWithControlPoints(to: newQ50)
+                                            q2575.move(to: axisManager.coords(for: statMan.latestRangeBins.first!.quartiles.Q25))
                                             
-                                            q25points[bin.offset] = axisManager.coords(for: bin.element.quartiles.Q25).offset(dx: halfWidth)
-                                            q75points[bin.offset] = axisManager.coords(for: bin.element.quartiles.Q75).offset(dx: halfWidth)
+                                            q50path.move(to: axisManager.coords(for: statMan.latestRangeBins.first!.quartiles.Q50).offset(dx: (halfWidth), dy: 0.0))
                                             
-                                            q10points[bin.offset] = axisManager.coords(for: bin.element.quartiles.Q10).offset(dx: halfWidth)
-                                            q90points[bin.offset] = axisManager.coords(for: bin.element.quartiles.Q90).offset(dx: halfWidth)
+                                            
+                                            var q10points:[CGPoint] = Array(repeating: CGPoint.zero, count: statMan.latestRangeBins.count)
+                                            var q25points:[CGPoint] = Array(repeating: CGPoint.zero, count: statMan.latestRangeBins.count)
+                                            var q75points:[CGPoint] = Array(repeating: CGPoint.zero, count: statMan.latestRangeBins.count)
+                                            var q90points:[CGPoint] = Array(repeating: CGPoint.zero, count: statMan.latestRangeBins.count)
+                                            
+                                            // Draw lower bound of quartiles
+                                            for bin in statMan.latestRangeBins.enumerated() {
+                                                
+                                                let newQ50 = axisManager.coords(for: bin.element.quartiles.Q50).offset(dx: halfWidth)
+                                                
+                                                q50path.addCurveWithControlPoints(to: newQ50)
+                                                
+                                                q25points[bin.offset] = axisManager.coords(for: bin.element.quartiles.Q25).offset(dx: halfWidth)
+                                                q75points[bin.offset] = axisManager.coords(for: bin.element.quartiles.Q75).offset(dx: halfWidth)
+                                                
+                                                q10points[bin.offset] = axisManager.coords(for: bin.element.quartiles.Q10).offset(dx: halfWidth)
+                                                q90points[bin.offset] = axisManager.coords(for: bin.element.quartiles.Q90).offset(dx: halfWidth)
+                                            }
+                                            
+                                            for i in 0 ..< q10points.count {
+                                                q2575.addCurveWithControlPoints(to: q25points[i])
+                                                q1090.addCurveWithControlPoints(to: q10points[i])
+                                            }
+                                            
+                                            for i in (0 ..< q10points.count).reversed() {
+                                                q2575.addCurveWithControlPoints(to: q75points[i])
+                                                q1090.addCurveWithControlPoints(to: q90points[i])
+                                            }
                                         }
+
+                                        // Render the wider ranges
+                                        Rectangle().foregroundColor(rangeColour)
+                                            .opacity(0.3).clipShape(q1090, style: FillStyle(eoFill: false, antialiased: true))
+                                            .blendMode(.screen)
+
+                                        // Render the narrower ranges
+                                        Rectangle().foregroundColor(rangeColour)
+                                            .opacity(0.3).clipShape(q2575, style: FillStyle(eoFill: false, antialiased: true))
+                                            .blendMode(.screen)
+
+                                        q50.stroke(Color.white, lineWidth: 2.0)
                                         
-                                        for i in 0 ..< q10points.count {
-                                            q2575.addCurveWithControlPoints(to: q25points[i])
-                                            q1090.addCurveWithControlPoints(to: q10points[i])
-                                        }
-                                        
-                                        for i in (0 ..< q10points.count).reversed() {
-                                            q2575.addCurveWithControlPoints(to: q75points[i])
-                                            q1090.addCurveWithControlPoints(to: q90points[i])
-                                        }
-                                    }
+                                    }.gesture(DragGesture(minimumDistance: 0).onEnded({ value in
+                                        timeBarOpacity = false
+                                    }).onChanged({ value in
+                                        timeBarOpacity = true
+                                        touchedDate = axisManager.xManager.getDate(from: value.location.x, in: proxy.size.width)
+                                        touchedPoint = value.location
+                                    }))
+                                }
 
-                                    // Render the wider ranges
-                                    Rectangle().foregroundColor(rangeColour)
-                                        .opacity(0.3).clipShape(q1090, style: FillStyle(eoFill: false, antialiased: true))
-                                        .blendMode(.screen)
-
-                                    // Render the narrower ranges
-                                    Rectangle().foregroundColor(rangeColour)
-                                        .opacity(0.3).clipShape(q2575, style: FillStyle(eoFill: false, antialiased: true))
-                                        .blendMode(.screen)
-
-                                    q50.stroke(Color.white, lineWidth: 2.0)
+                                if timeBarOpacity {
                                     
-                                }.gesture(DragGesture(minimumDistance: 0).onEnded({ value in
-                                    timeBarOpacity = false
-                                }).onChanged({ value in
-                                    timeBarOpacity = true
-                                    touchedDate = axisManager.xManager.getDate(from: value.location.x, in: proxy.size.width)
-                                    touchedPoint = value.location
-                                }))
-                            }
-
-                            if timeBarOpacity {
-                                
-                                let nearest = statMan.latestRangeBins[touchedDate.hour]
-                                
-                                timeBar(at: nearest.quartiles.Q75.timestamp,
-                                        inViewSize: proxy.size,
-                                        information: [
-                                            (text: nearest.quartiles.Q90.levelInUserUnitsString, quartile: 90),
-                                            (text: nearest.quartiles.Q75.levelInUserUnitsString, quartile: 75),
-                                            (text: nearest.averageLevel.levelInUserUnitsString, quartile: 0),
-                                            (text: nearest.quartiles.Q25.levelInUserUnitsString, quartile: 25),
-                                            (text: nearest.quartiles.Q10.levelInUserUnitsString, quartile: 10)
-                                            ]
-                                ).opacity(timeBarOpacity.rawDoubleValue)
-                                
-                                let x: CGFloat = touchedPoint.x + (touchedPoint.x > (proxy.size.width / 2) ? -80 : 80)
-                                
-                                infoBox(information: [
-                                    (text: nearest.quartiles.Q50.unitisedString, quartile: 50)
-                                    ]
-                                ).position(CGPoint(x: x, y: axisManager.coords(for: nearest.quartiles.Q50).y))
+                                    let nearest = statMan.latestRangeBins[touchedDate.hour]
+                                    
+                                    timeBar(at: nearest.quartiles.Q75.timestamp,
+                                            inViewSize: proxy.size,
+                                            information: [
+                                                (text: nearest.quartiles.Q90.levelInUserUnitsString, quartile: 90),
+                                                (text: nearest.quartiles.Q75.levelInUserUnitsString, quartile: 75),
+                                                (text: nearest.averageLevel.levelInUserUnitsString, quartile: 0),
+                                                (text: nearest.quartiles.Q25.levelInUserUnitsString, quartile: 25),
+                                                (text: nearest.quartiles.Q10.levelInUserUnitsString, quartile: 10)
+                                                ]
+                                    ).opacity(timeBarOpacity.rawDoubleValue)
+                                    
+                                    let x: CGFloat = touchedPoint.x + (touchedPoint.x > (proxy.size.width / 2) ? -80 : 80)
+                                    
+                                    infoBox(information: [
+                                        (text: nearest.quartiles.Q50.unitisedString, quartile: 50)
+                                        ]
+                                    ).position(CGPoint(x: x, y: axisManager.coords(for: nearest.quartiles.Q50).y))
+                                }
                             }
                         }
-                    }
+                    }.blur(radius: 6 * statMan.isWorking.rawDoubleValue)
+                    
+                    //Draw min and max levels at side of screen
+                    VStack(alignment: .trailing) {
+                        Text((useMgDl ? (axisManager.chartUpperBounds).mgdl.unitisedString : axisManager.chartUpperBounds.mmoll.unitisedString))
+                            .font(Font(ConstantsUI.MiniFont))
+                            .foregroundColor(textColour)
+                        
+                        Spacer().frame(maxWidth: .infinity)
+                        
+                        Text((useMgDl ? axisManager.chartLowerBounds.mgdl.unitisedString : axisManager.chartLowerBounds.mmoll.unitisedString))
+                            .font(Font(ConstantsUI.MiniFont))
+                            .foregroundColor(textColour)
+                    }.opacity(0.5)
                 }
-                
-                //Draw min and max levels at side of screen
-                VStack(alignment: .trailing) {
-                    Text((useMgDl ? (axisManager.chartUpperBounds).mgdl.unitisedString : axisManager.chartUpperBounds.mmoll.unitisedString))
-                        .font(Font(ConstantsUI.MiniFont))
-                        .foregroundColor(textColour)
-                    
-                    Spacer().frame(maxWidth: .infinity)
-                    
-                    Text((useMgDl ? axisManager.chartLowerBounds.mgdl.unitisedString : axisManager.chartLowerBounds.mmoll.unitisedString))
-                        .font(Font(ConstantsUI.MiniFont))
-                        .foregroundColor(textColour)
-                }.opacity(0.5)
+                SUIWorkingWheeels(size: 100.0, isWorking: statMan.isWorking)
             }
         }
     }

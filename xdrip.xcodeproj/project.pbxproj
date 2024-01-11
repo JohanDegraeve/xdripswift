@@ -47,7 +47,6 @@
 		47DB06E92A715FD900267BE3 /* LibreLinkUpModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E82A715FD900267BE3 /* LibreLinkUpModels.swift */; };
 		47F8E95A2710255D00B8B02B /* ConstantsWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F8E9592710255C00B8B02B /* ConstantsWatchApp.swift */; };
 		47FB28082636B04200042FFB /* StatisticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47FB28072636B04200042FFB /* StatisticsManager.swift */; };
-		9A13AE992B4DBA3200CA5F87 /* AGP.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9A13AE982B4DBA3200CA5F87 /* AGP.storyboard */; };
 		9A13AE9C2B4DBADC00CA5F87 /* SUIChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A13AE9B2B4DBADC00CA5F87 /* SUIChartViewController.swift */; };
 		9A13AE9E2B4DBC0700CA5F87 /* SUIChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A13AE9D2B4DBC0700CA5F87 /* SUIChartView.swift */; };
 		9A13AEA02B4DBC5C00CA5F87 /* UnitsPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A13AE9F2B4DBC5C00CA5F87 /* UnitsPrimitives.swift */; };
@@ -58,6 +57,7 @@
 		9A86D3E42B50156A000DCA1A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 470B618B270C448100561E56 /* Assets.xcassets */; };
 		9A86D3E52B50158A000DCA1A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 470B618B270C448100561E56 /* Assets.xcassets */; };
 		9A86D3E62B50158B000DCA1A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 470B618B270C448100561E56 /* Assets.xcassets */; };
+		9A8D9C752B50345100B0E0F0 /* AGP.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9A8D9C742B50345100B0E0F0 /* AGP.storyboard */; };
 		9AAE309A2B4FC47400D8BFCC /* Bool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAE30992B4FC47400D8BFCC /* Bool.swift */; };
 		9AAE309C2B4FC54900D8BFCC /* Path.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAE309B2B4FC54900D8BFCC /* Path.swift */; };
 		9AAE309E2B4FC6AC00D8BFCC /* UniversalBGLevel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AAE309D2B4FC6AC00D8BFCC /* UniversalBGLevel.swift */; };
@@ -776,7 +776,6 @@
 		47FB28072636B04200042FFB /* StatisticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsManager.swift; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xdrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xdrip/Version.xcconfig; sourceTree = "<group>"; };
-		9A13AE982B4DBA3200CA5F87 /* AGP.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = AGP.storyboard; sourceTree = "<group>"; };
 		9A13AE9B2B4DBADC00CA5F87 /* SUIChartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SUIChartViewController.swift; sourceTree = "<group>"; };
 		9A13AE9D2B4DBC0700CA5F87 /* SUIChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SUIChartView.swift; sourceTree = "<group>"; };
 		9A13AE9F2B4DBC5C00CA5F87 /* UnitsPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitsPrimitives.swift; sourceTree = "<group>"; };
@@ -784,6 +783,7 @@
 		9A13AEA32B4DBDAD00CA5F87 /* CGPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGPoint.swift; sourceTree = "<group>"; };
 		9A13AEA52B4DBE2F00CA5F87 /* Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Color.swift; sourceTree = "<group>"; };
 		9A13AEA72B4DBE6E00CA5F87 /* Set.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Set.swift; sourceTree = "<group>"; };
+		9A8D9C742B50345100B0E0F0 /* AGP.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = AGP.storyboard; sourceTree = "<group>"; };
 		9AAE30992B4FC47400D8BFCC /* Bool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bool.swift; sourceTree = "<group>"; };
 		9AAE309B2B4FC54900D8BFCC /* Path.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Path.swift; sourceTree = "<group>"; };
 		9AAE309D2B4FC6AC00D8BFCC /* UniversalBGLevel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UniversalBGLevel.swift; sourceTree = "<group>"; };
@@ -2202,7 +2202,7 @@
 				F8B48A9A22B2FA66009BCC01 /* SpeakReading.strings */,
 				D4AC54412778C82B0097FF10 /* Treatments.strings */,
 				F81F370525C1583400520946 /* WatlaaView.strings */,
-				9A13AE982B4DBA3200CA5F87 /* AGP.storyboard */,
+				9A8D9C742B50345100B0E0F0 /* AGP.storyboard */,
 			);
 			path = Storyboards;
 			sourceTree = "<group>";
@@ -3456,6 +3456,7 @@
 				F824376D24CB7A9800BED341 /* Time_Has_Come.caf in Resources */,
 				F824379E24CB7A9900BED341 /* Hell_Yeah_Somewhat_Calmer.caf in Resources */,
 				F8BDD442221C9D0D006EAB84 /* Common.strings in Resources */,
+				9A8D9C752B50345100B0E0F0 /* AGP.storyboard in Resources */,
 				F8AC426A21ADEBD70078C348 /* LaunchScreen.storyboard in Resources */,
 				F824378524CB7A9900BED341 /* Siri_Low_Glucose.caf in Resources */,
 				F824378124CB7A9800BED341 /* Cartoon_Uh_Oh.caf in Resources */,
@@ -3568,7 +3569,6 @@
 				F821CF7D22A46CDD005C1E43 /* 1-millisecond-of-silence.caf in Resources */,
 				F824377A24CB7A9800BED341 /* Sci-Fi_Spaceship_Message.caf in Resources */,
 				D4AC54502778C82C0097FF10 /* Treatments.strings in Resources */,
-				9A13AE992B4DBA3200CA5F87 /* AGP.storyboard in Resources */,
 				F824377124CB7A9800BED341 /* Indeed.caf in Resources */,
 				F8B3A7CE226CC0B7004BA588 /* shorthigh2.caf in Resources */,
 				F82437D224CB7A9900BED341 /* Remembers_Me_Of_Asia.caf in Resources */,

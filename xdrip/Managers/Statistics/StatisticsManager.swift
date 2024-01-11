@@ -155,11 +155,11 @@ public final class StatisticsManager: ObservableObject {
                         //if the current values timestamp is more than the minimum filter time, then add it to the glucoseValues array. Include a check to ensure that the first reading is added despite there not being any difference to itself
                         if (Double(secondsDifference.second!) >= minimumSecondsBetweenReadings) || (previousValueTimeStamp == firstValueTimeStamp) {
                             
+                            self.backgroundRangeBins[currentTimeStamp.hour].addResult(level: UniversalBGLevel(timestamp: currentTimeStamp.AGPDate, mgdl: MGDL(calculatedValue)))
+                            
                             if !isMgDl {
                                 calculatedValue = calculatedValue * ConstantsBloodGlucose.mgDlToMmoll
                             }
-                            
-                            self.backgroundRangeBins[currentTimeStamp.hour].addResult(level: UniversalBGLevel(timestamp: currentTimeStamp.AGPDate, mgdl: MGDL(calculatedValue)))
                             
                             glucoseValues.append(calculatedValue)
                             
