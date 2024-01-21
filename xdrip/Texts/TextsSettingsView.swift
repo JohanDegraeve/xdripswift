@@ -45,6 +45,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_labelLiveActivityType", tableName: filename, bundle: Bundle.main, value: "Live Activities", comment: "notification settings, type of live activities that should be enabled")
     }()
     
+    static let labelLiveActivityNotificationSizeType: String = {
+        return NSLocalizedString("settingsviews_labelLiveActivityNotificationSizeType", tableName: filename, bundle: Bundle.main, value: "Live Activity Size", comment: "notification settings, the size that the live activities should be displayed")
+    }()
+    
     static let liveActivityTypeDisabled: String = {
         return NSLocalizedString("settingsviews_liveActivityTypeDisabled", tableName: filename, bundle: Bundle.main, value: "Disabled", comment: "notification settings, disable live activities")
     }()

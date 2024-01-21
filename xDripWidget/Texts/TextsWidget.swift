@@ -13,19 +13,19 @@ class Texts_Widget {
     }()
     
     static let high = {
-        return NSLocalizedString("widget_high", tableName: filename, bundle: Bundle.main, value: "High", comment: "the word HIGH, in capitals")
+        return NSLocalizedString("widget_high", tableName: filename, bundle: Bundle.main, value: "HIGH", comment: "the word HIGH, in capitals")
     }()
     
     static let low = {
-        return NSLocalizedString("widget_low", tableName: filename, bundle: Bundle.main, value: "Low", comment: "the word LOW, in capitals")
+        return NSLocalizedString("widget_low", tableName: filename, bundle: Bundle.main, value: "LOW", comment: "the word LOW, in capitals")
     }()
     
     static let urgentHigh = {
-        return NSLocalizedString("widget_urgentHigh", tableName: filename, bundle: Bundle.main, value: "Urgent High", comment: "the words urgent HIGH, in capitals")
+        return NSLocalizedString("widget_urgentHigh", tableName: filename, bundle: Bundle.main, value: "URGENT\nHIGH", comment: "the words URGENT HIGH, in capitals")
     }()
     
     static let urgentLow = {
-        return NSLocalizedString("widget_urgentLow", tableName: filename, bundle: Bundle.main, value: "Urgent Low", comment: "the words urgent LOW, in capitals")
+        return NSLocalizedString("widget_urgentLow", tableName: filename, bundle: Bundle.main, value: "URGENT\nLOW", comment: "the words URGENT LOW, in capitals")
     }()
         
     static let mgdl: String = {

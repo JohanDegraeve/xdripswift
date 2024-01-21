@@ -32,7 +32,8 @@ extension LiveActivityManager {
     
     /// start or update the live activity based upon whether it currently exists or not
     /// - Parameter contentState: the contentState to show
-    func runActivity(contentState: XDripWidgetAttributes.ContentState) {
+    /// - Parameter forceRestart: will force the current live activity to end and a new one will be started
+    func runActivity(contentState: XDripWidgetAttributes.ContentState, forceRestart: Bool) {
         
         trace("In runActivity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
         
@@ -42,8 +43,17 @@ extension LiveActivityManager {
                 trace("    eventActivity == nil, trying to start new activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
                 
                 startActivity(contentState: contentState)
+            } else if forceRestart {
+                print("ending current activity and starting a new one")
+                trace("    eventActivity != nil, will attempt to end the current activity and start a new one", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+                
+                Task {
+                    endActivity()
+                    
+                    startActivity(contentState: contentState)
+                }
             } else {
-                trace("    eventActivity != nil, trying to update existing", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+                trace("    eventActivity != nil, trying to update existing activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
                 
                 Task {
                     await updateActivity(to: contentState)
@@ -66,7 +76,8 @@ extension LiveActivityManager {
                 content: content,
                 pushType: nil
             )
-            print("New activity started: \(String(describing: eventActivity?.id))")
+            
+            print("New live activity started: \(String(describing: eventActivity?.id))")
             
             let idString = "\(String(describing: eventActivity?.id))"
             trace("New live activity started: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, idString)
@@ -85,7 +96,7 @@ extension LiveActivityManager {
             Task {
                 print("Live activity state is \(String(describing: eventActivity?.activityState))")
                 
-                trace("Previous live activity was dismissed so will end it and try to start a new one.", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+                trace("Previous live activity was dismissed by the user so it will be ended and will try to start a new one.", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
                 
                 endAllActivities()
                 
@@ -94,12 +105,26 @@ extension LiveActivityManager {
             return
             
         } else {
-            await eventActivity?.update(
-                ActivityContent<XDripWidgetAttributes.ContentState>(
-                    state: contentState,
-                    staleDate: Date().addingTimeInterval(10)
+            
+            // check if the activity is not about to be orphaned by iOS (after 8 hours) and left on the screen with the initial state. If it is then end it.
+            if eventAttributes.eventStartDate > Date().addingTimeInterval(-3600 * 8) {
+                
+                await eventActivity?.update(
+                    ActivityContent<XDripWidgetAttributes.ContentState>(
+                        state: contentState,
+                        staleDate: Date().addingTimeInterval(10)
+                    )
                 )
-            )
+                
+            } else {
+                
+                trace("Live activity is 8 hours old so will no longer be able to be updated. Ending activity ", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+                
+                endActivity()
+                
+                startActivity(contentState: contentState)
+                
+            }
         }
     }
     
@@ -108,13 +133,15 @@ extension LiveActivityManager {
         
         if eventActivity != nil {
             Task {
-                print("Ending live activity: \(String(describing: eventActivity?.id))")
-                
-                let idString = "\(String(describing: eventActivity?.id))"
-                trace("Ending live activity: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, idString)
-                
-                await eventActivity?.end(nil, dismissalPolicy: .immediate)
-                eventActivity = nil
+                for activity in Activity<XDripWidgetAttributes>.activities
+                {
+                    
+                    let idString = "\(String(describing: eventActivity?.id))"
+                    trace("Ending live activity: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, idString)
+                    
+                    await activity.end(nil, dismissalPolicy: .immediate)
+                    eventActivity = nil
+                }
             }
         }
     }
@@ -130,10 +157,10 @@ extension LiveActivityManager {
         {
             for activity in Activity<XDripWidgetAttributes>.activities
             {
-                print("Force-close detected. Ending Live Activity: \(activity.id)")
+                print("Ending live activity: \(activity.id)")
                 
                 let idString = "\(String(describing: eventActivity?.id))"
-                trace("Force-close detected. Ending live activity: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, idString)
+                trace("Ending live activity: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, idString)
                 
                 await activity.end(nil, dismissalPolicy: .immediate)
                 eventActivity = nil

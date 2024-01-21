@@ -73,6 +73,8 @@ extension UserDefaults {
         case notificationInterval = "notificationInterval"
         /// which type of live activities should be shown?
         case liveActivityType = "liveActivityType"
+        /// which size should the live activities be shown?
+        case liveActivityNotificationSizeType = "liveActivityNotificationSizeType"
         
         // Home Screen and main chart settings
         
@@ -630,6 +632,18 @@ extension UserDefaults {
         }
         set {
             set(newValue.rawValue, forKey: Key.liveActivityType.rawValue)
+        }
+    }
+    
+    /// holds the enum integer of the type of live activity to be shown
+    /// default to 0 (normal)
+    var liveActivityNotificationSizeType: LiveActivityNotificationSizeType {
+        get {
+            let liveActivityNotificationSizeTypeAsInt = integer(forKey: Key.liveActivityNotificationSizeType.rawValue)
+            return LiveActivityNotificationSizeType(rawValue: liveActivityNotificationSizeTypeAsInt) ?? .normal
+        }
+        set {
+            set(newValue.rawValue, forKey: Key.liveActivityNotificationSizeType.rawValue)
         }
     }
     

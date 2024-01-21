@@ -18,43 +18,49 @@ struct XDripWidgetAttributes: ActivityAttributes {
         //var previousActivityID: String
         //var activityID: String
         
+        
         // Dynamic stateful properties about your activity go here!
-        var bgValueInMgDl: Double
+        var bgReadingValues: [Double]
+        var bgReadingDates: [Date]
         var isMgDl: Bool
-//        var trendArrow: String
         var slopeOrdinal: Int
         var deltaChangeInMgDl: Double?
         var urgentLowLimitInMgDl: Double
         var lowLimitInMgDl: Double
         var highLimitInMgDl: Double
         var urgentHighLimitInMgDl: Double
-        var bgReadingDate: Date
         var updatedDate: Date
+        var liveActivityNotificationSizeTypeAsInt: Int
         
-        var bgValueStringInUserChosenUnit: String
+        
+        var bgValueInMgDl: Double
+        var bgReadingDate: Date
         var bgUnitString: String
-//        var deltaChangeStringInUserChosenUnit: String
+        var bgValueStringInUserChosenUnit: String
         
-        init(bgValueInMgDl: Double, isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, bgReadingDate: Date, updatedDate: Date) {
+        //var bgReadings: [BgReading]
+        
+        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, updatedDate: Date, liveActivityNotificationSizeTypeAsInt: Int) {
             
             // these are the "passed in" stateful values used to initialize
-            self.bgValueInMgDl = bgValueInMgDl
             self.isMgDl = isMgDl
-//            self.trendArrow = trendArrow
             self.slopeOrdinal = slopeOrdinal
             self.deltaChangeInMgDl = deltaChangeInMgDl// ?? nil
             self.urgentLowLimitInMgDl = urgentLowLimitInMgDl
             self.lowLimitInMgDl = lowLimitInMgDl
             self.highLimitInMgDl = highLimitInMgDl
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl
-            self.bgReadingDate = bgReadingDate
             self.updatedDate = updatedDate
+            self.liveActivityNotificationSizeTypeAsInt = liveActivityNotificationSizeTypeAsInt
+            
+            self.bgReadingValues = bgReadingValues
+            self.bgReadingDates = bgReadingDates
             
             // these are dynamically initialized based on the above
-            //self.bgValueInUserChosenUnit = bgValueInMgDl.mgdlToMmol(mgdl: isMgDl)
+            self.bgValueInMgDl = bgReadingValues[0]
+            self.bgReadingDate = bgReadingDates[0]
             self.bgUnitString = isMgDl ? Texts_Widget.mgdl : Texts_Widget.mmol
-            self.bgValueStringInUserChosenUnit = bgValueInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
-            //self.deltaChangeStringInUserChosenUnit = deltaChangeInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
+            self.bgValueStringInUserChosenUnit = bgReadingValues[0].mgdlToMmolAndToString(mgdl: isMgDl)
             
             
         }
@@ -73,8 +79,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
         
         /// Show the bg event title if relevant
         /// - Returns: a localized string such as "HIGH" or "LOW" as required
-        func getBgTitle() -> String {
-            
+        func getBgTitle() -> String? {
             if bgValueInMgDl >= urgentHighLimitInMgDl {
                 return Texts_Widget.urgentHigh
             } else if bgValueInMgDl >= highLimitInMgDl {
@@ -84,7 +89,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             } else if bgValueInMgDl <= urgentLowLimitInMgDl {
                 return Texts_Widget.urgentLow
             } else {
-                return ""
+                return nil
             }
         }
         
@@ -122,7 +127,6 @@ struct XDripWidgetAttributes: ActivityAttributes {
         ///  returns a string holding the trend arrow
         /// - Returns: trend arrow string (i.e.  "↑")
         func trendArrow() -> String {
-            
             switch slopeOrdinal {
             case 7:
                 return "\u{2193}\u{2193}" // ↓↓
@@ -140,10 +144,19 @@ struct XDripWidgetAttributes: ActivityAttributes {
                 return "\u{2191}\u{2191}" // ↑↑
             default:
                 return "n/a"
-                
             }
-            
         }
+        
+        func deltaChangeFormatted(font: Font) -> some View {
+            HStack(spacing: 4) {
+                Text(getDeltaChangeStringInUserChosenUnit())
+                    .font(font).bold()
+                    .foregroundStyle(Color(white: 0.9))
+                Text(bgUnitString)
+                    .font(font)
+                    .foregroundStyle(Color(white: 0.5))
+            }
+        }        
         
     }
 
