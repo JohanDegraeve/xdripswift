@@ -38,8 +38,6 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var bgUnitString: String
         var bgValueStringInUserChosenUnit: String
         
-        //var bgReadings: [BgReading]
-        
         init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, updatedDate: Date, liveActivityNotificationSizeTypeAsInt: Int) {
             
             // these are the "passed in" stateful values used to initialize
@@ -79,17 +77,18 @@ struct XDripWidgetAttributes: ActivityAttributes {
         
         /// Show the bg event title if relevant
         /// - Returns: a localized string such as "HIGH" or "LOW" as required
-        func getBgTitle() -> String? {
+        @available(iOS 16, *)
+        func getBgTitle() -> LocalizedStringResource {
             if bgValueInMgDl >= urgentHighLimitInMgDl {
-                return Texts_Widget.urgentHigh
+                return "\(Texts_Widget.urgentHigh)"
             } else if bgValueInMgDl >= highLimitInMgDl {
-                return Texts_Widget.high
+                return "\(Texts_Widget.high)"
             } else if bgValueInMgDl <= lowLimitInMgDl {
-                return Texts_Widget.low
+                return "\(Texts_Widget.low)"
             } else if bgValueInMgDl <= urgentLowLimitInMgDl {
-                return Texts_Widget.urgentLow
+                return "\(Texts_Widget.urgentLow)"
             } else {
-                return nil
+                return "TEST"
             }
         }
         
@@ -148,18 +147,47 @@ struct XDripWidgetAttributes: ActivityAttributes {
         }
         
         func deltaChangeFormatted(font: Font) -> some View {
-            HStack(spacing: 4) {
+            HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(getDeltaChangeStringInUserChosenUnit())
                     .font(font).bold()
                     .foregroundStyle(Color(white: 0.9))
+                    .minimumScaleFactor(0.2)
+                    .lineLimit(1)
                 Text(bgUnitString)
                     .font(font)
                     .foregroundStyle(Color(white: 0.5))
+                    .minimumScaleFactor(0.2)
+                    .lineLimit(1)
             }
-        }        
+        }
         
+//        func remindUserToOpenApp(eventStartDate: Date) -> Bool {
+//            return eventStartDate < Date().addingTimeInterval(-3600 * 0.2) ? true : false
+//        }
+        
+        func placeTextAtBottomOfWidget(glucoseChartWidgetType: GlucoseChartWidgetType) -> Bool {
+            
+            // first see at which index in bgReadingDates the BG value is after one hour
+            var firstIndexForWidgetType = 0
+            var index = 0
+            
+            for _ in bgReadingValues {
+                if bgReadingDates[index] > Date().addingTimeInterval((-glucoseChartWidgetType.hoursToShow(liveActivityNotificationSizeType: LiveActivityNotificationSizeType(rawValue: liveActivityNotificationSizeTypeAsInt) ?? .normal) * 60 * 60) + 3600) {
+                    firstIndexForWidgetType = index
+                }
+                index += 1
+            }
+            
+            // then get the bg value of that index in the bgValues array
+            // if it is higher than the user's high limit, then we can assume that the data will be hidden
+            // by the text (bg value, trend + delta), so return true to show the text at the bottom of the view
+            if bgReadingValues[firstIndexForWidgetType] >= highLimitInMgDl {
+                return true
+            }
+            
+            return false
+        }
     }
 
-    // when was the live activity event started? We check this on each update cycle and dismiss/recreate it before the 8-hour limit.
-    var eventStartDate: Date
+    // no static data is needed
 }

@@ -9,6 +9,7 @@
 import Foundation
 import ActivityKit
 import OSLog
+import SwiftUI
 
 @available(iOS 16.2, *)
 public final class LiveActivityManager {
@@ -21,7 +22,7 @@ public final class LiveActivityManager {
     static let shared = LiveActivityManager()
     
     private init() {
-        eventAttributes = XDripWidgetAttributes(eventStartDate: Date())
+        eventAttributes = XDripWidgetAttributes() //eventStartDate: Date())
     }
     
 }
@@ -32,28 +33,28 @@ extension LiveActivityManager {
     
     /// start or update the live activity based upon whether it currently exists or not
     /// - Parameter contentState: the contentState to show
-    /// - Parameter forceRestart: will force the current live activity to end and a new one will be started
     func runActivity(contentState: XDripWidgetAttributes.ContentState, forceRestart: Bool) {
         
-        trace("In runActivity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+        trace("in runActivity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
         
         // checking whether 'Live activities' is enabled for the app in settings
         if ActivityAuthorizationInfo().areActivitiesEnabled {
             if eventActivity == nil {
-                trace("    eventActivity == nil, trying to start new activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+                print("Starting new Live Activity")
+                trace("    starting new live activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
                 
                 startActivity(contentState: contentState)
             } else if forceRestart {
-                print("ending current activity and starting a new one")
-                trace("    eventActivity != nil, will attempt to end the current activity and start a new one", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+                print("Restarting Live Activity")
+                trace("    restarting live activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
                 
                 Task {
-                    endActivity()
-                    
+                    await endActivity()
                     startActivity(contentState: contentState)
                 }
             } else {
-                trace("    eventActivity != nil, trying to update existing activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+                print("Updating Live Activity")
+                trace("    updating live activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
                 
                 Task {
                     await updateActivity(to: contentState)
@@ -70,7 +71,6 @@ extension LiveActivityManager {
         let content = ActivityContent(state: contentState, staleDate: nil, relevanceScore: 1.0)
         
         do {
-            print("Trying to start new live activity")
             eventActivity = try Activity.request(
                 attributes: eventAttributes,
                 content: content,
@@ -80,7 +80,7 @@ extension LiveActivityManager {
             print("New live activity started: \(String(describing: eventActivity?.id))")
             
             let idString = "\(String(describing: eventActivity?.id))"
-            trace("New live activity started: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, idString)
+            trace("new live activity started: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, idString)
         } catch {
             print(error.localizedDescription)
             
@@ -102,34 +102,26 @@ extension LiveActivityManager {
                 
                 startActivity(contentState: contentState)
             }
-            return
-            
         } else {
             
-            // check if the activity is not about to be orphaned by iOS (after 8 hours) and left on the screen with the initial state. If it is then end it.
-            if eventAttributes.eventStartDate > Date().addingTimeInterval(-3600 * 8) {
-                
-                await eventActivity?.update(
-                    ActivityContent<XDripWidgetAttributes.ContentState>(
-                        state: contentState,
-                        staleDate: Date().addingTimeInterval(10)
-                    )
-                )
-                
-            } else {
-                
-                trace("Live activity is 8 hours old so will no longer be able to be updated. Ending activity ", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
-                
-                endActivity()
-                
-                startActivity(contentState: contentState)
-                
-            }
+            //let alertConfiguration = AlertConfiguration(title: "BG Alert", body: contentState.getBgTitle(), sound: .default)
+            let updatedContent = ActivityContent(state: contentState, staleDate: nil)
+            
+//            if contentState.getBgTitle() != "" {
+//                print("Triggering Live Activity alert for \(String(describing: contentState.getBgTitle()))")
+//                trace("triggering live activity alert for: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, String(describing: contentState.getBgTitle()))
+//                
+//                await eventActivity?.update(updatedContent, alertConfiguration: alertConfiguration)
+//            } else {
+//                await eventActivity?.update(updatedContent)
+//            }
+            
+            await eventActivity?.update(updatedContent)
         }
     }
     
     /// end the live activity if it is being shown, do nothing if there is no eventyActivity
-    func endActivity() {
+    func endActivity() async {
         
         if eventActivity != nil {
             Task {
@@ -140,9 +132,9 @@ extension LiveActivityManager {
                     trace("Ending live activity: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, idString)
                     
                     await activity.end(nil, dismissalPolicy: .immediate)
-                    eventActivity = nil
                 }
             }
+            eventActivity = nil
         }
     }
     
@@ -163,10 +155,11 @@ extension LiveActivityManager {
                 trace("Ending live activity: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, idString)
                 
                 await activity.end(nil, dismissalPolicy: .immediate)
-                eventActivity = nil
             }
             semaphore.signal()
         }
         semaphore.wait()
+        
+        eventActivity = nil
     }
 }

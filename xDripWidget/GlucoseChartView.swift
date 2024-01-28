@@ -77,7 +77,8 @@ struct GlucoseChartView: View {
         let intervalBetweenAxisValues: Int = glucoseChartWidgetType.intervalBetweenAxisValues(liveActivityNotificationSizeType: liveActivityNotificationSizeType)
         
         /// first, for each int in mappingArray, we create a Date, starting with the lower hour + 1 hour - we will create 5 in this example, starting with hour 08 (7 + 3600 seconds)
-        let startDateLower = startDate.toLowerHour()
+        let startDateLower = Date(timeIntervalSinceReferenceDate:
+                                    (startDate.timeIntervalSinceReferenceDate / 3600.0).rounded(.down) * 3600.0)
         
         let xAxisValues: [Date] = stride(from: 1, to: mappingArray.count + 1, by: intervalBetweenAxisValues).map {
             startDateLower.addingTimeInterval(Double($0)*3600)
@@ -89,7 +90,8 @@ struct GlucoseChartView: View {
     
 
     var body: some View {
-        let domain = 40 ... max(bgReadingValues.max() ?? 400, urgentHighLimitInMgDl)
+        
+        let domain = (min((bgReadingValues.min() ?? 40), urgentLowLimitInMgDl) - 6) ... (max((bgReadingValues.max() ?? 400), urgentHighLimitInMgDl) + 6)
         
         Chart {
             if domain.contains(urgentLowLimitInMgDl) {
@@ -123,24 +125,47 @@ struct GlucoseChartView: View {
                     .symbolSize(glucoseChartWidgetType.glucoseCircleDiameter)
                     .foregroundStyle(bgColor(bgValueInMgDl: bgReadingValues[index]))
             }
+            
+            // add a phantom glucose point five minutes after the end of any BG values just to give more context
+            PointMark(x: .value("Time", Date().addingTimeInterval(5 * 60)),
+                      y: .value("BG", 100))
+            .symbol(Circle())
+            .symbolSize(glucoseChartWidgetType.glucoseCircleDiameter)
+            .foregroundStyle(.clear)
         }
         .chartXAxis {
             // https://developer.apple.com/documentation/charts/customizing-axes-in-swift-charts
-            AxisMarks(values: xAxisValues()) {
-                
+//            AxisMarks(values: xAxisValues()) { value in
+//                
+//                if let v = value.as(Date.self) {
+//                    AxisValueLabel {
+//                        Text(v.formatted(.dateTime.hour()))
+//                            .foregroundStyle(Color.white)
+//                    }
+//                    //.offset(x: glucoseChartWidgetType.xAxisLabelOffset)
+//                    
+//                    AxisGridLine()
+//                        .foregroundStyle(glucoseChartWidgetType.xAxisGridLineColor)
+//                }
+//            }
+            
+            AxisMarks(values: .automatic(desiredCount: Int(glucoseChartWidgetType.hoursToShow(liveActivityNotificationSizeType: liveActivityNotificationSizeType)))) {
                 if let v = $0.as(Date.self) {
-                    AxisValueLabel {
-                        Text(v.formatted(.dateTime.hour()))
-                            .foregroundStyle(Color.white)
-                    }
-                    .offset(x: glucoseChartWidgetType.xAxisLabelOffset)
+//                    AxisValueLabel {
+//                        Text(v.formatted(.dateTime.hour()))
+//                            .foregroundStyle(Color.white)
+//                    }
+//                    .offset(x: glucoseChartWidgetType.xAxisLabelOffset)
                     AxisGridLine()
                         .foregroundStyle(glucoseChartWidgetType.xAxisGridLineColor)
                 }
             }
         }
+        //.background(Color.purple)
         .chartYAxis(.hidden)
         .chartYScale(domain: domain)
         .frame(width: glucoseChartWidgetType.viewSize(liveActivityNotificationSizeType: liveActivityNotificationSizeType).width, height: glucoseChartWidgetType.viewSize(liveActivityNotificationSizeType: liveActivityNotificationSizeType).height)
+//        .padding(.top, 20)
+//        .padding(.bottom, 20)
     }
 }

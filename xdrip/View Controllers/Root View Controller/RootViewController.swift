@@ -3524,8 +3524,6 @@ final class RootViewController: UIViewController, ObservableObject {
             // also take advantage to just skip the rest of the function if they have live activities disabled
             var showLiveActivity: Bool = true //!(!UserDefaults.standard.isMaster || UserDefaults.standard.liveActivityType == .disabled)
             
-            let forceRestart = forceRestart
-            
             if let bgReadingsAccessor = bgReadingsAccessor, showLiveActivity {
                 
                 // get 2 last Readings, with a calculatedValue
