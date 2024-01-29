@@ -1582,6 +1582,12 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
 // MARK: - extension BluetoothTransmitterDelegate
 
 extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
+
+    func heartBeat() {
+        
+        bluetoothPeripheralManager?.heartBeat()
+        
+    }
     
     func transmitterNeedsPairing(bluetoothTransmitter: BluetoothTransmitter) {
         

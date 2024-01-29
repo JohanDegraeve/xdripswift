@@ -166,7 +166,7 @@ enum ConstantsLog {
 	/// for use in DataExporter
 	static let categoryDataExporter =                           "DataExporter             "
 
-    // for use in LoopManager
+    /// for use in LoopManager
     static let categoryLoopManager =                            "LoopManager              "
     
     /// for use in Bg Readings view
@@ -175,5 +175,16 @@ enum ConstantsLog {
     /// SettingsViewCalendarEventsSettingsViewModel logging
     static let categorySettingsViewDataSourceSettingsViewModel =         "SettingsViewDataSourceSettingsViewModel"
     
+    /// for use in Libre3HeartBeatTransmitter
+    static let categoryHeartBeatLibre3 =                       "HeartBeatLibre3          "
+    
+    /// for use in DexcomG7HeartBeatTransmitter
+    static let categoryHeartBeatG7 =                           "HeartBeatG7              "
+    
+    /// for use in LibreViewFollowManager
+    static let categoryLoopFollowManager =                     "LoopFollowManager        "
+    
+    /// for use in Omni¨PodHeartBeatTransmitter
+    static let categoryHeartBeatOmnipod =                      "HeartBeatOmnipod         "
 }
 

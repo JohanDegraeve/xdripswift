@@ -344,7 +344,7 @@ public class AlertManager:NSObject {
                                         // schedule missed reading alert with same content
                                         self.scheduleMissedReadingAlert(snoozePeriodInMinutes: snoozePeriod, content: content)
 
-                                    } else if UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled && UserDefaults.standard.activeSensorStartDate != nil) {
+                                    } else {
                                         
                                         _ = self.checkAlertAndFire(alertKind: .missedreading, lastBgReading: nil, lastButOneBgREading: nil, lastCalibration: nil, transmitterBatteryInfo: nil)
                                         
@@ -555,7 +555,7 @@ public class AlertManager:NSObject {
             
         }
         
-        if alertNeeded && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled)) {
+        if alertNeeded {
             
             // alert needs to be raised
             
@@ -720,15 +720,8 @@ public class AlertManager:NSObject {
             
         } else {
             
-            if !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
-                
-                trace("in checkAlert, there's no need to raise alert %{public}@ because we're in follower mode and keep-alive is disabled", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
-                
-            } else {
-                
-                trace("in checkAlert, there's no need to raise alert %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
-                
-            }
+            trace("in checkAlert, there's no need to raise alert %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
+
             return false
         }
     }

@@ -68,6 +68,15 @@ extension BLEPeripheral {
     // a BLEPeripheral should only have one of dexcomG5, watlaa, m5Stack, ...
     @NSManaged public var atom: Atom?
     
+    // a BLEPeripheral should only have one of dexcomG5, watlaa, m5Stack, ...
+    @NSManaged public var libre2heartbeat: Libre2HeartBeat?
+    
+    // a BLEPeripheral should only have one of dexcomG5, watlaa, m5Stack, ...
+    @NSManaged public var dexcomG7HeartBeat: DexcomG7HeartBeat?
+    
+    // a BLEPeripheral should only have one of dexcomG5, watlaa, m5Stack, ...
+    @NSManaged public var omniPodHeartBeat: OmniPodHeartBeat?
+    
     /// sensorSerialNumber of last sensor that was read
     @NSManaged public var sensorSerialNumber: String?
 
