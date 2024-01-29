@@ -29,4 +29,7 @@ protocol BluetoothTransmitterDelegate: AnyObject {
     /// to pass some text error message, delegate can decide to show to user, log, ...
     func error(message: String)
 
+    /// peripheral used as heartbeat, this is the heartbeat
+    func heartBeat()
+    
 }
