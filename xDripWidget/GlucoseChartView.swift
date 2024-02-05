@@ -117,6 +117,14 @@ struct GlucoseChartView: View {
                     .lineStyle(StrokeStyle(lineWidth: 1 * glucoseChartWidgetType.relativeYAxisLineSize, dash: [4 * glucoseChartWidgetType.relativeYAxisLineSize, 3 * glucoseChartWidgetType.relativeYAxisLineSize]))
                     .foregroundStyle(glucoseChartWidgetType.lowHighLineColor)
             }
+            
+            // add a phantom glucose point at the beginning of the timeline to fix the start point in case there are no glucose values at that time (for instances after starting a new sensor
+            // this will ensure that the x-axis scale remains correct and the few glucose points availabel don't stretch to cover the whole axis
+            PointMark(x: .value("Time", Date().addingTimeInterval(-glucoseChartWidgetType.hoursToShow(liveActivityNotificationSizeType: liveActivityNotificationSizeType) * 3600)),
+                      y: .value("BG", 100))
+            .symbol(Circle())
+            .symbolSize(glucoseChartWidgetType.glucoseCircleDiameter)
+            .foregroundStyle(.clear)
 
             ForEach(bgReadingValues.indices, id: \.self) { index in
                     PointMark(x: .value("Time", bgReadingDates[index]),

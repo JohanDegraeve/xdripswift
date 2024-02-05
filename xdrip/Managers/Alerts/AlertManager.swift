@@ -694,7 +694,7 @@ public class AlertManager:NSObject {
             if delayInSecondsToUse == 0 {
                 trace("in checkAlert, raising alert %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
             } else {
-                trace("in checkAlert, raising alert %{public}@ with a delay of %{public}@ minutes - this is a scheduled future alert, it will not go off now", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, ((round(Double(delayInSecondsToUse)/60*10))/10).description)
+                trace("in checkAlert, raising alert %{public}@ with a delay of %{public}@ minutes - this is a scheduled future alert, it will not go off now", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), ((Int(round(Double(delayInSecondsToUse)/60*10))/10)).description)
             }
 
             // check if app is allowed to send local notification and if not write info to trace
