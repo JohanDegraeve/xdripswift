@@ -158,7 +158,7 @@ struct GlucoseChartView: View {
 //            }
             
             AxisMarks(values: .automatic(desiredCount: Int(glucoseChartWidgetType.hoursToShow(liveActivityNotificationSizeType: liveActivityNotificationSizeType)))) {
-                if let v = $0.as(Date.self) {
+                if $0.as(Date.self) != nil {
 //                    AxisValueLabel {
 //                        Text(v.formatted(.dateTime.hour()))
 //                            .foregroundStyle(Color.white)
