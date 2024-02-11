@@ -30,6 +30,7 @@
 		4716A5112B41823A00419052 /* TextsWidget.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8E53FD0251D35FB00052CE5 /* TextsWidget.strings */; };
 		4716A5142B41CAD000419052 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A5132B41CAD000419052 /* LiveActivityManager.swift */; };
 		47228B152996BDD2008725DB /* BgReadingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47228B142996BDD2008725DB /* BgReadingsView.swift */; };
+		472596052B76301F00459D12 /* WatchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 472596042B76301F00459D12 /* WatchManager.swift */; };
 		4733B93E2AD17C99001D609D /* FollowerBgReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4733B93D2AD17C99001D609D /* FollowerBgReading.swift */; };
 		4733B9402AD17D15001D609D /* FollowerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4733B93F2AD17D15001D609D /* FollowerDelegate.swift */; };
 		4749EB9B25B36E010072DF8B /* LibreNFC.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4749EB9D25B36E010072DF8B /* LibreNFC.strings */; };
@@ -483,7 +484,7 @@
 		F8DF766D23ED9B0900063910 /* DexcomG5BluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF766C23ED9B0900063910 /* DexcomG5BluetoothPeripheralViewModel.swift */; };
 		F8E0475E28CC8E330049D8C9 /* GlucoseData+LoopShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */; };
 		F8E3A2A323D4E7E200E5E98A /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */; };
-		F8E3A2A923D906C200E5E98A /* WatchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2A823D906C200E5E98A /* WatchManager.swift */; };
+		F8E3A2A923D906C200E5E98A /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2A823D906C200E5E98A /* CalendarManager.swift */; };
 		F8E3A2AB23DA520B00E5E98A /* ConstantsWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2AA23DA520B00E5E98A /* ConstantsWatch.swift */; };
 		F8E3C3AB21FE17B700907A04 /* StringProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */; };
 		F8E3C3AD21FE551C00907A04 /* DexcomCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3C3AC21FE551C00907A04 /* DexcomCalibrator.swift */; };
@@ -700,6 +701,7 @@
 		4716A50C2B416EE100419052 /* ConstantsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsWidget.swift; sourceTree = "<group>"; };
 		4716A5132B41CAD000419052 /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
 		47228B142996BDD2008725DB /* BgReadingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadingsView.swift; sourceTree = "<group>"; };
+		472596042B76301F00459D12 /* WatchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchManager.swift; sourceTree = "<group>"; };
 		4733B93D2AD17C99001D609D /* FollowerBgReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBgReading.swift; sourceTree = "<group>"; };
 		4733B93F2AD17D15001D609D /* FollowerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerDelegate.swift; sourceTree = "<group>"; };
 		4749EB9C25B36E010072DF8B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LibreNFC.strings; sourceTree = "<group>"; };
@@ -1453,7 +1455,7 @@
 		F8DF766C23ED9B0900063910 /* DexcomG5BluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG5BluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
 		F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GlucoseData+LoopShare.swift"; sourceTree = "<group>"; };
 		F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
-		F8E3A2A823D906C200E5E98A /* WatchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchManager.swift; sourceTree = "<group>"; };
+		F8E3A2A823D906C200E5E98A /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarManager.swift; sourceTree = "<group>"; };
 		F8E3A2AA23DA520B00E5E98A /* ConstantsWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsWatch.swift; sourceTree = "<group>"; };
 		F8E3C3AA21FE17B700907A04 /* StringProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringProtocol.swift; sourceTree = "<group>"; };
 		F8E3C3AC21FE551C00907A04 /* DexcomCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomCalibrator.swift; sourceTree = "<group>"; };
@@ -1652,6 +1654,14 @@
 				47D08D5D2B54390B00B0BEA7 /* LiveActivityNotificationSizeType.swift */,
 			);
 			path = LiveActivity;
+			sourceTree = "<group>";
+		};
+		472596032B76300800459D12 /* Watch */ = {
+			isa = PBXGroup;
+			children = (
+				472596042B76301F00459D12 /* WatchManager.swift */,
+			);
+			path = Watch;
 			sourceTree = "<group>";
 		};
 		47DB06CC2A7013EF00267BE3 /* Followers */ = {
@@ -2100,6 +2110,7 @@
 		F85DC2F621D25E3A00B9F74A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				472596032B76300800459D12 /* Watch */,
 				F821CF48229BF43A005C1E43 /* Alerts */,
 				F821CF54229BF43A005C1E43 /* Application */,
 				F8297F42238DC4AC00D74D66 /* BluetoothPeripheral */,
@@ -2115,7 +2126,7 @@
 				F64039AE281C3F8D0051EFFE /* QuickActions */,
 				F821CF9922AEF2DF005C1E43 /* Speak */,
 				47FB28052636AFE700042FFB /* Statistics */,
-				F8E3A2A723D906B600E5E98A /* Watch */,
+				F8E3A2A723D906B600E5E98A /* Calendar */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -2709,12 +2720,12 @@
 			path = DexcomG5;
 			sourceTree = "<group>";
 		};
-		F8E3A2A723D906B600E5E98A /* Watch */ = {
+		F8E3A2A723D906B600E5E98A /* Calendar */ = {
 			isa = PBXGroup;
 			children = (
-				F8E3A2A823D906C200E5E98A /* WatchManager.swift */,
+				F8E3A2A823D906C200E5E98A /* CalendarManager.swift */,
 			);
-			path = Watch;
+			path = Calendar;
 			sourceTree = "<group>";
 		};
 		F8E51D5B2448D8A3001C9E5A /* Loop */ = {
@@ -3242,7 +3253,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				DefaultBuildSystemTypeForWorkspace = Latest;
-				LastSwiftUpdateCheck = 1510;
+				LastSwiftUpdateCheck = 1520;
 				LastUpgradeCheck = 1500;
 				ORGANIZATIONNAME = "Johan Degraeve";
 				TargetAttributes = {
@@ -3718,11 +3729,12 @@
 				F8A1586722EDB8BF007F5B5D /* ConstantsHomeView.swift in Sources */,
 				F8A1585922EDB7C6007F5B5D /* ConstantsDefaultAlertLevels.swift in Sources */,
 				F8A54AAD22D6859200934E7A /* SlopeParameters.swift in Sources */,
+				472596052B76301F00459D12 /* WatchManager.swift in Sources */,
 				F830993023C928E0005741DF /* WatlaaBluetoothTransmitterDelegate.swift in Sources */,
 				F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */,
 				47ADD2DF27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift in Sources */,
 				F8F9722723A5915900C3F17D /* CGMBluconTransmitter.swift in Sources */,
-				F8E3A2A923D906C200E5E98A /* WatchManager.swift in Sources */,
+				F8E3A2A923D906C200E5E98A /* CalendarManager.swift in Sources */,
 				F8B3A80A227A3D11004BA588 /* TextsAlertTypeSettings.swift in Sources */,
 				F85FF39125288870004E6FF1 /* HouseKeeper.swift in Sources */,
 				47D08D5E2B54390B00B0BEA7 /* LiveActivityNotificationSizeType.swift in Sources */,

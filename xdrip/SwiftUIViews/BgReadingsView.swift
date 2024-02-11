@@ -216,7 +216,7 @@ struct BgReadingsView: View {
         var visualIndicator = ""
         
         // configure the indicator based on the relevant range colour/symbol
-        // copied from WatchManager.createCalendarEvent()
+        // copied from CalendarManager.createCalendarEvent()
         switch bgRangeDescription {
         case .inRange:
             visualIndicator = ConstantsWatch.visualIndicatorInRange

@@ -549,8 +549,8 @@ final class RootViewController: UIViewController, ObservableObject {
     /// dexcomShareUploadManager instance
     private var dexcomShareUploadManager: DexcomShareUploadManager?
     
-    /// WatchManager instance
-    private var watchManager: WatchManager?
+    /// CalendarManager instance
+    private var calendarManager: CalendarManager?
     
     /// healthkit manager instance
     private var healthKitManager:HealthKitManager?
@@ -1066,7 +1066,7 @@ final class RootViewController: UIViewController, ObservableObject {
         }
     }
     
-    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, watchManager, housekeeper
+    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, calendarManager, housekeeper
     private func setupApplicationData() {
         
         // setup Trace
@@ -1201,8 +1201,8 @@ final class RootViewController: UIViewController, ObservableObject {
         // setup alertmanager
         alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
         
-        // setup watchmanager
-        watchManager = WatchManager(coreDataManager: coreDataManager)
+        // setup calendarManager
+        calendarManager = CalendarManager(coreDataManager: coreDataManager)
         
         // initialize glucoseChartManager
         glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager)
@@ -1483,7 +1483,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 bluetoothPeripheralManager?.sendLatestReading()
                 
-                watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                calendarManager?.processNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 if !UserDefaults.standard.suppressLoopShare {
                     loopManager?.share()
@@ -1969,8 +1969,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 // bluetoothPeripherals (M5Stack, ..) should receive latest reading with calculated value
                 self.bluetoothPeripheralManager?.sendLatestReading()
                 
-                // watchManager should process new reading
-                self.watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
+                // calendarManager should process new reading
+                self.calendarManager?.processNewReading(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
                 
                 // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
                 if !UserDefaults.standard.suppressLoopShare {
@@ -3915,8 +3915,8 @@ extension RootViewController: FollowerDelegate {
                 
                 bluetoothPeripheralManager?.sendLatestReading()
                 
-                // ask watchManager to process new reading, ignore last connection change timestamp because this is follower mode, there is no connection to a transmitter
-                watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: nil)
+                // ask calendarManager to process new reading, ignore last connection change timestamp because this is follower mode, there is no connection to a transmitter
+                calendarManager?.processNewReading(lastConnectionStatusChangeTimeStamp: nil)
                 
                 // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
                 if !UserDefaults.standard.suppressLoopShare {
