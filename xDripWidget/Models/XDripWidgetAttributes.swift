@@ -142,7 +142,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             case 1:
                 return "\u{2191}\u{2191}" // ↑↑
             default:
-                return "n/a"
+                return ""
             }
         }
         

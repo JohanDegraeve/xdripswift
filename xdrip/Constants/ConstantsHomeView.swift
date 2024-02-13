@@ -49,7 +49,7 @@ enum ConstantsHomeView {
     static let sensorProgressViewProgressColorUrgent: UIColor = .systemRed
     
     /// colour for an expired sensor
-    static let sensorProgressExpired: UIColor = .systemPurple
+    static let sensorProgressExpired: UIColor = .purple
     
     /// colour for an normal text
     static let sensorProgressNormalTextColor: UIColor = .lightGray
