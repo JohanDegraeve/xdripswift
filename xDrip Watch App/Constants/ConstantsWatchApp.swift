@@ -27,7 +27,7 @@ enum ConstantsWatchApp {
     // live activity notification widget
     static let viewWidthLiveActivityNotificationNormal: CGFloat = 180
     static let viewHeightLiveActivityNotificationNormal: CGFloat = 90
-    static let hoursToShowLiveActivityNotificationNormal: Double = 3
+    static let hoursToShowLiveActivityNotificationNormal: Double = 4
     static let intervalBetweenXAxisValuesLiveActivityNotificationNormal: Int = 1
     
     static let viewWidthLiveActivityNotificationLarge: CGFloat = 360
