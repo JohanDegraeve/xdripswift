@@ -546,6 +546,8 @@ final class RootViewController: UIViewController, ObservableObject {
     /// libreLinkUpFollowManager instance
     private var libreLinkUpFollowManager: LibreLinkUpFollowManager?
     
+    private var loopFollowManager: LoopFollowManager?
+    
     /// dexcomShareUploadManager instance
     private var dexcomShareUploadManager: DexcomShareUploadManager?
     
@@ -1113,6 +1115,9 @@ final class RootViewController: UIViewController, ObservableObject {
         // setup nightscoutmanager
         libreLinkUpFollowManager = LibreLinkUpFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
         
+        // setup loop follow manager
+        loopFollowManager = LoopFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
+        
         // setup healthkitmanager
         healthKitManager = HealthKitManager(coreDataManager: coreDataManager)
         
@@ -1193,7 +1198,15 @@ final class RootViewController: UIViewController, ObservableObject {
         }
         
         // setup bluetoothPeripheralManager
-        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self, uIViewController: self, cgmTransmitterInfoChanged: cgmTransmitterInfoChanged)
+        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self, uIViewController: self, heartBeatFunction: {
+            
+            self.loopFollowManager?.getReading()
+            
+            self.nightScoutFollowManager?.download()
+        
+            self.libreLinkUpFollowManager?.download()
+
+        }, cgmTransmitterInfoChanged: cgmTransmitterInfoChanged)
         
         // to initialize UserDefaults.standard.transmitterTypeAsString
         cgmTransmitterInfoChanged()
@@ -1584,7 +1597,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // if showReadingInAppBadge = false, means user set it from true to false
             // set the app badge to 0. This will cause removal of the badge counter, but also removal of any existing notification on the screen
-            if !UserDefaults.standard.showReadingInAppBadge || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled) {
+            if !UserDefaults.standard.showReadingInAppBadge {
                 
                 // applicationIconBadgeNumber has been deprecated for iOS17 but as we currently have a minimum deployment target of iOS15, let's add a conditional check
                 if #available(iOS 16.0, *) {
@@ -1592,13 +1605,6 @@ final class RootViewController: UIViewController, ObservableObject {
                 } else {
                     UIApplication.shared.applicationIconBadgeNumber = 0
                 }
-                
-            }
-            
-            // make sure that any pending (i.e. already scheduled in the future) missed reading notifications are removed
-            if !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
-                
-                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [ConstantsNotifications.NotificationIdentifiersForAlerts.missedReadingAlert])
                 
             }
             
@@ -2147,8 +2153,8 @@ final class RootViewController: UIViewController, ObservableObject {
             // Create Notification Content
             let notificationContent = UNMutableNotificationContent()
             
-            // set value in badge if required and also only if master, or when background keep alive is enabled for followers
-            if UserDefaults.standard.showReadingInAppBadge && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster &&  UserDefaults.standard.followerBackgroundKeepAliveType != .disabled)) {
+            // set value in badge if required
+            if UserDefaults.standard.showReadingInAppBadge {
                 
                 // rescale if unit is mmol
                 if !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
@@ -2191,7 +2197,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // notification shouldn't be shown, but maybe the badge counter. Here the badge value needs to be shown in another way and also only if master, or when background keep alive is enabled for followers
             
-            if UserDefaults.standard.showReadingInAppBadge && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled)) {
+            if UserDefaults.standard.showReadingInAppBadge {
                 
                 // rescale of unit is mmol
                 readingValueForBadge = readingValueForBadge.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
@@ -3063,7 +3069,9 @@ final class RootViewController: UIViewController, ObservableObject {
         // if there is a transmitter connected, pull the current maxSensorAgeInDays and store in in UserDefaults
         if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let maxDays = cgmTransmitter.maxSensorAgeInDays() {
             
-            UserDefaults.standard.activeSensorMaxSensorAgeInDays = maxDays
+            if maxDays > 0 {
+                UserDefaults.standard.activeSensorMaxSensorAgeInDays = maxDays
+            }
             
             UserDefaults.standard.activeSensorDescription = cgmTransmitter.cgmTransmitterType().detailedDescription()
             

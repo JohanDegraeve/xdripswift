@@ -99,6 +99,9 @@ enum M5StackTransmitterOpCodeRx: UInt8, CaseIterable {
     /// M5Stack sending battery level
     case readBatteryLevelRx = 0x20
 
+    /// received heartbeat
+    case heartbeat = 0x21
+
 }
 
 extension M5StackTransmitterOpCodeRx: CustomStringConvertible {
@@ -121,6 +124,8 @@ extension M5StackTransmitterOpCodeRx: CustomStringConvertible {
             return "readAllParametersRx"
         case .readBatteryLevelRx:
             return "readBatteryLevelRx"
+        case .heartbeat:
+            return "heartbeat"
         }
     }
 }

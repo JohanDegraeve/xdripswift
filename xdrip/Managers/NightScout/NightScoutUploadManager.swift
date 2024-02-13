@@ -163,7 +163,7 @@ public class NightScoutUploadManager: NSObject, ObservableObject {
     }
     
     /// synchronize treatments with NightScout
-    public func syncTreatmentsWithNightScout() {
+    private func syncTreatmentsWithNightScout() {
         
         // check that NightScout is enabled
         // and nightScoutUrl exists

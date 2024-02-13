@@ -238,7 +238,7 @@ enum CGMTransmitterType:String, CaseIterable {
             return ""
             
         case .dexcom:
-            return "voltA"
+            return "voltB"
             
         case .miaomiao, .Bubble, .Droplet1:
             return "%"

@@ -337,5 +337,14 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         
     }
 
+    // to confirm to protocol BluetoothPeripheralDelegate
+    func heartBeat() {
+        // bluetooth peripheral's heart is beating
+        // if a heartBeat function is set, then call it
+        if let heartBeatFunction = heartBeatFunction {
+            heartBeatFunction()
+        }
+    }
+
 }
 

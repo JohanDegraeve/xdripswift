@@ -188,5 +188,16 @@ enum ConstantsLog {
     /// for use in LiveActivityManager
     static let categoryLiveActivityManager =         "LiveActivityManager         "
     
+    /// for use in Libre3HeartBeatTransmitter
+    static let categoryHeartBeatLibre3 =                       "HeartBeatLibre3          "
+    
+    /// for use in DexcomG7HeartBeatTransmitter
+    static let categoryHeartBeatG7 =                           "HeartBeatG7              "
+    
+    /// for use in LibreViewFollowManager
+    static let categoryLoopFollowManager =                     "LoopFollowManager        "
+    
+    /// for use in Omni¨PodHeartBeatTransmitter
+    static let categoryHeartBeatOmnipod =                      "HeartBeatOmnipod         "
 }
 
