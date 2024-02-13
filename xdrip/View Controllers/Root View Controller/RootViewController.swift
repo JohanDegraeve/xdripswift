@@ -673,7 +673,6 @@ final class RootViewController: UIViewController, ObservableObject {
                 self.updateDataSourceInfo(animate: false)
                 
             }
-            
             self.updateLabelsAndChart(overrideApplicationState: true)
             
         }
@@ -1359,7 +1358,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 let checktimestamp = Date(timeInterval: 5.0 * 60.0 - 10.0, since: timeStampLastBgReading)
                 
                 // timestamp of glucose being processed must be higher (ie more recent) than checktimestamp except if it's the last one (ie the first in the array), because there we don't care if it's less than 5 minutes different with the last but one
-                if (glucose.timeStamp > checktimestamp || ((index == 0) && (glucose.timeStamp > timeStampLastBgReading))) {
+                // adding 10 seconds to timeStampLastBgReading to handle case of G7, with backfills, because the array contains two times the same reading with a timestamp difference of a few seconds
+                if (glucose.timeStamp > checktimestamp || ((index == 0) && (glucose.timeStamp > timeStampLastBgReading.addingTimeInterval(10)))) {
                     
                     // check on glucoseLevelRaw > 0 because I've had a case where a faulty sensor was giving negative values
                     if glucose.glucoseLevelRaw > 0 {
@@ -1745,6 +1745,13 @@ final class RootViewController: UIViewController, ObservableObject {
     /// should be called only once immediately after app start, ie in viewdidload
     private func setupUpdateLabelsAndChartTimer() {
         
+        let test = "2760105d476fb579e61cf51bffcaaf44cf6a917d"
+        
+        if let testdata = test.hexadecimal() {
+            let testbattery = DexcomSessionStartRxMessage(data: testdata)
+            print("hello")
+        }
+        
         // set timeStampAppLaunch to now
         UserDefaults.standard.timeStampAppLaunch = Date()
         
@@ -1953,7 +1960,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             calibrator = DexcomCalibrator()
             
-        case .dexcom:
+        case .dexcom, .dexcomG7:
             
             if cgmTransmitter.isWebOOPEnabled() {
                 

@@ -17,4 +17,5 @@ extension DexcomG7HeartBeat {
     }
 
     @NSManaged public var blePeripheral: BLEPeripheral
+    
 }

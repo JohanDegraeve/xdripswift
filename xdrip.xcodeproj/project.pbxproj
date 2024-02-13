@@ -286,6 +286,7 @@
 		F85542322B7573D20058CE09 /* OmniPodHeartBeat+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85542312B7573D20058CE09 /* OmniPodHeartBeat+CoreDataClass.swift */; };
 		F85542342B7574330058CE09 /* OmniPodHeartBeat+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85542332B7574330058CE09 /* OmniPodHeartBeat+CoreDataProperties.swift */; };
 		F85542362B7575B40058CE09 /* OmniPodHeartBeatBluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85542352B7575B40058CE09 /* OmniPodHeartBeatBluetoothPeripheralViewModel.swift */; };
+		F85544912B83E6C3002569F8 /* DexcomG7GlucoseDataRxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F85544902B83E6C3002569F8 /* DexcomG7GlucoseDataRxMessage.swift */; };
 		F856CE5B22EDC8E50083E436 /* ConstantsBluetoothPairing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */; };
 		F857A32A253E2D9E00951BB2 /* LibreAlgorithmThresholds.swift in Sources */ = {isa = PBXBuildFile; fileRef = F857A329253E2D9E00951BB2 /* LibreAlgorithmThresholds.swift */; };
 		F857A334253F6A7600951BB2 /* LibreCalibrationInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F857A333253F6A7500951BB2 /* LibreCalibrationInfo.swift */; };
@@ -472,6 +473,7 @@
 		F8CB59CE27444D6300BA199E /* DexcomSessionStopResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59CD27444D6300BA199E /* DexcomSessionStopResponse.swift */; };
 		F8CB59D3274D94AF00BA199E /* DexcomSessionStartTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59D2274D94AE00BA199E /* DexcomSessionStartTxMessage.swift */; };
 		F8D0587C24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D0587B24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift */; };
+		F8DB19D22B89583F00569C37 /* DexcomG7BackfillMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DB19D12B89583F00569C37 /* DexcomG7BackfillMessage.swift */; };
 		F8DF765323E34F4500063910 /* DexcomG5+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF765223E34F4500063910 /* DexcomG5+CoreDataClass.swift */; };
 		F8DF765523E34FD500063910 /* DexcomG5+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF765423E34FD500063910 /* DexcomG5+CoreDataProperties.swift */; };
 		F8DF765C23E350B100063910 /* DexcomG5+BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF765B23E350B100063910 /* DexcomG5+BluetoothPeripheral.swift */; };
@@ -526,6 +528,14 @@
 		F8F1671727288B24001AA3D8 /* DexcomSessionStopRxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F1671627288B24001AA3D8 /* DexcomSessionStopRxMessage.swift */; };
 		F8F1671927288FC6001AA3D8 /* DexcomSessionStartRxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F1671827288FC6001AA3D8 /* DexcomSessionStartRxMessage.swift */; };
 		F8F1671B272B3E4F001AA3D8 /* DexcomBackfillStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F1671A272B3E4F001AA3D8 /* DexcomBackfillStream.swift */; };
+		F8F71D742B7C1143005076E8 /* CGMG7Transmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F71D732B7C1143005076E8 /* CGMG7Transmitter.swift */; };
+		F8F71D782B7D2754005076E8 /* CGMG7TransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F71D772B7D2754005076E8 /* CGMG7TransmitterDelegate.swift */; };
+		F8F71D7A2B7E9DFB005076E8 /* ConstantsDexcomG7.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F71D792B7E9DFB005076E8 /* ConstantsDexcomG7.swift */; };
+		F8F71D7D2B7EA600005076E8 /* DexcomG7BluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F71D7C2B7EA600005076E8 /* DexcomG7BluetoothPeripheralViewModel.swift */; };
+		F8F71D802B7EAA2E005076E8 /* DexcomG7+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F71D7E2B7EAA2D005076E8 /* DexcomG7+CoreDataClass.swift */; };
+		F8F71D812B7EAA2E005076E8 /* DexcomG7+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F71D7F2B7EAA2D005076E8 /* DexcomG7+CoreDataProperties.swift */; };
+		F8F71D832B7EACC9005076E8 /* BluetoothPeripheralManager+CGMG7TransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F71D822B7EACC9005076E8 /* BluetoothPeripheralManager+CGMG7TransmitterDelegate.swift */; };
+		F8F71D862B7EC1AD005076E8 /* DexcomG7+BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F71D852B7EC1AD005076E8 /* DexcomG7+BluetoothPeripheral.swift */; };
 		F8F7B8E6259A6EBF00C47B04 /* LibreSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F7B8E5259A6EBF00C47B04 /* LibreSmoothing.swift */; };
 		F8F7B8EB259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F7B8EA259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift */; };
 		F8F971B623A5914D00C3F17D /* M5Stack+BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8F971B123A5914C00C3F17D /* M5Stack+BluetoothPeripheral.swift */; };
@@ -1197,6 +1207,7 @@
 		F85542312B7573D20058CE09 /* OmniPodHeartBeat+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OmniPodHeartBeat+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F85542332B7574330058CE09 /* OmniPodHeartBeat+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OmniPodHeartBeat+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F85542352B7575B40058CE09 /* OmniPodHeartBeatBluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OmniPodHeartBeatBluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
+		F85544902B83E6C3002569F8 /* DexcomG7GlucoseDataRxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG7GlucoseDataRxMessage.swift; sourceTree = "<group>"; };
 		F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBluetoothPairing.swift; sourceTree = "<group>"; };
 		F857A329253E2D9E00951BB2 /* LibreAlgorithmThresholds.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreAlgorithmThresholds.swift; sourceTree = "<group>"; };
 		F857A333253F6A7500951BB2 /* LibreCalibrationInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LibreCalibrationInfo.swift; sourceTree = "<group>"; };
@@ -1480,6 +1491,7 @@
 		F8D094FC2846BDD70087FFEA /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/LibreStates.strings; sourceTree = "<group>"; };
 		F8D094FD2846BDD70087FFEA /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Snooze.strings; sourceTree = "<group>"; };
 		F8D094FE2846BDD70087FFEA /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/LibreNFC.strings; sourceTree = "<group>"; };
+		F8DB19D12B89583F00569C37 /* DexcomG7BackfillMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG7BackfillMessage.swift; sourceTree = "<group>"; };
 		F8DF765223E34F4500063910 /* DexcomG5+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DexcomG5+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F8DF765423E34FD500063910 /* DexcomG5+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DexcomG5+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F8DF765B23E350B100063910 /* DexcomG5+BluetoothPeripheral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DexcomG5+BluetoothPeripheral.swift"; sourceTree = "<group>"; };
@@ -1565,6 +1577,14 @@
 		F8F1671627288B24001AA3D8 /* DexcomSessionStopRxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomSessionStopRxMessage.swift; sourceTree = "<group>"; };
 		F8F1671827288FC6001AA3D8 /* DexcomSessionStartRxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomSessionStartRxMessage.swift; sourceTree = "<group>"; };
 		F8F1671A272B3E4F001AA3D8 /* DexcomBackfillStream.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomBackfillStream.swift; sourceTree = "<group>"; };
+		F8F71D732B7C1143005076E8 /* CGMG7Transmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG7Transmitter.swift; sourceTree = "<group>"; };
+		F8F71D772B7D2754005076E8 /* CGMG7TransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMG7TransmitterDelegate.swift; sourceTree = "<group>"; };
+		F8F71D792B7E9DFB005076E8 /* ConstantsDexcomG7.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsDexcomG7.swift; sourceTree = "<group>"; };
+		F8F71D7C2B7EA600005076E8 /* DexcomG7BluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomG7BluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
+		F8F71D7E2B7EAA2D005076E8 /* DexcomG7+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DexcomG7+CoreDataClass.swift"; sourceTree = "<group>"; };
+		F8F71D7F2B7EAA2D005076E8 /* DexcomG7+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "DexcomG7+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		F8F71D822B7EACC9005076E8 /* BluetoothPeripheralManager+CGMG7TransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BluetoothPeripheralManager+CGMG7TransmitterDelegate.swift"; sourceTree = "<group>"; };
+		F8F71D852B7EC1AD005076E8 /* DexcomG7+BluetoothPeripheral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DexcomG7+BluetoothPeripheral.swift"; sourceTree = "<group>"; };
 		F8F7B8E5259A6EBF00C47B04 /* LibreSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreSmoothing.swift; sourceTree = "<group>"; };
 		F8F7B8EA259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavitzkyGolaySmoothableArray.swift; sourceTree = "<group>"; };
 		F8F971B123A5914C00C3F17D /* M5Stack+BluetoothPeripheral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "M5Stack+BluetoothPeripheral.swift"; sourceTree = "<group>"; };
@@ -2299,6 +2319,7 @@
 				F8A2BC2425DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMDexcomG4TransmitterDelegate.swift */,
 				F8A2BC1F25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMDropletTransmitterDelegate.swift */,
 				F8A2BC1E25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMG5TransmitterDelegate.swift */,
+				F8F71D822B7EACC9005076E8 /* BluetoothPeripheralManager+CGMG7TransmitterDelegate.swift */,
 				F8A2BC2B25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMGNSEntryTransmitterDelegate.swift */,
 				F8A2BC2A25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMLibre2TransmitterDelegate.swift */,
 				F8A2BC2825DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMMiaoMiaoTransmitterDelegate.swift */,
@@ -2724,6 +2745,7 @@
 		F8DF765923E350B100063910 /* Dexcom */ = {
 			isa = PBXGroup;
 			children = (
+				F8F71D842B7EC19A005076E8 /* G7 */,
 				F816E1222439DB42009EE65B /* G4 */,
 				F8DF765A23E350B100063910 /* G5 */,
 			);
@@ -2750,6 +2772,7 @@
 		F8DF766A23ED9AF100063910 /* Dexcom */ = {
 			isa = PBXGroup;
 			children = (
+				F8F71D7B2B7EA5EF005076E8 /* DexcomG7 */,
 				F816E12F2439E2A0009EE65B /* DexcomG4 */,
 				F8DF766B23ED9AF100063910 /* DexcomG5 */,
 			);
@@ -2818,6 +2841,7 @@
 				F8AF36142455C6F700B5977B /* ConstantsTrace.swift */,
 				F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */,
 				F8E3A2AA23DA520B00E5E98A /* ConstantsWatch.swift */,
+				F8F71D792B7E9DFB005076E8 /* ConstantsDexcomG7.swift */,
 			);
 			name = Constants;
 			path = xdrip/Constants;
@@ -2866,6 +2890,8 @@
 				F816E12B2439DFBA009EE65B /* DexcomG4+CoreDataProperties.swift */,
 				F8DF765223E34F4500063910 /* DexcomG5+CoreDataClass.swift */,
 				F8DF765423E34FD500063910 /* DexcomG5+CoreDataProperties.swift */,
+				F8F71D7E2B7EAA2D005076E8 /* DexcomG7+CoreDataClass.swift */,
+				F8F71D7F2B7EAA2D005076E8 /* DexcomG7+CoreDataProperties.swift */,
 				F8EE3EAA2B6834FD00B27B96 /* DexcomG7HeartBeat+CoreDataClass.swift */,
 				F8EE3EA92B6834FD00B27B96 /* DexcomG7HeartBeat+CoreDataProperties.swift */,
 				F816E119243923B2009EE65B /* Droplet+CoreDataClass.swift */,
@@ -2956,6 +2982,8 @@
 				F8F1671227274557001AA3D8 /* DexcomCalibrationRxMessage.swift */,
 				F8CB59C927405A6800BA199E /* DexcomCalibrationTxMessage.swift */,
 				F8CB59C5273ECFE500BA199E /* DexcomG6GlucoseDataRxMessage.swift */,
+				F8DB19D12B89583F00569C37 /* DexcomG7BackfillMessage.swift */,
+				F85544902B83E6C3002569F8 /* DexcomG7GlucoseDataRxMessage.swift */,
 				F8CB59C12738206D00BA199E /* DexcomGlucoseDataTxMessage.swift */,
 				F8CB59CB2744471000BA199E /* DexcomSessionStartResponse.swift */,
 				F8F1671827288FC6001AA3D8 /* DexcomSessionStartRxMessage.swift */,
@@ -2981,6 +3009,31 @@
 				F8F971C123A5915900C3F17D /* TransmitterVersionTxMessage.swift */,
 			);
 			path = Generic;
+			sourceTree = "<group>";
+		};
+		F8F71D702B7C10E1005076E8 /* G7 */ = {
+			isa = PBXGroup;
+			children = (
+				F8F71D732B7C1143005076E8 /* CGMG7Transmitter.swift */,
+				F8F71D772B7D2754005076E8 /* CGMG7TransmitterDelegate.swift */,
+			);
+			path = G7;
+			sourceTree = "<group>";
+		};
+		F8F71D7B2B7EA5EF005076E8 /* DexcomG7 */ = {
+			isa = PBXGroup;
+			children = (
+				F8F71D7C2B7EA600005076E8 /* DexcomG7BluetoothPeripheralViewModel.swift */,
+			);
+			path = DexcomG7;
+			sourceTree = "<group>";
+		};
+		F8F71D842B7EC19A005076E8 /* G7 */ = {
+			isa = PBXGroup;
+			children = (
+				F8F71D852B7EC1AD005076E8 /* DexcomG7+BluetoothPeripheral.swift */,
+			);
+			path = G7;
 			sourceTree = "<group>";
 		};
 		F8F7B8E9259A7A9400C47B04 /* SavitzkyGolayFilter */ = {
@@ -3075,6 +3128,7 @@
 				F8AF11F924B1FB3500AE5BA2 /* DexcomError.swift */,
 				F8F971D423A5915900C3F17D /* G4 */,
 				F8F971BE23A5915900C3F17D /* G5 */,
+				F8F71D702B7C10E1005076E8 /* G7 */,
 				F8F1670F27274067001AA3D8 /* Generic */,
 			);
 			path = Dexcom;
@@ -3647,6 +3701,7 @@
 				D400F8032778BD8000B57648 /* TextsTreatmentsView.swift in Sources */,
 				47ADD2E127FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift in Sources */,
 				47228B152996BDD2008725DB /* BgReadingsView.swift in Sources */,
+				F8F71D802B7EAA2E005076E8 /* DexcomG7+CoreDataClass.swift in Sources */,
 				F81FA006228E09D40028C70F /* TextsCalibration.swift in Sources */,
 				F816E0F724367137009EE65B /* GNSEntry+CoreDataClass.swift in Sources */,
 				F8F9721923A5915900C3F17D /* CGMGNSEntryTransmitter.swift in Sources */,
@@ -3667,6 +3722,7 @@
 				F8B3A85D22821BB6004BA588 /* Int.swift in Sources */,
 				F808D2CE2403292C0084B5DB /* Bubble+CoreDataProperties.swift in Sources */,
 				F8A2BC1A25DB0C28001D1E78 /* CGMAtomTransmitterDelegate.swift in Sources */,
+				F8F71D862B7EC1AD005076E8 /* DexcomG7+BluetoothPeripheral.swift in Sources */,
 				47046EA42A6E8BA700A6F736 /* TextsBgReadings.swift in Sources */,
 				F8E0475E28CC8E330049D8C9 /* GlucoseData+LoopShare.swift in Sources */,
 				F85542322B7573D20058CE09 /* OmniPodHeartBeat+CoreDataClass.swift in Sources */,
@@ -3701,6 +3757,7 @@
 				F816E11C2439243B009EE65B /* Droplet+CoreDataProperties.swift in Sources */,
 				F821CF56229BF43A005C1E43 /* AlertKind.swift in Sources */,
 				F85DC2ED21CFE2F500B9F74A /* BgReading+CoreDataProperties.swift in Sources */,
+				F85544912B83E6C3002569F8 /* DexcomG7GlucoseDataRxMessage.swift in Sources */,
 				F8A2BC0D25DB0B12001D1E78 /* Atom+BluetoothPeripheral.swift in Sources */,
 				F8F9723123A5915900C3F17D /* M5StackAuthenticateTXMessage.swift in Sources */,
 				F8EE3EAE2B6834FD00B27B96 /* DexcomG7HeartBeat+CoreDataClass.swift in Sources */,
@@ -3732,17 +3789,20 @@
 				F8C9784D2428052E00A09483 /* CGMSensorType.swift in Sources */,
 				F8A1586B22EDB967007F5B5D /* ConstantsMaster.swift in Sources */,
 				47DB06D02A70141E00267BE3 /* FollowerDataSourceType.swift in Sources */,
+				F8DB19D22B89583F00569C37 /* DexcomG7BackfillMessage.swift in Sources */,
 				F8F9723923A5928D00C3F17D /* M5StackBluetoothPeripheralViewModel.swift in Sources */,
 				F8F9722B23A5915900C3F17D /* CGMTransmitterDelegate.swift in Sources */,
 				F80859292364D61B00F3829D /* UserDefaults+charts.swift in Sources */,
 				F8B955B7258D5E2000C06016 /* ConstantsHealthKit.swift in Sources */,
 				F8B3A7B2226A0878004BA588 /* TextsAlerts.swift in Sources */,
 				D4BAF37627769B38009D3465 /* TreatmentTableViewCell.swift in Sources */,
+				F8F71D782B7D2754005076E8 /* CGMG7TransmitterDelegate.swift in Sources */,
 				D40C3DA62775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift in Sources */,
 				F80D917024F85C7A006840B5 /* Libre2+BluetoothPeripheral.swift in Sources */,
 				F8F9721423A5915900C3F17D /* AuthChallengeRxMessage.swift in Sources */,
 				47B60F3726F389E2003198D3 /* LandscapeChartViewController.swift in Sources */,
 				F8025E5421EE8D2100ECF0C0 /* Libre1Calibrator.swift in Sources */,
+				F8F71D742B7C1143005076E8 /* CGMG7Transmitter.swift in Sources */,
 				F81FA00A228F53680028C70F /* TextsHomeView.swift in Sources */,
 				F8E3C3AD21FE551C00907A04 /* DexcomCalibrator.swift in Sources */,
 				F8F9723523A5915900C3F17D /* BluetoothTransmitter.swift in Sources */,
@@ -3774,6 +3834,7 @@
 				F8B3A835227F08AC004BA588 /* PickerViewController.swift in Sources */,
 				F821CF9522ADB0D7005C1E43 /* HealthKitManager.swift in Sources */,
 				F8CB59CE27444D6300BA199E /* DexcomSessionStopResponse.swift in Sources */,
+				F8F71D812B7EAA2E005076E8 /* DexcomG7+CoreDataProperties.swift in Sources */,
 				F8B3A81D227DEC92004BA588 /* CalibrationsAccessor.swift in Sources */,
 				F821CF9D22AEF483005C1E43 /* BGReadingSpeaker.swift in Sources */,
 				F8297F4E238DCAD800D74D66 /* BluetoothPeripheralsViewController.swift in Sources */,
@@ -3795,6 +3856,7 @@
 				F816E10E2437EAC9009EE65B /* BlueReader+CoreDataProperties.swift in Sources */,
 				F8B3A830227F085A004BA588 /* SettingsTableViewCell.swift in Sources */,
 				F82436FC24BE014000BED341 /* TextsLibreStates.swift in Sources */,
+				F8F71D7A2B7E9DFB005076E8 /* ConstantsDexcomG7.swift in Sources */,
 				47DB06C22A6FC02200267BE3 /* SettingsViewDataSourceSettingsViewModel.swift in Sources */,
 				F8F7B8EB259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift in Sources */,
 				D417E51C282EC8DB008DC467 /* ProgressBarViewController.swift in Sources */,
@@ -3803,6 +3865,7 @@
 				F808D2CC240328FA0084B5DB /* Bubble+CoreDataClass.swift in Sources */,
 				F8A1586122EDB844007F5B5D /* ConstantsNotifications.swift in Sources */,
 				F8DF765523E34FD500063910 /* DexcomG5+CoreDataProperties.swift in Sources */,
+				F8F71D832B7EACC9005076E8 /* BluetoothPeripheralManager+CGMG7TransmitterDelegate.swift in Sources */,
 				D4E499AB277B43E3000F8CBA /* TreatmentCollection.swift in Sources */,
 				F8F9720423A5915900C3F17D /* TransmitterVersionTxMessage.swift in Sources */,
 				F8DF765C23E350B100063910 /* DexcomG5+BluetoothPeripheral.swift in Sources */,
@@ -3810,6 +3873,7 @@
 				F85FF3C4252D0C32004E6FF1 /* xdrip.xcdatamodeld in Sources */,
 				F8B3A81C227DEC92004BA588 /* AlertEntriesAccessor.swift in Sources */,
 				F8A1585B22EDB7EA007F5B5D /* ConstantsDexcomG5.swift in Sources */,
+				F8F71D7D2B7EA600005076E8 /* DexcomG7BluetoothPeripheralViewModel.swift in Sources */,
 				F816E0F524367132009EE65B /* GNSEntry+CoreDataProperties.swift in Sources */,
 				F898EDF4234A8A3200BFB79B /* UInt16.swift in Sources */,
 				F8BDD452221DEAB2006EAB84 /* TextsSettingsView.swift in Sources */,
@@ -4958,7 +5022,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "$(XDRIP_ENTITLEMENTS_RELEASE)";
-				CODE_SIGN_IDENTITY = "$(XDRIP_CODE_SIGN_IDENTITY_RELEASE)";
+				CODE_SIGN_IDENTITY = "(XDRIP_CODE_SIGN_IDENTITY_RELEASE)";
 				CODE_SIGN_STYLE = "$(XDRIP_CODE_SIGN_STYLE)";
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
 				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";

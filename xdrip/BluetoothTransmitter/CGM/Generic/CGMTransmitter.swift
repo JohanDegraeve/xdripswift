@@ -84,6 +84,9 @@ enum CGMTransmitterType:String, CaseIterable {
     /// dexcom G5, G6
     case dexcom = "Dexcom"
     
+    /// dexcom G7
+    case dexcomG7 = "Dexcom G7"
+    
     /// miaomiao
     case miaomiao = "MiaoMiao"
     
@@ -116,7 +119,7 @@ enum CGMTransmitterType:String, CaseIterable {
         
         switch self {
             
-        case .dexcomG4, .dexcom:
+        case .dexcomG4, .dexcom, .dexcomG7:
             return .Dexcom
             
         case .miaomiao, .Bubble, .GNSentry, .Droplet1, .blueReader, .watlaa, .Blucon, .Libre2, .Atom:
@@ -167,6 +170,9 @@ enum CGMTransmitterType:String, CaseIterable {
         case .Atom:
             return true
             
+        case .dexcomG7:
+            return true
+            
         }
     }
     
@@ -182,7 +188,9 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .miaomiao, .Bubble, .Blucon, .Libre2, .Atom:
             return true
-        
+            
+        case .dexcomG7:
+            return false
         
         }
     }
@@ -224,6 +232,10 @@ enum CGMTransmitterType:String, CaseIterable {
         case .Atom:
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelAtom
             
+        case .dexcomG7:
+            // we don't use this
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDexcomG5
+            
         }
     }
     
@@ -260,6 +272,10 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .Atom:
             return "%"
+            
+        case .dexcomG7:
+            // we don't use this
+            return ""
             
         }
     }

@@ -25,6 +25,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// Dexcom
     case DexcomType = "Dexcom G5 / G6 / One"
     
+    /// Dexcom G7
+    case DexcomG7Type = "Dexcom G7"
+    
     /// DexcomG4
     case DexcomG4Type = "Dexcom G4 (Bridge)"
     
@@ -52,6 +55,8 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// DexcomG7 heartbeat
     case DexcomG7HeartBeatType = "Dexcom G7 HeartBeat"
     
+    
+    /// omnipod heartbeat
     case OmniPodHeartBeatType = "OmniPod HeartBeat"
     
     /// - returns: the BluetoothPeripheralViewModel. If nil then there's no specific settings for the tpe of bluetoothPeripheral
@@ -106,6 +111,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .OmniPodHeartBeatType:
             return OmniPodHeartBeatBluetoothPeripheralViewModel()
+            
+        case .DexcomG7Type:
+            return DexcomG7BluetoothPeripheralViewModel()
         }
         
     }
@@ -181,6 +189,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .OmniPodHeartBeatType:
             return OmniPodHeartBeat(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
+        case .DexcomG7Type:
+            return DexcomG7(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+            
         }
         
     }
@@ -193,7 +204,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .M5StackType, .M5StickCType:
             return .M5Stack
             
-        case .DexcomType, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .WatlaaType, .Libre2Type, .AtomType:
+        case .DexcomType, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .WatlaaType, .Libre2Type, .AtomType, .DexcomG7Type:
             return .CGM
             
         case .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType:
@@ -209,6 +220,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
         switch self {
             
         case .M5StackType, .M5StickCType, .WatlaaType, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType, .Libre2Type, .AtomType, .OmniPodHeartBeatType:
+            return false
+            
+        case .DexcomG7Type:
+            // try to figure out the active sensor without needing to know the transmitter id
             return false
             
         case .DexcomType, .BluconType, .DexcomG4Type, .Libre3HeartBeatType, .DexcomG7HeartBeatType:
@@ -259,6 +274,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
             // transmitter id is used to create expected device name, could be anything apparently
             return nil
             
+        case .DexcomG7Type:
+            return nil
+            
         case .BluconType:
             
             let regex = try! NSRegularExpression(pattern: "^[0-9]{1,5}$", options: .caseInsensitive)
@@ -294,6 +312,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
             // oop web can still be used for Libre2 because in the end the data received is Libre 1 format, we can use oop web to get slope parameters
             return true
             
+        case .DexcomG7Type:
+            return true
+            
         }
         
     }
@@ -303,7 +324,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .M5StackType, .M5StickCType, .DexcomG4Type, .DexcomType, .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType:
+        case .M5StackType, .M5StickCType, .DexcomG4Type, .DexcomType, .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType, .DexcomG7Type:
             return false
             
         case .BubbleType, .MiaoMiaoType, .WatlaaType, .BluconType, .BlueReaderType, .DropletType , .GNSentryType, .AtomType:
@@ -321,7 +342,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .M5StackType, .M5StickCType, .DexcomG4Type, .DexcomType, .BubbleType, .MiaoMiaoType, .WatlaaType, .BluconType, .BlueReaderType, .DropletType , .GNSentryType, .AtomType, .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType:
+        case .M5StackType, .M5StickCType, .DexcomG4Type, .DexcomType, .BubbleType, .MiaoMiaoType, .WatlaaType, .BluconType, .BlueReaderType, .DropletType , .GNSentryType, .AtomType, .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType, .DexcomG7Type:
             return false
             
         case .Libre2Type:

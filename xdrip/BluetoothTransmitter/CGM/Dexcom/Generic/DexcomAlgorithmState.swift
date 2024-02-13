@@ -33,6 +33,9 @@ enum DexcomAlgorithmState: UInt8, CustomStringConvertible {
     case SensorFailedDueToHighCountsAberration = 0x14
     case SensorFailedDueToLowCountsAberration = 0x15
     case SensorFailedDueToRestart = 0x16
+    case questionMarks = 0x18
+    case expired = 0x24
+    case sensorFailed = 0x25
     
     public var description: String {
         
@@ -61,7 +64,9 @@ enum DexcomAlgorithmState: UInt8, CustomStringConvertible {
         case .SensorFailedDueToHighCountsAberration: return "Sensor failed due to high counts aberration"
         case .SensorFailedDueToLowCountsAberration: return "Sensor failed due to low counts aberration"
         case .SensorFailedDueToRestart: return "Sensor failed due to restart"
-
+        case .questionMarks: return "???"
+        case .expired: return "Expired"
+        case .sensorFailed: return "Sensor failed"
         }
         
     }
