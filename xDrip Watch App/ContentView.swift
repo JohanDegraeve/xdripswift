@@ -122,7 +122,7 @@ struct ContentView_Previews: PreviewProvider {
             if currentValue < 70 {
                 increaseValues = true
                 bgValueArray[index] = currentValue + abs(randomValue)
-            } else if currentValue > 200 {
+            } else if currentValue > 180 {
                 increaseValues = false
                 bgValueArray[index] = currentValue - abs(randomValue)
             } else {
@@ -130,9 +130,7 @@ struct ContentView_Previews: PreviewProvider {
             }
             currentValue = bgValueArray[index]
         }
-        
         return bgValueArray
-        
     }
     
     static var previews: some View {
@@ -148,7 +146,7 @@ struct ContentView_Previews: PreviewProvider {
         state.highLimitInMgDl = 140
         state.urgentHighLimitInMgDl = 180
         state.updatedDate = Date().addingTimeInterval(-400)
-        state.activeSensorDescription = "Dexcom G6"
+        state.activeSensorDescription = "Data Source"
         state.sensorAgeInMinutes = 6788
         state.sensorMaxAgeInMinutes = 14400
         
