@@ -43,8 +43,8 @@ class WatchStateModel: NSObject, ObservableObject {
     
     var session: WCSession
     
-    var bgReadingValues: [Double] = []
-    var bgReadingDates: [Date] = []
+    var bgReadingValues: [Double] = [234]
+    var bgReadingDates: [Date] = [Date().addingTimeInterval(-200)]
     @Published var isMgDl: Bool = true
     @Published var slopeOrdinal: Int = 5
     @Published var deltaChangeInMgDl: Double = 3

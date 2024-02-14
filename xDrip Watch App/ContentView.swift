@@ -14,7 +14,7 @@ struct ContentView: View {
     var body: some View {
         VStack {
             HStack {
-                Text("\(state.bgReadingValues[14].mgdlToMmolAndToString(mgdl: state.isMgDl)) \(state.trendArrow())")
+                Text("\(state.bgReadingValues[0].mgdlToMmolAndToString(mgdl: state.isMgDl))\(state.trendArrow())")
                     .font(.system(size: 60)).bold()
                     .foregroundStyle(state.getBgColor())
                     .scaledToFill()
@@ -34,7 +34,8 @@ struct ContentView: View {
                 }
             }
             .padding([.leading, .trailing], 5) // needed to fit 49mm screens (Ultra 1/2)
-            .padding([.bottom], -5)
+            .padding([.top], 20)
+            .padding([.bottom], -10)
             
 //            .padding([.bottom], -20) // needed if the below view is shown
             
