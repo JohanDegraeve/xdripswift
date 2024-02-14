@@ -1,5 +1,5 @@
 //
-//  GlucoseChartWidgetType.swift
+//  GlucoseChartType.swift
 //  xdrip
 //
 //  Created by Paul Plant on 5/1/24.
@@ -11,9 +11,9 @@ import UIKit
 import SwiftUI
 
 /// holds and returns the different parameters used for creating the images for different widget types
-public enum GlucoseChartWidgetType: Int, CaseIterable {
+public enum GlucoseChartType: Int, CaseIterable {
     
-    // when adding GlucoseChartWidgetType, add new cases at the end (ie 3, ...)
+    // when adding GlucoseChartType, add new cases at the end (ie 3, ...)
     // if this is done in the middle then a database migration would be required, because the rawvalue is stored as Int16 in the coredata
     // the order of the data source types will in the uiview is determined by the initializer init(forRowAt row: Int)
 
@@ -35,12 +35,12 @@ public enum GlucoseChartWidgetType: Int, CaseIterable {
         case .liveActivityNotification:
             switch liveActivityNotificationSizeType {
             case .large:
-                return (ConstantsWidget.viewWidthLiveActivityNotificationLarge, ConstantsWidget.viewHeightLiveActivityNotificationLarge)
+                return (ConstantsGlucoseChartSwiftUI.viewWidthLiveActivityNotificationLarge, ConstantsGlucoseChartSwiftUI.viewHeightLiveActivityNotificationLarge)
             default:
-                return (ConstantsWidget.viewWidthLiveActivityNotificationNormal, ConstantsWidget.viewHeightLiveActivityNotificationNormal)
+                return (ConstantsGlucoseChartSwiftUI.viewWidthLiveActivityNotificationNormal, ConstantsGlucoseChartSwiftUI.viewHeightLiveActivityNotificationNormal)
             }
         case .dynamicIsland:
-            return (ConstantsWidget.viewWidthDynamicIsland, ConstantsWidget.viewHeightDynamicIsland)
+            return (ConstantsGlucoseChartSwiftUI.viewWidthDynamicIsland, ConstantsGlucoseChartSwiftUI.viewHeightDynamicIsland)
         }
     }
     
@@ -49,12 +49,12 @@ public enum GlucoseChartWidgetType: Int, CaseIterable {
         case .liveActivityNotification:
             switch liveActivityNotificationSizeType {
             case .large:
-                return ConstantsWidget.hoursToShowLiveActivityNotificationLarge
+                return ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNotificationLarge
             default:
-                return ConstantsWidget.hoursToShowLiveActivityNotificationNormal
+                return ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNotificationNormal
             }
         case .dynamicIsland:
-            return ConstantsWidget.hoursToShowDynamicIsland
+            return ConstantsGlucoseChartSwiftUI.hoursToShowDynamicIsland
         }
     }
     
@@ -63,75 +63,75 @@ public enum GlucoseChartWidgetType: Int, CaseIterable {
         case .liveActivityNotification:
             switch liveActivityNotificationSizeType {
             case .large:
-                return ConstantsWidget.intervalBetweenXAxisValuesLiveActivityNotificationLarge
+                return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesLiveActivityNotificationLarge
             default:
-                return ConstantsWidget.intervalBetweenXAxisValuesLiveActivityNotificationNormal
+                return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesLiveActivityNotificationNormal
         }
         case .dynamicIsland:
-            return ConstantsWidget.intervalBetweenXAxisValuesDynamicIsland
+            return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesDynamicIsland
         }
     }
     
     var backgroundColor: Color {
         switch self {
         case .liveActivityNotification:
-            return ConstantsWidget.viewBackgroundColorLiveActivityNotification
+            return ConstantsGlucoseChartSwiftUI.viewBackgroundColorLiveActivityNotification
         case .dynamicIsland:
-            return ConstantsWidget.viewBackgroundColorDynamicIsland
+            return ConstantsGlucoseChartSwiftUI.viewBackgroundColorDynamicIsland
         }
     }
     
     var glucoseCircleDiameter: Double {
         switch self {
         case .liveActivityNotification:
-            return ConstantsWidget.glucoseCircleDiameterLiveActivityNotification
+            return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterLiveActivityNotification
         case .dynamicIsland:
-            return ConstantsWidget.glucoseCircleDiameterDynamicIsland
+            return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterDynamicIsland
         }
     }
     
     var lowHighLineColor: Color {
         switch self {
         case .liveActivityNotification:
-            return ConstantsWidget.lowHighLineColorLiveActivityNotification
+            return ConstantsGlucoseChartSwiftUI.lowHighLineColorLiveActivityNotification
         case .dynamicIsland:
-            return ConstantsWidget.lowHighLineColorDynamicIsland
+            return ConstantsGlucoseChartSwiftUI.lowHighLineColorDynamicIsland
         }
     }
     
     var urgentLowHighLineColor: Color {
         switch self {
         case .liveActivityNotification:
-            return ConstantsWidget.urgentLowHighLineLiveActivityNotification
+            return ConstantsGlucoseChartSwiftUI.urgentLowHighLineLiveActivityNotification
         case .dynamicIsland:
-            return ConstantsWidget.urgentLowHighLineColorDynamicIsland
+            return ConstantsGlucoseChartSwiftUI.urgentLowHighLineColorDynamicIsland
         }
     }
     
     var relativeYAxisLineSize: Double {
         switch self {
         case .liveActivityNotification:
-            return ConstantsWidget.relativeYAxisLineSizeLiveActivityNotification
+            return ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeLiveActivityNotification
         case .dynamicIsland:
-            return ConstantsWidget.relativeYAxisLineSizeDynamicIsland
+            return ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeDynamicIsland
         }
     }
     
     var xAxisLabelOffset: Double {
         switch self {
         case .liveActivityNotification:
-            return ConstantsWidget.xAxisLabelOffsetLiveActivityNotification
+            return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetLiveActivityNotification
         case .dynamicIsland:
-            return ConstantsWidget.xAxisLabelOffsetDynamicIsland
+            return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetDynamicIsland
         }
     }
     
     var xAxisGridLineColor: Color {
         switch self {
         case .liveActivityNotification:
-            return ConstantsWidget.xAxisGridLineColorLiveActivityNotification
+            return ConstantsGlucoseChartSwiftUI.xAxisGridLineColorLiveActivityNotification
         case .dynamicIsland:
-            return ConstantsWidget.xAxisGridLineColorDynamicIsland
+            return ConstantsGlucoseChartSwiftUI.xAxisGridLineColorDynamicIsland
         }
     }
     

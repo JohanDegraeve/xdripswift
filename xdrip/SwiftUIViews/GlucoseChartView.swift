@@ -15,7 +15,7 @@ struct GlucoseChartView: View {
     
     var bgReadingValues: [Double]
     var bgReadingDates: [Date]
-    let glucoseChartWidgetType: GlucoseChartWidgetType
+    let glucoseChartType: GlucoseChartType
     let isMgDl: Bool
     let urgentLowLimitInMgDl: Double
     let lowLimitInMgDl: Double
@@ -23,23 +23,23 @@ struct GlucoseChartView: View {
     let urgentHighLimitInMgDl: Double
     let liveActivityNotificationSizeType: LiveActivityNotificationSizeType
     
-    init(bgReadingValues: [Double], bgReadingDates: [Date], glucoseChartWidgetType: GlucoseChartWidgetType, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityNotificationSizeType: LiveActivityNotificationSizeType) {
+    init(bgReadingValues: [Double], bgReadingDates: [Date], glucoseChartType: GlucoseChartType, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityNotificationSizeType: LiveActivityNotificationSizeType) {
         
-        // as all widget instances are passed 12 hours of bg values, we must initialize this instance to use only the amount of hours of value required by the glucoseChartWidgetType passed
+        // as all widget instances are passed 12 hours of bg values, we must initialize this instance to use only the amount of hours of value required by the glucoseChartType passed
         self.bgReadingValues = []
         self.bgReadingDates = []
         
         var index = 0
         
         for _ in bgReadingValues {
-            if bgReadingDates[index] > Date().addingTimeInterval(-glucoseChartWidgetType.hoursToShow(liveActivityNotificationSizeType: liveActivityNotificationSizeType) * 60 * 60) {
+            if bgReadingDates[index] > Date().addingTimeInterval(-glucoseChartType.hoursToShow(liveActivityNotificationSizeType: liveActivityNotificationSizeType) * 60 * 60) {
                 self.bgReadingValues.append(bgReadingValues[index])
                 self.bgReadingDates.append(bgReadingDates[index])
             }
             index += 1
         }
         
-        self.glucoseChartWidgetType = glucoseChartWidgetType
+        self.glucoseChartType = glucoseChartType
         self.isMgDl = isMgDl
         self.urgentLowLimitInMgDl = urgentLowLimitInMgDl
         self.lowLimitInMgDl = lowLimitInMgDl
@@ -64,7 +64,7 @@ struct GlucoseChartView: View {
         
         // adapted from generateXAxisValues() from GlucoseChartManager.swift in xDrip target
                 
-        let startDate: Date = bgReadingDates.last ?? Date().addingTimeInterval(-glucoseChartWidgetType.hoursToShow(liveActivityNotificationSizeType: liveActivityNotificationSizeType) * 3600)
+        let startDate: Date = bgReadingDates.last ?? Date().addingTimeInterval(-glucoseChartType.hoursToShow(liveActivityNotificationSizeType: liveActivityNotificationSizeType) * 3600)
         let endDate: Date = Date()
         
         /// how many full hours between startdate and enddate
@@ -74,7 +74,7 @@ struct GlucoseChartView: View {
         let mappingArray = Array(1...amountOfFullHours)
         
         /// set the stride count interval to make sure we don't add too many labels to the x-axis if the user wants to view >6 hours
-        let intervalBetweenAxisValues: Int = glucoseChartWidgetType.intervalBetweenAxisValues(liveActivityNotificationSizeType: liveActivityNotificationSizeType)
+        let intervalBetweenAxisValues: Int = glucoseChartType.intervalBetweenAxisValues(liveActivityNotificationSizeType: liveActivityNotificationSizeType)
         
         /// first, for each int in mappingArray, we create a Date, starting with the lower hour + 1 hour - we will create 5 in this example, starting with hour 08 (7 + 3600 seconds)
         let startDateLower = Date(timeIntervalSinceReferenceDate:
@@ -96,41 +96,41 @@ struct GlucoseChartView: View {
         Chart {
             if domain.contains(urgentLowLimitInMgDl) {
                 RuleMark(y: .value("", urgentLowLimitInMgDl))
-                    .lineStyle(StrokeStyle(lineWidth: 1 * glucoseChartWidgetType.relativeYAxisLineSize, dash: [2 * glucoseChartWidgetType.relativeYAxisLineSize, 6 * glucoseChartWidgetType.relativeYAxisLineSize]))
-                    .foregroundStyle(glucoseChartWidgetType.urgentLowHighLineColor)
+                    .lineStyle(StrokeStyle(lineWidth: 1 * glucoseChartType.relativeYAxisLineSize, dash: [2 * glucoseChartType.relativeYAxisLineSize, 6 * glucoseChartType.relativeYAxisLineSize]))
+                    .foregroundStyle(glucoseChartType.urgentLowHighLineColor)
             }
             
             if domain.contains(urgentHighLimitInMgDl) {
                 RuleMark(y: .value("", urgentHighLimitInMgDl))
-                    .lineStyle(StrokeStyle(lineWidth: 1 * glucoseChartWidgetType.relativeYAxisLineSize, dash: [2 * glucoseChartWidgetType.relativeYAxisLineSize, 6 * glucoseChartWidgetType.relativeYAxisLineSize]))
-                    .foregroundStyle(glucoseChartWidgetType.urgentLowHighLineColor)
+                    .lineStyle(StrokeStyle(lineWidth: 1 * glucoseChartType.relativeYAxisLineSize, dash: [2 * glucoseChartType.relativeYAxisLineSize, 6 * glucoseChartType.relativeYAxisLineSize]))
+                    .foregroundStyle(glucoseChartType.urgentLowHighLineColor)
             }
 
             if domain.contains(lowLimitInMgDl) {
                 RuleMark(y: .value("", lowLimitInMgDl))
-                    .lineStyle(StrokeStyle(lineWidth: 1 * glucoseChartWidgetType.relativeYAxisLineSize, dash: [4 * glucoseChartWidgetType.relativeYAxisLineSize, 3 * glucoseChartWidgetType.relativeYAxisLineSize]))
-                    .foregroundStyle(glucoseChartWidgetType.lowHighLineColor)
+                    .lineStyle(StrokeStyle(lineWidth: 1 * glucoseChartType.relativeYAxisLineSize, dash: [4 * glucoseChartType.relativeYAxisLineSize, 3 * glucoseChartType.relativeYAxisLineSize]))
+                    .foregroundStyle(glucoseChartType.lowHighLineColor)
             }
             
             if domain.contains(highLimitInMgDl) {
                 RuleMark(y: .value("", highLimitInMgDl))
-                    .lineStyle(StrokeStyle(lineWidth: 1 * glucoseChartWidgetType.relativeYAxisLineSize, dash: [4 * glucoseChartWidgetType.relativeYAxisLineSize, 3 * glucoseChartWidgetType.relativeYAxisLineSize]))
-                    .foregroundStyle(glucoseChartWidgetType.lowHighLineColor)
+                    .lineStyle(StrokeStyle(lineWidth: 1 * glucoseChartType.relativeYAxisLineSize, dash: [4 * glucoseChartType.relativeYAxisLineSize, 3 * glucoseChartType.relativeYAxisLineSize]))
+                    .foregroundStyle(glucoseChartType.lowHighLineColor)
             }
             
             // add a phantom glucose point at the beginning of the timeline to fix the start point in case there are no glucose values at that time (for instances after starting a new sensor
             // this will ensure that the x-axis scale remains correct and the few glucose points availabel don't stretch to cover the whole axis
-            PointMark(x: .value("Time", Date().addingTimeInterval(-glucoseChartWidgetType.hoursToShow(liveActivityNotificationSizeType: liveActivityNotificationSizeType) * 3600)),
+            PointMark(x: .value("Time", Date().addingTimeInterval(-glucoseChartType.hoursToShow(liveActivityNotificationSizeType: liveActivityNotificationSizeType) * 3600)),
                       y: .value("BG", 100))
             .symbol(Circle())
-            .symbolSize(glucoseChartWidgetType.glucoseCircleDiameter)
+            .symbolSize(glucoseChartType.glucoseCircleDiameter)
             .foregroundStyle(.clear)
 
             ForEach(bgReadingValues.indices, id: \.self) { index in
                     PointMark(x: .value("Time", bgReadingDates[index]),
                               y: .value("BG", bgReadingValues[index]))
                     .symbol(Circle())
-                    .symbolSize(glucoseChartWidgetType.glucoseCircleDiameter)
+                    .symbolSize(glucoseChartType.glucoseCircleDiameter)
                     .foregroundStyle(bgColor(bgValueInMgDl: bgReadingValues[index]))
             }
             
@@ -138,7 +138,7 @@ struct GlucoseChartView: View {
             PointMark(x: .value("Time", Date().addingTimeInterval(5 * 60)),
                       y: .value("BG", 100))
             .symbol(Circle())
-            .symbolSize(glucoseChartWidgetType.glucoseCircleDiameter)
+            .symbolSize(glucoseChartType.glucoseCircleDiameter)
             .foregroundStyle(.clear)
         }
         .chartXAxis {
@@ -150,29 +150,29 @@ struct GlucoseChartView: View {
 //                        Text(v.formatted(.dateTime.hour()))
 //                            .foregroundStyle(Color.white)
 //                    }
-//                    //.offset(x: glucoseChartWidgetType.xAxisLabelOffset)
+//                    //.offset(x: glucoseChartType.xAxisLabelOffset)
 //                    
 //                    AxisGridLine()
-//                        .foregroundStyle(glucoseChartWidgetType.xAxisGridLineColor)
+//                        .foregroundStyle(glucoseChartType.xAxisGridLineColor)
 //                }
 //            }
             
-            AxisMarks(values: .automatic(desiredCount: Int(glucoseChartWidgetType.hoursToShow(liveActivityNotificationSizeType: liveActivityNotificationSizeType)))) {
+            AxisMarks(values: .automatic(desiredCount: Int(glucoseChartType.hoursToShow(liveActivityNotificationSizeType: liveActivityNotificationSizeType)))) {
                 if $0.as(Date.self) != nil {
 //                    AxisValueLabel {
 //                        Text(v.formatted(.dateTime.hour()))
 //                            .foregroundStyle(Color.white)
 //                    }
-//                    .offset(x: glucoseChartWidgetType.xAxisLabelOffset)
+//                    .offset(x: glucoseChartType.xAxisLabelOffset)
                     AxisGridLine()
-                        .foregroundStyle(glucoseChartWidgetType.xAxisGridLineColor)
+                        .foregroundStyle(glucoseChartType.xAxisGridLineColor)
                 }
             }
         }
         //.background(Color.purple)
         .chartYAxis(.hidden)
         .chartYScale(domain: domain)
-        .frame(width: glucoseChartWidgetType.viewSize(liveActivityNotificationSizeType: liveActivityNotificationSizeType).width, height: glucoseChartWidgetType.viewSize(liveActivityNotificationSizeType: liveActivityNotificationSizeType).height)
+        .frame(width: glucoseChartType.viewSize(liveActivityNotificationSizeType: liveActivityNotificationSizeType).width, height: glucoseChartType.viewSize(liveActivityNotificationSizeType: liveActivityNotificationSizeType).height)
 //        .padding(.top, 20)
 //        .padding(.bottom, 20)
     }

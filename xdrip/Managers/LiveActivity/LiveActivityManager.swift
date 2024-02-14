@@ -104,17 +104,7 @@ extension LiveActivityManager {
             }
         } else {
             
-            //let alertConfiguration = AlertConfiguration(title: "BG Alert", body: contentState.getBgTitle(), sound: .default)
             let updatedContent = ActivityContent(state: contentState, staleDate: nil)
-            
-//            if contentState.getBgTitle() != "" {
-//                print("Triggering Live Activity alert for \(String(describing: contentState.getBgTitle()))")
-//                trace("triggering live activity alert for: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, String(describing: contentState.getBgTitle()))
-//                
-//                await eventActivity?.update(updatedContent, alertConfiguration: alertConfiguration)
-//            } else {
-//                await eventActivity?.update(updatedContent)
-//            }
             
             await eventActivity?.update(updatedContent)
         }

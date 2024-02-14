@@ -1,5 +1,5 @@
 //
-//  ConstantsWidget.swift
+//  ConstantsGlucoseChartSwiftUI.swift
 //  xDripWidgetExtension
 //
 //  Created by Paul Plant on 31/12/23.
@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-enum ConstantsWidget {
+enum ConstantsGlucoseChartSwiftUI {
     
     static let mmollToMgdl = 18.01801801801802
     static let mgDlToMmoll = 0.0555

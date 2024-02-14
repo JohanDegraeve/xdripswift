@@ -57,7 +57,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             // these are dynamically initialized based on the above
             self.bgValueInMgDl = bgReadingValues[0]
             self.bgReadingDate = bgReadingDates[0]
-            self.bgUnitString = isMgDl ? Texts_Widget.mgdl : Texts_Widget.mmol
+            self.bgUnitString = isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
             self.bgValueStringInUserChosenUnit = bgReadingValues[0].mgdlToMmolAndToString(mgdl: isMgDl)
             
             
@@ -72,23 +72,6 @@ struct XDripWidgetAttributes: ActivityAttributes {
                 return .yellow
             } else {
                 return .green
-            }
-        }
-        
-        /// Show the bg event title if relevant
-        /// - Returns: a localized string such as "HIGH" or "LOW" as required
-        @available(iOS 16, *)
-        func getBgTitle() -> LocalizedStringResource {
-            if bgValueInMgDl >= urgentHighLimitInMgDl {
-                return "\(Texts_Widget.urgentHigh)"
-            } else if bgValueInMgDl >= highLimitInMgDl {
-                return "\(Texts_Widget.high)"
-            } else if bgValueInMgDl <= lowLimitInMgDl {
-                return "\(Texts_Widget.low)"
-            } else if bgValueInMgDl <= urgentLowLimitInMgDl {
-                return "\(Texts_Widget.urgentLow)"
-            } else {
-                return "TEST"
             }
         }
         
@@ -165,14 +148,14 @@ struct XDripWidgetAttributes: ActivityAttributes {
 //            return eventStartDate < Date().addingTimeInterval(-3600 * 0.2) ? true : false
 //        }
         
-        func placeTextAtBottomOfWidget(glucoseChartWidgetType: GlucoseChartWidgetType) -> Bool {
+        func placeTextAtBottomOfWidget(glucoseChartType: GlucoseChartType) -> Bool {
             
             // first see at which index in bgReadingDates the BG value is after one hour
             var firstIndexForWidgetType = 0
             var index = 0
             
             for _ in bgReadingValues {
-                if bgReadingDates[index] > Date().addingTimeInterval((-glucoseChartWidgetType.hoursToShow(liveActivityNotificationSizeType: LiveActivityNotificationSizeType(rawValue: liveActivityNotificationSizeTypeAsInt) ?? .normal) * 60 * 60) + 3600) {
+                if bgReadingDates[index] > Date().addingTimeInterval((-glucoseChartType.hoursToShow(liveActivityNotificationSizeType: LiveActivityNotificationSizeType(rawValue: liveActivityNotificationSizeTypeAsInt) ?? .normal) * 60 * 60) + 3600) {
                     firstIndexForWidgetType = index
                 }
                 index += 1

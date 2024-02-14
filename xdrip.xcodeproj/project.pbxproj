@@ -22,12 +22,7 @@
 		4716A4FE2B406C3F00419052 /* xDripWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4716A4ED2B406C3D00419052 /* xDripWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4716A5052B40709E00419052 /* XDripWidgetAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A5042B40709E00419052 /* XDripWidgetAttributes.swift */; };
 		4716A5072B4082ED00419052 /* XDripWidgetAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A5042B40709E00419052 /* XDripWidgetAttributes.swift */; };
-		4716A50A2B416E6500419052 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A5092B416E6500419052 /* Double.swift */; };
-		4716A50D2B416EE100419052 /* ConstantsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A50C2B416EE100419052 /* ConstantsWidget.swift */; };
-		4716A50E2B41707D00419052 /* TextsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E53FE8251F7B8800052CE5 /* TextsWidget.swift */; };
-		4716A50F2B41708000419052 /* TextsWidget.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8E53FD0251D35FB00052CE5 /* TextsWidget.strings */; };
-		4716A5102B41823600419052 /* TextsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E53FE8251F7B8800052CE5 /* TextsWidget.swift */; };
-		4716A5112B41823A00419052 /* TextsWidget.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8E53FD0251D35FB00052CE5 /* TextsWidget.strings */; };
+		4716A50D2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A50C2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift */; };
 		4716A5142B41CAD000419052 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A5132B41CAD000419052 /* LiveActivityManager.swift */; };
 		47228B152996BDD2008725DB /* BgReadingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47228B142996BDD2008725DB /* BgReadingsView.swift */; };
 		472596052B76301F00459D12 /* WatchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 472596042B76301F00459D12 /* WatchManager.swift */; };
@@ -48,23 +43,42 @@
 		47A6ABE62B790CC70047A4BA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 47A6ABE52B790CC70047A4BA /* Assets.xcassets */; };
 		47A6ABE92B790CC70047A4BA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 47A6ABE82B790CC70047A4BA /* Preview Assets.xcassets */; };
 		47A6ABEF2B7949B80047A4BA /* WatchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6ABEE2B7949B80047A4BA /* WatchModel.swift */; };
-		47A6ABF22B79518E0047A4BA /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6ABF12B79518E0047A4BA /* Date.swift */; };
-		47A6ABF42B7951A50047A4BA /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6ABF32B7951A50047A4BA /* Double.swift */; };
-		47A6ABF72B7951EB0047A4BA /* TextsWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6ABF62B7951EB0047A4BA /* TextsWatchApp.swift */; };
-		47A6ABFA2B7952380047A4BA /* ConstantsWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6ABF92B7952380047A4BA /* ConstantsWatchApp.swift */; };
-		47A6ABFC2B795D230047A4BA /* GlucoseChartWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210EF2B52A05B00005711 /* GlucoseChartWidgetView.swift */; };
-		47A6ABFF2B795DA30047A4BA /* GlucoseChartWidgetType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210ED2B5298EB00005711 /* GlucoseChartWidgetType.swift */; };
+		47A6ABFF2B795DA30047A4BA /* GlucoseChartType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210ED2B5298EB00005711 /* GlucoseChartType.swift */; };
 		47A6AC012B795DD80047A4BA /* GlucoseChartWatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6AC002B795DD80047A4BA /* GlucoseChartWatchView.swift */; };
-		47A6AC042B7BE85E0047A4BA /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6AC032B7BE85E0047A4BA /* View.swift */; };
+		47A6AC292B7D3DAB0047A4BA /* GlucoseChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210EF2B52A05B00005711 /* GlucoseChartView.swift */; };
+		47A6AC2A2B7D3DE30047A4BA /* GlucoseChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210EF2B52A05B00005711 /* GlucoseChartView.swift */; };
+		47A6AC2B2B7D3DE30047A4BA /* GlucoseChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210EF2B52A05B00005711 /* GlucoseChartView.swift */; };
+		47A6AC2C2B7D3E170047A4BA /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4D21ED450300ECF0C0 /* Double.swift */; };
+		47A6AC2D2B7D3E170047A4BA /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C8121B723BC0082976B /* Date.swift */; };
+		47A6AC2E2B7D3E170047A4BA /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4D21ED450300ECF0C0 /* Double.swift */; };
+		47A6AC2F2B7D3E170047A4BA /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C8121B723BC0082976B /* Date.swift */; };
+		47A6AC302B7D3E250047A4BA /* ConstantsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */; };
+		47A6AC312B7D3E250047A4BA /* ConstantsBloodGlucose.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585222EDB602007F5B5D /* ConstantsBloodGlucose.swift */; };
+		47A6AC322B7D3E250047A4BA /* ConstantsUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */; };
+		47A6AC332B7D3E260047A4BA /* ConstantsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */; };
+		47A6AC342B7D3E260047A4BA /* ConstantsBloodGlucose.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585222EDB602007F5B5D /* ConstantsBloodGlucose.swift */; };
+		47A6AC352B7D3E260047A4BA /* ConstantsUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */; };
+		47A6AC362B7D3E640047A4BA /* GlucoseChartType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210ED2B5298EB00005711 /* GlucoseChartType.swift */; };
+		47A6AC372B7D3E650047A4BA /* GlucoseChartType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210ED2B5298EB00005711 /* GlucoseChartType.swift */; };
+		47A6AC382B7D3E770047A4BA /* TextsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81FA009228F53680028C70F /* TextsHomeView.swift */; };
+		47A6AC392B7D3E770047A4BA /* TextsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F81FA009228F53680028C70F /* TextsHomeView.swift */; };
+		47A6AC3A2B7D3F200047A4BA /* LiveActivityNotificationSizeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D08D5D2B54390B00B0BEA7 /* LiveActivityNotificationSizeType.swift */; };
+		47A6AC3B2B7D3F9B0047A4BA /* ConstantsGlucoseChartSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A50C2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift */; };
+		47A6AC3F2B7D41860047A4BA /* GlucoseChartWatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6AC002B795DD80047A4BA /* GlucoseChartWatchView.swift */; };
+		47A6AC402B7D41860047A4BA /* GlucoseChartWatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6AC002B795DD80047A4BA /* GlucoseChartWatchView.swift */; };
+		47A6AC412B7D42EC0047A4BA /* TextsCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD44F221CAA64006EAB84 /* TextsCommon.swift */; };
+		47A6AC422B7D42ED0047A4BA /* TextsCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD44F221CAA64006EAB84 /* TextsCommon.swift */; };
+		47A6AC432B7D430D0047A4BA /* HomeView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8B48A9E22B2FA7B009BCC01 /* HomeView.strings */; };
+		47A6AC442B7D430D0047A4BA /* HomeView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8B48A9E22B2FA7B009BCC01 /* HomeView.strings */; };
+		47A6AC452B7D43100047A4BA /* Common.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD444221C9D0D006EAB84 /* Common.strings */; };
+		47A6AC462B7D43110047A4BA /* Common.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD444221C9D0D006EAB84 /* Common.strings */; };
 		47AB72F327105EF4005E7CAB /* SettingsViewHelpSettingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47AB72F227105EF4005E7CAB /* SettingsViewHelpSettingModel.swift */; };
 		47ADD2DF27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47ADD2DE27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift */; };
 		47ADD2E127FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47ADD2E027FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift */; };
-		47B2F77B2B53DBA60038E0B6 /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E53FBC2517F96800052CE5 /* Date.swift */; };
 		47B60F3726F389E2003198D3 /* LandscapeChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */; };
 		47B7FC722B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */; };
 		47CF18B22B37689A00FA6160 /* TimeInRangeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CF18B12B37689A00FA6160 /* TimeInRangeType.swift */; };
-		47D08D5B2B5437F500B0BEA7 /* ConstantsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A50C2B416EE100419052 /* ConstantsWidget.swift */; };
-		47D08D5C2B54386600B0BEA7 /* GlucoseChartWidgetType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210ED2B5298EB00005711 /* GlucoseChartWidgetType.swift */; };
+		47D08D5B2B5437F500B0BEA7 /* ConstantsGlucoseChartSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A50C2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift */; };
 		47D08D5E2B54390B00B0BEA7 /* LiveActivityNotificationSizeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D08D5D2B54390B00B0BEA7 /* LiveActivityNotificationSizeType.swift */; };
 		47D08D5F2B54390B00B0BEA7 /* LiveActivityNotificationSizeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D08D5D2B54390B00B0BEA7 /* LiveActivityNotificationSizeType.swift */; };
 		47D2DB3B2B14F6D000C8EE6B /* ScreenLockDimmingType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D2DB3A2B14F6D000C8EE6B /* ScreenLockDimmingType.swift */; };
@@ -646,7 +660,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		198D44C3260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/TextsWidget.strings; sourceTree = "<group>"; };
 		198D44C4260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Alerts.strings; sourceTree = "<group>"; };
 		198D44C5260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
 		198D44C6260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/BluetoothPeripheralsView.strings; sourceTree = "<group>"; };
@@ -670,7 +683,6 @@
 		198D44E7260A822000A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Main.strings; sourceTree = "<group>"; };
 		2867F5C825BC209400AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		2867F5C925BC209500AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Main.strings; sourceTree = "<group>"; };
-		2867F5CA25BC209500AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/TextsWidget.strings; sourceTree = "<group>"; };
 		2867F5CB25BC209500AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Alerts.strings; sourceTree = "<group>"; };
 		2867F5CC25BC209500AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
 		2867F5CD25BC209500AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/BluetoothPeripheralsView.strings; sourceTree = "<group>"; };
@@ -690,7 +702,6 @@
 		2867F5DB25BC209C00AA1E98 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/LibreNFC.strings; sourceTree = "<group>"; };
 		4166BFB728C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		4166BFB828C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Main.strings; sourceTree = "<group>"; };
-		4166BFB928C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/TextsWidget.strings; sourceTree = "<group>"; };
 		4166BFBA28C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Treatments.strings; sourceTree = "<group>"; };
 		4166BFBB28C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/Alerts.strings; sourceTree = "<group>"; };
 		4166BFBC28C3501500199980 /* el */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = el; path = el.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
@@ -725,8 +736,7 @@
 		4716A4F92B406C3F00419052 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4716A4FB2B406C3F00419052 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4716A5042B40709E00419052 /* XDripWidgetAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XDripWidgetAttributes.swift; sourceTree = "<group>"; };
-		4716A5092B416E6500419052 /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
-		4716A50C2B416EE100419052 /* ConstantsWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsWidget.swift; sourceTree = "<group>"; };
+		4716A50C2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsGlucoseChartSwiftUI.swift; sourceTree = "<group>"; };
 		4716A5132B41CAD000419052 /* LiveActivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityManager.swift; sourceTree = "<group>"; };
 		47228B142996BDD2008725DB /* BgReadingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadingsView.swift; sourceTree = "<group>"; };
 		472596042B76301F00459D12 /* WatchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchManager.swift; sourceTree = "<group>"; };
@@ -768,19 +778,14 @@
 		47A6ABE52B790CC70047A4BA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		47A6ABE82B790CC70047A4BA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		47A6ABEE2B7949B80047A4BA /* WatchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchModel.swift; sourceTree = "<group>"; };
-		47A6ABF12B79518E0047A4BA /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
-		47A6ABF32B7951A50047A4BA /* Double.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Double.swift; sourceTree = "<group>"; };
-		47A6ABF62B7951EB0047A4BA /* TextsWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsWatchApp.swift; sourceTree = "<group>"; };
-		47A6ABF92B7952380047A4BA /* ConstantsWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsWatchApp.swift; sourceTree = "<group>"; };
 		47A6AC002B795DD80047A4BA /* GlucoseChartWatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseChartWatchView.swift; sourceTree = "<group>"; };
-		47A6AC032B7BE85E0047A4BA /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
 		47AB72F227105EF4005E7CAB /* SettingsViewHelpSettingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewHelpSettingModel.swift; sourceTree = "<group>"; };
 		47ADD2DE27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartPointsScatterDownTrianglesLayer.swift; sourceTree = "<group>"; };
 		47ADD2E027FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift; sourceTree = "<group>"; };
 		47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandscapeChartViewController.swift; sourceTree = "<group>"; };
 		47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBackgroundKeepAliveType.swift; sourceTree = "<group>"; };
-		47C210ED2B5298EB00005711 /* GlucoseChartWidgetType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlucoseChartWidgetType.swift; sourceTree = "<group>"; };
-		47C210EF2B52A05B00005711 /* GlucoseChartWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseChartWidgetView.swift; sourceTree = "<group>"; };
+		47C210ED2B5298EB00005711 /* GlucoseChartType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlucoseChartType.swift; sourceTree = "<group>"; };
+		47C210EF2B52A05B00005711 /* GlucoseChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseChartView.swift; sourceTree = "<group>"; };
 		47CF18B12B37689A00FA6160 /* TimeInRangeType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeInRangeType.swift; sourceTree = "<group>"; };
 		47D08D5D2B54390B00B0BEA7 /* LiveActivityNotificationSizeType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityNotificationSizeType.swift; sourceTree = "<group>"; };
 		47D2DB3A2B14F6D000C8EE6B /* ScreenLockDimmingType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenLockDimmingType.swift; sourceTree = "<group>"; };
@@ -813,7 +818,6 @@
 		CE1B2FDD25D0264B00F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/M5StackView.strings; sourceTree = "<group>"; };
 		CE1B2FDE25D0264B00F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Snooze.strings; sourceTree = "<group>"; };
 		CE1B2FDF25D0264B00F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/BluetoothPeripheralView.strings; sourceTree = "<group>"; };
-		CE1B2FE425D026B400F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/TextsWidget.strings; sourceTree = "<group>"; };
 		D400F8022778BD8000B57648 /* TextsTreatmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsTreatmentsView.swift; sourceTree = "<group>"; };
 		D4028CBF2774A50600341476 /* TreatmentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsViewController.swift; sourceTree = "<group>"; };
 		D40C3DA3277542C400111B73 /* TreatmentEntry+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TreatmentEntry+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -961,7 +965,6 @@
 		F81F39EB25C616C900520946 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/LibreNFC.strings; sourceTree = "<group>"; };
 		F81F3A6025C9E5A800520946 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		F81F3A6125C9E5A800520946 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Main.strings; sourceTree = "<group>"; };
-		F81F3A6225C9E5A800520946 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/TextsWidget.strings; sourceTree = "<group>"; };
 		F81F3A6325C9E5A800520946 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Alerts.strings; sourceTree = "<group>"; };
 		F81F3A6425C9E5A800520946 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
 		F81F3A6525C9E5A800520946 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/BluetoothPeripheralsView.strings; sourceTree = "<group>"; };
@@ -1264,11 +1267,6 @@
 		F88EC12325F6CFB200DF0EAF /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/SettingsViews.strings; sourceTree = "<group>"; };
 		F88EC12425F6CFC200DF0EAF /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/WatlaaView.strings; sourceTree = "<group>"; };
 		F88EC12525F6CFC500DF0EAF /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/WatlaaView.strings; sourceTree = "<group>"; };
-		F88EC17325FABAAE00DF0EAF /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/TextsWidget.strings; sourceTree = "<group>"; };
-		F88EC17425FABAB000DF0EAF /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = it.lproj/TextsWidget.strings; sourceTree = "<group>"; };
-		F88EC17525FABAB300DF0EAF /* pl-PL */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pl-PL"; path = "pl-PL.lproj/TextsWidget.strings"; sourceTree = "<group>"; };
-		F88EC17625FABAB700DF0EAF /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/TextsWidget.strings; sourceTree = "<group>"; };
-		F88EC17725FABAB800DF0EAF /* sl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sl; path = sl.lproj/TextsWidget.strings; sourceTree = "<group>"; };
 		F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsAlerts.swift; sourceTree = "<group>"; };
 		F890E079247687AE008FB2EC /* URL.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URL.swift; sourceTree = "<group>"; };
 		F897AAF82200F2D200CDDD10 /* CBPeripheralState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CBPeripheralState.swift; sourceTree = "<group>"; };
@@ -1472,7 +1470,6 @@
 		F8CB59CD27444D6300BA199E /* DexcomSessionStopResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomSessionStopResponse.swift; sourceTree = "<group>"; };
 		F8CB59D2274D94AE00BA199E /* DexcomSessionStartTxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomSessionStartTxMessage.swift; sourceTree = "<group>"; };
 		F8D0587B24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewHomeScreenSettingsViewModel.swift; sourceTree = "<group>"; };
-		F8D094EB2846BDD50087FFEA /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/TextsWidget.strings; sourceTree = "<group>"; };
 		F8D094EC2846BDD50087FFEA /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Treatments.strings; sourceTree = "<group>"; };
 		F8D094ED2846BDD50087FFEA /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Alerts.strings; sourceTree = "<group>"; };
 		F8D094EE2846BDD50087FFEA /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
@@ -1507,7 +1504,6 @@
 		F8E3C3AC21FE551C00907A04 /* DexcomCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomCalibrator.swift; sourceTree = "<group>"; };
 		F8E4DCDA2805F7FA007CF822 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		F8E4DCDB2805F7FA007CF822 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Main.strings; sourceTree = "<group>"; };
-		F8E4DCDC2805F7FA007CF822 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/TextsWidget.strings; sourceTree = "<group>"; };
 		F8E4DCDD2805F7FB007CF822 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Treatments.strings; sourceTree = "<group>"; };
 		F8E4DCDE2805F7FB007CF822 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Alerts.strings; sourceTree = "<group>"; };
 		F8E4DCDF2805F7FB007CF822 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
@@ -1535,13 +1531,6 @@
 		F8E51D64244BA790001C9E5A /* WatlaaBluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WatlaaBluetoothPeripheralViewModel.swift; sourceTree = "<group>"; };
 		F8E51D66244BAE0E001C9E5A /* WatlaaBluetoothTransmitterMaster+CGMTransmitter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "WatlaaBluetoothTransmitterMaster+CGMTransmitter.swift"; sourceTree = "<group>"; };
 		F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewTraceSettingsViewModel.swift; sourceTree = "<group>"; };
-		F8E53FBC2517F96800052CE5 /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
-		F8E53FCF251D35FB00052CE5 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/TextsWidget.strings; sourceTree = "<group>"; };
-		F8E53FD1251D360200052CE5 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/TextsWidget.strings; sourceTree = "<group>"; };
-		F8E53FD2251D360300052CE5 /* zh */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = zh; path = zh.lproj/TextsWidget.strings; sourceTree = "<group>"; };
-		F8E53FD3251D361600052CE5 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/TextsWidget.strings; sourceTree = "<group>"; };
-		F8E53FD7251D363B00052CE5 /* pt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pt; path = pt.lproj/TextsWidget.strings; sourceTree = "<group>"; };
-		F8E53FE8251F7B8800052CE5 /* TextsWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextsWidget.swift; sourceTree = "<group>"; };
 		F8E5404B2522624800052CE5 /* ConstantsHousekeeping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsHousekeeping.swift; sourceTree = "<group>"; };
 		F8E6C78B24CDDB83007C1199 /* SnoozeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeViewController.swift; sourceTree = "<group>"; };
 		F8E6C78F24CEC22A007C1199 /* TextsSnooze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsSnooze.swift; sourceTree = "<group>"; };
@@ -1671,43 +1660,21 @@
 			isa = PBXGroup;
 			children = (
 				4716A4FB2B406C3F00419052 /* Info.plist */,
-				47C210EF2B52A05B00005711 /* GlucoseChartWidgetView.swift */,
 				4716A4F72B406C3D00419052 /* XDripWidget.swift */,
 				4716A4F32B406C3D00419052 /* XDripWidgetBundle.swift */,
 				4716A4F52B406C3D00419052 /* XDripWidgetLiveActivity.swift */,
 				4716A4F92B406C3F00419052 /* Assets.xcassets */,
-				4716A50B2B416ECF00419052 /* Constants */,
-				F870D3EF25149EA0008967B0 /* Extensions */,
 				4716A5032B40704000419052 /* Models */,
-				4716A5022B40702D00419052 /* Texts */,
 			);
 			path = xDripWidget;
-			sourceTree = "<group>";
-		};
-		4716A5022B40702D00419052 /* Texts */ = {
-			isa = PBXGroup;
-			children = (
-				F8E53FE8251F7B8800052CE5 /* TextsWidget.swift */,
-				F8E53FD0251D35FB00052CE5 /* TextsWidget.strings */,
-			);
-			path = Texts;
 			sourceTree = "<group>";
 		};
 		4716A5032B40704000419052 /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				47C210ED2B5298EB00005711 /* GlucoseChartWidgetType.swift */,
 				4716A5042B40709E00419052 /* XDripWidgetAttributes.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		4716A50B2B416ECF00419052 /* Constants */ = {
-			isa = PBXGroup;
-			children = (
-				4716A50C2B416EE100419052 /* ConstantsWidget.swift */,
-			);
-			path = Constants;
 			sourceTree = "<group>";
 		};
 		4716A5122B41CA9C00419052 /* LiveActivity */ = {
@@ -1735,11 +1702,7 @@
 				47A6ABEE2B7949B80047A4BA /* WatchModel.swift */,
 				47A6ABE12B790CC60047A4BA /* xDripApp.swift */,
 				47A6ABE52B790CC70047A4BA /* Assets.xcassets */,
-				47A6ABF82B7952280047A4BA /* Constants */,
-				47A6ABF02B7951720047A4BA /* Extensions */,
 				47A6ABE72B790CC70047A4BA /* Preview Content */,
-				47A6ABF52B7951DC0047A4BA /* Texts */,
-				47A6AC002B795DD80047A4BA /* GlucoseChartWatchView.swift */,
 			);
 			path = "xDrip Watch App";
 			sourceTree = "<group>";
@@ -1750,32 +1713,6 @@
 				47A6ABE82B790CC70047A4BA /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		47A6ABF02B7951720047A4BA /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				47A6ABF12B79518E0047A4BA /* Date.swift */,
-				47A6ABF32B7951A50047A4BA /* Double.swift */,
-				47A6AC032B7BE85E0047A4BA /* View.swift */,
-			);
-			path = Extensions;
-			sourceTree = "<group>";
-		};
-		47A6ABF52B7951DC0047A4BA /* Texts */ = {
-			isa = PBXGroup;
-			children = (
-				47A6ABF62B7951EB0047A4BA /* TextsWatchApp.swift */,
-			);
-			path = Texts;
-			sourceTree = "<group>";
-		};
-		47A6ABF82B7952280047A4BA /* Constants */ = {
-			isa = PBXGroup;
-			children = (
-				47A6ABF92B7952380047A4BA /* ConstantsWatchApp.swift */,
-			);
-			path = Constants;
 			sourceTree = "<group>";
 		};
 		47DB06CC2A7013EF00267BE3 /* Followers */ = {
@@ -2312,6 +2249,8 @@
 			children = (
 				47D9BC942A78498500AB85B2 /* BgReadingsDetailView.swift */,
 				47228B142996BDD2008725DB /* BgReadingsView.swift */,
+				47C210EF2B52A05B00005711 /* GlucoseChartView.swift */,
+				47A6AC002B795DD80047A4BA /* GlucoseChartWatchView.swift */,
 				F866974E2867A97000025441 /* Settings */,
 			);
 			path = SwiftUIViews;
@@ -2323,15 +2262,6 @@
 				F866974F2867AA4A00025441 /* LoopDelayScheduleView.swift */,
 			);
 			path = Settings;
-			sourceTree = "<group>";
-		};
-		F870D3EF25149EA0008967B0 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-				F8E53FBC2517F96800052CE5 /* Date.swift */,
-				4716A5092B416E6500419052 /* Double.swift */,
-			);
-			path = Extensions;
 			sourceTree = "<group>";
 		};
 		F8A2BBFB25D9D36C001D1E78 /* Atom */ = {
@@ -2772,6 +2702,7 @@
 				47ADD2DE27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift */,
 				47ADD2E027FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift */,
 				F8BECB04235CE5D80060DAE1 /* GlucoseChartManager.swift */,
+				47C210ED2B5298EB00005711 /* GlucoseChartType.swift */,
 				477F45E5285B993100AC8475 /* GlucoseMiniChartManager.swift */,
 			);
 			path = Charts;
@@ -2857,8 +2788,6 @@
 		F8EA6C7D21B70DEA0082976B /* Constants */ = {
 			isa = PBXGroup;
 			children = (
-				F8EE3EA12B68332200B27B96 /* ConstantsHeartBeat.swift */,
-				476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */,
 				F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */,
 				F8A1585022EDB597007F5B5D /* ConstantsBGGraphBuilder.swift */,
 				F8A1585222EDB602007F5B5D /* ConstantsBloodGlucose.swift */,
@@ -2869,8 +2798,11 @@
 				F8A1586422EDB89D007F5B5D /* ConstantsDefaultAlertTypeSettings.swift */,
 				F8A1585A22EDB7EA007F5B5D /* ConstantsDexcomG5.swift */,
 				F8A1587222EDC893007F5B5D /* ConstantsDexcomShare.swift */,
+				476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */,
 				F80859262364355F00F3829D /* ConstantsGlucoseChart.swift */,
+				4716A50C2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift */,
 				F8B955B6258D5E2000C06016 /* ConstantsHealthKit.swift */,
+				F8EE3EA12B68332200B27B96 /* ConstantsHeartBeat.swift */,
 				F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */,
 				F8E5404B2522624800052CE5 /* ConstantsHousekeeping.swift */,
 				F8252866243E50FE0067AF77 /* ConstantsLibre.swift */,
@@ -2900,6 +2832,7 @@
 			children = (
 				F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */,
 				F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */,
+				47D2DB3A2B14F6D000C8EE6B /* ScreenLockDimmingType.swift */,
 				F8C5EBE622F38F0E00563B5F /* Trace.swift */,
 				F8EA6CA821BBE3010082976B /* UniqueId.swift */,
 				F8FDFEA6260DE1A70047597D /* CustomColoredDisclosureIndicator */,
@@ -2908,7 +2841,6 @@
 				F821CF69229FC22D005C1E43 /* Network */,
 				F8F7B8E9259A7A9400C47B04 /* SavitzkyGolayFilter */,
 				F8B3A7DD226E48C1004BA588 /* SoundPlayer */,
-				47D2DB3A2B14F6D000C8EE6B /* ScreenLockDimmingType.swift */,
 			);
 			path = Utilities;
 			sourceTree = "<group>";
@@ -3499,8 +3431,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4716A50F2B41708000419052 /* TextsWidget.strings in Resources */,
+				47A6AC432B7D430D0047A4BA /* HomeView.strings in Resources */,
 				4716A4FA2B406C3F00419052 /* Assets.xcassets in Resources */,
+				47A6AC452B7D43100047A4BA /* Common.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3508,8 +3441,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				47A6AC442B7D430D0047A4BA /* HomeView.strings in Resources */,
 				47A6ABE92B790CC70047A4BA /* Preview Assets.xcassets in Resources */,
 				47A6ABE62B790CC70047A4BA /* Assets.xcassets in Resources */,
+				47A6AC462B7D43110047A4BA /* Common.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3567,7 +3502,6 @@
 				F824379524CB7A9900BED341 /* Pager_Beeps.caf in Resources */,
 				F8B3A7CD226CC0B7004BA588 /* shorthigh3.caf in Resources */,
 				F824376A24CB7A9800BED341 /* Martian_Gun.caf in Resources */,
-				4716A5112B41823A00419052 /* TextsWidget.strings in Resources */,
 				F824378824CB7A9900BED341 /* Insistently.caf in Resources */,
 				F82437B924CB7A9900BED341 /* Siri_Alert_Transmitter_Battery_Low.caf in Resources */,
 				F8B3A7D0226CC0B7004BA588 /* modernalarm.caf in Resources */,
@@ -3680,17 +3614,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				47A6AC2A2B7D3DE30047A4BA /* GlucoseChartView.swift in Sources */,
+				47A6AC2D2B7D3E170047A4BA /* Date.swift in Sources */,
 				4716A5052B40709E00419052 /* XDripWidgetAttributes.swift in Sources */,
+				47A6AC302B7D3E250047A4BA /* ConstantsHomeView.swift in Sources */,
+				47A6AC382B7D3E770047A4BA /* TextsHomeView.swift in Sources */,
 				4716A4F62B406C3D00419052 /* XDripWidgetLiveActivity.swift in Sources */,
-				47D08D5C2B54386600B0BEA7 /* GlucoseChartWidgetType.swift in Sources */,
 				4716A4F42B406C3D00419052 /* XDripWidgetBundle.swift in Sources */,
-				4716A50A2B416E6500419052 /* Double.swift in Sources */,
 				47D08D5F2B54390B00B0BEA7 /* LiveActivityNotificationSizeType.swift in Sources */,
-				47A6ABFC2B795D230047A4BA /* GlucoseChartWidgetView.swift in Sources */,
 				4716A4F82B406C3D00419052 /* XDripWidget.swift in Sources */,
-				4716A50D2B416EE100419052 /* ConstantsWidget.swift in Sources */,
-				47B2F77B2B53DBA60038E0B6 /* Date.swift in Sources */,
-				4716A50E2B41707D00419052 /* TextsWidget.swift in Sources */,
+				4716A50D2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift in Sources */,
+				47A6AC312B7D3E250047A4BA /* ConstantsBloodGlucose.swift in Sources */,
+				47A6AC2C2B7D3E170047A4BA /* Double.swift in Sources */,
+				47A6AC3F2B7D41860047A4BA /* GlucoseChartWatchView.swift in Sources */,
+				47A6AC412B7D42EC0047A4BA /* TextsCommon.swift in Sources */,
+				47A6AC322B7D3E250047A4BA /* ConstantsUI.swift in Sources */,
+				47A6AC362B7D3E640047A4BA /* GlucoseChartType.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3698,15 +3637,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				47A6ABF72B7951EB0047A4BA /* TextsWatchApp.swift in Sources */,
+				47A6AC2B2B7D3DE30047A4BA /* GlucoseChartView.swift in Sources */,
+				47A6AC342B7D3E260047A4BA /* ConstantsBloodGlucose.swift in Sources */,
+				47A6AC2E2B7D3E170047A4BA /* Double.swift in Sources */,
+				47A6AC392B7D3E770047A4BA /* TextsHomeView.swift in Sources */,
+				47A6AC332B7D3E260047A4BA /* ConstantsHomeView.swift in Sources */,
+				47A6AC372B7D3E650047A4BA /* GlucoseChartType.swift in Sources */,
 				47A6ABE42B790CC60047A4BA /* ContentView.swift in Sources */,
 				47A6ABEF2B7949B80047A4BA /* WatchModel.swift in Sources */,
+				47A6AC3A2B7D3F200047A4BA /* LiveActivityNotificationSizeType.swift in Sources */,
 				47A6ABE22B790CC60047A4BA /* xDripApp.swift in Sources */,
 				47A6AC012B795DD80047A4BA /* GlucoseChartWatchView.swift in Sources */,
-				47A6AC042B7BE85E0047A4BA /* View.swift in Sources */,
-				47A6ABF42B7951A50047A4BA /* Double.swift in Sources */,
-				47A6ABF22B79518E0047A4BA /* Date.swift in Sources */,
-				47A6ABFA2B7952380047A4BA /* ConstantsWatchApp.swift in Sources */,
+				47A6AC2F2B7D3E170047A4BA /* Date.swift in Sources */,
+				47A6AC422B7D42ED0047A4BA /* TextsCommon.swift in Sources */,
+				47A6AC3B2B7D3F9B0047A4BA /* ConstantsGlucoseChartSwiftUI.swift in Sources */,
+				47A6AC352B7D3E260047A4BA /* ConstantsUI.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3803,7 +3748,7 @@
 				F8F9721B23A5915900C3F17D /* CGMMiaoMiaoTransmitter.swift in Sources */,
 				F8F9721A23A5915900C3F17D /* CGMBubbleTransmitter.swift in Sources */,
 				4752B400263570DA0081D551 /* ConstantsStatistics.swift in Sources */,
-				47A6ABFF2B795DA30047A4BA /* GlucoseChartWidgetType.swift in Sources */,
+				47A6ABFF2B795DA30047A4BA /* GlucoseChartType.swift in Sources */,
 				F8A2BC3B25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift in Sources */,
 				F8A2BC3A25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMGNSEntryTransmitterDelegate.swift in Sources */,
 				F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */,
@@ -3888,6 +3833,7 @@
 				F8DF765C23E350B100063910 /* DexcomG5+BluetoothPeripheral.swift in Sources */,
 				F8F9720323A5915900C3F17D /* CGMG5Transmitter.swift in Sources */,
 				F85FF3C4252D0C32004E6FF1 /* xdrip.xcdatamodeld in Sources */,
+				47A6AC402B7D41860047A4BA /* GlucoseChartWatchView.swift in Sources */,
 				F8B3A81C227DEC92004BA588 /* AlertEntriesAccessor.swift in Sources */,
 				F8A1585B22EDB7EA007F5B5D /* ConstantsDexcomG5.swift in Sources */,
 				F816E0F524367132009EE65B /* GNSEntry+CoreDataProperties.swift in Sources */,
@@ -3959,7 +3905,7 @@
 				F8CB59D3274D94AF00BA199E /* DexcomSessionStartTxMessage.swift in Sources */,
 				F80ED2ED236F68F90005C035 /* SettingsViewM5StackGeneralSettingsViewModel.swift in Sources */,
 				F816E10A2437E7B8009EE65B /* CGMBlueReaderTransmitterDelegate.swift in Sources */,
-				47D08D5B2B5437F500B0BEA7 /* ConstantsWidget.swift in Sources */,
+				47D08D5B2B5437F500B0BEA7 /* ConstantsGlucoseChartSwiftUI.swift in Sources */,
 				F8B3A850227F26F8004BA588 /* AlertTypesSettingsViewController.swift in Sources */,
 				D484BC292774F783008490E9 /* TreatmentsInsertViewController.swift in Sources */,
 				F816E0FE24367338009EE65B /* GNSEntry+BluetoothPeripheral.swift in Sources */,
@@ -4025,6 +3971,7 @@
 				F8A2BC1425DB0B61001D1E78 /* CGMAtomTransmitter.swift in Sources */,
 				F8AC426021ADEBD60078C348 /* RootViewController.swift in Sources */,
 				F8B3A78B225D473D004BA588 /* UIAlertController.swift in Sources */,
+				47A6AC292B7D3DAB0047A4BA /* GlucoseChartView.swift in Sources */,
 				F816E118243921FB009EE65B /* CGMBDropletTransmitterDelegate.swift in Sources */,
 				F8F9720E23A5915900C3F17D /* AuthRequestRxMessage.swift in Sources */,
 				F8A2BC3F25DB0D89001D1E78 /* BluetoothPeripheralManager+CGMAtomTransmitterDelegate.swift in Sources */,
@@ -4046,7 +3993,6 @@
 				F8A2BC2D25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMG5TransmitterDelegate.swift in Sources */,
 				47DB06E72A715EC500267BE3 /* ConstantsLibreLinkUp.swift in Sources */,
 				F8FDFEA9260DE1A70047597D /* DTCustomColoredAccessory.m in Sources */,
-				4716A5102B41823600419052 /* TextsWidget.swift in Sources */,
 				F8B3A7DF226E48C1004BA588 /* SoundPlayer.swift in Sources */,
 				D48E8F78278E49B300CCEE08 /* TreatmentNSResponse.swift in Sources */,
 				F816E12C2439DFBA009EE65B /* DexcomG4+CoreDataProperties.swift in Sources */,
@@ -4654,30 +4600,6 @@
 				4166BFC728C3501500199980 /* el */,
 			);
 			name = SettingsViews.strings;
-			sourceTree = "<group>";
-		};
-		F8E53FD0251D35FB00052CE5 /* TextsWidget.strings */ = {
-			isa = PBXVariantGroup;
-			children = (
-				F8E53FCF251D35FB00052CE5 /* en */,
-				F8E53FD1251D360200052CE5 /* ar */,
-				F8E53FD2251D360300052CE5 /* zh */,
-				F8E53FD3251D361600052CE5 /* nl */,
-				F8E53FD7251D363B00052CE5 /* pt */,
-				2867F5CA25BC209500AA1E98 /* fi */,
-				F81F3A6225C9E5A800520946 /* es */,
-				CE1B2FE425D026B400F642F5 /* fr */,
-				F88EC17325FABAAE00DF0EAF /* de */,
-				F88EC17425FABAB000DF0EAF /* it */,
-				F88EC17525FABAB300DF0EAF /* pl-PL */,
-				F88EC17625FABAB700DF0EAF /* ru */,
-				F88EC17725FABAB800DF0EAF /* sl */,
-				198D44C3260A3A3300A2B4A2 /* sv */,
-				F8E4DCDC2805F7FA007CF822 /* da */,
-				F8D094EB2846BDD50087FFEA /* uk */,
-				4166BFB928C3501500199980 /* el */,
-			);
-			name = TextsWidget.strings;
 			sourceTree = "<group>";
 		};
 		F8E6C79324CEC2E3007C1199 /* Snooze.strings */ = {

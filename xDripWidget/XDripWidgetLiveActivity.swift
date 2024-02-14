@@ -37,7 +37,7 @@ struct XDripWidgetLiveActivity: Widget {
                     .padding(4)
                     
 //                    ZStack {
-                        GlucoseChartView(bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, glucoseChartWidgetType: .liveActivityNotification, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityNotificationSizeType: LiveActivityNotificationSizeType(rawValue: context.state.liveActivityNotificationSizeTypeAsInt) ?? .normal)
+                        GlucoseChartView(bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, glucoseChartType: .liveActivityNotification, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityNotificationSizeType: LiveActivityNotificationSizeType(rawValue: context.state.liveActivityNotificationSizeTypeAsInt) ?? .normal)
                         
                         //Text(context.attributes.eventStartDate.formatted(date: .omitted, time: .shortened))
                         
@@ -91,13 +91,13 @@ struct XDripWidgetLiveActivity: Widget {
                 
                 ZStack {
                     
-                    GlucoseChartView(bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, glucoseChartWidgetType: .liveActivityNotification, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityNotificationSizeType: LiveActivityNotificationSizeType(rawValue: context.state.liveActivityNotificationSizeTypeAsInt) ?? .normal)
+                    GlucoseChartView(bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, glucoseChartType: .liveActivityNotification, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityNotificationSizeType: LiveActivityNotificationSizeType(rawValue: context.state.liveActivityNotificationSizeTypeAsInt) ?? .normal)
                     
                     //Text(context.attributes.eventStartDate.formatted(date: .omitted, time: .shortened))
                     
                     VStack {
                         
-                        if context.state.placeTextAtBottomOfWidget(glucoseChartWidgetType: .liveActivityNotification) {
+                        if context.state.placeTextAtBottomOfWidget(glucoseChartType: .liveActivityNotification) {
                             Spacer()
                         }
                         
@@ -112,16 +112,9 @@ struct XDripWidgetLiveActivity: Widget {
                         .background(Color(white: 0, opacity: 0.7))
                         .cornerRadius(20)
                         
-                        if !context.state.placeTextAtBottomOfWidget(glucoseChartWidgetType: .liveActivityNotification) {
+                        if !context.state.placeTextAtBottomOfWidget(glucoseChartType: .liveActivityNotification) {
                             Spacer()
                         }
-                        
-                        //                    if let bgTitle = state.getBgTitle() {
-                        //                        Text(bgTitle)
-                        //                            .foregroundStyle(state.getBgColor())
-                        //                            .font(.subheadline).bold()
-                        //                            .multilineTextAlignment(.center)
-                        //                    }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(6)
@@ -161,7 +154,7 @@ struct XDripWidgetLiveActivity: Widget {
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     
-                    GlucoseChartView(bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, glucoseChartWidgetType: .dynamicIsland, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityNotificationSizeType: LiveActivityNotificationSizeType(rawValue: context.state.liveActivityNotificationSizeTypeAsInt) ?? .normal)
+                    GlucoseChartView(bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, glucoseChartType: .dynamicIsland, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityNotificationSizeType: LiveActivityNotificationSizeType(rawValue: context.state.liveActivityNotificationSizeTypeAsInt) ?? .normal)
                     
                 }
             } compactLeading: {
@@ -188,7 +181,7 @@ struct XDripWidgetLiveActivity: Widget {
 //struct LiveActivityView: View {
 //    
 //    let state: XDripWidgetAttributes.ContentState
-//    let glucoseChartWidgetType: GlucoseChartWidgetType = .liveActivityNotification
+//    let glucoseChartType: GlucoseChartType = .liveActivityNotification
 //    
 //    var body: some View {
 //    }

@@ -74,7 +74,7 @@ class WatchStateModel: NSObject, ObservableObject {
     }
     
     func bgUnitString() -> String {
-        return isMgDl ? Texts_WatchApp.mgdl : Texts_WatchApp.mmol
+        return isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
     }
     
     func bgValueStringInUserChosenUnit() -> String {
@@ -120,8 +120,6 @@ class WatchStateModel: NSObject, ObservableObject {
     /// convert the optional delta change int (in mg/dL) to a formatted change value in the user chosen unit making sure all zero values are shown as a positive change to follow Nightscout convention
     /// - Returns: a string holding the formatted delta change value (i.e. +0.4 or -6)
     func getDeltaChangeStringInUserChosenUnit() -> String {
-        
-//        if deltaChangeInMgDl != nil {
             
             let valueAsString = deltaChangeInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
             
@@ -143,9 +141,6 @@ class WatchStateModel: NSObject, ObservableObject {
                     return deltaSign + valueAsString
                 }
             }
-//        } else {
-//            return ""
-//        }
     }
     
     func activeSensorProgress() -> (progress: Float, progressColor: Color, textColor: Color) {
@@ -157,19 +152,19 @@ class WatchStateModel: NSObject, ObservableObject {
         // irrespective of all the above, if the current sensor age is over the max age, then just set everything to the expired colour to make it clear
         if sensorTimeLeftInMinutes < 0 {
             
-            return (1.0, ConstantsWatchApp.sensorProgressExpired, ConstantsWatchApp.sensorProgressExpired)
+            return (1.0, ConstantsHomeView.sensorProgressExpiredSwiftUI, ConstantsHomeView.sensorProgressExpiredSwiftUI)
             
-        } else if sensorTimeLeftInMinutes <= ConstantsWatchApp.sensorProgressViewUrgentInMinutes {
+        } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewUrgentInMinutes {
             
-            return (progress, ConstantsWatchApp.sensorProgressViewProgressColorUrgent, ConstantsWatchApp.sensorProgressViewProgressColorUrgent)
+            return (progress, ConstantsHomeView.sensorProgressViewProgressColorUrgentSwiftUI, ConstantsHomeView.sensorProgressViewProgressColorUrgentSwiftUI)
             
-        } else if sensorTimeLeftInMinutes <= ConstantsWatchApp.sensorProgressViewWarningInMinutes {
+        } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewWarningInMinutes {
             
-            return (progress, ConstantsWatchApp.sensorProgressViewProgressColorWarning, ConstantsWatchApp.sensorProgressViewProgressColorWarning)
+            return (progress, ConstantsHomeView.sensorProgressViewProgressColorWarningSwiftUI, ConstantsHomeView.sensorProgressViewProgressColorWarningSwiftUI)
             
         } else {
             
-            return (progress, ConstantsWatchApp.sensorProgressViewNormalColor, ConstantsWatchApp.sensorProgressNormalTextColor)
+            return (progress, ConstantsHomeView.sensorProgressViewNormalColorSwiftUI, ConstantsHomeView.sensorProgressNormalTextColorSwiftUI)
         }
     }
     
@@ -195,11 +190,6 @@ class WatchStateModel: NSObject, ObservableObject {
         highLimitInMgDl = state.highLimitInMgDl ?? 180
         urgentHighLimitInMgDl = state.urgentHighLimitInMgDl ?? 240
         updatedDate = state.updatedDate ?? Date()
-        
-//        bgValueInMgDl = state.bgValueInMgDl ?? 100.0
-//        bgReadingDate = state.bgReadingDate ?? Date()
-//        bgUnitString = state.bgUnitString ?? ""
-//        bgValueStringInUserChosenUnit = state.bgValueStringInUserChosenUnit ?? ""
         
     }
 }

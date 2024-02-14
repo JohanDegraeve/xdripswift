@@ -23,14 +23,14 @@ struct GlucoseChartWatchView: View {
     
     init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double) {
         
-        // as all widget instances are passed 12 hours of bg values, we must initialize this instance to use only the amount of hours of value required by the glucoseChartWidgetType passed
+        // as all widget instances are passed 12 hours of bg values, we must initialize this instance to use only the amount of hours of value required by the glucoseChartType passed
         self.bgReadingValues = []
         self.bgReadingDates = []
         
         var index = 0
         
         for _ in bgReadingValues {
-            if bgReadingDates[index] > Date().addingTimeInterval(-ConstantsWatchApp.hoursToShowLiveActivityNotificationNormal * 60 * 60) {
+            if bgReadingDates[index] > Date().addingTimeInterval(-ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNotificationNormal * 60 * 60) {
                 self.bgReadingValues.append(bgReadingValues[index])
                 self.bgReadingDates.append(bgReadingDates[index])
             }
@@ -60,7 +60,7 @@ struct GlucoseChartWatchView: View {
         
         // adapted from generateXAxisValues() from GlucoseChartManager.swift in xDrip target
                 
-        let startDate: Date = bgReadingDates.last ?? Date().addingTimeInterval(-ConstantsWatchApp.hoursToShowLiveActivityNotificationNormal * 3600)
+        let startDate: Date = bgReadingDates.last ?? Date().addingTimeInterval(-ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNotificationNormal * 3600)
         let endDate: Date = Date()
         
         /// how many full hours between startdate and enddate
@@ -70,7 +70,7 @@ struct GlucoseChartWatchView: View {
         let mappingArray = Array(1...amountOfFullHours)
         
         /// set the stride count interval to make sure we don't add too many labels to the x-axis if the user wants to view >6 hours
-        let intervalBetweenAxisValues: Int = ConstantsWatchApp.intervalBetweenXAxisValuesLiveActivityNotificationNormal
+        let intervalBetweenAxisValues: Int = ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesLiveActivityNotificationNormal
         
         /// first, for each int in mappingArray, we create a Date, starting with the lower hour + 1 hour - we will create 5 in this example, starting with hour 08 (7 + 3600 seconds)
         let startDateLower = Date(timeIntervalSinceReferenceDate:
@@ -93,40 +93,40 @@ struct GlucoseChartWatchView: View {
             if domain.contains(urgentLowLimitInMgDl) {
                 RuleMark(y: .value("", urgentLowLimitInMgDl))
                     .lineStyle(StrokeStyle(lineWidth: 1 , dash: [2, 6]))
-                    .foregroundStyle(ConstantsWatchApp.urgentLowHighLineLiveActivityNotification)
+                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.urgentLowHighLineLiveActivityNotification)
             }
             
             if domain.contains(urgentHighLimitInMgDl) {
                 RuleMark(y: .value("", urgentHighLimitInMgDl))
-                    .lineStyle(StrokeStyle(lineWidth: 1 * ConstantsWatchApp.relativeYAxisLineSizeLiveActivityNotification, dash: [2 * ConstantsWatchApp.relativeYAxisLineSizeLiveActivityNotification, 6 * ConstantsWatchApp.relativeYAxisLineSizeLiveActivityNotification]))
-                    .foregroundStyle(ConstantsWatchApp.urgentLowHighLineLiveActivityNotification)
+                    .lineStyle(StrokeStyle(lineWidth: 1 * ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeLiveActivityNotification, dash: [2 * ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeLiveActivityNotification, 6 * ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeLiveActivityNotification]))
+                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.urgentLowHighLineLiveActivityNotification)
             }
 
             if domain.contains(lowLimitInMgDl) {
                 RuleMark(y: .value("", lowLimitInMgDl))
-                    .lineStyle(StrokeStyle(lineWidth: 1 * ConstantsWatchApp.relativeYAxisLineSizeLiveActivityNotification, dash: [4 * ConstantsWatchApp.relativeYAxisLineSizeLiveActivityNotification, 3 * ConstantsWatchApp.relativeYAxisLineSizeLiveActivityNotification]))
-                    .foregroundStyle(ConstantsWatchApp.lowHighLineColorLiveActivityNotification)
+                    .lineStyle(StrokeStyle(lineWidth: 1 * ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeLiveActivityNotification, dash: [4 * ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeLiveActivityNotification, 3 * ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeLiveActivityNotification]))
+                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.lowHighLineColorLiveActivityNotification)
             }
             
             if domain.contains(highLimitInMgDl) {
                 RuleMark(y: .value("", highLimitInMgDl))
-                    .lineStyle(StrokeStyle(lineWidth: 1 * ConstantsWatchApp.relativeYAxisLineSizeLiveActivityNotification, dash: [4 * ConstantsWatchApp.relativeYAxisLineSizeLiveActivityNotification, 3 * ConstantsWatchApp.relativeYAxisLineSizeLiveActivityNotification]))
-                    .foregroundStyle(ConstantsWatchApp.lowHighLineColorLiveActivityNotification)
+                    .lineStyle(StrokeStyle(lineWidth: 1 * ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeLiveActivityNotification, dash: [4 * ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeLiveActivityNotification, 3 * ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeLiveActivityNotification]))
+                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.lowHighLineColorLiveActivityNotification)
             }
             
             // add a phantom glucose point at the beginning of the timeline to fix the start point in case there are no glucose values at that time (for instances after starting a new sensor
             // this will ensure that the x-axis scale remains correct and the few glucose points availabel don't stretch to cover the whole axis
-            PointMark(x: .value("Time", Date().addingTimeInterval(-ConstantsWatchApp.hoursToShowLiveActivityNotificationNormal * 3600)),
+            PointMark(x: .value("Time", Date().addingTimeInterval(-ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNotificationNormal * 3600)),
                       y: .value("BG", 100))
             .symbol(Circle())
-            .symbolSize(ConstantsWatchApp.glucoseCircleDiameterLiveActivityNotification)
+            .symbolSize(ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterLiveActivityNotification)
             .foregroundStyle(.clear)
 
             ForEach(bgReadingValues.indices, id: \.self) { index in
                     PointMark(x: .value("Time", bgReadingDates[index]),
                               y: .value("BG", bgReadingValues[index]))
                     .symbol(Circle())
-                    .symbolSize(ConstantsWatchApp.glucoseCircleDiameterLiveActivityNotification * 0.4)
+                    .symbolSize(ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterLiveActivityNotification * 0.4)
                     .foregroundStyle(bgColor(bgValueInMgDl: bgReadingValues[index]))
             }
             
@@ -134,7 +134,7 @@ struct GlucoseChartWatchView: View {
             PointMark(x: .value("Time", Date().addingTimeInterval(5 * 60)),
                       y: .value("BG", 100))
             .symbol(Circle())
-            .symbolSize(ConstantsWatchApp.glucoseCircleDiameterLiveActivityNotification)
+            .symbolSize(ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterLiveActivityNotification)
             .foregroundStyle(.clear)
         }
         .chartXAxis {
@@ -146,17 +146,17 @@ struct GlucoseChartWatchView: View {
 //                        Text(v.formatted(.dateTime.hour()))
 //                            .foregroundStyle(Color.white)
 //                    }
-//                    //.offset(x: glucoseChartWidgetType.xAxisLabelOffset)
+//                    //.offset(x: glucoseChartType.xAxisLabelOffset)
 //
 //                    AxisGridLine()
-//                        .foregroundStyle(ConstantsWatchApp.xAxisGridLineColorLiveActivityNotification)
+//                        .foregroundStyle(ConstantsGlucoseChartSwiftUI.xAxisGridLineColorLiveActivityNotification)
 //                }
 //            }
             
-            AxisMarks(values: .automatic(desiredCount: Int(ConstantsWatchApp.hoursToShowLiveActivityNotificationNormal))) {
+            AxisMarks(values: .automatic(desiredCount: Int(ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNotificationNormal))) {
                 if $0.as(Date.self) != nil {
                     AxisGridLine()
-                        .foregroundStyle(ConstantsWatchApp.xAxisGridLineColorLiveActivityNotification)
+                        .foregroundStyle(ConstantsGlucoseChartSwiftUI.xAxisGridLineColorLiveActivityNotification)
                 }
             }
         }
