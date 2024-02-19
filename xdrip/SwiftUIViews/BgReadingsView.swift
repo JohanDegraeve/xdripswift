@@ -208,7 +208,7 @@ struct BgReadingsView: View {
     
     /// returns the visual indicator symbol based on the BgRangeDescription from a BgReading
     /// - parameters:
-    ///   - bgRangeDescription: an enum as defined in ConstantsWatch
+    ///   - bgRangeDescription: an enum as defined in ConstantsCalendar
     /// - returns:
     ///   - a Text view containing a string (in this case a coloured symbol)
     private func visualIndicator(bgRangeDescription: BgRangeDescription) -> Text {
@@ -219,11 +219,11 @@ struct BgReadingsView: View {
         // copied from CalendarManager.createCalendarEvent()
         switch bgRangeDescription {
         case .inRange:
-            visualIndicator = ConstantsWatch.visualIndicatorInRange
+            visualIndicator = ConstantsCalendar.visualIndicatorInRange
         case .notUrgent:
-            visualIndicator = ConstantsWatch.visualIndicatorNotUrgent
+            visualIndicator = ConstantsCalendar.visualIndicatorNotUrgent
         case .urgent:
-            visualIndicator = ConstantsWatch.visualIndicatorUrgent
+            visualIndicator = ConstantsCalendar.visualIndicatorUrgent
         }
         
         // return the indicator symbol

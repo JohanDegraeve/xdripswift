@@ -1,6 +1,6 @@
 import Foundation
 
-enum ConstantsWatch {
+enum ConstantsCalendar {
     
     /// text to add as notes in glucose events
     static let textInCreatedEvent = "created by xDrip4iOS"

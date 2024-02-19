@@ -14,12 +14,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
     
     public struct ContentState: Codable, Hashable {
         
-        // store the activity id here to enable us to remove it in case it is stale
-        //var previousActivityID: String
-        //var activityID: String
-        
-        
-        // Dynamic stateful properties about your activity go here!
+        // dynamic stateful properties
         var bgReadingValues: [Double]
         var bgReadingDates: [Date]
         var isMgDl: Bool
@@ -29,18 +24,21 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var lowLimitInMgDl: Double
         var highLimitInMgDl: Double
         var urgentHighLimitInMgDl: Double
-        var updatedDate: Date
+        var eventStartDate: Date = Date()
+        var warnUserToOpenApp: Bool = true
         var liveActivityNotificationSizeTypeAsInt: Int
         
-        
+        // computed properties
         var bgValueInMgDl: Double
         var bgReadingDate: Date
         var bgUnitString: String
         var bgValueStringInUserChosenUnit: String
         
-        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, updatedDate: Date, liveActivityNotificationSizeTypeAsInt: Int) {
+        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityNotificationSizeTypeAsInt: Int) {
             
             // these are the "passed in" stateful values used to initialize
+            self.bgReadingValues = bgReadingValues
+            self.bgReadingDates = bgReadingDates
             self.isMgDl = isMgDl
             self.slopeOrdinal = slopeOrdinal
             self.deltaChangeInMgDl = deltaChangeInMgDl// ?? nil
@@ -48,19 +46,13 @@ struct XDripWidgetAttributes: ActivityAttributes {
             self.lowLimitInMgDl = lowLimitInMgDl
             self.highLimitInMgDl = highLimitInMgDl
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl
-            self.updatedDate = updatedDate
             self.liveActivityNotificationSizeTypeAsInt = liveActivityNotificationSizeTypeAsInt
-            
-            self.bgReadingValues = bgReadingValues
-            self.bgReadingDates = bgReadingDates
             
             // these are dynamically initialized based on the above
             self.bgValueInMgDl = bgReadingValues[0]
             self.bgReadingDate = bgReadingDates[0]
             self.bgUnitString = isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
             self.bgValueStringInUserChosenUnit = bgReadingValues[0].mgdlToMmolAndToString(mgdl: isMgDl)
-            
-            
         }
         
         /// Blood glucose color dependant on the user defined limit values
@@ -136,6 +128,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
                     .foregroundStyle(Color(white: 0.9))
                     .minimumScaleFactor(0.2)
                     .lineLimit(1)
+                
                 Text(bgUnitString)
                     .font(font)
                     .foregroundStyle(Color(white: 0.5))
@@ -144,10 +137,14 @@ struct XDripWidgetAttributes: ActivityAttributes {
             }
         }
         
-//        func remindUserToOpenApp(eventStartDate: Date) -> Bool {
-//            return eventStartDate < Date().addingTimeInterval(-3600 * 0.2) ? true : false
-//        }
-        
+        func getEventEndTime(textString: String) -> Text {
+//            if eventStartDate != nil {
+                return Text(textString + eventStartDate.formatted(date: .omitted, time: .shortened))
+//            } else {
+//                return ""
+//            }
+        }
+            
         func placeTextAtBottomOfWidget(glucoseChartType: GlucoseChartType) -> Bool {
             
             // first see at which index in bgReadingDates the BG value is after one hour
@@ -164,13 +161,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             // then get the bg value of that index in the bgValues array
             // if it is higher than the user's high limit, then we can assume that the data will be hidden
             // by the text (bg value, trend + delta), so return true to show the text at the bottom of the view
-            if bgReadingValues[firstIndexForWidgetType] >= highLimitInMgDl {
-                return true
-            }
-            
-            return false
+            return bgReadingValues[firstIndexForWidgetType] >= highLimitInMgDl ? true : false
         }
     }
-
-    // no static data is needed
 }

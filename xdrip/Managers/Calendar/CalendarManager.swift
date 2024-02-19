@@ -101,11 +101,11 @@ class CalendarManager: NSObject {
             // configure the indicator based on the relevant range
             switch lastReading[0].bgRangeDescription() {
             case .inRange:
-                visualIndicator = ConstantsWatch.visualIndicatorInRange
+                visualIndicator = ConstantsCalendar.visualIndicatorInRange
             case .notUrgent:
-                visualIndicator = ConstantsWatch.visualIndicatorNotUrgent
+                visualIndicator = ConstantsCalendar.visualIndicatorNotUrgent
             case .urgent:
-                visualIndicator = ConstantsWatch.visualIndicatorUrgent
+                visualIndicator = ConstantsCalendar.visualIndicatorUrgent
             }
             
             // pre-append the indicator to the title
@@ -132,7 +132,7 @@ class CalendarManager: NSObject {
         // create an event now
         let event = EKEvent(eventStore: eventStore)
         event.title = title
-        event.notes = ConstantsWatch.textInCreatedEvent
+        event.notes = ConstantsCalendar.textInCreatedEvent
         event.startDate = Date()
         event.endDate = Date(timeIntervalSinceNow: 60 * 10)
         event.calendar = calendar
@@ -187,7 +187,7 @@ class CalendarManager: NSObject {
         
         for event in events {
             if let notes = event.notes {
-                if notes.contains(find: ConstantsWatch.textInCreatedEvent) {
+                if notes.contains(find: ConstantsCalendar.textInCreatedEvent) {
                     do{
                         try eventStore.remove(event, span: .thisEvent)
                     } catch let error {

@@ -36,30 +36,34 @@ struct XDripWidgetLiveActivity: Widget {
                     }
                     .padding(4)
                     
-//                    ZStack {
+                    ZStack {
                         GlucoseChartView(bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, glucoseChartType: .liveActivityNotification, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityNotificationSizeType: LiveActivityNotificationSizeType(rawValue: context.state.liveActivityNotificationSizeTypeAsInt) ?? .normal)
                         
-                        //Text(context.attributes.eventStartDate.formatted(date: .omitted, time: .shortened))
-                        
-                        /*
-                        if context.state.remindUserToOpenApp(eventStartDate: context.attributes.eventStartDate) {
+                        if context.state.warnUserToOpenApp {
                             VStack(alignment: .center) {
                                 Spacer()
-                                Text("Please open xDrip4iOS")
-                                    .font(.caption)
-                                    .minimumScaleFactor(0.1)
+//                                Text("Please open xDrip4iOS")
+//                                    .font(.caption)
+//                                    .minimumScaleFactor(0.1)
+//                                    .foregroundStyle(.black)
+//                                    .multilineTextAlignment(.center)
+//                                    .lineLimit(1)
+//                                    .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
+//                                    .background(Color(white: 0.8, opacity: 0.8))
+//                                    .cornerRadius(15)
+                                Text("Activity ending soon")
+                                    .font(.footnote).bold()
                                     .foregroundStyle(.black)
                                     .multilineTextAlignment(.center)
-                                    .lineLimit(1)
-                                    .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
-                                    .background(Color(white: 0.8, opacity: 0.8))
-                                    .cornerRadius(15)
+                                    .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10))
+                                    .background(.cyan).opacity(0.9)
+                                    .cornerRadius(10)
+    //                                .background(Color(white: 0.8, opacity: 0.8))
                                 Spacer()
                             }
                             .padding(8)
                         }
-                         */
-//                    }
+                    }
                 }
                 .activityBackgroundTint(.black)
                 .padding(6)
@@ -78,6 +82,18 @@ struct XDripWidgetLiveActivity: Widget {
                     
                     Spacer()
                     
+                    if context.state.warnUserToOpenApp {
+                        Text("Activity soon")
+                            .font(.footnote).bold()
+                            .foregroundStyle(.black)
+                            .multilineTextAlignment(.center)
+                            .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10))
+                            .background(.cyan).opacity(0.9)
+                            .cornerRadius(10)
+                        //                                .background(Color(white: 0.8, opacity: 0.8))
+                        Spacer()
+                    }
+                    
                     context.state.deltaChangeFormatted(font: .title)
                         .minimumScaleFactor(0.1)
                         .lineLimit(1)
@@ -92,8 +108,6 @@ struct XDripWidgetLiveActivity: Widget {
                 ZStack {
                     
                     GlucoseChartView(bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, glucoseChartType: .liveActivityNotification, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityNotificationSizeType: LiveActivityNotificationSizeType(rawValue: context.state.liveActivityNotificationSizeTypeAsInt) ?? .normal)
-                    
-                    //Text(context.attributes.eventStartDate.formatted(date: .omitted, time: .shortened))
                     
                     VStack {
                         
@@ -118,22 +132,22 @@ struct XDripWidgetLiveActivity: Widget {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(6)
-                    /*
-                    if context.state.remindUserToOpenApp(eventStartDate: context.attributes.eventStartDate) {
+                    
+                    if context.state.warnUserToOpenApp {
                         VStack(alignment: .center) {
                             Spacer()
-                            Text("Live activity ending soon\nPlease open xDrip4iOS")
+                            
+                            Text("Live activity ending soon")
                                 .font(.footnote).bold()
                                 .foregroundStyle(.black)
                                 .multilineTextAlignment(.center)
                                 .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10))
-                                .background(Color(white: 0.8, opacity: 0.8))
-                                .cornerRadius(15)
+                                .background(.cyan).opacity(0.9)
+                                .cornerRadius(10)
+//                                .background(Color(white: 0.8, opacity: 0.8))
                             Spacer()
                         }
                     }
-                    */
-                    
                 }
                 .activityBackgroundTint(.black)
             }
@@ -233,9 +247,9 @@ struct XDripWidgetLiveActivity_Previews: PreviewProvider {
     }
     
     
-    static let attributes = XDripWidgetAttributes() //(eventStartDate: Date().addingTimeInterval(-1000))
+    static let attributes = XDripWidgetAttributes()
     
-    static let contentState = XDripWidgetAttributes.ContentState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 5, deltaChangeInMgDl: -2, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, updatedDate: Date(), liveActivityNotificationSizeTypeAsInt: 0)
+    static let contentState = XDripWidgetAttributes.ContentState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 5, deltaChangeInMgDl: -2, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, liveActivityNotificationSizeTypeAsInt: 0)
     
     static var previews: some View {
         attributes
