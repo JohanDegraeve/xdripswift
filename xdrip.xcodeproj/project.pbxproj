@@ -2163,10 +2163,10 @@
 		F85DC2F621D25E3A00B9F74A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
-				472596032B76300800459D12 /* Watch */,
 				F821CF48229BF43A005C1E43 /* Alerts */,
 				F821CF54229BF43A005C1E43 /* Application */,
 				F8297F42238DC4AC00D74D66 /* BluetoothPeripheral */,
+				F8E3A2A723D906B600E5E98A /* Calendar */,
 				F8BECB03235CE5970060DAE1 /* Charts */,
 				F821CF4D229BF43A005C1E43 /* CoreData */,
 				F81D6D4622BD5F43005EFAE2 /* DexcomShare */,
@@ -2179,7 +2179,7 @@
 				F64039AE281C3F8D0051EFFE /* QuickActions */,
 				F821CF9922AEF2DF005C1E43 /* Speak */,
 				47FB28052636AFE700042FFB /* Statistics */,
-				F8E3A2A723D906B600E5E98A /* Calendar */,
+				472596032B76300800459D12 /* Watch */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
