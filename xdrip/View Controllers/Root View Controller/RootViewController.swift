@@ -3373,6 +3373,96 @@ final class RootViewController: UIViewController, ObservableObject {
     private func updateWatchApp() {
         
         // if there is no active WCSession open (i.e. if there is no paired Apple Watch with the watch app installed and running), then do nothing and just return
+        //if let validSession = self.session, validSession.isReachable {
+            
+            let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+            
+            var state = WatchState()
+            
+            if let bgReadingsAccessor = bgReadingsAccessor {
+                
+                // get 2 last Readings, with a calculatedValue
+                let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 0)
+                
+                // there should be at least one reading
+                guard lastReading.count > 0 else {
+                    print("exiting updateWatch(), no recent BG readings returned")
+                    return
+                }
+                
+                //let bgReadingDate = lastReading[0].timeStamp
+                let slopeOrdinal: Int = lastReading[0].slopeOrdinal() //? "" : lastReading[0].slopeArrow()
+                
+                var deltaChangeInMgDl: Double?
+                
+                // add delta if needed
+                if lastReading.count > 1 {
+                    
+                    deltaChangeInMgDl = lastReading[0].currentSlope(previousBgReading: lastReading[1]) * lastReading[0].timeStamp.timeIntervalSince(lastReading[1].timeStamp) * 1000;
+                }
+                
+                
+                // let's create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
+                // this is due to the problems passing structs that are not codable/hashable
+                
+                let hoursOfBgReadingsToSend: Double = 12
+                
+                let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+                
+                var bgReadingValues: [Double] = []
+                var bgReadingDates: [Date] = []
+                
+                for bgReading in bgReadings {
+                    bgReadingValues.append(bgReading.calculatedValue)
+                    bgReadingDates.append(bgReading.timeStamp)
+                }
+                
+                // now process the WatchState
+                
+                state.bgReadingValues = bgReadingValues
+                state.bgReadingDates = bgReadingDates
+                state.isMgDl = isMgDl
+                state.slopeOrdinal = slopeOrdinal
+                state.deltaChangeInMgDl = deltaChangeInMgDl
+                state.urgentLowLimitInMgDl = UserDefaults.standard.urgentLowMarkValue
+                state.lowLimitInMgDl = UserDefaults.standard.lowMarkValue
+                state.highLimitInMgDl = UserDefaults.standard.highMarkValue
+                state.urgentHighLimitInMgDl = UserDefaults.standard.urgentHighMarkValue
+                //state.updatedDate: Date?
+                
+                // specific to the Watch state
+                state.activeSensorDescription = UserDefaults.standard.activeSensorDescription
+                if let sensorStartDate = UserDefaults.standard.activeSensorStartDate {
+                    state.sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: Date()).minute!)
+                }
+                state.sensorMaxAgeInMinutes = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
+                
+                
+                guard let data = try? JSONEncoder().encode(state) else {
+                    print("Cannot encode watch state")
+                    return
+                }
+                
+//                guard validSession.isReachable else { return }
+//                validSession.sendMessageData(data, replyHandler: nil) { error in
+//                    print("Cannot send message to watch")
+//                }
+                
+                session?.sendMessageData(data, replyHandler: nil) { error in
+                    print("Cannot send message to watch")
+                }
+                
+                
+            }
+            
+        //}
+            
+    }
+    
+    /// if there is an active WCSession open between the app and the watch app, then process the current data and send it via the messaging service to the watch app.
+    private func updateWatchAppOld() {
+        
+        // if there is no active WCSession open (i.e. if there is no paired Apple Watch with the watch app installed and running), then do nothing and just return
         if let validSession = self.session, validSession.isReachable {
             
             let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
@@ -3964,12 +4054,9 @@ extension RootViewController: UIGestureRecognizerDelegate {
 // MARK: - conform to WCSessionDelegate protocol
 
 extension RootViewController: WCSessionDelegate {
-    
-    func sessionDidBecomeInactive(_ session: WCSession) {
-    }
-    
-    func sessionDidDeactivate(_ session: WCSession) {
-    }
+    func sessionDidBecomeInactive(_: WCSession) {}
+
+    func sessionDidDeactivate(_: WCSession) {}
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
     }
@@ -3994,4 +4081,8 @@ extension RootViewController: WCSessionDelegate {
             
         }
     }
+    
+    func session(_: WCSession, didReceiveMessageData _: Data) {}
+
+    func sessionReachabilityDidChange(_ session: WCSession) {}
 }

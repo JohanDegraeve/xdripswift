@@ -9,6 +9,35 @@
 import Foundation
 import SwiftUI
 
+struct WatchState: Codable {
+    
+    // these are similar to the context state of the Live Activity
+    var bgReadingValues: [Double] = []
+    var bgReadingDates: [Date] = []
+    var isMgDl: Bool?
+    var slopeOrdinal: Int?
+    var deltaChangeInMgDl: Double?
+    var urgentLowLimitInMgDl: Double?
+    var lowLimitInMgDl: Double?
+    var highLimitInMgDl: Double?
+    var urgentHighLimitInMgDl: Double?
+    var updatedDate: Date?
+    
+    // specific to the Watch state
+    var activeSensorDescription: String?
+    var sensorAgeInMinutes: Double?
+    var sensorMaxAgeInMinutes: Double?
+    var dataSourceConnectionStatusImageString: String?
+    var dataSourceConnectionStatusIsActive: Bool?
+    
+    var bgValueInMgDl: Double?
+    var bgReadingDate: Date?
+    var bgUnitString: String?
+    var bgValueStringInUserChosenUnit: String?
+    
+}
+
+
 class WatchManager: NSObject, ObservableObject {
     
     // PLACEHOLDER CODE    
