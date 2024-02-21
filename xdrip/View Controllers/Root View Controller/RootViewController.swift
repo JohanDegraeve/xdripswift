@@ -15,8 +15,6 @@ final class RootViewController: UIViewController, ObservableObject {
     
     // MARK: - Properties - Outlets and Actions for buttons and labels in home screen
     
-    private var session: WCSession?
-    
     @IBOutlet weak var toolbarOutlet: UIToolbar!
     
     @IBOutlet weak var preSnoozeToolbarButtonOutlet: UIBarButtonItem!
@@ -579,6 +577,9 @@ final class RootViewController: UIViewController, ObservableObject {
     /// statisticsManager instance
     private var statisticsManager: StatisticsManager?
     
+    /// watchManager instance
+    private var watchManager: WatchManager?
+    
     /// dateformatter for minutesLabelOutlet, when user is panning the chart
     private let dateTimeFormatterForMinutesLabelWhenPanning: DateFormatter = {
         
@@ -682,7 +683,7 @@ final class RootViewController: UIViewController, ObservableObject {
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
         
-        updateWatchApp()
+        watchManager?.updateWatchApp()
         
         // let's run the data source info and chart update 1 second after the root view appears. This should give time for the follower modes to download and populate the info needed.
         // no animation is needed as in most cases, we're just refreshing and displaying what is already shown on screen so we want to keep this refresh invisible.
@@ -703,7 +704,6 @@ final class RootViewController: UIViewController, ObservableObject {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.configureWatchKitSession()
         
         // if the user requested to hide the help icon on the main screen, then remove it (and the flexible space next to it)
         // this is because we keep the help icon as the last one in the toolbar item array.
@@ -1226,6 +1226,9 @@ final class RootViewController: UIViewController, ObservableObject {
         // initialize statisticsManager
         statisticsManager = StatisticsManager(coreDataManager: coreDataManager)
         
+        // initialize watchManager
+        watchManager = WatchManager(coreDataManager: coreDataManager)
+        
         // initialize chartGenerator in chartOutlet
         self.chartOutlet.chartGenerator = { [weak self] (frame) in
             return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
@@ -1501,8 +1504,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 if !UserDefaults.standard.suppressLoopShare {
                     loopManager?.share()
                 }
-
-                updateWatchApp()
+                
+                watchManager?.updateWatchApp()
                 
                 updateLiveActivity(forceRestart: false)
             }
@@ -1609,7 +1612,7 @@ final class RootViewController: UIViewController, ObservableObject {
             }
             
             // also update Watch App with the new values. (Only really needed for unit change between mg/dl and mmol/l)
-            updateWatchApp()
+            watchManager?.updateWatchApp()
             
             // this will trigger update of app badge, will also create notification, but as app is most likely in foreground, this won't show up
             createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
@@ -1630,7 +1633,7 @@ final class RootViewController: UIViewController, ObservableObject {
             updateMiniChart()
             
             // update Watch App with the new objective values
-            updateWatchApp()
+            watchManager?.updateWatchApp()
             
             updateLiveActivity(forceRestart: false)
             
@@ -1741,19 +1744,7 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     // MARK: - private helper functions
-    
-    /// configures the WKSession used for communication between the app and the watch app if available
-    private func configureWatchKitSession() {
-        
-        if WCSession.isSupported() {
-            
-            session = WCSession.default
-            session?.delegate = self
-            session?.activate()
-            
-        }
-    }
-    
+
     /// creates notification
     private func createNotification(title: String?, body: String?, identifier: String, sound: UNNotificationSound?) {
         
@@ -3367,98 +3358,7 @@ final class RootViewController: UIViewController, ObservableObject {
             }
         }
     }
-
-
-    /// if there is an active WCSession open between the app and the watch app, then process the current data and send it via the messaging service to the watch app.
-    private func updateWatchApp() {
-        
-        // if there is no active WCSession open (i.e. if there is no paired Apple Watch with the watch app installed and running), then do nothing and just return
-        //if let validSession = self.session, validSession.isReachable {
-            
-            let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-            
-            var state = WatchState()
-            
-            if let bgReadingsAccessor = bgReadingsAccessor {
-                
-                // get 2 last Readings, with a calculatedValue
-                let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 0)
-                
-                // there should be at least one reading
-                guard lastReading.count > 0 else {
-                    print("exiting updateWatch(), no recent BG readings returned")
-                    return
-                }
-                
-                //let bgReadingDate = lastReading[0].timeStamp
-                let slopeOrdinal: Int = lastReading[0].slopeOrdinal() //? "" : lastReading[0].slopeArrow()
-                
-                var deltaChangeInMgDl: Double?
-                
-                // add delta if needed
-                if lastReading.count > 1 {
-                    
-                    deltaChangeInMgDl = lastReading[0].currentSlope(previousBgReading: lastReading[1]) * lastReading[0].timeStamp.timeIntervalSince(lastReading[1].timeStamp) * 1000;
-                }
-                
-                
-                // let's create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
-                // this is due to the problems passing structs that are not codable/hashable
-                
-                let hoursOfBgReadingsToSend: Double = 12
-                
-                let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-                
-                var bgReadingValues: [Double] = []
-                var bgReadingDates: [Date] = []
-                
-                for bgReading in bgReadings {
-                    bgReadingValues.append(bgReading.calculatedValue)
-                    bgReadingDates.append(bgReading.timeStamp)
-                }
-                
-                // now process the WatchState
-                
-                state.bgReadingValues = bgReadingValues
-                state.bgReadingDates = bgReadingDates
-                state.isMgDl = isMgDl
-                state.slopeOrdinal = slopeOrdinal
-                state.deltaChangeInMgDl = deltaChangeInMgDl
-                state.urgentLowLimitInMgDl = UserDefaults.standard.urgentLowMarkValue
-                state.lowLimitInMgDl = UserDefaults.standard.lowMarkValue
-                state.highLimitInMgDl = UserDefaults.standard.highMarkValue
-                state.urgentHighLimitInMgDl = UserDefaults.standard.urgentHighMarkValue
-                //state.updatedDate: Date?
-                
-                // specific to the Watch state
-                state.activeSensorDescription = UserDefaults.standard.activeSensorDescription
-                if let sensorStartDate = UserDefaults.standard.activeSensorStartDate {
-                    state.sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: Date()).minute!)
-                }
-                state.sensorMaxAgeInMinutes = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
-                
-                
-                guard let data = try? JSONEncoder().encode(state) else {
-                    print("Cannot encode watch state")
-                    return
-                }
-                
-//                guard validSession.isReachable else { return }
-//                validSession.sendMessageData(data, replyHandler: nil) { error in
-//                    print("Cannot send message to watch")
-//                }
-                
-                session?.sendMessageData(data, replyHandler: nil) { error in
-                    print("Cannot send message to watch")
-                }
-                
-                
-            }
-            
-        //}
-            
-    }
-    
+    /*
     /// if there is an active WCSession open between the app and the watch app, then process the current data and send it via the messaging service to the watch app.
     private func updateWatchAppOld() {
         
@@ -3529,7 +3429,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
         }
             
-    }
+    }*/
     
     /// if allowed set the main screen rotation settings 
     fileprivate func updateScreenRotationSettings() {
@@ -4020,8 +3920,8 @@ extension RootViewController: FollowerDelegate {
                 if !UserDefaults.standard.suppressLoopShare {
                     self.loopManager?.share()
                 }
-                                
-                updateWatchApp()
+                
+                watchManager?.updateWatchApp()
                 
                 updateLiveActivity(forceRestart: false)
                 
@@ -4048,41 +3948,4 @@ extension RootViewController: UIGestureRecognizerDelegate {
         
     }
     
-}
-
-
-// MARK: - conform to WCSessionDelegate protocol
-
-extension RootViewController: WCSessionDelegate {
-    func sessionDidBecomeInactive(_: WCSession) {}
-
-    func sessionDidDeactivate(_: WCSession) {}
-    
-    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-    }
-    
-    // process any received messages from the watch app
-    func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-        
-        // uncomment the following for debug console use
-        print("received message from Watch App: \(message)")
-        
-        DispatchQueue.main.async {
-            
-            // if the action: refreshBGData message is received, then force the app to send new data to the Watch App
-            if let action = message["action"] as? String {
-                
-                if action == "refreshBGData" {
-                    
-                    self.updateWatchApp()
-                    
-                }
-            }
-            
-        }
-    }
-    
-    func session(_: WCSession, didReceiveMessageData _: Data) {}
-
-    func sessionReachabilityDidChange(_ session: WCSession) {}
 }

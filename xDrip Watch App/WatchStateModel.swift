@@ -11,34 +11,6 @@ import Foundation
 import SwiftUI
 import WatchConnectivity
 
-//struct WatchState: Codable {
-//    
-//    // these are similar to the context state of the Live Activity
-//    var bgReadingValues: [Double] = []
-//    var bgReadingDates: [Date] = []
-//    var isMgDl: Bool?
-//    var slopeOrdinal: Int?
-//    var deltaChangeInMgDl: Double?
-//    var urgentLowLimitInMgDl: Double?
-//    var lowLimitInMgDl: Double?
-//    var highLimitInMgDl: Double?
-//    var urgentHighLimitInMgDl: Double?
-//    var updatedDate: Date?
-//    
-//    // specific to the Watch state
-//    var activeSensorDescription: String?
-//    var sensorAgeInMinutes: Double?
-//    var sensorMaxAgeInMinutes: Double?
-//    var dataSourceConnectionStatusImageString: String?
-//    var dataSourceConnectionStatusIsActive: Bool?
-//    
-//    var bgValueInMgDl: Double?
-//    var bgReadingDate: Date?
-//    var bgUnitString: String?
-//    var bgValueStringInUserChosenUnit: String?
-//    
-//}
-
 class WatchStateModel: NSObject, ObservableObject {
     
     var session: WCSession
@@ -169,7 +141,7 @@ class WatchStateModel: NSObject, ObservableObject {
     }
     
     
-    func requestState() {
+    func getUpdate() {
         guard session.activationState == .activated else {
             session.activate()
             return
@@ -196,17 +168,13 @@ class WatchStateModel: NSObject, ObservableObject {
 
 extension WatchStateModel: WCSessionDelegate {
 #if os(iOS)
-    public func sessionDidBecomeInactive(_ session: WCSession) { }
-    public func sessionDidDeactivate(_ session: WCSession) {
-    }
+    public func sessionDidBecomeInactive(_ session: WCSession) {}
+    public func sessionDidDeactivate(_ session: WCSession) {}
 #endif
-//    func sessionDidBecomeInactive(_: WCSession) {}
-//
-//    func sessionDidDeactivate(_: WCSession) {}
     
     func session(_: WCSession, activationDidCompleteWith state: WCSessionActivationState, error _: Error?) {
         print("WCSession activated: \(state == .activated)")
-        requestState()
+        getUpdate()
     }
 
     func session(_: WCSession, didReceiveMessage _: [String: Any]) {}
