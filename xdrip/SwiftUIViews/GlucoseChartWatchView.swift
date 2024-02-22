@@ -163,7 +163,7 @@ struct GlucoseChartWatchView: View {
 //        .background(Color.purple)
         .chartYAxis(.hidden)
         .chartYScale(domain: domain)
-        .frame(width: 200, height: 120)
+        .frame(width: 200, height: 100)
 //        .padding(.top, -20)
 //        .padding(.bottom, 20)
     }

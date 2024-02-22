@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import SwiftUI
 
-/// holds and returns the different parameters used for creating the images for different widget types
+/// holds and returns the different parameters used for creating the newer (2024) SwiftUI glucose charts
 public enum GlucoseChartType: Int, CaseIterable {
     
     // when adding GlucoseChartType, add new cases at the end (ie 3, ...)
@@ -19,6 +19,8 @@ public enum GlucoseChartType: Int, CaseIterable {
 
     case liveActivityNotification = 0
     case dynamicIsland = 1
+//    case mainChart = 2
+//    case miniChart = 3
     
     var description: String {
         switch self {

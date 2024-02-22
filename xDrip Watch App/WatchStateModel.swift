@@ -15,7 +15,7 @@ class WatchStateModel: NSObject, ObservableObject {
     
     var session: WCSession
     
-    var bgReadingValues: [Double] = [234]
+    var bgReadingValues: [Double] = [123]
     var bgReadingDates: [Date] = [Date().addingTimeInterval(-200)]
     @Published var isMgDl: Bool = true
     @Published var slopeOrdinal: Int = 5
@@ -28,6 +28,8 @@ class WatchStateModel: NSObject, ObservableObject {
     @Published var activeSensorDescription: String = ""
     @Published var sensorAgeInMinutes: Double = 2880
     @Published var sensorMaxAgeInMinutes: Double = 14400
+    
+    @Published var updatedString: String = "Updated: 12:34"
     
     init(session: WCSession = .default) {
         self.session = session
@@ -141,28 +143,34 @@ class WatchStateModel: NSObject, ObservableObject {
     }
     
     
-    func getUpdate() {
+    func requestWatchStateUpdate() {
         guard session.activationState == .activated else {
             session.activate()
             return
         }
-        session.sendMessage(["stateRequest": true], replyHandler: nil) { error in
+        
+        print("Requesting watch state update to iOS companion app")
+        session.sendMessage(["requestWatchStateUpdate": true], replyHandler: nil) { error in
             print("WatchStateModel error: " + error.localizedDescription)
         }
     }
     
-    private func processState(_ state: WatchState) {
-        bgReadingValues = state.bgReadingValues //?? [Double]()
-        bgReadingDates = state.bgReadingDates //?? [Date]()
-        isMgDl = state.isMgDl ?? true
-        slopeOrdinal = state.slopeOrdinal ?? 5
-        deltaChangeInMgDl = state.deltaChangeInMgDl ?? 2
-        urgentLowLimitInMgDl = state.urgentLowLimitInMgDl ?? 60
-        lowLimitInMgDl = state.lowLimitInMgDl ?? 80
-        highLimitInMgDl = state.highLimitInMgDl ?? 180
-        urgentHighLimitInMgDl = state.urgentHighLimitInMgDl ?? 240
-        updatedDate = state.updatedDate ?? Date()
+    private func processState(_ watchState: WatchState) {
+        bgReadingValues = watchState.bgReadingValues //?? [Double]()
+        bgReadingDates = watchState.bgReadingDates //?? [Date]()
+        isMgDl = watchState.isMgDl ?? true
+        slopeOrdinal = watchState.slopeOrdinal ?? 5
+        deltaChangeInMgDl = watchState.deltaChangeInMgDl ?? 2
+        urgentLowLimitInMgDl = watchState.urgentLowLimitInMgDl ?? 60
+        lowLimitInMgDl = watchState.lowLimitInMgDl ?? 80
+        highLimitInMgDl = watchState.highLimitInMgDl ?? 180
+        urgentHighLimitInMgDl = watchState.urgentHighLimitInMgDl ?? 240
+        updatedDate = watchState.updatedDate ?? Date()
+        activeSensorDescription = watchState.activeSensorDescription ?? ""
+        sensorAgeInMinutes = watchState.sensorAgeInMinutes ?? 0
+        sensorMaxAgeInMinutes = watchState.sensorMaxAgeInMinutes ?? 0
         
+        updatedString = "BG: \(bgReadingDate().formatted(date: .omitted, time: .shortened)) / State: \(Date().formatted(date: .omitted, time: .shortened))"
     }
 }
 
@@ -174,7 +182,7 @@ extension WatchStateModel: WCSessionDelegate {
     
     func session(_: WCSession, activationDidCompleteWith state: WCSessionActivationState, error _: Error?) {
         print("WCSession activated: \(state == .activated)")
-        getUpdate()
+        requestWatchStateUpdate()
     }
 
     func session(_: WCSession, didReceiveMessage _: [String: Any]) {}
@@ -184,9 +192,10 @@ extension WatchStateModel: WCSessionDelegate {
     }
 
     func session(_: WCSession, didReceiveMessageData messageData: Data) {
-        if let state = try? JSONDecoder().decode(WatchState.self, from: messageData) {
+        if let watchState = try? JSONDecoder().decode(WatchState.self, from: messageData) {
             DispatchQueue.main.async {
-                self.processState(state)
+                print("Received watch state from iOS")
+                self.processState(watchState)
             }
         }
     }

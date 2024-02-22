@@ -21,7 +21,7 @@ public final class WatchManager: NSObject, ObservableObject {
     /// a coreDataManager
     private var coreDataManager: CoreDataManager
     
-    private var state = WatchState()
+    private var watchState = WatchState()
     
     // MARK: - intializer
     
@@ -44,9 +44,9 @@ public final class WatchManager: NSObject, ObservableObject {
     }
 
     private func processWatchState() {
+        guard session.isReachable else { return }
+        
         DispatchQueue.main.async {
-            
-//            let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
             
             // get 2 last Readings, with a calculatedValue
             let lastReading = self.bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 0)
@@ -69,8 +69,8 @@ public final class WatchManager: NSObject, ObservableObject {
             }
             
             
-            // let's create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
-            // this is due to the problems passing structs that are not codable/hashable
+            // create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
+            // this is needed due to the not being able to pass structs that are not codable/hashable
             let hoursOfBgReadingsToSend: Double = 12
             
             let bgReadings = self.bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
@@ -84,22 +84,23 @@ public final class WatchManager: NSObject, ObservableObject {
             }
             
             // now process the WatchState
-            self.state.bgReadingValues = bgReadingValues
-            self.state.bgReadingDates = bgReadingDates
-            self.state.isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-            self.state.slopeOrdinal = slopeOrdinal
-            self.state.deltaChangeInMgDl = deltaChangeInMgDl
-            self.state.urgentLowLimitInMgDl = UserDefaults.standard.urgentLowMarkValue
-            self.state.lowLimitInMgDl = UserDefaults.standard.lowMarkValue
-            self.state.highLimitInMgDl = UserDefaults.standard.highMarkValue
-            self.state.urgentHighLimitInMgDl = UserDefaults.standard.urgentHighMarkValue
+            self.watchState.bgReadingValues = bgReadingValues
+            self.watchState.bgReadingDates = bgReadingDates
+            self.watchState.isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+            self.watchState.slopeOrdinal = slopeOrdinal
+            self.watchState.deltaChangeInMgDl = deltaChangeInMgDl
+            self.watchState.urgentLowLimitInMgDl = UserDefaults.standard.urgentLowMarkValue
+            self.watchState.lowLimitInMgDl = UserDefaults.standard.lowMarkValue
+            self.watchState.highLimitInMgDl = UserDefaults.standard.highMarkValue
+            self.watchState.urgentHighLimitInMgDl = UserDefaults.standard.urgentHighMarkValue
             
             // specific to the Watch state
-            self.state.activeSensorDescription = UserDefaults.standard.activeSensorDescription
+            self.watchState.activeSensorDescription = UserDefaults.standard.activeSensorDescription
+            
             if let sensorStartDate = UserDefaults.standard.activeSensorStartDate {
-                self.state.sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: Date()).minute!)
+                self.watchState.sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: Date()).minute!)
             }
-            self.state.sensorMaxAgeInMinutes = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
+            self.watchState.sensorMaxAgeInMinutes = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
             
             self.sendToWatch()
         }
@@ -107,15 +108,15 @@ public final class WatchManager: NSObject, ObservableObject {
     
     
     private func sendToWatch() {
-        //        dispatchPrecondition(condition: .onQueue(processQueue))
-        guard let data = try? JSONEncoder().encode(state) else {
-            print("Cannot encode watch state")
+        guard let data = try? JSONEncoder().encode(watchState) else {
+            print("Watch state JSON encoding error")
             return
         }
         
-        guard session.isReachable else { return }
+        print("Current watch state will be sent to Watch")
+        
         session.sendMessageData(data, replyHandler: nil) { error in
-            print("Cannot send message to watch")
+            print("Cannot send data message to watch")
         }
     }
     
@@ -145,9 +146,9 @@ extension WatchManager: WCSessionDelegate {
         print("received message from Watch App: \(message)")
         
         // if the action: refreshBGData message is received, then force the app to send new data to the Watch App
-        if let stateRequest = message["stateRequest"] as? Bool, stateRequest {
+        if let requestWatchStateUpdate = message["requestWatchStateUpdate"] as? Bool, requestWatchStateUpdate {
             DispatchQueue.main.async {
-                self.sendToWatch()
+                self.processWatchState()
             }
         }
     }
@@ -157,7 +158,7 @@ extension WatchManager: WCSessionDelegate {
     public func sessionReachabilityDidChange(_ session: WCSession) {
         if session.isReachable {
             DispatchQueue.main.async {
-                self.sendToWatch()
+                self.processWatchState()
             }
         }
     }

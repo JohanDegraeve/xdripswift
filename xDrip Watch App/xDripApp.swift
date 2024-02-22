@@ -10,13 +10,13 @@ import SwiftUI
 
 @main
 struct xDrip_Watch_AppApp: App {
-    @StateObject var state = WatchStateModel()
+    @StateObject var watchState = WatchStateModel()
     
     var body: some Scene {
         WindowGroup {
             NavigationView {
-                ContentView()
-            }.environmentObject(state)
+                MainView()
+            }.environmentObject(watchState)
         }
     }
 }

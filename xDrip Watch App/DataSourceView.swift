@@ -1,0 +1,99 @@
+//
+//  DataSourceView.swift
+//  xDrip Watch App
+//
+//  Created by Paul Plant on 21/2/24.
+//  Copyright © 2024 Johan Degraeve. All rights reserved.
+//
+
+import Foundation
+import SwiftUI
+
+struct DataSourceView: View {
+    @EnvironmentObject var watchState: WatchStateModel
+    
+    var body: some View {
+            VStack(spacing: 0) {
+                
+                ProgressView(value: Float(watchState.activeSensorProgress().progress))
+                    .tint(watchState.activeSensorProgress().progressColor)
+                    .scaleEffect(x: 1, y: 0.3, anchor: .center)
+                
+                HStack {
+                    Text(watchState.activeSensorDescription)
+                        .font(.system(size: 14)).bold()
+                    
+                    Spacer()
+                    
+                    Text(watchState.sensorAgeInMinutes.minutesToDaysAndHours())
+                        .font(.system(size: 14))
+                        .foregroundStyle(watchState.activeSensorProgress().textColor)
+                    
+                }
+                .padding([.leading, .trailing], 10)
+            }
+    }
+}
+
+struct DataSourceView_Previews: PreviewProvider {
+    
+    static func bgDateArray() -> [Date] {
+        let endDate = Date()
+        let startDate = endDate.addingTimeInterval(-3600 * 12)
+        var currentDate = startDate
+        
+        var dateArray: [Date] = []
+        
+        while currentDate < endDate {
+            dateArray.append(currentDate)
+            currentDate = currentDate.addingTimeInterval(60 * 5)
+        }
+        
+        return dateArray
+    }
+    
+    static func bgValueArray() -> [Double] {
+        
+        var bgValueArray:[Double] = Array(repeating: 0, count: 144)
+        var currentValue: Double = 120
+        var increaseValues: Bool = true
+        
+        for index in bgValueArray.indices {
+            let randomValue = Double(Int.random(in: -10..<30))
+            
+            if currentValue < 70 {
+                increaseValues = true
+                bgValueArray[index] = currentValue + abs(randomValue)
+            } else if currentValue > 180 {
+                increaseValues = false
+                bgValueArray[index] = currentValue - abs(randomValue)
+            } else {
+                bgValueArray[index] = currentValue + (increaseValues ? randomValue : -randomValue)
+            }
+            currentValue = bgValueArray[index]
+        }
+        return bgValueArray
+    }
+    
+    static var previews: some View {
+        let watchState = WatchStateModel()
+        
+        watchState.bgReadingValues = bgValueArray()
+        watchState.bgReadingDates = bgDateArray()
+        watchState.isMgDl = true
+        watchState.slopeOrdinal = 5
+        watchState.deltaChangeInMgDl = -2
+        watchState.urgentLowLimitInMgDl = 60
+        watchState.lowLimitInMgDl = 80
+        watchState.highLimitInMgDl = 140
+        watchState.urgentHighLimitInMgDl = 180
+        watchState.updatedDate = Date().addingTimeInterval(-400)
+        watchState.activeSensorDescription = "Data Source"
+        watchState.sensorAgeInMinutes = 6788
+        watchState.sensorMaxAgeInMinutes = 14400
+        
+        return Group {
+            DataSourceView()
+        }.environmentObject(watchState)
+    }
+}
