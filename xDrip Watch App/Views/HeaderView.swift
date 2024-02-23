@@ -1,60 +1,43 @@
 //
-//  MainView.swift
+//  HeaderView.swift
 //  xDrip Watch App
 //
-//  Created by Paul Plant on 11/2/24.
+//  Created by Paul Plant on 21/2/24.
 //  Copyright © 2024 Johan Degraeve. All rights reserved.
 //
 
+import Foundation
 import SwiftUI
 
-struct MainView: View {
+struct HeaderView: View {
     @EnvironmentObject var watchState: WatchStateModel
     
-    // set timer to automatically refresh the view
-    // https://www.hackingwithswift.com/quick-start/swiftui/how-to-use-a-timer-with-swiftui
-    let timer = Timer.publish(every: 15, on: .main, in: .common).autoconnect()
-    @State private var currentDate = Date.now
-
-    // MARK: -  Body
     var body: some View {
-        VStack {
-            HeaderView()
-            .padding([.leading, .trailing], 5) // needed to fit 49mm screens (Ultra 1/2)
-            .padding([.top], 20)
-            .padding([.bottom], -10)
-            .onTapGesture(count: 2) {
-                watchState.updatedString = "Updating..."
-                watchState.requestWatchStateUpdate()
-            }
-            
-            GlucoseChartWatchView(bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl)
-                .padding(.bottom, 5)
+        HStack {
+            Text("\(watchState.bgReadingValues[0].mgdlToMmolAndToString(mgdl: watchState.isMgDl))\(watchState.trendArrow())")
+                .font(.system(size: 60))
+                .foregroundStyle(watchState.getBgTextColor())
+                .scaledToFill()
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
             
             Spacer()
             
-            DataSourceView()
-            
-            Text(watchState.updatedString)
-            .font(.system(size: 12))
-            .foregroundStyle(.cyan)
-            .lineLimit(1)
-        }
-        .padding(.bottom, 20)
-        .onReceive(timer) { date in
-            currentDate = date
-            watchState.updatedString = "Updating..."
-            watchState.requestWatchStateUpdate()
-        }
-        .onAppear {
-            watchState.updatedString = "Updating..."
-            watchState.requestWatchStateUpdate()
+            VStack(alignment: .trailing, spacing: 0) {
+                Text(watchState.getDeltaChangeStringInUserChosenUnit())
+                    .font(.system(size: 28)).bold()
+                    .lineLimit(1)
+                    .padding(.bottom, -3)
+                Text(watchState.bgUnitString())
+                    .font(.system(size: 14))
+                    .foregroundStyle(.gray)
+                    .lineLimit(1)
+            }
         }
     }
 }
 
-// MARK: -  Preview
-struct ContentView_Previews: PreviewProvider {
+struct HeaderView_Previews: PreviewProvider {
     
     static func bgDateArray() -> [Date] {
         let endDate = Date()
@@ -112,7 +95,7 @@ struct ContentView_Previews: PreviewProvider {
         watchState.sensorMaxAgeInMinutes = 14400
         
         return Group {
-            MainView()
+            HeaderView()
         }.environmentObject(watchState)
     }
 }

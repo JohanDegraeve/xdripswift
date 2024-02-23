@@ -896,7 +896,7 @@ final class RootViewController: UIViewController, ObservableObject {
         // if live action type is updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.liveActivityType.rawValue, options: .new, context: nil)
         // if live action size is updated
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.liveActivityNotificationSizeType.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.liveActivitySizeType.rawValue, options: .new, context: nil)
         
         // high mark , low mark , urgent high mark, urgent low mark. change requires redraw of chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.urgentLowMarkValue.rawValue, options: .new, context: nil)
@@ -915,6 +915,9 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // add observer for followerKeepAliveType, to reset the app badge notification if in follower mode and keep-alive is set to disabled
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
+        
+        // add observer for showAppleWatchDebug, to reload the watch app view if the value changes
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showAppleWatchDebug.rawValue, options: .new, context: nil)
 
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
@@ -1619,7 +1622,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             updateLiveActivity(forceRestart: false)
             
-        case UserDefaults.Key.liveActivityType, UserDefaults.Key.liveActivityNotificationSizeType:
+        case UserDefaults.Key.liveActivityType, UserDefaults.Key.liveActivitySizeType:
             
             // check and configure the live activity if applicable
             updateLiveActivity(forceRestart: false)
@@ -1678,6 +1681,10 @@ final class RootViewController: UIViewController, ObservableObject {
                 UserDefaults.standard.stopActiveSensor = false
                 
             }
+            
+        case UserDefaults.Key.showAppleWatchDebug:
+            
+            watchManager?.updateWatchApp()
 
         default:
             break
@@ -3583,7 +3590,7 @@ final class RootViewController: UIViewController, ObservableObject {
                     
                     
                     // create the contentState that will update the dynamic attributes of the Live Activity Widget
-                    let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityNotificationSizeTypeAsInt: UserDefaults.standard.liveActivityNotificationSizeType.rawValue)
+                    let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySizeTypeAsInt: UserDefaults.standard.liveActivitySizeType.rawValue)
                                         
                     LiveActivityManager.shared.runActivity(contentState: contentState, forceRestart: forceRestart)
                     

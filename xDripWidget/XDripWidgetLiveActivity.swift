@@ -19,14 +19,14 @@ struct XDripWidgetLiveActivity: Widget {
             
             // Lock screen/banner UI goes here
             
-            if context.state.liveActivityNotificationSizeTypeAsInt == 0 {
+            if context.state.liveActivitySizeTypeAsInt == 0 {
                 
                 // 0 = normal size chart
                 HStack(spacing: 20) {
                     VStack {
                         Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
                             .font(.system(size: 50)).bold()
-                            .foregroundStyle(context.state.getBgColor())
+                            .foregroundStyle(context.state.getBgTextColor())
                             .minimumScaleFactor(0.1)
                             .lineLimit(1)
                         
@@ -37,20 +37,11 @@ struct XDripWidgetLiveActivity: Widget {
                     .padding(4)
                     
                     ZStack {
-                        GlucoseChartView(bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, glucoseChartType: .liveActivityNotification, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityNotificationSizeType: LiveActivityNotificationSizeType(rawValue: context.state.liveActivityNotificationSizeTypeAsInt) ?? .normal)
+                        GlucoseChartView(glucoseChartType: .liveActivity, bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivitySizeType: LiveActivitySizeType(rawValue: context.state.liveActivitySizeTypeAsInt) ?? .normal, overrideHoursToShow: nil, glucoseCircleDiameterScalingHours: nil)
                         
                         if context.state.warnUserToOpenApp {
                             VStack(alignment: .center) {
                                 Spacer()
-//                                Text("Please open xDrip4iOS")
-//                                    .font(.caption)
-//                                    .minimumScaleFactor(0.1)
-//                                    .foregroundStyle(.black)
-//                                    .multilineTextAlignment(.center)
-//                                    .lineLimit(1)
-//                                    .padding(EdgeInsets(top: 4, leading: 8, bottom: 4, trailing: 8))
-//                                    .background(Color(white: 0.8, opacity: 0.8))
-//                                    .cornerRadius(15)
                                 Text("Activity ending soon")
                                     .font(.footnote).bold()
                                     .foregroundStyle(.black)
@@ -58,7 +49,6 @@ struct XDripWidgetLiveActivity: Widget {
                                     .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10))
                                     .background(.cyan).opacity(0.9)
                                     .cornerRadius(10)
-    //                                .background(Color(white: 0.8, opacity: 0.8))
                                 Spacer()
                             }
                             .padding(8)
@@ -68,7 +58,7 @@ struct XDripWidgetLiveActivity: Widget {
                 .activityBackgroundTint(.black)
                 .padding(6)
                 
-            } else if context.state.liveActivityNotificationSizeTypeAsInt == 1 {
+            } else if context.state.liveActivitySizeTypeAsInt == 1 {
                 
                 // 1 = minimal widget with no chart
                 
@@ -76,7 +66,7 @@ struct XDripWidgetLiveActivity: Widget {
                     
                     Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
                         .font(.largeTitle).bold()
-                        .foregroundStyle(context.state.getBgColor())
+                        .foregroundStyle(context.state.getBgTextColor())
                         .minimumScaleFactor(0.1)
                         .lineLimit(1)
                     
@@ -90,7 +80,6 @@ struct XDripWidgetLiveActivity: Widget {
                             .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10))
                             .background(.cyan).opacity(0.9)
                             .cornerRadius(10)
-                        //                                .background(Color(white: 0.8, opacity: 0.8))
                         Spacer()
                     }
                     
@@ -107,18 +96,18 @@ struct XDripWidgetLiveActivity: Widget {
                 
                 ZStack {
                     
-                    GlucoseChartView(bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, glucoseChartType: .liveActivityNotification, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityNotificationSizeType: LiveActivityNotificationSizeType(rawValue: context.state.liveActivityNotificationSizeTypeAsInt) ?? .normal)
+                    GlucoseChartView(glucoseChartType: .liveActivity, bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivitySizeType: LiveActivitySizeType(rawValue: context.state.liveActivitySizeTypeAsInt) ?? .normal, overrideHoursToShow: nil, glucoseCircleDiameterScalingHours: nil)
                     
                     VStack {
                         
-                        if context.state.placeTextAtBottomOfWidget(glucoseChartType: .liveActivityNotification) {
+                        if context.state.placeTextAtBottomOfWidget(glucoseChartType: .liveActivity) {
                             Spacer()
                         }
                         
                         HStack(alignment: .firstTextBaseline) {
                             Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow()) ")
                                 .font(.title2).bold()
-                                .foregroundStyle(context.state.getBgColor())
+                                .foregroundStyle(context.state.getBgTextColor())
                             
                             context.state.deltaChangeFormatted(font: .title3)
                         }
@@ -126,7 +115,7 @@ struct XDripWidgetLiveActivity: Widget {
                         .background(Color(white: 0, opacity: 0.7))
                         .cornerRadius(20)
                         
-                        if !context.state.placeTextAtBottomOfWidget(glucoseChartType: .liveActivityNotification) {
+                        if !context.state.placeTextAtBottomOfWidget(glucoseChartType: .liveActivity) {
                             Spacer()
                         }
                     }
@@ -144,7 +133,6 @@ struct XDripWidgetLiveActivity: Widget {
                                 .padding(EdgeInsets(top: 6, leading: 10, bottom: 6, trailing: 10))
                                 .background(.cyan).opacity(0.9)
                                 .cornerRadius(10)
-//                                .background(Color(white: 0.8, opacity: 0.8))
                             Spacer()
                         }
                     }
@@ -157,7 +145,7 @@ struct XDripWidgetLiveActivity: Widget {
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {                    Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
                         .font(.largeTitle).bold()
-                        .foregroundStyle(context.state.getBgColor())
+                        .foregroundStyle(context.state.getBgTextColor())
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                         .minimumScaleFactor(0.1)
                         .lineLimit(1)
@@ -168,38 +156,29 @@ struct XDripWidgetLiveActivity: Widget {
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     
-                    GlucoseChartView(bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, glucoseChartType: .dynamicIsland, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityNotificationSizeType: LiveActivityNotificationSizeType(rawValue: context.state.liveActivityNotificationSizeTypeAsInt) ?? .normal)
+                    GlucoseChartView(glucoseChartType: .dynamicIsland, bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivitySizeType: nil, overrideHoursToShow: nil, glucoseCircleDiameterScalingHours: nil)
                     
                 }
             } compactLeading: {
                 Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
-                    .foregroundStyle(context.state.getBgColor())
+                    .foregroundStyle(context.state.getBgTextColor())
                     .minimumScaleFactor(0.1)
             } compactTrailing: {
                 Text(context.state.getDeltaChangeStringInUserChosenUnit())
                     .minimumScaleFactor(0.1)
             } minimal: {
                 Text(context.state.bgValueStringInUserChosenUnit)
-                    .foregroundStyle(context.state.getBgColor())
+                    .foregroundStyle(context.state.getBgTextColor())
                     .minimumScaleFactor(0.1)
             }
             .widgetURL(URL(string: "xdripswift"))
-            .keylineTint(context.state.getBgColor())
+            .keylineTint(context.state.getBgTextColor())
         }
         
     }
     
 }
 
-//@available(iOSApplicationExtension 16.2, *)
-//struct LiveActivityView: View {
-//    
-//    let state: XDripWidgetAttributes.ContentState
-//    let glucoseChartType: GlucoseChartType = .liveActivityNotification
-//    
-//    var body: some View {
-//    }
-//}
 
 @available(iOS 16.2, *)
 struct XDripWidgetLiveActivity_Previews: PreviewProvider {
@@ -249,7 +228,7 @@ struct XDripWidgetLiveActivity_Previews: PreviewProvider {
     
     static let attributes = XDripWidgetAttributes()
     
-    static let contentState = XDripWidgetAttributes.ContentState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 5, deltaChangeInMgDl: -2, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, liveActivityNotificationSizeTypeAsInt: 0)
+    static let contentState = XDripWidgetAttributes.ContentState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 5, deltaChangeInMgDl: -2, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, liveActivitySizeTypeAsInt: 0)
     
     static var previews: some View {
         attributes

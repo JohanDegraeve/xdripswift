@@ -15,7 +15,7 @@ fileprivate enum Setting:Int, CaseIterable {
     case liveActivityType = 2
     
     /// live activity size
-    case liveActivityNotificationSizeType = 3
+    case liveActivitySizeType = 3
     
     /// show reading in app badge
     case showReadingInAppBadge = 4
@@ -115,7 +115,7 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
                 return .nothing
             }
             
-        case .liveActivityNotificationSizeType:
+        case .liveActivitySizeType:
             
             if #available(iOS 16.2, *) {
                 // live activities can only be used in master mode as follower mode
@@ -129,14 +129,14 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
                     
                     var index = 0
                     
-                    let currentLiveActivityNotificationSizeType = UserDefaults.standard.liveActivityNotificationSizeType
+                    let currentLiveActivitySizeType = UserDefaults.standard.liveActivitySizeType
                     
                     // get all data source types and add the description to data. Search for the type that matches the FollowerDataSourceType that is currently stored in userdefaults.
-                    for liveActivityNotificationSizeType in LiveActivityNotificationSizeType.allCases {
+                    for liveActivitySizeType in LiveActivitySizeType.allCases {
                         
-                        data.append(liveActivityNotificationSizeType.description)
+                        data.append(liveActivitySizeType.description)
                         
-                        if liveActivityNotificationSizeType == currentLiveActivityNotificationSizeType {
+                        if liveActivitySizeType == currentLiveActivitySizeType {
                             selectedRow = index
                         }
                         
@@ -144,18 +144,18 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
                         
                     }
                     
-                    return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelLiveActivityNotificationSizeType, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
+                    return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelLiveActivitySizeType, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
                         
                         // we'll set this here so that we can use it in the else statement for logging
-                        let oldLiveActivityNotificationSizeType = UserDefaults.standard.liveActivityNotificationSizeType
+                        let oldLiveActivitySizeType = UserDefaults.standard.liveActivitySizeType
                         
                         if index != selectedRow {
                             
-                            UserDefaults.standard.liveActivityNotificationSizeType = LiveActivityNotificationSizeType(rawValue: index) ?? .normal
+                            UserDefaults.standard.liveActivitySizeType = LiveActivitySizeType(rawValue: index) ?? .normal
                             
-                            let newLiveActivityNotificationSizeType = UserDefaults.standard.liveActivityNotificationSizeType
+                            let newLiveActivitySizeType = UserDefaults.standard.liveActivitySizeType
                             
-                            trace("Live activity notification size was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, oldLiveActivityNotificationSizeType.description, newLiveActivityNotificationSizeType.description)
+                            trace("Live activity notification size was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, oldLiveActivitySizeType.description, newLiveActivitySizeType.description)
                             
                         }
                         
@@ -163,7 +163,7 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
                     
                 } else {
                     
-                    return .showInfoText(title: Texts_SettingsView.labelLiveActivityNotificationSizeType, message: Texts_SettingsView.liveActivityDisabledInFollowerModeMessage, actionHandler: {})
+                    return .showInfoText(title: Texts_SettingsView.labelLiveActivitySizeType, message: Texts_SettingsView.liveActivityDisabledInFollowerModeMessage, actionHandler: {})
                     
                 }
             } else {
@@ -202,8 +202,8 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
         case .liveActivityType:
             return Texts_SettingsView.labelLiveActivityType
             
-        case .liveActivityNotificationSizeType:
-            return Texts_SettingsView.labelLiveActivityNotificationSizeType
+        case .liveActivitySizeType:
+            return Texts_SettingsView.labelLiveActivitySizeType
             
         case .showReadingInAppBadge:
             return Texts_SettingsView.labelShowReadingInAppBadge
@@ -225,7 +225,7 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
         case .notificationInterval:
             return .disclosureIndicator
             
-        case .liveActivityType, .liveActivityNotificationSizeType:
+        case .liveActivityType, .liveActivitySizeType:
             if #available(iOS 16.2, *) {
                 return 1==1 || UserDefaults.standard.isMaster ? .disclosureIndicator : .none
             } else {
@@ -253,9 +253,9 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
                 return "iOS 16.2 needed"
             }
             
-        case .liveActivityNotificationSizeType:
+        case .liveActivitySizeType:
             if #available(iOS 16.2, *) {
-                return 1==1 || UserDefaults.standard.isMaster ? UserDefaults.standard.liveActivityNotificationSizeType.description : Texts_SettingsView.liveActivityDisabledInFollowerMode
+                return 1==1 || UserDefaults.standard.isMaster ? UserDefaults.standard.liveActivitySizeType.description : Texts_SettingsView.liveActivityDisabledInFollowerMode
             } else {
                 return "iOS 16.2 needed"
             }
@@ -280,7 +280,7 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
 
             return UISwitch(isOn: UserDefaults.standard.multipleAppBadgeValueWith10, action: {(isOn:Bool) in UserDefaults.standard.multipleAppBadgeValueWith10 = isOn})
 
-        case .notificationInterval, .liveActivityType, .liveActivityNotificationSizeType:
+        case .notificationInterval, .liveActivityType, .liveActivitySizeType:
             return nil
             
         }

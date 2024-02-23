@@ -74,7 +74,7 @@ extension UserDefaults {
         /// which type of live activities should be shown?
         case liveActivityType = "liveActivityType"
         /// which size should the live activities be shown?
-        case liveActivityNotificationSizeType = "liveActivityNotificationSizeType"
+        case liveActivitySizeType = "liveActivitySizeType"
         
         // Home Screen and main chart settings
         
@@ -374,6 +374,9 @@ extension UserDefaults {
         /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
         case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
         
+        /// enable debug info in Apple Watch App
+        case showAppleWatchDebug = "showAppleWatchDebug"
+        
         /// will be set to true when UIApplication.willEnterForegroundNotification is triggered. And to false when app goes back to background
         ///
         /// Can be used if status needs to be known, app in for or background. UIApplication.shared.applicationState seems to come a bit too late to active, when the app is coming to the foreground, in cases where it's needed, this UserDefaults key can be used
@@ -637,13 +640,13 @@ extension UserDefaults {
     
     /// holds the enum integer of the type of live activity to be shown
     /// default to 0 (normal)
-    var liveActivityNotificationSizeType: LiveActivityNotificationSizeType {
+    var liveActivitySizeType: LiveActivitySizeType {
         get {
-            let liveActivityNotificationSizeTypeAsInt = integer(forKey: Key.liveActivityNotificationSizeType.rawValue)
-            return LiveActivityNotificationSizeType(rawValue: liveActivityNotificationSizeTypeAsInt) ?? .normal
+            let liveActivitySizeTypeAsInt = integer(forKey: Key.liveActivitySizeType.rawValue)
+            return LiveActivitySizeType(rawValue: liveActivitySizeTypeAsInt) ?? .normal
         }
         set {
-            set(newValue.rawValue, forKey: Key.liveActivityNotificationSizeType.rawValue)
+            set(newValue.rawValue, forKey: Key.liveActivitySizeType.rawValue)
         }
     }
     
@@ -1956,6 +1959,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.libreLinkUpVersion.rawValue)
+        }
+    }
+    
+    /// show Apple Watch Debug info in watch app. Default false
+    @objc dynamic var showAppleWatchDebug: Bool {
+        get {
+            return bool(forKey: Key.showAppleWatchDebug.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.showAppleWatchDebug.rawValue)
         }
     }
     

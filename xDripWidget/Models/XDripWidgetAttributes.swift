@@ -26,7 +26,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var urgentHighLimitInMgDl: Double
         var eventStartDate: Date = Date()
         var warnUserToOpenApp: Bool = true
-        var liveActivityNotificationSizeTypeAsInt: Int
+        var liveActivitySizeTypeAsInt: Int
         
         // computed properties
         var bgValueInMgDl: Double
@@ -34,7 +34,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var bgUnitString: String
         var bgValueStringInUserChosenUnit: String
         
-        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityNotificationSizeTypeAsInt: Int) {
+        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySizeTypeAsInt: Int) {
             
             // these are the "passed in" stateful values used to initialize
             self.bgReadingValues = bgReadingValues
@@ -46,7 +46,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             self.lowLimitInMgDl = lowLimitInMgDl
             self.highLimitInMgDl = highLimitInMgDl
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl
-            self.liveActivityNotificationSizeTypeAsInt = liveActivityNotificationSizeTypeAsInt
+            self.liveActivitySizeTypeAsInt = liveActivitySizeTypeAsInt
             
             // these are dynamically initialized based on the above
             self.bgValueInMgDl = bgReadingValues[0]
@@ -57,13 +57,17 @@ struct XDripWidgetAttributes: ActivityAttributes {
         
         /// Blood glucose color dependant on the user defined limit values
         /// - Returns: a Color object either red, yellow or green
-        func getBgColor() -> Color {
-            if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
-                return .red
-            } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
-                return .yellow
+        func getBgTextColor() -> Color {
+            if bgReadingDate > Date().addingTimeInterval(-60 * 7) {
+                if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
+                    return Color(.red)
+                } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
+                    return Color(.yellow)
+                } else {
+                    return Color(.green)
+                }
             } else {
-                return .green
+                return Color.gray
             }
         }
         
@@ -152,7 +156,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             var index = 0
             
             for _ in bgReadingValues {
-                if bgReadingDates[index] > Date().addingTimeInterval((-glucoseChartType.hoursToShow(liveActivityNotificationSizeType: LiveActivityNotificationSizeType(rawValue: liveActivityNotificationSizeTypeAsInt) ?? .normal) * 60 * 60) + 3600) {
+                if bgReadingDates[index] > Date().addingTimeInterval((-glucoseChartType.hoursToShow(liveActivitySizeType: LiveActivitySizeType(rawValue: liveActivitySizeTypeAsInt) ?? .normal) * 60 * 60) + 3600) {
                     firstIndexForWidgetType = index
                 }
                 index += 1

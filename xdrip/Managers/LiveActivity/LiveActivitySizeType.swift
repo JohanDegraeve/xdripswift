@@ -1,5 +1,5 @@
 //
-//  LiveActivityNotificationSizeType.swift
+//  LiveActivitySizeType.swift
 //  xdrip
 //
 //  Created by Paul Plant on 14/1/24.
@@ -9,9 +9,9 @@
 import Foundation
 
 /// holds and returns the different parameters used for creating the images for different widget types
-public enum LiveActivityNotificationSizeType: Int, CaseIterable {
+public enum LiveActivitySizeType: Int, CaseIterable {
     
-    // when adding LiveActivityNotificationSizeType, add new cases at the end (ie 3, ...)
+    // when adding LiveActivitySizeType, add new cases at the end (ie 3, ...)
     // if this is done in the middle then a database migration would be required, because the rawvalue is stored as Int16 in the coredata
     // the order of the data source types will in the uiview is determined by the initializer init(forRowAt row: Int)
     
@@ -30,8 +30,8 @@ public enum LiveActivityNotificationSizeType: Int, CaseIterable {
         }
     }
     
-    /// gives the raw value of the LiveActivityNotificationSizeType for a specific section in a uitableview, is the opposite of the initializer
-    static func LiveActivityNotificationSizeTypeRawValue(rawValue: Int) -> Int {
+    /// gives the raw value of the LiveActivitySizeType for a specific section in a uitableview, is the opposite of the initializer
+    static func LiveActivitySizeTypeRawValue(rawValue: Int) -> Int {
         
         switch rawValue {
             
@@ -42,7 +42,7 @@ public enum LiveActivityNotificationSizeType: Int, CaseIterable {
         case 2:// large
             return 2
         default:
-            fatalError("in LiveActivityNotificationSizeType, unknown case")
+            fatalError("in LiveActivitySizeType, unknown case")
             
         }
         

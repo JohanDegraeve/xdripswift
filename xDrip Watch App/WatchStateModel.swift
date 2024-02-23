@@ -17,6 +17,7 @@ class WatchStateModel: NSObject, ObservableObject {
     
     var bgReadingValues: [Double] = [123]
     var bgReadingDates: [Date] = [Date().addingTimeInterval(-200)]
+    
     @Published var isMgDl: Bool = true
     @Published var slopeOrdinal: Int = 5
     @Published var deltaChangeInMgDl: Double = 3
@@ -28,8 +29,11 @@ class WatchStateModel: NSObject, ObservableObject {
     @Published var activeSensorDescription: String = ""
     @Published var sensorAgeInMinutes: Double = 2880
     @Published var sensorMaxAgeInMinutes: Double = 14400
+    @Published var showAppleWatchDebug: Bool = false
     
-    @Published var updatedString: String = "Updated: 12:34"
+    @Published var infoString: String = "Updating..."
+    @Published var debugString: String = "Debug info..."
+    @Published var chartHoursIndex: Int = 1
     
     init(session: WCSession = .default) {
         self.session = session
@@ -39,10 +43,12 @@ class WatchStateModel: NSObject, ObservableObject {
         session.activate()
     }
     
+    /// the latest BG reading value in the array
     func bgValueInMgDl() -> Double {
         return bgReadingValues[0]
     }
     
+    /// the timestamp of the latest BG reading value in the array
     func bgReadingDate() -> Date {
         return bgReadingDates[0]
     }
@@ -55,18 +61,33 @@ class WatchStateModel: NSObject, ObservableObject {
         return bgReadingValues[0].mgdlToMmolAndToString(mgdl: isMgDl)
     }
     
-    /// Blood glucose color dependant on the user defined limit values
+    /// Blood glucose color dependant on the user defined limit values and also on if it is a recent value
     /// - Returns: a Color object either red, yellow or green
-    func getBgColor() -> Color {
-        if bgValueInMgDl() >= urgentHighLimitInMgDl || bgValueInMgDl() <= urgentLowLimitInMgDl {
-            return .red
-        } else if bgValueInMgDl() >= highLimitInMgDl || bgValueInMgDl() <= lowLimitInMgDl {
-            return .yellow
+    func getBgTextColor() -> Color {
+        if bgReadingDate() > Date().addingTimeInterval(-60 * 7) {
+            if bgValueInMgDl() >= urgentHighLimitInMgDl || bgValueInMgDl() <= urgentLowLimitInMgDl {
+                return Color(.red)
+            } else if bgValueInMgDl() >= highLimitInMgDl || bgValueInMgDl() <= lowLimitInMgDl {
+                return Color(.yellow)
+            } else {
+                return Color(.green)
+            }
         } else {
-            return .green
+            return Color.gray
         }
     }
     
+    /// Color dependant on how long ago the last BG reading was
+    /// - Returns: a Color either normal or gray
+    func getInfoTextColor() -> Color {
+        if bgReadingDate() > Date().addingTimeInterval(-60 * 7) {
+            return Color(.lightGray)
+        } else if bgReadingDate() > Date().addingTimeInterval(-60 * 12) {
+            return Color(.yellow)
+        } else {
+            return Color(.red)
+        }
+    }
     
     ///  returns a string holding the trend arrow
     /// - Returns: trend arrow string (i.e.  "↑")
@@ -149,15 +170,20 @@ class WatchStateModel: NSObject, ObservableObject {
             return
         }
         
-        print("Requesting watch state update to iOS companion app")
+        // change the text, this must be done in the main thread
+        DispatchQueue.main.async {
+            self.infoString = "Updating..."
+        }
+        
+        print("Requesting watch state update from iOS")
         session.sendMessage(["requestWatchStateUpdate": true], replyHandler: nil) { error in
             print("WatchStateModel error: " + error.localizedDescription)
         }
     }
     
     private func processState(_ watchState: WatchState) {
-        bgReadingValues = watchState.bgReadingValues //?? [Double]()
-        bgReadingDates = watchState.bgReadingDates //?? [Date]()
+        bgReadingValues = watchState.bgReadingValues ?? [Double]()
+        bgReadingDates = watchState.bgReadingDates ?? [Date]()
         isMgDl = watchState.isMgDl ?? true
         slopeOrdinal = watchState.slopeOrdinal ?? 5
         deltaChangeInMgDl = watchState.deltaChangeInMgDl ?? 2
@@ -169,8 +195,11 @@ class WatchStateModel: NSObject, ObservableObject {
         activeSensorDescription = watchState.activeSensorDescription ?? ""
         sensorAgeInMinutes = watchState.sensorAgeInMinutes ?? 0
         sensorMaxAgeInMinutes = watchState.sensorMaxAgeInMinutes ?? 0
+        showAppleWatchDebug = watchState.showAppleWatchDebug ?? false
         
-        updatedString = "BG: \(bgReadingDate().formatted(date: .omitted, time: .shortened)) / State: \(Date().formatted(date: .omitted, time: .shortened))"
+        infoString = "Updated at \(bgReadingDate().formatted(date: .omitted, time: .shortened))"
+        
+        debugString = "State updated: \(Date().formatted(date: .omitted, time: .shortened))\nBG updated: \(bgReadingDate().formatted(date: .omitted, time: .shortened))\nBG values: \(bgReadingValues.count)"
     }
 }
 
@@ -181,20 +210,17 @@ extension WatchStateModel: WCSessionDelegate {
 #endif
     
     func session(_: WCSession, activationDidCompleteWith state: WCSessionActivationState, error _: Error?) {
-        print("WCSession activated: \(state == .activated)")
         requestWatchStateUpdate()
     }
 
     func session(_: WCSession, didReceiveMessage _: [String: Any]) {}
 
     func sessionReachabilityDidChange(_ session: WCSession) {
-        print("WCSession Reachability: \(session.isReachable)")
     }
 
     func session(_: WCSession, didReceiveMessageData messageData: Data) {
         if let watchState = try? JSONDecoder().decode(WatchState.self, from: messageData) {
             DispatchQueue.main.async {
-                print("Received watch state from iOS")
                 self.processState(watchState)
             }
         }

@@ -30,7 +30,7 @@ struct GlucoseChartWatchView: View {
         var index = 0
         
         for _ in bgReadingValues {
-            if bgReadingDates[index] > Date().addingTimeInterval(-ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNotificationNormal * 60 * 60) {
+            if bgReadingDates[index] > Date().addingTimeInterval(-ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNormal * 60 * 60) {
                 self.bgReadingValues.append(bgReadingValues[index])
                 self.bgReadingDates.append(bgReadingDates[index])
             }
@@ -60,7 +60,7 @@ struct GlucoseChartWatchView: View {
         
         // adapted from generateXAxisValues() from GlucoseChartManager.swift in xDrip target
                 
-        let startDate: Date = bgReadingDates.last ?? Date().addingTimeInterval(-ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNotificationNormal * 3600)
+        let startDate: Date = bgReadingDates.last ?? Date().addingTimeInterval(-ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNormal * 3600)
         let endDate: Date = Date()
         
         /// how many full hours between startdate and enddate
@@ -70,7 +70,7 @@ struct GlucoseChartWatchView: View {
         let mappingArray = Array(1...amountOfFullHours)
         
         /// set the stride count interval to make sure we don't add too many labels to the x-axis if the user wants to view >6 hours
-        let intervalBetweenAxisValues: Int = ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesLiveActivityNotificationNormal
+        let intervalBetweenAxisValues: Int = ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesLiveActivityNormal
         
         /// first, for each int in mappingArray, we create a Date, starting with the lower hour + 1 hour - we will create 5 in this example, starting with hour 08 (7 + 3600 seconds)
         let startDateLower = Date(timeIntervalSinceReferenceDate:
@@ -116,7 +116,7 @@ struct GlucoseChartWatchView: View {
             
             // add a phantom glucose point at the beginning of the timeline to fix the start point in case there are no glucose values at that time (for instances after starting a new sensor
             // this will ensure that the x-axis scale remains correct and the few glucose points availabel don't stretch to cover the whole axis
-            PointMark(x: .value("Time", Date().addingTimeInterval(-ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNotificationNormal * 3600)),
+            PointMark(x: .value("Time", Date().addingTimeInterval(-ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNormal * 3600)),
                       y: .value("BG", 100))
             .symbol(Circle())
             .symbolSize(ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterLiveActivityNotification)
@@ -153,7 +153,7 @@ struct GlucoseChartWatchView: View {
 //                }
 //            }
             
-            AxisMarks(values: .automatic(desiredCount: Int(ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNotificationNormal))) {
+            AxisMarks(values: .automatic(desiredCount: Int(ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNormal))) {
                 if $0.as(Date.self) != nil {
                     AxisGridLine()
                         .foregroundStyle(ConstantsGlucoseChartSwiftUI.xAxisGridLineColorLiveActivityNotification)

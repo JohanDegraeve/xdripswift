@@ -45,8 +45,8 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_labelLiveActivityType", tableName: filename, bundle: Bundle.main, value: "Live Activities", comment: "notification settings, type of live activities that should be enabled")
     }()
     
-    static let labelLiveActivityNotificationSizeType: String = {
-        return NSLocalizedString("settingsviews_labelLiveActivityNotificationSizeType", tableName: filename, bundle: Bundle.main, value: "Live Activity Size", comment: "notification settings, the size that the live activities should be displayed")
+    static let labelLiveActivitySizeType: String = {
+        return NSLocalizedString("settingsviews_labelLiveActivitySizeType", tableName: filename, bundle: Bundle.main, value: "Live Activity Size", comment: "notification settings, the size that the live activities should be displayed")
     }()
     
     static let liveActivityTypeDisabled: String = {
@@ -749,6 +749,10 @@ class Texts_SettingsView {
     
     static let libreLinkUpVersionMessage = {
         return String(format: NSLocalizedString("libreLinkUpVersionMessage", tableName: filename, bundle: Bundle.main, value: "\nSetting this value incorrectly could result in your LibreLinkUp account being locked.\n\nDo not touch this setting unless instructed by an xDrip4iOS developer.\n\nThe default version is: %@", comment: "developer settings, ask the user for the libre link up version"), ConstantsLibreLinkUp.libreLinkUpVersionDefault)        
+    }()
+    
+    static let showAppleWatchDebug: String = {
+        return NSLocalizedString("showAppleWatchDebug", tableName: filename, bundle: Bundle.main, value: "Enable Watch App Debug", comment: "developer settings, show watch app debug")
     }()
     
     // MARK: - Section Housekeeper

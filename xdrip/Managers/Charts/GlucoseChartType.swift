@@ -17,123 +17,146 @@ public enum GlucoseChartType: Int, CaseIterable {
     // if this is done in the middle then a database migration would be required, because the rawvalue is stored as Int16 in the coredata
     // the order of the data source types will in the uiview is determined by the initializer init(forRowAt row: Int)
 
-    case liveActivityNotification = 0
+    case liveActivity = 0
     case dynamicIsland = 1
+    case watch = 2
 //    case mainChart = 2
 //    case miniChart = 3
     
     var description: String {
         switch self {
-        case .liveActivityNotification:
-            return "Live Activity Notification Widget"
+        case .liveActivity:
+            return "Live Activity Notification Chart"
         case .dynamicIsland:
-            return "Dynamic Island (Expanded) Widget"
+            return "Dynamic Island (Expanded) Chart"
+        case .watch:
+            return "Apple Watch Chart"
         }
     }
     
     
-    func viewSize(liveActivityNotificationSizeType: LiveActivityNotificationSizeType) -> (width: CGFloat, height: CGFloat) {
+    func viewSize(liveActivitySizeType: LiveActivitySizeType) -> (width: CGFloat, height: CGFloat) {
         switch self {
-        case .liveActivityNotification:
-            switch liveActivityNotificationSizeType {
+        case .liveActivity:
+            switch liveActivitySizeType {
             case .large:
-                return (ConstantsGlucoseChartSwiftUI.viewWidthLiveActivityNotificationLarge, ConstantsGlucoseChartSwiftUI.viewHeightLiveActivityNotificationLarge)
+                return (ConstantsGlucoseChartSwiftUI.viewWidthLiveActivityLarge, ConstantsGlucoseChartSwiftUI.viewHeightLiveActivityLarge)
             default:
-                return (ConstantsGlucoseChartSwiftUI.viewWidthLiveActivityNotificationNormal, ConstantsGlucoseChartSwiftUI.viewHeightLiveActivityNotificationNormal)
+                return (ConstantsGlucoseChartSwiftUI.viewWidthLiveActivityNormal, ConstantsGlucoseChartSwiftUI.viewHeightLiveActivityNormal)
             }
         case .dynamicIsland:
             return (ConstantsGlucoseChartSwiftUI.viewWidthDynamicIsland, ConstantsGlucoseChartSwiftUI.viewHeightDynamicIsland)
+        case .watch:
+            return (ConstantsGlucoseChartSwiftUI.viewWidthWatch, ConstantsGlucoseChartSwiftUI.viewHeightWatch)
         }
     }
     
-    func hoursToShow(liveActivityNotificationSizeType: LiveActivityNotificationSizeType) -> Double {
+    func hoursToShow(liveActivitySizeType: LiveActivitySizeType) -> Double {
         switch self {
-        case .liveActivityNotification:
-            switch liveActivityNotificationSizeType {
+        case .liveActivity:
+            switch liveActivitySizeType {
             case .large:
-                return ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNotificationLarge
+                return ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityLarge
             default:
-                return ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNotificationNormal
+                return ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityNormal
             }
         case .dynamicIsland:
             return ConstantsGlucoseChartSwiftUI.hoursToShowDynamicIsland
+        case .watch:
+            return ConstantsGlucoseChartSwiftUI.hoursToShowWatch
         }
     }
     
-    func intervalBetweenAxisValues(liveActivityNotificationSizeType: LiveActivityNotificationSizeType) -> Int {
+    func intervalBetweenAxisValues(liveActivitySizeType: LiveActivitySizeType) -> Int {
         switch self {
-        case .liveActivityNotification:
-            switch liveActivityNotificationSizeType {
+        case .liveActivity:
+            switch liveActivitySizeType {
             case .large:
-                return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesLiveActivityNotificationLarge
+                return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesLiveActivityLarge
             default:
-                return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesLiveActivityNotificationNormal
+                return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesLiveActivityNormal
         }
         case .dynamicIsland:
             return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesDynamicIsland
+        case .watch:
+            return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesWatch
         }
     }
     
     var backgroundColor: Color {
         switch self {
-        case .liveActivityNotification:
+        case .liveActivity:
             return ConstantsGlucoseChartSwiftUI.viewBackgroundColorLiveActivityNotification
         case .dynamicIsland:
             return ConstantsGlucoseChartSwiftUI.viewBackgroundColorDynamicIsland
+        case .watch:
+            return ConstantsGlucoseChartSwiftUI.viewBackgroundColorWatch
         }
     }
     
     var glucoseCircleDiameter: Double {
         switch self {
-        case .liveActivityNotification:
+        case .liveActivity:
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterLiveActivityNotification
         case .dynamicIsland:
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterDynamicIsland
+        case .watch:
+            return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterWatch
         }
     }
     
     var lowHighLineColor: Color {
         switch self {
-        case .liveActivityNotification:
+        case .liveActivity:
             return ConstantsGlucoseChartSwiftUI.lowHighLineColorLiveActivityNotification
         case .dynamicIsland:
             return ConstantsGlucoseChartSwiftUI.lowHighLineColorDynamicIsland
+        case .watch:
+            return ConstantsGlucoseChartSwiftUI.lowHighLineColorWatch
         }
     }
     
     var urgentLowHighLineColor: Color {
         switch self {
-        case .liveActivityNotification:
+        case .liveActivity:
             return ConstantsGlucoseChartSwiftUI.urgentLowHighLineLiveActivityNotification
         case .dynamicIsland:
             return ConstantsGlucoseChartSwiftUI.urgentLowHighLineColorDynamicIsland
+        case .watch:
+            return ConstantsGlucoseChartSwiftUI.urgentLowHighLineColorWatch
         }
     }
     
     var relativeYAxisLineSize: Double {
         switch self {
-        case .liveActivityNotification:
+        case .liveActivity:
             return ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeLiveActivityNotification
         case .dynamicIsland:
             return ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeDynamicIsland
+        case .watch:
+            return ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeWatch
         }
     }
     
     var xAxisLabelOffset: Double {
         switch self {
-        case .liveActivityNotification:
+        case .liveActivity:
             return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetLiveActivityNotification
         case .dynamicIsland:
             return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetDynamicIsland
+        case .watch:
+            return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetWatch
         }
     }
     
     var xAxisGridLineColor: Color {
         switch self {
-        case .liveActivityNotification:
+        case .liveActivity:
             return ConstantsGlucoseChartSwiftUI.xAxisGridLineColorLiveActivityNotification
         case .dynamicIsland:
             return ConstantsGlucoseChartSwiftUI.xAxisGridLineColorDynamicIsland
+        case .watch:
+            return ConstantsGlucoseChartSwiftUI.xAxisGridLineColorWatch
         }
     }
     
