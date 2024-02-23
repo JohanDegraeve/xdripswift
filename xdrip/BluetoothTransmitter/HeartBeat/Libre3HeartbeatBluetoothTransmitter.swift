@@ -56,21 +56,6 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
     
     // MARK: CBCentralManager overriden functions
     
-    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-
-        super.centralManager(central, didConnect: peripheral)
-        
-        // this is the trigger for calling the heartbeat
-        if (Date()).timeIntervalSince(lastHeartBeatTimeStamp) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
-            
-            bluetoothTransmitterDelegate?.heartBeat()
-            
-            lastHeartBeatTimeStamp = Date()
-            
-        }
-
-    }
-    
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
 
         // trace the received value and uuid
@@ -80,6 +65,9 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
 
         // this is the trigger for calling the heartbeat
         if (Date()).timeIntervalSince(lastHeartBeatTimeStamp) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
+            
+            // sleep for a second to allow the official app to upload to LibreView
+            Thread.sleep(forTimeInterval: 1)
             
             bluetoothTransmitterDelegate?.heartBeat()
             
