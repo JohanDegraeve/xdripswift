@@ -38,7 +38,12 @@
 		4779BCF42974308F00515714 /* PieCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 4779BCF32974308F00515714 /* PieCharts */; };
 		477B2C7E2B432775002F64A4 /* LiveActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477B2C7D2B432775002F64A4 /* LiveActivityType.swift */; };
 		477F45E6285B993200AC8475 /* GlucoseMiniChartManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477F45E5285B993100AC8475 /* GlucoseMiniChartManager.swift */; };
-		47A6ABE22B790CC60047A4BA /* xDripApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6ABE12B790CC60047A4BA /* xDripApp.swift */; };
+		479359862B88B95A007D3CEE /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4716A4EE2B406C3D00419052 /* WidgetKit.framework */; };
+		479359872B88B95A007D3CEE /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4716A4F02B406C3D00419052 /* SwiftUI.framework */; };
+		4793598A2B88B95A007D3CEE /* xDripWatchComplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479359892B88B95A007D3CEE /* xDripWatchComplication.swift */; };
+		4793598C2B88B95B007D3CEE /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4793598B2B88B95B007D3CEE /* Assets.xcassets */; };
+		479359902B88B95B007D3CEE /* xDrip Watch ComplicationExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 479359852B88B95A007D3CEE /* xDrip Watch ComplicationExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		47A6ABE22B790CC60047A4BA /* xDripWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6ABE12B790CC60047A4BA /* xDripWatchApp.swift */; };
 		47A6ABE42B790CC60047A4BA /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6ABE32B790CC60047A4BA /* MainView.swift */; };
 		47A6ABE62B790CC70047A4BA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 47A6ABE52B790CC70047A4BA /* Assets.xcassets */; };
 		47A6ABE92B790CC70047A4BA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 47A6ABE82B790CC70047A4BA /* Preview Assets.xcassets */; };
@@ -630,6 +635,13 @@
 			remoteGlobalIDString = 4716A4EC2B406C3D00419052;
 			remoteInfo = xDripWidgetExtension;
 		};
+		4793598E2B88B95B007D3CEE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F8AC425221ADEBD60078C348 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 479359842B88B95A007D3CEE;
+			remoteInfo = "xDrip Watch ComplicationExtension";
+		};
 		47DE41B02B864EE50041DA19 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F8AC425221ADEBD60078C348 /* Project object */;
@@ -660,6 +672,17 @@
 				47DE41AF2B864EE50041DA19 /* xDrip Watch App.app in Embed Watch Content */,
 			);
 			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		479359912B88B95B007D3CEE /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				479359902B88B95B007D3CEE /* xDrip Watch ComplicationExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F870D3DE25126A49008967B0 /* Embed Foundation Extensions */ = {
@@ -766,6 +789,10 @@
 		476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsFollower.swift; sourceTree = "<group>"; };
 		477B2C7D2B432775002F64A4 /* LiveActivityType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityType.swift; sourceTree = "<group>"; };
 		477F45E5285B993100AC8475 /* GlucoseMiniChartManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseMiniChartManager.swift; sourceTree = "<group>"; };
+		479359852B88B95A007D3CEE /* xDrip Watch ComplicationExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "xDrip Watch ComplicationExtension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		479359892B88B95A007D3CEE /* xDripWatchComplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xDripWatchComplication.swift; sourceTree = "<group>"; };
+		4793598B2B88B95B007D3CEE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		4793598D2B88B95B007D3CEE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		4798BAC727BA6AA8002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		4798BAC827BA6AA8002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Main.strings; sourceTree = "<group>"; };
 		4798BACB27BA7688002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Alerts.strings; sourceTree = "<group>"; };
@@ -789,7 +816,7 @@
 		4798BADD27BA7996002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/M5StackView.strings; sourceTree = "<group>"; };
 		4798BADE27BA79B8002583BC /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		47A6ABDF2B790CC60047A4BA /* xDrip Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "xDrip Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		47A6ABE12B790CC60047A4BA /* xDripApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xDripApp.swift; sourceTree = "<group>"; };
+		47A6ABE12B790CC60047A4BA /* xDripWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xDripWatchApp.swift; sourceTree = "<group>"; };
 		47A6ABE32B790CC60047A4BA /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		47A6ABE52B790CC70047A4BA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		47A6ABE82B790CC70047A4BA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -1655,6 +1682,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		479359822B88B95A007D3CEE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				479359872B88B95A007D3CEE /* SwiftUI.framework in Frameworks */,
+				479359862B88B95A007D3CEE /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		47A6ABDC2B790CC60047A4BA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1679,25 +1715,25 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		4716A4F22B406C3D00419052 /* xDripWidget */ = {
+		4716A4F22B406C3D00419052 /* xDrip Widget */ = {
 			isa = PBXGroup;
 			children = (
 				4716A4FB2B406C3F00419052 /* Info.plist */,
 				4716A4F72B406C3D00419052 /* XDripWidget.swift */,
 				4716A4F32B406C3D00419052 /* XDripWidgetBundle.swift */,
-				4716A4F52B406C3D00419052 /* XDripWidgetLiveActivity.swift */,
 				4716A4F92B406C3F00419052 /* Assets.xcassets */,
-				4716A5032B40704000419052 /* Models */,
+				4716A5032B40704000419052 /* DataModels */,
+				479359962B88BA69007D3CEE /* Views */,
 			);
-			path = xDripWidget;
+			path = "xDrip Widget";
 			sourceTree = "<group>";
 		};
-		4716A5032B40704000419052 /* Models */ = {
+		4716A5032B40704000419052 /* DataModels */ = {
 			isa = PBXGroup;
 			children = (
 				4716A5042B40709E00419052 /* XDripWidgetAttributes.swift */,
 			);
-			path = Models;
+			path = DataModels;
 			sourceTree = "<group>";
 		};
 		4716A5122B41CA9C00419052 /* LiveActivity */ = {
@@ -1719,15 +1755,41 @@
 			path = Watch;
 			sourceTree = "<group>";
 		};
+		479359882B88B95A007D3CEE /* xDrip Watch Complication */ = {
+			isa = PBXGroup;
+			children = (
+				4793598D2B88B95B007D3CEE /* Info.plist */,
+				479359892B88B95A007D3CEE /* xDripWatchComplication.swift */,
+				4793598B2B88B95B007D3CEE /* Assets.xcassets */,
+			);
+			path = "xDrip Watch Complication";
+			sourceTree = "<group>";
+		};
+		479359952B88BA4E007D3CEE /* DataModels */ = {
+			isa = PBXGroup;
+			children = (
+				47A6ABEE2B7949B80047A4BA /* WatchStateModel.swift */,
+			);
+			path = DataModels;
+			sourceTree = "<group>";
+		};
+		479359962B88BA69007D3CEE /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4716A4F52B406C3D00419052 /* XDripWidgetLiveActivity.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		47A6ABE02B790CC60047A4BA /* xDrip Watch App */ = {
 			isa = PBXGroup;
 			children = (
-				47DE41B72B87B2510041DA19 /* Views */,
-				47DE41B62B87B24C0041DA19 /* Constants */,
-				47A6ABEE2B7949B80047A4BA /* WatchStateModel.swift */,
-				47A6ABE12B790CC60047A4BA /* xDripApp.swift */,
+				47A6ABE12B790CC60047A4BA /* xDripWatchApp.swift */,
 				47A6ABE52B790CC70047A4BA /* Assets.xcassets */,
+				47DE41B62B87B24C0041DA19 /* Constants */,
+				479359952B88BA4E007D3CEE /* DataModels */,
 				47A6ABE72B790CC70047A4BA /* Preview Content */,
+				47DE41B72B87B2510041DA19 /* Views */,
 			);
 			path = "xDrip Watch App";
 			sourceTree = "<group>";
@@ -2371,8 +2433,9 @@
 				F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */,
 				666E283926F7E54C00ACE4DF /* Version.xcconfig */,
 				666E283826F7E54C00ACE4DF /* xDrip.xcconfig */,
-				4716A4F22B406C3D00419052 /* xDripWidget */,
+				4716A4F22B406C3D00419052 /* xDrip Widget */,
 				47A6ABE02B790CC60047A4BA /* xDrip Watch App */,
+				479359882B88B95A007D3CEE /* xDrip Watch Complication */,
 				48C0E851274A3BB6D42C6F20 /* Frameworks */,
 				F8AC425B21ADEBD60078C348 /* Products */,
 				F85DC29B21CFCEB800B9F74A /* Recovered References */,
@@ -2386,6 +2449,7 @@
 				F8AC425A21ADEBD60078C348 /* xdrip.app */,
 				4716A4ED2B406C3D00419052 /* xDripWidgetExtension.appex */,
 				47A6ABDF2B790CC60047A4BA /* xDrip Watch App.app */,
+				479359852B88B95A007D3CEE /* xDrip Watch ComplicationExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -3352,6 +3416,23 @@
 			productReference = 4716A4ED2B406C3D00419052 /* xDripWidgetExtension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
+		479359842B88B95A007D3CEE /* xDrip Watch ComplicationExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 479359942B88B95B007D3CEE /* Build configuration list for PBXNativeTarget "xDrip Watch ComplicationExtension" */;
+			buildPhases = (
+				479359812B88B95A007D3CEE /* Sources */,
+				479359822B88B95A007D3CEE /* Frameworks */,
+				479359832B88B95A007D3CEE /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "xDrip Watch ComplicationExtension";
+			productName = "xDrip Watch ComplicationExtension";
+			productReference = 479359852B88B95A007D3CEE /* xDrip Watch ComplicationExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		47A6ABDE2B790CC60047A4BA /* xDrip Watch App */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 47A6ABEC2B790CC70047A4BA /* Build configuration list for PBXNativeTarget "xDrip Watch App" */;
@@ -3359,10 +3440,12 @@
 				47A6ABDB2B790CC60047A4BA /* Sources */,
 				47A6ABDC2B790CC60047A4BA /* Frameworks */,
 				47A6ABDD2B790CC60047A4BA /* Resources */,
+				479359912B88B95B007D3CEE /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				4793598F2B88B95B007D3CEE /* PBXTargetDependency */,
 			);
 			name = "xDrip Watch App";
 			productName = "xDrip Watch App";
@@ -3411,6 +3494,9 @@
 				TargetAttributes = {
 					4716A4EC2B406C3D00419052 = {
 						CreatedOnToolsVersion = 15.1;
+					};
+					479359842B88B95A007D3CEE = {
+						CreatedOnToolsVersion = 15.2;
 					};
 					47A6ABDE2B790CC60047A4BA = {
 						CreatedOnToolsVersion = 15.2;
@@ -3468,6 +3554,7 @@
 				F8AC425921ADEBD60078C348 /* xdrip */,
 				4716A4EC2B406C3D00419052 /* xDripWidgetExtension */,
 				47A6ABDE2B790CC60047A4BA /* xDrip Watch App */,
+				479359842B88B95A007D3CEE /* xDrip Watch ComplicationExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -3480,6 +3567,14 @@
 				47A6AC432B7D430D0047A4BA /* HomeView.strings in Resources */,
 				4716A4FA2B406C3F00419052 /* Assets.xcassets in Resources */,
 				47A6AC452B7D43100047A4BA /* Common.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		479359832B88B95A007D3CEE /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4793598C2B88B95B007D3CEE /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3679,6 +3774,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		479359812B88B95A007D3CEE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4793598A2B88B95A007D3CEE /* xDripWatchComplication.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		47A6ABDB2B790CC60047A4BA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -3693,7 +3796,7 @@
 				47A6ABE42B790CC60047A4BA /* MainView.swift in Sources */,
 				47A6ABEF2B7949B80047A4BA /* WatchStateModel.swift in Sources */,
 				47A6AC3A2B7D3F200047A4BA /* LiveActivitySizeType.swift in Sources */,
-				47A6ABE22B790CC60047A4BA /* xDripApp.swift in Sources */,
+				47A6ABE22B790CC60047A4BA /* xDripWatchApp.swift in Sources */,
 				47DE41B32B8672F90041DA19 /* DataSourceView.swift in Sources */,
 				47A6AC012B795DD80047A4BA /* GlucoseChartWatchView.swift in Sources */,
 				47A6AC2F2B7D3E170047A4BA /* Date.swift in Sources */,
@@ -4126,6 +4229,11 @@
 			isa = PBXTargetDependency;
 			target = 4716A4EC2B406C3D00419052 /* xDripWidgetExtension */;
 			targetProxy = 4716A4FC2B406C3F00419052 /* PBXContainerItemProxy */;
+		};
+		4793598F2B88B95B007D3CEE /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 479359842B88B95A007D3CEE /* xDrip Watch ComplicationExtension */;
+			targetProxy = 4793598E2B88B95B007D3CEE /* PBXContainerItemProxy */;
 		};
 		47DE41B12B864EE50041DA19 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -4779,9 +4887,79 @@
 			};
 			name = Release;
 		};
+		479359922B88B95B007D3CEE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "xDrip Watch Complication/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "xDrip Watch Complication";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Johan Degraeve. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.92C77A2942.xdripswift.watchkitapp.xDrip-Watch-Complication";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.2;
+			};
+			name = Debug;
+		};
+		479359932B88B95B007D3CEE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "xDrip Watch Complication/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "xDrip Watch Complication";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Johan Degraeve. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.92C77A2942.xdripswift.watchkitapp.xDrip-Watch-Complication";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.2;
+			};
+			name = Release;
+		};
 		47A6ABEA2B790CC70047A4BA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -4819,6 +4997,7 @@
 		47A6ABEB2B790CC70047A4BA /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -5046,6 +5225,15 @@
 			buildConfigurations = (
 				4716A4FF2B406C3F00419052 /* Debug */,
 				4716A5002B406C3F00419052 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		479359942B88B95B007D3CEE /* Build configuration list for PBXNativeTarget "xDrip Watch ComplicationExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				479359922B88B95B007D3CEE /* Debug */,
+				479359932B88B95B007D3CEE /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

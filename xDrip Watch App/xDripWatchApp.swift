@@ -1,5 +1,5 @@
 //
-//  xDripApp.swift
+//  xDripWatchApp.swift
 //  xDrip Watch App
 //
 //  Created by Paul Plant on 11/2/24.
