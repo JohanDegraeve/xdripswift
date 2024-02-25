@@ -14,9 +14,9 @@ struct HeaderView: View {
     
     var body: some View {
         HStack {
-            Text("\(watchState.bgReadingValues[0].mgdlToMmolAndToString(mgdl: watchState.isMgDl))\(watchState.trendArrow())")
-                .font(.system(size: 60))
-                .foregroundStyle(watchState.getBgTextColor())
+            Text("\(watchState.bgValueStringInUserChosenUnit())\(watchState.trendArrow())")
+                .font(.system(size: 60)).fontWeight(.semibold)
+                .foregroundStyle(watchState.bgTextColor())
                 .scaledToFill()
                 .minimumScaleFactor(0.5)
                 .lineLimit(1)
@@ -24,10 +24,11 @@ struct HeaderView: View {
             Spacer()
             
             VStack(alignment: .trailing, spacing: 0) {
+                Spacer()
                 Text(watchState.getDeltaChangeStringInUserChosenUnit())
-                    .font(.system(size: 28)).bold()
+                    .font(.system(size: 28)).fontWeight(.semibold)
                     .lineLimit(1)
-                    .padding(.bottom, -3)
+                    .padding(.bottom, -7)
                 Text(watchState.bgUnitString())
                     .font(.system(size: 14))
                     .foregroundStyle(.gray)
@@ -38,7 +39,6 @@ struct HeaderView: View {
 }
 
 struct HeaderView_Previews: PreviewProvider {
-    
     static func bgDateArray() -> [Date] {
         let endDate = Date()
         let startDate = endDate.addingTimeInterval(-3600 * 12)
@@ -55,7 +55,6 @@ struct HeaderView_Previews: PreviewProvider {
     }
     
     static func bgValueArray() -> [Double] {
-        
         var bgValueArray:[Double] = Array(repeating: 0, count: 144)
         var currentValue: Double = 120
         var increaseValues: Bool = true

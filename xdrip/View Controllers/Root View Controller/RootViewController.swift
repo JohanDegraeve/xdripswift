@@ -3096,40 +3096,58 @@ final class RootViewController: UIViewController, ObservableObject {
             // blank out the current sensor age label by default. If the sensor isn't in warm-up, then it will be filled in later
             dataSourceSensorCurrentAgeOutlet.text = ""
             
-            // set-up the labels for the sensor time, total and also if still considered in warm-up
-            if !isMaster && UserDefaults.standard.followerDataSourceType == .libreLinkUp && sensorAgeInMinutes < ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre {
+            // check if there are any recent bg readings. If not then check if the sensor is in warm-up time
+            if let bgReadingsAccessor = self.bgReadingsAccessor {
                 
-                // the LibreLinkUp active sensor is still in warm-up
-                if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre * 60) {
+                // get 2 last Readings, with a calculatedValue
+                let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 0)
+                
+                // if no recent readings then check if the sensor is in warm-up
+                if lastReading.count == 0 {
                     
-                    dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                    // set-up the labels for the sensor time, total and also if still considered in warm-up
+                    if !isMaster && UserDefaults.standard.followerDataSourceType == .libreLinkUp && sensorAgeInMinutes < ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre {
+                        
+                        // the LibreLinkUp active sensor is still in warm-up
+                        if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre * 60) {
+                            
+                            dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                        }
+                        
+                    } else if isMaster && sensorType == .Libre && sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutes {
+                        
+                        // the connected Libre sensor is still in warm-up (as per defined minimum warm-up time)
+                        if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutes * 60) {
+                            
+                            dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                            
+                        }
+                        
+                    } else if isMaster && sensorType == .Dexcom && sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6 {
+                        
+                        // the connected Dexcom sensor is still in warm-up (as per defined standard Dexcom warm-up time)
+                        if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6 * 60) {
+                            
+                            dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                            
+                        } else {
+                            
+                            // fill in the labels to show sensor time elapsed and max age
+                            dataSourceSensorCurrentAgeOutlet.text = sensorStartDate?.daysAndHoursAgo()
+                            
+                            dataSourceSensorMaxAgeOutlet.text = " / " + sensorMaxAgeInMinutes.minutesToDaysAndHours()
+                            
+                        }
+                    }
+                    
+                } else {
+                    
+                    // fill in the labels to show sensor time elapsed and max age
+                    dataSourceSensorCurrentAgeOutlet.text = sensorStartDate?.daysAndHoursAgo()
+                    
+                    dataSourceSensorMaxAgeOutlet.text = " / " + sensorMaxAgeInMinutes.minutesToDaysAndHours()
+                    
                 }
-                
-            } else if isMaster && sensorType == .Libre && sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutes {
-                
-                // the connected Libre sensor is still in warm-up (as per defined minimum warm-up time)
-                if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutes * 60) {
-                    
-                    dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
-                    
-                }
-                
-            } else if isMaster && sensorType == .Dexcom && sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6 {
-                
-                // the connected Dexcom sensor is still in warm-up (as per defined standard Dexcom warm-up time)
-                if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6 * 60) {
-                    
-                    dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
-                    
-                }
-                
-            } else {
-                
-                // fill in the labels to show sensor time elapsed and max age
-                dataSourceSensorCurrentAgeOutlet.text = sensorStartDate?.daysAndHoursAgo()
-                
-                dataSourceSensorMaxAgeOutlet.text = " / " + sensorMaxAgeInMinutes.minutesToDaysAndHours()
-                
             }
             
             // set progress view colours and text colours from constants file
@@ -3147,17 +3165,38 @@ final class RootViewController: UIViewController, ObservableObject {
                 dataSourceSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressExpired
                 dataSourceSensorMaxAgeOutlet.textColor = ConstantsHomeView.sensorProgressExpired
                 
+                // change the progress colour back to normal after a second or two
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    UIView.transition(with: self.sensorProgressOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
+                        self.sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColor
+                    })
+                }
+                
             } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewUrgentInMinutes {
                 
                 // sensor is very close to ending
                 dataSourceSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressViewProgressColorUrgent
                 sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColorUrgent
                 
+                // change the progress colour back to normal after a second or two
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    UIView.transition(with: self.sensorProgressOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
+                        self.sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColor
+                    })
+                }
+                
             } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewWarningInMinutes {
                 
                 // sensor will soon be close to ending
                 dataSourceSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressViewProgressColorWarning
                 sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColorWarning
+                
+                // change the progress colour back to normal after a second or two
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+                    UIView.transition(with: self.sensorProgressOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
+                        self.sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColor
+                    })
+                }
                 
             }
             
@@ -3529,57 +3568,24 @@ final class RootViewController: UIViewController, ObservableObject {
             // also take advantage to just skip the rest of the function if they have live activities disabled
             var showLiveActivity: Bool = true //!(!UserDefaults.standard.isMaster || UserDefaults.standard.liveActivityType == .disabled)
             
-            if let bgReadingsAccessor = bgReadingsAccessor, showLiveActivity {
-                
-                // get 2 last Readings, with a calculatedValue
-                let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 0)
-                
-                // there should be at least one reading
-                guard lastReading.count > 0 else {
-                    print("no recent BG readings returned")
-                    LiveActivityManager.shared.endAllActivities()
-                    return
-                }
-                
-                let bgValueInMgDl = lastReading[0].calculatedValue
-                
-                // now that we've got the current BG value, let's refine the check to see if we should run/show the live activity
-                switch liveActivityType {
-                case .always:
-                    showLiveActivity = true
-                case .disabled:
-                    showLiveActivity = false
-                case .low:
-                    showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.lowMarkValue) ? true : false
-                case .urgentLow:
-                    showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) ? true : false
-                case .lowHigh:
-                    showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.lowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.highMarkValue)) ? true : false
-                case .urgentLowHigh:
-                    showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.urgentHighMarkValue)) ? true : false
-                }
-                
-                // if we should still show it, then let's continue processing the lastReading array to create a valid contentState
-                if showLiveActivity {
-                    //let bgReadingDate = lastReading[0].timeStamp
-                    let slopeOrdinal: Int = lastReading[0].slopeOrdinal() //? "" : lastReading[0].slopeArrow()
+            DispatchQueue.main.async {
+                if let bgReadingsAccessor = self.bgReadingsAccessor, showLiveActivity {
+                    
+                    // create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
+                    // this is needed due to the not being able to pass structs that are not codable/hashable
+                    let hoursOfBgReadingsToSend: Double = 12
+                    
+                    let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+                    
+                    let slopeOrdinal: Int = bgReadings[0].slopeOrdinal() //? "" : lastReading[0].slopeArrow()
                     
                     var deltaChangeInMgDl: Double?
                     
                     // add delta if needed
-                    if lastReading.count > 1 {
-                        
-                        deltaChangeInMgDl = lastReading[0].currentSlope(previousBgReading: lastReading[1]) * lastReading[0].timeStamp.timeIntervalSince(lastReading[1].timeStamp) * 1000;
+                    if bgReadings.count > 1 {
+                        deltaChangeInMgDl = bgReadings[0].currentSlope(previousBgReading: bgReadings[1]) * bgReadings[0].timeStamp.timeIntervalSince(bgReadings[1].timeStamp) * 1000;
                     }
                     
-                    
-                    // let's create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
-                    // this is due to the problems passing structs that are not codable/hashable
-                    
-                    let hoursOfBgReadingsToSend: Double = 12
-                    
-                    let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-                                        
                     var bgReadingValues: [Double] = []
                     var bgReadingDates: [Date] = []
                     
@@ -3588,12 +3594,33 @@ final class RootViewController: UIViewController, ObservableObject {
                         bgReadingDates.append(bgReading.timeStamp)
                     }
                     
+                    let bgValueInMgDl = bgReadingValues[0]
                     
-                    // create the contentState that will update the dynamic attributes of the Live Activity Widget
-                    let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySizeTypeAsInt: UserDefaults.standard.liveActivitySizeType.rawValue)
-                                        
-                    LiveActivityManager.shared.runActivity(contentState: contentState, forceRestart: forceRestart)
+                    // now that we've got the current BG value, let's refine the check to see if we should run/show the live activity
+                    switch liveActivityType {
+                    case .always:
+                        showLiveActivity = true
+                    case .disabled:
+                        showLiveActivity = false
+                    case .low:
+                        showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.lowMarkValue) ? true : false
+                    case .urgentLow:
+                        showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) ? true : false
+                    case .lowHigh:
+                        showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.lowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.highMarkValue)) ? true : false
+                    case .urgentLowHigh:
+                        showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.urgentHighMarkValue)) ? true : false
+                    }
                     
+                    // if we should still show it, then let's continue processing the lastReading array to create a valid contentState
+                    if showLiveActivity {
+                        
+                        // create the contentState that will update the dynamic attributes of the Live Activity Widget
+                        let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySizeTypeAsInt: UserDefaults.standard.liveActivitySizeType.rawValue)
+                        
+                        LiveActivityManager.shared.runActivity(contentState: contentState, forceRestart: forceRestart)
+                        
+                    }
                 }
             }
             

@@ -15,23 +15,24 @@ class WatchStateModel: NSObject, ObservableObject {
     
     var session: WCSession
     
-    var bgReadingValues: [Double] = [123]
-    var bgReadingDates: [Date] = [Date().addingTimeInterval(-200)]
+    var bgReadingValues: [Double] = []
+    var bgReadingDates: [Date] = []
     
     @Published var isMgDl: Bool = true
-    @Published var slopeOrdinal: Int = 5
-    @Published var deltaChangeInMgDl: Double = 3
+    @Published var slopeOrdinal: Int = 0
+    @Published var deltaChangeInMgDl: Double = 0
     @Published var urgentLowLimitInMgDl: Double = 60
     @Published var lowLimitInMgDl: Double = 80
     @Published var highLimitInMgDl: Double = 170
     @Published var urgentHighLimitInMgDl: Double = 250
     @Published var updatedDate: Date = Date()
     @Published var activeSensorDescription: String = ""
-    @Published var sensorAgeInMinutes: Double = 2880
+    @Published var sensorAgeInMinutes: Double = 0
     @Published var sensorMaxAgeInMinutes: Double = 14400
     @Published var showAppleWatchDebug: Bool = false
     
-    @Published var infoString: String = "Updating..."
+    @Published var lastUpdatedTextString: String = "Updating..."
+    @Published var lastUpdatedTimeString: String = "12:34"
     @Published var debugString: String = "Debug info..."
     @Published var chartHoursIndex: Int = 1
     
@@ -44,45 +45,49 @@ class WatchStateModel: NSObject, ObservableObject {
     }
     
     /// the latest BG reading value in the array
-    func bgValueInMgDl() -> Double {
-        return bgReadingValues[0]
+    func bgValueInMgDl() -> Double? {
+        return bgReadingValues.isEmpty ? nil : bgReadingValues[0]
+    }
+    
+    func bgValueStringInUserChosenUnit() -> String {
+        if let bgReadingDate = bgReadingDate(), let bgValueInMgDl = bgValueInMgDl(), bgReadingDate > Date().addingTimeInterval(-60 * 20) {
+            return bgReadingValues.isEmpty ? "---" : bgValueInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
+        } else {
+            return "---"
+        }
     }
     
     /// the timestamp of the latest BG reading value in the array
-    func bgReadingDate() -> Date {
-        return bgReadingDates[0]
+    func bgReadingDate() -> Date? {
+        return bgReadingDates.isEmpty ? nil : bgReadingDates[0]
     }
     
     func bgUnitString() -> String {
         return isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
     }
     
-    func bgValueStringInUserChosenUnit() -> String {
-        return bgReadingValues[0].mgdlToMmolAndToString(mgdl: isMgDl)
-    }
-    
     /// Blood glucose color dependant on the user defined limit values and also on if it is a recent value
     /// - Returns: a Color object either red, yellow or green
-    func getBgTextColor() -> Color {
-        if bgReadingDate() > Date().addingTimeInterval(-60 * 7) {
-            if bgValueInMgDl() >= urgentHighLimitInMgDl || bgValueInMgDl() <= urgentLowLimitInMgDl {
+    func bgTextColor() -> Color {
+        if let bgReadingDate = bgReadingDate(), let bgValueInMgDl = bgValueInMgDl(), bgReadingDate > Date().addingTimeInterval(-60 * 7) {
+            if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
                 return Color(.red)
-            } else if bgValueInMgDl() >= highLimitInMgDl || bgValueInMgDl() <= lowLimitInMgDl {
+            } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
                 return Color(.yellow)
             } else {
                 return Color(.green)
             }
         } else {
-            return Color.gray
+            return Color(.gray)
         }
     }
     
     /// Color dependant on how long ago the last BG reading was
     /// - Returns: a Color either normal or gray
-    func getInfoTextColor() -> Color {
-        if bgReadingDate() > Date().addingTimeInterval(-60 * 7) {
-            return Color(.lightGray)
-        } else if bgReadingDate() > Date().addingTimeInterval(-60 * 12) {
+    func lastUpdatedTimeColor() -> Color {
+        if let bgReadingDate = bgReadingDate(), bgReadingDate > Date().addingTimeInterval(-60 * 7) {
+            return Color(.gray)
+        } else if let bgReadingDate = bgReadingDate(), bgReadingDate > Date().addingTimeInterval(-60 * 12) {
             return Color(.yellow)
         } else {
             return Color(.red)
@@ -138,28 +143,20 @@ class WatchStateModel: NSObject, ObservableObject {
             }
     }
     
-    func activeSensorProgress() -> (progress: Float, progressColor: Color, textColor: Color) {
-        
+    func activeSensorProgress() -> (progress: Float, textColor: Color) {
         let sensorTimeLeftInMinutes = sensorMaxAgeInMinutes - sensorAgeInMinutes
         
         let progress = Float(1 - (sensorTimeLeftInMinutes / sensorMaxAgeInMinutes))
         
         // irrespective of all the above, if the current sensor age is over the max age, then just set everything to the expired colour to make it clear
         if sensorTimeLeftInMinutes < 0 {
-            
-            return (1.0, ConstantsHomeView.sensorProgressExpiredSwiftUI, ConstantsHomeView.sensorProgressExpiredSwiftUI)
-            
+            return (1.0, ConstantsHomeView.sensorProgressExpiredSwiftUI)
         } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewUrgentInMinutes {
-            
-            return (progress, ConstantsHomeView.sensorProgressViewProgressColorUrgentSwiftUI, ConstantsHomeView.sensorProgressViewProgressColorUrgentSwiftUI)
-            
+            return (progress, ConstantsHomeView.sensorProgressViewProgressColorUrgentSwiftUI)
         } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewWarningInMinutes {
-            
-            return (progress, ConstantsHomeView.sensorProgressViewProgressColorWarningSwiftUI, ConstantsHomeView.sensorProgressViewProgressColorWarningSwiftUI)
-            
+            return (progress, ConstantsHomeView.sensorProgressViewProgressColorWarningSwiftUI)
         } else {
-            
-            return (progress, ConstantsHomeView.sensorProgressViewNormalColorSwiftUI, ConstantsHomeView.sensorProgressNormalTextColorSwiftUI)
+            return (progress, ConstantsHomeView.sensorProgressNormalTextColorSwiftUI)
         }
     }
     
@@ -172,7 +169,8 @@ class WatchStateModel: NSObject, ObservableObject {
         
         // change the text, this must be done in the main thread
         DispatchQueue.main.async {
-            self.infoString = "Updating..."
+            self.lastUpdatedTextString = "Waiting for data..."
+            self.lastUpdatedTimeString = ""
         }
         
         print("Requesting watch state update from iOS")
@@ -182,8 +180,8 @@ class WatchStateModel: NSObject, ObservableObject {
     }
     
     private func processState(_ watchState: WatchState) {
-        bgReadingValues = watchState.bgReadingValues ?? [Double]()
-        bgReadingDates = watchState.bgReadingDates ?? [Date]()
+        bgReadingValues = watchState.bgReadingValues 
+        bgReadingDates = watchState.bgReadingDates 
         isMgDl = watchState.isMgDl ?? true
         slopeOrdinal = watchState.slopeOrdinal ?? 5
         deltaChangeInMgDl = watchState.deltaChangeInMgDl ?? 2
@@ -197,9 +195,17 @@ class WatchStateModel: NSObject, ObservableObject {
         sensorMaxAgeInMinutes = watchState.sensorMaxAgeInMinutes ?? 0
         showAppleWatchDebug = watchState.showAppleWatchDebug ?? false
         
-        infoString = "Updated at \(bgReadingDate().formatted(date: .omitted, time: .shortened))"
+        // check if there is any BG data available before updating the strings accordingly
+        if let bgReadingDate = bgReadingDate() {
+            lastUpdatedTextString = "Updated at"
+            lastUpdatedTimeString = bgReadingDate.formatted(date: .omitted, time: .shortened)
+            debugString = "State updated: \(Date().formatted(date: .omitted, time: .shortened))\nBG updated: \(bgReadingDate.formatted(date: .omitted, time: .shortened))\nBG values: \(bgReadingValues.count)"
+        } else {
+            lastUpdatedTextString = "No sensor data"
+            lastUpdatedTimeString = ""
+            debugString = "State updated: \(Date().formatted(date: .omitted, time: .shortened))\nBG updated: ---\nBG values: \(bgReadingValues.count)"
+        }
         
-        debugString = "State updated: \(Date().formatted(date: .omitted, time: .shortened))\nBG updated: \(bgReadingDate().formatted(date: .omitted, time: .shortened))\nBG values: \(bgReadingValues.count)"
     }
 }
 

@@ -1,55 +1,31 @@
 //
-//  DataSourceView.swift
+//  InfoView.swift
 //  xDrip Watch App
 //
-//  Created by Paul Plant on 21/2/24.
+//  Created by Paul Plant on 24/2/24.
 //  Copyright © 2024 Johan Degraeve. All rights reserved.
 //
 
 import Foundation
 import SwiftUI
 
-struct DataSourceView: View {
+struct InfoView: View {
     @EnvironmentObject var watchState: WatchStateModel
     
     var body: some View {
-        VStack(spacing: 0) {
-            if watchState.activeSensorDescription != "" || watchState.sensorAgeInMinutes > 0 {
-                
-                ProgressView(value: Float(watchState.activeSensorProgress().progress))
-                    .tint(ConstantsHomeView.sensorProgressViewNormalColorSwiftUI)
-                    .scaleEffect(x: 1, y: 0.3, anchor: .center)
-                
-                HStack {
-                    Text(watchState.activeSensorDescription)
-                        .font(.system(size: 14)).fontWeight(.semibold)
-                    
-                    Spacer()
-                    
-                    Text(watchState.sensorAgeInMinutes.minutesToDaysAndHours())
-                        .font(.system(size: 14))
-                        .foregroundStyle(watchState.activeSensorProgress().textColor)
-                }
-                .padding([.leading, .trailing], 10)
-            } else {
-                ProgressView(value: 0)
-                    .tint(ConstantsHomeView.sensorProgressViewNormalColorSwiftUI)
-                    .scaleEffect(x: 1, y: 0.3, anchor: .center)
-                
-                HStack {
-                    Text(" ⚠️  " + Texts_HomeView.noDataSourceConnectedWatch)
-                        .font(.system(size: 14)).bold()
-                    
-                    Spacer()
-                }
-                .padding([.leading, .trailing], 10)
-            }
+        HStack(spacing: 2) {
+            Text(watchState.lastUpdatedTextString)
+                .font(.system(size: 14))
+                .foregroundStyle(.gray)
+            
+            Text(watchState.lastUpdatedTimeString)
+                .font(.system(size: 14))
+                .foregroundStyle(watchState.lastUpdatedTimeColor())
         }
     }
 }
 
-struct DataSourceView_Previews: PreviewProvider {
-    
+struct InfoView_Previews: PreviewProvider {
     static func bgDateArray() -> [Date] {
         let endDate = Date()
         let startDate = endDate.addingTimeInterval(-3600 * 12)
@@ -66,7 +42,6 @@ struct DataSourceView_Previews: PreviewProvider {
     }
     
     static func bgValueArray() -> [Double] {
-        
         var bgValueArray:[Double] = Array(repeating: 0, count: 144)
         var currentValue: Double = 120
         var increaseValues: Bool = true
@@ -100,13 +75,13 @@ struct DataSourceView_Previews: PreviewProvider {
         watchState.lowLimitInMgDl = 80
         watchState.highLimitInMgDl = 140
         watchState.urgentHighLimitInMgDl = 180
-        watchState.updatedDate = Date().addingTimeInterval(-400)
+        watchState.updatedDate = Date().addingTimeInterval(-120)
         watchState.activeSensorDescription = "Data Source"
-        watchState.sensorAgeInMinutes = 6788
+        watchState.sensorAgeInMinutes = Double(Int.random(in: 1..<14400))
         watchState.sensorMaxAgeInMinutes = 14400
         
         return Group {
-            DataSourceView()
+            InfoView()
         }.environmentObject(watchState)
     }
 }

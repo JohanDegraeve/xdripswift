@@ -25,7 +25,7 @@ struct XDripWidgetLiveActivity: Widget {
                 HStack(spacing: 20) {
                     VStack {
                         Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
-                            .font(.system(size: 50)).bold()
+                            .font(.system(size: 50)).fontWeight(.semibold)
                             .foregroundStyle(context.state.getBgTextColor())
                             .minimumScaleFactor(0.1)
                             .lineLimit(1)
@@ -65,7 +65,7 @@ struct XDripWidgetLiveActivity: Widget {
                 HStack(alignment: .center) {
                     
                     Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
-                        .font(.largeTitle).bold()
+                        .font(.largeTitle).fontWeight(.semibold)
                         .foregroundStyle(context.state.getBgTextColor())
                         .minimumScaleFactor(0.1)
                         .lineLimit(1)
@@ -106,7 +106,7 @@ struct XDripWidgetLiveActivity: Widget {
                         
                         HStack(alignment: .firstTextBaseline) {
                             Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow()) ")
-                                .font(.title2).bold()
+                                .font(.title2).fontWeight(.semibold)
                                 .foregroundStyle(context.state.getBgTextColor())
                             
                             context.state.deltaChangeFormatted(font: .title3)

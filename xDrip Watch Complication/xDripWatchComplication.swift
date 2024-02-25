@@ -40,7 +40,8 @@ struct SimpleEntry: TimelineEntry {
     let emoji: String
 }
 
-struct xDrip_Watch_ComplicationEntryView : View {
+// main complication view body
+struct xDripWatchComplicationEntryView : View {
     var entry: Provider.Entry
 
     var body: some View {
@@ -57,16 +58,16 @@ struct xDrip_Watch_ComplicationEntryView : View {
 }
 
 @main
-struct xDrip_Watch_Complication: Widget {
-    let kind: String = "xDrip_Watch_Complication"
+struct xDripWatchComplication: Widget {
+    let kind: String = "xDripWatchComplication"
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             if #available(watchOS 10.0, *) {
-                xDrip_Watch_ComplicationEntryView(entry: entry)
+                xDripWatchComplicationEntryView(entry: entry)
                     .containerBackground(.fill.tertiary, for: .widget)
             } else {
-                xDrip_Watch_ComplicationEntryView(entry: entry)
+                xDripWatchComplicationEntryView(entry: entry)
                     .padding()
                     .background()
             }
@@ -76,8 +77,9 @@ struct xDrip_Watch_Complication: Widget {
     }
 }
 
+//@available(watchOS 10.0, *)
 #Preview(as: .accessoryRectangular) {
-    xDrip_Watch_Complication()
+    xDripWatchComplication()
 } timeline: {
     SimpleEntry(date: .now, emoji: "😀")
     SimpleEntry(date: .now, emoji: "🤩")

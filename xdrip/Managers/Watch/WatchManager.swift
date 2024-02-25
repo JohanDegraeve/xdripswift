@@ -13,14 +13,16 @@ public final class WatchManager: NSObject, ObservableObject {
     
     // MARK: - private properties
     
+    /// a watch connectivity session instance
     private let session: WCSession
     
-    /// BgReadingsAccessor instance
+    /// a BgReadingsAccessor instance
     private var bgReadingsAccessor: BgReadingsAccessor
     
-    /// a coreDataManager
+    /// a coreDataManager instance (must be passed from RVC in the initializer)
     private var coreDataManager: CoreDataManager
     
+    /// hold the current watch state model
     private var watchState = WatchState()
     
     // MARK: - intializer
@@ -44,33 +46,34 @@ public final class WatchManager: NSObject, ObservableObject {
     }
 
     private func processWatchState() {
+        // check if the watch is connected and active before doing anything
         guard session.isReachable else { return }
         
         DispatchQueue.main.async {
             
             // get 2 last Readings, with a calculatedValue
-            let lastReading = self.bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 0)
+            //let lastReading = self.bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 0)
             
             // there should be at least one reading
-            guard lastReading.count > 0 else {
-                print("exiting processWatchState(), no recent BG readings returned")
-                return
-            }
-            
-            let slopeOrdinal: Int = lastReading[0].slopeOrdinal() //? "" : lastReading[0].slopeArrow()
-            
-            var deltaChangeInMgDl: Double?
-            
-            // add delta if needed
-            if lastReading.count > 1 {
-                deltaChangeInMgDl = lastReading[0].currentSlope(previousBgReading: lastReading[1]) * lastReading[0].timeStamp.timeIntervalSince(lastReading[1].timeStamp) * 1000;
-            }
+//            guard lastReading.count > 0 else {
+//                print("exiting processWatchState(), no recent BG readings returned")
+//                return
+//            }
             
             // create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
             // this is needed due to the not being able to pass structs that are not codable/hashable
             let hoursOfBgReadingsToSend: Double = 12
             
             let bgReadings = self.bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+            
+            let slopeOrdinal: Int = bgReadings[0].slopeOrdinal() //? "" : lastReading[0].slopeArrow()
+            
+            var deltaChangeInMgDl: Double?
+            
+            // add delta if needed
+            if bgReadings.count > 1 {
+                deltaChangeInMgDl = bgReadings[0].currentSlope(previousBgReading: bgReadings[1]) * bgReadings[0].timeStamp.timeIntervalSince(bgReadings[1].timeStamp) * 1000;
+            }
             
             var bgReadingValues: [Double] = []
             var bgReadingDates: [Date] = []
@@ -95,6 +98,8 @@ public final class WatchManager: NSObject, ObservableObject {
             
             if let sensorStartDate = UserDefaults.standard.activeSensorStartDate {
                 self.watchState.sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: Date()).minute!)
+            } else {
+                self.watchState.sensorAgeInMinutes = 0
             }
             self.watchState.sensorMaxAgeInMinutes = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
             

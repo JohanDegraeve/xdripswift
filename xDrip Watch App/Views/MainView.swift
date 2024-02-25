@@ -24,7 +24,7 @@ struct MainView: View {
     var body: some View {
         VStack {
             HeaderView()
-                .padding([.leading, .trailing], 5) // needed to fit 49mm screens (Ultra 1/2)
+                .padding([.leading, .trailing], 5)
                 .padding([.top], 20)
                 .padding([.bottom], -10)
                 .onTapGesture(count: 2) {
@@ -68,9 +68,7 @@ struct MainView: View {
             
             DataSourceView()
             
-            Text(watchState.infoString)
-                .font(.system(size: 14))
-                .foregroundStyle(watchState.getInfoTextColor())
+            InfoView()
         }
         .padding(.bottom, 20)
         .onReceive(timer) { date in
