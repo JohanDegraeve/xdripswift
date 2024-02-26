@@ -3616,10 +3616,9 @@ final class RootViewController: UIViewController, ObservableObject {
                     if showLiveActivity {
                         
                         // create the contentState that will update the dynamic attributes of the Live Activity Widget
-                        let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySizeTypeAsInt: UserDefaults.standard.liveActivitySizeType.rawValue)
+                        let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, configureForStandByAtNight: UserDefaults.standard.liveActivityConfigureForStandByAtNight, liveActivitySizeType: UserDefaults.standard.liveActivitySizeType)
                         
                         LiveActivityManager.shared.runActivity(contentState: contentState, forceRestart: forceRestart)
-                        
                     }
                 }
             }
@@ -3628,10 +3627,8 @@ final class RootViewController: UIViewController, ObservableObject {
             if !showLiveActivity {
                 LiveActivityManager.shared.endAllActivities()
             }
-            
         }
     }
-    
 }
 
 

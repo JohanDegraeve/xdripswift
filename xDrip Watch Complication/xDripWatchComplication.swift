@@ -11,11 +11,11 @@ import SwiftUI
 
 struct Provider: TimelineProvider {
     func placeholder(in context: Context) -> SimpleEntry {
-        SimpleEntry(date: Date(), emoji: "😀")
+        SimpleEntry(date: Date(), bgValueInMgDl: 123, isMgDl: true, slopeOrdinal: 3, bgValueStringInUserChosenUnit: "234")
     }
 
     func getSnapshot(in context: Context, completion: @escaping (SimpleEntry) -> ()) {
-        let entry = SimpleEntry(date: Date(), emoji: "😀")
+        let entry = SimpleEntry(date: Date(), bgValueInMgDl: 123, isMgDl: true, slopeOrdinal: 3, bgValueStringInUserChosenUnit: "234")
         completion(entry)
     }
 
@@ -26,7 +26,7 @@ struct Provider: TimelineProvider {
         let currentDate = Date()
         for hourOffset in 0 ..< 5 {
             let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
-            let entry = SimpleEntry(date: entryDate, emoji: "😀")
+            let entry = SimpleEntry(date: entryDate, bgValueInMgDl: 123, isMgDl: true, slopeOrdinal: 3, bgValueStringInUserChosenUnit: "234")
             entries.append(entry)
         }
 
@@ -36,8 +36,35 @@ struct Provider: TimelineProvider {
 }
 
 struct SimpleEntry: TimelineEntry {
-    let date: Date
-    let emoji: String
+    var date: Date
+    
+    let bgValueInMgDl: Double
+    let isMgDl: Bool
+    let slopeOrdinal: Int
+    let bgValueStringInUserChosenUnit: String
+    
+    ///  returns a string holding the trend arrow
+    /// - Returns: trend arrow string (i.e.  "↑")
+    func trendArrow() -> String {
+        switch slopeOrdinal {
+        case 7:
+            return "\u{2193}\u{2193}" // ↓↓
+        case 6:
+            return "\u{2193}" // ↓
+        case 5:
+            return "\u{2198}" // ↘
+        case 4:
+            return "\u{2192}" // →
+        case 3:
+            return "\u{2197}" // ↗
+        case 2:
+            return "\u{2191}" // ↑
+        case 1:
+            return "\u{2191}\u{2191}" // ↑↑
+        default:
+            return ""
+        }
+    }
 }
 
 // main complication view body
@@ -47,12 +74,9 @@ struct xDripWatchComplicationEntryView : View {
     var body: some View {
         VStack {
             HStack {
-                Text("Time:")
-                Text(entry.date, style: .time)
+                Text(entry.bgValueStringInUserChosenUnit)
+                Text(entry.trendArrow())
             }
-
-            Text("Emoji:")
-            Text(entry.emoji)
         }
     }
 }
@@ -72,15 +96,20 @@ struct xDripWatchComplication: Widget {
                     .background()
             }
         }
-        .configurationDisplayName("My Widget")
+        .configurationDisplayName(ConstantsHomeView.applicationName)
         .description("This is an example widget.")
+
     }
+    
+    
+    
+    
+    
 }
 
 //@available(watchOS 10.0, *)
 #Preview(as: .accessoryRectangular) {
     xDripWatchComplication()
 } timeline: {
-    SimpleEntry(date: .now, emoji: "😀")
-    SimpleEntry(date: .now, emoji: "🤩")
+    SimpleEntry(date: Date(), bgValueInMgDl: 123, isMgDl: true, slopeOrdinal: 3, bgValueStringInUserChosenUnit: "234")
 }

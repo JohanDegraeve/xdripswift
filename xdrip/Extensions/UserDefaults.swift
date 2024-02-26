@@ -75,6 +75,8 @@ extension UserDefaults {
         case liveActivityType = "liveActivityType"
         /// which size should the live activities be shown?
         case liveActivitySizeType = "liveActivitySizeType"
+        /// should the live activity be automatically configured for stand-by mode at night?
+        case liveActivityConfigureForStandByAtNight = "liveActivityConfigureForStandByAtNight"
         
         // Home Screen and main chart settings
         
@@ -647,6 +649,19 @@ extension UserDefaults {
         }
         set {
             set(newValue.rawValue, forKey: Key.liveActivitySizeType.rawValue)
+        }
+    }
+    
+    /// should the live activity be configured for the best stand-by mode during night hours?
+    /// if true (and if the live activity is started/updated after 22hrs and before 08hrs), the big chart view with a clock will be shown
+    /// if false (and if the live activity is started/updated before 22hrs or after 08hrs) then just show the normal live activity type the user has selected
+    @objc dynamic var liveActivityConfigureForStandByAtNight: Bool {
+        // default value for bool in userdefaults is false, as default we want this to be disabled
+        get {
+            return !bool(forKey: Key.liveActivityConfigureForStandByAtNight.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.liveActivityConfigureForStandByAtNight.rawValue)
         }
     }
     

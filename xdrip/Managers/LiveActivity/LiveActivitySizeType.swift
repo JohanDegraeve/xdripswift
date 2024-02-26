@@ -9,7 +9,7 @@
 import Foundation
 
 /// holds and returns the different parameters used for creating the images for different widget types
-public enum LiveActivitySizeType: Int, CaseIterable {
+public enum LiveActivitySizeType: Int, CaseIterable, Codable {
     
     // when adding LiveActivitySizeType, add new cases at the end (ie 3, ...)
     // if this is done in the middle then a database migration would be required, because the rawvalue is stored as Int16 in the coredata

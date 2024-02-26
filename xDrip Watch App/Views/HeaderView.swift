@@ -25,7 +25,7 @@ struct HeaderView: View {
             
             VStack(alignment: .trailing, spacing: 0) {
                 Spacer()
-                Text(watchState.getDeltaChangeStringInUserChosenUnit())
+                Text(watchState.deltaChangeStringInUserChosenUnit())
                     .font(.system(size: 28)).fontWeight(.semibold)
                     .lineLimit(1)
                     .padding(.bottom, -7)

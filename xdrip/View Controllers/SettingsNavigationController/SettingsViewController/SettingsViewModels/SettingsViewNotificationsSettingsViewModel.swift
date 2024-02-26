@@ -17,11 +17,14 @@ fileprivate enum Setting:Int, CaseIterable {
     /// live activity size
     case liveActivitySizeType = 3
     
+    /// live activity will be automatically configured for night/stand-by use?
+    case liveActivityConfigureForStandByAtNight = 4
+    
     /// show reading in app badge
-    case showReadingInAppBadge = 4
+    case showReadingInAppBadge = 5
     
     /// if reading is shown in app badge, should value be multiplied with 10 yes or no
-    case multipleAppBadgeValueWith10 = 5
+    case multipleAppBadgeValueWith10 = 6
     
 }
 
@@ -53,7 +56,7 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
+        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .liveActivityConfigureForStandByAtNight:
             return .nothing
             
         case .notificationInterval:
@@ -205,6 +208,9 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
         case .liveActivitySizeType:
             return Texts_SettingsView.labelLiveActivitySizeType
             
+        case .liveActivityConfigureForStandByAtNight:
+            return Texts_SettingsView.liveActivityConfigureForStandByAtNight
+            
         case .showReadingInAppBadge:
             return Texts_SettingsView.labelShowReadingInAppBadge
             
@@ -219,7 +225,7 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
+        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .liveActivityConfigureForStandByAtNight:
             return .none
             
         case .notificationInterval:
@@ -259,6 +265,13 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
             } else {
                 return "iOS 16.2 needed"
             }
+            
+        case .liveActivityConfigureForStandByAtNight:
+            if #available(iOS 16.2, *) {
+                return 1==1 || UserDefaults.standard.isMaster ? nil : Texts_SettingsView.liveActivityDisabledInFollowerMode
+            } else {
+                return "iOS 16.2 needed"
+            }
         }
     }
     
@@ -267,24 +280,20 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-            
         case .showReadingInNotification:
-            
             return UISwitch(isOn: UserDefaults.standard.showReadingInNotification, action: {(isOn:Bool) in UserDefaults.standard.showReadingInNotification = isOn})
             
         case .showReadingInAppBadge:
-
             return UISwitch(isOn: UserDefaults.standard.showReadingInAppBadge, action: {(isOn:Bool) in UserDefaults.standard.showReadingInAppBadge = isOn})
 
         case .multipleAppBadgeValueWith10:
-
             return UISwitch(isOn: UserDefaults.standard.multipleAppBadgeValueWith10, action: {(isOn:Bool) in UserDefaults.standard.multipleAppBadgeValueWith10 = isOn})
 
         case .notificationInterval, .liveActivityType, .liveActivitySizeType:
             return nil
             
+        case .liveActivityConfigureForStandByAtNight:
+            return UISwitch(isOn: UserDefaults.standard.liveActivityConfigureForStandByAtNight, action: {(isOn:Bool) in UserDefaults.standard.liveActivityConfigureForStandByAtNight = isOn})
         }
-
     }
-    
 }

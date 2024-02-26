@@ -97,29 +97,33 @@ class WatchStateModel: NSObject, ObservableObject {
     ///  returns a string holding the trend arrow
     /// - Returns: trend arrow string (i.e.  "↑")
     func trendArrow() -> String {
-        switch slopeOrdinal {
-        case 7:
-            return "\u{2193}\u{2193}" // ↓↓
-        case 6:
-            return "\u{2193}" // ↓
-        case 5:
-            return "\u{2198}" // ↘
-        case 4:
-            return "\u{2192}" // →
-        case 3:
-            return "\u{2197}" // ↗
-        case 2:
-            return "\u{2191}" // ↑
-        case 1:
-            return "\u{2191}\u{2191}" // ↑↑
-        default:
+        if let bgReadingDate = bgReadingDate(), let bgValueInMgDl = bgValueInMgDl(), bgReadingDate > Date().addingTimeInterval(-60 * 20) {
+            switch slopeOrdinal {
+            case 7:
+                return "\u{2193}\u{2193}" // ↓↓
+            case 6:
+                return "\u{2193}" // ↓
+            case 5:
+                return "\u{2198}" // ↘
+            case 4:
+                return "\u{2192}" // →
+            case 3:
+                return "\u{2197}" // ↗
+            case 2:
+                return "\u{2191}" // ↑
+            case 1:
+                return "\u{2191}\u{2191}" // ↑↑
+            default:
+                return ""
+            }
+        } else {
             return ""
         }
     }
     
     /// convert the optional delta change int (in mg/dL) to a formatted change value in the user chosen unit making sure all zero values are shown as a positive change to follow Nightscout convention
     /// - Returns: a string holding the formatted delta change value (i.e. +0.4 or -6)
-    func getDeltaChangeStringInUserChosenUnit() -> String {
+    func deltaChangeStringInUserChosenUnit() -> String {
             
             let valueAsString = deltaChangeInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
             

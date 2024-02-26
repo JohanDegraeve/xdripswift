@@ -26,7 +26,8 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var urgentHighLimitInMgDl: Double
         var eventStartDate: Date = Date()
         var warnUserToOpenApp: Bool = true
-        var liveActivitySizeTypeAsInt: Int
+        var configureForStandByAtNight: Bool = false
+        var liveActivitySizeType: LiveActivitySizeType
         
         // computed properties
         var bgValueInMgDl: Double
@@ -34,7 +35,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var bgUnitString: String
         var bgValueStringInUserChosenUnit: String
         
-        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySizeTypeAsInt: Int) {
+        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, configureForStandByAtNight: Bool, liveActivitySizeType: LiveActivitySizeType) {
             
             // these are the "passed in" stateful values used to initialize
             self.bgReadingValues = bgReadingValues
@@ -46,18 +47,22 @@ struct XDripWidgetAttributes: ActivityAttributes {
             self.lowLimitInMgDl = lowLimitInMgDl
             self.highLimitInMgDl = highLimitInMgDl
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl
-            self.liveActivitySizeTypeAsInt = liveActivitySizeTypeAsInt
+                            
+            let hour = Calendar.current.component(.hour, from: Date())
+            self.configureForStandByAtNight = (configureForStandByAtNight && (hour >= ConstantsLiveActivity.configureForStandByAtNightFromHour || hour < ConstantsLiveActivity.configureForStandByAtNightToHour)) ? true : false
             
-            // these are dynamically initialized based on the above
+            self.liveActivitySizeType = self.configureForStandByAtNight ? .large : liveActivitySizeType
+            
+            // the last bg reading (used for other functions)
             self.bgValueInMgDl = bgReadingValues[0]
             self.bgReadingDate = bgReadingDates[0]
             self.bgUnitString = isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
             self.bgValueStringInUserChosenUnit = bgReadingValues[0].mgdlToMmolAndToString(mgdl: isMgDl)
         }
         
-        /// Blood glucose color dependant on the user defined limit values
+        /// Blood glucose color dependant on the user defined limit values and based upon the time since the last reading
         /// - Returns: a Color object either red, yellow or green
-        func getBgTextColor() -> Color {
+        func bgTextColor() -> Color {
             if bgReadingDate > Date().addingTimeInterval(-60 * 7) {
                 if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
                     return Color(.red)
@@ -73,29 +78,17 @@ struct XDripWidgetAttributes: ActivityAttributes {
         
         /// convert the optional delta change int (in mg/dL) to a formatted change value in the user chosen unit making sure all zero values are shown as a positive change to follow Nightscout convention
         /// - Returns: a string holding the formatted delta change value (i.e. +0.4 or -6)
-        func getDeltaChangeStringInUserChosenUnit() -> String {
-            
+        func deltaChangeStringInUserChosenUnit() -> String {
             if let deltaChangeInMgDl = deltaChangeInMgDl {
-                
+                let deltaSign: String = deltaChangeInMgDl > 0 ? "+" : ""
                 let valueAsString = deltaChangeInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
-                
-                var deltaSign: String = ""
-                if (deltaChangeInMgDl > 0) { deltaSign = "+"; }
                 
                 // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
                 // show unitized zero deltas as +0 or +0.0 as per Nightscout format
                 if (isMgDl) {
-                    if (deltaChangeInMgDl > -1) && (deltaChangeInMgDl < 1) {
-                        return "+0"
-                    } else {
-                        return deltaSign + valueAsString
-                    }
+                    return (deltaChangeInMgDl > -1 && deltaChangeInMgDl < 1) ?  "+0" : (deltaSign + valueAsString)
                 } else {
-                    if (deltaChangeInMgDl > -0.1) && (deltaChangeInMgDl < 0.1) {
-                        return "+0.0"
-                    } else {
-                        return deltaSign + valueAsString
-                    }
+                    return (deltaChangeInMgDl > -0.1 && deltaChangeInMgDl < 0.1) ? "+0.0" : (deltaSign + valueAsString)
                 }
             } else {
                 return ""
@@ -124,42 +117,18 @@ struct XDripWidgetAttributes: ActivityAttributes {
                 return ""
             }
         }
-        
-        func deltaChangeFormatted(font: Font) -> some View {
-            HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Text(getDeltaChangeStringInUserChosenUnit())
-                    .font(font).bold()
-                    .foregroundStyle(Color(white: 0.9))
-                    .minimumScaleFactor(0.2)
-                    .lineLimit(1)
-                
-                Text(bgUnitString)
-                    .font(font)
-                    .foregroundStyle(Color(white: 0.5))
-                    .minimumScaleFactor(0.2)
-                    .lineLimit(1)
-            }
-        }
-        
-        func getEventEndTime(textString: String) -> Text {
-//            if eventStartDate != nil {
-                return Text(textString + eventStartDate.formatted(date: .omitted, time: .shortened))
-//            } else {
-//                return ""
-//            }
-        }
             
-        func placeTextAtBottomOfWidget(glucoseChartType: GlucoseChartType) -> Bool {
+        func shouldPlaceTextAtBottomOfWidget(glucoseChartType: GlucoseChartType) -> Bool {
             
-            // first see at which index in bgReadingDates the BG value is after one hour
+            // check at which index in bgReadingDates the BG value is one hour after the first reading used by the chart type
             var firstIndexForWidgetType = 0
-            var index = 0
+            var index = bgReadingDates.endIndex - 1
             
             for _ in bgReadingValues {
-                if bgReadingDates[index] > Date().addingTimeInterval((-glucoseChartType.hoursToShow(liveActivitySizeType: LiveActivitySizeType(rawValue: liveActivitySizeTypeAsInt) ?? .normal) * 60 * 60) + 3600) {
+                if bgReadingDates[index] > Date().addingTimeInterval((-glucoseChartType.hoursToShow(liveActivitySizeType: liveActivitySizeType) * 60 * 60) + 3600) {
                     firstIndexForWidgetType = index
                 }
-                index += 1
+                index -= 1
             }
             
             // then get the bg value of that index in the bgValues array

@@ -81,6 +81,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_liveActivityDisabledInFollowerModeMessage", tableName: filename, bundle: Bundle.main, value: "\nLive activities can only be used in Master mode.\n\nThey are disabled for Follower mode.", comment: "notification settings, live activities are not available in follower mode")
     }()
     
+    static let liveActivityConfigureForStandByAtNight: String = {
+        return NSLocalizedString("settingsviews_liveActivityConfigureForStandByAtNight", tableName: filename, bundle: Bundle.main, value: "Configure Standby at night", comment: "notification settings, live activities will be configured for standby mode at night")
+    }()
+    
     
     // MARK: - Section Data Source
     

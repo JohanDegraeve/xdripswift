@@ -38,6 +38,9 @@
 		4779BCF42974308F00515714 /* PieCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 4779BCF32974308F00515714 /* PieCharts */; };
 		477B2C7E2B432775002F64A4 /* LiveActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477B2C7D2B432775002F64A4 /* LiveActivityType.swift */; };
 		477F45E6285B993200AC8475 /* GlucoseMiniChartManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477F45E5285B993100AC8475 /* GlucoseMiniChartManager.swift */; };
+		478A923E2B8B64DE0084C394 /* ConstantsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */; };
+		478A92402B8BC6970084C394 /* xDripWatchComplicationViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 478A923F2B8BC6970084C394 /* xDripWatchComplicationViews.swift */; };
+		478A92422B8CCF8F0084C394 /* ConstantsLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7313F2B83DC0200B0A450 /* ConstantsLiveActivity.swift */; };
 		479359862B88B95A007D3CEE /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4716A4EE2B406C3D00419052 /* WidgetKit.framework */; };
 		479359872B88B95A007D3CEE /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4716A4F02B406C3D00419052 /* SwiftUI.framework */; };
 		4793598A2B88B95A007D3CEE /* xDripWatchComplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479359892B88B95A007D3CEE /* xDripWatchComplication.swift */; };
@@ -790,6 +793,7 @@
 		476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsFollower.swift; sourceTree = "<group>"; };
 		477B2C7D2B432775002F64A4 /* LiveActivityType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityType.swift; sourceTree = "<group>"; };
 		477F45E5285B993100AC8475 /* GlucoseMiniChartManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseMiniChartManager.swift; sourceTree = "<group>"; };
+		478A923F2B8BC6970084C394 /* xDripWatchComplicationViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xDripWatchComplicationViews.swift; sourceTree = "<group>"; };
 		479359852B88B95A007D3CEE /* xDrip Watch Complication Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "xDrip Watch Complication Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		479359892B88B95A007D3CEE /* xDripWatchComplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xDripWatchComplication.swift; sourceTree = "<group>"; };
 		4793598B2B88B95B007D3CEE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -1742,8 +1746,8 @@
 			isa = PBXGroup;
 			children = (
 				4716A5132B41CAD000419052 /* LiveActivityManager.swift */,
-				477B2C7D2B432775002F64A4 /* LiveActivityType.swift */,
 				47D08D5D2B54390B00B0BEA7 /* LiveActivitySizeType.swift */,
+				477B2C7D2B432775002F64A4 /* LiveActivityType.swift */,
 			);
 			path = LiveActivity;
 			sourceTree = "<group>";
@@ -1762,6 +1766,7 @@
 			children = (
 				4793598D2B88B95B007D3CEE /* Info.plist */,
 				479359892B88B95A007D3CEE /* xDripWatchComplication.swift */,
+				478A923F2B8BC6970084C394 /* xDripWatchComplicationViews.swift */,
 				4793598B2B88B95B007D3CEE /* Assets.xcassets */,
 			);
 			path = "xDrip Watch Complication";
@@ -3774,6 +3779,7 @@
 				47A6AC412B7D42EC0047A4BA /* TextsCommon.swift in Sources */,
 				47A6AC322B7D3E250047A4BA /* ConstantsUI.swift in Sources */,
 				47A6AC362B7D3E640047A4BA /* GlucoseChartType.swift in Sources */,
+				478A92422B8CCF8F0084C394 /* ConstantsLiveActivity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3782,6 +3788,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				4793598A2B88B95A007D3CEE /* xDripWatchComplication.swift in Sources */,
+				478A92402B8BC6970084C394 /* xDripWatchComplicationViews.swift in Sources */,
+				478A923E2B8B64DE0084C394 /* ConstantsHomeView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4977,7 +4985,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.92C77A2942.xdripswift;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5015,7 +5023,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.92C77A2942.xdripswift;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
