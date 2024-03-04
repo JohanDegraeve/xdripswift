@@ -1512,8 +1512,6 @@ final class RootViewController: UIViewController, ObservableObject {
                 watchManager?.updateWatchApp()
                 
                 updateLiveActivityAndWidgets(forceRestart: false)
-                
-                WidgetCenter.shared.reloadAllTimelines()
             }
             
         }
@@ -3161,45 +3159,20 @@ final class RootViewController: UIViewController, ObservableObject {
             dataSourceSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressNormalTextColor
             dataSourceSensorMaxAgeOutlet.textColor = ConstantsHomeView.sensorProgressNormalTextColor
             
-            // irrespective of all the above, if the current sensor age is over the max age, then just set everything to the expired colour to make it clear
+            // irrespective of all the above, if the current sensor age is over, or close to, the max age, then set the text color
             if sensorTimeLeftInMinutes < 0 {
                 
-                sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressExpired
                 dataSourceSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressExpired
-                dataSourceSensorMaxAgeOutlet.textColor = ConstantsHomeView.sensorProgressExpired
-                
-                // change the progress colour back to normal after a second or two
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    UIView.transition(with: self.sensorProgressOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
-                        self.sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColor
-                    })
-                }
                 
             } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewUrgentInMinutes {
                 
                 // sensor is very close to ending
                 dataSourceSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressViewProgressColorUrgent
-                sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColorUrgent
-                
-                // change the progress colour back to normal after a second or two
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    UIView.transition(with: self.sensorProgressOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
-                        self.sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColor
-                    })
-                }
                 
             } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewWarningInMinutes {
                 
                 // sensor will soon be close to ending
                 dataSourceSensorCurrentAgeOutlet.textColor = ConstantsHomeView.sensorProgressViewProgressColorWarning
-                sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColorWarning
-                
-                // change the progress colour back to normal after a second or two
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                    UIView.transition(with: self.sensorProgressOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
-                        self.sensorProgressOutlet.progressTintColor = ConstantsHomeView.sensorProgressViewProgressColor
-                    })
-                }
                 
             }
             
@@ -3215,9 +3188,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // let's run the progress update in an async thread with a really small delay so that the animation updates smoothly after the view has appeared
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                
                 self.sensorProgressOutlet.setProgress(Float(1 - (sensorTimeLeftInMinutes / sensorMaxAgeInMinutes)), animated: animate)
-                
             }
             
         } else {
@@ -3637,6 +3608,8 @@ final class RootViewController: UIViewController, ObservableObject {
                         if let widgetData = try? JSONEncoder().encode(widgetSharedUserDefaultsModel) {
                             UserDefaults.storeInSharedUserDefaults(value: widgetData, forKey: "widgetSharedUserDefaults")
                         }
+                        
+                        WidgetCenter.shared.reloadAllTimelines()
                     }
                 }
             }
