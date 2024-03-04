@@ -11,9 +11,15 @@ import Foundation
 import SwiftUI
 import WatchConnectivity
 
+/// holds, the watch state and allows updates and computed properties/variables to be generated for the view
+/// also used to update the ComplicationSharedUserDefaultsModel in the app group so that the complication can access the data
 class WatchStateModel: NSObject, ObservableObject {
     
-    var session: WCSession
+    /// shared UserDefaults to publish data
+    private let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName)
+    
+    /// the Watch Connectivity session
+    private var session: WCSession
     
     var bgReadingValues: [Double] = []
     var bgReadingDates: [Date] = []
@@ -44,11 +50,14 @@ class WatchStateModel: NSObject, ObservableObject {
         session.activate()
     }
     
-    /// the latest BG reading value in the array
+    /// the latest BG reading value in the array as a double
+    /// - Returns: an optional double with the bg value in mg/dL if it exists
     func bgValueInMgDl() -> Double? {
         return bgReadingValues.isEmpty ? nil : bgReadingValues[0]
     }
     
+    /// return the latest BG value in the user's chosen unit as a string
+    /// - Returns: a string with bgValueInMgDl() converted into the user unit
     func bgValueStringInUserChosenUnit() -> String {
         if let bgReadingDate = bgReadingDate(), let bgValueInMgDl = bgValueInMgDl(), bgReadingDate > Date().addingTimeInterval(-60 * 20) {
             return bgReadingValues.isEmpty ? "---" : bgValueInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
@@ -58,10 +67,13 @@ class WatchStateModel: NSObject, ObservableObject {
     }
     
     /// the timestamp of the latest BG reading value in the array
+    /// - Returns: an optional date
     func bgReadingDate() -> Date? {
         return bgReadingDates.isEmpty ? nil : bgReadingDates[0]
     }
     
+    /// returns the localized string of mg/dL or mmol/L
+    /// - Returns: string representation of mg/dL or mmol/L
     func bgUnitString() -> String {
         return isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
     }
@@ -83,7 +95,7 @@ class WatchStateModel: NSObject, ObservableObject {
     }
     
     /// Color dependant on how long ago the last BG reading was
-    /// - Returns: a Color either normal or gray
+    /// - Returns: a Color either normal (gray) or yellow/red if the reading was several minutes ago and hasn't been updated
     func lastUpdatedTimeColor() -> Color {
         if let bgReadingDate = bgReadingDate(), bgReadingDate > Date().addingTimeInterval(-60 * 7) {
             return Color(.gray)
@@ -97,7 +109,7 @@ class WatchStateModel: NSObject, ObservableObject {
     ///  returns a string holding the trend arrow
     /// - Returns: trend arrow string (i.e.  "↑")
     func trendArrow() -> String {
-        if let bgReadingDate = bgReadingDate(), let bgValueInMgDl = bgValueInMgDl(), bgReadingDate > Date().addingTimeInterval(-60 * 20) {
+        if let bgReadingDate = bgReadingDate(), bgReadingDate > Date().addingTimeInterval(-60 * 20) {
             switch slopeOrdinal {
             case 7:
                 return "\u{2193}\u{2193}" // ↓↓
@@ -147,6 +159,8 @@ class WatchStateModel: NSObject, ObservableObject {
             }
     }
     
+    /// function to calculate the sensor progress value and return a text color to be used by the view
+    /// - Returns: progress: the % progress between 0 and 1, textColor: 
     func activeSensorProgress() -> (progress: Float, textColor: Color) {
         let sensorTimeLeftInMinutes = sensorMaxAgeInMinutes - sensorAgeInMinutes
         
@@ -184,8 +198,8 @@ class WatchStateModel: NSObject, ObservableObject {
     }
     
     private func processState(_ watchState: WatchState) {
-        bgReadingValues = watchState.bgReadingValues 
-        bgReadingDates = watchState.bgReadingDates 
+        bgReadingValues = watchState.bgReadingValues
+        bgReadingDates = watchState.bgReadingDates
         isMgDl = watchState.isMgDl ?? true
         slopeOrdinal = watchState.slopeOrdinal ?? 5
         deltaChangeInMgDl = watchState.deltaChangeInMgDl ?? 2
@@ -210,6 +224,23 @@ class WatchStateModel: NSObject, ObservableObject {
             debugString = "State updated: \(Date().formatted(date: .omitted, time: .shortened))\nBG updated: ---\nBG values: \(bgReadingValues.count)"
         }
         
+        // now process the shared user defaults to get data for the WidgetKit complications
+        updateWatchSharedUserDefaults()
+    }
+    
+    private func updateWatchSharedUserDefaults() {
+        guard let sharedUserDefaults = sharedUserDefaults else { return }
+                
+        let bgReadingDatesAsDouble = bgReadingDates.map { date in
+            date.timeIntervalSince1970
+        }
+        
+        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl,
+            urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl)
+        
+        if let stateData = try? JSONEncoder().encode(complicationSharedUserDefaultsModel) {
+            sharedUserDefaults.set(stateData, forKey: "complicationSharedUserDefaults")
+        }
     }
 }
 
@@ -236,4 +267,3 @@ extension WatchStateModel: WCSessionDelegate {
         }
     }
 }
-

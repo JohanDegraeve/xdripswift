@@ -22,11 +22,11 @@ struct GlucoseChartView: View {
     let lowLimitInMgDl: Double
     let highLimitInMgDl: Double
     let urgentHighLimitInMgDl: Double
-    let liveActivitySizeType: LiveActivitySizeType
+    let liveActivitySize: LiveActivitySize
     let hoursToShow: Double
     let glucoseCircleDiameter: Double
     
-    init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySizeType: LiveActivitySizeType?, overrideHoursToShow: Double?, glucoseCircleDiameterScalingHours: Double?) {
+    init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double]?, bgReadingDates: [Date]?, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySize: LiveActivitySize?, hoursToShowScalingHours: Double?, glucoseCircleDiameterScalingHours: Double?) {
         
         self.glucoseChartType = glucoseChartType
         self.isMgDl = isMgDl
@@ -34,27 +34,28 @@ struct GlucoseChartView: View {
         self.lowLimitInMgDl = lowLimitInMgDl
         self.highLimitInMgDl = highLimitInMgDl
         self.urgentHighLimitInMgDl = urgentHighLimitInMgDl
-        self.liveActivitySizeType = liveActivitySizeType ?? .normal
+        self.liveActivitySize = liveActivitySize ?? .normal
         
-        // here we want to automatically set the hoursToShow based upon the chart type, but some instances might need
-        // this to be overriden such as for zooming in/out of the chart
-        self.hoursToShow = overrideHoursToShow ?? glucoseChartType.hoursToShow(liveActivitySizeType: self.liveActivitySizeType)
+        // here we want to automatically set the hoursToShow based upon the chart type, but some chart instances might need
+        // this to be overriden such as for zooming in/out of the chart (i.e. the Watch App)
+        self.hoursToShow = hoursToShowScalingHours ?? glucoseChartType.hoursToShow(liveActivitySize: self.liveActivitySize)
         
         // apply a scale to the glucoseCircleDiameter if an override value is passed
-        self.glucoseCircleDiameter = glucoseChartType.glucoseCircleDiameter * ((glucoseCircleDiameterScalingHours ?? self.hoursToShow) / self.hoursToShow)
+        self.glucoseCircleDiameter = glucoseChartType.glucoseCircleDiameter(liveActivitySize: self.liveActivitySize) * ((glucoseCircleDiameterScalingHours ?? self.hoursToShow) / self.hoursToShow)
         
         // as all widget instances are passed 12 hours of bg values, we must initialize this instance to use only the amount of hours of value required by the glucoseChartType passed
         self.bgReadingValues = []
         self.bgReadingDates = []
         
-        var index = 0
-        
-        for _ in bgReadingValues {
-            if bgReadingDates[index] > Date().addingTimeInterval(-hoursToShow * 60 * 60) {
-                self.bgReadingValues.append(bgReadingValues[index])
-                self.bgReadingDates.append(bgReadingDates[index])
+        if let bgReadingValues = bgReadingValues, let bgReadingDates = bgReadingDates {
+            var index = 0
+            for _ in bgReadingValues {
+                if bgReadingDates[index] > Date().addingTimeInterval(-hoursToShow * 60 * 60) {
+                    self.bgReadingValues.append(bgReadingValues[index])
+                    self.bgReadingDates.append(bgReadingDates[index])
+                }
+                index += 1
             }
-            index += 1
         }
     }
     
@@ -84,7 +85,7 @@ struct GlucoseChartView: View {
         let mappingArray = Array(1...amountOfFullHours)
         
         /// set the stride count interval to make sure we don't add too many labels to the x-axis if the user wants to view >6 hours
-        let intervalBetweenAxisValues: Int = glucoseChartType.intervalBetweenAxisValues(liveActivitySizeType: liveActivitySizeType)
+        let intervalBetweenAxisValues: Int = glucoseChartType.intervalBetweenAxisValues(liveActivitySize: liveActivitySize)
         
         /// first, for each int in mappingArray, we create a Date, starting with the lower hour + 1 hour - we will create 5 in this example, starting with hour 08 (7 + 3600 seconds)
         let startDateLower = Date(timeIntervalSinceReferenceDate:
@@ -180,6 +181,6 @@ struct GlucoseChartView: View {
         }
         .chartYAxis(.hidden)
         .chartYScale(domain: domain)
-        .frame(width: glucoseChartType.viewSize(liveActivitySizeType: liveActivitySizeType).width, height: glucoseChartType.viewSize(liveActivitySizeType: liveActivitySizeType).height)
+        .frame(width: glucoseChartType.viewSize(liveActivitySize: liveActivitySize).width, height: glucoseChartType.viewSize(liveActivitySize: liveActivitySize).height)
     }
 }

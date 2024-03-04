@@ -26,50 +26,55 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var urgentHighLimitInMgDl: Double
         var eventStartDate: Date = Date()
         var warnUserToOpenApp: Bool = true
-        var configureForStandByAtNight: Bool = false
-        var liveActivitySizeType: LiveActivitySizeType
+        var showClockAtNight: Bool = false
+        var liveActivitySize: LiveActivitySize
         
         // computed properties
-        var bgValueInMgDl: Double
-        var bgReadingDate: Date
         var bgUnitString: String
+        var bgValueInMgDl: Double?
+        var bgReadingDate: Date?
         var bgValueStringInUserChosenUnit: String
         
-        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, configureForStandByAtNight: Bool, liveActivitySizeType: LiveActivitySizeType) {
+        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, showClockAtNight: Bool, liveActivitySize: LiveActivitySize) {
             
             // these are the "passed in" stateful values used to initialize
             self.bgReadingValues = bgReadingValues
             self.bgReadingDates = bgReadingDates
             self.isMgDl = isMgDl
             self.slopeOrdinal = slopeOrdinal
-            self.deltaChangeInMgDl = deltaChangeInMgDl// ?? nil
+            self.deltaChangeInMgDl = deltaChangeInMgDl
             self.urgentLowLimitInMgDl = urgentLowLimitInMgDl
             self.lowLimitInMgDl = lowLimitInMgDl
             self.highLimitInMgDl = highLimitInMgDl
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl
-                            
-            let hour = Calendar.current.component(.hour, from: Date())
-            self.configureForStandByAtNight = (configureForStandByAtNight && (hour >= ConstantsLiveActivity.configureForStandByAtNightFromHour || hour < ConstantsLiveActivity.configureForStandByAtNightToHour)) ? true : false
             
-            self.liveActivitySizeType = self.configureForStandByAtNight ? .large : liveActivitySizeType
+            let hour = Calendar.current.component(.hour, from: Date())
+            self.showClockAtNight = (showClockAtNight && (hour >= ConstantsLiveActivity.showClockAtNightFromHour || hour < ConstantsLiveActivity.showClockAtNightToHour)) ? true : false
+            
+            self.liveActivitySize = self.showClockAtNight ? .large : liveActivitySize
+            
+            self.bgUnitString = isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
             
             // the last bg reading (used for other functions)
             self.bgValueInMgDl = bgReadingValues[0]
             self.bgReadingDate = bgReadingDates[0]
-            self.bgUnitString = isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
             self.bgValueStringInUserChosenUnit = bgReadingValues[0].mgdlToMmolAndToString(mgdl: isMgDl)
         }
         
         /// Blood glucose color dependant on the user defined limit values and based upon the time since the last reading
         /// - Returns: a Color object either red, yellow or green
         func bgTextColor() -> Color {
-            if bgReadingDate > Date().addingTimeInterval(-60 * 7) {
-                if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
-                    return Color(.red)
-                } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
-                    return Color(.yellow)
+            if let bgReadingDate = bgReadingDate, let bgValueInMgDl = bgValueInMgDl {
+                if bgReadingDate > Date().addingTimeInterval(-60 * 7) {
+                    if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
+                        return Color(.red)
+                    } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
+                        return Color(.yellow)
+                    } else {
+                        return Color(.green)
+                    }
                 } else {
-                    return Color(.green)
+                    return Color.gray
                 }
             } else {
                 return Color.gray
@@ -116,25 +121,6 @@ struct XDripWidgetAttributes: ActivityAttributes {
             default:
                 return ""
             }
-        }
-            
-        func shouldPlaceTextAtBottomOfWidget(glucoseChartType: GlucoseChartType) -> Bool {
-            
-            // check at which index in bgReadingDates the BG value is one hour after the first reading used by the chart type
-            var firstIndexForWidgetType = 0
-            var index = bgReadingDates.endIndex - 1
-            
-            for _ in bgReadingValues {
-                if bgReadingDates[index] > Date().addingTimeInterval((-glucoseChartType.hoursToShow(liveActivitySizeType: liveActivitySizeType) * 60 * 60) + 3600) {
-                    firstIndexForWidgetType = index
-                }
-                index -= 1
-            }
-            
-            // then get the bg value of that index in the bgValues array
-            // if it is higher than the user's high limit, then we can assume that the data will be hidden
-            // by the text (bg value, trend + delta), so return true to show the text at the bottom of the view
-            return bgReadingValues[firstIndexForWidgetType] >= highLimitInMgDl ? true : false
         }
     }
 }

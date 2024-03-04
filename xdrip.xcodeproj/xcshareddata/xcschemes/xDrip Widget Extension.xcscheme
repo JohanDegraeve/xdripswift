@@ -15,23 +15,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "479359842B88B95A007D3CEE"
-               BuildableName = "xDrip Watch Complication Extension.appex"
-               BlueprintName = "xDrip Watch Complication Extension"
-               ReferencedContainer = "container:xdrip.xcodeproj">
-            </BuildableReference>
-         </BuildActionEntry>
-         <BuildActionEntry
-            buildForTesting = "YES"
-            buildForRunning = "YES"
-            buildForProfiling = "YES"
-            buildForArchiving = "YES"
-            buildForAnalyzing = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "47A6ABDE2B790CC60047A4BA"
-               BuildableName = "xDrip Watch App.app"
-               BlueprintName = "xDrip Watch App"
+               BlueprintIdentifier = "4716A4EC2B406C3D00419052"
+               BuildableName = "xDrip Widget Extension.appex"
+               BlueprintName = "xDrip Widget Extension"
                ReferencedContainer = "container:xdrip.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -74,21 +60,12 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "479359842B88B95A007D3CEE"
-            BuildableName = "xDrip Watch Complication Extension.appex"
-            BlueprintName = "xDrip Watch Complication Extension"
+            BlueprintIdentifier = "F8AC425921ADEBD60078C348"
+            BuildableName = "xdrip.app"
+            BlueprintName = "xdrip"
             ReferencedContainer = "container:xdrip.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <MacroExpansion>
-         <BuildableReference
-            BuildableIdentifier = "primary"
-            BlueprintIdentifier = "47A6ABDE2B790CC60047A4BA"
-            BuildableName = "xDrip Watch App.app"
-            BlueprintName = "xDrip Watch App"
-            ReferencedContainer = "container:xdrip.xcodeproj">
-         </BuildableReference>
-      </MacroExpansion>
       <EnvironmentVariables>
          <EnvironmentVariable
             key = "_XCWidgetKind"
@@ -112,14 +89,16 @@
       shouldUseLaunchSchemeArgsEnv = "YES"
       savedToolIdentifier = ""
       useCustomWorkingDirectory = "NO"
-      debugDocumentVersioning = "YES">
+      debugDocumentVersioning = "YES"
+      askForAppToLaunch = "Yes"
+      launchAutomaticallySubstyle = "2">
       <BuildableProductRunnable
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "479359842B88B95A007D3CEE"
-            BuildableName = "xDrip Watch Complication Extension.appex"
-            BlueprintName = "xDrip Watch Complication Extension"
+            BlueprintIdentifier = "F8AC425921ADEBD60078C348"
+            BuildableName = "xdrip.app"
+            BlueprintName = "xdrip"
             ReferencedContainer = "container:xdrip.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

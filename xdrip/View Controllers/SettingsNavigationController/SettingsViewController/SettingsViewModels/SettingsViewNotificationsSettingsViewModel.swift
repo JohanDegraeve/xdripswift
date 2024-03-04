@@ -15,10 +15,10 @@ fileprivate enum Setting:Int, CaseIterable {
     case liveActivityType = 2
     
     /// live activity size
-    case liveActivitySizeType = 3
+    case liveActivitySize = 3
     
     /// live activity will be automatically configured for night/stand-by use?
-    case liveActivityConfigureForStandByAtNight = 4
+    case liveActivityShowClockAtNight = 4
     
     /// show reading in app badge
     case showReadingInAppBadge = 5
@@ -56,7 +56,7 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .liveActivityConfigureForStandByAtNight:
+        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .liveActivityShowClockAtNight:
             return .nothing
             
         case .notificationInterval:
@@ -118,7 +118,7 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
                 return .nothing
             }
             
-        case .liveActivitySizeType:
+        case .liveActivitySize:
             
             if #available(iOS 16.2, *) {
                 // live activities can only be used in master mode as follower mode
@@ -132,14 +132,14 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
                     
                     var index = 0
                     
-                    let currentLiveActivitySizeType = UserDefaults.standard.liveActivitySizeType
+                    let currentliveActivitySize = UserDefaults.standard.liveActivitySize
                     
                     // get all data source types and add the description to data. Search for the type that matches the FollowerDataSourceType that is currently stored in userdefaults.
-                    for liveActivitySizeType in LiveActivitySizeType.allCases {
+                    for liveActivitySize in LiveActivitySize.allCasesForList {
                         
-                        data.append(liveActivitySizeType.description)
+                        data.append(liveActivitySize.description)
                         
-                        if liveActivitySizeType == currentLiveActivitySizeType {
+                        if liveActivitySize == currentliveActivitySize {
                             selectedRow = index
                         }
                         
@@ -147,26 +147,25 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
                         
                     }
                     
-                    return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelLiveActivitySizeType, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
+                    return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelliveActivitySize, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
                         
                         // we'll set this here so that we can use it in the else statement for logging
-                        let oldLiveActivitySizeType = UserDefaults.standard.liveActivitySizeType
+                        let oldliveActivitySize = UserDefaults.standard.liveActivitySize
                         
                         if index != selectedRow {
                             
-                            UserDefaults.standard.liveActivitySizeType = LiveActivitySizeType(rawValue: index) ?? .normal
+                            UserDefaults.standard.liveActivitySize = LiveActivitySize(forRowAt: index) ?? .normal
                             
-                            let newLiveActivitySizeType = UserDefaults.standard.liveActivitySizeType
+                            let newliveActivitySize = UserDefaults.standard.liveActivitySize
                             
-                            trace("Live activity notification size was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, oldLiveActivitySizeType.description, newLiveActivitySizeType.description)
-                            
+                            trace("Live activity notification size was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, oldliveActivitySize.description, newliveActivitySize.description)
                         }
                         
                     }, cancelHandler: nil, didSelectRowHandler: nil)
                     
                 } else {
                     
-                    return .showInfoText(title: Texts_SettingsView.labelLiveActivitySizeType, message: Texts_SettingsView.liveActivityDisabledInFollowerModeMessage, actionHandler: {})
+                    return .showInfoText(title: Texts_SettingsView.labelliveActivitySize, message: Texts_SettingsView.liveActivityDisabledInFollowerModeMessage, actionHandler: {})
                     
                 }
             } else {
@@ -205,11 +204,11 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
         case .liveActivityType:
             return Texts_SettingsView.labelLiveActivityType
             
-        case .liveActivitySizeType:
-            return Texts_SettingsView.labelLiveActivitySizeType
+        case .liveActivitySize:
+            return Texts_SettingsView.labelliveActivitySize
             
-        case .liveActivityConfigureForStandByAtNight:
-            return Texts_SettingsView.liveActivityConfigureForStandByAtNight
+        case .liveActivityShowClockAtNight:
+            return Texts_SettingsView.liveActivityShowClockAtNight
             
         case .showReadingInAppBadge:
             return Texts_SettingsView.labelShowReadingInAppBadge
@@ -225,13 +224,13 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .liveActivityConfigureForStandByAtNight:
+        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .liveActivityShowClockAtNight:
             return .none
             
         case .notificationInterval:
             return .disclosureIndicator
             
-        case .liveActivityType, .liveActivitySizeType:
+        case .liveActivityType, .liveActivitySize:
             if #available(iOS 16.2, *) {
                 return 1==1 || UserDefaults.standard.isMaster ? .disclosureIndicator : .none
             } else {
@@ -259,14 +258,14 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
                 return "iOS 16.2 needed"
             }
             
-        case .liveActivitySizeType:
+        case .liveActivitySize:
             if #available(iOS 16.2, *) {
-                return 1==1 || UserDefaults.standard.isMaster ? UserDefaults.standard.liveActivitySizeType.description : Texts_SettingsView.liveActivityDisabledInFollowerMode
+                return 1==1 || UserDefaults.standard.isMaster ? UserDefaults.standard.liveActivitySize.description : Texts_SettingsView.liveActivityDisabledInFollowerMode
             } else {
                 return "iOS 16.2 needed"
             }
             
-        case .liveActivityConfigureForStandByAtNight:
+        case .liveActivityShowClockAtNight:
             if #available(iOS 16.2, *) {
                 return 1==1 || UserDefaults.standard.isMaster ? nil : Texts_SettingsView.liveActivityDisabledInFollowerMode
             } else {
@@ -289,11 +288,11 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
         case .multipleAppBadgeValueWith10:
             return UISwitch(isOn: UserDefaults.standard.multipleAppBadgeValueWith10, action: {(isOn:Bool) in UserDefaults.standard.multipleAppBadgeValueWith10 = isOn})
 
-        case .notificationInterval, .liveActivityType, .liveActivitySizeType:
+        case .notificationInterval, .liveActivityType, .liveActivitySize:
             return nil
             
-        case .liveActivityConfigureForStandByAtNight:
-            return UISwitch(isOn: UserDefaults.standard.liveActivityConfigureForStandByAtNight, action: {(isOn:Bool) in UserDefaults.standard.liveActivityConfigureForStandByAtNight = isOn})
+        case .liveActivityShowClockAtNight:
+            return UISwitch(isOn: UserDefaults.standard.liveActivityShowClockAtNight, action: {(isOn:Bool) in UserDefaults.standard.liveActivityShowClockAtNight = isOn})
         }
     }
 }

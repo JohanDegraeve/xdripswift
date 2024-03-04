@@ -74,9 +74,9 @@ extension UserDefaults {
         /// which type of live activities should be shown?
         case liveActivityType = "liveActivityType"
         /// which size should the live activities be shown?
-        case liveActivitySizeType = "liveActivitySizeType"
+        case liveActivitySize = "liveActivitySize"
         /// should the live activity be automatically configured for stand-by mode at night?
-        case liveActivityConfigureForStandByAtNight = "liveActivityConfigureForStandByAtNight"
+        case liveActivityShowClockAtNight = "liveActivityShowClockAtNight"
         
         // Home Screen and main chart settings
         
@@ -642,26 +642,26 @@ extension UserDefaults {
     
     /// holds the enum integer of the type of live activity to be shown
     /// default to 0 (normal)
-    var liveActivitySizeType: LiveActivitySizeType {
+    var liveActivitySize: LiveActivitySize {
         get {
-            let liveActivitySizeTypeAsInt = integer(forKey: Key.liveActivitySizeType.rawValue)
-            return LiveActivitySizeType(rawValue: liveActivitySizeTypeAsInt) ?? .normal
+            let liveActivitySizeAsInt = integer(forKey: Key.liveActivitySize.rawValue)
+            return LiveActivitySize(rawValue: liveActivitySizeAsInt) ?? .normal
         }
         set {
-            set(newValue.rawValue, forKey: Key.liveActivitySizeType.rawValue)
+            set(newValue.rawValue, forKey: Key.liveActivitySize.rawValue)
         }
     }
     
     /// should the live activity be configured for the best stand-by mode during night hours?
     /// if true (and if the live activity is started/updated after 22hrs and before 08hrs), the big chart view with a clock will be shown
     /// if false (and if the live activity is started/updated before 22hrs or after 08hrs) then just show the normal live activity type the user has selected
-    @objc dynamic var liveActivityConfigureForStandByAtNight: Bool {
+    @objc dynamic var liveActivityShowClockAtNight: Bool {
         // default value for bool in userdefaults is false, as default we want this to be disabled
         get {
-            return !bool(forKey: Key.liveActivityConfigureForStandByAtNight.rawValue)
+            return !bool(forKey: Key.liveActivityShowClockAtNight.rawValue)
         }
         set {
-            set(!newValue, forKey: Key.liveActivityConfigureForStandByAtNight.rawValue)
+            set(!newValue, forKey: Key.liveActivityShowClockAtNight.rawValue)
         }
     }
     

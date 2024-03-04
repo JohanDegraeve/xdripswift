@@ -45,8 +45,8 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_labelLiveActivityType", tableName: filename, bundle: Bundle.main, value: "Live Activities", comment: "notification settings, type of live activities that should be enabled")
     }()
     
-    static let labelLiveActivitySizeType: String = {
-        return NSLocalizedString("settingsviews_labelLiveActivitySizeType", tableName: filename, bundle: Bundle.main, value: "Live Activity Size", comment: "notification settings, the size that the live activities should be displayed")
+    static let labelliveActivitySize: String = {
+        return NSLocalizedString("settingsviews_labelliveActivitySize", tableName: filename, bundle: Bundle.main, value: "Live Activity Size", comment: "notification settings, the size that the live activities should be displayed")
     }()
     
     static let liveActivityTypeDisabled: String = {
@@ -81,8 +81,20 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_liveActivityDisabledInFollowerModeMessage", tableName: filename, bundle: Bundle.main, value: "\nLive activities can only be used in Master mode.\n\nThey are disabled for Follower mode.", comment: "notification settings, live activities are not available in follower mode")
     }()
     
-    static let liveActivityConfigureForStandByAtNight: String = {
-        return NSLocalizedString("settingsviews_liveActivityConfigureForStandByAtNight", tableName: filename, bundle: Bundle.main, value: "Configure Standby at night", comment: "notification settings, live activities will be configured for standby mode at night")
+    static let liveActivitySizeMinimal: String = {
+        return NSLocalizedString("settingsviews_liveActivitySizeMinimal", tableName: filename, bundle: Bundle.main, value: "Minimal", comment: "notification settings, live activity size minimal")
+    }()
+    
+    static let liveActivitySizeNormal: String = {
+        return NSLocalizedString("settingsviews_liveActivitySizeNormal", tableName: filename, bundle: Bundle.main, value: "Normal", comment: "notification settings, live activity size normal")
+    }()
+    
+    static let liveActivitySizeLarge: String = {
+        return NSLocalizedString("settingsviews_liveActivitySizeLarge", tableName: filename, bundle: Bundle.main, value: "Large", comment: "notification settings, live activity size large")
+    }()
+    
+    static let liveActivityShowClockAtNight: String = {
+        return NSLocalizedString("settingsviews_liveActivityShowClockAtNight", tableName: filename, bundle: Bundle.main, value: "Automatically configure for StandBy", comment: "notification settings, live activities will be automatically switch for standby mode at night")
     }()
     
     

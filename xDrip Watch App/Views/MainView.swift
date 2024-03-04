@@ -33,7 +33,7 @@ struct MainView: View {
             
             ZStack(alignment: Alignment(horizontal: .center, vertical: .top), content: {
                 
-                GlucoseChartView(glucoseChartType: .watch, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivitySizeType: nil, overrideHoursToShow: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4)
+                GlucoseChartView(glucoseChartType: .watchApp, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivitySize: nil, hoursToShowScalingHours: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4)
                     .padding(.bottom, 9)
                     .gesture(
                         DragGesture(minimumDistance: 80, coordinateSpace: .local)

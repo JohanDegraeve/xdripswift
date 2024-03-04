@@ -9,6 +9,7 @@ import AVFoundation
 import PieCharts
 import WatchConnectivity
 import SwiftUI
+import WidgetKit
 
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController, ObservableObject {
@@ -862,7 +863,7 @@ final class RootViewController: UIViewController, ObservableObject {
             // launch Nightscout sync
             UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
             
-            self.updateLiveActivity(forceRestart: false)
+            self.updateLiveActivityAndWidgets(forceRestart: false)
             
         })
         
@@ -896,7 +897,7 @@ final class RootViewController: UIViewController, ObservableObject {
         // if live action type is updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.liveActivityType.rawValue, options: .new, context: nil)
         // if live action size is updated
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.liveActivitySizeType.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.liveActivitySize.rawValue, options: .new, context: nil)
         
         // high mark , low mark , urgent high mark, urgent low mark. change requires redraw of chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.urgentLowMarkValue.rawValue, options: .new, context: nil)
@@ -1016,7 +1017,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 // check and see if we need to restart the live activity in case the user dismissed it from the lock screen
                 // the app cannot restart the activity from the background so let's check it now
                 // we'll also take advantage to restart the live activity when the user brings the app to the foregroud
-                self.updateLiveActivity(forceRestart: true)
+                self.updateLiveActivityAndWidgets(forceRestart: true)
                 
             }
             
@@ -1510,7 +1511,9 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 watchManager?.updateWatchApp()
                 
-                updateLiveActivity(forceRestart: false)
+                updateLiveActivityAndWidgets(forceRestart: false)
+                
+                WidgetCenter.shared.reloadAllTimelines()
             }
             
         }
@@ -1587,7 +1590,7 @@ final class RootViewController: UIViewController, ObservableObject {
             guard let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() else {break}
             
             // need to check this in order to disable live activities in follower mode
-            updateLiveActivity(forceRestart: false)
+            updateLiveActivityAndWidgets(forceRestart: false)
             
             // no sensor needed in follower mode, stop it
             stopSensor(cGMTransmitter: cgmTransmitter, sendToTransmitter: false)
@@ -1620,12 +1623,12 @@ final class RootViewController: UIViewController, ObservableObject {
             // this will trigger update of app badge, will also create notification, but as app is most likely in foreground, this won't show up
             createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
             
-            updateLiveActivity(forceRestart: false)
+            updateLiveActivityAndWidgets(forceRestart: false)
             
-        case UserDefaults.Key.liveActivityType, UserDefaults.Key.liveActivitySizeType:
+        case UserDefaults.Key.liveActivityType, UserDefaults.Key.liveActivitySize:
             
             // check and configure the live activity if applicable
-            updateLiveActivity(forceRestart: false)
+            updateLiveActivityAndWidgets(forceRestart: false)
             
         case UserDefaults.Key.urgentLowMarkValue, UserDefaults.Key.lowMarkValue, UserDefaults.Key.highMarkValue, UserDefaults.Key.urgentHighMarkValue, UserDefaults.Key.nightScoutTreatmentsUpdateCounter:
             
@@ -1638,7 +1641,7 @@ final class RootViewController: UIViewController, ObservableObject {
             // update Watch App with the new objective values
             watchManager?.updateWatchApp()
             
-            updateLiveActivity(forceRestart: false)
+            updateLiveActivityAndWidgets(forceRestart: false)
             
         case UserDefaults.Key.offsetCarbTreatmentsOnChart:
             
@@ -3557,7 +3560,8 @@ final class RootViewController: UIViewController, ObservableObject {
     
     
     /// check if the conditions are correct to start a live activity, update it, or end it
-    private func updateLiveActivity(forceRestart: Bool) {
+    /// also update the widget data stored in user defaults
+    private func updateLiveActivityAndWidgets(forceRestart: Bool) {
         
         if #available(iOS 16.2, *) {
             // check the live activity type requested by the user
@@ -3569,7 +3573,7 @@ final class RootViewController: UIViewController, ObservableObject {
             var showLiveActivity: Bool = true //!(!UserDefaults.standard.isMaster || UserDefaults.standard.liveActivityType == .disabled)
             
             DispatchQueue.main.async {
-                if let bgReadingsAccessor = self.bgReadingsAccessor, showLiveActivity {
+                if let bgReadingsAccessor = self.bgReadingsAccessor {
                     
                     // create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
                     // this is needed due to the not being able to pass structs that are not codable/hashable
@@ -3577,48 +3581,62 @@ final class RootViewController: UIViewController, ObservableObject {
                     
                     let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
                     
-                    let slopeOrdinal: Int = bgReadings[0].slopeOrdinal() //? "" : lastReading[0].slopeArrow()
-                    
-                    var deltaChangeInMgDl: Double?
-                    
-                    // add delta if needed
-                    if bgReadings.count > 1 {
-                        deltaChangeInMgDl = bgReadings[0].currentSlope(previousBgReading: bgReadings[1]) * bgReadings[0].timeStamp.timeIntervalSince(bgReadings[1].timeStamp) * 1000;
-                    }
-                    
-                    var bgReadingValues: [Double] = []
-                    var bgReadingDates: [Date] = []
-                    
-                    for bgReading in bgReadings {
-                        bgReadingValues.append(bgReading.calculatedValue)
-                        bgReadingDates.append(bgReading.timeStamp)
-                    }
-                    
-                    let bgValueInMgDl = bgReadingValues[0]
-                    
-                    // now that we've got the current BG value, let's refine the check to see if we should run/show the live activity
-                    switch liveActivityType {
-                    case .always:
-                        showLiveActivity = true
-                    case .disabled:
-                        showLiveActivity = false
-                    case .low:
-                        showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.lowMarkValue) ? true : false
-                    case .urgentLow:
-                        showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) ? true : false
-                    case .lowHigh:
-                        showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.lowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.highMarkValue)) ? true : false
-                    case .urgentLowHigh:
-                        showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.urgentHighMarkValue)) ? true : false
-                    }
-                    
-                    // if we should still show it, then let's continue processing the lastReading array to create a valid contentState
-                    if showLiveActivity {
+                    if bgReadings.count > 0 {
                         
-                        // create the contentState that will update the dynamic attributes of the Live Activity Widget
-                        let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, configureForStandByAtNight: UserDefaults.standard.liveActivityConfigureForStandByAtNight, liveActivitySizeType: UserDefaults.standard.liveActivitySizeType)
+                        var slopeOrdinal: Int = 0
+                        var deltaChangeInMgDl: Double = 0
+                        var bgReadingValues: [Double] = []
+                        var bgReadingDates: [Date] = []
+                        let bgValueInMgDl = bgReadings[0].calculatedValue
                         
-                        LiveActivityManager.shared.runActivity(contentState: contentState, forceRestart: forceRestart)
+                        // add delta if available
+                        if bgReadings.count > 1 {
+                            deltaChangeInMgDl = bgReadings[0].currentSlope(previousBgReading: bgReadings[1]) * bgReadings[0].timeStamp.timeIntervalSince(bgReadings[1].timeStamp) * 1000;
+                            
+                            slopeOrdinal = bgReadings[0].slopeOrdinal()
+                        }
+                        
+                        for bgReading in bgReadings {
+                            bgReadingValues.append(bgReading.calculatedValue)
+                            bgReadingDates.append(bgReading.timeStamp)
+                        }
+                        
+                        // now that we've got the current BG value, let's refine the check to see if we should run/show the live activity
+                        switch liveActivityType {
+                        case .always:
+                            showLiveActivity = true
+                        case .disabled:
+                            showLiveActivity = false
+                        case .low:
+                            showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.lowMarkValue) ? true : false
+                        case .urgentLow:
+                            showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) ? true : false
+                        case .lowHigh:
+                            showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.lowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.highMarkValue)) ? true : false
+                        case .urgentLowHigh:
+                            showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.urgentHighMarkValue)) ? true : false
+                        }
+                        
+                        // if we should still show it, then let's continue processing the lastReading array to create a valid contentState
+                        if showLiveActivity {
+                            
+                            // create the contentState that will update the dynamic attributes of the Live Activity Widget
+                            let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, showClockAtNight: UserDefaults.standard.liveActivityShowClockAtNight, liveActivitySize: UserDefaults.standard.liveActivitySize)
+                            
+                            LiveActivityManager.shared.runActivity(contentState: contentState, forceRestart: forceRestart)
+                            
+                        }
+                        
+                        // update the widget data stored in user defaults
+                        let bgReadingDatesAsDouble = bgReadingDates.map { date in
+                            date.timeIntervalSince1970
+                        }
+                        
+                        let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue)
+                        
+                        if let widgetData = try? JSONEncoder().encode(widgetSharedUserDefaultsModel) {
+                            UserDefaults.storeInSharedUserDefaults(value: widgetData, forKey: "widgetSharedUserDefaults")
+                        }
                     }
                 }
             }
@@ -3954,7 +3972,7 @@ extension RootViewController: FollowerDelegate {
                 
                 watchManager?.updateWatchApp()
                 
-                updateLiveActivity(forceRestart: false)
+                updateLiveActivityAndWidgets(forceRestart: false)
                 
             }
         }

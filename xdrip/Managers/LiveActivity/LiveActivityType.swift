@@ -8,12 +8,11 @@
 
 import Foundation
 
-/// types of live activity
+/// types of live activity, namely when we should show the live activities
 public enum LiveActivityType: Int, CaseIterable {
     
     // when adding to LiveActivityType, add new cases at the end (ie 3, ...)
     // if this is done in the middle then a database migration would be required, because the rawvalue is stored as Int16 in the coredata
-    // the order of the returned enum can be defined in allCases below
     
     case disabled = 0
     case always = 1

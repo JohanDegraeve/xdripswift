@@ -17,10 +17,10 @@ enum ConstantsLiveActivity {
     // in case there is a missed reading (and therefore no update cycle) towards the end
     static let endLiveActivityAfterMinutes: Double = 7.75 * 60 * 60
     
-    // what time should the automatic stand-by configuration start from?
-    static let configureForStandByAtNightFromHour: Int = 22
+    // what time should the automatic standBy live activity view be started from?
+    static let showClockAtNightFromHour: Int = 23
     
-    // what time should the automatic stand-by configuration end at?
-    static let configureForStandByAtNightToHour: Int = 9
+    // what time should the automatic standBy live activity view end at?
+    static let showClockAtNightToHour: Int = 8
     
 }
