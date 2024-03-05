@@ -24,6 +24,7 @@ public enum GlucoseChartType: Int, CaseIterable {
     case widgetSystemSmall = 4
     case widgetSystemMedium = 5
     case widgetSystemLarge = 6
+    case widgetAccessoryRectangular = 7
     
     var description: String {
         switch self {
@@ -41,6 +42,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return "Widget Chart .systemMedium"
         case .widgetSystemLarge:
             return "Widget Chart .systemLarge"
+        case .widgetAccessoryRectangular:
+            return "Widget Chart .accessoryRectangular"
         }
     }
     
@@ -66,6 +69,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return (ConstantsGlucoseChartSwiftUI.viewWidthWidgetSystemMedium, ConstantsGlucoseChartSwiftUI.viewHeightWidgetSystemMedium)
         case .widgetSystemLarge:
             return (ConstantsGlucoseChartSwiftUI.viewWidthWidgetSystemMedium, ConstantsGlucoseChartSwiftUI.viewHeightWidgetSystemLarge)
+        case .widgetAccessoryRectangular:
+            return (ConstantsGlucoseChartSwiftUI.viewWidthWidgetAccessoryRectangular, ConstantsGlucoseChartSwiftUI.viewHeightWidgetAccessoryRectangular)
         }
     }
     
@@ -90,6 +95,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.hoursToShowWidgetSystemMedium
         case .widgetSystemLarge:
             return ConstantsGlucoseChartSwiftUI.hoursToShowWidgetSystemLarge
+        case .widgetAccessoryRectangular:
+            return ConstantsGlucoseChartSwiftUI.hoursToShowWidgetAccessoryRectangular
         }
     }
     
@@ -114,6 +121,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesWidgetSystemMedium
         case .widgetSystemLarge:
             return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesWidgetSystemLarge
+        case .widgetAccessoryRectangular:
+            return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesWidgetAccessoryRectangular
         }
     }
     
@@ -138,6 +147,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterWidgetSystemMedium
         case .widgetSystemLarge:
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterWidgetSystemLarge
+        case .widgetAccessoryRectangular:
+            return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterWidgetAccessoryRectangular
         }
     }
     
@@ -157,6 +168,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.lowHighLineColorWidgetSystemMedium
         case .widgetSystemLarge:
             return ConstantsGlucoseChartSwiftUI.lowHighLineColorWidgetSystemLarge
+        case .widgetAccessoryRectangular:
+            return ConstantsGlucoseChartSwiftUI.lowHighLineColorWidgetAccessoryRectangular
         }
     }
     
@@ -176,6 +189,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.urgentLowHighLineColorWidgetSystemMedium
         case .widgetSystemLarge:
             return ConstantsGlucoseChartSwiftUI.urgentLowHighLineColorWidgetSystemLarge
+        case .widgetAccessoryRectangular:
+            return ConstantsGlucoseChartSwiftUI.urgentLowHighLineColorWidgetAccessoryRectangular
         }
     }
     
@@ -195,6 +210,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeWidgetSystemMedium
         case .widgetSystemLarge:
             return ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeWidgetSystemLarge
+        case .widgetAccessoryRectangular:
+            return ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeWidgetAccessoryRectangular
         }
     }
     
@@ -214,6 +231,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetWidgetSystemMedium
         case .widgetSystemLarge:
             return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetWidgetSystemLarge
+        case .widgetAccessoryRectangular:
+            return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetWidgetAccessoryRectangular
         }
     }
     
@@ -233,6 +252,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.xAxisGridLineColorWidgetSystemMedium
         case .widgetSystemLarge:
             return ConstantsGlucoseChartSwiftUI.xAxisGridLineColorWidgetSystemLarge
+        case .widgetAccessoryRectangular:
+            return ConstantsGlucoseChartSwiftUI.xAxisGridLineColorWidgetAccessoryRectangular
         }
     }
     

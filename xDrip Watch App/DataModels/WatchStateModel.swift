@@ -10,6 +10,7 @@ import Combine
 import Foundation
 import SwiftUI
 import WatchConnectivity
+import WidgetKit
 
 /// holds, the watch state and allows updates and computed properties/variables to be generated for the view
 /// also used to update the ComplicationSharedUserDefaultsModel in the app group so that the complication can access the data
@@ -81,7 +82,7 @@ class WatchStateModel: NSObject, ObservableObject {
     /// Blood glucose color dependant on the user defined limit values and also on if it is a recent value
     /// - Returns: a Color object either red, yellow or green
     func bgTextColor() -> Color {
-        if let bgReadingDate = bgReadingDate(), let bgValueInMgDl = bgValueInMgDl(), bgReadingDate > Date().addingTimeInterval(-60 * 7) {
+        if let bgReadingDate = bgReadingDate(), bgReadingDate > Date().addingTimeInterval(-60 * 7), let bgValueInMgDl = bgValueInMgDl() {
             if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
                 return Color(.red)
             } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
@@ -160,7 +161,7 @@ class WatchStateModel: NSObject, ObservableObject {
     }
     
     /// function to calculate the sensor progress value and return a text color to be used by the view
-    /// - Returns: progress: the % progress between 0 and 1, textColor: 
+    /// - Returns: progress: the % progress between 0 and 1, textColor:
     func activeSensorProgress() -> (progress: Float, textColor: Color) {
         let sensorTimeLeftInMinutes = sensorMaxAgeInMinutes - sensorAgeInMinutes
         
@@ -215,7 +216,7 @@ class WatchStateModel: NSObject, ObservableObject {
         
         // check if there is any BG data available before updating the strings accordingly
         if let bgReadingDate = bgReadingDate() {
-            lastUpdatedTextString = "Updated at"
+            lastUpdatedTextString = "Last reading "
             lastUpdatedTimeString = bgReadingDate.formatted(date: .omitted, time: .shortened)
             debugString = "State updated: \(Date().formatted(date: .omitted, time: .shortened))\nBG updated: \(bgReadingDate.formatted(date: .omitted, time: .shortened))\nBG values: \(bgReadingValues.count)"
         } else {
@@ -230,17 +231,18 @@ class WatchStateModel: NSObject, ObservableObject {
     
     private func updateWatchSharedUserDefaults() {
         guard let sharedUserDefaults = sharedUserDefaults else { return }
-                
+        
         let bgReadingDatesAsDouble = bgReadingDates.map { date in
             date.timeIntervalSince1970
         }
         
-        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl,
-            urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl)
+        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl)
         
         if let stateData = try? JSONEncoder().encode(complicationSharedUserDefaultsModel) {
             sharedUserDefaults.set(stateData, forKey: "complicationSharedUserDefaults")
         }
+        
+        WidgetCenter.shared.reloadAllTimelines()
     }
 }
 

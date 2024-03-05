@@ -127,6 +127,8 @@
 		47B60F3726F389E2003198D3 /* LandscapeChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */; };
 		47B731412B83DD3C00B0A450 /* ConstantsLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7313F2B83DC0200B0A450 /* ConstantsLiveActivity.swift */; };
 		47B7FC722B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */; };
+		47CA61E42B965E7100C2A597 /* AccessoryCircularView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CA61E32B965E7100C2A597 /* AccessoryCircularView.swift */; };
+		47CA61E62B966A9700C2A597 /* AccessoryRectangularView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CA61E52B966A9700C2A597 /* AccessoryRectangularView.swift */; };
 		47CF18B22B37689A00FA6160 /* TimeInRangeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CF18B12B37689A00FA6160 /* TimeInRangeType.swift */; };
 		47D08D5B2B5437F500B0BEA7 /* ConstantsGlucoseChartSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A50C2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift */; };
 		47D08D5E2B54390B00B0BEA7 /* LiveActivitySize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D08D5D2B54390B00B0BEA7 /* LiveActivitySize.swift */; };
@@ -894,6 +896,8 @@
 		47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBackgroundKeepAliveType.swift; sourceTree = "<group>"; };
 		47C210ED2B5298EB00005711 /* GlucoseChartType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlucoseChartType.swift; sourceTree = "<group>"; };
 		47C210EF2B52A05B00005711 /* GlucoseChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseChartView.swift; sourceTree = "<group>"; };
+		47CA61E32B965E7100C2A597 /* AccessoryCircularView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessoryCircularView.swift; sourceTree = "<group>"; };
+		47CA61E52B966A9700C2A597 /* AccessoryRectangularView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessoryRectangularView.swift; sourceTree = "<group>"; };
 		47CF18B12B37689A00FA6160 /* TimeInRangeType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeInRangeType.swift; sourceTree = "<group>"; };
 		47D08D5D2B54390B00B0BEA7 /* LiveActivitySize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivitySize.swift; sourceTree = "<group>"; };
 		47D2DB3A2B14F6D000C8EE6B /* ScreenLockDimmingType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenLockDimmingType.swift; sourceTree = "<group>"; };
@@ -1848,6 +1852,8 @@
 				4746067D2B962FBD00AC9214 /* SystemLargeView.swift */,
 				4746067B2B962F8500AC9214 /* SystemMediumView.swift */,
 				474606792B962F4C00AC9214 /* SystemSmallView.swift */,
+				47CA61E32B965E7100C2A597 /* AccessoryCircularView.swift */,
+				47CA61E52B966A9700C2A597 /* AccessoryRectangularView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -3874,6 +3880,7 @@
 				47A6AC2A2B7D3DE30047A4BA /* GlucoseChartView.swift in Sources */,
 				47A6AC2D2B7D3E170047A4BA /* Date.swift in Sources */,
 				471C9C002B932957005E1326 /* LibreLinkUpModels.swift in Sources */,
+				47CA61E42B965E7100C2A597 /* AccessoryCircularView.swift in Sources */,
 				471C9C082B94F0F0005E1326 /* Bundle.swift in Sources */,
 				4746067E2B962FBD00AC9214 /* SystemLargeView.swift in Sources */,
 				4716A5052B40709E00419052 /* XDripWidgetAttributes.swift in Sources */,
@@ -3890,6 +3897,7 @@
 				4716A4F82B406C3D00419052 /* XDripWidget.swift in Sources */,
 				4716A50D2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift in Sources */,
 				47A6AC312B7D3E250047A4BA /* ConstantsBloodGlucose.swift in Sources */,
+				47CA61E62B966A9700C2A597 /* AccessoryRectangularView.swift in Sources */,
 				4746068A2B96380200AC9214 /* ConstantsLibreLinkUp.swift in Sources */,
 				47A6AC2C2B7D3E170047A4BA /* Double.swift in Sources */,
 				47A6AC412B7D42EC0047A4BA /* TextsCommon.swift in Sources */,
@@ -4998,7 +5006,7 @@
 				INFOPLIST_FILE = "xDrip Widget/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = xDrip4iO5;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 Johan Degraeve. All rights reserved.";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -5034,7 +5042,7 @@
 				INFOPLIST_FILE = "xDrip Widget/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = xDrip4iO5;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 Johan Degraeve. All rights reserved.";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -5347,7 +5355,7 @@
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
 				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -5376,7 +5384,7 @@
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
 				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
 				INFOPLIST_FILE = "$(SRCROOT)/xdrip/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

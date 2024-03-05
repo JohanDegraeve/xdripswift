@@ -15,9 +15,17 @@ struct XDripWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: Provider()) { entry in
             XDripWidget.EntryView(entry: entry)
+                .widgetBackground(backgroundView: Color.black)
         }
         .configurationDisplayName(ConstantsHomeView.applicationName)
         .description("Show the current blood glucose level")
+        .supportedFamilies([
+                .systemSmall,
+                .systemMedium,
+                .systemLarge,
+                .accessoryCircular,
+                .accessoryRectangular
+            ])
     }
 }
 
@@ -26,6 +34,13 @@ struct XDripWidget_Previews: PreviewProvider {
         Group {
             XDripWidget.EntryView(entry: .placeholder)
                 .previewContext(WidgetPreviewContext(family: .systemSmall))
+                .previewDisplayName("systemSmall")
+            XDripWidget.EntryView(entry: .placeholder)
+                .previewContext(WidgetPreviewContext(family: .accessoryCircular))
+                .previewDisplayName("accessoryCircular")
+            XDripWidget.EntryView(entry: .placeholder)
+                .previewContext(WidgetPreviewContext(family: .accessoryInline))
+                .previewDisplayName("accessoryInline")
             
             //            EntryView(entry: Entry(date: Date()))
             //                .previewContext(WidgetPreviewContext(family: .systemMedium))

@@ -59,7 +59,7 @@ extension XDripWidget.Entry {
         /// Blood glucose color dependant on the user defined limit values and based upon the time since the last reading
         /// - Returns: a Color either red, yellow or green
         func bgTextColor() -> Color {
-            if let bgValueInMgDl = bgValueInMgDl {
+            if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-60 * 7), let bgValueInMgDl = bgValueInMgDl {
                 if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
                     return Color(.red)
                 } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
@@ -67,8 +67,9 @@ extension XDripWidget.Entry {
                 } else {
                     return Color(.green)
                 }
+            } else {
+                return Color(.gray)
             }
-            return Color(.gray)
         }
         
         /// used to return values and colors used by a SwiftUI gauge view

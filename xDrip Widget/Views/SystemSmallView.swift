@@ -42,8 +42,9 @@ extension XDripWidget.EntryView {
             HStack {
                 Spacer()
                 
-                Text("Updated at \(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
+                Text("Last reading \(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
                     .font(.caption).bold()
+                    .minimumScaleFactor(0.2)
                     .foregroundStyle(Color(white: 0.6))
             }
         }

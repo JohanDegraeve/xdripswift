@@ -72,12 +72,12 @@ enum ConstantsGlucoseChartSwiftUI {
     
     // watch complication .accessoryRectangular chart
     static let viewWidthWatchAccessoryRectangular: CGFloat = 180
-    static let viewHeightWatchAccessoryRectangular: CGFloat = 50
+    static let viewHeightWatchAccessoryRectangular: CGFloat = 55
     
     static let lowHighLineColorWatchAccessoryRectangular = Color(white: 0.7)
     static let urgentLowHighLineColorWatchAccessoryRectangular = Color(white: 0.5)
     static let xAxisGridLineColorWatchAccessoryRectangular = Color(white: 0.4)
-    static let hoursToShowWatchAccessoryRectangular: Double = 4
+    static let hoursToShowWatchAccessoryRectangular: Double = 5
     static let intervalBetweenXAxisValuesWatchAccessoryRectangular: Int = 1
     static let glucoseCircleDiameterWatchAccessoryRectangular: Double = 14
     static let relativeYAxisLineSizeWatchAccessoryRectangular: Double = 0.8
@@ -121,4 +121,17 @@ enum ConstantsGlucoseChartSwiftUI {
     static let glucoseCircleDiameterWidgetSystemLarge: Double = 30
     static let relativeYAxisLineSizeWidgetSystemLarge: Double = 0.8
     static let xAxisLabelOffsetWidgetSystemLarge: Double = -10
+    
+    // widget (lock screen) .accessoryRectangular chart
+    static let viewWidthWidgetAccessoryRectangular: CGFloat = 130
+    static let viewHeightWidgetAccessoryRectangular: CGFloat = 40
+    
+    static let lowHighLineColorWidgetAccessoryRectangular = Color(white: 0.7)
+    static let urgentLowHighLineColorWidgetAccessoryRectangular = Color(white: 0.5)
+    static let xAxisGridLineColorWidgetAccessoryRectangular = Color(white: 0.4)
+    static let hoursToShowWidgetAccessoryRectangular: Double = 4
+    static let intervalBetweenXAxisValuesWidgetAccessoryRectangular: Int = 1
+    static let glucoseCircleDiameterWidgetAccessoryRectangular: Double = 14
+    static let relativeYAxisLineSizeWidgetAccessoryRectangular: Double = 0.8
+    static let xAxisLabelOffsetWidgetAccessoryRectangular: Double = -10
 }

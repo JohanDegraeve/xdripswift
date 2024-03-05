@@ -25,10 +25,12 @@ extension XDripWidget {
                 systemMediumView
             case .systemLarge:
                 systemLargeView
-//            case .systemExtraLarge:
-//                accessoryInlineView
+            case .accessoryCircular:
+                accessoryCircularView
+            case .accessoryRectangular:
+                accessoryRectangularView
             default:
-                Image("AppIcon")
+                Text("No Data Available")
             }
         }
     }
