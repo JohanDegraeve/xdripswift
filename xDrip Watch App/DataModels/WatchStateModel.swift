@@ -37,6 +37,11 @@ class WatchStateModel: NSObject, ObservableObject {
     @Published var sensorAgeInMinutes: Double = 0
     @Published var sensorMaxAgeInMinutes: Double = 14400
     @Published var showAppleWatchDebug: Bool = false
+    @Published var timeStampOfLastFollowerConnection: Date = Date()
+    @Published var secondsUntilFollowerDisconnectWarning: Int = 90
+    @Published var isMaster: Bool = true
+    @Published var followerDataSourceType: FollowerDataSourceType = .nightscout
+    @Published var followerBackgroundKeepAliveType: FollowerBackgroundKeepAliveType = .normal
     
     @Published var lastUpdatedTextString: String = "Updating..."
     @Published var lastUpdatedTimeString: String = "12:34"
@@ -46,7 +51,7 @@ class WatchStateModel: NSObject, ObservableObject {
     init(session: WCSession = .default) {
         self.session = session
         super.init()
-
+        
         session.delegate = self
         session.activate()
     }
@@ -137,49 +142,67 @@ class WatchStateModel: NSObject, ObservableObject {
     /// convert the optional delta change int (in mg/dL) to a formatted change value in the user chosen unit making sure all zero values are shown as a positive change to follow Nightscout convention
     /// - Returns: a string holding the formatted delta change value (i.e. +0.4 or -6)
     func deltaChangeStringInUserChosenUnit() -> String {
-            
-            let valueAsString = deltaChangeInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
-            
-            var deltaSign: String = ""
-            if (deltaChangeInMgDl > 0) { deltaSign = "+"; }
-            
-            // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
-            // show unitized zero deltas as +0 or +0.0 as per Nightscout format
-            if (isMgDl) {
-                if (deltaChangeInMgDl > -1) && (deltaChangeInMgDl < 1) {
-                    return "+0"
-                } else {
-                    return deltaSign + valueAsString
-                }
+        
+        let valueAsString = deltaChangeInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
+        
+        var deltaSign: String = ""
+        if (deltaChangeInMgDl > 0) { deltaSign = "+"; }
+        
+        // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
+        // show unitized zero deltas as +0 or +0.0 as per Nightscout format
+        if (isMgDl) {
+            if (deltaChangeInMgDl > -1) && (deltaChangeInMgDl < 1) {
+                return "+0"
             } else {
-                if (deltaChangeInMgDl > -0.1) && (deltaChangeInMgDl < 0.1) {
-                    return "+0.0"
-                } else {
-                    return deltaSign + valueAsString
-                }
+                return deltaSign + valueAsString
             }
+        } else {
+            if (deltaChangeInMgDl > -0.1) && (deltaChangeInMgDl < 0.1) {
+                return "+0.0"
+            } else {
+                return deltaSign + valueAsString
+            }
+        }
     }
     
     /// function to calculate the sensor progress value and return a text color to be used by the view
     /// - Returns: progress: the % progress between 0 and 1, textColor:
     func activeSensorProgress() -> (progress: Float, textColor: Color) {
-        let sensorTimeLeftInMinutes = sensorMaxAgeInMinutes - sensorAgeInMinutes
-        
-        let progress = Float(1 - (sensorTimeLeftInMinutes / sensorMaxAgeInMinutes))
-        
-        // irrespective of all the above, if the current sensor age is over the max age, then just set everything to the expired colour to make it clear
-        if sensorTimeLeftInMinutes < 0 {
-            return (1.0, ConstantsHomeView.sensorProgressExpiredSwiftUI)
-        } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewUrgentInMinutes {
-            return (progress, ConstantsHomeView.sensorProgressViewProgressColorUrgentSwiftUI)
-        } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewWarningInMinutes {
-            return (progress, ConstantsHomeView.sensorProgressViewProgressColorWarningSwiftUI)
+        if sensorAgeInMinutes > 0 {
+            let sensorTimeLeftInMinutes = sensorMaxAgeInMinutes - sensorAgeInMinutes
+            let progress = Float(1 - (sensorTimeLeftInMinutes / sensorMaxAgeInMinutes))
+            
+            // irrespective of all the above, if the current sensor age is over the max age, then just set everything to the expired colour to make it clear
+            if sensorTimeLeftInMinutes < 0 {
+                return (1.0, ConstantsHomeView.sensorProgressExpiredSwiftUI)
+            } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewUrgentInMinutes {
+                return (progress, ConstantsHomeView.sensorProgressViewProgressColorUrgentSwiftUI)
+            } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewWarningInMinutes {
+                return (progress, ConstantsHomeView.sensorProgressViewProgressColorWarningSwiftUI)
+            } else {
+                return (progress, ConstantsHomeView.sensorProgressNormalTextColorSwiftUI)
+            }
         } else {
-            return (progress, ConstantsHomeView.sensorProgressNormalTextColorSwiftUI)
+            return (0, ConstantsHomeView.sensorProgressNormalTextColorSwiftUI)
         }
     }
     
+    func getDataTimeStampOfLastFollowerConnection() -> (networkImage: Image, tintColor: Color) {
+        // check when the last follower connection was and compare that to the actual time
+        var networkImage: Image = Image(systemName: "network")
+        var tintColor: Color = .green
+        
+        if let timeDifferenceInSeconds = Calendar.current.dateComponents([.second], from: timeStampOfLastFollowerConnection, to: Date()).second {
+            // show "disconnected" if over the limit defined in the constants file
+            if timeDifferenceInSeconds >= secondsUntilFollowerDisconnectWarning {
+                networkImage = Image(systemName: "network.slash")
+                tintColor = .gray
+            }
+        }
+        return (networkImage, tintColor)
+    }
     
+    /// request a state update from the iOS companion app
     func requestWatchStateUpdate() {
         guard session.activationState == .activated else {
             session.activate()
@@ -198,6 +221,8 @@ class WatchStateModel: NSObject, ObservableObject {
         }
     }
     
+    /// update the watch state so that the view can be updated
+    /// - Parameter watchState: this is the new watch state as sent from the iOS companion app
     private func processState(_ watchState: WatchState) {
         bgReadingValues = watchState.bgReadingValues
         bgReadingDates = watchState.bgReadingDates
@@ -213,6 +238,11 @@ class WatchStateModel: NSObject, ObservableObject {
         sensorAgeInMinutes = watchState.sensorAgeInMinutes ?? 0
         sensorMaxAgeInMinutes = watchState.sensorMaxAgeInMinutes ?? 0
         showAppleWatchDebug = watchState.showAppleWatchDebug ?? false
+        timeStampOfLastFollowerConnection = watchState.timeStampOfLastFollowerConnection ?? Date()
+        secondsUntilFollowerDisconnectWarning = watchState.secondsUntilFollowerDisconnectWarning ?? 90
+        isMaster = watchState.isMaster ?? true
+        followerDataSourceType = FollowerDataSourceType(rawValue: watchState.followerDataSourceTypeRawValue ?? 0) ?? .nightscout
+        followerBackgroundKeepAliveType = FollowerBackgroundKeepAliveType(rawValue: watchState.followerBackgroundKeepAliveTypeRawValue ?? 0) ?? .normal
         
         // check if there is any BG data available before updating the strings accordingly
         if let bgReadingDate = bgReadingDate() {
@@ -229,6 +259,7 @@ class WatchStateModel: NSObject, ObservableObject {
         updateWatchSharedUserDefaults()
     }
     
+    /// once we've process the state update, then save this data to the shared app group so that the complication can read it
     private func updateWatchSharedUserDefaults() {
         guard let sharedUserDefaults = sharedUserDefaults else { return }
         
@@ -242,6 +273,7 @@ class WatchStateModel: NSObject, ObservableObject {
             sharedUserDefaults.set(stateData, forKey: "complicationSharedUserDefaults")
         }
         
+        // now that the new data is stored in the app group, try to force the complications to reload
         WidgetCenter.shared.reloadAllTimelines()
     }
 }
@@ -255,12 +287,12 @@ extension WatchStateModel: WCSessionDelegate {
     func session(_: WCSession, activationDidCompleteWith state: WCSessionActivationState, error _: Error?) {
         requestWatchStateUpdate()
     }
-
+    
     func session(_: WCSession, didReceiveMessage _: [String: Any]) {}
-
+    
     func sessionReachabilityDidChange(_ session: WCSession) {
     }
-
+    
     func session(_: WCSession, didReceiveMessageData messageData: Data) {
         if let watchState = try? JSONDecoder().decode(WatchState.self, from: messageData) {
             DispatchQueue.main.async {

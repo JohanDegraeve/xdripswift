@@ -129,6 +129,9 @@
 		47B7FC722B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */; };
 		47CA61E42B965E7100C2A597 /* AccessoryCircularView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CA61E32B965E7100C2A597 /* AccessoryCircularView.swift */; };
 		47CA61E62B966A9700C2A597 /* AccessoryRectangularView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CA61E52B966A9700C2A597 /* AccessoryRectangularView.swift */; };
+		47CA61E72B97948000C2A597 /* FollowerDataSourceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06CF2A70141E00267BE3 /* FollowerDataSourceType.swift */; };
+		47CA61E82B9796D200C2A597 /* ConstantsFollower.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */; };
+		47CA61E92B97A6BD00C2A597 /* FollowerBackgroundKeepAliveType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */; };
 		47CF18B22B37689A00FA6160 /* TimeInRangeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CF18B12B37689A00FA6160 /* TimeInRangeType.swift */; };
 		47D08D5B2B5437F500B0BEA7 /* ConstantsGlucoseChartSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A50C2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift */; };
 		47D08D5E2B54390B00B0BEA7 /* LiveActivitySize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D08D5D2B54390B00B0BEA7 /* LiveActivitySize.swift */; };
@@ -3954,6 +3957,7 @@
 				474606852B9637CA00AC9214 /* LiveActivitySize.swift in Sources */,
 				47A6AC2E2B7D3E170047A4BA /* Double.swift in Sources */,
 				47A6AC392B7D3E770047A4BA /* TextsHomeView.swift in Sources */,
+				47CA61E72B97948000C2A597 /* FollowerDataSourceType.swift in Sources */,
 				47A6AC332B7D3E260047A4BA /* ConstantsHomeView.swift in Sources */,
 				474606642B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift in Sources */,
 				474606902B963EA100AC9214 /* View.swift in Sources */,
@@ -3966,10 +3970,12 @@
 				47DE41B32B8672F90041DA19 /* DataSourceView.swift in Sources */,
 				4796C6062B9516FC00DE2210 /* Bundle.swift in Sources */,
 				47A6AC2F2B7D3E170047A4BA /* Date.swift in Sources */,
+				47CA61E92B97A6BD00C2A597 /* FollowerBackgroundKeepAliveType.swift in Sources */,
 				47DE41AE2B863D370041DA19 /* WatchState.swift in Sources */,
 				47A6AC422B7D42ED0047A4BA /* TextsCommon.swift in Sources */,
 				47A6AC3B2B7D3F9B0047A4BA /* ConstantsGlucoseChartSwiftUI.swift in Sources */,
 				47DE41B92B87B2680041DA19 /* ConstantsAppleWatch.swift in Sources */,
+				47CA61E82B9796D200C2A597 /* ConstantsFollower.swift in Sources */,
 				4746068B2B96380200AC9214 /* ConstantsLibreLinkUp.swift in Sources */,
 				47A6AC352B7D3E260047A4BA /* ConstantsUI.swift in Sources */,
 			);
@@ -5152,7 +5158,7 @@
 				INFOPLIST_FILE = "xDrip-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = xDrip4iO5;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.92C77A2942.xdripswift;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5193,7 +5199,7 @@
 				INFOPLIST_FILE = "xDrip-Watch-App-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = xDrip4iO5;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.92C77A2942.xdripswift;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

@@ -95,6 +95,11 @@ public final class WatchManager: NSObject, ObservableObject {
             self.watchState.urgentHighLimitInMgDl = UserDefaults.standard.urgentHighMarkValue
             self.watchState.showAppleWatchDebug = UserDefaults.standard.showAppleWatchDebug
             self.watchState.activeSensorDescription = UserDefaults.standard.activeSensorDescription
+            self.watchState.timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection ?? Date()
+            self.watchState.secondsUntilFollowerDisconnectWarning = UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning ?? 90
+            self.watchState.isMaster = UserDefaults.standard.isMaster
+            self.watchState.followerDataSourceTypeRawValue = UserDefaults.standard.followerDataSourceType.rawValue
+            self.watchState.followerBackgroundKeepAliveTypeRawValue = UserDefaults.standard.followerBackgroundKeepAliveType.rawValue
             
             if let sensorStartDate = UserDefaults.standard.activeSensorStartDate {
                 self.watchState.sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: Date()).minute!)

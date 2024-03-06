@@ -7,7 +7,7 @@
 //
 
 import Foundation
-
+import UIKit
 
 /// types of background keep-alive
 public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
@@ -28,6 +28,17 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
             return Texts_SettingsView.followerKeepAliveTypeNormal
         case .aggressive:
             return Texts_SettingsView.followerKeepAliveTypeAggressive
+        }
+    }
+    
+    public var rawValue: Int {
+        switch self {
+        case .disabled:
+            return 0
+        case .normal:
+            return 1
+        case .aggressive:
+            return 2
         }
     }
     

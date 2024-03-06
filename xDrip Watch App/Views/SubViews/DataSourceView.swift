@@ -14,21 +14,35 @@ struct DataSourceView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            if watchState.activeSensorDescription != "" || watchState.sensorAgeInMinutes > 0 {
+            if (watchState.activeSensorDescription != "" || watchState.sensorAgeInMinutes > 0) || !watchState.isMaster {
                 
                 ProgressView(value: Float(watchState.activeSensorProgress().progress))
                     .tint(ConstantsHomeView.sensorProgressViewNormalColorSwiftUI)
                     .scaleEffect(x: 1, y: 0.3, anchor: .center)
                 
                 HStack {
-                    Text(watchState.activeSensorDescription)
-                        .font(.system(size: 14)).fontWeight(.semibold)
+                    if !watchState.isMaster {
+                        HStack(alignment: .center, spacing: 6) {
+                            watchState.getDataTimeStampOfLastFollowerConnection().networkImage
+                                .font(.system(size: 14))
+                                .foregroundStyle(watchState.getDataTimeStampOfLastFollowerConnection().tintColor)
+                                .padding(.bottom, -2)
+                            
+                            Text(watchState.followerDataSourceType.fullDescription)
+                                .font(.system(size: 14)).fontWeight(.semibold)
+                        }
+                    } else {
+                        Text(watchState.activeSensorDescription)
+                            .font(.system(size: 14)).fontWeight(.semibold)
+                    }
                     
                     Spacer()
                     
-                    Text(watchState.sensorAgeInMinutes.minutesToDaysAndHours())
-                        .font(.system(size: 14))
-                        .foregroundStyle(watchState.activeSensorProgress().textColor)
+                    if watchState.sensorAgeInMinutes > 0 {
+                        Text(watchState.sensorAgeInMinutes.minutesToDaysAndHours())
+                            .font(.system(size: 14))
+                            .foregroundStyle(watchState.activeSensorProgress().textColor)
+                    }
                 }
                 .padding([.leading, .trailing], 10)
             } else {
@@ -102,8 +116,12 @@ struct DataSourceView_Previews: PreviewProvider {
         watchState.urgentHighLimitInMgDl = 180
         watchState.updatedDate = Date().addingTimeInterval(-400)
         watchState.activeSensorDescription = "Data Source"
-        watchState.sensorAgeInMinutes = 6788
+        watchState.sensorAgeInMinutes = 0
         watchState.sensorMaxAgeInMinutes = 14400
+        watchState.isMaster = false
+        watchState.followerDataSourceType = .libreLinkUp
+        watchState.secondsUntilFollowerDisconnectWarning = 60 * 7
+        watchState.timeStampOfLastFollowerConnection = Date().addingTimeInterval(-60 * 6)
         
         return Group {
             DataSourceView()

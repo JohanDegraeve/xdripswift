@@ -13,8 +13,10 @@ struct MainView: View {
     
     // set timer to automatically refresh the view
     // https://www.hackingwithswift.com/quick-start/swiftui/how-to-use-a-timer-with-swiftui
-    let timer = Timer.publish(every: 15, on: .main, in: .common).autoconnect()
+    let timer = Timer.publish(every: 7, on: .main, in: .common).autoconnect()
     
+    // get the array of different hour ranges from the constants file
+    // we'll move through this array as the user swipes left/right on the chart
     let hoursToShow: [Double] = ConstantsAppleWatch.hoursToShow
     
     @State private var currentDate = Date.now
@@ -30,11 +32,11 @@ struct MainView: View {
                 .onTapGesture(count: 2) {
                     watchState.requestWatchStateUpdate()
                 }
-            
             ZStack(alignment: Alignment(horizontal: .center, vertical: .top), content: {
                 
                 GlucoseChartView(glucoseChartType: .watchApp, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivitySize: nil, hoursToShowScalingHours: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4)
-                    .padding(.bottom, 9)
+                    .padding(.top, 3)
+                    .padding(.bottom, 3)
                     .gesture(
                         DragGesture(minimumDistance: 80, coordinateSpace: .local)
                             .onEnded({ value in
@@ -50,6 +52,27 @@ struct MainView: View {
                             })
                     )
                 
+                if !watchState.isMaster && watchState.followerBackgroundKeepAliveType == .disabled {
+                    VStack(spacing: 2) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .foregroundStyle(.black)
+                            .font(.system(size: 20))
+                            .padding(2)
+                        Text("Watch App not available")
+                            .foregroundStyle(.black)
+                            .font(.footnote).bold()
+                            .multilineTextAlignment(.center)
+                            .padding(2)
+                        Text("Follower keep-alive is disabled")
+                            .foregroundStyle(.black)
+                            .font(.footnote).bold()
+                            .multilineTextAlignment(.center)
+                            .padding(2)
+                    }
+                    .background(.red).opacity(0.9)
+                    .cornerRadius(6)
+                }
+                
                 if watchState.showAppleWatchDebug {
                     Text(watchState.debugString)
                         .foregroundStyle(.black)
@@ -60,7 +83,6 @@ struct MainView: View {
                         .cornerRadius(6)
                         .padding(.top, 10)
                         .padding(.leading, 2)
-                    //                    .opacity(watchState.showAppleWatchDebug ? 1 : 0)
                 }
             })
             
@@ -139,7 +161,9 @@ struct ContentView_Previews: PreviewProvider {
         watchState.activeSensorDescription = "Data Source"
         watchState.sensorAgeInMinutes = Double(Int.random(in: 1..<14400))
         watchState.sensorMaxAgeInMinutes = 14400
-        watchState.showAppleWatchDebug = true
+        watchState.showAppleWatchDebug = false
+        watchState.isMaster = false
+        watchState.followerBackgroundKeepAliveType = .normal
         
         return Group {
             MainView()

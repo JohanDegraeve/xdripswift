@@ -3538,10 +3538,9 @@ final class RootViewController: UIViewController, ObservableObject {
             // check the live activity type requested by the user
             let liveActivityType = UserDefaults.standard.liveActivityType
             
-            // TODO: remove the comments below for production
             // if the user is in follower mode then don't show live activities as they will not get updated in the background
             // also take advantage to just skip the rest of the function if they have live activities disabled
-            var showLiveActivity: Bool = true //!(!UserDefaults.standard.isMaster || UserDefaults.standard.liveActivityType == .disabled)
+            var showLiveActivity: Bool = UserDefaults.standard.isMaster
             
             DispatchQueue.main.async {
                 if let bgReadingsAccessor = self.bgReadingsAccessor {
@@ -3589,7 +3588,7 @@ final class RootViewController: UIViewController, ObservableObject {
                         }
                         
                         // if we should still show it, then let's continue processing the lastReading array to create a valid contentState
-                        if showLiveActivity {
+                        if UserDefaults.standard.isMaster && showLiveActivity {
                             
                             // create the contentState that will update the dynamic attributes of the Live Activity Widget
                             let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, showClockAtNight: UserDefaults.standard.liveActivityShowClockAtNight, liveActivitySize: UserDefaults.standard.liveActivitySize)

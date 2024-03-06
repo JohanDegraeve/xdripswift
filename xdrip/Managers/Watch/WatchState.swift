@@ -23,6 +23,9 @@ struct WatchState: Codable {
     var sensorAgeInMinutes: Double?
     var sensorMaxAgeInMinutes: Double?
     var showAppleWatchDebug: Bool?
-    var dataSourceConnectionStatusImageString: String?
-    var dataSourceConnectionStatusIsActive: Bool?
+    var isMaster: Bool?
+    var followerDataSourceTypeRawValue: Int?
+    var followerBackgroundKeepAliveTypeRawValue: Int?
+    var timeStampOfLastFollowerConnection: Date?
+    var secondsUntilFollowerDisconnectWarning: Int?
 }
