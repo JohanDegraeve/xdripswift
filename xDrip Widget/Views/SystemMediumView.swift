@@ -22,10 +22,10 @@ extension XDripWidget.EntryView {
                 
                 Spacer()
                 
-                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
                         .font(.title2).fontWeight(.bold)
-                        .foregroundStyle(Color(white: 0.9))
+                        .foregroundStyle(entry.widgetState.deltaChangeTextColor())
                         .lineLimit(1)
                     Text(entry.widgetState.bgUnitString)
                         .font(.title2)

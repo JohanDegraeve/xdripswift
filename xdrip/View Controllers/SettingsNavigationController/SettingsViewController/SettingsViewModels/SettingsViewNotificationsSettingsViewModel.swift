@@ -17,14 +17,11 @@ fileprivate enum Setting:Int, CaseIterable {
     /// live activity size
     case liveActivitySize = 3
     
-    /// live activity will be automatically configured for night/stand-by use?
-    case liveActivityShowClockAtNight = 4
-    
     /// show reading in app badge
-    case showReadingInAppBadge = 5
+    case showReadingInAppBadge = 4
     
     /// if reading is shown in app badge, should value be multiplied with 10 yes or no
-    case multipleAppBadgeValueWith10 = 6
+    case multipleAppBadgeValueWith10 = 5
     
 }
 
@@ -56,7 +53,7 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .liveActivityShowClockAtNight:
+        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
             return .nothing
             
         case .notificationInterval:
@@ -207,9 +204,6 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
         case .liveActivitySize:
             return Texts_SettingsView.labelliveActivitySize
             
-        case .liveActivityShowClockAtNight:
-            return Texts_SettingsView.liveActivityShowClockAtNight
-            
         case .showReadingInAppBadge:
             return Texts_SettingsView.labelShowReadingInAppBadge
             
@@ -224,7 +218,7 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10, .liveActivityShowClockAtNight:
+        case .showReadingInNotification, .showReadingInAppBadge, .multipleAppBadgeValueWith10:
             return .none
             
         case .notificationInterval:
@@ -264,13 +258,6 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
             } else {
                 return "iOS 16.2 needed"
             }
-            
-        case .liveActivityShowClockAtNight:
-            if #available(iOS 16.2, *) {
-                return UserDefaults.standard.isMaster ? nil : Texts_SettingsView.liveActivityDisabledInFollowerMode
-            } else {
-                return "iOS 16.2 needed"
-            }
         }
     }
     
@@ -290,9 +277,6 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
 
         case .notificationInterval, .liveActivityType, .liveActivitySize:
             return nil
-            
-        case .liveActivityShowClockAtNight:
-            return UISwitch(isOn: UserDefaults.standard.liveActivityShowClockAtNight, action: {(isOn:Bool) in UserDefaults.standard.liveActivityShowClockAtNight = isOn})
         }
     }
 }

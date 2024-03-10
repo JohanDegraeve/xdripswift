@@ -112,51 +112,31 @@ struct XDripWidgetLiveActivity: Widget {
                 // 3 = large chart is final default option
                 ZStack {
                     VStack {
-                            if context.state.showClockAtNight {
-                                HStack(alignment: .firstTextBaseline) {
-                                    Text(Date().formatted(date: .omitted, time: .shortened))
-                                        .font(.system(size: 50)).bold()
-                                        .foregroundStyle(Color(white: 0.7))
-                                        .minimumScaleFactor(0.2)
-                                    
-                                    Spacer()
-                                    
-                                    
-                                    Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow()) ")
-                                        .font(.system(size: 50)).bold()
-                                        .foregroundStyle(context.state.bgTextColor())
-                                }
-                                .padding(.top, 4)
-                                .padding(.bottom, -14)
-                                .padding(.leading, 6)
-                                .padding(.trailing, 6)
-                            } else {
-                                HStack(alignment: .center) {
-                                    Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow()) ")
-                                        .font(.largeTitle).bold()
-                                        .foregroundStyle(context.state.bgTextColor())
-                                    
-                                    Spacer()
-                                    
-                                    HStack(alignment: .center, spacing: 4) {
-                                        Text(context.state.deltaChangeStringInUserChosenUnit())
-                                            .font(.title2).bold()
-                                            .foregroundStyle(Color(white: 0.9))
-                                            .minimumScaleFactor(0.2)
-                                            .lineLimit(1)
-                                        
-                                        Text(context.state.bgUnitString)
-                                            .font(.title2)
-                                            .foregroundStyle(Color(white: 0.5))
-                                            .minimumScaleFactor(0.2)
-                                            .lineLimit(1)
-                                    }
-                                }
-                                .padding(.top, 4)
-                                .padding(.bottom, -8)
-                                .padding(.leading, 10)
-                                .padding(.trailing, 10)
+                        HStack(alignment: .center) {
+                            Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow()) ")
+                                .font(.largeTitle).bold()
+                                .foregroundStyle(context.state.bgTextColor())
+                            
+                            Spacer()
+                            
+                            HStack(alignment: .center, spacing: 4) {
+                                Text(context.state.deltaChangeStringInUserChosenUnit())
+                                    .font(.title2).bold()
+                                    .foregroundStyle(Color(white: 0.9))
+                                    .minimumScaleFactor(0.2)
+                                    .lineLimit(1)
+                                
+                                Text(context.state.bgUnitString)
+                                    .font(.title2)
+                                    .foregroundStyle(Color(white: 0.5))
+                                    .minimumScaleFactor(0.2)
+                                    .lineLimit(1)
                             }
+                        }
+                        .padding(.top, 4)
+                        .padding(.bottom, -8)
+                        .padding(.leading, 10)
+                        .padding(.trailing, 10)
                         
                         GlucoseChartView(glucoseChartType: .liveActivity, bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivitySize: .large, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil)
                     }
@@ -267,7 +247,7 @@ struct XDripWidgetLiveActivity_Previews: PreviewProvider {
     
     static let attributes = XDripWidgetAttributes()
     
-    static let contentState = XDripWidgetAttributes.ContentState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 5, deltaChangeInMgDl: -2, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, showClockAtNight: false, liveActivitySize: .minimal)
+    static let contentState = XDripWidgetAttributes.ContentState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 5, deltaChangeInMgDl: -2, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, liveActivitySize: .minimal)
     
     static var previews: some View {
         attributes

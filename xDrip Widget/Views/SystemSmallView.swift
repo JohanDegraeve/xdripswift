@@ -12,7 +12,7 @@ import SwiftUI
 extension XDripWidget.EntryView {
     var systemSmallView: some View {
         VStack(spacing: 0) {
-            HStack {
+            HStack(alignment: .center) {
                 Text("\(entry.widgetState.bgValueStringInUserChosenUnit)\(entry.widgetState.trendArrow())")
                     .font(.title).fontWeight(.semibold)
                     .foregroundStyle(entry.widgetState.bgTextColor())
@@ -22,29 +22,21 @@ extension XDripWidget.EntryView {
                 
                 Spacer()
                 
-                VStack(alignment: .trailing, spacing: 0) {
-                    Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
-                        .font(.headline).fontWeight(.bold)
-                        .foregroundStyle(Color(white: 0.9))
-                        .lineLimit(1)
-                        .padding(.bottom, -3)
-                    Text(entry.widgetState.bgUnitString)
-                        .font(.footnote)
-                        .foregroundStyle(.gray)
-                        .lineLimit(1)
-                }
+                Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
+                    .font(.title).fontWeight(.semibold)
+                    .foregroundStyle(entry.widgetState.deltaChangeTextColor())
+                    .minimumScaleFactor(0.5)
+                    .lineLimit(1)
             }
             .padding(.top, -6)
             .padding(.bottom, 6)
             
             GlucoseChartView(glucoseChartType: .widgetSystemSmall, bgReadingValues: entry.widgetState.bgReadingValues, bgReadingDates: entry.widgetState.bgReadingDates, isMgDl: entry.widgetState.isMgDl, urgentLowLimitInMgDl: entry.widgetState.urgentLowLimitInMgDl, lowLimitInMgDl: entry.widgetState.lowLimitInMgDl, highLimitInMgDl: entry.widgetState.highLimitInMgDl, urgentHighLimitInMgDl: entry.widgetState.urgentHighLimitInMgDl, liveActivitySize: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil)
-            
             HStack {
                 Spacer()
                 
                 Text("Last reading \(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
-                    .font(.caption).bold()
-                    .minimumScaleFactor(0.2)
+                    .font(.system(size: 10)).bold()
                     .foregroundStyle(Color(white: 0.6))
             }
         }

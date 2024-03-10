@@ -13,7 +13,7 @@ struct HeaderView: View {
     @EnvironmentObject var watchState: WatchStateModel
     
     var body: some View {
-        HStack {
+        HStack(alignment: .lastTextBaseline) {
             Text("\(watchState.bgValueStringInUserChosenUnit())\(watchState.trendArrow())")
                 .font(.system(size: 60)).fontWeight(.semibold)
                 .foregroundStyle(watchState.bgTextColor())

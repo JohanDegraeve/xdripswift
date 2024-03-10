@@ -26,7 +26,6 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var urgentHighLimitInMgDl: Double
         var eventStartDate: Date = Date()
         var warnUserToOpenApp: Bool = true
-        var showClockAtNight: Bool = false
         var liveActivitySize: LiveActivitySize
         
         // computed properties
@@ -35,7 +34,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var bgReadingDate: Date?
         var bgValueStringInUserChosenUnit: String
         
-        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, showClockAtNight: Bool, liveActivitySize: LiveActivitySize) {
+        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySize: LiveActivitySize) {
             
             // these are the "passed in" stateful values used to initialize
             self.bgReadingValues = bgReadingValues
@@ -46,12 +45,8 @@ struct XDripWidgetAttributes: ActivityAttributes {
             self.urgentLowLimitInMgDl = urgentLowLimitInMgDl
             self.lowLimitInMgDl = lowLimitInMgDl
             self.highLimitInMgDl = highLimitInMgDl
-            self.urgentHighLimitInMgDl = urgentHighLimitInMgDl
-            
-            let hour = Calendar.current.component(.hour, from: Date())
-            self.showClockAtNight = (showClockAtNight && (hour >= ConstantsLiveActivity.showClockAtNightFromHour || hour < ConstantsLiveActivity.showClockAtNightToHour)) ? true : false
-            
-            self.liveActivitySize = self.showClockAtNight ? .large : liveActivitySize
+            self.urgentHighLimitInMgDl = urgentHighLimitInMgDl            
+            self.liveActivitySize = liveActivitySize
             
             self.bgUnitString = isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
             

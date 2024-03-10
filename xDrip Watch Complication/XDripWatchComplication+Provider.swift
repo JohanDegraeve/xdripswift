@@ -24,7 +24,7 @@ extension XDripWatchComplication {
         func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
             let entry = Entry(date: .now, widgetState: getWidgetStateFromSharedUserDefaults() ?? sampleWidgetStateFromProvider)
                 
-            completion(.init(entries: [entry], policy: .atEnd))
+            completion(.init(entries: [entry], policy: .after(Date().addingTimeInterval(30*60))))
         }
     }
 }
@@ -34,10 +34,9 @@ extension XDripWatchComplication {
 
 extension XDripWatchComplication.Provider {
     func getWidgetStateFromSharedUserDefaults() -> XDripWatchComplication.Entry.WidgetState? {
-        
         guard let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) else {return nil}
         
-        guard let encodedLatestReadings = sharedUserDefaults.data(forKey: "complicationSharedUserDefaults") else {
+        guard let encodedLatestReadings = sharedUserDefaults.data(forKey: "complicationSharedUserDefaults.\(Bundle.main.mainAppBundleIdentifier)") else {
             return nil
         }
         
@@ -52,7 +51,7 @@ extension XDripWatchComplication.Provider {
                 Date(timeIntervalSince1970: date)
             }
             
-            return Entry.WidgetState(bgReadingValues: data.bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: data.isMgDl, slopeOrdinal: data.slopeOrdinal, deltaChangeInMgDl: data.deltaChangeInMgDl, urgentLowLimitInMgDl: data.urgentLowLimitInMgDl, lowLimitInMgDl: data.lowLimitInMgDl, highLimitInMgDl: data.highLimitInMgDl, urgentHighLimitInMgDl: data.urgentHighLimitInMgDl)
+            return Entry.WidgetState(bgReadingValues: data.bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: data.isMgDl, slopeOrdinal: data.slopeOrdinal, deltaChangeInMgDl: data.deltaChangeInMgDl, urgentLowLimitInMgDl: data.urgentLowLimitInMgDl, lowLimitInMgDl: data.lowLimitInMgDl, highLimitInMgDl: data.highLimitInMgDl, urgentHighLimitInMgDl: data.urgentHighLimitInMgDl, disableComplications: data.disableComplications)
         } catch {
             print(error.localizedDescription)
         }
@@ -61,7 +60,6 @@ extension XDripWatchComplication.Provider {
     }
     
     private var sampleWidgetStateFromProvider: XDripWatchComplication.Entry.WidgetState {
-        //var widgetState = Entry.WidgetState()
         
         func bgDateArray() -> [Date] {
             let endDate = Date()
@@ -100,8 +98,6 @@ extension XDripWatchComplication.Provider {
             return bgValueArray
         }
         
-        var widgetState = Entry.WidgetState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 3, deltaChangeInMgDl: 0, urgentLowLimitInMgDl: ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl, lowLimitInMgDl: ConstantsBGGraphBuilder.defaultLowMarkInMgdl, highLimitInMgDl: ConstantsBGGraphBuilder.defaultHighMarkInMgdl, urgentHighLimitInMgDl: ConstantsBGGraphBuilder.defaultUrgentHighMarkInMgdl)
-        
-        return widgetState
+        return Entry.WidgetState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 3, deltaChangeInMgDl: 0, urgentLowLimitInMgDl: ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl, lowLimitInMgDl: ConstantsBGGraphBuilder.defaultLowMarkInMgdl, highLimitInMgDl: ConstantsBGGraphBuilder.defaultHighMarkInMgdl, urgentHighLimitInMgDl: ConstantsBGGraphBuilder.defaultUrgentHighMarkInMgdl)
     }
 }

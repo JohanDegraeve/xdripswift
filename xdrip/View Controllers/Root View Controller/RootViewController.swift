@@ -3223,7 +3223,7 @@ final class RootViewController: UIViewController, ObservableObject {
         setFollowerConnectionStatus()
         
         // set the keep-alive image, then make it visible if in follower mode
-        dataSourceKeepAliveImageOutlet.image = UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImage
+        dataSourceKeepAliveImageOutlet.image = UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveUIImage
         dataSourceKeepAliveImageOutlet.isHidden = isMaster
         
         // let's go through the specific cases for follower modes
@@ -3591,7 +3591,7 @@ final class RootViewController: UIViewController, ObservableObject {
                         if UserDefaults.standard.isMaster && showLiveActivity {
                             
                             // create the contentState that will update the dynamic attributes of the Live Activity Widget
-                            let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, showClockAtNight: UserDefaults.standard.liveActivityShowClockAtNight, liveActivitySize: UserDefaults.standard.liveActivitySize)
+                            let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySize: UserDefaults.standard.liveActivitySize)
                             
                             LiveActivityManager.shared.runActivity(contentState: contentState, forceRestart: forceRestart)
                             
@@ -3603,9 +3603,11 @@ final class RootViewController: UIViewController, ObservableObject {
                         }
                         
                         let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue)
-                        
+                                                
+                        // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
+                        // the user's device - this allows several copies of the app to be installed without cross-contamination of widget data
                         if let widgetData = try? JSONEncoder().encode(widgetSharedUserDefaultsModel) {
-                            UserDefaults.storeInSharedUserDefaults(value: widgetData, forKey: "widgetSharedUserDefaults")
+                            UserDefaults.storeInSharedUserDefaults(value: widgetData, forKey: "widgetSharedUserDefaults.\(Bundle.main.mainAppBundleIdentifier)")
                         }
                         
                         WidgetCenter.shared.reloadAllTimelines()

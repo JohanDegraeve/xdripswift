@@ -163,9 +163,9 @@ class NightScoutFollowManager: NSObject {
             trace("    last reading is less than 30 seconds old, will not download now", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
             
             // schedule new download, only if followerBackgroundKeepAliveType != disabled
-            if UserDefaults.standard.followerBackgroundKeepAliveType != .disabled {
+            //if UserDefaults.standard.followerBackgroundKeepAliveType != .disabled {
                 self.scheduleNewDownload()
-            }
+            //}
             
             return
         }
@@ -205,9 +205,9 @@ class NightScoutFollowManager: NSObject {
                     }
 
                     // schedule new download, only if followerBackgroundKeepAliveType != disabled
-                    if UserDefaults.standard.followerBackgroundKeepAliveType != .disabled {
+                    //if UserDefaults.standard.followerBackgroundKeepAliveType != .disabled {
                         self.scheduleNewDownload()
-                    }
+                    //}
 
                 }
                 
@@ -417,13 +417,13 @@ class NightScoutFollowManager: NSObject {
             if UserDefaults.standard.followerBackgroundKeepAliveType != .disabled {
 
                 enableSuspensionPrevention()
-
-                // do initial download, this will also schedule future downloads
-                download()
                 
             } else {
                 disableSuspensionPrevention()
             }
+            
+            // do initial download, this will also schedule future downloads
+            download()
             
         } else {
             

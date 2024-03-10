@@ -72,6 +72,16 @@ extension XDripWidget.Entry {
             }
         }
         
+        /// Delta text color dependant on the time since the last reading
+        /// - Returns: a Color either red, yellow or green
+        func deltaChangeTextColor() -> Color {
+            if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-60 * 7) {
+                return Color(white: 0.8)
+            } else {
+                return Color(.gray)
+            }
+        }
+        
         /// used to return values and colors used by a SwiftUI gauge view
         /// - Returns: minValue/maxValue - used to define the limits of the gauge. gaugeColor/gaugeGradient - the gauge view will use one or the other
         func gaugeModel() -> (minValue: Double, maxValue: Double, gaugeColor: Color, gaugeGradient: Gradient) {

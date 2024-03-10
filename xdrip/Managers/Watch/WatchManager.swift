@@ -8,6 +8,7 @@
 
 import Foundation
 import WatchConnectivity
+import WidgetKit
 
 public final class WatchManager: NSObject, ObservableObject {
     
@@ -15,6 +16,9 @@ public final class WatchManager: NSObject, ObservableObject {
     
     /// a watch connectivity session instance
     private let session: WCSession
+    
+    // dispatch queue for async processing operations
+    private let processQueue = DispatchQueue(label: "WatchManager.processQueue")
     
     /// a BgReadingsAccessor instance
     private var bgReadingsAccessor: BgReadingsAccessor
@@ -46,20 +50,8 @@ public final class WatchManager: NSObject, ObservableObject {
     }
 
     private func processWatchState() {
-        // check if the watch is connected and active before doing anything
-        guard session.isReachable else { return }
-        
         DispatchQueue.main.async {
-            
-            // get 2 last Readings, with a calculatedValue
-            //let lastReading = self.bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 0)
-            
-            // there should be at least one reading
-//            guard lastReading.count > 0 else {
-//                print("exiting processWatchState(), no recent BG readings returned")
-//                return
-//            }
-            
+                
             // create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
             // this is needed due to the not being able to pass structs that are not codable/hashable
             let hoursOfBgReadingsToSend: Double = 12
@@ -96,16 +88,25 @@ public final class WatchManager: NSObject, ObservableObject {
             self.watchState.showAppleWatchDebug = UserDefaults.standard.showAppleWatchDebug
             self.watchState.activeSensorDescription = UserDefaults.standard.activeSensorDescription
             self.watchState.timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection ?? Date()
-            self.watchState.secondsUntilFollowerDisconnectWarning = UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning ?? 90
+            self.watchState.secondsUntilFollowerDisconnectWarning = UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning
             self.watchState.isMaster = UserDefaults.standard.isMaster
             self.watchState.followerDataSourceTypeRawValue = UserDefaults.standard.followerDataSourceType.rawValue
             self.watchState.followerBackgroundKeepAliveTypeRawValue = UserDefaults.standard.followerBackgroundKeepAliveType.rawValue
+            self.watchState.disableComplications = !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled
+                        
+            // check when the last follower connection was and compare that to the actual time
+            if let timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection, Calendar.current.dateComponents([.second], from: timeStampOfLastFollowerConnection, to: Date()).second! >= UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning {
+                self.watchState.followerConnectionIsStale = true
+            } else {
+                self.watchState.followerConnectionIsStale = false
+            }
             
             if let sensorStartDate = UserDefaults.standard.activeSensorStartDate {
                 self.watchState.sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: Date()).minute!)
             } else {
                 self.watchState.sensorAgeInMinutes = 0
             }
+            
             self.watchState.sensorMaxAgeInMinutes = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
             
             self.sendToWatch()
@@ -113,11 +114,13 @@ public final class WatchManager: NSObject, ObservableObject {
     }
     
     
-    private func sendToWatch() {
+    private func sendToWatch() {        
         guard let data = try? JSONEncoder().encode(watchState) else {
             print("Watch state JSON encoding error")
             return
         }
+        
+        guard session.isReachable else { return }
         
         session.sendMessageData(data, replyHandler: nil) { error in
             print("Cannot send data message to watch")
@@ -148,8 +151,8 @@ extension WatchManager: WCSessionDelegate {
         
         // if the action: refreshBGData message is received, then force the app to send new data to the Watch App
         if let requestWatchStateUpdate = message["requestWatchStateUpdate"] as? Bool, requestWatchStateUpdate {
-            DispatchQueue.main.async {
-                self.processWatchState()
+            processQueue.async {
+                self.sendToWatch()
             }
         }
     }
@@ -158,8 +161,8 @@ extension WatchManager: WCSessionDelegate {
 
     public func sessionReachabilityDidChange(_ session: WCSession) {
         if session.isReachable {
-            DispatchQueue.main.async {
-                self.processWatchState()
+            processQueue.async {
+                self.sendToWatch()
             }
         }
     }

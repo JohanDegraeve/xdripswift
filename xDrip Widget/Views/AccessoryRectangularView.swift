@@ -15,18 +15,11 @@ extension XDripWidget.EntryView {
         ZStack {
             AccessoryWidgetBackground()
                 .cornerRadius(8)
-            
-                VStack(spacing: 0) {
-                    Text("\(entry.widgetState.bgValueStringInUserChosenUnit)\(entry.widgetState.trendArrow())")
-                        .font(.largeTitle).fontWeight(.semibold)
-                        .foregroundStyle(Color(white: 1))
-                        .lineLimit(1)
-                    
-                    Text("Last reading \(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
-                        .font(.system(size: 12))
-                        .foregroundStyle(Color(white: 0.6))
-                }
-                .padding(8)
+            Text("\(entry.widgetState.bgValueStringInUserChosenUnit)\(entry.widgetState.trendArrow())")
+                .font(.system(size: 50)).fontWeight(.semibold)
+                .minimumScaleFactor(0.2)
+                .foregroundStyle(Color(white: 1))
+                .lineLimit(1)
         }
         .widgetBackground(backgroundView: Color.black)
     }

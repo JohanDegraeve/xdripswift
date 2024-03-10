@@ -93,10 +93,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_liveActivitySizeLarge", tableName: filename, bundle: Bundle.main, value: "Large", comment: "notification settings, live activity size large")
     }()
     
-    static let liveActivityShowClockAtNight: String = {
-        return NSLocalizedString("settingsviews_liveActivityShowClockAtNight", tableName: filename, bundle: Bundle.main, value: "Automatically configure for StandBy", comment: "notification settings, live activities will be automatically switch for standby mode at night")
-    }()
-    
     
     // MARK: - Section Data Source
     

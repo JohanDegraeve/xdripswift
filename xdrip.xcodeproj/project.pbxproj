@@ -151,6 +151,7 @@
 		47DE41B32B8672F90041DA19 /* DataSourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41B22B8672F90041DA19 /* DataSourceView.swift */; };
 		47DE41B52B8693CB0041DA19 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41B42B8693CB0041DA19 /* HeaderView.swift */; };
 		47DE41B92B87B2680041DA19 /* ConstantsAppleWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41B82B87B2680041DA19 /* ConstantsAppleWatch.swift */; };
+		47E91BBA2B9A43F20063181B /* FollowerBackgroundKeepAliveType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */; };
 		47FB28082636B04200042FFB /* StatisticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47FB28072636B04200042FFB /* StatisticsManager.swift */; };
 		CE1B2FE025D0264B00F642F5 /* LaunchScreen.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */; };
 		CE1B2FE125D0264B00F642F5 /* Main.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD425D0264900F642F5 /* Main.strings */; };
@@ -3937,6 +3938,7 @@
 				471C9BFF2B932952005E1326 /* LibreLinkUpModels.swift in Sources */,
 				478A923E2B8B64DE0084C394 /* ConstantsHomeView.swift in Sources */,
 				4796C6072B9516FD00DE2210 /* Bundle.swift in Sources */,
+				47E91BBA2B9A43F20063181B /* FollowerBackgroundKeepAliveType.swift in Sources */,
 				478A92582B8FA1F20084C394 /* Date.swift in Sources */,
 				478A92552B8FA1D80084C394 /* ConstantsBGGraphBuilder.swift in Sources */,
 				478A925F2B8FB5290084C394 /* XDripWatchComplication+Entry.swift in Sources */,
@@ -5010,7 +5012,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "xDrip Widget/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = xDrip4iO5;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 Johan Degraeve. All rights reserved.";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -5046,7 +5048,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "xDrip Widget/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = xDrip4iO5;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 Johan Degraeve. All rights reserved.";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -5080,7 +5082,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "xDrip Watch Complication/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = xDrip4iO5;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Johan Degraeve. All rights reserved.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5117,7 +5119,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "xDrip Watch Complication/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = xDrip4iO5;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Johan Degraeve. All rights reserved.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5156,7 +5158,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "xDrip-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = xDrip4iO5;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
@@ -5197,7 +5199,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "xDrip-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = xDrip4iO5;
+				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;

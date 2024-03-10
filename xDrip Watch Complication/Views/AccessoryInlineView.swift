@@ -12,7 +12,11 @@ import SwiftUI
 extension XDripWatchComplication.EntryView {
     @ViewBuilder
     var accessoryInlineView: some View {
-        Text("\(entry.widgetState.bgValueStringInUserChosenUnit) \(entry.widgetState.trendArrow())  \(entry.widgetState.deltaChangeStringInUserChosenUnit())")
+        if !entry.widgetState.disableComplications {
+            Text("\(entry.widgetState.bgValueStringInUserChosenUnit) \(entry.widgetState.trendArrow())  \(entry.widgetState.deltaChangeStringInUserChosenUnit())")
+        } else {
+            Text("\(ConstantsHomeView.applicationName)")
+        }
     }
 }
 

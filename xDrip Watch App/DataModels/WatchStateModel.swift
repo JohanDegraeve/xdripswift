@@ -16,11 +16,13 @@ import WidgetKit
 /// also used to update the ComplicationSharedUserDefaultsModel in the app group so that the complication can access the data
 class WatchStateModel: NSObject, ObservableObject {
     
-    /// shared UserDefaults to publish data
-    private let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName)
-    
     /// the Watch Connectivity session
-    private var session: WCSession
+    var session: WCSession
+    
+    // set timer to automatically refresh the view
+    // https://www.hackingwithswift.com/quick-start/swiftui/how-to-use-a-timer-with-swiftui
+    let timer = Timer.publish(every: 1, tolerance: 0.5, on: .main, in: .common).autoconnect()
+    @Published var timerControlDate = Date()
     
     var bgReadingValues: [Double] = []
     var bgReadingDates: [Date] = []
@@ -37,14 +39,16 @@ class WatchStateModel: NSObject, ObservableObject {
     @Published var sensorAgeInMinutes: Double = 0
     @Published var sensorMaxAgeInMinutes: Double = 14400
     @Published var showAppleWatchDebug: Bool = false
+    @Published var followerConnectionIsStale: Bool = false
     @Published var timeStampOfLastFollowerConnection: Date = Date()
     @Published var secondsUntilFollowerDisconnectWarning: Int = 90
     @Published var isMaster: Bool = true
     @Published var followerDataSourceType: FollowerDataSourceType = .nightscout
     @Published var followerBackgroundKeepAliveType: FollowerBackgroundKeepAliveType = .normal
+    @Published var disableComplications: Bool = false
     
-    @Published var lastUpdatedTextString: String = "Updating..."
-    @Published var lastUpdatedTimeString: String = "12:34"
+    @Published var lastUpdatedTextString: String = "Requesting data..."
+    @Published var lastUpdatedTimeString: String = ""
     @Published var debugString: String = "Debug info..."
     @Published var chartHoursIndex: Int = 1
     
@@ -142,26 +146,29 @@ class WatchStateModel: NSObject, ObservableObject {
     /// convert the optional delta change int (in mg/dL) to a formatted change value in the user chosen unit making sure all zero values are shown as a positive change to follow Nightscout convention
     /// - Returns: a string holding the formatted delta change value (i.e. +0.4 or -6)
     func deltaChangeStringInUserChosenUnit() -> String {
-        
-        let valueAsString = deltaChangeInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
-        
-        var deltaSign: String = ""
-        if (deltaChangeInMgDl > 0) { deltaSign = "+"; }
-        
-        // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
-        // show unitized zero deltas as +0 or +0.0 as per Nightscout format
-        if (isMgDl) {
-            if (deltaChangeInMgDl > -1) && (deltaChangeInMgDl < 1) {
-                return "+0"
+        if let bgReadingDate = bgReadingDate(), bgReadingDate > Date().addingTimeInterval(-60 * 20) {
+            let valueAsString = deltaChangeInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
+            
+            var deltaSign: String = ""
+            if (deltaChangeInMgDl > 0) { deltaSign = "+"; }
+            
+            // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
+            // show unitized zero deltas as +0 or +0.0 as per Nightscout format
+            if (isMgDl) {
+                if (deltaChangeInMgDl > -1) && (deltaChangeInMgDl < 1) {
+                    return "+0"
+                } else {
+                    return deltaSign + valueAsString
+                }
             } else {
-                return deltaSign + valueAsString
+                if (deltaChangeInMgDl > -0.1) && (deltaChangeInMgDl < 0.1) {
+                    return "+0.0"
+                } else {
+                    return deltaSign + valueAsString
+                }
             }
         } else {
-            if (deltaChangeInMgDl > -0.1) && (deltaChangeInMgDl < 0.1) {
-                return "+0.0"
-            } else {
-                return deltaSign + valueAsString
-            }
+            return "-"
         }
     }
     
@@ -202,6 +209,18 @@ class WatchStateModel: NSObject, ObservableObject {
         return (networkImage, tintColor)
     }
     
+    func getFollowerConnectionStatusImage() -> (networkImage: Image, tintColor: Color) {
+        var networkImage: Image = Image(systemName: "network")
+        var tintColor: Color = .green
+        
+        if followerConnectionIsStale {
+            networkImage = Image(systemName: "network.slash")
+            tintColor = .gray
+        }
+        
+        return (networkImage, tintColor)
+    }
+    
     /// request a state update from the iOS companion app
     func requestWatchStateUpdate() {
         guard session.activationState == .activated else {
@@ -211,8 +230,9 @@ class WatchStateModel: NSObject, ObservableObject {
         
         // change the text, this must be done in the main thread
         DispatchQueue.main.async {
-            self.lastUpdatedTextString = "Waiting for data..."
-            self.lastUpdatedTimeString = ""
+            self.debugString += "\nRequesting data..."
+//            self.lastUpdatedTextString = "Updating..."
+//            self.lastUpdatedTimeString = ""
         }
         
         print("Requesting watch state update from iOS")
@@ -243,12 +263,14 @@ class WatchStateModel: NSObject, ObservableObject {
         isMaster = watchState.isMaster ?? true
         followerDataSourceType = FollowerDataSourceType(rawValue: watchState.followerDataSourceTypeRawValue ?? 0) ?? .nightscout
         followerBackgroundKeepAliveType = FollowerBackgroundKeepAliveType(rawValue: watchState.followerBackgroundKeepAliveTypeRawValue ?? 0) ?? .normal
+        disableComplications = watchState.disableComplications ?? false
+        followerConnectionIsStale = watchState.followerConnectionIsStale ?? false
         
         // check if there is any BG data available before updating the strings accordingly
         if let bgReadingDate = bgReadingDate() {
             lastUpdatedTextString = "Last reading "
             lastUpdatedTimeString = bgReadingDate.formatted(date: .omitted, time: .shortened)
-            debugString = "State updated: \(Date().formatted(date: .omitted, time: .shortened))\nBG updated: \(bgReadingDate.formatted(date: .omitted, time: .shortened))\nBG values: \(bgReadingValues.count)"
+            debugString = "State updated: \(Date().formatted(date: .omitted, time: .standard))\nBG updated: \(bgReadingDate.formatted(date: .omitted, time: .standard))\nBG values: \(bgReadingValues.count)"
         } else {
             lastUpdatedTextString = "No sensor data"
             lastUpdatedTimeString = ""
@@ -260,17 +282,19 @@ class WatchStateModel: NSObject, ObservableObject {
     }
     
     /// once we've process the state update, then save this data to the shared app group so that the complication can read it
-    private func updateWatchSharedUserDefaults() {
-        guard let sharedUserDefaults = sharedUserDefaults else { return }
+    private func updateWatchSharedUserDefaults() {        
+        guard let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) else { return }
         
         let bgReadingDatesAsDouble = bgReadingDates.map { date in
             date.timeIntervalSince1970
         }
         
-        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl)
+        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl, disableComplications: disableComplications)
         
+        // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
+        // the user's device - this allows several copies of the app to be installed without cross-contamination of widget/complication data
         if let stateData = try? JSONEncoder().encode(complicationSharedUserDefaultsModel) {
-            sharedUserDefaults.set(stateData, forKey: "complicationSharedUserDefaults")
+            sharedUserDefaults.set(stateData, forKey: "complicationSharedUserDefaults.\(Bundle.main.mainAppBundleIdentifier)")
         }
         
         // now that the new data is stored in the app group, try to force the complications to reload

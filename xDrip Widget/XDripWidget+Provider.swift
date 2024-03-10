@@ -37,7 +37,7 @@ extension XDripWidget.Provider {
         
         guard let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) else {return nil}
         
-        guard let encodedLatestReadings = sharedUserDefaults.data(forKey: "widgetSharedUserDefaults") else {
+        guard let encodedLatestReadings = sharedUserDefaults.data(forKey: "widgetSharedUserDefaults.\(Bundle.main.mainAppBundleIdentifier)") else {
             return nil
         }
         

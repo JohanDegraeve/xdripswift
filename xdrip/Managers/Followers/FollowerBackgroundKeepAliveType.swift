@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import SwiftUI
 
 /// types of background keep-alive
 public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
@@ -42,7 +43,8 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
         }
     }
     
-    var keepAliveImage: UIImage {
+    // return the keep-alive image for UIKit views
+    var keepAliveUIImage: UIImage {
         switch self {
         case .disabled:
             return UIImage(systemName: "d.circle") ?? UIImage()
@@ -50,6 +52,18 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
             return UIImage(systemName: "n.circle") ?? UIImage()
         case .aggressive:
             return UIImage(systemName: "a.circle") ?? UIImage()
+        }
+    }
+    
+    // return the keep-alive image for SwiftUI views
+    var keepAliveImage: Image {
+        switch self {
+        case .disabled:
+            return Image(systemName: "d.circle")
+        case .normal:
+            return Image(systemName: "n.circle")
+        case .aggressive:
+            return Image(systemName: "a.circle")
         }
     }
     

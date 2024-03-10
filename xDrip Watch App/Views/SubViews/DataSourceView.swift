@@ -22,11 +22,16 @@ struct DataSourceView: View {
                 
                 HStack {
                     if !watchState.isMaster {
-                        HStack(alignment: .center, spacing: 6) {
-                            watchState.getDataTimeStampOfLastFollowerConnection().networkImage
+                        HStack(alignment: .center, spacing: 4) {
+                            watchState.getFollowerConnectionStatusImage().networkImage
                                 .font(.system(size: 14))
-                                .foregroundStyle(watchState.getDataTimeStampOfLastFollowerConnection().tintColor)
+                                .foregroundStyle(watchState.getFollowerConnectionStatusImage().tintColor)
                                 .padding(.bottom, -2)
+                            
+                            watchState.followerBackgroundKeepAliveType.keepAliveImage
+                                .font(.system(size: 14))
+                                .foregroundStyle(Color(white: 0.7))
+                                .padding(.bottom, -3)
                             
                             Text(watchState.followerDataSourceType.fullDescription)
                                 .font(.system(size: 14)).fontWeight(.semibold)

@@ -8,7 +8,7 @@
 
 import Foundation
 
-/// model of the data we'll store in the shared app group to pass from the watch app to the watch complication widget extension
+/// model of the data we'll store in the shared app group to pass from the watch app to widgetkit
 struct ComplicationSharedUserDefaultsModel: Codable {
     var bgReadingValues: [Double]
     var bgReadingDatesAsDouble: [Double]
@@ -19,4 +19,5 @@ struct ComplicationSharedUserDefaultsModel: Codable {
     var lowLimitInMgDl: Double
     var highLimitInMgDl: Double
     var urgentHighLimitInMgDl: Double
+    var disableComplications: Bool
 }

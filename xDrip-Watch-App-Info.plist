@@ -4,5 +4,7 @@
 <dict>
 	<key>AppGroupIdentifier</key>
 	<string>$(APP_GROUP_IDENTIFIER)</string>
+	<key>MainAppBundleIdentifier</key>
+	<string>$(MAIN_APP_BUNDLE_IDENTIFIER)</string>
 </dict>
 </plist>

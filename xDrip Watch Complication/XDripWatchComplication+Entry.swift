@@ -32,13 +32,16 @@ extension XDripWatchComplication.Entry {
         var lowLimitInMgDl: Double
         var highLimitInMgDl: Double
         var urgentHighLimitInMgDl: Double
+//        var isMaster: Bool = true
+//        var followerBackgroundKeepAliveType: FollowerBackgroundKeepAliveType = .normal
         
         var bgUnitString: String
         var bgValueInMgDl: Double?
         var bgReadingDate: Date?
         var bgValueStringInUserChosenUnit: String
+        var disableComplications: Bool
                 
-        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaChangeInMgDl: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250) {
+        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaChangeInMgDl: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, disableComplications: Bool? = false) {
             self.bgReadingValues = bgReadingValues
             self.bgReadingDates = bgReadingDates
             self.isMgDl = isMgDl ?? true
@@ -48,11 +51,14 @@ extension XDripWatchComplication.Entry {
             self.lowLimitInMgDl = lowLimitInMgDl ?? 80
             self.highLimitInMgDl = highLimitInMgDl ?? 180
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl ?? 250
+//            self.isMaster = isMaster ?? true
+//            self.followerBackgroundKeepAliveType = followerBackgroundKeepAliveType ?? .normal
             
             self.bgValueInMgDl = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0] : nil
             self.bgReadingDate = (bgReadingDates?.count ?? 0) > 0 ? bgReadingDates?[0] : nil
             self.bgUnitString = self.isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
             self.bgValueStringInUserChosenUnit = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0].mgdlToMmolAndToString(mgdl: self.isMgDl) ?? "" : ""
+            self.disableComplications = disableComplications ?? false //(!self.isMaster && self.followerBackgroundKeepAliveType == .disabled) ? true : false
             
         }
         
