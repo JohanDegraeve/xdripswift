@@ -340,11 +340,11 @@ public class AlertManager:NSObject {
                                 if alertKind == .missedreading {
                                     
                                     if let content = content {
-
+                                        
                                         // schedule missed reading alert with same content
                                         self.scheduleMissedReadingAlert(snoozePeriodInMinutes: snoozePeriod, content: content)
-
-                                    } else {
+                                        
+                                    } else if UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled && UserDefaults.standard.activeSensorStartDate != nil) {
                                         
                                         _ = self.checkAlertAndFire(alertKind: .missedreading, lastBgReading: nil, lastButOneBgREading: nil, lastCalibration: nil, transmitterBatteryInfo: nil)
                                         
@@ -555,7 +555,7 @@ public class AlertManager:NSObject {
             
         }
         
-        if alertNeeded {
+        if alertNeeded && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled)) {
             
             // alert needs to be raised
             
@@ -719,9 +719,11 @@ public class AlertManager:NSObject {
             return true
             
         } else {
-            
-            trace("in checkAlert, there's no need to raise alert %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
-
+            if !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
+                trace("in checkAlert, there's no need to raise alert %{public}@ because we're in follower mode and keep-alive is disabled", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
+            } else {
+                trace("in checkAlert, there's no need to raise alert %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
+            }
             return false
         }
     }

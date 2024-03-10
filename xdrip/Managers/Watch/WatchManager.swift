@@ -17,9 +17,6 @@ public final class WatchManager: NSObject, ObservableObject {
     /// a watch connectivity session instance
     private let session: WCSession
     
-    // dispatch queue for async processing operations
-    private let processQueue = DispatchQueue(label: "WatchManager.processQueue")
-    
     /// a BgReadingsAccessor instance
     private var bgReadingsAccessor: BgReadingsAccessor
     
@@ -58,7 +55,7 @@ public final class WatchManager: NSObject, ObservableObject {
             
             let bgReadings = self.bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
             
-            let slopeOrdinal: Int = bgReadings[0].slopeOrdinal() //? "" : lastReading[0].slopeArrow()
+            let slopeOrdinal: Int = !bgReadings.isEmpty ? bgReadings[0].slopeOrdinal() : 1
             
             var deltaChangeInMgDl: Double?
             
@@ -151,7 +148,7 @@ extension WatchManager: WCSessionDelegate {
         
         // if the action: refreshBGData message is received, then force the app to send new data to the Watch App
         if let requestWatchStateUpdate = message["requestWatchStateUpdate"] as? Bool, requestWatchStateUpdate {
-            processQueue.async {
+            DispatchQueue.main.async {
                 self.sendToWatch()
             }
         }
@@ -161,7 +158,7 @@ extension WatchManager: WCSessionDelegate {
 
     public func sessionReachabilityDidChange(_ session: WCSession) {
         if session.isReachable {
-            processQueue.async {
+            DispatchQueue.main.async {
                 self.sendToWatch()
             }
         }

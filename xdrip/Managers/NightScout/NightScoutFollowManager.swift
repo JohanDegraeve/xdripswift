@@ -204,10 +204,8 @@ class NightScoutFollowManager: NSObject {
                         followerDelegate.followerInfoReceived(followGlucoseDataArray: &followGlucoseDataArray)
                     }
 
-                    // schedule new download, only if followerBackgroundKeepAliveType != disabled
-                    //if UserDefaults.standard.followerBackgroundKeepAliveType != .disabled {
-                        self.scheduleNewDownload()
-                    //}
+                    // schedule new download
+                    self.scheduleNewDownload()
 
                 }
                 
@@ -415,9 +413,7 @@ class NightScoutFollowManager: NSObject {
             
             // this will enable the suspension prevention sound playing if background keep-alive is enabled
             if UserDefaults.standard.followerBackgroundKeepAliveType != .disabled {
-
                 enableSuspensionPrevention()
-                
             } else {
                 disableSuspensionPrevention()
             }

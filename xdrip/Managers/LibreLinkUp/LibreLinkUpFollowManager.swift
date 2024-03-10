@@ -315,7 +315,7 @@ class LibreLinkUpFollowManager: NSObject {
                         }
                         
                         // schedule new download
-                        //self.scheduleNewDownload()
+                        self.scheduleNewDownload()
                         
                     }
                     
@@ -330,12 +330,7 @@ class LibreLinkUpFollowManager: NSObject {
             // rescheduling the timer must be done in main thread
             // we do it here at the end of the function so that it is always rescheduled once a valid connection is established, irrespective of whether we get values.
             DispatchQueue.main.sync {
-                
-                // schedule new download, only if followerBackgroundKeepAliveType != disabled
-                if UserDefaults.standard.followerBackgroundKeepAliveType != .disabled {
-                    self.scheduleNewDownload()
-                }
-
+                self.scheduleNewDownload()
             }
         }
     }
@@ -520,6 +515,7 @@ class LibreLinkUpFollowManager: NSObject {
             
         }
         
+        print(loginUrl.description)
         trace("    in requestLogin, processing login request with URL: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, loginUrl)
         
         guard let url = URL(string: loginUrl) else { 
@@ -808,15 +804,13 @@ class LibreLinkUpFollowManager: NSObject {
             
             // this will enable the suspension prevention sound playing if background keep-alive is enabled
             if UserDefaults.standard.followerBackgroundKeepAliveType != .disabled {
-                
                 enableSuspensionPrevention()
-                
-                // do initial download, this will also schedule future downloads
-                download()
-                
             } else {
                 disableSuspensionPrevention()
             }
+            
+            // do initial download, this will also schedule future downloads
+            download()
                         
         } else {
             

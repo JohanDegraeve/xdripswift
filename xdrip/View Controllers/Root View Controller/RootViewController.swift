@@ -1491,6 +1491,9 @@ final class RootViewController: UIViewController, ObservableObject {
                     // update data source info
                     updateDataSourceInfo(animate: false)
                     
+                    // try and reload the widget timeline(s)
+                    WidgetCenter.shared.reloadAllTimelines()
+                    
                 }
                 
                 nightScoutUploadManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
@@ -1604,7 +1607,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // if showReadingInAppBadge = false, means user set it from true to false
             // set the app badge to 0. This will cause removal of the badge counter, but also removal of any existing notification on the screen
-            if !UserDefaults.standard.showReadingInAppBadge {
+            if !UserDefaults.standard.showReadingInAppBadge || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled) {
                 
                 // applicationIconBadgeNumber has been deprecated for iOS17 but as we currently have a minimum deployment target of iOS15, let's add a conditional check
                 if #available(iOS 16.0, *) {
@@ -1613,6 +1616,11 @@ final class RootViewController: UIViewController, ObservableObject {
                     UIApplication.shared.applicationIconBadgeNumber = 0
                 }
                 
+            }
+            
+            // make sure that any pending (i.e. already scheduled in the future) missed reading notifications are removed
+            if !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
+                UNUserNotificationCenter.current().removePendingNotificationRequests(withIdentifiers: [ConstantsNotifications.NotificationIdentifiersForAlerts.missedReadingAlert])
             }
             
             // also update Watch App with the new values. (Only really needed for unit change between mg/dl and mmol/l)
@@ -2152,8 +2160,8 @@ final class RootViewController: UIViewController, ObservableObject {
             // Create Notification Content
             let notificationContent = UNMutableNotificationContent()
             
-            // set value in badge if required
-            if UserDefaults.standard.showReadingInAppBadge {
+            // set value in badge if required and also only if master, or when background keep alive is enabled for followers
+            if UserDefaults.standard.showReadingInAppBadge && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster &&  UserDefaults.standard.followerBackgroundKeepAliveType != .disabled)) {
                 
                 // rescale if unit is mmol
                 if !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
@@ -2196,7 +2204,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // notification shouldn't be shown, but maybe the badge counter. Here the badge value needs to be shown in another way and also only if master, or when background keep alive is enabled for followers
             
-            if UserDefaults.standard.showReadingInAppBadge {
+            if UserDefaults.standard.showReadingInAppBadge && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled)) {
                 
                 // rescale of unit is mmol
                 readingValueForBadge = readingValueForBadge.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
