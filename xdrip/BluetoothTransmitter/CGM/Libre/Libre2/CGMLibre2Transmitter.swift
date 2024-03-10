@@ -10,13 +10,13 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     // MARK: - properties
     
     /// service to be discovered
-    private let CBUUID_Service_OmniPod: String = "FDE3"
+    private let CBUUID_Service_Libre2: String = "FDE3"
     
     /// receive characteristic
-    private let CBUUID_ReceiveCharacteristic_OmniPod: String = "F002"
+    private let CBUUID_ReceiveCharacteristic_Libre2: String = "F002"
     
     /// write characteristic
-    private let CBUUID_WriteCharacteristic_OmniPod: String = "F001"
+    private let CBUUID_WriteCharacteristic_Libre2: String = "F001"
     
     /// how many bytes should we receive from Libre 2
     private let expectedBufferSize = 46
@@ -101,7 +101,7 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
         // initialize webOOPEnabled
         self.webOOPEnabled = webOOPEnabled ?? false
 
-        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_OmniPod)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_OmniPod, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_OmniPod, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
+        super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_Libre2)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Libre2, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Libre2, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
     }
     
@@ -358,11 +358,11 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
     }
     
     func getCBUUID_Service() -> String {
-        return CBUUID_Service_OmniPod
+        return CBUUID_Service_Libre2
     }
     
     func getCBUUID_Receive() -> String {
-        return CBUUID_ReceiveCharacteristic_OmniPod
+        return CBUUID_ReceiveCharacteristic_Libre2
     }
 
 }
