@@ -275,7 +275,25 @@ extension UserDefaults {
         /// should a visual coloured indicator be shown in the calendar title yes or no
         case displayVisualIndicatorInCalendarEvent = "displayVisualIndicator"
         
+        // Contact trick
         
+        /// enable contact trick yes or no
+        case enableContactTrick = "enableContactTrick"
+        /// the ID of the contact to be used by the contact trick
+        case contactTrickContactId = "contactTrickContactId"
+        /// should trend be displayed yes or no
+        case displayTrendInContactTrick = "displayTrendInContactTrick"
+        /// should the range indicator be displayed, yes or no
+        case rangeIndicatorInContactTrick = "rangeIndicatorInContactTrick"
+        /// should the image be rendered for the dark mode, yes or no
+        case darkModeInContactTrick = "darkModeInContactTrick"
+        /// font size
+        case fontSizeInContactTrick = "fontSizeInContactTrick"
+        /// font weight
+        case fontWeightInContactTrick = "fontWeightInContactTrick"
+        /// font name
+        case fontNameInContactTrick = "fontNameInContactTrick"
+
         // Other Settings (not user configurable)
         
         /// - in case missed reading alert settings are changed by user, this value will be set to true
@@ -1729,7 +1747,92 @@ extension UserDefaults {
         }
     }
     
+    // MARK: - Contact trick
+    
+    /// enable the contact trick yes or no, default false
+    @objc dynamic var enableContactTrick: Bool {
+        get {
+            return bool(forKey: Key.enableContactTrick.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.enableContactTrick.rawValue)
+        }
+    }
 
+    /// the ID of the contact to be updated by the contact trick
+    @objc dynamic var contactTrickContactId: String? {
+        get {
+            return string(forKey: Key.contactTrickContactId.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.contactTrickContactId.rawValue)
+        }
+    }
+
+    /// this is for showing readings on watch via the contact trick. Should trend be displayed in the contact, yes or no, default no
+    @objc dynamic var displayTrendInContactTrick: Bool {
+        get {
+            return bool(forKey: Key.displayTrendInContactTrick.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.displayTrendInContactTrick.rawValue)
+        }
+    }
+    
+    /// this is for showing readings on watch via the contact trick. Should the range indicator be displayed, yes or no
+    @objc dynamic var rangeIndicatorInContactTrick: Bool {
+        get {
+            return bool(forKey: Key.rangeIndicatorInContactTrick.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.rangeIndicatorInContactTrick.rawValue)
+        }
+    }
+    
+    /// this is for showing readings on watch via the contact trick. Should the contact picture be drawn for the dark mode, yes or no
+    @objc dynamic var darkModeInContactTrick: Bool {
+        get {
+            return bool(forKey: Key.darkModeInContactTrick.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.darkModeInContactTrick.rawValue)
+        }
+    }
+    
+    /// this is for showing readings on watch via the contact trick. The font size
+    @objc dynamic var fontSizeInContactTrick: Int {
+        get {
+            let value = integer(forKey: Key.fontSizeInContactTrick.rawValue)
+            return value > 0 ? value : 100
+        }
+        set {
+            set(newValue, forKey: Key.fontSizeInContactTrick.rawValue)
+        }
+    }
+
+    /// font weight for the contact trick
+    dynamic var contactTrickFontWeight: FontWeightType {
+        get {
+            let fontWeightAsInt = integer(forKey: Key.fontWeightInContactTrick.rawValue)
+            return FontWeightType(rawValue: fontWeightAsInt) ?? .medium
+        }
+        set {
+            set(newValue.rawValue, forKey: Key.fontWeightInContactTrick.rawValue)
+        }
+    }
+
+    /// font name for the contact trick
+    @objc dynamic var contactTrickFontName: String? {
+        get {
+            return string(forKey: Key.fontNameInContactTrick.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.fontNameInContactTrick.rawValue)
+        }
+    }
+
+    
+    
     // MARK: - =====  Other Settings ======
     
     /// - in case missed reading alert settings are changed by user, this value will be set to true

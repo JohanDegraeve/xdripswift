@@ -136,9 +136,15 @@ enum ConstantsLog {
     /// SettingsViewCalendarEventsSettingsViewModel logging
     static let categorySettingsViewCalendarEventsSettingsViewModel =         "SettingsViewCalendarEventsSettingsViewModel"
     
+    /// SettingsViewContactTrickSettingsViewModel logging
+    static let categorySettingsViewContactTrickSettingsViewModel =           "SettingsViewContactTrickSettingsViewModel  "
+    
     /// WatchManager logging
     static let categoryWatchManager =                "WatchManager                  "
-    
+
+    /// ContactTrickManager logging
+    static let categoryContactTrickManager =                "ContactTrickManager           "
+
     /// bluetoothPeripheralViewController
     static let categoryBluetoothPeripheralViewController =   "blePeripheralViewController   "
     
