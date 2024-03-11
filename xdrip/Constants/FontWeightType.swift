@@ -1,12 +1,6 @@
 import Foundation
 
-
-/// types of background keep-alive
 public enum FontWeightType: Int, CaseIterable {
-    
-    // when adding to TimeInRangeType, add new cases at the end (ie 3, ...)
-    // if this is done in the middle then a database migration would be required, because the rawvalue is stored as Int16 in the coredata
-    // the order of the returned enum can be defined in allCases below
     
     case regular = 0
     case medium = 1
