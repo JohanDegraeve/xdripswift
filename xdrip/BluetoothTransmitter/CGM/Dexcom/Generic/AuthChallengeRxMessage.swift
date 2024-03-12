@@ -10,7 +10,7 @@ import Foundation
 
 
 struct AuthChallengeRxMessage: TransmitterRxMessage {
-    let authenticated: UInt8
+    let authenticated: Bool
     let paired: Bool
 
     init?(data: Data) {
@@ -22,7 +22,7 @@ struct AuthChallengeRxMessage: TransmitterRxMessage {
             return nil
         }
 
-        authenticated = data[1]
+        authenticated = data[1] == 0x1
         paired = data[2] != 2
     }
 }

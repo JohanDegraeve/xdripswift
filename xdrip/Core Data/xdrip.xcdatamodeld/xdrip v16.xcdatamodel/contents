@@ -57,6 +57,7 @@
         <relationship name="bubble" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Bubble" inverseName="blePeripheral" inverseEntity="Bubble"/>
         <relationship name="dexcomG4" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="DexcomG4" inverseName="blePeripheral" inverseEntity="DexcomG4"/>
         <relationship name="dexcomG5" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="DexcomG5" inverseName="blePeripheral" inverseEntity="DexcomG5"/>
+        <relationship name="dexcomG7" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DexcomG7" inverseName="blePeripheral" inverseEntity="DexcomG7"/>
         <relationship name="dexcomG7HeartBeat" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="DexcomG7HeartBeat" inverseName="blePeripheral" inverseEntity="DexcomG7HeartBeat"/>
         <relationship name="droplet" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Droplet" inverseName="blePeripheral" inverseEntity="Droplet"/>
         <relationship name="gNSEntry" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="GNSEntry" inverseName="blePeripheral" inverseEntity="GNSEntry"/>
@@ -115,6 +116,11 @@
         <attribute name="voltageA" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="voltageB" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="blePeripheral" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="dexcomG5" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="DexcomG7" representedClassName=".DexcomG7" syncable="YES">
+        <attribute name="sensorStartDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="sensorStatus" optional="YES" attributeType="String"/>
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BLEPeripheral" inverseName="dexcomG7" inverseEntity="BLEPeripheral"/>
     </entity>
     <entity name="DexcomG7HeartBeat" representedClassName=".DexcomG7HeartBeat" syncable="YES">
         <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BLEPeripheral" inverseName="dexcomG7HeartBeat" inverseEntity="BLEPeripheral"/>

@@ -167,7 +167,7 @@ class BluetoothPeripheralManager: NSObject {
                     // no need to send reading to watlaa in master mode
                     break
                     
-                case .DexcomType, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .Libre2Type, .AtomType:
+                case .DexcomType, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .Libre2Type, .AtomType, .DexcomG7Type:
                     // cgm's don't receive reading, they send it
                     break
                     
@@ -235,6 +235,18 @@ class BluetoothPeripheralManager: NSObject {
                     if let watlaa = bluetoothPeripheral as? Watlaa {
                         
                         newTransmitter = WatlaaBluetoothTransmitter(address: watlaa.blePeripheral.address, name: watlaa.blePeripheral.name, cgmTransmitterDelegate: cgmTransmitterDelegate, bluetoothTransmitterDelegate: self, watlaaBluetoothTransmitterDelegate: self,  sensorSerialNumber: watlaa.blePeripheral.sensorSerialNumber, webOOPEnabled: watlaa.blePeripheral.webOOPEnabled, nonFixedSlopeEnabled: watlaa.blePeripheral.nonFixedSlopeEnabled)
+                        
+                    }
+                    
+                case .DexcomG7Type:
+                    
+                    if let dexcomG7 = bluetoothPeripheral as? DexcomG7, let cgmTransmitterDelegate = cgmTransmitterDelegate {
+                        
+                        newTransmitter = CGMG7Transmitter(address: dexcomG7.blePeripheral.address, name: dexcomG7.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, webOOPEnabled: dexcomG7.blePeripheral.webOOPEnabled)
+                        
+                    } else {
+                        
+                        trace("in getBluetoothTransmitter, case DexcomG7Type cgmTransmitterDelegate is nil, looks like a coding error", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
                         
                     }
                     
@@ -529,6 +541,11 @@ class BluetoothPeripheralManager: NSObject {
                     return .OmniPodHeartBeatType
                 }
                 
+            case .DexcomG7Type:
+                if bluetoothTransmitter is CGMG7Transmitter {
+                    return .DexcomG7Type
+                }
+                
             }
             
         }
@@ -653,6 +670,14 @@ class BluetoothPeripheralManager: NSObject {
         case .OmniPodHeartBeatType:
             
             return OmniPodHeartBeatTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self)
+            
+        case .DexcomG7Type:
+            
+            guard let cgmTransmitterDelegate = cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, DexcomG7Type, cgmTransmitterDelegate is nil")
+            }
+            
+            return CGMG7Transmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, webOOPEnabled: nil)
             
         }
         
@@ -1252,7 +1277,34 @@ class BluetoothPeripheralManager: NSObject {
                         
                     }
                     
+                case .DexcomG7Type:
+                    
+                    if let dexcomG7 = blePeripheral.dexcomG7 {
+                        
+                        blePeripheralFound = true
+                        
+                        // add it to the list of bluetoothPeripherals
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: dexcomG7)
+                        
+                        if dexcomG7.blePeripheral.shouldconnect {
 
+                            // create an instance of CGMG7Transmitter, CGMG7Transmitter will automatically try to connect to the dexcomg7 with the address that is stored in bubble
+                            // add it to the array of bluetoothTransmitters
+                            bluetoothTransmitters.insert(CGMG7Transmitter(address: dexcomG7.blePeripheral.address, name: dexcomG7.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, webOOPEnabled: dexcomG7.blePeripheral.webOOPEnabled), at: index)
+                            
+                            // if CGMG7Transmitter is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+
+                        } else {
+                            
+                            // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
+                            bluetoothTransmitters.insert(nil, at: index)
+                            
+                        }
+                        
+                    }
                     
                 }
 
@@ -1397,7 +1449,7 @@ class BluetoothPeripheralManager: NSObject {
                     bluetoothPeripheral.blePeripheral.parameterUpdateNeededAtNextConnect = true
                 }
              
-            case .WatlaaType, .DexcomType, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .Libre2Type, .AtomType, .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType:
+            case .WatlaaType, .DexcomType, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .Libre2Type, .AtomType, .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType, .DexcomG7Type:
                 
                 // nothing to check
                 break

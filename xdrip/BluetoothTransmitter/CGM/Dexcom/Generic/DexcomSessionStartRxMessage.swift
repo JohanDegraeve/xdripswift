@@ -28,7 +28,7 @@ struct DexcomSessionStartRxMessage {
     let requestedStartDate: Date
     
     init?(data: Data) {
-        //27 00 06 ca452400 04bc2300 42462400 e9eb
+
         guard data.count >= 15 else { return nil }
         
         guard data.starts(with: .sessionStartRx) else {return nil}
