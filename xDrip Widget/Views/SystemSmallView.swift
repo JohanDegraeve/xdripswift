@@ -16,7 +16,6 @@ extension XDripWidget.EntryView {
                 Text("\(entry.widgetState.bgValueStringInUserChosenUnit)\(entry.widgetState.trendArrow())")
                     .font(.title).fontWeight(.semibold)
                     .foregroundStyle(entry.widgetState.bgTextColor())
-                    .scaledToFill()
                     .minimumScaleFactor(0.5)
                     .lineLimit(1)
                 
@@ -36,7 +35,7 @@ extension XDripWidget.EntryView {
                 Spacer()
                 
                 Text("Last reading \(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
-                    .font(.system(size: 10)).bold()
+                    .font(.system(size: 11)).bold()
                     .foregroundStyle(Color(white: 0.6))
             }
         }

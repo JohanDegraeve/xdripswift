@@ -41,58 +41,6 @@ struct XDripWidget_Previews: PreviewProvider {
             XDripWidget.EntryView(entry: .placeholder)
                 .previewContext(WidgetPreviewContext(family: .accessoryInline))
                 .previewDisplayName("accessoryInline")
-            
-            //            EntryView(entry: Entry(date: Date()))
-            //                .previewContext(WidgetPreviewContext(family: .systemMedium))
-            //
-            //            EntryView(entry: Entry(date: Date()))
-            //                .previewContext(WidgetPreviewContext(family: .systemLarge))
         }
     }
 }
-
-//@available(iOS 17.0, *)
-//#Preview(as: .systemSmall) {
-//    XDripWidget()
-//} timeline: {
-//    XDripWidget.Entry.placeholder
-//}
-
-//struct Provider: TimelineProvider {
-//    func placeholder(in context: Context) -> Entry {
-//        
-//        func placeholder(in context: Context) -> Entry {
-//            .placeholder
-//        }
-//        
-//        func getSnapshot(in context: Context, completion: @escaping (Entry) -> ()) {
-//            completion(.placeholder)
-//        }
-//        
-//        func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
-//            let entry = Entry(date: .now, widgetState: getWidgetStateFromSharedUserDefaults() ?? sampleWidgetStateFromProvider)
-//            
-//            completion(.init(entries: [entry], policy: .atEnd))
-//        }
-//    }
-//}
-
-//struct SimpleEntry: TimelineEntry {
-//    let date: Date
-//    let emoji: String
-//}
-
-//struct XDripWidgetEntryView : View {
-//    var entry: Provider.Entry
-//
-//    var body: some View {
-//        VStack {
-//            Text("Time:")
-//            Text(entry.date, style: .time)
-//
-//            Text("Emoji:")
-//            Text(entry.emoji)
-//        }
-//    }
-//}
-

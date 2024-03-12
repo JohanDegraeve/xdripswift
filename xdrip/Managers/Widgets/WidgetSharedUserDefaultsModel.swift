@@ -19,4 +19,5 @@ struct WidgetSharedUserDefaultsModel: Codable {
     var lowLimitInMgDl: Double
     var highLimitInMgDl: Double
     var urgentHighLimitInMgDl: Double
+    var dataSourceDescription: String
 }
