@@ -20,7 +20,7 @@ struct XDripWidgetLiveActivity: Widget {
                 
                 // 1 = minimal widget with no chart
                 HStack(alignment: .center) {
-                    Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
+                    Text("\(context.state.bgValueStringInUserChosenUnit) \(context.state.trendArrow())")
                         .font(.system(size: 35)).fontWeight(.semibold)
                         .foregroundStyle(context.state.bgTextColor())
                         .minimumScaleFactor(0.1)
@@ -43,7 +43,7 @@ struct XDripWidgetLiveActivity: Widget {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text(context.state.deltaChangeStringInUserChosenUnit())
                             .font(.title).bold()
-                            .foregroundStyle(Color(white: 0.9))
+                            .foregroundStyle(context.state.deltaChangeTextColor())
                             .minimumScaleFactor(0.2)
                             .lineLimit(1)
                         
@@ -61,23 +61,23 @@ struct XDripWidgetLiveActivity: Widget {
             } else if context.state.liveActivitySize == .normal {
                 
                 // 0 = normal size chart
-                HStack(spacing: 20) {
-                    VStack {
+                HStack(spacing: 30) {
+                    VStack(spacing: -2) {
                         Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
-                            .font(.system(size: 50)).fontWeight(.semibold)
+                            .font(.system(size: 44)).fontWeight(.semibold)
                             .foregroundStyle(context.state.bgTextColor())
                             .minimumScaleFactor(0.1)
                             .lineLimit(1)
                         
                         HStack(alignment: .firstTextBaseline, spacing: 4) {
                             Text(context.state.deltaChangeStringInUserChosenUnit())
-                                .font(.system(size: 25)).bold()
-                                .foregroundStyle(Color(white: 0.9))
+                                .font(.system(size: 20)).bold()
+                                .foregroundStyle(context.state.deltaChangeTextColor())
                                 .minimumScaleFactor(0.2)
                                 .lineLimit(1)
                             
                             Text(context.state.bgUnitString)
-                                .font(.system(size: 25))
+                                .font(.system(size: 20))
                                 .foregroundStyle(Color(white: 0.5))
                                 .minimumScaleFactor(0.2)
                                 .lineLimit(1)
@@ -112,31 +112,30 @@ struct XDripWidgetLiveActivity: Widget {
                 // 3 = large chart is final default option
                 ZStack {
                     VStack {
-                        HStack(alignment: .center) {
-                            Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow()) ")
-                                .font(.largeTitle).bold()
+                        HStack(alignment: .firstTextBaseline) {
+                            Text("\(context.state.bgValueStringInUserChosenUnit) \(context.state.trendArrow()) ")
+                                .font(.title).bold()
                                 .foregroundStyle(context.state.bgTextColor())
+                                .lineLimit(1)
                             
                             Spacer()
                             
-                            HStack(alignment: .center, spacing: 4) {
+                            HStack(alignment: .firstTextBaseline, spacing: 4) {
                                 Text(context.state.deltaChangeStringInUserChosenUnit())
-                                    .font(.title2).bold()
-                                    .foregroundStyle(Color(white: 0.9))
-                                    .minimumScaleFactor(0.2)
+                                    .font(.title).bold()
+                                    .foregroundStyle(context.state.deltaChangeTextColor())
                                     .lineLimit(1)
                                 
                                 Text(context.state.bgUnitString)
                                     .font(.title2)
                                     .foregroundStyle(Color(white: 0.5))
-                                    .minimumScaleFactor(0.2)
                                     .lineLimit(1)
                             }
                         }
                         .padding(.top, 4)
                         .padding(.bottom, -8)
-                        .padding(.leading, 10)
-                        .padding(.trailing, 10)
+                        .padding(.leading, 15)
+                        .padding(.trailing, 15)
                         
                         GlucoseChartView(glucoseChartType: .liveActivity, bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivitySize: .large, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil)
                     }
@@ -171,7 +170,7 @@ struct XDripWidgetLiveActivity: Widget {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text(context.state.deltaChangeStringInUserChosenUnit())
                             .font(.title).bold()
-                            .foregroundStyle(Color(white: 0.9))
+                            .foregroundStyle(context.state.deltaChangeTextColor())
                             .minimumScaleFactor(0.2)
                             .lineLimit(1)
                         

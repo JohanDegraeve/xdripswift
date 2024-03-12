@@ -24,7 +24,7 @@ extension XDripWatchComplication {
         func getTimeline(in context: Context, completion: @escaping (Timeline<Entry>) -> ()) {
             let entry = Entry(date: .now, widgetState: getWidgetStateFromSharedUserDefaults() ?? sampleWidgetStateFromProvider)
                 
-            completion(.init(entries: [entry], policy: .after(Date().addingTimeInterval(30*60))))
+            completion(.init(entries: [entry], policy: .never))
         }
     }
 }

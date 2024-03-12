@@ -15,23 +15,22 @@ extension XDripWatchComplication.EntryView {
         if !entry.widgetState.disableComplications {
             VStack(spacing: 0) {
                 HStack(alignment: .center) {
-                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    HStack(alignment: .center, spacing: 4) {
                         Text("\(entry.widgetState.bgValueStringInUserChosenUnit)\(entry.widgetState.trendArrow()) ")
                             .font(.system(size: 24)).bold()
                             .foregroundStyle(entry.widgetState.bgTextColor())
                         
                         Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
                             .font(.system(size: 24)).bold()
-                            .foregroundStyle(Color(white: 0.9))
-                            .minimumScaleFactor(0.2)
+                            .foregroundStyle(entry.widgetState.deltaChangeTextColor())
                             .lineLimit(1)
                     }
                     
                     Spacer()
                     
-                    Text(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")
-                        .font(.system(size: 18))
-                        .foregroundStyle(Color(white: 0.6))
+                    Text("\(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--") : \(entry.date.formatted(date: .omitted, time: .shortened))")
+                        .font(.system(size: 16))
+                        .foregroundStyle(Color(white: 0.7))
                         .minimumScaleFactor(0.2)
                 }
                 .padding(0)

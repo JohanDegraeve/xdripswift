@@ -27,6 +27,8 @@ class WatchStateModel: NSObject, ObservableObject {
     var bgReadingValues: [Double] = []
     var bgReadingDates: [Date] = []
     
+    @Published var updatedDatesString: String = ""
+    
     @Published var isMgDl: Bool = true
     @Published var slopeOrdinal: Int = 0
     @Published var deltaChangeInMgDl: Double = 0
@@ -51,6 +53,8 @@ class WatchStateModel: NSObject, ObservableObject {
     @Published var lastUpdatedTimeString: String = ""
     @Published var debugString: String = "Debug info..."
     @Published var chartHoursIndex: Int = 1
+    
+    var lastComplicationUpdateDate: Date = .distantPast
     
     init(session: WCSession = .default) {
         self.session = session
@@ -231,8 +235,8 @@ class WatchStateModel: NSObject, ObservableObject {
         // change the text, this must be done in the main thread
         DispatchQueue.main.async {
             self.debugString += "\nRequesting data..."
-//            self.lastUpdatedTextString = "Updating..."
-//            self.lastUpdatedTimeString = ""
+            //            self.lastUpdatedTextString = "Updating..."
+            //            self.lastUpdatedTimeString = ""
         }
         
         print("Requesting watch state update from iOS")
@@ -282,23 +286,31 @@ class WatchStateModel: NSObject, ObservableObject {
     }
     
     /// once we've process the state update, then save this data to the shared app group so that the complication can read it
-    private func updateWatchSharedUserDefaults() {        
-        guard let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) else { return }
+    private func updateWatchSharedUserDefaults() {
         
-        let bgReadingDatesAsDouble = bgReadingDates.map { date in
-            date.timeIntervalSince1970
+        if lastComplicationUpdateDate < Date().addingTimeInterval(-4.5*60) {
+            
+            updatedDatesString = "\(Date.now.formatted(date: .omitted, time: .standard)), " + updatedDatesString
+            
+            guard let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) else { return }
+            
+            let bgReadingDatesAsDouble = bgReadingDates.map { date in
+                date.timeIntervalSince1970
+            }
+            
+            let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl, disableComplications: disableComplications)
+            
+            // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
+            // the user's device - this allows several copies of the app to be installed without cross-contamination of widget/complication data
+            if let stateData = try? JSONEncoder().encode(complicationSharedUserDefaultsModel) {
+                sharedUserDefaults.set(stateData, forKey: "complicationSharedUserDefaults.\(Bundle.main.mainAppBundleIdentifier)")
+            }
+            
+            // now that the new data is stored in the app group, try to force the complications to reload
+            WidgetCenter.shared.reloadAllTimelines()
+            
+            lastComplicationUpdateDate = .now
         }
-        
-        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl, disableComplications: disableComplications)
-        
-        // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
-        // the user's device - this allows several copies of the app to be installed without cross-contamination of widget/complication data
-        if let stateData = try? JSONEncoder().encode(complicationSharedUserDefaultsModel) {
-            sharedUserDefaults.set(stateData, forKey: "complicationSharedUserDefaults.\(Bundle.main.mainAppBundleIdentifier)")
-        }
-        
-        // now that the new data is stored in the app group, try to force the complications to reload
-        WidgetCenter.shared.reloadAllTimelines()
     }
 }
 

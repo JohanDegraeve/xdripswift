@@ -76,6 +76,16 @@ struct XDripWidgetAttributes: ActivityAttributes {
             }
         }
         
+        /// Delta text color dependant on the time since the last reading
+        /// - Returns: a Color either red, yellow or green
+        func deltaChangeTextColor() -> Color {
+            if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-60 * 7) {
+                return Color(white: 0.8)
+            } else {
+                return Color(.gray)
+            }
+        }
+        
         /// convert the optional delta change int (in mg/dL) to a formatted change value in the user chosen unit making sure all zero values are shown as a positive change to follow Nightscout convention
         /// - Returns: a string holding the formatted delta change value (i.e. +0.4 or -6)
         func deltaChangeStringInUserChosenUnit() -> String {

@@ -50,7 +50,7 @@ struct MainView: View {
                         )
                     
                     if watchState.showAppleWatchDebug {
-                        Text(watchState.debugString)
+                        Text(watchState.updatedDatesString)
                             .foregroundStyle(.black)
                             .font(.footnote).bold()
                             .multilineTextAlignment(.leading)

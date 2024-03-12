@@ -45,10 +45,10 @@ public final class WatchManager: NSObject, ObservableObject {
         processWatchState()
         
     }
-
+    
     private func processWatchState() {
         DispatchQueue.main.async {
-                
+            
             // create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
             // this is needed due to the not being able to pass structs that are not codable/hashable
             let hoursOfBgReadingsToSend: Double = 12
@@ -90,7 +90,7 @@ public final class WatchManager: NSObject, ObservableObject {
             self.watchState.followerDataSourceTypeRawValue = UserDefaults.standard.followerDataSourceType.rawValue
             self.watchState.followerBackgroundKeepAliveTypeRawValue = UserDefaults.standard.followerBackgroundKeepAliveType.rawValue
             self.watchState.disableComplications = !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled
-                        
+            
             // check when the last follower connection was and compare that to the actual time
             if let timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection, Calendar.current.dateComponents([.second], from: timeStampOfLastFollowerConnection, to: Date()).second! >= UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning {
                 self.watchState.followerConnectionIsStale = true
@@ -109,7 +109,6 @@ public final class WatchManager: NSObject, ObservableObject {
             self.sendToWatch()
         }
     }
-    
     
     private func sendToWatch() {        
         guard let data = try? JSONEncoder().encode(watchState) else {
@@ -137,7 +136,7 @@ public final class WatchManager: NSObject, ObservableObject {
 
 extension WatchManager: WCSessionDelegate {
     public func sessionDidBecomeInactive(_: WCSession) {}
-
+    
     public func sessionDidDeactivate(_: WCSession) {}
     
     public func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
@@ -155,7 +154,7 @@ extension WatchManager: WCSessionDelegate {
     }
     
     public func session(_: WCSession, didReceiveMessageData _: Data) {}
-
+    
     public func sessionReachabilityDidChange(_ session: WCSession) {
         if session.isReachable {
             DispatchQueue.main.async {

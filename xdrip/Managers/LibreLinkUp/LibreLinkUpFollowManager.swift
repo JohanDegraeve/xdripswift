@@ -757,8 +757,8 @@ class LibreLinkUpFollowManager: NSObject {
     /// launches timer that will regular play sound - this will be played only when app goes to background and only if the user wants to keep the app alive
     private func enableSuspensionPrevention() {
         
-        // if keep-alive is disabled, then just return and do nothing
-        if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
+        // if keep-alive is disabled or if using a heartbeat, then just return and do nothing
+        if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled || UserDefaults.standard.followerBackgroundKeepAliveType ==  {
             
             print("not enabling suspension prevention as keep-alive is disabled")
             

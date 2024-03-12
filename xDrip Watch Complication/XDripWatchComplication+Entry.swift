@@ -32,8 +32,6 @@ extension XDripWatchComplication.Entry {
         var lowLimitInMgDl: Double
         var highLimitInMgDl: Double
         var urgentHighLimitInMgDl: Double
-//        var isMaster: Bool = true
-//        var followerBackgroundKeepAliveType: FollowerBackgroundKeepAliveType = .normal
         
         var bgUnitString: String
         var bgValueInMgDl: Double?
@@ -51,14 +49,12 @@ extension XDripWatchComplication.Entry {
             self.lowLimitInMgDl = lowLimitInMgDl ?? 80
             self.highLimitInMgDl = highLimitInMgDl ?? 180
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl ?? 250
-//            self.isMaster = isMaster ?? true
-//            self.followerBackgroundKeepAliveType = followerBackgroundKeepAliveType ?? .normal
             
             self.bgValueInMgDl = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0] : nil
             self.bgReadingDate = (bgReadingDates?.count ?? 0) > 0 ? bgReadingDates?[0] : nil
             self.bgUnitString = self.isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
             self.bgValueStringInUserChosenUnit = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0].mgdlToMmolAndToString(mgdl: self.isMgDl) ?? "" : ""
-            self.disableComplications = disableComplications ?? false //(!self.isMaster && self.followerBackgroundKeepAliveType == .disabled) ? true : false
+            self.disableComplications = disableComplications ?? false
             
         }
         
@@ -78,30 +74,14 @@ extension XDripWatchComplication.Entry {
             }
         }
         
-        /// used to return values and colors used by a SwiftUI gauge view
-        /// - Returns: minValue/maxValue - used to define the limits of the gauge. gaugeColor/gaugeGradient - the gauge view will use one or the other
-        func gaugeModel() -> (minValue: Double, maxValue: Double, gaugeColor: Color, gaugeGradient: Gradient) {
-            
-            var minValue: Double = lowLimitInMgDl
-            var maxValue: Double = highLimitInMgDl
-            var gaugeColor: Color = .green
-            var gaugeGradient: Gradient = Gradient(colors: [.yellow, .green, .green, .green, .green, .green, .green, .green, .green, .yellow])
-            
-            if let bgValueInMgDl = bgValueInMgDl {
-                if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
-                    minValue = 39
-                    maxValue = 400
-                    gaugeColor = .red
-                    gaugeGradient = Gradient(colors: [.red, .red, .red, .yellow, .yellow, .green, .yellow, .yellow, .red, .red, .red,])
-                } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
-                    minValue = urgentLowLimitInMgDl
-                    maxValue = urgentHighLimitInMgDl
-                    gaugeColor = .yellow
-                    gaugeGradient = Gradient(colors: [.red, .yellow, .green, .green, .green, .green, .yellow, .red])
-                }
+        /// Delta text color dependant on the time since the last reading
+        /// - Returns: a Color either red, yellow or green
+        func deltaChangeTextColor() -> Color {
+            if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-60 * 7) {
+                return Color(white: 0.8)
+            } else {
+                return Color(.gray)
             }
-            
-            return (minValue, maxValue, gaugeColor, gaugeGradient)
         }
         
         /// convert the optional delta change int (in mg/dL) to a formatted change value in the user chosen unit making sure all zero values are shown as a positive change to follow Nightscout convention
@@ -144,6 +124,31 @@ extension XDripWatchComplication.Entry {
             default:
                 return ""
             }
+        }
+        
+        /// used to return values and colors used by a SwiftUI gauge view
+        /// - Returns: minValue/maxValue - used to define the limits of the gauge. gaugeColor/gaugeGradient - the gauge view will use one or the other
+        func gaugeModel() -> (minValue: Double, maxValue: Double, gaugeColor: Color, gaugeGradient: Gradient) {
+            
+            var minValue: Double = lowLimitInMgDl
+            var maxValue: Double = highLimitInMgDl
+            var gaugeColor: Color = .green
+            var gaugeGradient: Gradient = Gradient(colors: [.yellow, .green, .green, .green, .green, .green, .green, .green, .green, .yellow])
+            
+            if let bgValueInMgDl = bgValueInMgDl {
+                if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
+                    minValue = 39
+                    maxValue = 400
+                    gaugeColor = .red
+                    gaugeGradient = Gradient(colors: [.red, .red, .red, .yellow, .yellow, .green, .yellow, .yellow, .red, .red, .red,])
+                } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
+                    minValue = urgentLowLimitInMgDl
+                    maxValue = urgentHighLimitInMgDl
+                    gaugeColor = .yellow
+                    gaugeGradient = Gradient(colors: [.red, .yellow, .green, .green, .green, .green, .yellow, .red])
+                }
+            }
+            return (minValue, maxValue, gaugeColor, gaugeGradient)
         }
         
     }
