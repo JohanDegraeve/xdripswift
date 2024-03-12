@@ -67,6 +67,8 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
             
             lastHeartBeatTimeStamp = Date()
             
+            UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
+            
         }
 
     }
@@ -85,6 +87,9 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
             
             lastHeartBeatTimeStamp = Date()
             
+            UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
+            
+            print("heatbeat timestamp: \(lastHeartBeatTimeStamp)")
         }
         
     }

@@ -919,6 +919,9 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // add observer for showAppleWatchDebug, to reload the watch app view if the value changes
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showAppleWatchDebug.rawValue, options: .new, context: nil)
+        
+        // add observer for the last heartbeat timestamp in order to update the UI
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.lastHeartBeatTimeStamp.rawValue, options: .new, context: nil)
 
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
@@ -1692,8 +1695,10 @@ final class RootViewController: UIViewController, ObservableObject {
             }
             
         case UserDefaults.Key.showAppleWatchDebug:
-            
             watchManager?.updateWatchApp()
+            
+        case UserDefaults.Key.lastHeartBeatTimeStamp:
+            updateDataSourceInfo(animate: false)
 
         default:
             break
@@ -3236,6 +3241,15 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // let's go through the specific cases for follower modes
         if !isMaster {
+            
+            // first set the heartbeat icon color depending on when the last heartbeat was received
+            if UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat {
+                if let lastHeartBeatTimeStamp = UserDefaults.standard.lastHeartBeatTimeStamp, lastHeartBeatTimeStamp < Date().addingTimeInterval(-30) {
+                    dataSourceKeepAliveImageOutlet.tintColor = .systemRed
+                } else {
+                    dataSourceKeepAliveImageOutlet.tintColor =  .systemGreen
+                }
+            }
             
             dataSourceLabelOutlet.text = UserDefaults.standard.followerDataSourceType.fullDescription
             

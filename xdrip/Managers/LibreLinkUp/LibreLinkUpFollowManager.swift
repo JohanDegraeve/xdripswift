@@ -758,9 +758,9 @@ class LibreLinkUpFollowManager: NSObject {
     private func enableSuspensionPrevention() {
         
         // if keep-alive is disabled or if using a heartbeat, then just return and do nothing
-        if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled || UserDefaults.standard.followerBackgroundKeepAliveType ==  {
+        if !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
             
-            print("not enabling suspension prevention as keep-alive is disabled")
+            print("not enabling suspension prevention as keep-alive type is:  \(UserDefaults.standard.followerBackgroundKeepAliveType.description)")
             
             return
             
@@ -803,7 +803,8 @@ class LibreLinkUpFollowManager: NSObject {
         if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .libreLinkUp && UserDefaults.standard.libreLinkUpEmail != nil && UserDefaults.standard.libreLinkUpPassword != nil {
             
             // this will enable the suspension prevention sound playing if background keep-alive is enabled
-            if UserDefaults.standard.followerBackgroundKeepAliveType != .disabled {
+            // (i.e. not disabled and not using a heartbeat)
+            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
                 enableSuspensionPrevention()
             } else {
                 disableSuspensionPrevention()

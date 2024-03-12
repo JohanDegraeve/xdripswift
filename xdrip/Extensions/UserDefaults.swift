@@ -394,6 +394,10 @@ extension UserDefaults {
         /// - stored as data as read from transmitter
         case librePatchInfo = "librePatchInfo"
         
+        // heartbeat
+        /// the last heartbeat connection timestamp
+        case lastHeartBeatTimeStamp = "lastHeartBeatTimeStamp"
+        
     }
     
     
@@ -2188,6 +2192,19 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.stopActiveSensor.rawValue)
+        }
+    }
+    
+    
+    // MARK: - Heartbeat
+    
+    /// timestamp of last successful connection to follower service
+    @objc dynamic var lastHeartBeatTimeStamp: Date? {
+        get {
+            return object(forKey: Key.lastHeartBeatTimeStamp.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.lastHeartBeatTimeStamp.rawValue)
         }
     }
     

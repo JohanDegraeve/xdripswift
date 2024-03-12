@@ -74,6 +74,8 @@ class DexcomG7HeartbeatBluetoothTransmitter: BluetoothTransmitter {
             self.bluetoothTransmitterDelegate?.heartBeat()
 
             lastHeartBeatTimeStamp = Date()
+            
+            UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
 
         }
         

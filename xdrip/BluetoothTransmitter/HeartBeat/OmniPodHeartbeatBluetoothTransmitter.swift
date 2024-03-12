@@ -68,6 +68,8 @@ class OmniPodHeartBeatTransmitter: BluetoothTransmitter {
             
             lastHeartBeatTimeStamp = Date()
             
+            UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
+            
         }
 
     }
@@ -84,6 +86,8 @@ class OmniPodHeartBeatTransmitter: BluetoothTransmitter {
             bluetoothTransmitterDelegate?.heartBeat()
             
             lastHeartBeatTimeStamp = Date()
+            
+            UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
             
         }
         

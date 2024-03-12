@@ -20,6 +20,7 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
     case disabled = 0
     case normal = 1
     case aggressive = 2
+    case heartbeat = 3
     
     var description: String {
         switch self {
@@ -29,6 +30,8 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
             return Texts_SettingsView.followerKeepAliveTypeNormal
         case .aggressive:
             return Texts_SettingsView.followerKeepAliveTypeAggressive
+        case .heartbeat:
+            return Texts_SettingsView.followerKeepAliveTypeHeartbeat
         }
     }
     
@@ -40,6 +43,19 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
             return 1
         case .aggressive:
             return 2
+        case .heartbeat:
+            return 3
+        }
+    }
+    
+    // return true if in follower mode and if the keep-alive type should provoke a background keep-alive action
+    // basically if not .disabled and if not .heartbeat
+    var shouldKeepAlive: Bool {
+        switch self {
+        case .disabled, .heartbeat:
+            return false
+        default:
+            return true
         }
     }
     
@@ -52,6 +68,8 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
             return UIImage(systemName: "n.circle") ?? UIImage()
         case .aggressive:
             return UIImage(systemName: "a.circle") ?? UIImage()
+        case .heartbeat:
+            return UIImage(systemName: "heart.circle") ?? UIImage()
         }
     }
     
@@ -64,6 +82,8 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
             return Image(systemName: "n.circle")
         case .aggressive:
             return Image(systemName: "a.circle")
+        case .heartbeat:
+            return Image(systemName: "heart.circle")
         }
     }
     

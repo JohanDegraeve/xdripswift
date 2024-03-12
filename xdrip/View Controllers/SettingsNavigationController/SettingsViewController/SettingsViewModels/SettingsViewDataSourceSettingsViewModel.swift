@@ -249,6 +249,8 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                         message += Texts_SettingsView.followerKeepAliveTypeNormalMessage
                     case .aggressive:
                         message += Texts_SettingsView.followerKeepAliveTypeAggressiveMessage
+                    case .heartbeat:
+                        message += Texts_SettingsView.followerKeepAliveTypeHeartbeatMessage
                     }
                     
                     self.callMessageHandlerInMainThread(title: Texts_SettingsView.labelfollowerKeepAliveType, message: message)

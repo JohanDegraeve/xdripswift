@@ -365,8 +365,8 @@ class NightScoutFollowManager: NSObject {
     /// launches timer that will regular play sound - this will be played only when app goes to background and only if the user wants to keep the app alive
     private func enableSuspensionPrevention() {
         
-        // if keep-alive is disabled, then just return and do nothing
-        if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
+        // if keep-alive is not needed, then just return and do nothing
+        if !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
             
             print("not enabling suspension prevention as keep-alive is disabled")
             
