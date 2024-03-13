@@ -68,15 +68,16 @@ class DexcomG7HeartbeatBluetoothTransmitter: BluetoothTransmitter {
         // this is the trigger for calling the heartbeat
         if (Date()).timeIntervalSince(lastHeartBeatTimeStamp) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
             
-            // sleep for a second to allow Loop to read the readings and upload them to NS
-            Thread.sleep(forTimeInterval: 1)
-
-            self.bluetoothTransmitterDelegate?.heartBeat()
-
             lastHeartBeatTimeStamp = Date()
             
             UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
-
+            
+            print("heatbeat timestamp: \(lastHeartBeatTimeStamp)")
+            
+            // wait for a second to allow the official app to upload to LibreView before triggering the heartbeat announcement to the delegate
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.bluetoothTransmitterDelegate?.heartBeat()
+            }
         }
         
     }

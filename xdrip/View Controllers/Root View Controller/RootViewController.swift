@@ -3249,9 +3249,10 @@ final class RootViewController: UIViewController, ObservableObject {
         // let's go through the specific cases for follower modes
         if !isMaster {
             
+            // TODO: The 70 seconds would work for L2 BLE but needs to be made to coincide with the transmitter/heartbeat type to be a good indicator of a failed heartbeat.
             // first set the heartbeat icon color depending on when the last heartbeat was received
             if UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat {
-                if let lastHeartBeatTimeStamp = UserDefaults.standard.lastHeartBeatTimeStamp, lastHeartBeatTimeStamp < Date().addingTimeInterval(-30) {
+                if let lastHeartBeatTimeStamp = UserDefaults.standard.lastHeartBeatTimeStamp, lastHeartBeatTimeStamp < Date().addingTimeInterval(-70) {
                     dataSourceKeepAliveImageOutlet.tintColor = .systemRed
                 } else {
                     dataSourceKeepAliveImageOutlet.tintColor =  .systemGreen
@@ -3407,78 +3408,6 @@ final class RootViewController: UIViewController, ObservableObject {
             }
         }
     }
-    /*
-    /// if there is an active WCSession open between the app and the watch app, then process the current data and send it via the messaging service to the watch app.
-    private func updateWatchAppOld() {
-        
-        // if there is no active WCSession open (i.e. if there is no paired Apple Watch with the watch app installed and running), then do nothing and just return
-        if let validSession = self.session, validSession.isReachable {
-            
-            let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-            
-            // make sure that the necessary objects are initialised and readings are available.
-            if let bgReadingsAccessor = bgReadingsAccessor, let lastReading = bgReadingsAccessor.last(forSensor: nil) {
-                
-                let calculatedValueAsString = lastReading.unitizedString(unitIsMgDl: mgdl)
-                
-                var calculatedValueFullAsString: String = ""
-                var calculatedValueTrendAsString: String = ""
-                
-                if !lastReading.hideSlope {
-                    calculatedValueTrendAsString = lastReading.slopeArrow()
-                    calculatedValueFullAsString = calculatedValueAsString + " " + calculatedValueTrendAsString
-                }
-                
-                let minutesAgo = -Int(lastReading.timeStamp.timeIntervalSinceNow) / 60
-                
-                let minutesAgoTextLocalized = (minutesAgo == 1 ? Texts_Common.minute:Texts_Common.minutes) // + " " + Texts_HomeView.ago
-                
-                let latestReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
-                
-                // check that there actually exists some readings. If not then return without doing anything (if we don't trap this it could sometimes cause a crash if the app hasn't had time to collect recent readings)
-                guard latestReadings.count > 0 else {
-                    
-                    return
-                }
-                
-                // assign last reading
-                let lastReading = latestReadings[0]
-                
-                // assign last but one reading
-                let lastButOneReading = latestReadings.count > 1 ? latestReadings[1]:nil
-                
-                // create delta text from the last two readings
-                let deltaText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: true, highGranularity: true, mgdl: mgdl)
-                
-                // create the WKSession messages in String format and send them. Although they are all sent almost immediately, they will be queued and sent in a background thread by the handler
-                validSession.sendMessage(["currentBGValueText" : calculatedValueAsString], replyHandler: nil, errorHandler: nil)
-                
-                validSession.sendMessage(["currentBGValueTextFull" : calculatedValueFullAsString], replyHandler: nil, errorHandler: nil)
-                
-                validSession.sendMessage(["currentBGValueTrend" : calculatedValueTrendAsString], replyHandler: nil, errorHandler: nil)
-                
-                validSession.sendMessage(["currentBGValue" : lastReading.unitizedString(unitIsMgDl: mgdl).description], replyHandler: nil, errorHandler: nil)
-                
-                validSession.sendMessage(["minutesAgoTextLocalized" : minutesAgoTextLocalized], replyHandler: nil, errorHandler: nil)
-                
-                validSession.sendMessage(["deltaTextLocalized" : deltaText], replyHandler: nil, errorHandler: nil)
-                
-                validSession.sendMessage(["urgentLowMarkValueInUserChosenUnit" : UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
-                
-                validSession.sendMessage(["lowMarkValueInUserChosenUnit" : UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
-                
-                validSession.sendMessage(["highMarkValueInUserChosenUnit" : UserDefaults.standard.highMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
-                
-                validSession.sendMessage(["urgentHighMarkValueInUserChosenUnit" : UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.bgValueRounded(mgdl: mgdl).description], replyHandler: nil, errorHandler: nil)
-                
-                // send the timestamp last as this is what will eventually trigger the view refresh on the watch
-                validSession.sendMessage(["currentBGTimeStamp" : ISO8601DateFormatter().string(from: lastReading.timeStamp)], replyHandler: nil, errorHandler: nil)
-                
-            }
-            
-        }
-            
-    }*/
     
     /// if allowed set the main screen rotation settings 
     fileprivate func updateScreenRotationSettings() {
@@ -3567,9 +3496,9 @@ final class RootViewController: UIViewController, ObservableObject {
             // check the live activity type requested by the user
             let liveActivityType = UserDefaults.standard.liveActivityType
             
-            // if the user is in follower mode then don't show live activities as they will not get updated in the background
+            // if the user is in follower mode (without a heartbeat) then don't show live activities as they will not get updated in the background
             // also take advantage to just skip the rest of the function if they have live activities disabled
-            var showLiveActivity: Bool = UserDefaults.standard.isMaster
+            var showLiveActivity: Bool = UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat
             
             DispatchQueue.main.async {
                 if let bgReadingsAccessor = self.bgReadingsAccessor {
@@ -3617,7 +3546,7 @@ final class RootViewController: UIViewController, ObservableObject {
                         }
                         
                         // if we should still show it, then let's continue processing the lastReading array to create a valid contentState
-                        if UserDefaults.standard.isMaster && showLiveActivity {
+                        if (UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat) && showLiveActivity {
                             
                             // create the contentState that will update the dynamic attributes of the Live Activity Widget
                             let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySize: UserDefaults.standard.liveActivitySize)

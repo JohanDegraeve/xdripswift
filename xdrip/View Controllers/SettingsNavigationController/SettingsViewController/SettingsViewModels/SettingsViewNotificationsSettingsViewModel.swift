@@ -65,7 +65,7 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
             if #available(iOS 16.2, *) {
                 // live activities can only be used in master mode as follower mode
                 // will not allow updates whilst the app is in the background
-                if UserDefaults.standard.isMaster {
+                if UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat {
                     
                     // data to be displayed in list from which user needs to pick a live activity type
                     var data = [String]()
@@ -120,7 +120,7 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
             if #available(iOS 16.2, *) {
                 // live activities can only be used in master mode as follower mode
                 // will not allow updates whilst the app is in the background
-                if UserDefaults.standard.isMaster {
+                if UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat {
                     
                     // data to be displayed in list from which user needs to pick a live activity type
                     var data = [String]()
@@ -226,7 +226,7 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
             
         case .liveActivityType, .liveActivitySize:
             if #available(iOS 16.2, *) {
-                return UserDefaults.standard.isMaster ? .disclosureIndicator : .none
+                return UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat ? .disclosureIndicator : .none
             } else {
                 return .none
             }
@@ -247,14 +247,14 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
             
         case .liveActivityType:
             if #available(iOS 16.2, *) {
-                return UserDefaults.standard.isMaster ? UserDefaults.standard.liveActivityType.description : Texts_SettingsView.liveActivityDisabledInFollowerMode
+                return UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat ? UserDefaults.standard.liveActivityType.description : Texts_SettingsView.liveActivityDisabledInFollowerMode
             } else {
                 return "iOS 16.2 needed"
             }
             
         case .liveActivitySize:
             if #available(iOS 16.2, *) {
-               return UserDefaults.standard.isMaster ? UserDefaults.standard.liveActivitySize.description : Texts_SettingsView.liveActivityDisabledInFollowerMode
+               return UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat ? UserDefaults.standard.liveActivitySize.description : Texts_SettingsView.liveActivityDisabledInFollowerMode
             } else {
                 return "iOS 16.2 needed"
             }

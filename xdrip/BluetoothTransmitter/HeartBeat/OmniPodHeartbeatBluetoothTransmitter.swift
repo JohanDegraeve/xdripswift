@@ -17,10 +17,10 @@ class OmniPodHeartBeatTransmitter: BluetoothTransmitter {
     
     /// service to be discovered
     private let CBUUID_Service_OmniPod: String = "1A7E4024-E3ED-4464-8B7E-751E03D0DC5F"
-
+    
     /// advertisement
     private let CBUUID_Advertisement_OmniPod: String? = "00004024-0000-1000-8000-00805f9b34fb"
-
+    
     /// receive characteristic
     private let CBUUID_ReceiveCharacteristic_OmniPod: String = "1A7E2442-E3ED-4464-8B7E-751E03D0DC5F"
     
@@ -32,14 +32,14 @@ class OmniPodHeartBeatTransmitter: BluetoothTransmitter {
     
     /// when was the last heartbeat
     private var lastHeartBeatTimeStamp: Date
-
+    
     // MARK: - Initialization
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
     ///     - bluetoothTransmitterDelegate : a bluetoothTransmitterDelegate
     init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate) {
-
+        
         // then device name of each omnipod contains "TWI BOARD"
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "BOARD")
         
@@ -50,7 +50,7 @@ class OmniPodHeartBeatTransmitter: BluetoothTransmitter {
         
         // initially last heartbeat was never (ie 1 1 1970)
         self.lastHeartBeatTimeStamp = Date(timeIntervalSince1970: 0)
-
+        
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_OmniPod, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_OmniPod)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_OmniPod, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_OmniPod, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
     }
@@ -58,37 +58,36 @@ class OmniPodHeartBeatTransmitter: BluetoothTransmitter {
     // MARK: CBCentralManager overriden functions
     
     override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-
+        
         super.centralManager(central, didConnect: peripheral)
         
-        // this is a trigger for calling the heartbeat
-        if (Date()).timeIntervalSince(lastHeartBeatTimeStamp) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
-            
-            bluetoothTransmitterDelegate?.heartBeat()
-            
-            lastHeartBeatTimeStamp = Date()
-            
-            UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
-            
+        lastHeartBeatTimeStamp = Date()
+        
+        UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
+        
+        print("heatbeat timestamp: \(lastHeartBeatTimeStamp)")
+        
+        // wait for a second to allow the official app to upload to LibreView before triggering the heartbeat announcement to the delegate
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.bluetoothTransmitterDelegate?.heartBeat()
         }
-
+        
     }
     
-
     
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-
+        
         super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
-
-        // this is a trigger for calling the heartbeat
-        if (Date()).timeIntervalSince(lastHeartBeatTimeStamp) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
-            
-            bluetoothTransmitterDelegate?.heartBeat()
-            
-            lastHeartBeatTimeStamp = Date()
-            
-            UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
-            
+        
+        lastHeartBeatTimeStamp = Date()
+        
+        UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
+        
+        print("heatbeat timestamp: \(lastHeartBeatTimeStamp)")
+        
+        // wait for a second to allow the official app to upload to LibreView before triggering the heartbeat announcement to the delegate
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            self.bluetoothTransmitterDelegate?.heartBeat()
         }
         
     }

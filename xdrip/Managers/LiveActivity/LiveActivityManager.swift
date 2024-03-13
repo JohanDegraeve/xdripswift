@@ -88,7 +88,7 @@ extension LiveActivityManager {
         
         // https://developer.apple.com/forums/thread/732418
         // Add a semaphore to force it to wait for the activities to end before returning from the method
-        let semaphore = DispatchSemaphore(value: 0)
+        //let semaphore = DispatchSemaphore(value: 0)
         
         Task
         {
@@ -98,9 +98,9 @@ extension LiveActivityManager {
                 
                 await activity.end(nil, dismissalPolicy: .immediate)
             }
-            semaphore.signal()
+            //semaphore.signal()
         }
-        semaphore.wait()
+        //semaphore.wait()
         
         eventActivity = nil
     }
