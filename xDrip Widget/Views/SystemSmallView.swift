@@ -31,11 +31,16 @@ extension XDripWidget.EntryView {
             .padding(.bottom, 6)
             
             GlucoseChartView(glucoseChartType: .widgetSystemSmall, bgReadingValues: entry.widgetState.bgReadingValues, bgReadingDates: entry.widgetState.bgReadingDates, isMgDl: entry.widgetState.isMgDl, urgentLowLimitInMgDl: entry.widgetState.urgentLowLimitInMgDl, lowLimitInMgDl: entry.widgetState.lowLimitInMgDl, highLimitInMgDl: entry.widgetState.highLimitInMgDl, urgentHighLimitInMgDl: entry.widgetState.urgentHighLimitInMgDl, liveActivitySize: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil)
+            
             HStack {
+                Text(entry.widgetState.dataSourceDescription)
+                    .font(.system(size: 11)).bold()
+                    .foregroundStyle(Color(white: 0.8))
+                
                 Spacer()
                 
-                Text("Last reading \(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
-                    .font(.system(size: 11)).bold()
+                Text("\(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
+                    .font(.system(size: 11))
                     .foregroundStyle(Color(white: 0.6))
             }
         }
