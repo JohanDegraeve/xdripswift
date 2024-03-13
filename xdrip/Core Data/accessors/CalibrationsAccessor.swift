@@ -37,11 +37,11 @@ class CalibrationsAccessor {
     /// - returns:
     ///     - the last calibration, can be nil
     func lastCalibrationForActiveSensor(withActivesensor sensor:Sensor?) -> Calibration? {
+        // check that xdrip is in follower mode, no calibration possible
+        if !UserDefaults.standard.isMaster {return nil}
         
         guard let sensor = sensor else {return nil}
-        
         return getFirstOrLastCalibration(withActivesensor: sensor, first: false)
-        
     }
     
     /// Returns last calibrations, possibly zero
