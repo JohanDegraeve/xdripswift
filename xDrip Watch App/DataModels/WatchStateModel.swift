@@ -288,7 +288,7 @@ class WatchStateModel: NSObject, ObservableObject {
     /// once we've process the state update, then save this data to the shared app group so that the complication can read it
     private func updateWatchSharedUserDefaults() {
         
-        if lastComplicationUpdateDate < Date().addingTimeInterval(-4.5*60) {
+        if lastComplicationUpdateDate < Date().addingTimeInterval(-20*60) {
             
             updatedDatesString = "\(Date.now.formatted(date: .omitted, time: .standard)), " + updatedDatesString
             
