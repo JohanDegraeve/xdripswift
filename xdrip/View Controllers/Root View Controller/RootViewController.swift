@@ -1811,13 +1811,6 @@ final class RootViewController: UIViewController, ObservableObject {
     /// should be called only once immediately after app start, ie in viewdidload
     private func setupUpdateLabelsAndChartTimer() {
         
-        let test = "2760105d476fb579e61cf51bffcaaf44cf6a917d"
-        
-        if let testdata = test.hexadecimal() {
-            let testbattery = DexcomSessionStartRxMessage(data: testdata)
-            print("hello")
-        }
-        
         // set timeStampAppLaunch to now
         UserDefaults.standard.timeStampAppLaunch = Date()
         
