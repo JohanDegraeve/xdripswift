@@ -162,10 +162,10 @@ class NightScoutFollowManager: NSObject {
             
             trace("    last reading is less than 30 seconds old, will not download now", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
             
-            // schedule new download, only if followerBackgroundKeepAliveType != disabled
-            //if UserDefaults.standard.followerBackgroundKeepAliveType != .disabled {
+            // schedule new download if required
+            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
                 self.scheduleNewDownload()
-            //}
+            }
             
             return
         }
@@ -203,9 +203,11 @@ class NightScoutFollowManager: NSObject {
                     if let followerDelegate = self.followerDelegate {
                         followerDelegate.followerInfoReceived(followGlucoseDataArray: &followGlucoseDataArray)
                     }
-
-                    // schedule new download
-                    self.scheduleNewDownload()
+                    
+                    // schedule new download if required
+                    if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
+                        self.scheduleNewDownload()
+                    }
 
                 }
                 
@@ -247,6 +249,8 @@ class NightScoutFollowManager: NSObject {
     
     /// schedule new download with timer, when timer expires download() will be called
     private func scheduleNewDownload() {
+        
+        guard UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive else { return }
         
         trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
         
@@ -368,7 +372,7 @@ class NightScoutFollowManager: NSObject {
         // if keep-alive is not needed, then just return and do nothing
         if !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
             
-            print("not enabling suspension prevention as keep-alive is disabled")
+            print("not enabling suspension prevention as keep-alive type is:  \(UserDefaults.standard.followerBackgroundKeepAliveType.description)")
             
             return
             
@@ -390,11 +394,13 @@ class NightScoutFollowManager: NSObject {
         
         // schedulePlaySoundTimer needs to be created when app goes to background
         ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer, closure: {
-            if let playSoundTimer = self.playSoundTimer {
-                playSoundTimer.resume()
-            }
-            if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                audioPlayer.play()
+            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
+                if let playSoundTimer = self.playSoundTimer {
+                    playSoundTimer.resume()
+                }
+                if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
+                    audioPlayer.play()
+                }
             }
         })
 
@@ -411,8 +417,9 @@ class NightScoutFollowManager: NSObject {
         
         if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .nightscout && UserDefaults.standard.nightScoutUrl != nil && UserDefaults.standard.nightScoutEnabled {
             
-            // this will enable the suspension prevention sound playing if background keep-alive is enabled
-            if UserDefaults.standard.followerBackgroundKeepAliveType != .disabled {
+            // this will enable the suspension prevention sound playing if background keep-alive is needed
+            // (i.e. not disabled and not using a heartbeat)
+            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
                 enableSuspensionPrevention()
             } else {
                 disableSuspensionPrevention()

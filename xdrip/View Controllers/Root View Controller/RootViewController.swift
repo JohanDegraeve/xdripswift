@@ -1002,7 +1002,7 @@ final class RootViewController: UIViewController, ObservableObject {
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {
             
             // update the connection status immediately (this will give the user a visual feedback that the connection was lost in the background if they have disabled keep-alive)
-            self.setFollowerConnectionStatus()
+            self.setFollowerConnectionAndHeartbeatStatus()
             
             // Schedule a call to updateLabelsAndChart when the app comes to the foreground, with a delay of 0.5 seconds. Because the application state is not immediately to .active, as a result, updates may not happen - especially the synctreatments may not happen because this may depend on the application state - by making a call just half a second later, when the status is surely = .active, the UI updates will be done correctly.
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -3233,7 +3233,7 @@ final class RootViewController: UIViewController, ObservableObject {
         }
         
         // the above means we must be in follower mode, so let's set the connection status
-        setFollowerConnectionStatus()
+        setFollowerConnectionAndHeartbeatStatus()
         
         // set the keep-alive image, then make it visible if in follower mode
         dataSourceKeepAliveImageOutlet.image = UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveUIImage
@@ -3241,17 +3241,6 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // let's go through the specific cases for follower modes
         if !isMaster {
-            
-            // TODO: The 70 seconds would work for L2 BLE but needs to be made to coincide with the transmitter/heartbeat type to be a good indicator of a failed heartbeat.
-            // first set the heartbeat icon color depending on when the last heartbeat was received
-            if UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat {
-                if let lastHeartBeatTimeStamp = UserDefaults.standard.lastHeartBeatTimeStamp, lastHeartBeatTimeStamp < Date().addingTimeInterval(-70) {
-                    dataSourceKeepAliveImageOutlet.tintColor = .systemRed
-                } else {
-                    dataSourceKeepAliveImageOutlet.tintColor =  .systemGreen
-                }
-            }
-            
             dataSourceLabelOutlet.text = UserDefaults.standard.followerDataSourceType.fullDescription
             
             switch UserDefaults.standard.followerDataSourceType {
@@ -3304,7 +3293,7 @@ final class RootViewController: UIViewController, ObservableObject {
     
     
     /// this should be called when the data source view is refreshed or when called by the followerConnectionTimer object
-    @objc private func setFollowerConnectionStatus() {
+    @objc private func setFollowerConnectionAndHeartbeatStatus() {
         
         // if in master mode, hide the connection status and destroy the timer if it was initialized
         // (for example if the user just changed from follower to master)
@@ -3329,30 +3318,33 @@ final class RootViewController: UIViewController, ObservableObject {
             if followerConnectionTimer == nil {
                 
                 // set a timer instance to update the connection status for follower modes
-                followerConnectionTimer = Timer.scheduledTimer(timeInterval: ConstantsFollower.secondsUsedByFollowerConnectionTimer, target: self, selector: #selector(setFollowerConnectionStatus), userInfo: nil, repeats:true)
+                followerConnectionTimer = Timer.scheduledTimer(timeInterval: ConstantsFollower.secondsUsedByFollowerConnectionTimer, target: self, selector: #selector(setFollowerConnectionAndHeartbeatStatus), userInfo: nil, repeats:true)
                 
             }
             
         }
         
         // check when the last follower connection was and compare that to the actual time
-        if let timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection, let timeDifferenceInSeconds = Calendar.current.dateComponents([.second], from: timeStampOfLastFollowerConnection, to: Date()).second {
-            
-            // show "disconnected" if over the limit defined in the constants file
-            if timeDifferenceInSeconds >= UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning {
-                
-                dataSourceConnectionStatusImage.image = UIImage(systemName: "network.slash")
-                dataSourceConnectionStatusImage.tintColor = .systemGray
-                
-            } else {
-                
-                dataSourceConnectionStatusImage.image = UIImage(systemName: "network")
-                dataSourceConnectionStatusImage.tintColor = .systemGreen
-                
-            }
-            
+        if let timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection, timeStampOfLastFollowerConnection < Date().addingTimeInterval(-Double(UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning)) {
+            dataSourceConnectionStatusImage.image = UIImage(systemName: "network.slash")
+            dataSourceConnectionStatusImage.tintColor = .systemRed
+        } else {
+            dataSourceConnectionStatusImage.image = UIImage(systemName: "network")
+            dataSourceConnectionStatusImage.tintColor = .systemGreen
         }
         
+        // TODO: The 40 seconds would work for L2 BLE but needs to be made to coincide with the transmitter/heartbeat type to be a good indicator of a failed heartbeat.
+        // if using a heartbeat then set the heartbeat icon color depending on when the last heartbeat was received
+        // if not using a heartbeat then just keep the icon gray
+        if UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat {
+            if let lastHeartBeatTimeStamp = UserDefaults.standard.lastHeartBeatTimeStamp, lastHeartBeatTimeStamp < Date().addingTimeInterval(-45) {
+                dataSourceKeepAliveImageOutlet.tintColor = .systemRed
+            } else {
+                dataSourceKeepAliveImageOutlet.tintColor =  .systemGreen
+            }
+        } else {
+            dataSourceKeepAliveImageOutlet.tintColor =  .systemGray
+        }
     }
     
     
