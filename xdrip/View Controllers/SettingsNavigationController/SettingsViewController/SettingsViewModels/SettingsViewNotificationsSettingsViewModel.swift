@@ -26,12 +26,23 @@ fileprivate enum Setting:Int, CaseIterable {
 }
 
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
-class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
+class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelProtocol {
     
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel)
     
+    override init() {
+        super.init()
+        addObservers()
+    }
+    
+    var sectionReloadClosure: (() -> Void)?
+    
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
+    
+    func storeSectionReloadClosure(sectionReloadClosure: @escaping (() -> Void)) {
+        self.sectionReloadClosure = sectionReloadClosure
+    }
     
     func storeUIViewController(uIViewController: UIViewController) {}
     
@@ -277,6 +288,35 @@ class SettingsViewNotificationsSettingsViewModel: SettingsViewModelProtocol {
 
         case .notificationInterval, .liveActivityType, .liveActivitySize:
             return nil
+        }
+    }
+    
+    // MARK: - observe functions
+    
+    private func addObservers() {
+        
+        // Listen for changes in the active sensor value to trigger the UI to be updated
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
+        
+    }
+    
+    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        
+        guard let keyPath = keyPath,
+              let keyPathEnum = UserDefaults.Key(rawValue: keyPath)
+        else { return }
+        
+        switch keyPathEnum {
+        case UserDefaults.Key.followerBackgroundKeepAliveType:
+            
+            // we have to run this in the main thread to avoid access errors
+            DispatchQueue.main.async {
+                self.sectionReloadClosure?()
+            }
+            
+        default:
+            break
+            
         }
     }
 }
