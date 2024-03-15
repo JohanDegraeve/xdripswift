@@ -162,10 +162,8 @@ class NightScoutFollowManager: NSObject {
             
             trace("    last reading is less than 30 seconds old, will not download now", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
             
-            // schedule new download if required
-            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                self.scheduleNewDownload()
-            }
+            // schedule new download
+            self.scheduleNewDownload()
             
             return
         }
@@ -204,10 +202,8 @@ class NightScoutFollowManager: NSObject {
                         followerDelegate.followerInfoReceived(followGlucoseDataArray: &followGlucoseDataArray)
                     }
                     
-                    // schedule new download if required
-                    if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                        self.scheduleNewDownload()
-                    }
+                    // schedule new download
+                    self.scheduleNewDownload()
 
                 }
                 
@@ -250,7 +246,7 @@ class NightScoutFollowManager: NSObject {
     /// schedule new download with timer, when timer expires download() will be called
     private func scheduleNewDownload() {
         
-        guard UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive else { return }
+        //guard UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive else { return }
         
         trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
         

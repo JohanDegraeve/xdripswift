@@ -311,10 +311,8 @@ class LibreLinkUpFollowManager: NSObject {
                             followerDelegate.followerInfoReceived(followGlucoseDataArray: &followGlucoseDataArray)
                         }
                         
-                        // schedule new download if required
-                        if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                            self.scheduleNewDownload()
-                        }
+                        // schedule new download
+                        self.scheduleNewDownload()
                         
                     }
                     
@@ -329,10 +327,8 @@ class LibreLinkUpFollowManager: NSObject {
             // rescheduling the timer must be done in main thread
             // we do it here at the end of the function so that it is always rescheduled once a valid connection is established, irrespective of whether we get values.
             DispatchQueue.main.sync {
-                // schedule new download if required
-                if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                    self.scheduleNewDownload()
-                }
+                // schedule new download
+                self.scheduleNewDownload()
             }
         }
     }
@@ -693,7 +689,7 @@ class LibreLinkUpFollowManager: NSObject {
     /// schedule new download with timer, when timer expires download() will be called
     private func scheduleNewDownload() {
         
-        guard UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive else { return }
+        //guard UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive else { return }
         
         trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
         
