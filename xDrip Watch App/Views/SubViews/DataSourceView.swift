@@ -12,44 +12,48 @@ import SwiftUI
 struct DataSourceView: View {
     @EnvironmentObject var watchState: WatchStateModel
     
+    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < 180 ? true : false
+    
     var body: some View {
         VStack(spacing: 0) {
+            
+            let textSize: CGFloat = isSmallScreen ? 12 : 14
+            
             if (watchState.activeSensorDescription != "" || watchState.sensorAgeInMinutes > 0) || !watchState.isMaster {
                 
                 ProgressView(value: Float(watchState.activeSensorProgress().progress))
                     .tint(ConstantsHomeView.sensorProgressViewNormalColorSwiftUI)
                     .scaleEffect(x: 1, y: 0.3, anchor: .center)
                 
-                HStack {
+                HStack(alignment: .center) {
                     if !watchState.isMaster {
-                        HStack(alignment: .center, spacing: 4) {
+                        HStack(alignment: .center, spacing: isSmallScreen ? 2 : 4) {
                             watchState.getFollowerConnectionStatusImage().networkImage
-                                .font(.system(size: 14))
+                                .font(.system(size: textSize))
                                 .foregroundStyle(watchState.getFollowerConnectionStatusImage().tintColor)
-                                .padding(.bottom, -2)
                             
                             watchState.followerBackgroundKeepAliveType.keepAliveImage
-                                .font(.system(size: 14))
+                                .font(.system(size: textSize))
                                 .foregroundStyle(Color(white: 0.7))
-                                .padding(.bottom, -3)
                             
                             Text(watchState.followerDataSourceType.fullDescription)
-                                .font(.system(size: 14)).fontWeight(.semibold)
+                                .font(.system(size: textSize)).fontWeight(.semibold)
+                                .minimumScaleFactor(0.2)
                         }
                     } else {
                         Text(watchState.activeSensorDescription)
-                            .font(.system(size: 14)).fontWeight(.semibold)
+                            .font(.system(size: textSize)).fontWeight(.semibold)
                     }
                     
                     Spacer()
                     
                     if watchState.sensorAgeInMinutes > 0 {
                         Text(watchState.sensorAgeInMinutes.minutesToDaysAndHours())
-                            .font(.system(size: 14))
+                            .font(.system(size: textSize))
                             .foregroundStyle(watchState.activeSensorProgress().textColor)
                     }
                 }
-                .padding([.leading, .trailing], 10)
+                .padding([.leading, .trailing], isSmallScreen ? 6 : 10)
             } else {
                 ProgressView(value: 0)
                     .tint(ConstantsHomeView.sensorProgressViewNormalColorSwiftUI)
@@ -57,7 +61,7 @@ struct DataSourceView: View {
                 
                 HStack {
                     Text(" ⚠️  " + Texts_HomeView.noDataSourceConnectedWatch)
-                        .font(.system(size: 14)).bold()
+                        .font(.system(size: textSize)).bold()
                     
                     Spacer()
                 }

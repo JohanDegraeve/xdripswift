@@ -12,14 +12,19 @@ import SwiftUI
 struct InfoView: View {
     @EnvironmentObject var watchState: WatchStateModel
     
+    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < 180 ? true : false
+    
     var body: some View {
+        
+        let textSize: CGFloat = isSmallScreen ? 12 : 14
+        
         HStack(spacing: 2) {
             Text(watchState.lastUpdatedTextString)
-                .font(.system(size: 14))
+                .font(.system(size: textSize))
                 .foregroundStyle(.gray)
             
             Text(watchState.lastUpdatedTimeString)
-                .font(.system(size: 14))
+                .font(.system(size: textSize))
                 .foregroundStyle(watchState.lastUpdatedTimeColor())
         }
     }

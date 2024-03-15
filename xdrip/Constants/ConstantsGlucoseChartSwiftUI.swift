@@ -58,8 +58,12 @@ enum ConstantsGlucoseChartSwiftUI {
     static let xAxisLabelOffsetDynamicIsland: Double = -10
     
     // watch chart
-    static let viewWidthWatchApp: CGFloat = 190 // was 200 but slightly too big for 44mm watches
+    static let viewWidthWatchApp: CGFloat = 190
     static let viewHeightWatchApp: CGFloat = 90
+    
+    // watch chart sizes for smaller watches
+    static let viewWidthWatchAppSmall: CGFloat = 175
+    static let viewHeightWatchAppSmall: CGFloat = 75
     
     static let lowHighLineColorWatchApp = Color(white: 0.6)
     static let urgentLowHighLineColorWatchApp = Color(white: 0.4)
