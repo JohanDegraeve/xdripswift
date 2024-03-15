@@ -3324,23 +3324,46 @@ final class RootViewController: UIViewController, ObservableObject {
             
         }
         
-        // check when the last follower connection was and compare that to the actual time
-        if let timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection, timeStampOfLastFollowerConnection < Date().addingTimeInterval(-Double(UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning)) {
-            dataSourceConnectionStatusImage.image = UIImage(systemName: "network.slash")
-            dataSourceConnectionStatusImage.tintColor = .systemRed
-        } else {
+        // if the last connection was newer than 'x' seconds ago, then show a valid connection icon. If not, show the follower service as disconnected
+        if let timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection, timeStampOfLastFollowerConnection > Date().addingTimeInterval(-Double(UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning)) {
             dataSourceConnectionStatusImage.image = UIImage(systemName: "network")
             dataSourceConnectionStatusImage.tintColor = .systemGreen
+        } else {
+            dataSourceConnectionStatusImage.image = UIImage(systemName: "network.slash")
+            dataSourceConnectionStatusImage.tintColor = .systemRed
         }
         
-        // TODO: The 40 seconds would work for L2 BLE but needs to be made to coincide with the transmitter/heartbeat type to be a good indicator of a failed heartbeat.
-        // if using a heartbeat then set the heartbeat icon color depending on when the last heartbeat was received
-        // if not using a heartbeat then just keep the icon gray
+        
+        // if the last heartbeat timestamp is newer than 'x' seconds ago, then show a valid heartbeat icon. If not, show the heartbeat as (temporarily) disconnected
+        // if not using a heartbeat (or if we fail to get 'x') then just keep the icon gray
         if UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat {
-            if let lastHeartBeatTimeStamp = UserDefaults.standard.lastHeartBeatTimeStamp, lastHeartBeatTimeStamp < Date().addingTimeInterval(-45) {
-                dataSourceKeepAliveImageOutlet.tintColor = .systemRed
-            } else {
+            
+            var heartbeatShowDisconnectedTimeInSeconds: Double? = nil
+            
+            if let bluetoothPeripherals = bluetoothPeripheralManager?.bluetoothPeripherals {
+                // loop through all bluetoothPeripherals
+                for bluetoothPeripheral in bluetoothPeripherals {
+                    // using bluetoothPeripheralType here so that whenever bluetoothPeripheralType is extended with new cases, we don't forget to handle them
+                    switch bluetoothPeripheral.bluetoothPeripheralType() {
+                        
+                    case .Libre3HeartBeatType:
+                        heartbeatShowDisconnectedTimeInSeconds = ConstantsHeartBeat.heartbeatShowDisconnectedTimeInSecondsLibre3
+                        
+                    case .DexcomG7HeartBeatType:
+                        heartbeatShowDisconnectedTimeInSeconds = ConstantsHeartBeat.heartbeatShowDisconnectedTimeInSecondsDexcomG7
+                        
+                    case .OmniPodHeartBeatType:
+                        heartbeatShowDisconnectedTimeInSeconds = ConstantsHeartBeat.heartbeatShowDisconnectedTimeInSecondsOmniPod
+                        
+                    default:
+                        break
+                    }
+                }
+            }
+            if let lastHeartBeatTimeStamp = UserDefaults.standard.lastHeartBeatTimeStamp, let heartbeatShowDisconnectedTimeInSeconds = heartbeatShowDisconnectedTimeInSeconds, lastHeartBeatTimeStamp > Date().addingTimeInterval(-heartbeatShowDisconnectedTimeInSeconds) {
                 dataSourceKeepAliveImageOutlet.tintColor =  .systemGreen
+            } else {
+                dataSourceKeepAliveImageOutlet.tintColor = .systemRed
             }
         } else {
             dataSourceKeepAliveImageOutlet.tintColor =  .systemGray
