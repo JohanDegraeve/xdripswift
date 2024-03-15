@@ -17,8 +17,15 @@ struct MainView: View {
     
     @State private var hoursToShowIndex: Int = ConstantsAppleWatch.hoursToShowDefaultIndex
     
+    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < 180 ? true : false
+    
     // MARK: -  Body
     var body: some View {
+        
+        let overrideChartHeight: Double? = isSmallScreen ? ConstantsGlucoseChartSwiftUI.viewHeightWatchAppSmall : nil
+        
+        let overrideChartWidth: Double? = isSmallScreen ? ConstantsGlucoseChartSwiftUI.viewWidthWatchAppSmall : nil
+        
         ZStack(alignment: .topLeading) {
             VStack {
                 HeaderView()
@@ -30,10 +37,8 @@ struct MainView: View {
                     }
                 
                 ZStack(alignment: Alignment(horizontal: .center, vertical: .top), content: {
-                    
-                    GlucoseChartView(glucoseChartType: .watchApp, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivitySize: nil, hoursToShowScalingHours: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4)
-                        .padding(.top, 3)
-                        .padding(.bottom, 3)
+                                        
+                    GlucoseChartView(glucoseChartType: .watchApp, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivitySize: nil, hoursToShowScalingHours: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4, overrideChartHeight: overrideChartHeight, overrideChartWidth: overrideChartWidth)
                         .gesture(
                             DragGesture(minimumDistance: 80, coordinateSpace: .local)
                                 .onEnded({ value in

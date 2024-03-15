@@ -12,10 +12,12 @@ import SwiftUI
 struct HeaderView: View {
     @EnvironmentObject var watchState: WatchStateModel
     
+    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < 180 ? true : false
+    
     var body: some View {
         HStack(alignment: .lastTextBaseline) {
             Text("\(watchState.bgValueStringInUserChosenUnit())\(watchState.trendArrow())")
-                .font(.system(size: 60)).fontWeight(.semibold)
+                .font(.system(size: isSmallScreen ? 50 : 60)).fontWeight(.semibold)
                 .foregroundStyle(watchState.bgTextColor())
                 .scaledToFill()
                 .minimumScaleFactor(0.5)
@@ -26,11 +28,11 @@ struct HeaderView: View {
             VStack(alignment: .trailing, spacing: 0) {
                 Spacer()
                 Text(watchState.deltaChangeStringInUserChosenUnit())
-                    .font(.system(size: 28)).fontWeight(.semibold)
+                    .font(.system(size: isSmallScreen ? 24 : 28)).fontWeight(.semibold)
                     .lineLimit(1)
                     .padding(.bottom, -7)
                 Text(watchState.bgUnitString())
-                    .font(.system(size: 14))
+                    .font(.system(size: isSmallScreen ? 12 : 14))
                     .foregroundStyle(.gray)
                     .lineLimit(1)
             }

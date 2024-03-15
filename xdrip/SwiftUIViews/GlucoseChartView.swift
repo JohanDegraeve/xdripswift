@@ -25,8 +25,10 @@ struct GlucoseChartView: View {
     let liveActivitySize: LiveActivitySize
     let hoursToShow: Double
     let glucoseCircleDiameter: Double
+    let chartHeight: Double
+    let chartWidth: Double
     
-    init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double]?, bgReadingDates: [Date]?, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySize: LiveActivitySize?, hoursToShowScalingHours: Double?, glucoseCircleDiameterScalingHours: Double?) {
+    init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double]?, bgReadingDates: [Date]?, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySize: LiveActivitySize?, hoursToShowScalingHours: Double?, glucoseCircleDiameterScalingHours: Double?, overrideChartHeight: Double?, overrideChartWidth: Double?) {
         
         self.glucoseChartType = glucoseChartType
         self.isMgDl = isMgDl
@@ -39,6 +41,9 @@ struct GlucoseChartView: View {
         // here we want to automatically set the hoursToShow based upon the chart type, but some chart instances might need
         // this to be overriden such as for zooming in/out of the chart (i.e. the Watch App)
         self.hoursToShow = hoursToShowScalingHours ?? glucoseChartType.hoursToShow(liveActivitySize: self.liveActivitySize)
+        
+        self.chartHeight = overrideChartHeight ?? glucoseChartType.viewSize(liveActivitySize: self.liveActivitySize).height
+        self.chartWidth = overrideChartWidth ?? glucoseChartType.viewSize(liveActivitySize: self.liveActivitySize).width
         
         // apply a scale to the glucoseCircleDiameter if an override value is passed
         self.glucoseCircleDiameter = glucoseChartType.glucoseCircleDiameter(liveActivitySize: self.liveActivitySize) * ((glucoseCircleDiameterScalingHours ?? self.hoursToShow) / self.hoursToShow)
@@ -181,6 +186,6 @@ struct GlucoseChartView: View {
         }
         .chartYAxis(.hidden)
         .chartYScale(domain: domain)
-        .frame(width: glucoseChartType.viewSize(liveActivitySize: liveActivitySize).width, height: glucoseChartType.viewSize(liveActivitySize: liveActivitySize).height)
+        .frame(width: chartWidth, height: chartHeight)
     }
 }
