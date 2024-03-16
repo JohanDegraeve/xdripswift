@@ -146,6 +146,9 @@ import AppIntents
     /// HealthKit manager instance
     private var healthKitManager:HealthKitManager?
     
+    /// OpenGlück manager instance
+    private var openGlückManager:OpenGlückManager?
+    
     /// BG post processing manager instance
     private var bgPostProcessingManager: BgPostProcessingManager?
 
@@ -795,6 +798,9 @@ import AppIntents
         // setup healthkitmanager
         healthKitManager = HealthKitManager(coreDataManager: coreDataManager)
         
+        // setup openGlückManager
+        openGlückManager = OpenGlückManager(coreDataManager: coreDataManager)
+        
         // setup bgPostProcessingManager
         bgPostProcessingManager = BgPostProcessingManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager, healthKitManager: healthKitManager)
 
@@ -986,7 +992,7 @@ import AppIntents
         cgmTransmitterInfoChanged()
         
         // setup alertmanager
-        alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
+        alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer, openGlückManager: openGlückManager)
         sensorExpiryIsReady = true
         reconcileSensorExpiryReminders()
         if let alertManager {
@@ -1374,6 +1380,7 @@ import AppIntents
                     watchManager?.updateWatchApp(forceComplicationUpdate: false)
                     nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                     healthKitManager?.storeBgReadings()
+                    openGlückManager?.storeBgReadings()
                     return
                 }
 
@@ -1423,6 +1430,7 @@ import AppIntents
                 nightscoutSyncManager?.syncAllWithNightscout()
                 
                 healthKitManager?.storeBgReadings()
+                openGlückManager?.storeBgReadings()
                 
                 bgReadingSpeaker?.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
@@ -3627,6 +3635,7 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                 checkAlertsCreateNotificationAndSetAppBadge()
                 
                 healthKitManager?.storeBgReadings()
+                openGlückManager?.storeBgReadings()
                 
                 if let bgReadingSpeaker = bgReadingSpeaker {
                     bgReadingSpeaker.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())

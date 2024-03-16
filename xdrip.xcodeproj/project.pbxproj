@@ -529,6 +529,10 @@
 		F821CF7D22A46CDD005C1E43 /* 1-millisecond-of-silence.caf in Resources */ = {isa = PBXBuildFile; fileRef = F821CF7C22A46CDD005C1E43 /* 1-millisecond-of-silence.caf */; };
 		F821CF7F22A4EDCF005C1E43 /* 20ms-of-silence.caf in Resources */ = {isa = PBXBuildFile; fileRef = F821CF7E22A4EDCF005C1E43 /* 20ms-of-silence.caf */; };
 		F821CF8122A5C814005C1E43 /* RepeatingTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */; };
+		9D67DF752A6DBEDC009A15DD /* SettingsViewOpenGlückSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D67DF742A6DBEDC009A15DD /* SettingsViewOpenGlückSettingsViewModel.swift */; };
+		9D67DF7A2A6DC365009A15DD /* OpenGlückManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D67DF792A6DC365009A15DD /* OpenGlückManager.swift */; };
+		9D9CF5C22EE16937009A2274 /* OG in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9CF5C12EE16937009A2274 /* OG */; };
+		9D9CF5C42EE16937009A2274 /* OGUI in Frameworks */ = {isa = PBXBuildFile; productRef = 9D9CF5C32EE16937009A2274 /* OGUI */; };
 		F821CF9522ADB0D7005C1E43 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF9422ADB0D7005C1E43 /* HealthKitManager.swift */; };
 		F821CF9722AE589E005C1E43 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F821CF9622AE589E005C1E43 /* HealthKit.framework */; };
 		F821CF9D22AEF483005C1E43 /* BGReadingSpeaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF9C22AEF483005C1E43 /* BGReadingSpeaker.swift */; };
@@ -1708,6 +1712,8 @@
 		F821CF7C22A46CDD005C1E43 /* 1-millisecond-of-silence.caf */ = {isa = PBXFileReference; lastKnownFileType = audio.caf; path = "1-millisecond-of-silence.caf"; sourceTree = "<group>"; };
 		F821CF7E22A4EDCF005C1E43 /* 20ms-of-silence.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "20ms-of-silence.caf"; sourceTree = "<group>"; };
 		F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatingTimer.swift; sourceTree = "<group>"; };
+		9D67DF742A6DBEDC009A15DD /* SettingsViewOpenGlückSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SettingsViewOpenGlückSettingsViewModel.swift"; sourceTree = "<group>"; };
+		9D67DF792A6DC365009A15DD /* OpenGlückManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "OpenGlückManager.swift"; sourceTree = "<group>"; };
 		F821CF9422ADB0D7005C1E43 /* HealthKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		F821CF9622AE589E005C1E43 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		F821CF9822AE589E005C1E43 /* xdrip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = xdrip.entitlements; sourceTree = "<group>"; };
@@ -2281,6 +2287,8 @@
 			files = (
 				F81F3C4225D1D91300520946 /* CoreNFC.framework in Frameworks */,
 				F821CF9722AE589E005C1E43 /* HealthKit.framework in Frameworks */,
+				9D9CF5C22EE16937009A2274 /* OG in Frameworks */,
+				9D9CF5C42EE16937009A2274 /* OGUI in Frameworks */,
 				47DE41AA2B860DF00041DA19 /* WatchConnectivity.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2892,6 +2900,7 @@
 				F8A1584C22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift */,
 				F8B3A839227F090D004BA588 /* SettingsViewDexcomShareSettingsViewModel.swift */,
 				F8B3A83C227F090D004BA588 /* SettingsViewHealthKitSettingsViewModel.swift */,
+				9D67DF742A6DBEDC009A15DD /* SettingsViewOpenGlückSettingsViewModel.swift */,
 				F8D0587B24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift */,
 				D41F32912827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift */,
 				F8A1584E22ECB281007F5B5D /* SettingsViewInfoViewModel.swift */,
@@ -3179,6 +3188,14 @@
 			path = Network;
 			sourceTree = "<group>";
 		};
+		9D67DF782A6DC339009A15DD /* OpenGlückManager */ = {
+			isa = PBXGroup;
+			children = (
+				9D67DF792A6DC365009A15DD /* OpenGlückManager.swift */,
+			);
+			path = "OpenGlückManager";
+			sourceTree = "<group>";
+		};
 		F821CF9122ADB064005C1E43 /* HealthKit */ = {
 			isa = PBXGroup;
 			children = (
@@ -3231,6 +3248,7 @@
 				F8E51D5B2448D8A3001C9E5A /* Loop */,
 				47A05CC42EF160A9004DABE7 /* MedtrumEasyView */,
 				F821CF4F229BF43A005C1E43 /* Nightscout */,
+				9D67DF782A6DC339009A15DD /* OpenGlückManager */,
 				4A9B10212F0A000100000001 /* PostProcessing */,
 				F64039AE281C3F8D0051EFFE /* QuickActions */,
 				4F2500213002000100000001 /* SensorHealth */,
@@ -4306,6 +4324,10 @@
 				47CD641F2BE9506C002BDA68 /* PBXTargetDependency */,
 			);
 			name = xdrip;
+			packageProductDependencies = (
+				9D9CF5C12EE16937009A2274 /* OG */,
+				9D9CF5C32EE16937009A2274 /* OGUI */,
+			);
 			productName = xdrip;
 			productReference = F8AC425A21ADEBD60078C348 /* xdrip.app */;
 			productType = "com.apple.product-type.application";
@@ -4378,6 +4400,9 @@
 				el,
 			);
 			mainGroup = F8AC425121ADEBD60078C348;
+			packageReferences = (
+				9D9CF5C02EE16937009A2274 /* XCRemoteSwiftPackageReference "OG" */,
+			);
 			productRefGroup = F8AC425B21ADEBD60078C348 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -5004,6 +5029,8 @@
 				4734FF552BEFE3F200C7115A /* AlertNotificationDictionary.swift in Sources */,
 				F8F1670E27273EA7001AA3D8 /* GlucoseDataRxMessage.swift in Sources */,
 				F821CF9522ADB0D7005C1E43 /* HealthKitManager.swift in Sources */,
+				9D67DF7A2A6DC365009A15DD /* OpenGlückManager.swift in Sources */,
+				9D67DF752A6DBEDC009A15DD /* SettingsViewOpenGlückSettingsViewModel.swift in Sources */,
 				F8CB59CE27444D6300BA199E /* DexcomSessionStopResponse.swift in Sources */,
 				F8F71D812B7EAA2E005076E8 /* DexcomG7+CoreDataProperties.swift in Sources */,
 				4D7180092FE8000100000001 /* MedtrumTouchCareNano+CoreDataProperties.swift in Sources */,
@@ -6477,7 +6504,7 @@
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
 				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
 				INFOPLIST_FILE = "xdrip/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -6506,7 +6533,7 @@
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
 				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
 				INFOPLIST_FILE = "xdrip/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -6588,6 +6615,30 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		9D9CF5C02EE16937009A2274 /* XCRemoteSwiftPackageReference "OG" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/open-gluck/OG.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9D9CF5C12EE16937009A2274 /* OG */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9D9CF5C02EE16937009A2274 /* XCRemoteSwiftPackageReference "OG" */;
+			productName = OG;
+		};
+		9D9CF5C32EE16937009A2274 /* OGUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9D9CF5C02EE16937009A2274 /* XCRemoteSwiftPackageReference "OG" */;
+			productName = OGUI;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		F85FF3C2252D0C32004E6FF1 /* xdrip.xcdatamodeld */ = {
