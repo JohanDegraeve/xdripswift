@@ -19,6 +19,15 @@
       }
     },
     {
+      "identity" : "og",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/callms/OG",
+      "state" : {
+        "revision" : "7324a2d1ce066f15e101a157bcc7cd2903004fec",
+        "version" : "1.0.74"
+      }
+    },
+    {
       "identity" : "piecharts",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/paulplant/PieCharts",

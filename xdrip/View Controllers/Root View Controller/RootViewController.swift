@@ -534,6 +534,9 @@ final class RootViewController: UIViewController, ObservableObject {
     /// healthkit manager instance
     private var healthKitManager:HealthKitManager?
     
+    /// OpenGlück manager instance
+    private var openGlückManager:OpenGlückManager?
+    
     /// reference to activeSensor
     private var activeSensor:Sensor?
     
@@ -1026,7 +1029,7 @@ final class RootViewController: UIViewController, ObservableObject {
         }
     }
     
-    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, watchManager, housekeeper
+    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, openGlückManager, bgReadingSpeaker, bluetoothPeripheralManager, watchManager, housekeeper
     private func setupApplicationData() {
         
         // setup Trace
@@ -1075,6 +1078,9 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // setup healthkitmanager
         healthKitManager = HealthKitManager(coreDataManager: coreDataManager)
+        
+        // setup openGlückManager
+        openGlückManager = OpenGlückManager(coreDataManager: coreDataManager)
         
         // setup bgReadingSpeaker
         bgReadingSpeaker = BGReadingSpeaker(sharedSoundPlayer: soundPlayer, coreDataManager: coreDataManager)
@@ -1159,7 +1165,7 @@ final class RootViewController: UIViewController, ObservableObject {
         cgmTransmitterInfoChanged()
         
         // setup alertmanager
-        alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
+        alertManager = AlertManager(coreDataManager: coreDataManager, soundPlayer: soundPlayer, openGlückManager: openGlückManager)
         
         // setup watchmanager
         watchManager = WatchManager(coreDataManager: coreDataManager)
@@ -1436,6 +1442,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 nightScoutUploadManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 healthKitManager?.storeBgReadings()
+
+                openGlückManager?.storeBgReadings()
                 
                 bgReadingSpeaker?.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
@@ -3763,6 +3771,10 @@ extension RootViewController: FollowerDelegate {
                 
                 if let healthKitManager = healthKitManager {
                     healthKitManager.storeBgReadings()
+                }
+                
+                if let openGlückManager = openGlückManager {
+                    openGlückManager.storeBgReadings()
                 }
                 
                 if let bgReadingSpeaker = bgReadingSpeaker {
