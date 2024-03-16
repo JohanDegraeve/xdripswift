@@ -1,4 +1,5 @@
 {
+  "originHash" : "0d5641e0fdf5e4f44a4d2de38aaee16285ceb48e3558d281791a48ed3399f19b",
   "pins" : [
     {
       "identity" : "actionclosurable",
@@ -16,6 +17,15 @@
       "state" : {
         "revision" : "db51c407d3be4a051484a141bf0bff36c43d3b1e",
         "version" : "1.8.0"
+      }
+    },
+    {
+      "identity" : "og",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/open-gluck/OG",
+      "state" : {
+        "revision" : "1b80c20e9fca97502159e8a0c9939d94156e9ccf",
+        "version" : "1.0.89"
       }
     },
     {
