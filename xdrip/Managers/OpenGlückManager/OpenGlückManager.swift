@@ -19,7 +19,7 @@ public class OpenGlückManager: NSObject, OpenGlückSyncClientDelegate {
     /// reference to BgReadingsAccessor
     private var bgReadingsAccessor: BgReadingsAccessor
 
-    /// is OpenGlück fully initiazed or not, that includes checking if healthkit is available, created successfully bloodGlucoseType, user authorized - value will get changed
+    /// is OpenGlück fully initiazed or not, that includes checking if OpenGlück is available, created successfully bloodGlucoseType, user authorized - value will get changed
     private var openGlückInitialized = false
 
     /// reference to the OpenGlück client, should be used only if we're sure OpenGlück is supported on the device
@@ -100,10 +100,9 @@ public class OpenGlückManager: NSObject, OpenGlückSyncClientDelegate {
         return (historics, scans)
     }
 
-    /// stores latest readings in healthkit, only if HK supported, authorized, enabled in settings
+    /// stores latest readings in OpenGlück, only if OG supported, authorized, enabled in settings
     public func storeBgReadings() {
-        // TODO:
-        // healthkit setting must be on, and healthkit must be initialized successfully
+        // OpenGlück setting must be on, and OG must be initialized successfully
         if !UserDefaults.standard.openGlückEnabled || !openGlückInitialized { return }
 
         guard let openGlückClient = openGlückClient else { return }
@@ -200,7 +199,7 @@ public class OpenGlückManager: NSObject, OpenGlückSyncClientDelegate {
 
     // MARK: - observe function
 
-    /// when UserDefaults storeReadingsInHealthkitAuthorized or storeReadingsInHealthkit changes, then reinitialize the property openGlückInitialized
+    /// when UserDefaults openGlückEnabled, openGlückUploadEnabled or openGlückToken changes, then reinitialize the property openGlückInitialized
     override public func observeValue(forKeyPath keyPath: String?, of _: Any?, change _: [NSKeyValueChangeKey: Any]?, context _: UnsafeMutableRawPointer?) {
         if let keyPath = keyPath {
             if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
