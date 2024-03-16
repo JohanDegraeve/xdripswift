@@ -6100,7 +6100,7 @@
 		};
 		9D06FF5E2A76EC0000ECEA9B /* XCRemoteSwiftPackageReference "OG" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/callms/OG";
+			repositoryURL = "https://github.com/open-gluck/OG";
 			requirement = {
 				kind = upToNextMajorVersion;
 				minimumVersion = 1.0.65;
