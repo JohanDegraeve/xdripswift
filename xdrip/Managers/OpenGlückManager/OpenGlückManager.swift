@@ -73,6 +73,10 @@ public class OpenGlückManager: NSObject, OpenGlückSyncClientDelegate {
         return true
     }
     
+    public func getClient() -> OpenGlückClient? {
+        openGlückClient
+    }
+    
     let intervalBetweenHistoricRecords: TimeInterval =  5 * 60 // 5m
     let historicScanTipoffInterval: TimeInterval = 20 * 60 // 20m
     private func splitRecordsByHistoricScan(_ readings: [BgReading]) -> ([BgReading], [BgReading]) {
@@ -177,8 +181,7 @@ public class OpenGlückManager: NSObject, OpenGlückSyncClientDelegate {
         
         // get the latest low
         do {
-            let latest = try await openGlückSyncClient.getLastData()
-            if let lows = latest.lowRecords {
+            if let latest = try await openGlückSyncClient.getLastData(), let lows = latest.lowRecords {
                 lastLowRecordAt = lows
                     .filter { !$0.deleted }
                     .filter {at >= $0.timestamp && at <= $0.timestamp.addingTimeInterval(dismissLowAfter) }

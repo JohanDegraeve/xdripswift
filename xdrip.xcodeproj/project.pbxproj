@@ -227,11 +227,11 @@
 		47F7B1CD2C68CC3000609DA7 /* ConstantsCalibrationAlgorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585422EDB706007F5B5D /* ConstantsCalibrationAlgorithms.swift */; };
 		47FB28082636B04200042FFB /* StatisticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47FB28072636B04200042FFB /* StatisticsManager.swift */; };
 		9D06FF5B2A76EB1600ECEA9B /* (null) in Frameworks */ = {isa = PBXBuildFile; };
-		9D06FF602A76EC0000ECEA9B /* DiablyLib in Frameworks */ = {isa = PBXBuildFile; productRef = 9D06FF5F2A76EC0000ECEA9B /* DiablyLib */; };
 		9D06FF622A76EC0000ECEA9B /* OG in Frameworks */ = {isa = PBXBuildFile; productRef = 9D06FF612A76EC0000ECEA9B /* OG */; };
 		9D67DF752A6DBEDC009A15DD /* SettingsViewOpenGlückSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D67DF742A6DBEDC009A15DD /* SettingsViewOpenGlückSettingsViewModel.swift */; };
 		9D67DF7A2A6DC365009A15DD /* OpenGlückManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D67DF792A6DC365009A15DD /* OpenGlückManager.swift */; };
 		9D67DF7D2A6DC603009A15DD /* (null) in Frameworks */ = {isa = PBXBuildFile; };
+		9DBB1A4A2BA5A02D004B255A /* OGUI in Frameworks */ = {isa = PBXBuildFile; productRef = 9DBB1A492BA5A02D004B255A /* OGUI */; };
 		CE1B2FE025D0264B00F642F5 /* LaunchScreen.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */; };
 		CE1B2FE125D0264B00F642F5 /* Main.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD425D0264900F642F5 /* Main.strings */; };
 		D400F8032778BD8000B57648 /* TextsTreatmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D400F8022778BD8000B57648 /* TextsTreatmentsView.swift */; };
@@ -1961,7 +1961,7 @@
 				9D67DF7D2A6DC603009A15DD /* (null) in Frameworks */,
 				4779BCEE2974306300515714 /* ActionClosurable in Frameworks */,
 				F821CF9722AE589E005C1E43 /* HealthKit.framework in Frameworks */,
-				9D06FF602A76EC0000ECEA9B /* DiablyLib in Frameworks */,
+				9DBB1A4A2BA5A02D004B255A /* OGUI in Frameworks */,
 				9D06FF5B2A76EB1600ECEA9B /* (null) in Frameworks */,
 				4779BCF42974308F00515714 /* PieCharts in Frameworks */,
 				4779BCF12974307700515714 /* CryptoSwift in Frameworks */,
@@ -3987,8 +3987,8 @@
 				4779BCF02974307700515714 /* CryptoSwift */,
 				4779BCF32974308F00515714 /* PieCharts */,
 				470824D1297484B500C52317 /* SwiftCharts */,
-				9D06FF5F2A76EC0000ECEA9B /* DiablyLib */,
 				9D06FF612A76EC0000ECEA9B /* OG */,
+				9DBB1A492BA5A02D004B255A /* OGUI */,
 			);
 			productName = xdrip;
 			productReference = F8AC425A21ADEBD60078C348 /* xdrip.app */;
@@ -6129,15 +6129,15 @@
 			package = 4779BCF22974308F00515714 /* XCRemoteSwiftPackageReference "PieCharts" */;
 			productName = PieCharts;
 		};
-		9D06FF5F2A76EC0000ECEA9B /* DiablyLib */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 9D06FF5E2A76EC0000ECEA9B /* XCRemoteSwiftPackageReference "OG" */;
-			productName = DiablyLib;
-		};
 		9D06FF612A76EC0000ECEA9B /* OG */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 9D06FF5E2A76EC0000ECEA9B /* XCRemoteSwiftPackageReference "OG" */;
 			productName = OG;
+		};
+		9DBB1A492BA5A02D004B255A /* OGUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 9D06FF5E2A76EC0000ECEA9B /* XCRemoteSwiftPackageReference "OG" */;
+			productName = OGUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 
