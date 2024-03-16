@@ -236,6 +236,13 @@ extension UserDefaults {
         /// should readings be stored in healthkit, true or false
         case storeReadingsInHealthkit = "storeReadingsInHealthkit"
         
+        // OpenGlück
+        case openGlückEnabled = "openGlückEnabled"
+        case openGlückUploadEnabled = "openGlückUploadEnabled"
+        case openGlückHostname = "openGlückHostname"
+        case openGlückToken = "openGlückToken"
+        case timeStampLatestOpenGlückBgReading = "openGlückLastUpload"
+
         // Speak readings
         
         /// speak readings
@@ -1612,6 +1619,58 @@ extension UserDefaults {
         }
     }
     
+    // MARK: OpenGlück Settings
+
+    /// is OpenGlück enabled?
+    @objc dynamic var openGlückEnabled: Bool {
+        get {
+            return bool(forKey: Key.openGlückEnabled.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.openGlückEnabled.rawValue)
+        }
+    }
+
+    /// is OpenGlück upload enabled?
+    @objc dynamic var openGlückUploadEnabled: Bool {
+        get {
+            return bool(forKey: Key.openGlückUploadEnabled.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.openGlückUploadEnabled.rawValue)
+        }
+    }
+
+    /// OpenGlück hostname
+    @objc dynamic var openGlückHostname: String? {
+        get {
+            return string(forKey: Key.openGlückHostname.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.openGlückHostname.rawValue)
+        }
+    }
+
+    /// OpenGlück token
+    @objc dynamic var openGlückToken: String? {
+        get {
+            return string(forKey: Key.openGlückToken.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.openGlückToken.rawValue)
+        }
+    }
+
+    /// OpenGlück last upload
+    @objc dynamic var timeStampLatestOpenGlückBgReading: Date? {
+        get {
+            return object(forKey: Key.timeStampLatestOpenGlückBgReading.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampLatestOpenGlückBgReading.rawValue)
+        }
+    }
+
     // MARK: Speak Settings
     
     /// should readings be spoken or not

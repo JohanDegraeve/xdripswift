@@ -38,6 +38,9 @@ public class AlertManager:NSObject {
     /// playSound instance
     private var soundPlayer:SoundPlayer?
     
+    /// openGlück manager instance
+    private var openGlückManager:OpenGlückManager?
+    
     /// snooze parameters
     private var snoozeParameters = [SnoozeParameters]()
     
@@ -63,7 +66,7 @@ public class AlertManager:NSObject {
     
     // MARK: - initializer
     
-    init(coreDataManager:CoreDataManager, soundPlayer:SoundPlayer?) {
+    init(coreDataManager:CoreDataManager, soundPlayer:SoundPlayer?, openGlückManager:OpenGlückManager?) {
         // initialize properties
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.alertTypesAccessor = AlertTypesAccessor(coreDataManager: coreDataManager)
@@ -71,6 +74,7 @@ public class AlertManager:NSObject {
         self.calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
         self.sensorsAccessor = SensorsAccessor(coreDataManager: coreDataManager)
         self.soundPlayer = soundPlayer
+        self.openGlückManager = openGlückManager
         self.uNUserNotificationCenter = UNUserNotificationCenter.current()
         self.coreDataManager = coreDataManager
         
@@ -773,18 +777,36 @@ public class AlertManager:NSObject {
             let notificationRequest = UNNotificationRequest(identifier: alertKind.notificationIdentifier(), content: content, trigger: trigger)
             
             // Add Request to User Notification Center
-            uNUserNotificationCenter.add(notificationRequest) { (error) in
-                if let error = error {
-                    trace("Unable to Add Notification Request %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .error, error.localizedDescription)
+            let lastBgReadingTimestamp = lastBgReading?.timeStamp
+            Task {
+                // check if current alert can be dismissed by third-party manager
+                switch alertKind {
+                case .low:
+                    // ask openglück
+                    if let lastBgReadingTimestamp, let openGlückManager, await openGlückManager.shouldDismissLow(at: lastBgReadingTimestamp) {
+                        trace("OpenGlück asked to dismiss a low notification", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info)
+                        return
+                    }
+                default:
+                    // no possible dismissal
+                    break
+                }
+                uNUserNotificationCenter.add(notificationRequest) { (error) in
+                    if let error = error {
+                        trace("Unable to Add Notification Request %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .error, error.localizedDescription)
+                    }
                 }
             }
             
             // snooze default period, to avoid that alert goes off every minute for Libre 2, except if it's a delayed alert (for delayed alerts it looks a bit risky to me)
             if delayInSecondsToUse == 0 {
-                
-                trace("in checkAlert, snoozing alert %{public}@ for %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes.description)
-                
-                getSnoozeParameters(alertKind: alertKind).snooze(snoozePeriodInMinutes: ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes)
+                if alertKind == .low || alertKind == .verylow {
+                    trace("in checkAlert, deliberately NOT snoozing alert %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
+                } else {
+                    trace("in checkAlert, snoozing alert %{public}@ for %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes.description)
+                    
+                    getSnoozeParameters(alertKind: alertKind).snooze(snoozePeriodInMinutes: ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes)
+                }
                 
             }
             
