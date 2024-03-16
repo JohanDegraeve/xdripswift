@@ -22,7 +22,6 @@ struct WatchState: Codable {
     var activeSensorDescription: String?
     var sensorAgeInMinutes: Double?
     var sensorMaxAgeInMinutes: Double?
-    var showAppleWatchDebug: Bool?
     var isMaster: Bool?
     var followerDataSourceTypeRawValue: Int?
     var followerBackgroundKeepAliveTypeRawValue: Int?

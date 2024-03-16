@@ -374,9 +374,6 @@ extension UserDefaults {
         /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
         case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
         
-        /// enable debug info in Apple Watch App
-        case showAppleWatchDebug = "showAppleWatchDebug"
-        
         /// will be set to true when UIApplication.willEnterForegroundNotification is triggered. And to false when app goes back to background
         ///
         /// Can be used if status needs to be known, app in for or background. UIApplication.shared.applicationState seems to come a bit too late to active, when the app is coming to the foreground, in cases where it's needed, this UserDefaults key can be used
@@ -1962,16 +1959,6 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.libreLinkUpVersion.rawValue)
-        }
-    }
-    
-    /// show Apple Watch Debug info in watch app. Default false
-    @objc dynamic var showAppleWatchDebug: Bool {
-        get {
-            return bool(forKey: Key.showAppleWatchDebug.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.showAppleWatchDebug.rawValue)
         }
     }
     

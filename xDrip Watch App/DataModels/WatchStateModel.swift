@@ -40,7 +40,6 @@ class WatchStateModel: NSObject, ObservableObject {
     @Published var activeSensorDescription: String = ""
     @Published var sensorAgeInMinutes: Double = 0
     @Published var sensorMaxAgeInMinutes: Double = 14400
-    @Published var showAppleWatchDebug: Bool = false
     @Published var followerConnectionIsStale: Bool = false
     @Published var timeStampOfLastFollowerConnection: Date = Date()
     @Published var secondsUntilFollowerDisconnectWarning: Int = 90
@@ -261,7 +260,6 @@ class WatchStateModel: NSObject, ObservableObject {
         activeSensorDescription = watchState.activeSensorDescription ?? ""
         sensorAgeInMinutes = watchState.sensorAgeInMinutes ?? 0
         sensorMaxAgeInMinutes = watchState.sensorMaxAgeInMinutes ?? 0
-        showAppleWatchDebug = watchState.showAppleWatchDebug ?? false
         timeStampOfLastFollowerConnection = watchState.timeStampOfLastFollowerConnection ?? Date()
         secondsUntilFollowerDisconnectWarning = watchState.secondsUntilFollowerDisconnectWarning ?? 90
         isMaster = watchState.isMaster ?? true
@@ -288,23 +286,21 @@ class WatchStateModel: NSObject, ObservableObject {
     /// once we've process the state update, then save this data to the shared app group so that the complication can read it
     private func updateWatchSharedUserDefaults() {
         
+        guard let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) else { return }
+        
+        let bgReadingDatesAsDouble = bgReadingDates.map { date in
+            date.timeIntervalSince1970
+        }
+        
+        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl, disableComplications: disableComplications)
+        
+        // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
+        // the user's device - this allows several copies of the app to be installed without cross-contamination of widget/complication data
+        if let stateData = try? JSONEncoder().encode(complicationSharedUserDefaultsModel) {
+            sharedUserDefaults.set(stateData, forKey: "complicationSharedUserDefaults.\(Bundle.main.mainAppBundleIdentifier)")
+        }
+        
         if lastComplicationUpdateDate < Date().addingTimeInterval(-20*60) {
-            
-            updatedDatesString = "\(Date.now.formatted(date: .omitted, time: .standard)), " + updatedDatesString
-            
-            guard let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) else { return }
-            
-            let bgReadingDatesAsDouble = bgReadingDates.map { date in
-                date.timeIntervalSince1970
-            }
-            
-            let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl, disableComplications: disableComplications)
-            
-            // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
-            // the user's device - this allows several copies of the app to be installed without cross-contamination of widget/complication data
-            if let stateData = try? JSONEncoder().encode(complicationSharedUserDefaultsModel) {
-                sharedUserDefaults.set(stateData, forKey: "complicationSharedUserDefaults.\(Bundle.main.mainAppBundleIdentifier)")
-            }
             
             // now that the new data is stored in the app group, try to force the complications to reload
             WidgetCenter.shared.reloadAllTimelines()

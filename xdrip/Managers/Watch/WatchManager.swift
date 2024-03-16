@@ -82,7 +82,6 @@ public final class WatchManager: NSObject, ObservableObject {
             self.watchState.lowLimitInMgDl = UserDefaults.standard.lowMarkValue
             self.watchState.highLimitInMgDl = UserDefaults.standard.highMarkValue
             self.watchState.urgentHighLimitInMgDl = UserDefaults.standard.urgentHighMarkValue
-            self.watchState.showAppleWatchDebug = UserDefaults.standard.showAppleWatchDebug
             self.watchState.activeSensorDescription = UserDefaults.standard.activeSensorDescription
             self.watchState.timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection ?? Date()
             self.watchState.secondsUntilFollowerDisconnectWarning = UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning

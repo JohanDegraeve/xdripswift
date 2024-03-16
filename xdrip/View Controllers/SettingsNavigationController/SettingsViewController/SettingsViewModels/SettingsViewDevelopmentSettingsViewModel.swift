@@ -28,9 +28,6 @@ fileprivate enum Setting:Int, CaseIterable {
     /// LibreLinkUp version number that will be used for the LLU follower mode http request headers
     case libreLinkUpVersion = 7
     
-    /// showAppleWatchDebug info on Watch app
-    case showAppleWatchDebug = 8
-    
 }
 
 struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
@@ -76,9 +73,6 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
             
         case .libreLinkUpVersion:
             return Texts_SettingsView.libreLinkUpVersion
-            
-        case .showAppleWatchDebug:
-            return Texts_SettingsView.showAppleWatchDebug
         }
     }
     
@@ -88,7 +82,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .suppressLoopShare, .showAppleWatchDebug:
+        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .suppressLoopShare:
             return UITableViewCell.AccessoryType.none
             
         case .loopDelay, .libreLinkUpVersion:
@@ -103,7 +97,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .suppressLoopShare, .shareToLoopOnceEvery5Minutes, .loopDelay, .showAppleWatchDebug:
+        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .suppressLoopShare, .shareToLoopOnceEvery5Minutes, .loopDelay:
             return nil
             
         case .libreLinkUpVersion:
@@ -170,14 +164,6 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         case .loopDelay, .libreLinkUpVersion:
             return nil
             
-        case .showAppleWatchDebug:
-            return UISwitch(isOn: UserDefaults.standard.showAppleWatchDebug, action: {
-                (isOn:Bool) in
-                
-                UserDefaults.standard.showAppleWatchDebug = isOn
-                
-            })
-            
         }
         
     }
@@ -192,7 +178,7 @@ struct SettingsViewDevelopmentSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
             
-        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .suppressLoopShare, .showAppleWatchDebug:
+        case .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .suppressLoopShare:
             return .nothing
             
         case .loopDelay:

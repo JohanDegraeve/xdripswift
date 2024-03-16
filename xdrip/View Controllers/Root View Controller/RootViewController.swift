@@ -916,9 +916,6 @@ final class RootViewController: UIViewController, ObservableObject {
         // add observer for followerKeepAliveType, to reset the app badge notification if in follower mode and keep-alive is set to disabled
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
         
-        // add observer for showAppleWatchDebug, to reload the watch app view if the value changes
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showAppleWatchDebug.rawValue, options: .new, context: nil)
-        
         // add observer for the last heartbeat timestamp in order to update the UI
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.lastHeartBeatTimeStamp.rawValue, options: .new, context: nil)
 
@@ -1693,9 +1690,6 @@ final class RootViewController: UIViewController, ObservableObject {
                 UserDefaults.standard.stopActiveSensor = false
                 
             }
-            
-        case UserDefaults.Key.showAppleWatchDebug:
-            watchManager?.updateWatchApp()
             
         case UserDefaults.Key.lastHeartBeatTimeStamp:
             updateDataSourceInfo(animate: false)

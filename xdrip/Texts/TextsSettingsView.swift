@@ -771,10 +771,6 @@ class Texts_SettingsView {
         return String(format: NSLocalizedString("libreLinkUpVersionMessage", tableName: filename, bundle: Bundle.main, value: "\nSetting this value incorrectly could result in your LibreLinkUp account being locked.\n\nDo not touch this setting unless instructed by an xDrip4iOS developer.\n\nThe default version is: %@", comment: "developer settings, ask the user for the libre link up version"), ConstantsLibreLinkUp.libreLinkUpVersionDefault)        
     }()
     
-    static let showAppleWatchDebug: String = {
-        return NSLocalizedString("showAppleWatchDebug", tableName: filename, bundle: Bundle.main, value: "Enable Watch App Debug", comment: "developer settings, show watch app debug")
-    }()
-    
     // MARK: - Section Housekeeper
 
     static let sectionTitleHousekeeper: String = {

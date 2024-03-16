@@ -17,6 +17,8 @@ struct MainView: View {
     
     @State private var hoursToShowIndex: Int = ConstantsAppleWatch.hoursToShowDefaultIndex
     
+    @State private var showDebug: Bool = false
+    
     let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < 180 ? true : false
     
     // MARK: -  Body
@@ -53,9 +55,12 @@ struct MainView: View {
                                     }
                                 })
                         )
+                        .onTapGesture(count: 5) {
+                            showDebug = !showDebug
+                        }
                     
-                    if watchState.showAppleWatchDebug {
-                        Text(watchState.updatedDatesString)
+                    if showDebug {
+                        Text(watchState.debugString)
                             .foregroundStyle(.black)
                             .font(.footnote).bold()
                             .multilineTextAlignment(.leading)
@@ -144,7 +149,6 @@ struct ContentView_Previews: PreviewProvider {
         watchState.activeSensorDescription = "Data Source"
         watchState.sensorAgeInMinutes = Double(Int.random(in: 1..<14400))
         watchState.sensorMaxAgeInMinutes = 14400
-        watchState.showAppleWatchDebug = false
         watchState.isMaster = false
         watchState.followerBackgroundKeepAliveType = .normal
         
