@@ -154,8 +154,6 @@ struct ContentView_Previews: PreviewProvider {
         
         return Group {
             MainView()
-            MainView().previewDevice("Apple Watch Series 5 - 40mm")
-            MainView().previewDevice("Apple Watch Series 3 - 38mm")
         }.environmentObject(watchState)
     }
 }

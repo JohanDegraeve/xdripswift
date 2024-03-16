@@ -17,7 +17,7 @@ struct HeaderView: View {
     var body: some View {
         HStack(alignment: .lastTextBaseline) {
             Text("\(watchState.bgValueStringInUserChosenUnit())\(watchState.trendArrow())")
-                .font(.system(size: isSmallScreen ? 50 : 60)).fontWeight(.semibold)
+                .font(.system(size: isSmallScreen ? 45 : 55)).fontWeight(.semibold)
                 .foregroundStyle(watchState.bgTextColor())
                 .scaledToFill()
                 .minimumScaleFactor(0.5)
@@ -30,7 +30,7 @@ struct HeaderView: View {
                 Text(watchState.deltaChangeStringInUserChosenUnit())
                     .font(.system(size: isSmallScreen ? 24 : 28)).fontWeight(.semibold)
                     .lineLimit(1)
-                    .padding(.bottom, -7)
+                    .padding(.bottom, isSmallScreen ? -5 : -6)
                 Text(watchState.bgUnitString())
                     .font(.system(size: isSmallScreen ? 12 : 14))
                     .foregroundStyle(.gray)
