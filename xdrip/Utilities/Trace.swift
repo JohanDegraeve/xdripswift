@@ -426,6 +426,12 @@ class Trace {
         // allow chart rotation
         traceInfo.appendStringAndNewLine("    Allow chart rotation: " + UserDefaults.standard.allowScreenRotation.description)
         
+        // animate progress bar
+        traceInfo.appendStringAndNewLine("    Animate progress bar: " + UserDefaults.standard.animateProgressBar.description)
+
+        // reverse progress bar
+        traceInfo.appendStringAndNewLine("    Reverse progress bar: " + UserDefaults.standard.reverseProgressBar.description)
+
         // screen dimming type
         traceInfo.appendStringAndNewLine("    Screen dimming type when locked: " + UserDefaults.standard.screenLockDimmingType.description)
 
