@@ -79,5 +79,22 @@ class DexcomG7HeartbeatBluetoothTransmitter: BluetoothTransmitter {
         }
         
     }
+    
+    override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        
+        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
+        
+        // this is the trigger for calling the heartbeat
+        if (Date()).timeIntervalSince(lastHeartBeatTimeStamp) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
+            
+            lastHeartBeatTimeStamp = Date()
+            
+            UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
+            
+            // no need to wait for a second, because the disconnect usually happens about 1' seconds after connect
+            // this case is for when a follower would be using an expired Dexcom G7 as a heartbeat
+            self.bluetoothTransmitterDelegate?.heartBeat()
+        }
+    }
             
 }
