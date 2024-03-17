@@ -689,7 +689,7 @@ class LibreLinkUpFollowManager: NSObject {
     /// schedule new download with timer, when timer expires download() will be called
     private func scheduleNewDownload() {
         
-        //guard UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive else { return }
+        guard UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
         
         trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
         
