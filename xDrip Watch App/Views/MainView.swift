@@ -19,7 +19,7 @@ struct MainView: View {
     
     @State private var showDebug: Bool = false
     
-    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < 180 ? true : false
+    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
     
     // MARK: -  Body
     var body: some View {

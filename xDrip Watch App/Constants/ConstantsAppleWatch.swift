@@ -16,4 +16,7 @@ enum ConstantsAppleWatch {
     /// the default index of hoursToShow when the app is opened (i.e. for example [1] = 4 hours)
     static let hoursToShowDefaultIndex: Int = 1
     
+    /// less than how many pixels wide should we consider the screen size to the "small"
+    static let pixelWidthLimitForSmallScreen: Double = 185
+    
 }

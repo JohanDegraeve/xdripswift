@@ -12,7 +12,7 @@ import SwiftUI
 struct DataSourceView: View {
     @EnvironmentObject var watchState: WatchStateModel
     
-    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < 180 ? true : false
+    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
     
     var body: some View {
         VStack(spacing: 0) {
