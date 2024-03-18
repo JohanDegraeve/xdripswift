@@ -2230,9 +2230,9 @@ final class RootViewController: UIViewController, ObservableObject {
     @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
         
         // TODO: Still crashing here...
-        DispatchQueue.main.async {
-            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
-        }
+//        DispatchQueue.main.async {
+//            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+//        }
         
         // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
         if let glucoseChartManager = glucoseChartManager  {

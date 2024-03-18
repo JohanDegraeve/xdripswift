@@ -97,4 +97,21 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
         
     }
     
+    override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        
+        trace("didDiscoverCharacteristicsFor for peripheral with name %{public}@, for service with uuid %{public}@", log: log, category: ConstantsLog.categoryHeartBeatLibre3, type: .info, deviceName ?? "'unknown'", String(describing:service.uuid))
+        
+        if let error = error {
+            trace("    didDiscoverCharacteristicsFor error: %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error , error.localizedDescription)
+        }
+        
+        if let characteristics = service.characteristics {
+            for characteristic in characteristics {
+                peripheral.setNotifyValue(true, for: characteristic)
+            }
+        } else {
+            trace("    Did discover characteristics, but no characteristics listed. There must be some error.", log: log, category: ConstantsLog.categoryHeartBeatLibre3, type: .error)
+        }
+    }
+    
 }
