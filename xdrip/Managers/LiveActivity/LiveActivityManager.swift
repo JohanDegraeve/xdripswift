@@ -22,7 +22,7 @@ public final class LiveActivityManager {
     private var eventAttributes: XDripWidgetAttributes
     private var eventActivity: Activity<XDripWidgetAttributes>?
     
-    // the start date of the event so when know track when to proactively end the activity
+    // the start date of the event so when know track when to proactively end/restart the activity
     private var eventStartDate: Date
     
     static let shared = LiveActivityManager()
@@ -54,8 +54,8 @@ extension LiveActivityManager {
                 trace("    starting new live activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
                 
                 startActivity(contentState: contentState)
-            } else if forceRestart {
-                // force an end/start cycle of the activity. This restarts the 8 hour limit.
+            } else if forceRestart && eventStartDate < Date().addingTimeInterval(-ConstantsLiveActivity.allowRestartLiveActivityAfterMinutes) {
+                // force an end/start cycle of the activity when the app comes to the foreground assuming at least 'x' hours have passed. This restarts the 8 hour limit.
                 trace("    restarting live activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
                 
                 Task {
