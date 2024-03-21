@@ -394,6 +394,8 @@ extension UserDefaults {
         // heartbeat
         /// the last heartbeat connection timestamp
         case lastHeartBeatTimeStamp = "lastHeartBeatTimeStamp"
+        /// how many seconds since the last heartbeat before we raise a disconnection warning
+        case heartbeatShowDisconnectedTimeInSeconds = "heartbeatShowDisconnectedTimeInSeconds"
         
     }
     
@@ -2192,6 +2194,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.lastHeartBeatTimeStamp.rawValue)
+        }
+    }
+    
+    /// how many seconds should be considered as the maximum since the last heartbeat before we show a warning/error?
+    var heartbeatShowDisconnectedTimeInSeconds: Double? {
+        get {
+            return double(forKey: Key.heartbeatShowDisconnectedTimeInSeconds.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.heartbeatShowDisconnectedTimeInSeconds.rawValue)
         }
     }
     

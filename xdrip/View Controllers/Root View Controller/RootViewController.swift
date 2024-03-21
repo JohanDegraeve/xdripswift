@@ -2230,9 +2230,9 @@ final class RootViewController: UIViewController, ObservableObject {
     @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
         
         // TODO: Still crashing here...
-//        DispatchQueue.main.async {
-//            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
-//        }
+        DispatchQueue.main.async {
+            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        }
         
         // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
         if let glucoseChartManager = glucoseChartManager  {
@@ -3341,20 +3341,20 @@ final class RootViewController: UIViewController, ObservableObject {
                     switch bluetoothPeripheral.bluetoothPeripheralType() {
                         
                     case .Libre3HeartBeatType:
-                        heartbeatShowDisconnectedTimeInSeconds = ConstantsHeartBeat.heartbeatShowDisconnectedTimeInSecondsLibre3
+                        UserDefaults.standard.heartbeatShowDisconnectedTimeInSeconds = ConstantsHeartBeat.heartbeatShowDisconnectedTimeInSecondsLibre3
                         
                     case .DexcomG7HeartBeatType:
-                        heartbeatShowDisconnectedTimeInSeconds = ConstantsHeartBeat.heartbeatShowDisconnectedTimeInSecondsDexcomG7
+                        UserDefaults.standard.heartbeatShowDisconnectedTimeInSeconds = ConstantsHeartBeat.heartbeatShowDisconnectedTimeInSecondsDexcomG7
                         
                     case .OmniPodHeartBeatType:
-                        heartbeatShowDisconnectedTimeInSeconds = ConstantsHeartBeat.heartbeatShowDisconnectedTimeInSecondsOmniPod
+                        UserDefaults.standard.heartbeatShowDisconnectedTimeInSeconds = ConstantsHeartBeat.heartbeatShowDisconnectedTimeInSecondsOmniPod
                         
                     default:
                         break
                     }
                 }
             }
-            if let lastHeartBeatTimeStamp = UserDefaults.standard.lastHeartBeatTimeStamp, let heartbeatShowDisconnectedTimeInSeconds = heartbeatShowDisconnectedTimeInSeconds, lastHeartBeatTimeStamp > Date().addingTimeInterval(-heartbeatShowDisconnectedTimeInSeconds) {
+            if let lastHeartBeatTimeStamp = UserDefaults.standard.lastHeartBeatTimeStamp, let heartbeatShowDisconnectedTimeInSeconds = UserDefaults.standard.heartbeatShowDisconnectedTimeInSeconds, lastHeartBeatTimeStamp > Date().addingTimeInterval(-heartbeatShowDisconnectedTimeInSeconds) {
                 dataSourceKeepAliveImageOutlet.tintColor =  .systemGreen
             } else {
                 dataSourceKeepAliveImageOutlet.tintColor = .systemRed

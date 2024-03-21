@@ -15,7 +15,7 @@ struct DataSourceView: View {
     let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
     
     var body: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 2) {
             
             let textSize: CGFloat = isSmallScreen ? 12 : 14
             
@@ -28,13 +28,13 @@ struct DataSourceView: View {
                 HStack(alignment: .center) {
                     if !watchState.isMaster {
                         HStack(alignment: .center, spacing: isSmallScreen ? 2 : 4) {
-                            watchState.getFollowerConnectionStatusImage().networkImage
+                            watchState.getFollowerConnectionNetworkStatus().image
                                 .font(.system(size: textSize))
-                                .foregroundStyle(watchState.getFollowerConnectionStatusImage().tintColor)
+                                .foregroundStyle(watchState.getFollowerConnectionNetworkStatus().color)
                             
                             watchState.followerBackgroundKeepAliveType.keepAliveImage
                                 .font(.system(size: textSize))
-                                .foregroundStyle(Color(white: 0.7))
+                                .foregroundStyle(watchState.getFollowerBackgroundKeepAliveColor())
                             
                             Text(watchState.followerDataSourceType.fullDescription)
                                 .font(.system(size: textSize)).fontWeight(.semibold)

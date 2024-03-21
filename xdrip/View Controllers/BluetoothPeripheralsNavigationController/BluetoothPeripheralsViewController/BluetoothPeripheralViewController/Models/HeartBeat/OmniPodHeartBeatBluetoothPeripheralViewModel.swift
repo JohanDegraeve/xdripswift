@@ -37,7 +37,7 @@ extension OmniPodHeartBeatBluetoothPeripheralViewModel: BluetoothPeripheralViewM
     func sectionTitle(forSection section: Int) -> String {
         
         // there's no section specific for this type of transmitter, this function will not be called
-        return "OmniPod Heartbeat"
+        return "OmniPod Heartbeat ♥"
         
     }
     

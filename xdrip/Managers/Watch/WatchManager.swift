@@ -89,14 +89,7 @@ public final class WatchManager: NSObject, ObservableObject {
             self.watchState.followerDataSourceTypeRawValue = UserDefaults.standard.followerDataSourceType.rawValue
             self.watchState.followerBackgroundKeepAliveTypeRawValue = UserDefaults.standard.followerBackgroundKeepAliveType.rawValue
             self.watchState.disableComplications = !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled
-            
-            // check when the last follower connection was and compare that to the actual time
-            if let timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection, Calendar.current.dateComponents([.second], from: timeStampOfLastFollowerConnection, to: Date()).second! >= UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning {
-                self.watchState.followerConnectionIsStale = true
-            } else {
-                self.watchState.followerConnectionIsStale = false
-            }
-            
+                        
             if let sensorStartDate = UserDefaults.standard.activeSensorStartDate {
                 self.watchState.sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: Date()).minute!)
             } else {
@@ -104,6 +97,12 @@ public final class WatchManager: NSObject, ObservableObject {
             }
             
             self.watchState.sensorMaxAgeInMinutes = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
+            
+            // let's set the state values if we're using a heartbeat
+            if let lastHeartBeatTimeStamp = UserDefaults.standard.lastHeartBeatTimeStamp, let heartbeatShowDisconnectedTimeInSeconds = UserDefaults.standard.heartbeatShowDisconnectedTimeInSeconds {
+                self.watchState.heartbeatShowDisconnectedTimeInSeconds = Int(heartbeatShowDisconnectedTimeInSeconds)
+                self.watchState.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
+            }
             
             self.sendToWatch()
         }

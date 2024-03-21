@@ -28,56 +28,48 @@ struct MainView: View {
         
         let overrideChartWidth: Double? = isSmallScreen ? ConstantsGlucoseChartSwiftUI.viewWidthWatchAppSmall : nil
         
-        ZStack(alignment: .topLeading) {
-            VStack {
+        ZStack(alignment: Alignment(horizontal: .center, vertical: .center), content: {
+            VStack(spacing: 2) {
                 HeaderView()
                     .padding([.leading, .trailing], 5)
-                    .padding([.top], 20)
-                    .padding([.bottom], -10)
+                    .padding([.top], -6)
+                    .padding([.bottom], -6)
                     .onTapGesture(count: 2) {
                         watchState.requestWatchStateUpdate()
                     }
                 
-                ZStack(alignment: Alignment(horizontal: .center, vertical: .top), content: {
-                                        
-                    GlucoseChartView(glucoseChartType: .watchApp, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivitySize: nil, hoursToShowScalingHours: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4, overrideChartHeight: overrideChartHeight, overrideChartWidth: overrideChartWidth)
-                        .gesture(
-                            DragGesture(minimumDistance: 80, coordinateSpace: .local)
-                                .onEnded({ value in
-                                    if (value.startLocation.x > value.location.x) {
-                                        if hoursToShow[hoursToShowIndex] != hoursToShow.first {
-                                            hoursToShowIndex -= 1
-                                        }
-                                    } else {
-                                        if hoursToShow[hoursToShowIndex] != hoursToShow.last {
-                                            hoursToShowIndex += 1
-                                        }
+                GlucoseChartView(glucoseChartType: .watchApp, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivitySize: nil, hoursToShowScalingHours: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4, overrideChartHeight: overrideChartHeight, overrideChartWidth: overrideChartWidth)
+                    .gesture(
+                        DragGesture(minimumDistance: 80, coordinateSpace: .local)
+                            .onEnded({ value in
+                                if (value.startLocation.x > value.location.x) {
+                                    if hoursToShow[hoursToShowIndex] != hoursToShow.first {
+                                        hoursToShowIndex -= 1
                                     }
-                                })
-                        )
-                        .onTapGesture(count: 5) {
-                            showDebug = !showDebug
-                        }
-                    
-                    if showDebug {
-                        Text(watchState.debugString)
-                            .foregroundStyle(.black)
-                            .font(.footnote).bold()
-                            .multilineTextAlignment(.leading)
-                            .padding(EdgeInsets(top: 2, leading: 6, bottom: 2, trailing: 6))
-                            .background(.teal).opacity(0.8)
-                            .cornerRadius(6)
-                            .padding(.top, 10)
-                            .padding(.leading, 2)
-                    }
-                })
+                                } else {
+                                    if hoursToShow[hoursToShowIndex] != hoursToShow.last {
+                                        hoursToShowIndex += 1
+                                    }
+                                }
+                            })
+                    )
                 
                 DataSourceView()
                 
                 InfoView()
             }
             .padding(.bottom, 20)
-        }
+            
+            if showDebug {
+                Text(watchState.debugString)
+                    .foregroundStyle(.black)
+                    .font(.system(size: 15)).bold()
+                    .multilineTextAlignment(.leading)
+                    .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
+                    .background(.teal).opacity(0.85)
+                    .cornerRadius(8)
+            }
+        })
         .frame(maxHeight: .infinity)
         .onReceive(watchState.timer) { date in
             if watchState.updatedDate.timeIntervalSinceNow < -5 {
@@ -87,6 +79,9 @@ struct MainView: View {
         }
         .onAppear {
             watchState.requestWatchStateUpdate()
+        }
+        .onTapGesture(count: 5) {
+            showDebug = !showDebug
         }
     }
 }
@@ -150,7 +145,7 @@ struct ContentView_Previews: PreviewProvider {
         watchState.sensorAgeInMinutes = Double(Int.random(in: 1..<14400))
         watchState.sensorMaxAgeInMinutes = 14400
         watchState.isMaster = false
-        watchState.followerBackgroundKeepAliveType = .normal
+        watchState.followerBackgroundKeepAliveType = .heartbeat
         
         return Group {
             MainView()
