@@ -27,7 +27,7 @@ enum ConstantsGlucoseChartSwiftUI {
     
     // live activity
     static let viewWidthLiveActivityNormal: CGFloat = 180
-    static let viewHeightLiveActivityNormal: CGFloat = 80
+    static let viewHeightLiveActivityNormal: CGFloat = 70
     static let hoursToShowLiveActivityNormal: Double = 3
     static let intervalBetweenXAxisValuesLiveActivityNormal: Int = 1
     static let glucoseCircleDiameterLiveActivityNormal: Double = 36
