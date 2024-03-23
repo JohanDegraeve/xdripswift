@@ -76,10 +76,8 @@ struct GlucoseChartView: View {
         }
     }
     
+    // adapted from generateXAxisValues() from GlucoseChartManager.swift in xDrip target
     func xAxisValues() -> [Date] {
-        
-        // adapted from generateXAxisValues() from GlucoseChartManager.swift in xDrip target
-                
         let startDate: Date = bgReadingDates.last ?? Date().addingTimeInterval(-hoursToShow * 3600)
         let endDate: Date = Date()
         
@@ -149,7 +147,9 @@ struct GlucoseChartView: View {
                     .foregroundStyle(bgColor(bgValueInMgDl: bgReadingValues[index]))
             }
             
-            // add a phantom glucose point five minutes after the end of any BG values just to give more context
+            // add a phantom glucose point five minutes after the end of any BG values to fix the end point
+            // we use it to make sure the chart ends "now" even if the last bg reading was some time ago
+            // it also serves to make sure the last chartpoint circle isn't cut off by the y-axis
             PointMark(x: .value("Time", Date().addingTimeInterval(5 * 60)),
                       y: .value("BG", 100))
             .symbol(Circle())
@@ -157,28 +157,8 @@ struct GlucoseChartView: View {
             .foregroundStyle(.clear)
         }
         .chartXAxis {
-            // https://developer.apple.com/documentation/charts/customizing-axes-in-swift-charts
-//            AxisMarks(values: xAxisValues()) { value in
-//                
-//                if let v = value.as(Date.self) {
-//                    AxisValueLabel {
-//                        Text(v.formatted(.dateTime.hour()))
-//                            .foregroundStyle(Color.white)
-//                    }
-//                    //.offset(x: glucoseChartType.xAxisLabelOffset)
-//                    
-//                    AxisGridLine()
-//                        .foregroundStyle(glucoseChartType.xAxisGridLineColor)
-//                }
-//            }
-            
             AxisMarks(values: .automatic(desiredCount: Int(hoursToShow))) {
                 if $0.as(Date.self) != nil {
-//                    AxisValueLabel {
-//                        Text(v.formatted(.dateTime.hour()))
-//                            .foregroundStyle(Color.white)
-//                    }
-//                    .offset(x: glucoseChartType.xAxisLabelOffset)
                     AxisGridLine()
                         .foregroundStyle(glucoseChartType.xAxisGridLineColor)
                 }

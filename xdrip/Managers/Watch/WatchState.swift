@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// model of the data we'll use to manage the watch views
 struct WatchState: Codable {
     var bgReadingValues: [Double] = []
     var bgReadingDates: [Date] = []

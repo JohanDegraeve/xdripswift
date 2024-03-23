@@ -8,7 +8,7 @@
 
 import Foundation
 
-/// model of the data we'll store in the shared app group to pass from the watch app to widgetkit
+/// model of the data we'll store in the shared app group to pass from the watch app to the widgets
 struct WidgetSharedUserDefaultsModel: Codable {
     var bgReadingValues: [Double]
     var bgReadingDatesAsDouble: [Double]

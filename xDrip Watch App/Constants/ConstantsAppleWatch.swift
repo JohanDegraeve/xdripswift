@@ -20,10 +20,16 @@ enum ConstantsAppleWatch {
     /// less than how many pixels wide should we consider the screen size to the "small"
     static let pixelWidthLimitForSmallScreen: Double = 185
     
-    /// colour for the "requesting data" symbol
-    static let requestingDataIconColorActive = Color(.green) //.opacity(0.9)
+    /// colour for the "requesting data" symbol when active
+    static let requestingDataIconColorActive = Color(.green)
+    
+    /// colour for the "requesting data" symbol when inactive
     static let requestingDataIconColorInactive = Color(.white).opacity(0.3)
+    
+    /// font size for the "requesting data" symbol
     static let requestingDataIconFontSize: CGFloat = 6
-    static let requestingDataIconSFSymbolName: String = "circle.fill" // "iphone.gen3.radiowaves.left.and.right" //
+    
+    /// SFSymbol name as a string for the "requesting data" symbol
+    static let requestingDataIconSFSymbolName: String = "circle.fill"
     
 }

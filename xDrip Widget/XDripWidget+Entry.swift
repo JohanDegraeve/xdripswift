@@ -22,7 +22,7 @@ extension XDripWidget {
 
 extension XDripWidget.Entry {
     
-    /// struct to hold the currect values that the widget/complication should show
+    /// struct to hold the values that the widgets/complications should show
     struct WidgetState {
         var bgReadingValues: [Double]?
         var bgReadingDates: [Date]?

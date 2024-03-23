@@ -12,7 +12,7 @@ import SwiftUI
 import WatchConnectivity
 import WidgetKit
 
-/// holds, the watch state and allows updates and computed properties/variables to be generated for the view
+/// holds, the watch state and allows updates and computed properties/variables to be generated for the different views that use it
 /// also used to update the ComplicationSharedUserDefaultsModel in the app group so that the complication can access the data
 class WatchStateModel: NSObject, ObservableObject {
     
@@ -198,6 +198,7 @@ class WatchStateModel: NSObject, ObservableObject {
     }
     
     /// check when the last follower connection was and compare that to the actual time
+    /// - Returns: image and color of the correct follower connection status
     func getFollowerConnectionNetworkStatus() -> (image: Image, color: Color) {
             if timeStampOfLastFollowerConnection > Date().addingTimeInterval(-Double(secondsUntilFollowerDisconnectWarning)) {
                 return(Image(systemName: "network"), Color(.green))
@@ -265,7 +266,7 @@ class WatchStateModel: NSObject, ObservableObject {
         sensorAgeInMinutes = watchState.sensorAgeInMinutes ?? 0
         sensorMaxAgeInMinutes = watchState.sensorMaxAgeInMinutes ?? 0
         timeStampOfLastFollowerConnection = watchState.timeStampOfLastFollowerConnection ?? .distantPast
-        secondsUntilFollowerDisconnectWarning = watchState.secondsUntilFollowerDisconnectWarning ?? 70// give it some more time compared to the iOS app
+        secondsUntilFollowerDisconnectWarning = watchState.secondsUntilFollowerDisconnectWarning ?? 70
         timeStampOfLastHeartBeat = watchState.timeStampOfLastHeartBeat ?? .distantPast
         secondsUntilHeartBeatDisconnectWarning = watchState.secondsUntilHeartBeatDisconnectWarning ?? 5
         isMaster = watchState.isMaster ?? true
