@@ -160,8 +160,26 @@ class ContactTrickManager: NSObject {
             saveRequest.update(mutableContact)
             do {
                 try self.contactStore.execute(saveRequest)
+            } catch let error as NSError {
+                var details: String?
+                if error.domain == CNErrorDomain {
+                    switch error.code {
+                    case CNError.authorizationDenied.rawValue:
+                        details = "Authorization denied"
+                    case CNError.communicationError.rawValue:
+                        details = "Communication error"
+                    case CNError.insertedRecordAlreadyExists.rawValue:
+                        details = "Record already exists"
+                    case CNError.dataAccessError.rawValue:
+                        details = "Data access error"
+                    default:
+                        details = "Code \(error.code)"
+                    }
+                }
+                trace("in updateContact, failed to update the contact - %{public}@: %{public}@", log: self.log, category: ConstantsLog.categoryContactTrickManager, type: .error, details ?? "no details", error.localizedDescription)
+
             } catch {
-                trace("in updateContact, failed to update the contact", log: self.log, category: ConstantsLog.categoryContactTrickManager, type: .info)
+                trace("in updateContact, failed to update the contact: %{public}@", log: self.log, category: ConstantsLog.categoryContactTrickManager, type: .error, error.localizedDescription)
             }
         }
     }
