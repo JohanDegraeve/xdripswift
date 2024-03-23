@@ -3331,24 +3331,17 @@ final class RootViewController: UIViewController, ObservableObject {
         // if the last heartbeat timestamp is newer than 'x' seconds ago, then show a valid heartbeat icon. If not, show the heartbeat as (temporarily) disconnected
         // if not using a heartbeat (or if we fail to get 'x') then just keep the icon gray
         if UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat {
-            
-            var heartbeatShowDisconnectedTimeInSeconds: Double? = nil
-            
             if let bluetoothPeripherals = bluetoothPeripheralManager?.bluetoothPeripherals {
                 // loop through all bluetoothPeripherals
                 for bluetoothPeripheral in bluetoothPeripherals {
                     // using bluetoothPeripheralType here so that whenever bluetoothPeripheralType is extended with new cases, we don't forget to handle them
                     switch bluetoothPeripheral.bluetoothPeripheralType() {
-                        
                     case .Libre3HeartBeatType:
                         UserDefaults.standard.heartbeatShowDisconnectedTimeInSeconds = ConstantsHeartBeat.heartbeatShowDisconnectedTimeInSecondsLibre3
-                        
                     case .DexcomG7HeartBeatType:
                         UserDefaults.standard.heartbeatShowDisconnectedTimeInSeconds = ConstantsHeartBeat.heartbeatShowDisconnectedTimeInSecondsDexcomG7
-                        
                     case .OmniPodHeartBeatType:
                         UserDefaults.standard.heartbeatShowDisconnectedTimeInSeconds = ConstantsHeartBeat.heartbeatShowDisconnectedTimeInSecondsOmniPod
-                        
                     default:
                         break
                     }
@@ -3547,11 +3540,13 @@ final class RootViewController: UIViewController, ObservableObject {
                             showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.urgentHighMarkValue)) ? true : false
                         }
                         
+                        let dataSourceDescription = UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "" : UserDefaults.standard.followerDataSourceType.fullDescription
+                        
                         // if we should still show it, then let's continue processing the lastReading array to create a valid contentState
                         if (UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat) && showLiveActivity {
                             
                             // create the contentState that will update the dynamic attributes of the Live Activity Widget
-                            let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySize: UserDefaults.standard.liveActivitySize)
+                            let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySize: UserDefaults.standard.liveActivitySize, dataSourceDescription: dataSourceDescription)
                             
                             LiveActivityManager.shared.runActivity(contentState: contentState, forceRestart: forceRestart)
                             
@@ -3561,8 +3556,6 @@ final class RootViewController: UIViewController, ObservableObject {
                         let bgReadingDatesAsDouble = bgReadingDates.map { date in
                             date.timeIntervalSince1970
                         }
-                        
-                        let dataSourceDescription = UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "" : UserDefaults.standard.followerDataSourceType.fullDescription
                                                 
                         let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, dataSourceDescription: dataSourceDescription)
                                                 

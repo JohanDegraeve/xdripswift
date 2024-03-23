@@ -21,7 +21,7 @@ extension XDripWatchComplication.EntryView {
                             .foregroundStyle(entry.widgetState.bgTextColor())
                         
                         Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
-                            .font(.system(size: 24)).bold()
+                            .font(.system(size: 24)).fontWeight(.semibold)
                             .foregroundStyle(entry.widgetState.deltaChangeTextColor())
                             .lineLimit(1)
                     }

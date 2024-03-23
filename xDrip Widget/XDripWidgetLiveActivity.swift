@@ -21,7 +21,7 @@ struct XDripWidgetLiveActivity: Widget {
                 // 1 = minimal widget with no chart
                 HStack(alignment: .center) {
                     Text("\(context.state.bgValueStringInUserChosenUnit) \(context.state.trendArrow())")
-                        .font(.system(size: 35)).fontWeight(.semibold)
+                        .font(.system(size: 35)).bold()
                         .foregroundStyle(context.state.bgTextColor())
                         .minimumScaleFactor(0.1)
                         .lineLimit(1)
@@ -29,7 +29,7 @@ struct XDripWidgetLiveActivity: Widget {
                     Spacer()
                     
                     if context.state.warnUserToOpenApp {
-                        Text("Ending soon...")
+                        Text("Open app...")
                             .font(.footnote).bold()
                             .foregroundStyle(.black)
                             .multilineTextAlignment(.center)
@@ -42,7 +42,7 @@ struct XDripWidgetLiveActivity: Widget {
                     
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text(context.state.deltaChangeStringInUserChosenUnit())
-                            .font(.title).bold()
+                            .font(.title).fontWeight(.semibold)
                             .foregroundStyle(context.state.deltaChangeTextColor())
                             .minimumScaleFactor(0.2)
                             .lineLimit(1)
@@ -62,16 +62,16 @@ struct XDripWidgetLiveActivity: Widget {
                 
                 // 0 = normal size chart
                 HStack(spacing: 30) {
-                    VStack(spacing: -2) {
+                    VStack(spacing: 0) {
                         Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
-                            .font(.system(size: 44)).fontWeight(.semibold)
+                            .font(.system(size: 44)).bold()
                             .foregroundStyle(context.state.bgTextColor())
                             .minimumScaleFactor(0.1)
                             .lineLimit(1)
                         
                         HStack(alignment: .firstTextBaseline, spacing: 4) {
                             Text(context.state.deltaChangeStringInUserChosenUnit())
-                                .font(.system(size: 20)).bold()
+                                .font(.system(size: 20)).fontWeight(.semibold)
                                 .foregroundStyle(context.state.deltaChangeTextColor())
                                 .minimumScaleFactor(0.2)
                                 .lineLimit(1)
@@ -83,7 +83,6 @@ struct XDripWidgetLiveActivity: Widget {
                                 .lineLimit(1)
                         }
                     }
-                    .padding(2)
                     
                     ZStack {
                         GlucoseChartView(glucoseChartType: .liveActivity, bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivitySize: .normal, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil)
@@ -91,7 +90,7 @@ struct XDripWidgetLiveActivity: Widget {
                         if context.state.warnUserToOpenApp {
                             VStack(alignment: .center) {
                                 Spacer()
-                                Text("Activity ending soon")
+                                Text("Open \(ConstantsHomeView.applicationName)")
                                     .font(.footnote).bold()
                                     .foregroundStyle(.black)
                                     .multilineTextAlignment(.center)
@@ -105,46 +104,65 @@ struct XDripWidgetLiveActivity: Widget {
                     }
                 }
                 .activityBackgroundTint(.black)
-                .padding(4)
+                .padding(.top, 10)
+                .padding(.bottom, 10)
                 
             } else {
                 
                 // 3 = large chart is final default option
                 ZStack {
-                    VStack {
-                        HStack(alignment: .firstTextBaseline) {
-                            Text("\(context.state.bgValueStringInUserChosenUnit) \(context.state.trendArrow()) ")
-                                .font(.title).bold()
+                    
+                    VStack(spacing: 0) {
+                        HStack(alignment: .center) {
+                            Text("\(context.state.bgValueStringInUserChosenUnit) \(context.state.trendArrow())")
+                                .font(.system(size: 32)).fontWeight(.bold)
                                 .foregroundStyle(context.state.bgTextColor())
+                                .scaledToFill()
+                                .minimumScaleFactor(0.5)
                                 .lineLimit(1)
                             
                             Spacer()
                             
                             HStack(alignment: .firstTextBaseline, spacing: 4) {
                                 Text(context.state.deltaChangeStringInUserChosenUnit())
-                                    .font(.title).bold()
+                                    .font(.system(size: 28)).fontWeight(.semibold)
                                     .foregroundStyle(context.state.deltaChangeTextColor())
                                     .lineLimit(1)
-                                
                                 Text(context.state.bgUnitString)
-                                    .font(.title2)
-                                    .foregroundStyle(Color(white: 0.5))
+                                    .font(.system(size: 28))
+                                    .foregroundStyle(.gray)
                                     .lineLimit(1)
                             }
                         }
-                        .padding(.top, 4)
-                        .padding(.bottom, -8)
+                        .padding(.top, 8)
+                        .padding(.bottom, 2)
                         .padding(.leading, 15)
                         .padding(.trailing, 15)
                         
                         GlucoseChartView(glucoseChartType: .liveActivity, bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivitySize: .large, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil)
+                        
+                        HStack {
+                            Text(context.state.dataSourceDescription)
+                                .font(.caption).bold()
+                                .foregroundStyle(Color(white: 0.8))
+                            
+                            Spacer()
+                            
+                            Text("Last reading at \(context.state.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
+                                .font(.caption)
+                                .foregroundStyle(Color(white: 0.6))
+                        }
+                        .padding(.top, 2)
+                        .padding(.bottom, 10)
+                        .padding(.leading, 15)
+                        .padding(.trailing, 15)
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(0)
                     
                     if context.state.warnUserToOpenApp {
                         VStack(alignment: .center) {
-                            Text("Live activity ending soon")
+                            Text("Please open \(ConstantsHomeView.applicationName)")
                                 .font(.footnote).bold()
                                 .foregroundStyle(.black)
                                 .multilineTextAlignment(.center)
@@ -169,7 +187,7 @@ struct XDripWidgetLiveActivity: Widget {
                 DynamicIslandExpandedRegion(.trailing) {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         Text(context.state.deltaChangeStringInUserChosenUnit())
-                            .font(.title).bold()
+                            .font(.title).fontWeight(.semibold)
                             .foregroundStyle(context.state.deltaChangeTextColor())
                             .minimumScaleFactor(0.2)
                             .lineLimit(1)
@@ -246,7 +264,7 @@ struct XDripWidgetLiveActivity_Previews: PreviewProvider {
     
     static let attributes = XDripWidgetAttributes()
     
-    static let contentState = XDripWidgetAttributes.ContentState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 5, deltaChangeInMgDl: -2, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, liveActivitySize: .minimal)
+    static let contentState = XDripWidgetAttributes.ContentState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 5, deltaChangeInMgDl: -2, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, liveActivitySize: .large, dataSourceDescription: "Dexcom G6")
     
     static var previews: some View {
         attributes

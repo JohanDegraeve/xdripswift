@@ -14,7 +14,7 @@ extension XDripWidget.EntryView {
         VStack(spacing: 0) {
             HStack(alignment: .center) {
                 Text("\(entry.widgetState.bgValueStringInUserChosenUnit) \(entry.widgetState.trendArrow())")
-                    .font(.title).fontWeight(.semibold)
+                    .font(.title).fontWeight(.bold)
                     .foregroundStyle(entry.widgetState.bgTextColor())
                     .scaledToFill()
                     .minimumScaleFactor(0.5)
@@ -24,7 +24,7 @@ extension XDripWidget.EntryView {
                 
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
-                        .font(.title2).fontWeight(.bold)
+                        .font(.title2).fontWeight(.semibold)
                         .foregroundStyle(entry.widgetState.deltaChangeTextColor())
                         .lineLimit(1)
                     Text(entry.widgetState.bgUnitString)

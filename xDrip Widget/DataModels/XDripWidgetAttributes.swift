@@ -27,6 +27,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var eventStartDate: Date = Date()
         var warnUserToOpenApp: Bool = true
         var liveActivitySize: LiveActivitySize
+        var dataSourceDescription: String
         
         // computed properties
         var bgUnitString: String
@@ -34,7 +35,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var bgReadingDate: Date?
         var bgValueStringInUserChosenUnit: String
         
-        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySize: LiveActivitySize) {
+        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySize: LiveActivitySize, dataSourceDescription: String? = "") {
             
             // these are the "passed in" stateful values used to initialize
             self.bgReadingValues = bgReadingValues
@@ -47,6 +48,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             self.highLimitInMgDl = highLimitInMgDl
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl            
             self.liveActivitySize = liveActivitySize
+            self.dataSourceDescription = dataSourceDescription ?? ""
             
             self.bgUnitString = isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
             
