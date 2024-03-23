@@ -393,9 +393,9 @@ extension UserDefaults {
         
         // heartbeat
         /// the last heartbeat connection timestamp
-        case lastHeartBeatTimeStamp = "lastHeartBeatTimeStamp"
+        case timeStampOfLastHeartBeat = "timeStampOfLastHeartBeat"
         /// how many seconds since the last heartbeat before we raise a disconnection warning
-        case heartbeatShowDisconnectedTimeInSeconds = "heartbeatShowDisconnectedTimeInSeconds"
+        case secondsUntilHeartBeatDisconnectWarning = "secondsUntilHeartBeatDisconnectWarning"
         
     }
     
@@ -2188,22 +2188,22 @@ extension UserDefaults {
     // MARK: - Heartbeat
     
     /// timestamp of last successful connection to follower service
-    @objc dynamic var lastHeartBeatTimeStamp: Date? {
+    @objc dynamic var timeStampOfLastHeartBeat: Date? {
         get {
-            return object(forKey: Key.lastHeartBeatTimeStamp.rawValue) as? Date
+            return object(forKey: Key.timeStampOfLastHeartBeat.rawValue) as? Date
         }
         set {
-            set(newValue, forKey: Key.lastHeartBeatTimeStamp.rawValue)
+            set(newValue, forKey: Key.timeStampOfLastHeartBeat.rawValue)
         }
     }
     
     /// how many seconds should be considered as the maximum since the last heartbeat before we show a warning/error?
-    var heartbeatShowDisconnectedTimeInSeconds: Double? {
+    var secondsUntilHeartBeatDisconnectWarning: Double? {
         get {
-            return double(forKey: Key.heartbeatShowDisconnectedTimeInSeconds.rawValue)
+            return double(forKey: Key.secondsUntilHeartBeatDisconnectWarning.rawValue)
         }
         set {
-            set(newValue, forKey: Key.heartbeatShowDisconnectedTimeInSeconds.rawValue)
+            set(newValue, forKey: Key.secondsUntilHeartBeatDisconnectWarning.rawValue)
         }
     }
     

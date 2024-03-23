@@ -28,7 +28,7 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryHeartBeatLibre3)
     
     /// when was the last heartbeat
-    private var lastHeartBeatTimeStamp: Date
+    private var timeStampOfLastHeartBeat: Date
 
     // MARK: - Initialization
     /// - parameters:
@@ -47,7 +47,7 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
         }
         
         // initially last heartbeat was never (ie 1 1 1970)
-        self.lastHeartBeatTimeStamp = Date(timeIntervalSince1970: 0)
+        self.timeStampOfLastHeartBeat = Date(timeIntervalSince1970: 0)
 
         // using nil as servicesCBUUIDs, that works.
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_Libre3, servicesCBUUIDs: nil, CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Libre3, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Libre3, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
@@ -61,11 +61,11 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
         super.centralManager(central, didConnect: peripheral)
         
         // this is the trigger for calling the heartbeat
-        if (Date()).timeIntervalSince(lastHeartBeatTimeStamp) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
+        if (Date()).timeIntervalSince(timeStampOfLastHeartBeat) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
             
-            lastHeartBeatTimeStamp = Date()
+            timeStampOfLastHeartBeat = Date()
             
-            UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
+            UserDefaults.standard.timeStampOfLastHeartBeat = timeStampOfLastHeartBeat
             
             // wait for a second to allow the official app to upload to LibreView before triggering the heartbeat announcement to the delegate
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -83,11 +83,11 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
         }
 
         // this is the trigger for calling the heartbeat
-        if (Date()).timeIntervalSince(lastHeartBeatTimeStamp) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
+        if (Date()).timeIntervalSince(timeStampOfLastHeartBeat) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
             
-            lastHeartBeatTimeStamp = Date()
+            timeStampOfLastHeartBeat = Date()
             
-            UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
+            UserDefaults.standard.timeStampOfLastHeartBeat = timeStampOfLastHeartBeat
             
             // wait for a second to allow the official app to upload to LibreView before triggering the heartbeat announcement to the delegate
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {

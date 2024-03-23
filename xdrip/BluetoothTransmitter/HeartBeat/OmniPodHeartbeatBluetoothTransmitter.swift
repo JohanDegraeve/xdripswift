@@ -31,7 +31,7 @@ class OmniPodHeartBeatTransmitter: BluetoothTransmitter {
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryHeartBeatOmnipod)
     
     /// when was the last heartbeat
-    private var lastHeartBeatTimeStamp: Date
+    private var timeStampOfLastHeartBeat: Date
     
     // MARK: - Initialization
     /// - parameters:
@@ -49,7 +49,7 @@ class OmniPodHeartBeatTransmitter: BluetoothTransmitter {
         }
         
         // initially last heartbeat was never (ie 1 1 1970)
-        self.lastHeartBeatTimeStamp = Date(timeIntervalSince1970: 0)
+        self.timeStampOfLastHeartBeat = Date(timeIntervalSince1970: 0)
         
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_OmniPod, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_OmniPod)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_OmniPod, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_OmniPod, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
@@ -61,9 +61,9 @@ class OmniPodHeartBeatTransmitter: BluetoothTransmitter {
         
         super.centralManager(central, didConnect: peripheral)
         
-        lastHeartBeatTimeStamp = Date()
+        timeStampOfLastHeartBeat = Date()
         
-        UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
+        UserDefaults.standard.timeStampOfLastHeartBeat = timeStampOfLastHeartBeat
         
         // wait for a second to allow the official app to upload to LibreView before triggering the heartbeat announcement to the delegate
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -77,9 +77,9 @@ class OmniPodHeartBeatTransmitter: BluetoothTransmitter {
         
         super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
         
-        lastHeartBeatTimeStamp = Date()
+        timeStampOfLastHeartBeat = Date()
         
-        UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
+        UserDefaults.standard.timeStampOfLastHeartBeat = timeStampOfLastHeartBeat
         
         // wait for a second to allow the official app to upload to LibreView before triggering the heartbeat announcement to the delegate
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {

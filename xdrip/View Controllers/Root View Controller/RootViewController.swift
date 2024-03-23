@@ -917,7 +917,7 @@ final class RootViewController: UIViewController, ObservableObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
         
         // add observer for the last heartbeat timestamp in order to update the UI
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.lastHeartBeatTimeStamp.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.timeStampOfLastHeartBeat.rawValue, options: .new, context: nil)
 
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
@@ -1691,7 +1691,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 
             }
             
-        case UserDefaults.Key.lastHeartBeatTimeStamp:
+        case UserDefaults.Key.timeStampOfLastHeartBeat:
             updateDataSourceInfo(animate: false)
 
         default:
@@ -3337,17 +3337,17 @@ final class RootViewController: UIViewController, ObservableObject {
                     // using bluetoothPeripheralType here so that whenever bluetoothPeripheralType is extended with new cases, we don't forget to handle them
                     switch bluetoothPeripheral.bluetoothPeripheralType() {
                     case .Libre3HeartBeatType:
-                        UserDefaults.standard.heartbeatShowDisconnectedTimeInSeconds = ConstantsHeartBeat.heartbeatShowDisconnectedTimeInSecondsLibre3
+                        UserDefaults.standard.secondsUntilHeartBeatDisconnectWarning = ConstantsHeartBeat.secondsUntilHeartBeatDisconnectWarningLibre3
                     case .DexcomG7HeartBeatType:
-                        UserDefaults.standard.heartbeatShowDisconnectedTimeInSeconds = ConstantsHeartBeat.heartbeatShowDisconnectedTimeInSecondsDexcomG7
+                        UserDefaults.standard.secondsUntilHeartBeatDisconnectWarning = ConstantsHeartBeat.secondsUntilHeartBeatDisconnectWarningDexcomG7
                     case .OmniPodHeartBeatType:
-                        UserDefaults.standard.heartbeatShowDisconnectedTimeInSeconds = ConstantsHeartBeat.heartbeatShowDisconnectedTimeInSecondsOmniPod
+                        UserDefaults.standard.secondsUntilHeartBeatDisconnectWarning = ConstantsHeartBeat.secondsUntilHeartBeatDisconnectWarningOmniPod
                     default:
                         break
                     }
                 }
             }
-            if let lastHeartBeatTimeStamp = UserDefaults.standard.lastHeartBeatTimeStamp, let heartbeatShowDisconnectedTimeInSeconds = UserDefaults.standard.heartbeatShowDisconnectedTimeInSeconds, lastHeartBeatTimeStamp > Date().addingTimeInterval(-heartbeatShowDisconnectedTimeInSeconds) {
+            if let timeStampOfLastHeartBeat = UserDefaults.standard.timeStampOfLastHeartBeat, let secondsUntilHeartBeatDisconnectWarning = UserDefaults.standard.secondsUntilHeartBeatDisconnectWarning, timeStampOfLastHeartBeat > Date().addingTimeInterval(-secondsUntilHeartBeatDisconnectWarning) {
                 dataSourceKeepAliveImageOutlet.tintColor =  .systemGreen
             } else {
                 dataSourceKeepAliveImageOutlet.tintColor = .systemRed

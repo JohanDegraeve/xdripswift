@@ -30,7 +30,7 @@ class DexcomG7HeartbeatBluetoothTransmitter: BluetoothTransmitter {
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryHeartBeatG7)
     
     /// when was the last heartbeat
-    private var lastHeartBeatTimeStamp: Date
+    private var timeStampOfLastHeartBeat: Date
 
     // MARK: - Initialization
     /// - parameters:
@@ -48,7 +48,7 @@ class DexcomG7HeartbeatBluetoothTransmitter: BluetoothTransmitter {
         }
         
         // initially last heartbeat was never (ie 1 1 1970)
-        self.lastHeartBeatTimeStamp = Date(timeIntervalSince1970: 0)
+        self.timeStampOfLastHeartBeat = Date(timeIntervalSince1970: 0)
 
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G7, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G7)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_G7, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_G7, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
         
@@ -66,11 +66,11 @@ class DexcomG7HeartbeatBluetoothTransmitter: BluetoothTransmitter {
         }
 
         // this is the trigger for calling the heartbeat
-        if (Date()).timeIntervalSince(lastHeartBeatTimeStamp) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
+        if (Date()).timeIntervalSince(timeStampOfLastHeartBeat) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
             
-            lastHeartBeatTimeStamp = Date()
+            timeStampOfLastHeartBeat = Date()
             
-            UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
+            UserDefaults.standard.timeStampOfLastHeartBeat = timeStampOfLastHeartBeat
             
             // wait for a second to allow the official app to upload to LibreView before triggering the heartbeat announcement to the delegate
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
@@ -85,11 +85,11 @@ class DexcomG7HeartbeatBluetoothTransmitter: BluetoothTransmitter {
         super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
         
         // this is the trigger for calling the heartbeat
-        if (Date()).timeIntervalSince(lastHeartBeatTimeStamp) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
+        if (Date()).timeIntervalSince(timeStampOfLastHeartBeat) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
             
-            lastHeartBeatTimeStamp = Date()
+            timeStampOfLastHeartBeat = Date()
             
-            UserDefaults.standard.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
+            UserDefaults.standard.timeStampOfLastHeartBeat = timeStampOfLastHeartBeat
             
             // no need to wait for a second, because the disconnect usually happens about 1' seconds after connect
             // this case is for when a follower would be using an expired Dexcom G7 as a heartbeat

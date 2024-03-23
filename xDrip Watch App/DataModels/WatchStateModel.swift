@@ -42,8 +42,8 @@ class WatchStateModel: NSObject, ObservableObject {
     @Published var sensorMaxAgeInMinutes: Double = 14400
     @Published var timeStampOfLastFollowerConnection: Date = Date()
     @Published var secondsUntilFollowerDisconnectWarning: Int = 90
-    @Published var lastHeartBeatTimeStamp: Date = Date()
-    @Published var heartbeatShowDisconnectedTimeInSeconds: Int = 90
+    @Published var timeStampOfLastHeartBeat: Date = Date()
+    @Published var secondsUntilHeartBeatDisconnectWarning: Int = 90
     @Published var isMaster: Bool = true
     @Published var followerDataSourceType: FollowerDataSourceType = .nightscout
     @Published var followerBackgroundKeepAliveType: FollowerBackgroundKeepAliveType = .normal
@@ -216,7 +216,7 @@ class WatchStateModel: NSObject, ObservableObject {
     /// if no heartbeat, just return the standard gray colour for the keep alive type icon
     func getFollowerBackgroundKeepAliveColor() -> Color {
         if followerBackgroundKeepAliveType == .heartbeat {
-            if let timeDifferenceInSeconds = Calendar.current.dateComponents([.second], from: lastHeartBeatTimeStamp, to: Date()).second, timeDifferenceInSeconds > heartbeatShowDisconnectedTimeInSeconds {
+            if let timeDifferenceInSeconds = Calendar.current.dateComponents([.second], from: timeStampOfLastHeartBeat, to: Date()).second, timeDifferenceInSeconds > secondsUntilHeartBeatDisconnectWarning {
                 return .red
             } else {
                 return .green
@@ -266,8 +266,8 @@ class WatchStateModel: NSObject, ObservableObject {
         sensorMaxAgeInMinutes = watchState.sensorMaxAgeInMinutes ?? 0
         timeStampOfLastFollowerConnection = watchState.timeStampOfLastFollowerConnection ?? .distantPast
         secondsUntilFollowerDisconnectWarning = watchState.secondsUntilFollowerDisconnectWarning ?? 70// give it some more time compared to the iOS app
-        lastHeartBeatTimeStamp = watchState.lastHeartBeatTimeStamp ?? .distantPast
-        heartbeatShowDisconnectedTimeInSeconds = watchState.heartbeatShowDisconnectedTimeInSeconds ?? 5
+        timeStampOfLastHeartBeat = watchState.timeStampOfLastHeartBeat ?? .distantPast
+        secondsUntilHeartBeatDisconnectWarning = watchState.secondsUntilHeartBeatDisconnectWarning ?? 5
         isMaster = watchState.isMaster ?? true
         followerDataSourceType = FollowerDataSourceType(rawValue: watchState.followerDataSourceTypeRawValue ?? 0) ?? .nightscout
         followerBackgroundKeepAliveType = FollowerBackgroundKeepAliveType(rawValue: watchState.followerBackgroundKeepAliveTypeRawValue ?? 0) ?? .normal
@@ -333,7 +333,7 @@ class WatchStateModel: NSObject, ObservableObject {
             debugString += "\nFollower conn.: \(timeStampOfLastFollowerConnection.formatted(date: .omitted, time: .standard))"
             
             if followerBackgroundKeepAliveType == .heartbeat {
-                debugString += "\nLast hearbeat: \(lastHeartBeatTimeStamp.formatted(date: .omitted, time: .standard))"
+                debugString += "\nLast hearbeat: \(timeStampOfLastHeartBeat.formatted(date: .omitted, time: .standard))"
             }
         }
         

@@ -27,7 +27,7 @@ struct WatchState: Codable {
     var followerBackgroundKeepAliveTypeRawValue: Int?
     var timeStampOfLastFollowerConnection: Date?
     var secondsUntilFollowerDisconnectWarning: Int?
-    var lastHeartBeatTimeStamp: Date?
-    var heartbeatShowDisconnectedTimeInSeconds: Int?
+    var timeStampOfLastHeartBeat: Date?
+    var secondsUntilHeartBeatDisconnectWarning: Int?
     var disableComplications: Bool?
 }

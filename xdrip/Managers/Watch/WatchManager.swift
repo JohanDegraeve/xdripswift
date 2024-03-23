@@ -97,9 +97,9 @@ public final class WatchManager: NSObject, ObservableObject {
             self.watchState.sensorMaxAgeInMinutes = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
             
             // let's set the state values if we're using a heartbeat
-            if let lastHeartBeatTimeStamp = UserDefaults.standard.lastHeartBeatTimeStamp, let heartbeatShowDisconnectedTimeInSeconds = UserDefaults.standard.heartbeatShowDisconnectedTimeInSeconds {
-                self.watchState.heartbeatShowDisconnectedTimeInSeconds = Int(heartbeatShowDisconnectedTimeInSeconds)
-                self.watchState.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
+            if let timeStampOfLastHeartBeat = UserDefaults.standard.timeStampOfLastHeartBeat, let secondsUntilHeartBeatDisconnectWarning = UserDefaults.standard.secondsUntilHeartBeatDisconnectWarning {
+                self.watchState.secondsUntilHeartBeatDisconnectWarning = Int(secondsUntilHeartBeatDisconnectWarning)
+                self.watchState.timeStampOfLastHeartBeat = timeStampOfLastHeartBeat
             }
             
             // let's set the follower server connection values if we're using follower mode
