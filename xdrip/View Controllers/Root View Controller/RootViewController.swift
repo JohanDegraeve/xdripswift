@@ -3486,14 +3486,10 @@ final class RootViewController: UIViewController, ObservableObject {
     /// check if the conditions are correct to start a live activity, update it, or end it
     /// also update the widget data stored in user defaults
     private func updateLiveActivityAndWidgets(forceRestart: Bool) {
-        
         if #available(iOS 16.2, *) {
-            // check the live activity type requested by the user
-            let liveActivityType = UserDefaults.standard.liveActivityType
-            
-            // if the user is in follower mode (without a heartbeat) then don't show live activities as they will not get updated in the background
-            // also take advantage to just skip the rest of the function if they have live activities disabled
-            var showLiveActivity: Bool = UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat
+            if (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat) || UserDefaults.standard.liveActivityType == .disabled {
+                LiveActivityManager.shared.endAllActivities()
+            }
             
             DispatchQueue.main.async {
                 if let bgReadingsAccessor = self.bgReadingsAccessor {
@@ -3524,8 +3520,12 @@ final class RootViewController: UIViewController, ObservableObject {
                             bgReadingDates.append(bgReading.timeStamp)
                         }
                         
+                        let dataSourceDescription = UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "" : UserDefaults.standard.followerDataSourceType.fullDescription
+                        
+                        var showLiveActivity: Bool = false
+                        
                         // now that we've got the current BG value, let's refine the check to see if we should run/show the live activity
-                        switch liveActivityType {
+                        switch UserDefaults.standard.liveActivityType {
                         case .always:
                             showLiveActivity = true
                         case .disabled:
@@ -3540,16 +3540,14 @@ final class RootViewController: UIViewController, ObservableObject {
                             showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.urgentHighMarkValue)) ? true : false
                         }
                         
-                        let dataSourceDescription = UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "" : UserDefaults.standard.followerDataSourceType.fullDescription
-                        
-                        // if we should still show it, then let's continue processing the lastReading array to create a valid contentState
-                        if (UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat) && showLiveActivity {
-                            
+                        // if we should show it, then let's continue processing the lastReading array to create a valid contentState
+                        if showLiveActivity {
                             // create the contentState that will update the dynamic attributes of the Live Activity Widget
                             let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySize: UserDefaults.standard.liveActivitySize, dataSourceDescription: dataSourceDescription)
                             
                             LiveActivityManager.shared.runActivity(contentState: contentState, forceRestart: forceRestart)
-                            
+                        } else {
+                            LiveActivityManager.shared.endAllActivities()
                         }
                         
                         // update the widget data stored in user defaults
@@ -3568,11 +3566,6 @@ final class RootViewController: UIViewController, ObservableObject {
                         WidgetCenter.shared.reloadAllTimelines()
                     }
                 }
-            }
-            
-            // try to end the activity if needed
-            if !showLiveActivity {
-                LiveActivityManager.shared.endAllActivities()
             }
         }
     }
