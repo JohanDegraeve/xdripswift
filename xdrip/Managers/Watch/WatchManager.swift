@@ -83,13 +83,11 @@ public final class WatchManager: NSObject, ObservableObject {
             self.watchState.highLimitInMgDl = UserDefaults.standard.highMarkValue
             self.watchState.urgentHighLimitInMgDl = UserDefaults.standard.urgentHighMarkValue
             self.watchState.activeSensorDescription = UserDefaults.standard.activeSensorDescription
-            self.watchState.timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection ?? Date()
-            self.watchState.secondsUntilFollowerDisconnectWarning = UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning
             self.watchState.isMaster = UserDefaults.standard.isMaster
             self.watchState.followerDataSourceTypeRawValue = UserDefaults.standard.followerDataSourceType.rawValue
             self.watchState.followerBackgroundKeepAliveTypeRawValue = UserDefaults.standard.followerBackgroundKeepAliveType.rawValue
             self.watchState.disableComplications = !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled
-                        
+            
             if let sensorStartDate = UserDefaults.standard.activeSensorStartDate {
                 self.watchState.sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: Date()).minute!)
             } else {
@@ -102,6 +100,12 @@ public final class WatchManager: NSObject, ObservableObject {
             if let lastHeartBeatTimeStamp = UserDefaults.standard.lastHeartBeatTimeStamp, let heartbeatShowDisconnectedTimeInSeconds = UserDefaults.standard.heartbeatShowDisconnectedTimeInSeconds {
                 self.watchState.heartbeatShowDisconnectedTimeInSeconds = Int(heartbeatShowDisconnectedTimeInSeconds)
                 self.watchState.lastHeartBeatTimeStamp = lastHeartBeatTimeStamp
+            }
+            
+            // let's set the follower server connection values if we're using follower mode
+            if let timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection {
+                self.watchState.secondsUntilFollowerDisconnectWarning = UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning
+                self.watchState.timeStampOfLastFollowerConnection = timeStampOfLastFollowerConnection
             }
             
             self.sendToWatch()

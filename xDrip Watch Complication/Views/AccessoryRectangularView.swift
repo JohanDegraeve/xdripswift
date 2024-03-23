@@ -12,7 +12,7 @@ import SwiftUI
 extension XDripWatchComplication.EntryView {
     @ViewBuilder
     var accessoryRectangularView: some View {
-        if !entry.widgetState.disableComplications {
+        ZStack {
             VStack(spacing: 0) {
                 HStack(alignment: .center) {
                     HStack(alignment: .center, spacing: 4) {
@@ -35,25 +35,22 @@ extension XDripWatchComplication.EntryView {
                 }
                 .padding(0)
                 
-                GlucoseChartView(glucoseChartType: .watchAccessoryRectangular, bgReadingValues: entry.widgetState.bgReadingValues, bgReadingDates: entry.widgetState.bgReadingDates, isMgDl: entry.widgetState.isMgDl, urgentLowLimitInMgDl: entry.widgetState.urgentLowLimitInMgDl, lowLimitInMgDl: entry.widgetState.lowLimitInMgDl, highLimitInMgDl: entry.widgetState.highLimitInMgDl, urgentHighLimitInMgDl: entry.widgetState.urgentHighLimitInMgDl, liveActivitySize: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil)
-            }
-            .widgetBackground(backgroundView: Color.clear)
-        } else {
-            VStack(alignment: .leading, spacing: 0) {
-                Text(ConstantsHomeView.applicationName)
-                    .fontWeight(/*@START_MENU_TOKEN@*/.bold/*@END_MENU_TOKEN@*/)
+                GlucoseChartView(glucoseChartType: .watchAccessoryRectangular, bgReadingValues: entry.widgetState.bgReadingValues, bgReadingDates: entry.widgetState.bgReadingDates, isMgDl: entry.widgetState.isMgDl, urgentLowLimitInMgDl: entry.widgetState.urgentLowLimitInMgDl, lowLimitInMgDl: entry.widgetState.lowLimitInMgDl, highLimitInMgDl: entry.widgetState.highLimitInMgDl, urgentHighLimitInMgDl: entry.widgetState.urgentHighLimitInMgDl, liveActivitySize: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: entry.widgetState.disableComplications ? ConstantsGlucoseChartSwiftUI.viewHeightWatchAccessoryRectangular - 15 : nil, overrideChartWidth: nil)
                 
-                HStack(alignment: .center, spacing: 6) {
-                    Image(systemName: "exclamationmark.triangle")
-                        .font(.system(size: 24))
-                    
-                    Text("Enable background keep-alive")
-                        .font(.system(size: 16))
+                if entry.widgetState.disableComplications {
+                    HStack(alignment: .center, spacing: 4) {
+                        Image(systemName: "exclamationmark.triangle")
+                            .font(.system(size: 14))
+                        
+                        Text("Keep-alive disabled")
+                            .font(.system(size: 14))
+                            .multilineTextAlignment(.leading)
+                    }
+                    .foregroundStyle(.teal)
+                    .padding(0)
                 }
-                .foregroundStyle(.yellow)
-                .padding(2)
             }
-            .widgetBackground(backgroundView: Color.clear)
         }
+        .widgetBackground(backgroundView: Color.clear)
     }
 }

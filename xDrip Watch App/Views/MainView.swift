@@ -63,7 +63,7 @@ struct MainView: View {
             if showDebug {
                 Text(watchState.debugString)
                     .foregroundStyle(.black)
-                    .font(.system(size: 15)).bold()
+                    .font(.system(size: isSmallScreen ? 12 : 14))
                     .multilineTextAlignment(.leading)
                     .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
                     .background(.teal).opacity(0.85)
@@ -145,6 +145,7 @@ struct ContentView_Previews: PreviewProvider {
         watchState.sensorAgeInMinutes = Double(Int.random(in: 1..<14400))
         watchState.sensorMaxAgeInMinutes = 14400
         watchState.isMaster = false
+        watchState.followerDataSourceType = .libreLinkUp
         watchState.followerBackgroundKeepAliveType = .heartbeat
         
         return Group {

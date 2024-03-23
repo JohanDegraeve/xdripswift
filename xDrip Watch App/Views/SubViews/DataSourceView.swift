@@ -47,13 +47,19 @@ struct DataSourceView: View {
                     
                     Spacer()
                     
+                    Image(systemName: ConstantsAppleWatch.requestingDataIconSFSymbolName)
+                        .font(.system(size: ConstantsAppleWatch.requestingDataIconFontSize, weight: .heavy))
+                        .foregroundStyle(watchState.requestingDataIconColor)
+                        .padding(.bottom, -2)
+                        .padding(.trailing, -3)
+                    
                     if watchState.sensorAgeInMinutes > 0 {
                         Text(watchState.sensorAgeInMinutes.minutesToDaysAndHours())
                             .font(.system(size: textSize))
                             .foregroundStyle(watchState.activeSensorProgress().textColor)
                     }
                 }
-                .padding([.leading, .trailing], isSmallScreen ? 6 : 10)
+                .padding([.leading, .trailing], isSmallScreen ? 6 : 8)
             } else {
                 ProgressView(value: 0)
                     .tint(ConstantsHomeView.sensorProgressViewNormalColorSwiftUI)
@@ -64,6 +70,11 @@ struct DataSourceView: View {
                         .font(.system(size: textSize)).bold()
                     
                     Spacer()
+                    
+                    Image(systemName: ConstantsAppleWatch.requestingDataIconSFSymbolName)
+                        .font(.system(size: ConstantsAppleWatch.requestingDataIconFontSize, weight: .heavy))
+                        .foregroundStyle(watchState.requestingDataIconColor)
+                        .padding(.bottom, -2)
                 }
                 .padding([.leading, .trailing], 10)
             }

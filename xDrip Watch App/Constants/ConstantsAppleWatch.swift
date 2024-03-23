@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 enum ConstantsAppleWatch {
     
@@ -18,5 +19,11 @@ enum ConstantsAppleWatch {
     
     /// less than how many pixels wide should we consider the screen size to the "small"
     static let pixelWidthLimitForSmallScreen: Double = 185
+    
+    /// colour for the "requesting data" symbol
+    static let requestingDataIconColorActive = Color(.green) //.opacity(0.9)
+    static let requestingDataIconColorInactive = Color(.white).opacity(0.3)
+    static let requestingDataIconFontSize: CGFloat = 6
+    static let requestingDataIconSFSymbolName: String = "circle.fill" // "iphone.gen3.radiowaves.left.and.right" //
     
 }

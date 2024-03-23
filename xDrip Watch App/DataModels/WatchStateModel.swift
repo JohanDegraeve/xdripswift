@@ -53,8 +53,7 @@ class WatchStateModel: NSObject, ObservableObject {
     @Published var lastUpdatedTimeString: String = ""
     @Published var debugString: String = "Debug..."
     @Published var chartHoursIndex: Int = 1
-    
-    var lastComplicationUpdateDate: Date = .distantPast
+    @Published var requestingDataIconColor: Color = ConstantsAppleWatch.requestingDataIconColorInactive
     
     init(session: WCSession = .default) {
         self.session = session
@@ -200,11 +199,17 @@ class WatchStateModel: NSObject, ObservableObject {
     
     /// check when the last follower connection was and compare that to the actual time
     func getFollowerConnectionNetworkStatus() -> (image: Image, color: Color) {
-        if let timeDifferenceInSeconds = Calendar.current.dateComponents([.second], from: timeStampOfLastFollowerConnection, to: Date()).second, timeDifferenceInSeconds > secondsUntilFollowerDisconnectWarning {
-            return(Image(systemName: "network.slash"), Color(.red))
-        } else {
-            return(Image(systemName: "network"), Color(.green))
-        }
+            if timeStampOfLastFollowerConnection > Date().addingTimeInterval(-Double(secondsUntilFollowerDisconnectWarning)) {
+                return(Image(systemName: "network"), Color(.green))
+            } else {
+                if followerBackgroundKeepAliveType != .disabled {
+                    return(Image(systemName: "network.slash"), Color(.red))
+                } else {
+                    // if keep-alive is disabled, then this will never show a constant server connection so just "disable" 
+                    // the icon when not recent. It would be incorrect to show a red error.
+                    return(Image(systemName: "network.slash"), Color(.gray))
+                }
+            }
     }
     
     /// check when the last heartbeat connection was and compare that to the actual time
@@ -226,10 +231,11 @@ class WatchStateModel: NSObject, ObservableObject {
         guard session.activationState == .activated else {
             session.activate()
             return
-        } 
+        }
         // change the text, this must be done in the main thread but only do it if the watch app is reachable
         if session.isReachable {
             DispatchQueue.main.async {
+                self.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorActive
                 self.debugString.removeLast(4)
                 self.debugString += "Fetching"
             }
@@ -259,7 +265,7 @@ class WatchStateModel: NSObject, ObservableObject {
         sensorAgeInMinutes = watchState.sensorAgeInMinutes ?? 0
         sensorMaxAgeInMinutes = watchState.sensorMaxAgeInMinutes ?? 0
         timeStampOfLastFollowerConnection = watchState.timeStampOfLastFollowerConnection ?? .distantPast
-        secondsUntilFollowerDisconnectWarning = watchState.secondsUntilFollowerDisconnectWarning ?? 5
+        secondsUntilFollowerDisconnectWarning = watchState.secondsUntilFollowerDisconnectWarning ?? 70// give it some more time compared to the iOS app
         lastHeartBeatTimeStamp = watchState.lastHeartBeatTimeStamp ?? .distantPast
         heartbeatShowDisconnectedTimeInSeconds = watchState.heartbeatShowDisconnectedTimeInSeconds ?? 5
         isMaster = watchState.isMaster ?? true
@@ -267,36 +273,25 @@ class WatchStateModel: NSObject, ObservableObject {
         followerBackgroundKeepAliveType = FollowerBackgroundKeepAliveType(rawValue: watchState.followerBackgroundKeepAliveTypeRawValue ?? 0) ?? .normal
         disableComplications = watchState.disableComplications ?? false
         
-        debugString = "🩸 WATCH DEBUG"
-        debugString += "\nLast state: \(Date().formatted(date: .omitted, time: .standard))"
-        
-        
-        // check if there is any BG data available before updating the strings accordingly
+        // check if there is any BG data available before updating the data source info strings accordingly
         if let bgReadingDate = bgReadingDate() {
             lastUpdatedTextString = "Last reading "
             lastUpdatedTimeString = bgReadingDate.formatted(date: .omitted, time: .shortened)
-            debugString += "\nBG updated: \(bgReadingDate.formatted(date: .omitted, time: .standard))"
         } else {
             lastUpdatedTextString = "No sensor data"
             lastUpdatedTimeString = ""
-            debugString += "\nBG updated: ---"
         }
         
-        debugString += "\nBG values: \(bgReadingValues.count)"
-        
-        if !isMaster {
-            debugString += "\nServer connection: \(timeStampOfLastFollowerConnection.formatted(date: .omitted, time: .standard))"
-            
-            if followerBackgroundKeepAliveType == .heartbeat {
-                debugString += "\nLast hearbeat: \(lastHeartBeatTimeStamp.formatted(date: .omitted, time: .standard))"
-            }
-        }
-        
-        debugString += "\nScreen width: \(Int(WKInterfaceDevice.current().screenBounds.size.width))"
-        debugString += "\n\(ConstantsHomeView.applicationName): Idle"
+        debugString = generateDebugString()
         
         // now process the shared user defaults to get data for the WidgetKit complications
         updateWatchSharedUserDefaults()
+        
+        // change the requesting icon color back after a small delay to prevent it
+        // flashing on/off too quickly
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorInactive
+        }
     }
     
     /// once we've process the state update, then save this data to the shared app group so that the complication can read it
@@ -318,6 +313,34 @@ class WatchStateModel: NSObject, ObservableObject {
         
         // now that the new data is stored in the app group, try to force the complications to reload
         WidgetCenter.shared.reloadAllTimelines()
+    }
+    
+    // generate a debugString
+    private func generateDebugString() -> String {
+        
+        var debugString = "Last state: \(Date().formatted(date: .omitted, time: .standard))"
+        
+        // check if there is any BG data available before updating the strings accordingly
+        if let bgReadingDate = bgReadingDate() {
+            debugString += "\nBG updated: \(bgReadingDate.formatted(date: .omitted, time: .standard))"
+        } else {
+            debugString += "\nBG updated: ---"
+        }
+        
+        debugString += "\nBG values: \(bgReadingValues.count)"
+        
+        if !isMaster {
+            debugString += "\nFollower conn.: \(timeStampOfLastFollowerConnection.formatted(date: .omitted, time: .standard))"
+            
+            if followerBackgroundKeepAliveType == .heartbeat {
+                debugString += "\nLast hearbeat: \(lastHeartBeatTimeStamp.formatted(date: .omitted, time: .standard))"
+            }
+        }
+        
+        debugString += "\nScreen width: \(Int(WKInterfaceDevice.current().screenBounds.size.width))"
+        debugString += "\niOS app: Idle"
+        
+        return debugString
     }
 }
 
