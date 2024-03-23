@@ -533,6 +533,9 @@ final class RootViewController: UIViewController, ObservableObject {
     /// WatchManager instance
     private var watchManager: WatchManager?
     
+    /// ContactTrickManager  instance
+    private var contactTrickManager: ContactTrickManager?
+
     /// healthkit manager instance
     private var healthKitManager:HealthKitManager?
     
@@ -1027,7 +1030,7 @@ final class RootViewController: UIViewController, ObservableObject {
         }
     }
     
-    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, watchManager, housekeeper
+    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, watchManager, contactTrickManager, housekeeper
     private func setupApplicationData() {
         
         // setup Trace
@@ -1175,6 +1178,9 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // setup watchmanager
         watchManager = WatchManager(coreDataManager: coreDataManager)
+        
+        // setup contactTrickManager
+        contactTrickManager = ContactTrickManager(coreDataManager: coreDataManager)
         
         // initialize glucoseChartManager
         glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager)
@@ -1457,6 +1463,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 bluetoothPeripheralManager?.sendLatestReading()
                 
                 watchManager?.processNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                
+                contactTrickManager?.processNewReading()
                 
                 if !UserDefaults.standard.suppressLoopShare {
                     loopManager?.share()
