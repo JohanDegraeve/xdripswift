@@ -102,10 +102,12 @@ class WatchManager: NSObject {
             switch lastReading[0].bgRangeDescription() {
             case .inRange:
                 visualIndicator = ConstantsWatch.visualIndicatorInRange
-            case .notUrgent:
+            case .notUrgent, .low, .high:
                 visualIndicator = ConstantsWatch.visualIndicatorNotUrgent
-            case .urgent:
+            case .urgent, .urgentLow, .urgentHigh:
                 visualIndicator = ConstantsWatch.visualIndicatorUrgent
+            default:
+                visualIndicator = ConstantsWatch.visualIndicatorNotUrgent
             }
             
             // pre-append the indicator to the title

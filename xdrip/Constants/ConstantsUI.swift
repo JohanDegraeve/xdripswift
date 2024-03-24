@@ -75,4 +75,28 @@ enum ConstantsUI {
     /// string to be used to show pm time if the user locale shows a 12 hour clock
     static let timeFormatPM = "pm"
     
+    /// MARK: - Used in the AGP
+
+    static let DefaultSize: CGFloat = 90.0
+    static let SmallSize: CGFloat = ConstantsUI.DefaultSize / 6
+    
+    // These are force unwrapped since we shouldn't be able to run without the resources
+    
+    /// Bold font indicating a very high BG
+    static let UrgentFont: UIFont = UIFont(name: "Quicksand-Bold", size: ConstantsUI.DefaultSize)!
+    
+    /// Semi-Bold font indicating a high BG
+    static let NonUrgentFont: UIFont = UIFont(name: "Quicksand-SemiBold", size: ConstantsUI.DefaultSize)!
+    
+    /// Regular font indicating in range BG or general message
+    static let InRangeFont: UIFont = UIFont(name: "Quicksand-Regular", size: ConstantsUI.DefaultSize)!
+    
+    /// Mid-sized, semi bold font - typically for the display of HBa1c.
+    static let MidSizeFont: UIFont = UIFont(name: "Quicksand-SemiBold", size: ConstantsUI.DefaultSize / 3.5)!
+    
+    /// Small, semi bold font - typically for the display of units.
+    static let SmallFont: UIFont = UIFont(name: "Quicksand-SemiBold", size: ConstantsUI.SmallSize)!
+    
+    /// Small, light font - typically for the display of units.
+    static let MiniFont: UIFont = UIFont(name: "Quicksand-SemiBold", size: ConstantsUI.SmallSize * 0.75)!
 }

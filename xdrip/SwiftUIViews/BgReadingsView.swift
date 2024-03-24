@@ -220,10 +220,12 @@ struct BgReadingsView: View {
         switch bgRangeDescription {
         case .inRange:
             visualIndicator = ConstantsWatch.visualIndicatorInRange
-        case .notUrgent:
+        case .notUrgent, .high, .low:
             visualIndicator = ConstantsWatch.visualIndicatorNotUrgent
-        case .urgent:
+        case .urgent, .urgentHigh, .urgentLow:
             visualIndicator = ConstantsWatch.visualIndicatorUrgent
+        default:
+            visualIndicator = ConstantsWatch.visualIndicatorNotUrgent
         }
         
         // return the indicator symbol

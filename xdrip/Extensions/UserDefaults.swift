@@ -581,8 +581,13 @@ extension UserDefaults {
     
     // MARK: General
     
-    /// true if unit is mgdl, false if mmol is used
+    /// Indicates if the user has selected to use mmol or mgdl
+    ///
+    /// - `false` when the user wants mmol/l
+    /// - `true` when the user wants mg/dl
+    ///  > Note: This is the inverse `Bool` of the stored value in `UserDefaults`
     @objc dynamic var bloodGlucoseUnitIsMgDl: Bool {
+   
         //default value for bool in userdefaults is false, false is for mgdl, true is for mmol
         get {
             return !bool(forKey: Key.bloodGlucoseUnitIsMgDl.rawValue)

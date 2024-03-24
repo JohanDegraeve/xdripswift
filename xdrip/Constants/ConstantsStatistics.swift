@@ -43,6 +43,14 @@ enum ConstantsStatistics {
     static let standardisedLowValueForTITRInMmol = 3.9
     static let standardisedHighValueForTITRInMmol = 7.8
     
+    // Constants for TIR and TITR  using `UniversalBGLevel`
+    static let standardisedUniLowValueForTITR = UniversalBGLevel(mgdl: MGDL(ConstantsStatistics.standardisedLowValueForTITRInMgDl))
+    static let standardisedUniHighValueForTITR = UniversalBGLevel(mgdl: MGDL(ConstantsStatistics.standardisedHighValueForTITRInMgDl))
+    
+    static let standardisedUniLowValueForTIR = UniversalBGLevel(mgdl: MGDL(ConstantsStatistics.standardisedLowValueForTIRInMgDl))
+    static let standardisedUniHighValueForTIR = UniversalBGLevel(mgdl: MGDL(ConstantsStatistics.standardisedHighValueForTIRInMgDl))
+    // ----
+    
     /// highlight color when changing between TIR modes
     static let highlightColorTitles: UIColor = .white
     
