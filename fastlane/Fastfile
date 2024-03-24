@@ -56,8 +56,9 @@ platform :ios do
       git_basic_authorization: Base64.strict_encode64("#{GITHUB_REPOSITORY_OWNER}:#{GH_PAT}"),
       app_identifier: [
         "com.#{TEAMID}.xdripswift",
-        "com.#{TEAMID}.xdripswift.xDrip4iOS-Widget",
-        "com.#{TEAMID}.xdripswift.watchkitapp"
+        "com.#{TEAMID}.xdripswift.xDripWidget",
+        "com.#{TEAMID}.xdripswift.watchkitapp",
+        "com.#{TEAMID}.xdripswift.watchkitapp.xDripWatchComplication"
       ]
     )
 
@@ -86,16 +87,23 @@ platform :ios do
 
     update_code_signing_settings(
       path: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
-      profile_name: mapping["com.#{TEAMID}.xdripswift.xDrip4iOS-Widget"],
+      profile_name: mapping["com.#{TEAMID}.xdripswift.xDripWidget"],
       code_sign_identity: "iPhone Distribution",
-      targets: ["xDrip4iOS Widget"]
+      targets: ["xDrip Widget Extension"]
     )
     
     update_code_signing_settings(
       path: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
       profile_name: mapping["com.#{TEAMID}.xdripswift.watchkitapp"],
       code_sign_identity: "iPhone Distribution",
-      targets: ["Watch App"]
+      targets: ["xDrip Watch App"]
+    )
+    
+    update_code_signing_settings(
+      path: "#{GITHUB_WORKSPACE}/xdrip.xcodeproj",
+      profile_name: mapping["com.#{TEAMID}.xdripswift.watchkitapp.xDripWatchComplication"],
+      code_sign_identity: "iPhone Distribution",
+      targets: ["xDrip Watch Complication Extension"]
     )
     
     gym(
@@ -153,11 +161,15 @@ platform :ios do
       Spaceship::ConnectAPI::BundleIdCapability::Type::NFC_TAG_READING
     ])
 
-    configure_bundle_id("xDrip4iOS Widget", "com.#{TEAMID}.xdripswift.xDrip4iOS-Widget", [
+    configure_bundle_id("xDrip Widget Extension", "com.#{TEAMID}.xdripswift.xDripWidget", [
       Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS
     ])
     
-    configure_bundle_id("Watch App", "com.#{TEAMID}.xdripswift.watchkitapp", [
+    configure_bundle_id("xDrip Watch App", "com.#{TEAMID}.xdripswift.watchkitapp", [
+      Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS
+    ])
+    
+    configure_bundle_id("xDrip Watch Complication Extension", "com.#{TEAMID}.xdripswift.watchkitapp.xDripWatchComplication", [
       Spaceship::ConnectAPI::BundleIdCapability::Type::APP_GROUPS
     ])
     
@@ -181,8 +193,9 @@ platform :ios do
       git_basic_authorization: Base64.strict_encode64("#{GITHUB_REPOSITORY_OWNER}:#{GH_PAT}"),
       app_identifier: [
         "com.#{TEAMID}.xdripswift",
-        "com.#{TEAMID}.xdripswift.xDrip4iOS-Widget",
-        "com.#{TEAMID}.xdripswift.watchkitapp"
+        "com.#{TEAMID}.xdripswift.xDripWidget",
+        "com.#{TEAMID}.xdripswift.watchkitapp",
+        "com.#{TEAMID}.xdripswift.watchkitapp.xDripWatchComplication"
       ]
     )
   end
