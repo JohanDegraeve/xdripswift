@@ -35,6 +35,8 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>MainAppBundleIdentifier</key>
+	<string>$(MAIN_APP_BUNDLE_IDENTIFIER)</string>
 	<key>NFCReaderUsageDescription</key>
 	<string>xDrip4iO5 uses NFC to scan Libre sensors.</string>
 	<key>NSAppTransportSecurity</key>
@@ -51,6 +53,8 @@
 	<string>Store bloodglucose readings</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Store bloodglucose readings</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

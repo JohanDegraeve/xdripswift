@@ -1,5 +1,6 @@
 import Foundation
 import UIKit
+import ActivityKit
 
 extension UserDefaults {
     
@@ -70,6 +71,10 @@ extension UserDefaults {
         case multipleAppBadgeValueWith10 = "multipleAppBadgeValueWith10"
         /// minimum time between two notifications, set by user
         case notificationInterval = "notificationInterval"
+        /// which type of live activities should be shown?
+        case liveActivityType = "liveActivityType"
+        /// which size should the live activities be shown?
+        case liveActivitySize = "liveActivitySize"
         
         // Home Screen and main chart settings
         
@@ -386,6 +391,12 @@ extension UserDefaults {
         /// - stored as data as read from transmitter
         case librePatchInfo = "librePatchInfo"
         
+        // heartbeat
+        /// the last heartbeat connection timestamp
+        case timeStampOfLastHeartBeat = "timeStampOfLastHeartBeat"
+        /// how many seconds since the last heartbeat before we raise a disconnection warning
+        case secondsUntilHeartBeatDisconnectWarning = "secondsUntilHeartBeatDisconnectWarning"
+        
     }
     
     
@@ -536,27 +547,6 @@ extension UserDefaults {
         }
     }
     
-    /// LibreLinkUp version
-    @objc dynamic var libreLinkUpVersion: String? {
-        get {
-            var returnValue = string(forKey: Key.libreLinkUpVersion.rawValue)
-            
-            // if nil set to defaultvalue
-            if returnValue == nil {
-                
-                set(ConstantsLibreLinkUp.libreLinkUpVersionDefault, forKey: Key.libreLinkUpVersion.rawValue)
-                
-                returnValue = string(forKey: Key.libreLinkUpVersion.rawValue)
-                
-            }
-
-            return returnValue
-        }
-        set {
-            set(newValue, forKey: Key.libreLinkUpVersion.rawValue)
-        }
-    }
-    
     /// keep track of if the terms of use must be re-accepted true or false, default false
     @objc dynamic var libreLinkUpReAcceptNeeded: Bool {
         get {
@@ -616,30 +606,6 @@ extension UserDefaults {
             set(newValue, forKey: Key.notificationInterval.rawValue)
         }
     }
-    
-    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
-    ///
-    /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
-    @objc dynamic var loopDelaySchedule: String? {
-        get {
-            return string(forKey: Key.loopDelaySchedule.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.loopDelaySchedule.rawValue)
-        }
-    }
-
-    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
-    ///
-    /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
-    @objc dynamic var loopDelayValueInMinutes: String? {
-        get {
-            return string(forKey: Key.loopDelayValueInMinutes.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.loopDelayValueInMinutes.rawValue)
-        }
-    }
 
     /// should reading be shown in app badge yes or no
     @objc dynamic var showReadingInAppBadge: Bool {
@@ -660,6 +626,30 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.multipleAppBadgeValueWith10.rawValue)
+        }
+    }
+    
+    /// holds the enum integer of the type of live activity to be shown
+    /// default to 0 (disabled)
+    var liveActivityType: LiveActivityType {
+        get {
+            let liveActivityTypeAsInt = integer(forKey: Key.liveActivityType.rawValue)
+            return LiveActivityType(rawValue: liveActivityTypeAsInt) ?? .disabled
+        }
+        set {
+            set(newValue.rawValue, forKey: Key.liveActivityType.rawValue)
+        }
+    }
+    
+    /// holds the enum integer of the type of live activity to be shown
+    /// default to 0 (normal)
+    var liveActivitySize: LiveActivitySize {
+        get {
+            let liveActivitySizeAsInt = integer(forKey: Key.liveActivitySize.rawValue)
+            return LiveActivitySize(rawValue: liveActivitySizeAsInt) ?? .normal
+        }
+        set {
+            set(newValue.rawValue, forKey: Key.liveActivitySize.rawValue)
         }
     }
     
@@ -1844,8 +1834,7 @@ extension UserDefaults {
         }
     }
     
-    
-    // MARK: - =====  Loop Share Settings ======
+    // MARK: - =====  Loopkit App Group Share variables ======
     
     /// dictionary representation of readings that were shared  with Loop. This is not the json representation, it's an array of dictionary
     var readingsStoredInSharedUserDefaultsAsDictionary: [Dictionary<String, Any>]? {
@@ -1867,35 +1856,16 @@ extension UserDefaults {
         }
     }
     
-    /// Loop sharing will be limited to just once every 5 minutes if true - default false
-    var shareToLoopOnceEvery5Minutes: Bool {
+    
+    // MARK: - =====  Developer Settings ======
+    
+    /// OSLogEnabled - default false
+    var OSLogEnabled: Bool {
         get {
-            return bool(forKey: Key.shareToLoopOnceEvery5Minutes.rawValue)
+            return bool(forKey: Key.OSLogEnabled.rawValue)
         }
         set {
-            set(newValue, forKey: Key.shareToLoopOnceEvery5Minutes.rawValue)
-        }
-    }
-    
-    // MARK: - =====  technical settings for testing ======
-    
-    /// G6 factor 1
-    @objc dynamic var G6v2ScalingFactor1:String? {
-        get {
-            return string(forKey: Key.G6v2ScalingFactor1.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.G6v2ScalingFactor1.rawValue)
-        }
-    }
-    
-    /// G6 factor 2
-    @objc dynamic var G6v2ScalingFactor2:String? {
-        get {
-            return string(forKey: Key.G6v2ScalingFactor2.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.G6v2ScalingFactor2.rawValue)
+            set(newValue, forKey: Key.OSLogEnabled.rawValue)
         }
     }
     
@@ -1919,13 +1889,15 @@ extension UserDefaults {
         }
     }
     
-    /// for Libre 2 : suppress sending unlockPayLoad, this will allow to run xDrip4iOS/Libre 2 in parallel with other app(s)
-    var suppressUnLockPayLoad: Bool {
+    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
+    ///
+    /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
+    @objc dynamic var loopDelaySchedule: String? {
         get {
-            return bool(forKey: Key.suppressUnLockPayLoad.rawValue)
+            return string(forKey: Key.loopDelaySchedule.rawValue)
         }
         set {
-            set(newValue, forKey: Key.suppressUnLockPayLoad.rawValue)
+            set(newValue, forKey: Key.loopDelaySchedule.rawValue)
         }
     }
     
@@ -1936,6 +1908,82 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.suppressLoopShare.rawValue)
+        }
+    }
+    
+    /// Loop sharing will be limited to just once every 5 minutes if true - default false
+    var shareToLoopOnceEvery5Minutes: Bool {
+        get {
+            return bool(forKey: Key.shareToLoopOnceEvery5Minutes.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.shareToLoopOnceEvery5Minutes.rawValue)
+        }
+    }
+    
+    /// for Libre 2 : suppress sending unlockPayLoad, this will allow to run xDrip4iOS/Libre 2 in parallel with other app(s)
+    var suppressUnLockPayLoad: Bool {
+        get {
+            return bool(forKey: Key.suppressUnLockPayLoad.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.suppressUnLockPayLoad.rawValue)
+        }
+    }
+    
+    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
+    ///
+    /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
+    @objc dynamic var loopDelayValueInMinutes: String? {
+        get {
+            return string(forKey: Key.loopDelayValueInMinutes.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.loopDelayValueInMinutes.rawValue)
+        }
+    }
+    
+    /// LibreLinkUp version
+    @objc dynamic var libreLinkUpVersion: String? {
+        get {
+            var returnValue = string(forKey: Key.libreLinkUpVersion.rawValue)
+            
+            // if nil set to defaultvalue
+            if returnValue == nil {
+                
+                set(ConstantsLibreLinkUp.libreLinkUpVersionDefault, forKey: Key.libreLinkUpVersion.rawValue)
+                
+                returnValue = string(forKey: Key.libreLinkUpVersion.rawValue)
+                
+            }
+
+            return returnValue
+        }
+        set {
+            set(newValue, forKey: Key.libreLinkUpVersion.rawValue)
+        }
+    }
+    
+    
+    // MARK: - =====  technical settings for testing ======
+    
+    /// G6 factor 1
+    @objc dynamic var G6v2ScalingFactor1:String? {
+        get {
+            return string(forKey: Key.G6v2ScalingFactor1.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.G6v2ScalingFactor1.rawValue)
+        }
+    }
+    
+    /// G6 factor 2
+    @objc dynamic var G6v2ScalingFactor2:String? {
+        get {
+            return string(forKey: Key.G6v2ScalingFactor2.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.G6v2ScalingFactor2.rawValue)
         }
     }
 
@@ -1996,16 +2044,6 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.previousTemperatureAdjustmentValues.rawValue)
-        }
-    }
-    
-    /// OSLogEnabled - default false
-    var OSLogEnabled: Bool {
-        get {
-            return bool(forKey: Key.OSLogEnabled.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.OSLogEnabled.rawValue)
         }
     }
     
@@ -2143,6 +2181,29 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.stopActiveSensor.rawValue)
+        }
+    }
+    
+    
+    // MARK: - Heartbeat
+    
+    /// timestamp of last successful connection to follower service
+    @objc dynamic var timeStampOfLastHeartBeat: Date? {
+        get {
+            return object(forKey: Key.timeStampOfLastHeartBeat.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampOfLastHeartBeat.rawValue)
+        }
+    }
+    
+    /// how many seconds should be considered as the maximum since the last heartbeat before we show a warning/error?
+    var secondsUntilHeartBeatDisconnectWarning: Double? {
+        get {
+            return double(forKey: Key.secondsUntilHeartBeatDisconnectWarning.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.secondsUntilHeartBeatDisconnectWarning.rawValue)
         }
     }
     

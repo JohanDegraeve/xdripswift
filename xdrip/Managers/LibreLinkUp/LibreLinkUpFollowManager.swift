@@ -250,9 +250,6 @@ class LibreLinkUpFollowManager: NSObject {
                 // this takes care of 1 and 2
                 try await checkLoginAndConnections()
                 
-                // store the current timestamp as a successful server connection with valid login
-                UserDefaults.standard.timeStampOfLastFollowerConnection = Date()
-                
                 // this takes care of 3
                 if (self.libreLinkUpToken != nil && self.libreLinkUpPatientId != nil) {
                     
@@ -315,7 +312,7 @@ class LibreLinkUpFollowManager: NSObject {
                         }
                         
                         // schedule new download
-                        //self.scheduleNewDownload()
+                        self.scheduleNewDownload()
                         
                     }
                     
@@ -330,12 +327,8 @@ class LibreLinkUpFollowManager: NSObject {
             // rescheduling the timer must be done in main thread
             // we do it here at the end of the function so that it is always rescheduled once a valid connection is established, irrespective of whether we get values.
             DispatchQueue.main.sync {
-                
-                // schedule new download, only if followerBackgroundKeepAliveType != disabled
-                if UserDefaults.standard.followerBackgroundKeepAliveType != .disabled {
-                    self.scheduleNewDownload()
-                }
-
+                // schedule new download
+                self.scheduleNewDownload()
             }
         }
     }
@@ -520,6 +513,7 @@ class LibreLinkUpFollowManager: NSObject {
             
         }
         
+        print(loginUrl.description)
         trace("    in requestLogin, processing login request with URL: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, loginUrl)
         
         guard let url = URL(string: loginUrl) else { 
@@ -654,6 +648,9 @@ class LibreLinkUpFollowManager: NSObject {
         
         if statusCode == 200 {
             
+            // store the current timestamp as a successful server connection with valid login
+            UserDefaults.standard.timeStampOfLastFollowerConnection = Date()
+            
             return try decode(Response<RequestGraphResponse>.self, data: data)
         }
         
@@ -691,6 +688,8 @@ class LibreLinkUpFollowManager: NSObject {
     
     /// schedule new download with timer, when timer expires download() will be called
     private func scheduleNewDownload() {
+        
+        guard UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
         
         trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
         
@@ -761,10 +760,10 @@ class LibreLinkUpFollowManager: NSObject {
     /// launches timer that will regular play sound - this will be played only when app goes to background and only if the user wants to keep the app alive
     private func enableSuspensionPrevention() {
         
-        // if keep-alive is disabled, then just return and do nothing
-        if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
+        // if keep-alive is disabled or if using a heartbeat, then just return and do nothing
+        if !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
             
-            print("not enabling suspension prevention as keep-alive is disabled")
+            print("not enabling suspension prevention as keep-alive type is:  \(UserDefaults.standard.followerBackgroundKeepAliveType.description)")
             
             return
             
@@ -786,11 +785,13 @@ class LibreLinkUpFollowManager: NSObject {
         
         // schedulePlaySoundTimer needs to be created when app goes to background
         ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer, closure: {
-            if let playSoundTimer = self.playSoundTimer {
-                playSoundTimer.resume()
-            }
-            if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                audioPlayer.play()
+            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
+                if let playSoundTimer = self.playSoundTimer {
+                    playSoundTimer.resume()
+                }
+                if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
+                    audioPlayer.play()
+                }
             }
         })
         
@@ -806,17 +807,16 @@ class LibreLinkUpFollowManager: NSObject {
     private func verifyUserDefaultsAndStartOrStopFollowMode() {
         if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .libreLinkUp && UserDefaults.standard.libreLinkUpEmail != nil && UserDefaults.standard.libreLinkUpPassword != nil {
             
-            // this will enable the suspension prevention sound playing if background keep-alive is enabled
-            if UserDefaults.standard.followerBackgroundKeepAliveType != .disabled {
-                
+            // this will enable the suspension prevention sound playing if background keep-alive is needed
+            // (i.e. not disabled and not using a heartbeat)
+            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
                 enableSuspensionPrevention()
-                
-                // do initial download, this will also schedule future downloads
-                download()
-                
             } else {
                 disableSuspensionPrevention()
             }
+            
+            // do initial download, this will also schedule future downloads
+            download()
                         
         } else {
             

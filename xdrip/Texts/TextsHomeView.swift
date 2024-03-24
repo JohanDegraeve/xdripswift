@@ -184,6 +184,10 @@ enum Texts_HomeView {
         return NSLocalizedString("noDataSourceConnected", tableName: filename, bundle: Bundle.main, value: "No CGM data source connected", comment: "no data source is enabled or connected")
     }()
     
+    static let noDataSourceConnectedWatch: String = {
+        return NSLocalizedString("noDataSourceConnectedWatch", tableName: filename, bundle: Bundle.main, value: "No data source", comment: "no data source is enabled or connected")
+    }()
+    
     static let reconnectLibreDataSource: String = {
         return NSLocalizedString("reconnectLibreDataSource", tableName: filename, bundle: Bundle.main, value: "Disconnect and reconnect Libre sensor", comment: "ask the user to disconnect and reconnect the sensor")
     }()

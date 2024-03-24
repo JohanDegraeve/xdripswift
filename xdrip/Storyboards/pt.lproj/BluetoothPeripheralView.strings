@@ -56,3 +56,16 @@
 "nfcErrorMessageScanErrorRetrying" = "Erro na Pesquisa de Sensor\n\nA tentar... # ";
 
 "nfcErrorMessageScanFailed" = "Pesquisa de Sensor Falhou";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// text to inform the user that multi-point calibration is an advanced option and could be dangerous if used incorrectly
+"nonFixedSlopeWarning" = "Multi-point calibration is an advanced feature.\n\nPlease do not use this feature until you have read the calibration section of the online help and understand how it works.";
+
+/// text in status row, when waiting for a successful NFC scan before starting bluetooth scanning
+"nfcScanNeeded" = "NFC scan needed";
+
+/// sensor warm-up text
+"warmingUpUntil" = "Warming up until";

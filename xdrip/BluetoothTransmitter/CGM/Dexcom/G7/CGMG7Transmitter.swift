@@ -98,6 +98,9 @@ class CGMG7Transmitter:BluetoothTransmitter, CGMTransmitter {
         }
     }
 
+    /// after subscribing to receiveAuthenticationCharacteristic (which is also used for authentication), and if not receiving a successful authentication within 2 seconds, then this is not the correct device
+    private var authenticationTimeOutTimer: Timer?
+
     // MARK: - public functions
     
     /// - parameters:
@@ -261,6 +264,8 @@ class CGMG7Transmitter:BluetoothTransmitter, CGMTransmitter {
                     
                     bluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: self)
                     
+                    cancelAuthenticationTimer()
+                    
                 } else {
                     
                     trace("Connected to Dexcom G7 that is not paired and/or authenticated by other app. Will disconnect and scan for another Dexcom G7", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
@@ -308,6 +313,14 @@ class CGMG7Transmitter:BluetoothTransmitter, CGMTransmitter {
                 trace("    characteristic: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, String(describing: characteristic.uuid))
                 
                     peripheral.setNotifyValue(true, for: characteristic)
+                
+                    if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue) {
+                    
+                        // this is the authentication characteristic, if the authentication is not successful within 2 seconds, then this is not the device that is currently being used by the official dexcom app, so let's forget it
+                        authenticationTimeOutTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(authenticationFailed), userInfo: nil, repeats: false)
+                    
+                    }
+
             }
         } else {
             trace("    Did discover characteristics, but no characteristics listed. There must be some error.", log: log, category: ConstantsLog.categoryCGMG7, type: .error)
@@ -318,9 +331,11 @@ class CGMG7Transmitter:BluetoothTransmitter, CGMTransmitter {
     override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
         
         if let error = error, error.localizedDescription.contains(find: "Encryption is insufficient") {
-            trace("didUpdateNotificationStateFor for peripheral with name %{public}@, characteristic %{public}@, error contains Encryption is insufficient. This is not the device we're looking for.", log: log, category: ConstantsLog.categoryCGMG7, type: .info)
+            trace("didUpdateNotificationStateFor for peripheral with name %{public}@, characteristic %{public}@, error contains Encryption is insufficient. This is not the device we're looking for.", log: log, category: ConstantsLog.categoryCGMG7, type: .info, (deviceName != nil ? deviceName! : "unknown"), String(describing: characteristic.uuid))
             
             // it's not the device we're interested in, disconnect, forget this device, and restart scanning for a new, other device
+            
+            cancelAuthenticationTimer()
             
             disconnectAndForget()
             
@@ -373,6 +388,26 @@ class CGMG7Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         return webOOPEnabled
         
+    }
+    
+    // MARK: - private functions
+    @objc private func authenticationFailed() {
+        
+        trace("Connected to Dexcom G7 but authentication not received. Will disconnect and scan for another Dexcom G7", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
+        
+        disconnectAndForget()
+        
+        _ = startScanning()
+        
+    }
+    
+    private func cancelAuthenticationTimer() {
+        if let authenticationTimeOutTimer = authenticationTimeOutTimer {
+            if authenticationTimeOutTimer.isValid {
+                authenticationTimeOutTimer.invalidate()
+                self.authenticationTimeOutTimer = nil
+            }
+        }
     }
     
 }

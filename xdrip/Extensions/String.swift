@@ -12,24 +12,18 @@ extension String {
         let idx2 = index(startIndex, offsetBy: min(self.count, range.upperBound))
         return String(self[idx1..<idx2])
     }
-}
-
-extension String {
+    
     /// validates if string matches regex
     func validate(withRegex regex: NSRegularExpression) -> Bool {
         let range = NSRange(self.startIndex..., in: self)
         let matchRange = regex.rangeOfFirstMatch(in: self, options: .reportProgress, range: range)
         return matchRange.location != NSNotFound
     }
-}
-
-extension String {
+    
     func startsWith(_ prefix: String) -> Bool {
         return lowercased().hasPrefix(prefix.lowercased())
     }
-}
-
-extension String {
+    
     /// converts String to Double, works with decimal seperator . or , - if conversion fails then returns nil
     func toDouble() -> Double? {
         
@@ -55,25 +49,19 @@ extension String {
         }
         return nil
     }
-}
-
-extension String {
+    
     func contains(find: String) -> Bool{
         return self.range(of: find) != nil
     }
     func containsIgnoringCase(find: String) -> Bool{
         return self.range(of: find, options: .caseInsensitive) != nil
     }
-}
-
-extension String {
+    
     func sha1() -> String {
         // sha1() here is a function in CryptoSwift Library
         return Data(self.utf8).sha1().hexEncodedString()
     }
-}
-
-extension String {
+    
     /// creates uicolor interpreting hex as hex color code, example #CED430
     func hexStringToUIColor () -> UIColor {
         var cString:String = self.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
@@ -96,10 +84,6 @@ extension String {
             alpha: CGFloat(1.0)
         )
     }
-
-}
-
-extension String {
     
     /// checks if string length is > 0 and if so returns self, otherwise returns nil
     ///
@@ -108,9 +92,6 @@ extension String {
         if self.count > 0 {return self}
         return nil
     }
-}
-
-extension String {
     
     /// Percent escape value to be added to a URL query value as specified in RFC 3986
     ///
@@ -163,7 +144,7 @@ extension String {
             }
             isOn = !isOn
         }
-
+        
         return isOn
         
     }
@@ -197,10 +178,7 @@ extension String {
         
         return data
     }
-
-}
-
-extension String {
+    
     func dateFromISOString() -> Date? {
         let dateFormatter = DateFormatter()
         dateFormatter.locale = Locale(identifier: "en_US_POSIX")
@@ -209,45 +187,12 @@ extension String {
         
         return dateFormatter.date(from: self)
     }
-}
-
-extension Optional where Wrapped == String {
-    
-    /// - if string doesn't start with http, then add https
-    /// - if ending with /, remove it
-    /// - convert to lowercase
-    /// - if string nil, then returnvalue is nil
-    func addHttpsIfNeeded() -> String? {
-        
-        // if self nil, then return nil
-        guard var returnValue = self else {return nil}
-                
-        // if self doesn't start with http or https, then add https. This might not make sense, but it will guard against throwing fatal errors when trying to get the scheme of the Endpoint
-        if !returnValue.startsWith("http://") && !returnValue.startsWith("https://") {
-            returnValue = "https://" + returnValue
-        }
-        
-        // if url ends with /, remove it
-        if returnValue.last == "/" {
-            returnValue.removeLast()
-        }
-
-        return returnValue
-        
-    }
-}
-
-extension String {
     
     mutating func appendStringAndNewLine(_ stringToAdd: String) {
         
         self = self + stringToAdd + "\n"
         
     }
-
-}
-
-extension String {
     
     /// use this to partially obscure a password, API-SECRET, token or other sensitive data. We want the user to see that something recognisable is there that makes sense to them, but it won't reveal any useful private information if they screenshot it
     func obscured() -> String {
@@ -290,5 +235,30 @@ extension String {
         
     }
     
+}
+
+extension Optional where Wrapped == String {
     
+    /// - if string doesn't start with http, then add https
+    /// - if ending with /, remove it
+    /// - convert to lowercase
+    /// - if string nil, then returnvalue is nil
+    func addHttpsIfNeeded() -> String? {
+        
+        // if self nil, then return nil
+        guard var returnValue = self else {return nil}
+        
+        // if self doesn't start with http or https, then add https. This might not make sense, but it will guard against throwing fatal errors when trying to get the scheme of the Endpoint
+        if !returnValue.startsWith("http://") && !returnValue.startsWith("https://") {
+            returnValue = "https://" + returnValue
+        }
+        
+        // if url ends with /, remove it
+        if returnValue.last == "/" {
+            returnValue.removeLast()
+        }
+        
+        return returnValue
+        
+    }
 }

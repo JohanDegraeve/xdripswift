@@ -358,3 +358,19 @@
 
 /* Class = "UINavigationItem"; title = "Title"; ObjectID = "wi3-X0-YuZ"; */
 "wi3-X0-YuZ.title" = "Title";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// 
+"zEq-FU-wV5.text" = "Second View";
+
+/// 
+"NDk-cv-Gan.text" = "Loaded by SecondViewController";
+
+/// 
+"A5M-7J-77L.text" = "Loaded by FirstViewController";
+
+/// 
+"KQZ-1w-vlD.text" = "First View";

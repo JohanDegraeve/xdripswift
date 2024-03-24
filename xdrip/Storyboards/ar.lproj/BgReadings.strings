@@ -1,0 +1,40 @@
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// timestamp of glucose reading
+"timestamp" = "Timestamp";
+
+/// glucose reading
+"glucoseReadingTitle" = "Glucose Reading";
+
+/// which date should be selected
+"selectDate" = "Date";
+
+/// the raw data value of the glucose reading
+"rawData" = "Raw data";
+
+/// no readings are found for the selected date
+"noReadingsToShow" = "No readings to show...";
+
+/// device name of the transmitter used to send the glucose reading
+"deviceName" = "Device name";
+
+/// calculated value of the glucose readings
+"calculatedValue" = "Calculated value";
+
+/// general glucose reading section header
+"generalSectionHeader" = "General";
+
+/// glucose reading
+"glucoseReadingsTitle" = "Glucose Readings";
+
+/// id of the glucose reading
+"id" = "ID";
+
+/// internal glucose reading data
+"internalDataSectionHeader" = "Internal data";
+
+/// the slope arrow of the glucose reading
+"slopeArrow" = "Slope arrow";

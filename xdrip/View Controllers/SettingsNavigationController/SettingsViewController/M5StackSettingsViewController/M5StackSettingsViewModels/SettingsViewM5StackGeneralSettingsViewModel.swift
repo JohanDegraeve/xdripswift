@@ -18,7 +18,7 @@ struct SettingsViewM5StackGeneralSettingsViewModel: SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.sectionTitleGeneral
+        return Texts_BgReadings.generalSectionHeader
     }
     
     func settingsRowText(index: Int) -> String {

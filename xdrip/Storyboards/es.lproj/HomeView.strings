@@ -47,3 +47,10 @@
 "nightscoutNotEnabled" = "Nightscout está deshabilitado";
 "nightscoutURLMissing" = "Falta la URL de Nightscout";
 "libreLinkUpAccountCredentialsMissing" = "Falta usuario/contraseña";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Literally 'Sensor', used as name in the button in the home screen, but also in text in pop ups
+"sensor" = "Sensor";
