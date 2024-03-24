@@ -1,5 +1,4 @@
 {
-  "originHash" : "20a19467224593c1dcb0789843c73f4580a23d8227b26f5a2c54d6c62c75927e",
   "pins" : [
     {
       "identity" : "actionclosurable",
@@ -38,5 +37,5 @@
       }
     }
   ],
-  "version" : 3
+  "version" : 2
 }
