@@ -15,6 +15,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// volume test for sound play in iOS notification
     case volumeTestiOSSound = 3
     
+    /// show slope in alarms
+    case showSlopeInAlarms = 4
+    
 }
 
 /// conforms to SettingsViewModelProtocol for all alert settings in the first sections screen
@@ -83,7 +86,11 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
             
             return SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.volumeTestiOSSoundExplanation, actionHandler: nil)
             
+        case .showSlopeInAlarms:
+            return .nothing
+
         }
+        
     }
     
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
@@ -97,7 +104,14 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
     }
     
     func uiView(index: Int) -> UIView? {
-        return nil
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+        
+        switch setting {
+        case .showSlopeInAlarms:
+            return UISwitch(isOn: UserDefaults.standard.showSlopeInAlarms, action: {(isOn:Bool) in UserDefaults.standard.showSlopeInAlarms = isOn})
+        default:
+            return nil
+        }
     }
     
     func settingsRowText(index: Int) -> String {
@@ -115,6 +129,9 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
             
         case .volumeTestiOSSound:
             return Texts_SettingsView.volumeTestiOSSound
+        
+        case .showSlopeInAlarms:
+            return Texts_SettingsView.showSlopeInAlarms
             
         }
     }
@@ -129,7 +146,7 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
             
             return .disclosureIndicator
             
-        case .volumeTestSoundPlayer, .volumeTestiOSSound:
+        case .volumeTestSoundPlayer, .volumeTestiOSSound, .showSlopeInAlarms:
             
             return .none
             
