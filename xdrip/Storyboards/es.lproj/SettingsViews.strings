@@ -172,3 +172,46 @@
 "settingsviews_housekeeperRetentionPeriod" = "Periodo de Retención (días)";
 "settingsviews_housekeeperExportAllData" = "Exportar Todo";
 "settingsviews_housekeeperRetentionPeriodMessage" = "¿Durante cuántos días debemos guardar los datos? (Min 90, Max 365)\n\n(Recomendado: 90 días)";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Settings screen for loop delay
+"Select Time" = "Select Time";
+
+/// Settings screen for loop delay, explanatory text for value
+"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with Loop";
+
+/// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
+"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
+
+/// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
+"warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
+
+/// data source settings, keep-alive mode is set to use an external heartbeat
+"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Background keep-alive is set to use an external heartbeat. ❤️\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
+
+/// When enabled, readings will not be reading to shared user defaults (for loop)
+"suppressLoopShare" = "Suppress Loop Share";
+
+/// When clicking the event interval setting, a pop up asks for minimum number of minutes between two events, this is the pop up message - this is used for setting the interval between two calendar events
+"settingsviews_CalenderIntervalTitle" = "Event Interval";
+
+/// When clicking the speak interval setting, a pop up asks for minimum number of minutes between two speech events, this is the pop up message - this is used for setting the interval between two spoken bg announcements
+"settingsviews_SpeakIntervalTitle" = "Speak Interval";
+
+/// When clicking the interval setting, a pop up asks for minimum number of minutes between two bg announcements, this is the pop up message - this is used for setting the interval between two readings in BG announcements, Speak readings, Apple Watch
+"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
+
+/// When enabled, then it should be possible to run xDrip4iOS/Libre 2 in parallel with other app(s)
+"suppressUnLockPayLoad" = "Suppress Unlock Payload";
+
+/// Settings screen for loop delay
+"Select Value" = "Select Value";
+
+/// Settings screen for loop delay, explanatory text for time
+"expanatoryTextSelectTime" = "As of what time should the value apply";
+
+/// Should loop data be shared only every 5 minutes
+"shareToLoopOnceEvery5Minutes" = "Share to Loop every 5 mins";

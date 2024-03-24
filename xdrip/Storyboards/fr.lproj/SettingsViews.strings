@@ -198,3 +198,145 @@
 
 /// Housekeeper retention period, for how long to store data
 "settingsviews_housekeeperRetentionPeriod" = "Retention Period (days)";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// Settings screen for loop delay
+"Select Time" = "Select Time";
+
+/// transmitter settings, to explain that the reset option only works for certain transmitters
+"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or One transmitters.";
+
+/// data source settings, keep-alive mode is set to aggressive
+"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
+
+/// libre link up follower settings, no active sensor
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+
+/// data source settings, keep-alive mode is set to disabled
+"settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
+
+/// Settings screen for loop delay, explanatory text for value
+"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with Loop";
+
+/// statistics settings, prefer time in tight range
+"settingsviews_timeInRangeTypeTightRange" = "Tight Range";
+
+/// data source settings, keep-alive mode is set to normal
+"settingsviews_followerKeepAliveTypeNormal" = "Normal";
+
+/// data source settings, keep-alive mode is set to aggressive
+"settingsviews_followerKeepAliveTypeAggressive" = "Aggressive";
+
+/// statistics settings, prefer standard time in range
+"settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
+
+/// statistics settings, the type of time in range selected
+"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+
+/// data source settings, enable background keep alive
+"settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
+
+/// this setting is required
+"settingsviews_valueIsRequired" = "⚠️ Required";
+
+/// treatments settings, offset the carb treatments on main chart
+"settingsviews_offsetCarbTreatmentsOnChart" = "Offset Carbs on Chart";
+
+/// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
+"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
+
+/// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
+"warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
+
+/// statistics settings, prefer user-defined range
+"settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
+
+/// CGM data source settings, section title
+"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+
+/// follower settings, pop up that asks user to enter their username
+"settingsviews_enterUsername" = "Enter your username (e-mail)";
+
+/// data source settings, show that Nightscout is disabled
+"settingsviews_nightscoutNotEnabledRowText" = "Disabled";
+
+/// data source settings, keep-alive mode is set to use an external heartbeat
+"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Background keep-alive is set to use an external heartbeat. ❤️\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
+
+/// When enabled, readings will not be reading to shared user defaults (for loop)
+"suppressLoopShare" = "Suppress Loop Share";
+
+/// When clicking the event interval setting, a pop up asks for minimum number of minutes between two events, this is the pop up message - this is used for setting the interval between two calendar events
+"settingsviews_CalenderIntervalTitle" = "Event Interval";
+
+/// data source settings, enable Nightscout in the Nightscout section
+"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload follower BG values to Nightscout, you must enable it in the Nightscout section.";
+
+/// screen dimming is disabled
+"settingsviews_screenLockDimmingTypeDisabled" = "Disabled";
+
+/// When clicking the speak interval setting, a pop up asks for minimum number of minutes between two speech events, this is the pop up message - this is used for setting the interval between two spoken bg announcements
+"settingsviews_SpeakIntervalTitle" = "Speak Interval";
+
+/// libre link up follower settings, pop up that asks user to enter their region
+"settingsviews_libreLinkUpReAcceptNeeded" = "Need to accept terms";
+
+/// When clicking the interval setting, a pop up asks for minimum number of minutes between two bg announcements, this is the pop up message - this is used for setting the interval between two readings in BG announcements, Speak readings, Apple Watch
+"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
+
+/// home screen settings, should the mini-chart be shown
+"settingsviews_showMiniChart" = "Show the Mini-Chart";
+
+/// data source settings, the name of the person we are following
+"settingsviews_followerPatientName" = "Patient Name";
+
+/// data source settings, keep-alive mode is set to disabled
+"settingsviews_followerKeepAliveTypeDisabled" = "Disabled";
+
+/// screen dimming is dark
+"settingsviews_screenLockDimmingTypeDark" = "Dark";
+
+/// screen dimming is dimmed
+"settingsviews_screenLockDimmingTypeDimmed" = "Dimmed";
+
+/// When enabled, then it should be possible to run xDrip4iOS/Libre 2 in parallel with other app(s)
+"suppressUnLockPayLoad" = "Suppress Unlock Payload";
+
+/// Settings screen for loop delay
+"Select Value" = "Select Value";
+
+/// Settings screen for loop delay, explanatory text for time
+"expanatoryTextSelectTime" = "As of what time should the value apply";
+
+/// data source settings, data source region
+"settingsviews_labelFollowerDataSourceRegion" = "Server (Country)";
+
+/// data source settings, data source
+"settingsviews_labelFollowerDataSourceType" = "Follower Data Source";
+
+/// data source settings, enable Nightscout upload
+"settingsviews_labelUploadFollowerDataToNightscout" = "Upload to Nightscout";
+
+/// data source settings, ask the user to enter the name of the person we are following if they want to - it's optional
+"settingsviews_followerPatientNameMessage" = "Here you can write the name of the person you are following.\n\nThis can be useful if you are following several different people with several different apps.\n\nThis is optional and would normally be left empty.";
+
+/// follower settings, pop up that asks user to enter their password
+"settingsviews_enterPassword" = "Enter your password";
+
+/// The user needs to update their calendar permissions
+"infoCalendarAccessWriteOnly" = "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > %@ > Calendars and select 'Full Access'.";
+
+/// data source settings, keep-alive mode is set to normal
+"settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
+
+/// home screen settings, should the screen be dimmed when the screen is locked
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+
+/// Should loop data be shared only every 5 minutes
+"shareToLoopOnceEvery5Minutes" = "Share to Loop every 5 mins";
+
+/// screen dimming is very dark
+"settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";

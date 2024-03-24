@@ -124,3 +124,13 @@
 
 /// don't show again
 "common_dontshowagain" = "Don't Show Again";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// the words in tight range
+"common_statistics_inTightRange" = "Tight Range";
+
+/// the words in user range
+"common_statistics_userRange" = "User Range";

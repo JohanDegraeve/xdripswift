@@ -18,3 +18,13 @@
 "treatments_question_mark" = "?";
 "treatments_success" = "Success";
 "treatments_sync_complete" = "Synchronization complete.";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// warn about trying to set a future bg value
+"treatments_cannotStoreFutureBGCheck" = "You cannot store a BG Check in the future.\n\nIt will be stored at the actual time.";
+
+/// filter the treatments by type
+"treatments_filterTreatmentsLabel" = "Filter";
