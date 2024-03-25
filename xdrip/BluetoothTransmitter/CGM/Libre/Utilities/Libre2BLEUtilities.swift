@@ -170,9 +170,19 @@ class Libre2BLEUtilities {
             
             let libreMeasurement = LibreMeasurement(rawGlucose: rawGlucoseValues[index], rawTemperature: rawTemperatureValues[index], minuteCounter: 0, date: Date().addingTimeInterval(-Double(60 * index)), temperatureAdjustment: temperatureAdjustmentValues[index], libre1DerivedAlgorithmParameters: libre1DerivedAlgorithmParameters)
             
-            bleGlucose.append(GlucoseData(timeStamp: libreMeasurement.date, glucoseLevelRaw: (libreMeasurement.temperatureAlgorithmGlucose > 0 ? libreMeasurement.temperatureAlgorithmGlucose : Double(libreMeasurement.rawGlucose) * ConstantsBloodGlucose.libreMultiplier)))
+            let newGlucoseValue = GlucoseData(timeStamp: libreMeasurement.date, glucoseLevelRaw: (libreMeasurement.temperatureAlgorithmGlucose > 0 ? libreMeasurement.temperatureAlgorithmGlucose : Double(libreMeasurement.rawGlucose) * ConstantsBloodGlucose.libreMultiplier))
             
+            // to handle issue 502 https://github.com/JohanDegraeve/xdripswift/issues/502
+            // if the raw glucose value > 3000 mg/dl, then something is seriously wrong, return an empty array.
+            // this should finally result in a missed reading alert. Normally the user should have had many low alerts before this happens
+            // a limit of 3000 should be enough, the values reported in the issue go above 20000
+            // in case libreMeasurement.temperatureAlgorithmGlucose, 3000 needs to be multiplied with ConstantsBloodGlucose.libreMultiplier
+            if newGlucoseValue.glucoseLevelRaw > (libreMeasurement.temperatureAlgorithmGlucose > 0 ? 3000 : 3000 * ConstantsBloodGlucose.libreMultiplier) {
+                return ([GlucoseData](), wearTimeMinutes)
+            }
             
+            bleGlucose.append(newGlucoseValue)
+                        
         }
         
         // sensor gives values only every 1 minute but it gives only 7 readings for the last 16 minutes, with gaps between 1 and 4 minutes Try to fill those gaps using previous sessions, but this may not always be successful, (eg if there's been a disconnection of 2 minutes). So let's fill missing gaps

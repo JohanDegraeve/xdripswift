@@ -40,9 +40,19 @@
 "sensorStatus" = "Статус сенсора";
 "invalidAccountOrPassword" = "Неверный аккаунт или пароль";
 "common_statistics_low" = "Низ";
-"common_statistics_inRange" = "В диапозоне";
+"common_statistics_inRange" = "В диапазоне";
 "common_statistics_high" = "Выс";
 "common_statistics_average" = "Средний";
 "common_statistics_a1c" = "HbA1c";
 "common_statistics_cv" = "CV";
 "common_dontshowagain" = "Не показывать снова";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// the words in tight range
+"common_statistics_inTightRange" = "Tight Range";
+
+/// the words in user range
+"common_statistics_userRange" = "User Range";

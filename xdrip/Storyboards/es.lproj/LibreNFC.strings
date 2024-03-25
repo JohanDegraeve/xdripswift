@@ -4,3 +4,10 @@
 "deviceMustSupportIOS14" = "Para conectar a un sensor Libre 2, se debe actualizar este iPhone a iOS14";
 "donotusethelibrelinkapp" = "Conectado a tu Libre 2.\n\nPor favor, asegurarse que haya deshabilitado el permiso de bluetooth para la app del Libre en la configuración de tu iPhone.\n\nSi no lo haces, al escanear con la app del Libre, se cortará la conexión entre %@ y tu Libre 2.\n\nSi acabas de conectar a un Libre 2 nuevo, no recibirás lecturas hasta que hayan pasado %@ minutos desde que se inició el sensor.";
 "nfcErrorRetryScan" = "Se ha producido un error al escanear el sensor. Haz click en 'Escanear' o si sigue fallando, haz click en 'Atrás', añadir de nuevo el Libre 2 y escanear otra vez.";
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+/////   Translation needed - remove this header after translation                       /////
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+/// The user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user that he/she should click 'disconnect', add a new CGM sensor and scan again.
+"connectedLibre2DoesNotMatchScannedLibre2" = "You have scanned a new Libre sensor, but %@ has connected to a different sensor (probably the previous one).\n\nTo solve this do NOT delete this old sensor just yet. Click 'Disconnect' or 'Stop Scanning', go back to the previous screen and add a new CGM of type Libre 2 and scan the sensor again.\n\n%@ should now try and connect to the new sensor.";

@@ -51,11 +51,15 @@ enum DexcomTransmitterOpCode: UInt8 {
     case transmitterVersionTx = 0x4a
     case transmitterVersionRx = 0x4b
     
+    /// also used for G7
     case glucoseG6Tx = 0x4e
     case glucoseG6Rx = 0x4f
 
     case glucoseBackfillTx = 0x50
     case glucoseBackfillRx = 0x51
+    
+    /// used for G7
+    case backfillFinished = 0x59
     
     case keepAliveRx = 0xFF // found during testing
 }
@@ -189,6 +193,9 @@ extension DexcomTransmitterOpCode: CustomStringConvertible {
         case .keepAliveRx:
             return "keepAliveRx"
         
+        case .backfillFinished:
+            return "backfillFinished"
+            
         }
     }
 }

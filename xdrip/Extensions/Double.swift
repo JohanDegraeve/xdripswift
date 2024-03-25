@@ -109,12 +109,10 @@ extension Double: RawRepresentable {
         
         // set a default value assuming that we're unable to calculate the hours + days
         var daysAndHoursString: String = "n/a"
-        
-        let days = floor(self / (24 * 60))
-        let hoursInMinutes = self.truncatingRemainder(dividingBy: 24 * 60)
-        let hours = hoursInMinutes / 60
-        let minutes = self.truncatingRemainder(dividingBy: 24 * 60 * 60)
-        
+                
+        let days = Int(floor(self / (24 * 60)))
+        let hours = Int(self.truncatingRemainder(dividingBy: 24 * 60) / 60)
+        let minutes = Int(self.truncatingRemainder(dividingBy: 24 * 60 * 60)) - (hours * 60)
         
         if days == 0 && hours < 1 {
             

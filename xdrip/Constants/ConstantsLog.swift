@@ -7,80 +7,86 @@ enum ConstantsLog {
     /// for use in NSLog
     static let tracePrefix = "xDrip-NSLog"
     
-    /// for use in OSLog
-    static let categoryBlueToothTransmitter =        "BlueToothTransmitter          "
-    
-    /// for use in cgm transmitter miaomiao
-    static let categoryCGMMiaoMiao =                 "CGMMiaoMiao                   "
-    
-    /// for use in cgm transmitter bubble
-    static let categoryCGMBubble =                   "CGMBubble                     "
-    
-    /// for use in cgm xdripg4
-    static let categoryCGMxDripG4 =                  "CGMxDripG4                    "
-    
-    /// for use in firstview
-    static let categoryRootView =                    "RootView                      "
-    
-    /// calibration
-    static let categoryCalibration =                 "Calibration                   "
-    
     /// debuglogging
     static let debuglogging = "xdripdebuglogging"
     
     /// timestamp format for nslog
     static let dateFormatNSLog = "y-MM-dd HH:mm:ss.SSSS"
     
+    // MARK: - Categories
+    
+    /// for use in OSLog
+    static let categoryBlueToothTransmitter =           "BlueToothTransmitter          "
+    
+    /// for use in cgm transmitter miaomiao
+    static let categoryCGMMiaoMiao =                    "CGMMiaoMiao                   "
+    
+    /// for use in cgm transmitter bubble
+    static let categoryCGMBubble =                      "CGMBubble                     "
+    
+    /// for use in cgm xdripg4
+    static let categoryCGMxDripG4 =                     "CGMxDripG4                    "
+    
+    /// for use in firstview
+    static let categoryRootView =                       "RootView                      "
+    
+    /// calibration
+    static let categoryCalibration =                    "Calibration                   "
+    
     /// G5
-    static let categoryCGMG5 =                       "CGMG5                         "
+    static let categoryCGMG5 =                          "CGMG5                         "
+    
+    /// G7
+    static let categoryCGMG7 =                       "CGMG7                         "
     
     /// watlaa
-    static let categoryWatlaa = "Watlaa"
+    static let categoryWatlaa =                         "Watlaa"
     
     /// GNSEntry
-    static let categoryCGMGNSEntry =                 "CGMGNSEntry                   "
+    static let categoryCGMGNSEntry =                    "CGMGNSEntry                   "
     
     /// Blucon
-    static let categoryBlucon =                      "Blucon                        "
+    static let categoryBlucon =                         "Blucon                        "
     
     /// Libre2
-    static let categoryCGMLibre2 =                   "Libre2                        "
+    static let categoryCGMLibre2 =                      "Libre2                        "
     
     /// core data manager
-    static let categoryCoreDataManager =             "CoreDataManager               "
+    static let categoryCoreDataManager =                "CoreDataManager               "
     
     /// application data bgreadings
-    static let categoryApplicationDataBgReadings =   "ApplicationDataBgReadings     "
+    static let categoryApplicationDataBgReadings =      "ApplicationDataBgReadings     "
 	
 	/// application data Treatments
-	static let categoryApplicationDataTreatments =   "ApplicationDataTreatments     "
+	static let categoryApplicationDataTreatments =      "ApplicationDataTreatments     "
     
     /// application data calibrations
-    static let categoryApplicationDataCalibrations = "ApplicationDataCalibrations   "
+    static let categoryApplicationDataCalibrations =    "ApplicationDataCalibrations   "
     
     /// application data sensors
-    static let categoryApplicationDataSensors =      "ApplicationDataSensors        "
+    static let categoryApplicationDataSensors =         "ApplicationDataSensors        "
     
     /// application data alerttypes
-    static let categoryApplicationDataAlertTypes =   "ApplicationDataAlertTypes     "
+    static let categoryApplicationDataAlertTypes =      "ApplicationDataAlertTypes     "
     
     /// application data alertentries
-    static let categoryApplicationDataAlertEntries = "ApplicationDataAlertEntries   "
+    static let categoryApplicationDataAlertEntries =    "ApplicationDataAlertEntries   "
     
     /// application data for M5Stack
-    static let categoryApplicationDataM5Stacks =     "ApplicationDataM5Stacks       "
+    static let categoryApplicationDataM5Stacks =        "ApplicationDataM5Stacks       "
     
     /// application data for M5Stack
-    static let categoryApplicationDataWatlaa = "ApplicationDataWatlaa"
+    static let categoryApplicationDataWatlaa =          "ApplicationDataWatlaa"
     
     /// application data for BLEPeripheral
-    static let categoryApplicationDataBLEPeripheral = "ApplicationDataBLEPeripheral"
+    static let categoryApplicationDataBLEPeripheral = 
+                                                        "ApplicationDataBLEPeripheral"
     
     /// application data for DexcomG5
-    static let categoryApplicationDataDexcomG5 = "ApplicationDataDexcomG5"
+    static let categoryApplicationDataDexcomG5 =        "ApplicationDataDexcomG5"
     
     /// application for for M5StackName
-    static let categoryApplicationDataM5StackNames = "ApplicationDataM5StackNames   "
+    static let categoryApplicationDataM5StackNames =    "ApplicationDataM5StackNames   "
     
     /// nightscout uploader
     static let categoryNightScoutUploadManager =     "NightScoutUploadManager       "
@@ -89,7 +95,7 @@ enum ConstantsLog {
     static let categoryNightScoutFollowManager =     "NightScoutFollowManager       "
     
     /// nightscout follow
-    static let categoryLibreLinkUpFollowManager =     "LibreLinkUpFollowManager       "
+    static let categoryLibreLinkUpFollowManager =    "LibreLinkUpFollowManager      "
     
     /// alertmanager
     static let categoryAlertManager =                "AlertManager                  "
@@ -133,8 +139,11 @@ enum ConstantsLog {
     /// SettingsViewCalendarEventsSettingsViewModel logging
     static let categorySettingsViewCalendarEventsSettingsViewModel =         "SettingsViewCalendarEventsSettingsViewModel"
     
+    /// CalendarManager logging
+    static let categoryCalendarManager =                    "CalendarManager                "
+    
     /// WatchManager logging
-    static let categoryWatchManager =                "WatchManager                  "
+    static let categoryWatchManager =                       "WatchManager                   "
     
     /// bluetoothPeripheralViewController
     static let categoryBluetoothPeripheralViewController =   "blePeripheralViewController   "
@@ -161,13 +170,13 @@ enum ConstantsLog {
     static let categoryLibre2BLEUtilities =             "Libre2BLEUtilities       "
 
     /// for use in Libre2BLEUtilities
-    static let categoryAppDelegate =                    "AppDelegate              "
+    static let categoryAppDelegate =                            "AppDelegate              "
 	
 	/// for use in DataExporter
 	static let categoryDataExporter =                           "DataExporter             "
 
     // for use in LoopManager
-    static let categoryLoopManager =                            "LoopManager              "
+    static let categoryLoopManager =                            "LoopManager               "
     
     /// for use in Bg Readings view
     static let categoryBgReadingsView =                         "BgReadingsView           "
@@ -175,5 +184,23 @@ enum ConstantsLog {
     /// SettingsViewCalendarEventsSettingsViewModel logging
     static let categorySettingsViewDataSourceSettingsViewModel =         "SettingsViewDataSourceSettingsViewModel"
     
+    /// SettingsViewNotificationsSettingsViewModel logging
+    static let categorySettingsViewNotificationsSettingsViewModel = 
+                                                     "NotificationsViewModel      "
+    
+    /// for use in LiveActivityManager
+    static let categoryLiveActivityManager =         "LiveActivityManager         "
+    
+    /// for use in Libre3HeartBeatTransmitter
+    static let categoryHeartBeatLibre3 =                       "HeartBeatLibre3          "
+    
+    /// for use in DexcomG7HeartBeatTransmitter
+    static let categoryHeartBeatG7 =                           "HeartBeatG7              "
+    
+    /// for use in LibreViewFollowManager
+    static let categoryLoopFollowManager =                     "LoopFollowManager        "
+    
+    /// for use in Omni¨PodHeartBeatTransmitter
+    static let categoryHeartBeatOmnipod =                      "HeartBeatOmnipod         "
 }
 

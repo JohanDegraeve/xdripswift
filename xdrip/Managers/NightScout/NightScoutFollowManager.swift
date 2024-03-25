@@ -118,35 +118,9 @@ class NightScoutFollowManager: NSObject {
         
     }
     
-    // MARK: - private functions
-    
-    /// taken from xdripplus
-    ///
-    /// updates bgreading
-    ///
-    private func findSlope() -> (calculatedValueSlope:Double, hideSlope:Bool) {
-        
-        // init returnvalues
-        var hideSlope = true
-        var calculatedValueSlope = 0.0
-
-        // get last readings
-        let last2Readings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-        
-        // if more thant 2 readings, calculate slope and hie
-        if last2Readings.count >= 2 {
-            let (slope, hide) = last2Readings[0].calculateSlope(lastBgReading:last2Readings[1]);
-            calculatedValueSlope = slope
-            hideSlope = hide
-        }
-
-        return (calculatedValueSlope, hideSlope)
-        
-    }
-
-    
-    /// download recent readings from nightScout, send result to delegate, and schedule new download
-    @objc private func download() {
+    /// - download recent readings from nightScout, send result to delegate, and schedule new download (if followerBackgroundKeepAliveType != disabled)
+    /// - no download is done if latest reading is less than 30 seconds old
+    @objc public func download() {
         
         trace("in download", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
 
@@ -155,7 +129,22 @@ class NightScoutFollowManager: NSObject {
         DispatchQueue.main.async {
             UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
         }
+
+        guard UserDefaults.standard.nightScoutEnabled else {
+            trace("    nightscout not enabled", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+            return
+        }
+
+        guard !UserDefaults.standard.isMaster else {
+            trace("    not follower", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+            return
+        }
         
+        guard UserDefaults.standard.followerDataSourceType == .nightscout else {
+            trace("    followerDataSourceType is not nightscout", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+            return
+        }
+
         // nightscout URl must be non-nil - could be that url is not valid, this is not checked here, the app will just retry every x minutes
         guard let nightScoutUrl = UserDefaults.standard.nightScoutUrl else {return}
         
@@ -166,6 +155,17 @@ class NightScoutFollowManager: NSObject {
         let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
         if latestBgReadings.count > 0 {
             timeStampOfFirstBgReadingToDowload = max(latestBgReadings[0].timeStamp, timeStampOfFirstBgReadingToDowload)
+        }
+        
+        // to handle case where a reading was already fetched by LoopFollowManger right before the call to this function. In that case there should already be a reading available, and it's not necessary to download from NS
+        guard abs(timeStampOfFirstBgReadingToDowload.timeIntervalSinceNow) > 30.0 else {
+            
+            trace("    last reading is less than 30 seconds old, will not download now", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+            
+            // schedule new download
+            self.scheduleNewDownload()
+            
+            return
         }
         
         // calculate count, which is a parameter in the nightscout API - divide by 300, we're assuming readings every 5 minutes = 300 seconds
@@ -201,7 +201,7 @@ class NightScoutFollowManager: NSObject {
                     if let followerDelegate = self.followerDelegate {
                         followerDelegate.followerInfoReceived(followGlucoseDataArray: &followGlucoseDataArray)
                     }
-
+                    
                     // schedule new download
                     self.scheduleNewDownload()
 
@@ -216,8 +216,37 @@ class NightScoutFollowManager: NSObject {
 
     }
     
+    // MARK: - private functions
+    
+    /// taken from xdripplus
+    ///
+    /// updates bgreading
+    ///
+    private func findSlope() -> (calculatedValueSlope:Double, hideSlope:Bool) {
+        
+        // init returnvalues
+        var hideSlope = true
+        var calculatedValueSlope = 0.0
+
+        // get last readings
+        let last2Readings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        
+        // if more thant 2 readings, calculate slope and hie
+        if last2Readings.count >= 2 {
+            let (slope, hide) = last2Readings[0].calculateSlope(lastBgReading:last2Readings[1]);
+            calculatedValueSlope = slope
+            hideSlope = hide
+        }
+
+        return (calculatedValueSlope, hideSlope)
+        
+    }
+
+    
     /// schedule new download with timer, when timer expires download() will be called
     private func scheduleNewDownload() {
+        
+        guard UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
         
         trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
         
@@ -336,10 +365,10 @@ class NightScoutFollowManager: NSObject {
     /// launches timer that will regular play sound - this will be played only when app goes to background and only if the user wants to keep the app alive
     private func enableSuspensionPrevention() {
         
-        // if keep-alive is disabled, then just return and do nothing
-        if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
+        // if keep-alive is not needed, then just return and do nothing
+        if !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
             
-            print("not enabling suspension prevention as keep-alive is disabled")
+            print("not enabling suspension prevention as keep-alive type is:  \(UserDefaults.standard.followerBackgroundKeepAliveType.description)")
             
             return
             
@@ -354,18 +383,20 @@ class NightScoutFollowManager: NSObject {
             trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
             
             if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                trace("playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, interval, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
+                trace("playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, interval.description, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
                 audioPlayer.play()
             }
         })
         
         // schedulePlaySoundTimer needs to be created when app goes to background
         ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer, closure: {
-            if let playSoundTimer = self.playSoundTimer {
-                playSoundTimer.resume()
-            }
-            if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                audioPlayer.play()
+            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
+                if let playSoundTimer = self.playSoundTimer {
+                    playSoundTimer.resume()
+                }
+                if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
+                    audioPlayer.play()
+                }
             }
         })
 
@@ -382,8 +413,9 @@ class NightScoutFollowManager: NSObject {
         
         if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .nightscout && UserDefaults.standard.nightScoutUrl != nil && UserDefaults.standard.nightScoutEnabled {
             
-            // this will enable the suspension prevention sound playing if background keep-alive is enabled
-            if UserDefaults.standard.followerBackgroundKeepAliveType != .disabled {
+            // this will enable the suspension prevention sound playing if background keep-alive is needed
+            // (i.e. not disabled and not using a heartbeat)
+            if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
                 enableSuspensionPrevention()
             } else {
                 disableSuspensionPrevention()

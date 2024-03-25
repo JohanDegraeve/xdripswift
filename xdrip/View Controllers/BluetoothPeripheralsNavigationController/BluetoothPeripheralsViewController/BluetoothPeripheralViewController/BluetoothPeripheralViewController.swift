@@ -510,7 +510,7 @@ class BluetoothPeripheralViewController: UIViewController {
                     
                 } else if expectedBluetoothPeripheralType.canWebOOP() {
                     
-                    // mark web oop and non fixed slope settings sections as not shown
+                    // mark web oop as shown, non fixed slope settings sections as not shown
                     webOOPSettingsSectionIsShown = true
                     nonFixedSettingsSectionIsShown = false
                     
@@ -1582,6 +1582,12 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
 // MARK: - extension BluetoothTransmitterDelegate
 
 extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
+
+    func heartBeat() {
+        
+        bluetoothPeripheralManager?.heartBeat()
+        
+    }
     
     func transmitterNeedsPairing(bluetoothTransmitter: BluetoothTransmitter) {
         

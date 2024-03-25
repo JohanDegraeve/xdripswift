@@ -38,6 +38,62 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_restartNeeded", tableName: filename, bundle: Bundle.main, value: "(Restart required)", comment: "help settings, restart needed")
     }()
     
+    
+    // MARK: - Notifications
+        
+    static let labelLiveActivityType: String = {
+        return NSLocalizedString("settingsviews_labelLiveActivityType", tableName: filename, bundle: Bundle.main, value: "Live Activities", comment: "notification settings, type of live activities that should be enabled")
+    }()
+    
+    static let labelliveActivitySize: String = {
+        return NSLocalizedString("settingsviews_labelliveActivitySize", tableName: filename, bundle: Bundle.main, value: "Live Activity Size", comment: "notification settings, the size that the live activities should be displayed")
+    }()
+    
+    static let liveActivityTypeDisabled: String = {
+        return NSLocalizedString("settingsviews_liveActivityTypeDisabled", tableName: filename, bundle: Bundle.main, value: "Disabled", comment: "notification settings, disable live activities")
+    }()
+    
+    static let liveActivityTypeAlways: String = {
+        return NSLocalizedString("settingsviews_liveActivityTypeAlways", tableName: filename, bundle: Bundle.main, value: "Always", comment: "notification settings, always show live activities")
+    }()
+    
+    static let liveActivityTypeUrgentLow: String = {
+        return NSLocalizedString("settingsviews_liveActivityTypeUrgentLow", tableName: filename, bundle: Bundle.main, value: "Only Urgent Low", comment: "notification settings, show live activities urgent low")
+    }()
+    
+    static let liveActivityTypeLow: String = {
+        return NSLocalizedString("settingsviews_liveActivityTypeLow", tableName: filename, bundle: Bundle.main, value: "Only when Low", comment: "notification settings, show live activities when low")
+    }()
+    
+    static let liveActivityTypeLowHigh: String = {
+        return NSLocalizedString("settingsviews_liveActivityTypeLowHigh", tableName: filename, bundle: Bundle.main, value: "When Low or High", comment: "notification settings, show live activities when low or high")
+    }()
+    
+    static let liveActivityTypeUrgentLowHigh: String = {
+        return NSLocalizedString("settingsviews_liveActivityTypeUrgentLowHigh", tableName: filename, bundle: Bundle.main, value: "Only Urgent Low/High", comment: "notification settings, show live activities when urgent high or urgent low")
+    }()
+    
+    static let liveActivityDisabledInFollowerMode: String = {
+        return NSLocalizedString("settingsviews_liveActivityDisabledInFollowerMode", tableName: filename, bundle: Bundle.main, value: "Disabled in follower mode", comment: "notification settings, live activities are not available in follower mode")
+    }()
+    
+    static let liveActivityDisabledInFollowerModeMessage: String = {
+        return NSLocalizedString("settingsviews_liveActivityDisabledInFollowerModeMessage", tableName: filename, bundle: Bundle.main, value: "\nLive activities can only be used in Follower mode when a valid heartbeat is enabled.", comment: "notification settings, live activities are not available in follower mode")
+    }()
+    
+    static let liveActivitySizeMinimal: String = {
+        return NSLocalizedString("settingsviews_liveActivitySizeMinimal", tableName: filename, bundle: Bundle.main, value: "Minimal", comment: "notification settings, live activity size minimal")
+    }()
+    
+    static let liveActivitySizeNormal: String = {
+        return NSLocalizedString("settingsviews_liveActivitySizeNormal", tableName: filename, bundle: Bundle.main, value: "Normal", comment: "notification settings, live activity size normal")
+    }()
+    
+    static let liveActivitySizeLarge: String = {
+        return NSLocalizedString("settingsviews_liveActivitySizeLarge", tableName: filename, bundle: Bundle.main, value: "Large", comment: "notification settings, live activity size large")
+    }()
+    
+    
     // MARK: - Section Data Source
     
     static let sectionTitleDataSource: String = {
@@ -72,6 +128,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_followerKeepAliveTypeAggressive", tableName: filename, bundle: Bundle.main, value: "Aggressive", comment: "data source settings, keep-alive mode is set to aggressive")
     }()
     
+    static let followerKeepAliveTypeHeartbeat: String = {
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeHeartbeat", tableName: filename, bundle: Bundle.main, value: "Heartbeat ♥", comment: "data source settings, keep-alive mode is set to use an external heartbeat")
+    }()
+    
     static let followerKeepAliveTypeDisabledMessage: String = {
         return NSLocalizedString("settingsviews_followerKeepAliveTypeDisabledMessage", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.", comment: "data source settings, keep-alive mode is set to disabled")
     }()
@@ -82,6 +142,10 @@ class Texts_SettingsView {
     
     static let followerKeepAliveTypeAggressiveMessage: String = {
         return NSLocalizedString("settingsviews_followerKeepAliveTypeAggressiveMessage", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.", comment: "data source settings, keep-alive mode is set to aggressive")
+    }()
+    
+    static let followerKeepAliveTypeHeartbeatMessage: String = {
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeHeartbeatMessage", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is set to use an external heartbeat. ❤️\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.", comment: "data source settings, keep-alive mode is set to use an external heartbeat")
     }()
     
     static let followerPatientName: String = {
@@ -120,10 +184,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_libreLinkUpNoActiveSensor", tableName: filename, bundle: Bundle.main, value: "No active sensor", comment: "libre link up follower settings, no active sensor")
     }()
     
-    // MARK: - Section General
+    // MARK: - Section Notifications
     
-    static let sectionTitleGeneral: String = {
-        return NSLocalizedString("settingsviews_sectiontitlegeneral", tableName: filename, bundle: Bundle.main, value: "General", comment: "general settings, section title")
+    static let sectionTitleNotifications: String = {
+        return NSLocalizedString("settingsviews_sectiontitleNotifications", tableName: filename, bundle: Bundle.main, value: "Notifications", comment: "general settings, section title")
     }()
 
     static let labelSelectBgUnit:String = {

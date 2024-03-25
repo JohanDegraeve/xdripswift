@@ -97,7 +97,7 @@ jobs:
       if: |
         needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' &&
         (vars.SCHEDULED_BUILD != 'false' || vars.SCHEDULED_SYNC != 'false')
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         token: ${{ secrets.GH_PAT }}
         ref: alive
@@ -107,7 +107,7 @@ jobs:
         needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' &&
         vars.SCHEDULED_SYNC != 'false' && github.repository_owner != 'JohanDegraeve'
       id: sync
-      uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+      uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
       with:
         target_sync_branch: ${{ env.ALIVE_BRANCH }}
         shallow_since: 6 months ago
@@ -173,7 +173,7 @@ jobs:
         if: |
           needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' &&
           vars.SCHEDULED_SYNC != 'false'
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GH_PAT }}
           ref: ${{ env.TARGET_BRANCH }} 
@@ -183,7 +183,7 @@ jobs:
           needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' &&
           vars.SCHEDULED_SYNC != 'false' && github.repository_owner != 'JohanDegraeve'
         id: sync
-        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
         with:
           target_sync_branch: ${{ env.TARGET_BRANCH }}
           shallow_since: 6 months ago
@@ -213,7 +213,7 @@ jobs:
           echo "NEW_COMMITS=${{ steps.sync.outputs.has_new_commits }}" >> $GITHUB_OUTPUT
 
       - name: Checkout Repo for building
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GH_PAT }}
           submodules: recursive
@@ -256,7 +256,7 @@ jobs:
       # Upload Build artifacts
       - name: Upload build log, IPA and Symbol artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
           path: |

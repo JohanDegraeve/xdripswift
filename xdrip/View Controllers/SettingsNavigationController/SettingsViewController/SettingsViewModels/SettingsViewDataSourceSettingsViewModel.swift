@@ -11,35 +11,38 @@ import os
 
 fileprivate enum Setting: Int, CaseIterable {
     
+    /// blood glucose  unit
+    case bloodGlucoseUnit = 0
+    
     /// choose between master and follower
-    case masterFollower = 0
+    case masterFollower = 1
     
     /// if follower, what should be the data source
-    case followerDataSourceType = 1
+    case followerDataSourceType = 2
     
     /// if follower, should we try and keep the app alive in the background
-    case followerKeepAliveType = 2
+    case followerKeepAliveType = 3
     
     /// patient name/alias (optional) - useful for users who follow various people
-    case followerPatientName = 3
+    case followerPatientName = 4
     
     /// if follower data source is not Nightscout, should we upload the BG values to Nightscout?
-    case followerUploadDataToNightscout = 4
+    case followerUploadDataToNightscout = 5
     
     /// web follower username
-    case followerUserName = 5
+    case followerUserName = 6
     
     /// web follower username
-    case followerPassword = 6
+    case followerPassword = 7
     
     /// web follower sensor serial number (will not always be available)
-    case followerSensorSerialNumber = 7
+    case followerSensorSerialNumber = 8
     
     /// web follower sensor start date (will not always be available)
-    case followerSensorStartDate = 8
+    case followerSensorStartDate = 9
     
     /// web follower server region
-    case followerRegion = 9
+    case followerRegion = 10
     
 }
 
@@ -92,7 +95,8 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
         
         // changing follower to master or master to follower requires changing ui for nightscout settings and transmitter type settings
-        if (index == Setting.masterFollower.rawValue || index == Setting.followerDataSourceType.rawValue) {return true}
+        // the same applies when changing bloodGlucoseUnit, because off the seperate section with bgObjectives
+        if (index == Setting.bloodGlucoseUnit.rawValue || index == Setting.masterFollower.rawValue || index == Setting.followerDataSourceType.rawValue) {return true}
         
         return false
     }
@@ -105,6 +109,13 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
 
         switch setting {
+            
+        case .bloodGlucoseUnit:
+            return SettingsSelectedRowAction.callFunction(function: {
+                
+                UserDefaults.standard.bloodGlucoseUnitIsMgDl ? (UserDefaults.standard.bloodGlucoseUnitIsMgDl = false) : (UserDefaults.standard.bloodGlucoseUnitIsMgDl = true)
+                
+            })
 
         case .masterFollower:
             
@@ -238,6 +249,8 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                         message += Texts_SettingsView.followerKeepAliveTypeNormalMessage
                     case .aggressive:
                         message += Texts_SettingsView.followerKeepAliveTypeAggressiveMessage
+                    case .heartbeat:
+                        message += Texts_SettingsView.followerKeepAliveTypeHeartbeatMessage
                     }
                     
                     self.callMessageHandlerInMainThread(title: Texts_SettingsView.labelfollowerKeepAliveType, message: message)
@@ -341,7 +354,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         // if master is selected then just show this row and hide the rest
         if UserDefaults.standard.isMaster {
             
-            return 1
+            return 2
             
         } else {
             
@@ -351,7 +364,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             
             case .nightscout:
                 // no need to show any extra rows/settings (beyond patient name) as all Nightscout required parameters are set in the Nightscout section
-                return 4
+                return 5
             
             case .libreLinkUp:
                 // show all sections
@@ -367,6 +380,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
+            
+        case .bloodGlucoseUnit:
+            return Texts_SettingsView.labelSelectBgUnit
             
         case .masterFollower:
             return Texts_SettingsView.labelMasterOrFollower
@@ -407,7 +423,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         
         switch setting {
     
-        case .masterFollower, .followerUploadDataToNightscout, .followerSensorSerialNumber, .followerRegion:
+        case .bloodGlucoseUnit, .masterFollower, .followerUploadDataToNightscout, .followerSensorSerialNumber, .followerRegion:
             return UITableViewCell.AccessoryType.none
             
         case .followerDataSourceType, .followerKeepAliveType, .followerPatientName, .followerUserName, .followerPassword:
@@ -424,6 +440,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
 
         switch setting {
+            
+        case .bloodGlucoseUnit:
+            return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl:Texts_Common.mmol
             
         case .masterFollower:
             return UserDefaults.standard.isMaster ? Texts_SettingsView.master : Texts_SettingsView.follower
@@ -546,7 +565,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .followerUploadDataToNightscout:
             return UserDefaults.standard.nightScoutEnabled ? UISwitch(isOn: UserDefaults.standard.followerUploadDataToNightscout, action: {(isOn:Bool) in UserDefaults.standard.followerUploadDataToNightscout = isOn}) : nil
 
-        case .masterFollower, .followerDataSourceType, .followerKeepAliveType, .followerPatientName, .followerUserName, .followerPassword, .followerSensorSerialNumber, .followerSensorStartDate, .followerRegion:
+        case .bloodGlucoseUnit, .masterFollower, .followerDataSourceType, .followerKeepAliveType, .followerPatientName, .followerUserName, .followerPassword, .followerSensorSerialNumber, .followerSensorStartDate, .followerRegion:
             return nil
             
         }

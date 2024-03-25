@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21C52" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="22522" systemVersion="22G91" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="AlertEntry" representedClassName=".AlertEntry" syncable="YES">
         <attribute name="alertkind" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="start" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
@@ -51,17 +51,21 @@
         <attribute name="shouldconnect" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="transmitterId" optional="YES" attributeType="String"/>
         <attribute name="webOOPEnabled" attributeType="Boolean" usesScalarValueType="YES"/>
-        <relationship name="atom" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Atom" inverseName="blePeripheral" inverseEntity="Atom"/>
+        <relationship name="atom" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Atom" inverseName="blePeripheral" inverseEntity="Atom"/>
         <relationship name="blucon" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Blucon" inverseName="blePeripheral" inverseEntity="Blucon"/>
         <relationship name="blueReader" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BlueReader" inverseName="blePeripheral" inverseEntity="BlueReader"/>
         <relationship name="bubble" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Bubble" inverseName="blePeripheral" inverseEntity="Bubble"/>
         <relationship name="dexcomG4" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="DexcomG4" inverseName="blePeripheral" inverseEntity="DexcomG4"/>
         <relationship name="dexcomG5" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="DexcomG5" inverseName="blePeripheral" inverseEntity="DexcomG5"/>
-        <relationship name="droplet" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Droplet" inverseName="blePeripheral" inverseEntity="Droplet"/>
+        <relationship name="dexcomG7" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DexcomG7" inverseName="blePeripheral" inverseEntity="DexcomG7"/>
+        <relationship name="dexcomG7HeartBeat" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="DexcomG7HeartBeat" inverseName="blePeripheral" inverseEntity="DexcomG7HeartBeat"/>
+        <relationship name="droplet" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Droplet" inverseName="blePeripheral" inverseEntity="Droplet"/>
         <relationship name="gNSEntry" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="GNSEntry" inverseName="blePeripheral" inverseEntity="GNSEntry"/>
         <relationship name="libre2" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Libre2" inverseName="blePeripheral" inverseEntity="Libre2"/>
+        <relationship name="libre2heartbeat" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Libre2HeartBeat" inverseName="blePeripheral" inverseEntity="Libre2HeartBeat"/>
         <relationship name="m5Stack" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="M5Stack" inverseName="blePeripheral" inverseEntity="M5Stack"/>
         <relationship name="miaoMiao" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="MiaoMiao" inverseName="blePeripheral" inverseEntity="MiaoMiao"/>
+        <relationship name="omniPodHeartBeat" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="OmniPodHeartBeat" inverseName="blePeripheral" inverseEntity="OmniPodHeartBeat"/>
         <relationship name="watlaa" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Watlaa" inverseName="blePeripheral" inverseEntity="Watlaa"/>
     </entity>
     <entity name="Blucon" representedClassName=".Blucon" syncable="YES">
@@ -113,6 +117,14 @@
         <attribute name="voltageB" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="blePeripheral" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="dexcomG5" inverseEntity="BLEPeripheral"/>
     </entity>
+    <entity name="DexcomG7" representedClassName=".DexcomG7" syncable="YES">
+        <attribute name="sensorStartDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="sensorStatus" optional="YES" attributeType="String"/>
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BLEPeripheral" inverseName="dexcomG7" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="DexcomG7HeartBeat" representedClassName=".DexcomG7HeartBeat" syncable="YES">
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BLEPeripheral" inverseName="dexcomG7HeartBeat" inverseEntity="BLEPeripheral"/>
+    </entity>
     <entity name="Droplet" representedClassName=".Droplet" syncable="YES">
         <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="droplet" inverseEntity="BLEPeripheral"/>
     </entity>
@@ -124,6 +136,9 @@
     </entity>
     <entity name="Libre2" representedClassName=".Libre2" syncable="YES">
         <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="libre2" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="Libre2HeartBeat" representedClassName=".Libre2HeartBeat" syncable="YES">
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BLEPeripheral" inverseName="libre2heartbeat" inverseEntity="BLEPeripheral"/>
     </entity>
     <entity name="M5Stack" representedClassName=".M5Stack" syncable="YES">
         <attribute name="backGroundColor" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
@@ -139,6 +154,9 @@
         <attribute name="firmware" optional="YES" attributeType="String"/>
         <attribute name="hardware" optional="YES" attributeType="String"/>
         <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="miaoMiao" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="OmniPodHeartBeat" representedClassName=".OmniPodHeartBeat" syncable="YES">
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="BLEPeripheral" inverseName="omniPodHeartBeat" inverseEntity="BLEPeripheral"/>
     </entity>
     <entity name="Sensor" representedClassName=".Sensor" syncable="YES">
         <attribute name="endDate" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
@@ -167,26 +185,4 @@
         <attribute name="hardware" optional="YES" attributeType="String"/>
         <relationship name="blePeripheral" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="watlaa" inverseEntity="BLEPeripheral"/>
     </entity>
-    <elements>
-        <element name="AlertEntry" positionX="-648" positionY="189" width="128" height="28"/>
-        <element name="AlertType" positionX="-657" positionY="180" width="128" height="28"/>
-        <element name="Atom" positionX="-657" positionY="189" width="128" height="74"/>
-        <element name="BgReading" positionX="-285.87109375" positionY="31.9921875" width="128" height="298"/>
-        <element name="BLEPeripheral" positionX="-630" positionY="216" width="128" height="359"/>
-        <element name="Blucon" positionX="-657" positionY="189" width="128" height="58"/>
-        <element name="BlueReader" positionX="-639" positionY="207" width="128" height="58"/>
-        <element name="Bubble" positionX="-657" positionY="189" width="128" height="88"/>
-        <element name="Calibration" positionX="-859.21484375" positionY="46.21484375" width="128" height="299"/>
-        <element name="DexcomG4" positionX="-621" positionY="225" width="128" height="58"/>
-        <element name="DexcomG5" positionX="-648" positionY="198" width="128" height="224"/>
-        <element name="Droplet" positionX="-630" positionY="216" width="128" height="58"/>
-        <element name="GNSEntry" positionX="-648" positionY="198" width="128" height="103"/>
-        <element name="Libre2" positionX="-648" positionY="198" width="128" height="58"/>
-        <element name="M5Stack" positionX="-657" positionY="180" width="128" height="163"/>
-        <element name="MiaoMiao" positionX="-657" positionY="189" width="128" height="88"/>
-        <element name="Sensor" positionX="-603.0859375" positionY="482.2890625" width="128" height="133"/>
-        <element name="SnoozeParameters" positionX="-648" positionY="198" width="128" height="28"/>
-        <element name="TreatmentEntry" positionX="-657" positionY="189" width="128" height="134"/>
-        <element name="Watlaa" positionX="-639" positionY="207" width="128" height="88"/>
-    </elements>
 </model>

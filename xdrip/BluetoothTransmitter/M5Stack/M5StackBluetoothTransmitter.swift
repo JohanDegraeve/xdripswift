@@ -410,6 +410,9 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
             // M5Stack is sending batteryLevel, which is in the second byte
             m5StackBluetoothTransmitterDelegate?.receivedBattery(level: receivedBatteryLevel, m5StackBluetoothTransmitter: self)
             
+        case .heartbeat:
+            // this is a trigger for calling the heartbeat
+            bluetoothTransmitterDelegate?.heartBeat()
         }
 
     }

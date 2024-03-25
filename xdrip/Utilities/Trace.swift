@@ -317,166 +317,168 @@ class Trace {
     static func getAppInfoFileAsData() -> (Data?, String) {
         
         var traceInfo = ""
-
+             
+        traceInfo.appendStringAndNewLine(paragraphSeperator)
+        
+        traceInfo.appendStringAndNewLine("Date + timezone: " + Date().toString(timeStyle: .full, dateStyle: .medium))
+        
+        traceInfo.appendStringAndNewLine(paragraphSeperator)
+        
         // app name, version and build
         traceInfo.appendStringAndNewLine("App name: " + ConstantsHomeView.applicationName)
         traceInfo.appendStringAndNewLine("Version: " + applicationVersion)
-        traceInfo.appendStringAndNewLine("Build number: " + buildNumber + " (" + timeStampAppBuild.toString(timeStyle: .none, dateStyle: .long) + ")\n")
+        traceInfo.appendStringAndNewLine("Build number: " + buildNumber + " (" + timeStampAppBuild.toString(timeStyle: .none, dateStyle: .medium) + ")\n")
         
         // app install and open timestamps
-        traceInfo.appendStringAndNewLine("App first installed on: " + timeStampAppInstall.toString(timeStyle: .long, dateStyle: .long))
+        traceInfo.appendStringAndNewLine("App first installed on: " + timeStampAppInstall.toString(timeStyle: .short, dateStyle: .medium))
                 
         if let timeStampAppLaunch = UserDefaults.standard.timeStampAppLaunch {
-            traceInfo.appendStringAndNewLine("App last opened on: " + timeStampAppLaunch.toString(timeStyle: .long, dateStyle: .long))
+            traceInfo.appendStringAndNewLine("App last opened on: " + timeStampAppLaunch.toString(timeStyle: .short, dateStyle: .medium))
         }
         
         traceInfo.appendStringAndNewLine(paragraphSeperator)
-        
-        // nightscout info
-        if UserDefaults.standard.nightScoutEnabled {
-            
-            traceInfo.appendStringAndNewLine("Nightscout: Enabled")
-            
-            if UserDefaults.standard.nightScoutUrl != nil {
-                
-                traceInfo.appendStringAndNewLine("    URL: Present")
-                
-            } else {
-                
-                traceInfo.appendStringAndNewLine("    URL: Missing")
-                
-            }
-            
-            if UserDefaults.standard.nightScoutAPIKey != nil {
-                
-                traceInfo.appendStringAndNewLine("    API_SECRET: Present")
-                
-            } else {
-                
-                traceInfo.appendStringAndNewLine("    API_SECRET: Missing")
-                
-            }
-            
-            if UserDefaults.standard.nightscoutToken != nil {
-                
-                traceInfo.appendStringAndNewLine("    Token: Present")
-                
-            } else {
-                
-                traceInfo.appendStringAndNewLine("    Token: Missing")
-                
-            }
-        
-        } else {
-            
-            traceInfo.appendStringAndNewLine("Nightscout: Disabled")
-            
-        }
-        
-        traceInfo.appendStringAndNewLine("")
-        
-        // cgm transmitter type from UserDefaults
-        if let cgmTransmitterTypeAsString = UserDefaults.standard.cgmTransmitterTypeAsString {
-            traceInfo.appendStringAndNewLine("Transmitter type: " + cgmTransmitterTypeAsString + "\n")
-        }
-        
-        traceInfo.appendStringAndNewLine("App settings:")
 
         // master or follower mode?
-        traceInfo.appendStringAndNewLine("    Data Source Mode: " + (UserDefaults.standard.isMaster ? "Master" : UserDefaults.standard.followerDataSourceType.descriptionForLogging()))
+        traceInfo.appendStringAndNewLine("Data Source Mode: " + (UserDefaults.standard.isMaster ? "Master" : UserDefaults.standard.followerDataSourceType.descriptionForLogging()))
         
-        // if follower mode, is background keep-alive enabled?
-        if !UserDefaults.standard.isMaster {
+        if UserDefaults.standard.isMaster {
             
-            traceInfo.appendStringAndNewLine("       Background follower keep-alive type: " + UserDefaults.standard.followerBackgroundKeepAliveType.description)
-            
-        }
-                
-        // if follower mode, what is the data source selected
-        if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .libreLinkUp {
-            
-            if UserDefaults.standard.libreLinkUpEmail != nil {
-                traceInfo.appendStringAndNewLine("    Username: Present")
-            } else {
-                traceInfo.appendStringAndNewLine("    Username: Missing")
+            if let cgmTransmitterTypeAsString = UserDefaults.standard.cgmTransmitterTypeAsString {
+                traceInfo.appendStringAndNewLine("    Transmitter type: " + cgmTransmitterTypeAsString)
             }
             
-            if UserDefaults.standard.libreLinkUpPassword != nil {
-                traceInfo.appendStringAndNewLine("    Password: Present")
-            } else {
-                traceInfo.appendStringAndNewLine("    Password: Missing")
+        } else {
+            
+            traceInfo.appendStringAndNewLine("    Keep-alive type: " + UserDefaults.standard.followerBackgroundKeepAliveType.description)
+            traceInfo.appendStringAndNewLine("    Patient name: " + (UserDefaults.standard.followerPatientName?.description ?? "nil"))
+            
+            // if follower mode, what is the data source selected
+            if UserDefaults.standard.followerDataSourceType == .libreLinkUp {
+                traceInfo.appendStringAndNewLine("    Username: " + ((UserDefaults.standard.libreLinkUpEmail?.description ?? "") != "" ? "present" : "missing"))
+                traceInfo.appendStringAndNewLine("    Password: " + ((UserDefaults.standard.libreLinkUpPassword?.description ?? "") != "" ? "present" : "missing"))
+                traceInfo.appendStringAndNewLine("    Upload to Nightscout: " + UserDefaults.standard.followerUploadDataToNightscout.description)
             }
         }
-
-        // is help icon hidden on or off
+        
+        traceInfo.appendStringAndNewLine("\nHelp settings:")
+        traceInfo.appendStringAndNewLine("    Translate automatically: " + UserDefaults.standard.translateOnlineHelp.description)
         traceInfo.appendStringAndNewLine("    Show help icon: " + UserDefaults.standard.showHelpIcon.description)
-
-        // is translate help on or off
-        traceInfo.appendStringAndNewLine("    Translate help: " + UserDefaults.standard.translateOnlineHelp.description)
-
-        // is showReadingInNotification on or off
-        traceInfo.appendStringAndNewLine("    Show BG in notification: " + UserDefaults.standard.showReadingInNotification.description)
-
-        // minimum interval between notifications
+        
+        traceInfo.appendStringAndNewLine("\nGeneral settings:")
+        traceInfo.appendStringAndNewLine("    Measurement unit: " + (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
+        traceInfo.appendStringAndNewLine("    Show BG in notifications: " + UserDefaults.standard.showReadingInNotification.description)
         traceInfo.appendStringAndNewLine("    Notification interval: " + UserDefaults.standard.notificationInterval.description + " minutes")
-
-        // show BG in app badge on or off
         traceInfo.appendStringAndNewLine("    Show BG in app badge: " + UserDefaults.standard.showReadingInAppBadge.description)
-
-        // allow chart rotation
+                
+        traceInfo.appendStringAndNewLine("\nHome screen settings:")
         traceInfo.appendStringAndNewLine("    Allow chart rotation: " + UserDefaults.standard.allowScreenRotation.description)
-        
-        // screen dimming type
         traceInfo.appendStringAndNewLine("    Screen dimming type when locked: " + UserDefaults.standard.screenLockDimmingType.description)
-
-        // is use statistics on or off
+        traceInfo.appendStringAndNewLine("    Show mini-chart: " + UserDefaults.standard.showMiniChart.description)
+        traceInfo.appendStringAndNewLine("    Urgent high: " + UserDefaults.standard.urgentHighMarkValueInUserChosenUnitRounded.description)
+        traceInfo.appendStringAndNewLine("    High: " + UserDefaults.standard.highMarkValueInUserChosenUnitRounded.description)
+        traceInfo.appendStringAndNewLine("    Low: " + UserDefaults.standard.lowMarkValueInUserChosenUnitRounded.description)
+        traceInfo.appendStringAndNewLine("    Urgent low: " + UserDefaults.standard.urgentLowMarkValueInUserChosenUnitRounded.description)
+        traceInfo.appendStringAndNewLine("    Show objectives: " + UserDefaults.standard.useObjectives.description)
+        traceInfo.appendStringAndNewLine("    Show target line: " + UserDefaults.standard.showTarget.description)
+        traceInfo.appendStringAndNewLine("    Target: " + UserDefaults.standard.targetMarkValueInUserChosenUnitRounded.description)
+        
+        traceInfo.appendStringAndNewLine("\nTreatments settings:")
+        traceInfo.appendStringAndNewLine("    Show treatments: " + UserDefaults.standard.showTreatmentsOnChart.description)
+        traceInfo.appendStringAndNewLine("    Micro-bolus threshold: " + UserDefaults.standard.smallBolusTreatmentThreshold.description)
+        traceInfo.appendStringAndNewLine("    Show micro-bolus: " + UserDefaults.standard.showSmallBolusTreatmentsOnChart.description)
+        traceInfo.appendStringAndNewLine("    Offset carbs on chart: " + UserDefaults.standard.offsetCarbTreatmentsOnChart.description)
+        
+        traceInfo.appendStringAndNewLine("\nStatistics settings:")
         traceInfo.appendStringAndNewLine("    Show statistics: " + UserDefaults.standard.showStatistics.description)
-        
-        // how many days is the user using to calculation the statistics
-        traceInfo.appendStringAndNewLine("    Days to use for statistics calculations: " + UserDefaults.standard.daysToUseStatistics.description)
-        
-        // how many hours are selected for the chart width
-        traceInfo.appendStringAndNewLine("    Selected chart width: " + UserDefaults.standard.chartWidthInHours.description)
-  
-        // are calendar events on or off
-        traceInfo.appendStringAndNewLine("    Write calendar events: " + UserDefaults.standard.createCalendarEvent.description)
-        
-        if let calendarId = UserDefaults.standard.calenderId {
-            
-            traceInfo.appendStringAndNewLine("    Calendar to use: " + calendarId)
-        
+        traceInfo.appendStringAndNewLine("    Time in Range type: " + UserDefaults.standard.timeInRangeType.description)
+        traceInfo.appendStringAndNewLine("    Show HbA1c in mmols/mol: " + UserDefaults.standard.useIFCCA1C.description)
+          
+        traceInfo.appendStringAndNewLine("\nNightscout settings:")
+        traceInfo.appendStringAndNewLine("    Nightscout enabled: " + UserDefaults.standard.nightScoutEnabled.description)
+        if UserDefaults.standard.nightScoutEnabled {
+            traceInfo.appendStringAndNewLine("    URL: " + ((UserDefaults.standard.nightScoutUrl?.description ?? "") != "" ? "present" : "missing"))
+            traceInfo.appendStringAndNewLine("    API_SECRET: " + ((UserDefaults.standard.nightScoutAPIKey?.description ?? "") != "" ? "present" : "missing"))
+            traceInfo.appendStringAndNewLine("    Token: " + ((UserDefaults.standard.nightscoutToken?.description ?? "") != "" ? "present" : "missing"))
+            if UserDefaults.standard.nightScoutPort != 0 {
+                traceInfo.appendStringAndNewLine("    Port: " + UserDefaults.standard.nightScoutPort.description)
+            } else {
+                traceInfo.appendStringAndNewLine("    Port: Missing")
+            }
         }
-
-        // is Apple Health on or off
+        
+        traceInfo.appendStringAndNewLine("\nDexcom Share settings:")
+        traceInfo.appendStringAndNewLine("    Upload to Dexcom Share: " + UserDefaults.standard.uploadReadingstoDexcomShare.description)
+        if UserDefaults.standard.uploadReadingstoDexcomShare {
+            traceInfo.appendStringAndNewLine("    Account name: " + ((UserDefaults.standard.dexcomShareAccountName?.description ?? "") != "" ? "present" : "missing"))
+            traceInfo.appendStringAndNewLine("    Password: " + ((UserDefaults.standard.dexcomSharePassword?.description ?? "") != "" ? "present" : "missing"))
+            traceInfo.appendStringAndNewLine("    Use US servers: " + UserDefaults.standard.useUSDexcomShareurl .description)
+            traceInfo.appendStringAndNewLine("    Receiver serial number: " + (UserDefaults.standard.dexcomShareSerialNumber?.description ?? "nil"))
+            traceInfo.appendStringAndNewLine("    Use upload schedule: " + UserDefaults.standard.dexcomShareUseSchedule.description)
+        }
+                                             
+        traceInfo.appendStringAndNewLine("\nApple Health settings:")
         traceInfo.appendStringAndNewLine("    Write to Apple Health: " + UserDefaults.standard.storeReadingsInHealthkit.description)
-
-        // is speak readings on or off
+                                             
+        traceInfo.appendStringAndNewLine("\nCalendar events settings:")
+        traceInfo.appendStringAndNewLine("    Create calendar events: " + UserDefaults.standard.createCalendarEvent.description)
+        if UserDefaults.standard.createCalendarEvent {
+            if let calendarId = UserDefaults.standard.calenderId {
+                traceInfo.appendStringAndNewLine("    Calendar to use: " + calendarId)
+            }
+            traceInfo.appendStringAndNewLine("    Display trend: " + UserDefaults.standard.displayTrendInCalendarEvent.description)
+            traceInfo.appendStringAndNewLine("    Display delta: " + UserDefaults.standard.displayDeltaInCalendarEvent.description)
+            traceInfo.appendStringAndNewLine("    Display unit: " + UserDefaults.standard.displayUnitInCalendarEvent.description)
+            traceInfo.appendStringAndNewLine("    Display visual indicator: " + UserDefaults.standard.displayVisualIndicatorInCalendarEvent.description)
+            traceInfo.appendStringAndNewLine("    Event interval: " + UserDefaults.standard.calendarInterval.description + " minutes")
+        }
+                                             
+        traceInfo.appendStringAndNewLine("\nVoice settings:")
         traceInfo.appendStringAndNewLine("    Speak BG readings: " + UserDefaults.standard.speakReadings.description)
+        if UserDefaults.standard.speakReadings {
+            //if let languageCode = UserDefaults.standard.speakReadingLanguageCode {
+                traceInfo.appendStringAndNewLine("    Language: " + Texts_SpeakReading.languageName.description)
+            //}
+            traceInfo.appendStringAndNewLine("    Speak trend: " + UserDefaults.standard.speakTrend.description)
+            traceInfo.appendStringAndNewLine("    Speak delta: " + UserDefaults.standard.speakDelta.description)
+            traceInfo.appendStringAndNewLine("    Speak interval: " + UserDefaults.standard.speakInterval.description + " minutes")
+        }
+        
+        traceInfo.appendStringAndNewLine("\nData management settings:")
+        traceInfo.appendStringAndNewLine("    Retention period: " + UserDefaults.standard.retentionPeriodInDays.description + " days")
         
         // developer settings
-        traceInfo.appendStringAndNewLine("    Hide screen lock warning?: " + UserDefaults.standard.lockScreenDontShowAgain.description)
+        traceInfo.appendStringAndNewLine("\nDeveloper settings:")
         traceInfo.appendStringAndNewLine("    NS log enabled: " + UserDefaults.standard.NSLogEnabled.description)
         traceInfo.appendStringAndNewLine("    OS log enabled: " + UserDefaults.standard.OSLogEnabled.description)
-        traceInfo.appendStringAndNewLine("    Smooth Libre Readings: " + UserDefaults.standard.smoothLibreValues.description)
-        traceInfo.appendStringAndNewLine("    Suppress Unlock Payload Libre Readings: " + UserDefaults.standard.suppressUnLockPayLoad.description)
-        traceInfo.appendStringAndNewLine("    Suppress Loop Share: " + UserDefaults.standard.suppressLoopShare.description)
-        traceInfo.appendStringAndNewLine("    LibreLinkUp version: " + (UserDefaults.standard.libreLinkUpVersion?.description ?? "nil") + "\n")
-
-        // BG chart threshold values
-        traceInfo.appendStringAndNewLine("Chart threshold values:")
-        traceInfo.appendStringAndNewLine("    Urgent low: " + UserDefaults.standard.urgentLowMarkValueInUserChosenUnitRounded.description)
-        traceInfo.appendStringAndNewLine("    Low: " + UserDefaults.standard.lowMarkValueInUserChosenUnitRounded.description)
-        traceInfo.appendStringAndNewLine("    Target: " + UserDefaults.standard.targetMarkValueInUserChosenUnitRounded.description)
-        traceInfo.appendStringAndNewLine("    High: " + UserDefaults.standard.highMarkValueInUserChosenUnitRounded.description)
-        traceInfo.appendStringAndNewLine("    Urgent high: " + UserDefaults.standard.urgentHighMarkValueInUserChosenUnitRounded.description + "\n")
+        traceInfo.appendStringAndNewLine("    Smooth Libre readings: " + UserDefaults.standard.smoothLibreValues.description)
+        traceInfo.appendStringAndNewLine("    Suppress unlock payload: " + UserDefaults.standard.suppressUnLockPayLoad.description)
+        traceInfo.appendStringAndNewLine("    Suppress Loop share: " + UserDefaults.standard.suppressLoopShare.description)
+        traceInfo.appendStringAndNewLine("    LibreLinkUp version: " + (UserDefaults.standard.libreLinkUpVersion?.description ?? "nil"))
+        
+        traceInfo.appendStringAndNewLine(paragraphSeperator)
+        
+        traceInfo.appendStringAndNewLine("General flags/variables:\n")
+        // how many hours are selected for the chart width
+        traceInfo.appendStringAndNewLine("    Selected chart width: " + UserDefaults.standard.chartWidthInHours.description + " hours")
+        traceInfo.appendStringAndNewLine("    Hide screen lock warning: " + UserDefaults.standard.lockScreenDontShowAgain.description)
+        traceInfo.appendStringAndNewLine("    Days to use for statistics calculations: " + UserDefaults.standard.daysToUseStatistics.description)
+        
         
         // show the active sensor information from coredata
         traceInfo.appendStringAndNewLine(paragraphSeperator)
-        traceInfo.appendStringAndNewLine("Active Sensor Information (stored in Core Data):\n")
-        traceInfo.appendStringAndNewLine("    Active Sensor Description: " + (UserDefaults.standard.activeSensorDescription?.description ?? "nil"))
-        traceInfo.appendStringAndNewLine("    Active Sensor Start Date: " + (UserDefaults.standard.activeSensorStartDate?.description ?? "nil"))
-        traceInfo.appendStringAndNewLine("    Active Sensor Max Days: " + (UserDefaults.standard.activeSensorMaxSensorAgeInDays?.description ?? "nil"))
-        traceInfo.appendStringAndNewLine("    Active Transmitter ID (optional): " + (UserDefaults.standard.activeSensorTransmitterId?.description ?? "nil") + "\n")
+        traceInfo.appendStringAndNewLine("Active Sensor Information (from UserDefaults):\n")
+        if !(!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .nightscout) {
+            traceInfo.appendStringAndNewLine("    Description: " + (UserDefaults.standard.activeSensorDescription?.description ?? "nil"))
+            if let startDate = UserDefaults.standard.activeSensorStartDate {
+                traceInfo.appendStringAndNewLine("    Sensor start date: " + startDate.toString(timeStyle: .short, dateStyle: .medium) + " (" + startDate.daysAndHoursAgo(appendAgo: true) + ")")
+            } else {
+                traceInfo.appendStringAndNewLine("    Sensor start date: nil")
+            }
+            traceInfo.appendStringAndNewLine("    Sensor max days: " + (UserDefaults.standard.activeSensorMaxSensorAgeInDays?.description ?? "nil"))
+            traceInfo.appendStringAndNewLine("    Transmitter ID: " + (UserDefaults.standard.activeSensorTransmitterId?.description ?? "nil"))
+        } else {
+            traceInfo.appendStringAndNewLine("    Not used in Nightscout follower mode")
+        }
         
         
         // Info from coredata
@@ -499,7 +501,7 @@ class Trace {
                 if let alias = blePeripheral.alias {
                     traceInfo.appendStringAndNewLine("        Alias: " + alias)
                 }
-                traceInfo.appendStringAndNewLine("        " + ConstantsHomeView.applicationName + " will " + (blePeripheral.shouldconnect ? "try":"*not* try") + " to connect to this peripheral")
+                traceInfo.appendStringAndNewLine("        " + ConstantsHomeView.applicationName + (blePeripheral.shouldconnect ? " is set" : " is *not* set") + " to try and connect to this peripheral")
                 
                 if let libreSensorType = blePeripheral.libreSensorType {
                     traceInfo.appendStringAndNewLine("Last known libreSensorType: " + libreSensorType.description)
@@ -542,9 +544,21 @@ class Trace {
                             
                             traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
                             
+                            traceInfo.appendStringAndNewLine("        Transmitter start date: " + (dexcomG5.transmitterStartDate?.toString(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (UserDefaults.standard.activeSensorStartDate?.daysAndHoursAgo(appendAgo: true) ?? "nil") + ")")
+                            
+                            traceInfo.appendStringAndNewLine("        Sensor start date: " + (dexcomG5.sensorStartDate?.toString(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (UserDefaults.standard.activeSensorStartDate?.daysAndHoursAgo(appendAgo: true) ?? "nil") + ")")
+                            
+                            traceInfo.appendStringAndNewLine("        Sensor status: " + (dexcomG5.sensorStatus?.description ?? "nil"))
+                            
+                            traceInfo.appendStringAndNewLine("        Firmware: " + (dexcomG5.firmwareVersion?.description ?? "nil"))
+                            
+                            traceInfo.appendStringAndNewLine("        Read from Dexcom app: " + dexcomG5.useOtherApp.description)
+                            
+                            traceInfo.appendStringAndNewLine("        Last reset: " + (dexcomG5.lastResetTimeStamp?.toString(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (UserDefaults.standard.activeSensorStartDate?.daysAndHoursAgo(appendAgo: true) ?? "nil") + ")")
+                            
                             // if needed additional specific info can be added
-                            traceInfo.appendStringAndNewLine("        Voltage A: " + dexcomG5.voltageA.description)
-                            traceInfo.appendStringAndNewLine("        Voltage B: " + dexcomG5.voltageB.description)
+                            traceInfo.appendStringAndNewLine("        Voltage A: " + dexcomG5.voltageA.description + "0mV")
+                            traceInfo.appendStringAndNewLine("        Voltage B: " + dexcomG5.voltageB.description + "0mV")
                             
                         }
                         
@@ -620,26 +634,54 @@ class Trace {
                             
                         }
                         
+                    case .Libre3HeartBeatType:
+                        if blePeripheral.libre2heartbeat != nil {
+                            
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            
+                        }
+                        
+                    case .DexcomG7HeartBeatType:
+                        if blePeripheral.dexcomG7HeartBeat != nil {
+                            
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            
+                        }
+                        
+                    case .OmniPodHeartBeatType:
+                        if blePeripheral.omniPodHeartBeat != nil {
+                            
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            
+                        }
+                        
+                    case .DexcomG7Type:
+                        if blePeripheral.dexcomG7 != nil {
+                            
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            
+                        }
+                        
                     }
                 }
-                
-                traceInfo.appendStringAndNewLine("")
                 
             }
             
             traceInfo.appendStringAndNewLine(paragraphSeperator)
             
             // all alertentries
-            traceInfo.appendStringAndNewLine("List of Alarms:\n")
+            traceInfo.appendStringAndNewLine("List of Alarms:")
             
             for alertKind in AlertKind.allCases {
                 
-                traceInfo.appendStringAndNewLine("    Name: " + alertKind.descriptionForLogging())
+                traceInfo.appendStringAndNewLine("")
+                
+                traceInfo.appendStringAndNewLine("    " + alertKind.descriptionForLogging())
                 
                 let alertEntries = alertEntriesAccessor.getAllEntries(forAlertKind: alertKind, alertTypesAccessor: alertTypesAccessor)
                 
                 for alertEntry in alertEntries {
-                    traceInfo.appendStringAndNewLine("        start: " + alertEntry.start.convertMinutesToTimeAsString() + " / value: " + alertEntry.value.description + " / alarm type: " + alertEntry.alertType.description)
+                    traceInfo.appendStringAndNewLine("        -> start: " + alertEntry.start.convertMinutesToTimeAsString() + " / value: " +  alertEntry.value.description + " / alarm type: " + alertEntry.alertType.description)
                     
                 }
                 
@@ -654,7 +696,8 @@ class Trace {
                 
                 traceInfo.appendStringAndNewLine("    Name: " + alertType.description)
                 traceInfo.appendStringAndNewLine("        Enabled: " + alertType.enabled.description)
-                traceInfo.appendStringAndNewLine("        Override Mute: " + alertType.overridemute.description)
+                traceInfo.appendStringAndNewLine("        Override mute: " + alertType.overridemute.description)
+                traceInfo.appendStringAndNewLine("        Vibrate: " + alertType.vibrate.description)
                 traceInfo.appendStringAndNewLine("        Snooze via notification: " + alertType.snooze.description)
                 traceInfo.appendStringAndNewLine("        Default snooze period: " + alertType.snoozeperiod.description)
                 if let soundname = alertType.soundname {
