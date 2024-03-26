@@ -17,7 +17,7 @@ struct HeaderView: View {
     var body: some View {
         HStack(alignment: .lastTextBaseline) {
             Text("\(watchState.bgValueStringInUserChosenUnit())\(watchState.trendArrow())")
-                .font(.system(size: isSmallScreen ? 45 : 55)).fontWeight(.semibold)
+                .font(.system(size: isSmallScreen ? 40 : 50)).fontWeight(.semibold)
                 .foregroundStyle(watchState.bgTextColor())
                 .scaledToFill()
                 .minimumScaleFactor(0.5)
