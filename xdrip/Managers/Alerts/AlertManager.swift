@@ -720,7 +720,7 @@ public class AlertManager:NSObject {
             
         } else {
             if !UserDefaults.standard.isMaster && !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                trace("in checkAlert, there's no need to raise alert %{public}@ because we're in follower mode and keep-alive is: %[public]@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), UserDefaults.standard.followerBackgroundKeepAliveType.description)
+                trace("in checkAlert, there's no need to raise alert %{public}@ because we're in follower mode and keep-alive is: %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), UserDefaults.standard.followerBackgroundKeepAliveType.description)
             } else {
                 trace("in checkAlert, there's no need to raise alert %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
             }
