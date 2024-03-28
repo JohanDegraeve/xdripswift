@@ -11,7 +11,7 @@ enum BluetoothPeripheralCategory: String, CaseIterable {
     
     /// for using a a bluetooth device as heartbeat : whenever the device sends someting over a read characteristic, then xDrip4iOS will wake up
     /// Heartbeat also works for connect and disconnect
-    case HeartBeat = "HeartBeat"
+    case HeartBeat = "HeartBeat ♥"
     
     /// returns index in list of BluetoothPeripheralCategory's
     func index() -> Int {
