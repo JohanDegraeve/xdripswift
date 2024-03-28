@@ -123,16 +123,17 @@ class NightScoutFollowManager: NSObject {
     @objc public func download() {
         
         trace("in download", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
-
-        trace("    setting nightScoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
         
-        DispatchQueue.main.async {
-            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
-        }
-
         guard UserDefaults.standard.nightScoutEnabled else {
             trace("    nightscout not enabled", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
             return
+        }
+        
+        if (UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightScout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+            trace("    setting nightScoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+            
+            UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest = .now
+            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
         }
 
         guard !UserDefaults.standard.isMaster else {

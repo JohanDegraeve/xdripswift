@@ -210,7 +210,9 @@ public class LoopManager:NSObject {
             sharedUserDefaults.set(data, forKey: "latestReadings")
             
             // store in local userdefaults
-            UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = dictionary
+            if !dictionary.isEmpty {
+                UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = dictionary
+            }
             
             // initially set timeStampLatestLoopSharedBgReading to timestamp of first reading - may get another value later, in case loopdelay > 0
             // add 5 seconds to last Readings timestamp, because due to the way timestamp for libre readings is calculated, it may happen that the same reading shifts 1 or 2 seconds in next reading cycle

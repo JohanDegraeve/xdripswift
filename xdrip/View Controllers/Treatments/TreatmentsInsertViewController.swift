@@ -217,8 +217,7 @@ class TreatmentsInsertViewController : UIViewController {
                         treatMentEntryToUpdate.uploaded = false
 
                         // trigger nightscoutsync
-                        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
-
+                        self.setNightscoutSyncTreatmentsRequiredToTrue()
                     }
                     
                 } else {
@@ -233,7 +232,7 @@ class TreatmentsInsertViewController : UIViewController {
                         treatMentEntryToUpdate.uploaded = false
                         
                         // trigger nightscoutsync
-                        UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+                        self.setNightscoutSyncTreatmentsRequiredToTrue()
                         
                         self.treatMentEntryToUpdate = nil
                         
@@ -296,7 +295,7 @@ class TreatmentsInsertViewController : UIViewController {
                     _ = TreatmentEntry(date: Date(timeInterval: dateOffset, since: datePicker.date), value: value, treatmentType: treatmentType, nightscoutEventType: nil, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
                     
                     // trigger nightscoutsync
-                    UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+                    setNightscoutSyncTreatmentsRequiredToTrue()
                     
                     // save to coredata
                     coreDataManager.saveChanges()
@@ -368,5 +367,14 @@ class TreatmentsInsertViewController : UIViewController {
 	@objc private func dismissKeyboardTouchOutside() {
 	   view.endEditing(true)
 	}
+    
+    // set the flag to sync Nightscout treatments if a short time has passed since the last time
+    // as accessing userdefaults is not thread-safe
+    private func setNightscoutSyncTreatmentsRequiredToTrue() {
+        if (UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightScout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+            UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest = .now
+            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        }
+    }
 	
 }
