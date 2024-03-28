@@ -1325,7 +1325,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             case .nonFixedSlopeEnabled:
                 
                 cell.textLabel?.text = Texts_SettingsView.labelNonFixedTransmitter
-                cell.detailTextLabel?.text = nil
+                cell.detailTextLabel?.text = ""
                 
                 var currentStatus = false
                 if let bluetoothPeripheral = bluetoothPeripheral {
@@ -1377,9 +1377,9 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                 
             case .webOOPEnabled:
                 
-                // set row text and set default row label to nil
+                // set row text and set default row label to an empty string
                 cell.textLabel?.text = Texts_SettingsView.labelWebOOPTransmitter
-                cell.detailTextLabel?.text = nil
+                cell.detailTextLabel?.text = ""
                 
                 // get current value of webOOPEnabled, default false
                 var currentWebOOPEnabledValue = false
