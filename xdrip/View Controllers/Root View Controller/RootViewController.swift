@@ -3490,7 +3490,16 @@ final class RootViewController: UIViewController, ObservableObject {
                 // this is needed due to the not being able to pass structs that are not codable/hashable
                 let hoursOfBgReadingsToSend: Double = 12
                 
-                let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+                let allBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+                
+                // Live Activities have maximum payload size of 4kB.
+                // This value is selected by testing how much we can send before getting the "Payload maximum size exceeded" error.
+                let maxNumberOfReadings = 275
+                
+                // If there are more readings than we can send to the Live Activity, downsample the values to fit.
+                let bgReadings = allBgReadings.count > maxNumberOfReadings
+                ? (0 ..< maxNumberOfReadings).map { allBgReadings[$0 * allBgReadings.count / maxNumberOfReadings] }
+                : allBgReadings
                 
                 if bgReadings.count > 0 {
                     
@@ -3511,8 +3520,6 @@ final class RootViewController: UIViewController, ObservableObject {
                         bgReadingValues.append(bgReading.calculatedValue)
                         bgReadingDates.append(bgReading.timeStamp)
                     }
-                    
-                    let dataSourceDescription = UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "" : UserDefaults.standard.followerDataSourceType.fullDescription
                     
                     var showLiveActivity: Bool = UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)
                     
