@@ -3497,18 +3497,9 @@ final class RootViewController: UIViewController, ObservableObject {
                     // create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
                     // this is needed due to the not being able to pass structs that are not codable/hashable
                     let hoursOfBgReadingsToSend: Double = 12
-
-                    let allBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-
-                    // Live Activities have maximum payload size of 4kB.
-                    // This value is selected by testing how much we can send before getting the "Payload maximum size exceeded" error.
-                    let maxNumberOfReadings = 100
-
-                    // If there are more readings than we can send to the Live Activity, downsample the values to fit.
-                    let bgReadings = allBgReadings.count > maxNumberOfReadings
-                      ? (0 ..< maxNumberOfReadings).map { allBgReadings[$0 * allBgReadings.count / maxNumberOfReadings] }
-                      : allBgReadings
-
+                    
+                    let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+                    
                     if bgReadings.count > 0 {
                         
                         var slopeOrdinal: Int = 0
