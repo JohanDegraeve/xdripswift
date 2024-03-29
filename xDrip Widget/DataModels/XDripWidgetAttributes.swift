@@ -13,10 +13,22 @@ import SwiftUI
 struct XDripWidgetAttributes: ActivityAttributes {
     
     public struct ContentState: Codable, Hashable {
-        
-        // dynamic stateful properties
-        var bgReadingValues: [Double]
-        var bgReadingDates: [Date]
+
+        // Store values with a 16 bit precision to save payload bytes
+        private var _bgReadingValues: [Float16]
+        // Expose those conveniently as Doubles
+        var bgReadingValues: [Double] { _bgReadingValues.map(Double.init) }
+
+        // To save those precious payload bytes, store only the earliest date as Date
+        private var _firstDate: Date
+        // ...and all other as seconds from that moment.
+        // No need for floating points, a second is precise enough for the graph
+        // UInt16 maximum value is 65535 so that means 18.2 hours.
+        // This would need to be changed if wishing to present a 24 hour chart.
+        private var _secondsSinceFirstDate: [UInt16]
+        // Expose the dates conveniently
+        var bgReadingDates: [Date] { _secondsSinceFirstDate.map { Date(timeInterval: Double($0), since: _firstDate) } }
+
         var isMgDl: Bool
         var slopeOrdinal: Int
         var deltaChangeInMgDl: Double?
@@ -36,10 +48,12 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var bgValueStringInUserChosenUnit: String
         
         init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySize: LiveActivitySize, dataSourceDescription: String? = "") {
+
+            self._bgReadingValues = bgReadingValues.map(Float16.init)
+            let firstDate = bgReadingDates.last ?? .now
+            self._firstDate = firstDate
+            self._secondsSinceFirstDate = bgReadingDates.map { UInt16(truncatingIfNeeded: Int($0.timeIntervalSince(firstDate))) }
             
-            // these are the "passed in" stateful values used to initialize
-            self.bgReadingValues = bgReadingValues
-            self.bgReadingDates = bgReadingDates
             self.isMgDl = isMgDl
             self.slopeOrdinal = slopeOrdinal
             self.deltaChangeInMgDl = deltaChangeInMgDl
