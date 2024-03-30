@@ -3502,7 +3502,7 @@ final class RootViewController: UIViewController, ObservableObject {
 
                     // Live Activities have maximum payload size of 4kB.
                     // This value is selected by testing how much we can send before getting the "Payload maximum size exceeded" error.
-                    let maxNumberOfReadings = 275
+                    let maxNumberOfReadings = 260
 
                     // If there are more readings than we can send to the Live Activity, downsample the values to fit.
                     let bgReadings = allBgReadings.count > maxNumberOfReadings
