@@ -104,10 +104,10 @@ public class NightScoutUploadManager: NSObject, ObservableObject {
         // and nightScoutUrl exists
         guard UserDefaults.standard.nightScoutEnabled, UserDefaults.standard.nightScoutUrl != nil else {return}
 
-        // TODO: crash here
-        trace("    setting nightScoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
-        
-        DispatchQueue.main.async {
+        if (UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightScout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+            trace("    setting nightScoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.oslog, category: ConstantsLog.categoryNightScoutUploadManager, type: .info)
+            
+            UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest = .now
             UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
         }
         
@@ -170,7 +170,7 @@ public class NightScoutUploadManager: NSObject, ObservableObject {
         guard UserDefaults.standard.nightScoutEnabled, UserDefaults.standard.nightScoutUrl != nil else {return}
 
         // no sync needed if app is running in the background
-        guard UserDefaults.standard.appInForeGround else {return}
+        //guard UserDefaults.standard.appInForeGround else {return}
         
         // if sync already running, then set nightScoutTreatmentSyncRequired to true
         // sync is running already, once stopped it will rerun
@@ -432,13 +432,8 @@ public class NightScoutUploadManager: NSObject, ObservableObject {
                         guard UserDefaults.standard.nightScoutSyncTreatmentsRequired else {return}
                         
                         UserDefaults.standard.nightScoutSyncTreatmentsRequired = false
-                        
-                        // if Nightscout is enabled, then a nightscout sync is required
-                        if UserDefaults.standard.nightScoutEnabled {
                             
-                            syncTreatmentsWithNightScout()
-                            
-                        }
+                        syncTreatmentsWithNightScout()
                         
                     }
                     
@@ -1517,6 +1512,15 @@ public class NightScoutUploadManager: NSObject, ObservableObject {
         
         return numberOfNewTreatments
         
+    }
+    
+    // set the flag to sync Nightscout treatments if a short time has passed since the last time 
+    // as accessing userdefaults is not thread-safe
+    private func setNightscoutSyncTreatmentsRequiredToTrue() {        
+        if (UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightScout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+            UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest = .now
+            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        }
     }
     
 }

@@ -860,7 +860,7 @@ final class RootViewController: UIViewController, ObservableObject {
             }
             
             // launch Nightscout sync
-            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+            self.setNightscoutSyncTreatmentsRequiredToTrue()
             
             self.updateLiveActivityAndWidgets(forceRestart: false)
             
@@ -1031,7 +1031,7 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // launch nightscout treatment sync whenever the app comes to the foreground
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyStartNightScoutTreatmentSync, closure: {
-            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+            self.setNightscoutSyncTreatmentsRequiredToTrue()
         })
         
     }
@@ -2229,10 +2229,7 @@ final class RootViewController: UIViewController, ObservableObject {
     ///     - forceReset : if true, then force the update to be done even if the main chart is panned back in time (used for the double tap gesture)
     @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
         
-        // TODO: Still crashing here...
-        DispatchQueue.main.async {
-            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
-        }
+        setNightscoutSyncTreatmentsRequiredToTrue()
         
         // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
         if let glucoseChartManager = glucoseChartManager  {
@@ -3487,43 +3484,45 @@ final class RootViewController: UIViewController, ObservableObject {
     /// also update the widget data stored in user defaults
     private func updateLiveActivityAndWidgets(forceRestart: Bool) {
         if #available(iOS 16.2, *) {
-            if (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat) || UserDefaults.standard.liveActivityType == .disabled {
-                LiveActivityManager.shared.endAllActivities()
-            }
-            
-            DispatchQueue.main.async {
-                if let bgReadingsAccessor = self.bgReadingsAccessor {
+            if let bgReadingsAccessor = self.bgReadingsAccessor {
+                
+                // create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
+                // this is needed due to the not being able to pass structs that are not codable/hashable
+                let hoursOfBgReadingsToSend: Double = 12
+                
+                let allBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+                
+                // Live Activities have maximum payload size of 4kB.
+                // This value is selected by testing how much we can send before getting the "Payload maximum size exceeded" error.
+                let maxNumberOfReadings = 260
+                
+                // If there are more readings than we can send to the Live Activity, downsample the values to fit.
+                let bgReadings = allBgReadings.count > maxNumberOfReadings
+                ? (0 ..< maxNumberOfReadings).map { allBgReadings[$0 * allBgReadings.count / maxNumberOfReadings] }
+                : allBgReadings
+                
+                if bgReadings.count > 0 {
+                    var slopeOrdinal: Int = 0
+                    var deltaChangeInMgDl: Double = 0
+                    var bgReadingValues: [Double] = []
+                    var bgReadingDates: [Date] = []
+                    let bgValueInMgDl = bgReadings[0].calculatedValue
                     
-                    // create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
-                    // this is needed due to the not being able to pass structs that are not codable/hashable
-                    let hoursOfBgReadingsToSend: Double = 12
+                    // add delta if available
+                    if bgReadings.count > 1 {
+                        deltaChangeInMgDl = bgReadings[0].currentSlope(previousBgReading: bgReadings[1]) * bgReadings[0].timeStamp.timeIntervalSince(bgReadings[1].timeStamp) * 1000;
+                        
+                        slopeOrdinal = bgReadings[0].slopeOrdinal()
+                    }
                     
-                    let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+                    for bgReading in bgReadings {
+                        bgReadingValues.append(bgReading.calculatedValue)
+                        bgReadingDates.append(bgReading.timeStamp)
+                    }
                     
-                    if bgReadings.count > 0 {
-                        
-                        var slopeOrdinal: Int = 0
-                        var deltaChangeInMgDl: Double = 0
-                        var bgReadingValues: [Double] = []
-                        var bgReadingDates: [Date] = []
-                        let bgValueInMgDl = bgReadings[0].calculatedValue
-                        
-                        // add delta if available
-                        if bgReadings.count > 1 {
-                            deltaChangeInMgDl = bgReadings[0].currentSlope(previousBgReading: bgReadings[1]) * bgReadings[0].timeStamp.timeIntervalSince(bgReadings[1].timeStamp) * 1000;
-                            
-                            slopeOrdinal = bgReadings[0].slopeOrdinal()
-                        }
-                        
-                        for bgReading in bgReadings {
-                            bgReadingValues.append(bgReading.calculatedValue)
-                            bgReadingDates.append(bgReading.timeStamp)
-                        }
-                        
-                        let dataSourceDescription = UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "" : UserDefaults.standard.followerDataSourceType.fullDescription
-                        
-                        var showLiveActivity: Bool = false
-                        
+                    var showLiveActivity: Bool = UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)
+                    
+                    if showLiveActivity {
                         // now that we've got the current BG value, let's refine the check to see if we should run/show the live activity
                         switch UserDefaults.standard.liveActivityType {
                         case .always:
@@ -3539,34 +3538,42 @@ final class RootViewController: UIViewController, ObservableObject {
                         case .urgentLowHigh:
                             showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.urgentHighMarkValue)) ? true : false
                         }
-                        
-                        // if we should show it, then let's continue processing the lastReading array to create a valid contentState
-                        if showLiveActivity {
-                            // create the contentState that will update the dynamic attributes of the Live Activity Widget
-                            let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySize: UserDefaults.standard.liveActivitySize, dataSourceDescription: dataSourceDescription)
-                            
-                            LiveActivityManager.shared.runActivity(contentState: contentState, forceRestart: forceRestart)
-                        } else {
-                            LiveActivityManager.shared.endAllActivities()
-                        }
-                        
-                        // update the widget data stored in user defaults
-                        let bgReadingDatesAsDouble = bgReadingDates.map { date in
-                            date.timeIntervalSince1970
-                        }
-                                                
-                        let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, dataSourceDescription: dataSourceDescription)
-                                                
-                        // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
-                        // the user's device - this allows several copies of the app to be installed without cross-contamination of widget data
-                        if let widgetData = try? JSONEncoder().encode(widgetSharedUserDefaultsModel) {
-                            UserDefaults.storeInSharedUserDefaults(value: widgetData, forKey: "widgetSharedUserDefaults.\(Bundle.main.mainAppBundleIdentifier)")
-                        }
-                        
-                        WidgetCenter.shared.reloadAllTimelines()
                     }
+                    
+                    // if we should show it, then let's continue processing the lastReading array to create a valid contentState
+                    if showLiveActivity {
+                        // create the contentState that will update the dynamic attributes of the Live Activity Widget
+                        let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySize: UserDefaults.standard.liveActivitySize, dataSourceDescription: dataSourceDescription)
+                        
+                        LiveActivityManager.shared.runActivity(contentState: contentState, forceRestart: forceRestart)
+                    } else {
+                        LiveActivityManager.shared.endAllActivities()
+                    }
+                    
+                    // update the widget data stored in user defaults
+                    let bgReadingDatesAsDouble = bgReadingDates.map { date in
+                        date.timeIntervalSince1970
+                    }
+                    
+                    let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, dataSourceDescription: dataSourceDescription)
+                    
+                    // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
+                    // the user's device - this allows several copies of the app to be installed without cross-contamination of widget data
+                    if let widgetData = try? JSONEncoder().encode(widgetSharedUserDefaultsModel) {
+                        UserDefaults.storeInSharedUserDefaults(value: widgetData, forKey: "widgetSharedUserDefaults.\(Bundle.main.mainAppBundleIdentifier)")
+                    }
+                } else {
+                    LiveActivityManager.shared.endAllActivities()
                 }
+                WidgetCenter.shared.reloadAllTimelines()
             }
+        }
+    }
+    
+    private func setNightscoutSyncTreatmentsRequiredToTrue() {
+        if (UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightScout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+            UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest = .now
+            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
         }
     }
 }

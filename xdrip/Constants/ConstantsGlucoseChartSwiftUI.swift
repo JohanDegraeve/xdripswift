@@ -62,7 +62,7 @@ enum ConstantsGlucoseChartSwiftUI {
     static let viewHeightWatchApp: CGFloat = 90
     
     // watch chart sizes for smaller watches
-    static let viewWidthWatchAppSmall: CGFloat = 175
+    static let viewWidthWatchAppSmall: CGFloat = 155
     static let viewHeightWatchAppSmall: CGFloat = 75
     
     static let lowHighLineColorWatchApp = Color(white: 0.6)

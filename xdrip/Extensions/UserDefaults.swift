@@ -292,6 +292,8 @@ extension UserDefaults {
         // Nightscout
         /// timestamp lastest reading uploaded to NightScout
         case timeStampLatestNSUploadedBgReadingToNightScout = "timeStampLatestUploadedBgReading"
+        /// timestamp lastest treatment sync request to NightScout
+        case timeStampLatestNightScoutTreatmentSyncRequest = "timeStampLatestNightScoutTreatmentSyncRequest"
         /// timestamp latest calibration uploaded to NightScout
         case timeStampLatestNSUploadedCalibrationToNightScout = "timeStampLatestUploadedCalibration"
         
@@ -1373,6 +1375,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.nightScoutSyncTreatmentsRequired.rawValue)
+        }
+    }
+    
+    /// timestamp lastest reading uploaded to NightScout
+    var timeStampLatestNightScoutTreatmentSyncRequest: Date? {
+        get {
+            return object(forKey: Key.timeStampLatestNightScoutTreatmentSyncRequest.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampLatestNightScoutTreatmentSyncRequest.rawValue)
         }
     }
     

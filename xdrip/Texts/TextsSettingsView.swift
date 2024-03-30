@@ -371,6 +371,18 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_transmitterid", tableName: filename, bundle: Bundle.main, value: "Transmitter ID:", comment: "transmitter settings, just the words that explain that the settings is about transmitter id")
     }()
     
+    static let labelBluetoothDeviceName:String = {
+        return NSLocalizedString("settingsviews_bluetoothDeviceName", tableName: filename, bundle: Bundle.main, value: "Device Name", comment: "transmitter settings, just the words that explain that the settings is about the bluetooth device name")
+    }()
+    
+    static let heartbeatLibreMessage:String = {
+        return NSLocalizedString("settingsviews_heartbeatLibreMessage", tableName: filename, bundle: Bundle.main, value: "IMPORTANT: You MUST force-close the Libre app first.\n\nEnter the device name shown in the iPhone Settings -> Bluetooth devices list.\n\nOnce you have connected, you can reopen the Libre app.", comment: "transmitter settings, instructions for adding a Libre heartbeat")
+    }()
+    
+    static let heartbeatG7Message:String = {
+        return NSLocalizedString("settingsviews_heartbeatG7Message", tableName: filename, bundle: Bundle.main, value: "IMPORTANT: Make sure the Dexcom app is running.\n\nEnter the Dexcom G7 bluetooth name shown in the iPhone Settings -> Bluetooth devices list.", comment: "transmitter settings, instructions for adding a G7 heartbeat")
+    }()
+    
     static let labelTransmitterIdTextForButton:String = {
         return NSLocalizedString("settingsviews_transmitterid_text_for_button", tableName: filename, bundle: Bundle.main, value: "Transmitter ID", comment: "transmitter settings, this is for the button, when clicked then user will be requested to give transmitter id. The only difference with settingsviews_transmitterid is that ':' is not added")
     }()
