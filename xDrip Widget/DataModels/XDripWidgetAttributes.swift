@@ -40,13 +40,23 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var warnUserToOpenApp: Bool = true
         var liveActivitySize: LiveActivitySize
         var dataSourceDescription: String
-        
-        // computed properties
-        var bgUnitString: String
-        var bgValueInMgDl: Double?
-        var bgReadingDate: Date?
-        var bgValueStringInUserChosenUnit: String
-        
+
+        var bgUnitString: String {
+            isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
+        }
+        /// the latest bg reading
+        var bgValueInMgDl: Double? {
+            bgReadingValues[0]
+        }
+        /// the latest bg reading date
+        var bgReadingDate: Date? {
+            bgReadingDates[0]
+        }
+
+        var bgValueStringInUserChosenUnit: String {
+            bgReadingValues[0].mgdlToMmolAndToString(mgdl: isMgDl)
+        }
+
         init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySize: LiveActivitySize, dataSourceDescription: String? = "") {
 
             self._bgReadingValues = bgReadingValues.map(Float16.init)
@@ -63,13 +73,6 @@ struct XDripWidgetAttributes: ActivityAttributes {
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl            
             self.liveActivitySize = liveActivitySize
             self.dataSourceDescription = dataSourceDescription ?? ""
-            
-            self.bgUnitString = isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
-            
-            // the last bg reading (used for other functions)
-            self.bgValueInMgDl = bgReadingValues[0]
-            self.bgReadingDate = bgReadingDates[0]
-            self.bgValueStringInUserChosenUnit = bgReadingValues[0].mgdlToMmolAndToString(mgdl: isMgDl)
         }
         
         /// Blood glucose color dependant on the user defined limit values and based upon the time since the last reading
