@@ -3520,6 +3520,8 @@ final class RootViewController: UIViewController, ObservableObject {
                         bgReadingDates.append(bgReading.timeStamp)
                     }
                     
+                    let dataSourceDescription = UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "" : UserDefaults.standard.followerDataSourceType.fullDescription
+                    
                     var showLiveActivity: Bool = UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)
                     
                     if showLiveActivity {
