@@ -151,6 +151,22 @@ extension XDripWatchComplication.Entry {
             return (minValue, maxValue, gaugeColor, gaugeGradient)
         }
         
+        func isSmallScreen() -> Bool {
+            return (WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen) ? true : false
+        }
+        
+        func overrideChartHeight() -> Double {
+            var height = isSmallScreen() ? ConstantsGlucoseChartSwiftUI.viewHeightWatchAccessoryRectangularSmall : ConstantsGlucoseChartSwiftUI.viewHeightWatchAccessoryRectangular
+            
+            height += disableComplications ? -15 : 0
+            
+            return height
+        }
+        
+        func overrideChartWidth() -> Double {
+            return isSmallScreen() ? ConstantsGlucoseChartSwiftUI.viewWidthWatchAccessoryRectangularSmall : ConstantsGlucoseChartSwiftUI.viewWidthWatchAccessoryRectangular
+        }
+        
     }
 }
 
@@ -158,6 +174,6 @@ extension XDripWatchComplication.Entry {
 
 extension XDripWatchComplication.Entry {
     static var placeholder: Self {
-        .init(date: .now, widgetState: WidgetState(bgReadingValues: [100], bgReadingDates: [Date()], isMgDl: true, slopeOrdinal: 3, deltaChangeInMgDl: 0, urgentLowLimitInMgDl: 60, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180))
+        .init(date: .now, widgetState: WidgetState(bgReadingValues: [100], bgReadingDates: [Date()], isMgDl: true, slopeOrdinal: 3, deltaChangeInMgDl: 0, urgentLowLimitInMgDl: 60, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, disableComplications: true))
     }
 }
