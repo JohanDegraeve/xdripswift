@@ -12,6 +12,7 @@
 		470824D2297484B500C52317 /* SwiftCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 470824D1297484B500C52317 /* SwiftCharts */; };
 		470824D3297484B500C52317 /* SwiftCharts in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 470824D1297484B500C52317 /* SwiftCharts */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		470CE1FC246802EB00D5CB74 /* BluetoothPeripheralsView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 470CE1FE246802EB00D5CB74 /* BluetoothPeripheralsView.strings */; };
+		4713B0142BBAB12D009F2838 /* ConstantsAppleWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41B82B87B2680041DA19 /* ConstantsAppleWatch.swift */; };
 		47150A4027F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47150A3F27F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift */; };
 		4716A4EF2B406C3D00419052 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4716A4EE2B406C3D00419052 /* WidgetKit.framework */; };
 		4716A4F12B406C3D00419052 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4716A4F02B406C3D00419052 /* SwiftUI.framework */; };
@@ -3996,6 +3997,7 @@
 				47E91BBA2B9A43F20063181B /* FollowerBackgroundKeepAliveType.swift in Sources */,
 				478A92582B8FA1F20084C394 /* Date.swift in Sources */,
 				478A92552B8FA1D80084C394 /* ConstantsBGGraphBuilder.swift in Sources */,
+				4713B0142BBAB12D009F2838 /* ConstantsAppleWatch.swift in Sources */,
 				478A925F2B8FB5290084C394 /* XDripWatchComplication+Entry.swift in Sources */,
 				478A925A2B8FA27D0084C394 /* TextsCommon.swift in Sources */,
 				4746068C2B96380200AC9214 /* ConstantsLibreLinkUp.swift in Sources */,
