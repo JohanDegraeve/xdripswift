@@ -59,32 +59,28 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
         }
     }
     
-    // return the keep-alive image for UIKit views
-    var keepAliveUIImage: UIImage {
+    // return the keep-alive image for SwiftUI views
+    var keepAliveImageString: String {
         switch self {
         case .disabled:
-            return UIImage(systemName: "d.circle") ?? UIImage()
+            return "d.circle"
         case .normal:
-            return UIImage(systemName: "n.circle") ?? UIImage()
+            return "n.circle"
         case .aggressive:
-            return UIImage(systemName: "a.circle") ?? UIImage()
+            return "a.circle"
         case .heartbeat:
-            return UIImage(systemName: "heart.circle") ?? UIImage()
+            return "heart.circle"
         }
+    }
+    
+    // return the keep-alive image for UIKit views
+    var keepAliveUIImage: UIImage {
+        return UIImage(systemName: keepAliveImageString) ?? UIImage()
     }
     
     // return the keep-alive image for SwiftUI views
     var keepAliveImage: Image {
-        switch self {
-        case .disabled:
-            return Image(systemName: "d.circle")
-        case .normal:
-            return Image(systemName: "n.circle")
-        case .aggressive:
-            return Image(systemName: "a.circle")
-        case .heartbeat:
-            return Image(systemName: "heart.circle")
-        }
+        return Image(systemName: keepAliveImageString)
     }
     
 }
