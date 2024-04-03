@@ -4,8 +4,8 @@
 //
 
 // Version [DEFAULT]
-XDRIP_MARKETING_VERSION = 5.1.4
-CURRENT_PROJECT_VERSION = 4196
+XDRIP_MARKETING_VERSION = 5.1.5
+CURRENT_PROJECT_VERSION = 4197
 
 // Optional override
 #include? "VersionOverride.xcconfig"
