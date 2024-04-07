@@ -209,6 +209,7 @@ struct XDripWidgetLiveActivity: Widget {
                     .minimumScaleFactor(0.1)
             } compactTrailing: {
                 Text(context.state.deltaChangeStringInUserChosenUnit())
+                    .foregroundStyle(context.state.deltaChangeTextColor())
                     .minimumScaleFactor(0.1)
             } minimal: {
                 Text("\(context.state.bgValueStringInUserChosenUnit)")
