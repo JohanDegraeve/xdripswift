@@ -14,7 +14,7 @@ import WidgetKit
 
 /// holds, the watch state and allows updates and computed properties/variables to be generated for the different views that use it
 /// also used to update the ComplicationSharedUserDefaultsModel in the app group so that the complication can access the data
-class WatchStateModel: NSObject, ObservableObject {
+final class WatchStateModel: NSObject, ObservableObject {
     
     /// the Watch Connectivity session
     var session: WCSession
@@ -26,8 +26,9 @@ class WatchStateModel: NSObject, ObservableObject {
     
     var bgReadingValues: [Double] = []
     var bgReadingDates: [Date] = []
+    var bgReadingDatesAsDouble: [Double] = []
     
-    @Published var updatedDatesString: String = ""
+//    @Published var updatedDatesString: String = ""
     
     @Published var isMgDl: Bool = true
     @Published var slopeOrdinal: Int = 0
@@ -48,12 +49,14 @@ class WatchStateModel: NSObject, ObservableObject {
     @Published var followerDataSourceType: FollowerDataSourceType = .nightscout
     @Published var followerBackgroundKeepAliveType: FollowerBackgroundKeepAliveType = .normal
     @Published var disableComplications: Bool = false
+    @Published var remainingComplicationUserInfoTransfers: Int = 99
     
     @Published var lastUpdatedTextString: String = "Requesting data..."
     @Published var lastUpdatedTimeString: String = ""
     @Published var debugString: String = "Debug..."
     @Published var chartHoursIndex: Int = 1
     @Published var requestingDataIconColor: Color = ConstantsAppleWatch.requestingDataIconColorInactive
+    @Published var lastComplicationUpdateTimeStamp: Date = .distantPast
     
     init(session: WCSession = .default) {
         self.session = session
@@ -240,39 +243,41 @@ class WatchStateModel: NSObject, ObservableObject {
                 self.debugString.removeLast(4)
                 self.debugString += "Fetching"
             }
-        }
-        
-        print("Requesting watch state update from iOS")
-        session.sendMessage(["requestWatchStateUpdate": true], replyHandler: nil) { error in
-            print("WatchStateModel error: " + error.localizedDescription)
+            
+            print("Requesting watch state update from iOS")
+            
+            session.sendMessage(["requestWatchUpdate": "watchState"], replyHandler: nil) { error in
+                print("WatchStateModel error: " + error.localizedDescription)
+            }
         }
     }
     
-    /// update the watch state so that the view can be updated
-    /// - Parameter watchState: this is the new watch state as sent from the iOS companion app
-    private func processState(_ watchState: WatchState) {
-        updatedDate = Date()
+    private func processWatchStateFromDictionary(dictionary: [String: Any]) {
+        let bgReadingDatesFromDictionary: [Double] = dictionary["bgReadingDatesAsDouble"] as? [Double] ?? [0]
         
-        bgReadingValues = watchState.bgReadingValues
-        bgReadingDates = watchState.bgReadingDates
-        isMgDl = watchState.isMgDl ?? true
-        slopeOrdinal = watchState.slopeOrdinal ?? 5
-        deltaChangeInMgDl = watchState.deltaChangeInMgDl ?? 2
-        urgentLowLimitInMgDl = watchState.urgentLowLimitInMgDl ?? 60
-        lowLimitInMgDl = watchState.lowLimitInMgDl ?? 80
-        highLimitInMgDl = watchState.highLimitInMgDl ?? 180
-        urgentHighLimitInMgDl = watchState.urgentHighLimitInMgDl ?? 240
-        activeSensorDescription = watchState.activeSensorDescription ?? ""
-        sensorAgeInMinutes = watchState.sensorAgeInMinutes ?? 0
-        sensorMaxAgeInMinutes = watchState.sensorMaxAgeInMinutes ?? 0
-        timeStampOfLastFollowerConnection = watchState.timeStampOfLastFollowerConnection ?? .distantPast
-        secondsUntilFollowerDisconnectWarning = watchState.secondsUntilFollowerDisconnectWarning ?? 70
-        timeStampOfLastHeartBeat = watchState.timeStampOfLastHeartBeat ?? .distantPast
-        secondsUntilHeartBeatDisconnectWarning = watchState.secondsUntilHeartBeatDisconnectWarning ?? 5
-        isMaster = watchState.isMaster ?? true
-        followerDataSourceType = FollowerDataSourceType(rawValue: watchState.followerDataSourceTypeRawValue ?? 0) ?? .nightscout
-        followerBackgroundKeepAliveType = FollowerBackgroundKeepAliveType(rawValue: watchState.followerBackgroundKeepAliveTypeRawValue ?? 0) ?? .normal
-        disableComplications = watchState.disableComplications ?? false
+        bgReadingDates = bgReadingDatesFromDictionary.map { (bgReadingDateAsDouble) -> Date in
+            return Date(timeIntervalSince1970: bgReadingDateAsDouble)
+        }
+        
+        bgReadingValues = dictionary["bgReadingValues"] as? [Double] ?? [100]
+        isMgDl = dictionary["isMgDl"] as? Bool ?? true
+        slopeOrdinal = dictionary["slopeOrdinal"] as? Int ?? 0
+        deltaChangeInMgDl = dictionary["deltaChangeInMgDl"] as? Double ?? 0
+        urgentLowLimitInMgDl = dictionary["urgentLowLimitInMgDl"] as? Double ?? 60
+        lowLimitInMgDl = dictionary["lowLimitInMgDl"] as? Double ?? 70
+        highLimitInMgDl = dictionary["highLimitInMgDl"] as? Double ?? 180
+        urgentHighLimitInMgDl = dictionary["urgentHighLimitInMgDl"] as? Double ?? 250
+        updatedDate = dictionary["updatedDate"] as? Date ?? .now
+        activeSensorDescription = dictionary["activeSensorDescription"] as? String ?? ""
+        sensorAgeInMinutes = dictionary["sensorAgeInMinutes"] as? Double ?? 0
+        sensorMaxAgeInMinutes = dictionary["sensorMaxAgeInMinutes"] as? Double ?? 0
+        isMaster = dictionary["isMaster"] as? Bool ?? true
+        followerDataSourceType = FollowerDataSourceType(rawValue: dictionary["followerDataSourceTypeRawValue"] as? Int ?? 0) ?? .nightscout
+        followerBackgroundKeepAliveType = FollowerBackgroundKeepAliveType(rawValue: dictionary["followerBackgroundKeepAliveTypeRawValue"] as? Int ?? 0) ?? .normal
+        timeStampOfLastHeartBeat = dictionary["timeStampOfLastHeartBeat"] as? Date ?? .distantPast
+        secondsUntilHeartBeatDisconnectWarning = dictionary["secondsUntilHeartBeatDisconnectWarning"] as? Int ?? 0
+        disableComplications = dictionary["disableComplications"] as? Bool ?? false
+        remainingComplicationUserInfoTransfers = dictionary["remainingComplicationUserInfoTransfers"] as? Int ?? 99
         
         // check if there is any BG data available before updating the data source info strings accordingly
         if let bgReadingDate = bgReadingDate() {
@@ -286,17 +291,14 @@ class WatchStateModel: NSObject, ObservableObject {
         debugString = generateDebugString()
         
         // now process the shared user defaults to get data for the WidgetKit complications
-        updateWatchSharedUserDefaults()
-        
-        // change the requesting icon color back after a small delay to prevent it
-        // flashing on/off too quickly
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorInactive
-        }
+        updateComplicationData()
     }
     
     /// once we've process the state update, then save this data to the shared app group so that the complication can read it
-    private func updateWatchSharedUserDefaults() {
+    private func updateComplicationData() {
+        // limit the update calls to once every 50 seconds. No real reason but it makes no sense to try and 
+        // update userdefaults every few seconds if there is no way the data could have changed yet
+        guard lastComplicationUpdateTimeStamp < Date().addingTimeInterval(-50) else { return }
         
         guard let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) else { return }
         
@@ -304,7 +306,7 @@ class WatchStateModel: NSObject, ObservableObject {
             date.timeIntervalSince1970
         }
         
-        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl, disableComplications: disableComplications)
+        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl, disableComplications: disableComplications, remainingComplicationUserInfoTransfers: remainingComplicationUserInfoTransfers)
         
         // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
         // the user's device - this allows several copies of the app to be installed without cross-contamination of widget/complication data
@@ -314,7 +316,10 @@ class WatchStateModel: NSObject, ObservableObject {
         
         // now that the new data is stored in the app group, try to force the complications to reload
         WidgetCenter.shared.reloadAllTimelines()
+        
+        lastComplicationUpdateTimeStamp = .now
     }
+    
     
     // generate a debugString
     private func generateDebugString() -> String {
@@ -329,6 +334,9 @@ class WatchStateModel: NSObject, ObservableObject {
         }
         
         debugString += "\nBG values: \(bgReadingValues.count)"
+        
+        debugString += "\nComp updated: \(lastComplicationUpdateTimeStamp.formatted(date: .omitted, time: .standard))"
+        debugString += "\nComp remain: \(remainingComplicationUserInfoTransfers.description)/50"
         
         if !isMaster {
             debugString += "\nFollower conn.: \(timeStampOfLastFollowerConnection.formatted(date: .omitted, time: .standard))"
@@ -345,26 +353,37 @@ class WatchStateModel: NSObject, ObservableObject {
     }
 }
 
-extension WatchStateModel: WCSessionDelegate {
-#if os(iOS)
-    public func sessionDidBecomeInactive(_ session: WCSession) {}
-    public func sessionDidDeactivate(_ session: WCSession) {}
-#endif
-    
-    func session(_: WCSession, activationDidCompleteWith state: WCSessionActivationState, error _: Error?) {
-        requestWatchStateUpdate()
+extension WatchStateModel: WCSessionDelegate {    
+    func session(_: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error _: Error?) {
+        if activationState == .activated {
+            requestWatchStateUpdate()
+        }
     }
     
-    func session(_: WCSession, didReceiveMessage _: [String: Any]) {}
+    func sessionReachabilityDidChange(_ session: WCSession) {}
     
-    func sessionReachabilityDidChange(_ session: WCSession) {
-    }
+    func session(_: WCSession, didReceiveMessageData messageData: Data) {}
     
-    func session(_: WCSession, didReceiveMessageData messageData: Data) {
-        if let watchState = try? JSONDecoder().decode(WatchState.self, from: messageData) {
-            DispatchQueue.main.async {
-                self.processState(watchState)
+    func session(_: WCSession, didReceiveMessage message: [String : Any]) {
+        let watchStateAsDictionary = message["watchState"] as! [String : Any]
+        
+        DispatchQueue.main.async {
+            self.processWatchStateFromDictionary(dictionary: watchStateAsDictionary)
+            
+            // change the requesting icon color back after a small delay to prevent it
+            // flashing on/off too quickly
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorInactive
             }
         }
     }
+    
+//    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
+    func session(_: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
+        let watchStateAsDictionary = userInfo["watchState"] as! [String : Any]
+            DispatchQueue.main.async {
+                self.processWatchStateFromDictionary(dictionary: watchStateAsDictionary)
+            }
+//        }
+     }
 }

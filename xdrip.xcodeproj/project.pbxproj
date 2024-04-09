@@ -85,6 +85,7 @@
 		478A92652B90AB040084C394 /* GlucoseChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210EF2B52A05B00005711 /* GlucoseChartView.swift */; };
 		478A92662B90AB230084C394 /* GlucoseChartType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210ED2B5298EB00005711 /* GlucoseChartType.swift */; };
 		478A92682B90ABB30084C394 /* ConstantsGlucoseChartSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A50C2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift */; };
+		47930E822BC5A001000BD8A1 /* ConstantsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47930E812BC5A001000BD8A1 /* ConstantsWidget.swift */; };
 		479359862B88B95A007D3CEE /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4716A4EE2B406C3D00419052 /* WidgetKit.framework */; };
 		479359872B88B95A007D3CEE /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4716A4F02B406C3D00419052 /* SwiftUI.framework */; };
 		4793598A2B88B95A007D3CEE /* XDripWatchComplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479359892B88B95A007D3CEE /* XDripWatchComplication.swift */; };
@@ -871,6 +872,7 @@
 		478A925E2B8FB5290084C394 /* XDripWatchComplication+Entry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XDripWatchComplication+Entry.swift"; sourceTree = "<group>"; };
 		478A92602B8FB53B0084C394 /* XDripWatchComplication+EntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XDripWatchComplication+EntryView.swift"; sourceTree = "<group>"; };
 		478A92622B8FB5490084C394 /* XDripWatchComplication+Provider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XDripWatchComplication+Provider.swift"; sourceTree = "<group>"; };
+		47930E812BC5A001000BD8A1 /* ConstantsWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsWidget.swift; sourceTree = "<group>"; };
 		479359852B88B95A007D3CEE /* xDrip Watch Complication Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "xDrip Watch Complication Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		479359892B88B95A007D3CEE /* XDripWatchComplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XDripWatchComplication.swift; sourceTree = "<group>"; };
 		4793598B2B88B95B007D3CEE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -3083,6 +3085,7 @@
 				F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */,
 				F8AF36142455C6F700B5977B /* ConstantsTrace.swift */,
 				F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */,
+				47930E812BC5A001000BD8A1 /* ConstantsWidget.swift */,
 			);
 			name = Constants;
 			path = xdrip/Constants;
@@ -4241,6 +4244,7 @@
 				F8C97859242AAE7B00A09483 /* MiaoMiao+BluetoothPeripheral.swift in Sources */,
 				476FE8FF2B2F1D1700537E0A /* ConstantsFollower.swift in Sources */,
 				F8EEDD5422FF685400D2D610 /* NSMutableURLRequest.swift in Sources */,
+				47930E822BC5A001000BD8A1 /* ConstantsWidget.swift in Sources */,
 				F897AAFB2201018800CDDD10 /* String.swift in Sources */,
 				F85542342B7574330058CE09 /* OmniPodHeartBeat+CoreDataProperties.swift in Sources */,
 				F8B3A847227F090E004BA588 /* SettingsViewNightScoutSettingsViewModel.swift in Sources */,

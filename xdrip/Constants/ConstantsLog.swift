@@ -143,7 +143,7 @@ enum ConstantsLog {
     static let categoryCalendarManager =                    "CalendarManager                "
     
     /// WatchManager logging
-    static let categoryWatchManager =                       "WatchManager                   "
+    static let categoryWatchManager =                        "WatchManager                  "
     
     /// bluetoothPeripheralViewController
     static let categoryBluetoothPeripheralViewController =   "blePeripheralViewController   "

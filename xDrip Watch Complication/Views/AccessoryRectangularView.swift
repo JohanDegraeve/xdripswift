@@ -29,6 +29,12 @@ extension XDripWatchComplication.EntryView {
                     
                     Spacer()
                     
+                    // TODO: Debug only. Remove for production.
+                    Text("[\(entry.widgetState.remainingComplicationUserInfoTransfers)]")
+                        .font(.system(size: entry.widgetState.isSmallScreen() ? 12 : 14))
+                        .foregroundStyle(Color(.cyan))
+                        .minimumScaleFactor(0.2)
+                    
                     Text("\(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
                         .font(.system(size: entry.widgetState.isSmallScreen() ? 14 : 16))
                         .foregroundStyle(Color(white: 0.7))
