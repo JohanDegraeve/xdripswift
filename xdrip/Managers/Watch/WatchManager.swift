@@ -119,18 +119,18 @@ final class WatchManager: NSObject, ObservableObject {
     
     func sendStateToWatch() {
         guard session.isPaired else {
-            trace("No Watch is paired", log: self.log, category: ConstantsLog.categoryWatchManager, type: .debug)
+            trace("no Watch is paired", log: self.log, category: ConstantsLog.categoryWatchManager, type: .debug)
             return
         }
         
         guard session.isWatchAppInstalled else {
-            trace("Watch app is not installed", log: self.log, category: ConstantsLog.categoryWatchManager, type: .debug)
+            trace("watch app is not installed", log: self.log, category: ConstantsLog.categoryWatchManager, type: .debug)
             return
         }
         
         guard session.activationState == .activated else {
             let activationStateString = "\(session.activationState)"
-            trace("Watch session activationState = %{public}@. Reactivating", log: self.log, category: ConstantsLog.categoryWatchManager, type: .error, activationStateString)
+            trace("watch session activationState = %{public}@. Reactivating", log: self.log, category: ConstantsLog.categoryWatchManager, type: .error, activationStateString)
             session.activate()
             return
         }
@@ -142,16 +142,16 @@ final class WatchManager: NSObject, ObservableObject {
         if let userInfo: [String: Any] = watchState.asDictionary {
             if session.isReachable {
                 session.sendMessage(["watchState": userInfo], replyHandler: nil, errorHandler: { (error) -> Void in
-                    trace("Error sending watch state, error = %{public}@", log: self.log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)
+                    trace("error sending watch state, error = %{public}@", log: self.log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)
                 })
             } else {
                 if lastForcedComplicationUpdateTimeStamp < Date().addingTimeInterval(-ConstantsWidget.forceComplicationRefreshTimeInMinutes * 60), session.isComplicationEnabled {
-                    trace("Forcing background complication update, remaining complication transfers today = %{public}@", log: self.log, category: ConstantsLog.categoryWatchManager, type: .info, session.remainingComplicationUserInfoTransfers.description)
+                    trace("forcing background complication update, remaining complication transfers left today = %{public}@ / 50", log: self.log, category: ConstantsLog.categoryWatchManager, type: .info, session.remainingComplicationUserInfoTransfers.description)
                     
                     session.transferCurrentComplicationUserInfo(["watchState": userInfo])
                     lastForcedComplicationUpdateTimeStamp = .now
                 } else {
-                    trace("Sending background watch state update", log: self.log, category: ConstantsLog.categoryWatchManager, type: .info)
+                    trace("sending background watch state update", log: self.log, category: ConstantsLog.categoryWatchManager, type: .info)
                     
                     session.transferUserInfo(["watchState": userInfo])
                 }

@@ -38,5 +38,22 @@ public enum LiveActivityType: Int, CaseIterable {
         }
     }
     
+    var debugDescription: String {
+        switch self {
+        case .disabled:
+            return "Disabled"
+        case .always:
+            return "Always"
+        case .urgentLow:
+            return "Only Urgent Low"
+        case .low:
+            return "When Low"
+        case .lowHigh:
+            return "When Low or High"
+        case .urgentLowHigh:
+            return "Only when Urgent Low or Urgent High"
+        }
+    }
+    
 }
 
