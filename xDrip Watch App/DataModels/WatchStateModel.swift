@@ -296,10 +296,6 @@ final class WatchStateModel: NSObject, ObservableObject {
     
     /// once we've process the state update, then save this data to the shared app group so that the complication can read it
     private func updateComplicationData() {
-        // limit the update calls to once every 50 seconds. No real reason but it makes no sense to try and 
-        // update userdefaults every few seconds if there is no way the data could have changed yet
-        guard lastComplicationUpdateTimeStamp < Date().addingTimeInterval(-50) else { return }
-        
         guard let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) else { return }
         
         let bgReadingDatesAsDouble = bgReadingDates.map { date in
