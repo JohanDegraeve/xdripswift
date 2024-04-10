@@ -23,7 +23,7 @@ extension XDripWatchComplication.EntryView {
                         
                         Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
                             .font(.system(size: entry.widgetState.isSmallScreen() ? 20 : 24)).fontWeight(.semibold)
-                            .foregroundStyle(entry.widgetState.deltaChangeTextColor())
+                            .foregroundStyle(.colorPrimary)
                             .lineLimit(1)
                     }
                     
@@ -32,12 +32,12 @@ extension XDripWatchComplication.EntryView {
                     // TODO: Debug only. Remove for production.
                     Text("[\(entry.widgetState.remainingComplicationUserInfoTransfers)]")
                         .font(.system(size: entry.widgetState.isSmallScreen() ? 12 : 14))
-                        .foregroundStyle(Color(.cyan))
+                        .foregroundStyle(.cyan)
                         .minimumScaleFactor(0.2)
                     
                     Text("\(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
-                        .font(.system(size: entry.widgetState.isSmallScreen() ? 14 : 16))
-                        .foregroundStyle(Color(white: 0.7))
+                        .font(.system(size: entry.widgetState.isSmallScreen() ? 15 : 17))
+                        .foregroundStyle(.colorPrimary)
                         .minimumScaleFactor(0.2)
                 }
                 .padding(0)

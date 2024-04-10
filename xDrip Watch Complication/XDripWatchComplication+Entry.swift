@@ -13,7 +13,6 @@ extension XDripWatchComplication {
     struct Entry: TimelineEntry {
         var date: Date = .now
         var widgetState: WidgetState
-        
     }
 }
 
@@ -63,29 +62,20 @@ extension XDripWatchComplication.Entry {
             self.bgValueStringInUserChosenUnit = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0].mgdlToMmolAndToString(mgdl: self.isMgDl) ?? "" : ""
         }
         
-        /// Blood glucose color dependant on the user defined limit values and based upon the time since the last reading
+        /// Blood glucose color dependant on the user defined limit values
         /// - Returns: a Color either red, yellow or green
         func bgTextColor() -> Color {
-            if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-60 * 7), let bgValueInMgDl = bgValueInMgDl {
+            if let bgValueInMgDl = bgValueInMgDl {
                 if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
-                    return Color(.red)
+                    return .red
                 } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
-                    return Color(.yellow)
+                    return .yellow
                 } else {
-                    return Color(.green)
+                    return .green
                 }
             } else {
-                return Color(.gray)
-            }
-        }
-        
-        /// Delta text color dependant on the time since the last reading
-        /// - Returns: a Color either red, yellow or green
-        func deltaChangeTextColor() -> Color {
-            if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-60 * 7) {
-                return Color(white: 0.8)
-            } else {
-                return Color(.gray)
+                // this would never usually be returned in real use but it keeps the compiler happy
+                return .colorSecondary
             }
         }
         

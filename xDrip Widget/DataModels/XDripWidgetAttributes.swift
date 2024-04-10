@@ -32,6 +32,14 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var bgReadingDates: [Date] {
             secondsSinceFirstDate.map { Date(timeInterval: Double($0), since: firstDate) }
         }
+        
+        // For some reason, ActivityAttributes can't see the main target Assets folder
+        // so we'll just duplicate the colors here for now
+        // We have to store just the float value instead of the whole Color object to
+        // keep the struct conforming to Codable
+        private var colorPrimaryWhiteValue: Double = 0.9
+        private var colorSecondaryWhiteValue: Double = 0.65
+        private var colorTertiaryWhiteValue: Double = 0.45
 
         var isMgDl: Bool
         var slopeOrdinal: Int
@@ -86,27 +94,27 @@ struct XDripWidgetAttributes: ActivityAttributes {
             if let bgReadingDate = bgReadingDate, let bgValueInMgDl = bgValueInMgDl {
                 if bgReadingDate > Date().addingTimeInterval(-60 * 7) {
                     if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
-                        return Color(.red)
+                        return .red
                     } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
-                        return Color(.yellow)
+                        return .yellow
                     } else {
-                        return Color(.green)
+                        return .green
                     }
                 } else {
-                    return Color.gray
+                    return Color(white: colorTertiaryWhiteValue)
                 }
             } else {
-                return Color.gray
+                return Color(white: colorTertiaryWhiteValue)
             }
         }
         
         /// Delta text color dependant on the time since the last reading
-        /// - Returns: a Color either red, yellow or green
+        /// - Returns: a Color either white(ish) or gray
         func deltaChangeTextColor() -> Color {
             if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-60 * 7) {
-                return Color(white: 0.8)
+                return Color(white: colorPrimaryWhiteValue)
             } else {
-                return Color(.gray)
+                return Color(white: colorTertiaryWhiteValue)
             }
         }
         

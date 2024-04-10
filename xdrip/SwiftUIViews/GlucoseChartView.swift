@@ -68,11 +68,11 @@ struct GlucoseChartView: View {
     /// - Returns: a Color object either red, yellow or green
     func bgColor(bgValueInMgDl: Double) -> Color {
         if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
-            return Color(.red)
+            return .red
         } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
-            return Color(.yellow)
+            return .yellow
         } else {
-            return Color(.green)
+            return .green
         }
     }
     

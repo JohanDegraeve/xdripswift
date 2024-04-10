@@ -15,6 +15,8 @@ extension XDripWidget {
         // get the widget's family so that we can show the correct view
         @Environment(\.widgetFamily) private var widgetFamily
         
+        @Environment(\.colorScheme) var colorScheme
+        
         var entry: Entry
         
         var body: some View {

@@ -99,14 +99,14 @@ final class WatchStateModel: NSObject, ObservableObject {
     func bgTextColor() -> Color {
         if let bgReadingDate = bgReadingDate(), bgReadingDate > Date().addingTimeInterval(-60 * 7), let bgValueInMgDl = bgValueInMgDl() {
             if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
-                return Color(.red)
+                return .red
             } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
-                return Color(.yellow)
+                return .yellow
             } else {
-                return Color(.green)
+                return .green
             }
         } else {
-            return Color(.gray)
+            return .gray
         }
     }
     
@@ -114,11 +114,11 @@ final class WatchStateModel: NSObject, ObservableObject {
     /// - Returns: a Color either normal (gray) or yellow/red if the reading was several minutes ago and hasn't been updated
     func lastUpdatedTimeColor() -> Color {
         if let bgReadingDate = bgReadingDate(), bgReadingDate > Date().addingTimeInterval(-60 * 7) {
-            return Color(.gray)
+            return .colorSecondary
         } else if let bgReadingDate = bgReadingDate(), bgReadingDate > Date().addingTimeInterval(-60 * 12) {
-            return Color(.yellow)
+            return .yellow
         } else {
-            return Color(.red)
+            return .red
         }
     }
     
@@ -204,14 +204,14 @@ final class WatchStateModel: NSObject, ObservableObject {
     /// - Returns: image and color of the correct follower connection status
     func getFollowerConnectionNetworkStatus() -> (image: Image, color: Color) {
             if timeStampOfLastFollowerConnection > Date().addingTimeInterval(-Double(secondsUntilFollowerDisconnectWarning)) {
-                return(Image(systemName: "network"), Color(.green))
+                return(Image(systemName: "network"), .green)
             } else {
                 if followerBackgroundKeepAliveType != .disabled {
-                    return(Image(systemName: "network.slash"), Color(.red))
+                    return(Image(systemName: "network.slash"), .red)
                 } else {
                     // if keep-alive is disabled, then this will never show a constant server connection so just "disable" 
                     // the icon when not recent. It would be incorrect to show a red error.
-                    return(Image(systemName: "network.slash"), Color(.gray))
+                    return(Image(systemName: "network.slash"), .gray)
                 }
             }
     }
@@ -226,7 +226,7 @@ final class WatchStateModel: NSObject, ObservableObject {
                 return .green
             }
         } else {
-            return Color(.gray)
+            return .gray
         }
     }
     

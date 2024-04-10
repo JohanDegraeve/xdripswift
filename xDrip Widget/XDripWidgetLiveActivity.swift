@@ -49,7 +49,7 @@ struct XDripWidgetLiveActivity: Widget {
                         
                         Text(context.state.bgUnitString)
                             .font(.title)
-                            .foregroundStyle(Color(white: 0.5))
+                            .foregroundStyle(.colorTertiary)
                             .minimumScaleFactor(0.2)
                             .lineLimit(1)
                     }
@@ -78,7 +78,7 @@ struct XDripWidgetLiveActivity: Widget {
                             
                             Text(context.state.bgUnitString)
                                 .font(.system(size: 20))
-                                .foregroundStyle(Color(white: 0.5))
+                                .foregroundStyle(.colorTertiary)
                                 .minimumScaleFactor(0.2)
                                 .lineLimit(1)
                         }
@@ -130,7 +130,7 @@ struct XDripWidgetLiveActivity: Widget {
                                     .lineLimit(1)
                                 Text(context.state.bgUnitString)
                                     .font(.system(size: 28))
-                                    .foregroundStyle(.gray)
+                                    .foregroundStyle(.colorTertiary)
                                     .lineLimit(1)
                             }
                         }
@@ -144,13 +144,13 @@ struct XDripWidgetLiveActivity: Widget {
                         HStack {
                             Text(context.state.dataSourceDescription)
                                 .font(.caption).bold()
-                                .foregroundStyle(Color(white: 0.8))
+                                .foregroundStyle(.colorSecondary)
                             
                             Spacer()
                             
                             Text("Last reading at \(context.state.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
                                 .font(.caption)
-                                .foregroundStyle(Color(white: 0.6))
+                                .foregroundStyle(.colorTertiary)
                         }
                         .padding(.top, 2)
                         .padding(.bottom, 10)
@@ -194,7 +194,7 @@ struct XDripWidgetLiveActivity: Widget {
                         
                         Text(context.state.bgUnitString)
                             .font(.title)
-                            .foregroundStyle(Color(white: 0.5))
+                            .foregroundStyle(.colorSecondary)
                             .minimumScaleFactor(0.2)
                             .lineLimit(1)
                     }
