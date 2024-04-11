@@ -13,7 +13,6 @@ extension XDripWatchComplication {
     struct Entry: TimelineEntry {
         var date: Date = .now
         var widgetState: WidgetState
-        
     }
 }
 
@@ -32,14 +31,17 @@ extension XDripWatchComplication.Entry {
         var lowLimitInMgDl: Double
         var highLimitInMgDl: Double
         var urgentHighLimitInMgDl: Double
+        var disableComplications: Bool
+        
+        // TODO: Debug only. Remove for production.
+        var remainingComplicationUserInfoTransfers: Int
         
         var bgUnitString: String
         var bgValueInMgDl: Double?
         var bgReadingDate: Date?
         var bgValueStringInUserChosenUnit: String
-        var disableComplications: Bool
                 
-        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaChangeInMgDl: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, disableComplications: Bool? = false) {
+        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaChangeInMgDl: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, disableComplications: Bool? = false, remainingComplicationUserInfoTransfers: Int? = 99) {
             self.bgReadingValues = bgReadingValues
             self.bgReadingDates = bgReadingDates
             self.isMgDl = isMgDl ?? true
@@ -49,38 +51,31 @@ extension XDripWatchComplication.Entry {
             self.lowLimitInMgDl = lowLimitInMgDl ?? 80
             self.highLimitInMgDl = highLimitInMgDl ?? 180
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl ?? 250
+            self.disableComplications = disableComplications ?? false
+            
+            // TODO: Debug only. Remove for production.
+            self.remainingComplicationUserInfoTransfers = remainingComplicationUserInfoTransfers ?? 99
             
             self.bgValueInMgDl = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0] : nil
             self.bgReadingDate = (bgReadingDates?.count ?? 0) > 0 ? bgReadingDates?[0] : nil
             self.bgUnitString = self.isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
             self.bgValueStringInUserChosenUnit = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0].mgdlToMmolAndToString(mgdl: self.isMgDl) ?? "" : ""
-            self.disableComplications = disableComplications ?? false
-            
         }
         
-        /// Blood glucose color dependant on the user defined limit values and based upon the time since the last reading
+        /// Blood glucose color dependant on the user defined limit values
         /// - Returns: a Color either red, yellow or green
         func bgTextColor() -> Color {
-            if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-60 * 7), let bgValueInMgDl = bgValueInMgDl {
+            if let bgValueInMgDl = bgValueInMgDl {
                 if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
-                    return Color(.red)
+                    return .red
                 } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
-                    return Color(.yellow)
+                    return .yellow
                 } else {
-                    return Color(.green)
+                    return .green
                 }
             } else {
-                return Color(.gray)
-            }
-        }
-        
-        /// Delta text color dependant on the time since the last reading
-        /// - Returns: a Color either red, yellow or green
-        func deltaChangeTextColor() -> Color {
-            if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-60 * 7) {
-                return Color(white: 0.8)
-            } else {
-                return Color(.gray)
+                // this would never usually be returned in real use but it keeps the compiler happy
+                return .colorSecondary
             }
         }
         

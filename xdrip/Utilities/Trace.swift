@@ -317,10 +317,8 @@ class Trace {
     static func getAppInfoFileAsData() -> (Data?, String) {
         
         var traceInfo = ""
-             
-        traceInfo.appendStringAndNewLine(paragraphSeperator)
         
-        traceInfo.appendStringAndNewLine("Date + timezone: " + Date().toString(timeStyle: .full, dateStyle: .medium))
+        traceInfo.appendStringAndNewLine("\nDate & timezone: " + Date().toString(timeStyle: .full, dateStyle: .medium))
         
         traceInfo.appendStringAndNewLine(paragraphSeperator)
         
@@ -330,16 +328,21 @@ class Trace {
         traceInfo.appendStringAndNewLine("Build number: " + buildNumber + " (" + timeStampAppBuild.toString(timeStyle: .none, dateStyle: .medium) + ")\n")
         
         // app install and open timestamps
-        traceInfo.appendStringAndNewLine("App first installed on: " + timeStampAppInstall.toString(timeStyle: .short, dateStyle: .medium))
+        traceInfo.appendStringAndNewLine("Installed on: " + timeStampAppInstall.toString(timeStyle: .short, dateStyle: .medium) + " (" + timeStampAppInstall.daysAndHoursAgo(appendAgo: true) + ")")
                 
         if let timeStampAppLaunch = UserDefaults.standard.timeStampAppLaunch {
-            traceInfo.appendStringAndNewLine("App last opened on: " + timeStampAppLaunch.toString(timeStyle: .short, dateStyle: .medium))
+            traceInfo.appendStringAndNewLine("Last opened on: " + timeStampAppLaunch.toString(timeStyle: .short, dateStyle: .medium) + " (" + timeStampAppLaunch.daysAndHoursAgo(appendAgo: true) + ")")
         }
         
         traceInfo.appendStringAndNewLine(paragraphSeperator)
+        
+        traceInfo.appendStringAndNewLine("Help settings:")
+        traceInfo.appendStringAndNewLine("    Translate automatically: " + UserDefaults.standard.translateOnlineHelp.description)
+        traceInfo.appendStringAndNewLine("    Show help icon: " + UserDefaults.standard.showHelpIcon.description)
 
         // master or follower mode?
-        traceInfo.appendStringAndNewLine("Data Source Mode: " + (UserDefaults.standard.isMaster ? "Master" : UserDefaults.standard.followerDataSourceType.descriptionForLogging()))
+        traceInfo.appendStringAndNewLine("\nCGM Data Source: " + (UserDefaults.standard.isMaster ? "Master" : UserDefaults.standard.followerDataSourceType.descriptionForLogging()))
+        traceInfo.appendStringAndNewLine("    Measurement unit: " + (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
         
         if UserDefaults.standard.isMaster {
             
@@ -360,15 +363,13 @@ class Trace {
             }
         }
         
-        traceInfo.appendStringAndNewLine("\nHelp settings:")
-        traceInfo.appendStringAndNewLine("    Translate automatically: " + UserDefaults.standard.translateOnlineHelp.description)
-        traceInfo.appendStringAndNewLine("    Show help icon: " + UserDefaults.standard.showHelpIcon.description)
-        
-        traceInfo.appendStringAndNewLine("\nGeneral settings:")
-        traceInfo.appendStringAndNewLine("    Measurement unit: " + (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
+        traceInfo.appendStringAndNewLine("\nNotifications settings:")
         traceInfo.appendStringAndNewLine("    Show BG in notifications: " + UserDefaults.standard.showReadingInNotification.description)
         traceInfo.appendStringAndNewLine("    Notification interval: " + UserDefaults.standard.notificationInterval.description + " minutes")
+        traceInfo.appendStringAndNewLine("    Live Activities: " + UserDefaults.standard.liveActivityType.debugDescription)
+        traceInfo.appendStringAndNewLine("    Live Activities Size: " + UserDefaults.standard.liveActivitySize.debugDescription)
         traceInfo.appendStringAndNewLine("    Show BG in app badge: " + UserDefaults.standard.showReadingInAppBadge.description)
+        traceInfo.appendStringAndNewLine("    Multiply app badge by 10: " + (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? "-" : UserDefaults.standard.multipleAppBadgeValueWith10.description))
                 
         traceInfo.appendStringAndNewLine("\nHome screen settings:")
         traceInfo.appendStringAndNewLine("    Allow chart rotation: " + UserDefaults.standard.allowScreenRotation.description)
@@ -554,7 +555,7 @@ class Trace {
                             
                             traceInfo.appendStringAndNewLine("        Read from Dexcom app: " + dexcomG5.useOtherApp.description)
                             
-                            traceInfo.appendStringAndNewLine("        Last reset: " + (dexcomG5.lastResetTimeStamp?.toString(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (UserDefaults.standard.activeSensorStartDate?.daysAndHoursAgo(appendAgo: true) ?? "nil") + ")")
+                            traceInfo.appendStringAndNewLine("        Last reset: " + (dexcomG5.lastResetTimeStamp?.toString(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (dexcomG5.lastResetTimeStamp?.daysAndHoursAgo(appendAgo: true) ?? "nil") + ")")
                             
                             // if needed additional specific info can be added
                             traceInfo.appendStringAndNewLine("        Voltage A: " + dexcomG5.voltageA.description + "0mV")

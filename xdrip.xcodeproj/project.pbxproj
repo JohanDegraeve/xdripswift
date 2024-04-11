@@ -22,12 +22,15 @@
 		4716A4FA2B406C3F00419052 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4716A4F92B406C3F00419052 /* Assets.xcassets */; };
 		4716A4FE2B406C3F00419052 /* xDrip Widget Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 4716A4ED2B406C3D00419052 /* xDrip Widget Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4716A5052B40709E00419052 /* XDripWidgetAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A5042B40709E00419052 /* XDripWidgetAttributes.swift */; };
-		4716A5072B4082ED00419052 /* XDripWidgetAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A5042B40709E00419052 /* XDripWidgetAttributes.swift */; };
 		4716A50D2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A50C2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift */; };
 		4716A5142B41CAD000419052 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A5132B41CAD000419052 /* LiveActivityManager.swift */; };
 		471C9BFF2B932952005E1326 /* LibreLinkUpModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E82A715FD900267BE3 /* LibreLinkUpModels.swift */; };
 		471C9C002B932957005E1326 /* LibreLinkUpModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E82A715FD900267BE3 /* LibreLinkUpModels.swift */; };
 		471C9C082B94F0F0005E1326 /* Bundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D602448E695001C9E5A /* Bundle.swift */; };
+		472134DC2BC69E6200729850 /* XDripWidgetAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A5042B40709E00419052 /* XDripWidgetAttributes.swift */; };
+		472134DD2BC6A63100729850 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
+		472134DE2BC6A63100729850 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
+		472134DF2BC6A63100729850 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
 		47228B152996BDD2008725DB /* BgReadingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47228B142996BDD2008725DB /* BgReadingsView.swift */; };
 		472596052B76301F00459D12 /* WatchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 472596042B76301F00459D12 /* WatchManager.swift */; };
 		4733B93E2AD17C99001D609D /* FollowerBgReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4733B93D2AD17C99001D609D /* FollowerBgReading.swift */; };
@@ -85,6 +88,7 @@
 		478A92652B90AB040084C394 /* GlucoseChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210EF2B52A05B00005711 /* GlucoseChartView.swift */; };
 		478A92662B90AB230084C394 /* GlucoseChartType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210ED2B5298EB00005711 /* GlucoseChartType.swift */; };
 		478A92682B90ABB30084C394 /* ConstantsGlucoseChartSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A50C2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift */; };
+		47930E822BC5A001000BD8A1 /* ConstantsWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47930E812BC5A001000BD8A1 /* ConstantsWidget.swift */; };
 		479359862B88B95A007D3CEE /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4716A4EE2B406C3D00419052 /* WidgetKit.framework */; };
 		479359872B88B95A007D3CEE /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4716A4F02B406C3D00419052 /* SwiftUI.framework */; };
 		4793598A2B88B95A007D3CEE /* XDripWatchComplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479359892B88B95A007D3CEE /* XDripWatchComplication.swift */; };
@@ -874,6 +878,7 @@
 		478A925E2B8FB5290084C394 /* XDripWatchComplication+Entry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XDripWatchComplication+Entry.swift"; sourceTree = "<group>"; };
 		478A92602B8FB53B0084C394 /* XDripWatchComplication+EntryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XDripWatchComplication+EntryView.swift"; sourceTree = "<group>"; };
 		478A92622B8FB5490084C394 /* XDripWatchComplication+Provider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XDripWatchComplication+Provider.swift"; sourceTree = "<group>"; };
+		47930E812BC5A001000BD8A1 /* ConstantsWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsWidget.swift; sourceTree = "<group>"; };
 		479359852B88B95A007D3CEE /* xDrip Watch Complication Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "xDrip Watch Complication Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		479359892B88B95A007D3CEE /* XDripWatchComplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = XDripWatchComplication.swift; sourceTree = "<group>"; };
 		4793598B2B88B95B007D3CEE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -3099,6 +3104,7 @@
 				F8A1586E22EDC7EE007F5B5D /* ConstantsSuspensionPrevention.swift */,
 				F8AF36142455C6F700B5977B /* ConstantsTrace.swift */,
 				F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */,
+				47930E812BC5A001000BD8A1 /* ConstantsWidget.swift */,
 			);
 			name = Constants;
 			path = xdrip/Constants;
@@ -3765,6 +3771,7 @@
 			files = (
 				47A6AC432B7D430D0047A4BA /* HomeView.strings in Resources */,
 				4716A4FA2B406C3F00419052 /* Assets.xcassets in Resources */,
+				472134DD2BC6A63100729850 /* Assets.xcassets in Resources */,
 				47A6AC452B7D43100047A4BA /* Common.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3773,6 +3780,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				472134DF2BC6A63100729850 /* Assets.xcassets in Resources */,
 				4793598C2B88B95B007D3CEE /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3785,6 +3793,7 @@
 				47A6ABE92B790CC70047A4BA /* Preview Assets.xcassets in Resources */,
 				47A6ABE62B790CC70047A4BA /* Assets.xcassets in Resources */,
 				47A6AC462B7D43110047A4BA /* Common.strings in Resources */,
+				472134DE2BC6A63100729850 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4206,6 +4215,7 @@
 				F8AF36152455C6F700B5977B /* ConstantsTrace.swift in Sources */,
 				F8F971B723A5914D00C3F17D /* BluetoothPeripheralType.swift in Sources */,
 				F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */,
+				472134DC2BC69E6200729850 /* XDripWidgetAttributes.swift in Sources */,
 				F8F1670E27273EA7001AA3D8 /* GlucoseDataRxMessage.swift in Sources */,
 				F8B3A835227F08AC004BA588 /* PickerViewController.swift in Sources */,
 				F821CF9522ADB0D7005C1E43 /* HealthKitManager.swift in Sources */,
@@ -4259,6 +4269,7 @@
 				F8C97859242AAE7B00A09483 /* MiaoMiao+BluetoothPeripheral.swift in Sources */,
 				476FE8FF2B2F1D1700537E0A /* ConstantsFollower.swift in Sources */,
 				F8EEDD5422FF685400D2D610 /* NSMutableURLRequest.swift in Sources */,
+				47930E822BC5A001000BD8A1 /* ConstantsWidget.swift in Sources */,
 				F897AAFB2201018800CDDD10 /* String.swift in Sources */,
 				F85542342B7574330058CE09 /* OmniPodHeartBeat+CoreDataProperties.swift in Sources */,
 				F8B3A847227F090E004BA588 /* SettingsViewNightScoutSettingsViewModel.swift in Sources */,
@@ -4445,7 +4456,6 @@
 				F808D2D2240329E80084B5DB /* Bubble+BluetoothPeripheral.swift in Sources */,
 				F8025C1321DA683400ECF0C0 /* Data.swift in Sources */,
 				F80859272364355F00F3829D /* ConstantsGlucoseChart.swift in Sources */,
-				4716A5072B4082ED00419052 /* XDripWidgetAttributes.swift in Sources */,
 				F816E10324367389009EE65B /* GNSEntryBluetoothPeripheralViewModel.swift in Sources */,
 				D4E499AD277B4CE7000F8CBA /* DateOnly.swift in Sources */,
 				F8E51D5D2448D8B5001C9E5A /* LoopManager.swift in Sources */,
