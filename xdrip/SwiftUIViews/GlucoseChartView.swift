@@ -105,7 +105,7 @@ struct GlucoseChartView: View {
 
     var body: some View {
         
-        let domain = (min((bgReadingValues.min() ?? 40), urgentLowLimitInMgDl) - 6) ... (max((bgReadingValues.max() ?? 400), urgentHighLimitInMgDl) + 6)
+        let domain = (min((bgReadingValues.min() ?? 40), urgentLowLimitInMgDl) - 6) ... (max((bgReadingValues.max() ?? urgentHighLimitInMgDl), urgentHighLimitInMgDl) + 6)
         
         Chart {
             if domain.contains(urgentLowLimitInMgDl) {
