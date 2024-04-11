@@ -143,7 +143,7 @@ enum ConstantsLog {
     static let categoryCalendarManager =                    "CalendarManager                "
     
     /// WatchManager logging
-    static let categoryWatchManager =                       "WatchManager                   "
+    static let categoryWatchManager =                        "WatchManager                  "
     
     /// bluetoothPeripheralViewController
     static let categoryBluetoothPeripheralViewController =   "blePeripheralViewController   "
@@ -189,7 +189,7 @@ enum ConstantsLog {
                                                      "NotificationsViewModel      "
     
     /// for use in LiveActivityManager
-    static let categoryLiveActivityManager =         "LiveActivityManager         "
+    static let categoryLiveActivityManager =         "LiveActivityManager           "
     
     /// for use in Libre3HeartBeatTransmitter
     static let categoryHeartBeatLibre3 =                       "HeartBeatLibre3          "

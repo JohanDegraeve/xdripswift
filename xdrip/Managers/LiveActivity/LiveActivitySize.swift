@@ -36,6 +36,17 @@ public enum LiveActivitySize: Int, CaseIterable, Codable {
         }
     }
     
+    var debugDescription: String {
+        switch self {
+        case .normal:
+            return "Normal"
+        case .minimal:
+            return "Minimal"
+        case .large:
+            return "Large"
+        }
+    }
+    
     /// this is used for presentation in list. It allows to order the size kinds in the view, different than they case ordering, and so allows to add new cases
     init?(forRowAt row: Int) {
         switch row {
