@@ -6,6 +6,7 @@ xDripConfigOverride.xcconfig
 UserInterfaceState.xcuserstate
 iBreakpoints_v2.xcbkptlist
 xdrip.xcodeproj/xcuserdata/johandegraeve.xcuserdatad/xcdebugger/
+Package.resolved
 
 # Ruby version settings
 .ruby-version

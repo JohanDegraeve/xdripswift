@@ -18,6 +18,14 @@ public enum FollowerDataSourceType: Int, CaseIterable {
     case nightscout = 0
     case libreLinkUp = 1
     
+    public var rawValue: Int {
+        switch self {
+        case .nightscout:
+            return 0
+        case .libreLinkUp:
+            return 1
+        }
+    }
     var description: String {
         switch self {
         case .nightscout:

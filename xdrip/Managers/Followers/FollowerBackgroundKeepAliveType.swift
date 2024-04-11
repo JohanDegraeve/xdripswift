@@ -7,7 +7,8 @@
 //
 
 import Foundation
-
+import UIKit
+import SwiftUI
 
 /// types of background keep-alive
 public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
@@ -19,6 +20,7 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
     case disabled = 0
     case normal = 1
     case aggressive = 2
+    case heartbeat = 3
     
     var description: String {
         switch self {
@@ -28,18 +30,57 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
             return Texts_SettingsView.followerKeepAliveTypeNormal
         case .aggressive:
             return Texts_SettingsView.followerKeepAliveTypeAggressive
+        case .heartbeat:
+            return Texts_SettingsView.followerKeepAliveTypeHeartbeat
         }
     }
     
-    var keepAliveImage: UIImage {
+    public var rawValue: Int {
         switch self {
         case .disabled:
-            return UIImage(systemName: "d.circle") ?? UIImage()
+            return 0
         case .normal:
-            return UIImage(systemName: "n.circle") ?? UIImage()
+            return 1
         case .aggressive:
-            return UIImage(systemName: "a.circle") ?? UIImage()
+            return 2
+        case .heartbeat:
+            return 3
         }
+    }
+    
+    // return true if in follower mode and if the keep-alive type should provoke a background keep-alive action
+    // basically if not .disabled and if not .heartbeat
+    var shouldKeepAlive: Bool {
+        switch self {
+        case .disabled, .heartbeat:
+            return false
+        default:
+            return true
+        }
+    }
+    
+    // return the keep-alive image for SwiftUI views
+    var keepAliveImageString: String {
+        switch self {
+        case .disabled:
+            return "d.circle"
+        case .normal:
+            return "n.circle"
+        case .aggressive:
+            return "a.circle"
+        case .heartbeat:
+            return "heart.circle"
+        }
+    }
+    
+    // return the keep-alive image for UIKit views
+    var keepAliveUIImage: UIImage {
+        return UIImage(systemName: keepAliveImageString) ?? UIImage()
+    }
+    
+    // return the keep-alive image for SwiftUI views
+    var keepAliveImage: Image {
+        return Image(systemName: keepAliveImageString)
     }
     
 }

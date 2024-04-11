@@ -1,4 +1,8 @@
 /// constants for home view, ie first view
+
+import UIKit
+import SwiftUI
+
 enum ConstantsHomeView {
     
     /// how often to update the labels in the homeview (ie label with latest reading, minutes ago, etc..)
@@ -42,17 +46,22 @@ enum ConstantsHomeView {
     
     /// warning time left / colour
     static let sensorProgressViewWarningInMinutes: Double = 60 * 24.0 // 24 hours before the sensor reaches max age
-    static let sensorProgressViewProgressColorWarning: UIColor = .systemYellow
+    static let sensorProgressViewProgressColorWarning: UIColor = .yellow
+    static let sensorProgressViewProgressColorWarningSwiftUI: Color = .yellow
     
     /// urgent time left / colour
     static let sensorProgressViewUrgentInMinutes: Double = 60 * 12.0 // 12 hours before the sensor reaches max age
-    static let sensorProgressViewProgressColorUrgent: UIColor = .systemRed
+    static let sensorProgressViewProgressColorUrgent: UIColor = .red
+    static let sensorProgressViewProgressColorUrgentSwiftUI: Color = .red
     
     /// colour for an expired sensor
-    static let sensorProgressExpired: UIColor = .systemPurple
+    static let sensorProgressExpired: UIColor = .purple
+    static let sensorProgressExpiredSwiftUI: Color = .purple
     
     /// colour for an normal text
     static let sensorProgressNormalTextColor: UIColor = .lightGray
+    static let sensorProgressNormalTextColorSwiftUI: Color = .white
+    static let sensorProgressViewNormalColorSwiftUI: Color = .gray
     
     /// colour for the dimmed screen lock overlay view
     static let screenLockDimmingOptionsDimmed: UIColor = .black.withAlphaComponent(0.3)

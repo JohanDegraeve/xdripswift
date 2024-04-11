@@ -88,7 +88,7 @@ final class SettingsViewController: UIViewController {
             case .dataSource:
                 return SettingsViewDataSourceSettingsViewModel(coreDataManager: coreDataManager)
             case .general:
-                return SettingsViewGeneralSettingsViewModel()
+                return SettingsViewNotificationsSettingsViewModel()
             case .homescreen:
                 return SettingsViewHomeScreenSettingsViewModel()
             case .treatments:

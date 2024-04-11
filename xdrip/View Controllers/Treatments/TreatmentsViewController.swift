@@ -330,7 +330,8 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
             coreDataManager.saveChanges()
             
             // trigger nightscoutsync
-            DispatchQueue.main.async {
+            if (UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightScout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+                UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest = .now
                 UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
             }
             

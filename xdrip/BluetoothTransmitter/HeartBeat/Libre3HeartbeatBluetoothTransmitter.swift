@@ -28,7 +28,7 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryHeartBeatLibre3)
     
     /// when was the last heartbeat
-    private var lastHeartBeatTimeStamp: Date
+    private var timeStampOfLastHeartBeat: Date
 
     // MARK: - Initialization
     /// - parameters:
@@ -47,7 +47,7 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
         }
         
         // initially last heartbeat was never (ie 1 1 1970)
-        self.lastHeartBeatTimeStamp = Date(timeIntervalSince1970: 0)
+        self.timeStampOfLastHeartBeat = Date(timeIntervalSince1970: 0)
 
         // using nil as servicesCBUUIDs, that works.
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_Libre3, servicesCBUUIDs: nil, CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_Libre3, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_Libre3, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
@@ -55,6 +55,25 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
     }
     
     // MARK: CBCentralManager overriden functions
+    
+    override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
+
+        super.centralManager(central, didConnect: peripheral)
+        
+        // this is the trigger for calling the heartbeat
+        if (Date()).timeIntervalSince(timeStampOfLastHeartBeat) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
+            
+            timeStampOfLastHeartBeat = Date()
+            
+            UserDefaults.standard.timeStampOfLastHeartBeat = timeStampOfLastHeartBeat
+            
+            // wait for a second to allow the official app to upload to LibreView before triggering the heartbeat announcement to the delegate
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.bluetoothTransmitterDelegate?.heartBeat()
+            }
+        }
+
+    }
     
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
 
@@ -64,17 +83,35 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
         }
 
         // this is the trigger for calling the heartbeat
-        if (Date()).timeIntervalSince(lastHeartBeatTimeStamp) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
+        if (Date()).timeIntervalSince(timeStampOfLastHeartBeat) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
             
-            // sleep for a second to allow the official app to upload to LibreView
-            Thread.sleep(forTimeInterval: 1)
+            timeStampOfLastHeartBeat = Date()
             
-            bluetoothTransmitterDelegate?.heartBeat()
+            UserDefaults.standard.timeStampOfLastHeartBeat = timeStampOfLastHeartBeat
             
-            lastHeartBeatTimeStamp = Date()
-            
+            // wait for a second to allow the official app to upload to LibreView before triggering the heartbeat announcement to the delegate
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.bluetoothTransmitterDelegate?.heartBeat()
+            }
         }
         
+    }
+    
+    override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        
+        trace("didDiscoverCharacteristicsFor for peripheral with name %{public}@, for service with uuid %{public}@", log: log, category: ConstantsLog.categoryHeartBeatLibre3, type: .info, deviceName ?? "'unknown'", String(describing:service.uuid))
+        
+        if let error = error {
+            trace("    didDiscoverCharacteristicsFor error: %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error , error.localizedDescription)
+        }
+        
+        if let characteristics = service.characteristics {
+            for characteristic in characteristics {
+                peripheral.setNotifyValue(true, for: characteristic)
+            }
+        } else {
+            trace("    Did discover characteristics, but no characteristics listed. There must be some error.", log: log, category: ConstantsLog.categoryHeartBeatLibre3, type: .error)
+        }
     }
     
 }
