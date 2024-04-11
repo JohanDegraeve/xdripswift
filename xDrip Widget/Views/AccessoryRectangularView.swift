@@ -18,7 +18,7 @@ extension XDripWidget.EntryView {
             Text("\(entry.widgetState.bgValueStringInUserChosenUnit)\(entry.widgetState.trendArrow())")
                 .font(.system(size: 50)).bold()
                 .minimumScaleFactor(0.2)
-                .foregroundStyle(Color(white: 1))
+                .foregroundStyle(.primary)
                 .lineLimit(1)
         }
         .widgetBackground(backgroundView: Color.black)

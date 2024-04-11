@@ -66,14 +66,14 @@ extension XDripWidget.Entry {
         func bgTextColor() -> Color {
             if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-60 * 7), let bgValueInMgDl = bgValueInMgDl {
                 if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
-                    return Color(.red)
+                    return .red
                 } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
-                    return Color(.yellow)
+                    return .yellow
                 } else {
-                    return Color(.green)
+                    return .green
                 }
             } else {
-                return Color(.gray)
+                return .colorTertiary
             }
         }
         
@@ -81,9 +81,9 @@ extension XDripWidget.Entry {
         /// - Returns: a Color either red, yellow or green
         func deltaChangeTextColor() -> Color {
             if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-60 * 7) {
-                return Color(white: 0.8)
+                return .colorPrimary
             } else {
-                return Color(.gray)
+                return .colorTertiary
             }
         }
         

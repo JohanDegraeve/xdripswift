@@ -2760,7 +2760,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 self.timePeriodLabelOutlet.text = "24 " + Texts_Common.hours
                 
             default:
-                self.timePeriodLabelOutlet.text = statistics.numberOfDaysUsed.description + " " + Texts_Common.days
+                self.timePeriodLabelOutlet.text = statistics.numberOfDaysUsed.description + " " + (statistics.numberOfDaysUsed == 1 ? Texts_Common.day : Texts_Common.days)
             }
             
             
