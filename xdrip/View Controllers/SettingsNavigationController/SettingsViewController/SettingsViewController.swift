@@ -65,6 +65,9 @@ final class SettingsViewController: UIViewController {
         /// Apple Watch settings
         case AppleWatch
         
+        /// Contact Trick settings
+        case ContactTrick
+        
         /// housekeeper settings
         case housekeeper
         
@@ -108,6 +111,8 @@ final class SettingsViewController: UIViewController {
                 return SettingsViewDevelopmentSettingsViewModel()
             case .AppleWatch:
                 return SettingsViewCalendarEventsSettingsViewModel()
+            case .ContactTrick:
+                return SettingsViewContactTrickSettingsViewModel()
             case .housekeeper:
                 return SettingsViewHousekeeperSettingsViewModel(coreDataManager: coreDataManager)
             case .trace:

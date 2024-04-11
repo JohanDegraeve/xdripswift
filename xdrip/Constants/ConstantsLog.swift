@@ -9,12 +9,12 @@ enum ConstantsLog {
     
     /// debuglogging
     static let debuglogging = "xdripdebuglogging"
-    
+
     /// timestamp format for nslog
     static let dateFormatNSLog = "y-MM-dd HH:mm:ss.SSSS"
-    
+
     // MARK: - Categories
-    
+
     /// for use in OSLog
     static let categoryBlueToothTransmitter =           "BlueToothTransmitter          "
     
@@ -32,7 +32,7 @@ enum ConstantsLog {
     
     /// calibration
     static let categoryCalibration =                    "Calibration                   "
-    
+
     /// G5
     static let categoryCGMG5 =                          "CGMG5                         "
     
@@ -79,7 +79,7 @@ enum ConstantsLog {
     static let categoryApplicationDataWatlaa =          "ApplicationDataWatlaa"
     
     /// application data for BLEPeripheral
-    static let categoryApplicationDataBLEPeripheral = 
+    static let categoryApplicationDataBLEPeripheral =
                                                         "ApplicationDataBLEPeripheral"
     
     /// application data for DexcomG5
@@ -141,10 +141,16 @@ enum ConstantsLog {
     
     /// CalendarManager logging
     static let categoryCalendarManager =                    "CalendarManager                "
-    
+
+    /// SettingsViewContactTrickSettingsViewModel logging
+    static let categorySettingsViewContactTrickSettingsViewModel =           "SettingsViewContactTrickSettingsViewModel  "
+
     /// WatchManager logging
-    static let categoryWatchManager =                        "WatchManager                  "
-    
+    static let categoryWatchManager =                       "WatchManager                   "
+
+    /// ContactTrickManager logging
+    static let categoryContactTrickManager =                "ContactTrickManager           "
+
     /// bluetoothPeripheralViewController
     static let categoryBluetoothPeripheralViewController =   "blePeripheralViewController   "
     
@@ -185,9 +191,9 @@ enum ConstantsLog {
     static let categorySettingsViewDataSourceSettingsViewModel =         "SettingsViewDataSourceSettingsViewModel"
     
     /// SettingsViewNotificationsSettingsViewModel logging
-    static let categorySettingsViewNotificationsSettingsViewModel = 
+    static let categorySettingsViewNotificationsSettingsViewModel =
                                                      "NotificationsViewModel      "
-    
+
     /// for use in LiveActivityManager
     static let categoryLiveActivityManager =         "LiveActivityManager           "
     

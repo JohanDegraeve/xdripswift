@@ -98,6 +98,8 @@
 	</array>
 	<key>UIUserInterfaceStyle</key>
 	<string>Light</string>
+	<key>NSContactsUsageDescription</key>
+	<string>To update the contact with the BG reading values (contact trick)</string>
 	<key>view controller-based status bar</key>
 	<false/>
 </dict>

@@ -280,7 +280,17 @@ extension UserDefaults {
         /// should a visual coloured indicator be shown in the calendar title yes or no
         case displayVisualIndicatorInCalendarEvent = "displayVisualIndicator"
         
+        // Contact trick
         
+        /// enable contact trick yes or no
+        case enableContactTrick = "enableContactTrick"
+        /// the ID of the contact to be used by the contact trick
+        case contactTrickContactId = "contactTrickContactId"
+        /// should trend be displayed yes or no
+        case displayTrendInContactTrick = "displayTrendInContactTrick"
+        /// should the range indicator be displayed, yes or no
+        case rangeIndicatorInContactTrick = "rangeIndicatorInContactTrick"
+
         // Other Settings (not user configurable)
         
         /// - in case missed reading alert settings are changed by user, this value will be set to true
@@ -1731,7 +1741,48 @@ extension UserDefaults {
         }
     }
     
+    // MARK: - Contact trick
+    
+    /// enable the contact trick yes or no, default false
+    @objc dynamic var enableContactTrick: Bool {
+        get {
+            return bool(forKey: Key.enableContactTrick.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.enableContactTrick.rawValue)
+        }
+    }
 
+    /// the ID of the contact to be updated by the contact trick
+    @objc dynamic var contactTrickContactId: String? {
+        get {
+            return string(forKey: Key.contactTrickContactId.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.contactTrickContactId.rawValue)
+        }
+    }
+
+    /// this is for showing readings on watch via the contact trick. Should trend be displayed in the contact, yes or no, default no
+    @objc dynamic var displayTrendInContactTrick: Bool {
+        get {
+            return bool(forKey: Key.displayTrendInContactTrick.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.displayTrendInContactTrick.rawValue)
+        }
+    }
+    
+    /// this is for showing readings on watch via the contact trick. Should the range indicator be displayed, yes or no
+    @objc dynamic var rangeIndicatorInContactTrick: Bool {
+        get {
+            return bool(forKey: Key.rangeIndicatorInContactTrick.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.rangeIndicatorInContactTrick.rawValue)
+        }
+    }
+    
     // MARK: - =====  Other Settings ======
     
     /// - in case missed reading alert settings are changed by user, this value will be set to true

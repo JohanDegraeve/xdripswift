@@ -653,6 +653,10 @@ class Texts_SettingsView {
     static let infoCalendarAccessDeniedByUser: String = {
         return String(format: NSLocalizedString("infoCalendarAccessDeniedByUser", tableName: filename, bundle: Bundle.main, value: "You previously denied access to your calendars.\n\nGo to iPhone Settings > %@ > Calendars and enable full access.", comment: "If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown"), ConstantsHomeView.applicationName)
     }()
+
+    static let infoContactsAccessDeniedByUser: String = {
+        return String(format: NSLocalizedString("infoContactsAccessDeniedByUser", tableName: filename, bundle: Bundle.main, value: "You previously denied access to your contacts.\n\nGo to iPhone Settings > %@ > Contacts and enable full access.", comment: "If user has earlier denied access to contacts, and then tries to activate the contact trick, this message will be shown"), ConstantsHomeView.applicationName)
+    }()
     
     static let infoCalendarAccessWriteOnly: String = {
         return String(format: NSLocalizedString("infoCalendarAccessWriteOnly", tableName: filename, bundle: Bundle.main, value: "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > %@ > Calendars and select 'Full Access'.", comment: "The user needs to update their calendar permissions"), ConstantsHomeView.applicationName)
@@ -661,7 +665,7 @@ class Texts_SettingsView {
     static let infoCalendarAccessRestricted: String = {
         return String(format: NSLocalizedString("infoCalendarAccessRestricted", tableName: filename, bundle: Bundle.main, value: "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.", comment: "If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown"), ConstantsHomeView.applicationName)
     }()
-    
+
     static let displayVisualIndicatorInCalendar: String = {
         return NSLocalizedString("settingsviews_displayVisualIndicatorInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Visual Indicator", comment: "Calendar Events Settings - text in row where user needs to say if the visual target indicator should be displayed or not")
     }()
@@ -673,8 +677,33 @@ class Texts_SettingsView {
     static let settingsviews_CalenderIntervalMessage = {
         return NSLocalizedString("settingsviews_CalenderIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two calender events (mins)", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch")
     }()
+        
+    // MARK: - Contact trick
     
+    static let infoContactsAccessRestricted: String = {
+        return String(format: NSLocalizedString("infoContactsAccessRestricted", tableName: filename, bundle: Bundle.main, value: "You cannot give authorization to %@ to access your contacts. This is possibly due to active restrictions such as parental controls being in place.", comment: "If user is not allowed to give any app access to the Contacts, due to restrictions. And then tries to activate the contact trick, this message will be shown"), ConstantsHomeView.applicationName)
+    }()
     
+    static let contactTrickSectionTitle: String = {
+        return NSLocalizedString("settingsviews_contactTrickSectionTitle", tableName: filename, bundle: Bundle.main, value: "Contact Trick", comment: "Contact Trick - section title")
+    }()
+    
+    static let enableContactTrick: String = {
+        return NSLocalizedString("settingsviews_enableContactTrick", tableName: filename, bundle: Bundle.main, value: "Enable Contact Trick", comment: "Contact Trick Settings - text in row where contact trick is enabled or disabled ")
+    }()
+
+    static let contactTrickContactId: String = {
+        return NSLocalizedString("settingsviews_contactTrickContactId", tableName: filename, bundle: Bundle.main, value: "Contact", comment: "Contact Trick Settings - text in row where user needs to select a contact")
+    }()
+    
+    static let displayTrendInContactTrick: String = {
+        return NSLocalizedString("settingsviews_displayTrendInContactTrick", tableName: filename, bundle: Bundle.main, value: "Display Trend", comment: "Contact Trick Settings - text in row where user needs to say if trend should be displayed or not")
+    }()
+    
+    static let rangeIndicatorInContactTrick: String = {
+        return NSLocalizedString("settingsviews_rangeIndicatorInContactTrick", tableName: filename, bundle: Bundle.main, value: "Display Range Indicator", comment: "Contact Trick Settings - text in row where user needs to say if they want the range indicator to be rendered")
+    }()
+
     // MARK: - Issue Reporting
     
     static let sectionTitleTrace: String = {
