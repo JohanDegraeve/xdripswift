@@ -77,44 +77,44 @@ final class WatchManager: NSObject, ObservableObject {
         }
         
         // now process the WatchState
-        self.watchState.bgReadingValues = bgReadingValues
-        self.watchState.bgReadingDatesAsDouble = bgReadingDatesAsDouble
-        self.watchState.isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-        self.watchState.slopeOrdinal = slopeOrdinal
-        self.watchState.deltaChangeInMgDl = deltaChangeInMgDl
-        self.watchState.urgentLowLimitInMgDl = UserDefaults.standard.urgentLowMarkValue
-        self.watchState.lowLimitInMgDl = UserDefaults.standard.lowMarkValue
-        self.watchState.highLimitInMgDl = UserDefaults.standard.highMarkValue
-        self.watchState.urgentHighLimitInMgDl = UserDefaults.standard.urgentHighMarkValue
-        self.watchState.activeSensorDescription = UserDefaults.standard.activeSensorDescription
-        self.watchState.isMaster = UserDefaults.standard.isMaster
-        self.watchState.followerDataSourceTypeRawValue = UserDefaults.standard.followerDataSourceType.rawValue
-        self.watchState.followerBackgroundKeepAliveTypeRawValue = UserDefaults.standard.followerBackgroundKeepAliveType.rawValue
-        self.watchState.disableComplications = !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled
+        watchState.bgReadingValues = bgReadingValues
+        watchState.bgReadingDatesAsDouble = bgReadingDatesAsDouble
+        watchState.isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        watchState.slopeOrdinal = slopeOrdinal
+        watchState.deltaChangeInMgDl = deltaChangeInMgDl
+        watchState.urgentLowLimitInMgDl = UserDefaults.standard.urgentLowMarkValue
+        watchState.lowLimitInMgDl = UserDefaults.standard.lowMarkValue
+        watchState.highLimitInMgDl = UserDefaults.standard.highMarkValue
+        watchState.urgentHighLimitInMgDl = UserDefaults.standard.urgentHighMarkValue
+        watchState.activeSensorDescription = UserDefaults.standard.activeSensorDescription
+        watchState.isMaster = UserDefaults.standard.isMaster
+        watchState.followerDataSourceTypeRawValue = UserDefaults.standard.followerDataSourceType.rawValue
+        watchState.followerBackgroundKeepAliveTypeRawValue = UserDefaults.standard.followerBackgroundKeepAliveType.rawValue
+        watchState.disableComplications = !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled
         
         if let sensorStartDate = UserDefaults.standard.activeSensorStartDate {
-            self.watchState.sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: Date()).minute!)
+            watchState.sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: Date()).minute!)
         } else {
-            self.watchState.sensorAgeInMinutes = 0
+            watchState.sensorAgeInMinutes = 0
         }
         
-        self.watchState.sensorMaxAgeInMinutes = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
+        watchState.sensorMaxAgeInMinutes = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
         
         // let's set the state values if we're using a heartbeat
         if let timeStampOfLastHeartBeat = UserDefaults.standard.timeStampOfLastHeartBeat, let secondsUntilHeartBeatDisconnectWarning = UserDefaults.standard.secondsUntilHeartBeatDisconnectWarning {
-            self.watchState.secondsUntilHeartBeatDisconnectWarning = Int(secondsUntilHeartBeatDisconnectWarning)
-            self.watchState.timeStampOfLastHeartBeat = timeStampOfLastHeartBeat
+            watchState.secondsUntilHeartBeatDisconnectWarning = Int(secondsUntilHeartBeatDisconnectWarning)
+            watchState.timeStampOfLastHeartBeat = timeStampOfLastHeartBeat
         }
         
         // let's set the follower server connection values if we're using follower mode
         if let timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection {
-            self.watchState.secondsUntilFollowerDisconnectWarning = UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning
-            self.watchState.timeStampOfLastFollowerConnection = timeStampOfLastFollowerConnection
+            watchState.secondsUntilFollowerDisconnectWarning = UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning
+            watchState.timeStampOfLastFollowerConnection = timeStampOfLastFollowerConnection
         }
         
-        self.watchState.remainingComplicationUserInfoTransfers = self.session.remainingComplicationUserInfoTransfers
+        watchState.remainingComplicationUserInfoTransfers = session.remainingComplicationUserInfoTransfers
         
-        self.sendStateToWatch()
+        sendStateToWatch()
     }
     
     func sendStateToWatch() {
