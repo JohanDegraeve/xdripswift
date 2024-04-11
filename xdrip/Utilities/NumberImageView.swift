@@ -7,40 +7,26 @@ struct NumberImageView: View {
     @Binding var range: BgRangeDescription?
     @Binding var valueIsUpToDate: Bool?
     @Binding var rangeIndicator: Bool
-    @Binding var darkMode: Bool
-    @Binding var fontSize: Int
-    @Binding var fontWeight: UIFont.Weight
-    @Binding var fontName: String?
         
     static let normalColorDark = Color(red: 17 / 256, green: 156 / 256, blue: 12 / 256)
-    static let normalColorLight = Color(red: 17 / 256, green: 156 / 256, blue: 12 / 256)
-    
     static let notUrgentColorDark = Color(red: 254 / 256, green: 149 / 256, blue: 4 / 256)
-    static let notUrgentColorLight = Color(red: 254 / 256, green: 149 / 256, blue: 4 / 256)
-    
     static let urgentColorDark = Color(red: 255 / 256, green: 52 / 256, blue: 0 / 256)
-    static let urgentColorLight = Color(red: 255 / 256, green: 52 / 256, blue: 0 / 256)
-    
     static let unknownColorDark = Color(red: 0x88 / 256, green: 0x88 / 256, blue: 0x88 / 256)
-    static let unknownColorLight = Color(red: 0x88 / 256, green: 0x88 / 256, blue: 0x88 / 256)
     
-    static func getColor(value: String, range: BgRangeDescription, valueIsUpToDate: Bool?, darkMode: Bool) -> Color {
+    static func getColor(value: String, range: BgRangeDescription, valueIsUpToDate: Bool?) -> Color {
         if let valueIsUpToDate, valueIsUpToDate {
             return switch range {
-            case .inRange:
-                darkMode ? Self.normalColorDark : Self.normalColorLight
-            case .notUrgent:
-                darkMode ? Self.notUrgentColorDark : Self.notUrgentColorLight
-            case .urgent:
-                darkMode ? Self.urgentColorDark : Self.urgentColorLight
+            case .inRange: Self.normalColorDark
+            case .notUrgent: Self.notUrgentColorDark
+            case .urgent: Self.urgentColorDark
             }
         } else {
-            return darkMode ? Self.unknownColorDark : Self.unknownColorLight
+            return Self.unknownColorDark
         }
 
     }
     
-    static func getImage(value: String?, range: BgRangeDescription?, slopeArrow: String?, valueIsUpToDate: Bool?, rangeIndicator: Bool, darkMode: Bool, fontSize: Int, fontWeight: UIFont.Weight, fontName: String?) -> UIImage {
+    static func getImage(value: String?, range: BgRangeDescription?, slopeArrow: String?, valueIsUpToDate: Bool?, rangeIndicator: Bool) -> UIImage {
         let width = 256.0
         let height = 256.0
         let rect = CGRect(x: 0, y: 0, width: width, height: height)
@@ -48,15 +34,13 @@ struct NumberImageView: View {
         let string: String?
                 
         if value != nil && range != nil {
-            color = getColor(value: value!, range: range!, valueIsUpToDate: valueIsUpToDate, darkMode: darkMode)
+            color = getColor(value: value!, range: range!, valueIsUpToDate: valueIsUpToDate)
             string = value
         } else {
-            color = darkMode ? Self.unknownColorDark : Self.unknownColorLight
+            color = Self.unknownColorDark
             string = "—"
         }
-        let textColor: Color = darkMode ?
-            Color(red: 250 / 256, green: 2500 / 256, blue: 250 / 256) :
-            Color(red: 20 / 256, green: 20 / 256, blue: 20 / 256)
+        let textColor: Color = Color(red: 250 / 256, green: 2500 / 256, blue: 250 / 256)
                 
         UIGraphicsBeginImageContext(rect.size)
         let context = UIGraphicsGetCurrentContext()
@@ -80,21 +64,13 @@ struct NumberImageView: View {
             }
         }
                 
-        var theFontSize = fontSize
-        var font: UIFont
-        
-        if fontName != nil {
-            font = UIFont(name: fontName!, size: CGFloat(fontSize)) ?? UIFont.systemFont(ofSize: CGFloat(fontSize), weight: fontWeight)
-        } else {
-            font = UIFont.systemFont(ofSize: CGFloat(fontSize), weight: fontWeight)
-        }
-        
-        
+        var fontSize = 100.0
+        var font: UIFont = UIFont.systemFont(ofSize: CGFloat(fontSize))
         
         var attributes: [NSAttributedString.Key : Any] = [
             .font : font,
             .foregroundColor : UIColor(textColor),
-            .tracking : -fontSize / 17,
+            .tracking : -0.025, // "tight"
         ]
         let slopeAttributes: [NSAttributedString.Key : Any] = [
             NSAttributedString.Key.font : UIFont.systemFont(ofSize: 80, weight: .regular),
@@ -105,11 +81,11 @@ struct NumberImageView: View {
         if let string {
             var stringSize = string.size(withAttributes: attributes)
             while stringSize.width > width*0.9 {
-                theFontSize = theFontSize - 10
+                fontSize = fontSize - 10
                 attributes = [
                     .font : font,
                     .foregroundColor : UIColor(textColor),
-                    .tracking : -fontSize / 17,
+                    .tracking : -0.025, // "tight"
                 ]
                 stringSize = string.size(withAttributes: attributes)
             }
@@ -142,7 +118,7 @@ struct NumberImageView: View {
     }
     
     var uiImage: UIImage {
-        return NumberImageView.getImage(value: value, range: range, slopeArrow: slopeArrow, valueIsUpToDate: valueIsUpToDate, rangeIndicator: rangeIndicator, darkMode: darkMode, fontSize: fontSize, fontWeight: fontWeight, fontName: fontName)
+        return NumberImageView.getImage(value: value, range: range, slopeArrow: slopeArrow, valueIsUpToDate: valueIsUpToDate, rangeIndicator: rangeIndicator)
     }
     
     var body: some View {
@@ -157,21 +133,17 @@ struct NumberImageViewPreview: View {
     @Binding var range: BgRangeDescription?
     @Binding var valueIsUpToDate: Bool?
     @Binding var rangeIndicator: Bool
-    @Binding var darkMode: Bool
-    @Binding var fontSize: Int
-    @Binding var fontWeight: UIFont.Weight
-    @Binding var fontName: String?
     
     var body: some View {
         ZStack {
-            NumberImageView(value: $value, slopeArrow: $slopeArrow, range: $range, valueIsUpToDate: $valueIsUpToDate, rangeIndicator: $rangeIndicator, darkMode: $darkMode, fontSize: $fontSize, fontWeight: $fontWeight, fontName: $fontName)
+            NumberImageView(value: $value, slopeArrow: $slopeArrow, range: $range, valueIsUpToDate: $valueIsUpToDate, rangeIndicator: $rangeIndicator)
             Circle()
                 .stroke(lineWidth: 20)
                 .foregroundColor(.white)
         }
         .frame(width: 256, height: 256)
         .clipShape(Circle())
-        .preferredColorScheme($darkMode.wrappedValue ? .dark : .light)
+        .preferredColorScheme(.dark)
     }
 }
 
@@ -184,15 +156,15 @@ struct NumberImageView_Previews: PreviewProvider {
         @State var fontName: String? = "AmericanTypewriter"
         
         var body: some View {
-            NumberImageViewPreview(value: .constant("40"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.urgent),  valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator, darkMode: $darkMode, fontSize: $fontSize, fontWeight: $fontWeight, fontName: $fontName).previewDisplayName("40")
-            NumberImageViewPreview(value: .constant("63"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator, darkMode: $darkMode, fontSize: $fontSize, fontWeight: $fontWeight, fontName: $fontName).previewDisplayName("63")
-            NumberImageViewPreview(value: .constant("69"), slopeArrow: .constant("\u{2192}" /* → */), range: .constant(BgRangeDescription.inRange), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator, darkMode: $darkMode, fontSize: $fontSize, fontWeight: $fontWeight, fontName: $fontName).previewDisplayName("69 →")
-            NumberImageViewPreview(value: .constant("79"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.inRange), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator, darkMode: $darkMode, fontSize: $fontSize, fontWeight: $fontWeight, fontName: $fontName).previewDisplayName("79")
-            NumberImageViewPreview(value: .constant("11.3"), slopeArrow: .constant("\u{2198}" /* ↘ */), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator, darkMode: $darkMode, fontSize: $fontSize, fontWeight: $fontWeight, fontName: $fontName).previewDisplayName("11.3 ↘")
-            NumberImageViewPreview(value: .constant("166"), slopeArrow: .constant("\u{2191}" /* ↑ */), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator, darkMode: $darkMode, fontSize: $fontSize, fontWeight: $fontWeight, fontName: $fontName).previewDisplayName("166 ↑")
-            NumberImageViewPreview(value: .constant("260"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.urgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator, darkMode: $darkMode, fontSize: $fontSize, fontWeight: $fontWeight, fontName: $fontName).previewDisplayName("260")
-            NumberImageViewPreview(value: .constant(nil), slopeArrow: .constant(nil), range: .constant(nil), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator, darkMode: $darkMode, fontSize: $fontSize, fontWeight: $fontWeight, fontName: $fontName).previewDisplayName("Unknown")
-            NumberImageViewPreview(value: .constant("120"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(false), rangeIndicator: $rangeIndicator, darkMode: $darkMode, fontSize: $fontSize, fontWeight: $fontWeight, fontName: $fontName).previewDisplayName("120,no real-time")
+            NumberImageViewPreview(value: .constant("40"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.urgent),  valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("40")
+            NumberImageViewPreview(value: .constant("63"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("63")
+            NumberImageViewPreview(value: .constant("69"), slopeArrow: .constant("\u{2192}" /* → */), range: .constant(BgRangeDescription.inRange), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("69 →")
+            NumberImageViewPreview(value: .constant("79"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.inRange), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("79")
+            NumberImageViewPreview(value: .constant("11.3"), slopeArrow: .constant("\u{2198}" /* ↘ */), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("11.3 ↘")
+            NumberImageViewPreview(value: .constant("166"), slopeArrow: .constant("\u{2191}" /* ↑ */), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("166 ↑")
+            NumberImageViewPreview(value: .constant("260"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.urgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("260")
+            NumberImageViewPreview(value: .constant(nil), slopeArrow: .constant(nil), range: .constant(nil), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("Unknown")
+            NumberImageViewPreview(value: .constant("120"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(false), rangeIndicator: $rangeIndicator).previewDisplayName("120,no real-time")
         }
     }
     static var previews: some View {

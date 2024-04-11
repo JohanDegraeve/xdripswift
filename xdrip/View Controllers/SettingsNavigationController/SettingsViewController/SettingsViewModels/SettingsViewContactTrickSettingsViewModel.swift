@@ -16,18 +16,6 @@ fileprivate enum Setting:Int, CaseIterable {
 
     /// should the range indicator be displayed yes or no
     case rangeIndicator = 3
-
-    /// should the image be rendered in dark mode yes or no
-    case darkMode = 4
-
-    /// font size
-    case fontSize = 5
-
-    /// font family
-    case fontName = 6
-    
-    /// font weight
-    case fontWeight = 7 // beware: numberOfRows() below expects this one to be the last one
     
 }
 
@@ -69,18 +57,6 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
         case .rangeIndicator:
             return Texts_SettingsView.rangeIndicatorInContactTrick
 
-        case .darkMode:
-            return Texts_SettingsView.darkModeInContactTrick
-
-        case .fontSize:
-            return Texts_SettingsView.fontSizeInContactTrick
-
-        case .fontWeight:
-            return Texts_SettingsView.fontWeightInContactTrick
-
-        case .fontName:
-            return Texts_SettingsView.fontNameInContactTrick
-
         }
 
     }
@@ -116,18 +92,9 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
                 
             }
             
-        case .contactTrickContactId, .displayTrend, .rangeIndicator, .darkMode:
+        case .contactTrickContactId, .displayTrend, .rangeIndicator:
             return UITableViewCell.AccessoryType.none
          
-        case .fontSize:
-            return UITableViewCell.AccessoryType.disclosureIndicator
-
-        case .fontWeight:
-            return UITableViewCell.AccessoryType.disclosureIndicator
-
-        case .fontName:
-            return UITableViewCell.AccessoryType.disclosureIndicator
-
         }
     }
 
@@ -154,18 +121,9 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
             }
             return nil
             
-        case .enableContactTrick, .displayTrend, .rangeIndicator, .darkMode:
+        case .enableContactTrick, .displayTrend, .rangeIndicator:
             return nil
             
-        case .fontSize:
-            return UserDefaults.standard.fontSizeInContactTrick.description
-
-        case .fontWeight:
-            return UserDefaults.standard.contactTrickFontWeight.description
-
-        case .fontName:
-            return UserDefaults.standard.contactTrickFontName?.description ?? "System Default"
-
         }
     }
 
@@ -236,18 +194,6 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
         case .rangeIndicator:
             return UISwitch(isOn: UserDefaults.standard.rangeIndicatorInContactTrick, action: {(isOn:Bool) in UserDefaults.standard.rangeIndicatorInContactTrick = isOn})
 
-        case .darkMode:
-            return UISwitch(isOn: UserDefaults.standard.darkModeInContactTrick, action: {(isOn:Bool) in UserDefaults.standard.darkModeInContactTrick = isOn})
-           
-        case .fontSize:
-            return nil
-
-        case .fontWeight:
-            return nil
-            
-        case .fontName:
-            return nil
-
         }
         
     }
@@ -266,10 +212,6 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
                 
             }
             
-            if UserDefaults.standard.contactTrickFontName != nil {
-                return Setting.allCases.count - 1 // only show fontWeight for System Default
-            }
-            
             return Setting.allCases.count
             
         } else {
@@ -286,7 +228,7 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .enableContactTrick, .displayTrend, .rangeIndicator, .darkMode:
+        case .enableContactTrick, .displayTrend, .rangeIndicator:
             
             // depending on status of authorization, we will either do nothing or show a message
             
@@ -345,80 +287,6 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
                 if index != selectedRow {
                     UserDefaults.standard.contactTrickContactId = contacts[index].identifier
                 }
-            }, cancelHandler: nil, didSelectRowHandler: nil)
-
-        case .fontSize:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.fontSizeInContactTrickTitle, message: nil, keyboardType: .numberPad, text: UserDefaults.standard.fontSizeInContactTrick.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(fontSize:String) in if let fontSize = Int(fontSize) {UserDefaults.standard.fontSizeInContactTrick = Int(fontSize)}}, cancelHandler: nil, inputValidator: nil)
-            
-        case .fontWeight:
-            
-            // data to be displayed in list from which user needs to pick a screen dimming type
-            var data = [String]()
-            
-            var selectedRow: Int?
-            
-            var index = 0
-            
-            let currentFontWeight = UserDefaults.standard.contactTrickFontWeight
-            
-            // get all data source types and add the description to data. Search for the type that matches the ScreenLockDimmingType that is currently stored in userdefaults.
-            for fontWeight in FontWeightType.allCases {
-                
-                data.append(fontWeight.description)
-                
-                if fontWeight == currentFontWeight {
-                    selectedRow = index
-                }
-                
-                index += 1
-                
-            }
-            
-            return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelFontWeightInContactTrick, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
-                
-                if index != selectedRow {
-                    
-                    UserDefaults.standard.contactTrickFontWeight = FontWeightType(rawValue: index) ?? .medium
-                    
-                }
-                
-            }, cancelHandler: nil, didSelectRowHandler: nil)
-            
-        case .fontName:
-            
-            // data to be displayed in list from which user needs to pick a screen dimming type
-            var data = [String]()
-            
-            var selectedRow: Int?
-            
-            let currentFontName = UserDefaults.standard.contactTrickFontName
-            
-            data.append("System Default")
-            if currentFontName == nil {
-                selectedRow = 0
-            }
-            var index = 1
-            UIFont.familyNames.forEach { family in
-                UIFont.fontNames(forFamilyName: family).forEach { font in
-                    data.append(font)
-                    if font == currentFontName {
-                        selectedRow = index
-                    }
-                    index += 1
-                }
-                
-            }
-            
-            return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelFontNameInContactTrick, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
-                
-                if index != selectedRow {
-                    if (index == 0) {
-                        UserDefaults.standard.contactTrickFontName = nil
-                    } else {
-                        UserDefaults.standard.contactTrickFontName = data[index]
-                    }
-                }
-                
             }, cancelHandler: nil, didSelectRowHandler: nil)
 
         }

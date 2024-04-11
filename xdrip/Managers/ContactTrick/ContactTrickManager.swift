@@ -25,12 +25,8 @@ class ContactTrickManager: NSObject {
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         super.init()
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.contactTrickContactId.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.darkModeInContactTrick.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.displayTrendInContactTrick.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.rangeIndicatorInContactTrick.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.fontSizeInContactTrick.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.fontWeightInContactTrick.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.fontNameInContactTrick.rawValue, options: .new, context: nil)
     }
     
     // MARK: - public functions
@@ -46,8 +42,7 @@ class ContactTrickManager: NSObject {
     private func evaluateUserDefaultsChange(keyPathEnum: UserDefaults.Key) {
         switch keyPathEnum {
         
-        case UserDefaults.Key.contactTrickContactId, UserDefaults.Key.darkModeInContactTrick, UserDefaults.Key.displayTrendInContactTrick, UserDefaults.Key.rangeIndicatorInContactTrick,
-            UserDefaults.Key.fontSizeInContactTrick, UserDefaults.Key.fontWeightInContactTrick, UserDefaults.Key.fontNameInContactTrick:
+        case UserDefaults.Key.contactTrickContactId, UserDefaults.Key.displayTrendInContactTrick, UserDefaults.Key.rangeIndicatorInContactTrick:
             updateContact()
 
         default:
@@ -112,10 +107,6 @@ class ContactTrickManager: NSObject {
             guard let mutableContact = contact.mutableCopy() as? CNMutableContact else { return }
             
             let rangeIndicator = UserDefaults.standard.rangeIndicatorInContactTrick
-            let darkMode = UserDefaults.standard.darkModeInContactTrick
-            let fontSize = UserDefaults.standard.fontSizeInContactTrick
-            let fontWeight = UserDefaults.standard.contactTrickFontWeight.toUI()
-            let fontName = UserDefaults.standard.contactTrickFontName
             
             if lastReading.count > 0  {
                 let reading = lastReading[0].unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).description
@@ -128,11 +119,7 @@ class ContactTrickManager: NSObject {
                     range: rangeDescription,
                     slopeArrow: slopeArrow,
                     valueIsUpToDate: valueIsUpToDate,
-                    rangeIndicator: rangeIndicator,
-                    darkMode: darkMode,
-                    fontSize: fontSize,
-                    fontWeight: fontWeight,
-                    fontName: fontName
+                    rangeIndicator: rangeIndicator
                 ).pngData()
                 
                 // schedule an update in 5 min 15 seconds - if no new data is received until then, the empty value will get rendered into the contact (this update will be canceled if new data is received)
@@ -148,11 +135,7 @@ class ContactTrickManager: NSObject {
                     range: nil,
                     slopeArrow: nil,
                     valueIsUpToDate: false,
-                    rangeIndicator: rangeIndicator,
-                    darkMode: darkMode,
-                    fontSize: fontSize,
-                    fontWeight: fontWeight,
-                    fontName: fontName
+                    rangeIndicator: rangeIndicator
                 ).pngData()
             }
             
