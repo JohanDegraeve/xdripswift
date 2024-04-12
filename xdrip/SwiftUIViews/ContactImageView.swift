@@ -1,7 +1,7 @@
 import Foundation
 import SwiftUI
 
-struct NumberImageView: View {
+struct ContactImageView: View {
     @Binding var value: String?
     @Binding var slopeArrow: String?
     @Binding var range: BgRangeDescription?
@@ -118,7 +118,7 @@ struct NumberImageView: View {
     }
     
     var uiImage: UIImage {
-        return NumberImageView.getImage(value: value, range: range, slopeArrow: slopeArrow, valueIsUpToDate: valueIsUpToDate, rangeIndicator: rangeIndicator)
+        return ContactImageView.getImage(value: value, range: range, slopeArrow: slopeArrow, valueIsUpToDate: valueIsUpToDate, rangeIndicator: rangeIndicator)
     }
     
     var body: some View {
@@ -127,7 +127,7 @@ struct NumberImageView: View {
     }
 }
 
-struct NumberImageViewPreview: View {
+struct ContactImageViewPreview: View {
     @Binding var value: String?
     @Binding var slopeArrow: String?
     @Binding var range: BgRangeDescription?
@@ -136,7 +136,7 @@ struct NumberImageViewPreview: View {
     
     var body: some View {
         ZStack {
-            NumberImageView(value: $value, slopeArrow: $slopeArrow, range: $range, valueIsUpToDate: $valueIsUpToDate, rangeIndicator: $rangeIndicator)
+            ContactImageView(value: $value, slopeArrow: $slopeArrow, range: $range, valueIsUpToDate: $valueIsUpToDate, rangeIndicator: $rangeIndicator)
             Circle()
                 .stroke(lineWidth: 20)
                 .foregroundColor(.white)
@@ -147,7 +147,7 @@ struct NumberImageViewPreview: View {
     }
 }
 
-struct NumberImageView_Previews: PreviewProvider {
+struct ContactImageView_Previews: PreviewProvider {
     struct Preview: View {
         @State var rangeIndicator: Bool = true
         @State var darkMode: Bool = true
@@ -156,15 +156,15 @@ struct NumberImageView_Previews: PreviewProvider {
         @State var fontName: String? = "AmericanTypewriter"
         
         var body: some View {
-            NumberImageViewPreview(value: .constant("40"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.urgent),  valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("40")
-            NumberImageViewPreview(value: .constant("63"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("63")
-            NumberImageViewPreview(value: .constant("69"), slopeArrow: .constant("\u{2192}" /* → */), range: .constant(BgRangeDescription.inRange), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("69 →")
-            NumberImageViewPreview(value: .constant("79"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.inRange), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("79")
-            NumberImageViewPreview(value: .constant("11.3"), slopeArrow: .constant("\u{2198}" /* ↘ */), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("11.3 ↘")
-            NumberImageViewPreview(value: .constant("166"), slopeArrow: .constant("\u{2191}" /* ↑ */), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("166 ↑")
-            NumberImageViewPreview(value: .constant("260"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.urgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("260")
-            NumberImageViewPreview(value: .constant(nil), slopeArrow: .constant(nil), range: .constant(nil), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("Unknown")
-            NumberImageViewPreview(value: .constant("120"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(false), rangeIndicator: $rangeIndicator).previewDisplayName("120,no real-time")
+            ContactImageViewPreview(value: .constant("40"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.urgent),  valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("40")
+            ContactImageViewPreview(value: .constant("63"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("63")
+            ContactImageViewPreview(value: .constant("69"), slopeArrow: .constant("\u{2192}" /* → */), range: .constant(BgRangeDescription.inRange), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("69 →")
+            ContactImageViewPreview(value: .constant("79"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.inRange), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("79")
+            ContactImageViewPreview(value: .constant("11.3"), slopeArrow: .constant("\u{2198}" /* ↘ */), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("11.3 ↘")
+            ContactImageViewPreview(value: .constant("166"), slopeArrow: .constant("\u{2191}" /* ↑ */), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("166 ↑")
+            ContactImageViewPreview(value: .constant("260"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.urgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("260")
+            ContactImageViewPreview(value: .constant(nil), slopeArrow: .constant(nil), range: .constant(nil), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("Unknown")
+            ContactImageViewPreview(value: .constant("120"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(false), rangeIndicator: $rangeIndicator).previewDisplayName("120,no real-time")
         }
     }
     static var previews: some View {

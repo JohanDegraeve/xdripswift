@@ -114,7 +114,7 @@ class ContactImageManager: NSObject {
                 let slopeArrow = UserDefaults.standard.displayTrendInContactImage ? lastReading[0].slopeArrow() : nil
                 let valueIsUpToDate = abs(lastReading[0].timeStamp.timeIntervalSinceNow) < 5 * 60
                 
-                mutableContact.imageData = NumberImageView.getImage(
+                mutableContact.imageData = ContactImageView.getImage(
                     value: reading,
                     range: rangeDescription,
                     slopeArrow: slopeArrow,
@@ -130,7 +130,7 @@ class ContactImageManager: NSObject {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 5 * 60 + 15, execute: self.workItem!)
                 
             } else {
-                mutableContact.imageData = NumberImageView.getImage(
+                mutableContact.imageData = ContactImageView.getImage(
                     value: nil,
                     range: nil,
                     slopeArrow: nil,
