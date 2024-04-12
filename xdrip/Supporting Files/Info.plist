@@ -99,7 +99,7 @@
 	<key>UIUserInterfaceStyle</key>
 	<string>Light</string>
 	<key>NSContactsUsageDescription</key>
-	<string>To update the contact with the BG reading values (contact trick)</string>
+	<string>To update the contact photo with an image showing the current BG values</string>
 	<key>view controller-based status bar</key>
 	<false/>
 </dict>

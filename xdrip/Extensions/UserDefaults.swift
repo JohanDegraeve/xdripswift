@@ -280,16 +280,16 @@ extension UserDefaults {
         /// should a visual coloured indicator be shown in the calendar title yes or no
         case displayVisualIndicatorInCalendarEvent = "displayVisualIndicator"
         
-        // Contact trick
+        // Contact image
         
-        /// enable contact trick yes or no
-        case enableContactTrick = "enableContactTrick"
-        /// the ID of the contact to be used by the contact trick
-        case contactTrickContactId = "contactTrickContactId"
+        /// enable contact image yes or no
+        case enableContactImage = "enableContactImage"
+        /// the ID of the contact to be used by the contact image function
+        case contactImageContactId = "contactImageContactId"
         /// should trend be displayed yes or no
-        case displayTrendInContactTrick = "displayTrendInContactTrick"
+        case displayTrendInContactImage = "displayTrendInContactImage"
         /// should the range indicator be displayed, yes or no
-        case rangeIndicatorInContactTrick = "rangeIndicatorInContactTrick"
+        case rangeIndicatorInContactImage = "rangeIndicatorInContactImage"
 
         // Other Settings (not user configurable)
         
@@ -1741,45 +1741,45 @@ extension UserDefaults {
         }
     }
     
-    // MARK: - Contact trick
+    // MARK: - Contact image
     
-    /// enable the contact trick yes or no, default false
-    @objc dynamic var enableContactTrick: Bool {
+    /// enable the contact image yes or no, default false
+    @objc dynamic var enableContactImage: Bool {
         get {
-            return bool(forKey: Key.enableContactTrick.rawValue)
+            return bool(forKey: Key.enableContactImage.rawValue)
         }
         set {
-            set(newValue, forKey: Key.enableContactTrick.rawValue)
+            set(newValue, forKey: Key.enableContactImage.rawValue)
         }
     }
 
-    /// the ID of the contact to be updated by the contact trick
-    @objc dynamic var contactTrickContactId: String? {
+    /// the ID of the contact to be updated by the contact image function
+    @objc dynamic var contactImageContactId: String? {
         get {
-            return string(forKey: Key.contactTrickContactId.rawValue)
+            return string(forKey: Key.contactImageContactId.rawValue)
         }
         set {
-            set(newValue, forKey: Key.contactTrickContactId.rawValue)
+            set(newValue, forKey: Key.contactImageContactId.rawValue)
         }
     }
 
-    /// this is for showing readings on watch via the contact trick. Should trend be displayed in the contact, yes or no, default no
-    @objc dynamic var displayTrendInContactTrick: Bool {
+    /// this is for showing readings on watch via the contact image. Should trend be displayed in the contact, yes or no, default no
+    @objc dynamic var displayTrendInContactImage: Bool {
         get {
-            return bool(forKey: Key.displayTrendInContactTrick.rawValue)
+            return bool(forKey: Key.displayTrendInContactImage.rawValue)
         }
         set {
-            set(newValue, forKey: Key.displayTrendInContactTrick.rawValue)
+            set(newValue, forKey: Key.displayTrendInContactImage.rawValue)
         }
     }
     
-    /// this is for showing readings on watch via the contact trick. Should the range indicator be displayed, yes or no
-    @objc dynamic var rangeIndicatorInContactTrick: Bool {
+    /// this is for showing readings on watch via the contact image. Should the range indicator be displayed, yes or no
+    @objc dynamic var rangeIndicatorInContactImage: Bool {
         get {
-            return bool(forKey: Key.rangeIndicatorInContactTrick.rawValue)
+            return bool(forKey: Key.rangeIndicatorInContactImage.rawValue)
         }
         set {
-            set(newValue, forKey: Key.rangeIndicatorInContactTrick.rawValue)
+            set(newValue, forKey: Key.rangeIndicatorInContactImage.rawValue)
         }
     }
     

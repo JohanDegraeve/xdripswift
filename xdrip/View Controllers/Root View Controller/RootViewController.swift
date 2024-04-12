@@ -553,8 +553,8 @@ final class RootViewController: UIViewController, ObservableObject {
     /// CalendarManager instance
     private var calendarManager: CalendarManager?
     
-    /// ContactTrickManager  instance
-    private var contactTrickManager: ContactTrickManager?
+    /// ContactImageManager  instance
+    private var contactImageManager: ContactImageManager?
 
     /// healthkit manager instance
     private var healthKitManager:HealthKitManager?
@@ -1074,7 +1074,7 @@ final class RootViewController: UIViewController, ObservableObject {
         }
     }
     
-    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, calendarManager, housekeeper, contactTrickManager
+    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, calendarManager, housekeeper, contactImageManager
     private func setupApplicationData() {
         
         // setup Trace
@@ -1223,8 +1223,8 @@ final class RootViewController: UIViewController, ObservableObject {
         // setup calendarManager
         calendarManager = CalendarManager(coreDataManager: coreDataManager)
         
-        // setup contactTrickManager
-        contactTrickManager = ContactTrickManager(coreDataManager: coreDataManager)
+        // setup contactImageManager
+        contactImageManager = ContactImageManager(coreDataManager: coreDataManager)
 
         // initialize glucoseChartManager
         glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager)
@@ -1514,7 +1514,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 calendarManager?.processNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
-                contactTrickManager?.processNewReading()
+                contactImageManager?.processNewReading()
 
                 if !UserDefaults.standard.suppressLoopShare {
                     loopManager?.share()

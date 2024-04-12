@@ -177,7 +177,7 @@
 		D4E499AD277B4CE7000F8CBA /* DateOnly.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E499AC277B4CE7000F8CBA /* DateOnly.swift */; };
 		D4FD899727772F9100689788 /* TreatmentEntryAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */; };
 		F227BF192B9DF76D00CEEAAD /* SettingsViewContactTrickSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F227BF182B9DF76D00CEEAAD /* SettingsViewContactTrickSettingsViewModel.swift */; };
-		F227BF1C2B9E426B00CEEAAD /* ContactTrickManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F227BF1B2B9E426B00CEEAAD /* ContactTrickManager.swift */; };
+		F227BF1C2B9E426B00CEEAAD /* ContactImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F227BF1B2B9E426B00CEEAAD /* ContactImageManager.swift */; };
 		F227BF1E2B9E536400CEEAAD /* NumberImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F227BF1D2B9E536400CEEAAD /* NumberImageView.swift */; };
 		F51B9F7D24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51B9F7C24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift */; };
 		F64039B0281C3F9D0051EFFE /* QuickActionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64039AF281C3F9D0051EFFE /* QuickActionsManager.swift */; };
@@ -988,7 +988,7 @@
 		D4E499AC277B4CE7000F8CBA /* DateOnly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateOnly.swift; sourceTree = "<group>"; };
 		D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreatmentEntryAccessor.swift; sourceTree = "<group>"; };
 		F227BF182B9DF76D00CEEAAD /* SettingsViewContactTrickSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewContactTrickSettingsViewModel.swift; sourceTree = "<group>"; };
-		F227BF1B2B9E426B00CEEAAD /* ContactTrickManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactTrickManager.swift; sourceTree = "<group>"; };
+		F227BF1B2B9E426B00CEEAAD /* ContactImageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactImageManager.swift; sourceTree = "<group>"; };
 		F227BF1D2B9E536400CEEAAD /* NumberImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberImageView.swift; sourceTree = "<group>"; };
 		F51B9F7C24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre1NonFixedSlopeCalibrator.swift; sourceTree = "<group>"; };
 		F64039AF281C3F9D0051EFFE /* QuickActionsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsManager.swift; sourceTree = "<group>"; };
@@ -2039,12 +2039,12 @@
 			path = Treatments;
 			sourceTree = "<group>";
 		};
-		F227BF1A2B9E425800CEEAAD /* ContactTrick */ = {
+		F227BF1A2B9E425800CEEAAD /* ContactImage */ = {
 			isa = PBXGroup;
 			children = (
-				F227BF1B2B9E426B00CEEAAD /* ContactTrickManager.swift */,
+				F227BF1B2B9E426B00CEEAAD /* ContactImageManager.swift */,
 			);
-			path = ContactTrick;
+			path = ContactImage;
 			sourceTree = "<group>";
 		};
 		F64039AE281C3F8D0051EFFE /* QuickActions */ = {
@@ -2432,12 +2432,12 @@
 		F85DC2F621D25E3A00B9F74A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
-				F227BF1A2B9E425800CEEAAD /* ContactTrick */,
 				F821CF48229BF43A005C1E43 /* Alerts */,
 				F821CF54229BF43A005C1E43 /* Application */,
 				F8297F42238DC4AC00D74D66 /* BluetoothPeripheral */,
 				F8E3A2A723D906B600E5E98A /* Calendar */,
 				F8BECB03235CE5970060DAE1 /* Charts */,
+				F227BF1A2B9E425800CEEAAD /* ContactImage */,
 				F821CF4D229BF43A005C1E43 /* CoreData */,
 				F81D6D4622BD5F43005EFAE2 /* DexcomShare */,
 				47DB06CC2A7013EF00267BE3 /* Followers */,
@@ -4485,7 +4485,7 @@
 				F8A1584F22ECB281007F5B5D /* SettingsViewInfoViewModel.swift in Sources */,
 				F8B3A845227F090E004BA588 /* SettingsViewDexcomSettingsViewModel.swift in Sources */,
 				F8F9720C23A5915900C3F17D /* SensorDataTxMessage.swift in Sources */,
-				F227BF1C2B9E426B00CEEAAD /* ContactTrickManager.swift in Sources */,
+				F227BF1C2B9E426B00CEEAAD /* ContactImageManager.swift in Sources */,
 				F8DF766223E390D100063910 /* BLEPeripheral+CoreDataProperties.swift in Sources */,
 				F8A1585F22EDB81E007F5B5D /* ConstantsLog.swift in Sources */,
 				F8284230274ED56A0097E0C9 /* DexcomCalibrationParameters.swift in Sources */,

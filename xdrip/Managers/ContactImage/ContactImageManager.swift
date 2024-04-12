@@ -2,7 +2,7 @@ import Foundation
 import os
 import Contacts
 
-class ContactTrickManager: NSObject {
+class ContactImageManager: NSObject {
     
     // MARK: - private properties
     
@@ -13,7 +13,7 @@ class ContactTrickManager: NSObject {
     private let bgReadingsAccessor:BgReadingsAccessor
 
     /// for logging
-    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryContactTrickManager)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryContactImageManager)
     
     /// to work with contacts
     let contactStore = CNContactStore()
@@ -24,9 +24,9 @@ class ContactTrickManager: NSObject {
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         super.init()
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.contactTrickContactId.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.displayTrendInContactTrick.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.rangeIndicatorInContactTrick.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.contactImageContactId.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.displayTrendInContactImage.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.rangeIndicatorInContactImage.rawValue, options: .new, context: nil)
     }
     
     // MARK: - public functions
@@ -42,7 +42,7 @@ class ContactTrickManager: NSObject {
     private func evaluateUserDefaultsChange(keyPathEnum: UserDefaults.Key) {
         switch keyPathEnum {
         
-        case UserDefaults.Key.contactTrickContactId, UserDefaults.Key.displayTrendInContactTrick, UserDefaults.Key.rangeIndicatorInContactTrick:
+        case UserDefaults.Key.contactImageContactId, UserDefaults.Key.displayTrendInContactImage, UserDefaults.Key.rangeIndicatorInContactImage:
             updateContact()
 
         default:
@@ -75,18 +75,18 @@ class ContactTrickManager: NSObject {
             self.workItem?.cancel()
             self.workItem = nil
             
-            if !UserDefaults.standard.enableContactTrick {
+            if !UserDefaults.standard.enableContactImage {
                 return
             }
             
             // check that access to contacts is authorized by the user
             guard CNContactStore.authorizationStatus(for: .contacts) == .authorized else {
-                trace("in updateContact, enableContactTrick is enabled but access to contacts is not authorized, setting UserDefaults.standard.enableContactTrick to false", log: self.log, category: ConstantsLog.categoryContactTrickManager, type: .info)
-                UserDefaults.standard.enableContactTrick = false
+                trace("in updateContact, enableContactImage is enabled but access to contacts is not authorized, setting UserDefaults.standard.enableContactImage to false", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
+                UserDefaults.standard.enableContactImage = false
                 return
             }
             
-            if UserDefaults.standard.contactTrickContactId == nil {
+            if UserDefaults.standard.contactImageContactId == nil {
                 return
             }
             
@@ -95,9 +95,9 @@ class ContactTrickManager: NSObject {
             
             let contact: CNContact
             do {
-                contact = try self.contactStore.unifiedContact(withIdentifier: UserDefaults.standard.contactTrickContactId!, keysToFetch: keysToFetch)
+                contact = try self.contactStore.unifiedContact(withIdentifier: UserDefaults.standard.contactImageContactId!, keysToFetch: keysToFetch)
             } catch {
-                trace("in updateContact, an error has been thrown while fetching the selected contact", log: self.log, category: ConstantsLog.categoryContactTrickManager, type: .error)
+                trace("in updateContact, an error has been thrown while fetching the selected contact", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error)
                 return
             }
             
@@ -106,12 +106,12 @@ class ContactTrickManager: NSObject {
             
             guard let mutableContact = contact.mutableCopy() as? CNMutableContact else { return }
             
-            let rangeIndicator = UserDefaults.standard.rangeIndicatorInContactTrick
+            let rangeIndicator = UserDefaults.standard.rangeIndicatorInContactImage
             
             if lastReading.count > 0  {
                 let reading = lastReading[0].unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).description
                 let rangeDescription = lastReading[0].bgRangeDescription()
-                let slopeArrow = UserDefaults.standard.displayTrendInContactTrick ? lastReading[0].slopeArrow() : nil
+                let slopeArrow = UserDefaults.standard.displayTrendInContactImage ? lastReading[0].slopeArrow() : nil
                 let valueIsUpToDate = abs(lastReading[0].timeStamp.timeIntervalSinceNow) < 5 * 60
                 
                 mutableContact.imageData = NumberImageView.getImage(
@@ -124,7 +124,7 @@ class ContactTrickManager: NSObject {
                 
                 // schedule an update in 5 min 15 seconds - if no new data is received until then, the empty value will get rendered into the contact (this update will be canceled if new data is received)
                 self.workItem = DispatchWorkItem(block: {
-                    trace("in updateContact, no updates received for more than 5 minutes", log: self.log, category: ConstantsLog.categoryContactTrickManager, type: .error)
+                    trace("in updateContact, no updates received for more than 5 minutes", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error)
                     self.updateContact()
                 })
                 DispatchQueue.main.asyncAfter(deadline: .now() + 5 * 60 + 15, execute: self.workItem!)
@@ -159,10 +159,10 @@ class ContactTrickManager: NSObject {
                         details = "Code \(error.code)"
                     }
                 }
-                trace("in updateContact, failed to update the contact - %{public}@: %{public}@", log: self.log, category: ConstantsLog.categoryContactTrickManager, type: .error, details ?? "no details", error.localizedDescription)
+                trace("in updateContact, failed to update the contact - %{public}@: %{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, details ?? "no details", error.localizedDescription)
 
             } catch {
-                trace("in updateContact, failed to update the contact: %{public}@", log: self.log, category: ConstantsLog.categoryContactTrickManager, type: .error, error.localizedDescription)
+                trace("in updateContact, failed to update the contact: %{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, error.localizedDescription)
             }
         }
     }

@@ -5,11 +5,11 @@ import os
 
 fileprivate enum Setting:Int, CaseIterable {
     
-    /// enable contact trick yes or no
-    case enableContactTrick = 0
+    /// enable contact image yes or no
+    case enableContactImage = 0
     
     /// selected contact  id
-    case contactTrickContactId = 1
+    case contactImageContactId = 1
     
     /// should trend be displayed yes or no
     case displayTrend = 2
@@ -19,10 +19,10 @@ fileprivate enum Setting:Int, CaseIterable {
     
 }
 
-class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
+class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
     
     /// for logging
-    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categorySettingsViewContactTrickSettingsViewModel)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel)
     
     /// used for requesting authorization to access contacts
     let contactStore = CNContactStore()
@@ -36,7 +36,7 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.contactTrickSectionTitle
+        return Texts_SettingsView.contactImageSectionTitle
     }
     
     func settingsRowText(index: Int) -> String {
@@ -45,17 +45,17 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .enableContactTrick:
-            return Texts_SettingsView.enableContactTrick
+        case .enableContactImage:
+            return Texts_SettingsView.enableContactImage
             
-        case .contactTrickContactId:
-            return Texts_SettingsView.contactTrickContactId
+        case .contactImageContactId:
+            return Texts_SettingsView.contactImageContactId
             
         case .displayTrend:
-            return Texts_SettingsView.displayTrendInContactTrick
+            return Texts_SettingsView.displayTrendInContactImage
 
         case .rangeIndicator:
-            return Texts_SettingsView.rangeIndicatorInContactTrick
+            return Texts_SettingsView.rangeIndicatorInContactImage
 
         }
 
@@ -67,7 +67,7 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .enableContactTrick:
+        case .enableContactImage:
             // if access to Contacts was previously denied by user, then show disclosure indicator, clicking the row will give info how user should authorize access
             // also if access is restricted
             
@@ -87,12 +87,12 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
                 return UITableViewCell.AccessoryType.none
                 
             @unknown default:
-                trace("in SettingsViewContactTrickSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                trace("in SettingsViewContactImageSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                 return UITableViewCell.AccessoryType.none
                 
             }
             
-        case .contactTrickContactId, .displayTrend, .rangeIndicator:
+        case .contactImageContactId, .displayTrend, .rangeIndicator:
             return UITableViewCell.AccessoryType.none
          
         }
@@ -104,24 +104,24 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .contactTrickContactId:
-            if UserDefaults.standard.contactTrickContactId != nil {
+        case .contactImageContactId:
+            if UserDefaults.standard.contactImageContactId != nil {
                 
                 let keysToFetch = [CNContactEmailAddressesKey, CNContactGivenNameKey, CNContactFamilyNameKey] as [CNKeyDescriptor]
                 do {
-                    let contact = try contactStore.unifiedContact(withIdentifier: UserDefaults.standard.contactTrickContactId!, keysToFetch: keysToFetch)
+                    let contact = try contactStore.unifiedContact(withIdentifier: UserDefaults.standard.contactImageContactId!, keysToFetch: keysToFetch)
                     if contact.emailAddresses.isEmpty {
                         return contact.identifier
                     }
                     return "\(contact.emailAddresses.first!.value)"
                 } catch {
-                    trace("in SettingsViewContactTrickSettingsViewModel, an error has been thrown while fetching the selected contact", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
-                    return UserDefaults.standard.contactTrickContactId
+                    trace("in SettingsViewContactImageSettingsViewModel, an error has been thrown while fetching the selected contact", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                    return UserDefaults.standard.contactImageContactId
                 }
             }
             return nil
             
-        case .enableContactTrick, .displayTrend, .rangeIndicator:
+        case .enableContactImage, .displayTrend, .rangeIndicator:
             return nil
             
         }
@@ -133,18 +133,18 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
 
         switch setting {
             
-        case .enableContactTrick:
+        case .enableContactImage:
             
             // if authorizationStatus is denied or restricted, then don't show the uiswitch
             let authorizationStatus = CNContactStore.authorizationStatus(for: .contacts)
             if authorizationStatus == .denied || authorizationStatus == .restricted {return nil}
             
-            return UISwitch(isOn: UserDefaults.standard.enableContactTrick, action: {
+            return UISwitch(isOn: UserDefaults.standard.enableContactImage, action: {
                 (isOn:Bool) in
                 
                 // if setting to false, then no need to check authorization status
                 if !isOn {
-                    UserDefaults.standard.enableContactTrick = false
+                    UserDefaults.standard.enableContactImage = false
                     return
                 }
                 
@@ -157,42 +157,42 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
                     self.contactStore.requestAccess(for: .contacts) { (granted, error) in
                         DispatchQueue.main.async {
                             if !granted {
-                                trace("in SettingsViewContactTrickSettingsViewModel, CNContactStore access not granted", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
-                                UserDefaults.standard.enableContactTrick = false
+                                trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access not granted", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                                UserDefaults.standard.enableContactImage = false
                             } else {
-                                trace("in SettingsViewContactTrickSettingsViewModel, CNContactStore access granted", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-                                UserDefaults.standard.enableContactTrick = true
+                                trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access granted", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+                                UserDefaults.standard.enableContactImage = true
                             }
                         }
                     }
                     
                 case .restricted:
-                    trace("in SettingsViewContactTrickSettingsViewModel, CNContactStore access restricted, according to apple doc 'possibly due to active restrictions such as parental controls being in place'", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
-                    UserDefaults.standard.enableContactTrick = false
+                    trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access restricted, according to apple doc 'possibly due to active restrictions such as parental controls being in place'", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                    UserDefaults.standard.enableContactImage = false
                     
                 case .denied:
-                    trace("in SettingsViewContactTrickSettingsViewModel, CNContactStore access denied by user", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
-                    UserDefaults.standard.enableContactTrick = false
+                    trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access denied by user", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                    UserDefaults.standard.enableContactImage = false
 
                 case .authorized:
-                    trace("in SettingsViewContactTrickSettingsViewModel, CNContactStore access authorized", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
-                    UserDefaults.standard.enableContactTrick = true
+                    trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access authorized", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                    UserDefaults.standard.enableContactImage = true
                     
                 @unknown default:
-                    trace("in SettingsViewContactTrickSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                    trace("in SettingsViewContactImageSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                     
                 }
                 
             })
             
-        case .contactTrickContactId:
+        case .contactImageContactId:
             return nil
             
         case .displayTrend:
-            return UISwitch(isOn: UserDefaults.standard.displayTrendInContactTrick, action: {(isOn:Bool) in UserDefaults.standard.displayTrendInContactTrick = isOn})
+            return UISwitch(isOn: UserDefaults.standard.displayTrendInContactImage, action: {(isOn:Bool) in UserDefaults.standard.displayTrendInContactImage = isOn})
 
         case .rangeIndicator:
-            return UISwitch(isOn: UserDefaults.standard.rangeIndicatorInContactTrick, action: {(isOn:Bool) in UserDefaults.standard.rangeIndicatorInContactTrick = isOn})
+            return UISwitch(isOn: UserDefaults.standard.rangeIndicatorInContactImage, action: {(isOn:Bool) in UserDefaults.standard.rangeIndicatorInContactImage = isOn})
 
         }
         
@@ -200,13 +200,13 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
     
     func numberOfRows() -> Int {
         
-        // if contact trick is not enabled, then all other settings can be hidden
-        if UserDefaults.standard.enableContactTrick {
+        // if contact image is not enabled, then all other settings can be hidden
+        if UserDefaults.standard.enableContactImage {
             
             // user may have removed the authorization, in that case set setting to false and return 1 row
             if CNContactStore.authorizationStatus(for: .contacts) != .authorized {
                 
-                UserDefaults.standard.enableContactTrick = false
+                UserDefaults.standard.enableContactImage = false
                 
                 return 1
                 
@@ -228,7 +228,7 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .enableContactTrick, .displayTrend, .rangeIndicator:
+        case .enableContactImage, .displayTrend, .rangeIndicator:
             
             // depending on status of authorization, we will either do nothing or show a message
             
@@ -247,13 +247,13 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
                 return SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.infoContactsAccessRestricted)
                 
             @unknown default:
-                trace("in SettingsViewContactTrickSettingsViewModel, unknown case returned when authorizing CNContactStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                trace("in SettingsViewContactImageSettingsViewModel, unknown case returned when authorizing CNContactStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                 
             }
 
             return SettingsSelectedRowAction.nothing
         
-        case .contactTrickContactId:
+        case .contactImageContactId:
             
             let keysToFetch = [CNContactEmailAddressesKey, CNContactGivenNameKey, CNContactFamilyNameKey] as [CNKeyDescriptor]
             let fetchRequest = CNContactFetchRequest(keysToFetch: keysToFetch)
@@ -265,14 +265,14 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
                 try contactStore.enumerateContacts(with: fetchRequest) { (contact, stop) in
                     if !contact.emailAddresses.isEmpty || !contact.givenName.isEmpty {
                         contacts.append(contact)
-                        if contact.identifier == UserDefaults.standard.contactTrickContactId {
+                        if contact.identifier == UserDefaults.standard.contactImageContactId {
                             selectedRow = index
                         }
                         index += 1
                     }
                 }
             } catch {
-                trace("in SettingsViewContactTrickSettingsViewModel, an error has been thrown while fetching the contacts", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                trace("in SettingsViewContactImageSettingsViewModel, an error has been thrown while fetching the contacts", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
             }
                         
             let _ = contacts.partition { c in
@@ -283,9 +283,9 @@ class SettingsViewContactTrickSettingsViewModel: SettingsViewModelProtocol {
             let data = contacts.map { c -> String in
                 c.emailAddresses.isEmpty ? c.givenName : "\(c.emailAddresses.first!.value)"
             }
-            return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.contactTrickContactId, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
+            return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.contactImageContactId, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
                 if index != selectedRow {
-                    UserDefaults.standard.contactTrickContactId = contacts[index].identifier
+                    UserDefaults.standard.contactImageContactId = contacts[index].identifier
                 }
             }, cancelHandler: nil, didSelectRowHandler: nil)
 
