@@ -145,7 +145,7 @@ final class WatchManager: NSObject, ObservableObject {
                     trace("error sending watch state, error = %{public}@", log: self.log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)
                 })
             } else {
-                if lastForcedComplicationUpdateTimeStamp < Date().addingTimeInterval(-ConstantsWidget.forceComplicationRefreshTimeInMinutes * 60), session.isComplicationEnabled {
+                if lastForcedComplicationUpdateTimeStamp < Date().addingTimeInterval(-ConstantsWidget.forceComplicationRefreshTimeInMinutes), session.isComplicationEnabled {
                     trace("forcing background complication update, remaining complication transfers left today = %{public}@ / 50", log: self.log, category: ConstantsLog.categoryWatchManager, type: .info, session.remainingComplicationUserInfoTransfers.description)
                     
                     session.transferCurrentComplicationUserInfo(["watchState": userInfo])
