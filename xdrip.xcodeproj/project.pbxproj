@@ -180,6 +180,9 @@
 		D4FD899727772F9100689788 /* TreatmentEntryAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */; };
 		F227BF192B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F227BF182B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift */; };
 		F227BF1C2B9E426B00CEEAAD /* ContactImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F227BF1B2B9E426B00CEEAAD /* ContactImageManager.swift */; };
+		E4B8C71E2B3EBEE3006375E2 /* GlucoseIntentResponseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4B8C71D2B3EBEE3006375E2 /* GlucoseIntentResponseView.swift */; };
+		E4C006212B3DE8EC00D59303 /* GlucoseIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C006202B3DE8EC00D59303 /* GlucoseIntent.swift */; };
+		E4D530632B418FF80018C6A4 /* AppShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4D530622B418FF80018C6A4 /* AppShortcuts.swift */; };
 		F51B9F7D24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F51B9F7C24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift */; };
 		F64039B0281C3F9D0051EFFE /* QuickActionsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F64039AF281C3F9D0051EFFE /* QuickActionsManager.swift */; };
 		F64039B2281E90CF0051EFFE /* QuickActions.strings in Resources */ = {isa = PBXBuildFile; fileRef = F64039B1281E90CF0051EFFE /* QuickActions.strings */; };
@@ -992,6 +995,9 @@
 		D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreatmentEntryAccessor.swift; sourceTree = "<group>"; };
 		F227BF182B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewContactImageSettingsViewModel.swift; sourceTree = "<group>"; };
 		F227BF1B2B9E426B00CEEAAD /* ContactImageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactImageManager.swift; sourceTree = "<group>"; };
+		E4B8C71D2B3EBEE3006375E2 /* GlucoseIntentResponseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseIntentResponseView.swift; sourceTree = "<group>"; };
+		E4C006202B3DE8EC00D59303 /* GlucoseIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseIntent.swift; sourceTree = "<group>"; };
+		E4D530622B418FF80018C6A4 /* AppShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShortcuts.swift; sourceTree = "<group>"; };
 		F51B9F7C24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre1NonFixedSlopeCalibrator.swift; sourceTree = "<group>"; };
 		F64039AF281C3F9D0051EFFE /* QuickActionsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickActionsManager.swift; sourceTree = "<group>"; };
 		F64039B1281E90CF0051EFFE /* QuickActions.strings */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; path = QuickActions.strings; sourceTree = "<group>"; };
@@ -2047,6 +2053,16 @@
 				F227BF1B2B9E426B00CEEAAD /* ContactImageManager.swift */,
 			);
 			path = ContactImage;
+            sourceTree = "<group>";
+        };
+		E4C0061F2B3DE8C100D59303 /* AppIntents */ = {
+			isa = PBXGroup;
+			children = (
+				E4C006202B3DE8EC00D59303 /* GlucoseIntent.swift */,
+				E4B8C71D2B3EBEE3006375E2 /* GlucoseIntentResponseView.swift */,
+				E4D530622B418FF80018C6A4 /* AppShortcuts.swift */,
+			);
+			name = AppIntents;
 			sourceTree = "<group>";
 		};
 		F64039AE281C3F8D0051EFFE /* QuickActions */ = {
@@ -2613,6 +2629,7 @@
 				F85DC29B21CFCEB800B9F74A /* Recovered References */,
 				F8AC425C21ADEBD60078C348 /* xdrip */,
 			);
+			indentWidth = 4;
 			sourceTree = "<group>";
 		};
 		F8AC425B21ADEBD60078C348 /* Products */ = {
@@ -2629,6 +2646,7 @@
 		F8AC425C21ADEBD60078C348 /* xdrip */ = {
 			isa = PBXGroup;
 			children = (
+				E4C0061F2B3DE8C100D59303 /* AppIntents */,
 				F821CF9822AE589E005C1E43 /* xdrip.entitlements */,
 				F8A5EEC5257EDC910085E660 /* xdripDebug.entitlements */,
 				F8A54B0A22D9215500934E7A /* xdrip-Bridging-Header.h */,
@@ -4323,6 +4341,7 @@
 				47B136DB2BC9BB55001E7ED3 /* ContactImageView.swift in Sources */,
 				F830993023C928E0005741DF /* WatlaaBluetoothTransmitterDelegate.swift in Sources */,
 				F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */,
+				E4B8C71E2B3EBEE3006375E2 /* GlucoseIntentResponseView.swift in Sources */,
 				47ADD2DF27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift in Sources */,
 				F8F9722723A5915900C3F17D /* CGMBluconTransmitter.swift in Sources */,
 				F8E3A2A923D906C200E5E98A /* CalendarManager.swift in Sources */,
@@ -4450,6 +4469,7 @@
 				F816E0E42432A4FA009EE65B /* CGMBluconTransmitterDelegate.swift in Sources */,
 				F8A389CF232AE2EA0010F405 /* M5StackSettingsViewController.swift in Sources */,
 				F821CF5E229BF43A005C1E43 /* BgReading+NightScout.swift in Sources */,
+				E4C006212B3DE8EC00D59303 /* GlucoseIntent.swift in Sources */,
 				F8CB59CA27405A6800BA199E /* DexcomCalibrationTxMessage.swift in Sources */,
 				F8A2BC3025DB0D6D001D1E78 /* BluetoothPeripheralManager.swift in Sources */,
 				F8A389EB233175A10010F405 /* SettingsViewM5StackSettingsViewModel.swift in Sources */,
