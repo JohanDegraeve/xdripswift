@@ -135,7 +135,7 @@
 "settingsviews_infoContactsAccessRestricted" = "You cannot give authorization to %@ to access your contacts. This is possibly due to active restrictions such as parental controls being in place.";
 "settingsviews_contactImageSectionTitle" = "Contact Image";
 "settingsviews_enableContactImage" = "Create Contact";
-"settingsviews_displayTrendInContactImage" = "Display Trend";
+"settingsviews_displayTrendInContactImage" = "Show Trend";
 "settingsviews_contactImageCreatedByString" = "Contact automatically created by";
 "sectionTitleTrace" = "Issue Reporting";
 "sendTraceFile" = "Send Issue Report";

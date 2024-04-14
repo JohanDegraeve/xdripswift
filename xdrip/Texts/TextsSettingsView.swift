@@ -689,11 +689,11 @@ class Texts_SettingsView {
     }()
     
     static let enableContactImage: String = {
-        return NSLocalizedString("settingsviews_enableContactImage", tableName: filename, bundle: Bundle.main, value: "Enable Contact Image", comment: "Contact Image Settings - text in row where contact image is enabled or disabled ")
+        return NSLocalizedString("settingsviews_enableContactImage", tableName: filename, bundle: Bundle.main, value: "Create Contact", comment: "Contact Image Settings - text in row where contact image is enabled or disabled ")
     }()
     
     static let displayTrendInContactImage: String = {
-        return NSLocalizedString("settingsviews_displayTrendInContactImage", tableName: filename, bundle: Bundle.main, value: "Display Trend", comment: "Contact Image Settings - text in row where user needs to say if trend should be displayed or not")
+        return NSLocalizedString("settingsviews_displayTrendInContactImage", tableName: filename, bundle: Bundle.main, value: "Show Trend", comment: "Contact Image Settings - text in row where user needs to say if trend should be displayed or not")
     }()
     
     static let contactImageCreatedByString: String = {
