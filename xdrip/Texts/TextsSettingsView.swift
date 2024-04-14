@@ -681,7 +681,7 @@ class Texts_SettingsView {
     // MARK: - Contact image
     
     static let infoContactsAccessRestricted: String = {
-        return String(format: NSLocalizedString("infoContactsAccessRestricted", tableName: filename, bundle: Bundle.main, value: "You cannot give authorization to %@ to access your contacts. This is possibly due to active restrictions such as parental controls being in place.", comment: "If user is not allowed to give any app access to the Contacts, due to restrictions. And then tries to activate the contact image, this message will be shown"), ConstantsHomeView.applicationName)
+        return String(format: NSLocalizedString("settingsviews_infoContactsAccessRestricted", tableName: filename, bundle: Bundle.main, value: "You cannot give authorization to %@ to access your contacts. This is possibly due to active restrictions such as parental controls being in place.", comment: "If user is not allowed to give any app access to the Contacts, due to restrictions. And then tries to activate the contact image, this message will be shown"), ConstantsHomeView.applicationName)
     }()
     
     static let contactImageSectionTitle: String = {
@@ -691,17 +691,13 @@ class Texts_SettingsView {
     static let enableContactImage: String = {
         return NSLocalizedString("settingsviews_enableContactImage", tableName: filename, bundle: Bundle.main, value: "Enable Contact Image", comment: "Contact Image Settings - text in row where contact image is enabled or disabled ")
     }()
-
-    static let contactImageContactId: String = {
-        return NSLocalizedString("settingsviews_contactImageContactId", tableName: filename, bundle: Bundle.main, value: "Contact", comment: "Contact Image Settings - text in row where user needs to select a contact")
-    }()
     
     static let displayTrendInContactImage: String = {
         return NSLocalizedString("settingsviews_displayTrendInContactImage", tableName: filename, bundle: Bundle.main, value: "Display Trend", comment: "Contact Image Settings - text in row where user needs to say if trend should be displayed or not")
     }()
     
-    static let rangeIndicatorInContactImage: String = {
-        return NSLocalizedString("settingsviews_rangeIndicatorInContactImage", tableName: filename, bundle: Bundle.main, value: "Display Range Indicator", comment: "Contact Image Settings - text in row where user needs to say if they want the range indicator to be rendered")
+    static let contactImageCreatedByString: String = {
+        return NSLocalizedString("settingsviews_contactImageCreatedByString", tableName: filename, bundle: Bundle.main, value: "Contact automatically created by", comment: "Add a note to the contact so that user knows it was the app that automatically created it")
     }()
 
     // MARK: - Issue Reporting

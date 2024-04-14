@@ -8,11 +8,8 @@ fileprivate enum Setting:Int, CaseIterable {
     /// enable contact image yes or no
     case enableContactImage = 0
     
-    /// selected contact  id
-    case contactImageContactId = 1
-    
     /// should trend be displayed yes or no
-    case displayTrend = 2
+    case displayTrend = 1
     
 }
 
@@ -44,9 +41,6 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
             
         case .enableContactImage:
             return Texts_SettingsView.enableContactImage
-            
-        case .contactImageContactId:
-            return Texts_SettingsView.contactImageContactId
             
         case .displayTrend:
             return Texts_SettingsView.displayTrendInContactImage
@@ -86,7 +80,7 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
                 
             }
             
-        case .contactImageContactId, .displayTrend:
+        case .displayTrend:
             return UITableViewCell.AccessoryType.none
          
         }
@@ -97,27 +91,8 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-            
-        case .contactImageContactId:
-            if UserDefaults.standard.contactImageContactId != nil {
-                
-                let keysToFetch = [CNContactEmailAddressesKey, CNContactGivenNameKey, CNContactFamilyNameKey] as [CNKeyDescriptor]
-                do {
-                    let contact = try contactStore.unifiedContact(withIdentifier: UserDefaults.standard.contactImageContactId!, keysToFetch: keysToFetch)
-                    if contact.emailAddresses.isEmpty {
-                        return contact.identifier
-                    }
-                    return "\(contact.emailAddresses.first!.value)"
-                } catch {
-                    trace("in SettingsViewContactImageSettingsViewModel, an error has been thrown while fetching the selected contact", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
-                    return UserDefaults.standard.contactImageContactId
-                }
-            }
-            return nil
-            
         case .enableContactImage, .displayTrend:
             return nil
-            
         }
     }
 
@@ -179,9 +154,6 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
                 
             })
             
-        case .contactImageContactId:
-            return nil
-            
         case .displayTrend:
             return UISwitch(isOn: UserDefaults.standard.displayTrendInContactImage, action: {(isOn:Bool) in UserDefaults.standard.displayTrendInContactImage = isOn})
 
@@ -240,45 +212,8 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
                 trace("in SettingsViewContactImageSettingsViewModel, unknown case returned when authorizing CNContactStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                 
             }
-
+            
             return SettingsSelectedRowAction.nothing
-        
-        case .contactImageContactId:
-            
-            let keysToFetch = [CNContactEmailAddressesKey, CNContactGivenNameKey, CNContactFamilyNameKey] as [CNKeyDescriptor]
-            let fetchRequest = CNContactFetchRequest(keysToFetch: keysToFetch)
-            var contacts = [CNContact]()
-            var selectedRow:Int?
-
-            var index = 0
-            do {
-                try contactStore.enumerateContacts(with: fetchRequest) { (contact, stop) in
-                    if !contact.emailAddresses.isEmpty || !contact.givenName.isEmpty {
-                        contacts.append(contact)
-                        if contact.identifier == UserDefaults.standard.contactImageContactId {
-                            selectedRow = index
-                        }
-                        index += 1
-                    }
-                }
-            } catch {
-                trace("in SettingsViewContactImageSettingsViewModel, an error has been thrown while fetching the contacts", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
-            }
-                        
-            let _ = contacts.partition { c in
-                let s = (c.emailAddresses.isEmpty ? c.givenName : "\(c.emailAddresses.first!.value)").lowercased()
-                return !(s.contains(find: "bg") || s.contains(find: "xdrip") || s.contains(find: "glucos"))
-            }
-            
-            let data = contacts.map { c -> String in
-                c.emailAddresses.isEmpty ? c.givenName : "\(c.emailAddresses.first!.value)"
-            }
-            return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.contactImageContactId, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
-                if index != selectedRow {
-                    UserDefaults.standard.contactImageContactId = contacts[index].identifier
-                }
-            }, cancelHandler: nil, didSelectRowHandler: nil)
-
         }
         
     }

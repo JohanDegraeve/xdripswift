@@ -91,7 +91,7 @@ struct ContactImageView: View {
         let rect = CGRect(x: 0, y: 0, width: width, height: height)
         
         let bgValueString: String = bgValue.mgdlToMmolAndToString(mgdl: isMgDl)
-        let showSlopeArrow: Bool = (valueIsUpToDate && slopeArrow != nil) ? true : false
+        let showSlopeArrow: Bool = (valueIsUpToDate && slopeArrow != "") ? true : false
                 
         UIGraphicsBeginImageContext(rect.size)
         

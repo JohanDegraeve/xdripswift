@@ -141,6 +141,11 @@
 "nslog" = "NSLog";
 "developerSettings" = "Opciones de Desarrollo";
 "settingsviews_sectiontitlehomescreen" = "Inicio";
+"settingsviews_infoContactsAccessRestricted" = "No has podido dar permiso a %@ para accesar a tus contactos. Esto es probablemente debido a restriciones como el control parental o similar.";
+"settingsviews_contactImageSectionTitle" = "Imagen de Contacto";
+"settingsviews_enableContactImage" = "Crear Contacto";
+"settingsviews_displayTrendInContactImage" = "Mostrar Tendencia";
+"settingsviews_contactImageCreatedByString" = "Contacto creado automáticamente por";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

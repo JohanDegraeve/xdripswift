@@ -132,6 +132,11 @@
 "infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
 "settingsviews_CalenderIntervalTitle" = "Event Interval";
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
+"settingsviews_infoContactsAccessRestricted" = "You cannot give authorization to %@ to access your contacts. This is possibly due to active restrictions such as parental controls being in place.";
+"settingsviews_contactImageSectionTitle" = "Contact Image";
+"settingsviews_enableContactImage" = "Create Contact";
+"settingsviews_displayTrendInContactImage" = "Display Trend";
+"settingsviews_contactImageCreatedByString" = "Contact automatically created by";
 "sectionTitleTrace" = "Issue Reporting";
 "sendTraceFile" = "Send Issue Report";
 "describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";

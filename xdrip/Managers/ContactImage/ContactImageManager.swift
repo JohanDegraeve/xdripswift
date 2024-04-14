@@ -8,10 +8,10 @@ class ContactImageManager: NSObject {
     
     /// CoreDataManager to use
     private let coreDataManager:CoreDataManager
-
+    
     /// BgReadingsAccessor instance
     private let bgReadingsAccessor:BgReadingsAccessor
-
+    
     /// for logging
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryContactImageManager)
     
@@ -33,9 +33,10 @@ class ContactImageManager: NSObject {
         super.init()
         
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.enableContactImage.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.contactImageContactId.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.displayTrendInContactImage.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
+        
+        
     }
     
     // MARK: - public functions
@@ -62,16 +63,25 @@ class ContactImageManager: NSObject {
     /// used by observevalue for UserDefaults.Key
     private func evaluateUserDefaultsChange(keyPathEnum: UserDefaults.Key) {
         switch keyPathEnum {
-        
-        case UserDefaults.Key.enableContactImage, UserDefaults.Key.contactImageContactId, UserDefaults.Key.displayTrendInContactImage, UserDefaults.Key.bloodGlucoseUnitIsMgDl:
+            
+        case UserDefaults.Key.enableContactImage:
+            UserDefaults.standard.enableContactImage ? updateContact() : deleteContact()
+            
+        case UserDefaults.Key.displayTrendInContactImage, UserDefaults.Key.bloodGlucoseUnitIsMgDl:
             updateContact()
-
+            
         default:
             break
-
+            
         }
     }
     
+    /// this function will perform the following actions:
+    /// - first check that it should do something and the user has given access/authorization to the app to work with the device contacts
+    /// - create an image view based upon the recent glucose value(s)
+    /// - check if a valid contact (with the same name as the app) exists. If so, update it with a png image of the image view
+    /// - if a valid contact doesn't yet exist, create one with the app name and add a png image of the image view
+    /// - schedule a 5-6 minute timer to repeat the above (just in case the function isn't updated again by the root view controller)
     private func updateContact() {
         debouncer.debounce {
             self.workItem?.cancel()
@@ -87,31 +97,14 @@ class ContactImageManager: NSObject {
                 return
             }
             
-            // if the user hasn't selected a contact to use, then there's nothing to do yet
-            guard (UserDefaults.standard.contactImageContactId != nil) else { return }
-            
-            let keysToFetch = [CNContactImageDataKey] as [CNKeyDescriptor]
-            
-            let contact: CNContact
-            
-            do {
-                contact = try self.contactStore.unifiedContact(withIdentifier: UserDefaults.standard.contactImageContactId!, keysToFetch: keysToFetch)
-            } catch {
-                trace("in updateContact, an error has been thrown while fetching the selected contact", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error)
-                return
-            }
-            
+            // create a contact image view
             // get 2 last Readings, with a calculatedValue
             let lastReading = self.bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
-            
-            guard let mutableContact = contact.mutableCopy() as? CNMutableContact else { return }
-            
             let valueIsUpToDate = abs(lastReading[0].timeStamp.timeIntervalSinceNow) < 7 * 60
+            var contactImageView: ContactImageView
             
             if lastReading.count > 0  {
-                let contactImageView = ContactImageView(bgValue: lastReading[0].calculatedValue, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: UserDefaults.standard.displayTrendInContactImage ? lastReading[0].slopeArrow() : "", bgRangeDescription: lastReading[0].bgRangeDescription(), valueIsUpToDate: valueIsUpToDate)
-                
-                mutableContact.imageData = contactImageView.getImage().pngData()
+                contactImageView = ContactImageView(bgValue: lastReading[0].calculatedValue, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: UserDefaults.standard.displayTrendInContactImage ? lastReading[0].slopeArrow() : "", bgRangeDescription: lastReading[0].bgRangeDescription(), valueIsUpToDate: valueIsUpToDate)
                 
                 // schedule an update in 5 min 15 seconds - if no new data is received until then, the empty value will get rendered into the contact (this update will be canceled if new data is received)
                 self.workItem = DispatchWorkItem(block: {
@@ -120,44 +113,99 @@ class ContactImageManager: NSObject {
                 })
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + (5 * 60) + 15, execute: self.workItem!)
-                
             } else {
-                let contactImageView = ContactImageView(bgValue: 0, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: "", bgRangeDescription: .inRange, valueIsUpToDate: valueIsUpToDate)
-                
-                mutableContact.imageData = contactImageView.getImage().pngData()
+                // create an 'empty' image view if there is no BG data to show
+                contactImageView = ContactImageView(bgValue: 0, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: "", bgRangeDescription: .inRange, valueIsUpToDate: valueIsUpToDate)
             }
             
+            // we're going to use the app name as the given name of the contact we want to use/create/update
+            let keyToFetch = [CNContactGivenNameKey, CNContactFamilyNameKey, CNContactOrganizationNameKey, CNContactImageDataKey] as [CNKeyDescriptor]
+            let predicate = CNContact.predicateForContacts(matchingName: ConstantsHomeView.applicationName)
             let saveRequest = CNSaveRequest()
             
-            saveRequest.update(mutableContact)
+            let updatedString = (UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "Updated" : UserDefaults.standard.followerDataSourceType.fullDescription) + ": \(Date().formatted(date: .omitted, time: .shortened))"
             
-            do {
-                try self.contactStore.execute(saveRequest)
-            } catch let error as NSError {
-                var details: String?
+            // now let's try and find an existing contact with the same name as the app name
+            // we'll search for all results and then just use the first one for now
+            // we do it this way so that in the future we want to add a descriptor to the family name to have various contact images (such as "BG", "IOB", "COB" as needed)
+            if let contacts = try? self.contactStore.unifiedContacts(matching: predicate, keysToFetch: keyToFetch), let contact = contacts.first {
+                trace("in updateContact, existing contact found. Updating it's contact image.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
                 
-                if error.domain == CNErrorDomain {
-                    switch error.code {
-                    case CNError.authorizationDenied.rawValue:
-                        details = "Authorization denied"
-                    case CNError.communicationError.rawValue:
-                        details = "Communication error"
-                    case CNError.insertedRecordAlreadyExists.rawValue:
-                        details = "Record already exists"
-                    case CNError.dataAccessError.rawValue:
-                        details = "Data access error"
-                    default:
-                        details = "Code \(error.code)"
-                    }
+                // create a mutableContact from the existing contact so that we can modify it
+                guard let mutableContact = contact.mutableCopy() as? CNMutableContact else { return }
+                
+                mutableContact.imageData = contactImageView.getImage().pngData()
+                mutableContact.organizationName = updatedString
+                
+                // we'll update the existing contact with the new data
+                saveRequest.update(mutableContact)
+            } else {
+                trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' and adding a contact image.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName)
+                
+                // create a new mutable contact instance and assign properties to it
+                let contact = CNMutableContact()
+                var appVersion: String = " "
+                
+                if let dictionary = Bundle.main.infoDictionary, let version = dictionary["CFBundleShortVersionString"] as? String {
+                    appVersion += "v" + version
                 }
-                trace("in updateContact, failed to update the contact - %{public}@: %{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, details ?? "no details", error.localizedDescription)
-
-            } catch {
-                trace("in updateContact, failed to update the contact: %{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, error.localizedDescription)
+                
+                contact.givenName = ConstantsHomeView.applicationName
+                contact.imageData = contactImageView.getImage().pngData()
+                contact.organizationName = updatedString
+                contact.note = "\(Texts_SettingsView.contactImageCreatedByString) \(ConstantsHomeView.applicationName)\(appVersion) - \(Date().formatted(date: .abbreviated, time: .shortened))"
+                
+                // add a new contact to the device contacts
+                saveRequest.add(contact, toContainerWithIdentifier: nil)
             }
+            
+            // now execute the saveRequest - either to update an existing contact, or to create a new one
+            self.executeSaveRequest(saveRequest: saveRequest)
         }
     }
     
+    func deleteContact() {
+        // we're going to use the app name as the given name of the contact we want to use/create/update
+        let keyToFetch = [CNContactGivenNameKey] as [CNKeyDescriptor]
+        let predicate = CNContact.predicateForContacts(matchingName: ConstantsHomeView.applicationName)
+        let saveRequest = CNSaveRequest()
+        
+        if let contacts = try? self.contactStore.unifiedContacts(matching: predicate, keysToFetch: keyToFetch), let contact = contacts.first {
+            trace("in deleteContact, existing contact found. Will try and delete it.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
+            
+            let mutableContact = contact.mutableCopy() as! CNMutableContact
+            saveRequest.delete(mutableContact)
+            
+            executeSaveRequest(saveRequest: saveRequest)
+        }
+    }
+    
+    private func executeSaveRequest(saveRequest: CNSaveRequest) {
+        // now execute the saveRequest - to delete the existing contact
+        do {
+            try self.contactStore.execute(saveRequest)
+        } catch let error as NSError {
+            var details: String?
+            
+            if error.domain == CNErrorDomain {
+                switch error.code {
+                case CNError.authorizationDenied.rawValue:
+                    details = "Authorization denied"
+                case CNError.communicationError.rawValue:
+                    details = "Communication error"
+                case CNError.insertedRecordAlreadyExists.rawValue:
+                    details = "Record already exists"
+                case CNError.dataAccessError.rawValue:
+                    details = "Data access error"
+                default:
+                    details = "Code \(error.code)"
+                }
+            }
+            trace("in executeSaveRequest, failed to update/add/delete the contact - %{public}@: %{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, details ?? "no details", error.localizedDescription)
+        } catch {
+            trace("in executeSaveRequest, failed to update/add/delete the contact: %{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, error.localizedDescription)
+        }
+    }
 }
 
 extension ContactImageManager {
@@ -174,7 +222,7 @@ extension ContactImageManager {
         
         func debounce(_ block: @escaping () -> Void) {
             workItem?.cancel()
-
+            
             let workItem = DispatchWorkItem(block: {
                 block()
                 
@@ -182,7 +230,7 @@ extension ContactImageManager {
             })
             
             self.workItem = workItem
-
+            
             let thisDelay: TimeInterval
             
             if lastExecutedAt == nil {

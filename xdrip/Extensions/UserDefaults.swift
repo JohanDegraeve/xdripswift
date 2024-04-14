@@ -284,8 +284,6 @@ extension UserDefaults {
         
         /// enable contact image yes or no
         case enableContactImage = "enableContactImage"
-        /// the ID of the contact to be used by the contact image function
-        case contactImageContactId = "contactImageContactId"
         /// should trend be displayed yes or no
         case displayTrendInContactImage = "displayTrendInContactImage"
 
@@ -1748,16 +1746,6 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.enableContactImage.rawValue)
-        }
-    }
-
-    /// the ID of the contact to be updated by the contact image function
-    @objc dynamic var contactImageContactId: String? {
-        get {
-            return string(forKey: Key.contactImageContactId.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.contactImageContactId.rawValue)
         }
     }
 
