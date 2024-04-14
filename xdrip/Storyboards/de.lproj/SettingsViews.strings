@@ -498,3 +498,9 @@
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+"settingsviews_infoContactsAccessRestricted" = "Authorisierung von %@ zum Zugriff auf Kontakte nicht möglich. Möglicherweise sind Einschränkungen, bspw. Elternkontrolle, aktiv.";
+"settingsviews_contactImageSectionTitle" = "Kontaktbild";
+"settingsviews_enableContactImage" = "Erstelle Kontakt";
+"settingsviews_displayTrendInContactImage" = "Zeige Trend";
+"settingsviews_contactImageCreatedByString" = "Kontakt automatisch erstellt von";
