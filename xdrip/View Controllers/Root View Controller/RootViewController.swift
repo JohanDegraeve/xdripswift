@@ -10,6 +10,9 @@ import PieCharts
 import WatchConnectivity
 import SwiftUI
 import WidgetKit
+#if canImport(AppIntents)
+import AppIntents
+#endif
 
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController, ObservableObject {
@@ -703,6 +706,9 @@ final class RootViewController: UIViewController, ObservableObject {
             
         }
         
+        if #available(iOS 16, *) {
+            IntentDonationManager.shared.donate(intent: GlucoseIntent())
+        }
     }
     
     override func viewDidLoad() {
@@ -1000,6 +1006,12 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // reinitialise glucose chart and also to update labels and chart
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {
+            
+            if #available(iOS 16, *) {
+                // if view is appeared, view did appear will not get called when app moves to the foreground
+                // so need to donate here
+                IntentDonationManager.shared.donate(intent: GlucoseIntent())
+            }
             
             // update the connection status immediately (this will give the user a visual feedback that the connection was lost in the background if they have disabled keep-alive)
             self.setFollowerConnectionAndHeartbeatStatus()

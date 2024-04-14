@@ -102,5 +102,20 @@
 	<string>To update the contact photo with an image showing the current BG values</string>
 	<key>view controller-based status bar</key>
 	<false/>
+    <key>INAlternativeAppNames</key>
+        <array>
+            <dict>
+                <key>INAlternativeAppName</key>
+                <string>xDrip</string>
+                <key>INAlternativeAppNamePronunciationHint</key>
+                <string>ex drip</string>
+            </dict>
+            <dict>
+                <key>INAlternativeAppName</key>
+                <string>Drip</string>
+                <key>INAlternativeAppNamePronunciationHint</key>
+                <string>drip</string>
+            </dict>
+        </array>
 </dict>
 </plist>

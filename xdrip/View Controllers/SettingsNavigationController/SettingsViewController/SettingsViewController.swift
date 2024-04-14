@@ -284,6 +284,12 @@ extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
 
     }
     
+    func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        
+        return viewModels[section].sectionFooter()
+
+    }
+    
     func numberOfSections(in tableView: UITableView) -> Int {
         return Section.allCases.count
     }
