@@ -13,9 +13,6 @@ fileprivate enum Setting:Int, CaseIterable {
     
     /// should trend be displayed yes or no
     case displayTrend = 2
-
-    /// should the range indicator be displayed yes or no
-    case rangeIndicator = 3
     
 }
 
@@ -54,9 +51,6 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
         case .displayTrend:
             return Texts_SettingsView.displayTrendInContactImage
 
-        case .rangeIndicator:
-            return Texts_SettingsView.rangeIndicatorInContactImage
-
         }
 
     }
@@ -92,7 +86,7 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
                 
             }
             
-        case .contactImageContactId, .displayTrend, .rangeIndicator:
+        case .contactImageContactId, .displayTrend:
             return UITableViewCell.AccessoryType.none
          
         }
@@ -121,7 +115,7 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
             }
             return nil
             
-        case .enableContactImage, .displayTrend, .rangeIndicator:
+        case .enableContactImage, .displayTrend:
             return nil
             
         }
@@ -191,9 +185,6 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
         case .displayTrend:
             return UISwitch(isOn: UserDefaults.standard.displayTrendInContactImage, action: {(isOn:Bool) in UserDefaults.standard.displayTrendInContactImage = isOn})
 
-        case .rangeIndicator:
-            return UISwitch(isOn: UserDefaults.standard.rangeIndicatorInContactImage, action: {(isOn:Bool) in UserDefaults.standard.rangeIndicatorInContactImage = isOn})
-
         }
         
     }
@@ -228,10 +219,9 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .enableContactImage, .displayTrend, .rangeIndicator:
+        case .enableContactImage, .displayTrend:
             
             // depending on status of authorization, we will either do nothing or show a message
-            
             switch CNContactStore.authorizationStatus(for: .contacts) {
                 
             case .denied:

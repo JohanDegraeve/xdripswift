@@ -2,141 +2,155 @@ import Foundation
 import SwiftUI
 
 struct ContactImageView: View {
-    @Binding var value: String?
-    @Binding var slopeArrow: String?
-    @Binding var range: BgRangeDescription?
-    @Binding var valueIsUpToDate: Bool?
-    @Binding var rangeIndicator: Bool
-        
-    static let normalColorDark = Color(red: 17 / 256, green: 156 / 256, blue: 12 / 256)
-    static let notUrgentColorDark = Color(red: 254 / 256, green: 149 / 256, blue: 4 / 256)
-    static let urgentColorDark = Color(red: 255 / 256, green: 52 / 256, blue: 0 / 256)
-    static let unknownColorDark = Color(red: 0x88 / 256, green: 0x88 / 256, blue: 0x88 / 256)
     
-    static func getColor(value: String, range: BgRangeDescription, valueIsUpToDate: Bool?) -> Color {
-        if let valueIsUpToDate, valueIsUpToDate {
-            return switch range {
-            case .inRange: Self.normalColorDark
-            case .notUrgent: Self.notUrgentColorDark
-            case .urgent: Self.urgentColorDark
-            }
-        } else {
-            return Self.unknownColorDark
-        }
+    // public vars that need to be initialized when creating an instance of the view
+    var bgValue: Double
+    var isMgDl: Bool
+    var slopeArrow: String
+    var bgRangeDescription: BgRangeDescription
+    var valueIsUpToDate: Bool
 
-    }
-    
-    static func getImage(value: String?, range: BgRangeDescription?, slopeArrow: String?, valueIsUpToDate: Bool?, rangeIndicator: Bool) -> UIImage {
-        let width = 256.0
-        let height = 256.0
-        let rect = CGRect(x: 0, y: 0, width: width, height: height)
-        let color: Color
-        let string: String?
-                
-        if value != nil && range != nil {
-            color = getColor(value: value!, range: range!, valueIsUpToDate: valueIsUpToDate)
-            string = value
-        } else {
-            color = Self.unknownColorDark
-            string = "—"
-        }
-        let textColor: Color = Color(red: 250 / 256, green: 2500 / 256, blue: 250 / 256)
-                
-        UIGraphicsBeginImageContext(rect.size)
-        let context = UIGraphicsGetCurrentContext()
-        
-        let indicator = CGRect(x: (width - width*0.35)/2, y: height*0.15, width: width*0.35, height: height*0.10)
-        
-        if rangeIndicator {
-            context?.setFillColor(color.cgColor!)
-            let cornerRadius: CGFloat = 10.0
-            
-            if let context = UIGraphicsGetCurrentContext() {
-                context.beginPath()
-                context.move(to: CGPoint(x: indicator.minX + cornerRadius, y: indicator.minY))
-                context.addArc(tangent1End: CGPoint(x: indicator.maxX, y: indicator.minY), tangent2End: CGPoint(x: indicator.maxX, y: indicator.maxY), radius: cornerRadius)
-                context.addArc(tangent1End: CGPoint(x: indicator.maxX, y: indicator.maxY), tangent2End: CGPoint(x: indicator.minX, y: indicator.maxY), radius: cornerRadius)
-                context.addArc(tangent1End: CGPoint(x: indicator.minX, y: indicator.maxY), tangent2End: CGPoint(x: indicator.minX, y: indicator.minY), radius: cornerRadius)
-                context.addArc(tangent1End: CGPoint(x: indicator.minX, y: indicator.minY), tangent2End: CGPoint(x: indicator.maxX, y: indicator.minY), radius: cornerRadius)
-                context.closePath()
-                
-                context.fillPath()
-            }
-        }
-                
-        var fontSize = 100.0
-        var font: UIFont = UIFont.systemFont(ofSize: CGFloat(fontSize))
-        
-        var attributes: [NSAttributedString.Key : Any] = [
-            .font : font,
-            .foregroundColor : UIColor(textColor),
-            .tracking : -0.025, // "tight"
-        ]
-        let slopeAttributes: [NSAttributedString.Key : Any] = [
-            NSAttributedString.Key.font : UIFont.systemFont(ofSize: 80, weight: .regular),
-            NSAttributedString.Key.foregroundColor : UIColor(textColor)
-        ]
-        
-        
-        if let string {
-            var stringSize = string.size(withAttributes: attributes)
-            while stringSize.width > width*0.9 {
-                fontSize = fontSize - 10
-                attributes = [
-                    .font : font,
-                    .foregroundColor : UIColor(textColor),
-                    .tracking : -0.025, // "tight"
-                ]
-                stringSize = string.size(withAttributes: attributes)
-            }
-            
-            string.draw(
-                in: CGRectMake(
-                    (width - stringSize.width) / 2,
-                    (height - stringSize.height) / 2,
-                    stringSize.width,
-                    stringSize.height
-                ),
-                withAttributes: attributes
-            )
-            if let slopeArrow {
-                let slopeArrowSize = slopeArrow.size(withAttributes: slopeAttributes)
-                slopeArrow.draw(
-                    in: CGRectMake(
-                        (width - slopeArrowSize.width) / 2,
-                        height - slopeArrowSize.height * 1.05,
-                        slopeArrowSize.width,
-                        slopeArrowSize.height
-                    ),
-                    withAttributes: slopeAttributes
-                )
-            }
-        }
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-        return image ?? UIImage()
-    }
-    
     var uiImage: UIImage {
-        return ContactImageView.getImage(value: value, range: range, slopeArrow: slopeArrow, valueIsUpToDate: valueIsUpToDate, rangeIndicator: rangeIndicator)
+        return getImage()
     }
     
     var body: some View {
         Image(uiImage: uiImage)
             .frame(width: 256, height: 256)
     }
+    
+    var bgColor: UIColor {
+        guard bgValue > 0, valueIsUpToDate else { return ConstantsContactImage.unknownColor }
+        
+        switch bgRangeDescription {
+        case .inRange:
+            return ConstantsContactImage.inRangeColor
+        case .notUrgent:
+            return ConstantsContactImage.notUrgentColor
+        case .urgent:
+            return ConstantsContactImage.urgentColor
+        }
+    }
+    
+    var bgValueFont: UIFont {
+        var fontSize: CGFloat = 100
+        let showSlopeArrow: Bool = (valueIsUpToDate && slopeArrow != "") ? true : false
+        
+        if isMgDl {
+            switch bgValue {
+            case 1..<100:
+                fontSize = showSlopeArrow ? 120 : 130
+            case 100..<200:
+                fontSize = showSlopeArrow ? 95 : 105
+            default:
+                fontSize = showSlopeArrow ? 90 : 100
+            }
+        } else {
+            switch bgValue.mgdlToMmol() {
+            case 0.1..<10.0:
+                fontSize = showSlopeArrow ? 100 : 110
+            case 10.0..<20.0:
+                fontSize = showSlopeArrow ? 80 : 90
+            default:
+                fontSize = showSlopeArrow ? 80 : 85
+            }
+        }
+        
+        return UIFont.systemFont(ofSize: fontSize, weight: .bold)
+    }
+    
+//    var slopeArrowFont: UIFont {
+//        var fontSize: CGFloat = 100
+//        
+//        if isMgDl {
+//            switch bgValue {
+//            case 1..<100:
+//                fontSize = 90
+//            case 100..<200:
+//                fontSize = 90
+//            default:
+//                fontSize = 100
+//            }
+//        } else {
+//            switch bgValue.mgdlToMmol() {
+//            case 0.1..<10.0:
+//                fontSize = 100
+//            case 10.0..<20.0:
+//                fontSize = 120
+//            default:
+//                fontSize = 120
+//            }
+//        }
+//        
+//        return UIFont.systemFont(ofSize: 80, weight: .bold)
+//    }
+    
+    func getImage() -> UIImage {
+        let width = 256.0
+        let height = 256.0
+        let rect = CGRect(x: 0, y: 0, width: width, height: height)
+        
+        let bgValueString: String = bgValue.mgdlToMmolAndToString(mgdl: isMgDl)
+        let showSlopeArrow: Bool = (valueIsUpToDate && slopeArrow != nil) ? true : false
+                
+        UIGraphicsBeginImageContext(rect.size)
+        
+        let bgValueAttributes: [NSAttributedString.Key : Any] = [
+            .font : bgValueFont,
+            .foregroundColor: bgColor,
+            .tracking : -0.025, // "tight"
+        ]
+        
+        let slopeArrowAttributes: [NSAttributedString.Key : Any] = [
+            .font: UIFont.systemFont(ofSize: 80, weight: .bold),
+            .foregroundColor: bgColor,
+        ]
+        
+        if bgValueString != "" {
+            var size = bgValueString.size(withAttributes: bgValueAttributes)
+            
+            bgValueString.draw(
+                in: CGRectMake(
+                    (width - size.width) / 2,
+                    (height - size.height) / (showSlopeArrow ? 2 + ConstantsContactImage.bgValueVerticalOffsetIfSlopeArrow : 2),
+                    size.width,
+                    size.height
+                ),
+                withAttributes: bgValueAttributes
+            )
+            
+            if showSlopeArrow {
+                size = slopeArrow.size(withAttributes: slopeArrowAttributes)
+                
+                slopeArrow.draw(
+                    in: CGRectMake(
+                        (width - size.width) / 2,
+                        (height - size.height) / (2 + ConstantsContactImage.slopeArrowVerticalOffset),
+                        size.width,
+                        size.height
+                    ),
+                    withAttributes: slopeArrowAttributes
+                )
+            }
+        }
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext()
+        
+        return image ?? UIImage()
+    }
 }
 
 struct ContactImageViewPreview: View {
-    @Binding var value: String?
-    @Binding var slopeArrow: String?
-    @Binding var range: BgRangeDescription?
-    @Binding var valueIsUpToDate: Bool?
-    @Binding var rangeIndicator: Bool
+    var bgValue: Double
+    var isMgDl: Bool
+    var slopeArrow: String
+    var bgRangeDescription: BgRangeDescription
+    var valueIsUpToDate: Bool
     
     var body: some View {
         ZStack {
-            ContactImageView(value: $value, slopeArrow: $slopeArrow, range: $range, valueIsUpToDate: $valueIsUpToDate, rangeIndicator: $rangeIndicator)
+            ContactImageView(bgValue: bgValue, isMgDl: isMgDl, slopeArrow: slopeArrow, bgRangeDescription: bgRangeDescription, valueIsUpToDate: valueIsUpToDate)
             Circle()
                 .stroke(lineWidth: 20)
                 .foregroundColor(.white)
@@ -149,22 +163,23 @@ struct ContactImageViewPreview: View {
 
 struct ContactImageView_Previews: PreviewProvider {
     struct Preview: View {
-        @State var rangeIndicator: Bool = true
-        @State var darkMode: Bool = true
-        @State var fontSize: Int = 130
-        @State var fontWeight: UIFont.Weight = .bold
-        @State var fontName: String? = "AmericanTypewriter"
-        
         var body: some View {
-            ContactImageViewPreview(value: .constant("40"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.urgent),  valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("40")
-            ContactImageViewPreview(value: .constant("63"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("63")
-            ContactImageViewPreview(value: .constant("69"), slopeArrow: .constant("\u{2192}" /* → */), range: .constant(BgRangeDescription.inRange), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("69 →")
-            ContactImageViewPreview(value: .constant("79"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.inRange), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("79")
-            ContactImageViewPreview(value: .constant("11.3"), slopeArrow: .constant("\u{2198}" /* ↘ */), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("11.3 ↘")
-            ContactImageViewPreview(value: .constant("166"), slopeArrow: .constant("\u{2191}" /* ↑ */), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("166 ↑")
-            ContactImageViewPreview(value: .constant("260"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.urgent), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("260")
-            ContactImageViewPreview(value: .constant(nil), slopeArrow: .constant(nil), range: .constant(nil), valueIsUpToDate: .constant(true), rangeIndicator: $rangeIndicator).previewDisplayName("Unknown")
-            ContactImageViewPreview(value: .constant("120"), slopeArrow: .constant(nil), range: .constant(BgRangeDescription.notUrgent), valueIsUpToDate: .constant(false), rangeIndicator: $rangeIndicator).previewDisplayName("120,no real-time")
+            
+            ContactImageViewPreview(bgValue: 88, isMgDl: true, slopeArrow: "", bgRangeDescription: BgRangeDescription.notUrgent, valueIsUpToDate: true).previewDisplayName("88")
+            ContactImageViewPreview(bgValue: 88, isMgDl: true, slopeArrow: "\u{2192}" /* → */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("88 →")
+            ContactImageViewPreview(bgValue: 188, isMgDl: true, slopeArrow: "", bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("188")
+            ContactImageViewPreview(bgValue: 188, isMgDl: true, slopeArrow: "\u{2198}" /* ↘ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("188 ↘")
+            ContactImageViewPreview(bgValue: 388, isMgDl: true, slopeArrow: "", bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("388")
+            ContactImageViewPreview(bgValue: 388, isMgDl: true, slopeArrow: "\u{2191}\u{2191}" /* ↑↑ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("388 ↑↑")
+            
+            ContactImageViewPreview(bgValue: 160, isMgDl: false, slopeArrow: "",  bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("8.9") /* → */
+            ContactImageViewPreview(bgValue: 160, isMgDl: false, slopeArrow: "\u{2198}" /* ↘ */,  bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("8.9 ↘") /* → */
+            ContactImageViewPreview(bgValue: 188, isMgDl: false, slopeArrow: "", bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("10.4")
+            ContactImageViewPreview(bgValue: 188, isMgDl: false, slopeArrow: "\u{2198}" /* ↘ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("10.4 ↘")
+            ContactImageViewPreview(bgValue: 400, isMgDl: false, slopeArrow: "", bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("22.2")
+            ContactImageViewPreview(bgValue: 400, isMgDl: false, slopeArrow: "\u{2191}\u{2191}" /* ↑↑ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("22.2 ↑↑")
+            
+            ContactImageViewPreview(bgValue: 120, isMgDl: true, slopeArrow: "\u{2191}" /* ↑ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: false).previewDisplayName("120, not current")
         }
     }
     static var previews: some View {

@@ -288,8 +288,6 @@ extension UserDefaults {
         case contactImageContactId = "contactImageContactId"
         /// should trend be displayed yes or no
         case displayTrendInContactImage = "displayTrendInContactImage"
-        /// should the range indicator be displayed, yes or no
-        case rangeIndicatorInContactImage = "rangeIndicatorInContactImage"
 
         // Other Settings (not user configurable)
         
@@ -1770,16 +1768,6 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.displayTrendInContactImage.rawValue)
-        }
-    }
-    
-    /// this is for showing readings on watch via the contact image. Should the range indicator be displayed, yes or no
-    @objc dynamic var rangeIndicatorInContactImage: Bool {
-        get {
-            return bool(forKey: Key.rangeIndicatorInContactImage.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.rangeIndicatorInContactImage.rawValue)
         }
     }
     
