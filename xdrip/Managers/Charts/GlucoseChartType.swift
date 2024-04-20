@@ -25,6 +25,7 @@ public enum GlucoseChartType: Int, CaseIterable {
     case widgetSystemMedium = 5
     case widgetSystemLarge = 6
     case widgetAccessoryRectangular = 7
+    case siriGlucoseIntent = 8
     
     var description: String {
         switch self {
@@ -44,9 +45,12 @@ public enum GlucoseChartType: Int, CaseIterable {
             return "Widget Chart .systemLarge"
         case .widgetAccessoryRectangular:
             return "Widget Chart .accessoryRectangular"
+        case .siriGlucoseIntent:
+            return "Siri Glucose Intent Chart"
         }
     }
     
+    // MARK: - general chart properties
     
     func viewSize(liveActivitySize: LiveActivitySize) -> (width: CGFloat, height: CGFloat) {
         switch self {
@@ -68,9 +72,11 @@ public enum GlucoseChartType: Int, CaseIterable {
         case .widgetSystemMedium:
             return (ConstantsGlucoseChartSwiftUI.viewWidthWidgetSystemMedium, ConstantsGlucoseChartSwiftUI.viewHeightWidgetSystemMedium)
         case .widgetSystemLarge:
-            return (ConstantsGlucoseChartSwiftUI.viewWidthWidgetSystemMedium, ConstantsGlucoseChartSwiftUI.viewHeightWidgetSystemLarge)
+            return (ConstantsGlucoseChartSwiftUI.viewWidthWidgetSystemLarge, ConstantsGlucoseChartSwiftUI.viewHeightWidgetSystemLarge)
         case .widgetAccessoryRectangular:
             return (ConstantsGlucoseChartSwiftUI.viewWidthWidgetAccessoryRectangular, ConstantsGlucoseChartSwiftUI.viewHeightWidgetAccessoryRectangular)
+        case .siriGlucoseIntent:
+            return (ConstantsGlucoseChartSwiftUI.viewWidthWidgetSiriGlucoseIntent, ConstantsGlucoseChartSwiftUI.viewHeightWidgetSiriGlucoseIntent)
         }
     }
     
@@ -97,33 +103,13 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.hoursToShowWidgetSystemLarge
         case .widgetAccessoryRectangular:
             return ConstantsGlucoseChartSwiftUI.hoursToShowWidgetAccessoryRectangular
+        case .siriGlucoseIntent:
+            return ConstantsGlucoseChartSwiftUI.hoursToShowWidgetSiriGlucoseIntent
         }
     }
     
     func intervalBetweenAxisValues(liveActivitySize: LiveActivitySize) -> Int {
-        switch self {
-        case .liveActivity:
-            switch liveActivitySize {
-            case .large:
-                return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesLiveActivityLarge
-            default:
-                return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesLiveActivityNormal
-        }
-        case .dynamicIsland:
-            return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesDynamicIsland
-        case .watchApp:
-            return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesWatchApp
-        case .watchAccessoryRectangular:
-            return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesWatchAccessoryRectangular
-        case .widgetSystemSmall:
-            return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesWidgetSystemSmall
-        case .widgetSystemMedium:
-            return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesWidgetSystemMedium
-        case .widgetSystemLarge:
-            return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesWidgetSystemLarge
-        case .widgetAccessoryRectangular:
-            return ConstantsGlucoseChartSwiftUI.intervalBetweenXAxisValuesWidgetAccessoryRectangular
-        }
+        return ConstantsGlucoseChartSwiftUI.xAxisIntervalBetweenValues
     }
     
     func glucoseCircleDiameter(liveActivitySize: LiveActivitySize) -> Double {
@@ -149,112 +135,120 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterWidgetSystemLarge
         case .widgetAccessoryRectangular:
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterWidgetAccessoryRectangular
+        case .siriGlucoseIntent:
+            return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterSiriGlucoseIntent
         }
     }
     
-    var lowHighLineColor: Color {
+    func backgroundColor() -> Color {
         switch self {
-        case .liveActivity:
-            return ConstantsGlucoseChartSwiftUI.lowHighLineColorLiveActivity
-        case .dynamicIsland:
-            return ConstantsGlucoseChartSwiftUI.lowHighLineColorDynamicIsland
-        case .watchApp:
-            return ConstantsGlucoseChartSwiftUI.lowHighLineColorWatchApp
-        case .watchAccessoryRectangular:
-            return ConstantsGlucoseChartSwiftUI.lowHighLineColorWatchAccessoryRectangular
-        case .widgetSystemSmall:
-            return ConstantsGlucoseChartSwiftUI.lowHighLineColorWidgetSystemSmall
-        case .widgetSystemMedium:
-            return ConstantsGlucoseChartSwiftUI.lowHighLineColorWidgetSystemMedium
-        case .widgetSystemLarge:
-            return ConstantsGlucoseChartSwiftUI.lowHighLineColorWidgetSystemLarge
-        case .widgetAccessoryRectangular:
-            return ConstantsGlucoseChartSwiftUI.lowHighLineColorWidgetAccessoryRectangular
+        case .siriGlucoseIntent:
+            return ConstantsGlucoseChartSwiftUI.backgroundColorSiriGlucoseIntent
+        default:
+            return .black
         }
     }
     
-    var urgentLowHighLineColor: Color {
+    func frame() -> Bool {
         switch self {
-        case .liveActivity:
-            return ConstantsGlucoseChartSwiftUI.urgentLowHighLineLiveActivity
-        case .dynamicIsland:
-            return ConstantsGlucoseChartSwiftUI.urgentLowHighLineColorDynamicIsland
-        case .watchApp:
-            return ConstantsGlucoseChartSwiftUI.urgentLowHighLineColorWatchApp
-        case .watchAccessoryRectangular:
-            return ConstantsGlucoseChartSwiftUI.urgentLowHighLineColorWatchAccessoryRectangular
-        case .widgetSystemSmall:
-            return ConstantsGlucoseChartSwiftUI.urgentLowHighLineColorWidgetSystemSmall
-        case .widgetSystemMedium:
-            return ConstantsGlucoseChartSwiftUI.urgentLowHighLineColorWidgetSystemMedium
-        case .widgetSystemLarge:
-            return ConstantsGlucoseChartSwiftUI.urgentLowHighLineColorWidgetSystemLarge
-        case .widgetAccessoryRectangular:
-            return ConstantsGlucoseChartSwiftUI.urgentLowHighLineColorWidgetAccessoryRectangular
+        case .siriGlucoseIntent:
+            return false
+        default:
+            return true
         }
     }
     
-    var relativeYAxisLineSize: Double {
+    func aspectRatio() -> (enable: Bool, aspectRatio: CGFloat, contentMode: ContentMode) {
         switch self {
-        case .liveActivity:
-            return ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeLiveActivity
-        case .dynamicIsland:
-            return ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeDynamicIsland
-        case .watchApp:
-            return ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeWatchApp
-        case .watchAccessoryRectangular:
-            return ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeWatchAccessoryRectangular
-        case .widgetSystemSmall:
-            return ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeWidgetSystemSmall
-        case .widgetSystemMedium:
-            return ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeWidgetSystemMedium
-        case .widgetSystemLarge:
-            return ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeWidgetSystemLarge
-        case .widgetAccessoryRectangular:
-            return ConstantsGlucoseChartSwiftUI.relativeYAxisLineSizeWidgetAccessoryRectangular
+        case .siriGlucoseIntent:
+            return (true, 1.5, .fit)
+        default:
+            return (false, 1, .fill) // use anything here after false as it won't be used
         }
     }
     
-    var xAxisLabelOffset: Double {
+    func cornerRadius() -> Double {
         switch self {
-        case .liveActivity:
-            return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetLiveActivity
-        case .dynamicIsland:
-            return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetDynamicIsland
-        case .watchApp:
-            return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetWatchApp
-        case .watchAccessoryRectangular:
-            return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetWatchAccessoryRectangular
-        case .widgetSystemSmall:
-            return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetWidgetSystemSmall
-        case .widgetSystemMedium:
-            return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetWidgetSystemMedium
-        case .widgetSystemLarge:
-            return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetWidgetSystemLarge
-        case .widgetAccessoryRectangular:
-            return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetWidgetAccessoryRectangular
+        case .siriGlucoseIntent:
+            return ConstantsGlucoseChartSwiftUI.cornerRadiusSiriGlucoseIntent
+        default:
+            return ConstantsGlucoseChartSwiftUI.cornerRadius
         }
     }
     
-    var xAxisGridLineColor: Color {
+    func padding() -> (enable: Bool, padding: CGFloat) {
         switch self {
-        case .liveActivity:
-            return ConstantsGlucoseChartSwiftUI.xAxisGridLineColorLiveActivity
-        case .dynamicIsland:
-            return ConstantsGlucoseChartSwiftUI.xAxisGridLineColorDynamicIsland
-        case .watchApp:
-            return ConstantsGlucoseChartSwiftUI.xAxisGridLineColorWatchApp
-        case .watchAccessoryRectangular:
-            return ConstantsGlucoseChartSwiftUI.xAxisGridLineColorWatchAccessoryRectangular
-        case .widgetSystemSmall:
-            return ConstantsGlucoseChartSwiftUI.xAxisGridLineColorWidgetSystemSmall
-        case .widgetSystemMedium:
-            return ConstantsGlucoseChartSwiftUI.xAxisGridLineColorWidgetSystemMedium
-        case .widgetSystemLarge:
-            return ConstantsGlucoseChartSwiftUI.xAxisGridLineColorWidgetSystemLarge
-        case .widgetAccessoryRectangular:
-            return ConstantsGlucoseChartSwiftUI.xAxisGridLineColorWidgetAccessoryRectangular
+        case .siriGlucoseIntent:
+            return (true, ConstantsGlucoseChartSwiftUI.paddingSiriGlucoseIntent)
+        default:
+            return (false, 0)
         }
     }
     
+    
+    // MARK: - x axis properties
+    
+    func xAxisShowLabels() -> Bool {
+        switch self {
+        case .siriGlucoseIntent, .widgetSystemLarge:
+            return true
+        default:
+            return false
+        }
+    }
+    
+    func xAxisLabelEveryHours() -> Int {
+        switch self {
+        default:
+            return 1
+        }
+    }
+    
+    func xAxisLabelOffsetX() -> CGFloat {
+        switch self {
+        case .siriGlucoseIntent, .widgetSystemLarge:
+            return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetX
+        default:
+            return 0
+        }
+    }
+    
+    func xAxisLabelOffsetY() -> CGFloat {
+        switch self {
+        case .siriGlucoseIntent, .widgetSystemLarge:
+            return ConstantsGlucoseChartSwiftUI.xAxisLabelOffsetY
+        default:
+            return 0
+        }
+    }
+    
+    
+    // MARK: - y axis properties
+    
+    func yAxisShowLabels() -> Visibility {
+        switch self {
+        case .siriGlucoseIntent, .widgetSystemLarge:
+            return .automatic
+        default:
+            return .hidden
+        }
+    }
+    
+    func yAxisLabelOffsetX() -> CGFloat {
+        switch self {
+        case .siriGlucoseIntent, .widgetSystemLarge:
+            return ConstantsGlucoseChartSwiftUI.yAxisLabelOffsetX
+        default:
+            return 0
+        }
+    }
+    
+    func yAxisLabelOffsetY() -> CGFloat {
+        switch self {
+        case .siriGlucoseIntent, .widgetSystemLarge:
+            return ConstantsGlucoseChartSwiftUI.yAxisLabelOffsetY
+        default:
+            return 0
+        }
+    }
 }

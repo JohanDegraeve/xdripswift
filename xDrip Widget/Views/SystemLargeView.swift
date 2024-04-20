@@ -55,6 +55,7 @@ extension XDripWidget.EntryView {
                     .font(.caption)
                     .foregroundStyle(.colorTertiary)
             }
+            .padding(.top, 10)
         }
         .widgetBackground(backgroundView: Color.black)
     }
