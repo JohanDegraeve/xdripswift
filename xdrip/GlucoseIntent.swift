@@ -12,7 +12,6 @@ import AppIntents
 import Foundation
 import SwiftUI
 
-@available(iOS 16, *)
 struct GlucoseIntent: AppIntent {
     static var authenticationPolicy = IntentAuthenticationPolicy.alwaysAllowed
 
@@ -91,7 +90,6 @@ extension CoreDataManager {
     }
 }
 
-@available(iOS 16, *)
 enum IntentError: Error, CustomLocalizedStringResourceConvertible {
     case message(String)
 

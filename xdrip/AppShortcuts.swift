@@ -8,7 +8,6 @@
 
 import AppIntents
 
-@available(iOS 16,*)
 struct AppsShortcuts: AppShortcutsProvider {
     @AppShortcutsBuilder
     static var appShortcuts: [AppShortcut] {

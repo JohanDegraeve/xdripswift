@@ -22,7 +22,6 @@ struct XDripWatchComplication: Widget {
     }
 }
 
-@available(watchOS 10.0, *)
 #Preview(as: .accessoryRectangular) {
     XDripWatchComplication()
 } timeline: {

@@ -10,7 +10,6 @@ import Charts
 import SwiftUI
 import Foundation
 
-@available(iOS 16, *)
 struct GlucoseChartView: View {
     
     var bgReadingValues: [Double]
