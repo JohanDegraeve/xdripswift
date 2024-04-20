@@ -545,9 +545,9 @@ class Trace {
                             
                             traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
                             
-                            traceInfo.appendStringAndNewLine("        Transmitter start date: " + (dexcomG5.transmitterStartDate?.toString(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (UserDefaults.standard.activeSensorStartDate?.daysAndHoursAgo(appendAgo: true) ?? "nil") + ")")
+                            traceInfo.appendStringAndNewLine("        Transmitter start date: " + (dexcomG5.transmitterStartDate?.toString(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (dexcomG5.transmitterStartDate?.daysAndHoursAgo(appendAgo: true) ?? "nil") + ")")
                             
-                            traceInfo.appendStringAndNewLine("        Sensor start date: " + (dexcomG5.sensorStartDate?.toString(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (UserDefaults.standard.activeSensorStartDate?.daysAndHoursAgo(appendAgo: true) ?? "nil") + ")")
+                            traceInfo.appendStringAndNewLine("        Sensor start date: " + (dexcomG5.sensorStartDate?.toString(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (dexcomG5.sensorStartDate?.daysAndHoursAgo(appendAgo: true) ?? "nil") + ")")
                             
                             traceInfo.appendStringAndNewLine("        Sensor status: " + (dexcomG5.sensorStatus?.description ?? "nil"))
                             
