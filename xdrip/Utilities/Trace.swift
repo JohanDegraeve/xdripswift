@@ -475,7 +475,7 @@ class Trace {
             } else {
                 traceInfo.appendStringAndNewLine("    Sensor start date: nil")
             }
-            traceInfo.appendStringAndNewLine("    Sensor max days: " + (UserDefaults.standard.activeSensorMaxSensorAgeInDays?.description ?? "nil"))
+            traceInfo.appendStringAndNewLine("    Sensor max days: " + (Int(UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0)).description)
             traceInfo.appendStringAndNewLine("    Transmitter ID: " + (UserDefaults.standard.activeSensorTransmitterId?.description ?? "nil"))
         } else {
             traceInfo.appendStringAndNewLine("    Not used in Nightscout follower mode")
