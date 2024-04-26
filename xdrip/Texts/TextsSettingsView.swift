@@ -624,6 +624,22 @@ class Texts_SettingsView {
         return NSLocalizedString("appleWatchSectionTitle", tableName: filename, bundle: Bundle.main, value: "Apple Watch", comment: "Apple Watch Settings - section title")
     }()
     
+    static let appleWatchShowDataInComplications: String = {
+        return NSLocalizedString("appleWatchShowDataInComplications", tableName: filename, bundle: Bundle.main, value: "Show Values in Complications", comment: "Apple Watch Settings - show values in the complications")
+    }()
+    
+    static let appleWatchShowDataInComplicationsMessage: String = {
+        return String(format: NSLocalizedString("appleWatchShowDataInComplicationsMessage", tableName: filename, bundle: Bundle.main, value: "Please note that Apple Watch complications will not update in real-time. They will only update 2-3 times per hour.\n\nDO NOT rely on values in the complication for treatment decisions.\n\nFor real-time values, open the %@ Watch app.\n\nOnly click 'OK' if you understand and agree.", comment: "Apple Watch Settings - explain why the user needs to confirm that complications will not always show real-time values"), ConstantsHomeView.applicationName)
+    }()
+    
+    static let appleWatchComplicationUserAgreementDate: String = {
+        return NSLocalizedString("appleWatchComplicationUserAgreementDate", tableName: filename, bundle: Bundle.main, value: "User Agreement", comment: "Apple Watch Settings - the date when the user agreed that the complications will not always display real-time values")
+    }()
+    
+    static let appleWatchRemainingComplicationUserInfoTransfers: String = {
+        return NSLocalizedString("appleWatchRemainingComplicationUserInfoTransfers", tableName: filename, bundle: Bundle.main, value: "Remaining Complication Updates", comment: "Apple Watch Settings - amount of forced complication updates still available today")
+    }()
+    
     // MARK: - Calendar Events
     
     static let calendarEventsSectionTitle: String = {

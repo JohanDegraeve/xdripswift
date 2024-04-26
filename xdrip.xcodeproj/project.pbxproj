@@ -65,7 +65,10 @@
 		47503382247420A200D2260B /* BluetoothPeripheralView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 47503384247420A200D2260B /* BluetoothPeripheralView.strings */; };
 		4752B400263570DA0081D551 /* ConstantsStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */; };
 		4752B4062635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */; };
+		4767BDD62BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4767BDD52BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift */; };
 		476CAF792B9F6A7200743168 /* ComplicationSharedUserDefaultsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474606632B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift */; };
+		476FA90C2BDC1EBA0091866C /* WatchComplication.strings in Resources */ = {isa = PBXBuildFile; fileRef = 476FA90A2BDC1EBA0091866C /* WatchComplication.strings */; };
+		476FA90E2BDC1EF80091866C /* TextsWatchComplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476FA90D2BDC1EF80091866C /* TextsWatchComplication.swift */; };
 		476FE8FF2B2F1D1700537E0A /* ConstantsFollower.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */; };
 		4779BCEE2974306300515714 /* ActionClosurable in Frameworks */ = {isa = PBXBuildFile; productRef = 4779BCED2974306300515714 /* ActionClosurable */; };
 		4779BCF12974307700515714 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4779BCF02974307700515714 /* CryptoSwift */; };
@@ -874,6 +877,10 @@
 		4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsStatistics.swift; sourceTree = "<group>"; };
 		4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewStatisticsSettingsViewModel.swift; sourceTree = "<group>"; };
 		475DED96244AF92A00F78473 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Alerts.strings; sourceTree = "<group>"; };
+		4767BDD52BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewAppleWatchSettingsViewModel.swift; sourceTree = "<group>"; };
+		476FA90B2BDC1EBA0091866C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/WatchComplication.strings; sourceTree = "<group>"; };
+		476FA90D2BDC1EF80091866C /* TextsWatchComplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsWatchComplication.swift; sourceTree = "<group>"; };
+		476FA9102BDC1FFF0091866C /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/WatchComplication.strings; sourceTree = "<group>"; };
 		476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsFollower.swift; sourceTree = "<group>"; };
 		477B2C7D2B432775002F64A4 /* LiveActivityType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityType.swift; sourceTree = "<group>"; };
 		477F45E5285B993100AC8475 /* GlucoseMiniChartManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseMiniChartManager.swift; sourceTree = "<group>"; };
@@ -1908,6 +1915,15 @@
 			path = Widgets;
 			sourceTree = "<group>";
 		};
+		476FA90F2BDC1FE30091866C /* Texts */ = {
+			isa = PBXGroup;
+			children = (
+				476FA90D2BDC1EF80091866C /* TextsWatchComplication.swift */,
+				476FA90A2BDC1EBA0091866C /* WatchComplication.strings */,
+			);
+			path = Texts;
+			sourceTree = "<group>";
+		};
 		478A92542B8F95930084C394 /* SubViews */ = {
 			isa = PBXGroup;
 			children = (
@@ -1928,6 +1944,7 @@
 				478A92622B8FB5490084C394 /* XDripWatchComplication+Provider.swift */,
 				4793598B2B88B95B007D3CEE /* Assets.xcassets */,
 				474606662B95F12A00AC9214 /* DataModels */,
+				476FA90F2BDC1FE30091866C /* Texts */,
 				474606672B96168A00AC9214 /* Views */,
 			);
 			path = "xDrip Watch Complication";
@@ -2898,6 +2915,7 @@
 			isa = PBXGroup;
 			children = (
 				F8B3A838227F090D004BA588 /* SettingsViewAlertSettingsViewModel.swift */,
+				4767BDD52BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift */,
 				47DB06C52A6FC72000267BE3 /* SettingsViewCalendarEventsSettingsViewModel.swift */,
 				F227BF182B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift */,
 				47DB06C12A6FC02200267BE3 /* SettingsViewDataSourceSettingsViewModel.swift */,
@@ -3798,6 +3816,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				472134DF2BC6A63100729850 /* Assets.xcassets in Resources */,
+				476FA90C2BDC1EBA0091866C /* WatchComplication.strings in Resources */,
 				4793598C2B88B95B007D3CEE /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4038,6 +4057,7 @@
 				478A923E2B8B64DE0084C394 /* ConstantsHomeView.swift in Sources */,
 				4796C6072B9516FD00DE2210 /* Bundle.swift in Sources */,
 				47E91BBA2B9A43F20063181B /* FollowerBackgroundKeepAliveType.swift in Sources */,
+				476FA90E2BDC1EF80091866C /* TextsWatchComplication.swift in Sources */,
 				478A92582B8FA1F20084C394 /* Date.swift in Sources */,
 				478A92552B8FA1D80084C394 /* ConstantsBGGraphBuilder.swift in Sources */,
 				4713B0142BBAB12D009F2838 /* ConstantsAppleWatch.swift in Sources */,
@@ -4109,6 +4129,7 @@
 				F80D916D24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift in Sources */,
 				F8B955EB2591355200C06016 /* CGMLibre2Transmitter+TestData.swift in Sources */,
 				F8B3A85B2280CCD1004BA588 /* AlertSettingsViewController.swift in Sources */,
+				4767BDD62BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift in Sources */,
 				F8F9722E23A5915900C3F17D /* M5StackTransmitterOpCode.swift in Sources */,
 				47D9BC952A78498500AB85B2 /* BgReadingsDetailView.swift in Sources */,
 				F816E0E22432A4D1009EE65B /* Blucon+BluetoothPeripheral.swift in Sources */,
@@ -4619,6 +4640,15 @@
 				4166BFBE28C3501500199980 /* el */,
 			);
 			name = BluetoothPeripheralView.strings;
+			sourceTree = "<group>";
+		};
+		476FA90A2BDC1EBA0091866C /* WatchComplication.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				476FA90B2BDC1EBA0091866C /* en */,
+				476FA9102BDC1FFF0091866C /* es */,
+			);
+			name = WatchComplication.strings;
 			sourceTree = "<group>";
 		};
 		CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */ = {

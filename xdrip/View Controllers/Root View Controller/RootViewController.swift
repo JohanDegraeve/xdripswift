@@ -690,7 +690,7 @@ final class RootViewController: UIViewController, ObservableObject {
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
         
-        watchManager?.updateWatchApp()
+        watchManager?.updateWatchApp(forceComplicationUpdate: false)
         
         // let's run the data source info and chart update 1 second after the root view appears. This should give time for the follower modes to download and populate the info needed.
         // no animation is needed as in most cases, we're just refreshing and displaying what is already shown on screen so we want to keep this refresh invisible.
@@ -927,7 +927,13 @@ final class RootViewController: UIViewController, ObservableObject {
 
         // add observer for the last heartbeat timestamp in order to update the UI
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.timeStampOfLastHeartBeat.rawValue, options: .new, context: nil)
-
+        
+        // if the user agrees to enable (or disable) Watch complications data
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showDataInWatchComplications.rawValue, options: .new, context: nil)
+        
+        // force a manual complication update
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.forceComplicationUpdate.rawValue, options: .new, context: nil)
+        
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
         
@@ -1532,7 +1538,7 @@ final class RootViewController: UIViewController, ObservableObject {
                     loopManager?.share()
                 }
 
-                watchManager?.updateWatchApp()
+                watchManager?.updateWatchApp(forceComplicationUpdate: false)
 
                 updateLiveActivityAndWidgets(forceRestart: false)
             }
@@ -1644,7 +1650,7 @@ final class RootViewController: UIViewController, ObservableObject {
             }
 
             // also update Watch App with the new values. (Only really needed for unit change between mg/dl and mmol/l)
-            watchManager?.updateWatchApp()
+            watchManager?.updateWatchApp(forceComplicationUpdate: false)
             
             // this will trigger update of app badge, will also create notification, but as app is most likely in foreground, this won't show up
             createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
@@ -1665,7 +1671,7 @@ final class RootViewController: UIViewController, ObservableObject {
             updateMiniChart()
             
             // update Watch App with the new objective values
-            watchManager?.updateWatchApp()
+            watchManager?.updateWatchApp(forceComplicationUpdate: false)
 
             updateLiveActivityAndWidgets(forceRestart: false)
             
@@ -1713,6 +1719,15 @@ final class RootViewController: UIViewController, ObservableObject {
 
         case UserDefaults.Key.timeStampOfLastHeartBeat:
             updateDataSourceInfo(animate: false)
+            
+        case UserDefaults.Key.showDataInWatchComplications:
+            watchManager?.updateWatchApp(forceComplicationUpdate: true)
+            
+        case UserDefaults.Key.forceComplicationUpdate:
+            if UserDefaults.standard.forceComplicationUpdate {
+                watchManager?.updateWatchApp(forceComplicationUpdate: true)
+                UserDefaults.standard.forceComplicationUpdate = false
+            }
 
         default:
             break
@@ -3921,7 +3936,7 @@ extension RootViewController: FollowerDelegate {
                     self.loopManager?.share()
                 }
 
-                watchManager?.updateWatchApp()
+                watchManager?.updateWatchApp(forceComplicationUpdate: false)
                 
                 updateLiveActivityAndWidgets(forceRestart: false)
 

@@ -30,7 +30,8 @@ struct WatchState: Codable {
     var secondsUntilFollowerDisconnectWarning: Int?
     var timeStampOfLastHeartBeat: Date?
     var secondsUntilHeartBeatDisconnectWarning: Int?
-    var disableComplications: Bool?
+    var keepAliveIsDisabled: Bool?
+    var liveDataIsEnabled: Bool?
     var remainingComplicationUserInfoTransfers: Int?
     
     var asDictionary: [String: Any]? {

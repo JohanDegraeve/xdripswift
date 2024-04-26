@@ -48,3 +48,5 @@
 "common_statistics_a1c" = "HbA1c";
 "common_statistics_cv" = "CV";
 "common_dontshowagain" = "Don't Show Again";
+"common_enabled" = "Enabled";
+"common_disabled" = "Disabled";

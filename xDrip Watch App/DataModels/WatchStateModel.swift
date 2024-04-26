@@ -48,11 +48,13 @@ final class WatchStateModel: NSObject, ObservableObject {
     @Published var isMaster: Bool = true
     @Published var followerDataSourceType: FollowerDataSourceType = .nightscout
     @Published var followerBackgroundKeepAliveType: FollowerBackgroundKeepAliveType = .normal
-    @Published var disableComplications: Bool = false
+    @Published var keepAliveIsDisabled: Bool = false
+    @Published var liveDataIsEnabled: Bool = false
     @Published var remainingComplicationUserInfoTransfers: Int = 99
     
     @Published var lastUpdatedTextString: String = "Requesting data..."
     @Published var lastUpdatedTimeString: String = ""
+    @Published var lastUpdatedTimeAgoString: String = ""
     @Published var debugString: String = "Debug..."
     @Published var chartHoursIndex: Int = 1
     @Published var requestingDataIconColor: Color = ConstantsAppleWatch.requestingDataIconColorInactive
@@ -239,7 +241,7 @@ final class WatchStateModel: NSObject, ObservableObject {
         // change the text, this must be done in the main thread but only do it if the watch app is reachable
         if session.isReachable {
             DispatchQueue.main.async {
-                self.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorActive
+                self.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorPending
                 self.debugString.removeLast(4)
                 self.debugString += "Fetching"
             }
@@ -276,16 +278,19 @@ final class WatchStateModel: NSObject, ObservableObject {
         followerBackgroundKeepAliveType = FollowerBackgroundKeepAliveType(rawValue: dictionary["followerBackgroundKeepAliveTypeRawValue"] as? Int ?? 0) ?? .normal
         timeStampOfLastHeartBeat = dictionary["timeStampOfLastHeartBeat"] as? Date ?? .distantPast
         secondsUntilHeartBeatDisconnectWarning = dictionary["secondsUntilHeartBeatDisconnectWarning"] as? Int ?? 0
-        disableComplications = dictionary["disableComplications"] as? Bool ?? false
+        keepAliveIsDisabled = dictionary["keepAliveIsDisabled"] as? Bool ?? false
         remainingComplicationUserInfoTransfers = dictionary["remainingComplicationUserInfoTransfers"] as? Int ?? 99
+        liveDataIsEnabled = dictionary["liveDataIsEnabled"] as? Bool ?? false
         
         // check if there is any BG data available before updating the data source info strings accordingly
         if let bgReadingDate = bgReadingDate() {
             lastUpdatedTextString = "Last reading "
             lastUpdatedTimeString = bgReadingDate.formatted(date: .omitted, time: .shortened)
+            lastUpdatedTimeAgoString = bgReadingDate.daysAndHoursAgo(appendAgo: true)
         } else {
             lastUpdatedTextString = "No sensor data"
             lastUpdatedTimeString = ""
+            lastUpdatedTimeAgoString = ""
         }
         
         debugString = generateDebugString()
@@ -302,7 +307,7 @@ final class WatchStateModel: NSObject, ObservableObject {
             date.timeIntervalSince1970
         }
         
-        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl, disableComplications: disableComplications, remainingComplicationUserInfoTransfers: remainingComplicationUserInfoTransfers)
+        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl, keepAliveIsDisabled: keepAliveIsDisabled, liveDataIsEnabled: liveDataIsEnabled)
         
         // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
         // the user's device - this allows several copies of the app to be installed without cross-contamination of widget/complication data
@@ -330,6 +335,8 @@ final class WatchStateModel: NSObject, ObservableObject {
         }
         
         debugString += "\nBG values: \(bgReadingValues.count)"
+        
+        debugString += "\nComp enabled: \(liveDataIsEnabled.description)"
         
         debugString += "\nComp updated: \(lastComplicationUpdateTimeStamp.formatted(date: .omitted, time: .standard))"
         debugString += "\nComp remain: \(remainingComplicationUserInfoTransfers.description)/50"
@@ -365,6 +372,7 @@ extension WatchStateModel: WCSessionDelegate {
         
         DispatchQueue.main.async {
             self.processWatchStateFromDictionary(dictionary: watchStateAsDictionary)
+            self.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorActive
             
             // change the requesting icon color back after a small delay to prevent it
             // flashing on/off too quickly

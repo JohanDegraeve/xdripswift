@@ -147,6 +147,12 @@
 "settingsviews_displayTrendInContactImage" = "Mostrar Tendencia";
 "settingsviews_contactImageCreatedByString" = "Contacto creado automáticamente por";
 
+"appleWatchSectionTitle" = "Apple Watch";
+"appleWatchShowDataInComplications" = "Mostrar Complicaciones";
+"appleWatchShowDataInComplicationsMessage" = "Las complicaciones de Apple Watch no pueden actualizarse en tiempo-real. Solo se actualizarán 2-3 veces por hora.\n\nNO DEBES fiar de los valores mostrados a la hora de tomar decisiones.\n\nPara valores actuales y fiables, debes abrir la app de %@ en tu Watch.\n\nHaz click en 'OK' únicamente si lo has entendido y estás de acuerdo.";
+"appleWatchComplicationUserAgreementDate" = "Acuerdo del Usuario";
+"appleWatchRemainingComplicationUserInfoTransfers" = "Actualizaciones Disponibles Hoy";
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////

@@ -12,7 +12,7 @@ import SwiftUI
 extension XDripWatchComplication.EntryView {
     @ViewBuilder
     var accessoryCornerView: some View {
-        if !entry.widgetState.disableComplications {
+        if !entry.widgetState.keepAliveIsDisabled && entry.widgetState.liveDataIsEnabled {
             Text("\(entry.widgetState.bgValueStringInUserChosenUnit)\(entry.widgetState.trendArrow())")
                 .font(.system(size: 20))
                 .foregroundColor(entry.widgetState.bgTextColor())

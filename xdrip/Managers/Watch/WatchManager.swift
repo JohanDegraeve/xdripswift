@@ -48,11 +48,11 @@ final class WatchManager: NSObject, ObservableObject {
             session.activate()
         }
         
-        processWatchState()
+        processWatchState(forceComplicationUpdate: false)
         
     }
     
-    private func processWatchState() {
+    private func processWatchState(forceComplicationUpdate: Bool) {
         // create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
         // this is needed due to the not being able to pass structs that are not codable/hashable
         let hoursOfBgReadingsToSend: Double = 12
@@ -90,7 +90,8 @@ final class WatchManager: NSObject, ObservableObject {
         watchState.isMaster = UserDefaults.standard.isMaster
         watchState.followerDataSourceTypeRawValue = UserDefaults.standard.followerDataSourceType.rawValue
         watchState.followerBackgroundKeepAliveTypeRawValue = UserDefaults.standard.followerBackgroundKeepAliveType.rawValue
-        watchState.disableComplications = !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled
+        watchState.keepAliveIsDisabled = !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled
+        watchState.liveDataIsEnabled = UserDefaults.standard.showDataInWatchComplications
         
         if let sensorStartDate = UserDefaults.standard.activeSensorStartDate {
             watchState.sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: Date()).minute!)
@@ -114,10 +115,10 @@ final class WatchManager: NSObject, ObservableObject {
         
         watchState.remainingComplicationUserInfoTransfers = session.remainingComplicationUserInfoTransfers
         
-        sendStateToWatch()
+        sendStateToWatch(forceComplicationUpdate: false)
     }
     
-    func sendStateToWatch() {
+    func sendStateToWatch(forceComplicationUpdate: Bool) {
         guard session.isPaired else {
             trace("no Watch is paired", log: self.log, category: ConstantsLog.categoryWatchManager, type: .debug)
             return
@@ -145,11 +146,15 @@ final class WatchManager: NSObject, ObservableObject {
                     trace("error sending watch state, error = %{public}@", log: self.log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)
                 })
             } else {
-                if lastForcedComplicationUpdateTimeStamp < Date().addingTimeInterval(-ConstantsWidget.forceComplicationRefreshTimeInMinutes), session.isComplicationEnabled {
-                    trace("forcing background complication update, remaining complication transfers left today = %{public}@ / 50", log: self.log, category: ConstantsLog.categoryWatchManager, type: .info, session.remainingComplicationUserInfoTransfers.description)
+                if (lastForcedComplicationUpdateTimeStamp < Date().addingTimeInterval(-Double(UserDefaults.standard.forceComplicationUpdateInMinutes * 60)) && session.isComplicationEnabled && UserDefaults.standard.showDataInWatchComplications) || forceComplicationUpdate {
+                    
+                    let updateType: String = forceComplicationUpdate ? "forcing" : "sending"
+                    
+                    trace("%{public}@ background complication update every %{public}@ minutes, remaining complication transfers left today: %{public}@ / 50", log: self.log, category: ConstantsLog.categoryWatchManager, type: .info, updateType, UserDefaults.standard.forceComplicationUpdateInMinutes.description, session.remainingComplicationUserInfoTransfers.description)
                     
                     session.transferCurrentComplicationUserInfo(["watchState": userInfo])
                     lastForcedComplicationUpdateTimeStamp = .now
+                    UserDefaults.standard.remainingComplicationUserInfoTransfers = session.remainingComplicationUserInfoTransfers
                 } else {
                     trace("sending background watch state update", log: self.log, category: ConstantsLog.categoryWatchManager, type: .info)
                     
@@ -162,8 +167,8 @@ final class WatchManager: NSObject, ObservableObject {
     
     // MARK: - Public functions
     
-    func updateWatchApp() {
-        processWatchState()
+    func updateWatchApp(forceComplicationUpdate: Bool) {
+        processWatchState(forceComplicationUpdate: forceComplicationUpdate)
     }
 }
 
@@ -190,7 +195,7 @@ extension WatchManager: WCSessionDelegate {
             switch requestWatchUpdate {
             case "watchState":
                 DispatchQueue.main.async {
-                    self.sendStateToWatch()
+                    self.sendStateToWatch(forceComplicationUpdate: false)
                 }
             default:
                 break
@@ -205,7 +210,7 @@ extension WatchManager: WCSessionDelegate {
     func sessionReachabilityDidChange(_ session: WCSession) {
         if session.isReachable {
             DispatchQueue.main.async {
-                self.sendStateToWatch()
+                self.sendStateToWatch(forceComplicationUpdate: false)
             }
         }
     }

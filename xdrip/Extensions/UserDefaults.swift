@@ -261,6 +261,19 @@ extension UserDefaults {
         
         // Apple Watch
         
+        /// enable the Watch complications
+        case showDataInWatchComplications = "showDataInWatchComplications"
+        /// timestamp that the user acknowledged that the complications will not show in real-time
+        case watchComplicationUserAgreementDate = "watchComplicationUserAgreementDate"
+        /// how many complication updates are remaining for the current day
+        case forceComplicationUpdateInMinutes = "forceComplicationUpdateInMinutes"
+        /// how many complication updates are remaining for the current day
+        case remainingComplicationUserInfoTransfers = "remainingComplicationUserInfoTransfers"
+        /// force a complication update
+        case forceComplicationUpdate = "forceComplicationUpdate"
+        
+        // Calendar Events
+        
         /// create calendar event yes or no
         case createCalendarEvent = "createCalendarEvent"
         
@@ -286,6 +299,7 @@ extension UserDefaults {
         case enableContactImage = "enableContactImage"
         /// should trend be displayed yes or no
         case displayTrendInContactImage = "displayTrendInContactImage"
+        
 
         // Other Settings (not user configurable)
         
@@ -1577,7 +1591,7 @@ extension UserDefaults {
         }
     }
     
-    // MARK: M5Stack
+    // MARK:M5Stack
 
     /// M5StackBlePassword, used for authenticating xdrip app towards M5Stack
     var m5StackBlePassword: String? {
@@ -1666,6 +1680,65 @@ extension UserDefaults {
     }
     
     // MARK: - Apple Watch
+    
+    /// enable the Watch complications, default false
+    @objc dynamic var showDataInWatchComplications: Bool {
+        get {
+            return bool(forKey: Key.showDataInWatchComplications.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.showDataInWatchComplications.rawValue)
+        }
+    }
+    
+    /// timestamp that the user acknowledged that the complications will not show in real-time
+    var watchComplicationUserAgreementDate: Date? {
+        get {
+            return object(forKey: Key.watchComplicationUserAgreementDate.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.watchComplicationUserAgreementDate.rawValue)
+        }
+    }
+    
+    /// every how many minutes should we force a complication update (these updates counts against the 50 times limit per day)
+    var forceComplicationUpdateInMinutes: Int {
+        get {
+            //read currentvalue in mgdl
+            var returnValue = integer(forKey: Key.forceComplicationUpdateInMinutes.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0 {
+                returnValue = ConstantsWidget.defaultForceComplicationRefreshTimeInMinutes
+            }
+            return returnValue
+        }
+        set {
+            set(newValue, forKey: Key.forceComplicationUpdateInMinutes.rawValue)
+        }
+    }
+    
+    /// how many complication updates are remaining for the current day
+    var remainingComplicationUserInfoTransfers: Int? {
+        get {
+            return integer(forKey: Key.remainingComplicationUserInfoTransfers.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.remainingComplicationUserInfoTransfers.rawValue)
+        }
+    }
+    
+    /// force a complication update
+    @objc dynamic var forceComplicationUpdate: Bool {
+        get {
+            return bool(forKey: Key.forceComplicationUpdate.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.forceComplicationUpdate.rawValue)
+        }
+    }
+    
+    
+    // MARK: - Calendar Events
     
     /// create calendar event yes or no, default false
     @objc dynamic var createCalendarEvent: Bool {

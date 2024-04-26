@@ -21,7 +21,7 @@ enum ConstantsGlucoseChartSwiftUI {
     static let yAxisLowHighLineColor = Color(white: 0.7)
     static let yAxisUrgentLowHighLineColor = Color(white: 0.6)
     
-    static let xAxisGridLineColor = Color(white: 0.5)
+    static let xAxisGridLineColor = Color(white: 0.45)
     static let xAxisLabelOffsetX: CGFloat = -12
     static let xAxisLabelOffsetY: CGFloat = -2
     static let xAxisIntervalBetweenValues: Int = 1

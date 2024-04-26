@@ -31,17 +31,15 @@ extension XDripWatchComplication.Entry {
         var lowLimitInMgDl: Double
         var highLimitInMgDl: Double
         var urgentHighLimitInMgDl: Double
-        var disableComplications: Bool
-        
-        // TODO: Debug only. Remove for production.
-        var remainingComplicationUserInfoTransfers: Int
+        var keepAliveIsDisabled: Bool
+        var liveDataIsEnabled: Bool
         
         var bgUnitString: String
         var bgValueInMgDl: Double?
         var bgReadingDate: Date?
         var bgValueStringInUserChosenUnit: String
                 
-        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaChangeInMgDl: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, disableComplications: Bool? = false, remainingComplicationUserInfoTransfers: Int? = 99) {
+        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaChangeInMgDl: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, keepAliveIsDisabled: Bool? = false, remainingComplicationUserInfoTransfers: Int? = 99, liveDataIsEnabled: Bool? = false) {
             self.bgReadingValues = bgReadingValues
             self.bgReadingDates = bgReadingDates
             self.isMgDl = isMgDl ?? true
@@ -51,10 +49,8 @@ extension XDripWatchComplication.Entry {
             self.lowLimitInMgDl = lowLimitInMgDl ?? 80
             self.highLimitInMgDl = highLimitInMgDl ?? 180
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl ?? 250
-            self.disableComplications = disableComplications ?? false
-            
-            // TODO: Debug only. Remove for production.
-            self.remainingComplicationUserInfoTransfers = remainingComplicationUserInfoTransfers ?? 99
+            self.keepAliveIsDisabled = keepAliveIsDisabled ?? false
+            self.liveDataIsEnabled = liveDataIsEnabled ?? false
             
             self.bgValueInMgDl = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0] : nil
             self.bgReadingDate = (bgReadingDates?.count ?? 0) > 0 ? bgReadingDates?[0] : nil
@@ -153,7 +149,7 @@ extension XDripWatchComplication.Entry {
         func overrideChartHeight() -> Double {
             var height = isSmallScreen() ? ConstantsGlucoseChartSwiftUI.viewHeightWatchAccessoryRectangularSmall : ConstantsGlucoseChartSwiftUI.viewHeightWatchAccessoryRectangular
             
-            height += disableComplications ? -15 : 0
+            height += keepAliveIsDisabled ? -15 : 0
             
             return height
         }
@@ -169,6 +165,6 @@ extension XDripWatchComplication.Entry {
 
 extension XDripWatchComplication.Entry {
     static var placeholder: Self {
-        .init(date: .now, widgetState: WidgetState(bgReadingValues: [100], bgReadingDates: [Date()], isMgDl: true, slopeOrdinal: 3, deltaChangeInMgDl: 0, urgentLowLimitInMgDl: 60, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, disableComplications: true))
+        .init(date: .now, widgetState: WidgetState(bgReadingValues: [100], bgReadingDates: [Date()], isMgDl: true, slopeOrdinal: 3, deltaChangeInMgDl: 0, urgentLowLimitInMgDl: 60, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, keepAliveIsDisabled: false, liveDataIsEnabled: true))
     }
 }

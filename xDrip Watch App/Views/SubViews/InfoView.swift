@@ -18,13 +18,13 @@ struct InfoView: View {
         
         let textSize: CGFloat = isSmallScreen ? 12 : 14
         
-        HStack(spacing: 2) {
+        HStack(spacing: 0) {
             Text(watchState.lastUpdatedTextString)
                 .font(.system(size: textSize))
                 .foregroundStyle(.gray)
             
-            Text(watchState.lastUpdatedTimeString)
-                .font(.system(size: textSize))
+            Text(watchState.lastUpdatedTimeAgoString)
+                .font(.system(size: textSize)).fontWeight(.semibold)
                 .foregroundStyle(watchState.lastUpdatedTimeColor())
         }
     }

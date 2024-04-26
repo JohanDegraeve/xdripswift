@@ -213,4 +213,12 @@ class Texts_Common {
     static let dontShowAgain = {
         return NSLocalizedString("common_dontshowagain", tableName: filename, bundle: Bundle.main, value: "Don't Show Again", comment: "don't show again")
     }()
+    
+    static let enabled = {
+        return NSLocalizedString("common_enabled", tableName: filename, bundle: Bundle.main, value: "Enabled", comment: "enabled")
+    }()
+    
+    static let disabled = {
+        return NSLocalizedString("common_disabled", tableName: filename, bundle: Bundle.main, value: "Disabled", comment: "disabled")
+    }()
 }

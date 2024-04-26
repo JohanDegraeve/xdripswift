@@ -1,0 +1,12 @@
+/* 
+  WatchComplication.strings
+  xdrip
+
+  Created by Paul Plant on 26/4/24.
+  Copyright © 2024 Johan Degraeve. All rights reserved.
+*/
+"liveDataDisabled" = "Live data disabled";
+"goTo" = "Go to";
+"appleWatch" = "Apple Watch";
+"settings" = "Settings";
+"toEnable" = "to enable";

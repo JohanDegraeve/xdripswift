@@ -63,10 +63,13 @@ final class SettingsViewController: UIViewController {
         case M5stack
         
         /// Apple Watch settings
-        case AppleWatch
+        case appleWatch
+        
+        /// Calendar event settings
+        case calendarEvents
         
         /// contact Image settings
-        case ContactImage
+        case contactImage
         
         /// housekeeper settings
         case housekeeper
@@ -109,9 +112,11 @@ final class SettingsViewController: UIViewController {
                 return SettingsViewM5StackSettingsViewModel()
             case .developer:
                 return SettingsViewDevelopmentSettingsViewModel()
-            case .AppleWatch:
+            case .appleWatch:
+                return SettingsViewAppleWatchSettingsViewModel()
+            case .calendarEvents:
                 return SettingsViewCalendarEventsSettingsViewModel()
-            case .ContactImage:
+            case .contactImage:
                 return SettingsViewContactImageSettingsViewModel()
             case .housekeeper:
                 return SettingsViewHousekeeperSettingsViewModel(coreDataManager: coreDataManager)

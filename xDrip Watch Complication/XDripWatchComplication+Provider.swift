@@ -51,7 +51,7 @@ extension XDripWatchComplication.Provider {
                 Date(timeIntervalSince1970: date)
             }
             
-            return Entry.WidgetState(bgReadingValues: data.bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: data.isMgDl, slopeOrdinal: data.slopeOrdinal, deltaChangeInMgDl: data.deltaChangeInMgDl, urgentLowLimitInMgDl: data.urgentLowLimitInMgDl, lowLimitInMgDl: data.lowLimitInMgDl, highLimitInMgDl: data.highLimitInMgDl, urgentHighLimitInMgDl: data.urgentHighLimitInMgDl, disableComplications: data.disableComplications, remainingComplicationUserInfoTransfers: data.remainingComplicationUserInfoTransfers)
+            return Entry.WidgetState(bgReadingValues: data.bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: data.isMgDl, slopeOrdinal: data.slopeOrdinal, deltaChangeInMgDl: data.deltaChangeInMgDl, urgentLowLimitInMgDl: data.urgentLowLimitInMgDl, lowLimitInMgDl: data.lowLimitInMgDl, highLimitInMgDl: data.highLimitInMgDl, urgentHighLimitInMgDl: data.urgentHighLimitInMgDl, keepAliveIsDisabled: data.keepAliveIsDisabled, liveDataIsEnabled: data.liveDataIsEnabled)
         } catch {
             print(error.localizedDescription)
         }
@@ -98,6 +98,6 @@ extension XDripWatchComplication.Provider {
             return bgValueArray
         }
         
-        return Entry.WidgetState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 3, deltaChangeInMgDl: 0, urgentLowLimitInMgDl: ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl, lowLimitInMgDl: ConstantsBGGraphBuilder.defaultLowMarkInMgdl, highLimitInMgDl: ConstantsBGGraphBuilder.defaultHighMarkInMgdl, urgentHighLimitInMgDl: ConstantsBGGraphBuilder.defaultUrgentHighMarkInMgdl)
+        return Entry.WidgetState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 3, deltaChangeInMgDl: 0, urgentLowLimitInMgDl: ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl, lowLimitInMgDl: ConstantsBGGraphBuilder.defaultLowMarkInMgdl, highLimitInMgDl: ConstantsBGGraphBuilder.defaultHighMarkInMgdl, urgentHighLimitInMgDl: ConstantsBGGraphBuilder.defaultUrgentHighMarkInMgdl, liveDataIsEnabled: true)
     }
 }
