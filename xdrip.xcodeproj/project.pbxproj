@@ -958,6 +958,8 @@
 		47EDD1452BDD565A00C5A286 /* TextsWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsWatchApp.swift; sourceTree = "<group>"; };
 		47EDD1482BDD56C800C5A286 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/WatchApp.strings; sourceTree = "<group>"; };
 		47EDD14A2BDD57D600C5A286 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/WatchApp.strings; sourceTree = "<group>"; };
+		47EDD1542BDD8ADD00C5A286 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/WatchApp.strings; sourceTree = "<group>"; };
+		47EDD1552BDD8AF300C5A286 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/WatchComplication.strings; sourceTree = "<group>"; };
 		47FB28072636B04200042FFB /* StatisticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsManager.swift; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xdrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xdrip/Version.xcconfig; sourceTree = "<group>"; };
@@ -4680,6 +4682,7 @@
 			children = (
 				476FA90B2BDC1EBA0091866C /* en */,
 				476FA9102BDC1FFF0091866C /* es */,
+				47EDD1552BDD8AF300C5A286 /* de */,
 			);
 			name = WatchComplication.strings;
 			sourceTree = "<group>";
@@ -4689,6 +4692,7 @@
 			children = (
 				47EDD1482BDD56C800C5A286 /* en */,
 				47EDD14A2BDD57D600C5A286 /* es */,
+				47EDD1542BDD8ADD00C5A286 /* de */,
 			);
 			name = WatchApp.strings;
 			sourceTree = "<group>";
