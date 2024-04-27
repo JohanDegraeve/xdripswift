@@ -52,7 +52,7 @@ final class WatchStateModel: NSObject, ObservableObject {
     @Published var liveDataIsEnabled: Bool = false
     @Published var remainingComplicationUserInfoTransfers: Int = 99
     
-    @Published var lastUpdatedTextString: String = "Requesting data..."
+    @Published var lastUpdatedTextString: String = Texts_WatchApp.requestingData
     @Published var lastUpdatedTimeString: String = ""
     @Published var lastUpdatedTimeAgoString: String = ""
     @Published var debugString: String = "Debug..."
@@ -242,8 +242,7 @@ final class WatchStateModel: NSObject, ObservableObject {
         if session.isReachable {
             DispatchQueue.main.async {
                 self.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorPending
-                self.debugString.removeLast(4)
-                self.debugString += "Fetching"
+                self.debugString = self.debugString.replacingOccurrences(of: "Idle", with: "Fetching")
             }
             
             print("Requesting watch state update from iOS")
@@ -284,11 +283,11 @@ final class WatchStateModel: NSObject, ObservableObject {
         
         // check if there is any BG data available before updating the data source info strings accordingly
         if let bgReadingDate = bgReadingDate() {
-            lastUpdatedTextString = "Last reading "
+            lastUpdatedTextString = Texts_WatchApp.lastReading + " "
             lastUpdatedTimeString = bgReadingDate.formatted(date: .omitted, time: .shortened)
             lastUpdatedTimeAgoString = bgReadingDate.daysAndHoursAgo(appendAgo: true)
         } else {
-            lastUpdatedTextString = "No sensor data"
+            lastUpdatedTextString = Texts_WatchApp.noSensorData
             lastUpdatedTimeString = ""
             lastUpdatedTimeAgoString = ""
         }

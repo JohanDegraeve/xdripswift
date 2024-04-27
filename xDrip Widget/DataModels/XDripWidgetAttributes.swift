@@ -6,6 +6,7 @@
 //  Copyright © 2023 Johan Degraeve. All rights reserved.
 //
 
+import Foundation
 import ActivityKit
 import WidgetKit
 import SwiftUI
@@ -66,7 +67,11 @@ struct XDripWidgetAttributes: ActivityAttributes {
         }
 
         var bgValueStringInUserChosenUnit: String {
-            bgReadingValues[0].mgdlToMmolAndToString(mgdl: isMgDl)
+            if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-ConstantsWidgetExtension.bgReadingDateVeryStaleInMinutes) {
+                bgReadingValues[0].mgdlToMmolAndToString(mgdl: isMgDl)
+            } else {
+                isMgDl ? "---" : "-.-"
+            }
         }
 
         init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySize: LiveActivitySize, dataSourceDescription: String? = "") {
@@ -92,7 +97,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
         /// - Returns: a Color object either red, yellow or green
         func bgTextColor() -> Color {
             if let bgReadingDate = bgReadingDate, let bgValueInMgDl = bgValueInMgDl {
-                if bgReadingDate > Date().addingTimeInterval(-60 * 7) {
+                if bgReadingDate > Date().addingTimeInterval(-ConstantsWidgetExtension.bgReadingDateStaleInMinutes) {
                     if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
                         return .red
                     } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
@@ -111,7 +116,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
         /// Delta text color dependant on the time since the last reading
         /// - Returns: a Color either white(ish) or gray
         func deltaChangeTextColor() -> Color {
-            if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-60 * 7) {
+            if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-ConstantsWidgetExtension.bgReadingDateStaleInMinutes) {
                 return Color(white: colorPrimaryWhiteValue)
             } else {
                 return Color(white: colorTertiaryWhiteValue)
@@ -121,7 +126,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
         /// convert the optional delta change int (in mg/dL) to a formatted change value in the user chosen unit making sure all zero values are shown as a positive change to follow Nightscout convention
         /// - Returns: a string holding the formatted delta change value (i.e. +0.4 or -6)
         func deltaChangeStringInUserChosenUnit() -> String {
-            if let deltaChangeInMgDl = deltaChangeInMgDl {
+            if let deltaChangeInMgDl = deltaChangeInMgDl, let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-ConstantsWidgetExtension.bgReadingDateVeryStaleInMinutes) {
                 let deltaSign: String = deltaChangeInMgDl > 0 ? "+" : ""
                 let valueAsString = deltaChangeInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
                 
@@ -133,30 +138,34 @@ struct XDripWidgetAttributes: ActivityAttributes {
                     return (deltaChangeInMgDl > -0.1 && deltaChangeInMgDl < 0.1) ? "+0.0" : (deltaSign + valueAsString)
                 }
             } else {
-                return ""
+                return isMgDl ? "-" : "-.-"
             }
         }
         
         ///  returns a string holding the trend arrow
         /// - Returns: trend arrow string (i.e.  "↑")
         func trendArrow() -> String {
-            switch slopeOrdinal {
-            case 7:
-                return "\u{2193}\u{2193}" // ↓↓
-            case 6:
-                return "\u{2193}" // ↓
-            case 5:
-                return "\u{2198}" // ↘
-            case 4:
-                return "\u{2192}" // →
-            case 3:
-                return "\u{2197}" // ↗
-            case 2:
-                return "\u{2191}" // ↑
-            case 1:
-                return "\u{2191}\u{2191}" // ↑↑
-            default:
-                return ""
+            if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-ConstantsWidgetExtension.bgReadingDateVeryStaleInMinutes) {
+                switch slopeOrdinal {
+                case 7:
+                    return "\u{2193}\u{2193}" // ↓↓
+                case 6:
+                    return "\u{2193}" // ↓
+                case 5:
+                    return "\u{2198}" // ↘
+                case 4:
+                    return "\u{2192}" // →
+                case 3:
+                    return "\u{2197}" // ↗
+                case 2:
+                    return "\u{2191}" // ↑
+                case 1:
+                    return "\u{2191}\u{2191}" // ↑↑
+                default:
+                    return ""
+                }
+            } else {
+                return "\u{2194}"
             }
         }
     }

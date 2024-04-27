@@ -23,8 +23,8 @@ struct InfoView: View {
                 .font(.system(size: textSize))
                 .foregroundStyle(.gray)
             
-            Text(watchState.lastUpdatedTimeAgoString)
-                .font(.system(size: textSize)).fontWeight(.semibold)
+            Text(watchState.lastUpdatedTimeString)
+                .font(.system(size: textSize))
                 .foregroundStyle(watchState.lastUpdatedTimeColor())
         }
     }

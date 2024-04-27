@@ -27,7 +27,6 @@
 		471C9BFF2B932952005E1326 /* LibreLinkUpModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E82A715FD900267BE3 /* LibreLinkUpModels.swift */; };
 		471C9C002B932957005E1326 /* LibreLinkUpModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E82A715FD900267BE3 /* LibreLinkUpModels.swift */; };
 		471C9C082B94F0F0005E1326 /* Bundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D602448E695001C9E5A /* Bundle.swift */; };
-		472134DC2BC69E6200729850 /* XDripWidgetAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A5042B40709E00419052 /* XDripWidgetAttributes.swift */; };
 		472134DD2BC6A63100729850 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
 		472134DE2BC6A63100729850 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
 		472134DF2BC6A63100729850 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
@@ -163,6 +162,12 @@
 		47DE41B52B8693CB0041DA19 /* HeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41B42B8693CB0041DA19 /* HeaderView.swift */; };
 		47DE41B92B87B2680041DA19 /* ConstantsAppleWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41B82B87B2680041DA19 /* ConstantsAppleWatch.swift */; };
 		47E91BBA2B9A43F20063181B /* FollowerBackgroundKeepAliveType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */; };
+		47EDD1402BDD4F5D00C5A286 /* ConstantsWidgetExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47EDD13E2BDD4F5D00C5A286 /* ConstantsWidgetExtension.swift */; };
+		47EDD1412BDD4FAE00C5A286 /* TimeInterval.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BECB11235CEA9B0060DAE1 /* TimeInterval.swift */; };
+		47EDD1422BDD4FE500C5A286 /* XDripWidgetAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A5042B40709E00419052 /* XDripWidgetAttributes.swift */; };
+		47EDD1432BDD4FE900C5A286 /* ConstantsWidgetExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47EDD13E2BDD4F5D00C5A286 /* ConstantsWidgetExtension.swift */; };
+		47EDD1462BDD565A00C5A286 /* TextsWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47EDD1452BDD565A00C5A286 /* TextsWatchApp.swift */; };
+		47EDD1492BDD56C800C5A286 /* WatchApp.strings in Resources */ = {isa = PBXBuildFile; fileRef = 47EDD1472BDD56C800C5A286 /* WatchApp.strings */; };
 		47FB28082636B04200042FFB /* StatisticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47FB28072636B04200042FFB /* StatisticsManager.swift */; };
 		CE1B2FE025D0264B00F642F5 /* LaunchScreen.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */; };
 		CE1B2FE125D0264B00F642F5 /* Main.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD425D0264900F642F5 /* Main.strings */; };
@@ -949,6 +954,10 @@
 		47DE41B22B8672F90041DA19 /* DataSourceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSourceView.swift; sourceTree = "<group>"; };
 		47DE41B42B8693CB0041DA19 /* HeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaderView.swift; sourceTree = "<group>"; };
 		47DE41B82B87B2680041DA19 /* ConstantsAppleWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsAppleWatch.swift; sourceTree = "<group>"; };
+		47EDD13E2BDD4F5D00C5A286 /* ConstantsWidgetExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsWidgetExtension.swift; sourceTree = "<group>"; };
+		47EDD1452BDD565A00C5A286 /* TextsWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsWatchApp.swift; sourceTree = "<group>"; };
+		47EDD1482BDD56C800C5A286 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/WatchApp.strings; sourceTree = "<group>"; };
+		47EDD14A2BDD57D600C5A286 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/WatchApp.strings; sourceTree = "<group>"; };
 		47FB28072636B04200042FFB /* StatisticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsManager.swift; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xdrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xdrip/Version.xcconfig; sourceTree = "<group>"; };
@@ -1843,6 +1852,7 @@
 				4716A4F32B406C3D00419052 /* XDripWidgetBundle.swift */,
 				4716A4F52B406C3D00419052 /* XDripWidgetLiveActivity.swift */,
 				4716A4F92B406C3F00419052 /* Assets.xcassets */,
+				47EDD13F2BDD4F5D00C5A286 /* Constants */,
 				4716A5032B40704000419052 /* DataModels */,
 				474606782B962F3300AC9214 /* Views */,
 			);
@@ -1968,6 +1978,7 @@
 				47DE41B62B87B24C0041DA19 /* Constants */,
 				479359952B88BA4E007D3CEE /* DataModels */,
 				47A6ABE72B790CC70047A4BA /* Preview Content */,
+				47EDD1442BDD564300C5A286 /* Texts */,
 				47DE41B72B87B2510041DA19 /* Views */,
 			);
 			path = "xDrip Watch App";
@@ -2016,6 +2027,23 @@
 				478A92542B8F95930084C394 /* SubViews */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		47EDD13F2BDD4F5D00C5A286 /* Constants */ = {
+			isa = PBXGroup;
+			children = (
+				47EDD13E2BDD4F5D00C5A286 /* ConstantsWidgetExtension.swift */,
+			);
+			path = Constants;
+			sourceTree = "<group>";
+		};
+		47EDD1442BDD564300C5A286 /* Texts */ = {
+			isa = PBXGroup;
+			children = (
+				47EDD1452BDD565A00C5A286 /* TextsWatchApp.swift */,
+				47EDD1472BDD56C800C5A286 /* WatchApp.strings */,
+			);
+			path = Texts;
 			sourceTree = "<group>";
 		};
 		47FB28052636AFE700042FFB /* Statistics */ = {
@@ -3827,6 +3855,7 @@
 			files = (
 				47A6AC442B7D430D0047A4BA /* HomeView.strings in Resources */,
 				47A6ABE92B790CC70047A4BA /* Preview Assets.xcassets in Resources */,
+				47EDD1492BDD56C800C5A286 /* WatchApp.strings in Resources */,
 				47A6ABE62B790CC70047A4BA /* Assets.xcassets in Resources */,
 				47A6AC462B7D43110047A4BA /* Common.strings in Resources */,
 				472134DE2BC6A63100729850 /* Assets.xcassets in Resources */,
@@ -4009,6 +4038,7 @@
 				47A6AC302B7D3E250047A4BA /* ConstantsHomeView.swift in Sources */,
 				474606732B962B9500AC9214 /* XDripWidget+Entry.swift in Sources */,
 				47A6AC382B7D3E770047A4BA /* TextsHomeView.swift in Sources */,
+				47EDD1412BDD4FAE00C5A286 /* TimeInterval.swift in Sources */,
 				4746067A2B962F4C00AC9214 /* SystemSmallView.swift in Sources */,
 				474606772B962CCD00AC9214 /* XDripWidget+Provider.swift in Sources */,
 				4746067C2B962F8500AC9214 /* SystemMediumView.swift in Sources */,
@@ -4022,6 +4052,7 @@
 				47CA61E62B966A9700C2A597 /* AccessoryRectangularView.swift in Sources */,
 				4746068A2B96380200AC9214 /* ConstantsLibreLinkUp.swift in Sources */,
 				47A6AC2C2B7D3E170047A4BA /* Double.swift in Sources */,
+				47EDD1402BDD4F5D00C5A286 /* ConstantsWidgetExtension.swift in Sources */,
 				47A6AC412B7D42EC0047A4BA /* TextsCommon.swift in Sources */,
 				478A92572B8FA1E30084C394 /* ConstantsBGGraphBuilder.swift in Sources */,
 				4746068F2B963EA100AC9214 /* View.swift in Sources */,
@@ -4083,6 +4114,7 @@
 				47A6AC332B7D3E260047A4BA /* ConstantsHomeView.swift in Sources */,
 				474606642B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift in Sources */,
 				474606902B963EA100AC9214 /* View.swift in Sources */,
+				47EDD1462BDD565A00C5A286 /* TextsWatchApp.swift in Sources */,
 				47A6AC372B7D3E650047A4BA /* GlucoseChartType.swift in Sources */,
 				47A6ABE42B790CC60047A4BA /* MainView.swift in Sources */,
 				474606882B9637F600AC9214 /* TextsSettingsView.swift in Sources */,
@@ -4254,7 +4286,6 @@
 				F8AF36152455C6F700B5977B /* ConstantsTrace.swift in Sources */,
 				F8F971B723A5914D00C3F17D /* BluetoothPeripheralType.swift in Sources */,
 				F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */,
-				472134DC2BC69E6200729850 /* XDripWidgetAttributes.swift in Sources */,
 				F8F1670E27273EA7001AA3D8 /* GlucoseDataRxMessage.swift in Sources */,
 				F8B3A835227F08AC004BA588 /* PickerViewController.swift in Sources */,
 				F821CF9522ADB0D7005C1E43 /* HealthKitManager.swift in Sources */,
@@ -4288,6 +4319,7 @@
 				D417E51C282EC8DB008DC467 /* ProgressBarViewController.swift in Sources */,
 				47DB06C62A6FC72000267BE3 /* SettingsViewCalendarEventsSettingsViewModel.swift in Sources */,
 				F830991C23C2909E005741DF /* Watlaa+CoreDataClass.swift in Sources */,
+				47EDD1422BDD4FE500C5A286 /* XDripWidgetAttributes.swift in Sources */,
 				F808D2CC240328FA0084B5DB /* Bubble+CoreDataClass.swift in Sources */,
 				F8A1586122EDB844007F5B5D /* ConstantsNotifications.swift in Sources */,
 				F8DF765523E34FD500063910 /* DexcomG5+CoreDataProperties.swift in Sources */,
@@ -4315,6 +4347,7 @@
 				F8B3A79622635A25004BA588 /* AlertEntry+CoreDataClass.swift in Sources */,
 				F8A2BC3725DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMMiaoMiaoTransmitterDelegate.swift in Sources */,
 				F8F7B8E6259A6EBF00C47B04 /* LibreSmoothing.swift in Sources */,
+				47EDD1432BDD4FE900C5A286 /* ConstantsWidgetExtension.swift in Sources */,
 				F8284237276BE78D0097E0C9 /* String+Dexcom.swift in Sources */,
 				F808D2CA240325E40084B5DB /* CGMBubbleTransmitterDelegate.swift in Sources */,
 				F804870C2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift in Sources */,
@@ -4649,6 +4682,15 @@
 				476FA9102BDC1FFF0091866C /* es */,
 			);
 			name = WatchComplication.strings;
+			sourceTree = "<group>";
+		};
+		47EDD1472BDD56C800C5A286 /* WatchApp.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				47EDD1482BDD56C800C5A286 /* en */,
+				47EDD14A2BDD57D600C5A286 /* es */,
+			);
+			name = WatchApp.strings;
 			sourceTree = "<group>";
 		};
 		CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */ = {
