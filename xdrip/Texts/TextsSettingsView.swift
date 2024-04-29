@@ -637,7 +637,15 @@ class Texts_SettingsView {
     }()
     
     static let appleWatchRemainingComplicationUserInfoTransfers: String = {
-        return NSLocalizedString("appleWatchRemainingComplicationUserInfoTransfers", tableName: filename, bundle: Bundle.main, value: "Remaining Complication Updates", comment: "Apple Watch Settings - amount of forced complication updates still available today")
+        return NSLocalizedString("appleWatchRemainingComplicationUserInfoTransfers", tableName: filename, bundle: Bundle.main, value: "Remaining Complication Updates", comment: "Apple Watch Developer Settings - amount of forced complication updates still available today")
+    }()
+    
+    static let appleWatchForceManualComplicationUpdate: String = {
+        return NSLocalizedString("appleWatchForceManualComplicationUpdate", tableName: filename, bundle: Bundle.main, value: "Force Complication Update", comment: "Apple Watch Developer Settings - manually force a complication update")
+    }()
+    
+    static let appleWatchForceManualComplicationUpdateMessage: String = {
+        return NSLocalizedString("appleWatchForceManualComplicationUpdateMessage", tableName: filename, bundle: Bundle.main, value: "This will manually force an update of the Apple Watch complications.\n\nIt will use up one of the remaining transfers available for today", comment: "Apple Watch Developer Settings - message explaining how to manually force a complication update")
     }()
     
     // MARK: - Calendar Events

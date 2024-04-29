@@ -11,17 +11,11 @@ import UIKit
 import OSLog
 
 fileprivate enum Setting: Int, CaseIterable {
-    // allow the homescreen to be show a landscape chart when rotated?
+    // does the user agree to show data in the complications knowing that it will not always be up-to-date?
     case showDataInWatchComplications = 0
     
-    // show a clock at the bottom of the home screen when the screen lock is activated?
+    /// the date that the user agreed
     case watchComplicationUserAgreementDate = 1
-    
-    // show a clock at the bottom of the home screen when the screen lock is activated?
-//    case forceComplicationUpdateInMinutes = 2
-    
-    // type of semi-transparent dark overlay to cover the app when the screen is locked
-    case remainingComplicationUserInfoTransfers = 2
 }
 
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
@@ -59,7 +53,7 @@ class SettingsViewAppleWatchSettingsViewModel: NSObject, SettingsViewModelProtoc
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-        case .showDataInWatchComplications, .watchComplicationUserAgreementDate, .remainingComplicationUserInfoTransfers:
+        case .showDataInWatchComplications, .watchComplicationUserAgreementDate:
             return nil
         }
     }
@@ -93,10 +87,6 @@ class SettingsViewAppleWatchSettingsViewModel: NSObject, SettingsViewModelProtoc
                         self.sectionReloadClosure?()
                     }
                 })
-        
-        case .remainingComplicationUserInfoTransfers:
-            UserDefaults.standard.forceComplicationUpdate = true
-            return .nothing
             
         case .watchComplicationUserAgreementDate:
             return .nothing
@@ -121,9 +111,6 @@ class SettingsViewAppleWatchSettingsViewModel: NSObject, SettingsViewModelProtoc
             
         case .watchComplicationUserAgreementDate:
             return Texts_SettingsView.appleWatchComplicationUserAgreementDate
-            
-        case .remainingComplicationUserInfoTransfers:
-            return Texts_SettingsView.appleWatchRemainingComplicationUserInfoTransfers
         }
     }
     
@@ -133,7 +120,7 @@ class SettingsViewAppleWatchSettingsViewModel: NSObject, SettingsViewModelProtoc
         switch setting {
         case .showDataInWatchComplications:
             return .disclosureIndicator
-        case .watchComplicationUserAgreementDate, .remainingComplicationUserInfoTransfers:
+        case .watchComplicationUserAgreementDate:
             return .none
         }
     }
@@ -148,42 +135,6 @@ class SettingsViewAppleWatchSettingsViewModel: NSObject, SettingsViewModelProtoc
             
         case .watchComplicationUserAgreementDate:
             return UserDefaults.standard.watchComplicationUserAgreementDate?.formatted(date: .abbreviated, time: .shortened) ?? "-"
-            
-        case .remainingComplicationUserInfoTransfers:
-            if let remainingComplicationUserInfoTrans = UserDefaults.standard.remainingComplicationUserInfoTransfers {
-                return remainingComplicationUserInfoTrans.description + " / 50"
-            } else {
-                return "-"
-            }
         }
     }
-    
-    // MARK: - observe functions
-    
-    private func addObservers() {
-        
-        // Listen for changes in the remaining complication transfers to trigger the UI to be updated
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.remainingComplicationUserInfoTransfers.rawValue, options: .new, context: nil)
-        
-    }
-    
-    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        
-        guard let keyPath = keyPath,
-              let keyPathEnum = UserDefaults.Key(rawValue: keyPath)
-        else { return }
-        
-        switch keyPathEnum {
-        case UserDefaults.Key.remainingComplicationUserInfoTransfers:
-            
-            // we have to run this in the main thread to avoid access errors
-            DispatchQueue.main.async {
-                self.sectionReloadClosure?()
-            }
-            
-        default:
-            break
-        }
-    }
-    
 }

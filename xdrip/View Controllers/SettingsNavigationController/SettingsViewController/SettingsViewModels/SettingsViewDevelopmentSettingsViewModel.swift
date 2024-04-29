@@ -31,9 +31,12 @@ fileprivate enum Setting:Int, CaseIterable {
     /// LibreLinkUp version number that will be used for the LLU follower mode http request headers
     case libreLinkUpVersion = 8
     
+    /// number of remaining forced complication updates available today
+    case remainingComplicationUserInfoTransfers = 9
+    
 }
 
-class SettingsViewDevelopmentSettingsViewModel: SettingsViewModelProtocol {
+class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProtocol {
     
     var sectionReloadClosure: (() -> Void)?
     
@@ -85,6 +88,9 @@ class SettingsViewDevelopmentSettingsViewModel: SettingsViewModelProtocol {
             
         case .libreLinkUpVersion:
             return Texts_SettingsView.libreLinkUpVersion
+            
+        case .remainingComplicationUserInfoTransfers:
+            return Texts_SettingsView.appleWatchRemainingComplicationUserInfoTransfers
         }
     }
     
@@ -95,10 +101,10 @@ class SettingsViewDevelopmentSettingsViewModel: SettingsViewModelProtocol {
         switch setting {
             
         case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .suppressLoopShare:
-            return UITableViewCell.AccessoryType.none
+            return .none
             
-        case .loopDelay, .libreLinkUpVersion:
-            return UITableViewCell.AccessoryType.disclosureIndicator
+        case .loopDelay, .libreLinkUpVersion, .remainingComplicationUserInfoTransfers:
+            return .disclosureIndicator
             
         }
     }
@@ -114,6 +120,13 @@ class SettingsViewDevelopmentSettingsViewModel: SettingsViewModelProtocol {
             
         case .libreLinkUpVersion:
             return UserDefaults.standard.libreLinkUpVersion
+            
+        case .remainingComplicationUserInfoTransfers:
+            if let remainingComplicationUserInfoTrans = UserDefaults.standard.remainingComplicationUserInfoTransfers {
+                return remainingComplicationUserInfoTrans.description + " / 50"
+            } else {
+                return "-"
+            }
             
         }
         
@@ -134,7 +147,7 @@ class SettingsViewDevelopmentSettingsViewModel: SettingsViewModelProtocol {
                 // this is a bit messy, but seems to be the best way to reset the setting to false
                 // this will usually happen when the view is not on screen anyway
                 if isOn {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 30) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
                         UserDefaults.standard.showDeveloperSettings = false
                         self.sectionReloadClosure?()
                     }
@@ -190,7 +203,7 @@ class SettingsViewDevelopmentSettingsViewModel: SettingsViewModelProtocol {
                 
             })
             
-        case .loopDelay, .libreLinkUpVersion:
+        case .remainingComplicationUserInfoTransfers, .loopDelay, .libreLinkUpVersion:
             return nil
             
         }
@@ -225,6 +238,10 @@ class SettingsViewDevelopmentSettingsViewModel: SettingsViewModelProtocol {
                 
             }, cancelHandler: nil, inputValidator: nil)
             
+        case .remainingComplicationUserInfoTransfers:
+            return .askConfirmation(title: Texts_SettingsView.appleWatchForceManualComplicationUpdate, message: Texts_SettingsView.appleWatchForceManualComplicationUpdateMessage, actionHandler: {
+                UserDefaults.standard.forceComplicationUpdate = true
+            }, cancelHandler: nil)
         }
     }
     
@@ -248,6 +265,35 @@ class SettingsViewDevelopmentSettingsViewModel: SettingsViewModelProtocol {
         
         return matches.first != nil
         
+    }
+    
+    
+    // MARK: - observe functions
+    
+    private func addObservers() {
+        
+        // Listen for changes in the remaining complication transfers to trigger the UI to be updated
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.remainingComplicationUserInfoTransfers.rawValue, options: .new, context: nil)
+        
+    }
+    
+    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        
+        guard let keyPath = keyPath,
+              let keyPathEnum = UserDefaults.Key(rawValue: keyPath)
+        else { return }
+        
+        switch keyPathEnum {
+        case UserDefaults.Key.remainingComplicationUserInfoTransfers:
+            
+            // we have to run this in the main thread to avoid access errors
+            DispatchQueue.main.async {
+                self.sectionReloadClosure?()
+            }
+            
+        default:
+            break
+        }
     }
     
 }
