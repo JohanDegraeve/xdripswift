@@ -99,7 +99,7 @@ class SettingsViewAppleWatchSettingsViewModel: NSObject, SettingsViewModelProtoc
     
     func numberOfRows() -> Int {
         // if the user doesn't enable the complications, then hide the rest of the settings
-        return Setting.allCases.count - (UserDefaults.standard.showDataInWatchComplications ? 0 : 2)
+        return Setting.allCases.count - (UserDefaults.standard.showDataInWatchComplications ? 0 : 1)
     }
     
     func settingsRowText(index: Int) -> String {
