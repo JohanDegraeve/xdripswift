@@ -66,47 +66,24 @@ final class RootViewController: UIViewController, ObservableObject {
         // get the 2 character language code for the App Locale (i.e. "en", "es", "nl", "fr")
         // if the user has the app in a language other than English and they have the "auto translate" option selected, then load the help pages through Google Translate
         // important to check the the URLs actually exist in ConstansHomeView before trying to open them
-        if #available(iOS 16, *) {
-            if let languageCode = NSLocale.current.language.languageCode?.identifier, languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
-
-                guard let url = URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode + ConstantsHomeView.onlineHelpURLTranslated2) else { return }
-
-                UIApplication.shared.open(url)
-
-            } else {
-
-                // so the user is running the app in English
-                // or
-                // NSLocale.current.languageCode returned a nil value
-                // or
-                // they don't want to translate so let's just load it directly
-                guard let url = URL(string: ConstantsHomeView.onlineHelpURL) else { return }
-
-                UIApplication.shared.open(url)
-
-            }
+        if let languageCode = NSLocale.current.language.languageCode?.identifier, languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
+            
+            guard let url = URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode + ConstantsHomeView.onlineHelpURLTranslated2) else { return }
+            
+            UIApplication.shared.open(url)
+            
         } else {
-            // Fallback on earlier versions
-            if let languageCode = NSLocale.current.languageCode, languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
-
-                guard let url = URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode + ConstantsHomeView.onlineHelpURLTranslated2) else { return }
-
-                UIApplication.shared.open(url)
-
-            } else {
-
-                // so the user is running the app in English
-                // or
-                // NSLocale.current.languageCode returned a nil value
-                // or
-                // they don't want to translate so let's just load it directly
-                guard let url = URL(string: ConstantsHomeView.onlineHelpURL) else { return }
-
-                UIApplication.shared.open(url)
-
-            }
+            
+            // so the user is running the app in English
+            // or
+            // NSLocale.current.languageCode returned a nil value
+            // or
+            // they don't want to translate so let's just load it directly
+            guard let url = URL(string: ConstantsHomeView.onlineHelpURL) else { return }
+            
+            UIApplication.shared.open(url)
+            
         }
-        
     }
     
     /// outlet for the lock button - it will change text based upon whether they screen is locked or not
@@ -706,9 +683,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
         }
         
-        if #available(iOS 16, *) {
-            IntentDonationManager.shared.donate(intent: GlucoseIntent())
-        }
+        IntentDonationManager.shared.donate(intent: GlucoseIntent())
     }
     
     override func viewDidLoad() {
@@ -995,10 +970,8 @@ final class RootViewController: UIViewController, ObservableObject {
         // add tracing when app will terminate - this only works for non-suspended apps, probably (not tested) also works for apps that crash in the background
         ApplicationManager.shared.addClosureToRunWhenAppWillTerminate(key: applicationManagerKeyTraceAppWillTerminate, closure: {
 
-            if #available(iOS 16.2, *) {
-                // force the live activity to end if it exists to prevent it becoming "orphaned" and unclosable by the app
-                LiveActivityManager.shared.endAllActivities()
-            }
+            // force the live activity to end if it exists to prevent it becoming "orphaned" and unclosable by the app
+            LiveActivityManager.shared.endAllActivities()
 
             trace("Application will terminate - it has probably been force-closed by the user", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
 
@@ -1013,11 +986,9 @@ final class RootViewController: UIViewController, ObservableObject {
         // reinitialise glucose chart and also to update labels and chart
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {
             
-            if #available(iOS 16, *) {
-                // if view is appeared, view did appear will not get called when app moves to the foreground
-                // so need to donate here
-                IntentDonationManager.shared.donate(intent: GlucoseIntent())
-            }
+            // if view is appeared, view did appear will not get called when app moves to the foreground
+            // so need to donate here
+            IntentDonationManager.shared.donate(intent: GlucoseIntent())
             
             // update the connection status immediately (this will give the user a visual feedback that the connection was lost in the background if they have disabled keep-alive)
             self.setFollowerConnectionAndHeartbeatStatus()
@@ -1636,11 +1607,7 @@ final class RootViewController: UIViewController, ObservableObject {
             if !UserDefaults.standard.showReadingInAppBadge || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled) {
                 
                 // applicationIconBadgeNumber has been deprecated for iOS17 but as we currently have a minimum deployment target of iOS15, let's add a conditional check
-                if #available(iOS 16.0, *) {
-                    UNUserNotificationCenter.current().setBadgeCount(0)
-                } else {
-                    UIApplication.shared.applicationIconBadgeNumber = 0
-                }
+                UNUserNotificationCenter.current().setBadgeCount(0)
                 
             }
             
@@ -3518,92 +3485,90 @@ final class RootViewController: UIViewController, ObservableObject {
     /// check if the conditions are correct to start a live activity, update it, or end it
     /// also update the widget data stored in user defaults
     private func updateLiveActivityAndWidgets(forceRestart: Bool) {
-        if #available(iOS 16.2, *) {
-            if let bgReadingsAccessor = self.bgReadingsAccessor {
-
-                // create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
-                // this is needed due to the not being able to pass structs that are not codable/hashable
-                let hoursOfBgReadingsToSend: Double = 12
-
-                let allBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-
-                // Live Activities have maximum payload size of 4kB.
-                // This value is selected by testing how much we can send before getting the "Payload maximum size exceeded" error.
-                let maxNumberOfReadings = 260
-
-                // If there are more readings than we can send to the Live Activity, downsample the values to fit.
-                let bgReadings = allBgReadings.count > maxNumberOfReadings
-                ? (0 ..< maxNumberOfReadings).map { allBgReadings[$0 * allBgReadings.count / maxNumberOfReadings] }
-                : allBgReadings
-
-                if bgReadings.count > 0 {
-                    var slopeOrdinal: Int = 0
-                    var deltaChangeInMgDl: Double = 0
-                    var bgReadingValues: [Double] = []
-                    var bgReadingDates: [Date] = []
-                    let bgValueInMgDl = bgReadings[0].calculatedValue
-
-                    // add delta if available
-                    if bgReadings.count > 1 {
-                        deltaChangeInMgDl = bgReadings[0].currentSlope(previousBgReading: bgReadings[1]) * bgReadings[0].timeStamp.timeIntervalSince(bgReadings[1].timeStamp) * 1000;
-
-                        slopeOrdinal = bgReadings[0].slopeOrdinal()
+        if let bgReadingsAccessor = self.bgReadingsAccessor {
+            
+            // create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
+            // this is needed due to the not being able to pass structs that are not codable/hashable
+            let hoursOfBgReadingsToSend: Double = 12
+            
+            let allBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+            
+            // Live Activities have maximum payload size of 4kB.
+            // This value is selected by testing how much we can send before getting the "Payload maximum size exceeded" error.
+            let maxNumberOfReadings = 260
+            
+            // If there are more readings than we can send to the Live Activity, downsample the values to fit.
+            let bgReadings = allBgReadings.count > maxNumberOfReadings
+            ? (0 ..< maxNumberOfReadings).map { allBgReadings[$0 * allBgReadings.count / maxNumberOfReadings] }
+            : allBgReadings
+            
+            if bgReadings.count > 0 {
+                var slopeOrdinal: Int = 0
+                var deltaChangeInMgDl: Double = 0
+                var bgReadingValues: [Double] = []
+                var bgReadingDates: [Date] = []
+                let bgValueInMgDl = bgReadings[0].calculatedValue
+                
+                // add delta if available
+                if bgReadings.count > 1 {
+                    deltaChangeInMgDl = bgReadings[0].currentSlope(previousBgReading: bgReadings[1]) * bgReadings[0].timeStamp.timeIntervalSince(bgReadings[1].timeStamp) * 1000;
+                    
+                    slopeOrdinal = bgReadings[0].slopeOrdinal()
+                }
+                
+                for bgReading in bgReadings {
+                    bgReadingValues.append(bgReading.calculatedValue)
+                    bgReadingDates.append(bgReading.timeStamp)
+                }
+                
+                let dataSourceDescription = UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "" : UserDefaults.standard.followerDataSourceType.fullDescription
+                
+                var showLiveActivity: Bool = UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)
+                
+                if showLiveActivity {
+                    // now that we've got the current BG value, let's refine the check to see if we should run/show the live activity
+                    switch UserDefaults.standard.liveActivityType {
+                    case .always:
+                        showLiveActivity = true
+                    case .disabled:
+                        showLiveActivity = false
+                    case .low:
+                        showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.lowMarkValue) ? true : false
+                    case .urgentLow:
+                        showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) ? true : false
+                    case .lowHigh:
+                        showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.lowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.highMarkValue)) ? true : false
+                    case .urgentLowHigh:
+                        showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.urgentHighMarkValue)) ? true : false
                     }
-
-                    for bgReading in bgReadings {
-                        bgReadingValues.append(bgReading.calculatedValue)
-                        bgReadingDates.append(bgReading.timeStamp)
-                    }
-
-                    let dataSourceDescription = UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "" : UserDefaults.standard.followerDataSourceType.fullDescription
-
-                    var showLiveActivity: Bool = UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)
-
-                    if showLiveActivity {
-                        // now that we've got the current BG value, let's refine the check to see if we should run/show the live activity
-                        switch UserDefaults.standard.liveActivityType {
-                        case .always:
-                            showLiveActivity = true
-                        case .disabled:
-                            showLiveActivity = false
-                        case .low:
-                            showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.lowMarkValue) ? true : false
-                        case .urgentLow:
-                            showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) ? true : false
-                        case .lowHigh:
-                            showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.lowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.highMarkValue)) ? true : false
-                        case .urgentLowHigh:
-                            showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.urgentHighMarkValue)) ? true : false
-                        }
-                    }
-
-                    // if we should show it, then let's continue processing the lastReading array to create a valid contentState
-                    if showLiveActivity {
-                        // create the contentState that will update the dynamic attributes of the Live Activity Widget
-                        let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySize: UserDefaults.standard.liveActivitySize, dataSourceDescription: dataSourceDescription)
-
-                        LiveActivityManager.shared.runActivity(contentState: contentState, forceRestart: forceRestart)
-                    } else {
-                        LiveActivityManager.shared.endAllActivities()
-                    }
-
-                    // update the widget data stored in user defaults
-                    let bgReadingDatesAsDouble = bgReadingDates.map { date in
-                        date.timeIntervalSince1970
-                    }
-
-                    let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, dataSourceDescription: dataSourceDescription, keepAliveImageString: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImageString : nil)
-
-                    // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
-                    // the user's device - this allows several copies of the app to be installed without cross-contamination of widget data
-                    if let widgetData = try? JSONEncoder().encode(widgetSharedUserDefaultsModel) {
-                        UserDefaults.storeInSharedUserDefaults(value: widgetData, forKey: "widgetSharedUserDefaults.\(Bundle.main.mainAppBundleIdentifier)")
-                    }
+                }
+                
+                // if we should show it, then let's continue processing the lastReading array to create a valid contentState
+                if showLiveActivity {
+                    // create the contentState that will update the dynamic attributes of the Live Activity Widget
+                    let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySize: UserDefaults.standard.liveActivitySize, dataSourceDescription: dataSourceDescription)
+                    
+                    LiveActivityManager.shared.runActivity(contentState: contentState, forceRestart: forceRestart)
                 } else {
                     LiveActivityManager.shared.endAllActivities()
                 }
-                WidgetCenter.shared.reloadAllTimelines()
+                
+                // update the widget data stored in user defaults
+                let bgReadingDatesAsDouble = bgReadingDates.map { date in
+                    date.timeIntervalSince1970
+                }
+                
+                let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, dataSourceDescription: dataSourceDescription, keepAliveImageString: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImageString : nil)
+                
+                // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
+                // the user's device - this allows several copies of the app to be installed without cross-contamination of widget data
+                if let widgetData = try? JSONEncoder().encode(widgetSharedUserDefaultsModel) {
+                    UserDefaults.storeInSharedUserDefaults(value: widgetData, forKey: "widgetSharedUserDefaults.\(Bundle.main.mainAppBundleIdentifier)")
+                }
+            } else {
+                LiveActivityManager.shared.endAllActivities()
             }
+            WidgetCenter.shared.reloadAllTimelines()
         }
     }
 
