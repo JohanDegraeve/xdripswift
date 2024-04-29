@@ -165,7 +165,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
                     return ""
                 }
             } else {
-                return "\u{2194}"
+                return ""
             }
         }
     }
