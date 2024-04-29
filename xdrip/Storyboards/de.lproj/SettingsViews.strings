@@ -173,9 +173,6 @@
 /// name of setting for text color
 "m5stack_settingsviews_textColor" = "Text Color";
 
-/// home screen settings, use objectives in graph
-"settingsviews_useobjectives" = "Objekte im Diagram anzeigen";
-
 /// nightscout settings, where user can set the nightscout api key
 "settingsviews_nightScoutAPIKey" = "API_SECRET";
 

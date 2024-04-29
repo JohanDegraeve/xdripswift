@@ -20,7 +20,6 @@
 "settingsviews_targetValue" = "Τιμή στόχου";
 "settingsviews_lowValue" = "Χαμηλή γλυκόζη";
 "settingsviews_urgentLowValue" = "Επείγον Χαμηλή γλυκόζη";
-"settingsviews_useobjectives" = "Εμφάνιση στόχων στο γράφημα;";
 "settingsviews_showcoloredobjectives" = "Εμφάνιση έγχρωμων γραμμών;";
 "settingsviews_showtarget" = "Εμφάνιση γραμμής στόχου;";
 "settingsviews_sectiontitletreatments" = "Θεραπείες";

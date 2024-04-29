@@ -88,8 +88,6 @@ extension UserDefaults {
         case showClockWhenScreenIsLocked = "showClockWhenScreenIsLocked"
         /// how (and if) the screen should be dimmed when screen lock is enabled
         case screenLockDimmingType = "screenLockDimmingType"
-        /// show the objectives and make them display on the graph? Or just hide it all because it's too complicated to waste time with?
-        case useObjectives = "useObjectives"
         /// show the objective lines in color or grey?
         case urgentHighMarkValue = "urgentHighMarkValue"
         /// high value
@@ -982,17 +980,6 @@ extension UserDefaults {
                 UserDefaults.storeInSharedUserDefaults(value: value, forKey: Key.urgentLowMarkValue.rawValue)
             }
 
-        }
-    }
-    
-    /// should we use objectives for the BG values and graph lines etc?
-    @objc dynamic var useObjectives: Bool {
-        // default value for bool in userdefaults is false, by default we want the objective-based graph to be disabled so as not to scare anybody. They can enable it when they have time to understand it.
-        get {
-            return !bool(forKey: Key.useObjectives.rawValue)
-        }
-        set {
-            set(!newValue, forKey: Key.useObjectives.rawValue)
         }
     }
     

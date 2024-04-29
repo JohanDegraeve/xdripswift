@@ -144,7 +144,7 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
     
     func numberOfRows() -> Int {
         
-        // if the user doesn't want to see the objectives on the graph, then hide the options, the same applies to the Show Target option
+        // if the user doesn't want to see the statistics, then hide the options
         if UserDefaults.standard.showStatistics {
             return Setting.allCases.count
         } else {

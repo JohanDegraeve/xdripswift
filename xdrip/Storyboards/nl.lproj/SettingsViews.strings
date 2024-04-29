@@ -17,7 +17,6 @@
 "settingsviews_targetValue" = "Doel Waarde";
 "settingsviews_lowValue" = "Lage Waarde";
 "settingsviews_urgentLowValue" = "Urgent Lage Waarde";
-"settingsviews_useobjectives" = "Toon Doelen in Grafiek";
 "settingsviews_showcoloredobjectives" = "Toon Gekleurde Lijnen";
 "settingsviews_showtarget" = "Toon Doel Lijn";
 "settingsviews_sectiontitlestatistics" = "Statistieken";

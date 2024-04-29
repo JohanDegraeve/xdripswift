@@ -45,10 +45,7 @@ enum ConstantsGlucoseChart {
     /// axis line label for any values that we don't need to display
     static let axisLabelColorHidden = UIColor.clear
     
-    /// grid color to use if useObjectives is not enabled
-    static let gridColor = UIColor.darkGray
-    
-    /// grid color to use if useObjectives is enabled
+    /// grid color
     static let gridColorObjectives = UIColor.darkGray.withAlphaComponent(0.5)
     
     // objective/target range guidelines. Will use either standard gray or colored lines

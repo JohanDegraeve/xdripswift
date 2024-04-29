@@ -22,26 +22,23 @@ fileprivate enum Setting:Int, CaseIterable {
     // show a fixed scale mini-chart under the main scrollable chart?
     case showMiniChart = 3
     
+    //show target line?
+    case showTarget = 4
+    
     //urgent high value
-    case urgentHighMarkValue = 4
+    case urgentHighMarkValue = 5
     
     //high value
-    case highMarkValue = 5
-    
-    //low value
-    case lowMarkValue = 6
-    
-    //urgent low value
-    case urgentLowMarkValue = 7
-    
-    //use objectives in graph?
-    case useObjectives = 8
-    
-    //show target line?
-    case showTarget = 9
+    case highMarkValue = 6
     
     //target value
-    case targetMarkValue = 10
+    case targetMarkValue = 7
+    
+    //low value
+    case lowMarkValue = 8
+    
+    //urgent low value
+    case urgentLowMarkValue = 9
     
 }
 
@@ -62,9 +59,6 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
             
         case .showMiniChart:
             return UISwitch(isOn: UserDefaults.standard.showMiniChart, action: {(isOn:Bool) in UserDefaults.standard.showMiniChart = isOn})
-            
-        case .useObjectives:
-            return UISwitch(isOn: UserDefaults.standard.useObjectives, action: {(isOn:Bool) in UserDefaults.standard.useObjectives = isOn})
             
         case .showTarget :
             return UISwitch(isOn: UserDefaults.standard.showTarget, action: {(isOn:Bool) in UserDefaults.standard.showTarget = isOn})
@@ -102,6 +96,9 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
             
         case .highMarkValue:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelHighValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.highMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultHighMarkInMgdl.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(highMarkValue:String) in UserDefaults.standard.highMarkValueInUserChosenUnitRounded = highMarkValue}, cancelHandler: nil, inputValidator: nil)
+            
+        case .targetMarkValue:
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelTargetValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.targetMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultTargetMarkInMgdl.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(targetMarkValue:String) in UserDefaults.standard.targetMarkValueInUserChosenUnitRounded = targetMarkValue}, cancelHandler: nil, inputValidator: nil)
             
         case .lowMarkValue:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelLowValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.lowMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultLowMarkInMgdl.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(lowMarkValue:String) in UserDefaults.standard.lowMarkValueInUserChosenUnitRounded = lowMarkValue}, cancelHandler: nil, inputValidator: nil)
@@ -170,15 +167,6 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
                 }
             })
             
-        case .useObjectives:
-            return SettingsSelectedRowAction.callFunction(function: {
-                if UserDefaults.standard.useObjectives {
-                    UserDefaults.standard.useObjectives = false
-                } else {
-                    UserDefaults.standard.useObjectives = true
-                }
-            })
-            
         case .showTarget:
             return SettingsSelectedRowAction.callFunction(function: {
                 if UserDefaults.standard.showTarget {
@@ -187,9 +175,6 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
                     UserDefaults.standard.showTarget = true
                 }
             })
-            
-        case .targetMarkValue:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelTargetValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.targetMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultTargetMarkInMgdl.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(targetMarkValue:String) in UserDefaults.standard.targetMarkValueInUserChosenUnitRounded = targetMarkValue}, cancelHandler: nil, inputValidator: nil)
         }
     }
     
@@ -198,33 +183,13 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
     }
     
     func numberOfRows() -> Int {
-        
-        // if the user doesn't want to see the objectives on the graph, then hide the options, the same applies to the Show Target option
-        if UserDefaults.standard.useObjectives && UserDefaults.standard.showTarget {
-            return Setting.allCases.count
-        } else if UserDefaults.standard.useObjectives && !UserDefaults.standard.showTarget {
-            return Setting.allCases.count - 1
-        } else {
-            return Setting.allCases.count - 2
-        }
+        return Setting.allCases.count
     }
     
     func settingsRowText(index: Int) -> String {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-            
-        case .urgentHighMarkValue:
-            return Texts_SettingsView.labelUrgentHighValue
-            
-        case .highMarkValue:
-            return Texts_SettingsView.labelHighValue
-            
-        case .lowMarkValue:
-            return Texts_SettingsView.labelLowValue
-            
-        case .urgentLowMarkValue:
-            return Texts_SettingsView.labelUrgentLowValue
             
         case .allowScreenRotation:
             return Texts_SettingsView.allowScreenRotation
@@ -238,14 +203,23 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .showMiniChart:
             return Texts_SettingsView.showMiniChart
             
-        case .useObjectives:
-            return Texts_SettingsView.labelUseObjectives
-            
         case .showTarget:
             return Texts_SettingsView.labelShowTarget
             
+        case .urgentHighMarkValue:
+            return "🔴 " + Texts_SettingsView.labelUrgentHighValue
+            
+        case .highMarkValue:
+            return "🟡 " + Texts_SettingsView.labelHighValue
+            
         case .targetMarkValue:
-            return Texts_SettingsView.labelTargetValue
+            return "🟢 " + Texts_SettingsView.labelTargetValue
+            
+        case .lowMarkValue:
+            return "🟡 " + Texts_SettingsView.labelLowValue
+            
+        case .urgentLowMarkValue:
+            return "🔴 " + Texts_SettingsView.labelUrgentLowValue
         }
     }
     
@@ -257,7 +231,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .lowMarkValue, .urgentLowMarkValue, .targetMarkValue:
             return UITableViewCell.AccessoryType.disclosureIndicator
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .useObjectives, .showTarget:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .showTarget:
             return UITableViewCell.AccessoryType.none
             
         }
@@ -274,19 +248,19 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .highMarkValue:
             return UserDefaults.standard.highMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
+        case .targetMarkValue:
+            return UserDefaults.standard.targetMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            
         case .lowMarkValue:
             return UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
         case .urgentLowMarkValue:
             return UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
-        case .targetMarkValue:
-            return UserDefaults.standard.targetMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-            
         case .screenLockDimmingType:
             return UserDefaults.standard.screenLockDimmingType.description
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .useObjectives, .showTarget:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .showTarget:
             return nil
             
         }

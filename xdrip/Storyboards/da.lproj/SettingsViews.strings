@@ -19,7 +19,6 @@
 "settingsviews_targetValue" = "Target Value";
 "settingsviews_lowValue" = "Low Value";
 "settingsviews_urgentLowValue" = "Urgent Low Value";
-"settingsviews_useobjectives" = "Show Objectives in Graph";
 "settingsviews_showcoloredobjectives" = "Show Colored Lines";
 "settingsviews_showtarget" = "Show Target Line";
 "settingsviews_sectiontitletreatments" = "Treatments";

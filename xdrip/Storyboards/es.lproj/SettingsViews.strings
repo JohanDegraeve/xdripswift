@@ -42,7 +42,6 @@
 "settingsviews_targetValue" = "Valor Objectivo";
 "settingsviews_lowValue" = "Valor de Glucemia Baja";
 "settingsviews_urgentLowValue" = "Valor de Glucemia Baja (Urgente)";
-"settingsviews_useobjectives" = "Mostrar Objetivos";
 "settingsviews_showcoloredobjectives" = "Mostrar Colores";
 "settingsviews_showtarget" = "Mostrar Línea Target";
 "settingsviews_sectiontitletreatments" = "Tratamientos";
