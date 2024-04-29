@@ -366,6 +366,8 @@ extension UserDefaults {
 
         // development settings
         
+        /// show Developer Settings
+        case showDeveloperSettings = "showDeveloperSettings"
         /// G6 factor1 - for testing G6 scaling
         case G6v2ScalingFactor1 = "G6v2ScalingFactor1"
         /// G6 factor2 - for testing G6 scaling
@@ -1970,6 +1972,17 @@ extension UserDefaults {
     
     
     // MARK: - =====  Developer Settings ======
+    
+    /// showDeveloperSettings - default false
+    /// we'll reset this to false anyway every time the app is opened
+    var showDeveloperSettings: Bool {
+        get {
+            return bool(forKey: Key.showDeveloperSettings.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.showDeveloperSettings.rawValue)
+        }
+    }
     
     /// OSLogEnabled - default false
     var OSLogEnabled: Bool {

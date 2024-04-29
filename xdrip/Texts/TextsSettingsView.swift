@@ -807,6 +807,10 @@ class Texts_SettingsView {
     static let shareToLoopOnceEvery5Minutes: String = {
         return NSLocalizedString("shareToLoopOnceEvery5Minutes", tableName: filename, bundle: Bundle.main, value: "Share to Loop every 5 mins", comment: "Should loop data be shared only every 5 minutes")
     }()
+    
+    static let showDeveloperSettings: String = {
+        return NSLocalizedString("showDeveloperSettings", tableName: filename, bundle: Bundle.main, value: "Show Developer Settings", comment: "developer settings, show them or hide them")
+    }()
 
     static let nsLog: String = {
         return NSLocalizedString("nslog", tableName: filename, bundle: Bundle.main, value: "NSLog", comment: "developer settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog")
