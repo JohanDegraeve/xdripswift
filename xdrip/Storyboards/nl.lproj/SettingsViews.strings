@@ -96,6 +96,11 @@
 "warningChangeFromMasterToFollower" = "Wisselen van Master naar Volger stopt de huidige sensor. Wil je doorgaan ?";
 "nightScoutPort" = "Port";
 
+"appleWatchShowDataInComplications" = "Toon waardes in complicaties";
+"appleWatchShowDataInComplicationsMessage" = "Apple Watch complicaties zijn niet up-to-date. Updates gebeuren 2 tot 3 keer per uur.\n\nREKEN NIET op waardes in de complicaties.\n\nOm up-to-date waardes te zien, open de %@ Watch app.\n\nKlik 'OK' als je dit begrijpt en aanvaardt.";
+"appleWatchComplicationUserAgreementDate" = "Gebruikersovereenkomst";
+"appleWatchRemainingComplicationUserInfoTransfers" = "Overblijvende complicatie updates";
+
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
