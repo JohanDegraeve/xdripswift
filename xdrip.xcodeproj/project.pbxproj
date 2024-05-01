@@ -64,6 +64,7 @@
 		47503382247420A200D2260B /* BluetoothPeripheralView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 47503384247420A200D2260B /* BluetoothPeripheralView.strings */; };
 		4752B400263570DA0081D551 /* ConstantsStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */; };
 		4752B4062635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */; };
+		476698662BE2572C008EB2A9 /* ConstantsSettingsIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */; };
 		4767BDD62BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4767BDD52BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift */; };
 		476CAF792B9F6A7200743168 /* ComplicationSharedUserDefaultsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474606632B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift */; };
 		476FA90C2BDC1EBA0091866C /* WatchComplication.strings in Resources */ = {isa = PBXBuildFile; fileRef = 476FA90A2BDC1EBA0091866C /* WatchComplication.strings */; };
@@ -883,6 +884,7 @@
 		4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsStatistics.swift; sourceTree = "<group>"; };
 		4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewStatisticsSettingsViewModel.swift; sourceTree = "<group>"; };
 		475DED96244AF92A00F78473 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Alerts.strings; sourceTree = "<group>"; };
+		476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSettingsIcons.swift; sourceTree = "<group>"; };
 		4767BDD52BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewAppleWatchSettingsViewModel.swift; sourceTree = "<group>"; };
 		476FA90B2BDC1EBA0091866C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/WatchComplication.strings; sourceTree = "<group>"; };
 		476FA90D2BDC1EF80091866C /* TextsWatchComplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsWatchComplication.swift; sourceTree = "<group>"; };
@@ -3186,6 +3188,7 @@
 				F8AF36142455C6F700B5977B /* ConstantsTrace.swift */,
 				F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */,
 				47930E812BC5A001000BD8A1 /* ConstantsWidget.swift */,
+				476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */,
 			);
 			name = Constants;
 			path = xdrip/Constants;
@@ -4194,6 +4197,7 @@
 				F8F71D862B7EC1AD005076E8 /* DexcomG7+BluetoothPeripheral.swift in Sources */,
 				47046EA42A6E8BA700A6F736 /* TextsBgReadings.swift in Sources */,
 				F8E0475E28CC8E330049D8C9 /* GlucoseData+LoopShare.swift in Sources */,
+				476698662BE2572C008EB2A9 /* ConstantsSettingsIcons.swift in Sources */,
 				F85542322B7573D20058CE09 /* OmniPodHeartBeat+CoreDataClass.swift in Sources */,
 				F816E1002436734C009EE65B /* CGMGNSEntryTransmitterDelegate.swift in Sources */,
 				F82842322752CBE00097E0C9 /* DexcomSessionStopTxMessage.swift in Sources */,

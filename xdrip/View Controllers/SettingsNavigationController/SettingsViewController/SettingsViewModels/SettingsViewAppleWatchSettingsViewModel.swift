@@ -94,7 +94,7 @@ class SettingsViewAppleWatchSettingsViewModel: NSObject, SettingsViewModelProtoc
     }
     
     func sectionTitle() -> String? {
-        return "⌚️ " + Texts_SettingsView.appleWatchSectionTitle
+        return ConstantsSettingsIcons.appleWatchSettingsIcon + " " + Texts_SettingsView.appleWatchSectionTitle
     }
     
     func numberOfRows() -> Int {

@@ -53,7 +53,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
     }
 
     func sectionTitle() -> String? {
-        return "👨🏻‍💻 " + Texts_SettingsView.developerSettings
+        return ConstantsSettingsIcons.developerSettingsIcon + " " + Texts_SettingsView.developerSettings
     }
     
     func settingsRowText(index: Int) -> String {

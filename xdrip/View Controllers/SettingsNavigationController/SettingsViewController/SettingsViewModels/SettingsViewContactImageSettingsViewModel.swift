@@ -30,7 +30,7 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
     func sectionTitle() -> String? {
-        return "☎️ " + Texts_SettingsView.contactImageSectionTitle
+        return ConstantsSettingsIcons.contactImageSettingsIcon + " " + Texts_SettingsView.contactImageSectionTitle
     }
     
     func settingsRowText(index: Int) -> String {

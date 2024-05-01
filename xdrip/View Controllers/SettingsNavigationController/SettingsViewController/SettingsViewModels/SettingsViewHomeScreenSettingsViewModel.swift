@@ -179,7 +179,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return "📈 " + Texts_SettingsView.sectionTitleHomeScreen
+        return ConstantsSettingsIcons.homeScreenSettingsIcon + " " + Texts_SettingsView.sectionTitleHomeScreen
     }
     
     func numberOfRows() -> Int {

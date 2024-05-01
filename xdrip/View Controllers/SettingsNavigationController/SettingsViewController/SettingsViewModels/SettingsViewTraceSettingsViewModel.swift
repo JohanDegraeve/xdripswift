@@ -43,7 +43,7 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return "📤 " + Texts_SettingsView.sectionTitleTrace
+        return ConstantsSettingsIcons.traceSettingsIcon + " " + Texts_SettingsView.sectionTitleTrace
     }
     
     func settingsRowText(index: Int) -> String {
