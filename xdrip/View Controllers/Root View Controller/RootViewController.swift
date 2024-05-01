@@ -3530,7 +3530,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 let dataSourceDescription = UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "" : UserDefaults.standard.followerDataSourceType.fullDescription
                 
-                var showLiveActivity: Bool = true //UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)
+                var showLiveActivity: Bool = UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)
                 
                 if showLiveActivity {
                     // now that we've got the current BG value, let's refine the check to see if we should run/show the live activity
