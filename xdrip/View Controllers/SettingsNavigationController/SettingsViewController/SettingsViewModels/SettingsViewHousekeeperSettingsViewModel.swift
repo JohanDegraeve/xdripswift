@@ -34,7 +34,7 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
     }
 	
 	func sectionTitle() -> String? {
-		return Texts_SettingsView.sectionTitleHousekeeper;
+		return "💾 " + Texts_SettingsView.sectionTitleHousekeeper;
 	}
 	
 	func settingsRowText(index: Int) -> String {

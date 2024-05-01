@@ -173,7 +173,7 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
     }
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.sectionTitleNotifications
+        return "📢 " + Texts_SettingsView.sectionTitleNotifications
     }
 
     func numberOfRows() -> Int {
