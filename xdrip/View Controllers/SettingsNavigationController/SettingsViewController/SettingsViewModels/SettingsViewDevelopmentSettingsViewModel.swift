@@ -147,7 +147,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                 // this is a bit messy, but seems to be the best way to reset the setting to false
                 // this will usually happen when the view is not on screen anyway
                 if isOn {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 60) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 120) {
                         UserDefaults.standard.showDeveloperSettings = false
                         self.sectionReloadClosure?()
                     }

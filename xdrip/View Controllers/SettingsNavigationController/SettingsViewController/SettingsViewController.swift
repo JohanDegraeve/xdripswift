@@ -59,9 +59,6 @@ final class SettingsViewController: UIViewController {
         /// store bg values in healthkit
         case speak
         
-        /// M5 stack settings
-        case M5stack
-        
         /// Apple Watch settings
         case appleWatch
         
@@ -72,7 +69,10 @@ final class SettingsViewController: UIViewController {
         case contactImage
         
         /// housekeeper settings
-        case housekeeper
+        // case housekeeper // let's leave this out for now until an import function is added
+        
+        /// M5 stack settings
+        case M5stack
         
         /// tracing
         case trace
@@ -118,8 +118,8 @@ final class SettingsViewController: UIViewController {
                 return SettingsViewCalendarEventsSettingsViewModel()
             case .contactImage:
                 return SettingsViewContactImageSettingsViewModel()
-            case .housekeeper:
-                return SettingsViewHousekeeperSettingsViewModel(coreDataManager: coreDataManager)
+//            case .housekeeper:
+//                return SettingsViewHousekeeperSettingsViewModel(coreDataManager: coreDataManager)
             case .trace:
                 return SettingsViewTraceSettingsViewModel()
             case .info:
