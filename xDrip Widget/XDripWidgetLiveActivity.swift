@@ -151,7 +151,7 @@ struct XDripWidgetLiveActivity: Widget {
                                 .font(.caption)
                                 .foregroundStyle(.colorTertiary)
                         }
-                        .padding(.top, 2)
+                        .padding(.top, 6)
                         .padding(.bottom, 10)
                         .padding(.leading, 15)
                         .padding(.trailing, 15)
