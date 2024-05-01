@@ -46,6 +46,7 @@
 "settingsviews_urgentHighValue" = "Urgent High Value";
 "settingsviews_highValue" = "High Value";
 "settingsviews_targetValue" = "Target Value";
+"settingsviews_targetValueMessage" = "Set to 0 to disable the target";
 "settingsviews_lowValue" = "Low Value";
 "settingsviews_urgentLowValue" = "Urgent Low Value";
 "settingsviews_showcoloredobjectives" = "Show Colored Lines";

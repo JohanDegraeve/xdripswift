@@ -265,23 +265,27 @@ class Texts_SettingsView {
     }()
 
     static let labelUrgentHighValue: String = {
-        return NSLocalizedString("settingsviews_urgentHighValue", tableName: filename, bundle: Bundle.main, value: "Urgent High Value:", comment: "home screen settings, urgent high value")
+        return NSLocalizedString("settingsviews_urgentHighValue", tableName: filename, bundle: Bundle.main, value: "Urgent High Value", comment: "home screen settings, urgent high value")
     }()
     
     static let labelHighValue: String = {
-        return NSLocalizedString("settingsviews_highValue", tableName: filename, bundle: Bundle.main, value: "High Value:", comment: "home screen settings, high value")
+        return NSLocalizedString("settingsviews_highValue", tableName: filename, bundle: Bundle.main, value: "High Value", comment: "home screen settings, high value")
     }()
     
     static let labelTargetValue: String = {
-        return NSLocalizedString("settingsviews_targetValue", tableName: filename, bundle: Bundle.main, value: "Target Value:", comment: "home screen settings, target value")
+        return NSLocalizedString("settingsviews_targetValue", tableName: filename, bundle: Bundle.main, value: "Target Value", comment: "home screen settings, target value")
+    }()
+    
+    static let targetValueMessage: String = {
+        return NSLocalizedString("settingsviews_targetValueMessage", tableName: filename, bundle: Bundle.main, value: "Set to 0 to disable the target", comment: "home screen settings, target value can be disabled by making this value zero")
     }()
     
     static let labelLowValue: String = {
-        return NSLocalizedString("settingsviews_lowValue", tableName: filename, bundle: Bundle.main, value: "Low Value:", comment: "home screen settings, low value")
+        return NSLocalizedString("settingsviews_lowValue", tableName: filename, bundle: Bundle.main, value: "Low Value", comment: "home screen settings, low value")
     }()
     
     static let labelUrgentLowValue: String = {
-        return NSLocalizedString("settingsviews_urgentLowValue", tableName: filename, bundle: Bundle.main, value: "Urgent Low Value:", comment: "home screen settings, urgent low value")
+        return NSLocalizedString("settingsviews_urgentLowValue", tableName: filename, bundle: Bundle.main, value: "Urgent Low Value", comment: "home screen settings, urgent low value")
     }()
     
     static let labelShowTarget: String = {

@@ -793,10 +793,6 @@ extension UserDefaults {
         get {
             //read currentvalue in mgdl
             var returnValue = double(forKey: Key.targetMarkValue.rawValue)
-            // if 0 set to defaultvalue
-            if returnValue == 0.0 {
-                returnValue = ConstantsBGGraphBuilder.defaultTargetMarkInMgdl
-            }
             if !bloodGlucoseUnitIsMgDl {
                 returnValue = returnValue.mgdlToMmol()
             }

@@ -22,23 +22,20 @@ fileprivate enum Setting:Int, CaseIterable {
     // show a fixed scale mini-chart under the main scrollable chart?
     case showMiniChart = 3
     
-    //show target line?
-    case showTarget = 4
-    
     //urgent high value
-    case urgentHighMarkValue = 5
+    case urgentHighMarkValue = 4
     
     //high value
-    case highMarkValue = 6
+    case highMarkValue = 5
     
     //target value
-    case targetMarkValue = 7
+    case targetMarkValue = 6
     
     //low value
-    case lowMarkValue = 8
+    case lowMarkValue = 7
     
     //urgent low value
-    case urgentLowMarkValue = 9
+    case urgentLowMarkValue = 8
     
 }
 
@@ -59,9 +56,6 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
             
         case .showMiniChart:
             return UISwitch(isOn: UserDefaults.standard.showMiniChart, action: {(isOn:Bool) in UserDefaults.standard.showMiniChart = isOn})
-            
-        case .showTarget :
-            return UISwitch(isOn: UserDefaults.standard.showTarget, action: {(isOn:Bool) in UserDefaults.standard.showTarget = isOn})
             
         case  .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .targetMarkValue, .lowMarkValue, .urgentLowMarkValue:
             return nil
@@ -98,7 +92,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelHighValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.highMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultHighMarkInMgdl.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(highMarkValue:String) in UserDefaults.standard.highMarkValueInUserChosenUnitRounded = highMarkValue}, cancelHandler: nil, inputValidator: nil)
             
         case .targetMarkValue:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelTargetValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.targetMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultTargetMarkInMgdl.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(targetMarkValue:String) in UserDefaults.standard.targetMarkValueInUserChosenUnitRounded = targetMarkValue}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelTargetValue, message: Texts_SettingsView.targetValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.targetMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultTargetMarkInMgdl.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(targetMarkValue:String) in UserDefaults.standard.targetMarkValueInUserChosenUnitRounded = targetMarkValue}, cancelHandler: nil, inputValidator: nil)
             
         case .lowMarkValue:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelLowValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.lowMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultLowMarkInMgdl.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(lowMarkValue:String) in UserDefaults.standard.lowMarkValueInUserChosenUnitRounded = lowMarkValue}, cancelHandler: nil, inputValidator: nil)
@@ -166,15 +160,6 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
                     UserDefaults.standard.showMiniChart = true
                 }
             })
-            
-        case .showTarget:
-            return SettingsSelectedRowAction.callFunction(function: {
-                if UserDefaults.standard.showTarget {
-                    UserDefaults.standard.showTarget = false
-                } else {
-                    UserDefaults.standard.showTarget = true
-                }
-            })
         }
     }
     
@@ -203,9 +188,6 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .showMiniChart:
             return Texts_SettingsView.showMiniChart
             
-        case .showTarget:
-            return Texts_SettingsView.labelShowTarget
-            
         case .urgentHighMarkValue:
             return "🔴 " + Texts_SettingsView.labelUrgentHighValue
             
@@ -231,7 +213,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .lowMarkValue, .urgentLowMarkValue, .targetMarkValue:
             return UITableViewCell.AccessoryType.disclosureIndicator
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .showTarget:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart:
             return UITableViewCell.AccessoryType.none
             
         }
@@ -249,7 +231,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
             return UserDefaults.standard.highMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
         case .targetMarkValue:
-            return UserDefaults.standard.targetMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            return UserDefaults.standard.targetMarkValueInUserChosenUnit == 0 ? Texts_Common.disabled : UserDefaults.standard.targetMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
         case .lowMarkValue:
             return UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
@@ -260,7 +242,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .screenLockDimmingType:
             return UserDefaults.standard.screenLockDimmingType.description
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .showTarget:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart:
             return nil
             
         }

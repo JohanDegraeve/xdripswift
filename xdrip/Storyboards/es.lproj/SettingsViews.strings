@@ -40,6 +40,7 @@
 "settingsviews_urgentHighValue" = "Valor de Glucemia Alta (Urgente)";
 "settingsviews_highValue" = "Valor de Glucemia Alta";
 "settingsviews_targetValue" = "Valor Objectivo";
+"settingsviews_targetValueMessage" = "Usar 0 para deshabilitar el valor objectivo en la gráfica";
 "settingsviews_lowValue" = "Valor de Glucemia Baja";
 "settingsviews_urgentLowValue" = "Valor de Glucemia Baja (Urgente)";
 "settingsviews_showcoloredobjectives" = "Mostrar Colores";

@@ -137,6 +137,8 @@
 /// home screen settings, target value
 "settingsviews_targetValue" = "Zielwert";
 
+"settingsviews_targetValueMessage" = "Setze auf 0 um Zielwert zu deaktivieren";
+
 /// home screen settings, show target line
 "settingsviews_showtarget" = "Zielwert Linie anzeigen";
 

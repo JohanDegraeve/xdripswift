@@ -602,8 +602,8 @@ public class GlucoseChartManager {
         
         yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsObjectives) as ChartAxisValue]
         
-        // if the user is showing the Target guideline, then let's label that too
-        if UserDefaults.standard.showTarget {
+        // if the user has set the target value > 0, then enable the label too
+        if UserDefaults.standard.targetMarkValueInUserChosenUnit > 0 {
             yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.targetMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsTarget) as ChartAxisValue]
         }
         
@@ -733,7 +733,7 @@ public class GlucoseChartManager {
         
         let highLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineHighLow, linesWidth: 1, dotWidth: 4, dotSpacing: 4)
         
-        let targetLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineTargetColor, linesWidth: UserDefaults.standard.showTarget ? 1 : 0, dotWidth: 12, dotSpacing: 6)
+        let targetLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineTargetColor, linesWidth: UserDefaults.standard.targetMarkValueInUserChosenUnit > 0 ? 1 : 0, dotWidth: 12, dotSpacing: 6)
         
         // high/low/target guidelines
         let urgentHighLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: urgentHighLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.urgentHighMarkValueInUserChosenUnit)])

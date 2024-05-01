@@ -689,6 +689,13 @@ final class RootViewController: UIViewController, ObservableObject {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // from 5.2.0 the showTarget userdefault will be deprecated
+        // showTarget will not be checked by the app any more, it will use targetMarkValue
+        // targetMarkValue == 0 for disabled (hide) or targetMarkValue > 0 for enabled (show)
+        if !UserDefaults.standard.showTarget {
+            UserDefaults.standard.targetMarkValueInUserChosenUnit = 0
+        }
+        
         // if the user requested to hide the help icon on the main screen, then remove it (and the flexible space next to it)
         // this is because we keep the help icon as the last one in the toolbar item array.
         if !UserDefaults.standard.showHelpIcon {
