@@ -105,6 +105,7 @@
 
 /// home screen settings, target value
 "settingsviews_targetValue" = "Valeur cible";
+"settingsviews_targetValueMessage" = "Mettre à 0 pour désactiver l'objectif";
 
 /// home screen settings, show target line
 "settingsviews_showtarget" = "Montrer la ligne Cible";
