@@ -105,6 +105,7 @@
 
 /// home screen settings, target value
 "settingsviews_targetValue" = "Valeur cible";
+"settingsviews_targetValueMessage" = "Mettre à 0 pour désactiver l'objectif";
 
 /// home screen settings, show target line
 "settingsviews_showtarget" = "Montrer la ligne Cible";
@@ -120,9 +121,6 @@
 
 /// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for sound player volume test
 "volumeTestSoundPlayerExplanation" = "Le son d'une alarme est joué actuellement avec le même volume que celui qui sera utilisé pour le type d'alarme avec 'Ignorer Mode Silencieux' = On\n\n(Utilisé pour toutes les alarmes à l'exception de l'alarme Lecture manquante).\n\n Presser l'un des boutons Volume pour arrêter, puis changer le volume avec les boutons au niveau souhaité et tester à nouveau";
-
-/// home screen settings, use objectives in graph
-"settingsviews_useobjectives" = "Montrer les valeurs cibles ";
 
 /// 
 "settingsviews_showcoloredobjectives" = "Montrer les lignes colorées ";
@@ -340,3 +338,8 @@
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+"appleWatchShowDataInComplications" = "Afficher les valeurs...";
+"appleWatchShowDataInComplicationsMessage" = "Veuillez noter que les complications de l'Apple Watch ne seront pas mises à jour en temps réel. Elles ne le seront que 2 à 3 fois par heure.\n\nNe vous fiez PAS des valeurs de la complication pour prendre des décisions de traitement.\n\nPour les valeurs en temps réel, ouvrez l'application %@ Watch.\n\nCliquez sur 'OK' uniquement si vous comprenez et vous êtes d'accord.";
+"appleWatchComplicationUserAgreementDate" = "Contrat d'utilisateur";
+"appleWatchRemainingComplicationUserInfoTransfers" = "Mises à jour de complication restantes";

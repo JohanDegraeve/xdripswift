@@ -18,7 +18,7 @@ struct InfoView: View {
         
         let textSize: CGFloat = isSmallScreen ? 12 : 14
         
-        HStack(spacing: 2) {
+        HStack(spacing: 0) {
             Text(watchState.lastUpdatedTextString)
                 .font(.system(size: textSize))
                 .foregroundStyle(.gray)

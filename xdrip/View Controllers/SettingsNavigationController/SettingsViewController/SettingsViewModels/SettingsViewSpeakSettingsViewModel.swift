@@ -81,7 +81,7 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.sectionTitleSpeak
+        return ConstantsSettingsIcons.speakSettingsIcon + " " + Texts_SettingsView.sectionTitleSpeak
     }
 
     func numberOfRows() -> Int {

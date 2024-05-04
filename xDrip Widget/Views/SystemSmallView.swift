@@ -36,20 +36,21 @@ extension XDripWidget.EntryView {
                 if let keepAliveImageString = entry.widgetState.keepAliveImageString {
                     Image(systemName: keepAliveImageString)
                         .font(.caption)
-                        .foregroundStyle(Color(white: 0.6))
+                        .foregroundStyle(.colorTertiary)
                         .padding(.trailing, -4)
                 }
                     
                 Text(entry.widgetState.dataSourceDescription)
-                    .font(.system(size: 11)).bold()
-                    .foregroundStyle(Color(white: 0.8))
+                    .font(.caption).bold()
+                    .foregroundStyle(.colorSecondary)
                 
                 Spacer()
                 
                 Text("\(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Color(white: 0.6))
+                    .font(.caption)
+                    .foregroundStyle(.colorTertiary)
             }
+            .padding(.top, 6)
         }
         .widgetBackground(backgroundView: Color.black)
     }

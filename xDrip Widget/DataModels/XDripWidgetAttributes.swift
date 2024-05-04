@@ -6,6 +6,7 @@
 //  Copyright © 2023 Johan Degraeve. All rights reserved.
 //
 
+import Foundation
 import ActivityKit
 import WidgetKit
 import SwiftUI
@@ -32,6 +33,14 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var bgReadingDates: [Date] {
             secondsSinceFirstDate.map { Date(timeInterval: Double($0), since: firstDate) }
         }
+        
+        // For some reason, ActivityAttributes can't see the main target Assets folder
+        // so we'll just duplicate the colors here for now
+        // We have to store just the float value instead of the whole Color object to
+        // keep the struct conforming to Codable
+        private var colorPrimaryWhiteValue: Double = 0.9
+        private var colorSecondaryWhiteValue: Double = 0.65
+        private var colorTertiaryWhiteValue: Double = 0.45
 
         var isMgDl: Bool
         var slopeOrdinal: Int
@@ -58,7 +67,11 @@ struct XDripWidgetAttributes: ActivityAttributes {
         }
 
         var bgValueStringInUserChosenUnit: String {
-            bgReadingValues[0].mgdlToMmolAndToString(mgdl: isMgDl)
+            if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-ConstantsWidgetExtension.bgReadingDateVeryStaleInMinutes) {
+                bgReadingValues[0].mgdlToMmolAndToString(mgdl: isMgDl)
+            } else {
+                isMgDl ? "---" : "-.-"
+            }
         }
 
         init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySize: LiveActivitySize, dataSourceDescription: String? = "") {
@@ -84,36 +97,36 @@ struct XDripWidgetAttributes: ActivityAttributes {
         /// - Returns: a Color object either red, yellow or green
         func bgTextColor() -> Color {
             if let bgReadingDate = bgReadingDate, let bgValueInMgDl = bgValueInMgDl {
-                if bgReadingDate > Date().addingTimeInterval(-60 * 7) {
+                if bgReadingDate > Date().addingTimeInterval(-ConstantsWidgetExtension.bgReadingDateStaleInMinutes) {
                     if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
-                        return Color(.red)
+                        return .red
                     } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
-                        return Color(.yellow)
+                        return .yellow
                     } else {
-                        return Color(.green)
+                        return .green
                     }
                 } else {
-                    return Color.gray
+                    return Color(white: colorTertiaryWhiteValue)
                 }
             } else {
-                return Color.gray
+                return Color(white: colorTertiaryWhiteValue)
             }
         }
         
         /// Delta text color dependant on the time since the last reading
-        /// - Returns: a Color either red, yellow or green
+        /// - Returns: a Color either white(ish) or gray
         func deltaChangeTextColor() -> Color {
-            if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-60 * 7) {
-                return Color(white: 0.8)
+            if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-ConstantsWidgetExtension.bgReadingDateStaleInMinutes) {
+                return Color(white: colorPrimaryWhiteValue)
             } else {
-                return Color(.gray)
+                return Color(white: colorTertiaryWhiteValue)
             }
         }
         
         /// convert the optional delta change int (in mg/dL) to a formatted change value in the user chosen unit making sure all zero values are shown as a positive change to follow Nightscout convention
         /// - Returns: a string holding the formatted delta change value (i.e. +0.4 or -6)
         func deltaChangeStringInUserChosenUnit() -> String {
-            if let deltaChangeInMgDl = deltaChangeInMgDl {
+            if let deltaChangeInMgDl = deltaChangeInMgDl, let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-ConstantsWidgetExtension.bgReadingDateVeryStaleInMinutes) {
                 let deltaSign: String = deltaChangeInMgDl > 0 ? "+" : ""
                 let valueAsString = deltaChangeInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
                 
@@ -125,29 +138,33 @@ struct XDripWidgetAttributes: ActivityAttributes {
                     return (deltaChangeInMgDl > -0.1 && deltaChangeInMgDl < 0.1) ? "+0.0" : (deltaSign + valueAsString)
                 }
             } else {
-                return ""
+                return isMgDl ? "-" : "-.-"
             }
         }
         
         ///  returns a string holding the trend arrow
         /// - Returns: trend arrow string (i.e.  "↑")
         func trendArrow() -> String {
-            switch slopeOrdinal {
-            case 7:
-                return "\u{2193}\u{2193}" // ↓↓
-            case 6:
-                return "\u{2193}" // ↓
-            case 5:
-                return "\u{2198}" // ↘
-            case 4:
-                return "\u{2192}" // →
-            case 3:
-                return "\u{2197}" // ↗
-            case 2:
-                return "\u{2191}" // ↑
-            case 1:
-                return "\u{2191}\u{2191}" // ↑↑
-            default:
+            if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-ConstantsWidgetExtension.bgReadingDateVeryStaleInMinutes) {
+                switch slopeOrdinal {
+                case 7:
+                    return "\u{2193}\u{2193}" // ↓↓
+                case 6:
+                    return "\u{2193}" // ↓
+                case 5:
+                    return "\u{2198}" // ↘
+                case 4:
+                    return "\u{2192}" // →
+                case 3:
+                    return "\u{2197}" // ↗
+                case 2:
+                    return "\u{2191}" // ↑
+                case 1:
+                    return "\u{2191}\u{2191}" // ↑↑
+                default:
+                    return ""
+                }
+            } else {
                 return ""
             }
         }

@@ -316,7 +316,7 @@ extension SettingsViewNightScoutSettingsViewModel: SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.sectionTitleNightScout
+        return ConstantsSettingsIcons.nightscoutSettingsIcon + " " + Texts_SettingsView.sectionTitleNightScout
     }
 
     func numberOfRows() -> Int {

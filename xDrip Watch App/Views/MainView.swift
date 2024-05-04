@@ -66,7 +66,7 @@ struct MainView: View {
                     .font(.system(size: isSmallScreen ? 12 : 14))
                     .multilineTextAlignment(.leading)
                     .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
-                    .background(.teal).opacity(0.85)
+                    .background(.teal).opacity(0.9)
                     .cornerRadius(8)
             }
         })

@@ -1,0 +1,10 @@
+/* 
+  WatchApp.strings
+  xdrip
+
+  Created by Paul Plant on 27/4/24.
+  Copyright © 2024 Johan Degraeve. All rights reserved.
+*/
+"requestingData" = "Attente de données...";
+"lastReading" = "Dernière lecture";
+"noSensorData" = "Pas de données du capteur";

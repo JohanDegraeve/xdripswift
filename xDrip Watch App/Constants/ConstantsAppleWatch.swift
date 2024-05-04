@@ -21,10 +21,13 @@ enum ConstantsAppleWatch {
     static let pixelWidthLimitForSmallScreen: Double = 185
     
     /// colour for the "requesting data" symbol when active
-    static let requestingDataIconColorActive = Color(.green)
+    static let requestingDataIconColorActive = Color.green
     
     /// colour for the "requesting data" symbol when inactive
-    static let requestingDataIconColorInactive = Color(.white).opacity(0.3)
+    static let requestingDataIconColorInactive = Color.white.opacity(0.3)
+    
+    /// colour for the "requesting data" symbol whilst waiting for data back
+    static let requestingDataIconColorPending = Color.orange
     
     /// font size for the "requesting data" symbol
     static let requestingDataIconFontSize: CGFloat = 6

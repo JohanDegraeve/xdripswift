@@ -46,9 +46,9 @@
 "settingsviews_urgentHighValue" = "Urgent High Value";
 "settingsviews_highValue" = "High Value";
 "settingsviews_targetValue" = "Target Value";
+"settingsviews_targetValueMessage" = "Set to 0 to disable the target";
 "settingsviews_lowValue" = "Low Value";
 "settingsviews_urgentLowValue" = "Urgent Low Value";
-"settingsviews_useobjectives" = "Show Objectives in Graph";
 "settingsviews_showcoloredobjectives" = "Show Colored Lines";
 "settingsviews_showtarget" = "Show Target Line";
 "settingsviews_sectiontitletreatments" = "Treatments";
@@ -132,6 +132,11 @@
 "infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
 "settingsviews_CalenderIntervalTitle" = "Event Interval";
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
+"settingsviews_infoContactsAccessRestricted" = "You cannot give authorization to %@ to access your contacts. This is possibly due to active restrictions such as parental controls being in place.";
+"settingsviews_contactImageSectionTitle" = "Contact Image";
+"settingsviews_enableContactImage" = "Create Contact";
+"settingsviews_displayTrendInContactImage" = "Show Trend";
+"settingsviews_contactImageCreatedByString" = "Contact automatically created by";
 "sectionTitleTrace" = "Issue Reporting";
 "sendTraceFile" = "Send Issue Report";
 "describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";
@@ -162,3 +167,9 @@
 "expanatoryTextSelectTime" = "As of what time should the value apply";
 "expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with Loop";
 "warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
+
+"appleWatchSectionTitle" = "Apple Watch";
+"appleWatchShowDataInComplications" = "Show Values in Complications";
+"appleWatchShowDataInComplicationsMessage" = "Please note that Apple Watch complications will not update in real-time. They will only update 2-3 times per hour.\n\nDO NOT rely on values in the complication for treatment decisions.\n\nFor real-time values, open the %@ Watch app.\n\nOnly click 'OK' if you understand and agree.";
+"appleWatchComplicationUserAgreementDate" = "User Agreement";
+"appleWatchRemainingComplicationUserInfoTransfers" = "Remaining Complication Updates";

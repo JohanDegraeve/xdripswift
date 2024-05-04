@@ -34,7 +34,7 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.sectionTitleHealthKit
+        return ConstantsSettingsIcons.healthKitSettingsIcon + " " + Texts_SettingsView.sectionTitleHealthKit
     }
 
     func numberOfRows() -> Int {

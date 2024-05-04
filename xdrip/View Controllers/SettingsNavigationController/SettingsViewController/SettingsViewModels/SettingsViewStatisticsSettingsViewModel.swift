@@ -139,12 +139,12 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
     }
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.sectionTitleStatistics
+        return ConstantsSettingsIcons.statisticsSettingsIcon + " " + Texts_SettingsView.sectionTitleStatistics
     }
     
     func numberOfRows() -> Int {
         
-        // if the user doesn't want to see the objectives on the graph, then hide the options, the same applies to the Show Target option
+        // if the user doesn't want to see the statistics, then hide the options
         if UserDefaults.standard.showStatistics {
             return Setting.allCases.count
         } else {

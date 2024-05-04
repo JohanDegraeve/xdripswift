@@ -18,7 +18,6 @@
 "settingsviews_targetValue" = "Valor Alvo";
 "settingsviews_lowValue" = "Valor Hipo";
 "settingsviews_urgentLowValue" = "Valor Hipo Urgente";
-"settingsviews_useobjectives" = "Mostra Objectivos no Gráfico";
 "settingsviews_showcoloredobjectives" = "Mostrar Linhas Coloridas";
 "settingsviews_showtarget" = "Mostrar Linha Alvo";
 "settingsviews_sectiontitletreatments" = "Tratamentos";

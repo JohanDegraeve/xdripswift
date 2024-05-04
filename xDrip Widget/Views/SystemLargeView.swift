@@ -29,7 +29,7 @@ extension XDripWidget.EntryView {
                         .lineLimit(1)
                     Text(entry.widgetState.bgUnitString)
                         .font(.title)
-                        .foregroundStyle(.gray)
+                        .foregroundStyle(.colorTertiary)
                         .lineLimit(1)
                 }
             }
@@ -41,20 +41,21 @@ extension XDripWidget.EntryView {
                 if let keepAliveImageString = entry.widgetState.keepAliveImageString {
                     Image(systemName: keepAliveImageString)
                         .font(.caption)
-                        .foregroundStyle(Color(white: 0.6))
+                        .foregroundStyle(.colorTertiary)
                         .padding(.trailing, -4)
                 }
                 
                 Text(entry.widgetState.dataSourceDescription)
                     .font(.caption).bold()
-                    .foregroundStyle(Color(white: 0.8))
+                    .foregroundStyle(.colorSecondary)
                 
                 Spacer()
                 
                 Text("Last reading at \(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
                     .font(.caption)
-                    .foregroundStyle(Color(white: 0.6))
+                    .foregroundStyle(.colorTertiary)
             }
+            .padding(.top, 10)
         }
         .widgetBackground(backgroundView: Color.black)
     }

@@ -107,7 +107,7 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.sectionTitleTreatments
+        return ConstantsSettingsIcons.treatmentsSettingsIcon + " " + Texts_SettingsView.sectionTitleTreatments
     }
     
     func numberOfRows() -> Int {

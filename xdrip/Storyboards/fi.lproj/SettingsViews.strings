@@ -84,7 +84,6 @@
 "debugLevel" = "Sisällytä debug taso";
 "warningChangeFromMasterToFollower" = "Vaihtaminen masterista seuraajaan pysäyttää nykyisen anturin. Haluatko jatkaa?";
 "nightScoutPort" = "Portti";
-"settingsviews_useobjectives" = "Käytä tavoitteita kaaviossa";
 "settingsviews_showcoloredobjectives" = "Näytä värilliset tavoiteviivat ";
 "settingsviews_showtarget" = "Näytä kohdeviiva";
 "settingsviews_targetValue" = "Tavoitearvo";

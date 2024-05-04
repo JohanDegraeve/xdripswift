@@ -113,28 +113,24 @@ class TreatmentsViewController : UIViewController {
         filterBgCheckButtonOutlet.isSelected = UserDefaults.standard.showBgCheckTreatmentsInList
         
         // set up the button configuration to show the correct image (per state), text (i.e. nothing!) and size. The empty title is just a fix to prevent the default label being shown at runtime (it's doesn't happen in UIBuilder)
-        if #available(iOS 13.0, *) {
-            
-            filterBolusButtonOutlet.setImage(UIImage(systemName: "arrowtriangle.down"), for: .normal)
-            filterBolusButtonOutlet.setImage(UIImage(systemName: "arrowtriangle.down.fill"), for: .selected)
-            filterBolusButtonOutlet.setTitle("", for: .normal)
-            
-            filterSmallBolusButtonOutlet.setImage(UIImage(systemName: "arrowtriangle.down"), for: .normal)
-            filterSmallBolusButtonOutlet.setImage(UIImage(systemName: "arrowtriangle.down.fill"), for: .selected)
-            filterSmallBolusButtonOutlet.setTitle("", for: .normal)
-            
-            // let's also scale down the micro-bolus button image as even though it is initially set in UIBuilder, once we manipulate the image to show it filled, or not, then we lose the symbol scale attribute.
-            filterSmallBolusButtonOutlet.imageView?.layer.transform = CATransform3DMakeScale(0.6, 0.6, 0.6)
-            
-            filterCarbsButtonOutlet.setImage(UIImage(systemName: "circle"), for: .normal)
-            filterCarbsButtonOutlet.setImage(UIImage(systemName: "circle.fill"), for: .selected)
-            filterCarbsButtonOutlet.setTitle("", for: .normal)
-            
-            filterBgCheckButtonOutlet.setImage(UIImage(systemName: "drop"), for: .normal)
-            filterBgCheckButtonOutlet.setImage(UIImage(systemName: "drop.fill"), for: .selected)
-            filterBgCheckButtonOutlet.setTitle("", for: .normal)
-            
-        }
+        filterBolusButtonOutlet.setImage(UIImage(systemName: "arrowtriangle.down"), for: .normal)
+        filterBolusButtonOutlet.setImage(UIImage(systemName: "arrowtriangle.down.fill"), for: .selected)
+        filterBolusButtonOutlet.setTitle("", for: .normal)
+        
+        filterSmallBolusButtonOutlet.setImage(UIImage(systemName: "arrowtriangle.down"), for: .normal)
+        filterSmallBolusButtonOutlet.setImage(UIImage(systemName: "arrowtriangle.down.fill"), for: .selected)
+        filterSmallBolusButtonOutlet.setTitle("", for: .normal)
+        
+        // let's also scale down the micro-bolus button image as even though it is initially set in UIBuilder, once we manipulate the image to show it filled, or not, then we lose the symbol scale attribute.
+        filterSmallBolusButtonOutlet.imageView?.layer.transform = CATransform3DMakeScale(0.6, 0.6, 0.6)
+        
+        filterCarbsButtonOutlet.setImage(UIImage(systemName: "circle"), for: .normal)
+        filterCarbsButtonOutlet.setImage(UIImage(systemName: "circle.fill"), for: .selected)
+        filterCarbsButtonOutlet.setTitle("", for: .normal)
+        
+        filterBgCheckButtonOutlet.setImage(UIImage(systemName: "drop"), for: .normal)
+        filterBgCheckButtonOutlet.setImage(UIImage(systemName: "drop.fill"), for: .selected)
+        filterBgCheckButtonOutlet.setTitle("", for: .normal)
         
         filterLabelOutlet.text = Texts_TreatmentsView.filterTreatmentsLabel
         

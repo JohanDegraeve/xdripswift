@@ -89,7 +89,7 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.sectionTitleAlerting
+        return ConstantsSettingsIcons.alertSettingsIcon + " " + Texts_SettingsView.sectionTitleAlerting
     }
     
     func numberOfRows() -> Int {

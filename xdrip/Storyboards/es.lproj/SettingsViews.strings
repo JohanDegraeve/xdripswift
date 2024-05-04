@@ -40,9 +40,9 @@
 "settingsviews_urgentHighValue" = "Valor de Glucemia Alta (Urgente)";
 "settingsviews_highValue" = "Valor de Glucemia Alta";
 "settingsviews_targetValue" = "Valor Objectivo";
+"settingsviews_targetValueMessage" = "Usar 0 para deshabilitar el valor objectivo en la gráfica";
 "settingsviews_lowValue" = "Valor de Glucemia Baja";
 "settingsviews_urgentLowValue" = "Valor de Glucemia Baja (Urgente)";
-"settingsviews_useobjectives" = "Mostrar Objetivos";
 "settingsviews_showcoloredobjectives" = "Mostrar Colores";
 "settingsviews_showtarget" = "Mostrar Línea Target";
 "settingsviews_sectiontitletreatments" = "Tratamientos";
@@ -141,6 +141,17 @@
 "nslog" = "NSLog";
 "developerSettings" = "Opciones de Desarrollo";
 "settingsviews_sectiontitlehomescreen" = "Inicio";
+"settingsviews_infoContactsAccessRestricted" = "No has podido dar permiso a %@ para accesar a tus contactos. Esto es probablemente debido a restriciones como el control parental o similar.";
+"settingsviews_contactImageSectionTitle" = "Imagen de Contacto";
+"settingsviews_enableContactImage" = "Crear Contacto";
+"settingsviews_displayTrendInContactImage" = "Mostrar Tendencia";
+"settingsviews_contactImageCreatedByString" = "Contacto creado automáticamente por";
+
+"appleWatchSectionTitle" = "Apple Watch";
+"appleWatchShowDataInComplications" = "Mostrar Complicaciones";
+"appleWatchShowDataInComplicationsMessage" = "Las complicaciones de Apple Watch no pueden actualizarse en tiempo-real. Solo se actualizarán 2-3 veces por hora.\n\nNO DEBES fiar de los valores mostrados a la hora de tomar decisiones.\n\nPara valores actuales y fiables, debes abrir la app de %@ en tu Watch.\n\nHaz click en 'OK' únicamente si lo has entendido y estás de acuerdo.";
+"appleWatchComplicationUserAgreementDate" = "Acuerdo del Usuario";
+"appleWatchRemainingComplicationUserInfoTransfers" = "Actualizaciones Disponibles Hoy";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

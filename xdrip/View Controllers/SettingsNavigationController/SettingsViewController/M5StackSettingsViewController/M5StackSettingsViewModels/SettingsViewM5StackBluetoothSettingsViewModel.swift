@@ -18,7 +18,7 @@ struct SettingsViewM5StackBluetoothSettingsViewModel: SettingsViewModelProtocol 
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.m5StackSectionTitleBluetooth
+        return ConstantsSettingsIcons.m5StackBluetoothSettingsIcon + " " + Texts_SettingsView.m5StackSectionTitleBluetooth
     }
     
     func settingsRowText(index: Int) -> String {

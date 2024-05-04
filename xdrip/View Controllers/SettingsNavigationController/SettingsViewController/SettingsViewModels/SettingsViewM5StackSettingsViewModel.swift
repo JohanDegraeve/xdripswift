@@ -18,7 +18,7 @@ struct SettingsViewM5StackSettingsViewModel: SettingsViewModelProtocol {
     }
     
    func sectionTitle() -> String? {
-        return "M5Stack"
+        return ConstantsSettingsIcons.m5StackSettingsIcon + " " + "M5Stack"
     }
     
     func settingsRowText(index: Int) -> String {

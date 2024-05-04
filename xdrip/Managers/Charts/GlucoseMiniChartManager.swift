@@ -263,7 +263,7 @@ public class GlucoseMiniChartManager {
         let gridLayer = ChartGuideLinesForValuesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: data().chartGuideLinesLayerSettings, axisValuesX: Array(xAxisValues.dropFirst().dropLast()), axisValuesY: [])
         
         // Guidelines
-        let highLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineMiniChartHighLowColor, linesWidth: UserDefaults.standard.useObjectives ? 0.3 : 0, dotWidth: 3, dotSpacing: 3)
+        let highLowLineLayerSettings = ChartGuideLinesDottedLayerSettings(linesColor: ConstantsGlucoseChart.guidelineMiniChartHighLowColor, linesWidth: 0.3, dotWidth: 3, dotSpacing: 3)
         
         let highLineLayer = ChartGuideLinesForValuesDottedLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, settings: highLowLineLayerSettings, axisValuesX: [ChartAxisValueDouble(0)], axisValuesY: [ChartAxisValueDouble(UserDefaults.standard.highMarkValueInUserChosenUnit)])
         

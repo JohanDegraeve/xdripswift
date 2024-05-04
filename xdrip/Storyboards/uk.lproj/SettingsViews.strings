@@ -318,9 +318,6 @@
 /// statistics settings, how many days to use for calculations
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate";
 
-/// home screen settings, use objectives in graph
-"settingsviews_useobjectives" = "Show Objectives in Graph";
-
 /// Calendar Events Settings - text in row where user needs to say if trend should be displayed or not
 "settingsviews_displayTrendInCalendarEvent" = "Display Trend";
 

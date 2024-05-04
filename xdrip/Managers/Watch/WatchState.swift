@@ -11,7 +11,7 @@ import Foundation
 /// model of the data we'll use to manage the watch views
 struct WatchState: Codable {
     var bgReadingValues: [Double] = []
-    var bgReadingDates: [Date] = []
+    var bgReadingDatesAsDouble: [Double] = []
     var isMgDl: Bool?
     var slopeOrdinal: Int?
     var deltaChangeInMgDl: Double?
@@ -30,5 +30,12 @@ struct WatchState: Codable {
     var secondsUntilFollowerDisconnectWarning: Int?
     var timeStampOfLastHeartBeat: Date?
     var secondsUntilHeartBeatDisconnectWarning: Int?
-    var disableComplications: Bool?
+    var keepAliveIsDisabled: Bool?
+    var liveDataIsEnabled: Bool?
+    var remainingComplicationUserInfoTransfers: Int?
+    
+    var asDictionary: [String: Any]? {
+        guard let data = try? JSONEncoder().encode(self) else { return nil }
+        return (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)).flatMap { $0 as? [String: Any] }
+    }
 }

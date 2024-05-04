@@ -30,7 +30,6 @@ fileprivate struct NFCCommand {
     }
 }
 
-@available(iOS 14.0, *)
 class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
     
     // MARK: - properties
