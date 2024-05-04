@@ -375,7 +375,6 @@ class Trace {
         traceInfo.appendStringAndNewLine("    Allow chart rotation: " + UserDefaults.standard.allowScreenRotation.description)
         traceInfo.appendStringAndNewLine("    Screen dimming type when locked: " + UserDefaults.standard.screenLockDimmingType.description)
         traceInfo.appendStringAndNewLine("    Show mini-chart: " + UserDefaults.standard.showMiniChart.description)
-        traceInfo.appendStringAndNewLine("    Show target line: " + UserDefaults.standard.showTarget.description)
         traceInfo.appendStringAndNewLine("    Urgent high: " + UserDefaults.standard.urgentHighMarkValueInUserChosenUnitRounded.description)
         traceInfo.appendStringAndNewLine("    High: " + UserDefaults.standard.highMarkValueInUserChosenUnitRounded.description)
         traceInfo.appendStringAndNewLine("    Target: " + UserDefaults.standard.targetMarkValueInUserChosenUnitRounded.description)
@@ -418,6 +417,25 @@ class Trace {
                                              
         traceInfo.appendStringAndNewLine("\nApple Health settings:")
         traceInfo.appendStringAndNewLine("    Write to Apple Health: " + UserDefaults.standard.storeReadingsInHealthkit.description)
+        
+        traceInfo.appendStringAndNewLine("\nVoice settings:")
+        traceInfo.appendStringAndNewLine("    Speak BG readings: " + UserDefaults.standard.speakReadings.description)
+        if UserDefaults.standard.speakReadings {
+            //if let languageCode = UserDefaults.standard.speakReadingLanguageCode {
+                traceInfo.appendStringAndNewLine("    Language: " + Texts_SpeakReading.languageName.description)
+            //}
+            traceInfo.appendStringAndNewLine("    Speak trend: " + UserDefaults.standard.speakTrend.description)
+            traceInfo.appendStringAndNewLine("    Speak delta: " + UserDefaults.standard.speakDelta.description)
+            traceInfo.appendStringAndNewLine("    Speak interval: " + UserDefaults.standard.speakInterval.description + " minutes")
+        }
+        
+        traceInfo.appendStringAndNewLine("\nApple Watch settings:")
+        traceInfo.appendStringAndNewLine("    Show values in complications: " + UserDefaults.standard.showDataInWatchComplications.description)
+        if let agreementDate = UserDefaults.standard.watchComplicationUserAgreementDate {
+            traceInfo.appendStringAndNewLine("    User agreement date: " + agreementDate.toString(timeStyle: .short, dateStyle: .medium) + " (" + agreementDate.daysAndHoursAgo(appendAgo: true) + ")")
+        } else {
+            traceInfo.appendStringAndNewLine("    User agreement date: nil")
+        }
                                              
         traceInfo.appendStringAndNewLine("\nCalendar events settings:")
         traceInfo.appendStringAndNewLine("    Create calendar events: " + UserDefaults.standard.createCalendarEvent.description)
@@ -431,23 +449,17 @@ class Trace {
             traceInfo.appendStringAndNewLine("    Display visual indicator: " + UserDefaults.standard.displayVisualIndicatorInCalendarEvent.description)
             traceInfo.appendStringAndNewLine("    Event interval: " + UserDefaults.standard.calendarInterval.description + " minutes")
         }
-                                             
-        traceInfo.appendStringAndNewLine("\nVoice settings:")
-        traceInfo.appendStringAndNewLine("    Speak BG readings: " + UserDefaults.standard.speakReadings.description)
-        if UserDefaults.standard.speakReadings {
-            //if let languageCode = UserDefaults.standard.speakReadingLanguageCode {
-                traceInfo.appendStringAndNewLine("    Language: " + Texts_SpeakReading.languageName.description)
-            //}
-            traceInfo.appendStringAndNewLine("    Speak trend: " + UserDefaults.standard.speakTrend.description)
-            traceInfo.appendStringAndNewLine("    Speak delta: " + UserDefaults.standard.speakDelta.description)
-            traceInfo.appendStringAndNewLine("    Speak interval: " + UserDefaults.standard.speakInterval.description + " minutes")
-        }
+        
+        traceInfo.appendStringAndNewLine("\nContact Image settings:")
+        traceInfo.appendStringAndNewLine("    Create contact: " + UserDefaults.standard.enableContactImage.description)
+        traceInfo.appendStringAndNewLine("    Show trend: " + UserDefaults.standard.displayTrendInContactImage.description)
         
         traceInfo.appendStringAndNewLine("\nData management settings:")
         traceInfo.appendStringAndNewLine("    Retention period: " + UserDefaults.standard.retentionPeriodInDays.description + " days")
         
         // developer settings
         traceInfo.appendStringAndNewLine("\nDeveloper settings:")
+        traceInfo.appendStringAndNewLine("    Show developer settings: " + UserDefaults.standard.showDeveloperSettings.description)
         traceInfo.appendStringAndNewLine("    NS log enabled: " + UserDefaults.standard.NSLogEnabled.description)
         traceInfo.appendStringAndNewLine("    OS log enabled: " + UserDefaults.standard.OSLogEnabled.description)
         traceInfo.appendStringAndNewLine("    Smooth Libre readings: " + UserDefaults.standard.smoothLibreValues.description)
