@@ -53,7 +53,7 @@ jobs:
     - name: Check for alive branch
       if: steps.workflow-permission.outputs.has_permission == 'true'
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
       run: |
         if [[ "$(gh api -H "Accept: application/vnd.github+json" /repos/${{ github.repository_owner }}/xdripswift/branches | jq --raw-output 'any(.name=="alive")')" == "true" ]]; then
           echo "Branch 'alive' exists."
@@ -66,7 +66,7 @@ jobs:
     - name: Create alive branch
       if: env.ALIVE_BRANCH_EXISTS == 'false'
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
       run: |
         # Get ref for JohanDegraeve/xdripswift:develop
         SHA=$(curl -sS https://api.github.com/repos/${{ env.UPSTREAM_REPO }}/git/refs \
@@ -156,7 +156,7 @@ jobs:
   build:
     name: Build
     needs: [validate, check_alive_and_permissions, check_latest_from_upstream]
-    runs-on: macos-13
+    runs-on: macos-14
     permissions:
       contents: write
     if: | # runs if started manually, or if sync schedule is set and enabled and scheduled on the first Saturday each month, or if sync schedule is set and enabled and new commits were found
@@ -167,7 +167,7 @@ jobs:
         )
     steps:
       - name: Select Xcode version
-        run: "sudo xcode-select --switch /Applications/Xcode_15.0.app/Contents/Developer"
+        run: "sudo xcode-select --switch /Applications/Xcode_15.3.app/Contents/Developer"
       
       - name: Checkout Repo for syncing
         if: |
