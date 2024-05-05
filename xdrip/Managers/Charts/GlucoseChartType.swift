@@ -144,6 +144,8 @@ public enum GlucoseChartType: Int, CaseIterable {
         switch self {
         case .siriGlucoseIntent:
             return ConstantsGlucoseChartSwiftUI.backgroundColorSiriGlucoseIntent
+        case .watchAccessoryRectangular:
+            return ConstantsGlucoseChartSwiftUI.backgroundColorWatchAccessoryRectangular
         default:
             return .black
         }
