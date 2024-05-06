@@ -32,17 +32,25 @@ extension XDripWidget.EntryView {
             
             GlucoseChartView(glucoseChartType: .widgetSystemSmall, bgReadingValues: entry.widgetState.bgReadingValues, bgReadingDates: entry.widgetState.bgReadingDates, isMgDl: entry.widgetState.isMgDl, urgentLowLimitInMgDl: entry.widgetState.urgentLowLimitInMgDl, lowLimitInMgDl: entry.widgetState.lowLimitInMgDl, highLimitInMgDl: entry.widgetState.highLimitInMgDl, urgentHighLimitInMgDl: entry.widgetState.urgentHighLimitInMgDl, liveActivitySize: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil)
             
-            HStack {
+            HStack(alignment: .center) {
+                if let keepAliveImageString = entry.widgetState.keepAliveImageString {
+                    Image(systemName: keepAliveImageString)
+                        .font(.caption)
+                        .foregroundStyle(.colorTertiary)
+                        .padding(.trailing, -4)
+                }
+                    
                 Text(entry.widgetState.dataSourceDescription)
-                    .font(.system(size: 11)).bold()
-                    .foregroundStyle(Color(white: 0.8))
+                    .font(.caption).bold()
+                    .foregroundStyle(.colorSecondary)
                 
                 Spacer()
                 
                 Text("\(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Color(white: 0.6))
+                    .font(.caption)
+                    .foregroundStyle(.colorTertiary)
             }
+            .padding(.top, 6)
         }
         .widgetBackground(backgroundView: Color.black)
     }

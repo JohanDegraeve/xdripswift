@@ -30,7 +30,7 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.sectionTitleAbout
+        return ConstantsSettingsIcons.infoSettingsIcon + " " + Texts_SettingsView.sectionTitleAbout
     }
     
     func settingsRowText(index: Int) -> String {

@@ -15,9 +15,9 @@
 "settingsviews_urgentHighValue" = "Urgent Hoge Waarde";
 "settingsviews_highValue" = "Hoge Waarde";
 "settingsviews_targetValue" = "Doel Waarde";
+"settingsviews_targetValueMessage" = "Zet op 0 om doelwaarde uit te schakelen";
 "settingsviews_lowValue" = "Lage Waarde";
 "settingsviews_urgentLowValue" = "Urgent Lage Waarde";
-"settingsviews_useobjectives" = "Toon Doelen in Grafiek";
 "settingsviews_showcoloredobjectives" = "Toon Gekleurde Lijnen";
 "settingsviews_showtarget" = "Toon Doel Lijn";
 "settingsviews_sectiontitlestatistics" = "Statistieken";
@@ -95,6 +95,11 @@
 "debugLevel" = "Inclusief Debug Niveau";
 "warningChangeFromMasterToFollower" = "Wisselen van Master naar Volger stopt de huidige sensor. Wil je doorgaan ?";
 "nightScoutPort" = "Port";
+
+"appleWatchShowDataInComplications" = "Toon waardes in complicaties";
+"appleWatchShowDataInComplicationsMessage" = "Apple Watch complicaties zijn niet up-to-date. Updates gebeuren 2 tot 3 keer per uur.\n\nREKEN NIET op waardes in de complicaties.\n\nOm up-to-date waardes te zien, open de %@ Watch app.\n\nKlik 'OK' als je dit begrijpt en aanvaardt.";
+"appleWatchComplicationUserAgreementDate" = "Gebruikersovereenkomst";
+"appleWatchRemainingComplicationUserInfoTransfers" = "Overblijvende complicatie updates";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

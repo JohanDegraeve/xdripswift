@@ -51,7 +51,7 @@ extension XDripWatchComplication.Provider {
                 Date(timeIntervalSince1970: date)
             }
             
-            return Entry.WidgetState(bgReadingValues: data.bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: data.isMgDl, slopeOrdinal: data.slopeOrdinal, deltaChangeInMgDl: data.deltaChangeInMgDl, urgentLowLimitInMgDl: data.urgentLowLimitInMgDl, lowLimitInMgDl: data.lowLimitInMgDl, highLimitInMgDl: data.highLimitInMgDl, urgentHighLimitInMgDl: data.urgentHighLimitInMgDl, disableComplications: data.disableComplications)
+            return Entry.WidgetState(bgReadingValues: data.bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: data.isMgDl, slopeOrdinal: data.slopeOrdinal, deltaChangeInMgDl: data.deltaChangeInMgDl, urgentLowLimitInMgDl: data.urgentLowLimitInMgDl, lowLimitInMgDl: data.lowLimitInMgDl, highLimitInMgDl: data.highLimitInMgDl, urgentHighLimitInMgDl: data.urgentHighLimitInMgDl, keepAliveIsDisabled: data.keepAliveIsDisabled, liveDataIsEnabled: data.liveDataIsEnabled)
         } catch {
             print(error.localizedDescription)
         }
@@ -59,45 +59,7 @@ extension XDripWatchComplication.Provider {
         return sampleWidgetStateFromProvider
     }
     
-    private var sampleWidgetStateFromProvider: XDripWatchComplication.Entry.WidgetState {
-        
-        func bgDateArray() -> [Date] {
-            let endDate = Date()
-            let startDate = endDate.addingTimeInterval(-3600 * 12)
-            var currentDate = startDate
-            
-            var dateArray: [Date] = []
-            
-            while currentDate < endDate {
-                dateArray.append(currentDate)
-                currentDate = currentDate.addingTimeInterval(60 * 5)
-            }
-            return dateArray
-        }
-        
-        func bgValueArray() -> [Double] {
-            
-            var bgValueArray:[Double] = Array(repeating: 0, count: 144)
-            var currentValue: Double = 100
-            var increaseValues: Bool = true
-            
-            for index in bgValueArray.indices {
-                let randomValue = Double(Int.random(in: -10..<10))
-                
-                if currentValue < 75 {
-                    increaseValues = true
-                    bgValueArray[index] = currentValue + abs(randomValue)
-                } else if currentValue > 150 {
-                    increaseValues = false
-                    bgValueArray[index] = currentValue - abs(randomValue)
-                } else {
-                    bgValueArray[index] = currentValue + (increaseValues ? randomValue : -randomValue)
-                }
-                currentValue = bgValueArray[index]
-            }
-            return bgValueArray
-        }
-        
-        return Entry.WidgetState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 3, deltaChangeInMgDl: 0, urgentLowLimitInMgDl: ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl, lowLimitInMgDl: ConstantsBGGraphBuilder.defaultLowMarkInMgdl, highLimitInMgDl: ConstantsBGGraphBuilder.defaultHighMarkInMgdl, urgentHighLimitInMgDl: ConstantsBGGraphBuilder.defaultUrgentHighMarkInMgdl)
+    private var sampleWidgetStateFromProvider: XDripWatchComplication.Entry.WidgetState {        
+        return Entry.WidgetState(bgReadingValues: ConstantsWatchComplication.bgReadingValuesPlaceholderData, bgReadingDates: ConstantsWatchComplication.bgReadingDatesPlaceholderData(), isMgDl: true, slopeOrdinal: 4, deltaChangeInMgDl: 0, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 90, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, liveDataIsEnabled: true)
     }
 }

@@ -24,9 +24,6 @@ class LibreLinkUpFollowManager: NSObject {
     /// for logging
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryLibreLinkUpFollowManager)
     
-    /// when to do next download
-    private var nextFollowDownloadTimeStamp: Date
-    
     /// reference to coredatamanager
     private var coreDataManager: CoreDataManager
     
@@ -92,9 +89,6 @@ class LibreLinkUpFollowManager: NSObject {
     
     /// initializer
     public init(coreDataManager:CoreDataManager, followerDelegate: FollowerDelegate) {
-        
-        // initialize nextFollowDownloadTimeStamp to now, which is at the moment FollowManager is instantiated
-        nextFollowDownloadTimeStamp = Date()
         
         // initialize non optional private properties
         self.coreDataManager = coreDataManager
@@ -207,10 +201,10 @@ class LibreLinkUpFollowManager: NSObject {
         
         trace("in download", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
         
-        trace("    setting nightScoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
-
-        // TODO: crash here sometimes
-        DispatchQueue.main.async {
+        if (UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow > 15 {
+            trace("    setting nightScoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
+            
+            UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest = .now
             UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
         }
         
@@ -312,7 +306,7 @@ class LibreLinkUpFollowManager: NSObject {
                         }
                         
                         // schedule new download
-                        self.scheduleNewDownload()
+                        //self.scheduleNewDownload()
                         
                     }
                     

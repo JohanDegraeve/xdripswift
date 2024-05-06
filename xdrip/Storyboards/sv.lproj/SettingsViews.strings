@@ -13,7 +13,6 @@
 "settingsviews_targetValue" = "Målvärde";
 "settingsviews_lowValue" = "Lågt värde";
 "settingsviews_urgentLowValue" = "Akut lågt värde";
-"settingsviews_useobjectives" = "Visa målvärde i diagram";
 "settingsviews_showcoloredobjectives" = "Visa färgade linjer";
 "settingsviews_showtarget" = "Visa målvärdeslinje";
 "settingsviews_sectiontitletreatments" = "Behandlingar";

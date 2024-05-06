@@ -19,5 +19,6 @@ struct ComplicationSharedUserDefaultsModel: Codable {
     var lowLimitInMgDl: Double
     var highLimitInMgDl: Double
     var urgentHighLimitInMgDl: Double
-    var disableComplications: Bool
+    var keepAliveIsDisabled: Bool
+    var liveDataIsEnabled: Bool
 }

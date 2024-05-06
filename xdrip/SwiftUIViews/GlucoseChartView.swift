@@ -10,13 +10,12 @@ import Charts
 import SwiftUI
 import Foundation
 
-@available(iOS 16, *)
 struct GlucoseChartView: View {
     
     var bgReadingValues: [Double]
     var bgReadingDates: [Date]
     
-    let glucoseChartType: GlucoseChartType
+    let chartType: GlucoseChartType // shortened to chartType to make reading easier below
     let isMgDl: Bool
     let urgentLowLimitInMgDl: Double
     let lowLimitInMgDl: Double
@@ -30,7 +29,7 @@ struct GlucoseChartView: View {
     
     init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double]?, bgReadingDates: [Date]?, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySize: LiveActivitySize?, hoursToShowScalingHours: Double?, glucoseCircleDiameterScalingHours: Double?, overrideChartHeight: Double?, overrideChartWidth: Double?) {
         
-        self.glucoseChartType = glucoseChartType
+        self.chartType = glucoseChartType
         self.isMgDl = isMgDl
         self.urgentLowLimitInMgDl = urgentLowLimitInMgDl
         self.lowLimitInMgDl = lowLimitInMgDl
@@ -40,15 +39,16 @@ struct GlucoseChartView: View {
         
         // here we want to automatically set the hoursToShow based upon the chart type, but some chart instances might need
         // this to be overriden such as for zooming in/out of the chart (i.e. the Watch App)
-        self.hoursToShow = hoursToShowScalingHours ?? glucoseChartType.hoursToShow(liveActivitySize: self.liveActivitySize)
+        self.hoursToShow = hoursToShowScalingHours ?? chartType.hoursToShow(liveActivitySize: self.liveActivitySize)
         
-        self.chartHeight = overrideChartHeight ?? glucoseChartType.viewSize(liveActivitySize: self.liveActivitySize).height
-        self.chartWidth = overrideChartWidth ?? glucoseChartType.viewSize(liveActivitySize: self.liveActivitySize).width
+        self.chartHeight = overrideChartHeight ?? chartType.viewSize(liveActivitySize: self.liveActivitySize).height
+        
+        self.chartWidth = overrideChartWidth ?? chartType.viewSize(liveActivitySize: self.liveActivitySize).width
         
         // apply a scale to the glucoseCircleDiameter if an override value is passed
-        self.glucoseCircleDiameter = glucoseChartType.glucoseCircleDiameter(liveActivitySize: self.liveActivitySize) * ((glucoseCircleDiameterScalingHours ?? self.hoursToShow) / self.hoursToShow)
+        self.glucoseCircleDiameter = chartType.glucoseCircleDiameter(liveActivitySize: self.liveActivitySize) * ((glucoseCircleDiameterScalingHours ?? self.hoursToShow) / self.hoursToShow)
         
-        // as all widget instances are passed 12 hours of bg values, we must initialize this instance to use only the amount of hours of value required by the glucoseChartType passed
+        // as all widget instances are passed 12 hours of bg values, we must initialize this instance to use only the amount of hours of value required by the chartType passed
         self.bgReadingValues = []
         self.bgReadingDates = []
         
@@ -68,11 +68,11 @@ struct GlucoseChartView: View {
     /// - Returns: a Color object either red, yellow or green
     func bgColor(bgValueInMgDl: Double) -> Color {
         if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
-            return Color(.red)
+            return .red
         } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
-            return Color(.yellow)
+            return .yellow
         } else {
-            return Color(.green)
+            return .green
         }
     }
     
@@ -88,7 +88,7 @@ struct GlucoseChartView: View {
         let mappingArray = Array(1...amountOfFullHours)
         
         /// set the stride count interval to make sure we don't add too many labels to the x-axis if the user wants to view >6 hours
-        let intervalBetweenAxisValues: Int = glucoseChartType.intervalBetweenAxisValues(liveActivitySize: liveActivitySize)
+        let intervalBetweenAxisValues: Int = chartType.intervalBetweenAxisValues(liveActivitySize: liveActivitySize)
         
         /// first, for each int in mappingArray, we create a Date, starting with the lower hour + 1 hour - we will create 5 in this example, starting with hour 08 (7 + 3600 seconds)
         let startDateLower = Date(timeIntervalSinceReferenceDate:
@@ -104,32 +104,33 @@ struct GlucoseChartView: View {
     
 
     var body: some View {
+        let domain = (min((bgReadingValues.min() ?? 40), urgentLowLimitInMgDl) - 6) ... (max((bgReadingValues.max() ?? urgentHighLimitInMgDl), urgentHighLimitInMgDl) + 6)
         
-        let domain = (min((bgReadingValues.min() ?? 40), urgentLowLimitInMgDl) - 6) ... (max((bgReadingValues.max() ?? 400), urgentHighLimitInMgDl) + 6)
+        let yAxisLineSize = ConstantsGlucoseChartSwiftUI.yAxisLineSize
         
         Chart {
             if domain.contains(urgentLowLimitInMgDl) {
                 RuleMark(y: .value("", urgentLowLimitInMgDl))
-                    .lineStyle(StrokeStyle(lineWidth: 1 * glucoseChartType.relativeYAxisLineSize, dash: [2 * glucoseChartType.relativeYAxisLineSize, 6 * glucoseChartType.relativeYAxisLineSize]))
-                    .foregroundStyle(glucoseChartType.urgentLowHighLineColor)
+                    .lineStyle(StrokeStyle(lineWidth: yAxisLineSize, dash: [2 * yAxisLineSize, 6 * yAxisLineSize]))
+                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.yAxisUrgentLowHighLineColor)
             }
             
             if domain.contains(urgentHighLimitInMgDl) {
                 RuleMark(y: .value("", urgentHighLimitInMgDl))
-                    .lineStyle(StrokeStyle(lineWidth: 1 * glucoseChartType.relativeYAxisLineSize, dash: [2 * glucoseChartType.relativeYAxisLineSize, 6 * glucoseChartType.relativeYAxisLineSize]))
-                    .foregroundStyle(glucoseChartType.urgentLowHighLineColor)
+                    .lineStyle(StrokeStyle(lineWidth: yAxisLineSize, dash: [2 * yAxisLineSize, 6 * yAxisLineSize]))
+                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.yAxisUrgentLowHighLineColor)
             }
 
             if domain.contains(lowLimitInMgDl) {
                 RuleMark(y: .value("", lowLimitInMgDl))
-                    .lineStyle(StrokeStyle(lineWidth: 1 * glucoseChartType.relativeYAxisLineSize, dash: [4 * glucoseChartType.relativeYAxisLineSize, 3 * glucoseChartType.relativeYAxisLineSize]))
-                    .foregroundStyle(glucoseChartType.lowHighLineColor)
+                    .lineStyle(StrokeStyle(lineWidth: yAxisLineSize, dash: [4 * yAxisLineSize, 3 * yAxisLineSize]))
+                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.yAxisLowHighLineColor)
             }
             
             if domain.contains(highLimitInMgDl) {
                 RuleMark(y: .value("", highLimitInMgDl))
-                    .lineStyle(StrokeStyle(lineWidth: 1 * glucoseChartType.relativeYAxisLineSize, dash: [4 * glucoseChartType.relativeYAxisLineSize, 3 * glucoseChartType.relativeYAxisLineSize]))
-                    .foregroundStyle(glucoseChartType.lowHighLineColor)
+                    .lineStyle(StrokeStyle(lineWidth: yAxisLineSize, dash: [4 * yAxisLineSize, 3 * yAxisLineSize]))
+                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.yAxisLowHighLineColor)
             }
             
             // add a phantom glucose point at the beginning of the timeline to fix the start point in case there are no glucose values at that time (for instances after starting a new sensor)
@@ -157,15 +158,59 @@ struct GlucoseChartView: View {
             .foregroundStyle(.clear)
         }
         .chartXAxis {
-            AxisMarks(values: .automatic(desiredCount: Int(hoursToShow))) {
-                if $0.as(Date.self) != nil {
+            AxisMarks(values: .stride(by: .hour, count: chartType.xAxisLabelEveryHours())) {
+                if let value = $0.as(Date.self) {
+                    if chartType.xAxisShowLabels() {
+                        AxisValueLabel {
+                            let shouldHideLabel = abs(Date().distance(to: value)) < ConstantsGlucoseChartSwiftUI.xAxisLabelFirstClippingInMinutes || abs(Date().addingTimeInterval(-hoursToShow * 3600).distance(to: value)) < ConstantsGlucoseChartSwiftUI.xAxisLabelLastClippingInMinutes ? true : false
+                            
+                            Text(!shouldHideLabel ? value.formatted(.dateTime.hour()) : "")
+                                .foregroundStyle(Color(.colorSecondary))
+                                .font(.footnote)
+                                .offset(x: chartType.xAxisLabelOffsetX(), y: chartType.xAxisLabelOffsetY())
+                        }
+                    }
+                    
                     AxisGridLine()
-                        .foregroundStyle(glucoseChartType.xAxisGridLineColor)
+                        .foregroundStyle(ConstantsGlucoseChartSwiftUI.xAxisGridLineColor)
                 }
             }
         }
-        .chartYAxis(.hidden)
+        .chartYAxis {
+            AxisMarks(values: [lowLimitInMgDl, highLimitInMgDl]) {
+                if let value = $0.as(Double.self) {
+                    AxisValueLabel {
+                        Text(value.mgdlToMmolAndToString(mgdl: isMgDl))
+                            .foregroundStyle(Color(.colorPrimary))
+                            .font(.footnote)
+                            .offset(x: chartType.yAxisLabelOffsetX(), y: chartType.yAxisLabelOffsetY())
+                    }
+                }
+            }
+            
+            AxisMarks(values: [urgentLowLimitInMgDl, urgentHighLimitInMgDl]) {
+                if let value = $0.as(Double.self) {
+                    AxisValueLabel {
+                        Text(value.mgdlToMmolAndToString(mgdl: isMgDl))
+                            .foregroundStyle(Color(.colorSecondary))
+                            .font(.footnote)
+                            .offset(x: chartType.yAxisLabelOffsetX(), y: chartType.yAxisLabelOffsetY())
+                    }
+                }
+            }
+        }
+        .if({ return chartType.frame() ? true : false }()) { view in 
+            view.frame(width: chartWidth, height: chartHeight)
+        }
+        .if({ return chartType.aspectRatio().enable ? true : false }()) { view in
+            view.aspectRatio(chartType.aspectRatio().aspectRatio, contentMode: chartType.aspectRatio().contentMode)
+        }
+        .if({ return chartType.padding().enable ? true : false }()) { view in 
+            view.padding(chartType.padding().padding)
+        }
+        .chartYAxis(chartType.yAxisShowLabels())
         .chartYScale(domain: domain)
-        .frame(width: chartWidth, height: chartHeight)
+        .background(chartType.backgroundColor())
+        .clipShape(RoundedRectangle(cornerRadius: chartType.cornerRadius()))
     }
 }

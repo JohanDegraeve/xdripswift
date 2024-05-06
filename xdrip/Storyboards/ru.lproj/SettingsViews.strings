@@ -20,7 +20,6 @@
 "settingsviews_targetValue" = "Целевое значение";
 "settingsviews_lowValue" = "Низкое значение";
 "settingsviews_urgentLowValue" = "Опасно низкое значение";
-"settingsviews_useobjectives" = "Показывать цели на графике";
 "settingsviews_showcoloredobjectives" = "Показывать цветные линии";
 "settingsviews_showtarget" = "Показать целевую линию";
 "settingsviews_sectiontitletreatments" = "Терапия";

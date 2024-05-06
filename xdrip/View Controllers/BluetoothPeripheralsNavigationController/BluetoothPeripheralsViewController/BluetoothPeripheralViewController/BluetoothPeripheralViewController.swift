@@ -973,7 +973,26 @@ class BluetoothPeripheralViewController: UIViewController {
         // unwrap bluetoothPeripheralManager
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
         
-        SettingsViewUtilities.runSelectedRowAction(selectedRowAction: SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelTransmitterId, message: Texts_SettingsView.labelGiveTransmitterId, keyboardType: UIKeyboardType.alphabet, text: transmitterIdTempValue, placeHolder: "00000", actionTitle: nil, cancelTitle: nil, actionHandler:
+        // set default text strings. These will be overwritten if needed.
+        var transmitterIdTitleText = Texts_SettingsView.labelTransmitterId
+        var transmitterIdMessageText = Texts_SettingsView.labelGiveTransmitterId
+        var placeHolder = "00000"
+        
+        // if using a special case (like a heartbeat), adapt the strings to include relevant instructions and information
+        switch expectedBluetoothPeripheralType {
+        case .Libre3HeartBeatType:
+            transmitterIdTitleText = Texts_SettingsView.labelBluetoothDeviceName
+            transmitterIdMessageText = Texts_SettingsView.heartbeatLibreMessage
+            placeHolder = "000000000000"
+        case .DexcomG7HeartBeatType:
+            transmitterIdTitleText = Texts_SettingsView.labelBluetoothDeviceName
+            transmitterIdMessageText = Texts_SettingsView.heartbeatG7Message
+            placeHolder = "DXCM00"
+        default:
+            break
+        }
+        
+        SettingsViewUtilities.runSelectedRowAction(selectedRowAction: SettingsSelectedRowAction.askText(title: transmitterIdTitleText, message: transmitterIdMessageText, keyboardType: UIKeyboardType.alphabet, text: transmitterIdTempValue, placeHolder: placeHolder, actionTitle: nil, cancelTitle: nil, actionHandler:
             {(transmitterId:String) in
                 
                 // convert to uppercase
@@ -1325,7 +1344,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             case .nonFixedSlopeEnabled:
                 
                 cell.textLabel?.text = Texts_SettingsView.labelNonFixedTransmitter
-                cell.detailTextLabel?.text = nil
+                cell.detailTextLabel?.text = ""
                 
                 var currentStatus = false
                 if let bluetoothPeripheral = bluetoothPeripheral {
@@ -1377,9 +1396,9 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                 
             case .webOOPEnabled:
                 
-                // set row text and set default row label to nil
+                // set row text and set default row label to an empty string
                 cell.textLabel?.text = Texts_SettingsView.labelWebOOPTransmitter
-                cell.detailTextLabel?.text = nil
+                cell.detailTextLabel?.text = ""
                 
                 // get current value of webOOPEnabled, default false
                 var currentWebOOPEnabledValue = false

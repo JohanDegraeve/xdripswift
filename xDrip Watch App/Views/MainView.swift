@@ -66,7 +66,7 @@ struct MainView: View {
                     .font(.system(size: isSmallScreen ? 12 : 14))
                     .multilineTextAlignment(.leading)
                     .padding(EdgeInsets(top: 5, leading: 5, bottom: 5, trailing: 5))
-                    .background(.teal).opacity(0.85)
+                    .background(.teal).opacity(0.9)
                     .cornerRadius(8)
             }
         })
@@ -133,9 +133,9 @@ struct ContentView_Previews: PreviewProvider {
         
         watchState.bgReadingValues = bgValueArray()
         watchState.bgReadingDates = bgDateArray()
-        watchState.isMgDl = true
-        watchState.slopeOrdinal = 5
-        watchState.deltaChangeInMgDl = 0
+        watchState.isMgDl = false
+        watchState.slopeOrdinal = 3
+        watchState.deltaChangeInMgDl = 2
         watchState.urgentLowLimitInMgDl = 60
         watchState.lowLimitInMgDl = 80
         watchState.highLimitInMgDl = 140

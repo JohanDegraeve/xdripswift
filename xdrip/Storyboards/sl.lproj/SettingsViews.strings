@@ -258,9 +258,6 @@
 /// dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no
 "settingsviews_uploadReadingstoDexcomShare" = "Upload to Dexcom Share";
 
-/// home screen settings, use objectives in graph
-"settingsviews_useobjectives" = "Show Objectives in Graph";
-
 /// Apple Watch Settings - text in row where user needs to say if trend should be displayed or not
 "settingsviews_displayTrendInCalendarEvent" = "Display Trend";
 

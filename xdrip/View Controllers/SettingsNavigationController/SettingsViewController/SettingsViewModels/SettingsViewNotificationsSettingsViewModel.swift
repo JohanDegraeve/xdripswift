@@ -72,118 +72,108 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_IntervalTitle, message: Texts_SettingsView.settingsviews_IntervalMessage, keyboardType: .numberPad, text: UserDefaults.standard.notificationInterval.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.notificationInterval = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
             
         case .liveActivityType:
-            
-            if #available(iOS 16.2, *) {
-                // live activities can only be used in master mode as follower mode
-                // will not allow updates whilst the app is in the background
-                if UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat {
+            // live activities can only be used in master mode as follower mode
+            // will not allow updates whilst the app is in the background
+            if UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat {
+                
+                // data to be displayed in list from which user needs to pick a live activity type
+                var data = [String]()
+                
+                var selectedRow: Int?
+                
+                var index = 0
+                
+                let currentLiveActivityType = UserDefaults.standard.liveActivityType
+                
+                // get all data source types and add the description to data. Search for the type that matches the FollowerDataSourceType that is currently stored in userdefaults.
+                for liveActivityType in LiveActivityType.allCases {
                     
-                    // data to be displayed in list from which user needs to pick a live activity type
-                    var data = [String]()
+                    data.append(liveActivityType.description)
                     
-                    var selectedRow: Int?
+                    if liveActivityType == currentLiveActivityType {
+                        selectedRow = index
+                    }
                     
-                    var index = 0
+                    index += 1
                     
-                    let currentLiveActivityType = UserDefaults.standard.liveActivityType
+                }
+                
+                return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelLiveActivityType, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
                     
-                    // get all data source types and add the description to data. Search for the type that matches the FollowerDataSourceType that is currently stored in userdefaults.
-                    for liveActivityType in LiveActivityType.allCases {
+                    // we'll set this here so that we can use it in the else statement for logging
+                    let oldLiveActivityType = UserDefaults.standard.liveActivityType
+                    
+                    if index != selectedRow {
                         
-                        data.append(liveActivityType.description)
+                        UserDefaults.standard.liveActivityType = LiveActivityType(rawValue: index) ?? .disabled
                         
-                        if liveActivityType == currentLiveActivityType {
-                            selectedRow = index
-                        }
+                        let newLiveActivityType = UserDefaults.standard.liveActivityType
                         
-                        index += 1
+                        trace("Live activity type was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, oldLiveActivityType.description, newLiveActivityType.description)
                         
                     }
                     
-                    return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelLiveActivityType, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
-                        
-                        // we'll set this here so that we can use it in the else statement for logging
-                        let oldLiveActivityType = UserDefaults.standard.liveActivityType
-                        
-                        if index != selectedRow {
-                            
-                            UserDefaults.standard.liveActivityType = LiveActivityType(rawValue: index) ?? .disabled
-                            
-                            let newLiveActivityType = UserDefaults.standard.liveActivityType
-                            
-                            trace("Live activity type was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, oldLiveActivityType.description, newLiveActivityType.description)
-                            
-                        }
-                        
-                    }, cancelHandler: nil, didSelectRowHandler: nil)
-                    
-                } else {
-                    
-                    return .showInfoText(title: Texts_SettingsView.labelLiveActivityType, message: Texts_SettingsView.liveActivityDisabledInFollowerModeMessage, actionHandler: {})
-                    
-                }
+                }, cancelHandler: nil, didSelectRowHandler: nil)
+                
             } else {
-                return .nothing
+                
+                return .showInfoText(title: Texts_SettingsView.labelLiveActivityType, message: Texts_SettingsView.liveActivityDisabledInFollowerModeMessage, actionHandler: {})
+                
             }
             
         case .liveActivitySize:
-            
-            if #available(iOS 16.2, *) {
-                // live activities can only be used in master mode as follower mode
-                // will not allow updates whilst the app is in the background
-                if UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat {
+            // live activities can only be used in master mode as follower mode
+            // will not allow updates whilst the app is in the background
+            if UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat {
+                
+                // data to be displayed in list from which user needs to pick a live activity type
+                var data = [String]()
+                
+                var selectedRow: Int?
+                
+                var index = 0
+                
+                let currentliveActivitySize = UserDefaults.standard.liveActivitySize
+                
+                // get all data source types and add the description to data. Search for the type that matches the FollowerDataSourceType that is currently stored in userdefaults.
+                for liveActivitySize in LiveActivitySize.allCasesForList {
                     
-                    // data to be displayed in list from which user needs to pick a live activity type
-                    var data = [String]()
+                    data.append(liveActivitySize.description)
                     
-                    var selectedRow: Int?
-                    
-                    var index = 0
-                    
-                    let currentliveActivitySize = UserDefaults.standard.liveActivitySize
-                    
-                    // get all data source types and add the description to data. Search for the type that matches the FollowerDataSourceType that is currently stored in userdefaults.
-                    for liveActivitySize in LiveActivitySize.allCasesForList {
-                        
-                        data.append(liveActivitySize.description)
-                        
-                        if liveActivitySize == currentliveActivitySize {
-                            selectedRow = index
-                        }
-                        
-                        index += 1
-                        
+                    if liveActivitySize == currentliveActivitySize {
+                        selectedRow = index
                     }
                     
-                    return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelliveActivitySize, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
-                        
-                        // we'll set this here so that we can use it in the else statement for logging
-                        let oldliveActivitySize = UserDefaults.standard.liveActivitySize
-                        
-                        if index != selectedRow {
-                            
-                            UserDefaults.standard.liveActivitySize = LiveActivitySize(forRowAt: index) ?? .normal
-                            
-                            let newliveActivitySize = UserDefaults.standard.liveActivitySize
-                            
-                            trace("Live activity notification size was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, oldliveActivitySize.description, newliveActivitySize.description)
-                        }
-                        
-                    }, cancelHandler: nil, didSelectRowHandler: nil)
-                    
-                } else {
-                    
-                    return .showInfoText(title: Texts_SettingsView.labelliveActivitySize, message: Texts_SettingsView.liveActivityDisabledInFollowerModeMessage, actionHandler: {})
+                    index += 1
                     
                 }
+                
+                return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelliveActivitySize, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
+                    
+                    // we'll set this here so that we can use it in the else statement for logging
+                    let oldliveActivitySize = UserDefaults.standard.liveActivitySize
+                    
+                    if index != selectedRow {
+                        
+                        UserDefaults.standard.liveActivitySize = LiveActivitySize(forRowAt: index) ?? .normal
+                        
+                        let newliveActivitySize = UserDefaults.standard.liveActivitySize
+                        
+                        trace("Live activity notification size was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, oldliveActivitySize.description, newliveActivitySize.description)
+                    }
+                    
+                }, cancelHandler: nil, didSelectRowHandler: nil)
+                
             } else {
-                return .nothing
+                
+                return .showInfoText(title: Texts_SettingsView.labelliveActivitySize, message: Texts_SettingsView.liveActivityDisabledInFollowerModeMessage, actionHandler: {})
+                
             }
         }
     }
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.sectionTitleNotifications
+        return ConstantsSettingsIcons.notificationsSettingsIcon + " " + Texts_SettingsView.sectionTitleNotifications
     }
 
     func numberOfRows() -> Int {
@@ -236,12 +226,7 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
             return .disclosureIndicator
             
         case .liveActivityType, .liveActivitySize:
-            if #available(iOS 16.2, *) {
-                return UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat ? .disclosureIndicator : .none
-            } else {
-                return .none
-            }
-            
+            return UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat ? .disclosureIndicator : .none
         }
     }
     
@@ -257,18 +242,10 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
             return UserDefaults.standard.notificationInterval.description
             
         case .liveActivityType:
-            if #available(iOS 16.2, *) {
-                return UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat ? UserDefaults.standard.liveActivityType.description : Texts_SettingsView.liveActivityDisabledInFollowerMode
-            } else {
-                return "iOS 16.2 needed"
-            }
+            return UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat ? UserDefaults.standard.liveActivityType.description : Texts_SettingsView.liveActivityDisabledInFollowerMode
             
         case .liveActivitySize:
-            if #available(iOS 16.2, *) {
-               return UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat ? UserDefaults.standard.liveActivitySize.description : Texts_SettingsView.liveActivityDisabledInFollowerMode
-            } else {
-                return "iOS 16.2 needed"
-            }
+            return UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat ? UserDefaults.standard.liveActivitySize.description : Texts_SettingsView.liveActivityDisabledInFollowerMode
         }
     }
     

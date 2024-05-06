@@ -114,28 +114,20 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
         // meanwhile, the real scanning can start
         
         // create libreNFC instance and start session
-        if #available(iOS 14.0, *) {
+        if NFCTagReaderSession.readingAvailable {
             
-            if NFCTagReaderSession.readingAvailable {
-
-                // startScanning is getting called several times, but we must restrict launch of nfc scan to one single time, therefore check if libreNFC == nil
-                if libreNFC == nil {
-                    
-                    libreNFC = LibreNFC(libreNFCDelegate: self)
-                    
-                    (libreNFC as! LibreNFC).startSession()
-                    
-                }
-
-            } else {
+            // startScanning is getting called several times, but we must restrict launch of nfc scan to one single time, therefore check if libreNFC == nil
+            if libreNFC == nil {
                 
-                bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.deviceMustSupportNFC)
+                libreNFC = LibreNFC(libreNFCDelegate: self)
+                
+                (libreNFC as! LibreNFC).startSession()
                 
             }
             
         } else {
             
-            bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.deviceMustSupportIOS14)
+            bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.deviceMustSupportNFC)
             
         }
         

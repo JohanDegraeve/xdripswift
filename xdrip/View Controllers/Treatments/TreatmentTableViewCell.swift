@@ -42,30 +42,21 @@ class TreatmentTableViewCell: UITableViewCell {
             
         }
         
-        if #available(iOS 13.0, *) {
+        switch treatment.treatmentType {
             
-            switch treatment.treatmentType {
-                
-            case .Insulin:
-                self.iconImageView.image =  UIImage(systemName: "arrowtriangle.down.fill")!
-                
-            case .Carbs:
-                self.iconImageView.image =  UIImage(systemName: "circle.fill")!
-                
-            case .Exercise:
-                self.iconImageView.image =  UIImage(systemName: "heart.fill")!
-                
-            case .BgCheck:
-                self.iconImageView.image =  UIImage(systemName: "drop.fill") ?? nil
-                
-            }
+        case .Insulin:
+            self.iconImageView.image =  UIImage(systemName: "arrowtriangle.down.fill")!
             
-        } else {
+        case .Carbs:
+            self.iconImageView.image =  UIImage(systemName: "circle.fill")!
             
-            self.iconImageView.image =  nil
+        case .Exercise:
+            self.iconImageView.image =  UIImage(systemName: "heart.fill")!
+            
+        case .BgCheck:
+            self.iconImageView.image =  UIImage(systemName: "drop.fill") ?? nil
             
         }
-        
         
         // treatment type label
         self.typeLabel.text = treatment.treatmentType.asString()

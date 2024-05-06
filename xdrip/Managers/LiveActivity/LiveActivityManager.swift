@@ -11,7 +11,6 @@ import ActivityKit
 import OSLog
 import SwiftUI
 
-@available(iOS 16.2, *)
 /// manager class to handle the live activity events
 public final class LiveActivityManager {
     
@@ -35,7 +34,6 @@ public final class LiveActivityManager {
 }
 
 // MARK: - Helper Extension
-@available(iOS 16.2, *)
 extension LiveActivityManager {
     
     /// start or update the live activity based upon whether it currently exists or not

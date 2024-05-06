@@ -19,7 +19,6 @@
 "settingsviews_targetValue" = "Hedef Değer";
 "settingsviews_lowValue" = "Düşük Değer";
 "settingsviews_urgentLowValue" = "Acil Düşük Değer";
-"settingsviews_useobjectives" = "Hedefler Grafikte Gösterilsin mi";
 "settingsviews_showcoloredobjectives" = "Renkli Çizgileri Göstersin mi";
 "settingsviews_showtarget" = "Hedef Çizgiyi Göstersin mi";
 "settingsviews_sectiontitlestatistics" = "İstatistik";

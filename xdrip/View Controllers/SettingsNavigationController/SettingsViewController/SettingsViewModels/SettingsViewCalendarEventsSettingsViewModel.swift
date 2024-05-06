@@ -45,7 +45,7 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.calendarEventsSectionTitle
+        return ConstantsSettingsIcons.calendarEventSettingsIcon + " " + Texts_SettingsView.calendarEventsSectionTitle
     }
     
     func settingsRowText(index: Int) -> String {

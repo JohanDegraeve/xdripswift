@@ -12,7 +12,6 @@
 "settingsviews_targetValue" = "قيمة الهدف";
 "settingsviews_lowValue" = "القيمة الدنيا";
 "settingsviews_urgentLowValue" = "قيمة الحد الأدنى الخطر";
-"settingsviews_useobjectives" = "إظهار الأهداف في الرسم البياني";
 "settingsviews_showcoloredobjectives" = "عرض خطوط ملونة";
 "settingsviews_showtarget" = "عرض خط الهدف";
 "settingsviews_sectiontitlestatistics" = "إحصائيات";

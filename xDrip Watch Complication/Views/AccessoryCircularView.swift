@@ -12,7 +12,7 @@ import SwiftUI
 extension XDripWatchComplication.EntryView {
     @ViewBuilder
     var accessoryCircularView: some View {
-        if !entry.widgetState.disableComplications {
+        if !entry.widgetState.keepAliveIsDisabled && entry.widgetState.liveDataIsEnabled {
             Gauge(value: entry.widgetState.bgValueInMgDl ?? 100, in: entry.widgetState.gaugeModel().minValue...entry.widgetState.gaugeModel().maxValue) {
                 Text("Not shown")
             } currentValueLabel: {
@@ -23,12 +23,12 @@ extension XDripWatchComplication.EntryView {
             } minimumValueLabel: {
                 Text(entry.widgetState.gaugeModel().minValue.mgdlToMmolAndToString(mgdl: entry.widgetState.isMgDl))
                     .font(.system(size: 8))
-                    .foregroundStyle(Color(white: 0.7))
+                    .foregroundStyle(.colorPrimary)
                     .minimumScaleFactor(0.2)
             } maximumValueLabel: {
                 Text(entry.widgetState.gaugeModel().maxValue.mgdlToMmolAndToString(mgdl: entry.widgetState.isMgDl))
                     .font(.system(size: 8))
-                    .foregroundStyle(Color(white: 0.7))
+                    .foregroundStyle(.colorPrimary)
                     .minimumScaleFactor(0.2)
             }
             .gaugeStyle(.accessoryCircular)

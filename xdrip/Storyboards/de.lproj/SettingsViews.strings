@@ -137,6 +137,8 @@
 /// home screen settings, target value
 "settingsviews_targetValue" = "Zielwert";
 
+"settingsviews_targetValueMessage" = "Setze auf 0 um Zielwert zu deaktivieren";
+
 /// home screen settings, show target line
 "settingsviews_showtarget" = "Zielwert Linie anzeigen";
 
@@ -172,9 +174,6 @@
 
 /// name of setting for text color
 "m5stack_settingsviews_textColor" = "Text Color";
-
-/// home screen settings, use objectives in graph
-"settingsviews_useobjectives" = "Objekte im Diagram anzeigen";
 
 /// nightscout settings, where user can set the nightscout api key
 "settingsviews_nightScoutAPIKey" = "API_SECRET";
@@ -498,3 +497,14 @@
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+"settingsviews_infoContactsAccessRestricted" = "Authorisierung von %@ zum Zugriff auf Kontakte nicht möglich. Möglicherweise sind Einschränkungen, bspw. Elternkontrolle, aktiv.";
+"settingsviews_contactImageSectionTitle" = "Kontaktbild";
+"settingsviews_enableContactImage" = "Erstelle Kontakt";
+"settingsviews_displayTrendInContactImage" = "Zeige Trend";
+"settingsviews_contactImageCreatedByString" = "Kontakt automatisch erstellt von";
+
+"appleWatchShowDataInComplications" = "Zeige Werte in Komplikation";
+"appleWatchShowDataInComplicationsMessage" = "Bitte beachten Sie, dass die Komplikationen der Apple Watch nicht in Echtzeit aktualisiert werden. Sie werden nur 2-3 Mal pro Stunde aktualisiert.\n\nTreffen Sie Behandlungsentscheidungen NICHT basierend auf Werten in der Komplikation.\n\n %@ Watch app öffnen, um aktuelle Werte zu erhalten.\n\nKlicken Sie nur 'OK', wenn Sie dies verstanden haben und zustimmen.";
+"appleWatchComplicationUserAgreementDate" = "Nutzungsvereinbarung";
+"appleWatchRemainingComplicationUserInfoTransfers" = "Verbleibende Komplikations-Updates";

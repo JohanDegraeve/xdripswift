@@ -83,7 +83,7 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.sectionTitleDexcomShare
+        return ConstantsSettingsIcons.dexcomSettingsIcon + " " + Texts_SettingsView.sectionTitleDexcomShare
     }
 
     func numberOfRows() -> Int {

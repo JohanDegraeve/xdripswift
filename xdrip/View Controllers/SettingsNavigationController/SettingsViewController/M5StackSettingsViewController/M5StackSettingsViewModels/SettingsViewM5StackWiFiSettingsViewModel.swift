@@ -33,7 +33,7 @@ struct SettingsViewM5StackWiFiSettingsViewModel: SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return Texts_Common.WiFi
+        return ConstantsSettingsIcons.m5StackWiFiSettingsIcon + " " + Texts_Common.WiFi
     }
     
     func settingsRowText(index: Int) -> String {
