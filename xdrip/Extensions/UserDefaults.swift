@@ -101,6 +101,8 @@ extension UserDefaults {
         /// target value
         case targetMarkValue = "targetMarkValue"
         
+        
+        
         // Treatment settings
         
         /// should the treatments be shown on the main chart?
@@ -135,6 +137,13 @@ extension UserDefaults {
         /// use the newer TITR of 70-140mg/dL to calculate the statistics? If false, we will use the conventional TIR of 70-180mg/dL
         case useTITRStatisticsRange = "useTITRStatisticsRange"
 
+        // Alert settings
+        
+        /// when did the user snooze all alarms
+        case snoozeAllAlertsFromDate = "snoozeAllAlertsFromDate"
+        /// for how long did the user snooze all alarms
+        case snoozeAllAlertsUntilDate = "snoozeAllAlertsUntilDate"
+        
         // Housekeeper settings
 
         /// For how many days should we keep Readings, Treatments and Calibrations?
@@ -418,6 +427,10 @@ extension UserDefaults {
         case timeStampOfLastHeartBeat = "timeStampOfLastHeartBeat"
         /// how many seconds since the last heartbeat before we raise a disconnection warning
         case secondsUntilHeartBeatDisconnectWarning = "secondsUntilHeartBeatDisconnectWarning"
+        
+        // snooze
+        /// used by the observer in RVC to update the UI for the snooze status
+        case updateSnoozeStatus = "updateSnoozeStatus"
         
     }
     
@@ -1179,6 +1192,29 @@ extension UserDefaults {
         }
         set {
             set(newValue.rawValue, forKey: Key.timeInRangeType.rawValue)
+        }
+    }
+    
+    
+    // MARK: Alert Settings
+    
+    /// when did the user snooze all alerts. If this is nil, then the snooze all isn't activated
+    @objc dynamic var snoozeAllAlertsFromDate: Date? {
+        get {
+            return object(forKey: Key.snoozeAllAlertsFromDate.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.snoozeAllAlertsFromDate.rawValue)
+        }
+    }
+    
+    /// until when did the user snooze all alerts, can be nil until it's first set but unless snoozeAllAlertsDate != nil we'll ignore this value anyway
+    @objc dynamic var snoozeAllAlertsUntilDate: Date? {
+        get {
+            return object(forKey: Key.snoozeAllAlertsUntilDate.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.snoozeAllAlertsUntilDate.rawValue)
         }
     }
     
@@ -2315,6 +2351,17 @@ extension UserDefaults {
         }
     }
     
+    // MARK: - Snooze
+    
+    /// used by the observer in RVC to update the UI for the snooze status
+    @objc dynamic var updateSnoozeStatus: Bool {
+        get {
+            return bool(forKey: Key.updateSnoozeStatus.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.updateSnoozeStatus.rawValue)
+        }
+    }
 }
 
 

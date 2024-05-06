@@ -12,11 +12,6 @@ import SwiftUI
 
 /// holds and returns the different parameters used for creating the newer (2024) SwiftUI glucose charts
 public enum GlucoseChartType: Int, CaseIterable {
-    
-    // when adding GlucoseChartType, add new cases at the end (ie 3, ...)
-    // if this is done in the middle then a database migration would be required, because the rawvalue is stored as Int16 in the coredata
-    // the order of the data source types will in the uiview is determined by the initializer init(forRowAt row: Int)
-
     case liveActivity = 0
     case dynamicIsland = 1
     case watchApp = 2
@@ -26,6 +21,8 @@ public enum GlucoseChartType: Int, CaseIterable {
     case widgetSystemLarge = 6
     case widgetAccessoryRectangular = 7
     case siriGlucoseIntent = 8
+    case notificationImageThumbnail = 9
+    case notificationImageExpanded = 10
     
     var description: String {
         switch self {
@@ -47,6 +44,10 @@ public enum GlucoseChartType: Int, CaseIterable {
             return "Widget Chart .accessoryRectangular"
         case .siriGlucoseIntent:
             return "Siri Glucose Intent Chart"
+        case .notificationImageThumbnail:
+            return "Notification Thumbnail Image Chart"
+        case .notificationImageExpanded:
+            return "Notification Expanded Image Chart"
         }
     }
     
@@ -77,6 +78,10 @@ public enum GlucoseChartType: Int, CaseIterable {
             return (ConstantsGlucoseChartSwiftUI.viewWidthWidgetAccessoryRectangular, ConstantsGlucoseChartSwiftUI.viewHeightWidgetAccessoryRectangular)
         case .siriGlucoseIntent:
             return (ConstantsGlucoseChartSwiftUI.viewWidthWidgetSiriGlucoseIntent, ConstantsGlucoseChartSwiftUI.viewHeightWidgetSiriGlucoseIntent)
+        case .notificationImageThumbnail:
+            return (ConstantsGlucoseChartSwiftUI.viewWidthNotificationThumbnailImage, ConstantsGlucoseChartSwiftUI.viewHeightNotificationThumbnailImage)
+        case .notificationImageExpanded:
+            return (ConstantsGlucoseChartSwiftUI.viewWidthNotificationExpandedImage, ConstantsGlucoseChartSwiftUI.viewHeightNotificationExpandedImage)
         }
     }
     
@@ -105,6 +110,10 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.hoursToShowWidgetAccessoryRectangular
         case .siriGlucoseIntent:
             return ConstantsGlucoseChartSwiftUI.hoursToShowWidgetSiriGlucoseIntent
+        case .notificationImageThumbnail:
+            return ConstantsGlucoseChartSwiftUI.hoursToShowNotificationThumbnailImage
+        case .notificationImageExpanded:
+            return ConstantsGlucoseChartSwiftUI.hoursToShowNotificationExpandedImage
         }
     }
     
@@ -137,6 +146,10 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterWidgetAccessoryRectangular
         case .siriGlucoseIntent:
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterSiriGlucoseIntent
+        case .notificationImageThumbnail:
+            return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterNotificationThumbnailImage
+        case .notificationImageExpanded:
+            return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterNotificationExpandedImage
         }
     }
     
@@ -229,7 +242,7 @@ public enum GlucoseChartType: Int, CaseIterable {
     
     func yAxisShowLabels() -> Visibility {
         switch self {
-        case .siriGlucoseIntent, .widgetSystemLarge:
+        case .siriGlucoseIntent, .widgetSystemLarge, .notificationImageExpanded:
             return .automatic
         default:
             return .hidden
@@ -238,7 +251,7 @@ public enum GlucoseChartType: Int, CaseIterable {
     
     func yAxisLabelOffsetX() -> CGFloat {
         switch self {
-        case .siriGlucoseIntent, .widgetSystemLarge:
+        case .siriGlucoseIntent, .widgetSystemLarge, .notificationImageExpanded:
             return ConstantsGlucoseChartSwiftUI.yAxisLabelOffsetX
         default:
             return 0
@@ -247,10 +260,24 @@ public enum GlucoseChartType: Int, CaseIterable {
     
     func yAxisLabelOffsetY() -> CGFloat {
         switch self {
-        case .siriGlucoseIntent, .widgetSystemLarge:
+        case .siriGlucoseIntent, .widgetSystemLarge, .notificationImageExpanded:
             return ConstantsGlucoseChartSwiftUI.yAxisLabelOffsetY
         default:
             return 0
+        }
+    }
+    
+    
+    // MARK: - filename properties if generating an image of the chart/view
+    
+    func filename() -> String {
+        switch self {
+        case .notificationImageThumbnail:
+            return ConstantsGlucoseChartSwiftUI.filenameNotificationThumbnailImage
+        case .notificationImageExpanded:
+            return ConstantsGlucoseChartSwiftUI.filenameNotificationExpandedImage
+        default:
+            return ""
         }
     }
 }

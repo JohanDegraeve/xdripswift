@@ -114,7 +114,6 @@ enum ConstantsGlucoseChartSwiftUI {
     // ------------------------------------------
     // ----- Siri Intent Chart ------------------
     // ------------------------------------------
-    // siri glucose intent response chart
     static let viewWidthWidgetSiriGlucoseIntent: CGFloat = 320
     static let viewHeightWidgetSiriGlucoseIntent: CGFloat = 150
     static let hoursToShowWidgetSiriGlucoseIntent: Double = 4
@@ -122,4 +121,22 @@ enum ConstantsGlucoseChartSwiftUI {
     static let cornerRadiusSiriGlucoseIntent: Double = 0
     static let paddingSiriGlucoseIntent: Double = 10
     static let backgroundColorSiriGlucoseIntent: Color = .black // Color(red: 0.18, green: 0.18, blue: 0.18) originally from gshaviv
+    
+    
+    // ------------------------------------------
+    // ----- Notification Image Chart -----------
+    // ------------------------------------------
+    // thumbnail image
+    static let viewWidthNotificationThumbnailImage: CGFloat = 80
+    static let viewHeightNotificationThumbnailImage: CGFloat = 80
+    static let hoursToShowNotificationThumbnailImage: Double = 1
+    static let glucoseCircleDiameterNotificationThumbnailImage: Double = 70
+    static let filenameNotificationThumbnailImage: String = "notificationThumbnailImage"
+    
+    // expanded image
+    static let viewWidthNotificationExpandedImage: CGFloat = 373 //320
+    static let viewHeightNotificationExpandedImage: CGFloat = 170 //150
+    static let hoursToShowNotificationExpandedImage: Double = 3
+    static let glucoseCircleDiameterNotificationExpandedImage: Double = 30
+    static let filenameNotificationExpandedImage: String = "notificationExpandedImage"
 }
