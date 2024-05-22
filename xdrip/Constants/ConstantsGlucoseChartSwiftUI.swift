@@ -76,6 +76,7 @@ enum ConstantsGlucoseChartSwiftUI {
     static let viewHeightWatchAccessoryRectangular: CGFloat = 55
     static let hoursToShowWatchAccessoryRectangular: Double = 5
     static let glucoseCircleDiameterWatchAccessoryRectangular: Double = 14
+    static let backgroundColorWatchAccessoryRectangular: Color = .clear
     
     // watch complication sizes for smaller watches
     static let viewWidthWatchAccessoryRectangularSmall: CGFloat = 160

@@ -5,6 +5,7 @@
   Created by Paul Plant on 26/4/24.
   Copyright © 2024 Johan Degraeve. All rights reserved.
 */
+"liveDataDisabled" = "Datos deshabilitados";
 "goTo" = "Id a";
 "appleWatch" = "Apple Watch";
 "settings" = "Configuración";
