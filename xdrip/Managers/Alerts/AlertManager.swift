@@ -643,11 +643,25 @@ public class AlertManager:NSObject {
                 alertNotificationDictionary.trendString = lastBgReading.slopeArrow()
                 alertNotificationDictionary.alertUrgencyTypeRawValue = alertKind.alertUrgencyType().rawValue
                 
+                
+                // as we can't use the local notification attachments in Watch app
+                // we need to encode the image as string data and then re-encode it as an image later
+                let imageURL = URL.documentsDirectory.appendingPathComponent("\(ConstantsGlucoseChartSwiftUI.filenameNotificationWatchImage).png")
+                let image = UIImage(contentsOfFile: imageURL.path)
+                let imageData = image?.jpegData(compressionQuality: 1) // no need to try to reduce the quality
+                
+                if imageData != nil {
+                    alertNotificationDictionary.watchNotificationImageAsString = imageData?.base64EncodedString(options: .endLineWithLineFeed)
+                }
+                                
+                // check that we can correctly serialize the struct and if so, add it to the notification content
                 if let userInfo = alertNotificationDictionary.asDictionary {
                     content.userInfo = userInfo
                 }
             }
             
+            // add the last generated BG chart images as attachments to the notification content
+            // the bigger expanded image will be hidden from being a thumbnail so the notification short view will pick up the other one
             let expandedAttachment = try! UNNotificationAttachment(identifier: "image", url: URL.documentsDirectory.appendingPathComponent("\(ConstantsGlucoseChartSwiftUI.filenameNotificationExpandedImage).png"), options: [UNNotificationAttachmentOptionsThumbnailHiddenKey: true])
             
             let thumbnailAttachment = try! UNNotificationAttachment(identifier: "thumbnail", url: URL.documentsDirectory.appendingPathComponent("\(ConstantsGlucoseChartSwiftUI.filenameNotificationThumbnailImage).png"), options: [UNNotificationAttachmentOptionsThumbnailHiddenKey: false])

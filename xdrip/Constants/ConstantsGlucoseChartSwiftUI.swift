@@ -28,7 +28,7 @@ enum ConstantsGlucoseChartSwiftUI {
     static let xAxisLabelFirstClippingInMinutes: Double = 8 * 60
     static let xAxisLabelLastClippingInMinutes: Double = 12 * 60
     
-    static let cornerRadius: CGFloat = 2
+    static let cornerRadius: CGFloat = 0
     
     
     // ------------------------------------------
@@ -134,9 +134,17 @@ enum ConstantsGlucoseChartSwiftUI {
     static let filenameNotificationThumbnailImage: String = "notificationThumbnailImage"
     
     // expanded image
-    static let viewWidthNotificationExpandedImage: CGFloat = 373 //320
-    static let viewHeightNotificationExpandedImage: CGFloat = 170 //150
+    static let viewWidthNotificationExpandedImage: CGFloat = 373
+    static let viewHeightNotificationExpandedImage: CGFloat = 170
     static let hoursToShowNotificationExpandedImage: Double = 3
     static let glucoseCircleDiameterNotificationExpandedImage: Double = 30
     static let filenameNotificationExpandedImage: String = "notificationExpandedImage"
+    
+    // watch notification image
+    static let viewWidthNotificationWatchImage: CGFloat = 170
+    static let viewHeightNotificationWatchImage: CGFloat = 80
+    static let hoursToShowNotificationWatchImage: Double = 2
+    static let glucoseCircleDiameterNotificationWatchImage: Double = 30
+    static let paddingNotificationWatchImage: Double = 2
+    static let filenameNotificationWatchImage: String = "notificationWatchImage"
 }

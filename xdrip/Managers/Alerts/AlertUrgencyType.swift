@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import SwiftUI
 
 /// define urgency levels so that we can pass this to notifications to display them in a relevant style...
 public enum AlertUrgencyType: Int {
@@ -37,50 +38,6 @@ public enum AlertUrgencyType: Int {
         }
     }
     
-    var bgValueTextColor: UIColor {
-        switch self {
-        case .urgent:
-            return UIColor.systemRed
-        case .warning:
-            return UIColor.systemYellow
-        default:
-            return UIColor.systemGreen
-        }
-    }
- 
-    var bannerTextColor: UIColor {
-        switch self {
-        case .urgent:
-            return UIColor.white.withAlphaComponent(0.85)
-        case .warning:
-            return UIColor.black
-        default:
-            return UIColor.white.withAlphaComponent(0.85)
-        }
-    }
-    
-    var bannerBackgroundColor: UIColor {
-        switch self {
-        case .urgent:
-            return UIColor.systemRed
-        case .warning:
-            return UIColor.systemYellow
-        default:
-            return UIColor.clear
-        }
-    }
-    
-    var alertImageString: String? {
-        switch self {
-        case .urgent:
-            return "exclamationmark.triangle.fill"
-        case .warning:
-            return "exclamationmark.triangle"
-        default:
-            return "info.circle"
-        }
-    }
-    
     var description: String {
         switch self {
         case .urgent:
@@ -100,6 +57,52 @@ public enum AlertUrgencyType: Int {
             return Texts_Alerts.alertTypeWarning
         default:
             return ""
+        }
+    }
+ 
+    // UIKit colors
+    var bannerTextUIColor: UIColor {
+        switch self {
+        case .urgent:
+            return UIColor.white.withAlphaComponent(0.85)
+        case .warning:
+            return UIColor.black
+        default:
+            return UIColor.white.withAlphaComponent(0.85)
+        }
+    }
+    
+    var bannerBackgroundUIColor: UIColor {
+        switch self {
+        case .urgent:
+            return UIColor.red
+        case .warning:
+            return UIColor.yellow
+        default:
+            return ConstantsAlerts.notificationBannerBackgroundUIColor
+        }
+    }
+    
+    // SwiftUI colors
+    var bannerTextColor: Color {
+        switch self {
+        case .urgent:
+            return .white.opacity(0.85)
+        case .warning:
+            return .black
+        default:
+            return .white.opacity(0.85)
+        }
+    }
+    
+    var bannerBackgroundColor: Color {
+        switch self {
+        case .urgent:
+            return .red
+        case .warning:
+            return .yellow
+        default:
+            return ConstantsAlerts.notificationBannerBackgroundColor
         }
     }
 }

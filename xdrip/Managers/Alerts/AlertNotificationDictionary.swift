@@ -17,6 +17,7 @@ struct AlertNotificationDictionary: Codable {
     var deltaString: String?
     var isMgDl: Bool?
     var alertUrgencyTypeRawValue: Int?
+    var watchNotificationImageAsString: String?
     
     var asDictionary: [String: Any]? {
         guard let data = try? JSONEncoder().encode(self) else { return nil }

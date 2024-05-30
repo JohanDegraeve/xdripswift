@@ -5,7 +5,6 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -19,13 +18,13 @@
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1L8-uv-oca">
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="60"/>
-                                <color key="backgroundColor" systemColor="systemYellowColor"/>
+                                <color key="backgroundColor" name="colorTertiary"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="60" id="JMb-3I-Mco"/>
                                 </constraints>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ALERT TYPE" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.20000000000000001" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VEV-hO-Hv7">
-                                <rect key="frame" x="59.999999999999986" y="67.333333333333329" width="155.66666666666663" height="33.666666666666671"/>
+                                <rect key="frame" x="118.66666666666667" y="13.333333333333332" width="155.66666666666663" height="33.666666666666671"/>
                                 <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
                                 <color key="textColor" name="colorPrimary"/>
                                 <nil key="highlightedColor"/>
@@ -54,22 +53,13 @@
                                 <color key="textColor" name="colorSecondary"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="rya-b4-2Gc">
-                                <rect key="frame" x="20" y="69" width="30" height="30"/>
-                                <color key="tintColor" name="colorPrimary"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="30" id="7Is-NB-tAy"/>
-                                    <constraint firstAttribute="width" constant="30" id="Cpb-nV-GqM"/>
-                                </constraints>
-                            </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="2BE-c3-nQJ"/>
-                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" white="0.10000000000000001" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="tEl-sS-Qw5" firstAttribute="leading" secondItem="2BE-c3-nQJ" secondAttribute="leading" constant="10" id="0uH-6a-BMm"/>
                             <constraint firstItem="tEl-sS-Qw5" firstAttribute="top" secondItem="GcN-lo-r42" secondAttribute="bottom" constant="10" id="2ut-x4-4kV"/>
-                            <constraint firstItem="VEV-hO-Hv7" firstAttribute="centerY" secondItem="rya-b4-2Gc" secondAttribute="centerY" id="3UP-e3-BfS"/>
-                            <constraint firstItem="rya-b4-2Gc" firstAttribute="top" secondItem="2BE-c3-nQJ" secondAttribute="top" constant="10" id="6I4-x0-BpE"/>
+                            <constraint firstItem="VEV-hO-Hv7" firstAttribute="centerX" secondItem="S3S-Oj-5AN" secondAttribute="centerX" id="5CA-M8-OTB"/>
                             <constraint firstItem="ext-DE-4hO" firstAttribute="centerY" secondItem="ggK-c2-fEA" secondAttribute="centerY" id="6bv-F7-XdX"/>
                             <constraint firstItem="1L8-uv-oca" firstAttribute="top" secondItem="S3S-Oj-5AN" secondAttribute="top" id="7ml-EU-nhB"/>
                             <constraint firstItem="ext-DE-4hO" firstAttribute="leading" secondItem="ggK-c2-fEA" secondAttribute="trailing" constant="5" id="87D-Cl-f7v"/>
@@ -78,11 +68,10 @@
                             <constraint firstItem="1L8-uv-oca" firstAttribute="leading" secondItem="2BE-c3-nQJ" secondAttribute="leading" id="R7V-LD-4nt"/>
                             <constraint firstItem="ext-DE-4hO" firstAttribute="centerY" secondItem="GcN-lo-r42" secondAttribute="centerY" id="ULj-V1-yXD"/>
                             <constraint firstItem="2BE-c3-nQJ" firstAttribute="trailing" secondItem="ext-DE-4hO" secondAttribute="trailing" constant="15" id="Vue-y8-JGW"/>
+                            <constraint firstItem="VEV-hO-Hv7" firstAttribute="centerY" secondItem="1L8-uv-oca" secondAttribute="centerY" id="Yb5-4V-W8o"/>
                             <constraint firstItem="ext-DE-4hO" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="GcN-lo-r42" secondAttribute="trailing" constant="8" symbolic="YES" id="civ-f0-XQB"/>
-                            <constraint firstItem="rya-b4-2Gc" firstAttribute="leading" secondItem="2BE-c3-nQJ" secondAttribute="leading" constant="20" id="iHS-nd-yDJ"/>
                             <constraint firstItem="1L8-uv-oca" firstAttribute="trailing" secondItem="2BE-c3-nQJ" secondAttribute="trailing" id="nAm-x4-DEC"/>
                             <constraint firstItem="ggK-c2-fEA" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="GcN-lo-r42" secondAttribute="trailing" constant="8" symbolic="YES" id="nqb-jf-ChJ"/>
-                            <constraint firstItem="VEV-hO-Hv7" firstAttribute="leading" secondItem="rya-b4-2Gc" secondAttribute="trailing" constant="10" id="qHa-6y-6gF"/>
                             <constraint firstItem="tEl-sS-Qw5" firstAttribute="centerX" secondItem="S3S-Oj-5AN" secondAttribute="centerX" id="uu2-7w-1mi"/>
                         </constraints>
                     </view>
@@ -90,7 +79,6 @@
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="393" height="340"/>
                     <connections>
-                        <outlet property="alertIconOutlet" destination="rya-b4-2Gc" id="n5J-kv-To8"/>
                         <outlet property="alertTitleLabel" destination="VEV-hO-Hv7" id="epP-Nt-LqW"/>
                         <outlet property="bannerOutlet" destination="1L8-uv-oca" id="8Rr-9N-6mf"/>
                         <outlet property="bgValueLabel" destination="GcN-lo-r42" id="jEu-oX-dei"/>
@@ -112,8 +100,8 @@
         <namedColor name="colorSecondary">
             <color white="0.64999997615814209" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </namedColor>
-        <systemColor name="systemYellowColor">
-            <color red="1" green="0.80000000000000004" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </systemColor>
+        <namedColor name="colorTertiary">
+            <color white="0.44999998807907104" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </namedColor>
     </resources>
 </document>

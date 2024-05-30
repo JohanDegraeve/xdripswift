@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		47037B8E2C072346000BD6BD /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
+		47037B8F2C072973000BD6BD /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
+		47037B902C072974000BD6BD /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
+		47037B912C07B15E000BD6BD /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
 		47046EA42A6E8BA700A6F736 /* TextsBgReadings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47046EA32A6E8BA700A6F736 /* TextsBgReadings.swift */; };
 		47046EA72A6E8F7B00A6F736 /* BgReadings.strings in Resources */ = {isa = PBXBuildFile; fileRef = 47046EA92A6E8F7B00A6F736 /* BgReadings.strings */; };
 		470824D2297484B500C52317 /* SwiftCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 470824D1297484B500C52317 /* SwiftCharts */; };
@@ -64,6 +68,10 @@
 		474606902B963EA100AC9214 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4746068D2B963EA100AC9214 /* View.swift */; };
 		474606912B963EA100AC9214 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4746068D2B963EA100AC9214 /* View.swift */; };
 		474822412BFE62220052D4FB /* ConstantsCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2AA23DA520B00E5E98A /* ConstantsCalendar.swift */; };
+		474822442C0108EA0052D4FB /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474822432C0108EA0052D4FB /* NotificationView.swift */; };
+		474822462C01097D0052D4FB /* NotificationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474822452C01097D0052D4FB /* NotificationController.swift */; };
+		474822472C010DED0052D4FB /* AlertUrgencyType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CD642B2BEBEB0E002BDA68 /* AlertUrgencyType.swift */; };
+		474822482C010F380052D4FB /* TextsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7B1226A0878004BA588 /* TextsAlerts.swift */; };
 		4749EB9B25B36E010072DF8B /* LibreNFC.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4749EB9D25B36E010072DF8B /* LibreNFC.strings */; };
 		47503382247420A200D2260B /* BluetoothPeripheralView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 47503384247420A200D2260B /* BluetoothPeripheralView.strings */; };
 		4752B400263570DA0081D551 /* ConstantsStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */; };
@@ -901,6 +909,8 @@
 		4746067D2B962FBD00AC9214 /* SystemLargeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemLargeView.swift; sourceTree = "<group>"; };
 		4746067F2B96308A00AC9214 /* WidgetSharedUserDefaultsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSharedUserDefaultsModel.swift; sourceTree = "<group>"; };
 		4746068D2B963EA100AC9214 /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
+		474822432C0108EA0052D4FB /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
+		474822452C01097D0052D4FB /* NotificationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationController.swift; sourceTree = "<group>"; };
 		4749EB9C25B36E010072DF8B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LibreNFC.strings; sourceTree = "<group>"; };
 		47503383247420A200D2260B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BluetoothPeripheralView.strings; sourceTree = "<group>"; };
 		4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsStatistics.swift; sourceTree = "<group>"; };
@@ -2016,6 +2026,7 @@
 			isa = PBXGroup;
 			children = (
 				47A6ABEE2B7949B80047A4BA /* WatchStateModel.swift */,
+				474822452C01097D0052D4FB /* NotificationController.swift */,
 			);
 			path = DataModels;
 			sourceTree = "<group>";
@@ -2050,17 +2061,9 @@
 				47CD64242BEA9E5A002BDA68 /* xDrip Notification Context Extension.entitlements */,
 				47CD641D2BE9506C002BDA68 /* Info.plist */,
 				47CD64182BE9506C002BDA68 /* NotificationViewController.swift */,
-				47CD64252BEAA538002BDA68 /* Extensions */,
 				47CD641A2BE9506C002BDA68 /* MainInterface.storyboard */,
 			);
 			path = "xDrip Notification Context Extension";
-			sourceTree = "<group>";
-		};
-		47CD64252BEAA538002BDA68 /* Extensions */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Extensions;
 			sourceTree = "<group>";
 		};
 		47DB06CC2A7013EF00267BE3 /* Followers */ = {
@@ -2095,6 +2098,7 @@
 			isa = PBXGroup;
 			children = (
 				47A6ABE32B790CC60047A4BA /* MainView.swift */,
+				474822432C0108EA0052D4FB /* NotificationView.swift */,
 				478A92542B8F95930084C394 /* SubViews */,
 			);
 			path = Views;
@@ -3155,9 +3159,9 @@
 		F8DF765923E350B100063910 /* Dexcom */ = {
 			isa = PBXGroup;
 			children = (
-				F8F71D842B7EC19A005076E8 /* G7 */,
 				F816E1222439DB42009EE65B /* G4 */,
 				F8DF765A23E350B100063910 /* G5 */,
+				F8F71D842B7EC19A005076E8 /* G7 */,
 			);
 			path = Dexcom;
 			sourceTree = "<group>";
@@ -4170,6 +4174,7 @@
 				4746068A2B96380200AC9214 /* ConstantsLibreLinkUp.swift in Sources */,
 				47A6AC2C2B7D3E170047A4BA /* Double.swift in Sources */,
 				47EDD1402BDD4F5D00C5A286 /* ConstantsWidgetExtension.swift in Sources */,
+				47037B8F2C072973000BD6BD /* ConstantsAlerts.swift in Sources */,
 				47A6AC412B7D42EC0047A4BA /* TextsCommon.swift in Sources */,
 				478A92572B8FA1E30084C394 /* ConstantsBGGraphBuilder.swift in Sources */,
 				4746068F2B963EA100AC9214 /* View.swift in Sources */,
@@ -4185,6 +4190,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				47037B902C072974000BD6BD /* ConstantsAlerts.swift in Sources */,
 				474606912B963EA100AC9214 /* View.swift in Sources */,
 				4746066D2B9618B800AC9214 /* AccessoryCornerView.swift in Sources */,
 				478A92652B90AB040084C394 /* GlucoseChartView.swift in Sources */,
@@ -4222,6 +4228,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				474822462C01097D0052D4FB /* NotificationController.swift in Sources */,
 				47A6AC2B2B7D3DE30047A4BA /* GlucoseChartView.swift in Sources */,
 				47DE41B52B8693CB0041DA19 /* HeaderView.swift in Sources */,
 				47A6AC342B7D3E260047A4BA /* ConstantsBloodGlucose.swift in Sources */,
@@ -4236,6 +4243,7 @@
 				47A6AC372B7D3E650047A4BA /* GlucoseChartType.swift in Sources */,
 				47A6ABE42B790CC60047A4BA /* MainView.swift in Sources */,
 				474606882B9637F600AC9214 /* TextsSettingsView.swift in Sources */,
+				474822482C010F380052D4FB /* TextsAlerts.swift in Sources */,
 				4793599A2B8A2A4E007D3CEE /* InfoView.swift in Sources */,
 				47A6ABEF2B7949B80047A4BA /* WatchStateModel.swift in Sources */,
 				47A6ABE22B790CC60047A4BA /* xDripWatchApp.swift in Sources */,
@@ -4244,12 +4252,15 @@
 				47A6AC2F2B7D3E170047A4BA /* Date.swift in Sources */,
 				47CA61E92B97A6BD00C2A597 /* FollowerBackgroundKeepAliveType.swift in Sources */,
 				47DE41AE2B863D370041DA19 /* WatchState.swift in Sources */,
+				47037B8E2C072346000BD6BD /* ConstantsAlerts.swift in Sources */,
 				47A6AC422B7D42ED0047A4BA /* TextsCommon.swift in Sources */,
 				47A6AC3B2B7D3F9B0047A4BA /* ConstantsGlucoseChartSwiftUI.swift in Sources */,
+				474822442C0108EA0052D4FB /* NotificationView.swift in Sources */,
 				47DE41B92B87B2680041DA19 /* ConstantsAppleWatch.swift in Sources */,
 				47CA61E82B9796D200C2A597 /* ConstantsFollower.swift in Sources */,
 				4746068B2B96380200AC9214 /* ConstantsLibreLinkUp.swift in Sources */,
 				47A6AC352B7D3E260047A4BA /* ConstantsUI.swift in Sources */,
+				474822472C010DED0052D4FB /* AlertUrgencyType.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4263,6 +4274,7 @@
 				4734FF562BEFE3F200C7115A /* AlertNotificationDictionary.swift in Sources */,
 				47CD64192BE9506C002BDA68 /* NotificationViewController.swift in Sources */,
 				474822412BFE62220052D4FB /* ConstantsCalendar.swift in Sources */,
+				47037B912C07B15E000BD6BD /* ConstantsAlerts.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
