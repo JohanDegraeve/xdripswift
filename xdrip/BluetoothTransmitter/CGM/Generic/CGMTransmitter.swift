@@ -298,11 +298,11 @@ enum CGMTransmitterType:String, CaseIterable {
                     
                 } else if transmitterIdString.startsWith("5") {
                     
-                    return "Dexcom One"
+                    return "Dexcom ONE"
                     
                 } else if transmitterIdString.startsWith("C") {
                     
-                    return "Dexcom One"
+                    return "Dexcom ONE"
                     
                 }
                 

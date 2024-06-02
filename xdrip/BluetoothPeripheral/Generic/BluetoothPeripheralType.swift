@@ -23,10 +23,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
     case BubbleType = "Bubble / Bubble Mini"
     
     /// Dexcom
-    case DexcomType = "Dexcom G5 / G6 / One"
+    case DexcomType = "Dexcom G5 / G6 / ONE"
     
     /// Dexcom G7
-    case DexcomG7Type = "Dexcom G7"
+    case DexcomG7Type = "Dexcom G7 / ONE+"
     
     /// DexcomG4
     case DexcomG4Type = "Dexcom G4 (Bridge)"
