@@ -432,6 +432,8 @@ extension UserDefaults {
         /// used by the observer in RVC to update the UI for the snooze status
         case updateSnoozeStatus = "updateSnoozeStatus"
         
+        /// should the app allow a high contrast mode for the .systemSmall widget when shown in StandBy mode at night?
+        case allowStandByHighContrast = "allowStandByHighContrast"
     }
     
     
@@ -2105,6 +2107,17 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.libreLinkUpVersion.rawValue)
+        }
+    }
+    
+    /// should the app allow a high contrast mode for the .systemSmall widget when shown in StandBy mode at night?
+    var allowStandByHighContrast: Bool {
+        // default value for bool in userdefaults is false, as default we want the app to allow high contrast for StandBy as needed
+        get {
+            return !bool(forKey: Key.allowStandByHighContrast.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.allowStandByHighContrast.rawValue)
         }
     }
     

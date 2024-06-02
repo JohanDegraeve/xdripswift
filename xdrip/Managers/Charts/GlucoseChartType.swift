@@ -17,13 +17,14 @@ public enum GlucoseChartType: Int, CaseIterable {
     case watchApp = 2
     case watchAccessoryRectangular = 3
     case widgetSystemSmall = 4
-    case widgetSystemMedium = 5
-    case widgetSystemLarge = 6
-    case widgetAccessoryRectangular = 7
-    case siriGlucoseIntent = 8
-    case notificationImageThumbnail = 9
-    case notificationImageExpanded = 10
-    case notificationWatchImage = 11
+    case widgetSystemSmallStandBy = 5
+    case widgetSystemMedium = 6
+    case widgetSystemLarge = 7
+    case widgetAccessoryRectangular = 8
+    case siriGlucoseIntent = 9
+    case notificationImageThumbnail = 10
+    case notificationImageExpanded = 11
+    case notificationWatchImage = 12
     
     var description: String {
         switch self {
@@ -37,6 +38,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return "Watch Chart .accessoryRectangular"
         case .widgetSystemSmall:
             return "Widget Chart .systemSmall"
+        case .widgetSystemSmallStandBy:
+            return "Widget Chart .systemSmall for StandBy mode"
         case .widgetSystemMedium:
             return "Widget Chart .systemMedium"
         case .widgetSystemLarge:
@@ -73,6 +76,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return (ConstantsGlucoseChartSwiftUI.viewWidthWatchAccessoryRectangular, ConstantsGlucoseChartSwiftUI.viewHeightWatchAccessoryRectangular)
         case .widgetSystemSmall:
             return (ConstantsGlucoseChartSwiftUI.viewWidthWidgetSystemSmall, ConstantsGlucoseChartSwiftUI.viewHeightWidgetSystemSmall)
+        case .widgetSystemSmallStandBy:
+            return (ConstantsGlucoseChartSwiftUI.viewWidthWidgetSystemSmallStandBy, ConstantsGlucoseChartSwiftUI.viewHeightWidgetSystemSmallStandBy)
         case .widgetSystemMedium:
             return (ConstantsGlucoseChartSwiftUI.viewWidthWidgetSystemMedium, ConstantsGlucoseChartSwiftUI.viewHeightWidgetSystemMedium)
         case .widgetSystemLarge:
@@ -105,7 +110,7 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.hoursToShowWatchApp
         case .watchAccessoryRectangular:
             return ConstantsGlucoseChartSwiftUI.hoursToShowWatchAccessoryRectangular
-        case .widgetSystemSmall:
+        case .widgetSystemSmall, .widgetSystemSmallStandBy:
             return ConstantsGlucoseChartSwiftUI.hoursToShowWidgetSystemSmall
         case .widgetSystemMedium:
             return ConstantsGlucoseChartSwiftUI.hoursToShowWidgetSystemMedium
@@ -145,6 +150,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterWatchAccessoryRectangular
         case .widgetSystemSmall:
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterWidgetSystemSmall
+        case .widgetSystemSmallStandBy:
+            return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterWidgetSystemSmallStandBy
         case .widgetSystemMedium:
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterWidgetSystemMedium
         case .widgetSystemLarge:
@@ -281,6 +288,33 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.yAxisLabelOffsetY
         default:
             return 0
+        }
+    }
+    
+    func yAxisLineSize() -> Double {
+        switch self {
+        case .widgetSystemSmallStandBy:
+            return ConstantsGlucoseChartSwiftUI.yAxisLineSizeSystemSmallStandBy
+        default:
+            return ConstantsGlucoseChartSwiftUI.yAxisLineSize
+        }
+    }
+    
+    func yAxisLowHighLineColor() -> Color {
+        switch self {
+        case .widgetSystemSmallStandBy:
+            return ConstantsGlucoseChartSwiftUI.yAxisLowHighLineColorSystemSmallStandBy
+        default:
+            return ConstantsGlucoseChartSwiftUI.yAxisLowHighLineColor
+        }
+    }
+    
+    func yAxisUrgentLowHighLineColor() -> Color {
+        switch self {
+        case .widgetSystemSmallStandBy:
+            return ConstantsGlucoseChartSwiftUI.yAxisUrgentLowHighLineColorSystemSmallStandBy
+        default:
+            return ConstantsGlucoseChartSwiftUI.yAxisUrgentLowHighLineColor
         }
     }
     

@@ -21,7 +21,7 @@ enum ConstantsGlucoseChartSwiftUI {
     static let yAxisLowHighLineColor = Color(white: 0.7)
     static let yAxisUrgentLowHighLineColor = Color(white: 0.6)
     
-    static let xAxisGridLineColor = Color(white: 0.45)
+    static let xAxisGridLineColor = Color(white: 0.4)
     static let xAxisLabelOffsetX: CGFloat = -12
     static let xAxisLabelOffsetY: CGFloat = -2
     static let xAxisIntervalBetweenValues: Int = 1
@@ -92,6 +92,15 @@ enum ConstantsGlucoseChartSwiftUI {
     static let hoursToShowWidgetSystemSmall: Double = 3
     static let glucoseCircleDiameterWidgetSystemSmall: Double = 20
     
+    // widget systemSmall StandBy chart
+    static let viewWidthWidgetSystemSmallStandBy: CGFloat = 140
+    static let viewHeightWidgetSystemSmallStandBy: CGFloat = 100
+    static let hoursToShowWidgetSystemSmallStandBy: Double = 43
+    static let glucoseCircleDiameterWidgetSystemSmallStandBy: Double = 20
+    static let yAxisLineSizeSystemSmallStandBy: Double = 1.0
+    static let yAxisLowHighLineColorSystemSmallStandBy = Color(white: 1.0)
+    static let yAxisUrgentLowHighLineColorSystemSmallStandBy = Color(white: 0.8)
+    
     // widget systemMedium chart
     static let viewWidthWidgetSystemMedium: CGFloat = 300
     static let viewHeightWidgetSystemMedium: CGFloat = 80
@@ -142,8 +151,8 @@ enum ConstantsGlucoseChartSwiftUI {
     
     // watch notification image
     static let viewWidthNotificationWatchImage: CGFloat = 170
-    static let viewHeightNotificationWatchImage: CGFloat = 80
-    static let hoursToShowNotificationWatchImage: Double = 2
+    static let viewHeightNotificationWatchImage: CGFloat = 60
+    static let hoursToShowNotificationWatchImage: Double = 3
     static let glucoseCircleDiameterNotificationWatchImage: Double = 30
     static let paddingNotificationWatchImage: Double = 2
     static let filenameNotificationWatchImage: String = "notificationWatchImage"

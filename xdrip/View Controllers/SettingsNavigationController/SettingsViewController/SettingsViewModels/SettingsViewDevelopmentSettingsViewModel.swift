@@ -34,6 +34,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// number of remaining forced complication updates available today
     case remainingComplicationUserInfoTransfers = 9
     
+    /// allow StandBy mode to show a high contrast version of the widget at night
+    case allowStandByHighContrast = 10
+    
 }
 
 class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProtocol {
@@ -91,6 +94,9 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             
         case .remainingComplicationUserInfoTransfers:
             return Texts_SettingsView.appleWatchRemainingComplicationUserInfoTransfers
+            
+        case .allowStandByHighContrast:
+            return Texts_SettingsView.allowStandByHighContrast
         }
     }
     
@@ -100,7 +106,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .suppressLoopShare:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .suppressLoopShare, .allowStandByHighContrast:
             return .none
             
         case .loopDelay, .libreLinkUpVersion, .remainingComplicationUserInfoTransfers:
@@ -115,7 +121,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .suppressLoopShare, .shareToLoopOnceEvery5Minutes, .loopDelay:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .suppressLoopShare, .shareToLoopOnceEvery5Minutes, .loopDelay, .allowStandByHighContrast:
             return nil
             
         case .libreLinkUpVersion:
@@ -203,6 +209,14 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                 
             })
             
+        case .allowStandByHighContrast:
+            return UISwitch(isOn: UserDefaults.standard.allowStandByHighContrast, action: {
+                (isOn:Bool) in
+                
+                UserDefaults.standard.allowStandByHighContrast = isOn
+                
+            })
+            
         case .remainingComplicationUserInfoTransfers, .loopDelay, .libreLinkUpVersion:
             return nil
             
@@ -220,7 +234,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .suppressLoopShare:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .suppressLoopShare, .allowStandByHighContrast:
             return .nothing
             
         case .loopDelay:

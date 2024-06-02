@@ -1969,11 +1969,11 @@
 		474606782B962F3300AC9214 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				47CA61E32B965E7100C2A597 /* AccessoryCircularView.swift */,
+				47CA61E52B966A9700C2A597 /* AccessoryRectangularView.swift */,
 				4746067D2B962FBD00AC9214 /* SystemLargeView.swift */,
 				4746067B2B962F8500AC9214 /* SystemMediumView.swift */,
 				474606792B962F4C00AC9214 /* SystemSmallView.swift */,
-				47CA61E32B965E7100C2A597 /* AccessoryCircularView.swift */,
-				47CA61E52B966A9700C2A597 /* AccessoryRectangularView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
