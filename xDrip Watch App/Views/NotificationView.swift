@@ -11,7 +11,7 @@ import SwiftUI
 import UIKit
 
 
-struct NotificationView: View {    
+struct NotificationView: View {
     var alertTitle: String?
     var bgValueAndTrend: String?
     var delta: String?
@@ -23,8 +23,8 @@ struct NotificationView: View {
     var body: some View {
         
         VStack {
-                Text("\(alertTitle ?? "xDrip4iOS")")
-                    .font(.headline)
+                Text("\(alertTitle ?? "LOW ALARM")")
+                    .font(.headline).fontWeight(.semibold)
                     .foregroundStyle(alertUrgencyType?.bannerTextColor ?? .white.opacity(0.85))
                     .lineLimit(1)
                     .minimumScaleFactor(0.2)
@@ -33,19 +33,19 @@ struct NotificationView: View {
                     .padding(.bottom, 8)
                     .background(alertUrgencyType?.bannerBackgroundColor ?? .black)
 
-            HStack(alignment: .firstTextBaseline) {
-                Text("\(bgValueAndTrend ?? "-")")
-                    .font(.title3).bold()
+            HStack(alignment: .center) {
+                Text("\(bgValueAndTrend ?? "123")")
+                    .font(.title2).fontWeight(.bold)
                     .foregroundStyle(bgColor())
                 
                 Spacer()
                 
                 HStack(alignment: .firstTextBaseline, spacing: 2) {
-                    Text("\(delta ?? "?")")
-                        .font(.body).bold()
+                    Text("\(delta ?? "-2")")
+                        .font(.title3).fontWeight(.semibold)
                         .foregroundStyle(.colorPrimary)
-                    Text("\(unit ?? "")")
-                        .font(.body)
+                    Text("\(unit ?? "mg/dL")")
+                        .font(.title3)
                         .foregroundStyle(.colorSecondary)
                 }
             }
