@@ -138,8 +138,8 @@ enum ConstantsGlucoseChartSwiftUI {
     // thumbnail image
     static let viewWidthNotificationThumbnailImage: CGFloat = 80
     static let viewHeightNotificationThumbnailImage: CGFloat = 80
-    static let hoursToShowNotificationThumbnailImage: Double = 1
-    static let glucoseCircleDiameterNotificationThumbnailImage: Double = 70
+    static let hoursToShowNotificationThumbnailImage: Double = 0.5
+    static let glucoseCircleDiameterNotificationThumbnailImage: Double = 100
     static let filenameNotificationThumbnailImage: String = "notificationThumbnailImage"
     
     // expanded image
@@ -151,7 +151,7 @@ enum ConstantsGlucoseChartSwiftUI {
     
     // watch notification image
     static let viewWidthNotificationWatchImage: CGFloat = 170
-    static let viewHeightNotificationWatchImage: CGFloat = 60
+    static let viewHeightNotificationWatchImage: CGFloat = 80
     static let hoursToShowNotificationWatchImage: Double = 3
     static let glucoseCircleDiameterNotificationWatchImage: Double = 30
     static let paddingNotificationWatchImage: Double = 2

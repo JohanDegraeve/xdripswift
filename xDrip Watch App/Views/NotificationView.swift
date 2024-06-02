@@ -22,9 +22,9 @@ struct NotificationView: View {
     
     var body: some View {
         
-        VStack {
+        VStack(alignment: .center, spacing: 0) {
                 Text("\(alertTitle ?? "LOW ALARM")")
-                    .font(.headline).fontWeight(.semibold)
+                    .font(.headline).fontWeight(.bold)
                     .foregroundStyle(alertUrgencyType?.bannerTextColor ?? .white.opacity(0.85))
                     .lineLimit(1)
                     .minimumScaleFactor(0.2)
@@ -40,19 +40,12 @@ struct NotificationView: View {
                 
                 Spacer()
                 
-                HStack(alignment: .firstTextBaseline, spacing: 2) {
-                    Text("\(delta ?? "-2")")
-                        .font(.title3).fontWeight(.semibold)
-                        .foregroundStyle(.colorPrimary)
-                    Text("\(unit ?? "mg/dL")")
-                        .font(.title3)
-                        .foregroundStyle(.colorSecondary)
-                }
+                Text("\(delta ?? "-2")")
+                    .font(.title2).fontWeight(.semibold)
+                    .foregroundStyle(.colorPrimary)
             }
-            .padding(.top, 2)
+            .padding(.top, 4)
             .padding(.bottom, 2)
-            .padding(.leading, 2)
-            .padding(.trailing, 2)
             
             if let glucoseChartImage = glucoseChartImage {
                 Image(uiImage: glucoseChartImage).resizable()
@@ -60,6 +53,7 @@ struct NotificationView: View {
             }
         }
         .background(ConstantsAlerts.notificationBackgroundColor)
+        .padding(.bottom, -15)
     }
     
     func alertTitleColor() -> Color {

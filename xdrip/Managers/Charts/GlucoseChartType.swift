@@ -175,9 +175,6 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.backgroundColorSiriGlucoseIntent
         case .watchAccessoryRectangular:
             return ConstantsGlucoseChartSwiftUI.backgroundColorWatchAccessoryRectangular
-        case .notificationImageExpanded:
-            // use this value from the alert constants to keep everything the same
-            return ConstantsAlerts.notificationBackgroundColor
         case .notificationWatchImage:
             // use this value from the alert constants to keep everything the same
             return ConstantsAlerts.notificationBackgroundColor

@@ -13,7 +13,7 @@
 			<key>UNNotificationExtensionDefaultContentHidden</key>
 			<true/>
 			<key>UNNotificationExtensionInitialContentSizeRatio</key>
-			<integer>0</integer>
+			<real>0.5</real>
 			<key>UNNotificationExtensionOverridesDefaultTitle</key>
 			<false/>
 			<key>UNNotificationExtensionUserInteractionEnabled</key>
