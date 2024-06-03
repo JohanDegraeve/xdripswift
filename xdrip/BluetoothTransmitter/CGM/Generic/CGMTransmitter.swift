@@ -310,8 +310,16 @@ enum CGMTransmitterType:String, CaseIterable {
             
             return "Dexcom"
             
+        case .dexcomG7:
+            if let transmitterIdString = UserDefaults.standard.activeSensorTransmitterId {
+                if transmitterIdString.startsWith("DX02") {
+                    return "Dexcom ONE+"
+                }
+            }
+            return "Dexcom G7"
+            
         case .Libre2:
-            if let activeSensorMaxSensorAgeInDays = UserDefaults.standard.activeSensorMaxSensorAgeInDays, activeSensorMaxSensorAgeInDays < 15 {
+            if let activeSensorMaxSensorAgeInDays = UserDefaults.standard.activeSensorMaxSensorAgeInDays, activeSensorMaxSensorAgeInDays >= 15 {
                 return "Libre 2 Plus"
             } else {
                 return "Libre 2"

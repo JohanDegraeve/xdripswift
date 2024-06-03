@@ -53,7 +53,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
     case Libre3HeartBeatType = "Libre HeartBeat"
     
     /// DexcomG7 heartbeat
-    case DexcomG7HeartBeatType = "Dexcom G7 HeartBeat"
+    case DexcomG7HeartBeatType = "Dexcom G7/ONE+ HeartBeat"
     
     
     /// omnipod heartbeat

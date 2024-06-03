@@ -1396,9 +1396,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 // set timeStampLastSensorStartTimeRead
                 timeStampLastSensorStartTimeRead = Date()
                 
-                print("sensorStartDate = \(sensorStartDate)")
-                print("receivedSensorStartDate = \(receivedSensorStartDate)")
-                print("self.receivedSensorStartDate = \(self.receivedSensorStartDate)")
                 // if current sensorStartDate is < from receivedSensorStartDate then it seems a new sensor
                 if self.receivedSensorStartDate == nil || sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate.addingTimeInterval(-15.0)) {
                    
