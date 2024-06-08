@@ -141,6 +141,8 @@ public class OpenGlückManager: NSObject, OpenGlückSyncClientDelegate {
         Task {
             if UserDefaults.standard.openGlückUploadEnabled {
                 if !glucoseRecordsToUpload.isEmpty {
+                    // we don't need to specifically upload instant glucose records as this will update the latest scan record,
+                    // and all records uploaded here also end up in the instant glucose records
                     do {
                         let timeStampLastReadingToUpload = glucoseRecordsToUpload.map { $0.timestamp }.max()!
                         let device = OpenGlückDevice(modelName: modelName, deviceId: deviceId)
