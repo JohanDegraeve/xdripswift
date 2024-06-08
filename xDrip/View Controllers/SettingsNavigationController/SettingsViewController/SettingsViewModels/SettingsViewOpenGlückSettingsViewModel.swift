@@ -47,7 +47,7 @@ class SettingsViewOpenGlückSettingsViewModel:SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.sectionTitleOpenGlück
+        return ConstantsSettingsIcons.openGlückSettingsIcon + " " + Texts_SettingsView.sectionTitleOpenGlück
     }
 
     func numberOfRows() -> Int {
