@@ -38,10 +38,10 @@ fileprivate enum Setting:Int, CaseIterable {
     case urgentLowMarkValue = 8
     
     // animate the progress bar?
-    case animateProgressBar = 11
+    case animateProgressBar = 9
     
     // reverse the progress bar?
-    case reverseProgressBar = 12
+    case reverseProgressBar = 10
 
 }
 
