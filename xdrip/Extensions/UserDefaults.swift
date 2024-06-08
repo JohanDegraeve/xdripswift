@@ -135,6 +135,11 @@ extension UserDefaults {
         /// use the newer TITR of 70-140mg/dL to calculate the statistics? If false, we will use the conventional TIR of 70-180mg/dL
         case useTITRStatisticsRange = "useTITRStatisticsRange"
 
+        // Alarms settings
+        
+        /// hide slope in alarms
+        case hideSlopeInAlarms = "hideSlopeInAlarms"
+        
         // Housekeeper settings
 
         /// For how many days should we keep Readings, Treatments and Calibrations?
@@ -1182,6 +1187,15 @@ extension UserDefaults {
         }
     }
     
+    /// - show slopes in alarms
+    var showSlopeInAlarms: Bool {
+        get {
+            return !bool(forKey: Key.hideSlopeInAlarms.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.hideSlopeInAlarms.rawValue)
+        }
+    }
     
     // MARK: Sensor Info Settings
     
