@@ -37,6 +37,12 @@ fileprivate enum Setting:Int, CaseIterable {
     //urgent low value
     case urgentLowMarkValue = 8
     
+    // animate the progress bar?
+    case animateProgressBar = 11
+    
+    // reverse the progress bar?
+    case reverseProgressBar = 12
+
 }
 
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
@@ -60,6 +66,12 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case  .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .targetMarkValue, .lowMarkValue, .urgentLowMarkValue:
             return nil
             
+        case .animateProgressBar:
+            return UISwitch(isOn: UserDefaults.standard.animateProgressBar, action: {(isOn:Bool) in UserDefaults.standard.animateProgressBar = isOn})
+
+        case .reverseProgressBar:
+            return UISwitch(isOn: UserDefaults.standard.reverseProgressBar, action: {(isOn:Bool) in UserDefaults.standard.reverseProgressBar = isOn})
+
         }
     }
     
@@ -106,6 +118,24 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
                     UserDefaults.standard.allowScreenRotation = false
                 } else {
                     UserDefaults.standard.allowScreenRotation = true
+                }
+            })
+            
+        case .animateProgressBar:
+            return SettingsSelectedRowAction.callFunction(function: {
+                if UserDefaults.standard.animateProgressBar {
+                    UserDefaults.standard.animateProgressBar = false
+                } else {
+                    UserDefaults.standard.animateProgressBar = true
+                }
+            })
+            
+        case .reverseProgressBar:
+            return SettingsSelectedRowAction.callFunction(function: {
+                if UserDefaults.standard.reverseProgressBar {
+                    UserDefaults.standard.reverseProgressBar = false
+                } else {
+                    UserDefaults.standard.reverseProgressBar = true
                 }
             })
             
@@ -179,6 +209,12 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .allowScreenRotation:
             return Texts_SettingsView.allowScreenRotation
             
+        case .animateProgressBar:
+            return Texts_SettingsView.animateProgressBar
+            
+        case .reverseProgressBar:
+            return Texts_SettingsView.reverseProgressBar
+            
         case .showClockWhenScreenIsLocked:
             return Texts_SettingsView.showClockWhenScreenIsLocked
             
@@ -213,7 +249,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .lowMarkValue, .urgentLowMarkValue, .targetMarkValue:
             return UITableViewCell.AccessoryType.disclosureIndicator
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart:
+        case .allowScreenRotation, .animateProgressBar, .reverseProgressBar, .showClockWhenScreenIsLocked, .showMiniChart:
             return UITableViewCell.AccessoryType.none
             
         }
@@ -242,7 +278,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .screenLockDimmingType:
             return UserDefaults.standard.screenLockDimmingType.description
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart:
+        case .allowScreenRotation, .animateProgressBar, .reverseProgressBar, .showClockWhenScreenIsLocked, .showMiniChart:
             return nil
             
         }

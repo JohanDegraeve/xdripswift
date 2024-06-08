@@ -3236,7 +3236,9 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // let's run the progress update in an async thread with a really small delay so that the animation updates smoothly after the view has appeared
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                self.sensorProgressOutlet.setProgress(Float(1 - (sensorTimeLeftInMinutes / sensorMaxAgeInMinutes)), animated: false)
+                let valueTowardsTrailing:Float = Float(1 - (sensorTimeLeftInMinutes / sensorMaxAgeInMinutes))
+                let valueTowardsLeading:Float = 1 - valueTowardsTrailing
+                self.sensorProgressOutlet.setProgress(UserDefaults.standard.reverseProgressBar ? valueTowardsLeading : valueTowardsTrailing, animated: animate)
             }
             
         } else {
