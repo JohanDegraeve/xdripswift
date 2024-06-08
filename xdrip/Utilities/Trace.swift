@@ -371,6 +371,8 @@ class Trace {
                 
         traceInfo.appendStringAndNewLine("\nHome screen settings:")
         traceInfo.appendStringAndNewLine("    Allow chart rotation: " + UserDefaults.standard.allowScreenRotation.description)
+        traceInfo.appendStringAndNewLine("    Animate progress bar: " + UserDefaults.standard.animateProgressBar.description)
+        traceInfo.appendStringAndNewLine("    Reverse progress bar: " + UserDefaults.standard.reverseProgressBar.description)
         traceInfo.appendStringAndNewLine("    Screen dimming type when locked: " + UserDefaults.standard.screenLockDimmingType.description)
         traceInfo.appendStringAndNewLine("    Show mini-chart: " + UserDefaults.standard.showMiniChart.description)
         traceInfo.appendStringAndNewLine("    Urgent high: " + UserDefaults.standard.urgentHighMarkValueInUserChosenUnitRounded.description)
