@@ -3193,7 +3193,7 @@ final class RootViewController: UIViewController, ObservableObject {
             dataSourceLabelOutlet.text = UserDefaults.standard.activeSensorDescription
             
             // if animatation is requested, then first set the value to 0
-            if animate {
+            if animate && UserDefaults.standard.animateProgressBar {
                 
                 sensorProgressOutlet.setProgress(0.0, animated: false)
                 
@@ -3201,7 +3201,10 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // let's run the progress update in an async thread with a really small delay so that the animation updates smoothly after the view has appeared
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                self.sensorProgressOutlet.setProgress(Float(1 - (sensorTimeLeftInMinutes / sensorMaxAgeInMinutes)), animated: animate)
+                let valueTowardsTrailing:Float = Float(1 - (sensorTimeLeftInMinutes / sensorMaxAgeInMinutes))
+                let valueTowardsLeading:Float = 1 - valueTowardsTrailing
+                self.sensorProgressOutlet.setProgress(UserDefaults.standard.reverseProgressBar ? valueTowardsLeading : valueTowardsTrailing, animated: animate)
+                
             }
             
         } else {
