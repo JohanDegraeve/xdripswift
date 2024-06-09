@@ -2880,7 +2880,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             
             // disable the chart animation if it's just a normal update, enable it if the call comes from didAppear()
-            if animate {
+            if animate && UserDefaults.standard.animateProgressBar {
                 self.pieChartOutlet.animDuration = ConstantsStatistics.pieChartAnimationSpeed
             } else {
                 self.pieChartOutlet.animDuration = 0
@@ -3236,7 +3236,11 @@ final class RootViewController: UIViewController, ObservableObject {
                 }
             } else {
                 // fill in the labels to show sensor time elapsed and max age
-                dataSourceSensorCurrentAgeOutlet.text = sensorStartDate?.daysAndHoursAgo()
+                if UserDefaults.standard.reverseProgressBar {
+                    dataSourceSensorCurrentAgeOutlet.text = sensorTimeLeftInMinutes.minutesToDaysAndHours()
+                } else {
+                    dataSourceSensorCurrentAgeOutlet.text = sensorStartDate?.daysAndHoursAgo()
+                }
                 dataSourceSensorMaxAgeOutlet.text = " / " + sensorMaxAgeInMinutes.minutesToDaysAndHours()
             }
             
@@ -3271,7 +3275,7 @@ final class RootViewController: UIViewController, ObservableObject {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 let valueTowardsTrailing:Float = Float(1 - (sensorTimeLeftInMinutes / sensorMaxAgeInMinutes))
                 let valueTowardsLeading:Float = 1 - valueTowardsTrailing
-                self.sensorProgressOutlet.setProgress(UserDefaults.standard.reverseProgressBar ? valueTowardsLeading : valueTowardsTrailing, animated: animate)
+                self.sensorProgressOutlet.setProgress(UserDefaults.standard.reverseProgressBar ? valueTowardsLeading : valueTowardsTrailing, animated: false)
             }
             
         } else {
