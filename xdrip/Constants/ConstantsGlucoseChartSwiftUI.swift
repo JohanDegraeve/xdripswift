@@ -30,6 +30,8 @@ enum ConstantsGlucoseChartSwiftUI {
     
     static let cornerRadius: CGFloat = 0
     
+    static let backgroundColor: Color = .black
+    
     
     // ------------------------------------------
     // ----- Live Activities --------------------
@@ -129,31 +131,29 @@ enum ConstantsGlucoseChartSwiftUI {
     static let glucoseCircleDiameterSiriGlucoseIntent: Double = 20
     static let cornerRadiusSiriGlucoseIntent: Double = 0
     static let paddingSiriGlucoseIntent: Double = 10
-    static let backgroundColorSiriGlucoseIntent: Color = .black // Color(red: 0.18, green: 0.18, blue: 0.18) originally from gshaviv
+    static let backgroundColorSiriGlucoseIntent: Color = .black
     
     
     // ------------------------------------------
-    // ----- Notification Image Chart -----------
+    // ----- Notification Charts -----------
     // ------------------------------------------
-    // thumbnail image
+    // iOS notification chart - thumbnail image
     static let viewWidthNotificationThumbnailImage: CGFloat = 80
     static let viewHeightNotificationThumbnailImage: CGFloat = 80
     static let hoursToShowNotificationThumbnailImage: Double = 0.5
     static let glucoseCircleDiameterNotificationThumbnailImage: Double = 100
     static let filenameNotificationThumbnailImage: String = "notificationThumbnailImage"
     
-    // expanded image
-    static let viewWidthNotificationExpandedImage: CGFloat = 373
-    static let viewHeightNotificationExpandedImage: CGFloat = 170
-    static let hoursToShowNotificationExpandedImage: Double = 3
-    static let glucoseCircleDiameterNotificationExpandedImage: Double = 30
-    static let filenameNotificationExpandedImage: String = "notificationExpandedImage"
+    // iOS notification chart
+    static let viewWidthNotificationExpanded: CGFloat = 373
+    static let viewHeightNotificationExpanded: CGFloat = 170
+    static let hoursToShowNotificationExpanded: Double = 3
+    static let glucoseCircleDiameterNotificationExpanded: Double = 40
     
     // watch notification image
-    static let viewWidthNotificationWatchImage: CGFloat = 170
-    static let viewHeightNotificationWatchImage: CGFloat = 80
-    static let hoursToShowNotificationWatchImage: Double = 3
-    static let glucoseCircleDiameterNotificationWatchImage: Double = 30
-    static let paddingNotificationWatchImage: Double = 2
-    static let filenameNotificationWatchImage: String = "notificationWatchImage"
+    static let viewWidthNotificationWatch: CGFloat = 160
+    static let viewHeightNotificationWatch: CGFloat = 60
+    static let hoursToShowNotificationWatch: Double = 3
+    static let glucoseCircleDiameterNotificationWatch: Double = 20
+    static let backgroundColorNotificationWatch: Color = Color(red: 0.1, green: 0.1, blue: 0.1, opacity: 1)
 }

@@ -23,8 +23,8 @@ public enum GlucoseChartType: Int, CaseIterable {
     case widgetAccessoryRectangular = 8
     case siriGlucoseIntent = 9
     case notificationImageThumbnail = 10
-    case notificationImageExpanded = 11
-    case notificationWatchImage = 12
+    case notificationExpanded = 11
+    case notificationWatch = 12
     
     var description: String {
         switch self {
@@ -50,9 +50,9 @@ public enum GlucoseChartType: Int, CaseIterable {
             return "Siri Glucose Intent Chart"
         case .notificationImageThumbnail:
             return "Notification Thumbnail Image Chart"
-        case .notificationImageExpanded:
+        case .notificationExpanded:
             return "Notification Expanded Image Chart"
-        case .notificationWatchImage:
+        case .notificationWatch:
             return "Notification Watch Image Chart"
         }
     }
@@ -88,10 +88,10 @@ public enum GlucoseChartType: Int, CaseIterable {
             return (ConstantsGlucoseChartSwiftUI.viewWidthWidgetSiriGlucoseIntent, ConstantsGlucoseChartSwiftUI.viewHeightWidgetSiriGlucoseIntent)
         case .notificationImageThumbnail:
             return (ConstantsGlucoseChartSwiftUI.viewWidthNotificationThumbnailImage, ConstantsGlucoseChartSwiftUI.viewHeightNotificationThumbnailImage)
-        case .notificationImageExpanded:
-            return (ConstantsGlucoseChartSwiftUI.viewWidthNotificationExpandedImage, ConstantsGlucoseChartSwiftUI.viewHeightNotificationExpandedImage)
-        case .notificationWatchImage:
-            return (ConstantsGlucoseChartSwiftUI.viewWidthNotificationWatchImage, ConstantsGlucoseChartSwiftUI.viewHeightNotificationWatchImage)
+        case .notificationExpanded:
+            return (ConstantsGlucoseChartSwiftUI.viewWidthNotificationExpanded, ConstantsGlucoseChartSwiftUI.viewHeightNotificationExpanded)
+        case .notificationWatch:
+            return (ConstantsGlucoseChartSwiftUI.viewWidthNotificationWatch, ConstantsGlucoseChartSwiftUI.viewHeightNotificationWatch)
         }
     }
     
@@ -122,10 +122,10 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.hoursToShowWidgetSiriGlucoseIntent
         case .notificationImageThumbnail:
             return ConstantsGlucoseChartSwiftUI.hoursToShowNotificationThumbnailImage
-        case .notificationImageExpanded:
-            return ConstantsGlucoseChartSwiftUI.hoursToShowNotificationExpandedImage
-        case .notificationWatchImage:
-            return ConstantsGlucoseChartSwiftUI.hoursToShowNotificationWatchImage
+        case .notificationExpanded:
+            return ConstantsGlucoseChartSwiftUI.hoursToShowNotificationExpanded
+        case .notificationWatch:
+            return ConstantsGlucoseChartSwiftUI.hoursToShowNotificationWatch
         }
     }
     
@@ -162,10 +162,10 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterSiriGlucoseIntent
         case .notificationImageThumbnail:
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterNotificationThumbnailImage
-        case .notificationImageExpanded:
-            return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterNotificationExpandedImage
-        case .notificationWatchImage:
-            return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterNotificationWatchImage
+        case .notificationExpanded:
+            return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterNotificationExpanded
+        case .notificationWatch:
+            return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterNotificationWatch
         }
     }
     
@@ -175,11 +175,10 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.backgroundColorSiriGlucoseIntent
         case .watchAccessoryRectangular:
             return ConstantsGlucoseChartSwiftUI.backgroundColorWatchAccessoryRectangular
-        case .notificationWatchImage:
-            // use this value from the alert constants to keep everything the same
-            return ConstantsAlerts.notificationBackgroundColor
+        case .notificationWatch:
+            return ConstantsGlucoseChartSwiftUI.backgroundColorNotificationWatch
         default:
-            return .black
+            return ConstantsGlucoseChartSwiftUI.backgroundColor
         }
     }
     
@@ -214,8 +213,6 @@ public enum GlucoseChartType: Int, CaseIterable {
         switch self {
         case .siriGlucoseIntent:
             return (true, ConstantsGlucoseChartSwiftUI.paddingSiriGlucoseIntent)
-        case .notificationWatchImage:
-            return (true, ConstantsGlucoseChartSwiftUI.paddingNotificationWatchImage)
         default:
             return (false, 0)
         }
@@ -263,7 +260,7 @@ public enum GlucoseChartType: Int, CaseIterable {
     
     func yAxisShowLabels() -> Visibility {
         switch self {
-        case .siriGlucoseIntent, .widgetSystemLarge, .notificationImageExpanded:
+        case .siriGlucoseIntent, .widgetSystemLarge, .notificationExpanded:
             return .automatic
         default:
             return .hidden
@@ -272,7 +269,7 @@ public enum GlucoseChartType: Int, CaseIterable {
     
     func yAxisLabelOffsetX() -> CGFloat {
         switch self {
-        case .siriGlucoseIntent, .widgetSystemLarge, .notificationImageExpanded:
+        case .siriGlucoseIntent, .widgetSystemLarge, .notificationExpanded:
             return ConstantsGlucoseChartSwiftUI.yAxisLabelOffsetX
         default:
             return 0
@@ -281,7 +278,7 @@ public enum GlucoseChartType: Int, CaseIterable {
     
     func yAxisLabelOffsetY() -> CGFloat {
         switch self {
-        case .siriGlucoseIntent, .widgetSystemLarge, .notificationImageExpanded:
+        case .siriGlucoseIntent, .widgetSystemLarge, .notificationExpanded:
             return ConstantsGlucoseChartSwiftUI.yAxisLabelOffsetY
         default:
             return 0
@@ -322,10 +319,6 @@ public enum GlucoseChartType: Int, CaseIterable {
         switch self {
         case .notificationImageThumbnail:
             return ConstantsGlucoseChartSwiftUI.filenameNotificationThumbnailImage
-        case .notificationImageExpanded:
-            return ConstantsGlucoseChartSwiftUI.filenameNotificationExpandedImage
-        case .notificationWatchImage:
-            return ConstantsGlucoseChartSwiftUI.filenameNotificationWatchImage
         default:
             return ""
         }

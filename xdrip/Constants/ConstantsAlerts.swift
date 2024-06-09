@@ -12,14 +12,7 @@ enum ConstantsAlerts {
     /// unlike the specific alarms, we'll set this to a longer period such as 6 hours
     static let defaultSnoozeAllPeriodInMinutes = 6 * 60
     
-    
-    // iOS App using UIKit
-    /// the background color to be used for the notifications (and chart etc) - iOS App using UIKit
-    static let notificationBackgroundUIColor = UIColor(red: 0.1, green: 0.1, blue: 0.1, alpha: 1)
-    
-    /// the background color to be used for the alert title banner of the notifications - iOS App using UIKit
-    static let notificationBannerBackgroundUIColor = UIColor(red: 0.15, green: 0.15, blue: 0.15, alpha: 1)
-    
+    // Snooze all
     /// the snooze all banner background color when not activated
     static let bannerBackgroundColorWhenNotAllSnoozed = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1)
     
@@ -27,11 +20,14 @@ enum ConstantsAlerts {
     static let bannerTextColorWhenNotAllSnoozed = UIColor.gray
     
     
-    // WatchOS App using SwiftUI
-    /// the background color to be used for the notifications (and chart etc) - WatchOS App using SwiftUI
-    static let notificationBackgroundColor = Color(red: 0.1, green: 0.1, blue: 0.1, opacity: 1)
+    // Notifications
+    /// the background color to be used for the notifications (and chart etc) - iOS App
+    static let notificationBackgroundColor = Color.black
     
-    /// the background color to be used for the alert title banner of the notifications - WatchOS App using SwiftUI
+    /// the background color to be used for the notifications (and chart etc) - WatchOS App
+    static let notificationWatchBackgroundColor = Color(red: 0.1, green: 0.1, blue: 0.1, opacity: 1)
+    
+    /// the background color to be used for the alert title banner of the notifications - WatchOS App
     static let notificationBannerBackgroundColor = Color(red: 0.15, green: 0.15, blue: 0.15, opacity: 1)
         
     

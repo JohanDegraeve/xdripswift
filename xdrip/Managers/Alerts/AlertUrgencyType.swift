@@ -59,29 +59,6 @@ public enum AlertUrgencyType: Int {
             return ""
         }
     }
- 
-    // UIKit colors
-    var bannerTextUIColor: UIColor {
-        switch self {
-        case .urgent:
-            return UIColor.white.withAlphaComponent(0.85)
-        case .warning:
-            return UIColor.black
-        default:
-            return UIColor.white.withAlphaComponent(0.85)
-        }
-    }
-    
-    var bannerBackgroundUIColor: UIColor {
-        switch self {
-        case .urgent:
-            return UIColor.red
-        case .warning:
-            return UIColor.yellow
-        default:
-            return ConstantsAlerts.notificationBannerBackgroundUIColor
-        }
-    }
     
     // SwiftUI colors
     var bannerTextColor: Color {

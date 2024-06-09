@@ -3,8 +3,6 @@
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
-        <capability name="Named colors" minToolsVersion="9.0"/>
-        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -13,78 +11,27 @@
             <objects>
                 <viewController id="M4Y-Lb-cyx" userLabel="Notification View Controller" customClass="NotificationViewController" customModule="xDrip_Notification_Context_Extension" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" userInteractionEnabled="NO" contentMode="scaleToFill" simulatedAppContext="notificationCenter" id="S3S-Oj-5AN">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="340"/>
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="400"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="1L8-uv-oca">
-                                <rect key="frame" x="0.0" y="0.0" width="393" height="60"/>
-                                <color key="backgroundColor" name="colorTertiary"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="60" id="JMb-3I-Mco"/>
-                                </constraints>
-                            </view>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ALERT TYPE" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.20000000000000001" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="VEV-hO-Hv7">
-                                <rect key="frame" x="118.66666666666667" y="13.333333333333332" width="155.66666666666663" height="33.666666666666671"/>
-                                <fontDescription key="fontDescription" style="UICTFontTextStyleTitle1"/>
-                                <color key="textColor" name="colorPrimary"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="ComplicationIcon" translatesAutoresizingMaskIntoConstraints="NO" id="tEl-sS-Qw5">
-                                <rect key="frame" x="10" y="179.66666666666663" width="373" height="170"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="170" id="zyr-tb-9qe"/>
-                                </constraints>
-                            </imageView>
-                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="top" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="123" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="GcN-lo-r42">
-                                <rect key="frame" x="14.999999999999996" y="129" width="59.666666666666657" height="40.666666666666657"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="34"/>
-                                <color key="textColor" name="colorPrimary"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+3" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ggK-c2-fEA">
-                                <rect key="frame" x="259.33333333333331" y="133.66666666666666" width="35.333333333333314" height="31.333333333333343"/>
-                                <fontDescription key="fontDescription" type="boldSystem" pointSize="27"/>
-                                <color key="textColor" name="colorPrimary"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="mg/dL" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ext-DE-4hO">
-                                <rect key="frame" x="299.66666666666669" y="133.66666666666666" width="78.333333333333314" height="31.333333333333343"/>
-                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="27"/>
-                                <color key="textColor" name="colorSecondary"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <containerView opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" translatesAutoresizingMaskIntoConstraints="NO" id="v5J-R6-SOJ">
+                                <rect key="frame" x="16" y="59" width="361" height="307"/>
+                                <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </containerView>
                         </subviews>
-                        <viewLayoutGuide key="safeArea" id="2BE-c3-nQJ"/>
                         <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="tEl-sS-Qw5" firstAttribute="leading" secondItem="2BE-c3-nQJ" secondAttribute="leading" constant="10" id="0uH-6a-BMm"/>
-                            <constraint firstItem="tEl-sS-Qw5" firstAttribute="top" secondItem="GcN-lo-r42" secondAttribute="bottom" constant="10" id="2ut-x4-4kV"/>
-                            <constraint firstItem="VEV-hO-Hv7" firstAttribute="centerX" secondItem="S3S-Oj-5AN" secondAttribute="centerX" id="5CA-M8-OTB"/>
-                            <constraint firstItem="ext-DE-4hO" firstAttribute="centerY" secondItem="ggK-c2-fEA" secondAttribute="centerY" id="6bv-F7-XdX"/>
-                            <constraint firstItem="1L8-uv-oca" firstAttribute="top" secondItem="S3S-Oj-5AN" secondAttribute="top" id="7ml-EU-nhB"/>
-                            <constraint firstItem="ext-DE-4hO" firstAttribute="leading" secondItem="ggK-c2-fEA" secondAttribute="trailing" constant="5" id="87D-Cl-f7v"/>
-                            <constraint firstItem="GcN-lo-r42" firstAttribute="leading" secondItem="2BE-c3-nQJ" secondAttribute="leading" constant="15" id="8PC-zO-mwj"/>
-                            <constraint firstItem="GcN-lo-r42" firstAttribute="top" secondItem="2BE-c3-nQJ" secondAttribute="top" constant="70" id="Jeo-dB-LeF"/>
-                            <constraint firstItem="1L8-uv-oca" firstAttribute="leading" secondItem="2BE-c3-nQJ" secondAttribute="leading" id="R7V-LD-4nt"/>
-                            <constraint firstItem="ext-DE-4hO" firstAttribute="centerY" secondItem="GcN-lo-r42" secondAttribute="centerY" id="ULj-V1-yXD"/>
-                            <constraint firstItem="2BE-c3-nQJ" firstAttribute="trailing" secondItem="ext-DE-4hO" secondAttribute="trailing" constant="15" id="Vue-y8-JGW"/>
-                            <constraint firstItem="VEV-hO-Hv7" firstAttribute="centerY" secondItem="1L8-uv-oca" secondAttribute="centerY" id="Yb5-4V-W8o"/>
-                            <constraint firstItem="ext-DE-4hO" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="GcN-lo-r42" secondAttribute="trailing" constant="8" symbolic="YES" id="civ-f0-XQB"/>
-                            <constraint firstItem="1L8-uv-oca" firstAttribute="trailing" secondItem="2BE-c3-nQJ" secondAttribute="trailing" id="nAm-x4-DEC"/>
-                            <constraint firstItem="ggK-c2-fEA" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="GcN-lo-r42" secondAttribute="trailing" constant="8" symbolic="YES" id="nqb-jf-ChJ"/>
-                            <constraint firstItem="tEl-sS-Qw5" firstAttribute="centerX" secondItem="S3S-Oj-5AN" secondAttribute="centerX" id="uu2-7w-1mi"/>
+                            <constraint firstAttribute="bottomMargin" secondItem="v5J-R6-SOJ" secondAttribute="bottom" id="5EB-eI-ger"/>
+                            <constraint firstAttribute="trailingMargin" secondItem="v5J-R6-SOJ" secondAttribute="trailing" id="KhW-l2-lEL"/>
+                            <constraint firstItem="v5J-R6-SOJ" firstAttribute="top" secondItem="S3S-Oj-5AN" secondAttribute="topMargin" id="Ml7-At-PgR"/>
+                            <constraint firstItem="v5J-R6-SOJ" firstAttribute="leading" secondItem="S3S-Oj-5AN" secondAttribute="leadingMargin" id="ODQ-Ev-Dnu"/>
                         </constraints>
                     </view>
                     <extendedEdge key="edgesForExtendedLayout"/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-                    <size key="freeformSize" width="393" height="340"/>
+                    <size key="freeformSize" width="393" height="400"/>
                     <connections>
-                        <outlet property="alertTitleLabel" destination="VEV-hO-Hv7" id="epP-Nt-LqW"/>
-                        <outlet property="bannerOutlet" destination="1L8-uv-oca" id="8Rr-9N-6mf"/>
-                        <outlet property="bgValueLabel" destination="GcN-lo-r42" id="jEu-oX-dei"/>
-                        <outlet property="deltaLabel" destination="ggK-c2-fEA" id="QXi-Eo-LCi"/>
-                        <outlet property="glucoseChartImage" destination="tEl-sS-Qw5" id="sCe-Hy-wfO"/>
-                        <outlet property="unitLabel" destination="ext-DE-4hO" id="gaW-76-P9N"/>
+                        <outlet property="notificationViewContainer" destination="v5J-R6-SOJ" id="7kK-ad-IHz"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vXp-U4-Rya" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -92,16 +39,4 @@
             <point key="canvasLocation" x="138.1679389312977" y="4.2253521126760569"/>
         </scene>
     </scenes>
-    <resources>
-        <image name="ComplicationIcon" width="60" height="60"/>
-        <namedColor name="colorPrimary">
-            <color white="0.89999997615814209" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </namedColor>
-        <namedColor name="colorSecondary">
-            <color white="0.64999997615814209" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </namedColor>
-        <namedColor name="colorTertiary">
-            <color white="0.44999998807907104" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </namedColor>
-    </resources>
 </document>

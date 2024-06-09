@@ -3609,12 +3609,6 @@ final class RootViewController: UIViewController, ObservableObject {
         // create a small thumbnail glucose chart image to show in the standard iOS notification banner
         createNotificationImage(glucoseChartType: .notificationImageThumbnail)
         
-        // create a bigger, full glucose chart image to display in the Notification Content Extension view
-        createNotificationImage(glucoseChartType: .notificationImageExpanded)
-        
-        // create a smaller glucose chart image to display in the Watch notification
-        createNotificationImage(glucoseChartType: .notificationWatchImage)
-        
         /// create an image based upon a glucose chart view and save it to the app container documents directory
         /// - Parameter glucoseChartType: the type of glucose chart type we want to generate (i.e. thumbnail or full notification chart)
         func createNotificationImage(glucoseChartType: GlucoseChartType) {

@@ -1,15 +1,12 @@
 //
 //  NotificationView.swift
-//  xDrip Watch App
+//  xDrip Notification Context Extension
 //
-//  Created by Paul Plant on 24/5/24.
+//  Created by Paul Plant on 8/6/24.
 //  Copyright © 2024 Johan Degraeve. All rights reserved.
 //
 
-import Foundation
 import SwiftUI
-import UIKit
-
 
 struct NotificationView: View {
     var alertTitle: String?
@@ -28,52 +25,52 @@ struct NotificationView: View {
     var bgValueInMgDl: Double?
     var bgReadingDate: Date?
     var bgValueStringInUserChosenUnit: String?
-        
-    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
     
     var body: some View {
-        VStack(alignment: .center, spacing: 0) {
+        ZStack {
+            Color(ConstantsAlerts.notificationBackgroundColor)
+                .ignoresSafeArea()
+            
+            VStack(alignment: .center, spacing: 0) {
                 Text("\(alertTitle ?? "LOW ALARM")")
-                    .font(.headline).fontWeight(.bold)
+                    .font(.title).fontWeight(.bold)
                     .foregroundStyle(alertUrgencyType?.bannerTextColor ?? .white.opacity(0.85))
                     .lineLimit(1)
                     .minimumScaleFactor(0.2)
-                    .frame(maxWidth: .infinity)
-                    .padding(.top, -14)
-                    .padding(.bottom, 4)
+                    .frame(maxWidth: .infinity, maxHeight: 50)
                     .background(alertUrgencyType?.bannerBackgroundColor ?? .black)
+                    .padding(.top, -15)
                 
                 // this is the standard widget view
                 HStack(alignment: .center) {
                     Text("\(bgValueStringInUserChosenUnit ?? "")\(trendArrow())")
-                        .font(.system(size: isSmallScreen ? 26 : 32)).fontWeight(.semibold)
+                        .font(.system(size: 50)).fontWeight(.semibold)
                         .foregroundStyle(bgTextColor())
                         .minimumScaleFactor(0.5)
                         .lineLimit(1)
                     
                     Spacer()
                     
-                    VStack(alignment: .trailing, spacing: -5) {
+                    VStack(alignment: .trailing, spacing: -4) {
                         Text(deltaChangeStringInUserChosenUnit())
-                            .font(.system(size: isSmallScreen ? 15 : 19)).fontWeight(.semibold)
+                            .font(.system(size: 34)).fontWeight(.semibold)
                             .foregroundStyle(.colorPrimary)
                             .minimumScaleFactor(0.5)
                             .lineLimit(1)
                         
                         Text(bgUnitString ?? "")
-                            .font(.system(size: isSmallScreen ? 9 : 11))
+                            .font(.system(size: 20))
                             .foregroundStyle(.colorSecondary)
                             .minimumScaleFactor(0.5)
                             .lineLimit(1)
                     }
                 }
-                .padding(.top, 2)
-                .padding(.bottom, 2)
+                .padding(15)
                 
-            GlucoseChartView(glucoseChartType: .notificationWatch, bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: isMgDl ?? true, urgentLowLimitInMgDl: urgentLowLimitInMgDl ?? 60, lowLimitInMgDl: lowLimitInMgDl ?? 70, highLimitInMgDl: highLimitInMgDl ?? 180, urgentHighLimitInMgDl: urgentHighLimitInMgDl ?? 250, liveActivitySize: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
+                GlucoseChartView(glucoseChartType: .notificationExpanded, bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: isMgDl ?? true, urgentLowLimitInMgDl: urgentLowLimitInMgDl ?? 60, lowLimitInMgDl: lowLimitInMgDl ?? 70, highLimitInMgDl: highLimitInMgDl ?? 180, urgentHighLimitInMgDl: urgentHighLimitInMgDl ?? 250, liveActivitySize: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
+            }
+            .background(ConstantsAlerts.notificationBackgroundColor)
         }
-        .background(ConstantsAlerts.notificationWatchBackgroundColor)
-        .padding(.bottom, -15)
     }
     
     func alertTitleColor() -> Color {
@@ -154,7 +151,6 @@ struct NotificationView: View {
         }
     }
 }
-
 
 #Preview {
     NotificationView()

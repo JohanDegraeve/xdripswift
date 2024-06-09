@@ -12,22 +12,39 @@ import UserNotifications
 
 class NotificationController: WKUserNotificationHostingController<NotificationView> {
     var alertTitle: String?
-    var bgValueAndTrend: String?
-    var delta: String?
-    var unit: String?
+    var bgReadingValues: [Double]?
+    var bgReadingDates: [Date]?
+    var isMgDl: Bool?
+    var slopeOrdinal: Int?
+    var deltaChangeInMgDl: Double?
+    var urgentLowLimitInMgDl: Double?
+    var lowLimitInMgDl: Double?
+    var highLimitInMgDl: Double?
+    var urgentHighLimitInMgDl: Double?
     var alertUrgencyType: AlertUrgencyType?
-    var bgRangeDescriptionAsInt: Int?
-    var glucoseChartImage: UIImage?
+    
+    var bgUnitString: String?
+    var bgValueInMgDl: Double?
+    var bgReadingDate: Date?
+    var bgValueStringInUserChosenUnit: String?
     
     override var body: NotificationView {
         NotificationView(
             alertTitle: alertTitle,
-            bgValueAndTrend: bgValueAndTrend,
-            delta: delta,
-            unit: unit,
+            bgReadingValues: bgReadingValues,
+            bgReadingDates: bgReadingDates,
+            isMgDl: isMgDl,
+            slopeOrdinal: slopeOrdinal,
+            deltaChangeInMgDl: deltaChangeInMgDl,
+            urgentLowLimitInMgDl: urgentLowLimitInMgDl,
+            lowLimitInMgDl: lowLimitInMgDl,
+            highLimitInMgDl: highLimitInMgDl,
+            urgentHighLimitInMgDl: urgentHighLimitInMgDl,
             alertUrgencyType: alertUrgencyType,
-            bgRangeDescriptionAsInt: bgRangeDescriptionAsInt,
-            glucoseChartImage: glucoseChartImage
+            bgUnitString: bgUnitString,
+            bgValueInMgDl: bgValueInMgDl,
+            bgReadingDate: bgReadingDate,
+            bgValueStringInUserChosenUnit: bgValueStringInUserChosenUnit
         )
     }
     
@@ -35,25 +52,31 @@ class NotificationController: WKUserNotificationHostingController<NotificationVi
         // pull the userInfo dictionary from the received notification
         let userInfo = notification.request.content.userInfo
         
-        // set the image and colours based upon the alertUrgencyType
-        alertUrgencyType = AlertUrgencyType(rawValue: userInfo["alertUrgencyTypeRawValue"] as? Int ?? 0)
-        
         // set the title label. This is common for all notifications
         alertTitle = userInfo["alertTitle"] as? String ?? ""
         
-        // set the bg value and trend arrow if available
-        bgValueAndTrend = (userInfo["bgValueString"] as? String ?? "") + (userInfo["trendString"] as? String ?? "")
+        // set the image and colours based upon the alertUrgencyType
+        alertUrgencyType = AlertUrgencyType(rawValue: userInfo["alertUrgencyTypeRawValue"] as? Int ?? 0)
         
-        // set the bg value label color as per the rest of the app UI color
-        // it's a bit of a workaround to keep the dictionary as codable
-        bgRangeDescriptionAsInt = userInfo["BgRangeDescriptionAsInt"] as? Int ?? 0
+        bgReadingValues = userInfo["bgReadingValues"] as? [Double] ?? [0]
+        isMgDl = userInfo["isMgDl"] as? Bool ?? true
+        slopeOrdinal = userInfo["slopeOrdinal"] as? Int ?? 0
+        deltaChangeInMgDl = userInfo["deltaChangeInMgDl"] as? Double ?? 0
+        urgentLowLimitInMgDl = userInfo["urgentLowLimitInMgDl"] as? Double ?? 0
+        lowLimitInMgDl = userInfo["lowLimitInMgDl"] as? Double ?? 0
+        highLimitInMgDl = userInfo["highLimitInMgDl"] as? Double ?? 0
+        urgentHighLimitInMgDl = userInfo["urgentHighLimitInMgDl"] as? Double ?? 0
         
-        delta = userInfo["deltaString"] as? String ?? "-"
-        unit = (userInfo["isMgDl"] as? Bool ?? true) ? Texts_Common.mgdl : Texts_Common.mmol
-        
-        // recode the image from the sent userInfo
-        if let watchNotificationImageData = userInfo["watchNotificationImageAsString"] as? String, let imageData = Data(base64Encoded: watchNotificationImageData, options: .ignoreUnknownCharacters) {
-            glucoseChartImage = UIImage(data: imageData)
+        let bgReadingDatesFromDictionary: [Double] = userInfo["bgReadingDatesAsDouble"] as? [Double] ?? [0]
+        bgReadingDates = bgReadingDatesFromDictionary.map { (bgReadingDateAsDouble) -> Date in
+            return Date(timeIntervalSince1970: bgReadingDateAsDouble)
         }
+        
+        bgUnitString = isMgDl ?? true ? Texts_Common.mgdl : Texts_Common.mmol
+        bgValueInMgDl = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0] : nil
+        bgReadingDate = (bgReadingDates?.count ?? 0) > 0 ? bgReadingDates?[0] : nil
+        
+        bgValueStringInUserChosenUnit = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0].mgdlToMmolAndToString(mgdl: isMgDl ?? true) ?? "" : ""
+        
     }
 }

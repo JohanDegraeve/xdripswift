@@ -41,6 +41,18 @@
 		4734FF552BEFE3F200C7115A /* AlertNotificationDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4734FF542BEFE3F200C7115A /* AlertNotificationDictionary.swift */; };
 		4734FF562BEFE3F200C7115A /* AlertNotificationDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4734FF542BEFE3F200C7115A /* AlertNotificationDictionary.swift */; };
 		4734FF572BF13B9C00C7115A /* TextsCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD44F221CAA64006EAB84 /* TextsCommon.swift */; };
+		473775822C14D8C100525B90 /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473775812C14D8C100525B90 /* NotificationView.swift */; };
+		473775832C14DCA500525B90 /* GlucoseChartType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210ED2B5298EB00005711 /* GlucoseChartType.swift */; };
+		473775842C14DCA900525B90 /* ConstantsGlucoseChartSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A50C2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift */; };
+		473775852C14DCC600525B90 /* GlucoseChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210EF2B52A05B00005711 /* GlucoseChartView.swift */; };
+		473775862C14DCDF00525B90 /* LiveActivitySize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D08D5D2B54390B00B0BEA7 /* LiveActivitySize.swift */; };
+		473775872C14DCFB00525B90 /* TextsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD451221DEAB1006EAB84 /* TextsSettingsView.swift */; };
+		473775882C14DD2200525B90 /* ConstantsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */; };
+		473775892C14DD3100525B90 /* ConstantsLibreLinkUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E62A715EC500267BE3 /* ConstantsLibreLinkUp.swift */; };
+		4737758A2C14DD6300525B90 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4D21ED450300ECF0C0 /* Double.swift */; };
+		4737758B2C14DD7000525B90 /* ConstantsBloodGlucose.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585222EDB602007F5B5D /* ConstantsBloodGlucose.swift */; };
+		4737758C2C14DDA700525B90 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4746068D2B963EA100AC9214 /* View.swift */; };
+		4737758D2C14DDC900525B90 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
 		474606642B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474606632B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift */; };
 		474606652B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474606632B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift */; };
 		474606692B9616AA00AC9214 /* AccessoryRectangularView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474606682B9616AA00AC9214 /* AccessoryRectangularView.swift */; };
@@ -896,6 +908,7 @@
 		4733B93D2AD17C99001D609D /* FollowerBgReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBgReading.swift; sourceTree = "<group>"; };
 		4733B93F2AD17D15001D609D /* FollowerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerDelegate.swift; sourceTree = "<group>"; };
 		4734FF542BEFE3F200C7115A /* AlertNotificationDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertNotificationDictionary.swift; sourceTree = "<group>"; };
+		473775812C14D8C100525B90 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
 		474606632B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplicationSharedUserDefaultsModel.swift; sourceTree = "<group>"; };
 		474606682B9616AA00AC9214 /* AccessoryRectangularView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessoryRectangularView.swift; sourceTree = "<group>"; };
 		4746066A2B96185C00AC9214 /* AccessoryCircularView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessoryCircularView.swift; sourceTree = "<group>"; };
@@ -2060,6 +2073,7 @@
 			children = (
 				47CD64242BEA9E5A002BDA68 /* xDrip Notification Context Extension.entitlements */,
 				47CD641D2BE9506C002BDA68 /* Info.plist */,
+				473775812C14D8C100525B90 /* NotificationView.swift */,
 				47CD64182BE9506C002BDA68 /* NotificationViewController.swift */,
 				47CD641A2BE9506C002BDA68 /* MainInterface.storyboard */,
 			);
@@ -3980,6 +3994,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4737758D2C14DDC900525B90 /* Assets.xcassets in Resources */,
 				47CD641C2BE9506C002BDA68 /* Base in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -4268,13 +4283,24 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4737758B2C14DD7000525B90 /* ConstantsBloodGlucose.swift in Sources */,
 				47976E372BFBB870005E86EC /* TextsAlerts.swift in Sources */,
 				47CD642D2BEBEB0E002BDA68 /* AlertUrgencyType.swift in Sources */,
+				4737758A2C14DD6300525B90 /* Double.swift in Sources */,
 				4734FF572BF13B9C00C7115A /* TextsCommon.swift in Sources */,
+				473775822C14D8C100525B90 /* NotificationView.swift in Sources */,
 				4734FF562BEFE3F200C7115A /* AlertNotificationDictionary.swift in Sources */,
+				473775882C14DD2200525B90 /* ConstantsHomeView.swift in Sources */,
+				473775832C14DCA500525B90 /* GlucoseChartType.swift in Sources */,
+				473775852C14DCC600525B90 /* GlucoseChartView.swift in Sources */,
 				47CD64192BE9506C002BDA68 /* NotificationViewController.swift in Sources */,
 				474822412BFE62220052D4FB /* ConstantsCalendar.swift in Sources */,
+				473775862C14DCDF00525B90 /* LiveActivitySize.swift in Sources */,
 				47037B912C07B15E000BD6BD /* ConstantsAlerts.swift in Sources */,
+				4737758C2C14DDA700525B90 /* View.swift in Sources */,
+				473775892C14DD3100525B90 /* ConstantsLibreLinkUp.swift in Sources */,
+				473775842C14DCA900525B90 /* ConstantsGlucoseChartSwiftUI.swift in Sources */,
+				473775872C14DCFB00525B90 /* TextsSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -616,57 +616,72 @@ public class AlertManager:NSObject {
             // create the content for the alert notification, set body and text, category and also attachments and userInfo dict if available
             let content = UNMutableNotificationContent()
             
-            // set body, title
-            if let alertTitle = alertTitle {content.title = alertTitle}
-            if let alertBody = alertBody {content.body = alertBody}
-            
-            var alertNotificationDictionary = AlertNotificationDictionary()
-            
-            if let lastBgReading = lastBgReading {
-                alertNotificationDictionary.bgValueString = lastBgReading.unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-                
-                // a bit of an ugly way of doing it, but it's the easiest way to make the notification payload codable and it's only used for this
-                switch lastBgReading.bgRangeDescription() {
-                case .inRange:
-                    alertNotificationDictionary.BgRangeDescriptionAsInt = 0
-                case .notUrgent:
-                    alertNotificationDictionary.BgRangeDescriptionAsInt = 1
+            // set body, title for the standard notification (this will only be used for the short view in both iOS and WatchOS)
+            if let alertTitle = alertTitle {
+                switch alertKind.alertUrgencyType() {
                 case .urgent:
-                    alertNotificationDictionary.BgRangeDescriptionAsInt = 2
-                }
-                
-                if let lastButOneBgReading = lastButOneBgReading {
-                    alertNotificationDictionary.deltaString = lastBgReading.unitizedDeltaString(previousBgReading: lastButOneBgReading, showUnit: false, highGranularity: false, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-                }
-                
-                alertNotificationDictionary.alertTitle = alertKind.alertTitle().uppercased()
-                alertNotificationDictionary.trendString = lastBgReading.slopeArrow()
-                alertNotificationDictionary.alertUrgencyTypeRawValue = alertKind.alertUrgencyType().rawValue
-                
-                
-                // as we can't use the local notification attachments in Watch app
-                // we need to encode the image as string data and then re-encode it as an image later
-                let imageURL = URL.documentsDirectory.appendingPathComponent("\(ConstantsGlucoseChartSwiftUI.filenameNotificationWatchImage).png")
-                let image = UIImage(contentsOfFile: imageURL.path)
-                let imageData = image?.jpegData(compressionQuality: 1) // no need to try to reduce the quality
-                
-                if imageData != nil {
-                    alertNotificationDictionary.watchNotificationImageAsString = imageData?.base64EncodedString(options: .endLineWithLineFeed)
-                }
-                                
-                // check that we can correctly serialize the struct and if so, add it to the notification content
-                if let userInfo = alertNotificationDictionary.asDictionary {
-                    content.userInfo = userInfo
+                    content.title = "‼️ " + alertTitle.uppercased()
+                case .warning:
+                    content.title = "❗️" + alertTitle.uppercased()
+                case .normal:
+                    content.title = "⚠️ " + alertTitle.uppercased()
                 }
             }
             
-            // add the last generated BG chart images as attachments to the notification content
-            // the bigger expanded image will be hidden from being a thumbnail so the notification short view will pick up the other one
-            let expandedAttachment = try! UNNotificationAttachment(identifier: "image", url: URL.documentsDirectory.appendingPathComponent("\(ConstantsGlucoseChartSwiftUI.filenameNotificationExpandedImage).png"), options: [UNNotificationAttachmentOptionsThumbnailHiddenKey: true])
+            if let alertBody = alertBody {
+                content.body = alertBody
+            }
             
+            // now let's start creating the custom content
+            var alertNotificationDictionary = AlertNotificationDictionary()
+            
+            alertNotificationDictionary.alertTitle = alertKind.alertTitle().uppercased()
+            alertNotificationDictionary.alertUrgencyTypeRawValue = alertKind.alertUrgencyType().rawValue
+            
+            // create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
+            // this is needed due to the not being able to pass structs that are not codable/hashable
+            let hoursOfBgReadingsToSend: Double = ConstantsGlucoseChartSwiftUI.hoursToShowNotificationExpanded
+            
+            let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+            
+            if bgReadings.count > 0 {
+                alertNotificationDictionary.isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+                alertNotificationDictionary.slopeOrdinal = 0
+                alertNotificationDictionary.deltaChangeInMgDl = 0
+                alertNotificationDictionary.urgentLowLimitInMgDl = UserDefaults.standard.urgentLowMarkValue
+                alertNotificationDictionary.lowLimitInMgDl = UserDefaults.standard.lowMarkValue
+                alertNotificationDictionary.urgentHighLimitInMgDl = UserDefaults.standard.urgentHighMarkValue
+                alertNotificationDictionary.highLimitInMgDl = UserDefaults.standard.highMarkValue
+                
+                // add delta and slope if available
+                if bgReadings.count > 1 {
+                    alertNotificationDictionary.deltaChangeInMgDl = bgReadings[0].currentSlope(previousBgReading: bgReadings[1]) * bgReadings[0].timeStamp.timeIntervalSince(bgReadings[1].timeStamp) * 1000;
+                    
+                    alertNotificationDictionary.slopeOrdinal = bgReadings[0].slopeOrdinal()
+                }
+                
+                // create a new array, append all data and then assign that to the dictionary
+                var bgReadingValues: [Double] = []
+                var bgReadingDatesAsDouble: [Double] = []
+                
+                for bgReading in bgReadings {
+                    bgReadingValues.append(bgReading.calculatedValue)
+                    bgReadingDatesAsDouble.append(bgReading.timeStamp.timeIntervalSince1970)
+                }
+                
+                alertNotificationDictionary.bgReadingValues = bgReadingValues
+                alertNotificationDictionary.bgReadingDatesAsDouble = bgReadingDatesAsDouble
+            }
+            
+            // check that we can correctly serialize the dictionary data and if so, add it to the notification content
+            if let userInfo = alertNotificationDictionary.asDictionary {
+                content.userInfo = userInfo
+            }
+            
+            // add a small BG chart image as an attachment to the notification content
             let thumbnailAttachment = try! UNNotificationAttachment(identifier: "thumbnail", url: URL.documentsDirectory.appendingPathComponent("\(ConstantsGlucoseChartSwiftUI.filenameNotificationThumbnailImage).png"), options: [UNNotificationAttachmentOptionsThumbnailHiddenKey: false])
             
-            content.attachments = [expandedAttachment, thumbnailAttachment]
+            content.attachments = [thumbnailAttachment]
             
             // if snooze from notification in homescreen is needed then set the categoryIdentifier
             if applicableAlertType.snooze {

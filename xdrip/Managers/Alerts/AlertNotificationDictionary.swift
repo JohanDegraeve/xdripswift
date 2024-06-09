@@ -11,13 +11,16 @@ import Foundation
 /// model of the data we'll send to the notification content extension as userInfo for alerts
 struct AlertNotificationDictionary: Codable {
     var alertTitle: String?
-    var bgValueString: String?
-    var BgRangeDescriptionAsInt: Int?
-    var trendString: String?
-    var deltaString: String?
+    var bgReadingValues: [Double]?
+    var bgReadingDatesAsDouble: [Double]?
     var isMgDl: Bool?
+    var slopeOrdinal: Int?
+    var deltaChangeInMgDl: Double?
+    var urgentLowLimitInMgDl: Double?
+    var lowLimitInMgDl: Double?
+    var highLimitInMgDl: Double?
+    var urgentHighLimitInMgDl: Double?
     var alertUrgencyTypeRawValue: Int?
-    var watchNotificationImageAsString: String?
     
     var asDictionary: [String: Any]? {
         guard let data = try? JSONEncoder().encode(self) else { return nil }
