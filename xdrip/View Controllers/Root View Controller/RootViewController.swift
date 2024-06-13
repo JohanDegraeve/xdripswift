@@ -62,10 +62,6 @@ final class RootViewController: UIViewController, ObservableObject {
     
     @IBAction func helpToolbarButtonAction(_ sender: UIBarButtonItem) {
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
-            self.checkAlertsCreateNotificationAndSetAppBadge()
-        }
-        /*
         // get the 2 character language code for the App Locale (i.e. "en", "es", "nl", "fr")
         // get the 2 character language code for the App Locale (i.e. "en", "es", "nl", "fr")
         // if the user has the app in a language other than English and they have the "auto translate" option selected, then load the help pages through Google Translate
@@ -87,7 +83,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             UIApplication.shared.open(url)
             
-        }*/
+        }
     }
     
     /// outlet for the lock button - it will change text based upon whether they screen is locked or not
