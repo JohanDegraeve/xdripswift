@@ -37,35 +37,32 @@ struct NotificationView: View {
                     .foregroundStyle(alertUrgencyType?.bannerTextColor ?? .white.opacity(0.85))
                     .lineLimit(1)
                     .minimumScaleFactor(0.2)
-                    .frame(maxWidth: .infinity, maxHeight: 50)
+                    .frame(maxWidth: .infinity, maxHeight: 55)
                     .background(alertUrgencyType?.bannerBackgroundColor ?? .black)
                     .padding(.top, -15)
                 
                 // this is the standard widget view
                 HStack(alignment: .center) {
                     Text("\(bgValueStringInUserChosenUnit ?? "")\(trendArrow())")
-                        .font(.system(size: 50)).fontWeight(.semibold)
+                        .font(.system(size: 45)).fontWeight(.bold)
                         .foregroundStyle(bgTextColor())
-                        .minimumScaleFactor(0.5)
                         .lineLimit(1)
                     
                     Spacer()
                     
                     VStack(alignment: .trailing, spacing: -4) {
                         Text(deltaChangeStringInUserChosenUnit())
-                            .font(.system(size: 34)).fontWeight(.semibold)
+                            .font(.system(size: 30)).fontWeight(.bold)
                             .foregroundStyle(.colorPrimary)
-                            .minimumScaleFactor(0.5)
                             .lineLimit(1)
                         
                         Text(bgUnitString ?? "")
-                            .font(.system(size: 20))
+                            .font(.system(size: 15)).fontWeight(.semibold)
                             .foregroundStyle(.colorSecondary)
-                            .minimumScaleFactor(0.5)
                             .lineLimit(1)
                     }
                 }
-                .padding(15)
+                .padding(12)
                 
                 GlucoseChartView(glucoseChartType: .notificationExpanded, bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: isMgDl ?? true, urgentLowLimitInMgDl: urgentLowLimitInMgDl ?? 60, lowLimitInMgDl: lowLimitInMgDl ?? 70, highLimitInMgDl: highLimitInMgDl ?? 180, urgentHighLimitInMgDl: urgentHighLimitInMgDl ?? 250, liveActivitySize: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
             }

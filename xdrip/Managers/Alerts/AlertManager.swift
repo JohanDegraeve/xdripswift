@@ -617,19 +617,10 @@ public class AlertManager:NSObject {
             let content = UNMutableNotificationContent()
             
             // set body, title for the standard notification (this will only be used for the short view in both iOS and WatchOS)
-            if let alertTitle = alertTitle {
-                switch alertKind.alertUrgencyType() {
-                case .urgent:
-                    content.title = "‼️ " + alertTitle.uppercased()
-                case .warning:
-                    content.title = "❗️" + alertTitle.uppercased()
-                case .normal:
-                    content.title = "⚠️ " + alertTitle.uppercased()
-                }
-            }
-            
-            if let alertBody = alertBody {
-                content.body = alertBody
+            // after testing, the notification seems much clearer if we just use a single title line and include both title + body
+            // we'll put an emoji prefix just to give the notification a bit more character
+            if let alertTitle = alertTitle, let alertBody = alertBody {
+                content.title = alertKind.alertUrgencyType().alertTitlePrefix + " " + alertTitle.uppercased() + " " + alertBody
             }
             
             // now let's start creating the custom content

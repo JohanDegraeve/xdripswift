@@ -49,18 +49,17 @@ public enum AlertUrgencyType: Int {
         }
     }
     
-    var alertTitleType: String {
+    var alertTitlePrefix: String {
         switch self {
         case .urgent:
-            return Texts_Alerts.alertTypeUrgent
+            return "‼️"
         case .warning:
-            return Texts_Alerts.alertTypeWarning
-        default:
             return ""
+        default:
+            return "⚠️"
         }
     }
     
-    // SwiftUI colors
     var bannerTextColor: Color {
         switch self {
         case .urgent:
