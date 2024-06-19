@@ -128,9 +128,9 @@ extension XDripWidget.Entry {
                 // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
                 // show unitized zero deltas as +0 or +0.0 as per Nightscout format
                 if (isMgDl) {
-                    return (deltaChangeInMgDl > -1 && deltaChangeInMgDl < 1) ?  "+0" : (deltaSign + valueAsString)
+                    return (deltaChangeInMgDl == 0) ?  "+0" : (deltaSign + valueAsString)
                 } else {
-                    return (deltaChangeInMgDl > -0.1 && deltaChangeInMgDl < 0.1) ? "+0.0" : (deltaSign + valueAsString)
+                    return (deltaChangeInMgDl == 0.0) ? "+0.0" : (deltaSign + valueAsString)
                 }
             } else {
                 return isMgDl ? "-" : "-.-"
