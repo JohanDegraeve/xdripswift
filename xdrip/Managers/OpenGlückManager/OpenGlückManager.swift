@@ -144,10 +144,15 @@ public class OpenGlückManager: NSObject, OpenGlückSyncClientDelegate {
                     // we don't need to specifically upload instant glucose records as this will update the latest scan record,
                     // and all records uploaded here also end up in the instant glucose records
                     do {
-                        let timeStampLastReadingToUpload = glucoseRecordsToUpload.map { $0.timestamp }.max()!
+                        let timeStampLastReadingToUpload = glucoseRecordsToUpload.filter { $0.recordType == "historic" }.map { $0.timestamp }.max()!
                         let device = OpenGlückDevice(modelName: modelName, deviceId: deviceId)
                         _ = try await openGlückClient.upload(currentCgmProperties: CgmCurrentDeviceProperties(hasRealTime: true, realTimeInterval: 60), device: device, glucoseRecords: glucoseRecordsToUpload)
-                        UserDefaults.standard.timeStampLatestOpenGlückBgReading = timeStampLastReadingToUpload
+                        await MainActor.run {
+                            let currentLatest = UserDefaults.standard.timeStampLatestOpenGlückBgReading
+                            if currentLatest == nil || timeStampLastReadingToUpload > currentLatest! {
+                                UserDefaults.standard.timeStampLatestOpenGlückBgReading = timeStampLastReadingToUpload
+                            }
+                        }
                     } catch {
                         trace("Could not upload to OpenGlück", log: self.log, category: ConstantsLog.categoryOpenGlückManager, type: .error, error.localizedDescription)
                     }
