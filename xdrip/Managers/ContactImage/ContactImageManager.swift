@@ -101,9 +101,9 @@ class ContactImageManager: NSObject {
             // get 2 last Readings, with a calculatedValue
             let lastReading = self.bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
             var contactImageView: ContactImageView
-            
+            // [BILL] change 7 * 60 to 4 * 60
             if lastReading.count > 0  {
-                let valueIsUpToDate = abs(lastReading[0].timeStamp.timeIntervalSinceNow) < 7 * 60
+                let valueIsUpToDate = abs(lastReading[0].timeStamp.timeIntervalSinceNow) < 4 * 60
                 
                 contactImageView = ContactImageView(bgValue: lastReading[0].calculatedValue, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: UserDefaults.standard.displayTrendInContactImage ? lastReading[0].slopeArrow() : "", bgRangeDescription: lastReading[0].bgRangeDescription(), valueIsUpToDate: valueIsUpToDate)
                 
@@ -112,8 +112,8 @@ class ContactImageManager: NSObject {
                     trace("in updateContact, no updates received for more than 5 minutes", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error)
                     self.updateContact()
                 })
-                
-                DispatchQueue.main.asyncAfter(deadline: .now() + (5 * 60) + 15, execute: self.workItem!)
+                //[Change 5 * 60 to 1 * 60]
+                DispatchQueue.main.asyncAfter(deadline: .now() + (1 * 60) + 15, execute: self.workItem!)
             } else {
                 // create an 'empty' image view if there is no BG data to show
                 contactImageView = ContactImageView(bgValue: 0, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: "", bgRangeDescription: .inRange, valueIsUpToDate: false)
