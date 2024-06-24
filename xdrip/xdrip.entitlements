@@ -4,10 +4,6 @@
 <dict>
 	<key>com.apple.developer.healthkit</key>
 	<true/>
-	<key>com.apple.developer.nfc.readersession.formats</key>
-	<array>
-		<string>TAG</string>
-	</array>
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.com.${DEVELOPMENT_TEAM}.loopkit.LoopGroup</string>

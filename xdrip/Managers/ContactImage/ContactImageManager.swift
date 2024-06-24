@@ -100,10 +100,13 @@ class ContactImageManager: NSObject {
             // create a contact image view
             // get 2 last Readings, with a calculatedValue
             let lastReading = self.bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
-            var contactImageView: ContactImageView
-            // [BILL] change 7 * 60 to 4 * 60
-            if lastReading.count > 0  {
-                let valueIsUpToDate = abs(lastReading[0].timeStamp.timeIntervalSinceNow) < 4 * 60
+            var contactImageView: ContactImageView     
+            // [BILL] Variable to check the time of the last reading.
+            let timeCheck = abs(lastReading[0].timeStamp.timeIntervalSinceNow)
+            // [BILL] Add second condition to if statement to determine if reading is more than 10 minutes out of date. If so, run the else statement.
+            // [BILL] TIME CHANGE on valueIsUpToDate: 7 * 60 changed to 5 * 60 
+            if lastReading.count > 0 && timeCheck < 10 * 60 {
+                let valueIsUpToDate = abs(lastReading[0].timeStamp.timeIntervalSinceNow) < 5 * 60
                 
                 contactImageView = ContactImageView(bgValue: lastReading[0].calculatedValue, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: UserDefaults.standard.displayTrendInContactImage ? lastReading[0].slopeArrow() : "", bgRangeDescription: lastReading[0].bgRangeDescription(), valueIsUpToDate: valueIsUpToDate)
                 
@@ -112,11 +115,17 @@ class ContactImageManager: NSObject {
                     trace("in updateContact, no updates received for more than 5 minutes", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error)
                     self.updateContact()
                 })
-                //[Change 5 * 60 to 1 * 60]
+                //[BILL] TIME CHANGE on DispatchQueue: Change 5 * 60 to 1 * 60 to make the blood sugar update more often.
                 DispatchQueue.main.asyncAfter(deadline: .now() + (1 * 60) + 15, execute: self.workItem!)
             } else {
                 // create an 'empty' image view if there is no BG data to show
                 contactImageView = ContactImageView(bgValue: 0, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: "", bgRangeDescription: .inRange, valueIsUpToDate: false)
+                //[Bill] After an empty image is created set a timer to trigger updateContact(). This is to fix the error of not updating contact image after losing connection for a long period of time.
+                self.workItem = DispatchWorkItem(block: {
+                    trace("in updateContact, empty image created. Retrying updateContact", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error)
+                    self.updateContact()
+                })
+                DispatchQueue.main.asyncAfter(deadline: .now() + (2 * 60) + 15, execute: self.workItem!)  
             }
             
             // we're going to use the app name as the given name of the contact we want to use/create/update
