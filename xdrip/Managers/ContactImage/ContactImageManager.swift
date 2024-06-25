@@ -128,9 +128,9 @@ class ContactImageManager: NSObject {
                 
                 contactImageView = ContactImageView(bgValue: lastReading[0].calculatedValue, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: UserDefaults.standard.displayTrendInContactImage ? lastReading[0].slopeArrow() : "", bgRangeDescription: lastReading[0].bgRangeDescription(), valueIsUpToDate: valueIsUpToDate)
                 
-                // schedule an update in 5 min 15 seconds - if no new data is received until then, the empty value will get rendered into the contact (this update will be canceled if new data is received)
+                // schedule an update in 1 min 15 seconds
                 self.workItem = DispatchWorkItem(block: {
-                    trace("in updateContact, no updates received for more than 5 minutes", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error)
+                    trace("in updateContact, scheduling update in 1 minute and 15 seconds", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
                     self.updateContact()
                 })
                 
@@ -159,7 +159,7 @@ class ContactImageManager: NSObject {
             // we'll search for all results and then just use the first one for now
             // we do it this way so that in the future we want to add a descriptor to the family name to have various contact images (such as "BG", "IOB", "COB" as needed)
             if let contacts = try? self.contactStore.unifiedContacts(matching: predicate, keysToFetch: keyToFetch), let contact = contacts.first {
-                trace("in updateContact, existing contact found. Updating it's contact image.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
+                trace("in updateContact, existing contact found. Updating its contact image.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
                 
                 // create a mutableContact from the existing contact so that we can modify it
                 guard let mutableContact = contact.mutableCopy() as? CNMutableContact else { return }
