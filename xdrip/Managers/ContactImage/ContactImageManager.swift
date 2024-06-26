@@ -114,17 +114,14 @@ class ContactImageManager: NSObject {
                 return
             }
 
-            // [BILL] Logging to see if the array is empty or not. 
-            // let arrayEmpty = lastReading.isEmpty
-            // print("Is lastReading empty?", arrayEmpty)
-
-            // [BILL] Variable to check the time of the last reading.
+            // [BILL] Variable for checking time.
             let timeCheck = abs(lastReading[0].timeStamp.timeIntervalSinceNow)
         
             // [BILL] Add second condition to if statement to determine if reading is more than 10 minutes out of date.
             // [BILL] TIME CHANGE on valueIsUpToDate: 7 * 60 changed to 5 * 60 
             if lastReading.count > 0 && timeCheck < 10 * 60 {
-                let valueIsUpToDate = abs(lastReading[0].timeStamp.timeIntervalSinceNow) < 5 * 60
+                //let valueIsUpToDate = abs(lastReading[0].timeStamp.timeIntervalSinceNow) < 5 * 60
+                let valueIsUpToDate = timeCheck < 5 * 60
                 
                 contactImageView = ContactImageView(bgValue: lastReading[0].calculatedValue, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: UserDefaults.standard.displayTrendInContactImage ? lastReading[0].slopeArrow() : "", bgRangeDescription: lastReading[0].bgRangeDescription(), valueIsUpToDate: valueIsUpToDate)
                 
