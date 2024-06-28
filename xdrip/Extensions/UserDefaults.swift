@@ -341,14 +341,14 @@ extension UserDefaults {
         /// timestamp of latest reading uploaded to Dexcom Share
         case timeStampLatestDexcomShareUploadedBgReading = "timeStampLatestDexcomShareUploadedBgReading"
         
-        // Loop
-        /// dictionary representation of readings that were shared  with Loop. This is not the json representation, it's an array of dictionary
+        // OS-AID sharing (Loop, iAPS, Trio etc)
+        /// dictionary representation of readings that were shared with Loop (or another OS-AID system using the same method). This is not the json representation, it's an array of dictionary
         case readingsStoredInSharedUserDefaultsAsDictionary = "readingsStoredInSharedUserDefaultsAsDictionary"
             
-        /// timestamp lastest reading shared with Loop
+        /// timestamp lastest reading shared with Loop/OS-AID
         case timeStampLatestLoopSharedBgReading = "timeStampLatestLoopSharedBgReading"
         
-        /// Loop sharing will be limited to just once every 5 minutes if true
+        /// Loop/OS-AID sharing will be limited to just once every 5 minutes if true
         case shareToLoopOnceEvery5Minutes = "shareToLoopOnceEvery5Minutes"
         
 
@@ -387,8 +387,8 @@ extension UserDefaults {
         case smoothLibreValues = "smoothLibreValues"
         /// for Libre 2 : suppress sending unlockPayLoad, this will allow to run xDrip4iOS/Libre 2 in parallel with other app(s)
         case suppressUnLockPayLoad = "suppressUnLockPayLoad"
-        /// if true, then readings will not be written to shared user defaults (for loop)
-        case suppressLoopShare = "suppressLoopShare"
+        /// should the BG values be written to a shared app group?
+        case loopShareType = "loopShareType"
         /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
         ///
         /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
@@ -1614,7 +1614,7 @@ extension UserDefaults {
         }
     }
     
-    // MARK:M5Stack
+    // MARK: - M5Stack
 
     /// M5StackBlePassword, used for authenticating xdrip app towards M5Stack
     var m5StackBlePassword: String? {
@@ -1969,9 +1969,9 @@ extension UserDefaults {
         }
     }
     
-    // MARK: - =====  Loopkit App Group Share variables ======
+    // MARK: - =====  OS-AID (Loop/iAPS/Trio) App Group Share variables ======
     
-    /// dictionary representation of readings that were shared  with Loop. This is not the json representation, it's an array of dictionary
+    /// dictionary representation of readings that were shared with a looping system. This is not the json representation, it's an array of dictionary
     var readingsStoredInSharedUserDefaultsAsDictionary: [Dictionary<String, Any>]? {
         get {
             return object(forKey: Key.readingsStoredInSharedUserDefaultsAsDictionary.rawValue) as? [Dictionary<String, Any>]
@@ -1981,7 +1981,7 @@ extension UserDefaults {
         }
     }
 
-    /// timestamp lastest reading shared with Loop via App Group
+    /// timestamp lastest reading shared via the selected Shared App Group
     var timeStampLatestLoopSharedBgReading:Date? {
         get {
             return object(forKey: Key.timeStampLatestLoopSharedBgReading.rawValue) as? Date
@@ -2047,13 +2047,14 @@ extension UserDefaults {
         }
     }
     
-    /// if true, then readings will not be written to shared user defaults (for loop)
-    var suppressLoopShare: Bool {
+    /// should the BG values be shared with a specified app group
+    var loopShareType: LoopShareType {
         get {
-            return bool(forKey: Key.suppressLoopShare.rawValue)
+            let loopShareTypeAsInt = integer(forKey: Key.loopShareType.rawValue)
+            return LoopShareType(rawValue: loopShareTypeAsInt) ?? .disabled
         }
         set {
-            set(newValue, forKey: Key.suppressLoopShare.rawValue)
+            set(newValue.rawValue, forKey: Key.loopShareType.rawValue)
         }
     }
     

@@ -1521,10 +1521,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 calendarManager?.processNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 contactImageManager?.processNewReading()
-
-                if !UserDefaults.standard.suppressLoopShare {
-                    loopManager?.share()
-                }
+                
+                loopManager?.share()
 
                 watchManager?.updateWatchApp(forceComplicationUpdate: false)
 
@@ -2006,11 +2004,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 // calendarManager should process new reading
                 self.calendarManager?.processNewReading(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
                 
-                // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
-                if !UserDefaults.standard.suppressLoopShare {
-                    self.loopManager?.share()
-                }
-
+                // send also to loopmanager
+                self.loopManager?.share()
                 
             }
             
@@ -3983,10 +3978,7 @@ extension RootViewController: FollowerDelegate {
                 // ask calendarManager to process new reading, ignore last connection change timestamp because this is follower mode, there is no connection to a transmitter
                 calendarManager?.processNewReading(lastConnectionStatusChangeTimeStamp: nil)
                 
-                // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
-                if !UserDefaults.standard.suppressLoopShare {
-                    self.loopManager?.share()
-                }
+                loopManager?.share()
 
                 watchManager?.updateWatchApp(forceComplicationUpdate: false)
                 

@@ -11,6 +11,7 @@
 	<key>com.apple.security.application-groups</key>
 	<array>
 		<string>group.com.${DEVELOPMENT_TEAM}.loopkit.LoopGroup</string>
+		<string>group.org.nightscout.${DEVELOPMENT_TEAM}.trio.trio-app-group</string>
 	</array>
 </dict>
 </plist>

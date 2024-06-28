@@ -160,12 +160,11 @@
 "settingsviews_housekeeperExportAllData" = "Export All Data";
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 "suppressUnLockPayLoad" = "Suppress Unlock Payload";
-"suppressLoopShare" = "Suppress Loop Share";
-"shareToLoopOnceEvery5Minutes" = "Share to Loop every 5 mins";
+"shareToLoopOnceEvery5Minutes" = "Share with OS-AID every 5 mins";
 "Select Time" = "Select Time";
 "Select Value" = "Select Value";
 "expanatoryTextSelectTime" = "As of what time should the value apply";
-"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with Loop";
+"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
 "warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
 
 "appleWatchSectionTitle" = "Apple Watch";

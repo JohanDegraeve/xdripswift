@@ -17,8 +17,8 @@ fileprivate enum Setting:Int, CaseIterable {
     /// for Libre 2 only, to suppress that app sends unlock payload to Libre 2, in which case xDrip4iOS can run in parallel with other app(s)
     case suppressUnLockPayLoad = 4
 
-    /// if true, then readings will not be written to shared user defaults (for loop)
-    case suppressLoopShare = 5
+    /// should the BG values be written to a shared app group?
+    case loopShareType = 5
     
     /// if true, then readings will only be written to shared user defaults (for loop) every 5 minutes (>4.5 mins to be exact)
     case shareToLoopOnceEvery5Minutes = 6
@@ -80,8 +80,8 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         case .suppressUnLockPayLoad:
             return Texts_SettingsView.suppressUnLockPayLoad
             
-        case .suppressLoopShare:
-            return Texts_SettingsView.suppressLoopShare
+        case .loopShareType:
+            return Texts_SettingsView.loopShare
             
         case .shareToLoopOnceEvery5Minutes:
             return Texts_SettingsView.shareToLoopOnceEvery5Minutes
@@ -106,10 +106,10 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .suppressLoopShare, .allowStandByHighContrast:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .allowStandByHighContrast:
             return .none
             
-        case .loopDelay, .libreLinkUpVersion, .remainingComplicationUserInfoTransfers:
+        case .loopShareType, .loopDelay, .libreLinkUpVersion, .remainingComplicationUserInfoTransfers:
             return .disclosureIndicator
             
         }
@@ -121,8 +121,11 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .suppressLoopShare, .shareToLoopOnceEvery5Minutes, .loopDelay, .allowStandByHighContrast:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .loopDelay, .allowStandByHighContrast:
             return nil
+            
+        case .loopShareType:
+            return UserDefaults.standard.loopShareType.description
             
         case .libreLinkUpVersion:
             return UserDefaults.standard.libreLinkUpVersion
@@ -193,14 +196,6 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                 
             })
             
-        case .suppressLoopShare:
-            return UISwitch(isOn: UserDefaults.standard.suppressLoopShare, action: {
-                (isOn:Bool) in
-                
-                UserDefaults.standard.suppressLoopShare = isOn
-                
-            })
-            
         case .shareToLoopOnceEvery5Minutes:
             return UISwitch(isOn: UserDefaults.standard.shareToLoopOnceEvery5Minutes, action: {
                 (isOn:Bool) in
@@ -217,7 +212,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                 
             })
             
-        case .remainingComplicationUserInfoTransfers, .loopDelay, .libreLinkUpVersion:
+        case .loopShareType, .loopDelay, .remainingComplicationUserInfoTransfers, .libreLinkUpVersion:
             return nil
             
         }
@@ -234,8 +229,42 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .suppressLoopShare, .allowStandByHighContrast:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .smoothLibreValues, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .allowStandByHighContrast:
             return .nothing
+            
+        case .loopShareType:
+            
+            // data to be displayed in list from which user needs to pick a loop share type
+            var data = [String]()
+            
+            var selectedRow: Int?
+            
+            var index = 0
+            
+            let currentLoopShareType = UserDefaults.standard.loopShareType
+            
+            // get all loop share types and add the description to data. Search for the type that matches the LoopShareType that is currently stored in userdefaults.
+            for loopShareType in LoopShareType.allCases {
+                
+                data.append(loopShareType.description)
+                
+                if loopShareType == currentLoopShareType {
+                    selectedRow = index
+                }
+                
+                index += 1
+                
+            }
+            
+            return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.loopShare, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
+                
+                if index != selectedRow {
+                    
+                    UserDefaults.standard.loopShareType = LoopShareType(rawValue: index) ?? .disabled
+                    
+                }
+                
+            }, cancelHandler: nil, didSelectRowHandler: nil)
             
         case .loopDelay:
             return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToLoopDelaySchedule.rawValue, sender: self)
