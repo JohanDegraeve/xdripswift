@@ -201,7 +201,6 @@
 		47DB06E32A7137B000267BE3 /* LibreLinkUpFollowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E22A7137B000267BE3 /* LibreLinkUpFollowManager.swift */; };
 		47DB06E72A715EC500267BE3 /* ConstantsLibreLinkUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E62A715EC500267BE3 /* ConstantsLibreLinkUp.swift */; };
 		47DB06E92A715FD900267BE3 /* LibreLinkUpModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E82A715FD900267BE3 /* LibreLinkUpModels.swift */; };
-		47DE41AA2B860DF00041DA19 /* WatchConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 47DE41A92B860DF00041DA19 /* WatchConnectivity.framework */; };
 		47DE41AD2B863D370041DA19 /* WatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41AC2B863D370041DA19 /* WatchState.swift */; };
 		47DE41AE2B863D370041DA19 /* WatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41AC2B863D370041DA19 /* WatchState.swift */; };
 		47DE41AF2B864EE50041DA19 /* xDrip Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 47A6ABDF2B790CC60047A4BA /* xDrip Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
