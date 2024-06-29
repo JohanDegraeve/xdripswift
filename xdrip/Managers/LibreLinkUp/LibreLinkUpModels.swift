@@ -27,7 +27,8 @@ public enum LibreLinkUpRegion: Int, CaseIterable {
     case eu2 = 7
     case fr = 8
     case jp = 9
-    case us = 10
+    case la = 10
+    case us = 11
     
     
     init?() {
@@ -56,6 +57,8 @@ public enum LibreLinkUpRegion: Int, CaseIterable {
             self = .fr
         case "jp":
             self = .jp
+        case "la":
+            self = .la
         case "us":
             self = .us
         default:
@@ -88,6 +91,8 @@ public enum LibreLinkUpRegion: Int, CaseIterable {
             return "France"
         case .jp:
             return "Japan"
+        case .la:
+            return "Latin America"
         case .us:
             return "United States"
             
@@ -165,8 +170,10 @@ public enum LibreLinkUpRegion: Int, CaseIterable {
             return 8
         case 9:// jp
             return 9
-        case 10:// us
+        case 10:// la
             return 10
+        case 11:// us
+            return 11
         default:
             fatalError("in libreLinkUpRawValue, unknown case")
         }
