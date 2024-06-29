@@ -2,7 +2,7 @@ import Foundation
 import OG
 import os
 
-public class OpenGlückManager: NSObject, OpenGlückSyncClientDelegate {
+public class OpenGlückManager: NSObject, OpenGluckSyncClientDelegate {
     // MARK: - public properties
 
     // MARK: - private properties
@@ -23,8 +23,8 @@ public class OpenGlückManager: NSObject, OpenGlückSyncClientDelegate {
     private var openGlückInitialized = false
 
     /// reference to the OpenGlück client, should be used only if we're sure OpenGlück is supported on the device
-    private var openGlückClient: OpenGlückClient?
-    private var openGlückSyncClient: OpenGlückSyncClient?
+    private var openGlückClient: OpenGluckClient?
+    private var openGlückSyncClient: OpenGluckSyncClient?
     
     /// dismisses low notifications 30m after low record
     private let dismissLowAfter: TimeInterval = 30 * 60 // 30m
@@ -65,15 +65,18 @@ public class OpenGlückManager: NSObject, OpenGlückSyncClientDelegate {
         openGlückSyncClient = nil
         guard UserDefaults.standard.openGlückEnabled, let openGlückHostname =  UserDefaults.standard.openGlückHostname, let openGlückToken = UserDefaults.standard.openGlückToken else { return false }
 
-        openGlückClient = OpenGlückClient(hostname: openGlückHostname, token: openGlückToken, target: "xdripswift")
-        openGlückSyncClient = OpenGlückSyncClient()
-        openGlückSyncClient!.delegate = self
+        openGlückClient = OpenGluckClient(hostname: openGlückHostname, token: openGlückToken, target: "xdripswift")
+        Task {
+            let openGlückSyncClient = OpenGluckSyncClient()
+            await openGlückSyncClient.setDelegate(self)
+            self.openGlückSyncClient = openGlückSyncClient
+        }
 
         // all checks ok , return true
         return true
     }
     
-    public func getClient() -> OpenGlückClient? {
+    public func getClient() -> OpenGluckClient? {
         openGlückClient
     }
     
@@ -124,11 +127,11 @@ public class OpenGlückManager: NSObject, OpenGlückSyncClientDelegate {
 
         // reupload at least 4 historic records + scans
         let uploadHistoricAfter = (UserDefaults.standard.timeStampLatestOpenGlückBgReading ?? Date().addingTimeInterval(-86400)).addingTimeInterval(-historicScanTipoffInterval)
-        let glucoseRecordsToUpload: [OpenGlückGlucoseRecord] = (
+        let glucoseRecordsToUpload: [OpenGluckGlucoseRecord] = (
             historics.map ({
-                OpenGlückGlucoseRecord(timestamp: $0.timeStamp, mgDl: Int(round($0.calculatedValue)), recordType: "historic")
+                OpenGluckGlucoseRecord(timestamp: $0.timeStamp, mgDl: Int(round($0.calculatedValue)), recordType: "historic")
             }) + scans.map ({
-                OpenGlückGlucoseRecord(timestamp: $0.timeStamp, mgDl: Int(round($0.calculatedValue)), recordType: "scan")
+                OpenGluckGlucoseRecord(timestamp: $0.timeStamp, mgDl: Int(round($0.calculatedValue)), recordType: "scan")
             })
         ).filter {
             $0.timestamp >= uploadHistoricAfter
@@ -136,7 +139,7 @@ public class OpenGlückManager: NSObject, OpenGlückSyncClientDelegate {
         let modelName = "xdripswift"
         let deviceId = UIDevice.current.identifierForVendor?.uuidString ?? "(unknown-ifv)"
         let instantGlucoseRecords = bgReadingsToStore.map { bgReading in
-            OpenGlückInstantGlucoseRecord(timestamp: bgReading.timeStamp, mgDl: Int(round(bgReading.calculatedValue)), modelName: modelName, deviceId: deviceId)
+            OpenGluckInstantGlucoseRecord(timestamp: bgReading.timeStamp, mgDl: Int(round(bgReading.calculatedValue)), modelName: modelName, deviceId: deviceId)
         }
         Task {
             if UserDefaults.standard.openGlückUploadEnabled {
@@ -145,7 +148,7 @@ public class OpenGlückManager: NSObject, OpenGlückSyncClientDelegate {
                     // and all records uploaded here also end up in the instant glucose records
                     do {
                         let timeStampLastReadingToUpload = glucoseRecordsToUpload.filter { $0.recordType == "historic" }.map { $0.timestamp }.max()!
-                        let device = OpenGlückDevice(modelName: modelName, deviceId: deviceId)
+                        let device = OpenGluckDevice(modelName: modelName, deviceId: deviceId)
                         _ = try await openGlückClient.upload(currentCgmProperties: CgmCurrentDeviceProperties(hasRealTime: true, realTimeInterval: 60), device: device, glucoseRecords: glucoseRecordsToUpload)
                         await MainActor.run {
                             let currentLatest = UserDefaults.standard.timeStampLatestOpenGlückBgReading
@@ -173,7 +176,7 @@ public class OpenGlückManager: NSObject, OpenGlückSyncClientDelegate {
         }
     }
     
-    public func getClient() -> OpenGlückClient {
+    public func getClient() -> OpenGluckClient {
         return openGlückClient!
     }
     
