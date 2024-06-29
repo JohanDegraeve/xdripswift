@@ -754,9 +754,10 @@ public class AlertManager: NSObject {
                 uNUserNotificationCenter.add(notificationRequest) { error in
                     if let error = error {
                         trace("Unable to Add Notification Request %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .error, error.localizedDescription)
+                    }
                 }
             }
-            
+
             // snooze default period, to avoid that alert goes off every minute for Libre 2, except if it's a delayed alert (for delayed alerts it looks a bit risky to me)
             if delayInSecondsToUse == 0 {
                 trace("in checkAlert, snoozing alert '%{public}@' for %{public}@ minutes", log: log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes.description)
