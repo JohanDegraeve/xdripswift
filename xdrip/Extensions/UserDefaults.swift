@@ -101,6 +101,8 @@ extension UserDefaults {
         /// target value
         case targetMarkValue = "targetMarkValue"
         
+        
+        
         // Treatment settings
         
         /// should the treatments be shown on the main chart?
@@ -135,6 +137,13 @@ extension UserDefaults {
         /// use the newer TITR of 70-140mg/dL to calculate the statistics? If false, we will use the conventional TIR of 70-180mg/dL
         case useTITRStatisticsRange = "useTITRStatisticsRange"
 
+        // Alert settings
+        
+        /// when did the user snooze all alarms
+        case snoozeAllAlertsFromDate = "snoozeAllAlertsFromDate"
+        /// for how long did the user snooze all alarms
+        case snoozeAllAlertsUntilDate = "snoozeAllAlertsUntilDate"
+        
         // Housekeeper settings
 
         /// For how many days should we keep Readings, Treatments and Calibrations?
@@ -332,14 +341,14 @@ extension UserDefaults {
         /// timestamp of latest reading uploaded to Dexcom Share
         case timeStampLatestDexcomShareUploadedBgReading = "timeStampLatestDexcomShareUploadedBgReading"
         
-        // Loop
-        /// dictionary representation of readings that were shared  with Loop. This is not the json representation, it's an array of dictionary
+        // OS-AID sharing (Loop, iAPS, Trio etc)
+        /// dictionary representation of readings that were shared with Loop (or another OS-AID system using the same method). This is not the json representation, it's an array of dictionary
         case readingsStoredInSharedUserDefaultsAsDictionary = "readingsStoredInSharedUserDefaultsAsDictionary"
             
-        /// timestamp lastest reading shared with Loop
+        /// timestamp lastest reading shared with Loop/OS-AID
         case timeStampLatestLoopSharedBgReading = "timeStampLatestLoopSharedBgReading"
         
-        /// Loop sharing will be limited to just once every 5 minutes if true
+        /// Loop/OS-AID sharing will be limited to just once every 5 minutes if true
         case shareToLoopOnceEvery5Minutes = "shareToLoopOnceEvery5Minutes"
         
 
@@ -378,8 +387,8 @@ extension UserDefaults {
         case smoothLibreValues = "smoothLibreValues"
         /// for Libre 2 : suppress sending unlockPayLoad, this will allow to run xDrip4iOS/Libre 2 in parallel with other app(s)
         case suppressUnLockPayLoad = "suppressUnLockPayLoad"
-        /// if true, then readings will not be written to shared user defaults (for loop)
-        case suppressLoopShare = "suppressLoopShare"
+        /// should the BG values be written to a shared app group?
+        case loopShareType = "loopShareType"
         /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
         ///
         /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
@@ -419,6 +428,12 @@ extension UserDefaults {
         /// how many seconds since the last heartbeat before we raise a disconnection warning
         case secondsUntilHeartBeatDisconnectWarning = "secondsUntilHeartBeatDisconnectWarning"
         
+        // snooze
+        /// used by the observer in RVC to update the UI for the snooze status
+        case updateSnoozeStatus = "updateSnoozeStatus"
+        
+        /// should the app allow a high contrast mode for the .systemSmall widget when shown in StandBy mode at night?
+        case allowStandByHighContrast = "allowStandByHighContrast"
     }
     
     
@@ -1183,6 +1198,29 @@ extension UserDefaults {
     }
     
     
+    // MARK: Alert Settings
+    
+    /// when did the user snooze all alerts. If this is nil, then the snooze all isn't activated
+    @objc dynamic var snoozeAllAlertsFromDate: Date? {
+        get {
+            return object(forKey: Key.snoozeAllAlertsFromDate.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.snoozeAllAlertsFromDate.rawValue)
+        }
+    }
+    
+    /// until when did the user snooze all alerts, can be nil until it's first set but unless snoozeAllAlertsDate != nil we'll ignore this value anyway
+    @objc dynamic var snoozeAllAlertsUntilDate: Date? {
+        get {
+            return object(forKey: Key.snoozeAllAlertsUntilDate.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.snoozeAllAlertsUntilDate.rawValue)
+        }
+    }
+    
+    
     // MARK: Sensor Info Settings
     
     /// active sensor serial number. Optional as should be set to nil if no successful login has happened and/or if no active sensor is returned
@@ -1576,7 +1614,7 @@ extension UserDefaults {
         }
     }
     
-    // MARK:M5Stack
+    // MARK: - M5Stack
 
     /// M5StackBlePassword, used for authenticating xdrip app towards M5Stack
     var m5StackBlePassword: String? {
@@ -1931,9 +1969,9 @@ extension UserDefaults {
         }
     }
     
-    // MARK: - =====  Loopkit App Group Share variables ======
+    // MARK: - =====  OS-AID (Loop/iAPS/Trio) App Group Share variables ======
     
-    /// dictionary representation of readings that were shared  with Loop. This is not the json representation, it's an array of dictionary
+    /// dictionary representation of readings that were shared with a looping system. This is not the json representation, it's an array of dictionary
     var readingsStoredInSharedUserDefaultsAsDictionary: [Dictionary<String, Any>]? {
         get {
             return object(forKey: Key.readingsStoredInSharedUserDefaultsAsDictionary.rawValue) as? [Dictionary<String, Any>]
@@ -1943,7 +1981,7 @@ extension UserDefaults {
         }
     }
 
-    /// timestamp lastest reading shared with Loop via App Group
+    /// timestamp lastest reading shared via the selected Shared App Group
     var timeStampLatestLoopSharedBgReading:Date? {
         get {
             return object(forKey: Key.timeStampLatestLoopSharedBgReading.rawValue) as? Date
@@ -2009,13 +2047,14 @@ extension UserDefaults {
         }
     }
     
-    /// if true, then readings will not be written to shared user defaults (for loop)
-    var suppressLoopShare: Bool {
+    /// should the BG values be shared with a specified app group
+    var loopShareType: LoopShareType {
         get {
-            return bool(forKey: Key.suppressLoopShare.rawValue)
+            let loopShareTypeAsInt = integer(forKey: Key.loopShareType.rawValue)
+            return LoopShareType(rawValue: loopShareTypeAsInt) ?? .disabled
         }
         set {
-            set(newValue, forKey: Key.suppressLoopShare.rawValue)
+            set(newValue.rawValue, forKey: Key.loopShareType.rawValue)
         }
     }
     
@@ -2069,6 +2108,17 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.libreLinkUpVersion.rawValue)
+        }
+    }
+    
+    /// should the app allow a high contrast mode for the .systemSmall widget when shown in StandBy mode at night?
+    var allowStandByHighContrast: Bool {
+        // default value for bool in userdefaults is false, as default we want the app to allow high contrast for StandBy as needed
+        get {
+            return !bool(forKey: Key.allowStandByHighContrast.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.allowStandByHighContrast.rawValue)
         }
     }
     
@@ -2315,6 +2365,17 @@ extension UserDefaults {
         }
     }
     
+    // MARK: - Snooze
+    
+    /// used by the observer in RVC to update the UI for the snooze status
+    @objc dynamic var updateSnoozeStatus: Bool {
+        get {
+            return bool(forKey: Key.updateSnoozeStatus.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.updateSnoozeStatus.rawValue)
+        }
+    }
 }
 
 

@@ -5,6 +5,10 @@ extension Bundle {
         return object(forInfoDictionaryKey: "AppGroupIdentifier") as! String
     }
     
+    var appGroupSuiteNameTrio: String {
+        return object(forInfoDictionaryKey: "AppGroupIdentifierTrio") as! String
+    }
+    
     var mainAppBundleIdentifier: String {
         return object(forInfoDictionaryKey: "MainAppBundleIdentifier") as! String
     }

@@ -20,5 +20,6 @@ struct WidgetSharedUserDefaultsModel: Codable {
     var highLimitInMgDl: Double
     var urgentHighLimitInMgDl: Double
     var dataSourceDescription: String
+    var allowStandByHighContrast: Bool
     var keepAliveImageString: String?
 }

@@ -61,6 +61,10 @@ class Texts_Common {
         return NSLocalizedString("common_hours", tableName: filename, bundle: Bundle.main, value: "hours", comment: "literal translation needed")
     }()
     
+    static let minuteshort = {
+        return NSLocalizedString("common_minuteshort", tableName: filename, bundle: Bundle.main, value: "m", comment: "literal translation needed")
+    }()
+    
     static let minutes = {
         return NSLocalizedString("common_minutes", tableName: filename, bundle: Bundle.main, value: "mins", comment: "literal translation needed")
     }()

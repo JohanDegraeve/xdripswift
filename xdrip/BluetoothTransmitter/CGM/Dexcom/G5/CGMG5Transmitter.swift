@@ -1284,13 +1284,19 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             // setting glucoseTxSent to true, because we received just glucose data
             // possibly a glucoseTx message (was sent by other app on the same device, so it's not necessary to send a new one
             glucoseTxSent = true
+            
+            var forceNewSensor = false
+            
+            if let sensorStartDate = self.sensorStartDate, let activeSensorStartDate = UserDefaults.standard.activeSensorStartDate, activeSensorStartDate < sensorStartDate.addingTimeInterval(-15.0) {
+                forceNewSensor = true
+            }
 
             // this is a valid sensor state, now it's time to process receivedSensorStartDate if it exists
             if let receivedSensorStartDate = receivedSensorStartDate {
                 
                 // if current sensorStartDate is < receivedSensorStartDate then it seems a new sensor
                 // adding an interval of 15 seconds, because sensorStartDate reported by transmitter can vary a second
-                if sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate.addingTimeInterval(-15.0)) {
+                if forceNewSensor || sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate.addingTimeInterval(-15.0)) {
                     
                     if let sensorStartDate = sensorStartDate {
                         trace("    Currently known sensorStartDate = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, sensorStartDate.toString(timeStyle: .long, dateStyle: .long))
@@ -1311,7 +1317,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 sensorStartDate = receivedSensorStartDate
                 
                 // reset receivedSensorStartDate to nil
-                self.receivedSensorStartDate = nil
+                //self.receivedSensorStartDate = nil
                 
             }
             
@@ -1391,7 +1397,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 timeStampLastSensorStartTimeRead = Date()
                 
                 // if current sensorStartDate is < from receivedSensorStartDate then it seems a new sensor
-                if sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate.addingTimeInterval(-15.0)) {
+                if self.receivedSensorStartDate == nil || sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate.addingTimeInterval(-15.0)) {
                    
                     if let sensorStartDate = sensorStartDate {
                         trace("    Currently known sensorStartDate = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, sensorStartDate.toString(timeStyle: .long, dateStyle: .long))

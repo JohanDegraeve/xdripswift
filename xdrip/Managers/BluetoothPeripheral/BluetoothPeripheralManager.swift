@@ -52,8 +52,8 @@ class BluetoothPeripheralManager: NSObject {
                 
                 cgmTransmitterInfoChanged()
 
-                // share new address with loop, but not if suppressLoopShare is on
-                if !UserDefaults.standard.suppressLoopShare {
+                // share new address with loop, but not if loop share is disabled
+                if UserDefaults.standard.loopShareType != .disabled {
 
                     setCGMTransmitterInSharedUserDefaults()
 

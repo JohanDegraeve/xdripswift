@@ -396,7 +396,7 @@ class Texts_SettingsView {
     }()
     
     static let resetDexcomTransmitterMessage: String = {
-        return NSLocalizedString("settingsviews_resetDexcomTransmitterMessage", tableName: filename, bundle: Bundle.main, value: "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or One transmitters.", comment: "transmitter settings, to explain that the reset option only works for certain transmitters")
+        return NSLocalizedString("settingsviews_resetDexcomTransmitterMessage", tableName: filename, bundle: Bundle.main, value: "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.", comment: "transmitter settings, to explain that the reset option only works for certain transmitters")
     }()
     
     static let labelWebOOPTransmitter:String = {
@@ -648,6 +648,10 @@ class Texts_SettingsView {
         return NSLocalizedString("appleWatchForceManualComplicationUpdateMessage", tableName: filename, bundle: Bundle.main, value: "This will manually force an update of the Apple Watch complications.\n\nIt will use up one of the remaining transfers available for today", comment: "Apple Watch Developer Settings - message explaining how to manually force a complication update")
     }()
     
+    static let allowStandByHighContrast: String = {
+        return NSLocalizedString("allowStandByHighContrast", tableName: filename, bundle: Bundle.main, value: "StandBy Night Mode", comment: "should we allow the StandBy mode to show a specific high contrast view at night")
+    }()
+    
     // MARK: - Calendar Events
     
     static let calendarEventsSectionTitle: String = {
@@ -784,8 +788,16 @@ class Texts_SettingsView {
         return NSLocalizedString("suppressUnLockPayLoad", tableName: filename, bundle: Bundle.main, value: "Suppress Unlock Payload", comment: "When enabled, then it should be possible to run xDrip4iOS/Libre 2 in parallel with other app(s)")
     }()
     
-    static let suppressLoopShare: String = {
-        return NSLocalizedString("suppressLoopShare", tableName: filename, bundle: Bundle.main, value: "Suppress Loop Share", comment: "When enabled, readings will not be reading to shared user defaults (for loop)")
+    static let loopShare: String = {
+        return NSLocalizedString("loopShare", tableName: filename, bundle: Bundle.main, value: "Share with OS-AID", comment: "Should the BG readings be shared with an AID system via the shared app group?")
+    }()
+    
+    static let loopShareToLoop: String = {
+        return NSLocalizedString("loopShareToLoop", tableName: filename, bundle: Bundle.main, value: "Loop/iAPS", comment: "text for Loop and iAPS")
+    }()
+    
+    static let loopShareToTrio: String = {
+        return NSLocalizedString("loopShareToTrio", tableName: filename, bundle: Bundle.main, value: "Trio", comment: "text for Trio")
     }()
     
     static let selectTime: String = {
@@ -801,11 +813,11 @@ class Texts_SettingsView {
     }()
 
     static let loopDelaysScreenTitle: String = {
-        return NSLocalizedString("loopDelaysScreenTitle", tableName: filename, bundle: Bundle.main, value: "Loop Share Delays", comment: "Title for screen where loop delays are configured.")
+        return NSLocalizedString("loopDelaysScreenTitle", tableName: filename, bundle: Bundle.main, value: "OS-AID Share Delays", comment: "Title for screen where loop delays are configured.")
     }()
 
     static let expanatoryTextSelectValue: String = {
-        return NSLocalizedString("expanatoryTextSelectValue", tableName: filename, bundle: Bundle.main, value: "Delay in minutes, applied to readings shared with Loop", comment: "Settings screen for loop delay, explanatory text for value")
+        return NSLocalizedString("expanatoryTextSelectValue", tableName: filename, bundle: Bundle.main, value: "Delay in minutes, applied to readings shared with OS-AID", comment: "Settings screen for loop delay, explanatory text for value")
     }()
 
     static let warningLoopDelayAlreadyExists: String = {
@@ -813,7 +825,7 @@ class Texts_SettingsView {
     }()
     
     static let shareToLoopOnceEvery5Minutes: String = {
-        return NSLocalizedString("shareToLoopOnceEvery5Minutes", tableName: filename, bundle: Bundle.main, value: "Share to Loop every 5 mins", comment: "Should loop data be shared only every 5 minutes")
+        return NSLocalizedString("shareToLoopOnceEvery5Minutes", tableName: filename, bundle: Bundle.main, value: "Share with OS-AID every 5 mins", comment: "Should loop data be shared only every 5 minutes")
     }()
     
     static let showDeveloperSettings: String = {

@@ -15,7 +15,20 @@ extension XDripWidget {
         // get the widget's family so that we can show the correct view
         @Environment(\.widgetFamily) private var widgetFamily
         
-        @Environment(\.colorScheme) var colorScheme
+        // check if the widget container background has been removed by iOS
+        // this allows us to check if the widget is being displayed in StandBy mode
+        @Environment(\.showsWidgetContainerBackground) var isNotBeingUsedInStandByMode
+        
+        // check if we should consider that we're during the night and use this
+        // to display the widget in high-contrast mode
+        // will only be used in conjunction with isNotInStandByMode
+        func isAtNight() -> Bool {
+            if let currentHour = Calendar.current.dateComponents([.hour], from: Date()).hour, currentHour > ConstantsWidgetExtension.nightModeFromHour || currentHour < ConstantsWidgetExtension.nightModeUntilHour {
+                return entry.widgetState.allowStandByHighContrast
+            } else {
+                return false
+            }
+        }
         
         var entry: Entry
         

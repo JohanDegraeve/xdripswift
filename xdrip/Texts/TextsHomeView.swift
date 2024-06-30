@@ -8,6 +8,26 @@ enum Texts_HomeView {
         return NSLocalizedString("presnooze", tableName: filename, bundle: Bundle.main, value: "Snooze", comment: "Text in button on home screen")
     }()
     
+    static let snoozeAllTitle:String = {
+        return NSLocalizedString("snoozeAllTitle", tableName: filename, bundle: Bundle.main, value: "Snooze All Alarms", comment: "snooze all text in snooze screen")
+    }()
+    
+    static let snoozeAllDisabled:String = {
+        return NSLocalizedString("snoozeAllDisabled", tableName: filename, bundle: Bundle.main, value: "No urgent alarms are snoozed", comment: "no urgent alarms are snoozed text in snooze screen")
+    }()
+    
+    static let snoozeAllSnoozed:String = {
+        return NSLocalizedString("snoozeAllSnoozedUntil", tableName: filename, bundle: Bundle.main, value: "All alarms are snoozed!", comment: "snooze all text in snooze screen")
+    }()
+    
+    static let snoozeAllSnoozedUntil:String = {
+        return NSLocalizedString("snoozeAllSnoozedUntil", tableName: filename, bundle: Bundle.main, value: "All alarms are snoozed until", comment: "snooze all until text in snooze screen")
+    }()
+    
+    static let snoozeUrgentAlarms:String = {
+        return NSLocalizedString("snoozeUrgentAlarms", tableName: filename, bundle: Bundle.main, value: "Some urgent alarms are snoozed", comment: "text to inform that some of the urgent alarms are snoozed")
+    }()
+    
     static let sensor:String = {
         return NSLocalizedString("sensor", tableName: filename, bundle: Bundle.main, value: "Sensor", comment: "Literally 'Sensor', used as name in the button in the home screen, but also in text in pop ups")
     }()
@@ -106,6 +126,10 @@ enum Texts_HomeView {
     
     static let ago:String = {
         return NSLocalizedString("ago", tableName: filename, bundle: Bundle.main, value: "ago", comment: "for home view, where it say how old the reading is, 'x minutes ago', literaly translation of 'ago'")
+    }()
+    
+    static let remaining: String = {
+        return NSLocalizedString("remaining", tableName: filename, bundle: Bundle.main, value: "remaining", comment: "for home view, where it say how old much time is left, literaly translation of 'remaining'")
     }()
 
     static let licenseInfo:String = {

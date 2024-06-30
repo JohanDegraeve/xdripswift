@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		47037B8E2C072346000BD6BD /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
+		47037B8F2C072973000BD6BD /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
+		47037B902C072974000BD6BD /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
+		47037B912C07B15E000BD6BD /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
 		47046EA42A6E8BA700A6F736 /* TextsBgReadings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47046EA32A6E8BA700A6F736 /* TextsBgReadings.swift */; };
 		47046EA72A6E8F7B00A6F736 /* BgReadings.strings in Resources */ = {isa = PBXBuildFile; fileRef = 47046EA92A6E8F7B00A6F736 /* BgReadings.strings */; };
 		470824D2297484B500C52317 /* SwiftCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 470824D1297484B500C52317 /* SwiftCharts */; };
@@ -34,6 +38,22 @@
 		472596052B76301F00459D12 /* WatchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 472596042B76301F00459D12 /* WatchManager.swift */; };
 		4733B93E2AD17C99001D609D /* FollowerBgReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4733B93D2AD17C99001D609D /* FollowerBgReading.swift */; };
 		4733B9402AD17D15001D609D /* FollowerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4733B93F2AD17D15001D609D /* FollowerDelegate.swift */; };
+		4734FF552BEFE3F200C7115A /* AlertNotificationDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4734FF542BEFE3F200C7115A /* AlertNotificationDictionary.swift */; };
+		4734FF562BEFE3F200C7115A /* AlertNotificationDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4734FF542BEFE3F200C7115A /* AlertNotificationDictionary.swift */; };
+		4734FF572BF13B9C00C7115A /* TextsCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD44F221CAA64006EAB84 /* TextsCommon.swift */; };
+		473775822C14D8C100525B90 /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473775812C14D8C100525B90 /* NotificationView.swift */; };
+		473775832C14DCA500525B90 /* GlucoseChartType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210ED2B5298EB00005711 /* GlucoseChartType.swift */; };
+		473775842C14DCA900525B90 /* ConstantsGlucoseChartSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A50C2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift */; };
+		473775852C14DCC600525B90 /* GlucoseChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210EF2B52A05B00005711 /* GlucoseChartView.swift */; };
+		473775862C14DCDF00525B90 /* LiveActivitySize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D08D5D2B54390B00B0BEA7 /* LiveActivitySize.swift */; };
+		473775872C14DCFB00525B90 /* TextsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD451221DEAB1006EAB84 /* TextsSettingsView.swift */; };
+		473775882C14DD2200525B90 /* ConstantsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */; };
+		473775892C14DD3100525B90 /* ConstantsLibreLinkUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E62A715EC500267BE3 /* ConstantsLibreLinkUp.swift */; };
+		4737758A2C14DD6300525B90 /* Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E4D21ED450300ECF0C0 /* Double.swift */; };
+		4737758B2C14DD7000525B90 /* ConstantsBloodGlucose.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585222EDB602007F5B5D /* ConstantsBloodGlucose.swift */; };
+		4737758C2C14DDA700525B90 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4746068D2B963EA100AC9214 /* View.swift */; };
+		4737758D2C14DDC900525B90 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
+		473D9ECE2C2DC53A00364060 /* LoopShareType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473D9ECD2C2DC53A00364060 /* LoopShareType.swift */; };
 		474606642B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474606632B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift */; };
 		474606652B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474606632B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift */; };
 		474606692B9616AA00AC9214 /* AccessoryRectangularView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474606682B9616AA00AC9214 /* AccessoryRectangularView.swift */; };
@@ -60,6 +80,11 @@
 		4746068F2B963EA100AC9214 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4746068D2B963EA100AC9214 /* View.swift */; };
 		474606902B963EA100AC9214 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4746068D2B963EA100AC9214 /* View.swift */; };
 		474606912B963EA100AC9214 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4746068D2B963EA100AC9214 /* View.swift */; };
+		474822412BFE62220052D4FB /* ConstantsCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2AA23DA520B00E5E98A /* ConstantsCalendar.swift */; };
+		474822442C0108EA0052D4FB /* NotificationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474822432C0108EA0052D4FB /* NotificationView.swift */; };
+		474822462C01097D0052D4FB /* NotificationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474822452C01097D0052D4FB /* NotificationController.swift */; };
+		474822472C010DED0052D4FB /* AlertUrgencyType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CD642B2BEBEB0E002BDA68 /* AlertUrgencyType.swift */; };
+		474822482C010F380052D4FB /* TextsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7B1226A0878004BA588 /* TextsAlerts.swift */; };
 		4749EB9B25B36E010072DF8B /* LibreNFC.strings in Resources */ = {isa = PBXBuildFile; fileRef = 4749EB9D25B36E010072DF8B /* LibreNFC.strings */; };
 		47503382247420A200D2260B /* BluetoothPeripheralView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 47503384247420A200D2260B /* BluetoothPeripheralView.strings */; };
 		4752B400263570DA0081D551 /* ConstantsStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */; };
@@ -100,6 +125,8 @@
 		4793599A2B8A2A4E007D3CEE /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 479359992B8A2A4E007D3CEE /* InfoView.swift */; };
 		4796C6062B9516FC00DE2210 /* Bundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D602448E695001C9E5A /* Bundle.swift */; };
 		4796C6072B9516FD00DE2210 /* Bundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D602448E695001C9E5A /* Bundle.swift */; };
+		47976E362BF536BA005E86EC /* AlertSnoozeStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47976E352BF536BA005E86EC /* AlertSnoozeStatus.swift */; };
+		47976E372BFBB870005E86EC /* TextsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7B1226A0878004BA588 /* TextsAlerts.swift */; };
 		47A6ABE22B790CC60047A4BA /* xDripWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6ABE12B790CC60047A4BA /* xDripWatchApp.swift */; };
 		47A6ABE42B790CC60047A4BA /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6ABE32B790CC60047A4BA /* MainView.swift */; };
 		47A6ABE62B790CC70047A4BA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 47A6ABE52B790CC70047A4BA /* Assets.xcassets */; };
@@ -130,6 +157,7 @@
 		47A6AC442B7D430D0047A4BA /* HomeView.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8B48A9E22B2FA7B009BCC01 /* HomeView.strings */; };
 		47A6AC452B7D43100047A4BA /* Common.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD444221C9D0D006EAB84 /* Common.strings */; };
 		47A6AC462B7D43110047A4BA /* Common.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD444221C9D0D006EAB84 /* Common.strings */; };
+		47A7DFB62BE4BE4900F1DA5F /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A7DFB52BE4BE4900F1DA5F /* UIView.swift */; };
 		47AB72F327105EF4005E7CAB /* SettingsViewHelpSettingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47AB72F227105EF4005E7CAB /* SettingsViewHelpSettingModel.swift */; };
 		47ADD2DF27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47ADD2DE27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift */; };
 		47ADD2E127FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47ADD2E027FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift */; };
@@ -143,6 +171,13 @@
 		47CA61E72B97948000C2A597 /* FollowerDataSourceType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06CF2A70141E00267BE3 /* FollowerDataSourceType.swift */; };
 		47CA61E82B9796D200C2A597 /* ConstantsFollower.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */; };
 		47CA61E92B97A6BD00C2A597 /* FollowerBackgroundKeepAliveType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */; };
+		47CD64142BE9506C002BDA68 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 47CD64132BE9506C002BDA68 /* UserNotifications.framework */; };
+		47CD64162BE9506C002BDA68 /* UserNotificationsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 47CD64152BE9506C002BDA68 /* UserNotificationsUI.framework */; };
+		47CD64192BE9506C002BDA68 /* NotificationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CD64182BE9506C002BDA68 /* NotificationViewController.swift */; };
+		47CD641C2BE9506C002BDA68 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 47CD641B2BE9506C002BDA68 /* Base */; };
+		47CD64202BE9506C002BDA68 /* xDrip Notification Context Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 47CD64122BE9506C002BDA68 /* xDrip Notification Context Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		47CD642C2BEBEB0E002BDA68 /* AlertUrgencyType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CD642B2BEBEB0E002BDA68 /* AlertUrgencyType.swift */; };
+		47CD642D2BEBEB0E002BDA68 /* AlertUrgencyType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CD642B2BEBEB0E002BDA68 /* AlertUrgencyType.swift */; };
 		47CF18B22B37689A00FA6160 /* TimeInRangeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CF18B12B37689A00FA6160 /* TimeInRangeType.swift */; };
 		47D08D5B2B5437F500B0BEA7 /* ConstantsGlucoseChartSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A50C2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift */; };
 		47D08D5E2B54390B00B0BEA7 /* LiveActivitySize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D08D5D2B54390B00B0BEA7 /* LiveActivitySize.swift */; };
@@ -722,6 +757,13 @@
 			remoteGlobalIDString = 479359842B88B95A007D3CEE;
 			remoteInfo = "xDrip Watch ComplicationExtension";
 		};
+		47CD641E2BE9506C002BDA68 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F8AC425221ADEBD60078C348 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 47CD64112BE9506C002BDA68;
+			remoteInfo = "xDrip Notification Context Extension";
+		};
 		47DE41B02B864EE50041DA19 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F8AC425221ADEBD60078C348 /* Project object */;
@@ -771,6 +813,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
+				47CD64202BE9506C002BDA68 /* xDrip Notification Context Extension.appex in Embed Foundation Extensions */,
 				4716A4FE2B406C3F00419052 /* xDrip Widget Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
@@ -865,6 +908,9 @@
 		472596042B76301F00459D12 /* WatchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchManager.swift; sourceTree = "<group>"; };
 		4733B93D2AD17C99001D609D /* FollowerBgReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBgReading.swift; sourceTree = "<group>"; };
 		4733B93F2AD17D15001D609D /* FollowerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerDelegate.swift; sourceTree = "<group>"; };
+		4734FF542BEFE3F200C7115A /* AlertNotificationDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertNotificationDictionary.swift; sourceTree = "<group>"; };
+		473775812C14D8C100525B90 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
+		473D9ECD2C2DC53A00364060 /* LoopShareType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopShareType.swift; sourceTree = "<group>"; };
 		474606632B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplicationSharedUserDefaultsModel.swift; sourceTree = "<group>"; };
 		474606682B9616AA00AC9214 /* AccessoryRectangularView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessoryRectangularView.swift; sourceTree = "<group>"; };
 		4746066A2B96185C00AC9214 /* AccessoryCircularView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessoryCircularView.swift; sourceTree = "<group>"; };
@@ -878,6 +924,8 @@
 		4746067D2B962FBD00AC9214 /* SystemLargeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemLargeView.swift; sourceTree = "<group>"; };
 		4746067F2B96308A00AC9214 /* WidgetSharedUserDefaultsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSharedUserDefaultsModel.swift; sourceTree = "<group>"; };
 		4746068D2B963EA100AC9214 /* View.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = View.swift; sourceTree = "<group>"; };
+		474822432C0108EA0052D4FB /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
+		474822452C01097D0052D4FB /* NotificationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationController.swift; sourceTree = "<group>"; };
 		4749EB9C25B36E010072DF8B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LibreNFC.strings; sourceTree = "<group>"; };
 		47503383247420A200D2260B /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BluetoothPeripheralView.strings; sourceTree = "<group>"; };
 		4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsStatistics.swift; sourceTree = "<group>"; };
@@ -900,6 +948,7 @@
 		4793598B2B88B95B007D3CEE /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		4793598D2B88B95B007D3CEE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		479359992B8A2A4E007D3CEE /* InfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
+		47976E352BF536BA005E86EC /* AlertSnoozeStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertSnoozeStatus.swift; sourceTree = "<group>"; };
 		4798BAC727BA6AA8002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		4798BAC827BA6AA8002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Main.strings; sourceTree = "<group>"; };
 		4798BACB27BA7688002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Alerts.strings; sourceTree = "<group>"; };
@@ -928,6 +977,7 @@
 		47A6ABE52B790CC70047A4BA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		47A6ABE82B790CC70047A4BA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		47A6ABEE2B7949B80047A4BA /* WatchStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchStateModel.swift; sourceTree = "<group>"; };
+		47A7DFB52BE4BE4900F1DA5F /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		47AB72F227105EF4005E7CAB /* SettingsViewHelpSettingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewHelpSettingModel.swift; sourceTree = "<group>"; };
 		47ADD2DE27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartPointsScatterDownTrianglesLayer.swift; sourceTree = "<group>"; };
 		47ADD2E027FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift; sourceTree = "<group>"; };
@@ -940,6 +990,14 @@
 		47C210EF2B52A05B00005711 /* GlucoseChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseChartView.swift; sourceTree = "<group>"; };
 		47CA61E32B965E7100C2A597 /* AccessoryCircularView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessoryCircularView.swift; sourceTree = "<group>"; };
 		47CA61E52B966A9700C2A597 /* AccessoryRectangularView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessoryRectangularView.swift; sourceTree = "<group>"; };
+		47CD64122BE9506C002BDA68 /* xDrip Notification Context Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "xDrip Notification Context Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		47CD64132BE9506C002BDA68 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		47CD64152BE9506C002BDA68 /* UserNotificationsUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotificationsUI.framework; path = System/Library/Frameworks/UserNotificationsUI.framework; sourceTree = SDKROOT; };
+		47CD64182BE9506C002BDA68 /* NotificationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationViewController.swift; sourceTree = "<group>"; };
+		47CD641B2BE9506C002BDA68 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		47CD641D2BE9506C002BDA68 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		47CD64242BEA9E5A002BDA68 /* xDrip Notification Context Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "xDrip Notification Context Extension.entitlements"; sourceTree = "<group>"; };
+		47CD642B2BEBEB0E002BDA68 /* AlertUrgencyType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertUrgencyType.swift; sourceTree = "<group>"; };
 		47CF18B12B37689A00FA6160 /* TimeInRangeType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeInRangeType.swift; sourceTree = "<group>"; };
 		47D08D5D2B54390B00B0BEA7 /* LiveActivitySize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivitySize.swift; sourceTree = "<group>"; };
 		47D2DB3A2B14F6D000C8EE6B /* ScreenLockDimmingType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenLockDimmingType.swift; sourceTree = "<group>"; };
@@ -1833,6 +1891,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		47CD640F2BE9506C002BDA68 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				47CD64162BE9506C002BDA68 /* UserNotificationsUI.framework in Frameworks */,
+				47CD64142BE9506C002BDA68 /* UserNotifications.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F8AC425721ADEBD60078C348 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -1917,11 +1984,11 @@
 		474606782B962F3300AC9214 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				47CA61E32B965E7100C2A597 /* AccessoryCircularView.swift */,
+				47CA61E52B966A9700C2A597 /* AccessoryRectangularView.swift */,
 				4746067D2B962FBD00AC9214 /* SystemLargeView.swift */,
 				4746067B2B962F8500AC9214 /* SystemMediumView.swift */,
 				474606792B962F4C00AC9214 /* SystemSmallView.swift */,
-				47CA61E32B965E7100C2A597 /* AccessoryCircularView.swift */,
-				47CA61E52B966A9700C2A597 /* AccessoryRectangularView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1974,6 +2041,7 @@
 			isa = PBXGroup;
 			children = (
 				47A6ABEE2B7949B80047A4BA /* WatchStateModel.swift */,
+				474822452C01097D0052D4FB /* NotificationController.swift */,
 			);
 			path = DataModels;
 			sourceTree = "<group>";
@@ -2000,6 +2068,18 @@
 				47A6ABE82B790CC70047A4BA /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		47CD64172BE9506C002BDA68 /* xDrip Notification Context Extension */ = {
+			isa = PBXGroup;
+			children = (
+				47CD64242BEA9E5A002BDA68 /* xDrip Notification Context Extension.entitlements */,
+				47CD641D2BE9506C002BDA68 /* Info.plist */,
+				473775812C14D8C100525B90 /* NotificationView.swift */,
+				47CD64182BE9506C002BDA68 /* NotificationViewController.swift */,
+				47CD641A2BE9506C002BDA68 /* MainInterface.storyboard */,
+			);
+			path = "xDrip Notification Context Extension";
 			sourceTree = "<group>";
 		};
 		47DB06CC2A7013EF00267BE3 /* Followers */ = {
@@ -2034,6 +2114,7 @@
 			isa = PBXGroup;
 			children = (
 				47A6ABE32B790CC60047A4BA /* MainView.swift */,
+				474822432C0108EA0052D4FB /* NotificationView.swift */,
 				478A92542B8F95930084C394 /* SubViews */,
 			);
 			path = Views;
@@ -2082,6 +2163,8 @@
 				F870D3D225126A49008967B0 /* NotificationCenter.framework */,
 				4716A4EE2B406C3D00419052 /* WidgetKit.framework */,
 				4716A4F02B406C3D00419052 /* SwiftUI.framework */,
+				47CD64132BE9506C002BDA68 /* UserNotifications.framework */,
+				47CD64152BE9506C002BDA68 /* UserNotificationsUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2164,6 +2247,7 @@
 				F8BDD4232218790E006EAB84 /* UserDefaults.swift */,
 				F80859282364D61B00F3829D /* UserDefaults+charts.swift */,
 				4746068D2B963EA100AC9214 /* View.swift */,
+				47A7DFB52BE4BE4900F1DA5F /* UIView.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -2370,6 +2454,9 @@
 			children = (
 				F821CF49229BF43A005C1E43 /* AlertKind.swift */,
 				F821CF4B229BF43A005C1E43 /* AlertManager.swift */,
+				47976E352BF536BA005E86EC /* AlertSnoozeStatus.swift */,
+				47CD642B2BEBEB0E002BDA68 /* AlertUrgencyType.swift */,
+				4734FF542BEFE3F200C7115A /* AlertNotificationDictionary.swift */,
 				F821CF4A229BF43A005C1E43 /* SnoozeParameters.swift */,
 			);
 			path = Alerts;
@@ -2683,6 +2770,7 @@
 				4716A4F22B406C3D00419052 /* xDrip Widget */,
 				47A6ABE02B790CC60047A4BA /* xDrip Watch App */,
 				479359882B88B95A007D3CEE /* xDrip Watch Complication */,
+				47CD64172BE9506C002BDA68 /* xDrip Notification Context Extension */,
 				48C0E851274A3BB6D42C6F20 /* Frameworks */,
 				F8AC425B21ADEBD60078C348 /* Products */,
 				F85DC29B21CFCEB800B9F74A /* Recovered References */,
@@ -2698,6 +2786,7 @@
 				4716A4ED2B406C3D00419052 /* xDrip Widget Extension.appex */,
 				47A6ABDF2B790CC60047A4BA /* xDrip Watch App.app */,
 				479359852B88B95A007D3CEE /* xDrip Watch Complication Extension.appex */,
+				47CD64122BE9506C002BDA68 /* xDrip Notification Context Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -2705,10 +2794,10 @@
 		F8AC425C21ADEBD60078C348 /* xdrip */ = {
 			isa = PBXGroup;
 			children = (
-				E4C0061F2B3DE8C100D59303 /* AppIntents */,
 				F821CF9822AE589E005C1E43 /* xdrip.entitlements */,
 				F8A5EEC5257EDC910085E660 /* xdripDebug.entitlements */,
 				F8A54B0A22D9215500934E7A /* xdrip-Bridging-Header.h */,
+				E4C0061F2B3DE8C100D59303 /* AppIntents */,
 				F85DC2FB21D2CD7000B9F74A /* Application Delegate */,
 				F8F971AD23A5914C00C3F17D /* BluetoothPeripheral */,
 				F8F971B923A5915900C3F17D /* BluetoothTransmitter */,
@@ -3086,9 +3175,9 @@
 		F8DF765923E350B100063910 /* Dexcom */ = {
 			isa = PBXGroup;
 			children = (
-				F8F71D842B7EC19A005076E8 /* G7 */,
 				F816E1222439DB42009EE65B /* G4 */,
 				F8DF765A23E350B100063910 /* G5 */,
+				F8F71D842B7EC19A005076E8 /* G7 */,
 			);
 			path = Dexcom;
 			sourceTree = "<group>";
@@ -3139,9 +3228,10 @@
 		F8E51D5B2448D8A3001C9E5A /* Loop */ = {
 			isa = PBXGroup;
 			children = (
-				F855422A2B7182C60058CE09 /* LoopFollowManager.swift */,
 				F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */,
+				F855422A2B7182C60058CE09 /* LoopFollowManager.swift */,
 				F8E51D5C2448D8B5001C9E5A /* LoopManager.swift */,
+				473D9ECD2C2DC53A00364060 /* LoopShareType.swift */,
 			);
 			path = Loop;
 			sourceTree = "<group>";
@@ -3739,6 +3829,23 @@
 			productReference = 47A6ABDF2B790CC60047A4BA /* xDrip Watch App.app */;
 			productType = "com.apple.product-type.application";
 		};
+		47CD64112BE9506C002BDA68 /* xDrip Notification Context Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 47CD64232BE9506C002BDA68 /* Build configuration list for PBXNativeTarget "xDrip Notification Context Extension" */;
+			buildPhases = (
+				47CD640E2BE9506C002BDA68 /* Sources */,
+				47CD640F2BE9506C002BDA68 /* Frameworks */,
+				47CD64102BE9506C002BDA68 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "xDrip Notification Context Extension";
+			productName = "xDrip Notification Context Extension";
+			productReference = 47CD64122BE9506C002BDA68 /* xDrip Notification Context Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		F8AC425921ADEBD60078C348 /* xdrip */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F8AC426E21ADEBD70078C348 /* Build configuration list for PBXNativeTarget "xdrip" */;
@@ -3755,6 +3862,7 @@
 			dependencies = (
 				4716A4FD2B406C3F00419052 /* PBXTargetDependency */,
 				47DE41B12B864EE50041DA19 /* PBXTargetDependency */,
+				47CD641F2BE9506C002BDA68 /* PBXTargetDependency */,
 			);
 			name = xdrip;
 			packageProductDependencies = (
@@ -3775,7 +3883,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				DefaultBuildSystemTypeForWorkspace = Latest;
-				LastSwiftUpdateCheck = 1520;
+				LastSwiftUpdateCheck = 1530;
 				LastUpgradeCheck = 1500;
 				ORGANIZATIONNAME = "Johan Degraeve";
 				TargetAttributes = {
@@ -3787,6 +3895,9 @@
 					};
 					47A6ABDE2B790CC60047A4BA = {
 						CreatedOnToolsVersion = 15.2;
+					};
+					47CD64112BE9506C002BDA68 = {
+						CreatedOnToolsVersion = 15.3;
 					};
 					F8AC425921ADEBD60078C348 = {
 						CreatedOnToolsVersion = 10.1;
@@ -3842,6 +3953,7 @@
 				4716A4EC2B406C3D00419052 /* xDrip Widget Extension */,
 				47A6ABDE2B790CC60047A4BA /* xDrip Watch App */,
 				479359842B88B95A007D3CEE /* xDrip Watch Complication Extension */,
+				47CD64112BE9506C002BDA68 /* xDrip Notification Context Extension */,
 			);
 		};
 /* End PBXProject section */
@@ -3878,6 +3990,15 @@
 				47A6ABE62B790CC70047A4BA /* Assets.xcassets in Resources */,
 				47A6AC462B7D43110047A4BA /* Common.strings in Resources */,
 				472134DE2BC6A63100729850 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		47CD64102BE9506C002BDA68 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4737758D2C14DDC900525B90 /* Assets.xcassets in Resources */,
+				47CD641C2BE9506C002BDA68 /* Base in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4071,6 +4192,7 @@
 				4746068A2B96380200AC9214 /* ConstantsLibreLinkUp.swift in Sources */,
 				47A6AC2C2B7D3E170047A4BA /* Double.swift in Sources */,
 				47EDD1402BDD4F5D00C5A286 /* ConstantsWidgetExtension.swift in Sources */,
+				47037B8F2C072973000BD6BD /* ConstantsAlerts.swift in Sources */,
 				47A6AC412B7D42EC0047A4BA /* TextsCommon.swift in Sources */,
 				478A92572B8FA1E30084C394 /* ConstantsBGGraphBuilder.swift in Sources */,
 				4746068F2B963EA100AC9214 /* View.swift in Sources */,
@@ -4086,6 +4208,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				47037B902C072974000BD6BD /* ConstantsAlerts.swift in Sources */,
 				474606912B963EA100AC9214 /* View.swift in Sources */,
 				4746066D2B9618B800AC9214 /* AccessoryCornerView.swift in Sources */,
 				478A92652B90AB040084C394 /* GlucoseChartView.swift in Sources */,
@@ -4123,6 +4246,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				474822462C01097D0052D4FB /* NotificationController.swift in Sources */,
 				47A6AC2B2B7D3DE30047A4BA /* GlucoseChartView.swift in Sources */,
 				47DE41B52B8693CB0041DA19 /* HeaderView.swift in Sources */,
 				47A6AC342B7D3E260047A4BA /* ConstantsBloodGlucose.swift in Sources */,
@@ -4137,6 +4261,7 @@
 				47A6AC372B7D3E650047A4BA /* GlucoseChartType.swift in Sources */,
 				47A6ABE42B790CC60047A4BA /* MainView.swift in Sources */,
 				474606882B9637F600AC9214 /* TextsSettingsView.swift in Sources */,
+				474822482C010F380052D4FB /* TextsAlerts.swift in Sources */,
 				4793599A2B8A2A4E007D3CEE /* InfoView.swift in Sources */,
 				47A6ABEF2B7949B80047A4BA /* WatchStateModel.swift in Sources */,
 				47A6ABE22B790CC60047A4BA /* xDripWatchApp.swift in Sources */,
@@ -4145,12 +4270,40 @@
 				47A6AC2F2B7D3E170047A4BA /* Date.swift in Sources */,
 				47CA61E92B97A6BD00C2A597 /* FollowerBackgroundKeepAliveType.swift in Sources */,
 				47DE41AE2B863D370041DA19 /* WatchState.swift in Sources */,
+				47037B8E2C072346000BD6BD /* ConstantsAlerts.swift in Sources */,
 				47A6AC422B7D42ED0047A4BA /* TextsCommon.swift in Sources */,
 				47A6AC3B2B7D3F9B0047A4BA /* ConstantsGlucoseChartSwiftUI.swift in Sources */,
+				474822442C0108EA0052D4FB /* NotificationView.swift in Sources */,
 				47DE41B92B87B2680041DA19 /* ConstantsAppleWatch.swift in Sources */,
 				47CA61E82B9796D200C2A597 /* ConstantsFollower.swift in Sources */,
 				4746068B2B96380200AC9214 /* ConstantsLibreLinkUp.swift in Sources */,
 				47A6AC352B7D3E260047A4BA /* ConstantsUI.swift in Sources */,
+				474822472C010DED0052D4FB /* AlertUrgencyType.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		47CD640E2BE9506C002BDA68 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4737758B2C14DD7000525B90 /* ConstantsBloodGlucose.swift in Sources */,
+				47976E372BFBB870005E86EC /* TextsAlerts.swift in Sources */,
+				47CD642D2BEBEB0E002BDA68 /* AlertUrgencyType.swift in Sources */,
+				4737758A2C14DD6300525B90 /* Double.swift in Sources */,
+				4734FF572BF13B9C00C7115A /* TextsCommon.swift in Sources */,
+				473775822C14D8C100525B90 /* NotificationView.swift in Sources */,
+				4734FF562BEFE3F200C7115A /* AlertNotificationDictionary.swift in Sources */,
+				473775882C14DD2200525B90 /* ConstantsHomeView.swift in Sources */,
+				473775832C14DCA500525B90 /* GlucoseChartType.swift in Sources */,
+				473775852C14DCC600525B90 /* GlucoseChartView.swift in Sources */,
+				47CD64192BE9506C002BDA68 /* NotificationViewController.swift in Sources */,
+				474822412BFE62220052D4FB /* ConstantsCalendar.swift in Sources */,
+				473775862C14DCDF00525B90 /* LiveActivitySize.swift in Sources */,
+				47037B912C07B15E000BD6BD /* ConstantsAlerts.swift in Sources */,
+				4737758C2C14DDA700525B90 /* View.swift in Sources */,
+				473775892C14DD3100525B90 /* ConstantsLibreLinkUp.swift in Sources */,
+				473775842C14DCA900525B90 /* ConstantsGlucoseChartSwiftUI.swift in Sources */,
+				473775872C14DCFB00525B90 /* TextsSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4171,6 +4324,7 @@
 				47ADD2E127FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift in Sources */,
 				47228B152996BDD2008725DB /* BgReadingsView.swift in Sources */,
 				F8F71D802B7EAA2E005076E8 /* DexcomG7+CoreDataClass.swift in Sources */,
+				47A7DFB62BE4BE4900F1DA5F /* UIView.swift in Sources */,
 				F81FA006228E09D40028C70F /* TextsCalibration.swift in Sources */,
 				F816E0F724367137009EE65B /* GNSEntry+CoreDataClass.swift in Sources */,
 				F8F9721923A5915900C3F17D /* CGMGNSEntryTransmitter.swift in Sources */,
@@ -4269,6 +4423,7 @@
 				F8F9722B23A5915900C3F17D /* CGMTransmitterDelegate.swift in Sources */,
 				F80859292364D61B00F3829D /* UserDefaults+charts.swift in Sources */,
 				F8B955B7258D5E2000C06016 /* ConstantsHealthKit.swift in Sources */,
+				47CD642C2BEBEB0E002BDA68 /* AlertUrgencyType.swift in Sources */,
 				F8B3A7B2226A0878004BA588 /* TextsAlerts.swift in Sources */,
 				D4BAF37627769B38009D3465 /* TreatmentTableViewCell.swift in Sources */,
 				F8F71D782B7D2754005076E8 /* CGMG7TransmitterDelegate.swift in Sources */,
@@ -4305,6 +4460,7 @@
 				F830992023C291E2005741DF /* WatlaaBluetoothTransmitter.swift in Sources */,
 				F8AF36152455C6F700B5977B /* ConstantsTrace.swift in Sources */,
 				F8F971B723A5914D00C3F17D /* BluetoothPeripheralType.swift in Sources */,
+				4734FF552BEFE3F200C7115A /* AlertNotificationDictionary.swift in Sources */,
 				F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */,
 				F8F1670E27273EA7001AA3D8 /* GlucoseDataRxMessage.swift in Sources */,
 				F8B3A835227F08AC004BA588 /* PickerViewController.swift in Sources */,
@@ -4499,6 +4655,7 @@
 				F8F9723023A5915900C3F17D /* M5StackUtilities.swift in Sources */,
 				F8297F52238ECA3200D74D66 /* BluetoothPeripheralViewController.swift in Sources */,
 				F816E1312439E2DD009EE65B /* DexcomG4BluetoothPeripheralViewModel.swift in Sources */,
+				47976E362BF536BA005E86EC /* AlertSnoozeStatus.swift in Sources */,
 				F821CF66229EE68B005C1E43 /* NightScoutFollowManager.swift in Sources */,
 				F8F9722423A5915900C3F17D /* LibreMeasurement.swift in Sources */,
 				F869188C23A044340065B607 /* TextsM5StackView.swift in Sources */,
@@ -4552,6 +4709,7 @@
 				F816E10324367389009EE65B /* GNSEntryBluetoothPeripheralViewModel.swift in Sources */,
 				D4E499AD277B4CE7000F8CBA /* DateOnly.swift in Sources */,
 				F8E51D5D2448D8B5001C9E5A /* LoopManager.swift in Sources */,
+				473D9ECE2C2DC53A00364060 /* LoopShareType.swift in Sources */,
 				F8DF766D23ED9B0900063910 /* DexcomG5BluetoothPeripheralViewModel.swift in Sources */,
 				F8E51D65244BA790001C9E5A /* WatlaaBluetoothPeripheralViewModel.swift in Sources */,
 				F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */,
@@ -4601,6 +4759,11 @@
 			isa = PBXTargetDependency;
 			target = 479359842B88B95A007D3CEE /* xDrip Watch Complication Extension */;
 			targetProxy = 4793598E2B88B95B007D3CEE /* PBXContainerItemProxy */;
+		};
+		47CD641F2BE9506C002BDA68 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 47CD64112BE9506C002BDA68 /* xDrip Notification Context Extension */;
+			targetProxy = 47CD641E2BE9506C002BDA68 /* PBXContainerItemProxy */;
 		};
 		47DE41B12B864EE50041DA19 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -4705,6 +4868,14 @@
 				47EDD15C2BE028A200C5A286 /* fr */,
 			);
 			name = WatchComplication.strings;
+			sourceTree = "<group>";
+		};
+		47CD641A2BE9506C002BDA68 /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				47CD641B2BE9506C002BDA68 /* Base */,
+			);
+			name = MainInterface.storyboard;
 			sourceTree = "<group>";
 		};
 		47EDD1472BDD56C800C5A286 /* WatchApp.strings */ = {
@@ -5436,6 +5607,75 @@
 			};
 			name = Release;
 		};
+		47CD64212BE9506C002BDA68 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APP_GROUP_IDENTIFIER = "group.com.${DEVELOPMENT_TEAM}.loopkit.LoopGroup";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = "xDrip Notification Context Extension/xDrip Notification Context Extension.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
+				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "xDrip Notification Context Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Johan Degraeve. All rights reserved.";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).xDripNotificationContextExtension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		47CD64222BE9506C002BDA68 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APP_GROUP_IDENTIFIER = "group.com.${DEVELOPMENT_TEAM}.loopkit.LoopGroup";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_ENTITLEMENTS = "xDrip Notification Context Extension/xDrip Notification Context Extension.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
+				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "xDrip Notification Context Extension/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Johan Degraeve. All rights reserved.";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
+				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).xDripNotificationContextExtension";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		F8AC426C21ADEBD70078C348 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 666E283826F7E54C00ACE4DF /* xDrip.xcconfig */;
@@ -5570,6 +5810,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				APP_GROUP_IDENTIFIER = "group.com.${DEVELOPMENT_TEAM}.loopkit.LoopGroup";
+				APP_GROUP_IDENTIFIER_TRIO = "group.org.nightscout.${DEVELOPMENT_TEAM}.trio.trio-app-group";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "$(XDRIP_ENTITLEMENTS_DEBUG)";
@@ -5599,6 +5840,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				APP_GROUP_IDENTIFIER = "group.com.${DEVELOPMENT_TEAM}.loopkit.LoopGroup";
+				APP_GROUP_IDENTIFIER_TRIO = "group.org.nightscout.${DEVELOPMENT_TEAM}.trio.trio-app-group";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "$(XDRIP_ENTITLEMENTS_RELEASE)";
@@ -5648,6 +5890,15 @@
 			buildConfigurations = (
 				47A6ABEA2B790CC70047A4BA /* Debug */,
 				47A6ABEB2B790CC70047A4BA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		47CD64232BE9506C002BDA68 /* Build configuration list for PBXNativeTarget "xDrip Notification Context Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				47CD64212BE9506C002BDA68 /* Debug */,
+				47CD64222BE9506C002BDA68 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

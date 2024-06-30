@@ -50,6 +50,9 @@ final class PickerViewController : UIViewController {
         
         // remove the uiviewcontroller
         self.dismiss(animated: true, completion: nil)
+        
+        // force a state change so that the observer in RVC will pick it up and refresh the snooze icon state
+        UserDefaults.standard.updateSnoozeStatus = !UserDefaults.standard.updateSnoozeStatus
 
     }
     

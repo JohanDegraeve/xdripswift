@@ -58,15 +58,15 @@ class Texts_Alerts {
     }()
 
     static let alertStart: String = {
-        return NSLocalizedString("alertstart", tableName: filename, bundle: Bundle.main, value: "Apply from:", comment: "an alentry is applicable as of a certain timestamp in the day, this is the text in the field in the settings screen that allows to modify this timestamp")
+        return NSLocalizedString("alertstart", tableName: filename, bundle: Bundle.main, value: "Apply from:", comment: "an alert is applicable as of a certain timestamp in the day, this is the text in the field in the settings screen that allows to modify this timestamp")
     }()
     
     static let alertValue: String = {
-        return NSLocalizedString("alertvalue", tableName: filename, bundle: Bundle.main, value: "Value", comment: "an alentry is applicable as of a certain value (eg low alert as of 70 mg/dl), this is the name of the field in the settings screen that allows to modify this valule")
+        return NSLocalizedString("alertvalue", tableName: filename, bundle: Bundle.main, value: "Value", comment: "an alert is applicable as of a certain value (eg low alert as of 70 mg/dl), this is the name of the field in the settings screen that allows to modify this valule")
     }()
     
     static let alerttype: String = {
-        return NSLocalizedString("alerttype", tableName: filename, bundle: Bundle.main, value: "Alarm Type", comment: "an alentry is applicable as of a certain value (eg low alert as of 70 mg/dl), this is the name of the field in the settings screen that allows to modify this valule")
+        return NSLocalizedString("alerttype", tableName: filename, bundle: Bundle.main, value: "Alarm Type", comment: "an alert is applicable as of a certain value (eg low alert as of 70 mg/dl), this is the name of the field in the settings screen that allows to modify this valule")
     }()
     
     static let changeAlertValue: String = {
@@ -75,6 +75,14 @@ class Texts_Alerts {
     
     static let confirmDeletionAlert: String = {
         return NSLocalizedString("confirmdeletionalert", tableName: filename, bundle: Bundle.main, value: "Delete Alarm?", comment: "when trying to delete an alert, user needs to confirm first, this is the message")
+    }()
+    
+    static let alertTypeUrgent: String = {
+        return NSLocalizedString("alertTypeUrgent", tableName: filename, bundle: Bundle.main, value: "Urgent", comment: "text to show an urgent alarm type")
+    }()
+    
+    static let alertTypeWarning: String = {
+        return NSLocalizedString("alertTypeWarning", tableName: filename, bundle: Bundle.main, value: "Warning", comment: "text to show a warning alarm type")
     }()
     
 }

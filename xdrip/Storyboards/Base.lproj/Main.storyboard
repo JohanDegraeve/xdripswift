@@ -2,8 +2,10 @@
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="32700.99.1234" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
     <device id="retina6_0" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22684"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22685"/>
         <capability name="Image references" minToolsVersion="12.0"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -943,7 +945,6 @@
                                 </subviews>
                                 <constraints>
                                     <constraint firstItem="YJB-T6-p3Y" firstAttribute="top" secondItem="C16-NQ-F1Y" secondAttribute="bottom" id="7c1-Py-Jru"/>
-                                    <constraint firstAttribute="bottom" secondItem="bjv-fG-4ZY" secondAttribute="bottom" id="Jrb-Oq-JNF"/>
                                     <constraint firstItem="ETk-QH-u1x" firstAttribute="top" secondItem="MtJ-rx-OB9" secondAttribute="bottom" id="LX7-Ex-Sw8"/>
                                     <constraint firstItem="bjv-fG-4ZY" firstAttribute="top" secondItem="5cH-2r-1eU" secondAttribute="bottom" id="MY3-TM-M7A"/>
                                     <constraint firstItem="x9u-yg-PXE" firstAttribute="top" secondItem="YJB-T6-p3Y" secondAttribute="bottom" id="Vd7-Sw-DDw"/>
@@ -1062,8 +1063,45 @@
                         <rect key="frame" x="0.0" y="0.0" width="390" height="834"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="1" translatesAutoresizingMaskIntoConstraints="NO" id="g4X-8R-g01">
-                                <rect key="frame" x="0.0" y="70" width="390" height="715"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Snooze Alarms" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LzM-bz-Cnv">
+                                <rect key="frame" x="15" y="14.999999999999996" width="217.33333333333334" height="40.666666666666657"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="34"/>
+                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Snooze All" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QIL-9V-nnK">
+                                <rect key="frame" x="20" y="75.666666666666671" width="95" height="23"/>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="19"/>
+                                <color key="textColor" name="colorPrimary"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AL9-kl-Oqg">
+                                <rect key="frame" x="321" y="71.666666666666671" width="51" height="31"/>
+                                <connections>
+                                    <action selector="snoozeAllUISwitchAction:" destination="NvR-Zh-2Zn" eventType="valueChanged" id="2yp-49-IyO"/>
+                                </connections>
+                            </switch>
+                            <view userInteractionEnabled="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xJK-nY-4N6">
+                                <rect key="frame" x="10" y="113.66666666666669" width="370" height="60"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="All alarms are silenced until 11:34" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumScaleFactor="0.10000000000000001" adjustsFontForContentSizeCategory="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vyM-pm-YBR">
+                                        <rect key="frame" x="15" y="19.999999999999986" width="340" height="20.333333333333329"/>
+                                        <fontDescription key="fontDescription" style="UICTFontTextStyleHeadline"/>
+                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemRedColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="60" id="4ns-6x-tjl"/>
+                                    <constraint firstAttribute="trailing" secondItem="vyM-pm-YBR" secondAttribute="trailing" constant="15" id="883-JC-PMP"/>
+                                    <constraint firstItem="vyM-pm-YBR" firstAttribute="leading" secondItem="xJK-nY-4N6" secondAttribute="leading" constant="15" id="meu-aE-POA"/>
+                                    <constraint firstItem="vyM-pm-YBR" firstAttribute="centerY" secondItem="xJK-nY-4N6" secondAttribute="centerY" id="nVg-ML-1tJ"/>
+                                    <constraint firstItem="vyM-pm-YBR" firstAttribute="centerX" secondItem="xJK-nY-4N6" secondAttribute="centerX" id="quf-gW-CU4"/>
+                                </constraints>
+                            </view>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="1" sectionFooterHeight="1" translatesAutoresizingMaskIntoConstraints="NO" id="g4X-8R-g01">
+                                <rect key="frame" x="0.0" y="188.66666666666669" width="390" height="596.33333333333326"/>
                                 <color key="backgroundColor" white="0.10000000000000001" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="blue" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="SettingsCell" textLabel="tIz-Hj-yxH" detailTextLabel="Tpl-mr-dqb" style="IBUITableViewCellStyleValue1" id="zQ9-Zy-4Lu" customClass="SettingsTableViewCell" customModule="xdrip" customModuleProvider="target">
@@ -1076,14 +1114,14 @@
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" id="tIz-Hj-yxH">
                                                     <rect key="frame" x="20" y="11.999999999999998" width="33" height="20.333333333333332"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Detail" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Tpl-mr-dqb">
                                                     <rect key="frame" x="326.33333333333331" y="11.999999999999998" width="43.666666666666664" height="20.333333333333332"/>
                                                     <autoresizingMask key="autoresizingMask"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
                                                     <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
@@ -1093,21 +1131,23 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Snooze Alarms" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LzM-bz-Cnv">
-                                <rect key="frame" x="15" y="14.999999999999996" width="217.33333333333334" height="40.666666666666657"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="34"/>
-                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="jyR-1Z-GU2"/>
-                        <color key="backgroundColor" white="0.050000000000000003" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" white="0.10000000000000001" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="jyR-1Z-GU2" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="LzM-bz-Cnv" secondAttribute="trailing" symbolic="YES" id="0DX-z3-8ve"/>
+                            <constraint firstItem="AL9-kl-Oqg" firstAttribute="centerY" secondItem="QIL-9V-nnK" secondAttribute="centerY" id="61K-DI-a2e"/>
                             <constraint firstItem="jyR-1Z-GU2" firstAttribute="trailing" secondItem="g4X-8R-g01" secondAttribute="trailing" id="BSU-E5-nT5"/>
+                            <constraint firstItem="xJK-nY-4N6" firstAttribute="top" secondItem="QIL-9V-nnK" secondAttribute="bottom" constant="15" id="BnD-ry-W7i"/>
+                            <constraint firstItem="xJK-nY-4N6" firstAttribute="leading" secondItem="jyR-1Z-GU2" secondAttribute="leading" constant="10" id="DCp-cA-ehE"/>
                             <constraint firstItem="LzM-bz-Cnv" firstAttribute="leading" secondItem="jyR-1Z-GU2" secondAttribute="leading" constant="15" id="FUW-ER-kcd"/>
-                            <constraint firstItem="g4X-8R-g01" firstAttribute="top" secondItem="jyR-1Z-GU2" secondAttribute="top" constant="70" id="RBK-KA-edD"/>
+                            <constraint firstItem="QIL-9V-nnK" firstAttribute="leading" secondItem="jyR-1Z-GU2" secondAttribute="leading" constant="20" id="Py3-dt-IDJ"/>
+                            <constraint firstItem="xJK-nY-4N6" firstAttribute="trailing" secondItem="jyR-1Z-GU2" secondAttribute="trailing" constant="-10" id="S0z-O7-tFT"/>
+                            <constraint firstItem="g4X-8R-g01" firstAttribute="top" secondItem="xJK-nY-4N6" secondAttribute="bottom" constant="15" id="SvH-MT-Jwa"/>
+                            <constraint firstItem="jyR-1Z-GU2" firstAttribute="trailing" secondItem="AL9-kl-Oqg" secondAttribute="trailing" constant="20" id="WYL-jA-uDS"/>
+                            <constraint firstItem="AL9-kl-Oqg" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="QIL-9V-nnK" secondAttribute="trailing" constant="8" symbolic="YES" id="WfC-Mw-Ukv"/>
                             <constraint firstItem="jyR-1Z-GU2" firstAttribute="bottom" secondItem="g4X-8R-g01" secondAttribute="bottom" id="dcu-Aj-zv6"/>
+                            <constraint firstItem="QIL-9V-nnK" firstAttribute="top" secondItem="LzM-bz-Cnv" secondAttribute="bottom" constant="20" id="pHK-w3-7Nm"/>
                             <constraint firstItem="g4X-8R-g01" firstAttribute="leading" secondItem="jyR-1Z-GU2" secondAttribute="leading" id="vn7-la-bii"/>
                             <constraint firstItem="LzM-bz-Cnv" firstAttribute="top" secondItem="jyR-1Z-GU2" secondAttribute="top" constant="15" id="yoB-DB-PUa"/>
                         </constraints>
@@ -1116,6 +1156,10 @@
                     <navigationItem key="navigationItem" id="uhV-ES-jn7"/>
                     <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
+                        <outlet property="snoozeAllBannerText" destination="vyM-pm-YBR" id="7ZZ-Te-8B1"/>
+                        <outlet property="snoozeAllBannerView" destination="xJK-nY-4N6" id="tsk-rA-4R8"/>
+                        <outlet property="snoozeAllLabel" destination="QIL-9V-nnK" id="KbR-iB-JqD"/>
+                        <outlet property="snoozeAllUISwitch" destination="AL9-kl-Oqg" id="7Qm-9p-ICf"/>
                         <outlet property="tableView" destination="g4X-8R-g01" id="Nx5-hX-n9H"/>
                         <outlet property="titleLabel" destination="LzM-bz-Cnv" id="AeW-CB-eha"/>
                     </connections>
@@ -2370,6 +2414,9 @@
         <image name="questionmark.circle" catalog="system" width="128" height="123"/>
         <image name="scope" catalog="system" width="128" height="124"/>
         <image name="speaker.wave.2.circle" catalog="system" width="128" height="123"/>
+        <namedColor name="colorPrimary">
+            <color white="0.89999997615814209" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </namedColor>
         <systemColor name="systemBlueColor">
             <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
