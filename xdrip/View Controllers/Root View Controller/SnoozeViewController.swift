@@ -42,9 +42,14 @@ final class SnoozeViewController: UIViewController {
                 
                 UserDefaults.standard.snoozeAllAlertsFromDate = Date()
                 UserDefaults.standard.snoozeAllAlertsUntilDate = Date().addingTimeInterval(Double(snoozePeriod) * 60)
+                
+                // update the view
                 self.configureSnoozeAllView()
             },
-                                                onCancelClick: { () -> Void in },
+                                                onCancelClick: { () -> Void in
+                // update the view
+                self.configureSnoozeAllView()
+            },
                                                 didSelectRowHandler: nil
             )
             
@@ -53,9 +58,10 @@ final class SnoozeViewController: UIViewController {
         } else {
             UserDefaults.standard.snoozeAllAlertsFromDate = nil
             UserDefaults.standard.snoozeAllAlertsUntilDate = nil
+            
+            // now we've reset everything, update the view
+            configureSnoozeAllView()
         }
-        
-        configureSnoozeAllView()
     }
     
     // reference to alertManager
@@ -120,17 +126,19 @@ final class SnoozeViewController: UIViewController {
         if alertManager?.snoozeStatus() == .allSnoozed, let snoozeAllAlertsUntilDate = UserDefaults.standard.snoozeAllAlertsUntilDate {
             // if snoozed till after 00:00 then show date and time when it ends, else only show time
             self.snoozeAllUISwitch.isOn = true
-            snoozeAllBannerText.text = "\u{26A0} " + Texts_HomeView.snoozeAllSnoozedUntil + " " + (snoozeAllAlertsUntilDate.toMidnight() > Date() ? snoozeAllAlertsUntilDate.formatted(date: .abbreviated, time: .shortened) : snoozeAllAlertsUntilDate.formatted(date: .omitted, time: .shortened))
+            snoozeAllBannerText.text = "\(Texts_HomeView.snoozeAllSnoozed)\n\(snoozeAllAlertsUntilDate.daysAndHoursRemaining(appendRemaining: true))"
             snoozeAllBannerText.textColor = .white
             snoozeAllBannerView.backgroundColor = .systemRed
             snoozeAllLabel.textColor = .systemRed
         } else if alertManager?.snoozeStatus() == .urgent {
+            UserDefaults.standard.snoozeAllAlertsFromDate = nil
             self.snoozeAllUISwitch.isOn = false
             snoozeAllBannerView.backgroundColor = ConstantsAlerts.bannerBackgroundColorWhenNotAllSnoozed
-            snoozeAllBannerText.text = "\u{2757}" + Texts_HomeView.snoozeUrgentAlarms
+            snoozeAllBannerText.text = Texts_HomeView.snoozeUrgentAlarms
             snoozeAllBannerText.textColor = .systemRed
             snoozeAllLabel.textColor = UIColor(named: "colorPrimary")
         } else {
+            UserDefaults.standard.snoozeAllAlertsFromDate = nil
             self.snoozeAllUISwitch.isOn = false
             snoozeAllBannerView.backgroundColor = ConstantsAlerts.bannerBackgroundColorWhenNotAllSnoozed
             snoozeAllBannerText.text = Texts_HomeView.snoozeAllDisabled

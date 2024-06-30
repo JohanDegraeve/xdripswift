@@ -41,9 +41,9 @@ enum ConstantsAlerts {
     
     
     /// snooze all times in minutes - this can be much simpler than the individual alert snooze times...
-    static let snoozeAllValueMinutes = [15, 30, 60, 120, 240, 360, 480, 720, 1440, 2880, 10080]
+    static let snoozeAllValueMinutes = [15, 30, 60, 120, 240, 480, 720, 1440, 2880, 10080]
     
     /// snooze all times as shown to the user
     static var snoozeAllValueStrings = ["15 " + Texts_Common.minutes, "30 " + Texts_Common.minutes, "1 " + Texts_Common.hour, "2 " + Texts_Common.hours, "4 " + Texts_Common.hours,
-                                                   "6 " + Texts_Common.hours, "12 " + Texts_Common.hours, "1 " + Texts_Common.day, "2 " + Texts_Common.day, "1 " + Texts_Common.week]
+                                                   "6 " + Texts_Common.hours, "12 " + Texts_Common.hours, "1 " + Texts_Common.day, "2 " + Texts_Common.days, "1 " + Texts_Common.week]
 }

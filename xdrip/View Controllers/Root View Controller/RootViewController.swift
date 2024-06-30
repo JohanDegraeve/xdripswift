@@ -2374,6 +2374,9 @@ final class RootViewController: UIViewController, ObservableObject {
         
         self.updateMiniChart()
         
+        // force a snooze status update to see if the current snooze status has changed in the last minutes
+        UserDefaults.standard.updateSnoozeStatus = !UserDefaults.standard.updateSnoozeStatus
+        
     }
     
     /// if the user has chosen to show the mini-chart, then update it. If not, just return without doing anything.

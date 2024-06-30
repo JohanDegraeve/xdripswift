@@ -13,7 +13,11 @@ enum Texts_HomeView {
     }()
     
     static let snoozeAllDisabled:String = {
-        return NSLocalizedString("snoozeAllDisabled", tableName: filename, bundle: Bundle.main, value: "Snooze All is Disabled", comment: "snooze all is disabled text in snooze screen")
+        return NSLocalizedString("snoozeAllDisabled", tableName: filename, bundle: Bundle.main, value: "No urgent alarms are snoozed", comment: "no urgent alarms are snoozed text in snooze screen")
+    }()
+    
+    static let snoozeAllSnoozed:String = {
+        return NSLocalizedString("snoozeAllSnoozedUntil", tableName: filename, bundle: Bundle.main, value: "All alarms are snoozed!", comment: "snooze all text in snooze screen")
     }()
     
     static let snoozeAllSnoozedUntil:String = {
@@ -122,6 +126,10 @@ enum Texts_HomeView {
     
     static let ago:String = {
         return NSLocalizedString("ago", tableName: filename, bundle: Bundle.main, value: "ago", comment: "for home view, where it say how old the reading is, 'x minutes ago', literaly translation of 'ago'")
+    }()
+    
+    static let remaining: String = {
+        return NSLocalizedString("remaining", tableName: filename, bundle: Bundle.main, value: "remaining", comment: "for home view, where it say how old much time is left, literaly translation of 'remaining'")
     }()
 
     static let licenseInfo:String = {

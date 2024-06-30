@@ -163,31 +163,22 @@ extension Date {
     /// Example return: "6d11h ago" if optional appendAgo is true
     /// if less than 12 hours, return also minutes, e.g: "7h43m" or "58m" to give extra granularity
     func daysAndHoursAgo(appendAgo: Bool? = false) -> String {
-        
         // set a default value assuming that we're unable to calculate the hours + days
         var daysAndHoursAgoString: String = "n/a"
 
         let diffComponents = Calendar.current.dateComponents([.day, .hour, .minute], from: self, to: Date())
 
         if let days = diffComponents.day, let hours = diffComponents.hour, let minutes = diffComponents.minute {
-            
             if days == 0 && hours < 1 {
-                
                 // show just minutes for less than one hour
-                daysAndHoursAgoString = abs(minutes).description + "m"
-                
+                daysAndHoursAgoString = abs(minutes).description + Texts_Common.minuteshort
             } else if days == 0 && hours < 12 {
-                
                 // show just hours and minutes for less than twelve hours
-                daysAndHoursAgoString = abs(hours).description + "h" + abs(minutes).description + "m"
-                
+                daysAndHoursAgoString = abs(hours).description + Texts_Common.hourshort + abs(minutes).description + Texts_Common.minuteshort
             } else {
-                
                 // default show days and hours
-                daysAndHoursAgoString = abs(days).description + "d" + abs(hours).description + "h"
-                
+                daysAndHoursAgoString = abs(days).description + Texts_Common.dayshort + abs(hours).description + Texts_Common.hourshort
             }
-            
             
             // if the function was called using appendAgo == true, then add the "ago" string
             if appendAgo ?? false {
@@ -196,6 +187,42 @@ extension Date {
         }
 
         return daysAndHoursAgoString
+    }
+    
+    
+    /// returns the Nightscout style string showing the days and hours until a date (e.g. "6d11h")
+    /// we will add directly 1 minute to the date to round up. This gives the result more context.
+    /// Example return: "6d11h" if optional appendRemaining is false or not used
+    /// Example return: "6d11h remaining" if optional appendRemaining is true
+    /// if less than 12 hours, return also minutes, e.g: "7h43m" or "58m" to give extra granularity
+    func daysAndHoursRemaining(appendRemaining: Bool? = false) -> String {
+        // add a minute to the date stored in self. This avoids showing "0m" when 59 seconds is actually remaining.
+        let roundedDateToUpperMinute = self.addingTimeInterval(60)
+        
+        // set a default value assuming that we're unable to calculate the hours + days
+        var daysAndHoursRemainingString: String = "n/a"
+
+        let diffComponents = Calendar.current.dateComponents([.day, .hour, .minute], from: Date(), to: roundedDateToUpperMinute)
+
+        if let days = diffComponents.day, let hours = diffComponents.hour, let minutes = diffComponents.minute {
+            if days == 0 && hours < 1 {
+                // show just minutes for less than one hour
+                daysAndHoursRemainingString = abs(minutes).description + Texts_Common.minuteshort
+            } else if days == 0 && hours < 12 {
+                // show just hours and minutes for less than twelve hours
+                daysAndHoursRemainingString = abs(hours).description + Texts_Common.hourshort + abs(minutes).description + Texts_Common.minuteshort
+            } else {
+                // default show days and hours
+                daysAndHoursRemainingString = abs(days).description + Texts_Common.dayshort + abs(hours).description + Texts_Common.hourshort
+            }
+            
+            // if the function was called using appendRemaining == true, then add the "remaining" string
+            if appendRemaining ?? false {
+                daysAndHoursRemainingString += " " + Texts_HomeView.remaining
+            }
+        }
+
+        return daysAndHoursRemainingString
         
     }
     
