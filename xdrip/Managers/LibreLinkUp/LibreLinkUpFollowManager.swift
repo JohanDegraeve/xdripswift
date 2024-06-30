@@ -572,6 +572,7 @@ class LibreLinkUpFollowManager: NSObject {
         // this is pretty much the same request as done in requestLogin()
         var request = URLRequest(url: url)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue((libreLinkUpId ?? "").sha256(), forHTTPHeaderField: "Account-Id")
         
         for (header, value) in libreLinkUpRequestHeaders {
             request.setValue(value, forHTTPHeaderField: header)
@@ -627,6 +628,7 @@ class LibreLinkUpFollowManager: NSObject {
         // this is pretty much the same request as done in loginRequest()
         var request = URLRequest(url: url)
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        request.setValue((libreLinkUpId ?? "").sha256(), forHTTPHeaderField: "Account-Id")
         
         for (header, value) in libreLinkUpRequestHeaders {
             request.setValue(value, forHTTPHeaderField: header)
