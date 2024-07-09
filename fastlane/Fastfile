@@ -58,7 +58,7 @@ platform :ios do
         "com.#{TEAMID}.xdripswift",
         "com.#{TEAMID}.xdripswift.xDripWidget",
         "com.#{TEAMID}.xdripswift.watchkitapp",
-        "com.#{TEAMID}.xdripswift.watchkitapp.xDripWatchComplication"
+        "com.#{TEAMID}.xdripswift.watchkitapp.xDripWatchComplication",
         "com.#{TEAMID}.xdripswift.xDripNotificationContextExtension"
       ]
     )
@@ -207,7 +207,7 @@ platform :ios do
         "com.#{TEAMID}.xdripswift",
         "com.#{TEAMID}.xdripswift.xDripWidget",
         "com.#{TEAMID}.xdripswift.watchkitapp",
-        "com.#{TEAMID}.xdripswift.watchkitapp.xDripWatchComplication"
+        "com.#{TEAMID}.xdripswift.watchkitapp.xDripWatchComplication",
         "com.#{TEAMID}.xdripswift.xDripNotificationContextExtension"
       ]
     )
