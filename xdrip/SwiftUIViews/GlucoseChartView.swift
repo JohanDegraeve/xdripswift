@@ -26,8 +26,9 @@ struct GlucoseChartView: View {
     let glucoseCircleDiameter: Double
     let chartHeight: Double
     let chartWidth: Double
+    let showHighContrast: Bool
     
-    init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double]?, bgReadingDates: [Date]?, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySize: LiveActivitySize?, hoursToShowScalingHours: Double?, glucoseCircleDiameterScalingHours: Double?, overrideChartHeight: Double?, overrideChartWidth: Double?) {
+    init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double]?, bgReadingDates: [Date]?, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySize: LiveActivitySize?, hoursToShowScalingHours: Double?, glucoseCircleDiameterScalingHours: Double?, overrideChartHeight: Double?, overrideChartWidth: Double?, highContrast: Bool?) {
         
         self.chartType = glucoseChartType
         self.isMgDl = isMgDl
@@ -36,6 +37,7 @@ struct GlucoseChartView: View {
         self.highLimitInMgDl = highLimitInMgDl
         self.urgentHighLimitInMgDl = urgentHighLimitInMgDl
         self.liveActivitySize = liveActivitySize ?? .normal
+        self.showHighContrast = highContrast ?? false
         
         // here we want to automatically set the hoursToShow based upon the chart type, but some chart instances might need
         // this to be overriden such as for zooming in/out of the chart (i.e. the Watch App)
@@ -67,13 +69,18 @@ struct GlucoseChartView: View {
     /// Blood glucose color dependant on the user defined limit values
     /// - Returns: a Color object either red, yellow or green
     func bgColor(bgValueInMgDl: Double) -> Color {
-        if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
-            return .red
-        } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
-            return .yellow
+        if chartType != .widgetSystemSmallStandBy || !showHighContrast {
+            if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
+                return .red
+            } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
+                return .yellow
+            } else {
+                return .green
+            }
         } else {
-            return .green
+            return .white
         }
+            
     }
     
     // adapted from generateXAxisValues() from GlucoseChartManager.swift in xDrip target
@@ -106,31 +113,31 @@ struct GlucoseChartView: View {
     var body: some View {
         let domain = (min((bgReadingValues.min() ?? 40), urgentLowLimitInMgDl) - 6) ... (max((bgReadingValues.max() ?? urgentHighLimitInMgDl), urgentHighLimitInMgDl) + 6)
         
-        let yAxisLineSize = ConstantsGlucoseChartSwiftUI.yAxisLineSize
+        let yAxisLineSize = chartType.yAxisLineSize()
         
         Chart {
             if domain.contains(urgentLowLimitInMgDl) {
                 RuleMark(y: .value("", urgentLowLimitInMgDl))
                     .lineStyle(StrokeStyle(lineWidth: yAxisLineSize, dash: [2 * yAxisLineSize, 6 * yAxisLineSize]))
-                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.yAxisUrgentLowHighLineColor)
+                    .foregroundStyle(chartType.yAxisUrgentLowHighLineColor())
             }
             
             if domain.contains(urgentHighLimitInMgDl) {
                 RuleMark(y: .value("", urgentHighLimitInMgDl))
                     .lineStyle(StrokeStyle(lineWidth: yAxisLineSize, dash: [2 * yAxisLineSize, 6 * yAxisLineSize]))
-                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.yAxisUrgentLowHighLineColor)
+                    .foregroundStyle(chartType.yAxisUrgentLowHighLineColor())
             }
 
             if domain.contains(lowLimitInMgDl) {
                 RuleMark(y: .value("", lowLimitInMgDl))
                     .lineStyle(StrokeStyle(lineWidth: yAxisLineSize, dash: [4 * yAxisLineSize, 3 * yAxisLineSize]))
-                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.yAxisLowHighLineColor)
+                    .foregroundStyle(chartType.yAxisLowHighLineColor())
             }
             
             if domain.contains(highLimitInMgDl) {
                 RuleMark(y: .value("", highLimitInMgDl))
                     .lineStyle(StrokeStyle(lineWidth: yAxisLineSize, dash: [4 * yAxisLineSize, 3 * yAxisLineSize]))
-                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.yAxisLowHighLineColor)
+                    .foregroundStyle(chartType.yAxisLowHighLineColor())
             }
             
             // add a phantom glucose point at the beginning of the timeline to fix the start point in case there are no glucose values at that time (for instances after starting a new sensor)

@@ -683,6 +683,8 @@ final class RootViewController: UIViewController, ObservableObject {
             
         }
         
+        self.updateSnoozeStatus()
+        
         IntentDonationManager.shared.donate(intent: GlucoseIntent())
     }
     
@@ -916,6 +918,12 @@ final class RootViewController: UIViewController, ObservableObject {
         // force a manual complication update
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.forceComplicationUpdate.rawValue, options: .new, context: nil)
         
+        // force the snooze icon status to be updated
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.updateSnoozeStatus.rawValue, options: .new, context: nil)
+        
+        // if the snooze all until data changes, update the UI
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.snoozeAllAlertsUntilDate.rawValue, options: .new, context: nil)
+        
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
         
@@ -996,6 +1004,8 @@ final class RootViewController: UIViewController, ObservableObject {
             // if view is appeared, view did appear will not get called when app moves to the foreground
             // so need to donate here
             IntentDonationManager.shared.donate(intent: GlucoseIntent())
+            
+            self.updateSnoozeStatus()
             
             // update the connection status immediately (this will give the user a visual feedback that the connection was lost in the background if they have disabled keep-alive)
             self.setFollowerConnectionAndHeartbeatStatus()
@@ -1511,10 +1521,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 calendarManager?.processNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 contactImageManager?.processNewReading()
-
-                if !UserDefaults.standard.suppressLoopShare {
-                    loopManager?.share()
-                }
+                
+                loopManager?.share()
 
                 watchManager?.updateWatchApp(forceComplicationUpdate: false)
 
@@ -1702,7 +1710,10 @@ final class RootViewController: UIViewController, ObservableObject {
                 watchManager?.updateWatchApp(forceComplicationUpdate: true)
                 UserDefaults.standard.forceComplicationUpdate = false
             }
-
+            
+        case UserDefaults.Key.updateSnoozeStatus:
+            updateSnoozeStatus()
+            
         default:
             break
             
@@ -1993,11 +2004,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 // calendarManager should process new reading
                 self.calendarManager?.processNewReading(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
                 
-                // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
-                if !UserDefaults.standard.suppressLoopShare {
-                    self.loopManager?.share()
-                }
-
+                // send also to loopmanager
+                self.loopManager?.share()
                 
             }
             
@@ -2121,6 +2129,8 @@ final class RootViewController: UIViewController, ObservableObject {
             return
         }
         
+        let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        
         // get lastReading, with a calculatedValue - no check on activeSensor because in follower mode there is no active sensor
         let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
         
@@ -2158,7 +2168,7 @@ final class RootViewController: UIViewController, ObservableObject {
         guard readingValueForBadge > 12 else {return}
         // high limit to 400
         if readingValueForBadge >= 400.0 {readingValueForBadge = 400.0}
-        // low limit ti 40
+        // low limit to 40
         if readingValueForBadge <= 40.0 {readingValueForBadge = 40.0}
         
         // check if notification on home screen is enabled in the settings
@@ -2179,21 +2189,25 @@ final class RootViewController: UIViewController, ObservableObject {
                 }
                 
                 notificationContent.badge = NSNumber(value: readingValueForBadge.rawValue)
-                
             }
             
             // Configure notificationContent title, which is bg value in correct unit, add also slopeArrow if !hideSlope and finally the difference with previous reading, if there is one
-            var calculatedValueAsString = lastReading[0].unitizedString(unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            var calculatedValueAsString = lastReading[0].unitizedString(unitIsMgDl: isMgDl) + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+            
             if !lastReading[0].hideSlope {
                 calculatedValueAsString = calculatedValueAsString + " " + lastReading[0].slopeArrow()
             }
-            if lastReading.count > 1 {
-                calculatedValueAsString = calculatedValueAsString + "      " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-            }
-            notificationContent.title = calculatedValueAsString
             
-            // must set a body otherwise notification doesn't show up on iOS10
-            notificationContent.body = " "
+            if lastReading.count > 1 {
+                //calculatedValueAsString = calculatedValueAsString // + "      " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                
+                notificationContent.body = lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true, mgdl: isMgDl)
+            } else {
+                // must set a body otherwise notification doesn't show up on iOS10
+                notificationContent.body = " "
+            }
+            
+            notificationContent.title = calculatedValueAsString
             
             // Create Notification Request
             let notificationRequest = UNNotificationRequest(identifier: ConstantsNotifications.NotificationIdentifierForBgReading.bgReadingNotificationRequest, content: notificationContent, trigger: nil)
@@ -2215,7 +2229,7 @@ final class RootViewController: UIViewController, ObservableObject {
             if UserDefaults.standard.showReadingInAppBadge && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled)) {
                 
                 // rescale of unit is mmol
-                readingValueForBadge = readingValueForBadge.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                readingValueForBadge = readingValueForBadge.mgdlToMmol(mgdl: isMgDl)
                 
                 // if unit is mmol and if value needs to be multiplied by 10, then multiply by 10
                 if !UserDefaults.standard.bloodGlucoseUnitIsMgDl && UserDefaults.standard.multipleAppBadgeValueWith10 {
@@ -2359,6 +2373,9 @@ final class RootViewController: UIViewController, ObservableObject {
         updateChartWithResetEndDate()
         
         self.updateMiniChart()
+        
+        // force a snooze status update to see if the current snooze status has changed in the last minutes
+        UserDefaults.standard.updateSnoozeStatus = !UserDefaults.standard.updateSnoozeStatus
         
     }
     
@@ -2617,6 +2634,8 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // unwrap alerts and check alerts
         if let alertManager = alertManager {
+            
+            createNotificationImages()
             
             // check if an immediate alert went off that shows the current reading
             if alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsFollower.maximumBgReadingAgeForAlertsInSeconds) {
@@ -3530,7 +3549,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 let dataSourceDescription = UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "" : UserDefaults.standard.followerDataSourceType.fullDescription
                 
-                var showLiveActivity: Bool = UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)
+                var showLiveActivity: Bool = true // UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)
                 
                 if showLiveActivity {
                     // now that we've got the current BG value, let's refine the check to see if we should run/show the live activity
@@ -3565,7 +3584,7 @@ final class RootViewController: UIViewController, ObservableObject {
                     date.timeIntervalSince1970
                 }
                 
-                let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, dataSourceDescription: dataSourceDescription, keepAliveImageString: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImageString : nil)
+                let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, dataSourceDescription: dataSourceDescription, allowStandByHighContrast: UserDefaults.standard.allowStandByHighContrast, keepAliveImageString: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImageString : nil)
                 
                 // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
                 // the user's device - this allows several copies of the app to be installed without cross-contamination of widget data
@@ -3576,6 +3595,66 @@ final class RootViewController: UIViewController, ObservableObject {
                 LiveActivityManager.shared.endAllActivities()
             }
             WidgetCenter.shared.reloadAllTimelines()
+        }
+    }
+    
+    /// store notification glucose chart images in the app container documents folder
+    private func createNotificationImages() {
+        // create a small thumbnail glucose chart image to show in the standard iOS notification banner
+        createNotificationImage(glucoseChartType: .notificationImageThumbnail)
+        
+        /// create an image based upon a glucose chart view and save it to the app container documents directory
+        /// - Parameter glucoseChartType: the type of glucose chart type we want to generate (i.e. thumbnail or full notification chart)
+        func createNotificationImage(glucoseChartType: GlucoseChartType) {
+            if let bgReadingsAccessor = self.bgReadingsAccessor {
+                let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * glucoseChartType.hoursToShow(liveActivitySize: .normal)), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+                
+                if bgReadings.count > 0 {
+                    var bgReadingValues: [Double] = []
+                    var bgReadingDates: [Date] = []
+                    
+                    for bgReading in bgReadings {
+                        bgReadingValues.append(bgReading.calculatedValue)
+                        bgReadingDates.append(bgReading.timeStamp)
+                    }
+                    
+                    // create a chart view with just bg reading values and dates
+                    let glucoseChartView = GlucoseChartView(glucoseChartType: glucoseChartType, bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySize: .normal, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
+                    
+                    // render the glucose chart view as an image object
+                    guard let notificationImage = ImageRenderer(content: glucoseChartView).uiImage else { return }
+                    
+                    // try and save the image to the documents directory in the app container
+                    if let imageToSave = notificationImage.pngData() {
+                        let fileUrl = URL.documentsDirectory.appendingPathComponent("\(glucoseChartType.filename()).png")
+                        try? imageToSave.write(to: fileUrl)
+                    }
+                }
+            }
+        }
+    }
+    
+    // updates the toolbar UI to show the current snooze status of the app
+    private func updateSnoozeStatus() {
+        if let alertManager = alertManager {
+            switch alertManager.snoozeStatus() {
+            case .allSnoozed:
+                // all alerts are snoozed so let's make it clear - change to red filled icon
+                preSnoozeToolbarButtonOutlet.tintColor = .red
+                preSnoozeToolbarButtonOutlet.image = UIImage(systemName: "speaker.slash.circle.fill")
+            case .urgent:
+                // urgent low, low or fast drop alerts are snoozed - change to red outline icon
+                preSnoozeToolbarButtonOutlet.tintColor = .red
+                preSnoozeToolbarButtonOutlet.image = UIImage(systemName: "speaker.slash.circle")
+            case .notUrgent:
+                // some other alert except urgent low, low or fast drop is snoozed so let's just change the icon
+                preSnoozeToolbarButtonOutlet.tintColor = nil
+                preSnoozeToolbarButtonOutlet.image = UIImage(systemName: "speaker.slash.circle")
+            default:
+                // no alerts are snoozed so show default icon/colour
+                preSnoozeToolbarButtonOutlet.tintColor = nil
+                preSnoozeToolbarButtonOutlet.image = UIImage(systemName: "speaker.wave.2.circle")
+            }
         }
     }
 
@@ -3742,7 +3821,6 @@ extension RootViewController: UNUserNotificationCenterDelegate {
             // this will verify if it concerns an alert notification, if not pickerviewData will be nil
         } else if let pickerViewData = alertManager?.userNotificationCenter(center, willPresent: notification, withCompletionHandler: completionHandler) {
             
-            
             PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
             
         }  else if notification.request.identifier == ConstantsNotifications.notificationIdentifierForVolumeTest {
@@ -3903,10 +3981,7 @@ extension RootViewController: FollowerDelegate {
                 // ask calendarManager to process new reading, ignore last connection change timestamp because this is follower mode, there is no connection to a transmitter
                 calendarManager?.processNewReading(lastConnectionStatusChangeTimeStamp: nil)
                 
-                // send also to loopmanager, not interesting for loop probably, but the data is also used for today widget
-                if !UserDefaults.standard.suppressLoopShare {
-                    self.loopManager?.share()
-                }
+                loopManager?.share()
 
                 watchManager?.updateWatchApp(forceComplicationUpdate: false)
                 

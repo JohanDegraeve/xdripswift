@@ -21,14 +21,16 @@ enum ConstantsGlucoseChartSwiftUI {
     static let yAxisLowHighLineColor = Color(white: 0.7)
     static let yAxisUrgentLowHighLineColor = Color(white: 0.6)
     
-    static let xAxisGridLineColor = Color(white: 0.45)
+    static let xAxisGridLineColor = Color(white: 0.4)
     static let xAxisLabelOffsetX: CGFloat = -12
     static let xAxisLabelOffsetY: CGFloat = -2
     static let xAxisIntervalBetweenValues: Int = 1
     static let xAxisLabelFirstClippingInMinutes: Double = 8 * 60
     static let xAxisLabelLastClippingInMinutes: Double = 12 * 60
     
-    static let cornerRadius: CGFloat = 2
+    static let cornerRadius: CGFloat = 0
+    
+    static let backgroundColor: Color = .black
     
     
     // ------------------------------------------
@@ -92,6 +94,15 @@ enum ConstantsGlucoseChartSwiftUI {
     static let hoursToShowWidgetSystemSmall: Double = 3
     static let glucoseCircleDiameterWidgetSystemSmall: Double = 20
     
+    // widget systemSmall StandBy chart
+    static let viewWidthWidgetSystemSmallStandBy: CGFloat = 140
+    static let viewHeightWidgetSystemSmallStandBy: CGFloat = 100
+    static let hoursToShowWidgetSystemSmallStandBy: Double = 43
+    static let glucoseCircleDiameterWidgetSystemSmallStandBy: Double = 20
+    static let yAxisLineSizeSystemSmallStandBy: Double = 1.0
+    static let yAxisLowHighLineColorSystemSmallStandBy = Color(white: 1.0)
+    static let yAxisUrgentLowHighLineColorSystemSmallStandBy = Color(white: 0.8)
+    
     // widget systemMedium chart
     static let viewWidthWidgetSystemMedium: CGFloat = 300
     static let viewHeightWidgetSystemMedium: CGFloat = 80
@@ -114,12 +125,35 @@ enum ConstantsGlucoseChartSwiftUI {
     // ------------------------------------------
     // ----- Siri Intent Chart ------------------
     // ------------------------------------------
-    // siri glucose intent response chart
     static let viewWidthWidgetSiriGlucoseIntent: CGFloat = 320
     static let viewHeightWidgetSiriGlucoseIntent: CGFloat = 150
     static let hoursToShowWidgetSiriGlucoseIntent: Double = 4
     static let glucoseCircleDiameterSiriGlucoseIntent: Double = 20
     static let cornerRadiusSiriGlucoseIntent: Double = 0
     static let paddingSiriGlucoseIntent: Double = 10
-    static let backgroundColorSiriGlucoseIntent: Color = .black // Color(red: 0.18, green: 0.18, blue: 0.18) originally from gshaviv
+    static let backgroundColorSiriGlucoseIntent: Color = .black
+    
+    
+    // ------------------------------------------
+    // ----- Notification Charts -----------
+    // ------------------------------------------
+    // iOS notification chart - thumbnail image
+    static let viewWidthNotificationThumbnailImage: CGFloat = 80
+    static let viewHeightNotificationThumbnailImage: CGFloat = 80
+    static let hoursToShowNotificationThumbnailImage: Double = 0.5
+    static let glucoseCircleDiameterNotificationThumbnailImage: Double = 100
+    static let filenameNotificationThumbnailImage: String = "notificationThumbnailImage"
+    
+    // iOS notification chart
+    static let viewWidthNotificationExpanded: CGFloat = 373
+    static let viewHeightNotificationExpanded: CGFloat = 170
+    static let hoursToShowNotificationExpanded: Double = 3
+    static let glucoseCircleDiameterNotificationExpanded: Double = 40
+    
+    // watch notification image
+    static let viewWidthNotificationWatch: CGFloat = 160
+    static let viewHeightNotificationWatch: CGFloat = 60
+    static let hoursToShowNotificationWatch: Double = 3
+    static let glucoseCircleDiameterNotificationWatch: Double = 20
+    static let backgroundColorNotificationWatch: Color = Color(red: 0.1, green: 0.1, blue: 0.1, opacity: 1)
 }

@@ -34,6 +34,7 @@ extension XDripWidget.Entry {
         var highLimitInMgDl: Double
         var urgentHighLimitInMgDl: Double
         var dataSourceDescription: String
+        var allowStandByHighContrast: Bool
         var keepAliveImageString: String?
         
         var bgUnitString: String
@@ -41,7 +42,7 @@ extension XDripWidget.Entry {
         var bgReadingDate: Date?
         var bgValueStringInUserChosenUnit: String
                 
-        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaChangeInMgDl: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, dataSourceDescription: String? = "", keepAliveImageString: String?) {
+        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaChangeInMgDl: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, dataSourceDescription: String? = "", allowStandByHighContrast: Bool? = true, keepAliveImageString: String?) {
             self.bgReadingValues = bgReadingValues
             self.bgReadingDates = bgReadingDates
             self.isMgDl = isMgDl ?? true
@@ -52,6 +53,7 @@ extension XDripWidget.Entry {
             self.highLimitInMgDl = highLimitInMgDl ?? 180
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl ?? 250
             self.dataSourceDescription = dataSourceDescription ?? ""
+            self.allowStandByHighContrast = allowStandByHighContrast ?? true
             self.keepAliveImageString = keepAliveImageString
             
             
