@@ -61,6 +61,11 @@ extension String {
         // sha1() here is a function in CryptoSwift Library
         return Data(self.utf8).sha1().hexEncodedString()
     }
+        
+    func sha256() -> String {
+        // sha256() here is a function in CryptoSwift Library
+        return Data(self.utf8).sha256().hexEncodedString()
+    }
     
     /// creates uicolor interpreting hex as hex color code, example #CED430
     func hexStringToUIColor () -> UIColor {
