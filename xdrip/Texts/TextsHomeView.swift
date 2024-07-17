@@ -185,7 +185,7 @@ enum Texts_HomeView {
     }()
     
     static let calibrationNotNecessary:String = {
-        return NSLocalizedString("calibrationNotNecessary", tableName: filename, bundle: Bundle.main, value: "When using the native transmitter algorithm, manual calibration is not available.\n\nIf you want to calibrate, you can switch to the xDrip algorithm in the transmitter screen.", comment: "if web oop enabled, and also if transmitter supports this, user clicks calibrate button, but calibration is not possible")
+        return NSLocalizedString("calibrationNotNecessary", tableName: filename, bundle: Bundle.main, value: "When using the native transmitter algorithm, manual calibration is not available.\n\nIf you want to calibrate, you can switch to the xDrip algorithm in the transmitter screen (if available).", comment: "if web oop enabled, and also if transmitter supports this, user clicks calibrate button, but calibration is not possible")
     }()
  
     static let dexcomBatteryTooLow: String = {

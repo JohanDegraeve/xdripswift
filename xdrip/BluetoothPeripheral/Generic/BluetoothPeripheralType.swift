@@ -123,7 +123,6 @@ enum BluetoothPeripheralType: String, CaseIterable {
         switch self {
             
         case .M5StackType:
-            
             let newM5Stack = M5Stack(address: address, name: name, textColor: UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor, backGroundColor: ConstantsM5Stack.defaultBackGroundColor, rotation: ConstantsM5Stack.defaultRotation, brightness: 100, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
             // assign password stored in UserDefaults (might be nil)
@@ -132,55 +131,42 @@ enum BluetoothPeripheralType: String, CaseIterable {
             return newM5Stack
             
         case .M5StickCType:
-            
             return M5StickC(address: address, name: name, textColor: UserDefaults.standard.m5StackTextColor ?? ConstantsM5Stack.defaultTextColor, backGroundColor: ConstantsM5Stack.defaultBackGroundColor, rotation: ConstantsM5Stack.defaultRotation, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         case .WatlaaType:
-            
             return Watlaa(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         case .DexcomType:
-            
             return DexcomG5(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         case .BubbleType:
-            
             return Bubble(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         case .MiaoMiaoType:
-            
             return MiaoMiao(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         case .BluconType:
-            
             return Blucon(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         case .GNSentryType:
-            
             return GNSEntry(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         case .BlueReaderType:
-            
             return BlueReader(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         case .DropletType:
-            
             return Droplet(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         case .DexcomG4Type:
-            
             return DexcomG4(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         case .Libre2Type:
-            
             return Libre2(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         case .AtomType:
-            
             return Atom(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         case .Libre3HeartBeatType:
-            
             return Libre2HeartBeat(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
             
         case .DexcomG7HeartBeatType:
@@ -219,16 +205,11 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .M5StackType, .M5StickCType, .WatlaaType, .BubbleType, .MiaoMiaoType, .GNSentryType, .BlueReaderType, .DropletType, .Libre2Type, .AtomType, .OmniPodHeartBeatType:
-            return false
-            
-        case .DexcomG7Type:
-            // try to figure out the active sensor without needing to know the transmitter id
-            return false
-            
         case .DexcomType, .BluconType, .DexcomG4Type, .Libre3HeartBeatType, .DexcomG7HeartBeatType:
             return true
             
+        default:
+            return false
         }
         
     }
@@ -240,7 +221,6 @@ enum BluetoothPeripheralType: String, CaseIterable {
         switch self {
             
         case .DexcomType:
-            
             // length for G5 and G6 is 6
             if transmitterId.count != 6 {
                 return Texts_ErrorMessages.TransmitterIDShouldHaveLength6
@@ -256,7 +236,6 @@ enum BluetoothPeripheralType: String, CaseIterable {
             return nil
             
         case .DexcomG4Type:
-            
             let regex = try! NSRegularExpression(pattern: "[a-zA-Z0-9]", options: .caseInsensitive)
             if !transmitterId.validate(withRegex: regex) {
                 return Texts_ErrorMessages.DexcomTransmitterIDInvalidCharacters
@@ -267,7 +246,6 @@ enum BluetoothPeripheralType: String, CaseIterable {
             return nil
             
         case .BluconType:
-            
             let regex = try! NSRegularExpression(pattern: "^[0-9]{1,5}$", options: .caseInsensitive)
             if !transmitterId.validate(withRegex: regex) {
                 return Texts_ErrorMessages.TransmitterIdBluCon
