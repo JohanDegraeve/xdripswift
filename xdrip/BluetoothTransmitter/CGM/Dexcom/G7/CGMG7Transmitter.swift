@@ -371,24 +371,6 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         return CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue
     }
     
-    func setWebOOPEnabled(enabled: Bool) {
-        
-        if webOOPEnabled != enabled {
-            
-            webOOPEnabled = enabled
-            
-            trace("in setWebOOPEnabled, new value for webOOPEnabled = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, webOOPEnabled.description)
-            
-            // reset sensor start date, because changing webOOPEnabled value stops the sensor
-            sensorStartDate = nil
-            
-            // as sensor is stopped, also set sensorStatus to nil
-            cGMG7TransmitterDelegate?.received(sensorStatus: nil, cGMG7Transmitter: self)
-            
-        }
-        
-    }
-    
     func isWebOOPEnabled() -> Bool {
         
         return webOOPEnabled
