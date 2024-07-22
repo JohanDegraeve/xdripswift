@@ -2030,7 +2030,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             calibrator = DexcomCalibrator()
             
-        case .dexcom, .dexcomG7:
+        case .dexcom:
             
             if cgmTransmitter.isWebOOPEnabled() {
                 
@@ -2051,6 +2051,11 @@ final class RootViewController: UIViewController, ObservableObject {
                 calibrator = DexcomCalibrator()
                 
             }
+            
+        case .dexcomG7:
+            
+            // received values are already calibrated
+            calibrator = NoCalibrator()
 
             
         case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa, .Libre2, .Atom:
