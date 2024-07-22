@@ -719,7 +719,7 @@ class BluetoothPeripheralManager: NSObject {
     ///  for use with xdrip-client-swift
     private func setCGMTransmitterInSharedUserDefaults() {
      
-        if let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) {
+        if let sharedUserDefaults = UserDefaults(suiteName: UserDefaults.standard.loopShareType.sharedUserDefaultsSuiteName) {
             
             if let cgmTransmitter = getCGMTransmitter(), let cgmtransmitterAddress = currentCgmTransmitterAddress {
 
