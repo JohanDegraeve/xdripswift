@@ -18,6 +18,7 @@ enum ConstantsSettingsIcons {
     static let dataSourceSettingsIcon: String = "➡️ "
     static let developerSettingsIcon: String = "👨🏻‍💻 "
     static let dexcomSettingsIcon: String = "⬆️ "
+    static let openGlückSettingsIcon: String = "⬆️ "
     static let healthKitSettingsIcon: String = "❤️ "
     static let helpSettingsIcon: String = "📖 "
     static let homeScreenSettingsIcon: String = "📈 "
