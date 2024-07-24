@@ -163,13 +163,13 @@ final class WatchStateModel: NSObject, ObservableObject {
             // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
             // show unitized zero deltas as +0 or +0.0 as per Nightscout format
             if (isMgDl) {
-                if (deltaChangeInMgDl > -1) && (deltaChangeInMgDl < 1) {
+                if (deltaChangeInMgDl == 0) {
                     return "+0"
                 } else {
                     return deltaSign + valueAsString
                 }
             } else {
-                if (deltaChangeInMgDl > -0.1) && (deltaChangeInMgDl < 0.1) {
+                if (deltaChangeInMgDl == 0.0) {
                     return "+0.0"
                 } else {
                     return deltaSign + valueAsString
