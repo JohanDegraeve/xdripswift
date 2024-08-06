@@ -3,7 +3,8 @@ import CoreBluetooth
 import os
 
 class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
-    
+    let appId:UInt8=0xA0;
+    var lastDataTime:Double=0;
     // MARK: - properties
     
     /// service to be discovered
@@ -109,7 +110,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
     // MARK: - public functions
     
     func sendStartReadingCommmand() -> Bool {
-        if writeDataToPeripheral(data: Data([0x00, 0x00, 0x05]), type: .withoutResponse) {
+        if writeDataToPeripheral(data: Data([0x00, appId, 0x05]), type: .withoutResponse) {
             return true
         } else {
             trace("in sendStartReadingCommmand, write failed", log: log, category: ConstantsLog.categoryCGMBubble, type: .error)
@@ -128,7 +129,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         }
         
     }
-
+   
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         
         super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
@@ -162,15 +163,21 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         
                         // store received firmware local
                         self.firmware = firmware
-                        
+                        lastDataTime=0
+                        //deviceName
+                        if(deviceName!=="Bubble Nano"){
+                            _ = writeDataToPeripheral(data: Data([0x08, appId, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
+                        }else{
+                            if firmware.toDouble() ?? 0 >= 2.6 {
+                                _ = writeDataToPeripheral(data: Data([0x08, appId, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
+                            } else {
+                                _ = writeDataToPeripheral(data: Data([0x02, appId, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
+                            }
+                        }
                         // confirm receipt
                         // if firmware >= 2.6, write [0x08, 0x01, 0x00, 0x00, 0x00, 0x2B]
                         // bubble will decrypt the libre2 data and return it
-                        if firmware.toDouble() ?? 0 >= 2.6 {
-                            _ = writeDataToPeripheral(data: Data([0x08, 0x01, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
-                        } else {
-                            _ = writeDataToPeripheral(data: Data([0x02, 0x00, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
-                        }
+                  
                         
                     case .serialNumber:
                         
@@ -264,15 +271,17 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                     self.cGMBubbleTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
                                 }
                             }
-
-                            
+                            lastDataTime=Date().timeIntervalSince1970
                             //reset the buffer
                             resetRxBuffer()
                             
                         }
                         
                     case .noSensor:
-                        cgmTransmitterDelegate?.sensorNotDetected()
+                        if(Date().timeIntervalSince1970-lastDataTime>10000){
+                            cgmTransmitterDelegate?.sensorNotDetected()
+                        }
+                      
                         
                     case .patchInfo:
                         if value.count >= 10 {
