@@ -1,5 +1,5 @@
 //
-//  DataSourceView.swift
+//  MainViewDataSourceView.swift
 //  xDrip Watch App
 //
 //  Created by Paul Plant on 21/2/24.
@@ -9,7 +9,7 @@
 import Foundation
 import SwiftUI
 
-struct DataSourceView: View {
+struct MainViewDataSourceView: View {
     @EnvironmentObject var watchState: WatchStateModel
     
     let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
@@ -47,12 +47,6 @@ struct DataSourceView: View {
                     
                     Spacer()
                     
-                    Image(systemName: ConstantsAppleWatch.requestingDataIconSFSymbolName)
-                        .font(.system(size: ConstantsAppleWatch.requestingDataIconFontSize, weight: .heavy))
-                        .foregroundStyle(watchState.requestingDataIconColor)
-                        .padding(.bottom, -2)
-                        .padding(.trailing, -3)
-                    
                     if watchState.sensorAgeInMinutes > 0 {
                         Text(watchState.sensorAgeInMinutes.minutesToDaysAndHours())
                             .font(.system(size: textSize))
@@ -70,11 +64,6 @@ struct DataSourceView: View {
                         .font(.system(size: textSize)).bold()
                     
                     Spacer()
-                    
-                    Image(systemName: ConstantsAppleWatch.requestingDataIconSFSymbolName)
-                        .font(.system(size: ConstantsAppleWatch.requestingDataIconFontSize, weight: .heavy))
-                        .foregroundStyle(watchState.requestingDataIconColor)
-                        .padding(.bottom, -2)
                 }
                 .padding([.leading, .trailing], 10)
             }
@@ -82,7 +71,7 @@ struct DataSourceView: View {
     }
 }
 
-struct DataSourceView_Previews: PreviewProvider {
+struct MainViewDataSourceView_Previews: PreviewProvider {
     
     static func bgDateArray() -> [Date] {
         let endDate = Date()
@@ -144,7 +133,7 @@ struct DataSourceView_Previews: PreviewProvider {
         watchState.timeStampOfLastFollowerConnection = Date().addingTimeInterval(-60 * 6)
         
         return Group {
-            DataSourceView()
+            MainViewDataSourceView()
         }.environmentObject(watchState)
     }
 }

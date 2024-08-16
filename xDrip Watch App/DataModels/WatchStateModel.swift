@@ -31,7 +31,7 @@ final class WatchStateModel: NSObject, ObservableObject {
 //    @Published var updatedDatesString: String = ""
     
     @Published var isMgDl: Bool = true
-    @Published var slopeOrdinal: Int = 0
+    @Published var slopeOrdinal: Int = 2
     @Published var deltaChangeInMgDl: Double = 0
     @Published var urgentLowLimitInMgDl: Double = 60
     @Published var lowLimitInMgDl: Double = 80
@@ -42,7 +42,7 @@ final class WatchStateModel: NSObject, ObservableObject {
     @Published var sensorAgeInMinutes: Double = 0
     @Published var sensorMaxAgeInMinutes: Double = 14400
     @Published var timeStampOfLastFollowerConnection: Date = Date()
-    @Published var secondsUntilFollowerDisconnectWarning: Int = 90
+    @Published var secondsUntilFollowerDisconnectWarning: Int = 60 * 6
     @Published var timeStampOfLastHeartBeat: Date = Date()
     @Published var secondsUntilHeartBeatDisconnectWarning: Int = 90
     @Published var isMaster: Bool = true
@@ -60,6 +60,11 @@ final class WatchStateModel: NSObject, ObservableObject {
     @Published var requestingDataIconColor: Color = ConstantsAppleWatch.requestingDataIconColorInactive
     @Published var lastComplicationUpdateTimeStamp: Date = .distantPast
     
+    // we use the following to record when the user has manually requested a state update on each view so that we can trigger the animation on just this view
+    // this is to prevent the UI animating "pending animations" when we switch view tabs
+    @Published var updateBigNumberViewDate: Date = Date()
+    @Published var updateMainViewDate: Date = Date()
+    
     init(session: WCSession = .default) {
         self.session = session
         super.init()
@@ -67,6 +72,8 @@ final class WatchStateModel: NSObject, ObservableObject {
         session.delegate = self
         session.activate()
     }
+    
+    // MARK: - Functions to provide context data to populate the views
     
     /// the latest BG reading value in the array as a double
     /// - Returns: an optional double with the bg value in mg/dL if it exists
@@ -87,7 +94,7 @@ final class WatchStateModel: NSObject, ObservableObject {
     /// the timestamp of the latest BG reading value in the array
     /// - Returns: an optional date
     func bgReadingDate() -> Date? {
-        return bgReadingDates.isEmpty ? nil : bgReadingDates[0]
+        return bgReadingDates.isEmpty ? nil : bgReadingDates.first
     }
     
     /// returns the localized string of mg/dL or mmol/L
@@ -112,6 +119,16 @@ final class WatchStateModel: NSObject, ObservableObject {
         }
     }
     
+    /// returns the minutes ago string of the last updated time
+    /// - Returns: string representation of last reading time as "x mins ago"
+    func lastUpdatedMinsAgoString() -> String {
+        if let bgReadingDate = bgReadingDate() {
+            return bgReadingDate.daysAndHoursAgoFull(appendAgo: true)
+        } else {
+            return "Waiting..."
+        }
+    }
+    
     /// Color dependant on how long ago the last BG reading was
     /// - Returns: a Color either normal (gray) or yellow/red if the reading was several minutes ago and hasn't been updated
     func lastUpdatedTimeColor() -> Color {
@@ -119,8 +136,10 @@ final class WatchStateModel: NSObject, ObservableObject {
             return .colorSecondary
         } else if let bgReadingDate = bgReadingDate(), bgReadingDate > Date().addingTimeInterval(-60 * 12) {
             return .yellow
-        } else {
+        } else if let bgReadingDate = bgReadingDate(), bgReadingDate > Date().addingTimeInterval(-60 * 22) {
             return .red
+        } else {
+            return .colorTertiary
         }
     }
     
@@ -211,7 +230,7 @@ final class WatchStateModel: NSObject, ObservableObject {
                 if followerBackgroundKeepAliveType != .disabled {
                     return(Image(systemName: "network.slash"), .red)
                 } else {
-                    // if keep-alive is disabled, then this will never show a constant server connection so just "disable" 
+                    // if keep-alive is disabled, then this will never show a constant server connection so just "disable"
                     // the icon when not recent. It would be incorrect to show a red error.
                     return(Image(systemName: "network.slash"), .gray)
                 }
@@ -252,6 +271,56 @@ final class WatchStateModel: NSObject, ObservableObject {
             }
         }
     }
+        
+    /// used to return values and colors used by a SwiftUI gauge view
+    /// - Returns: minValue/maxValue - used to define the limits of the gauge. nilValue - used if there is currently no data present (basically puts the gauge at the 50% mark). gaugeGradient - the color ranges used
+    func gaugeModel() -> (minValue: Double, maxValue: Double, nilValue: Double, gaugeGradient: Gradient) {
+        
+        var minValue: Double = lowLimitInMgDl
+        var maxValue: Double = highLimitInMgDl
+        var colorArray = [Color]()
+                
+        if let bgValueInMgDl = bgValueInMgDl() {
+            if bgValueInMgDl >= urgentHighLimitInMgDl {
+                maxValue = ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValue
+            } else if bgValueInMgDl >= highLimitInMgDl {
+                maxValue = urgentHighLimitInMgDl
+            }
+            
+            if bgValueInMgDl <= urgentLowLimitInMgDl {
+                minValue = ConstantsCalibrationAlgorithms.minimumBgReadingCalculatedValue
+            } else if bgValueInMgDl <= lowLimitInMgDl {
+                minValue = urgentLowLimitInMgDl
+            }
+        }
+        
+        // let's round the min value down to nearest 10 and the max up to nearest 10
+        // this is to start creating the gradient ranges
+        let minValueRoundedDown = Double(10 * Int(minValue/10))
+        let maxValueRoundedUp = Double(10 * Int(maxValue/10)) + 10
+        
+        // the prevent the gradient changes from being too sharp, we'll reduce the granularity if trying to show a bigger range (such as >200mg/dL)
+        let reducedGranularity = (maxValueRoundedUp - minValueRoundedDown) > 200
+        
+        // step through the range and append the colors as necessary
+        for currentValue in stride(from: minValueRoundedDown, through: maxValueRoundedUp, by: reducedGranularity ? 20 : 10) {
+            if currentValue > urgentHighLimitInMgDl || currentValue <= urgentLowLimitInMgDl {
+                colorArray.append(Color.red)
+            } else if currentValue > highLimitInMgDl || currentValue <= lowLimitInMgDl {
+                colorArray.append(Color.yellow)
+            } else {
+                colorArray.append(Color.green)
+            }
+        }
+        
+        // calculate a nil value to show on the gauge (as it can't display nil). This should basically just peg the gauge indicator in the middle of the current range
+        let nilValue =  minValue + ((maxValue - minValue) / 2)
+        
+        return (minValue, maxValue, nilValue, Gradient(colors: colorArray))
+    }
+    
+    
+    // MARK: - Private functions used to interact with the WCSession and prepare internal data
     
     private func processWatchStateFromDictionary(dictionary: [String: Any]) {
         let bgReadingDatesFromDictionary: [Double] = dictionary["bgReadingDatesAsDouble"] as? [Double] ?? [0]
@@ -337,7 +406,6 @@ final class WatchStateModel: NSObject, ObservableObject {
         
         debugString += "\nComp enabled: \(liveDataIsEnabled.description)"
         
-        debugString += "\nComp updated: \(lastComplicationUpdateTimeStamp.formatted(date: .omitted, time: .standard))"
         debugString += "\nComp remain: \(remainingComplicationUserInfoTransfers.description)/50"
         
         if !isMaster {
@@ -355,7 +423,9 @@ final class WatchStateModel: NSObject, ObservableObject {
     }
 }
 
-extension WatchStateModel: WCSessionDelegate {    
+// MARK: - WCSession delegate to handle communications
+
+extension WatchStateModel: WCSessionDelegate {
     func session(_: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error _: Error?) {
         if activationState == .activated {
             requestWatchStateUpdate()

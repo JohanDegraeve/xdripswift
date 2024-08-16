@@ -1,46 +1,53 @@
 //
-//  HeaderView.swift
+//  MainViewInfoView.swift
 //  xDrip Watch App
 //
-//  Created by Paul Plant on 21/2/24.
+//  Created by Paul Plant on 24/2/24.
 //  Copyright © 2024 Johan Degraeve. All rights reserved.
 //
 
 import Foundation
 import SwiftUI
 
-struct HeaderView: View {
+struct MainViewInfoView: View {
     @EnvironmentObject var watchState: WatchStateModel
     
     let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
     
+    let originalMinsAgoTextColor = Color.colorSecondary
+    let animatedMinsAgoTextColor = Color.white
+    @State private var minsAgoTextColor = Color.colorSecondary
+    
     var body: some View {
-        HStack(alignment: .lastTextBaseline) {
-            Text("\(watchState.bgValueStringInUserChosenUnit())\(watchState.trendArrow())")
-                .font(.system(size: isSmallScreen ? 40 : 50)).fontWeight(.semibold)
-                .foregroundStyle(watchState.bgTextColor())
-                .scaledToFill()
-                .minimumScaleFactor(0.5)
-                .lineLimit(1)
+        
+        let textSize: CGFloat = isSmallScreen ? 14 : 16
+        
+        HStack(alignment: .center, spacing: 3) {
+            Image(systemName: ConstantsAppleWatch.requestingDataIconSFSymbolName)
+                .font(.system(size: ConstantsAppleWatch.requestingDataIconFontSize, weight: .heavy))
+                .foregroundStyle(watchState.requestingDataIconColor)
+                .padding(.top, 4)
+                .padding(.trailing, 2)
             
-            Spacer()
-            
-            VStack(alignment: .trailing, spacing: 0) {
-                Spacer()
-                Text(watchState.deltaChangeStringInUserChosenUnit())
-                    .font(.system(size: isSmallScreen ? 24 : 28)).fontWeight(.semibold)
-                    .lineLimit(1)
-                    .padding(.bottom, isSmallScreen ? -5 : -6)
-                Text(watchState.bgUnitString())
-                    .font(.system(size: isSmallScreen ? 12 : 14))
-                    .foregroundStyle(.gray)
-                    .lineLimit(1)
-            }
+            Text(watchState.lastUpdatedMinsAgoString())
+                .font(.system(size: textSize))
+                .foregroundStyle(minsAgoTextColor)
+                .animation(.easeOut(duration: 0.3), value: minsAgoTextColor)
+                .onChange(of: watchState.lastUpdatedMinsAgoString()) { oldState, newState in
+                    animateTextColor()
+                }
+        }
+    }
+    
+    func animateTextColor(){
+        minsAgoTextColor = animatedMinsAgoTextColor
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.3){
+            minsAgoTextColor = watchState.lastUpdatedTimeColor()
         }
     }
 }
 
-struct HeaderView_Previews: PreviewProvider {
+struct MainViewInfoView_Previews: PreviewProvider {
     static func bgDateArray() -> [Date] {
         let endDate = Date()
         let startDate = endDate.addingTimeInterval(-3600 * 12)
@@ -96,7 +103,7 @@ struct HeaderView_Previews: PreviewProvider {
         watchState.sensorMaxAgeInMinutes = 14400
         
         return Group {
-            HeaderView()
+            MainViewInfoView()
         }.environmentObject(watchState)
     }
 }

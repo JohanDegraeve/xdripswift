@@ -30,11 +30,12 @@ struct MainView: View {
         
         ZStack(alignment: Alignment(horizontal: .center, vertical: .center), content: {
             VStack(spacing: 2) {
-                HeaderView()
+                MainViewHeaderView()
                     .padding([.leading, .trailing], 5)
                     .padding([.top], -6)
                     .padding([.bottom], -6)
                     .onTapGesture(count: 2) {
+                        watchState.updateMainViewDate = Date()
                         watchState.requestWatchStateUpdate()
                     }
                 
@@ -54,9 +55,9 @@ struct MainView: View {
                             })
                     )
                 
-                DataSourceView()
+                MainViewDataSourceView()
                 
-                InfoView()
+                MainViewInfoView()
             }
             .padding(.bottom, 20)
             

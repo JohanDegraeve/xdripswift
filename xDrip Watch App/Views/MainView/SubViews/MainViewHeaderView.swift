@@ -1,36 +1,68 @@
 //
-//  InfoView.swift
+//  MainViewHeaderView.swift
 //  xDrip Watch App
 //
-//  Created by Paul Plant on 24/2/24.
+//  Created by Paul Plant on 21/2/24.
 //  Copyright © 2024 Johan Degraeve. All rights reserved.
 //
 
 import Foundation
 import SwiftUI
 
-struct InfoView: View {
+struct MainViewHeaderView: View {
     @EnvironmentObject var watchState: WatchStateModel
     
     let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
     
+    let originalTextScaleValue = 1.0
+    let animatedTextScaleValue = 1.1
+    @State private var textScaleValue = 1.0
+    
     var body: some View {
-        
-        let textSize: CGFloat = isSmallScreen ? 12 : 14
-        
-        HStack(spacing: 0) {
-            Text(watchState.lastUpdatedTextString)
-                .font(.system(size: textSize))
-                .foregroundStyle(.gray)
+        HStack(alignment: .lastTextBaseline) {
+            Text("\(watchState.bgValueStringInUserChosenUnit())\(watchState.trendArrow())")
+                .font(.system(size: isSmallScreen ? 40 : 50)).fontWeight(.semibold)
+                .foregroundStyle(watchState.bgTextColor())
+                .scaledToFill()
+                .minimumScaleFactor(0.5)
+                .lineLimit(1)
             
-            Text(watchState.lastUpdatedTimeString)
-                .font(.system(size: textSize))
-                .foregroundStyle(watchState.lastUpdatedTimeColor())
+            Spacer()
+            
+            VStack(alignment: .trailing, spacing: 0) {
+                Spacer()
+                
+                Text(watchState.deltaChangeStringInUserChosenUnit())
+                    .font(.system(size: isSmallScreen ? 24 : 28)).fontWeight(.semibold)
+                    .lineLimit(1)
+                    .padding(.bottom, isSmallScreen ? -5 : -6)
+                
+                Text(watchState.bgUnitString())
+                    .font(.system(size: isSmallScreen ? 12 : 14))
+                    .foregroundStyle(.gray)
+                    .lineLimit(1)
+            }
+        }
+        .scaleEffect(textScaleValue)
+        .padding(.trailing, 10)
+        .animation(.easeOut(duration: 0.3), value: textScaleValue)
+        .onChange(of: watchState.bgValueStringInUserChosenUnit()) { oldState, newState in
+            animateTextScale()
+        }
+        .onChange(of: watchState.updateMainViewDate) { oldState, newState in
+            animateTextScale()
+        }
+    }
+    
+    func animateTextScale(){
+        textScaleValue = animatedTextScaleValue
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.3){
+            textScaleValue = originalTextScaleValue
         }
     }
 }
 
-struct InfoView_Previews: PreviewProvider {
+struct MainViewHeaderView_Previews: PreviewProvider {
     static func bgDateArray() -> [Date] {
         let endDate = Date()
         let startDate = endDate.addingTimeInterval(-3600 * 12)
@@ -86,7 +118,7 @@ struct InfoView_Previews: PreviewProvider {
         watchState.sensorMaxAgeInMinutes = 14400
         
         return Group {
-            InfoView()
+            MainViewHeaderView()
         }.environmentObject(watchState)
     }
 }

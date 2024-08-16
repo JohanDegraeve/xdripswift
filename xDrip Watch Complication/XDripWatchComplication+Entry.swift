@@ -118,28 +118,53 @@ extension XDripWatchComplication.Entry {
         }
         
         /// used to return values and colors used by a SwiftUI gauge view
-        /// - Returns: minValue/maxValue - used to define the limits of the gauge. gaugeColor/gaugeGradient - the gauge view will use one or the other
-        func gaugeModel() -> (minValue: Double, maxValue: Double, gaugeColor: Color, gaugeGradient: Gradient) {
+        /// - Returns: minValue/maxValue - used to define the limits of the gauge. nilValue - used if there is currently no data present (basically puts the gauge at the 50% mark). gaugeGradient - the color ranges used
+        func gaugeModel() -> (minValue: Double, maxValue: Double, nilValue: Double, gaugeColor: Color, gaugeGradient: Gradient) {
             
             var minValue: Double = lowLimitInMgDl
             var maxValue: Double = highLimitInMgDl
             var gaugeColor: Color = .green
-            var gaugeGradient: Gradient = Gradient(colors: [.yellow, .green, .green, .green, .green, .green, .green, .green, .green, .yellow])
-            
+            var colorArray = [Color]()
+                    
             if let bgValueInMgDl = bgValueInMgDl {
-                if bgValueInMgDl >= urgentHighLimitInMgDl || bgValueInMgDl <= urgentLowLimitInMgDl {
-                    minValue = 39
-                    maxValue = 400
+                if bgValueInMgDl >= urgentHighLimitInMgDl {
+                    maxValue = ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValue
                     gaugeColor = .red
-                    gaugeGradient = Gradient(colors: [.red, .red, .red, .yellow, .yellow, .green, .yellow, .yellow, .red, .red, .red,])
-                } else if bgValueInMgDl >= highLimitInMgDl || bgValueInMgDl <= lowLimitInMgDl {
-                    minValue = urgentLowLimitInMgDl
+                } else if bgValueInMgDl >= highLimitInMgDl {
                     maxValue = urgentHighLimitInMgDl
+                    gaugeColor = .red
+                }
+                
+                if bgValueInMgDl <= urgentLowLimitInMgDl {
+                    minValue = ConstantsCalibrationAlgorithms.minimumBgReadingCalculatedValue
                     gaugeColor = .yellow
-                    gaugeGradient = Gradient(colors: [.red, .yellow, .green, .green, .green, .green, .yellow, .red])
+                } else if bgValueInMgDl <= lowLimitInMgDl {
+                    minValue = urgentLowLimitInMgDl
+                    gaugeColor = .yellow
                 }
             }
-            return (minValue, maxValue, gaugeColor, gaugeGradient)
+            
+            // let's round the min value down to nearest 10 and the max up to nearest 10
+            // this is to start creating the gradient ranges
+            let minValueRoundedDown = Double(10 * Int(minValue/10))
+            let maxValueRoundedUp = Double(10 * Int(maxValue/10)) + 10
+            
+            // the prevent the gradient changes from being too sharp, we'll reduce the granularity if trying to show a big range
+            // step through the range and append the colors as necessary
+            for currentValue in stride(from: minValueRoundedDown, through: maxValueRoundedUp, by: (maxValueRoundedUp - minValueRoundedDown) > 200 ? 20 : 10) {
+                if currentValue > urgentHighLimitInMgDl || currentValue <= urgentLowLimitInMgDl {
+                    colorArray.append(Color.red)
+                } else if currentValue > highLimitInMgDl || currentValue <= lowLimitInMgDl {
+                    colorArray.append(Color.yellow)
+                } else {
+                    colorArray.append(Color.green)
+                }
+            }
+            
+            // calculate a nil value to show on the gauge (as it can't display nil). This should basically just peg the gauge indicator in the middle of the current range
+            let nilValue =  minValue + ((maxValue - minValue) / 2)
+            
+            return (minValue, maxValue, nilValue, gaugeColor, Gradient(colors: colorArray))
         }
         
         func isSmallScreen() -> Bool {
