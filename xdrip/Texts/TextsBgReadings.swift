@@ -32,6 +32,10 @@ enum Texts_BgReadings {
         return NSLocalizedString("generalSectionHeader", tableName: filename, bundle: Bundle.main, value: "General", comment: "general glucose reading section header")
     }()
     
+    static let slopeSectionHeader:String = {
+        return NSLocalizedString("slopeSectionHeader", tableName: filename, bundle: Bundle.main, value: "Slope", comment: "glucose reading slope header")
+    }()
+    
     static let internalDataSectionHeader:String = {
         return NSLocalizedString("internalDataSectionHeader", tableName: filename, bundle: Bundle.main, value: "Internal Data", comment: "internal glucose reading data")
     }()
@@ -46,6 +50,14 @@ enum Texts_BgReadings {
     
     static let slopeArrow:String = {
         return NSLocalizedString("slopeArrow", tableName: filename, bundle: Bundle.main, value: "Slope Arrow", comment: "the slope arrow of the glucose reading")
+    }()
+    
+    static let slopePerMinute: String = {
+        return NSLocalizedString("slopePerMinute", tableName: filename, bundle: Bundle.main, value: "Slope/Minute", comment: "the slope value of the glucose reading per minute")
+    }()
+    
+    static let slopePer5Minutes: String = {
+        return NSLocalizedString("slopePer5Minutes", tableName: filename, bundle: Bundle.main, value: "Slope/5 Minutes", comment: "the slope value of the glucose reading per 5 minutes")
     }()
     
     static let id:String = {
