@@ -199,6 +199,8 @@
 		47DE41B32B8672F90041DA19 /* MainViewDataSourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41B22B8672F90041DA19 /* MainViewDataSourceView.swift */; };
 		47DE41B52B8693CB0041DA19 /* MainViewHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41B42B8693CB0041DA19 /* MainViewHeaderView.swift */; };
 		47DE41B92B87B2680041DA19 /* ConstantsAppleWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41B82B87B2680041DA19 /* ConstantsAppleWatch.swift */; };
+		47E3DB372C769C9600DE1AF0 /* AlgorithmType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47E3DB362C769C9600DE1AF0 /* AlgorithmType.swift */; };
+		47E3DB3A2C77C0D700DE1AF0 /* CalibrationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47E3DB392C77C0D700DE1AF0 /* CalibrationType.swift */; };
 		47E91BBA2B9A43F20063181B /* FollowerBackgroundKeepAliveType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */; };
 		47EDD1402BDD4F5D00C5A286 /* ConstantsWidgetExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47EDD13E2BDD4F5D00C5A286 /* ConstantsWidgetExtension.swift */; };
 		47EDD1422BDD4FE500C5A286 /* XDripWidgetAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A5042B40709E00419052 /* XDripWidgetAttributes.swift */; };
@@ -1021,6 +1023,8 @@
 		47DE41B22B8672F90041DA19 /* MainViewDataSourceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewDataSourceView.swift; sourceTree = "<group>"; };
 		47DE41B42B8693CB0041DA19 /* MainViewHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewHeaderView.swift; sourceTree = "<group>"; };
 		47DE41B82B87B2680041DA19 /* ConstantsAppleWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsAppleWatch.swift; sourceTree = "<group>"; };
+		47E3DB362C769C9600DE1AF0 /* AlgorithmType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmType.swift; sourceTree = "<group>"; };
+		47E3DB392C77C0D700DE1AF0 /* CalibrationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibrationType.swift; sourceTree = "<group>"; };
 		47EDD13E2BDD4F5D00C5A286 /* ConstantsWidgetExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsWidgetExtension.swift; sourceTree = "<group>"; };
 		47EDD1452BDD565A00C5A286 /* TextsWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsWatchApp.swift; sourceTree = "<group>"; };
 		47EDD1482BDD56C800C5A286 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/WatchApp.strings; sourceTree = "<group>"; };
@@ -2145,6 +2149,14 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		47E3DB382C77C0C500DE1AF0 /* Calibration */ = {
+			isa = PBXGroup;
+			children = (
+				47E3DB392C77C0D700DE1AF0 /* CalibrationType.swift */,
+			);
+			path = Calibration;
+			sourceTree = "<group>";
+		};
 		47EDD13F2BDD4F5D00C5A286 /* Constants */ = {
 			isa = PBXGroup;
 			children = (
@@ -2552,6 +2564,7 @@
 		F8297F42238DC4AC00D74D66 /* BluetoothPeripheral */ = {
 			isa = PBXGroup;
 			children = (
+				47E3DB362C769C9600DE1AF0 /* AlgorithmType.swift */,
 				F8A2BC1D25DB0D6D001D1E78 /* BluetoothPeripheral */,
 			);
 			path = BluetoothPeripheral;
@@ -2603,12 +2616,12 @@
 			path = watlaa;
 			sourceTree = "<group>";
 		};
-		F830992423C32226005741DF /* watlaa */ = {
+		F830992423C32226005741DF /* Watlaa */ = {
 			isa = PBXGroup;
 			children = (
 				F8E51D64244BA790001C9E5A /* WatlaaBluetoothPeripheralViewModel.swift */,
 			);
-			path = watlaa;
+			path = Watlaa;
 			sourceTree = "<group>";
 		};
 		F85DC29B21CFCEB800B9F74A /* Recovered References */ = {
@@ -2625,6 +2638,7 @@
 				F821CF54229BF43A005C1E43 /* Application */,
 				F8297F42238DC4AC00D74D66 /* BluetoothPeripheral */,
 				F8E3A2A723D906B600E5E98A /* Calendar */,
+				47E3DB382C77C0C500DE1AF0 /* Calibration */,
 				F8BECB03235CE5970060DAE1 /* Charts */,
 				F227BF1A2B9E425800CEEAAD /* ContactImage */,
 				F821CF4D229BF43A005C1E43 /* CoreData */,
@@ -3227,9 +3241,9 @@
 		F8DF766A23ED9AF100063910 /* Dexcom */ = {
 			isa = PBXGroup;
 			children = (
-				F8F71D7B2B7EA5EF005076E8 /* DexcomG7 */,
 				F816E12F2439E2A0009EE65B /* DexcomG4 */,
 				F8DF766B23ED9AF100063910 /* DexcomG5 */,
+				F8F71D7B2B7EA5EF005076E8 /* DexcomG7 */,
 			);
 			path = Dexcom;
 			sourceTree = "<group>";
@@ -3764,11 +3778,11 @@
 		F8F9723623A5928D00C3F17D /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				F8EE3EA32B6833B400B27B96 /* HeartBeat */,
 				F8DF766923ED9AF100063910 /* CGM */,
+				F8EE3EA32B6833B400B27B96 /* HeartBeat */,
 				F8F9723723A5928D00C3F17D /* M5Stack */,
 				F8F9723A23A5934300C3F17D /* M5StickC */,
-				F830992423C32226005741DF /* watlaa */,
+				F830992423C32226005741DF /* Watlaa */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -4442,6 +4456,7 @@
 				F227BF192B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift in Sources */,
 				F8A2BC3B25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift in Sources */,
 				F8A2BC3A25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMGNSEntryTransmitterDelegate.swift in Sources */,
+				47E3DB372C769C9600DE1AF0 /* AlgorithmType.swift in Sources */,
 				F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */,
 				F8A1585122EDB597007F5B5D /* ConstantsBGGraphBuilder.swift in Sources */,
 				F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */,
@@ -4627,6 +4642,7 @@
 				F8B3A78E22622954004BA588 /* AlertType+CoreDataClass.swift in Sources */,
 				F821CF5A229BF43A005C1E43 /* CoreDataManager.swift in Sources */,
 				F8E51D6924549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift in Sources */,
+				47E3DB3A2C77C0D700DE1AF0 /* CalibrationType.swift in Sources */,
 				F85DC2F321CFE3D400B9F74A /* Calibration+CoreDataClass.swift in Sources */,
 				F8AF361B245D93EE00B5977B /* Int16.swift in Sources */,
 				F8E3A2AB23DA520B00E5E98A /* ConstantsCalendar.swift in Sources */,

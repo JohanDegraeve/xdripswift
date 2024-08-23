@@ -31,15 +31,12 @@ class Libre2BluetoothPeripheralViewModel {
     /// temporary reference to bluetoothPerpipheral, will be set in configure function.
     private var bluetoothPeripheral: BluetoothPeripheral?
 
-    /// it's the bluetoothPeripheral as M5Stack
+    /// it's the bluetoothPeripheral as Libre2
     private var libre2: Libre2? {
         get {
             return bluetoothPeripheral as? Libre2
         }
     }
-
-    /// Libre 2 settings will be in section 0 + numberOfGeneralSections
-    private let sectionNumberForMiaoMiaoSpecificSettings = 0
 
     // MARK: - deinit
     
@@ -236,7 +233,7 @@ extension Libre2BluetoothPeripheralViewModel: CGMLibre2TransmitterDelegate {
         
         if let bluetoothPeripheralViewController = bluetoothPeripheralViewController {
             
-            tableView?.reloadRows(at: [IndexPath(row: row, section: bluetoothPeripheralViewController.numberOfGeneralSections() + sectionNumberForMiaoMiaoSpecificSettings)], with: .none)
+            tableView?.reloadRows(at: [IndexPath(row: row, section: bluetoothPeripheralViewController.numberOfGeneralSections() + sectionNumberForLibre2SpecificSettings)], with: .none)
             
         }
     }

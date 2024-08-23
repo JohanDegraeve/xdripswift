@@ -408,11 +408,23 @@ class Texts_SettingsView {
     }()
     
     static let labelNonFixedTransmitter:String = {
-        return NSLocalizedString("settingsviews_nonfixedtransmitter", tableName: filename, bundle: Bundle.main, value: "Use Multi-point Calibration", comment: "non fixed calibration slopes settings in bluetooth peripheral view : enabled or not")
+        return NSLocalizedString("settingsviews_nonfixedtransmitter", tableName: filename, bundle: Bundle.main, value: "Enable Multi-point Calibration", comment: "non fixed calibration slopes settings in bluetooth peripheral view : enabled or not")
     }()
     
     static let labelNonFixed:String = {
         return NSLocalizedString("settingsviews_labelNonFixed", tableName: filename, bundle: Bundle.main, value: "Multi-point Calibration", comment: "non fixed settings, title of the section")
+    }()
+    
+    static let labelAlgorithmType:String = {
+        return NSLocalizedString("settingsviews_labelAlgorithmType", tableName: filename, bundle: Bundle.main, value: "Algorithm Type", comment: "weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm")
+    }()
+    
+    static let labelCalibrationTitle:String = {
+        return NSLocalizedString("settingsviews_labelCalibrationTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Calibration", comment: "non fixed settings, title of the section")
+    }()
+    
+    static let labelCalibrationType:String = {
+        return NSLocalizedString("settingsviews_labelCalibrationType", tableName: filename, bundle: Bundle.main, value: "Calibration Type", comment: "non fixed settings, title of the section")
     }()
     
     // MARK: - Section Alerts
