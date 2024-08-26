@@ -3463,6 +3463,11 @@ final class RootViewController: UIViewController, ObservableObject {
         if let cGMTransmitter = cGMTransmitter, sendToTransmitter {
             cGMTransmitter.startSensor(sensorCode: sensorCode, startDate: sensorStarDate)
         }
+        
+        // update the activeSensorDescription. Needed as otherwise it won't get done for Libre after an algorithm change
+        if let cgmTransmitter = cGMTransmitter {
+            UserDefaults.standard.activeSensorDescription = cgmTransmitter.cgmTransmitterType().detailedDescription()
+        }
 
         // assign activeSensor to newSensor
         activeSensor = newSensor
