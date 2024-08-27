@@ -7,14 +7,7 @@ public class BgReading: NSManagedObject {
     /// creates BgReading with given parameters.
     ///
     /// properties that are not in the parameter list get either value 0 or false (depending on type). id gets new value
-    init(
-        timeStamp:Date,
-        sensor:Sensor?,
-        calibration:Calibration?,
-        rawData:Double,
-        deviceName:String?,
-        nsManagedObjectContext:NSManagedObjectContext
-    ) {
+    init(timeStamp:Date, sensor:Sensor?, calibration:Calibration?, rawData:Double, deviceName:String?, nsManagedObjectContext:NSManagedObjectContext) {
         let entity = NSEntityDescription.entity(forEntityName: "BgReading", in: nsManagedObjectContext)!
         super.init(entity: entity, insertInto: nsManagedObjectContext)
         self.timeStamp = timeStamp
@@ -236,10 +229,8 @@ public class BgReading: NSManagedObject {
     /// - returns:
     ///     - calculated slope and hideSlope
     func calculateSlope(lastBgReading:BgReading) -> (Double, Bool) {
-        if timeStamp == lastBgReading.timeStamp
-            ||
-            timeStamp.toMillisecondsAsDouble() - lastBgReading.timeStamp.toMillisecondsAsDouble() > Double(ConstantsBGGraphBuilder.maxSlopeInMinutes * 60 * 1000) {
-            return (0,true)
+        if timeStamp == lastBgReading.timeStamp || timeStamp.toMillisecondsAsDouble() - lastBgReading.timeStamp.toMillisecondsAsDouble() > Double(ConstantsBGGraphBuilder.maxSlopeInMinutes * 60 * 1000) {
+            return (0, true)
         }
         return ((lastBgReading.calculatedValue - calculatedValue) / (lastBgReading.timeStamp.toMillisecondsAsDouble() - timeStamp.toMillisecondsAsDouble()), false)
     }

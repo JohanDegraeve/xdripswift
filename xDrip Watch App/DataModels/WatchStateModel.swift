@@ -276,10 +276,17 @@ final class WatchStateModel: NSObject, ObservableObject {
     /// - Returns: minValue/maxValue - used to define the limits of the gauge. nilValue - used if there is currently no data present (basically puts the gauge at the 50% mark). gaugeGradient - the color ranges used
     func gaugeModel() -> (minValue: Double, maxValue: Double, nilValue: Double, gaugeGradient: Gradient) {
         
+        // now we've got the values, if there is no recent reading, return a gray gradient
+        if let bgReadingDate = bgReadingDate(), bgReadingDate < Date().addingTimeInterval(-60 * 7) {
+            return (0, 1, 0.5, Gradient(colors: [.gray]))
+        }
+        
         var minValue: Double = lowLimitInMgDl
         var maxValue: Double = highLimitInMgDl
         var colorArray = [Color]()
-                
+        
+        
+        // let's put the min and max values into values/context that makes sense for the UI we show to the user
         if let bgValueInMgDl = bgValueInMgDl() {
             if bgValueInMgDl >= urgentHighLimitInMgDl {
                 maxValue = ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValue
@@ -294,6 +301,10 @@ final class WatchStateModel: NSObject, ObservableObject {
             }
         }
         
+        // calculate a nil value to show on the gauge (as it can't display nil). This should basically just peg the gauge indicator in the middle of the current range
+        let nilValue =  minValue + ((maxValue - minValue) / 2)
+        
+        // this means that there is a recent reading so we can show a colored gauge
         // let's round the min value down to nearest 10 and the max up to nearest 10
         // this is to start creating the gradient ranges
         let minValueRoundedDown = Double(10 * Int(minValue/10))
@@ -305,16 +316,13 @@ final class WatchStateModel: NSObject, ObservableObject {
         // step through the range and append the colors as necessary
         for currentValue in stride(from: minValueRoundedDown, through: maxValueRoundedUp, by: reducedGranularity ? 20 : 10) {
             if currentValue > urgentHighLimitInMgDl || currentValue <= urgentLowLimitInMgDl {
-                colorArray.append(Color.red)
+                colorArray.append(.red)
             } else if currentValue > highLimitInMgDl || currentValue <= lowLimitInMgDl {
-                colorArray.append(Color.yellow)
+                colorArray.append(.yellow)
             } else {
-                colorArray.append(Color.green)
+                colorArray.append(.green)
             }
         }
-        
-        // calculate a nil value to show on the gauge (as it can't display nil). This should basically just peg the gauge indicator in the middle of the current range
-        let nilValue =  minValue + ((maxValue - minValue) / 2)
         
         return (minValue, maxValue, nilValue, Gradient(colors: colorArray))
     }

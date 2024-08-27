@@ -18,6 +18,8 @@ struct BgReadingsView: View {
     /// reference to nightscoutUploadManager
     @EnvironmentObject var nightScoutUploadManager: NightScoutUploadManager
     
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    
     // MARK: - private @State properties
     
     /// the BgReadings pulled from coredata via BgReadingsAccessor
@@ -56,7 +58,7 @@ struct BgReadingsView: View {
                 DatePicker(selection: $dateSelected, in: Date().addingTimeInterval(-(Double(numberOfDaysOfBgReadingsToShow) * 24 * 3600))...Date(), displayedComponents: .date) {
                     
                     HStack {
-                        Text(Texts_BgReadings.selectDate)
+                        Text(Texts_BgReadings.date)
                         
                         Spacer()
                         
@@ -114,6 +116,13 @@ struct BgReadingsView: View {
                 // hide the datePicker
                 self.datePickerReset = UUID()
             })
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(Texts_Common.Cancel, action: {
+                        self.presentationMode.wrappedValue.dismiss()
+                    })
+                }
+            }
         }
         .colorScheme(.dark)
         .onAppear() {
