@@ -3245,6 +3245,11 @@ final class RootViewController: UIViewController, ObservableObject {
                     
                     dataSourceLabelOutlet.text = " ⚠️  " + Texts_HomeView.reconnectLibreDataSource
                     
+                } else if (self.bluetoothPeripheralManager?.getCGMTransmitter()) != nil {
+                    
+                    // this is where all master modes will end up if there is no CGM connected or valid sensor started
+                    dataSourceLabelOutlet.text = " ⏳  " + Texts_HomeView.waitingForDataSource
+                    
                 } else {
                     
                     // this is where all master modes will end up if there is no CGM connected or valid sensor started
