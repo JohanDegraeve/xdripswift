@@ -2194,14 +2194,14 @@
 		48C0E851274A3BB6D42C6F20 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				47DE41A92B860DF00041DA19 /* WatchConnectivity.framework */,
 				F81F3C4125D1D91300520946 /* CoreNFC.framework */,
 				F821CF9622AE589E005C1E43 /* HealthKit.framework */,
 				F870D3D225126A49008967B0 /* NotificationCenter.framework */,
-				4716A4EE2B406C3D00419052 /* WidgetKit.framework */,
 				4716A4F02B406C3D00419052 /* SwiftUI.framework */,
 				47CD64132BE9506C002BDA68 /* UserNotifications.framework */,
 				47CD64152BE9506C002BDA68 /* UserNotificationsUI.framework */,
+				47DE41A92B860DF00041DA19 /* WatchConnectivity.framework */,
+				4716A4EE2B406C3D00419052 /* WidgetKit.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -2806,6 +2806,7 @@
 				F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */,
 				666E283926F7E54C00ACE4DF /* Version.xcconfig */,
 				666E283826F7E54C00ACE4DF /* xDrip.xcconfig */,
+				F8AC425C21ADEBD60078C348 /* xdrip */,
 				4716A4F22B406C3D00419052 /* xDrip Widget */,
 				47A6ABE02B790CC60047A4BA /* xDrip Watch App */,
 				479359882B88B95A007D3CEE /* xDrip Watch Complication */,
@@ -2813,7 +2814,6 @@
 				48C0E851274A3BB6D42C6F20 /* Frameworks */,
 				F8AC425B21ADEBD60078C348 /* Products */,
 				F85DC29B21CFCEB800B9F74A /* Recovered References */,
-				F8AC425C21ADEBD60078C348 /* xdrip */,
 			);
 			indentWidth = 4;
 			sourceTree = "<group>";
