@@ -7,10 +7,10 @@ fileprivate enum Setting:Int, CaseIterable {
     case dexcomShareAccountName = 1
     /// dexcomSharePassword
     case dexcomSharePassword = 2
-    /// should us url be used true or false
-    case useUSDexcomShareurl = 3
     /// dexcomShareSerialNumber
-    case dexcomShareSerialNumber = 4
+    case dexcomShareSerialNumber = 3
+    /// should us url be used true or false
+    case useUSDexcomShareurl = 4
     /// use dexcom share schedule or not
     case useSchedule = 5
     /// open uiviewcontroller to edit schedule
@@ -53,9 +53,6 @@ class SettingsViewDexcomShareSettingsViewModel:SettingsViewModelProtocol {
         case .dexcomSharePassword:
             return SettingsSelectedRowAction.askText(title: Texts_Common.password, message: Texts_SettingsView.giveDexcomSharePassword, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomSharePassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(password:String) in UserDefaults.standard.dexcomSharePassword = password.toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
             
-        case .useUSDexcomShareurl:
-            return SettingsSelectedRowAction.nothing
-            
         case .dexcomShareSerialNumber:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelDexcomShareSerialNumber, message: Texts_SettingsView.giveDexcomShareSerialNumber, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareSerialNumber, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in
                 
@@ -72,6 +69,9 @@ class SettingsViewDexcomShareSettingsViewModel:SettingsViewModelProtocol {
                 }
 
             }, cancelHandler: nil, inputValidator: nil)
+            
+        case .useUSDexcomShareurl:
+            return SettingsSelectedRowAction.nothing
             
         case .useSchedule:
             return .nothing
@@ -130,10 +130,10 @@ class SettingsViewDexcomShareSettingsViewModel:SettingsViewModelProtocol {
             return UITableViewCell.AccessoryType.disclosureIndicator
         case .dexcomSharePassword:
             return UITableViewCell.AccessoryType.disclosureIndicator
-        case .useUSDexcomShareurl:
-            return UITableViewCell.AccessoryType.none
         case .dexcomShareSerialNumber:
             return UITableViewCell.AccessoryType.disclosureIndicator
+        case .useUSDexcomShareurl:
+            return UITableViewCell.AccessoryType.none
         case .useSchedule:
             return UITableViewCell.AccessoryType.none
         case .schedule:
@@ -148,13 +148,13 @@ class SettingsViewDexcomShareSettingsViewModel:SettingsViewModelProtocol {
         case .uploadReadingstoDexcomShare:
             return nil
         case .dexcomShareAccountName:
-            return UserDefaults.standard.dexcomShareAccountName
+            return UserDefaults.standard.dexcomShareAccountName ?? Texts_SettingsView.valueIsRequired
         case .dexcomSharePassword:
-            return UserDefaults.standard.dexcomSharePassword != nil ? "***********" : nil
+            return UserDefaults.standard.dexcomSharePassword?.obscured() ?? Texts_SettingsView.valueIsRequired
         case .useUSDexcomShareurl:
             return nil
         case .dexcomShareSerialNumber:
-            return UserDefaults.standard.dexcomShareSerialNumber
+            return UserDefaults.standard.dexcomShareSerialNumber ?? Texts_SettingsView.valueIsRequired
         case .useSchedule:
             return nil
         case .schedule:
