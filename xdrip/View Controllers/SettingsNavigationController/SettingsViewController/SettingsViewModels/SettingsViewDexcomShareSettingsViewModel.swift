@@ -18,8 +18,8 @@ fileprivate enum Setting:Int, CaseIterable {
 
 }
 
-/// conforms to SettingsViewModelProtocol for all Dexcom settings in the first sections screen
-class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
+/// conforms to SettingsViewModelProtocol for all Dexcom Share settings in the first sections screen
+class SettingsViewDexcomShareSettingsViewModel:SettingsViewModelProtocol {
     
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
@@ -181,7 +181,7 @@ class SettingsViewDexcomSettingsViewModel:SettingsViewModelProtocol {
     }
 }
 
-extension SettingsViewDexcomSettingsViewModel: TimeSchedule {
+extension SettingsViewDexcomShareSettingsViewModel: TimeSchedule {
     
     func serviceName() -> String {
         return "Dexcom Share"
