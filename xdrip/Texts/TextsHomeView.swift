@@ -219,7 +219,7 @@ enum Texts_HomeView {
     
     // used when a CGM Transmitter is connected, but there is no active sensor data yet
     static let waitingForDataSource: String = {
-        return NSLocalizedString("waitingForDataSource", tableName: filename, bundle: Bundle.main, value: "Waiting for data...", comment: "waiting for data to arrive")
+        return NSLocalizedString("waitingForDataSource", tableName: filename, bundle: Bundle.main, value: "CGM connected. Waiting for data...", comment: "waiting for data to arrive")
     }()
     
     // make sure any translations are less than 20-22 characters long (including the "%@")
