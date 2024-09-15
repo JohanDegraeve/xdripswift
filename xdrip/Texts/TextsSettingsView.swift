@@ -376,7 +376,7 @@ class Texts_SettingsView {
     }()
     
     static let heartbeatLibreMessage:String = {
-        return NSLocalizedString("settingsviews_heartbeatLibreMessage", tableName: filename, bundle: Bundle.main, value: "IMPORTANT: You MUST force-close the Libre app first.\n\nEnter the device name shown in the iPhone Settings -> Bluetooth devices list.\n\nOnce you have connected, you can reopen the Libre app.", comment: "transmitter settings, instructions for adding a Libre heartbeat")
+        return NSLocalizedString("settingsviews_heartbeatLibreMessage", tableName: filename, bundle: Bundle.main, value: "IMPORTANT: You MUST force-close the Libre app first if adding a Libre heartbeat.\n\nEnter the device name shown in the iPhone Settings -> Bluetooth devices list.\n\nOnce you have connected, you can reopen the Libre app if needed.", comment: "transmitter settings, instructions for adding a generic or Libre heartbeat")
     }()
     
     static let heartbeatG7Message:String = {
