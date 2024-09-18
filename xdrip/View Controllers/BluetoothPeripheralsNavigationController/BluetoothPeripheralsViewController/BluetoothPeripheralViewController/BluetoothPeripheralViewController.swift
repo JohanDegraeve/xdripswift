@@ -125,6 +125,9 @@ class BluetoothPeripheralViewController: UIViewController {
     /// used to verify if a valid NFC scan has been recorded
     private var nfcScanSuccessful: Bool = false
     
+    /// keep track of whether the observers were already added/registered (to make sure before we try to remove them)
+    private var didAddObservers: Bool = false
+    
     
     // MARK: - public functions
     
@@ -509,12 +512,6 @@ class BluetoothPeripheralViewController: UIViewController {
             fatalError("in BluetoothPeripheralViewController viewDidLoad, bluetoothPeripheralManager is nil")
         }
         
-        // Listen for changes in the nfcScanFailed setting when it is changed by the delegate after a failed NFC scan
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nfcScanFailed.rawValue, options: .new, context: nil)
-        
-        // Listen for changes in the nfcScanSuccessful setting when it is changed by the delegate after a successful NFC scan
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nfcScanSuccessful.rawValue, options: .new, context: nil)
-        
         // here the tableView is not nil, we can safely call bluetoothPeripheralViewModel.configure, this one requires a non-nil tableView
         
         // get a viewModel instance for the expectedBluetoothPeripheralType
@@ -532,6 +529,33 @@ class BluetoothPeripheralViewController: UIViewController {
         
         setupView()
         
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        // check if the observers have already been added. If not, then add them
+        if !didAddObservers {
+            // Listen for changes in the nfcScanFailed setting when it is changed by the delegate after a failed NFC scan
+            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nfcScanFailed.rawValue, options: .new, context: nil)
+            
+            // Listen for changes in the nfcScanSuccessful setting when it is changed by the delegate after a successful NFC scan
+            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nfcScanSuccessful.rawValue, options: .new, context: nil)
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        // we need to remove all observers from the view controller before removing it from the navigation stack
+        // otherwise the app crashes when one of the userdefault values changes and the observer tries to
+        // update the UI (which isn't available any more)
+        
+        // as viewWillAppear could get called (or maybe not) several times, we need to check that the observers
+        // have really been registered before we try and remove them
+        if didAddObservers {
+            // Listen for changes in the nfcScanFailed setting when it is changed by the delegate after a failed NFC scan
+            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nfcScanFailed.rawValue)
+            
+            // Listen for changes in the nfcScanSuccessful setting when it is changed by the delegate after a successful NFC scan
+            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nfcScanSuccessful.rawValue)
+        }
     }
     
     override func willMove(toParent parent: UIViewController?) {
