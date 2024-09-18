@@ -120,10 +120,18 @@ final class WatchStateModel: NSObject, ObservableObject {
     }
     
     /// returns the minutes ago string of the last updated time
+    /// check if more than 12 hours has passed. If so, then the amount of text to show would be too much so return the shorter version
     /// - Returns: string representation of last reading time as "x mins ago"
     func lastUpdatedMinsAgoString() -> String {
         if let bgReadingDate = bgReadingDate() {
-            return bgReadingDate.daysAndHoursAgoFull(appendAgo: true)
+            
+            let diffComponents = Calendar.current.dateComponents([.day], from: bgReadingDate, to: Date())
+            
+            if let hours = diffComponents.hour, hours >= 12 {
+                return bgReadingDate.daysAndHoursAgo(appendAgo: true)
+            } else {
+                return bgReadingDate.daysAndHoursAgoFull(appendAgo: true)
+            }
         } else {
             return "Waiting..."
         }

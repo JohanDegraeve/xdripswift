@@ -73,6 +73,7 @@ struct BigNumberView: View {
                 .tint(watchState.gaugeModel().gaugeGradient)
                 .gaugeStyle(.accessoryLinear)
                 .opacity(gaugeOpacityValue)
+                .scaleEffect(0.8)
                 .animation(.easeOut(duration: 0.3), value: gaugeOpacityValue)
                 .onChange(of: watchState.bgValueStringInUserChosenUnit()) { oldState, newState in
                     animateGaugeOpacityValue()
