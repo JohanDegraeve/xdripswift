@@ -9,7 +9,7 @@
 import Foundation
 import OSLog
 
-public class LoopManager:NSObject {
+public class LoopManager: NSObject {
     
     // MARK: - private properties
     
@@ -18,9 +18,6 @@ public class LoopManager:NSObject {
     
     /// a BgReadingsAccessor
     private var bgReadingsAccessor:BgReadingsAccessor
-    
-    /// shared UserDefaults to publish data
-    private let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName)
     
     // for trace,
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryLoopManager)
@@ -51,8 +48,18 @@ public class LoopManager:NSObject {
     /// share latest readings with Loop
     public func share() {
         
-        // unwrap sharedUserDefaults
-        guard let sharedUserDefaults = sharedUserDefaults else {return}
+        // will return if loop share is disabled
+        guard UserDefaults.standard.loopShareType != .disabled else { return }
+        
+        // shared app group suite name to publish data
+        let suiteName = UserDefaults.standard.loopShareType.sharedUserDefaultsSuiteName
+        
+        // make sure the enum didn't return an empty string
+        guard suiteName != "" else { return }
+        
+        // create and unwrap sharedUserDefaults
+        // this was previously done at the class level, but the scope must now be changed to allow us to change the target app group
+        guard let sharedUserDefaults = UserDefaults(suiteName: suiteName) else {return}
         
         guard let timeStampLatestLoopSharedBgReading = UserDefaults.standard.timeStampLatestLoopSharedBgReading else {
             

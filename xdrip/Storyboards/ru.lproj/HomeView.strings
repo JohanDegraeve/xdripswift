@@ -44,7 +44,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// if web oop enabled, and also if transmitter supports this, user clicks calibrate button, but calibration is not possible
-"calibrationNotNecessary" = "When using the native transmitter algorithm, manual calibration is not available.\n\nIf you want to calibrate, you can switch to the xDrip algorithm in the transmitter screen.";
+"calibrationNotNecessary" = "When using the native transmitter algorithm, manual calibration is not available.\n\nIf you want to calibrate, you can switch to the xDrip algorithm in the transmitter screen (if available).";
 
 /// nightscout is not enabled
 "nightscoutNotEnabled" = "Nightscout is disabled";

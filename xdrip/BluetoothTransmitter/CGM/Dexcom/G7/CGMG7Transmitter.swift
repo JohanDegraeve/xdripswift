@@ -2,9 +2,9 @@ import Foundation
 import CoreBluetooth
 import os
 
-class CGMG7Transmitter:BluetoothTransmitter, CGMTransmitter {
+class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
-    /// is the transmitter oop web enabled or not
+    /// is the transmitter oop web enabled or not. For G7/ONE+ this must be set to true to use only the transmitter algorithm
     private var webOOPEnabled: Bool
 
     /// stored when receiving single reading, needed when receiving backfill data
@@ -108,18 +108,23 @@ class CGMG7Transmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
     ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
-    ///     - webOOPEnabled : enabled or not, if nil then default false
     ///     - cGMG7TransmitterDelegate : a CGMG7TransmitterDelegate
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG7TransmitterDelegate: CGMG7TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, webOOPEnabled: Bool?) {
+    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG7TransmitterDelegate: CGMG7TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate) {
         
         // assign addressname and name or expected devicename
         // For G7 we don't listen for a specific device name. Dexcom uses an advertising id, which already filters out all other devices (like tv's etc. We will verify in another way that we have the current active G7, and not an old one, which is still near
-        var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "DXCM")
+        var newAddressAndName: BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "DX")
+        
+        if let name = name {
+            UserDefaults.standard.activeSensorTransmitterId = name
+        }
+        
         if let address = address {
             newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address, name: name)
         }
         
-        self.webOOPEnabled = webOOPEnabled ?? false
+        // set this to true to make sure that only the raw G7 data is *always* used, even if upgrading from a previous version with a sensor already calibrated in xDrip algorithm
+        self.webOOPEnabled = true
         
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: CBUUID_Advertisement_G7, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_G7)], CBUUID_ReceiveCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue, CBUUID_WriteCharacteristic: CBUUID_Characteristic_UUID.CBUUID_Write_Control.rawValue, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
 
@@ -200,17 +205,16 @@ class CGMG7Transmitter:BluetoothTransmitter, CGMTransmitter {
                 
             case .glucoseG6Tx:
                 
-                guard let g7GglucoseMessage = G7GlucoseMessage(data: value) else {
+                guard let g7GlucoseMessage = G7GlucoseMessage(data: value) else {
                     trace("    failed to create G7GlucoseMessage", log: log, category: ConstantsLog.categoryCGMG7, type: .error )
                     return
                 }
                      
-                trace("    received g7GglucoseMessage mesage, calculatedValue = %{public}@, timeStamp = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, g7GglucoseMessage.calculatedValue.description, g7GglucoseMessage.timeStamp.description(with: .current))
+                trace("    received g7GlucoseMessage mesage, calculatedValue = %{public}@, timeStamp = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, g7GlucoseMessage.calculatedValue.description, g7GlucoseMessage.timeStamp.description(with: .current))
                 
-                sensorAge = g7GglucoseMessage.sensorAge
+                sensorAge = g7GlucoseMessage.sensorAge
                 
-                // if webOOPEnabled is false, then we use the xDrip algorithm, in that case value needs to be mulitplied with 1000
-                let newGlucoseData = GlucoseData(timeStamp: g7GglucoseMessage.timeStamp, glucoseLevelRaw: g7GglucoseMessage.calculatedValue * (webOOPEnabled ? 1.0 : 1000.0))
+                let newGlucoseData = GlucoseData(timeStamp: g7GlucoseMessage.timeStamp, glucoseLevelRaw: g7GlucoseMessage.calculatedValue)
                 
                 // add glucoseData to backfill
                 // possibly we will send it still later, if we receive also backfill data.
@@ -225,10 +229,10 @@ class CGMG7Transmitter:BluetoothTransmitter, CGMTransmitter {
                 }
                 
                 // send algorithm status of the transmitter to cGMG7TransmitterDelegate
-                cGMG7TransmitterDelegate?.received(sensorStatus: g7GglucoseMessage.algorithmStatus.description, cGMG7Transmitter: self)
+                cGMG7TransmitterDelegate?.received(sensorStatus: g7GlucoseMessage.algorithmStatus.description, cGMG7Transmitter: self)
                 
                 // send sensorStartDate to cGMG7TransmitterDelegate
-                cGMG7TransmitterDelegate?.received(sensorStartDate: Date(timeIntervalSinceNow: -g7GglucoseMessage.sensorAge), cGMG7Transmitter: self)
+                cGMG7TransmitterDelegate?.received(sensorStartDate: Date(timeIntervalSinceNow: -g7GlucoseMessage.sensorAge), cGMG7Transmitter: self)
                         
             case .backfillFinished:
                 
@@ -251,7 +255,8 @@ class CGMG7Transmitter:BluetoothTransmitter, CGMTransmitter {
 
             if let sensorAge = sensorAge, let dexcomG7BackfillMessage = DexcomG7BackfillMessage(data: value, sensorAge: sensorAge) {
                 trace("    received backfill mesage, calculatedValue = %{public}@, timeStamp = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, dexcomG7BackfillMessage.calculatedValue.description, dexcomG7BackfillMessage.timeStamp.description(with: .current))
-                backfill.append(GlucoseData(timeStamp: dexcomG7BackfillMessage.timeStamp, glucoseLevelRaw: dexcomG7BackfillMessage.calculatedValue * (webOOPEnabled ? 1.0 : 1000.0)))
+                
+                backfill.append(GlucoseData(timeStamp: dexcomG7BackfillMessage.timeStamp, glucoseLevelRaw: dexcomG7BackfillMessage.calculatedValue))
             }
             
         case .CBUUID_Receive_Authentication:
@@ -364,24 +369,6 @@ class CGMG7Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     func getCBUUID_Receive() -> String {
         return CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue
-    }
-    
-    func setWebOOPEnabled(enabled: Bool) {
-        
-        if webOOPEnabled != enabled {
-            
-            webOOPEnabled = enabled
-            
-            trace("in setWebOOPEnabled, new value for webOOPEnabled = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, webOOPEnabled.description)
-            
-            // reset sensor start date, because changing webOOPEnabled value stops the sensor
-            sensorStartDate = nil
-            
-            // as sensor is stopped, also set sensorStatus to nil
-            cGMG7TransmitterDelegate?.received(sensorStatus: nil, cGMG7Transmitter: self)
-            
-        }
-        
     }
     
     func isWebOOPEnabled() -> Bool {
