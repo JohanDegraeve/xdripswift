@@ -30,7 +30,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     private var blePasswordM5StackPacket:M5StackPacket?
     
     /// is the transmitter ready to receive data like parameter updates or reading values
-    private (set) var isReadyToReceiveData: Bool = false
+    private(set) var isReadyToReceiveData: Bool = false
     
     /// possible rotation values, , the value is how it will be sent to the M5Stack but not  how it's stored in the M5Stack object - In the M5Stack object we store an Int value which is used as index in rotationValues and rotationStrings
     private let rotationValues: [UInt16] = [ 1, 2, 3, 0]

@@ -67,7 +67,7 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
             case .notDetermined:
                 return UITableViewCell.AccessoryType.none
                 
-            case .restricted:
+            case .restricted, .limited:
                 // by clicking row, show what it means to be restricted, according to Apple doc
                 return UITableViewCell.AccessoryType.disclosureIndicator
                 
@@ -139,6 +139,10 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
                     trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access restricted, according to apple doc 'possibly due to active restrictions such as parental controls being in place'", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                     UserDefaults.standard.enableContactImage = false
                     
+                case .limited:
+                    trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access limited, ask the user to give full access", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                    UserDefaults.standard.enableContactImage = false
+                    
                 case .denied:
                     trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access denied by user", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                     UserDefaults.standard.enableContactImage = false
@@ -207,6 +211,10 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
             case .restricted:
                 // by clicking row, show what it means to be restricted, according to Apple doc
                 return SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.infoContactsAccessRestricted)
+                
+            case .limited:
+                // by clicking row, show what it means to be limited, according to Apple doc
+                return SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.infoContactsAccessLimited)
                 
             @unknown default:
                 trace("in SettingsViewContactImageSettingsViewModel, unknown case returned when authorizing CNContactStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)

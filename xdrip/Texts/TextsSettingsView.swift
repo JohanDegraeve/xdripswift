@@ -724,6 +724,10 @@ class Texts_SettingsView {
         return String(format: NSLocalizedString("settingsviews_infoContactsAccessRestricted", tableName: filename, bundle: Bundle.main, value: "You cannot give authorization to %@ to access your contacts. This is possibly due to active restrictions such as parental controls being in place.", comment: "If user is not allowed to give any app access to the Contacts, due to restrictions. And then tries to activate the contact image, this message will be shown"), ConstantsHomeView.applicationName)
     }()
     
+    static let infoContactsAccessLimited: String = {
+        return String(format: NSLocalizedString("settingsviews_infoContactsAccessLimited", tableName: filename, bundle: Bundle.main, value: "Only limited access has been given to %@ to access your contacts. Please change the permission to Full Access in the iPhone Settings", comment: "If user has only given limited access to the Contacts and then tries to activate the contact image, this message will be shown"), ConstantsHomeView.applicationName)
+    }()
+    
     static let contactImageSectionTitle: String = {
         return NSLocalizedString("settingsviews_contactImageSectionTitle", tableName: filename, bundle: Bundle.main, value: "Contact Image", comment: "Contact Image - section title")
     }()

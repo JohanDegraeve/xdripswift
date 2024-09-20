@@ -10,7 +10,7 @@ class LoopFollowManager: NSObject {
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryLoopFollowManager)
     
     /// delegate to pass back glucosedata
-    private (set) weak var followerDelegate:FollowerDelegate?
+    private(set) weak var followerDelegate:FollowerDelegate?
     
     // MARK: - initializer
         

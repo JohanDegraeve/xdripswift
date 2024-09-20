@@ -26,7 +26,7 @@ class NightScoutFollowManager: NSObject {
     private var bgReadingsAccessor: BgReadingsAccessor
     
     /// delegate to pass back glucosedata
-    private (set) weak var followerDelegate: FollowerDelegate?
+    private(set) weak var followerDelegate: FollowerDelegate?
     
     /// AVAudioPlayer to use
     private var audioPlayer: AVAudioPlayer?
