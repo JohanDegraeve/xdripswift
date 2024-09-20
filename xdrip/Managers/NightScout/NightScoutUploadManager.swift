@@ -1070,8 +1070,11 @@ public class NightScoutUploadManager: NSObject, ObservableObject {
                     
                     if hTTPURLResponse.statusCode == 200 {
                         
-                            // using 0 here for amount of updated treatments
-                            completionHandler(data, .success(0))
+                        // store the current timestamp as a successful server response
+                        UserDefaults.standard.timeStampOfLastFollowerConnection = Date()
+                        
+                        // using 0 here for amount of updated treatments
+                        completionHandler(data, .success(0))
                         
                     } else {
                     

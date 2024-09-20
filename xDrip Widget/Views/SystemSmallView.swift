@@ -43,7 +43,9 @@ extension XDripWidget.EntryView {
                             .padding(.trailing, -4)
                     }
                         
-                    Text(entry.widgetState.dataSourceDescription)
+                    // we'll use the abbreviated description here as the full one will usually
+                    // get trimmed in the systemSmall widget due to lack of space
+                    Text(entry.widgetState.dataSourceDescriptionAbbreviated)
                         .font(.caption).bold()
                         .foregroundStyle(.colorSecondary)
                     

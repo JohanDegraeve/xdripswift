@@ -26,6 +26,7 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return 1
         }
     }
+    
     var description: String {
         switch self {
         case .nightscout:
