@@ -740,6 +740,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_displayTrendInContactImage", tableName: filename, bundle: Bundle.main, value: "Show Trend", comment: "Contact Image Settings - text in row where user needs to say if trend should be displayed or not")
     }()
     
+    static let useHighContrastContactImage: String = {
+        return NSLocalizedString("settingsviews_useHighContrastContactImage", tableName: filename, bundle: Bundle.main, value: "Use High Contrast Image", comment: "Contact Image Settings - text in row where user needs to say if they prefer to use a high contrast contact image or not")
+    }()
+    
     static let contactImageCreatedByString: String = {
         return NSLocalizedString("settingsviews_contactImageCreatedByString", tableName: filename, bundle: Bundle.main, value: "Contact automatically created by", comment: "Add a note to the contact so that user knows it was the app that automatically created it")
     }()

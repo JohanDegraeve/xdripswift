@@ -306,6 +306,8 @@ extension UserDefaults {
         case enableContactImage = "enableContactImage"
         /// should trend be displayed yes or no
         case displayTrendInContactImage = "displayTrendInContactImage"
+        /// should a black/white contact image be used? Useful to display nicely in watchfaces with a colour tint (i.e. not multicolor)
+        case useHighContrastContactImage = "useHighContrastContactImage"
         
 
         // Other Settings (not user configurable)
@@ -1852,6 +1854,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.displayTrendInContactImage.rawValue)
+        }
+    }
+    
+    /// should a black/white contact image be used? Useful to display nicely in watchfaces with a colour tint (i.e. not multicolor), default false
+    @objc dynamic var useHighContrastContactImage: Bool {
+        get {
+            return bool(forKey: Key.useHighContrastContactImage.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.useHighContrastContactImage.rawValue)
         }
     }
     

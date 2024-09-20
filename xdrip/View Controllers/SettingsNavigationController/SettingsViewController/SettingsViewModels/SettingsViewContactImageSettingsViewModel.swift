@@ -11,6 +11,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// should trend be displayed yes or no
     case displayTrend = 1
     
+    /// should a black/white contact image be used? yes or no
+    case useHighContrastContactImage = 2
+    
 }
 
 class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
@@ -44,6 +47,9 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
             
         case .displayTrend:
             return Texts_SettingsView.displayTrendInContactImage
+            
+        case .useHighContrastContactImage:
+            return Texts_SettingsView.useHighContrastContactImage
 
         }
 
@@ -80,7 +86,7 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
                 
             }
             
-        case .displayTrend:
+        case .displayTrend, .useHighContrastContactImage:
             return UITableViewCell.AccessoryType.none
          
         }
@@ -91,7 +97,7 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-        case .enableContactImage, .displayTrend:
+        case .enableContactImage, .displayTrend, .useHighContrastContactImage:
             return nil
         }
     }
@@ -160,6 +166,9 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
             
         case .displayTrend:
             return UISwitch(isOn: UserDefaults.standard.displayTrendInContactImage, action: {(isOn:Bool) in UserDefaults.standard.displayTrendInContactImage = isOn})
+            
+        case .useHighContrastContactImage:
+            return UISwitch(isOn: UserDefaults.standard.useHighContrastContactImage, action: {(isOn:Bool) in UserDefaults.standard.useHighContrastContactImage = isOn})
 
         }
         
@@ -195,7 +204,7 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .enableContactImage, .displayTrend:
+        case .enableContactImage, .displayTrend, .useHighContrastContactImage:
             
             // depending on status of authorization, we will either do nothing or show a message
             switch CNContactStore.authorizationStatus(for: .contacts) {
