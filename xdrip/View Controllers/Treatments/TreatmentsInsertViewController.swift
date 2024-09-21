@@ -213,7 +213,7 @@ class TreatmentsInsertViewController : UIViewController {
                         // permenant save in coredata
                         self.coreDataManager.saveChanges()
                         
-                        // set uploaded to false so that the entry is synced with NightScout
+                        // set uploaded to false so that the entry is synced with Nightscout
                         treatMentEntryToUpdate.uploaded = false
 
                         // trigger nightscoutsync
@@ -228,7 +228,7 @@ class TreatmentsInsertViewController : UIViewController {
                         // text is nil or "0", set treatmentdeleted to true
                         treatMentEntryToUpdate.treatmentdeleted = true
                         
-                        // set uploaded to false so that the entry is synced with NightScout
+                        // set uploaded to false so that the entry is synced with Nightscout
                         treatMentEntryToUpdate.uploaded = false
                         
                         // trigger nightscoutsync
@@ -263,7 +263,7 @@ class TreatmentsInsertViewController : UIViewController {
             // viewcontroller is opened to create a new treatmenEntry
             
             // if there's more than one new treatmentEntry being created here, then each will be created with a small difference in timestamp, ie 1 millisecond
-            // because, after uploading to NightScout, the timestamp is is used to recognize/find back the actualy event, and so to find the id assigned by NightScout
+            // because, after uploading to Nightscout, the timestamp is is used to recognize/find back the actualy event, and so to find the id assigned by Nightscout
             // (probably it's better that xdrip4ioS would assign the id)
             // dateOffset is used to keep track of the offset to use
             var dateOffset = TimeInterval(0.0)
@@ -371,9 +371,9 @@ class TreatmentsInsertViewController : UIViewController {
     // set the flag to sync Nightscout treatments if a short time has passed since the last time
     // as accessing userdefaults is not thread-safe
     private func setNightscoutSyncTreatmentsRequiredToTrue() {
-        if (UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightScout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
-            UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest = .now
-            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        if (UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+            UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest = .now
+            UserDefaults.standard.nightscoutSyncTreatmentsRequired = true
         }
     }
 	

@@ -393,13 +393,13 @@ class Trace {
         traceInfo.appendStringAndNewLine("    Show HbA1c in mmols/mol: " + UserDefaults.standard.useIFCCA1C.description)
           
         traceInfo.appendStringAndNewLine("\nNightscout settings:")
-        traceInfo.appendStringAndNewLine("    Nightscout enabled: " + UserDefaults.standard.nightScoutEnabled.description)
-        if UserDefaults.standard.nightScoutEnabled {
-            traceInfo.appendStringAndNewLine("    URL: " + ((UserDefaults.standard.nightScoutUrl?.description ?? "") != "" ? "present" : "missing"))
-            traceInfo.appendStringAndNewLine("    API_SECRET: " + ((UserDefaults.standard.nightScoutAPIKey?.description ?? "") != "" ? "present" : "missing"))
+        traceInfo.appendStringAndNewLine("    Nightscout enabled: " + UserDefaults.standard.nightscoutEnabled.description)
+        if UserDefaults.standard.nightscoutEnabled {
+            traceInfo.appendStringAndNewLine("    URL: " + ((UserDefaults.standard.nightscoutUrl?.description ?? "") != "" ? "present" : "missing"))
+            traceInfo.appendStringAndNewLine("    API_SECRET: " + ((UserDefaults.standard.nightscoutAPIKey?.description ?? "") != "" ? "present" : "missing"))
             traceInfo.appendStringAndNewLine("    Token: " + ((UserDefaults.standard.nightscoutToken?.description ?? "") != "" ? "present" : "missing"))
-            if UserDefaults.standard.nightScoutPort != 0 {
-                traceInfo.appendStringAndNewLine("    Port: " + UserDefaults.standard.nightScoutPort.description)
+            if UserDefaults.standard.nightscoutPort != 0 {
+                traceInfo.appendStringAndNewLine("    Port: " + UserDefaults.standard.nightscoutPort.description)
             } else {
                 traceInfo.appendStringAndNewLine("    Port: Missing")
             }

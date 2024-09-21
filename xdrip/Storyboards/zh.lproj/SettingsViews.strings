@@ -20,12 +20,12 @@
 "settingsviews_dexcomShareAccountName" = "德康账号";
 "settingsviews_giveDexcomShareAccountName" = "输入Dexcom APP用户名";
 "settingsviews_giveDexcomSharePassword" = "输入Dexcom APP密码";
-"settingsviews_sectiontitlenightscout" = "NightScout远程监控";
-"settingsviews_nightScoutEnabled" = "NightScout 已启用";
-"settingsviews_nightScoutUrl" = "Url(网址)";
-"settingsviews_giveNightScoutUrl" = "输入 NightScout 网址";
-"settingsviews_nightScoutAPIKey" = "API 密钥";
-"settingsviews_giveNightScoutAPIKey" = "输入 NightScout API 密钥";
+"settingsviews_sectiontitlenightscout" = "Nightscout远程监控";
+"settingsviews_nightscoutEnabled" = "Nightscout 已启用";
+"settingsviews_nightscoutUrl" = "Url(网址)";
+"settingsviews_giveNightscoutUrl" = "输入 Nightscout 网址";
+"settingsviews_nightscoutAPIKey" = "API 密钥";
+"settingsviews_giveNightscoutAPIKey" = "输入 Nightscout API 密钥";
 "settingsviews_sectiontitlespeak" = "语音播报";
 "settingsviews_speakBgReadings" = "语音播报血糖值";
 "settingsviews_speakTrend" = "语音播报趋势";
@@ -46,7 +46,7 @@
 "volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
 
 /// nightscout settings, port to use
-"nightScoutPort" = "Port";
+"nightscoutPort" = "Port";
 
 /// home screen settings, urgent high value
 "settingsviews_urgentHighValue" = "Urgent High Value";
@@ -174,7 +174,7 @@
 /// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
 "warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
 
-/// used for editing schedule for NightScout upload and Dexcom Share upload
+/// used for editing schedule for Nightscout upload and Dexcom Share upload
 "editScheduleTimePickerSubtitle" = "Change: ";
 
 /// Apple Watch Settings - text in row where user needs to select a calendar

@@ -2,5 +2,5 @@
 "nightscouttestresult_verificationsuccessfulalertbody" = "Nightscout siteniz başarıyla doğrulandı";
 "nightscouttestresult_verificationerroralerttitle" = "Doğrulama hatası";
 "warningAPIKeyOrURLIsnil" = "Testi çalıştırmadan önce Nightscout URL'niz (ve isteğe bağlı olarak API_SECRET veya Token) ayarlanmalıdır.";
-"nightScoutAPIKeyAndURLStartedTitle" = "Doğrulanıyor...";
-"nightScoutAPIKeyAndURLStartedBody" = "Nightscout Doğrulama Testi Başlatıldı\n\nBu mesaj kısa süre sonra otomatik olarak kaybolacaktır";
+"nightscoutAPIKeyAndURLStartedTitle" = "Doğrulanıyor...";
+"nightscoutAPIKeyAndURLStartedBody" = "Nightscout Doğrulama Testi Başlatıldı\n\nBu mesaj kısa süre sonra otomatik olarak kaybolacaktır";

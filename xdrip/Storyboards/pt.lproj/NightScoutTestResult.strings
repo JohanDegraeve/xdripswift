@@ -1,6 +1,0 @@
-"nightscouttestresult_verificationsuccessfulalerttitle" = "Verificação bem sucedida";
-"nightscouttestresult_verificationsuccessfulalertbody" = "Site Nightscout verificado com sucesso";
-"nightscouttestresult_verificationerroralerttitle" = "Erro na Verificação";
-"warningAPIKeyOrURLIsnil" = "URL do NightScout (e opcionalmente API_SECRET ou Token) deve ser definido antes de correr o teste";
-"nightScoutAPIKeyAndURLStartedBody" = "Teste Iniciado de Verificação Nightscout\n\nEsta mensagem deverá desaparecer automaticamente brevemente";
-"nightScoutAPIKeyAndURLStartedTitle" = "A verificar...";

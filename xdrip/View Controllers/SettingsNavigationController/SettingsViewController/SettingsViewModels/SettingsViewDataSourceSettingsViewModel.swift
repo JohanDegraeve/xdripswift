@@ -268,7 +268,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             
         case .followerUploadDataToNightscout:
             
-            return UserDefaults.standard.nightScoutEnabled ? .nothing : SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.nightscoutNotEnabled)
+            return UserDefaults.standard.nightscoutEnabled ? .nothing : SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.nightscoutNotEnabled)
             
         case .followerUserName:
             
@@ -457,7 +457,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             return UserDefaults.standard.followerPatientName ?? "(optional)"
             
         case .followerUploadDataToNightscout:
-            return UserDefaults.standard.nightScoutEnabled ? nil : Texts_SettingsView.nightscoutNotEnabledRowText
+            return UserDefaults.standard.nightscoutEnabled ? nil : Texts_SettingsView.nightscoutNotEnabledRowText
             
         case .followerUserName:
             switch UserDefaults.standard.followerDataSourceType {
@@ -563,7 +563,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         switch setting {
             
         case .followerUploadDataToNightscout:
-            return UserDefaults.standard.nightScoutEnabled ? UISwitch(isOn: UserDefaults.standard.followerUploadDataToNightscout, action: {(isOn:Bool) in UserDefaults.standard.followerUploadDataToNightscout = isOn}) : nil
+            return UserDefaults.standard.nightscoutEnabled ? UISwitch(isOn: UserDefaults.standard.followerUploadDataToNightscout, action: {(isOn:Bool) in UserDefaults.standard.followerUploadDataToNightscout = isOn}) : nil
 
         case .bloodGlucoseUnit, .masterFollower, .followerDataSourceType, .followerKeepAliveType, .followerPatientName, .followerUserName, .followerPassword, .followerSensorSerialNumber, .followerSensorStartDate, .followerRegion:
             return nil

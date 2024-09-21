@@ -4,7 +4,7 @@ import AVFoundation
 import AudioToolbox
 
 /// instance of this class will do the follower functionality. Just make an instance, it will listen to the settings, do the regular download if needed - it could be deallocated when isMaster setting in Userdefaults changes, but that's not necessary to do
-class NightScoutFollowManager: NSObject {
+class NightscoutFollowManager: NSObject {
     
     // MARK: - public properties
     
@@ -14,7 +14,7 @@ class NightScoutFollowManager: NSObject {
     private let keyValueObserverTimeKeeper: KeyValueObserverTimeKeeper = KeyValueObserverTimeKeeper()
     
     /// for logging
-    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryNightScoutFollowManager)
+    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryNightscoutFollowManager)
     
     /// when to do next download
     private var nextFollowDownloadTimeStamp: Date
@@ -32,10 +32,10 @@ class NightScoutFollowManager: NSObject {
     private var audioPlayer: AVAudioPlayer?
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - create playsoundtimer
-    private let applicationManagerKeyResumePlaySoundTimer = "NightScoutFollowerManager-ResumePlaySoundTimer"
+    private let applicationManagerKeyResumePlaySoundTimer = "NightscoutFollowerManager-ResumePlaySoundTimer"
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - invalidate playsoundtimer
-    private let applicationManagerKeySuspendPlaySoundTimer = "NightScoutFollowerManager-SuspendPlaySoundTimer"
+    private let applicationManagerKeySuspendPlaySoundTimer = "NightscoutFollowerManager-SuspendPlaySoundTimer"
     
     /// closure to call when downloadtimer needs to be invalidated, eg when changing from master to follower
     private var invalidateDownLoadTimerClosure: (() -> Void)?
@@ -66,7 +66,7 @@ class NightScoutFollowManager: NSObject {
                 
             } catch let error {
                 
-                trace("in init, exception while trying to create audoplayer, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .error, error.localizedDescription)
+                trace("in init, exception while trying to create audoplayer, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, error.localizedDescription)
                 
             }
             
@@ -82,20 +82,20 @@ class NightScoutFollowManager: NSObject {
         // changing the follower keep alive type
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
         // setting nightscout url also does require action
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutUrl.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutUrl.rawValue, options: .new, context: nil)
         // setting nightscout API_SECRET also does require action
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutAPIKey.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutAPIKey.rawValue, options: .new, context: nil)
         // setting nightscout authentication token also does require action
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutToken.rawValue, options: .new, context: nil)
         // change value of nightscout enabled
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutEnabled.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutEnabled.rawValue, options: .new, context: nil)
 
         verifyUserDefaultsAndStartOrStopFollowMode()
     }
     
     // MARK: - public functions
     
-    /// creates a bgReading for reading downloaded from NightScout
+    /// creates a bgReading for reading downloaded from Nightscout
     /// - parameters:
     ///     - followGlucoseData : glucose data from which new BgReading needs to be created
     /// - returns:
@@ -103,7 +103,7 @@ class NightScoutFollowManager: NSObject {
     public func createBgReading(followGlucoseData: FollowerBgReading) -> BgReading {
         
         // create new bgReading
-        // using sgv as value for rawData because in some case these values are not available in NightScout
+        // using sgv as value for rawData because in some case these values are not available in Nightscout
         let bgReading = BgReading(timeStamp: followGlucoseData.timeStamp, sensor: nil, calibration: nil, rawData: followGlucoseData.sgv, deviceName: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
 
         // set calculatedValue
@@ -118,36 +118,36 @@ class NightScoutFollowManager: NSObject {
         
     }
     
-    /// - download recent readings from nightScout, send result to delegate, and schedule new download (if followerBackgroundKeepAliveType != disabled)
+    /// - download recent readings from nightscout, send result to delegate, and schedule new download (if followerBackgroundKeepAliveType != disabled)
     /// - no download is done if latest reading is less than 30 seconds old
     @objc public func download() {
         
-        trace("in download", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+        trace("in download", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
         
-        guard UserDefaults.standard.nightScoutEnabled else {
-            trace("    nightscout not enabled", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+        guard UserDefaults.standard.nightscoutEnabled else {
+            trace("    nightscout not enabled", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
             return
         }
         
-        if (UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightScout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
-            trace("    setting nightScoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+        if (UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+            trace("    setting nightscoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
             
-            UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest = .now
-            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+            UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest = .now
+            UserDefaults.standard.nightscoutSyncTreatmentsRequired = true
         }
 
         guard !UserDefaults.standard.isMaster else {
-            trace("    not follower", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+            trace("    not follower", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
             return
         }
         
         guard UserDefaults.standard.followerDataSourceType == .nightscout else {
-            trace("    followerDataSourceType is not nightscout", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+            trace("    followerDataSourceType is not nightscout", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
             return
         }
 
         // nightscout URl must be non-nil - could be that url is not valid, this is not checked here, the app will just retry every x minutes
-        guard let nightScoutUrl = UserDefaults.standard.nightScoutUrl else {return}
+        guard let nightscoutUrl = UserDefaults.standard.nightscoutUrl else {return}
         
         // maximum timeStamp to download initially set to 1 day back
         var timeStampOfFirstBgReadingToDowload = Date(timeIntervalSinceNow: TimeInterval(-Double(ConstantsFollower.maxiumDaysOfReadingsToDownload) * 24.0 * 3600.0))
@@ -161,7 +161,7 @@ class NightScoutFollowManager: NSObject {
         // to handle case where a reading was already fetched by LoopFollowManger right before the call to this function. In that case there should already be a reading available, and it's not necessary to download from NS
         guard abs(timeStampOfFirstBgReadingToDowload.timeIntervalSinceNow) > 30.0 else {
             
-            trace("    last reading is less than 30 seconds old, will not download now", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+            trace("    last reading is less than 30 seconds old, will not download now", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
             
             // schedule new download
             self.scheduleNewDownload()
@@ -173,7 +173,7 @@ class NightScoutFollowManager: NSObject {
         let count = Int(-timeStampOfFirstBgReadingToDowload.timeIntervalSinceNow / 300 + 1)
         
         // ceate endpoint to get latest entries
-        let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightScoutUrl, count: count, token: UserDefaults.standard.nightscoutToken)
+        let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightscoutUrl, count: count, token: UserDefaults.standard.nightscoutToken)
         
         // create downloadTask and start download
         if let url = latestEntriesEndpoint.url {
@@ -181,19 +181,19 @@ class NightScoutFollowManager: NSObject {
             // Create Request - this way we can add authentication in follower mode in order to pull data from Nightscout sites with AUTH_DEFAULT_ROLES configured to deny read access
             var request = URLRequest(url: url)
             
-            if let apiKey = UserDefaults.standard.nightScoutAPIKey {
+            if let apiKey = UserDefaults.standard.nightscoutAPIKey {
                 request.setValue(apiKey.sha1(), forHTTPHeaderField:"api-secret")
             }
             
             let task = URLSession.shared.dataTask(with: request, completionHandler: { data, response, error in
                 
-                trace("in download, finished task", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+                trace("in download, finished task", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
                 
                 // get array of FollowGlucoseData from json
                 var followGlucoseDataArray = [FollowerBgReading]()
                 self.processDownloadResponse(data: data, urlResponse: response, error: error, followGlucoseDataArray: &followGlucoseDataArray)
                 
-                trace("    finished download,  %{public}@ readings", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info, followGlucoseDataArray.count.description)
+                trace("    finished download,  %{public}@ readings", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info, followGlucoseDataArray.count.description)
                 
                 // call to delegate and rescheduling the timer must be done in main thread;
                 DispatchQueue.main.sync {
@@ -210,7 +210,7 @@ class NightScoutFollowManager: NSObject {
                 
             })
             
-            trace("in download, calling task.resume", log: log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+            trace("in download, calling task.resume", log: log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
             task.resume()
             
         }
@@ -249,7 +249,7 @@ class NightScoutFollowManager: NSObject {
         
         guard UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
         
-        trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+        trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
         
         // schedule a timer for 15 seconds and assign it to a let property
         let downloadTimer = Timer.scheduledTimer(timeInterval: 15, target: self, selector: #selector(self.download), userInfo: nil, repeats: false)
@@ -260,7 +260,7 @@ class NightScoutFollowManager: NSObject {
         }
     }
     
-    /// process result from download from NightScout
+    /// process result from download from Nightscout
     /// - parameters:
     ///     - data : data as result from dataTask
     ///     - urlResponse : urlResponse as result from dataTask
@@ -270,11 +270,11 @@ class NightScoutFollowManager: NSObject {
     private func processDownloadResponse(data:Data?, urlResponse:URLResponse?, error:Error?, followGlucoseDataArray:inout [FollowerBgReading] ) {
         
         // log info
-        trace("in processDownloadResponse", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .info)
+        trace("in processDownloadResponse", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
         
         // if error log an error
         if let error = error {
-            trace("    failed to download, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .error, error.localizedDescription)
+            trace("    failed to download, error = %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, error.localizedDescription)
             return
         }
         
@@ -323,27 +323,27 @@ class NightScoutFollowManager: NSObject {
                                         }
 
                                     } else {
-                                        trace("     failed to create glucoseData, entry = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .error, entry.description)
+                                        trace("     failed to create glucoseData, entry = %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, entry.description)
                                     }
                                 }
                             }
                             
                         } else {
-                            trace("     json deserialization failed, result is not a json array, data received = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .error, dataAsString)
+                            trace("     json deserialization failed, result is not a json array, data received = %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, dataAsString)
                         }
                         
                     } else {
-                        trace("     json deserialization failed, data received = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .error, dataAsString)
+                        trace("     json deserialization failed, data received = %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, dataAsString)
                     }
                     
                 } else {
-                    trace("     urlResponse.statusCode  is not 200 value = %{public}@", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .error, urlResponse.statusCode.description)
+                    trace("     urlResponse.statusCode  is not 200 value = %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error, urlResponse.statusCode.description)
                 }
             } else {
-                trace("    data is nil", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .error)
+                trace("    data is nil", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error)
             }
         } else {
-            trace("    urlResponse is not HTTPURLResponse", log: self.log, category: ConstantsLog.categoryNightScoutFollowManager, type: .error)
+            trace("    urlResponse is not HTTPURLResponse", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .error)
         }
     }
     
@@ -412,7 +412,7 @@ class NightScoutFollowManager: NSObject {
     /// verifies values of applicable UserDefaults and either starts or stops follower mode, inclusive call to enableSuspensionPrevention or disableSuspensionPrevention - also first download is started if applicable
     private func verifyUserDefaultsAndStartOrStopFollowMode() {
         
-        if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .nightscout && UserDefaults.standard.nightScoutUrl != nil && UserDefaults.standard.nightScoutEnabled {
+        if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .nightscout && UserDefaults.standard.nightscoutUrl != nil && UserDefaults.standard.nightscoutEnabled {
             
             // this will enable the suspension prevention sound playing if background keep-alive is needed
             // (i.e. not disabled and not using a heartbeat)
@@ -447,7 +447,7 @@ class NightScoutFollowManager: NSObject {
                 
                 switch keyPathEnum {
                     
-                case UserDefaults.Key.isMaster, UserDefaults.Key.followerDataSourceType, UserDefaults.Key.followerBackgroundKeepAliveType, UserDefaults.Key.nightScoutUrl, UserDefaults.Key.nightScoutEnabled, UserDefaults.Key.nightScoutAPIKey, UserDefaults.Key.nightscoutToken :
+                case UserDefaults.Key.isMaster, UserDefaults.Key.followerDataSourceType, UserDefaults.Key.followerBackgroundKeepAliveType, UserDefaults.Key.nightscoutUrl, UserDefaults.Key.nightscoutEnabled, UserDefaults.Key.nightscoutAPIKey, UserDefaults.Key.nightscoutToken :
                     
                     // change by user, should not be done within 200 ms
                     if (keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200)) {

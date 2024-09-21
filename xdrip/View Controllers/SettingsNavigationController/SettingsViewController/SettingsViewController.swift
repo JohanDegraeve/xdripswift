@@ -101,7 +101,7 @@ final class SettingsViewController: UIViewController {
             case .alarms:
                 return SettingsViewAlertSettingsViewModel()
             case .nightscout:
-                return SettingsViewNightScoutSettingsViewModel()
+                return SettingsViewNightscoutSettingsViewModel()
             case .dexcom:
                 return SettingsViewDexcomShareSettingsViewModel()
             case .healthkit:

@@ -16,7 +16,7 @@ struct BgReadingsView: View {
     @EnvironmentObject var bgReadingsAccessor: BgReadingsAccessor
     
     /// reference to nightscoutUploadManager
-    @EnvironmentObject var nightScoutUploadManager: NightScoutUploadManager
+    @EnvironmentObject var nightscoutUploadManager: NightscoutUploadManager
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
@@ -176,7 +176,7 @@ struct BgReadingsView: View {
         bgReadingsAccessor.delete(bgReading: bgReadingToDelete)
         
         // delete the BgReading from Nightscout (if it exists)
-        nightScoutUploadManager.deleteBgReadingFromNightscout(timeStampOfBgReadingToDelete: timestampOfBgReadingToDelete)
+        nightscoutUploadManager.deleteBgReadingFromNightscout(timeStampOfBgReadingToDelete: timestampOfBgReadingToDelete)
         
         return
     }

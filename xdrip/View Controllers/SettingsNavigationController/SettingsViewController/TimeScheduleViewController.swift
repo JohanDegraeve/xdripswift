@@ -233,7 +233,7 @@ extension TimeScheduleViewController: UITableViewDelegate {
 
 /// protocol that defines
 /// - functions to get and store the schedule from and to the UserDefaults
-/// - also name of the service, eg NightScout, this is just to show in the UI
+/// - also name of the service, eg Nightscout, this is just to show in the UI
 protocol TimeSchedule {
     
     /// get the schedule as array of int
@@ -242,7 +242,7 @@ protocol TimeSchedule {
     /// store the schedule
     func storeSchedule(schedule: [Int])
     
-    /// name of the service, eg NightScout, this is just to show in the UI
+    /// name of the service, eg Nightscout, this is just to show in the UI
     func serviceName() -> String
     
 }

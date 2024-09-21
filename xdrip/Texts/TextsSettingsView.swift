@@ -485,18 +485,18 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_giveDexcomShareSerialNumber", tableName: filename, bundle: Bundle.main, value: "Enter the Dexcom Receiver Serial Number", comment: "dexcom share settings, pop up that asks user to enter dexcom share serial number")
     }()
     
-    // MARK: - Section NightScout
+    // MARK: - Section Nightscout
     
-    static let sectionTitleNightScout: String = {
-        return NSLocalizedString("settingsviews_sectiontitlenightscout", tableName: filename, bundle: Bundle.main, value: "NightScout", comment: "nightscout settings, section title")
+    static let sectionTitleNightscout: String = {
+        return NSLocalizedString("settingsviews_sectiontitlenightscout", tableName: filename, bundle: Bundle.main, value: "Nightscout", comment: "nightscout settings, section title")
     }()
     
-    static let labelNightScoutEnabled = {
-        return NSLocalizedString("settingsviews_nightScoutEnabled", tableName: filename, bundle: Bundle.main, value: "Enable Nightscout", comment: "nightscout settings, where user can enable or disable nightscout")
+    static let labelNightscoutEnabled = {
+        return NSLocalizedString("settingsviews_nightscoutEnabled", tableName: filename, bundle: Bundle.main, value: "Enable Nightscout", comment: "nightscout settings, where user can enable or disable nightscout")
     }()
 
-    static let labelNightScoutUrl = {
-        return NSLocalizedString("settingsviews_nightScoutUrl", tableName: filename, bundle: Bundle.main, value: "URL:", comment: "nightscout settings, where user can set the nightscout url")
+    static let labelNightscoutUrl = {
+        return NSLocalizedString("settingsviews_nightscoutUrl", tableName: filename, bundle: Bundle.main, value: "URL:", comment: "nightscout settings, where user can set the nightscout url")
     }()
     
     static let useSchedule = {
@@ -507,20 +507,20 @@ class Texts_SettingsView {
         return NSLocalizedString("schedule", tableName: filename, bundle: Bundle.main, value: "Schedule:", comment: "nightscout or dexcom share settings, where user can select to edit the schedule")
     }()
     
-    static let giveNightScoutUrl = {
-        return NSLocalizedString("settingsviews_giveNightScoutUrl", tableName: filename, bundle: Bundle.main, value: "Enter your NightScout URL", comment: "nightscout  settings, pop up that asks user to enter nightscout url")
+    static let giveNightscoutUrl = {
+        return NSLocalizedString("settingsviews_giveNightscoutUrl", tableName: filename, bundle: Bundle.main, value: "Enter your Nightscout URL", comment: "nightscout  settings, pop up that asks user to enter nightscout url")
     }()
 
-    static let labelNightScoutAPIKey = {
-        return NSLocalizedString("settingsviews_nightScoutAPIKey", tableName: filename, bundle: Bundle.main, value: "API_SECRET:", comment: "nightscout settings, where user can set the nightscout api key")
+    static let labelNightscoutAPIKey = {
+        return NSLocalizedString("settingsviews_nightscoutAPIKey", tableName: filename, bundle: Bundle.main, value: "API_SECRET:", comment: "nightscout settings, where user can set the nightscout api key")
     }()
     
-    static let giveNightScoutAPIKey = {
-        return NSLocalizedString("settingsviews_giveNightScoutAPIKey", tableName: filename, bundle: Bundle.main, value: "Enter your API_SECRET", comment: "nightscout settings, pop up that asks user to enter nightscout api key")
+    static let giveNightscoutAPIKey = {
+        return NSLocalizedString("settingsviews_giveNightscoutAPIKey", tableName: filename, bundle: Bundle.main, value: "Enter your API_SECRET", comment: "nightscout settings, pop up that asks user to enter nightscout api key")
     }()
     
     static let editScheduleTimePickerSubtitle: String = {
-        return NSLocalizedString("editScheduleTimePickerSubtitle", tableName: filename, bundle: Bundle.main, value: "Change: ", comment: "used for editing schedule for NightScout upload and Dexcom Share upload")
+        return NSLocalizedString("editScheduleTimePickerSubtitle", tableName: filename, bundle: Bundle.main, value: "Change: ", comment: "used for editing schedule for Nightscout upload and Dexcom Share upload")
     }()
     
     static let timeScheduleViewTitle: String = {
@@ -535,8 +535,8 @@ class Texts_SettingsView {
         return NSLocalizedString("testUrlAndAPIKey", tableName: filename, bundle: Bundle.main, value: "Test Connection", comment: "nightscout settings, when clicking the cell, test the url and api key")
     }()
 
-    static let nightScoutPort: String = {
-        return NSLocalizedString("nightScoutPort", tableName: filename, bundle: Bundle.main, value: "Port:", comment: "nightscout settings, port to use")
+    static let nightscoutPort: String = {
+        return NSLocalizedString("nightscoutPort", tableName: filename, bundle: Bundle.main, value: "Port:", comment: "nightscout settings, port to use")
     }()
     
     static let nightscoutToken: String = {

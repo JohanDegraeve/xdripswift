@@ -2,8 +2,8 @@ import Foundation
 
 extension BgReading {
     
-    /// dictionary representation for upload to NightScout
-	func dictionaryRepresentationForNightScoutUpload(reuseDateFormatter: DateFormatter? = nil) -> [String: Any] {
+    /// dictionary representation for upload to Nightscout
+	func dictionaryRepresentationForNightscoutUpload(reuseDateFormatter: DateFormatter? = nil) -> [String: Any] {
 
         return  [
             "_id": id,

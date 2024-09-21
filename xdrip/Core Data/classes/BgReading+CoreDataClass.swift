@@ -235,7 +235,7 @@ public class BgReading: NSManagedObject {
         return ((lastBgReading.calculatedValue - calculatedValue) / (lastBgReading.timeStamp.toMillisecondsAsDouble() - timeStamp.toMillisecondsAsDouble()), false)
     }
     
-    /// slopeName for upload to NightScout
+    /// slopeName for upload to Nightscout
     public var slopeName:String {
         let slope_by_minute:Double = calculatedValueSlope * 60000
         var arrow = "NONE"

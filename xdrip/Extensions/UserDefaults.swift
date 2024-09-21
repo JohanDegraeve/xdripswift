@@ -173,32 +173,32 @@ extension UserDefaults {
         // Nightscout
         
         /// should readings be uploaded to nightscout
-        case nightScoutEnabled = "nightScoutEnabled"
+        case nightscoutEnabled = "nightscoutEnabled"
         /// should schedule be used for nightscout upload ?
-        case nightScoutUseSchedule = "nightScoutUseSchedule"
-        /// - schedule for nightscout use, only applicable if nightScoutUseSchedule = true
+        case nightscoutUseSchedule = "nightscoutUseSchedule"
+        /// - schedule for nightscout use, only applicable if nightscoutUseSchedule = true
         /// - string of values, seperate by '-', values are int values and represent minutes
-        case nightScoutSchedule = "nightScoutSchedule"
+        case nightscoutSchedule = "nightscoutSchedule"
         /// nightscout url
-        case nightScoutUrl = "nightScoutUrl"
+        case nightscoutUrl = "nightscoutUrl"
         /// nightscout api key
-        case nightScoutAPIKey = "nightScoutAPIKey"
+        case nightscoutAPIKey = "nightscoutAPIKey"
         /// send sensor start time to nightscout ?
         case uploadSensorStartTimeToNS = "uploadSensorStartTimeToNS"
         /// port number to use, 0 means not set
-        case nightScoutPort = "nightScoutPort"
+        case nightscoutPort = "nightscoutPort"
         /// token to use for authentication, 0 means not set
         case nightscoutToken = "nightscoutToken"
         
         /// is a  nightscout sync of treatments required
         ///
-        /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightScoutUploadManager and when set to true, the manager knows a new sync is required
-        case nightScoutSyncTreatmentsRequired = "nightScoutSyncTreatmentsRequired"
+        /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightscoutUploadManager and when set to true, the manager knows a new sync is required
+        case nightscoutSyncTreatmentsRequired = "nightscoutSyncTreatmentsRequired"
 
         /// used to trigger view controllers that there's a change in TreatmentEntries
         ///
         /// value will be increased with 1 each time there's an update
-        case nightScoutTreatmentsUpdateCounter = "nightScoutTreatmentsUpdateCounter"
+        case nightscoutTreatmentsUpdateCounter = "nightscoutTreatmentsUpdateCounter"
         
         // Dexcom Share
         
@@ -319,12 +319,12 @@ extension UserDefaults {
         case timeStampAppLaunch = "timeStampAppLaunch"
         
         // Nightscout
-        /// timestamp lastest reading uploaded to NightScout
-        case timeStampLatestNSUploadedBgReadingToNightScout = "timeStampLatestUploadedBgReading"
-        /// timestamp lastest treatment sync request to NightScout
-        case timeStampLatestNightScoutTreatmentSyncRequest = "timeStampLatestNightScoutTreatmentSyncRequest"
-        /// timestamp latest calibration uploaded to NightScout
-        case timeStampLatestNSUploadedCalibrationToNightScout = "timeStampLatestUploadedCalibration"
+        /// timestamp lastest reading uploaded to Nightscout
+        case timeStampLatestNSUploadedBgReadingToNightscout = "timeStampLatestUploadedBgReading"
+        /// timestamp lastest treatment sync request to Nightscout
+        case timeStampLatestNightscoutTreatmentSyncRequest = "timeStampLatestNightscoutTreatmentSyncRequest"
+        /// timestamp latest calibration uploaded to Nightscout
+        case timeStampLatestNSUploadedCalibrationToNightscout = "timeStampLatestUploadedCalibration"
         
         // Transmitter
         /// Transmitter Battery Level
@@ -1328,22 +1328,22 @@ extension UserDefaults {
     // MARK: Nightscout Settings
     
     /// nightscout enabled ? this impacts follower mode (download) and master mode (upload)
-    @objc dynamic var nightScoutEnabled: Bool {
+    @objc dynamic var nightscoutEnabled: Bool {
         get {
-            return bool(forKey: Key.nightScoutEnabled.rawValue)
+            return bool(forKey: Key.nightscoutEnabled.rawValue)
         }
         set {
-            set(newValue, forKey: Key.nightScoutEnabled.rawValue)
+            set(newValue, forKey: Key.nightscoutEnabled.rawValue)
         }
     }
     
     /// use schedule for nightscoutupload ?
-    @objc dynamic var nightScoutUseSchedule: Bool {
+    @objc dynamic var nightscoutUseSchedule: Bool {
         get {
-            return bool(forKey: Key.nightScoutUseSchedule.rawValue)
+            return bool(forKey: Key.nightscoutUseSchedule.rawValue)
         }
         set {
-            set(newValue, forKey: Key.nightScoutUseSchedule.rawValue)
+            set(newValue, forKey: Key.nightscoutUseSchedule.rawValue)
         }
     }
 
@@ -1358,12 +1358,12 @@ extension UserDefaults {
     }
     
     /// Nightscout port number, 0 means not set
-    @objc dynamic var nightScoutPort: Int {
+    @objc dynamic var nightscoutPort: Int {
         get {
-            return integer(forKey: Key.nightScoutPort.rawValue)
+            return integer(forKey: Key.nightscoutPort.rawValue)
         }
         set {
-            set(newValue, forKey: Key.nightScoutPort.rawValue)
+            set(newValue, forKey: Key.nightscoutPort.rawValue)
         }
     }
     
@@ -1380,68 +1380,68 @@ extension UserDefaults {
     /// the nightscout url - starts with http
     ///
     /// when assigning a new value, it will be checked if it starts with http, if not then automatically https:// will be added
-    @objc dynamic var nightScoutUrl:String? {
+    @objc dynamic var nightscoutUrl:String? {
         get {
-            return string(forKey: Key.nightScoutUrl.rawValue)
+            return string(forKey: Key.nightscoutUrl.rawValue)
         }
         set {
-            set(newValue, forKey: Key.nightScoutUrl.rawValue)
+            set(newValue, forKey: Key.nightscoutUrl.rawValue)
         }
     }
     
-    /// - schedule for nightscout use, only applicable if nightScoutUseSchedule = true
+    /// - schedule for nightscout use, only applicable if nightscoutUseSchedule = true
     /// - string of values, seperate by '-', values are int values and represent minutes
-    var nightScoutSchedule: String? {
+    var nightscoutSchedule: String? {
         get {
-            return string(forKey: Key.nightScoutSchedule.rawValue)
+            return string(forKey: Key.nightscoutSchedule.rawValue)
         }
         set {
-            set(newValue, forKey: Key.nightScoutSchedule.rawValue)
+            set(newValue, forKey: Key.nightscoutSchedule.rawValue)
         }
     }
     
 
     /// the nightscout api key
-    @objc dynamic var nightScoutAPIKey:String? {
+    @objc dynamic var nightscoutAPIKey:String? {
         get {
-            return string(forKey: Key.nightScoutAPIKey.rawValue)
+            return string(forKey: Key.nightscoutAPIKey.rawValue)
         }
         set {
-            set(newValue, forKey: Key.nightScoutAPIKey.rawValue)
+            set(newValue, forKey: Key.nightscoutAPIKey.rawValue)
         }
     }
     
     /// is a  nightscout sync of treatments required
     ///
-    /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightScoutUploadManager and when set to true, the manager knows a new sync is required
-    @objc dynamic var nightScoutSyncTreatmentsRequired: Bool {
+    /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightscoutUploadManager and when set to true, the manager knows a new sync is required
+    @objc dynamic var nightscoutSyncTreatmentsRequired: Bool {
         get {
-            return bool(forKey: Key.nightScoutSyncTreatmentsRequired.rawValue)
+            return bool(forKey: Key.nightscoutSyncTreatmentsRequired.rawValue)
         }
         set {
-            set(newValue, forKey: Key.nightScoutSyncTreatmentsRequired.rawValue)
+            set(newValue, forKey: Key.nightscoutSyncTreatmentsRequired.rawValue)
         }
     }
     
-    /// timestamp lastest reading uploaded to NightScout
-    var timeStampLatestNightScoutTreatmentSyncRequest: Date? {
+    /// timestamp lastest reading uploaded to Nightscout
+    var timeStampLatestNightscoutTreatmentSyncRequest: Date? {
         get {
-            return object(forKey: Key.timeStampLatestNightScoutTreatmentSyncRequest.rawValue) as? Date
+            return object(forKey: Key.timeStampLatestNightscoutTreatmentSyncRequest.rawValue) as? Date
         }
         set {
-            set(newValue, forKey: Key.timeStampLatestNightScoutTreatmentSyncRequest.rawValue)
+            set(newValue, forKey: Key.timeStampLatestNightscoutTreatmentSyncRequest.rawValue)
         }
     }
     
     /// used to trigger view controllers that there's a change in TreatmentEntries
     ///
     /// value will be increased with 1 each time there's an update
-    @objc dynamic var nightScoutTreatmentsUpdateCounter: Int {
+    @objc dynamic var nightscoutTreatmentsUpdateCounter: Int {
         get {
-            return integer(forKey: Key.nightScoutTreatmentsUpdateCounter.rawValue)
+            return integer(forKey: Key.nightscoutTreatmentsUpdateCounter.rawValue)
         }
         set {
-            set(newValue, forKey: Key.nightScoutTreatmentsUpdateCounter.rawValue)
+            set(newValue, forKey: Key.nightscoutTreatmentsUpdateCounter.rawValue)
         }
     }
 
@@ -1890,23 +1890,23 @@ extension UserDefaults {
         }
     }
     
-    /// timestamp lastest reading uploaded to NightScout
-    var timeStampLatestNightScoutUploadedBgReading:Date? {
+    /// timestamp lastest reading uploaded to Nightscout
+    var timeStampLatestNightscoutUploadedBgReading:Date? {
         get {
-            return object(forKey: Key.timeStampLatestNSUploadedBgReadingToNightScout.rawValue) as? Date
+            return object(forKey: Key.timeStampLatestNSUploadedBgReadingToNightscout.rawValue) as? Date
         }
         set {
-            set(newValue, forKey: Key.timeStampLatestNSUploadedBgReadingToNightScout.rawValue)
+            set(newValue, forKey: Key.timeStampLatestNSUploadedBgReadingToNightscout.rawValue)
         }
     }
     
-    /// timestamp latest calibration uploaded to NightScout
-    var timeStampLatestNightScoutUploadedCalibration:Date? {
+    /// timestamp latest calibration uploaded to Nightscout
+    var timeStampLatestNightscoutUploadedCalibration:Date? {
         get {
-            return object(forKey: Key.timeStampLatestNSUploadedCalibrationToNightScout.rawValue) as? Date
+            return object(forKey: Key.timeStampLatestNSUploadedCalibrationToNightscout.rawValue) as? Date
         }
         set {
-            set(newValue, forKey: Key.timeStampLatestNSUploadedCalibrationToNightScout.rawValue)
+            set(newValue, forKey: Key.timeStampLatestNSUploadedCalibrationToNightscout.rawValue)
         }
     }
     
@@ -1930,7 +1930,7 @@ extension UserDefaults {
         }
     }
     
-    /// timestamp latest calibration uploaded to NightScout
+    /// timestamp latest calibration uploaded to Nightscout
     var timeStampOfLastBatteryReading:Date? {
         get {
             return object(forKey: Key.timeStampOfLastBatteryReading.rawValue) as? Date

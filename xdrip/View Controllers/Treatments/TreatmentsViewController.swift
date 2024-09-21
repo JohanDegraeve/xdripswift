@@ -141,8 +141,8 @@ class TreatmentsViewController : UIViewController {
         
         // check if the observers have already been added. If not, then add them
         if !didAddObservers {
-            // add observer for nightScoutTreatmentsUpdateCounter, to reload the screen whenever the value changes
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
+            // add observer for nightscoutTreatmentsUpdateCounter, to reload the screen whenever the value changes
+            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
             
             // add observer for bloodGlucoseUnitIsMgDl, to reload the screen whenever the bg unit changes
             UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
@@ -175,8 +175,8 @@ class TreatmentsViewController : UIViewController {
         // as viewWillAppear could get called (or maybe not) several times, we need to check that the observers
         // have really been registered before we try and remove them
         if didAddObservers {
-            // add observer for nightScoutTreatmentsUpdateCounter, to reload the screen whenever the value changes
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
+            // add observer for nightscoutTreatmentsUpdateCounter, to reload the screen whenever the value changes
+            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
             
             // add observer for bloodGlucoseUnitIsMgDl, to reload the screen whenever the bg unit changes
             UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
@@ -285,7 +285,7 @@ class TreatmentsViewController : UIViewController {
                 
                 switch keyPathEnum {
                     
-                case UserDefaults.Key.nightScoutTreatmentsUpdateCounter, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.smallBolusTreatmentThreshold, UserDefaults.Key.showSmallBolusTreatmentsInList,  UserDefaults.Key.showBolusTreatmentsInList,  UserDefaults.Key.showCarbsTreatmentsInList,  UserDefaults.Key.showBgCheckTreatmentsInList:
+                case UserDefaults.Key.nightscoutTreatmentsUpdateCounter, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.smallBolusTreatmentThreshold, UserDefaults.Key.showSmallBolusTreatmentsInList,  UserDefaults.Key.showBolusTreatmentsInList,  UserDefaults.Key.showCarbsTreatmentsInList,  UserDefaults.Key.showBgCheckTreatmentsInList:
                     // Reloads data and table.
                     self.reload()
                     
@@ -363,15 +363,15 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 			// set treatmentDelete to true in coredata.
             treatment.treatmentdeleted = true
             
-            // set uploaded to false, so that at next nightscout sync, the treatment will be deleted at NightScout
+            // set uploaded to false, so that at next nightscout sync, the treatment will be deleted at Nightscout
             treatment.uploaded = false
 			
             coreDataManager.saveChanges()
             
             // trigger nightscoutsync
-            if (UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightScout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
-                UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest = .now
-                UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+            if (UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+                UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest = .now
+                UserDefaults.standard.nightscoutSyncTreatmentsRequired = true
             }
             
 			// Reloads data and table.

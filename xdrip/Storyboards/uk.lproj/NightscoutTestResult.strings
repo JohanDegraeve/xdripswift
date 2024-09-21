@@ -4,7 +4,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// in settings screen, user clicked test button for nightscout url and apikey - this is the body
-"nightScoutAPIKeyAndURLStartedBody" = "Nightscout Verification Test Started\n\nThis message should automatically disappear shortly";
+"nightscoutAPIKeyAndURLStartedBody" = "Nightscout Verification Test Started\n\nThis message should automatically disappear shortly";
 
 /// POP up after verifying nightscout credentials, to say that verification of url and api key were successful - this is the title
 "nightscouttestresult_verificationsuccessfulalerttitle" = "Verification Successful";
@@ -19,4 +19,4 @@
 "warningAPIKeyOrURLIsnil" = "Your Nightscout URL (and optionally API_SECRET or Token) must be set before you can run the test";
 
 /// in settings screen, user clicked test button for nightscout url and apikey - this is the title
-"nightScoutAPIKeyAndURLStartedTitle" = "Verifying...";
+"nightscoutAPIKeyAndURLStartedTitle" = "Verifying...";

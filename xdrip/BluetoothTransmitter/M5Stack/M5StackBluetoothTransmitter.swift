@@ -245,10 +245,10 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     /// - parameters:
     ///     - url : the nightscout url, if nil then nothing is sent
     /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
-    func writeNightScoutUrl(url: String?) -> Bool {
+    func writeNightscoutUrl(url: String?) -> Bool {
         
         if let url = url {
-            return writeStringToPeripheral(text: url, opCode: .writeNightScoutUrlTx)
+            return writeStringToPeripheral(text: url, opCode: .writeNightscoutUrlTx)
         } else {return false}
         
     }
@@ -257,10 +257,10 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     /// - parameters:
     ///     - apikey : the apikeyl, if nil then nothing is sent
     /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
-    func writeNightScoutAPIKey(apiKey: String?) -> Bool {
+    func writeNightscoutAPIKey(apiKey: String?) -> Bool {
         
         if let apiKey = apiKey {
-            return writeStringToPeripheral(text: apiKey, opCode: .writeNightScoutAPIKeyTx)
+            return writeStringToPeripheral(text: apiKey, opCode: .writeNightscoutAPIKeyTx)
         } else {return false}
         
     }

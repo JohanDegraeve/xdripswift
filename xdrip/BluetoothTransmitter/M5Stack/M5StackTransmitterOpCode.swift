@@ -3,11 +3,11 @@ import Foundation
 /// opcodes for writing to M5Stack
 enum M5StackTransmitterOpCodeTx: UInt8, CaseIterable {
     
-    /// client writes nightScouturl
-    case writeNightScoutUrlTx = 0x01
+    /// client writes nightscouturl
+    case writeNightscoutUrlTx = 0x01
     
-    /// client writes nightScoutToken
-    case writeNightScoutAPIKeyTx = 0x02
+    /// client writes nightscoutToken
+    case writeNightscoutAPIKeyTx = 0x02
     
     /// client writes mgdl, value 0 means mmol is used, value 1 is mgdl
     case writemgdlTx = 0x03
