@@ -888,8 +888,6 @@ final class RootViewController: UIViewController, ObservableObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showClockWhenScreenIsLocked.rawValue, options: .new, context: nil)
         // if live action type is updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.liveActivityType.rawValue, options: .new, context: nil)
-        // if live action size is updated
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.liveActivitySize.rawValue, options: .new, context: nil)
         
         // high mark , low mark , urgent high mark, urgent low mark. change requires redraw of chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.urgentLowMarkValue.rawValue, options: .new, context: nil)
@@ -1639,7 +1637,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             updateLiveActivityAndWidgets(forceRestart: false)
 
-        case UserDefaults.Key.liveActivityType, UserDefaults.Key.liveActivitySize:
+        case UserDefaults.Key.liveActivityType:
 
             // check and configure the live activity if applicable
             updateLiveActivityAndWidgets(forceRestart: false)
@@ -3548,7 +3546,6 @@ final class RootViewController: UIViewController, ObservableObject {
                 var deltaChangeInMgDl: Double = 0
                 var bgReadingValues: [Double] = []
                 var bgReadingDates: [Date] = []
-                let bgValueInMgDl = bgReadings[0].calculatedValue
                 
                 // add delta if available
                 if bgReadings.count > 1 {
@@ -3566,30 +3563,11 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 let dataSourceDescriptionAbbreviated = UserDefaults.standard.isMaster ? "" : UserDefaults.standard.followerDataSourceType.abbreviation
                 
-                var showLiveActivity: Bool = UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)
-                
-                if showLiveActivity {
-                    // now that we've got the current BG value, let's refine the check to see if we should run/show the live activity
-                    switch UserDefaults.standard.liveActivityType {
-                    case .always:
-                        showLiveActivity = true
-                    case .disabled:
-                        showLiveActivity = false
-                    case .low:
-                        showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.lowMarkValue) ? true : false
-                    case .urgentLow:
-                        showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) ? true : false
-                    case .lowHigh:
-                        showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.lowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.highMarkValue)) ? true : false
-                    case .urgentLowHigh:
-                        showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.urgentHighMarkValue)) ? true : false
-                    }
-                }
-                
+                // show the live activity if we're in master mode or (follower with a heartbeat) and only if the user has requested to show it
                 // if we should show it, then let's continue processing the lastReading array to create a valid contentState
-                if showLiveActivity {
+                if (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)) && UserDefaults.standard.liveActivityType != .disabled {
                     // create the contentState that will update the dynamic attributes of the Live Activity Widget
-                    let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySize: UserDefaults.standard.liveActivitySize, dataSourceDescription: dataSourceDescription)
+                    let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: UserDefaults.standard.liveActivityType, dataSourceDescription: dataSourceDescription)
                     
                     LiveActivityManager.shared.runActivity(contentState: contentState, forceRestart: forceRestart)
                 } else {
@@ -3624,7 +3602,7 @@ final class RootViewController: UIViewController, ObservableObject {
         /// - Parameter glucoseChartType: the type of glucose chart type we want to generate (i.e. thumbnail or full notification chart)
         func createNotificationImage(glucoseChartType: GlucoseChartType) {
             if let bgReadingsAccessor = self.bgReadingsAccessor {
-                let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * glucoseChartType.hoursToShow(liveActivitySize: .normal)), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+                let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * glucoseChartType.hoursToShow(liveActivityType: .normal)), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
                 
                 if bgReadings.count > 0 {
                     var bgReadingValues: [Double] = []
@@ -3636,7 +3614,7 @@ final class RootViewController: UIViewController, ObservableObject {
                     }
                     
                     // create a chart view with just bg reading values and dates
-                    let glucoseChartView = GlucoseChartView(glucoseChartType: glucoseChartType, bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySize: .normal, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
+                    let glucoseChartView = GlucoseChartView(glucoseChartType: glucoseChartType, bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: .normal, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
                     
                     // render the glucose chart view as an image object
                     guard let notificationImage = ImageRenderer(content: glucoseChartView).uiImage else { return }

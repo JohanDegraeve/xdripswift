@@ -11,17 +11,14 @@ fileprivate enum Setting:Int, CaseIterable {
     /// - except if there's been a disconnect, in that case this value is not taken into account
     case notificationInterval = 1
     
-    /// show live activities
+    /// show live activities type, if any
     case liveActivityType = 2
     
-    /// live activity size
-    case liveActivitySize = 3
-    
     /// show reading in app badge
-    case showReadingInAppBadge = 4
+    case showReadingInAppBadge = 3
     
     /// if reading is shown in app badge, should value be multiplied with 10 yes or no
-    case multipleAppBadgeValueWith10 = 5
+    case multipleAppBadgeValueWith10 = 4
     
 }
 
@@ -86,7 +83,7 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
                 let currentLiveActivityType = UserDefaults.standard.liveActivityType
                 
                 // get all data source types and add the description to data. Search for the type that matches the FollowerDataSourceType that is currently stored in userdefaults.
-                for liveActivityType in LiveActivityType.allCases {
+                for liveActivityType in LiveActivityType.allCasesForList {
                     
                     data.append(liveActivityType.description)
                     
@@ -105,7 +102,7 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
                     
                     if index != selectedRow {
                         
-                        UserDefaults.standard.liveActivityType = LiveActivityType(rawValue: index) ?? .disabled
+                        UserDefaults.standard.liveActivityType = LiveActivityType(forRowAt: index) ?? .disabled
                         
                         let newLiveActivityType = UserDefaults.standard.liveActivityType
                         
@@ -118,55 +115,6 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
             } else {
                 
                 return .showInfoText(title: Texts_SettingsView.labelLiveActivityType, message: Texts_SettingsView.liveActivityDisabledInFollowerModeMessage, actionHandler: {})
-                
-            }
-            
-        case .liveActivitySize:
-            // live activities can only be used in master mode as follower mode
-            // will not allow updates whilst the app is in the background
-            if UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat {
-                
-                // data to be displayed in list from which user needs to pick a live activity type
-                var data = [String]()
-                
-                var selectedRow: Int?
-                
-                var index = 0
-                
-                let currentliveActivitySize = UserDefaults.standard.liveActivitySize
-                
-                // get all data source types and add the description to data. Search for the type that matches the FollowerDataSourceType that is currently stored in userdefaults.
-                for liveActivitySize in LiveActivitySize.allCasesForList {
-                    
-                    data.append(liveActivitySize.description)
-                    
-                    if liveActivitySize == currentliveActivitySize {
-                        selectedRow = index
-                    }
-                    
-                    index += 1
-                    
-                }
-                
-                return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelliveActivitySize, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
-                    
-                    // we'll set this here so that we can use it in the else statement for logging
-                    let oldliveActivitySize = UserDefaults.standard.liveActivitySize
-                    
-                    if index != selectedRow {
-                        
-                        UserDefaults.standard.liveActivitySize = LiveActivitySize(forRowAt: index) ?? .normal
-                        
-                        let newliveActivitySize = UserDefaults.standard.liveActivitySize
-                        
-                        trace("Live activity notification size was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, oldliveActivitySize.description, newliveActivitySize.description)
-                    }
-                    
-                }, cancelHandler: nil, didSelectRowHandler: nil)
-                
-            } else {
-                
-                return .showInfoText(title: Texts_SettingsView.labelliveActivitySize, message: Texts_SettingsView.liveActivityDisabledInFollowerModeMessage, actionHandler: {})
                 
             }
         }
@@ -202,9 +150,6 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
         case .liveActivityType:
             return Texts_SettingsView.labelLiveActivityType
             
-        case .liveActivitySize:
-            return Texts_SettingsView.labelliveActivitySize
-            
         case .showReadingInAppBadge:
             return Texts_SettingsView.labelShowReadingInAppBadge
             
@@ -225,7 +170,7 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
         case .notificationInterval:
             return .disclosureIndicator
             
-        case .liveActivityType, .liveActivitySize:
+        case .liveActivityType:
             return UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat ? .disclosureIndicator : .none
         }
     }
@@ -243,9 +188,6 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
             
         case .liveActivityType:
             return UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat ? UserDefaults.standard.liveActivityType.description : Texts_SettingsView.liveActivityDisabledInFollowerMode
-            
-        case .liveActivitySize:
-            return UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat ? UserDefaults.standard.liveActivitySize.description : Texts_SettingsView.liveActivityDisabledInFollowerMode
         }
     }
     
@@ -263,7 +205,7 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
         case .multipleAppBadgeValueWith10:
             return UISwitch(isOn: UserDefaults.standard.multipleAppBadgeValueWith10, action: {(isOn:Bool) in UserDefaults.standard.multipleAppBadgeValueWith10 = isOn})
 
-        case .notificationInterval, .liveActivityType, .liveActivitySize:
+        case .notificationInterval, .liveActivityType:
             return nil
         }
     }

@@ -71,10 +71,8 @@ extension UserDefaults {
         case multipleAppBadgeValueWith10 = "multipleAppBadgeValueWith10"
         /// minimum time between two notifications, set by user
         case notificationInterval = "notificationInterval"
-        /// which type of live activities should be shown?
+        /// which type of live activities should be shown, if any?
         case liveActivityType = "liveActivityType"
-        /// which size should the live activities be shown?
-        case liveActivitySize = "liveActivitySize"
         
         // Home Screen and main chart settings
         
@@ -668,7 +666,7 @@ extension UserDefaults {
         }
     }
     
-    /// holds the enum integer of the type of live activity to be shown
+    /// holds the enum integer of the type of live activity to be shown, if any
     /// default to 0 (disabled)
     var liveActivityType: LiveActivityType {
         get {
@@ -677,18 +675,6 @@ extension UserDefaults {
         }
         set {
             set(newValue.rawValue, forKey: Key.liveActivityType.rawValue)
-        }
-    }
-    
-    /// holds the enum integer of the type of live activity to be shown
-    /// default to 0 (normal)
-    var liveActivitySize: LiveActivitySize {
-        get {
-            let liveActivitySizeAsInt = integer(forKey: Key.liveActivitySize.rawValue)
-            return LiveActivitySize(rawValue: liveActivitySizeAsInt) ?? .normal
-        }
-        set {
-            set(newValue.rawValue, forKey: Key.liveActivitySize.rawValue)
         }
     }
     

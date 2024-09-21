@@ -18,6 +18,10 @@
 		470CE1FC246802EB00D5CB74 /* BluetoothPeripheralsView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 470CE1FE246802EB00D5CB74 /* BluetoothPeripheralsView.strings */; };
 		4713B0142BBAB12D009F2838 /* ConstantsAppleWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41B82B87B2680041DA19 /* ConstantsAppleWatch.swift */; };
 		47150A4027F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47150A3F27F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift */; };
+		4715C32E2C9ED5E10052215F /* LiveActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477B2C7D2B432775002F64A4 /* LiveActivityType.swift */; };
+		4715C32F2C9ED5E10052215F /* LiveActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477B2C7D2B432775002F64A4 /* LiveActivityType.swift */; };
+		4715C3302C9ED5E10052215F /* LiveActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477B2C7D2B432775002F64A4 /* LiveActivityType.swift */; };
+		4715C3312C9ED5E10052215F /* LiveActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477B2C7D2B432775002F64A4 /* LiveActivityType.swift */; };
 		4716A4EF2B406C3D00419052 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4716A4EE2B406C3D00419052 /* WidgetKit.framework */; };
 		4716A4F12B406C3D00419052 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4716A4F02B406C3D00419052 /* SwiftUI.framework */; };
 		4716A4F42B406C3D00419052 /* XDripWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A4F32B406C3D00419052 /* XDripWidgetBundle.swift */; };
@@ -45,7 +49,6 @@
 		473775832C14DCA500525B90 /* GlucoseChartType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210ED2B5298EB00005711 /* GlucoseChartType.swift */; };
 		473775842C14DCA900525B90 /* ConstantsGlucoseChartSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A50C2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift */; };
 		473775852C14DCC600525B90 /* GlucoseChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47C210EF2B52A05B00005711 /* GlucoseChartView.swift */; };
-		473775862C14DCDF00525B90 /* LiveActivitySize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D08D5D2B54390B00B0BEA7 /* LiveActivitySize.swift */; };
 		473775872C14DCFB00525B90 /* TextsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD451221DEAB1006EAB84 /* TextsSettingsView.swift */; };
 		473775882C14DD2200525B90 /* ConstantsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */; };
 		473775892C14DD3100525B90 /* ConstantsLibreLinkUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E62A715EC500267BE3 /* ConstantsLibreLinkUp.swift */; };
@@ -68,8 +71,6 @@
 		4746067E2B962FBD00AC9214 /* SystemLargeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4746067D2B962FBD00AC9214 /* SystemLargeView.swift */; };
 		474606802B96308A00AC9214 /* WidgetSharedUserDefaultsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4746067F2B96308A00AC9214 /* WidgetSharedUserDefaultsModel.swift */; };
 		474606822B96358E00AC9214 /* WidgetSharedUserDefaultsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4746067F2B96308A00AC9214 /* WidgetSharedUserDefaultsModel.swift */; };
-		474606852B9637CA00AC9214 /* LiveActivitySize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D08D5D2B54390B00B0BEA7 /* LiveActivitySize.swift */; };
-		474606862B9637CB00AC9214 /* LiveActivitySize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D08D5D2B54390B00B0BEA7 /* LiveActivitySize.swift */; };
 		474606872B9637F100AC9214 /* TextsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD451221DEAB1006EAB84 /* TextsSettingsView.swift */; };
 		474606882B9637F600AC9214 /* TextsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD451221DEAB1006EAB84 /* TextsSettingsView.swift */; };
 		474606892B9637F600AC9214 /* TextsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD451221DEAB1006EAB84 /* TextsSettingsView.swift */; };
@@ -182,8 +183,6 @@
 		47CD642D2BEBEB0E002BDA68 /* AlertUrgencyType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CD642B2BEBEB0E002BDA68 /* AlertUrgencyType.swift */; };
 		47CF18B22B37689A00FA6160 /* TimeInRangeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CF18B12B37689A00FA6160 /* TimeInRangeType.swift */; };
 		47D08D5B2B5437F500B0BEA7 /* ConstantsGlucoseChartSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A50C2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift */; };
-		47D08D5E2B54390B00B0BEA7 /* LiveActivitySize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D08D5D2B54390B00B0BEA7 /* LiveActivitySize.swift */; };
-		47D08D5F2B54390B00B0BEA7 /* LiveActivitySize.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D08D5D2B54390B00B0BEA7 /* LiveActivitySize.swift */; };
 		47D2DB3B2B14F6D000C8EE6B /* ScreenLockDimmingType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D2DB3A2B14F6D000C8EE6B /* ScreenLockDimmingType.swift */; };
 		47D9BC952A78498500AB85B2 /* BgReadingsDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47D9BC942A78498500AB85B2 /* BgReadingsDetailView.swift */; };
 		47DB06C22A6FC02200267BE3 /* SettingsViewDataSourceSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06C12A6FC02200267BE3 /* SettingsViewDataSourceSettingsViewModel.swift */; };
@@ -1008,7 +1007,6 @@
 		47CD64242BEA9E5A002BDA68 /* xDrip Notification Context Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "xDrip Notification Context Extension.entitlements"; sourceTree = "<group>"; };
 		47CD642B2BEBEB0E002BDA68 /* AlertUrgencyType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertUrgencyType.swift; sourceTree = "<group>"; };
 		47CF18B12B37689A00FA6160 /* TimeInRangeType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeInRangeType.swift; sourceTree = "<group>"; };
-		47D08D5D2B54390B00B0BEA7 /* LiveActivitySize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivitySize.swift; sourceTree = "<group>"; };
 		47D2DB3A2B14F6D000C8EE6B /* ScreenLockDimmingType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenLockDimmingType.swift; sourceTree = "<group>"; };
 		47D9BC942A78498500AB85B2 /* BgReadingsDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BgReadingsDetailView.swift; sourceTree = "<group>"; };
 		47DB06C02A6FB3CC00267BE3 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/BgReadings.strings; sourceTree = "<group>"; };
@@ -1958,7 +1956,6 @@
 			isa = PBXGroup;
 			children = (
 				4716A5132B41CAD000419052 /* LiveActivityManager.swift */,
-				47D08D5D2B54390B00B0BEA7 /* LiveActivitySize.swift */,
 				477B2C7D2B432775002F64A4 /* LiveActivityType.swift */,
 			);
 			path = LiveActivity;
@@ -4223,9 +4220,9 @@
 				4746067C2B962F8500AC9214 /* SystemMediumView.swift in Sources */,
 				4716A4F62B406C3D00419052 /* XDripWidgetLiveActivity.swift in Sources */,
 				4716A4F42B406C3D00419052 /* XDripWidgetBundle.swift in Sources */,
-				47D08D5F2B54390B00B0BEA7 /* LiveActivitySize.swift in Sources */,
 				474606752B962C4D00AC9214 /* XDripWidget+EntryView.swift in Sources */,
 				4716A4F82B406C3D00419052 /* XDripWidget.swift in Sources */,
+				4715C32E2C9ED5E10052215F /* LiveActivityType.swift in Sources */,
 				4716A50D2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift in Sources */,
 				47A6AC312B7D3E250047A4BA /* ConstantsBloodGlucose.swift in Sources */,
 				47CA61E62B966A9700C2A597 /* AccessoryRectangularView.swift in Sources */,
@@ -4263,8 +4260,8 @@
 				478A92662B90AB230084C394 /* GlucoseChartType.swift in Sources */,
 				478A92632B8FB5490084C394 /* XDripWatchComplication+Provider.swift in Sources */,
 				478A92592B8FA1F20084C394 /* Double.swift in Sources */,
-				474606862B9637CB00AC9214 /* LiveActivitySize.swift in Sources */,
 				4746066F2B9618FD00AC9214 /* AccessoryInlineView.swift in Sources */,
+				4715C3302C9ED5E10052215F /* LiveActivityType.swift in Sources */,
 				474606892B9637F600AC9214 /* TextsSettingsView.swift in Sources */,
 				47EDD15A2BE01E9000C5A286 /* ConstantsWatchComplication.swift in Sources */,
 				471C9BFF2B932952005E1326 /* LibreLinkUpModels.swift in Sources */,
@@ -4291,11 +4288,11 @@
 				47A6AC2B2B7D3DE30047A4BA /* GlucoseChartView.swift in Sources */,
 				47DE41B52B8693CB0041DA19 /* MainViewHeaderView.swift in Sources */,
 				47A6AC342B7D3E260047A4BA /* ConstantsBloodGlucose.swift in Sources */,
-				474606852B9637CA00AC9214 /* LiveActivitySize.swift in Sources */,
 				47A6AC2E2B7D3E170047A4BA /* Double.swift in Sources */,
 				47A6AC392B7D3E770047A4BA /* TextsHomeView.swift in Sources */,
 				47CA61E72B97948000C2A597 /* FollowerDataSourceType.swift in Sources */,
 				47A6AC332B7D3E260047A4BA /* ConstantsHomeView.swift in Sources */,
+				4715C32F2C9ED5E10052215F /* LiveActivityType.swift in Sources */,
 				474606642B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift in Sources */,
 				474606902B963EA100AC9214 /* View.swift in Sources */,
 				47EDD1462BDD565A00C5A286 /* TextsWatchApp.swift in Sources */,
@@ -4338,11 +4335,11 @@
 				473775822C14D8C100525B90 /* NotificationView.swift in Sources */,
 				4734FF562BEFE3F200C7115A /* AlertNotificationDictionary.swift in Sources */,
 				473775882C14DD2200525B90 /* ConstantsHomeView.swift in Sources */,
+				4715C3312C9ED5E10052215F /* LiveActivityType.swift in Sources */,
 				473775832C14DCA500525B90 /* GlucoseChartType.swift in Sources */,
 				473775852C14DCC600525B90 /* GlucoseChartView.swift in Sources */,
 				47CD64192BE9506C002BDA68 /* NotificationViewController.swift in Sources */,
 				474822412BFE62220052D4FB /* ConstantsCalendar.swift in Sources */,
-				473775862C14DCDF00525B90 /* LiveActivitySize.swift in Sources */,
 				47037B912C07B15E000BD6BD /* ConstantsAlerts.swift in Sources */,
 				4737758C2C14DDA700525B90 /* View.swift in Sources */,
 				473775892C14DD3100525B90 /* ConstantsLibreLinkUp.swift in Sources */,
@@ -4617,7 +4614,6 @@
 				F8E3A2A923D906C200E5E98A /* CalendarManager.swift in Sources */,
 				F8B3A80A227A3D11004BA588 /* TextsAlertTypeSettings.swift in Sources */,
 				F85FF39125288870004E6FF1 /* HouseKeeper.swift in Sources */,
-				47D08D5E2B54390B00B0BEA7 /* LiveActivitySize.swift in Sources */,
 				F8CB59C42739D1CD00BA199E /* DexcomBackfillTxMessage.swift in Sources */,
 				F8F9721823A5915900C3F17D /* CGMBlueReaderTransmitter.swift in Sources */,
 				F8252867243E50FE0067AF77 /* ConstantsLibre.swift in Sources */,

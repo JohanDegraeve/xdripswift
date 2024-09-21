@@ -45,32 +45,8 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_labelLiveActivityType", tableName: filename, bundle: Bundle.main, value: "Live Activities", comment: "notification settings, type of live activities that should be enabled")
     }()
     
-    static let labelliveActivitySize: String = {
-        return NSLocalizedString("settingsviews_labelliveActivitySize", tableName: filename, bundle: Bundle.main, value: "Live Activity Size", comment: "notification settings, the size that the live activities should be displayed")
-    }()
-    
     static let liveActivityTypeDisabled: String = {
         return NSLocalizedString("settingsviews_liveActivityTypeDisabled", tableName: filename, bundle: Bundle.main, value: "Disabled", comment: "notification settings, disable live activities")
-    }()
-    
-    static let liveActivityTypeAlways: String = {
-        return NSLocalizedString("settingsviews_liveActivityTypeAlways", tableName: filename, bundle: Bundle.main, value: "Always", comment: "notification settings, always show live activities")
-    }()
-    
-    static let liveActivityTypeUrgentLow: String = {
-        return NSLocalizedString("settingsviews_liveActivityTypeUrgentLow", tableName: filename, bundle: Bundle.main, value: "Only Urgent Low", comment: "notification settings, show live activities urgent low")
-    }()
-    
-    static let liveActivityTypeLow: String = {
-        return NSLocalizedString("settingsviews_liveActivityTypeLow", tableName: filename, bundle: Bundle.main, value: "Only when Low", comment: "notification settings, show live activities when low")
-    }()
-    
-    static let liveActivityTypeLowHigh: String = {
-        return NSLocalizedString("settingsviews_liveActivityTypeLowHigh", tableName: filename, bundle: Bundle.main, value: "When Low or High", comment: "notification settings, show live activities when low or high")
-    }()
-    
-    static let liveActivityTypeUrgentLowHigh: String = {
-        return NSLocalizedString("settingsviews_liveActivityTypeUrgentLowHigh", tableName: filename, bundle: Bundle.main, value: "Only Urgent Low/High", comment: "notification settings, show live activities when urgent high or urgent low")
     }()
     
     static let liveActivityDisabledInFollowerMode: String = {
@@ -81,16 +57,16 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_liveActivityDisabledInFollowerModeMessage", tableName: filename, bundle: Bundle.main, value: "\nLive activities can only be used in Follower mode when a valid heartbeat is enabled.", comment: "notification settings, live activities are not available in follower mode")
     }()
     
-    static let liveActivitySizeMinimal: String = {
-        return NSLocalizedString("settingsviews_liveActivitySizeMinimal", tableName: filename, bundle: Bundle.main, value: "Minimal", comment: "notification settings, live activity size minimal")
+    static let liveActivityTypeMinimal: String = {
+        return NSLocalizedString("settingsviews_liveActivityTypeMinimal", tableName: filename, bundle: Bundle.main, value: "Minimal", comment: "notification settings, live activity size minimal")
     }()
     
-    static let liveActivitySizeNormal: String = {
-        return NSLocalizedString("settingsviews_liveActivitySizeNormal", tableName: filename, bundle: Bundle.main, value: "Normal", comment: "notification settings, live activity size normal")
+    static let liveActivityTypeNormal: String = {
+        return NSLocalizedString("settingsviews_liveActivityTypeNormal", tableName: filename, bundle: Bundle.main, value: "Normal", comment: "notification settings, live activity size normal")
     }()
     
-    static let liveActivitySizeLarge: String = {
-        return NSLocalizedString("settingsviews_liveActivitySizeLarge", tableName: filename, bundle: Bundle.main, value: "Large", comment: "notification settings, live activity size large")
+    static let liveActivityTypeLarge: String = {
+        return NSLocalizedString("settingsviews_liveActivityTypeLarge", tableName: filename, bundle: Bundle.main, value: "Large", comment: "notification settings, live activity size large")
     }()
     
     
