@@ -341,48 +341,55 @@ final class WatchStateModel: NSObject, ObservableObject {
     private func processWatchStateFromDictionary(dictionary: [String: Any]) {
         let bgReadingDatesFromDictionary: [Double] = dictionary["bgReadingDatesAsDouble"] as? [Double] ?? [0]
         
-        bgReadingDates = bgReadingDatesFromDictionary.map { (bgReadingDateAsDouble) -> Date in
-            return Date(timeIntervalSince1970: bgReadingDateAsDouble)
+        // let's make a quick check to see if the data about to be processed is from within the last 12 hours
+        // this is to avoid long delays when re-opening a Watch app for the first time in days and waiting
+        // whilst the whole queue of userInfo messages are processed
+        if let lastBgReadingDateFromDictionaryReceived = bgReadingDatesFromDictionary.first, Date(timeIntervalSince1970: lastBgReadingDateFromDictionaryReceived) > Date(timeIntervalSinceNow: -3600 * 12) {
+            
+            bgReadingDates = bgReadingDatesFromDictionary.map { (bgReadingDateAsDouble) -> Date in
+                return Date(timeIntervalSince1970: bgReadingDateAsDouble)
+            }
+            
+            bgReadingValues = dictionary["bgReadingValues"] as? [Double] ?? [100]
+            
+            isMgDl = dictionary["isMgDl"] as? Bool ?? true
+            slopeOrdinal = dictionary["slopeOrdinal"] as? Int ?? 0
+            deltaChangeInMgDl = dictionary["deltaChangeInMgDl"] as? Double ?? 0
+            urgentLowLimitInMgDl = dictionary["urgentLowLimitInMgDl"] as? Double ?? 60
+            lowLimitInMgDl = dictionary["lowLimitInMgDl"] as? Double ?? 70
+            highLimitInMgDl = dictionary["highLimitInMgDl"] as? Double ?? 180
+            urgentHighLimitInMgDl = dictionary["urgentHighLimitInMgDl"] as? Double ?? 250
+            updatedDate = dictionary["updatedDate"] as? Date ?? .now
+            activeSensorDescription = dictionary["activeSensorDescription"] as? String ?? ""
+            sensorAgeInMinutes = dictionary["sensorAgeInMinutes"] as? Double ?? 0
+            sensorMaxAgeInMinutes = dictionary["sensorMaxAgeInMinutes"] as? Double ?? 0
+            isMaster = dictionary["isMaster"] as? Bool ?? true
+            followerDataSourceType = FollowerDataSourceType(rawValue: dictionary["followerDataSourceTypeRawValue"] as? Int ?? 0) ?? .nightscout
+            followerBackgroundKeepAliveType = FollowerBackgroundKeepAliveType(rawValue: dictionary["followerBackgroundKeepAliveTypeRawValue"] as? Int ?? 0) ?? .normal
+            timeStampOfLastFollowerConnection = Date(timeIntervalSince1970: dictionary["timeStampOfLastFollowerConnection"] as? Double ?? 0)
+            secondsUntilFollowerDisconnectWarning = dictionary["secondsUntilFollowerDisconnectWarning"] as? Int ?? 0
+            timeStampOfLastHeartBeat = Date(timeIntervalSince1970: dictionary["timeStampOfLastHeartBeat"] as? Double ?? 0)
+            secondsUntilHeartBeatDisconnectWarning = dictionary["secondsUntilHeartBeatDisconnectWarning"] as? Int ?? 0
+            keepAliveIsDisabled = dictionary["keepAliveIsDisabled"] as? Bool ?? false
+            remainingComplicationUserInfoTransfers = dictionary["remainingComplicationUserInfoTransfers"] as? Int ?? 99
+            liveDataIsEnabled = dictionary["liveDataIsEnabled"] as? Bool ?? false
+            
+            // check if there is any BG data available before updating the data source info strings accordingly
+            if let bgReadingDate = bgReadingDate() {
+                lastUpdatedTextString = Texts_WatchApp.lastReading + " "
+                lastUpdatedTimeString = bgReadingDate.formatted(date: .omitted, time: .shortened)
+                lastUpdatedTimeAgoString = bgReadingDate.daysAndHoursAgo(appendAgo: true)
+            } else {
+                lastUpdatedTextString = Texts_WatchApp.noSensorData
+                lastUpdatedTimeString = ""
+                lastUpdatedTimeAgoString = ""
+            }
+            
+            debugString = generateDebugString()
+            
+            // now process the shared user defaults to get data for the WidgetKit complications
+            updateComplicationData()
         }
-        
-        bgReadingValues = dictionary["bgReadingValues"] as? [Double] ?? [100]
-        isMgDl = dictionary["isMgDl"] as? Bool ?? true
-        slopeOrdinal = dictionary["slopeOrdinal"] as? Int ?? 0
-        deltaChangeInMgDl = dictionary["deltaChangeInMgDl"] as? Double ?? 0
-        urgentLowLimitInMgDl = dictionary["urgentLowLimitInMgDl"] as? Double ?? 60
-        lowLimitInMgDl = dictionary["lowLimitInMgDl"] as? Double ?? 70
-        highLimitInMgDl = dictionary["highLimitInMgDl"] as? Double ?? 180
-        urgentHighLimitInMgDl = dictionary["urgentHighLimitInMgDl"] as? Double ?? 250
-        updatedDate = dictionary["updatedDate"] as? Date ?? .now
-        activeSensorDescription = dictionary["activeSensorDescription"] as? String ?? ""
-        sensorAgeInMinutes = dictionary["sensorAgeInMinutes"] as? Double ?? 0
-        sensorMaxAgeInMinutes = dictionary["sensorMaxAgeInMinutes"] as? Double ?? 0
-        isMaster = dictionary["isMaster"] as? Bool ?? true
-        followerDataSourceType = FollowerDataSourceType(rawValue: dictionary["followerDataSourceTypeRawValue"] as? Int ?? 0) ?? .nightscout
-        followerBackgroundKeepAliveType = FollowerBackgroundKeepAliveType(rawValue: dictionary["followerBackgroundKeepAliveTypeRawValue"] as? Int ?? 0) ?? .normal
-        timeStampOfLastFollowerConnection = Date(timeIntervalSince1970: dictionary["timeStampOfLastFollowerConnection"] as? Double ?? 0)
-        secondsUntilFollowerDisconnectWarning = dictionary["secondsUntilFollowerDisconnectWarning"] as? Int ?? 0
-        timeStampOfLastHeartBeat = Date(timeIntervalSince1970: dictionary["timeStampOfLastHeartBeat"] as? Double ?? 0)
-        secondsUntilHeartBeatDisconnectWarning = dictionary["secondsUntilHeartBeatDisconnectWarning"] as? Int ?? 0
-        keepAliveIsDisabled = dictionary["keepAliveIsDisabled"] as? Bool ?? false
-        remainingComplicationUserInfoTransfers = dictionary["remainingComplicationUserInfoTransfers"] as? Int ?? 99
-        liveDataIsEnabled = dictionary["liveDataIsEnabled"] as? Bool ?? false
-        
-        // check if there is any BG data available before updating the data source info strings accordingly
-        if let bgReadingDate = bgReadingDate() {
-            lastUpdatedTextString = Texts_WatchApp.lastReading + " "
-            lastUpdatedTimeString = bgReadingDate.formatted(date: .omitted, time: .shortened)
-            lastUpdatedTimeAgoString = bgReadingDate.daysAndHoursAgo(appendAgo: true)
-        } else {
-            lastUpdatedTextString = Texts_WatchApp.noSensorData
-            lastUpdatedTimeString = ""
-            lastUpdatedTimeAgoString = ""
-        }
-        
-        debugString = generateDebugString()
-        
-        // now process the shared user defaults to get data for the WidgetKit complications
-        updateComplicationData()
     }
     
     /// once we've process the state update, then save this data to the shared app group so that the complication can read it
