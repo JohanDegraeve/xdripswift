@@ -85,9 +85,9 @@ final class WatchStateModel: NSObject, ObservableObject {
     /// - Returns: a string with bgValueInMgDl() converted into the user unit
     func bgValueStringInUserChosenUnit() -> String {
         if let bgReadingDate = bgReadingDate(), let bgValueInMgDl = bgValueInMgDl(), bgReadingDate > Date().addingTimeInterval(-60 * 20) {
-            return bgReadingValues.isEmpty ? "---" : bgValueInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
+            return bgReadingValues.isEmpty ? (isMgDl ? "---" : "-.-") : bgValueInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
         } else {
-            return "---"
+            return isMgDl ? "---" : "-.-"
         }
     }
     
