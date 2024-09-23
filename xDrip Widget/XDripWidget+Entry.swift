@@ -34,7 +34,6 @@ extension XDripWidget.Entry {
         var highLimitInMgDl: Double
         var urgentHighLimitInMgDl: Double
         var dataSourceDescription: String
-        var dataSourceDescriptionAbbreviated: String
         var allowStandByHighContrast: Bool
         var keepAliveImageString: String?
         
@@ -43,7 +42,7 @@ extension XDripWidget.Entry {
         var bgReadingDate: Date?
         var bgValueStringInUserChosenUnit: String
                 
-        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaChangeInMgDl: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, dataSourceDescription: String? = "", dataSourceDescriptionAbbreviated: String? = "", allowStandByHighContrast: Bool? = true, keepAliveImageString: String?) {
+        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaChangeInMgDl: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, dataSourceDescription: String? = "", allowStandByHighContrast: Bool? = true, keepAliveImageString: String?) {
             self.bgReadingValues = bgReadingValues
             self.bgReadingDates = bgReadingDates
             self.isMgDl = isMgDl ?? true
@@ -54,7 +53,6 @@ extension XDripWidget.Entry {
             self.highLimitInMgDl = highLimitInMgDl ?? 180
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl ?? 250
             self.dataSourceDescription = dataSourceDescription ?? ""
-            self.dataSourceDescriptionAbbreviated = dataSourceDescriptionAbbreviated ?? ""
             self.allowStandByHighContrast = allowStandByHighContrast ?? true
             self.keepAliveImageString = keepAliveImageString
             
@@ -200,6 +198,6 @@ extension XDripWidget.Entry {
 
 extension XDripWidget.Entry {
     static var placeholder: Self {
-        .init(date: .now, widgetState: WidgetState(bgReadingValues: ConstantsWidgetExtension.bgReadingValuesPlaceholderData, bgReadingDates: ConstantsWidgetExtension.bgReadingDatesPlaceholderData(), isMgDl: true, slopeOrdinal: 4, deltaChangeInMgDl: 0, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 90, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, dataSourceDescription: "Dexcom G6", dataSourceDescriptionAbbreviated: "G6", keepAliveImageString: "circle"))
+        .init(date: .now, widgetState: WidgetState(bgReadingValues: ConstantsWidgetExtension.bgReadingValuesPlaceholderData, bgReadingDates: ConstantsWidgetExtension.bgReadingDatesPlaceholderData(), isMgDl: true, slopeOrdinal: 4, deltaChangeInMgDl: 0, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 90, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, dataSourceDescription: "Dexcom G6", keepAliveImageString: "circle"))
     }
 }
