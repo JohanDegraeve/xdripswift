@@ -56,6 +56,9 @@ final class SettingsViewController: UIViewController {
         /// healthkit
         case healthkit
         
+        /// openglück
+        case openGlück
+        
         /// store bg values in healthkit
         case speak
         
@@ -106,6 +109,8 @@ final class SettingsViewController: UIViewController {
                 return SettingsViewDexcomSettingsViewModel()
             case .healthkit:
                 return SettingsViewHealthKitSettingsViewModel()
+            case .openGlück:
+                return SettingsViewOpenGlückSettingsViewModel()
             case .speak:
                 return SettingsViewSpeakSettingsViewModel()
             case .M5stack:
