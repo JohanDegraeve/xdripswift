@@ -11,6 +11,9 @@ fileprivate enum Setting:Int, CaseIterable {
     /// should trend be displayed yes or no
     case displayTrend = 1
     
+    /// should a black/white contact image be used? yes or no
+    case useHighContrastContactImage = 2
+    
 }
 
 class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
@@ -44,6 +47,9 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
             
         case .displayTrend:
             return Texts_SettingsView.displayTrendInContactImage
+            
+        case .useHighContrastContactImage:
+            return Texts_SettingsView.useHighContrastContactImage
 
         }
 
@@ -67,7 +73,7 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
             case .notDetermined:
                 return UITableViewCell.AccessoryType.none
                 
-            case .restricted:
+            case .restricted, .limited:
                 // by clicking row, show what it means to be restricted, according to Apple doc
                 return UITableViewCell.AccessoryType.disclosureIndicator
                 
@@ -80,7 +86,7 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
                 
             }
             
-        case .displayTrend:
+        case .displayTrend, .useHighContrastContactImage:
             return UITableViewCell.AccessoryType.none
          
         }
@@ -91,7 +97,7 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-        case .enableContactImage, .displayTrend:
+        case .enableContactImage, .displayTrend, .useHighContrastContactImage:
             return nil
         }
     }
@@ -139,6 +145,10 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
                     trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access restricted, according to apple doc 'possibly due to active restrictions such as parental controls being in place'", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                     UserDefaults.standard.enableContactImage = false
                     
+                case .limited:
+                    trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access limited, ask the user to give full access", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                    UserDefaults.standard.enableContactImage = false
+                    
                 case .denied:
                     trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access denied by user", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                     UserDefaults.standard.enableContactImage = false
@@ -156,6 +166,9 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
             
         case .displayTrend:
             return UISwitch(isOn: UserDefaults.standard.displayTrendInContactImage, action: {(isOn:Bool) in UserDefaults.standard.displayTrendInContactImage = isOn})
+            
+        case .useHighContrastContactImage:
+            return UISwitch(isOn: UserDefaults.standard.useHighContrastContactImage, action: {(isOn:Bool) in UserDefaults.standard.useHighContrastContactImage = isOn})
 
         }
         
@@ -191,7 +204,7 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
             
-        case .enableContactImage, .displayTrend:
+        case .enableContactImage, .displayTrend, .useHighContrastContactImage:
             
             // depending on status of authorization, we will either do nothing or show a message
             switch CNContactStore.authorizationStatus(for: .contacts) {
@@ -207,6 +220,10 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
             case .restricted:
                 // by clicking row, show what it means to be restricted, according to Apple doc
                 return SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.infoContactsAccessRestricted)
+                
+            case .limited:
+                // by clicking row, show what it means to be limited, according to Apple doc
+                return SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.infoContactsAccessLimited)
                 
             @unknown default:
                 trace("in SettingsViewContactImageSettingsViewModel, unknown case returned when authorizing CNContactStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)

@@ -51,7 +51,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var urgentHighLimitInMgDl: Double
         var eventStartDate: Date = Date()
         var warnUserToOpenApp: Bool = true
-        var liveActivitySize: LiveActivitySize
+        var liveActivityType: LiveActivityType
         var dataSourceDescription: String
 
         var bgUnitString: String {
@@ -74,7 +74,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             }
         }
 
-        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySize: LiveActivitySize, dataSourceDescription: String? = "") {
+        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, dataSourceDescription: String? = "") {
         
             self.bgReadingFloats = bgReadingValues.map(Float16.init)
 
@@ -89,7 +89,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             self.lowLimitInMgDl = lowLimitInMgDl
             self.highLimitInMgDl = highLimitInMgDl
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl            
-            self.liveActivitySize = liveActivitySize
+            self.liveActivityType = liveActivityType
             self.dataSourceDescription = dataSourceDescription ?? ""
         }
         

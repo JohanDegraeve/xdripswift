@@ -33,13 +33,13 @@ public enum LibreSensorType: String {
             return "Libre 1 A2"
             
         case .libre2:
-            return "Libre 2"
+            return "Libre 2 EU"
             
         case .libre2C5:
-            return "Libre 2 C5"
+            return "Libre 2 EU C5"
             
         case .libre2C6:
-            return "Libre 2 Plus"
+            return "Libre 2 Plus EU"
             
         case .libreUS:
             return "Libre US"

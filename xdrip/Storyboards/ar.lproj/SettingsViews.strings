@@ -41,13 +41,13 @@
 "settingsviews_giveDexcomSharePassword" = "أعط ديكسكوم شير كلمة مرور";
 "settingsviews_giveDexcomShareSerialNumber" = "أدخل الرقم التسلسلي لجهاز استقبال ديكسكوم";
 "settingsviews_sectiontitlenightscout" = "نايتسكاوت";
-"settingsviews_nightScoutEnabled" = "تفعيل نايتسكاوت؟";
-"settingsviews_nightScoutUrl" = "الرابط";
+"settingsviews_nightscoutEnabled" = "تفعيل نايتسكاوت؟";
+"settingsviews_nightscoutUrl" = "الرابط";
 "settingsviews_useSchedule" = "استخدام جدولة التحميل؟";
 "schedule" = "الجدولة";
-"settingsviews_giveNightScoutUrl" = "أدخل رابط منصة نايتسكاوت الخاص بك";
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
-"settingsviews_giveNightScoutAPIKey" = "أدخل الـ API_SECRET الخاص بك";
+"settingsviews_giveNightscoutUrl" = "أدخل رابط منصة نايتسكاوت الخاص بك";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "أدخل الـ API_SECRET الخاص بك";
 "editScheduleTimePickerSubtitle" = "تغيير: ";
 "timeScheduleViewTitle" = "جدولة وقت تفعيل/إغلاق لـ";
 "uploadSensorStartTime" = "تحميل بداية وقت الحساس؟";
@@ -90,7 +90,7 @@
 "volumeTestiOSSound" = "اختبر مستوى الصوت (مستوى الصوت الحالي للآيفون)";
 "debugLevel" = "تضمين مستوى التصحيح";
 "warningChangeFromMasterToFollower" = "سيؤدي التبديل من رئيسي إلى متابعة، إلى إيقاف الحساس الحالي. هل تريد الاستمرار ?";
-"nightScoutPort" = "المنفذ (اختياري)";
+"nightscoutPort" = "المنفذ (اختياري)";
 "developerSettings" = "إعدادات المطور";
 "smoothLibreValues" = "تناسق قيم اليبري ?";
 "nslog" = "NSتقرير";

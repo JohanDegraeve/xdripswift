@@ -167,7 +167,7 @@ public class DataExporter {
 				self.partialUpdateCallback(0.50 / amountOfUpdates)
 			}
 			
-			readingsAsDicts.append(reading.dictionaryRepresentationForNightScoutUpload(reuseDateFormatter: reusableISODateFormatter))
+			readingsAsDicts.append(reading.dictionaryRepresentationForNightscoutUpload(reuseDateFormatter: reusableISODateFormatter))
 		}
 		
         return readingsAsDicts
@@ -182,7 +182,7 @@ public class DataExporter {
 	private func treatmentsAsDicts() -> [[String: Any]] {
 		let treatments = treatmentsAccessor.getTreatments(fromDate: onlyFromDate, toDate: endDate, on: privateManagedObjectContext)
 		let treatmentsAsDicts = treatments.map { treatment in
-			return treatment.dictionaryRepresentationForNightScoutUpload(reuseDateFormatter: reusableISODateFormatter)
+			return treatment.dictionaryRepresentationForNightscoutUpload(reuseDateFormatter: reusableISODateFormatter)
 		}
 		return treatmentsAsDicts
 	}
@@ -197,7 +197,7 @@ public class DataExporter {
 		let calibrations = calibrationsAccessor.getCalibrations(from: onlyFromDate, to: endDate, on: privateManagedObjectContext)
 		let calibrationsAsDicts = calibrations.map { calibration -> [String: Any] in
 			// Use the Cal representation, but add the mbg key with bg value.
-			var representation =  calibration.dictionaryRepresentationForCalRecordNightScoutUpload
+			var representation =  calibration.dictionaryRepresentationForCalRecordNightscoutUpload
 			representation["mbg"] = calibration.bg
 			return representation
 		}

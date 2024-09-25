@@ -31,7 +31,7 @@ class LibreLinkUpFollowManager: NSObject {
     private var bgReadingsAccessor: BgReadingsAccessor
     
     /// delegate to pass back glucosedata
-    private (set) weak var followerDelegate: FollowerDelegate?
+    private(set) weak var followerDelegate: FollowerDelegate?
     
     /// AVAudioPlayer to use
     private var audioPlayer:AVAudioPlayer?
@@ -201,11 +201,11 @@ class LibreLinkUpFollowManager: NSObject {
         
         trace("in download", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
         
-        if (UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow > 15 {
-            trace("    setting nightScoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
+        if (UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow > 15 {
+            trace("    setting nightscoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
             
-            UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest = .now
-            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+            UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest = .now
+            UserDefaults.standard.nightscoutSyncTreatmentsRequired = true
         }
         
         guard !UserDefaults.standard.isMaster else {

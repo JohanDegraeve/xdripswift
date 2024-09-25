@@ -26,9 +26,9 @@ struct WatchState: Codable {
     var isMaster: Bool?
     var followerDataSourceTypeRawValue: Int?
     var followerBackgroundKeepAliveTypeRawValue: Int?
-    var timeStampOfLastFollowerConnection: Date?
+    var timeStampOfLastFollowerConnection: Double?
     var secondsUntilFollowerDisconnectWarning: Int?
-    var timeStampOfLastHeartBeat: Date?
+    var timeStampOfLastHeartBeat: Double?
     var secondsUntilHeartBeatDisconnectWarning: Int?
     var keepAliveIsDisabled: Bool?
     var liveDataIsEnabled: Bool?

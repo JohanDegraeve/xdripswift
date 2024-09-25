@@ -1,0 +1,6 @@
+"nightscouttestresult_verificationsuccessfulalerttitle" = "تم التحقق بنجاح";
+"nightscouttestresult_verificationsuccessfulalertbody" = "تم التحقق من منصة نايسكاوت بنجاح";
+"nightscouttestresult_verificationerroralerttitle" = "خطأ في التحقق";
+"warningAPIKeyOrURLIsnil" = "يجب تعيين عنوان URL الخاص بـمنصة نايتسكاوت و API_SECRET قبل أن تتمكن من عمل الاختبار";
+"nightscoutAPIKeyAndURLStartedBody" = "تم بدأ الاختبار";
+"nightscoutAPIKeyAndURLStartedTitle" = "جاري التحقق ...";

@@ -320,9 +320,9 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .Libre2:
             if let activeSensorMaxSensorAgeInDays = UserDefaults.standard.activeSensorMaxSensorAgeInDays, activeSensorMaxSensorAgeInDays >= 15 {
-                return "Libre 2 Plus"
+                return "Libre 2 Plus EU"
             } else {
-                return "Libre 2"
+                return "Libre 2 EU"
             }
             
         default:

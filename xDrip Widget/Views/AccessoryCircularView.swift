@@ -16,7 +16,7 @@ extension XDripWidget.EntryView {
             AccessoryWidgetBackground()
                 .cornerRadius(8)
             
-            Gauge(value: entry.widgetState.bgValueInMgDl ?? 100, in: entry.widgetState.gaugeModel().minValue...entry.widgetState.gaugeModel().maxValue) {
+            Gauge(value: entry.widgetState.bgValueInMgDl ?? entry.widgetState.gaugeModel().nilValue, in: entry.widgetState.gaugeModel().minValue...entry.widgetState.gaugeModel().maxValue) {
                 Text("Not shown")
             } currentValueLabel: {
                 Text(entry.widgetState.bgValueStringInUserChosenUnit)

@@ -1,6 +1,6 @@
 "glucoseReadingsTitle" = "Glucose Metingen";
 "glucoseReadingTitle" = "Glucose Meting";
-"selectDate" = "Datum";
+"date" = "Datum";
 "noReadingsToShow" = "Geen metingen...";
 "generalSectionHeader" = "Algemeen";
 "internalDataSectionHeader" = "Interne data";

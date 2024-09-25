@@ -1,6 +1,6 @@
 import Foundation
 
-extension Double: RawRepresentable {
+extension Double: @retroactive RawRepresentable {
 
     //MARK: - copied from https://github.com/LoopKit/LoopKit
     

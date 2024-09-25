@@ -16,8 +16,13 @@ enum TransmitterBatteryInfo: Equatable {
         switch (self) {
         case .DexcomG4(let level):
             return level.description
-        case .DexcomG5(let voltA, let voltB, let res, let runt, let temp):
-            return "Voltage A: " + voltA.description + "0mV\nVoltage B: " + voltB.description + "0mV" + "\nResistance: " + res.description + "\nRuntime: " + (runt != -1 ? runt.description : "n/a") + "\nTemperature: " + temp.description
+        case .DexcomG5(let voltA, let voltB, _, _, _):
+            if (voltA == 0 || voltB == 0) {
+                return Texts_HomeView.waitingForDataSource // "waiting for data..."
+            } else {
+                return "Voltage A: " + voltA.description + "0mV\nVoltage B: " + voltB.description + "0mV"
+            }
+//            return "Voltage A: " + (voltA > 0 ? voltA.description + "0" : "-") + "mV\nVoltage B: " + (voltB > 0 ? voltB.description + "0" : "-") + "mV" //+ "\nResistance: " + resist.description + "\nRuntime: " + (runt != -1 ? runtime.description : "n/a") + "\nTemperature: " + temperature.description
         case .percentage(let perc):
             return  perc.description + "%"
         }

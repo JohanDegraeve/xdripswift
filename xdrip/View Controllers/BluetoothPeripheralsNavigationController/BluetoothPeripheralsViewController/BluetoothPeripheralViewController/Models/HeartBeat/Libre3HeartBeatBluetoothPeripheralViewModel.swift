@@ -37,7 +37,7 @@ extension Libre3HeartBeatBluetoothPeripheralViewModel: BluetoothPeripheralViewMo
     func sectionTitle(forSection section: Int) -> String {
         
         // there's no section specific for this type of transmitter, this function will not be called
-        return "Libre Heartbeat ♥"
+        return "Libre/Generic Heartbeat ♥"
         
     }
     

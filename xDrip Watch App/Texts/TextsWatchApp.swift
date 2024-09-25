@@ -8,7 +8,7 @@
 
 import Foundation
 
-/// all NightScout related texts
+/// all Nightscout related texts
 class Texts_WatchApp {
     static private let filename = "WatchApp"
     

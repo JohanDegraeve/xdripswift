@@ -30,7 +30,7 @@ class WatlaaBluetoothPeripheralViewModel {
     /// temporary reference to bluetoothPerpipheral, will be set in configure function.
     private var bluetoothPeripheral: BluetoothPeripheral?
     
-    /// it's the bluetoothPeripheral as M5Stack
+    /// it's the bluetoothPeripheral as Waatla
     private var Watlaa: Watlaa? {
         get {
             return bluetoothPeripheral as? Watlaa

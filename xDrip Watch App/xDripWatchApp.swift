@@ -15,7 +15,7 @@ struct xDrip_Watch_AppApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationView {
-                MainView()
+                RootView()
             }.environmentObject(watchState)
         }
         
