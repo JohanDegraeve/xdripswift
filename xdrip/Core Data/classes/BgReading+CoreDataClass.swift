@@ -174,13 +174,13 @@ public class BgReading: NSManagedObject {
         // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
         // show unitized zero deltas as +0 or +0.0 as per Nightscout format
         if (mgdl) {
-            if (value > -1) && (value < 1) {
+            if (value == 0) {
                 return "+0" + (showUnit ? (" " + Texts_Common.mgdl):"");
             } else {
                 return deltaSign + valueAsString + (showUnit ? (" " + Texts_Common.mgdl):"");
             }
         } else {
-            if (value > -0.1) && (value < 0.1) {
+            if (value == 0.0) {
                 return "+0.0" + (showUnit ? (" " + Texts_Common.mmol):"");
             } else {
                 return deltaSign + valueAsString + (showUnit ? (" " + Texts_Common.mmol):"");
