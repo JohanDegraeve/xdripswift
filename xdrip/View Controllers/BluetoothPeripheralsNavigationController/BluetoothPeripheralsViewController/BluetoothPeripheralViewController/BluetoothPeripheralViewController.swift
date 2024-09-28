@@ -486,12 +486,12 @@ class BluetoothPeripheralViewController: UIViewController {
                     // mark web oop settings section as shown
                     webOOPSettingsSectionIsShown = true
                     numberOfGeneralSections += 1
-                }
-                
-                if expectedBluetoothPeripheralType.canUseNonFixedSlope() {
-                    // mark non fixed slope settings section as shown
-                    nonFixedSettingsSectionIsShown = true
-                    numberOfGeneralSections += 1
+                    
+                    if expectedBluetoothPeripheralType.canUseNonFixedSlope() {
+                        // mark non fixed slope settings section as shown
+                        nonFixedSettingsSectionIsShown = true
+                        numberOfGeneralSections += 1
+                    }
                 }
                 
                 return numberOfGeneralSections

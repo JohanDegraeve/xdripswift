@@ -267,7 +267,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .BubbleType, .MiaoMiaoType, .AtomType, .DexcomType:
+        case .BubbleType, .MiaoMiaoType, .AtomType: //, .DexcomType:
             return true
             
         case .Libre2Type:
