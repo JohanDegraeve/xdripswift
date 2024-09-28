@@ -146,7 +146,7 @@ enum ConstantsLog {
     static let categorySettingsViewContactImageSettingsViewModel =           "SettingsViewContactImageSettingsViewModel  "
 
     /// WatchManager logging
-    static let categoryWatchManager =                       "WatchManager                   "
+    static let categoryWatchManager =                       "WatchManager                  "
 
     /// ContactImageManager logging
     static let categoryContactImageManager =                "ContactImageManager           "
