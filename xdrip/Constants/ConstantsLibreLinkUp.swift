@@ -11,7 +11,7 @@ import Foundation
 enum ConstantsLibreLinkUp {
     
     /// string to hold the default LibreLinkUp version number
-    static let libreLinkUpVersionDefault: String = "4.11.0"
+    static let libreLinkUpVersionDefault: String = "4.12.0"
     
     /// double to hold maximum sensor days for Libre sensors that upload to LibreLinkUp
     /// currently easy as they are all the same at 14 days exactly (LibreLink doesn't upload the extra 12 hours)
