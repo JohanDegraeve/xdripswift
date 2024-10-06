@@ -1287,7 +1287,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             
             var forceNewSensor = false
             
-            if let sensorStartDate = self.sensorStartDate, let activeSensorStartDate = UserDefaults.standard.activeSensorStartDate, activeSensorStartDate < sensorStartDate.addingTimeInterval(-15.0) {
+            if let sensorStartDate = self.sensorStartDate, let activeSensorStartDate = UserDefaults.standard.activeSensorStartDate, activeSensorStartDate < sensorStartDate.addingTimeInterval(-15.0) || activeSensorStartDate > sensorStartDate.addingTimeInterval(15.0) {
                 forceNewSensor = true
             }
 
@@ -1327,7 +1327,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             
             var forceNewSensor = false
             
-            if let sensorStartDate = self.sensorStartDate, let activeSensorStartDate = UserDefaults.standard.activeSensorStartDate, activeSensorStartDate < sensorStartDate.addingTimeInterval(-15.0) {
+            if let sensorStartDate = self.sensorStartDate, let activeSensorStartDate = UserDefaults.standard.activeSensorStartDate, activeSensorStartDate < sensorStartDate.addingTimeInterval(-15.0) || activeSensorStartDate > sensorStartDate.addingTimeInterval(15.0) {
                 forceNewSensor = true
             }
             
