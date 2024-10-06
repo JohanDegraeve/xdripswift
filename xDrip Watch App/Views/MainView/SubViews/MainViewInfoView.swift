@@ -92,7 +92,7 @@ struct MainViewInfoView_Previews: PreviewProvider {
         watchState.bgReadingDates = bgDateArray()
         watchState.isMgDl = true
         watchState.slopeOrdinal = 5
-        watchState.deltaChangeInMgDl = -2
+        watchState.deltaValueInUserUnit = -2
         watchState.urgentLowLimitInMgDl = 60
         watchState.lowLimitInMgDl = 80
         watchState.highLimitInMgDl = 140

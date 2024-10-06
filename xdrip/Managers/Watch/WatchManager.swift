@@ -58,15 +58,29 @@ final class WatchManager: NSObject, ObservableObject {
         // this is needed due to the not being able to pass structs that are not codable/hashable
         let hoursOfBgReadingsToSend: Double = 12
         
+        let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        
         let bgReadings = self.bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: .now.addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
         
         let slopeOrdinal: Int = !bgReadings.isEmpty ? bgReadings[0].slopeOrdinal() : 1
         
-        var deltaChangeInMgDl: Double?
+        var previousValueInUserUnit: Double = 0.0
+        var actualValueInUserUnit: Double = 0.0
+        var deltaValueInUserUnit: Double = 0.0
         
-        // add delta if needed
-        if bgReadings.count > 1 {
-            deltaChangeInMgDl = bgReadings[0].currentSlope(previousBgReading: bgReadings[1]) * bgReadings[0].timeStamp.timeIntervalSince(bgReadings[1].timeStamp) * 1000;
+        // add delta if available
+        if bgReadings.count > 0 {
+
+            previousValueInUserUnit = bgReadings[1].calculatedValue.mgDlToMmol(mgDl: isMgDl)
+            actualValueInUserUnit = bgReadings[0].calculatedValue.mgDlToMmol(mgDl: isMgDl)
+            
+            // if the values are in mmol/L, then round them to the nearest decimal point in order to get the same precision out of the next operation
+            if !isMgDl {
+                previousValueInUserUnit = (previousValueInUserUnit * 10).rounded() / 10
+                actualValueInUserUnit = (actualValueInUserUnit * 10).rounded() / 10
+            }
+            
+            deltaValueInUserUnit = actualValueInUserUnit - previousValueInUserUnit
         }
         
         var bgReadingValues: [Double] = []
@@ -82,7 +96,7 @@ final class WatchManager: NSObject, ObservableObject {
         watchState.bgReadingDatesAsDouble = bgReadingDatesAsDouble
         watchState.isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         watchState.slopeOrdinal = slopeOrdinal
-        watchState.deltaChangeInMgDl = deltaChangeInMgDl
+        watchState.deltaValueInUserUnit = deltaValueInUserUnit
         watchState.urgentLowLimitInMgDl = UserDefaults.standard.urgentLowMarkValue
         watchState.lowLimitInMgDl = UserDefaults.standard.lowMarkValue
         watchState.highLimitInMgDl = UserDefaults.standard.highMarkValue

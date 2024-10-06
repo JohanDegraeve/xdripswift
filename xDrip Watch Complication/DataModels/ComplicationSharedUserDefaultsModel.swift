@@ -14,7 +14,7 @@ struct ComplicationSharedUserDefaultsModel: Codable {
     var bgReadingDatesAsDouble: [Double]
     var isMgDl: Bool
     var slopeOrdinal: Int
-    var deltaChangeInMgDl: Double
+    var deltaValueInUserUnit: Double
     var urgentLowLimitInMgDl: Double
     var lowLimitInMgDl: Double
     var highLimitInMgDl: Double

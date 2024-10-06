@@ -82,7 +82,7 @@ class TreatmentsInsertViewController : UIViewController {
 		self.titleNavigation.title = Texts_TreatmentsView.newEntryTitle
         
         // update the BG Check placeholder text depending on BG unit being used
-        self.bgCheckTextField.placeholder = Double(0).mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        self.bgCheckTextField.placeholder = Double(0).mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
         
 		// Labels for each TextField
 		self.carbsLabel.text = Texts_TreatmentsView.carbs
@@ -138,7 +138,7 @@ class TreatmentsInsertViewController : UIViewController {
             case .BgCheck:
                 // set text to value of treatMentEntryToUpdate
                 // as the BG Check values are always stored in coredata as mg/dl, the number must be converted and rounded as needed
-                bgCheckTextField.text = treatMentEntryToUpdate.value.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).stringWithoutTrailingZeroes
+                bgCheckTextField.text = treatMentEntryToUpdate.value.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueRounded(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).stringWithoutTrailingZeroes
                 
                 // hide the other stack views
                 insulinStackView.isHidden = true
@@ -174,7 +174,7 @@ class TreatmentsInsertViewController : UIViewController {
         
                         if treatMentEntryToUpdate.treatmentType == .BgCheck {
             
-                            treatMentEntryToUpdate.value = value.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                            treatMentEntryToUpdate.value = value.mmolToMgdl(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueRounded(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
                             
                         } else {
                             
@@ -277,7 +277,7 @@ class TreatmentsInsertViewController : UIViewController {
         
                         if treatmentType == .BgCheck {
             
-                            value = value.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                            value = value.mmolToMgdl(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueRounded(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
                             
                             // For safety in some APS systems, ensure the user isn't trying to add a future BG Check. If so, warn/inform them and set the datePicker date to the actual date/time.
                             if datePicker.date > Date() {

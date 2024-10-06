@@ -32,7 +32,7 @@ final class WatchStateModel: NSObject, ObservableObject {
     
     @Published var isMgDl: Bool = true
     @Published var slopeOrdinal: Int = 2
-    @Published var deltaChangeInMgDl: Double = 0
+    @Published var deltaValueInUserUnit: Double = 0
     @Published var urgentLowLimitInMgDl: Double = 60
     @Published var lowLimitInMgDl: Double = 80
     @Published var highLimitInMgDl: Double = 170
@@ -85,7 +85,7 @@ final class WatchStateModel: NSObject, ObservableObject {
     /// - Returns: a string with bgValueInMgDl() converted into the user unit
     func bgValueStringInUserChosenUnit() -> String {
         if let bgReadingDate = bgReadingDate(), let bgValueInMgDl = bgValueInMgDl(), bgReadingDate > Date().addingTimeInterval(-60 * 20) {
-            return bgReadingValues.isEmpty ? (isMgDl ? "---" : "-.-") : bgValueInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
+            return bgReadingValues.isEmpty ? (isMgDl ? "---" : "-.-") : bgValueInMgDl.mgDlToMmolAndToString(mgDl: isMgDl)
         } else {
             return isMgDl ? "---" : "-.-"
         }
@@ -181,26 +181,17 @@ final class WatchStateModel: NSObject, ObservableObject {
     /// - Returns: a string holding the formatted delta change value (i.e. +0.4 or -6)
     func deltaChangeStringInUserChosenUnit() -> String {
         if let bgReadingDate = bgReadingDate(), bgReadingDate > Date().addingTimeInterval(-60 * 20) {
-            let valueAsString = deltaChangeInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
+            let deltaValueAsString = isMgDl ? deltaValueInUserUnit.mgDlToMmolAndToString(mgDl: isMgDl) : deltaValueInUserUnit.mmolToString()
             
             var deltaSign: String = ""
-            if (deltaChangeInMgDl > 0) { deltaSign = "+"; }
+            
+            if deltaValueInUserUnit > 0 {
+                deltaSign = "+"
+            }
             
             // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
             // show unitized zero deltas as +0 or +0.0 as per Nightscout format
-            if (isMgDl) {
-                if (deltaChangeInMgDl == 0) {
-                    return "+0"
-                } else {
-                    return deltaSign + valueAsString
-                }
-            } else {
-                if (deltaChangeInMgDl == 0.0) {
-                    return "+0.0"
-                } else {
-                    return deltaSign + valueAsString
-                }
-            }
+            return deltaValueInUserUnit == 0.0 ? (isMgDl ? "+0" : "+0.0") : (deltaSign + deltaValueAsString)
         } else {
             return "-"
         }
@@ -353,7 +344,7 @@ final class WatchStateModel: NSObject, ObservableObject {
             
             isMgDl = dictionary["isMgDl"] as? Bool ?? true
             slopeOrdinal = dictionary["slopeOrdinal"] as? Int ?? 0
-            deltaChangeInMgDl = dictionary["deltaChangeInMgDl"] as? Double ?? 0
+            deltaValueInUserUnit = dictionary["deltaValueInUserUnit"] as? Double ?? 0
             urgentLowLimitInMgDl = dictionary["urgentLowLimitInMgDl"] as? Double ?? 60
             lowLimitInMgDl = dictionary["lowLimitInMgDl"] as? Double ?? 70
             highLimitInMgDl = dictionary["highLimitInMgDl"] as? Double ?? 180
@@ -399,7 +390,7 @@ final class WatchStateModel: NSObject, ObservableObject {
             date.timeIntervalSince1970
         }
         
-        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl, keepAliveIsDisabled: keepAliveIsDisabled, liveDataIsEnabled: liveDataIsEnabled)
+        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl, keepAliveIsDisabled: keepAliveIsDisabled, liveDataIsEnabled: liveDataIsEnabled)
         
         // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
         // the user's device - this allows several copies of the app to be installed without cross-contamination of widget/complication data

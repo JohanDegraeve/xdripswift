@@ -80,7 +80,7 @@ struct BgReadingsView: View {
                                     visualIndicator(bgRangeDescription: bgReading.bgRangeDescription())
                                         .font(.system(size: 10))
                                     
-                                    Text(bgReading.calculatedValue.mgdlToMmol(mgdl: isMgDl).bgValueRounded(mgdl: isMgDl).bgValuetoString(mgdl: isMgDl))
+                                    Text(bgReading.calculatedValue.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).bgValueToString(mgDl: isMgDl))
                                         .foregroundColor(.primary)
                                     
                                     Text(String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
@@ -164,7 +164,7 @@ struct BgReadingsView: View {
         // get the timestamp so that we can match it to the main (unfiltered) array
         let timestampOfBgReadingToDelete = bgReadingToDelete.timeStamp
         
-        trace("deleting BG reading %{public}@ %{public}@ with timestamp %{public}@ from coredata", log: log, category: ConstantsLog.categoryBgReadingsView, type: .info, bgReadingToDelete.calculatedValue.mgdlToMmol(mgdl: isMgDl).bgValueRounded(mgdl: isMgDl).stringWithoutTrailingZeroes, String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol), timestampOfBgReadingToDelete.description)
+        trace("deleting BG reading %{public}@ %{public}@ with timestamp %{public}@ from coredata", log: log, category: ConstantsLog.categoryBgReadingsView, type: .info, bgReadingToDelete.calculatedValue.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).stringWithoutTrailingZeroes, String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol), timestampOfBgReadingToDelete.description)
         
         // delete from the filtered BgReading array which will also force a refresh of the view
         filteredBgReadings.remove(atOffsets: offsets)

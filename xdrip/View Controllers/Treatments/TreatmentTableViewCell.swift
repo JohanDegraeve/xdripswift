@@ -68,7 +68,7 @@ class TreatmentTableViewCell: UITableViewCell {
             let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
             
             // convert to mmol/l if needed, round accordingly and add the correct units
-            self.valueLabel.text = treatment.value.mgdlToMmol(mgdl: isMgDl).bgValueRounded(mgdl: isMgDl).stringWithoutTrailingZeroes
+            self.valueLabel.text = treatment.value.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).stringWithoutTrailingZeroes
             
         } else {
             

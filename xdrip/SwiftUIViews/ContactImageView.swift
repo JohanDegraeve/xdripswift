@@ -54,7 +54,7 @@ struct ContactImageView: View {
                 fontSize = showSlopeArrow ? 90 : 100
             }
         } else {
-            switch bgValue.mgdlToMmol() {
+            switch bgValue.mgDlToMmol() {
             case 0.1..<10.0:
                 fontSize = showSlopeArrow ? 100 : 110
             case 10.0..<20.0:
@@ -80,7 +80,7 @@ struct ContactImageView: View {
 //                fontSize = 100
 //            }
 //        } else {
-//            switch bgValue.mgdlToMmol() {
+//            switch bgValue.mgDlToMmol() {
 //            case 0.1..<10.0:
 //                fontSize = 100
 //            case 10.0..<20.0:
@@ -99,7 +99,7 @@ struct ContactImageView: View {
         let rect = CGRect(x: 0, y: 0, width: width, height: height)
         
         // if there is no current value, 0 will be received so show this as a relevant "---" string
-        let bgValueString: String = bgValue > 0 ? bgValue.mgdlToMmolAndToString(mgdl: isMgDl) : isMgDl ? "---" : "-.-"
+        let bgValueString: String = bgValue > 0 ? bgValue.mgDlToMmolAndToString(mgDl: isMgDl) : isMgDl ? "---" : "-.-"
         let showSlopeArrow: Bool = (valueIsUpToDate && slopeArrow != "") ? true : false
                 
         UIGraphicsBeginImageContext(rect.size)

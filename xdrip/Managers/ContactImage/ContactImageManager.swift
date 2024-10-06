@@ -66,7 +66,13 @@ class ContactImageManager: NSObject {
         switch keyPathEnum {
             
         case UserDefaults.Key.enableContactImage:
-            UserDefaults.standard.enableContactImage ? updateContact() : deleteContact()
+            // if the user has enabled the option, then update the existing contact or add a new one if it doesn't exist
+            // this isn't really the best way to do it as we should delete the contact if
+            // not required to "clean up", but too many users didn't re-select the new contact after
+            // re-enabling in the Watch complication and assumed that the app wasn't working
+            if UserDefaults.standard.enableContactImage {
+                updateContact()
+            }
             
         case UserDefaults.Key.displayTrendInContactImage, UserDefaults.Key.useHighContrastContactImage, UserDefaults.Key.bloodGlucoseUnitIsMgDl:
             updateContact()

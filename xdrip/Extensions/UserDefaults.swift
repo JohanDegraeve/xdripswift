@@ -742,7 +742,7 @@ extension UserDefaults {
                 returnValue = ConstantsBGGraphBuilder.defaultUrgentHighMarkInMgdl
             }
             if !bloodGlucoseUnitIsMgDl {
-                returnValue = returnValue.mgdlToMmol()
+                returnValue = returnValue.mgDlToMmol()
             }
             return returnValue
         }
@@ -766,7 +766,7 @@ extension UserDefaults {
                 returnValue = ConstantsBGGraphBuilder.defaultHighMarkInMgdl
             }
             if !bloodGlucoseUnitIsMgDl {
-                returnValue = returnValue.mgdlToMmol()
+                returnValue = returnValue.mgDlToMmol()
             }
             return returnValue
         }
@@ -797,7 +797,7 @@ extension UserDefaults {
             //read currentvalue in mgdl
             var returnValue = double(forKey: Key.targetMarkValue.rawValue)
             if !bloodGlucoseUnitIsMgDl {
-                returnValue = returnValue.mgdlToMmol()
+                returnValue = returnValue.mgDlToMmol()
             }
             return returnValue
         }
@@ -817,7 +817,7 @@ extension UserDefaults {
                 returnValue = ConstantsBGGraphBuilder.defaultLowMarkInMgdl
             }
             if !bloodGlucoseUnitIsMgDl {
-                returnValue = returnValue.mgdlToMmol()
+                returnValue = returnValue.mgDlToMmol()
             }
             return returnValue
         }
@@ -852,7 +852,7 @@ extension UserDefaults {
                 returnValue = ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl
             }
             if !bloodGlucoseUnitIsMgDl {
-                returnValue = returnValue.mgdlToMmol()
+                returnValue = returnValue.mgDlToMmol()
             }
             return returnValue
         }
@@ -880,7 +880,7 @@ extension UserDefaults {
     /// the urgenthighmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var urgentHighMarkValueInUserChosenUnitRounded:String {
         get {
-            return urgentHighMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+            return urgentHighMarkValueInUserChosenUnit.bgValueToString(mgDl: bloodGlucoseUnitIsMgDl)
         }
         set {
             var value = newValue.toDouble()
@@ -911,7 +911,7 @@ extension UserDefaults {
     /// the highmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var highMarkValueInUserChosenUnitRounded:String {
         get {
-            return highMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+            return highMarkValueInUserChosenUnit.bgValueToString(mgDl: bloodGlucoseUnitIsMgDl)
         }
         set {
             var value = newValue.toDouble()
@@ -931,7 +931,7 @@ extension UserDefaults {
     /// the targetmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var targetMarkValueInUserChosenUnitRounded:String {
         get {
-            return targetMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+            return targetMarkValueInUserChosenUnit.bgValueToString(mgDl: bloodGlucoseUnitIsMgDl)
         }
         set {
             var value = newValue.toDouble()
@@ -945,7 +945,7 @@ extension UserDefaults {
     /// the lowmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var lowMarkValueInUserChosenUnitRounded:String {
         get {
-            return lowMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+            return lowMarkValueInUserChosenUnit.bgValueToString(mgDl: bloodGlucoseUnitIsMgDl)
         }
         set {
             var value = newValue.toDouble()
@@ -965,7 +965,7 @@ extension UserDefaults {
     /// the urgentlowmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var urgentLowMarkValueInUserChosenUnitRounded:String {
         get {
-            return urgentLowMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+            return urgentLowMarkValueInUserChosenUnit.bgValueToString(mgDl: bloodGlucoseUnitIsMgDl)
         }
         set {
             var value = newValue.toDouble()

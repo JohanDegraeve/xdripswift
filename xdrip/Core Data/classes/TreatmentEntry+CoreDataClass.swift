@@ -87,7 +87,7 @@ import CoreData
         switch self {
             
         case .Insulin:
-            return ConstantsGlucoseChart.bolusTreatmentChartPointYAxisOffsetInMgDl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            return ConstantsGlucoseChart.bolusTreatmentChartPointYAxisOffsetInMgDl.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
             // if no offset is defined or needed for this treatment type, just return zero offset
         default:
@@ -103,7 +103,7 @@ import CoreData
         switch self {
             
         case .Insulin:
-            return ConstantsGlucoseChart.bolusTreatmentChartPointYAxisScaleFactor.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            return ConstantsGlucoseChart.bolusTreatmentChartPointYAxisScaleFactor.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
             // if no scale is defined or needed for this treatment type, just return a unity scale factor
         default:
@@ -194,7 +194,7 @@ public class TreatmentEntry: NSManagedObject, Comparable {
         case .BgCheck:
             dict["eventType"] = "BG Check" // maybe overwritten in next statement
             dict["glucose"] = self.value
-            dict["glucoseType"] = "Finger" + String(!UserDefaults.standard.bloodGlucoseUnitIsMgDl ? ": " + self.value.mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) + " " + Texts_Common.mmol : "")
+            dict["glucoseType"] = "Finger" + String(!UserDefaults.standard.bloodGlucoseUnitIsMgDl ? ": " + self.value.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) + " " + Texts_Common.mmol : "")
             dict["units"] = ConstantsNightscout.mgDlNightscoutUnitString
 		default:
 			break

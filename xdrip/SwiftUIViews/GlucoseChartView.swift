@@ -187,7 +187,7 @@ struct GlucoseChartView: View {
             AxisMarks(values: [lowLimitInMgDl, highLimitInMgDl]) {
                 if let value = $0.as(Double.self) {
                     AxisValueLabel {
-                        Text(value.mgdlToMmolAndToString(mgdl: isMgDl))
+                        Text(value.mgDlToMmolAndToString(mgDl: isMgDl))
                             .foregroundStyle(Color(.colorPrimary))
                             .font(.footnote)
                             .offset(x: chartType.yAxisLabelOffsetX(), y: chartType.yAxisLabelOffsetY())
@@ -198,7 +198,7 @@ struct GlucoseChartView: View {
             AxisMarks(values: [urgentLowLimitInMgDl, urgentHighLimitInMgDl]) {
                 if let value = $0.as(Double.self) {
                     AxisValueLabel {
-                        Text(value.mgdlToMmolAndToString(mgdl: isMgDl))
+                        Text(value.mgDlToMmolAndToString(mgDl: isMgDl))
                             .foregroundStyle(Color(.colorSecondary))
                             .font(.footnote)
                             .offset(x: chartType.yAxisLabelOffsetX(), y: chartType.yAxisLabelOffsetY())
