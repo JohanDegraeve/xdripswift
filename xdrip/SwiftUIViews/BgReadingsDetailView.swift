@@ -25,7 +25,7 @@ struct BgReadingsDetailView: View {
         List {
             Section(header: Text(Texts_BgReadings.generalSectionHeader)) {
                 row(title: Texts_BgReadings.timestamp, data: bgReading.timeStamp.formatted(date: .abbreviated, time: .shortened))
-                row(title: Texts_BgReadings.calculatedValue, data: bgReading.calculatedValue.mgdlToMmol(mgdl: isMgDl).bgValueRounded(mgdl: isMgDl).bgValuetoString(mgdl: isMgDl) + " " + String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
+                row(title: Texts_BgReadings.calculatedValue, data: bgReading.calculatedValue.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).bgValueToString(mgDl: isMgDl) + " " + String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
             }
             
             Section(header: Text(Texts_BgReadings.slopeSectionHeader)) {
@@ -40,14 +40,14 @@ struct BgReadingsDetailView: View {
                     row(title: Texts_BgReadings.date, data: calibration.timeStamp.formatted(date: .abbreviated, time: .shortened))
                     row(title: Texts_BgReadings.slope, data: calibration.slope.formatted(.number.rounded(increment: 0.0001)))
                     row(title: Texts_BgReadings.intercept, data: calibration.intercept.formatted(.number.rounded(increment: 0.0001)))
-                    row(title: Texts_BgReadings.calibrationValue, data: calibration.bg.bgValuetoString(mgdl: true))
-                    row(title: Texts_BgReadings.sensorRawValue, data: calibration.rawValue.bgValuetoString(mgdl: true))
+                    row(title: Texts_BgReadings.calibrationValue, data: calibration.bg.bgValueToString(mgDl: true))
+                    row(title: Texts_BgReadings.sensorRawValue, data: calibration.rawValue.bgValueToString(mgDl: true))
                 }
             }
             
             Section(header: Text(Texts_BgReadings.internalDataSectionHeader)) {
                 row(title: Texts_BgReadings.deviceName, data: bgReading.deviceName?.description ?? nilString)
-                row(title: Texts_BgReadings.rawData, data: bgReading.rawData.bgValuetoString(mgdl: true))
+                row(title: Texts_BgReadings.rawData, data: bgReading.rawData.bgValueToString(mgDl: true))
                 row(title: Texts_BgReadings.id, data: bgReading.id.description)
             }
         }

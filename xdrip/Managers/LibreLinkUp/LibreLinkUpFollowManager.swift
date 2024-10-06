@@ -175,7 +175,7 @@ class LibreLinkUpFollowManager: NSObject {
     ///
     /// updates bgreading
     ///
-    private func findSlope() -> (calculatedValueSlope:Double, hideSlope:Bool) {
+    private func findSlope() -> (calculatedValueSlope: Double, hideSlope: Bool) {
         
         // init returnvalues
         var hideSlope = true
@@ -186,7 +186,7 @@ class LibreLinkUpFollowManager: NSObject {
         
         // if more thant 2 readings, calculate slope and hie
         if last2Readings.count >= 2 {
-            let (slope, hide) = last2Readings[0].calculateSlope(lastBgReading:last2Readings[1]);
+            let (slope, hide) = last2Readings[0].calculateSlope(lastBgReading:last2Readings[1])
             calculatedValueSlope = slope
             hideSlope = hide
         }

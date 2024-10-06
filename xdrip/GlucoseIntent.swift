@@ -35,9 +35,9 @@ struct GlucoseIntent: AppIntent {
             throw IntentError.message("No glucose data")
         }
         
-        let value = mostRecent.calculatedValue.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) // UserDefaults.standard.bloodGlucoseUnitIsMgDl ? mostRecent.calculatedValue : (mostRecent.calculatedValue * ConstantsBloodGlucose.mgDlToMmoll)
+        let value = mostRecent.calculatedValue.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) // UserDefaults.standard.bloodGlucoseUnitIsMgDl ? mostRecent.calculatedValue : (mostRecent.calculatedValue * ConstantsBloodGlucose.mgDlToMmoll)
         
-        let valueString = value.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) // UserDefaults.standard.bloodGlucoseUnitIsMgDl ? value.formatted(.number.precision(.fractionLength(0))) : value.formatted(.number.precision(.fractionLength(1)))
+        let valueString = value.bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) // UserDefaults.standard.bloodGlucoseUnitIsMgDl ? value.formatted(.number.precision(.fractionLength(0))) : value.formatted(.number.precision(.fractionLength(1)))
         
         let trendDescription: LocalizedStringResource = switch mostRecent.slopeTrend() {
         case .droppingFast: "dropping fast"

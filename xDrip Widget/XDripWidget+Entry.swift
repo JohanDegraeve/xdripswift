@@ -28,7 +28,7 @@ extension XDripWidget.Entry {
         var bgReadingDates: [Date]?
         var isMgDl: Bool
         var slopeOrdinal: Int
-        var deltaChangeInMgDl: Double?
+        var deltaValueInUserUnit: Double?
         var urgentLowLimitInMgDl: Double
         var lowLimitInMgDl: Double
         var highLimitInMgDl: Double
@@ -42,12 +42,12 @@ extension XDripWidget.Entry {
         var bgReadingDate: Date?
         var bgValueStringInUserChosenUnit: String
                 
-        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaChangeInMgDl: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, dataSourceDescription: String? = "", allowStandByHighContrast: Bool? = true, keepAliveImageString: String?) {
+        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaValueInUserUnit: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, dataSourceDescription: String? = "", allowStandByHighContrast: Bool? = true, keepAliveImageString: String?) {
             self.bgReadingValues = bgReadingValues
             self.bgReadingDates = bgReadingDates
             self.isMgDl = isMgDl ?? true
             self.slopeOrdinal = slopeOrdinal ?? 0
-            self.deltaChangeInMgDl = deltaChangeInMgDl
+            self.deltaValueInUserUnit = deltaValueInUserUnit
             self.urgentLowLimitInMgDl = urgentLowLimitInMgDl ?? 60
             self.lowLimitInMgDl = lowLimitInMgDl ?? 80
             self.highLimitInMgDl = highLimitInMgDl ?? 180
@@ -62,7 +62,7 @@ extension XDripWidget.Entry {
             self.bgUnitString = self.isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
             
             if let bgReadingDate = self.bgReadingDate, bgReadingDate > Date().addingTimeInterval(-ConstantsWidgetExtension.bgReadingDateVeryStaleInMinutes) {
-                self.bgValueStringInUserChosenUnit =  (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0].mgdlToMmolAndToString(mgdl: self.isMgDl) ?? "" : ""
+                self.bgValueStringInUserChosenUnit =  (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0].mgDlToMmolAndToString(mgDl: self.isMgDl) ?? "" : ""
             } else {
                 self.bgValueStringInUserChosenUnit = self.isMgDl ? "---" : "-.-"
             }
@@ -147,17 +147,13 @@ extension XDripWidget.Entry {
         /// convert the optional delta change int (in mg/dL) to a formatted change value in the user chosen unit making sure all zero values are shown as a positive change to follow Nightscout convention
         /// - Returns: a string holding the formatted delta change value (i.e. +0.4 or -6)
         func deltaChangeStringInUserChosenUnit() -> String {
-            if let deltaChangeInMgDl = deltaChangeInMgDl, let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-ConstantsWidgetExtension.bgReadingDateVeryStaleInMinutes) {
-                let deltaSign: String = deltaChangeInMgDl > 0 ? "+" : ""
-                let valueAsString = deltaChangeInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
+            if let deltaValueInUserUnit = deltaValueInUserUnit, let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-ConstantsWidgetExtension.bgReadingDateVeryStaleInMinutes) {
+                let deltaSign: String = deltaValueInUserUnit > 0 ? "+" : ""
+                let deltaValueAsString = isMgDl ? deltaValueInUserUnit.mgDlToMmolAndToString(mgDl: isMgDl) : deltaValueInUserUnit.mmolToString()
                 
                 // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
                 // show unitized zero deltas as +0 or +0.0 as per Nightscout format
-                if (isMgDl) {
-                    return (deltaChangeInMgDl == 0) ?  "+0" : (deltaSign + valueAsString)
-                } else {
-                    return (deltaChangeInMgDl == 0.0) ? "+0.0" : (deltaSign + valueAsString)
-                }
+                return deltaValueInUserUnit == 0.0 ? (isMgDl ? "+0" : "+0.0") : (deltaSign + deltaValueAsString)
             } else {
                 return isMgDl ? "-" : "-.-"
             }
@@ -198,6 +194,6 @@ extension XDripWidget.Entry {
 
 extension XDripWidget.Entry {
     static var placeholder: Self {
-        .init(date: .now, widgetState: WidgetState(bgReadingValues: ConstantsWidgetExtension.bgReadingValuesPlaceholderData, bgReadingDates: ConstantsWidgetExtension.bgReadingDatesPlaceholderData(), isMgDl: true, slopeOrdinal: 4, deltaChangeInMgDl: 0, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 90, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, dataSourceDescription: "Dexcom G6", keepAliveImageString: "circle"))
+        .init(date: .now, widgetState: WidgetState(bgReadingValues: ConstantsWidgetExtension.bgReadingValuesPlaceholderData, bgReadingDates: ConstantsWidgetExtension.bgReadingDatesPlaceholderData(), isMgDl: true, slopeOrdinal: 4, deltaValueInUserUnit: 0, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 90, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, dataSourceDescription: "Dexcom G6", keepAliveImageString: "circle"))
     }
 }

@@ -142,7 +142,7 @@ class BGReadingSpeaker:NSObject {
             
             var previousBgReading:BgReading?
             if lastReadings.count > 1 {previousBgReading = lastReadings[1]}
-            var currentDelta:String = bgReadingToSpeak.unitizedDeltaString(previousBgReading: previousBgReading, showUnit: false, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            var currentDelta:String = bgReadingToSpeak.unitizedDeltaString(previousBgReading: previousBgReading, showUnit: false, highGranularity: true, mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
             //Format current delta in case of anomalies
             if currentDelta == "ERR" || currentDelta == "???"{
