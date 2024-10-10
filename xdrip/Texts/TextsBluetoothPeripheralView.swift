@@ -148,12 +148,12 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("warmingUpUntil", tableName: filename, bundle: Bundle.main, value: "Warming up until", comment: "sensor warm-up text")
     }()
     
-    static let transmitterAlgorithm: String = {
-        return NSLocalizedString("transmitterAlgorithm", tableName: filename, bundle: Bundle.main, value: "Transmitter", comment: "transmitter algorithm type text")
+    static let nativeAlgorithm: String = {
+        return NSLocalizedString("nativeAlgorithm", tableName: filename, bundle: Bundle.main, value: "Native Algorithm", comment: "native or transmitter algorithm type text")
     }()
     
     static let xDripAlgorithm: String = {
-        return NSLocalizedString("xDripAlgorithm", tableName: filename, bundle: Bundle.main, value: "xDrip", comment: "xDrip algorithm type text")
+        return NSLocalizedString("xDripAlgorithm", tableName: filename, bundle: Bundle.main, value: "xDrip Algorithm", comment: "xDrip algorithm type text")
     }()
     
     static let confirmAlgorithmChangeToTransmitterMessage: String = {
