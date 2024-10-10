@@ -12,6 +12,6 @@ enum ConstantsDexcomG7 {
     static let minimumTimeBetweenTwoReadings = TimeInterval(minutes: 2.1)
     
     /// how many days the sensor session lasts
-    static let maxSensorAgeInDays: Double = 10.0
+    static let maxSensorAgeInDays: Double = 10.5
     
 }
