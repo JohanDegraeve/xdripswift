@@ -3988,6 +3988,8 @@ extension RootViewController: FollowerDelegate {
                 // ask calendarManager to process new reading, ignore last connection change timestamp because this is follower mode, there is no connection to a transmitter
                 calendarManager?.processNewReading(lastConnectionStatusChangeTimeStamp: nil)
                 
+                contactImageManager?.processNewReading()
+                
                 loopManager?.share()
 
                 watchManager?.updateWatchApp(forceComplicationUpdate: false)
