@@ -30,8 +30,8 @@ struct BgReadingsDetailView: View {
             
             Section(header: Text(Texts_BgReadings.slopeSectionHeader)) {
                 row(title: Texts_BgReadings.slopeArrow, data: bgReading.slopeArrow())
-                row(title: Texts_BgReadings.slopePerMinute, data: (bgReading.calculatedValueSlope * 60000).formatted(.number.rounded(increment: isMgDl ? 0.01 : 0.001)) + " " + String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
-                row(title: Texts_BgReadings.slopePer5Minutes, data: (bgReading.calculatedValueSlope * 60000 * 5).formatted(.number.rounded(increment: isMgDl ? 0.01 : 0.001)) + " " + String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
+                row(title: Texts_BgReadings.slopePerMinute, data: (bgReading.calculatedValueSlope.mgDlToMmol(mgDl: isMgDl) * 60000).formatted(.number.rounded(increment: isMgDl ? 0.01 : 0.001)) + " " + String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
+                row(title: Texts_BgReadings.slopePer5Minutes, data: (bgReading.calculatedValueSlope.mgDlToMmol(mgDl: isMgDl) * 60000 * 5).formatted(.number.rounded(increment: isMgDl ? 0.01 : 0.001)) + " " + String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
             }
             
             if let calibration = bgReading.calibration {
