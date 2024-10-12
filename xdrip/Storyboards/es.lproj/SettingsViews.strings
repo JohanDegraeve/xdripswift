@@ -24,7 +24,7 @@
 "settingsviews_enterUsername" = "Entrar tu usuario (e-mail)";
 "settingsviews_enterPassword" = "Entrar tu contraseña";
 "settingsviews_libreLinkUpReAcceptNeeded" = "Aceptar terminos";
-"settingsviews_libreLinkUpNoActiveSensor" = "Sin sensor activo";
+"settingsviews_libreLinkUpNoActiveSensor" = "Sin datos de sensor activo";
 "settingsviews_translateOnlineHelp" = "Traducir Documentación";
 "settingsviews_showHelpIcon" = "Mostrar icono";
 "settingsviews_restartNeeded" = "(Pendiente reiniciar)";

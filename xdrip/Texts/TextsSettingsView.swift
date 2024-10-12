@@ -157,7 +157,7 @@ class Texts_SettingsView {
     }()
     
     static let libreLinkUpNoActiveSensor = {
-        return NSLocalizedString("settingsviews_libreLinkUpNoActiveSensor", tableName: filename, bundle: Bundle.main, value: "No active sensor", comment: "libre link up follower settings, no active sensor")
+        return NSLocalizedString("settingsviews_libreLinkUpNoActiveSensor", tableName: filename, bundle: Bundle.main, value: "No active sensor data", comment: "libre link up follower settings, no active sensor")
     }()
     
     // MARK: - Section Notifications

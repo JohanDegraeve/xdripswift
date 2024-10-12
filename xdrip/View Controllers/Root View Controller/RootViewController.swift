@@ -3305,11 +3305,6 @@ final class RootViewController: UIViewController, ObservableObject {
                     dataSourceSensorMaxAgeOutlet.textColor = .systemRed
                     dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.libreLinkUpAccountCredentialsMissing
                     
-                } else if sensorStartDate == nil || sensorMaxAgeInMinutes == 0 {
-                    
-                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
-                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.noSensorData
-                    
                 }
                 
             }
