@@ -227,6 +227,6 @@ class Texts_Common {
     }()
     
     static let notRequired = {
-        return NSLocalizedString("common_notRequired", tableName: filename, bundle: Bundle.main, value: "Not Required", comment: "not required")
+        return NSLocalizedString("common_notRequired", tableName: filename, bundle: Bundle.main, value: "Not required", comment: "not required")
     }()
 }

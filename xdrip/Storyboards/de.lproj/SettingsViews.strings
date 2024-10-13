@@ -92,6 +92,10 @@
 /// non fixed settings, title of the section
 "settingsviews_labelNonFixed" = "Mehrpunkt-Kalibrierung";
 
+"settingsviews_labelAlgorithmType" = "Algorithmus Typ";
+"settingsviews_labelCalibrationTitle" = "Sensor Kalibrierung";
+"settingsviews_labelCalibrationType" = "Kalibrierungs Typ";
+
 /// healthkit settings, literally 'healthkit'
 "settingsviews_healthkit" = "Apple Health nutzen";
 

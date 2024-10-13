@@ -69,3 +69,6 @@
 
 /// sensor warm-up text
 "warmingUpUntil" = "Warming up until";
+
+"nativeAlgorithm" = "Inbyggd Algoritm";
+"xDripAlgorithm" = "xDrip Algoritm";

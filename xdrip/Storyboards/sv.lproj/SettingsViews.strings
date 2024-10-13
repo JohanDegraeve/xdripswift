@@ -32,6 +32,11 @@
 "settingsviews_resettransmitter" = "Återställ sändare (Anubis)";
 "settingsviews_nonfixedtransmitter" = "Använd flerpunktskalibrering";
 "settingsviews_labelNonFixed" = "Flerpunktskalibrering";
+
+"settingsviews_labelAlgorithmType" = "Algoritm typ";
+"settingsviews_labelCalibrationTitle" = "Sensor Kalibrering";
+"settingsviews_labelCalibrationType" = "Kalibreringstyp";
+
 "settingsviews_sectiontitlealerting" = "Larm";
 "settingsviews_row_alert_types" = "Typ av larm";
 "settingsviews_row_alerts" = "Larm";

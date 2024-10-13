@@ -69,6 +69,9 @@
 "settingsviews_resetDexcomTransmitterMessage" = "\nEsta opción intentará resetear el transmisor durante la próxima conexión.\n\nEsto solo puede funcionar con transmisores G5 y transmisores G6 Anubis.\n\nNo funciona para transmisores normales tipo G6 y One.";
 "settingsviews_nonfixedtransmitter" = "Habilitar Calibración Multi-punto";
 "settingsviews_labelNonFixed" = "Calibración Multi-punto";
+"settingsviews_labelAlgorithmType" = "Tipo de Algoritmo";
+"settingsviews_labelCalibrationTitle" = "Calibración de Sensor";
+"settingsviews_labelCalibrationType" = "Tipo de Calibración";
 "settingsviews_sectiontitlealerting" = "Alarmas";
 "settingsviews_row_alert_types" = "Tipos de Alarmas";
 "settingsviews_row_alerts" = "Alarmas";

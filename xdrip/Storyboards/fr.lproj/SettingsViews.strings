@@ -113,6 +113,9 @@
 /// non fixed settings, title of the section
 "settingsviews_labelNonFixed" = "Calibration Multi-point";
 
+"settingsviews_labelAlgorithmType" = "Type d'algorithme";
+"settingsviews_labelCalibrationType" = "Type de calibration";
+
 /// In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row
 "volumeTestSoundPlayer" = "Test Volume (Si Ignorer Mode silencieux)";
 

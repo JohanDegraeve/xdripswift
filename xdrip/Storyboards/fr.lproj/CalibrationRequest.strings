@@ -2,3 +2,5 @@
 "calibration_title" = "Calibration";
 "calibration_notification_title" = "Calibration";
 "calibration_notification_body" = "Cliquez la notification pour calibrer";
+"singlePointCalibration" = "Standard";
+"multiPointCalibration" = "Multi-points";

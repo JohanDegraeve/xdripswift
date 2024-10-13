@@ -2,3 +2,5 @@
 "calibration_title" = "Kalibrering";
 "calibration_notification_title" = "Kalibrering";
 "calibration_notification_body" = "Klicka på notis för att kalibrera";
+"singlePointCalibration" = "Standard";
+"multiPointCalibration" = "Flerpunkts";

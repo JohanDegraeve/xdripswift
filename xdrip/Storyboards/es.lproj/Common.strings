@@ -50,3 +50,4 @@
 "common_dontshowagain" = "No Volver a Mostrar";
 "common_enabled" = "Habilitado";
 "common_disabled" = "Deshabilitado";
+"common_notRequired" = "No requerido";

@@ -30,6 +30,9 @@
 "settingsviews_resettransmitter" = "Reset Transmitter (Anubis)";
 "settingsviews_nonfixedtransmitter" = "Schakel Meerpuntskalibratie In";
 "settingsviews_labelNonFixed" = "Meerpuntskalibratie";
+"settingsviews_labelAlgorithmType" = "Type algoritme";
+"settingsviews_labelCalibrationTitle" = "Sensor Kalibratie";
+"settingsviews_labelCalibrationType" = "Type kalibratie";
 "settingsviews_sectiontitlealerting" = "Alarmen";
 "settingsviews_row_alert_types" = "Alarm Types";
 "settingsviews_row_alerts" = "Alarmen";

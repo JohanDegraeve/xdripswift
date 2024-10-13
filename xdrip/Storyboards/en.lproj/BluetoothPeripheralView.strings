@@ -42,3 +42,11 @@
 "nfcErrorMessageScanFailed" = "Sensor scan has failed";
 "nonFixedSlopeWarning" = "Multi-point calibration is an advanced feature.\n\nPlease do not use this feature until you have read the calibration section of the online help and understand how it works.";
 "warmingUpUntil" = "Warming up until";
+
+"nativeAlgorithm" = "Native algorithm";
+"xDripAlgorithm" = "xDrip algorithm";
+"confirmAlgorithmChangeToTransmitterMessage" = "Please confirm that you want to change back to the native/transmitter algorithm";
+"confirmAlgorithmChangeToxDripMessage" = "Please confirm that you want to change the the xDrip algorithm.\n\nThis will stop readings for a short time and ask you for a initial calibration value when ready.";
+"confirmCalibrationChangeToSinglePointMessage" = "Please confirm that you want to change the calibration type to the standard calibration\n\nThis will stop readings for a short time and ask you for a initial calibration value when ready.";
+"confirmCalibrationChangeToMultiPointMessage" = "Please confirm that you want to change the calibration type to multi-point\n\n⚠️ Please note that this method is only for advanced users and could potentially give dangerous results if not correctly calibrated.\n\nIf you are unsure how to use this method, please press Cancel.";
+"confirm" = "Confirm";
