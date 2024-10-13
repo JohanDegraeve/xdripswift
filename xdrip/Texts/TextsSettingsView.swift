@@ -709,7 +709,7 @@ class Texts_SettingsView {
     }()
     
     static let enableContactImage: String = {
-        return NSLocalizedString("settingsviews_enableContactImage", tableName: filename, bundle: Bundle.main, value: "Create Contact", comment: "Contact Image Settings - text in row where contact image is enabled or disabled ")
+        return NSLocalizedString("settingsviews_enableContactImage", tableName: filename, bundle: Bundle.main, value: "Enable Contact Image", comment: "Contact Image Settings - text in row where contact image is enabled or disabled ")
     }()
     
     static let displayTrendInContactImage: String = {
