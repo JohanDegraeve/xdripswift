@@ -10,7 +10,7 @@
 "volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
 
 /// nightscout settings, port to use
-"nightScoutPort" = "Port";
+"nightscoutPort" = "Port";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up title - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
 "settingsviews_IntervalTitle" = "Notification Interval";
@@ -19,7 +19,7 @@
 "settingsviews_urgentHighValue" = "Urgent High Value";
 
 /// nightscout settings, pop up that asks user to enter nightscout api key
-"settingsviews_giveNightScoutAPIKey" = "Enter your API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "Enter your API_SECRET";
 
 /// alerting settings, row alerts
 "settingsviews_row_alerts" = "Alarms";
@@ -34,10 +34,10 @@
 "settingsviews_speakTrend" = "Speak Trend";
 
 /// nightscout settings, where user can set the nightscout api key
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
 
 /// nightscout settings, where user can set the nightscout url
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_nightscoutUrl" = "URL";
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Settings";
@@ -82,7 +82,7 @@
 "sectionTitleTrace" = "Issue Reporting";
 
 /// nightscout settings, where user can enable or disable nightscout
-"settingsviews_nightScoutEnabled" = "Enable Nightscout";
+"settingsviews_nightscoutEnabled" = "Enable Nightscout";
 
 /// user tries to send trace file but there's no native email account configured
 "emailNotConfigured" = "You must configure an e-mail account on your iOS device.";
@@ -130,7 +130,7 @@
 "settingsviews_row_alert_types" = "Alarm Types";
 
 /// nightscout  settings, pop up that asks user to enter nightscout url
-"settingsviews_giveNightScoutUrl" = "Enter your NightScout URL";
+"settingsviews_giveNightscoutUrl" = "Enter your Nightscout URL";
 
 /// home screen settings, show target line
 "settingsviews_showtarget" = "Show Target Line";
@@ -232,12 +232,12 @@
 "settingsviews_speakBgReadings" = "Speak BG Readings";
 
 /// nightscout settings, section title
-"settingsviews_sectiontitlenightscout" = "NightScout";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
 
 /// dexcom share settings, where user can choose to use US url or not
 "settingsviews_useUSDexcomShareurl" = "Use Dexcom US Servers";
 
-/// used for editing schedule for NightScout upload and Dexcom Share upload
+/// used for editing schedule for Nightscout upload and Dexcom Share upload
 "editScheduleTimePickerSubtitle" = "Change: ";
 
 /// Apple Watch Settings - text in row where user needs to select a calendar
@@ -408,7 +408,7 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";

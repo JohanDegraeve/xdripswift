@@ -21,14 +21,14 @@ struct GlucoseChartView: View {
     let lowLimitInMgDl: Double
     let highLimitInMgDl: Double
     let urgentHighLimitInMgDl: Double
-    let liveActivitySize: LiveActivitySize
+    let liveActivityType: LiveActivityType
     let hoursToShow: Double
     let glucoseCircleDiameter: Double
     let chartHeight: Double
     let chartWidth: Double
     let showHighContrast: Bool
     
-    init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double]?, bgReadingDates: [Date]?, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySize: LiveActivitySize?, hoursToShowScalingHours: Double?, glucoseCircleDiameterScalingHours: Double?, overrideChartHeight: Double?, overrideChartWidth: Double?, highContrast: Bool?) {
+    init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double]?, bgReadingDates: [Date]?, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType?, hoursToShowScalingHours: Double?, glucoseCircleDiameterScalingHours: Double?, overrideChartHeight: Double?, overrideChartWidth: Double?, highContrast: Bool?) {
         
         self.chartType = glucoseChartType
         self.isMgDl = isMgDl
@@ -36,19 +36,19 @@ struct GlucoseChartView: View {
         self.lowLimitInMgDl = lowLimitInMgDl
         self.highLimitInMgDl = highLimitInMgDl
         self.urgentHighLimitInMgDl = urgentHighLimitInMgDl
-        self.liveActivitySize = liveActivitySize ?? .normal
+        self.liveActivityType = liveActivityType ?? .normal
         self.showHighContrast = highContrast ?? false
         
         // here we want to automatically set the hoursToShow based upon the chart type, but some chart instances might need
         // this to be overriden such as for zooming in/out of the chart (i.e. the Watch App)
-        self.hoursToShow = hoursToShowScalingHours ?? chartType.hoursToShow(liveActivitySize: self.liveActivitySize)
+        self.hoursToShow = hoursToShowScalingHours ?? chartType.hoursToShow(liveActivityType: self.liveActivityType)
         
-        self.chartHeight = overrideChartHeight ?? chartType.viewSize(liveActivitySize: self.liveActivitySize).height
+        self.chartHeight = overrideChartHeight ?? chartType.viewSize(liveActivityType: self.liveActivityType).height
         
-        self.chartWidth = overrideChartWidth ?? chartType.viewSize(liveActivitySize: self.liveActivitySize).width
+        self.chartWidth = overrideChartWidth ?? chartType.viewSize(liveActivityType: self.liveActivityType).width
         
         // apply a scale to the glucoseCircleDiameter if an override value is passed
-        self.glucoseCircleDiameter = chartType.glucoseCircleDiameter(liveActivitySize: self.liveActivitySize) * ((glucoseCircleDiameterScalingHours ?? self.hoursToShow) / self.hoursToShow)
+        self.glucoseCircleDiameter = chartType.glucoseCircleDiameter(liveActivityType: self.liveActivityType) * ((glucoseCircleDiameterScalingHours ?? self.hoursToShow) / self.hoursToShow)
         
         // as all widget instances are passed 12 hours of bg values, we must initialize this instance to use only the amount of hours of value required by the chartType passed
         self.bgReadingValues = []
@@ -95,7 +95,7 @@ struct GlucoseChartView: View {
         let mappingArray = Array(1...amountOfFullHours)
         
         /// set the stride count interval to make sure we don't add too many labels to the x-axis if the user wants to view >6 hours
-        let intervalBetweenAxisValues: Int = chartType.intervalBetweenAxisValues(liveActivitySize: liveActivitySize)
+        let intervalBetweenAxisValues: Int = chartType.intervalBetweenAxisValues(liveActivityType: liveActivityType)
         
         /// first, for each int in mappingArray, we create a Date, starting with the lower hour + 1 hour - we will create 5 in this example, starting with hour 08 (7 + 3600 seconds)
         let startDateLower = Date(timeIntervalSinceReferenceDate:
@@ -187,7 +187,7 @@ struct GlucoseChartView: View {
             AxisMarks(values: [lowLimitInMgDl, highLimitInMgDl]) {
                 if let value = $0.as(Double.self) {
                     AxisValueLabel {
-                        Text(value.mgdlToMmolAndToString(mgdl: isMgDl))
+                        Text(value.mgDlToMmolAndToString(mgDl: isMgDl))
                             .foregroundStyle(Color(.colorPrimary))
                             .font(.footnote)
                             .offset(x: chartType.yAxisLabelOffsetX(), y: chartType.yAxisLabelOffsetY())
@@ -198,7 +198,7 @@ struct GlucoseChartView: View {
             AxisMarks(values: [urgentLowLimitInMgDl, urgentHighLimitInMgDl]) {
                 if let value = $0.as(Double.self) {
                     AxisValueLabel {
-                        Text(value.mgdlToMmolAndToString(mgdl: isMgDl))
+                        Text(value.mgDlToMmolAndToString(mgDl: isMgDl))
                             .foregroundStyle(Color(.colorSecondary))
                             .font(.footnote)
                             .offset(x: chartType.yAxisLabelOffsetX(), y: chartType.yAxisLabelOffsetY())

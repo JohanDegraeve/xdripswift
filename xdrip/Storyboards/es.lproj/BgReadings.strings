@@ -1,6 +1,6 @@
 "glucoseReadingsTitle" = "Lecturas";
 "glucoseReadingTitle" = "Lectura";
-"selectDate" = "Fecha";
+"date" = "Fecha";
 "noReadingsToShow" = "No hay datos...";
 "generalSectionHeader" = "General";
 "internalDataSectionHeader" = "Datos internos";

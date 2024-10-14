@@ -14,7 +14,7 @@ struct NotificationView: View {
     var bgReadingDates: [Date]?
     var isMgDl: Bool?
     var slopeOrdinal: Int?
-    var deltaChangeInMgDl: Double?
+    var deltaValueInUserUnit: Double?
     var urgentLowLimitInMgDl: Double?
     var lowLimitInMgDl: Double?
     var highLimitInMgDl: Double?
@@ -64,7 +64,7 @@ struct NotificationView: View {
                 }
                 .padding(12)
                 
-                GlucoseChartView(glucoseChartType: .notificationExpanded, bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: isMgDl ?? true, urgentLowLimitInMgDl: urgentLowLimitInMgDl ?? 60, lowLimitInMgDl: lowLimitInMgDl ?? 70, highLimitInMgDl: highLimitInMgDl ?? 180, urgentHighLimitInMgDl: urgentHighLimitInMgDl ?? 250, liveActivitySize: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
+                GlucoseChartView(glucoseChartType: .notificationExpanded, bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: isMgDl ?? true, urgentLowLimitInMgDl: urgentLowLimitInMgDl ?? 60, lowLimitInMgDl: lowLimitInMgDl ?? 70, highLimitInMgDl: highLimitInMgDl ?? 180, urgentHighLimitInMgDl: urgentHighLimitInMgDl ?? 250, liveActivityType: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
             }
             .background(ConstantsAlerts.notificationBackgroundColor)
         }
@@ -104,17 +104,13 @@ struct NotificationView: View {
     /// convert the optional delta change int (in mg/dL) to a formatted change value in the user chosen unit making sure all zero values are shown as a positive change to follow Nightscout convention
     /// - Returns: a string holding the formatted delta change value (i.e. +0.4 or -6)
     func deltaChangeStringInUserChosenUnit() -> String {
-        if let deltaChangeInMgDl = deltaChangeInMgDl, let isMgDl = isMgDl {
-            let deltaSign: String = deltaChangeInMgDl > 0 ? "+" : ""
-            let valueAsString = deltaChangeInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
+        if let deltaValueInUserUnit = deltaValueInUserUnit, let isMgDl = isMgDl {
+            let deltaSign: String = deltaValueInUserUnit > 0 ? "+" : ""
+            let deltaValueAsString = isMgDl ? deltaValueInUserUnit.mgDlToMmolAndToString(mgDl: isMgDl) : deltaValueInUserUnit.mmolToString()
             
             // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
             // show unitized zero deltas as +0 or +0.0 as per Nightscout format
-            if isMgDl {
-                return (deltaChangeInMgDl > -1 && deltaChangeInMgDl < 1) ?  "+0" : (deltaSign + valueAsString)
-            } else {
-                return (deltaChangeInMgDl > -0.1 && deltaChangeInMgDl < 0.1) ? "+0.0" : (deltaSign + valueAsString)
-            }
+            return deltaValueInUserUnit == 0.0 ? (isMgDl ? "+0" : "+0.0") : (deltaSign + deltaValueAsString)
         } else {
             return (isMgDl ?? true) ? "-" : "-.-"
         }

@@ -27,6 +27,7 @@ final class WatchManager: NSObject, ObservableObject {
     /// hold the current watch state model
     private var watchState = WatchState()
     
+    /// keep track of when we last forced a complication update from within the code
     private var lastForcedComplicationUpdateTimeStamp: Date = .distantPast
     
     /// for logging
@@ -57,15 +58,29 @@ final class WatchManager: NSObject, ObservableObject {
         // this is needed due to the not being able to pass structs that are not codable/hashable
         let hoursOfBgReadingsToSend: Double = 12
         
-        let bgReadings = self.bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        
+        let bgReadings = self.bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: .now.addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
         
         let slopeOrdinal: Int = !bgReadings.isEmpty ? bgReadings[0].slopeOrdinal() : 1
         
-        var deltaChangeInMgDl: Double?
+        var previousValueInUserUnit: Double = 0.0
+        var actualValueInUserUnit: Double = 0.0
+        var deltaValueInUserUnit: Double = 0.0
         
-        // add delta if needed
-        if bgReadings.count > 1 {
-            deltaChangeInMgDl = bgReadings[0].currentSlope(previousBgReading: bgReadings[1]) * bgReadings[0].timeStamp.timeIntervalSince(bgReadings[1].timeStamp) * 1000;
+        // add delta if available
+        if bgReadings.count > 0 {
+
+            previousValueInUserUnit = bgReadings[1].calculatedValue.mgDlToMmol(mgDl: isMgDl)
+            actualValueInUserUnit = bgReadings[0].calculatedValue.mgDlToMmol(mgDl: isMgDl)
+            
+            // if the values are in mmol/L, then round them to the nearest decimal point in order to get the same precision out of the next operation
+            if !isMgDl {
+                previousValueInUserUnit = (previousValueInUserUnit * 10).rounded() / 10
+                actualValueInUserUnit = (actualValueInUserUnit * 10).rounded() / 10
+            }
+            
+            deltaValueInUserUnit = actualValueInUserUnit - previousValueInUserUnit
         }
         
         var bgReadingValues: [Double] = []
@@ -81,7 +96,7 @@ final class WatchManager: NSObject, ObservableObject {
         watchState.bgReadingDatesAsDouble = bgReadingDatesAsDouble
         watchState.isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         watchState.slopeOrdinal = slopeOrdinal
-        watchState.deltaChangeInMgDl = deltaChangeInMgDl
+        watchState.deltaValueInUserUnit = deltaValueInUserUnit
         watchState.urgentLowLimitInMgDl = UserDefaults.standard.urgentLowMarkValue
         watchState.lowLimitInMgDl = UserDefaults.standard.lowMarkValue
         watchState.highLimitInMgDl = UserDefaults.standard.highMarkValue
@@ -94,7 +109,7 @@ final class WatchManager: NSObject, ObservableObject {
         watchState.liveDataIsEnabled = UserDefaults.standard.showDataInWatchComplications
         
         if let sensorStartDate = UserDefaults.standard.activeSensorStartDate {
-            watchState.sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: Date()).minute!)
+            watchState.sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: .now).minute!)
         } else {
             watchState.sensorAgeInMinutes = 0
         }
@@ -102,13 +117,13 @@ final class WatchManager: NSObject, ObservableObject {
         watchState.sensorMaxAgeInMinutes = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
         
         // let's set the state values if we're using a heartbeat
-        if let timeStampOfLastHeartBeat = UserDefaults.standard.timeStampOfLastHeartBeat, let secondsUntilHeartBeatDisconnectWarning = UserDefaults.standard.secondsUntilHeartBeatDisconnectWarning {
+        if let timeStampOfLastHeartBeat = UserDefaults.standard.timeStampOfLastHeartBeat?.timeIntervalSince1970, let secondsUntilHeartBeatDisconnectWarning = UserDefaults.standard.secondsUntilHeartBeatDisconnectWarning {
             watchState.secondsUntilHeartBeatDisconnectWarning = Int(secondsUntilHeartBeatDisconnectWarning)
             watchState.timeStampOfLastHeartBeat = timeStampOfLastHeartBeat
         }
         
         // let's set the follower server connection values if we're using follower mode
-        if let timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection {
+        if let timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection?.timeIntervalSince1970 {
             watchState.secondsUntilFollowerDisconnectWarning = UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning
             watchState.timeStampOfLastFollowerConnection = timeStampOfLastFollowerConnection
         }
@@ -139,14 +154,14 @@ final class WatchManager: NSObject, ObservableObject {
         // if the WCSession is reachable it means that Watch app is in the foreground so send the watch state as a message
         // if it's not reachable, then it means it's in the background so send the state as a userInfo
         // if more than x minutes have passed since the last complication update, call transferCurrentComplicationUserInfo to force an update
-        // if not, then just send it as a normal priority transferUserInfo which will be queued and sent as soon as the watch app is reachable again (this will help get the app showing data quicker)
+        // if not, then just send it as a normal priority transferUserInfo (but limit the sending to once every 5 minutes!) which will be queued and sent as soon as the watch app is reachable again (this will help get the app showing data quicker)
         if let userInfo: [String: Any] = watchState.asDictionary {
             if session.isReachable {
                 session.sendMessage(["watchState": userInfo], replyHandler: nil, errorHandler: { (error) -> Void in
                     trace("error sending watch state, error = %{public}@", log: self.log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)
                 })
             } else {
-                if (lastForcedComplicationUpdateTimeStamp < Date().addingTimeInterval(-Double(UserDefaults.standard.forceComplicationUpdateInMinutes * 60)) && session.isComplicationEnabled && UserDefaults.standard.showDataInWatchComplications) || forceComplicationUpdate {
+                if (lastForcedComplicationUpdateTimeStamp < .now.addingTimeInterval(-Double(UserDefaults.standard.forceComplicationUpdateInMinutes * 60)) && session.isComplicationEnabled && UserDefaults.standard.showDataInWatchComplications) || forceComplicationUpdate {
                     
                     let updateType: String = forceComplicationUpdate ? "forcing" : "sending"
                     

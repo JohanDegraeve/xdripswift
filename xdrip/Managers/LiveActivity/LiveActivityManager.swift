@@ -40,21 +40,18 @@ extension LiveActivityManager {
     /// - Parameter contentState: the contentState to show
     /// - Parameter forceRestart: will force the function to end and restart the live activity
     func runActivity(contentState: XDripWidgetAttributes.ContentState, forceRestart: Bool) {
-        
-        trace("in runActivity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
-        
         // checking whether 'Live activities' is enabled for the app in settings
         if ActivityAuthorizationInfo().areActivitiesEnabled {
             
             // live activities are enabled. Now check if there is a currently
             // running activity (in which case update it) or if not, start a new one
             if eventActivity == nil {
-                trace("    starting new live activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+                trace("in runActivity, starting new live activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
                 
                 startActivity(contentState: contentState)
             } else if forceRestart && eventStartDate < Date().addingTimeInterval(-ConstantsLiveActivity.allowLiveActivityRestartAfterMinutes) {
                 // force an end/start cycle of the activity when the app comes to the foreground assuming at least 'x' hours have passed. This restarts the 8 hour limit.
-                trace("    restarting live activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+                trace("in runActivity, restarting live activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
                 
                 Task {
                     await endActivity()
@@ -62,21 +59,21 @@ extension LiveActivityManager {
                 }
             } else if eventStartDate < Date().addingTimeInterval(-ConstantsLiveActivity.endLiveActivityAfterMinutes) {
                 // if the activity has been running for almost 8 hours, proactively end the activity before it goes stale
-                trace("    ending live activity on purpose to avoid staying on the screen when stale", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+                trace("in runActivity, ending live activity on purpose to avoid staying on the screen when stale", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
                 
                 Task {
                     await endActivity()
                 }
             } else {
                 // none of the above conditions are true so let's just update the activity
-                trace("    updating live activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+                trace("in runActivity, updating live activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
                 
                 Task {
                     await updateActivity(to: contentState)
                 }
             }
         } else {
-            trace("    live activities are disabled in the iPhone Settings or permission has not been given.", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+            trace("in runActivity, live activities are disabled in the iPhone Settings or permission has not been given.", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
         }
     }
     

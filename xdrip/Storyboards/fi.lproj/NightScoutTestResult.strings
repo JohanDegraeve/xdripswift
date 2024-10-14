@@ -1,6 +1,0 @@
-"nightscouttestresult_verificationsuccessfulalerttitle" = "Vahvistus onnistui";
-"nightscouttestresult_verificationsuccessfulalertbody" = "Nightscout tilisi vahvistettu onnistuneesti";
-"nightscouttestresult_verificationerroralerttitle" = "Vahvistaminen epäonnistui";
-"warningAPIKeyOrURLIsnil" = "Nightscout URL ja API_SECRET pitää olla asetettu ennen testin suorittamista";
-"nightScoutAPIKeyAndURLStartedBody" = "Testi aloitettu";
-"nightScoutAPIKeyAndURLStartedTitle" = "Tarkistetaan...";

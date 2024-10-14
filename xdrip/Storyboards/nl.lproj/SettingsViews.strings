@@ -30,6 +30,9 @@
 "settingsviews_resettransmitter" = "Reset Transmitter (Anubis)";
 "settingsviews_nonfixedtransmitter" = "Schakel Meerpuntskalibratie In";
 "settingsviews_labelNonFixed" = "Meerpuntskalibratie";
+"settingsviews_labelAlgorithmType" = "Type algoritme";
+"settingsviews_labelCalibrationTitle" = "Sensor Kalibratie";
+"settingsviews_labelCalibrationType" = "Type kalibratie";
 "settingsviews_sectiontitlealerting" = "Alarmen";
 "settingsviews_row_alert_types" = "Alarm Types";
 "settingsviews_row_alerts" = "Alarmen";
@@ -43,14 +46,14 @@
 "settingsviews_giveDexcomShareAccountName" = "Voer Dexcom Share Account Nama In";
 "settingsviews_giveDexcomSharePassword" = "Voer Dexcom Share Wachtwoord In";
 "settingsviews_giveDexcomShareSerialNumber" = "Voer het Dexcom Ontvanger Serie Nummer In";
-"settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Nightscout Inschakelen";
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutEnabled" = "Nightscout Inschakelen";
+"settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Gebruik Upload Schema";
 "schedule" = "Schema";
-"settingsviews_giveNightScoutUrl" = "Voer NightScout URL In";
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
-"settingsviews_giveNightScoutAPIKey" = "Voer API_SECRET In";
+"settingsviews_giveNightscoutUrl" = "Voer Nightscout URL In";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "Voer API_SECRET In";
 "editScheduleTimePickerSubtitle" = "Wijzig: ";
 "timeScheduleViewTitle" = "Aan/Uit Tijdschema Voor ";
 "uploadSensorStartTime" = "Upload Sensor Start Tijd";
@@ -94,7 +97,7 @@
 "volumeTestiOSSound" = "Test Volume (Huidig iPhone Volume)";
 "debugLevel" = "Inclusief Debug Niveau";
 "warningChangeFromMasterToFollower" = "Wisselen van Master naar Volger stopt de huidige sensor. Wil je doorgaan ?";
-"nightScoutPort" = "Port";
+"nightscoutPort" = "Port";
 
 "appleWatchShowDataInComplications" = "Toon waardes in complicaties";
 "appleWatchShowDataInComplicationsMessage" = "Apple Watch complicaties zijn niet up-to-date. Updates gebeuren 2 tot 3 keer per uur.\n\nREKEN NIET op waardes in de complicaties.\n\nOm up-to-date waardes te zien, open de %@ Watch app.\n\nKlik 'OK' als je dit begrijpt en aanvaardt.";
@@ -204,7 +207,7 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";

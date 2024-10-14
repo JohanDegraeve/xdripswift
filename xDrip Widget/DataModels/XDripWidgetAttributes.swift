@@ -44,14 +44,14 @@ struct XDripWidgetAttributes: ActivityAttributes {
 
         var isMgDl: Bool
         var slopeOrdinal: Int
-        var deltaChangeInMgDl: Double?
+        var deltaValueInUserUnit: Double?
         var urgentLowLimitInMgDl: Double
         var lowLimitInMgDl: Double
         var highLimitInMgDl: Double
         var urgentHighLimitInMgDl: Double
         var eventStartDate: Date = Date()
         var warnUserToOpenApp: Bool = true
-        var liveActivitySize: LiveActivitySize
+        var liveActivityType: LiveActivityType
         var dataSourceDescription: String
 
         var bgUnitString: String {
@@ -68,13 +68,13 @@ struct XDripWidgetAttributes: ActivityAttributes {
 
         var bgValueStringInUserChosenUnit: String {
             if let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-ConstantsWidgetExtension.bgReadingDateVeryStaleInMinutes) {
-                bgReadingValues[0].mgdlToMmolAndToString(mgdl: isMgDl)
+                bgReadingValues[0].mgDlToMmolAndToString(mgDl: isMgDl)
             } else {
                 isMgDl ? "---" : "-.-"
             }
         }
 
-        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaChangeInMgDl: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivitySize: LiveActivitySize, dataSourceDescription: String? = "") {
+        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, dataSourceDescription: String? = "") {
         
             self.bgReadingFloats = bgReadingValues.map(Float16.init)
 
@@ -84,12 +84,12 @@ struct XDripWidgetAttributes: ActivityAttributes {
             
             self.isMgDl = isMgDl
             self.slopeOrdinal = slopeOrdinal
-            self.deltaChangeInMgDl = deltaChangeInMgDl
+            self.deltaValueInUserUnit = deltaValueInUserUnit
             self.urgentLowLimitInMgDl = urgentLowLimitInMgDl
             self.lowLimitInMgDl = lowLimitInMgDl
             self.highLimitInMgDl = highLimitInMgDl
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl            
-            self.liveActivitySize = liveActivitySize
+            self.liveActivityType = liveActivityType
             self.dataSourceDescription = dataSourceDescription ?? ""
         }
         
@@ -126,17 +126,13 @@ struct XDripWidgetAttributes: ActivityAttributes {
         /// convert the optional delta change int (in mg/dL) to a formatted change value in the user chosen unit making sure all zero values are shown as a positive change to follow Nightscout convention
         /// - Returns: a string holding the formatted delta change value (i.e. +0.4 or -6)
         func deltaChangeStringInUserChosenUnit() -> String {
-            if let deltaChangeInMgDl = deltaChangeInMgDl, let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-ConstantsWidgetExtension.bgReadingDateVeryStaleInMinutes) {
-                let deltaSign: String = deltaChangeInMgDl > 0 ? "+" : ""
-                let valueAsString = deltaChangeInMgDl.mgdlToMmolAndToString(mgdl: isMgDl)
+            if let deltaValueInUserUnit = deltaValueInUserUnit, let bgReadingDate = bgReadingDate, bgReadingDate > Date().addingTimeInterval(-ConstantsWidgetExtension.bgReadingDateVeryStaleInMinutes) {
+                let deltaSign: String = deltaValueInUserUnit > 0 ? "+" : ""
+                let deltaValueAsString = isMgDl ? deltaValueInUserUnit.mgDlToMmolAndToString(mgDl: isMgDl) : deltaValueInUserUnit.mmolToString()
                 
                 // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
                 // show unitized zero deltas as +0 or +0.0 as per Nightscout format
-                if (isMgDl) {
-                    return (deltaChangeInMgDl > -1 && deltaChangeInMgDl < 1) ?  "+0" : (deltaSign + valueAsString)
-                } else {
-                    return (deltaChangeInMgDl > -0.1 && deltaChangeInMgDl < 0.1) ? "+0.0" : (deltaSign + valueAsString)
-                }
+                return deltaValueInUserUnit == 0.0 ? (isMgDl ? "+0" : "+0.0") : (deltaSign + deltaValueAsString)
             } else {
                 return isMgDl ? "-" : "-.-"
             }

@@ -59,10 +59,10 @@ public enum GlucoseChartType: Int, CaseIterable {
     
     // MARK: - general chart properties
     
-    func viewSize(liveActivitySize: LiveActivitySize) -> (width: CGFloat, height: CGFloat) {
+    func viewSize(liveActivityType: LiveActivityType) -> (width: CGFloat, height: CGFloat) {
         switch self {
         case .liveActivity:
-            switch liveActivitySize {
+            switch liveActivityType {
             case .large:
                 return (ConstantsGlucoseChartSwiftUI.viewWidthLiveActivityLarge, ConstantsGlucoseChartSwiftUI.viewHeightLiveActivityLarge)
             default:
@@ -95,10 +95,10 @@ public enum GlucoseChartType: Int, CaseIterable {
         }
     }
     
-    func hoursToShow(liveActivitySize: LiveActivitySize) -> Double {
+    func hoursToShow(liveActivityType: LiveActivityType) -> Double {
         switch self {
         case .liveActivity:
-            switch liveActivitySize {
+            switch liveActivityType {
             case .large:
                 return ConstantsGlucoseChartSwiftUI.hoursToShowLiveActivityLarge
             default:
@@ -129,14 +129,14 @@ public enum GlucoseChartType: Int, CaseIterable {
         }
     }
     
-    func intervalBetweenAxisValues(liveActivitySize: LiveActivitySize) -> Int {
+    func intervalBetweenAxisValues(liveActivityType: LiveActivityType) -> Int {
         return ConstantsGlucoseChartSwiftUI.xAxisIntervalBetweenValues
     }
     
-    func glucoseCircleDiameter(liveActivitySize: LiveActivitySize) -> Double {
+    func glucoseCircleDiameter(liveActivityType: LiveActivityType) -> Double {
         switch self {
         case .liveActivity:
-            switch liveActivitySize {
+            switch liveActivityType {
             case .large:
                 return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterLiveActivityLarge
             default:

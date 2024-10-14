@@ -45,32 +45,8 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_labelLiveActivityType", tableName: filename, bundle: Bundle.main, value: "Live Activities", comment: "notification settings, type of live activities that should be enabled")
     }()
     
-    static let labelliveActivitySize: String = {
-        return NSLocalizedString("settingsviews_labelliveActivitySize", tableName: filename, bundle: Bundle.main, value: "Live Activity Size", comment: "notification settings, the size that the live activities should be displayed")
-    }()
-    
     static let liveActivityTypeDisabled: String = {
         return NSLocalizedString("settingsviews_liveActivityTypeDisabled", tableName: filename, bundle: Bundle.main, value: "Disabled", comment: "notification settings, disable live activities")
-    }()
-    
-    static let liveActivityTypeAlways: String = {
-        return NSLocalizedString("settingsviews_liveActivityTypeAlways", tableName: filename, bundle: Bundle.main, value: "Always", comment: "notification settings, always show live activities")
-    }()
-    
-    static let liveActivityTypeUrgentLow: String = {
-        return NSLocalizedString("settingsviews_liveActivityTypeUrgentLow", tableName: filename, bundle: Bundle.main, value: "Only Urgent Low", comment: "notification settings, show live activities urgent low")
-    }()
-    
-    static let liveActivityTypeLow: String = {
-        return NSLocalizedString("settingsviews_liveActivityTypeLow", tableName: filename, bundle: Bundle.main, value: "Only when Low", comment: "notification settings, show live activities when low")
-    }()
-    
-    static let liveActivityTypeLowHigh: String = {
-        return NSLocalizedString("settingsviews_liveActivityTypeLowHigh", tableName: filename, bundle: Bundle.main, value: "When Low or High", comment: "notification settings, show live activities when low or high")
-    }()
-    
-    static let liveActivityTypeUrgentLowHigh: String = {
-        return NSLocalizedString("settingsviews_liveActivityTypeUrgentLowHigh", tableName: filename, bundle: Bundle.main, value: "Only Urgent Low/High", comment: "notification settings, show live activities when urgent high or urgent low")
     }()
     
     static let liveActivityDisabledInFollowerMode: String = {
@@ -81,16 +57,16 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_liveActivityDisabledInFollowerModeMessage", tableName: filename, bundle: Bundle.main, value: "\nLive activities can only be used in Follower mode when a valid heartbeat is enabled.", comment: "notification settings, live activities are not available in follower mode")
     }()
     
-    static let liveActivitySizeMinimal: String = {
-        return NSLocalizedString("settingsviews_liveActivitySizeMinimal", tableName: filename, bundle: Bundle.main, value: "Minimal", comment: "notification settings, live activity size minimal")
+    static let liveActivityTypeMinimal: String = {
+        return NSLocalizedString("settingsviews_liveActivityTypeMinimal", tableName: filename, bundle: Bundle.main, value: "Minimal", comment: "notification settings, live activity size minimal")
     }()
     
-    static let liveActivitySizeNormal: String = {
-        return NSLocalizedString("settingsviews_liveActivitySizeNormal", tableName: filename, bundle: Bundle.main, value: "Normal", comment: "notification settings, live activity size normal")
+    static let liveActivityTypeNormal: String = {
+        return NSLocalizedString("settingsviews_liveActivityTypeNormal", tableName: filename, bundle: Bundle.main, value: "Normal", comment: "notification settings, live activity size normal")
     }()
     
-    static let liveActivitySizeLarge: String = {
-        return NSLocalizedString("settingsviews_liveActivitySizeLarge", tableName: filename, bundle: Bundle.main, value: "Large", comment: "notification settings, live activity size large")
+    static let liveActivityTypeLarge: String = {
+        return NSLocalizedString("settingsviews_liveActivityTypeLarge", tableName: filename, bundle: Bundle.main, value: "Large", comment: "notification settings, live activity size large")
     }()
     
     
@@ -181,7 +157,7 @@ class Texts_SettingsView {
     }()
     
     static let libreLinkUpNoActiveSensor = {
-        return NSLocalizedString("settingsviews_libreLinkUpNoActiveSensor", tableName: filename, bundle: Bundle.main, value: "No active sensor", comment: "libre link up follower settings, no active sensor")
+        return NSLocalizedString("settingsviews_libreLinkUpNoActiveSensor", tableName: filename, bundle: Bundle.main, value: "No active sensor data", comment: "libre link up follower settings, no active sensor")
     }()
     
     // MARK: - Section Notifications
@@ -376,7 +352,7 @@ class Texts_SettingsView {
     }()
     
     static let heartbeatLibreMessage:String = {
-        return NSLocalizedString("settingsviews_heartbeatLibreMessage", tableName: filename, bundle: Bundle.main, value: "IMPORTANT: You MUST force-close the Libre app first.\n\nEnter the device name shown in the iPhone Settings -> Bluetooth devices list.\n\nOnce you have connected, you can reopen the Libre app.", comment: "transmitter settings, instructions for adding a Libre heartbeat")
+        return NSLocalizedString("settingsviews_heartbeatLibreMessage", tableName: filename, bundle: Bundle.main, value: "IMPORTANT: You MUST force-close the Libre app first if adding a Libre heartbeat.\n\nEnter the device name shown in the iPhone Settings -> Bluetooth devices list.\n\nOnce you have connected, you can reopen the Libre app if needed.", comment: "transmitter settings, instructions for adding a generic or Libre heartbeat")
     }()
     
     static let heartbeatG7Message:String = {
@@ -408,11 +384,23 @@ class Texts_SettingsView {
     }()
     
     static let labelNonFixedTransmitter:String = {
-        return NSLocalizedString("settingsviews_nonfixedtransmitter", tableName: filename, bundle: Bundle.main, value: "Use Multi-point Calibration", comment: "non fixed calibration slopes settings in bluetooth peripheral view : enabled or not")
+        return NSLocalizedString("settingsviews_nonfixedtransmitter", tableName: filename, bundle: Bundle.main, value: "Enable Multi-point Calibration", comment: "non fixed calibration slopes settings in bluetooth peripheral view : enabled or not")
     }()
     
     static let labelNonFixed:String = {
         return NSLocalizedString("settingsviews_labelNonFixed", tableName: filename, bundle: Bundle.main, value: "Multi-point Calibration", comment: "non fixed settings, title of the section")
+    }()
+    
+    static let labelAlgorithmType:String = {
+        return NSLocalizedString("settingsviews_labelAlgorithmType", tableName: filename, bundle: Bundle.main, value: "Algorithm Type", comment: "weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm")
+    }()
+    
+    static let labelCalibrationTitle:String = {
+        return NSLocalizedString("settingsviews_labelCalibrationTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Calibration", comment: "non fixed settings, title of the section")
+    }()
+    
+    static let labelCalibrationType:String = {
+        return NSLocalizedString("settingsviews_labelCalibrationType", tableName: filename, bundle: Bundle.main, value: "Calibration Type", comment: "non fixed settings, title of the section")
     }()
     
     // MARK: - Section Alerts
@@ -473,18 +461,18 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_giveDexcomShareSerialNumber", tableName: filename, bundle: Bundle.main, value: "Enter the Dexcom Receiver Serial Number", comment: "dexcom share settings, pop up that asks user to enter dexcom share serial number")
     }()
     
-    // MARK: - Section NightScout
+    // MARK: - Section Nightscout
     
-    static let sectionTitleNightScout: String = {
-        return NSLocalizedString("settingsviews_sectiontitlenightscout", tableName: filename, bundle: Bundle.main, value: "NightScout", comment: "nightscout settings, section title")
+    static let sectionTitleNightscout: String = {
+        return NSLocalizedString("settingsviews_sectiontitlenightscout", tableName: filename, bundle: Bundle.main, value: "Nightscout", comment: "nightscout settings, section title")
     }()
     
-    static let labelNightScoutEnabled = {
-        return NSLocalizedString("settingsviews_nightScoutEnabled", tableName: filename, bundle: Bundle.main, value: "Enable Nightscout", comment: "nightscout settings, where user can enable or disable nightscout")
+    static let labelNightscoutEnabled = {
+        return NSLocalizedString("settingsviews_nightscoutEnabled", tableName: filename, bundle: Bundle.main, value: "Enable Nightscout", comment: "nightscout settings, where user can enable or disable nightscout")
     }()
 
-    static let labelNightScoutUrl = {
-        return NSLocalizedString("settingsviews_nightScoutUrl", tableName: filename, bundle: Bundle.main, value: "URL:", comment: "nightscout settings, where user can set the nightscout url")
+    static let labelNightscoutUrl = {
+        return NSLocalizedString("settingsviews_nightscoutUrl", tableName: filename, bundle: Bundle.main, value: "URL:", comment: "nightscout settings, where user can set the nightscout url")
     }()
     
     static let useSchedule = {
@@ -495,20 +483,20 @@ class Texts_SettingsView {
         return NSLocalizedString("schedule", tableName: filename, bundle: Bundle.main, value: "Schedule:", comment: "nightscout or dexcom share settings, where user can select to edit the schedule")
     }()
     
-    static let giveNightScoutUrl = {
-        return NSLocalizedString("settingsviews_giveNightScoutUrl", tableName: filename, bundle: Bundle.main, value: "Enter your NightScout URL", comment: "nightscout  settings, pop up that asks user to enter nightscout url")
+    static let giveNightscoutUrl = {
+        return NSLocalizedString("settingsviews_giveNightscoutUrl", tableName: filename, bundle: Bundle.main, value: "Enter your Nightscout URL", comment: "nightscout  settings, pop up that asks user to enter nightscout url")
     }()
 
-    static let labelNightScoutAPIKey = {
-        return NSLocalizedString("settingsviews_nightScoutAPIKey", tableName: filename, bundle: Bundle.main, value: "API_SECRET:", comment: "nightscout settings, where user can set the nightscout api key")
+    static let labelNightscoutAPIKey = {
+        return NSLocalizedString("settingsviews_nightscoutAPIKey", tableName: filename, bundle: Bundle.main, value: "API_SECRET:", comment: "nightscout settings, where user can set the nightscout api key")
     }()
     
-    static let giveNightScoutAPIKey = {
-        return NSLocalizedString("settingsviews_giveNightScoutAPIKey", tableName: filename, bundle: Bundle.main, value: "Enter your API_SECRET", comment: "nightscout settings, pop up that asks user to enter nightscout api key")
+    static let giveNightscoutAPIKey = {
+        return NSLocalizedString("settingsviews_giveNightscoutAPIKey", tableName: filename, bundle: Bundle.main, value: "Enter your API_SECRET", comment: "nightscout settings, pop up that asks user to enter nightscout api key")
     }()
     
     static let editScheduleTimePickerSubtitle: String = {
-        return NSLocalizedString("editScheduleTimePickerSubtitle", tableName: filename, bundle: Bundle.main, value: "Change: ", comment: "used for editing schedule for NightScout upload and Dexcom Share upload")
+        return NSLocalizedString("editScheduleTimePickerSubtitle", tableName: filename, bundle: Bundle.main, value: "Change: ", comment: "used for editing schedule for Nightscout upload and Dexcom Share upload")
     }()
     
     static let timeScheduleViewTitle: String = {
@@ -523,8 +511,8 @@ class Texts_SettingsView {
         return NSLocalizedString("testUrlAndAPIKey", tableName: filename, bundle: Bundle.main, value: "Test Connection", comment: "nightscout settings, when clicking the cell, test the url and api key")
     }()
 
-    static let nightScoutPort: String = {
-        return NSLocalizedString("nightScoutPort", tableName: filename, bundle: Bundle.main, value: "Port:", comment: "nightscout settings, port to use")
+    static let nightscoutPort: String = {
+        return NSLocalizedString("nightscoutPort", tableName: filename, bundle: Bundle.main, value: "Port:", comment: "nightscout settings, port to use")
     }()
     
     static let nightscoutToken: String = {
@@ -712,16 +700,24 @@ class Texts_SettingsView {
         return String(format: NSLocalizedString("settingsviews_infoContactsAccessRestricted", tableName: filename, bundle: Bundle.main, value: "You cannot give authorization to %@ to access your contacts. This is possibly due to active restrictions such as parental controls being in place.", comment: "If user is not allowed to give any app access to the Contacts, due to restrictions. And then tries to activate the contact image, this message will be shown"), ConstantsHomeView.applicationName)
     }()
     
+    static let infoContactsAccessLimited: String = {
+        return String(format: NSLocalizedString("settingsviews_infoContactsAccessLimited", tableName: filename, bundle: Bundle.main, value: "Only limited access has been given to %@ to access your contacts. Please change the permission to Full Access in the iPhone Settings", comment: "If user has only given limited access to the Contacts and then tries to activate the contact image, this message will be shown"), ConstantsHomeView.applicationName)
+    }()
+    
     static let contactImageSectionTitle: String = {
         return NSLocalizedString("settingsviews_contactImageSectionTitle", tableName: filename, bundle: Bundle.main, value: "Contact Image", comment: "Contact Image - section title")
     }()
     
     static let enableContactImage: String = {
-        return NSLocalizedString("settingsviews_enableContactImage", tableName: filename, bundle: Bundle.main, value: "Create Contact", comment: "Contact Image Settings - text in row where contact image is enabled or disabled ")
+        return NSLocalizedString("settingsviews_enableContactImage", tableName: filename, bundle: Bundle.main, value: "Enable Contact Image", comment: "Contact Image Settings - text in row where contact image is enabled or disabled ")
     }()
     
     static let displayTrendInContactImage: String = {
         return NSLocalizedString("settingsviews_displayTrendInContactImage", tableName: filename, bundle: Bundle.main, value: "Show Trend", comment: "Contact Image Settings - text in row where user needs to say if trend should be displayed or not")
+    }()
+    
+    static let useHighContrastContactImage: String = {
+        return NSLocalizedString("settingsviews_useHighContrastContactImage", tableName: filename, bundle: Bundle.main, value: "Use High Contrast Image", comment: "Contact Image Settings - text in row where user needs to say if they prefer to use a high contrast contact image or not")
     }()
     
     static let contactImageCreatedByString: String = {

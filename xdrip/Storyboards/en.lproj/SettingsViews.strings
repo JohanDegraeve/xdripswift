@@ -29,7 +29,7 @@
 "settingsviews_enterUsername" = "Enter your username (e-mail)";
 "settingsviews_enterPassword" = "Enter your password";
 "settingsviews_libreLinkUpReAcceptNeeded" = "Need to accept terms";
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 "settingsviews_showReadingInNotification" = "Show BG in Notifications";
 "settingsviews_labelShowReadingInAppBadge" = "Show BG in the App Badge";
 "settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10";
@@ -76,6 +76,9 @@
 "settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
 "settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration";
 "settingsviews_labelNonFixed" = "Multi-point Calibration";
+"settingsviews_labelAlgorithmType" = "Algorithm Type";
+"settingsviews_labelCalibrationTitle" = "Sensor Calibration";
+"settingsviews_labelCalibrationType" = "Calibration Type";
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
 "settingsviews_sectiontitlealerting" = "Alarms";
 "settingsviews_row_alert_types" = "Alarm Types";
@@ -90,14 +93,14 @@
 "settingsviews_giveDexcomShareAccountName" = "Enter Dexcom Share Account Name";
 "settingsviews_giveDexcomSharePassword" = "Give Dexcom Share Password";
 "settingsviews_giveDexcomShareSerialNumber" = "Enter the Dexcom Receiver Serial Number";
-"settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Enable Nightscout";
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutEnabled" = "Enable Nightscout";
+"settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Use Upload Schedule";
 "schedule" = "Schedule";
-"settingsviews_giveNightScoutUrl" = "Enter your NightScout URL";
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
-"settingsviews_giveNightScoutAPIKey" = "Enter your API_SECRET";
+"settingsviews_giveNightscoutUrl" = "Enter your Nightscout URL";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "Enter your API_SECRET";
 "editScheduleTimePickerSubtitle" = "Change: ";
 "timeScheduleViewTitle" = "On/Off Time Schedule for ";
 "uploadSensorStartTime" = "Upload Sensor Start Time";
@@ -134,7 +137,7 @@
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
 "settingsviews_infoContactsAccessRestricted" = "You cannot give authorization to %@ to access your contacts. This is possibly due to active restrictions such as parental controls being in place.";
 "settingsviews_contactImageSectionTitle" = "Contact Image";
-"settingsviews_enableContactImage" = "Create Contact";
+"settingsviews_enableContactImage" = "Enable Contact Image";
 "settingsviews_displayTrendInContactImage" = "Show Trend";
 "settingsviews_contactImageCreatedByString" = "Contact automatically created by";
 "sectionTitleTrace" = "Issue Reporting";
@@ -149,7 +152,7 @@
 "volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
 "debugLevel" = "Include Debug Level";
 "warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
-"nightScoutPort" = "Port";
+"nightscoutPort" = "Port";
 "developerSettings" = "Developer Settings";
 "smoothLibreValues" = "Smooth Libre Values";
 "nslog" = "NSLog";

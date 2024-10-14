@@ -20,12 +20,12 @@
 "settingsviews_dexcomShareAccountName" = "德康账号";
 "settingsviews_giveDexcomShareAccountName" = "输入Dexcom APP用户名";
 "settingsviews_giveDexcomSharePassword" = "输入Dexcom APP密码";
-"settingsviews_sectiontitlenightscout" = "NightScout远程监控";
-"settingsviews_nightScoutEnabled" = "NightScout 已启用";
-"settingsviews_nightScoutUrl" = "Url(网址)";
-"settingsviews_giveNightScoutUrl" = "输入 NightScout 网址";
-"settingsviews_nightScoutAPIKey" = "API 密钥";
-"settingsviews_giveNightScoutAPIKey" = "输入 NightScout API 密钥";
+"settingsviews_sectiontitlenightscout" = "Nightscout远程监控";
+"settingsviews_nightscoutEnabled" = "Nightscout 已启用";
+"settingsviews_nightscoutUrl" = "Url(网址)";
+"settingsviews_giveNightscoutUrl" = "输入 Nightscout 网址";
+"settingsviews_nightscoutAPIKey" = "API 密钥";
+"settingsviews_giveNightscoutAPIKey" = "输入 Nightscout API 密钥";
 "settingsviews_sectiontitlespeak" = "语音播报";
 "settingsviews_speakBgReadings" = "语音播报血糖值";
 "settingsviews_speakTrend" = "语音播报趋势";
@@ -46,7 +46,7 @@
 "volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
 
 /// nightscout settings, port to use
-"nightScoutPort" = "Port";
+"nightscoutPort" = "Port";
 
 /// home screen settings, urgent high value
 "settingsviews_urgentHighValue" = "Urgent High Value";
@@ -174,7 +174,7 @@
 /// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
 "warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
 
-/// used for editing schedule for NightScout upload and Dexcom Share upload
+/// used for editing schedule for Nightscout upload and Dexcom Share upload
 "editScheduleTimePickerSubtitle" = "Change: ";
 
 /// Apple Watch Settings - text in row where user needs to select a calendar
@@ -333,7 +333,7 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";

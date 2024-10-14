@@ -57,13 +57,13 @@
 "settingsviews_Version" = "Version";
 
 /// nightscout settings, where user can set the nightscout url
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_nightscoutUrl" = "URL";
 
 /// name of setting for back ground color
 "m5stack_settingsviews_backGroundColor" = "Hintergrund Farbe";
 
 /// nightscout settings, section title
-"settingsviews_sectiontitlenightscout" = "NightScout";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
 
 /// Apple Watch Settings - text in row where user needs to say if delta should be displayed or not
 "displayDeltaInCalendarEvent" = "Delta anzeigen";
@@ -87,10 +87,14 @@
 "settingsviews_multipleAppBadgeValueWith10" = "mit 10 multiplizieren";
 
 /// nightscout settings, pop up that asks user to enter nightscout api key
-"settingsviews_giveNightScoutAPIKey" = "API_SECRET Eingabe";
+"settingsviews_giveNightscoutAPIKey" = "API_SECRET Eingabe";
 
 /// non fixed settings, title of the section
 "settingsviews_labelNonFixed" = "Mehrpunkt-Kalibrierung";
+
+"settingsviews_labelAlgorithmType" = "Algorithmus Typ";
+"settingsviews_labelCalibrationTitle" = "Sensor Kalibrierung";
+"settingsviews_labelCalibrationType" = "Kalibrierungs Typ";
 
 /// healthkit settings, literally 'healthkit'
 "settingsviews_healthkit" = "Apple Health nutzen";
@@ -98,7 +102,7 @@
 /// speak settings, section title
 "settingsviews_sectiontitlespeak" = "Vorlesen";
 
-/// used for editing schedule for NightScout upload and Dexcom Share upload
+/// used for editing schedule for Nightscout upload and Dexcom Share upload
 "editScheduleTimePickerSubtitle" = "Ändern: ";
 
 /// alerting settings, row alert types
@@ -126,7 +130,7 @@
 "schedule" = "Upload Plan";
 
 /// nightscout settings, port to use
-"nightScoutPort" = "Port";
+"nightscoutPort" = "Port";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
 "settingsviews_IntervalTitle" = "Benachrichtigungsintervall";
@@ -161,7 +165,7 @@
 "timeScheduleViewTitle" = "An/Aus für geplanten upload ";
 
 /// nightscout settings, where user can enable or disable nightscout
-"settingsviews_nightScoutEnabled" = "Nightscout aktivieren";
+"settingsviews_nightscoutEnabled" = "Nightscout aktivieren";
 
 /// alerting settings, section title
 "settingsviews_sectiontitlealerting" = "Alarms";
@@ -176,7 +180,7 @@
 "m5stack_settingsviews_textColor" = "Text Color";
 
 /// nightscout settings, where user can set the nightscout api key
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
 
 /// user tries to send trace file but there's no native email account configured
 "emailNotConfigured" = "Sie müssen einen E-Mail Konto auf ihrem Gerät aktiviert haben.";
@@ -185,7 +189,7 @@
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 
 /// nightscout  settings, pop up that asks user to enter nightscout url
-"settingsviews_giveNightScoutUrl" = "Eingabe NightScout URL";
+"settingsviews_giveNightscoutUrl" = "Eingabe Nightscout URL";
 
 /// transmitter settings, pop up that asks user to inter transmitter id
 "settingsviews_givetransmitterid" = "Eingabe Transmitter ID";
@@ -370,7 +374,7 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";

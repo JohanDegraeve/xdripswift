@@ -234,19 +234,19 @@ public class GlucoseMiniChartManager {
         let xAxisModel = ChartAxisModel(axisValues: xAxisValues)
         
         // just to save typing
-        let unitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
         // create yAxisValues, start with 38 mgdl, this is to make sure we show a bit lower than the real lowest value which is usually 40 mgdl, make the label hidden. We must do this with by using a clear color label setting as the hidden property doesn't work (even if we don't know why).
-        let firstYAxisValue = ChartAxisValueDouble((ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl).mgdlToMmol(mgdl: unitIsMgDl), labelSettings: data().chartLabelSettingsHidden)
+        let firstYAxisValue = ChartAxisValueDouble((ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl).mgDlToMmol(mgDl: isMgDl), labelSettings: data().chartLabelSettingsHidden)
         
         // create now the yAxisValues and add the first
         var yAxisValues = [firstYAxisValue as ChartAxisValue]
         
-        yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.highMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsHidden) as ChartAxisValue]
+        yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.highMarkValueInUserChosenUnit.bgValueRounded(mgDl: isMgDl), labelSettings: data().chartLabelSettingsHidden) as ChartAxisValue]
 
-        if maximumValueInGlucoseChartPointsInMgDl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) >
-            UserDefaults.standard.highMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) {
-            yAxisValues += [ChartAxisValueDouble((maximumValueInGlucoseChartPointsInMgDl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)), labelSettings: data().chartLabelSettingsHidden) as ChartAxisValue]
+        if maximumValueInGlucoseChartPointsInMgDl.mgDlToMmol(mgDl: isMgDl) >
+            UserDefaults.standard.highMarkValueInUserChosenUnit.bgValueRounded(mgDl: isMgDl) {
+            yAxisValues += [ChartAxisValueDouble((maximumValueInGlucoseChartPointsInMgDl.mgDlToMmol(mgDl: isMgDl)), labelSettings: data().chartLabelSettingsHidden) as ChartAxisValue]
         }
         
         let yAxisModel = ChartAxisModel(axisValues: yAxisValues, lineColor: ConstantsGlucoseChart.axisLineColor, labelSpaceReservationMode: .fixed(0))
@@ -492,7 +492,7 @@ public class GlucoseMiniChartManager {
             if let maximumValueInGlucoseChartPoints = glucoseChartPoints.maximumValueInGlucoseChartPoints {
                 return maximumValueInGlucoseChartPoints
             } else {
-                return ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                return ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             }
             
         }

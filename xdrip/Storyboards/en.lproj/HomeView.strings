@@ -44,6 +44,7 @@
 "noSensorData" = "No sensor data";
 "noDataSourceConnected" = "No CGM data source connected";
 "reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
+"waitingForDataSource" = "CGM connected. Waiting for data...";
 "hidingUrlForXSeconds" = "Hiding URL for %@s...";
 "nightscoutNotEnabled" = "Nightscout is disabled";
 "nightscoutURLMissing" = "Nightscout URL missing";

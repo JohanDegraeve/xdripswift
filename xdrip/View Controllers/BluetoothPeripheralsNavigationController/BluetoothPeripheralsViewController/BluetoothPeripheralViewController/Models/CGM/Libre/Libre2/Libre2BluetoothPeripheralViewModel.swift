@@ -2,7 +2,7 @@ import UIKit
 import OSLog
 
 class Libre2BluetoothPeripheralViewModel {
-  
+    
     /// settings specific for Libre2
     private enum Settings: Int, CaseIterable {
         
@@ -11,6 +11,9 @@ class Libre2BluetoothPeripheralViewModel {
         
         /// sensor start time
         case sensorStartTime = 1
+        
+        /// case smooth libre values
+        case smoothLibreValues = 2
         
     }
     
@@ -30,17 +33,14 @@ class Libre2BluetoothPeripheralViewModel {
     
     /// temporary reference to bluetoothPerpipheral, will be set in configure function.
     private var bluetoothPeripheral: BluetoothPeripheral?
-
-    /// it's the bluetoothPeripheral as M5Stack
+    
+    /// it's the bluetoothPeripheral as Libre2
     private var libre2: Libre2? {
         get {
             return bluetoothPeripheral as? Libre2
         }
     }
-
-    /// Libre 2 settings will be in section 0 + numberOfGeneralSections
-    private let sectionNumberForMiaoMiaoSpecificSettings = 0
-
+    
     // MARK: - deinit
     
     deinit {
@@ -58,7 +58,7 @@ class Libre2BluetoothPeripheralViewModel {
         cGMLibre2BluetoothTransmitter.cGMLibre2TransmitterDelegate = bluetoothPeripheralManager as! BluetoothPeripheralManager
         
     }
-
+    
 }
 
 // MARK: - conform to BluetoothPeripheralViewModel
@@ -114,7 +114,7 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         // create disclosureIndicator in color ConstantsUI.disclosureIndicatorColor
         // will be used whenever accessoryType is to be set to disclosureIndicator
         let  disclosureAccessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
-
+        
         guard let setting = Settings(rawValue: rawValue) else { fatalError("Libre2BluetoothPeripheralViewModel update, unexpected setting") }
         
         switch setting {
@@ -125,7 +125,7 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             cell.detailTextLabel?.text = libre2.blePeripheral.sensorSerialNumber
             cell.accessoryType = .disclosureIndicator
             cell.accessoryView = disclosureAccessoryView
-
+            
         case .sensorStartTime:
             
             var sensorStartTimeText = "Not Connected"
@@ -154,9 +154,15 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             cell.detailTextLabel?.text = sensorStartTimeText
             cell.accessoryType = .disclosureIndicator
             cell.accessoryView = disclosureAccessoryView
+                        
+        case .smoothLibreValues:
             
+            cell.textLabel?.text = Texts_SettingsView.smoothLibreValues
+            cell.detailTextLabel?.text = nil // it's a UISwitch,  no detailed text
+            cell.accessoryView = UISwitch(isOn: UserDefaults.standard.smoothLibreValues, action: { (isOn:Bool) in
+                UserDefaults.standard.smoothLibreValues = isOn
+            })
         }
-        
     }
     
     func userDidSelectRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging) -> SettingsSelectedRowAction {
@@ -165,18 +171,18 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         guard let libre2 = bluetoothPeripheral as? Libre2 else {
             fatalError("Libre2BluetoothPeripheralViewModel update, bluetoothPeripheral is not Libre2")
         }
-
+        
         guard let setting = Settings(rawValue: rawValue) else { fatalError("Libre2BluetoothPeripheralViewModel userDidSelectRow, unexpected setting") }
         
         switch setting {
-        
+            
         case .sensorSerialNumber:
             
             // serial text could be longer than screen width, clicking the row allows to see it in a pop up with more text place
             if let serialNumber = libre2.blePeripheral.sensorSerialNumber {
                 return .showInfoText(title: Texts_BluetoothPeripheralView.sensorSerialNumber, message: "\n" + serialNumber)
             }
-
+            
         case .sensorStartTime:
             
             if let sensorTimeInMinutes = libre2.sensorTimeInMinutes {
@@ -189,6 +195,9 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                 
                 return .showInfoText(title: Texts_BluetoothPeripheralView.sensorStartDate, message: "\n" + sensorStartTimeText)
             }
+            
+        case .smoothLibreValues:
+            return .nothing
             
         }
         
@@ -205,7 +214,7 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         return 1
     }
     
-
+    
 }
 
 // MARK: - conform to CGMLibre2TransmitterDelegate
@@ -229,18 +238,18 @@ extension Libre2BluetoothPeripheralViewModel: CGMLibre2TransmitterDelegate {
         
         // here's the trigger to update the table
         reloadRow(row: Settings.sensorSerialNumber.rawValue)
-
+        
     }
     
     private func reloadRow(row: Int) {
         
         if let bluetoothPeripheralViewController = bluetoothPeripheralViewController {
             
-            tableView?.reloadRows(at: [IndexPath(row: row, section: bluetoothPeripheralViewController.numberOfGeneralSections() + sectionNumberForMiaoMiaoSpecificSettings)], with: .none)
+            tableView?.reloadRows(at: [IndexPath(row: row, section: bluetoothPeripheralViewController.numberOfGeneralSections() + sectionNumberForLibre2SpecificSettings)], with: .none)
             
         }
     }
     
-
+    
 }
 

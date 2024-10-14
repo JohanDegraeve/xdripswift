@@ -35,9 +35,9 @@ struct GlucoseIntent: AppIntent {
             throw IntentError.message("No glucose data")
         }
         
-        let value = mostRecent.calculatedValue.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) // UserDefaults.standard.bloodGlucoseUnitIsMgDl ? mostRecent.calculatedValue : (mostRecent.calculatedValue * ConstantsBloodGlucose.mgDlToMmoll)
+        let value = mostRecent.calculatedValue.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) // UserDefaults.standard.bloodGlucoseUnitIsMgDl ? mostRecent.calculatedValue : (mostRecent.calculatedValue * ConstantsBloodGlucose.mgDlToMmoll)
         
-        let valueString = value.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) // UserDefaults.standard.bloodGlucoseUnitIsMgDl ? value.formatted(.number.precision(.fractionLength(0))) : value.formatted(.number.precision(.fractionLength(1)))
+        let valueString = value.bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) // UserDefaults.standard.bloodGlucoseUnitIsMgDl ? value.formatted(.number.precision(.fractionLength(0))) : value.formatted(.number.precision(.fractionLength(1)))
         
         let trendDescription: LocalizedStringResource = switch mostRecent.slopeTrend() {
         case .droppingFast: "dropping fast"
@@ -72,7 +72,7 @@ struct GlucoseIntent: AppIntent {
         return .result(
             value: value,
             dialog: dialogString,
-            view: GlucoseChartView(glucoseChartType: .siriGlucoseIntent, bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySize: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
+            view: GlucoseChartView(glucoseChartType: .siriGlucoseIntent, bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
         )
     }
 }

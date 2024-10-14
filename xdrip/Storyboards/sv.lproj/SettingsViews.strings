@@ -32,6 +32,11 @@
 "settingsviews_resettransmitter" = "Återställ sändare (Anubis)";
 "settingsviews_nonfixedtransmitter" = "Använd flerpunktskalibrering";
 "settingsviews_labelNonFixed" = "Flerpunktskalibrering";
+
+"settingsviews_labelAlgorithmType" = "Algoritm typ";
+"settingsviews_labelCalibrationTitle" = "Sensor Kalibrering";
+"settingsviews_labelCalibrationType" = "Kalibreringstyp";
+
 "settingsviews_sectiontitlealerting" = "Larm";
 "settingsviews_row_alert_types" = "Typ av larm";
 "settingsviews_row_alerts" = "Larm";
@@ -45,14 +50,14 @@
 "settingsviews_giveDexcomShareAccountName" = "Ange Dexcom Share användarnamn";
 "settingsviews_giveDexcomSharePassword" = "Ange Dexcom Share lösenord";
 "settingsviews_giveDexcomShareSerialNumber" = "Ange Dexcom mottagares serienummer";
-"settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Slå på Nightscout";
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutEnabled" = "Slå på Nightscout";
+"settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Använd schemalagd uppladdning";
 "schedule" = "Schema";
-"settingsviews_giveNightScoutUrl" = "Ange din NightScout URL";
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
-"settingsviews_giveNightScoutAPIKey" = "Ange ditt API_SECRET";
+"settingsviews_giveNightscoutUrl" = "Ange din Nightscout URL";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "Ange ditt API_SECRET";
 "editScheduleTimePickerSubtitle" = "Ändra: ";
 "timeScheduleViewTitle" = "På/Av tidschema för ";
 "uploadSensorStartTime" = "Ladda upp sensorstarttid";
@@ -95,7 +100,7 @@
 "volumeTestiOSSound" = "Testa volym (nuvarande iPhone-volym)";
 "debugLevel" = "Inkludera felsökningsnivå";
 "warningChangeFromMasterToFollower" = "Byte från användare till följare kommer att stoppa nuvarande sensor. Vill du fortsätta?";
-"nightScoutPort" = "Port";
+"nightscoutPort" = "Port";
 "developerSettings" = "Inställningar för utvecklare";
 "smoothLibreValues" = "Utjämna Libre-värden";
 "nslog" = "NSLog";
@@ -167,7 +172,7 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";

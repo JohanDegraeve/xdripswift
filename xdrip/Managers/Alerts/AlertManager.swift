@@ -544,6 +544,8 @@ public class AlertManager:NSObject {
         /// will be initialized later
         var minimumDelayInSecondsToUse:Int?
         
+        let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        
         if let remainingSeconds = getSnoozeParameters(alertKind: alertKind).getSnoozeValue().remainingSeconds {
 
             trace("in checkAlertAndFire before calling getSnoozeValue for alert %{public}@, remaining seconds = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), remainingSeconds.description)
@@ -636,9 +638,9 @@ public class AlertManager:NSObject {
             let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
             
             if bgReadings.count > 0 {
-                alertNotificationDictionary.isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+                alertNotificationDictionary.isMgDl = isMgDl
                 alertNotificationDictionary.slopeOrdinal = 0
-                alertNotificationDictionary.deltaChangeInMgDl = 0
+                alertNotificationDictionary.deltaValueInUserUnit = 0
                 alertNotificationDictionary.urgentLowLimitInMgDl = UserDefaults.standard.urgentLowMarkValue
                 alertNotificationDictionary.lowLimitInMgDl = UserDefaults.standard.lowMarkValue
                 alertNotificationDictionary.urgentHighLimitInMgDl = UserDefaults.standard.urgentHighMarkValue
@@ -646,7 +648,19 @@ public class AlertManager:NSObject {
                 
                 // add delta and slope if available
                 if bgReadings.count > 1 {
-                    alertNotificationDictionary.deltaChangeInMgDl = bgReadings[0].currentSlope(previousBgReading: bgReadings[1]) * bgReadings[0].timeStamp.timeIntervalSince(bgReadings[1].timeStamp) * 1000;
+                    var previousValueInUserUnit: Double = 0.0
+                    var actualValueInUserUnit: Double = 0.0
+                    
+                    previousValueInUserUnit = bgReadings[1].calculatedValue.mgDlToMmol(mgDl: isMgDl)
+                    actualValueInUserUnit = bgReadings[0].calculatedValue.mgDlToMmol(mgDl: isMgDl)
+                    
+                    // if the values are in mmol/L, then round them to the nearest decimal point in order to get the same precision out of the next operation
+                    if !isMgDl {
+                        previousValueInUserUnit = (previousValueInUserUnit * 10).rounded() / 10
+                        actualValueInUserUnit = (actualValueInUserUnit * 10).rounded() / 10
+                    }
+                    
+                    alertNotificationDictionary.deltaValueInUserUnit = actualValueInUserUnit - previousValueInUserUnit
                     
                     alertNotificationDictionary.slopeOrdinal = bgReadings[0].slopeOrdinal()
                 }
@@ -776,7 +790,7 @@ public class AlertManager:NSObject {
             
             // if vibrate required , and if delay is nil, then vibrate
             if delayInSecondsToUse == 0, currentAlertEntry.alertType.vibrate {
-                AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+                AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
             }
             
             // log the result
@@ -808,8 +822,8 @@ public class AlertManager:NSObject {
             return true
             
         } else {
-            if !UserDefaults.standard.isMaster && !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-                trace("in checkAlert, there's no need to raise alert %{public}@ because we're in follower mode and keep-alive is: %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), UserDefaults.standard.followerBackgroundKeepAliveType.description)
+            if !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
+                trace("in checkAlert, there's no need to raise alert '%{public}@' because we're in follower mode and keep-alive is disabled", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
             } else {
                 trace("in checkAlert, there's no need to raise alert %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
             }

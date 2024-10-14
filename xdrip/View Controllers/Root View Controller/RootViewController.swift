@@ -216,7 +216,7 @@ final class RootViewController: UIViewController, ObservableObject {
     @IBAction func urlDoubleTapGestureRecognizerAction(_ sender: UITapGestureRecognizer) {
         
         // make sure we only act on the gesture if we're in Nightscout follower mode (i.e. with the URL visible)
-        if !UserDefaults.standard.isMaster && UserDefaults.standard.nightScoutEnabled && UserDefaults.standard.followerDataSourceType == .nightscout && UserDefaults.standard.nightScoutUrl != nil {
+        if !UserDefaults.standard.isMaster && UserDefaults.standard.nightscoutEnabled && UserDefaults.standard.followerDataSourceType == .nightscout && UserDefaults.standard.nightscoutUrl != nil {
             
             dataSourceSensorMaxAgeOutlet.textColor = .systemRed
             dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.hidingUrlForXSeconds
@@ -235,15 +235,15 @@ final class RootViewController: UIViewController, ObservableObject {
                     DispatchQueue.main.asyncAfter(deadline: .now() + Double(ConstantsHomeView.hideUrlDuringTimeInSeconds)) {
                         
                         // just copied directly from updateDataSourceInfo()
-                        var nightScoutUrlString: String = UserDefaults.standard.nightScoutUrl ?? ""
+                        var nightscoutUrlString: String = UserDefaults.standard.nightscoutUrl ?? ""
                         
-                        if nightScoutUrlString.count > 36 {
-                            nightScoutUrlString = nightScoutUrlString.replacingOccurrences(of: nightScoutUrlString.dropFirst(33), with: "...")
+                        if nightscoutUrlString.count > 36 {
+                            nightscoutUrlString = nightscoutUrlString.replacingOccurrences(of: nightscoutUrlString.dropFirst(33), with: "...")
                         }
                         
                         self.dataSourceSensorMaxAgeOutlet.alpha = 1
                         self.dataSourceSensorMaxAgeOutlet.textColor = .systemGray
-                        self.dataSourceSensorMaxAgeOutlet.text = nightScoutUrlString
+                        self.dataSourceSensorMaxAgeOutlet.text = nightscoutUrlString
                         
                     }
                     
@@ -271,7 +271,7 @@ final class RootViewController: UIViewController, ObservableObject {
                     self.valueLabelOutlet.attributedText = nil
                     
                     // set value to value of latest chartPoint
-                    self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                    self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
                     
                     // set timestamp to timestamp of latest chartPoint, in red so user can notice this is an old value
                     self.minutesLabelOutlet.text =  self.dateTimeFormatterForMinutesLabelWhenPanning.string(from: chartAxisValueDate.date)
@@ -445,7 +445,7 @@ final class RootViewController: UIViewController, ObservableObject {
     
     @IBSegueAction func segueToBgReadingsView(_ coder: NSCoder) -> UIViewController? {
                     
-        return UIHostingController(coder: coder, rootView: BgReadingsView().environmentObject(bgReadingsAccessor!).environmentObject(nightScoutUploadManager!))
+        return UIHostingController(coder: coder, rootView: BgReadingsView().environmentObject(bgReadingsAccessor!).environmentObject(nightscoutUploadManager!))
             
     }
     
@@ -483,8 +483,8 @@ final class RootViewController: UIViewController, ObservableObject {
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - to dismiss screenLockAlertController
     private let applicationManagerKeyDismissScreenLockAlertController = "applicationManagerKeyDismissScreenLockAlertController"
     
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - to do a NightScout Treatment sync
-    private let applicationManagerKeyStartNightScoutTreatmentSync = "applicationManagerKeyStartNightScoutTreatmentSync"
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - to do a Nightscout Treatment sync
+    private let applicationManagerKeyStartNightscoutTreatmentSync = "applicationManagerKeyStartNightscoutTreatmentSync"
 
     
     // MARK: - Properties - other private properties
@@ -507,8 +507,8 @@ final class RootViewController: UIViewController, ObservableObject {
     /// CalibrationsAccessor instance
     private var calibrationsAccessor: CalibrationsAccessor?
 	
-    /// NightScoutUploadManager instance
-    private var nightScoutUploadManager: NightScoutUploadManager?
+    /// NightscoutUploadManager instance
+    private var nightscoutUploadManager: NightscoutUploadManager?
     
     /// AlerManager instance
     private var alertManager: AlertManager?
@@ -519,8 +519,8 @@ final class RootViewController: UIViewController, ObservableObject {
     /// SoundPlayer instance
     private var soundPlayer: SoundPlayer?
     
-    /// nightScoutFollowManager instance
-    private var nightScoutFollowManager: NightScoutFollowManager?
+    /// nightscoutFollowManager instance
+    private var nightscoutFollowManager: NightscoutFollowManager?
     
     /// libreLinkUpFollowManager instance
     private var libreLinkUpFollowManager: LibreLinkUpFollowManager?
@@ -888,8 +888,6 @@ final class RootViewController: UIViewController, ObservableObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showClockWhenScreenIsLocked.rawValue, options: .new, context: nil)
         // if live action type is updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.liveActivityType.rawValue, options: .new, context: nil)
-        // if live action size is updated
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.liveActivitySize.rawValue, options: .new, context: nil)
         
         // high mark , low mark , urgent high mark, urgent low mark. change requires redraw of chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.urgentLowMarkValue.rawValue, options: .new, context: nil)
@@ -900,8 +898,8 @@ final class RootViewController: UIViewController, ObservableObject {
         // updating the offset carbs on chart requires a redraw of the chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.offsetCarbTreatmentsOnChart.rawValue, options: .new, context: nil)
 
-        // add observer for nightScoutTreatmentsUpdateCounter, to reload the chart whenever a treatment is added or updated or deleted changes
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
+        // add observer for nightscoutTreatmentsUpdateCounter, to reload the chart whenever a treatment is added or updated or deleted changes
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
         
         // add observer for stopActiveSensor, this will reset the active sensor to nil when the user disconnects an intergrated transmitter/sensor (e.g. Libre 2 Direct). This will help ensure that the data source info is updated/disabled until a new sensor is started.
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.stopActiveSensor.rawValue, options: .new, context: nil)
@@ -1039,7 +1037,7 @@ final class RootViewController: UIViewController, ObservableObject {
         })
         
         // launch nightscout treatment sync whenever the app comes to the foreground
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyStartNightScoutTreatmentSync, closure: {
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyStartNightscoutTreatmentSync, closure: {
             self.setNightscoutSyncTreatmentsRequiredToTrue()
         })
         
@@ -1080,7 +1078,7 @@ final class RootViewController: UIViewController, ObservableObject {
         }
     }
     
-    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightScoutUploadManager, soundPlayer, dexcomShareUploadManager, nightScoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, calendarManager, housekeeper, contactImageManager
+    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightscoutUploadManager, soundPlayer, dexcomShareUploadManager, nightscoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, calendarManager, housekeeper, contactImageManager
     private func setupApplicationData() {
         
         // setup Trace
@@ -1107,7 +1105,7 @@ final class RootViewController: UIViewController, ObservableObject {
         houseKeeper = HouseKeeper(coreDataManager: coreDataManager)
         
         // setup nightscout synchronizer
-        nightScoutUploadManager = NightScoutUploadManager(coreDataManager: coreDataManager, messageHandler: { (title:String, message:String) in
+        nightscoutUploadManager = NightscoutUploadManager(coreDataManager: coreDataManager, messageHandler: { (title:String, message:String) in
             
             let alert = UIAlertController(title: title, message: message, actionHandler: nil)
             
@@ -1122,7 +1120,7 @@ final class RootViewController: UIViewController, ObservableObject {
         guard let soundPlayer = soundPlayer else { fatalError("In setupApplicationData, this looks very in appropriate, shame")}
         
         // setup nightscoutmanager
-        nightScoutFollowManager = NightScoutFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
+        nightscoutFollowManager = NightscoutFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
         
         // setup nightscoutmanager
         libreLinkUpFollowManager = LibreLinkUpFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
@@ -1214,7 +1212,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             self.loopFollowManager?.getReading()
             
-            self.nightScoutFollowManager?.download()
+            self.nightscoutFollowManager?.download()
         
             self.libreLinkUpFollowManager?.download()
 
@@ -1508,7 +1506,7 @@ final class RootViewController: UIViewController, ObservableObject {
 
                 }
                 
-                nightScoutUploadManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                nightscoutUploadManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 healthKitManager?.storeBgReadings()
                 
@@ -1639,12 +1637,12 @@ final class RootViewController: UIViewController, ObservableObject {
             
             updateLiveActivityAndWidgets(forceRestart: false)
 
-        case UserDefaults.Key.liveActivityType, UserDefaults.Key.liveActivitySize:
+        case UserDefaults.Key.liveActivityType:
 
             // check and configure the live activity if applicable
             updateLiveActivityAndWidgets(forceRestart: false)
 
-        case UserDefaults.Key.urgentLowMarkValue, UserDefaults.Key.lowMarkValue, UserDefaults.Key.highMarkValue, UserDefaults.Key.urgentHighMarkValue, UserDefaults.Key.nightScoutTreatmentsUpdateCounter:
+        case UserDefaults.Key.urgentLowMarkValue, UserDefaults.Key.lowMarkValue, UserDefaults.Key.highMarkValue, UserDefaults.Key.urgentHighMarkValue, UserDefaults.Key.nightscoutTreatmentsUpdateCounter:
             
             // redraw chart is necessary
             updateChartWithResetEndDate()
@@ -1930,7 +1928,7 @@ final class RootViewController: UIViewController, ObservableObject {
             // store the calibration value entered by the user into the log
             trace("calibration : value %{public}@ entered by user", log: self.log, category: ConstantsLog.categoryRootView, type: .info, text.description)
             
-            let valueAsDoubleConvertedToMgDl = valueAsDouble.mmolToMgdl(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            let valueAsDoubleConvertedToMgDl = valueAsDouble.mmolToMgdl(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
             var latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
             
@@ -1985,9 +1983,9 @@ final class RootViewController: UIViewController, ObservableObject {
                 // this will store the newly created calibration(s) in coredata
                 coreDataManager.saveChanges()
                 
-                // initiate upload to NightScout, if needed
-                if let nightScoutUploadManager = self.nightScoutUploadManager {
-                    nightScoutUploadManager.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
+                // initiate upload to Nightscout, if needed
+                if let nightscoutUploadManager = self.nightscoutUploadManager {
+                    nightscoutUploadManager.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
                 }
                 
                 // initiate upload to Dexcom Share, if needed
@@ -2188,7 +2186,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 // rescale if unit is mmol
                 if !UserDefaults.standard.bloodGlucoseUnitIsMgDl {
-                    readingValueForBadge = readingValueForBadge.mgdlToMmol().round(toDecimalPlaces: 1)
+                    readingValueForBadge = readingValueForBadge.mgDlToMmol().round(toDecimalPlaces: 1)
                 } else {
                     readingValueForBadge = readingValueForBadge.round(toDecimalPlaces: 0)
                 }
@@ -2206,7 +2204,7 @@ final class RootViewController: UIViewController, ObservableObject {
             if lastReading.count > 1 {
                 //calculatedValueAsString = calculatedValueAsString // + "      " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
                 
-                notificationContent.body = lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true, mgdl: isMgDl)
+                notificationContent.body = lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: true, highGranularity: true, mgDl: isMgDl)
             } else {
                 // must set a body otherwise notification doesn't show up on iOS10
                 notificationContent.body = " "
@@ -2234,7 +2232,7 @@ final class RootViewController: UIViewController, ObservableObject {
             if UserDefaults.standard.showReadingInAppBadge && (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled)) {
                 
                 // rescale of unit is mmol
-                readingValueForBadge = readingValueForBadge.mgdlToMmol(mgdl: isMgDl)
+                readingValueForBadge = readingValueForBadge.mgDlToMmol(mgDl: isMgDl)
                 
                 // if unit is mmol and if value needs to be multiplied by 10, then multiply by 10
                 if !UserDefaults.standard.bloodGlucoseUnitIsMgDl && UserDefaults.standard.multipleAppBadgeValueWith10 {
@@ -2257,7 +2255,7 @@ final class RootViewController: UIViewController, ObservableObject {
     ///     - forceReset : if true, then force the update to be done even if the main chart is panned back in time (used for the double tap gesture)
     @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
         
-        setNightscoutSyncTreatmentsRequiredToTrue()
+        //setNightscoutSyncTreatmentsRequiredToTrue()
         
         // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
         if let glucoseChartManager = glucoseChartManager  {
@@ -2341,12 +2339,12 @@ final class RootViewController: UIViewController, ObservableObject {
             
             valueLabelOutlet.textColor = UIColor.lightGray
             
-        } else if lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) || lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) {
+        } else if lastReading.calculatedValue.bgValueRounded(mgDl: mgdl) >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgDl: mgdl).bgValueRounded(mgDl: mgdl) || lastReading.calculatedValue.bgValueRounded(mgDl: mgdl) <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgDl: mgdl).bgValueRounded(mgDl: mgdl) {
             
             // BG is higher than urgentHigh or lower than urgentLow objectives
             valueLabelOutlet.textColor = UIColor.red
             
-        } else if lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) || lastReading.calculatedValue.bgValueRounded(mgdl: mgdl) <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgdl: mgdl).bgValueRounded(mgdl: mgdl) {
+        } else if lastReading.calculatedValue.bgValueRounded(mgDl: mgdl) >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgDl: mgdl).bgValueRounded(mgDl: mgdl) || lastReading.calculatedValue.bgValueRounded(mgDl: mgdl) <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgDl: mgdl).bgValueRounded(mgDl: mgdl) {
             
             // BG is between urgentHigh/high and low/urgentLow objectives
             valueLabelOutlet.textColor = UIColor.yellow
@@ -2367,7 +2365,7 @@ final class RootViewController: UIViewController, ObservableObject {
         minutesAgoLabelOutlet.text = minutesAgoMinAgoText
         
         // create delta value text (without the units)
-        let diffLabelText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: false, highGranularity: true, mgdl: mgdl)
+        let diffLabelText = lastReading.unitizedDeltaString(previousBgReading: lastButOneReading, showUnit: false, highGranularity: true, mgDl: mgdl)
         diffLabelOutlet.text = diffLabelText
         
         // set the delta unit label text
@@ -2380,7 +2378,7 @@ final class RootViewController: UIViewController, ObservableObject {
         self.updateMiniChart()
         
         // force a snooze status update to see if the current snooze status has changed in the last minutes
-        UserDefaults.standard.updateSnoozeStatus = !UserDefaults.standard.updateSnoozeStatus
+        updateSnoozeStatus()
         
     }
     
@@ -3245,6 +3243,11 @@ final class RootViewController: UIViewController, ObservableObject {
                     
                     dataSourceLabelOutlet.text = " ⚠️  " + Texts_HomeView.reconnectLibreDataSource
                     
+                } else if (self.bluetoothPeripheralManager?.getCGMTransmitter()) != nil {
+                    
+                    // this is where all master modes will end up if there is no CGM connected or valid sensor started
+                    dataSourceLabelOutlet.text = " ⏳  " + Texts_HomeView.waitingForDataSource
+                    
                 } else {
                     
                     // this is where all master modes will end up if there is no CGM connected or valid sensor started
@@ -3271,27 +3274,27 @@ final class RootViewController: UIViewController, ObservableObject {
                 
             case .nightscout:
                 
-                if !UserDefaults.standard.nightScoutEnabled {
+                if !UserDefaults.standard.nightscoutEnabled {
                     
                     dataSourceSensorMaxAgeOutlet.textColor = .systemRed
                     dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.nightscoutNotEnabled
                     
-                } else if UserDefaults.standard.nightScoutUrl == nil {
+                } else if UserDefaults.standard.nightscoutUrl == nil {
                     
                     dataSourceSensorMaxAgeOutlet.textColor = .systemRed
                     dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.nightscoutURLMissing
                     
                 } else {
                     
-                    var nightScoutUrlString: String = UserDefaults.standard.nightScoutUrl ?? ""
+                    var nightscoutUrlString: String = UserDefaults.standard.nightscoutUrl ?? ""
                     
                     // let's use a shortened version of the url if necessary to display it cleanly in the UI. The main reason is that some of the newer service providers (such as Northflank and Google Cloud) use really long URLs as standard.
-                    if nightScoutUrlString.count > 36 {
-                        nightScoutUrlString = nightScoutUrlString.replacingOccurrences(of: nightScoutUrlString.dropFirst(33), with: "...")
+                    if nightscoutUrlString.count > 36 {
+                        nightscoutUrlString = nightscoutUrlString.replacingOccurrences(of: nightscoutUrlString.dropFirst(33), with: "...")
                     }
                     
                     dataSourceSensorMaxAgeOutlet.textColor = .systemGray
-                    dataSourceSensorMaxAgeOutlet.text = nightScoutUrlString
+                    dataSourceSensorMaxAgeOutlet.text = nightscoutUrlString
                     
                 }
                 
@@ -3301,11 +3304,6 @@ final class RootViewController: UIViewController, ObservableObject {
                     
                     dataSourceSensorMaxAgeOutlet.textColor = .systemRed
                     dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.libreLinkUpAccountCredentialsMissing
-                    
-                } else if sensorStartDate == nil || sensorMaxAgeInMinutes == 0 {
-                    
-                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
-                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.noSensorData
                     
                 }
                 
@@ -3463,6 +3461,11 @@ final class RootViewController: UIViewController, ObservableObject {
         if let cGMTransmitter = cGMTransmitter, sendToTransmitter {
             cGMTransmitter.startSensor(sensorCode: sensorCode, startDate: sensorStarDate)
         }
+        
+        // update the activeSensorDescription. Needed as otherwise it won't get done for Libre after an algorithm change
+        if let cgmTransmitter = cGMTransmitter {
+            UserDefaults.standard.activeSensorDescription = cgmTransmitter.cgmTransmitterType().detailedDescription()
+        }
 
         // assign activeSensor to newSensor
         activeSensor = newSensor
@@ -3506,7 +3509,7 @@ final class RootViewController: UIViewController, ObservableObject {
     /// show the SwiftUI view via UIHostingController
     private func showBgReadingsView() {
         
-        let bgReadingsViewController = UIHostingController(rootView: BgReadingsView().environmentObject(self.bgReadingsAccessor!).environmentObject(nightScoutUploadManager!) as! BgReadingsView)
+        let bgReadingsViewController = UIHostingController(rootView: BgReadingsView().environmentObject(self.bgReadingsAccessor!).environmentObject(nightscoutUploadManager!) as! BgReadingsView)
         
         navigationController?.pushViewController(bgReadingsViewController, animated: true)
         
@@ -3517,6 +3520,8 @@ final class RootViewController: UIViewController, ObservableObject {
     /// also update the widget data stored in user defaults
     private func updateLiveActivityAndWidgets(forceRestart: Bool) {
         if let bgReadingsAccessor = self.bgReadingsAccessor {
+            
+            let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
             
             // create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps
             // this is needed due to the not being able to pass structs that are not codable/hashable
@@ -3535,14 +3540,25 @@ final class RootViewController: UIViewController, ObservableObject {
             
             if bgReadings.count > 0 {
                 var slopeOrdinal: Int = 0
-                var deltaChangeInMgDl: Double = 0
+                var deltaValueInUserUnit: Double = 0
                 var bgReadingValues: [Double] = []
                 var bgReadingDates: [Date] = []
-                let bgValueInMgDl = bgReadings[0].calculatedValue
                 
                 // add delta if available
                 if bgReadings.count > 1 {
-                    deltaChangeInMgDl = bgReadings[0].currentSlope(previousBgReading: bgReadings[1]) * bgReadings[0].timeStamp.timeIntervalSince(bgReadings[1].timeStamp) * 1000;
+                    var previousValueInUserUnit: Double = 0.0
+                    var actualValueInUserUnit: Double = 0.0
+                    
+                    previousValueInUserUnit = bgReadings[1].calculatedValue.mgDlToMmol(mgDl: isMgDl)
+                    actualValueInUserUnit = bgReadings[0].calculatedValue.mgDlToMmol(mgDl: isMgDl)
+                    
+                    // if the values are in mmol/L, then round them to the nearest decimal point in order to get the same precision out of the next operation
+                    if !isMgDl {
+                        previousValueInUserUnit = (previousValueInUserUnit * 10).rounded() / 10
+                        actualValueInUserUnit = (actualValueInUserUnit * 10).rounded() / 10
+                    }
+                    
+                    deltaValueInUserUnit = actualValueInUserUnit - previousValueInUserUnit
                     
                     slopeOrdinal = bgReadings[0].slopeOrdinal()
                 }
@@ -3554,30 +3570,11 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 let dataSourceDescription = UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "" : UserDefaults.standard.followerDataSourceType.fullDescription
                 
-                var showLiveActivity: Bool = true // UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)
-                
-                if showLiveActivity {
-                    // now that we've got the current BG value, let's refine the check to see if we should run/show the live activity
-                    switch UserDefaults.standard.liveActivityType {
-                    case .always:
-                        showLiveActivity = true
-                    case .disabled:
-                        showLiveActivity = false
-                    case .low:
-                        showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.lowMarkValue) ? true : false
-                    case .urgentLow:
-                        showLiveActivity = (bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) ? true : false
-                    case .lowHigh:
-                        showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.lowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.highMarkValue)) ? true : false
-                    case .urgentLowHigh:
-                        showLiveActivity = ((bgValueInMgDl <= UserDefaults.standard.urgentLowMarkValue) || (bgValueInMgDl >= UserDefaults.standard.urgentHighMarkValue)) ? true : false
-                    }
-                }
-                
+                // show the live activity if we're in master mode or (follower with a heartbeat) and only if the user has requested to show it
                 // if we should show it, then let's continue processing the lastReading array to create a valid contentState
-                if showLiveActivity {
+                if (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)) && UserDefaults.standard.liveActivityType != .disabled {
                     // create the contentState that will update the dynamic attributes of the Live Activity Widget
-                    let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySize: UserDefaults.standard.liveActivitySize, dataSourceDescription: dataSourceDescription)
+                    let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: UserDefaults.standard.liveActivityType, dataSourceDescription: dataSourceDescription)
                     
                     LiveActivityManager.shared.runActivity(contentState: contentState, forceRestart: forceRestart)
                 } else {
@@ -3589,7 +3586,7 @@ final class RootViewController: UIViewController, ObservableObject {
                     date.timeIntervalSince1970
                 }
                 
-                let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaChangeInMgDl: deltaChangeInMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, dataSourceDescription: dataSourceDescription, allowStandByHighContrast: UserDefaults.standard.allowStandByHighContrast, keepAliveImageString: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImageString : nil)
+                let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, dataSourceDescription: dataSourceDescription, allowStandByHighContrast: UserDefaults.standard.allowStandByHighContrast, keepAliveImageString: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImageString : nil)
                 
                 // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
                 // the user's device - this allows several copies of the app to be installed without cross-contamination of widget data
@@ -3612,7 +3609,7 @@ final class RootViewController: UIViewController, ObservableObject {
         /// - Parameter glucoseChartType: the type of glucose chart type we want to generate (i.e. thumbnail or full notification chart)
         func createNotificationImage(glucoseChartType: GlucoseChartType) {
             if let bgReadingsAccessor = self.bgReadingsAccessor {
-                let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * glucoseChartType.hoursToShow(liveActivitySize: .normal)), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+                let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: Date().addingTimeInterval(-3600 * glucoseChartType.hoursToShow(liveActivityType: .normal)), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
                 
                 if bgReadings.count > 0 {
                     var bgReadingValues: [Double] = []
@@ -3624,7 +3621,7 @@ final class RootViewController: UIViewController, ObservableObject {
                     }
                     
                     // create a chart view with just bg reading values and dates
-                    let glucoseChartView = GlucoseChartView(glucoseChartType: glucoseChartType, bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivitySize: .normal, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
+                    let glucoseChartView = GlucoseChartView(glucoseChartType: glucoseChartType, bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: .normal, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
                     
                     // render the glucose chart view as an image object
                     guard let notificationImage = ImageRenderer(content: glucoseChartView).uiImage else { return }
@@ -3664,9 +3661,9 @@ final class RootViewController: UIViewController, ObservableObject {
     }
 
     private func setNightscoutSyncTreatmentsRequiredToTrue() {
-        if (UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightScout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
-            UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest = .now
-            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+        if (UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+            UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest = .now
+            UserDefaults.standard.nightscoutSyncTreatmentsRequired = true
         }
     }
 }
@@ -3889,7 +3886,7 @@ extension RootViewController: FollowerDelegate {
     
     func followerInfoReceived(followGlucoseDataArray: inout [FollowerBgReading]) {
         
-        if let coreDataManager = coreDataManager, let bgReadingsAccessor = bgReadingsAccessor { //}, let followManager = (UserDefaults.standard.followerDataSourceType == .nightscout ? self.nightScoutFollowManager : self.libreLinkUpFollowManager) {
+        if let coreDataManager = coreDataManager, let bgReadingsAccessor = bgReadingsAccessor { //}, let followManager = (UserDefaults.standard.followerDataSourceType == .nightscout ? self.nightscoutFollowManager : self.libreLinkUpFollowManager) {
             
             let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
             
@@ -3915,7 +3912,7 @@ extension RootViewController: FollowerDelegate {
                 
                 if followGlucoseData.timeStamp > timeStampLastBgReading {
                     
-                    trace("    creating new bgreading: value = %{public}@ %{public}@, timestamp =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info,  followGlucoseData.sgv.mgdlToMmol(mgdl: isMgDl).bgValuetoString(mgdl: isMgDl), isMgDl ? Texts_Common.mgdl : Texts_Common.mmol, followGlucoseData.timeStamp.toString(timeStyle: .long, dateStyle: .long))
+                    trace("    creating new bgreading: value = %{public}@ %{public}@, timestamp =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info,  followGlucoseData.sgv.mgDlToMmol(mgDl: isMgDl).bgValueToString(mgDl: isMgDl), isMgDl ? Texts_Common.mgdl : Texts_Common.mmol, followGlucoseData.timeStamp.toString(timeStyle: .long, dateStyle: .long))
                     
                     // create a new reading
                     // we'll need to check which should be the active followerManager to know where to call the function
@@ -3923,7 +3920,7 @@ extension RootViewController: FollowerDelegate {
                         
                     case .nightscout:
                         
-                        if let followManager = nightScoutFollowManager {
+                        if let followManager = nightscoutFollowManager {
                             _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
                         }
                         
@@ -3968,7 +3965,7 @@ extension RootViewController: FollowerDelegate {
                 // (this will only happen if we're not following Nightscout
                 // and if the user has requested to upload follower BG values
                 // to Nightscout
-                nightScoutUploadManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                nightscoutUploadManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 // check alerts, create notification, set app badge
                 checkAlertsCreateNotificationAndSetAppBadge()
@@ -3985,6 +3982,8 @@ extension RootViewController: FollowerDelegate {
                 
                 // ask calendarManager to process new reading, ignore last connection change timestamp because this is follower mode, there is no connection to a transmitter
                 calendarManager?.processNewReading(lastConnectionStatusChangeTimeStamp: nil)
+                
+                contactImageManager?.processNewReading()
                 
                 loopManager?.share()
 

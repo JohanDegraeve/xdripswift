@@ -4,7 +4,7 @@ import Foundation
 ///
 /// see https://stackoverflow.com/questions/36193503/kvo-broken-in-ios-9-3, to solve this
 ///
-/// where this needs to be checked, create an instance of KeyValueObserverTimeKeeper, example in NightScoutUploadManager
+/// where this needs to be checked, create an instance of KeyValueObserverTimeKeeper, example in NightscoutUploadManager
 class KeyValueObserverTimeKeeper {
     
     private var keyObserverKeeper = [String: Date]()

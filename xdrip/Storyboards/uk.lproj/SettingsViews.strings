@@ -46,7 +46,7 @@
 "settingsviews_givetransmitterid" = "Enter Transmitter ID";
 
 /// nightscout settings, where user can set the nightscout url
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_nightscoutUrl" = "URL";
 
 /// general settings, should reading be multiplied with 10 yes or no
 "settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10";
@@ -67,7 +67,7 @@
 "settingsviews_speakDelta" = "Speak Delta";
 
 /// nightscout settings, port to use
-"nightScoutPort" = "Port";
+"nightscoutPort" = "Port";
 
 /// healthkit settings, section title
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
@@ -103,7 +103,7 @@
 "settingsviews_housekeeperExportAllData" = "Export All Data";
 
 /// nightscout settings, where user can enable or disable nightscout
-"settingsviews_nightScoutEnabled" = "Enable Nightscout";
+"settingsviews_nightscoutEnabled" = "Enable Nightscout";
 
 /// home screen settings, urgent high value
 "settingsviews_urgentHighValue" = "Urgent High Value";
@@ -148,7 +148,7 @@
 "settingsviews_speakBgReadingslanguage" = "Language";
 
 /// nightscout settings, where user can set the nightscout api key
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
 
 /// transmitter settings, to explain that settings is about resetting the transmitter
 "settingsviews_resettransmitter" = "Reset Transmitter (Anubis only)";
@@ -186,7 +186,7 @@
 /// transmitter settings, section title
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 
-/// used for editing schedule for NightScout upload and Dexcom Share upload
+/// used for editing schedule for Nightscout upload and Dexcom Share upload
 "editScheduleTimePickerSubtitle" = "Change: ";
 
 /// In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row
@@ -223,7 +223,7 @@
 "settingsviews_follower" = "Follower";
 
 /// nightscout settings, pop up that asks user to enter nightscout api key
-"settingsviews_giveNightScoutAPIKey" = "Enter your API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "Enter your API_SECRET";
 
 /// Calendar Events Settings - text in row where user needs to select a calendar
 "calenderId" = "Calendar To Use";
@@ -241,7 +241,7 @@
 "settingsviews_restartNeeded" = "(Restart required)";
 
 /// nightscout settings, section title
-"settingsviews_sectiontitlenightscout" = "NightScout";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
 
 /// used in settings, section Info, title of the build setting
 "settingsviews_build" = "Build";
@@ -286,7 +286,7 @@
 "settingsviews_showtarget" = "Show Target Line";
 
 /// nightscout  settings, pop up that asks user to enter nightscout url
-"settingsviews_giveNightScoutUrl" = "Enter your NightScout URL";
+"settingsviews_giveNightscoutUrl" = "Enter your Nightscout URL";
 
 /// Calendar Events Settings - text in row where user needs to say if delta should be displayed or not
 "displayDeltaInCalendarEvent" = "Display Delta";
@@ -368,7 +368,7 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";

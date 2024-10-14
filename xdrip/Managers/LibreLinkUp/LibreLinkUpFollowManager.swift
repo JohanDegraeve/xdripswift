@@ -31,7 +31,7 @@ class LibreLinkUpFollowManager: NSObject {
     private var bgReadingsAccessor: BgReadingsAccessor
     
     /// delegate to pass back glucosedata
-    private (set) weak var followerDelegate: FollowerDelegate?
+    private(set) weak var followerDelegate: FollowerDelegate?
     
     /// AVAudioPlayer to use
     private var audioPlayer:AVAudioPlayer?
@@ -175,7 +175,7 @@ class LibreLinkUpFollowManager: NSObject {
     ///
     /// updates bgreading
     ///
-    private func findSlope() -> (calculatedValueSlope:Double, hideSlope:Bool) {
+    private func findSlope() -> (calculatedValueSlope: Double, hideSlope: Bool) {
         
         // init returnvalues
         var hideSlope = true
@@ -186,7 +186,7 @@ class LibreLinkUpFollowManager: NSObject {
         
         // if more thant 2 readings, calculate slope and hie
         if last2Readings.count >= 2 {
-            let (slope, hide) = last2Readings[0].calculateSlope(lastBgReading:last2Readings[1]);
+            let (slope, hide) = last2Readings[0].calculateSlope(lastBgReading:last2Readings[1])
             calculatedValueSlope = slope
             hideSlope = hide
         }
@@ -201,11 +201,11 @@ class LibreLinkUpFollowManager: NSObject {
         
         trace("in download", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
         
-        if (UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow > 15 {
-            trace("    setting nightScoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
+        if (UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow > 15 {
+            trace("    setting nightscoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
             
-            UserDefaults.standard.timeStampLatestNightScoutTreatmentSyncRequest = .now
-            UserDefaults.standard.nightScoutSyncTreatmentsRequired = true
+            UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest = .now
+            UserDefaults.standard.nightscoutSyncTreatmentsRequired = true
         }
         
         guard !UserDefaults.standard.isMaster else {
@@ -253,6 +253,7 @@ class LibreLinkUpFollowManager: NSObject {
                     let graphResponse = try await requestGraph(patientId: patientId)
                     
                     // before processing the glucoseMeasurement values, let's set up the sensor info in coredata so that we can show it to the user in the settings screen
+                    // starting with LLU 4.12.0 this data sometimes isn't sent for some users so we'll try and use it if available and if not, just continue as normal without throwing an error
                     if let startDate = graphResponse.data?.activeSensors?.first?.sensor?.a,
                        let serialNumber = graphResponse.data?.activeSensors?.first?.sensor?.sn {
                         
@@ -266,12 +267,12 @@ class LibreLinkUpFollowManager: NSObject {
                         if serialNumber.range(of: #"^MH"#, options: .regularExpression) != nil {
                             
                             // MHxxxxxxxx
-                            // must be a L2 sensor
+                            // must be a L2 (or Libre 2 Plus) sensor
                             activeSensorDescription = "Libre 2"
                             
                         } else if serialNumber.range(of: #"^0D"#, options: .regularExpression) != nil || serialNumber.range(of: #"^0E"#, options: .regularExpression) != nil || serialNumber.range(of: #"^0F"#, options: .regularExpression) != nil{
                             
-                            // must be a Libre 3 sensor
+                            // must be a Libre 3 (or Libre 3 Plus) sensor
                             activeSensorDescription = "Libre 3"
                             
                         }
@@ -281,9 +282,12 @@ class LibreLinkUpFollowManager: NSObject {
                     } else {
                         
                         // this will only happen if the account doesn't have an active sensor connected
+                        // reset the data just in case it was previously stored
                         resetActiveSensorData()
                         
-                        throw LibreLinkUpFollowError.generalError
+                        // for some reason no active sensor data was sent by the server. This seems to sometimes happen since LLU v4.12.0 for some users and for some (unknown) reason.
+                        // instead of throwing an error, we'll just continue as normal and hide later (in the UI) the sensor information
+                        trace("    in download, no active sensor data was returned by the server so just process the values if any", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
                         
                     }
                     
@@ -304,9 +308,6 @@ class LibreLinkUpFollowManager: NSObject {
                         if let followerDelegate = self.followerDelegate {
                             followerDelegate.followerInfoReceived(followGlucoseDataArray: &followGlucoseDataArray)
                         }
-                        
-                        // schedule new download
-                        //self.scheduleNewDownload()
                         
                     }
                     

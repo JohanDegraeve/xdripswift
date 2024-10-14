@@ -55,14 +55,14 @@
 "settingsviews_giveDexcomShareAccountName" = "Εισαγάγετε όνομα λογαριασμού Dexcom Share";
 "settingsviews_giveDexcomSharePassword" = "Κοινοποίηση κωδικού πρόσβασης για κοινή χρήση Dexcom";
 "settingsviews_giveDexcomShareSerialNumber" = "Εισαγάγετε τον σειριακό αριθμό του δέκτη Dexcom";
-"settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Ενεργοποίηση του Nightscout";
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutEnabled" = "Ενεργοποίηση του Nightscout";
+"settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Μεταφόρτωση με χρονοδιάγραμμα;";
 "schedule" = "Χρονοδιάγραμμα";
-"settingsviews_giveNightScoutUrl" = "Εισαγάγετε το NightScout URL σας";
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
-"settingsviews_giveNightScoutAPIKey" = "Εισαγάγετε το API_SECRET σας";
+"settingsviews_giveNightscoutUrl" = "Εισαγάγετε το Nightscout URL σας";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "Εισαγάγετε το API_SECRET σας";
 "editScheduleTimePickerSubtitle" = "Αλλαγή: ";
 "timeScheduleViewTitle" = "Χρονοδιάγραμμα On/Off για ";
 "uploadSensorStartTime" = "Μεταφόρτωση ώρα έναρξης αισθητήρα;";
@@ -106,7 +106,7 @@
 "volumeTestiOSSound" = "Έλεγχος (τρέχουσας) έντασης ήχου";
 "debugLevel" = "Συμπεριλάβετε λεπτομερή διαγνωστικά";
 "warningChangeFromMasterToFollower" = "Η εναλλαγή από κύριο σε ακόλουθο θα σταματήσει τον τρέχοντα αισθητήρα σας. Θέλετε να συνεχίσετε;";
-"nightScoutPort" = "Θύρα";
+"nightscoutPort" = "Θύρα";
 "developerSettings" = "Ρυθμίσεις προγραμματιστή";
 "smoothLibreValues" = "Ομαλοποίηση τιμών Libre;";
 "nslog" = "NSLog";
@@ -135,7 +135,7 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";

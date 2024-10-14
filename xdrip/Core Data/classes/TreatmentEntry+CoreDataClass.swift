@@ -56,12 +56,12 @@ import CoreData
     /// returns "-insulin", "-carbs", "-exercise", according to treatment type
     public func idExtension() -> String {
         
-        return "-" + self.nightScoutFieldname()
+        return "-" + self.nightscoutFieldname()
         
     }
     
-    /// return the name of the attribute used in NightScout for the TreatmentType
-    public func nightScoutFieldname() -> String {
+    /// return the name of the attribute used in Nightscout for the TreatmentType
+    public func nightscoutFieldname() -> String {
         
         switch self {
             
@@ -87,7 +87,7 @@ import CoreData
         switch self {
             
         case .Insulin:
-            return ConstantsGlucoseChart.bolusTreatmentChartPointYAxisOffsetInMgDl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            return ConstantsGlucoseChart.bolusTreatmentChartPointYAxisOffsetInMgDl.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
             // if no offset is defined or needed for this treatment type, just return zero offset
         default:
@@ -103,7 +103,7 @@ import CoreData
         switch self {
             
         case .Insulin:
-            return ConstantsGlucoseChart.bolusTreatmentChartPointYAxisScaleFactor.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            return ConstantsGlucoseChart.bolusTreatmentChartPointYAxisScaleFactor.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
             // if no scale is defined or needed for this treatment type, just return a unity scale factor
         default:
@@ -128,7 +128,7 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 
     /// initializer with id default empty, uploaded default false
     /// - parameters:
-    ///     -     nightscoutEventType : if it's a treatmentEntry that was downloaded from NightScout, then this is the eventType as it was received form NightScout. nil if not known or if it's a treatmentType that was not downloaded from NightScout
+    ///     -     nightscoutEventType : if it's a treatmentEntry that was downloaded from Nightscout, then this is the eventType as it was received form Nightscout. nil if not known or if it's a treatmentType that was not downloaded from Nightscout
     convenience init(date: Date, value: Double, treatmentType: TreatmentType, nightscoutEventType: String?, nsManagedObjectContext:NSManagedObjectContext) {
         
 		// Id defaults to Empty
@@ -163,9 +163,9 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 		super.init(entity: entity, insertInto: context)
 	}
 	
-	/// - get the dictionary representation required for creating a new treatment @ NighScout using POST or updating an existing treatment @ NightScout using PUT
+	/// - get the dictionary representation required for creating a new treatment @ NighScout using POST or updating an existing treatment @ Nightscout using PUT
     /// - splits of "-carbs" "-insulin" or "-exercise" from the id
-	func dictionaryRepresentationForNightScoutUpload(reuseDateFormatter: DateFormatter? = nil) -> [String: Any] {
+	func dictionaryRepresentationForNightscoutUpload(reuseDateFormatter: DateFormatter? = nil) -> [String: Any] {
         
 		// Universal fields.
 		var dict: [String: Any] = [
@@ -194,8 +194,8 @@ public class TreatmentEntry: NSManagedObject, Comparable {
         case .BgCheck:
             dict["eventType"] = "BG Check" // maybe overwritten in next statement
             dict["glucose"] = self.value
-            dict["glucoseType"] = "Finger" + String(!UserDefaults.standard.bloodGlucoseUnitIsMgDl ? ": " + self.value.mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) + " " + Texts_Common.mmol : "")
-            dict["units"] = ConstantsNightScout.mgDlNightscoutUnitString
+            dict["glucoseType"] = "Finger" + String(!UserDefaults.standard.bloodGlucoseUnitIsMgDl ? ": " + self.value.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) + " " + Texts_Common.mmol : "")
+            dict["units"] = ConstantsNightscout.mgDlNightscoutUnitString
 		default:
 			break
 		}

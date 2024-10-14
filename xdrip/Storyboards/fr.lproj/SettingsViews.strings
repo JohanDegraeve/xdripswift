@@ -38,14 +38,14 @@
 "settingsviews_giveDexcomShareAccountName" = "Entrer le nom du compte Dexcom";
 "settingsviews_giveDexcomSharePassword" = "Entrer le mot de passe Dexcom Share";
 "settingsviews_giveDexcomShareSerialNumber" = "Entrer le numéro de série Dexcom Receiver";
-"settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Connecter à Nightscout";
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutEnabled" = "Connecter à Nightscout";
+"settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Mettre à jour à heure fixe";
 "schedule" = "Heure";
-"settingsviews_giveNightScoutUrl" = "Entrer l'URL de NightScout";
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
-"settingsviews_giveNightScoutAPIKey" = "Entrer votre API_SECRET";
+"settingsviews_giveNightscoutUrl" = "Entrer l'URL de Nightscout";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "Entrer votre API_SECRET";
 "editScheduleTimePickerSubtitle" = "Changer";
 "timeScheduleViewTitle" = "On/Off Time Schedule pour";
 "uploadSensorStartTime" = "Charger heure démarrage capteur";
@@ -83,7 +83,7 @@
 "failedToSendEmail" = "Echec d'envoi du Email";
 
 /// nightscout settings, port to use
-"nightScoutPort" = "Port";
+"nightscoutPort" = "Port";
 
 /// home screen settings, urgent high value
 "settingsviews_urgentHighValue" = "Urgent Valeur Haute";
@@ -112,6 +112,9 @@
 
 /// non fixed settings, title of the section
 "settingsviews_labelNonFixed" = "Calibration Multi-point";
+
+"settingsviews_labelAlgorithmType" = "Type d'algorithme";
+"settingsviews_labelCalibrationType" = "Type de calibration";
 
 /// In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row
 "volumeTestSoundPlayer" = "Test Volume (Si Ignorer Mode silencieux)";
@@ -211,7 +214,7 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";

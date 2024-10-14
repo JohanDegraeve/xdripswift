@@ -33,7 +33,7 @@ class GNSEntryBluetoothPeripheralViewModel {
     /// temporary reference to bluetoothPerpipheral, will be set in configure function.
     private var bluetoothPeripheral: BluetoothPeripheral?
     
-    /// it's the bluetoothPeripheral as M5Stack
+    /// it's the bluetoothPeripheral as GNSentry
     private var GNSEntry: GNSEntry? {
         get {
             return bluetoothPeripheral as? GNSEntry

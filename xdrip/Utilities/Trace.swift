@@ -366,8 +366,7 @@ class Trace {
         traceInfo.appendStringAndNewLine("\nNotifications settings:")
         traceInfo.appendStringAndNewLine("    Show BG in notifications: " + UserDefaults.standard.showReadingInNotification.description)
         traceInfo.appendStringAndNewLine("    Notification interval: " + UserDefaults.standard.notificationInterval.description + " minutes")
-        traceInfo.appendStringAndNewLine("    Live Activities: " + UserDefaults.standard.liveActivityType.debugDescription)
-        traceInfo.appendStringAndNewLine("    Live Activities Size: " + UserDefaults.standard.liveActivitySize.debugDescription)
+        traceInfo.appendStringAndNewLine("    Live Activities Type: " + UserDefaults.standard.liveActivityType.debugDescription)
         traceInfo.appendStringAndNewLine("    Show BG in app badge: " + UserDefaults.standard.showReadingInAppBadge.description)
         traceInfo.appendStringAndNewLine("    Multiply app badge by 10: " + (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? "-" : UserDefaults.standard.multipleAppBadgeValueWith10.description))
                 
@@ -393,13 +392,13 @@ class Trace {
         traceInfo.appendStringAndNewLine("    Show HbA1c in mmols/mol: " + UserDefaults.standard.useIFCCA1C.description)
           
         traceInfo.appendStringAndNewLine("\nNightscout settings:")
-        traceInfo.appendStringAndNewLine("    Nightscout enabled: " + UserDefaults.standard.nightScoutEnabled.description)
-        if UserDefaults.standard.nightScoutEnabled {
-            traceInfo.appendStringAndNewLine("    URL: " + ((UserDefaults.standard.nightScoutUrl?.description ?? "") != "" ? "present" : "missing"))
-            traceInfo.appendStringAndNewLine("    API_SECRET: " + ((UserDefaults.standard.nightScoutAPIKey?.description ?? "") != "" ? "present" : "missing"))
+        traceInfo.appendStringAndNewLine("    Nightscout enabled: " + UserDefaults.standard.nightscoutEnabled.description)
+        if UserDefaults.standard.nightscoutEnabled {
+            traceInfo.appendStringAndNewLine("    URL: " + ((UserDefaults.standard.nightscoutUrl?.description ?? "") != "" ? "present" : "missing"))
+            traceInfo.appendStringAndNewLine("    API_SECRET: " + ((UserDefaults.standard.nightscoutAPIKey?.description ?? "") != "" ? "present" : "missing"))
             traceInfo.appendStringAndNewLine("    Token: " + ((UserDefaults.standard.nightscoutToken?.description ?? "") != "" ? "present" : "missing"))
-            if UserDefaults.standard.nightScoutPort != 0 {
-                traceInfo.appendStringAndNewLine("    Port: " + UserDefaults.standard.nightScoutPort.description)
+            if UserDefaults.standard.nightscoutPort != 0 {
+                traceInfo.appendStringAndNewLine("    Port: " + UserDefaults.standard.nightscoutPort.description)
             } else {
                 traceInfo.appendStringAndNewLine("    Port: Missing")
             }

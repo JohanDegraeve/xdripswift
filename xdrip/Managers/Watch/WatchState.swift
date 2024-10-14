@@ -14,7 +14,7 @@ struct WatchState: Codable {
     var bgReadingDatesAsDouble: [Double] = []
     var isMgDl: Bool?
     var slopeOrdinal: Int?
-    var deltaChangeInMgDl: Double?
+    var deltaValueInUserUnit: Double?
     var urgentLowLimitInMgDl: Double?
     var lowLimitInMgDl: Double?
     var highLimitInMgDl: Double?
@@ -26,9 +26,9 @@ struct WatchState: Codable {
     var isMaster: Bool?
     var followerDataSourceTypeRawValue: Int?
     var followerBackgroundKeepAliveTypeRawValue: Int?
-    var timeStampOfLastFollowerConnection: Date?
+    var timeStampOfLastFollowerConnection: Double?
     var secondsUntilFollowerDisconnectWarning: Int?
-    var timeStampOfLastHeartBeat: Date?
+    var timeStampOfLastHeartBeat: Double?
     var secondsUntilHeartBeatDisconnectWarning: Int?
     var keepAliveIsDisabled: Bool?
     var liveDataIsEnabled: Bool?

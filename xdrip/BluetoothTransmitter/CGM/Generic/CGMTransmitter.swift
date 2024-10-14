@@ -82,10 +82,10 @@ enum CGMTransmitterType:String, CaseIterable {
     case dexcomG4 = "Dexcom G4"
     
     /// dexcom G5, G6
-    case dexcom = "Dexcom"
+    case dexcom = "Dexcom G5/G6/ONE"
     
     /// dexcom G7
-    case dexcomG7 = "Dexcom G7"
+    case dexcomG7 = "Dexcom G7/ONE+"
     
     /// miaomiao
     case miaomiao = "MiaoMiao"
@@ -320,9 +320,9 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .Libre2:
             if let activeSensorMaxSensorAgeInDays = UserDefaults.standard.activeSensorMaxSensorAgeInDays, activeSensorMaxSensorAgeInDays >= 15 {
-                return "Libre 2 Plus"
+                return "Libre 2 Plus EU"
             } else {
-                return "Libre 2"
+                return "Libre 2 EU"
             }
             
         default:

@@ -89,10 +89,10 @@ enum ConstantsLog {
     static let categoryApplicationDataM5StackNames =    "ApplicationDataM5StackNames   "
     
     /// nightscout uploader
-    static let categoryNightScoutUploadManager =     "NightScoutUploadManager       "
+    static let categoryNightscoutUploadManager =     "NightscoutUploadManager       "
     
     /// nightscout follow
-    static let categoryNightScoutFollowManager =     "NightScoutFollowManager       "
+    static let categoryNightscoutFollowManager =     "NightscoutFollowManager       "
     
     /// nightscout follow
     static let categoryLibreLinkUpFollowManager =    "LibreLinkUpFollowManager      "
@@ -146,7 +146,7 @@ enum ConstantsLog {
     static let categorySettingsViewContactImageSettingsViewModel =           "SettingsViewContactImageSettingsViewModel  "
 
     /// WatchManager logging
-    static let categoryWatchManager =                       "WatchManager                   "
+    static let categoryWatchManager =                       "WatchManager                  "
 
     /// ContactImageManager logging
     static let categoryContactImageManager =                "ContactImageManager           "
@@ -155,7 +155,7 @@ enum ConstantsLog {
     static let categoryBluetoothPeripheralViewController =   "blePeripheralViewController   "
     
     /// nightscout view model
-    static let categoryNightScoutSettingsViewModel =         "nightScoutSettingsViewModel   "
+    static let categoryNightscoutSettingsViewModel =         "nightscoutSettingsViewModel   "
     
     /// trace
     static let categoryTraceSettingsViewModel =      "TraceSettingsViewModel"

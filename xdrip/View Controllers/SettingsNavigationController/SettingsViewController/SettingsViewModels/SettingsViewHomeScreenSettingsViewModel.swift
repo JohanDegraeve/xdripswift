@@ -225,19 +225,19 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         switch setting {
             
         case .urgentHighMarkValue:
-            return UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            return UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
         case .highMarkValue:
-            return UserDefaults.standard.highMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            return UserDefaults.standard.highMarkValueInUserChosenUnit.bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
         case .targetMarkValue:
-            return UserDefaults.standard.targetMarkValueInUserChosenUnit == 0 ? Texts_Common.disabled : UserDefaults.standard.targetMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            return UserDefaults.standard.targetMarkValueInUserChosenUnit == 0 ? Texts_Common.disabled : UserDefaults.standard.targetMarkValueInUserChosenUnit.bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
         case .lowMarkValue:
-            return UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            return UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
         case .urgentLowMarkValue:
-            return UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.bgValuetoString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            return UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
         case .screenLockDimmingType:
             return UserDefaults.standard.screenLockDimmingType.description

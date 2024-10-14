@@ -10,14 +10,15 @@ import SwiftUI
 import OSLog
 
 struct BgReadingsView: View {
-    
     // MARK: - environment objects
     
     /// reference to bgReadingsAccessor
     @EnvironmentObject var bgReadingsAccessor: BgReadingsAccessor
     
     /// reference to nightscoutUploadManager
-    @EnvironmentObject var nightScoutUploadManager: NightScoutUploadManager
+    @EnvironmentObject var nightscoutUploadManager: NightscoutUploadManager
+    
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     
     // MARK: - private @State properties
     
@@ -52,24 +53,18 @@ struct BgReadingsView: View {
     // MARK: - SwiftUI views
     
     var body: some View {
-        
         NavigationView {
-            
             VStack {
-                
                 DatePicker(selection: $dateSelected, in: Date().addingTimeInterval(-(Double(numberOfDaysOfBgReadingsToShow) * 24 * 3600))...Date(), displayedComponents: .date) {
                     
                     HStack {
-                        
-                        Text(Texts_BgReadings.selectDate)
+                        Text(Texts_BgReadings.date)
                         
                         Spacer()
                         
                         Text(dateSelectedDayName)
                             .foregroundColor(.secondary)
-                        
                     }
-                    
                 }
                 .padding()
                 .padding(.horizontal)
@@ -77,19 +72,15 @@ struct BgReadingsView: View {
                 .id(self.datePickerReset)
                 
                 List {
-                    
                     // only process the view contents if there is data to show.
                     if !filteredBgReadings.isEmpty {
-                        
                         ForEach(filteredBgReadings, id: \.self) { bgReading in
                             NavigationLink(destination: BgReadingsDetailView(bgReading: bgReading)) {
-                                
                                 HStack {
-                                    
                                     visualIndicator(bgRangeDescription: bgReading.bgRangeDescription())
                                         .font(.system(size: 10))
                                     
-                                    Text(bgReading.calculatedValue.mgdlToMmol(mgdl: isMgDl).bgValueRounded(mgdl: isMgDl).bgValuetoString(mgdl: isMgDl))
+                                    Text(bgReading.calculatedValue.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).bgValueToString(mgDl: isMgDl))
                                         .foregroundColor(.primary)
                                     
                                     Text(String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
@@ -103,30 +94,20 @@ struct BgReadingsView: View {
                                     
                                     Text(bgReading.timeStamp.toStringInUserLocale(timeStyle: .short, dateStyle: .none))
                                         .foregroundColor(.secondary)
-                                    
                                 }
                                 .foregroundColor(.white)
-                                
                             }
-                            
                         }
                         .onDelete(perform: deleteBgReading)
-                        
                     }
-                    
                     else {
-                        
                         // this is shown when there is no data for the selected date
                         Text(Texts_BgReadings.noReadingsToShow)
-                        
                     }
-                    
                 }
-                
             }
             .navigationTitle(Texts_BgReadings.glucoseReadingsTitle)
             .onChange(of: dateSelected, perform: { value in
-                
                 // update the filtered array with the newly selected date
                 filteredBgReadings = bgReadings.filter { Calendar.current.compare($0.timeStamp, to: dateSelected, toGranularity: .day) == .orderedSame}
                 
@@ -134,24 +115,25 @@ struct BgReadingsView: View {
                 
                 // hide the datePicker
                 self.datePickerReset = UUID()
-                
             })
-            
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(Texts_Common.Cancel, action: {
+                        self.presentationMode.wrappedValue.dismiss()
+                    })
+                }
+            }
         }
         .colorScheme(.dark)
         .onAppear() {
-            
             initializeView()
-            
         }
-        
     }
     
     // MARK: - private functions
     
     /// this is called when the view appears. It will pull BG readings from coredata
     private func initializeView() {
-        
         // set the fromDate to be midnight 'numberOfDaysOfBgReadingsToShow' days before the current date
         if let fromDate: Date = Calendar.current.date(byAdding: .day, value: -numberOfDaysOfBgReadingsToShow, to: dateSelected)?.toMidnight() {
             
@@ -163,20 +145,14 @@ struct BgReadingsView: View {
             
             // update the day name in the user language for the newly selected date
             updateDayName(date: dateSelected)
-            
         } else {
-            
             // this should never happen so it's not worth localizing it
             dateSelectedDayName = "Error"
-            
         }
-        
     }
-    
     
     /// delete a BG reading from the local arrays, coredata and also Nightscout based on the index passed to the function
     private func deleteBgReading(at offsets: IndexSet) {
-        
         // as we are using a separate filtered bgReading array to populate the List in the view, we need to delete the selected index from both the primary and filtered bgReading arrays to keep them in sync. This means getting the timestamp of the filtered array and matching it to the timestamp in the main array, then deleting them both. Then we can delete it from coredata and also Nightscout
         
         // get the index to be deleted from filteredBgReadings
@@ -188,7 +164,7 @@ struct BgReadingsView: View {
         // get the timestamp so that we can match it to the main (unfiltered) array
         let timestampOfBgReadingToDelete = bgReadingToDelete.timeStamp
         
-        trace("deleting BG reading %{public}@ %{public}@ with timestamp %{public}@ from coredata", log: log, category: ConstantsLog.categoryBgReadingsView, type: .info, bgReadingToDelete.calculatedValue.mgdlToMmol(mgdl: isMgDl).bgValueRounded(mgdl: isMgDl).stringWithoutTrailingZeroes, String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol), timestampOfBgReadingToDelete.description)
+        trace("deleting BG reading %{public}@ %{public}@ with timestamp %{public}@ from coredata", log: log, category: ConstantsLog.categoryBgReadingsView, type: .info, bgReadingToDelete.calculatedValue.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).stringWithoutTrailingZeroes, String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol), timestampOfBgReadingToDelete.description)
         
         // delete from the filtered BgReading array which will also force a refresh of the view
         filteredBgReadings.remove(atOffsets: offsets)
@@ -200,10 +176,9 @@ struct BgReadingsView: View {
         bgReadingsAccessor.delete(bgReading: bgReadingToDelete)
         
         // delete the BgReading from Nightscout (if it exists)
-        nightScoutUploadManager.deleteBgReadingFromNightscout(timeStampOfBgReadingToDelete: timestampOfBgReadingToDelete)
+        nightscoutUploadManager.deleteBgReadingFromNightscout(timeStampOfBgReadingToDelete: timestampOfBgReadingToDelete)
         
         return
-        
     }
     
     /// returns the visual indicator symbol based on the BgRangeDescription from a BgReading
@@ -233,13 +208,11 @@ struct BgReadingsView: View {
     
     /// this updates the state variable with the day name string (in user locale) based on the date passed to it
     private func updateDayName(date: Date) {
-        
         let dateFormatter = DateFormatter()
         
         dateFormatter.dateFormat = "EEEE"
         
         dateSelectedDayName = dateFormatter.string(from: date).capitalized
-        
     }
 }
 

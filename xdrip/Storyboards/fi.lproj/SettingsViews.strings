@@ -33,14 +33,14 @@
 "settingsviews_giveDexcomShareAccountName" = "Anna Dexcom Sharen käyttäjätunnus";
 "settingsviews_giveDexcomSharePassword" = "Anna Dexcom Sharen salasana";
 "settingsviews_giveDexcomShareSerialNumber" = "Anna Dexcom vastaanottimen sarjanumero";
-"settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Ota Nightscout käyttöön";
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutEnabled" = "Ota Nightscout käyttöön";
+"settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Käytä lähetysaikataulua";
 "schedule" = "Aikataulu";
-"settingsviews_giveNightScoutUrl" = "Anna NightScout palvelimesi URL";
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
-"settingsviews_giveNightScoutAPIKey" = "Anna API_SECRET";
+"settingsviews_giveNightscoutUrl" = "Anna Nightscout palvelimesi URL";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "Anna API_SECRET";
 "editScheduleTimePickerSubtitle" = "Muuta: ";
 "timeScheduleViewTitle" = "Päällä/pois aikataulu ";
 "uploadSensorStartTime" = "Lähetä sensorin aloitusaika";
@@ -83,7 +83,7 @@
 "volumeTestiOSSound" = "Testaa ääni (nykyinen iPhone voimakkuus)";
 "debugLevel" = "Sisällytä debug taso";
 "warningChangeFromMasterToFollower" = "Vaihtaminen masterista seuraajaan pysäyttää nykyisen anturin. Haluatko jatkaa?";
-"nightScoutPort" = "Portti";
+"nightscoutPort" = "Portti";
 "settingsviews_showcoloredobjectives" = "Näytä värilliset tavoiteviivat ";
 "settingsviews_showtarget" = "Näytä kohdeviiva";
 "settingsviews_targetValue" = "Tavoitearvo";
@@ -186,7 +186,7 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";

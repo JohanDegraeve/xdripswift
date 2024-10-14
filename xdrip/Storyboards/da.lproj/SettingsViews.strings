@@ -53,14 +53,14 @@
 "settingsviews_giveDexcomShareAccountName" = "Enter Dexcom Share Account Name";
 "settingsviews_giveDexcomSharePassword" = "Give Dexcom Share Password";
 "settingsviews_giveDexcomShareSerialNumber" = "Enter the Dexcom Receiver Serial Number";
-"settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Enable Nightscout";
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutEnabled" = "Enable Nightscout";
+"settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Use Upload Schedule";
 "schedule" = "Schedule";
-"settingsviews_giveNightScoutUrl" = "Enter your NightScout URL";
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
-"settingsviews_giveNightScoutAPIKey" = "Enter your API_SECRET";
+"settingsviews_giveNightscoutUrl" = "Enter your Nightscout URL";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "Enter your API_SECRET";
 "editScheduleTimePickerSubtitle" = "Change: ";
 "timeScheduleViewTitle" = "On/Off Time Schedule for ";
 "uploadSensorStartTime" = "Upload Sensor Start Time";
@@ -104,7 +104,7 @@
 "volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
 "debugLevel" = "Include Debug Level";
 "warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
-"nightScoutPort" = "Port";
+"nightscoutPort" = "Port";
 "developerSettings" = "Developer Settings";
 "smoothLibreValues" = "Smooth Libre Values";
 "nslog" = "NSLog";
@@ -145,7 +145,7 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";

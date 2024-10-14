@@ -14,13 +14,13 @@ enum BluetoothPeripheralType: String, CaseIterable {
     case M5StickCType = "M5StickC"
     
     /// Libre 2
-    case Libre2Type = "Libre 2 Direct"
+    case Libre2Type = "Libre 2 EU / 2+ EU"
     
     /// MiaoMiao
     case MiaoMiaoType = "MiaoMiao"
     
     /// bubble
-    case BubbleType = "Bubble / Bubble Mini"
+    case BubbleType = "Nano / Bubble / Bubble Mini"
     
     /// Dexcom
     case DexcomType = "Dexcom G5 / G6 / ONE"
@@ -49,8 +49,8 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// Atom
     case AtomType = "Atom"
     
-    /// to use a Libre 3 as heartbeat
-    case Libre3HeartBeatType = "Libre HeartBeat"
+    /// to use a Libre (such as L2 US/CA/AUS or Libre 3/Libre 3 Plus) or just any generic heartbeat device as heartbeat
+    case Libre3HeartBeatType = "Libre/Generic HeartBeat"
     
     /// DexcomG7 heartbeat
     case DexcomG7HeartBeatType = "Dexcom G7/ONE+ HeartBeat"
@@ -267,7 +267,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .BubbleType, .MiaoMiaoType, .AtomType, .DexcomType:
+        case .BubbleType, .MiaoMiaoType, .AtomType: //, .DexcomType:
             return true
             
         case .Libre2Type:

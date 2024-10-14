@@ -49,14 +49,14 @@
 "settingsviews_giveDexcomShareAccountName" = "Dexcom Share Hesabı Adını Girin";
 "settingsviews_giveDexcomSharePassword" = "Dexcom Share Parolasını Girin";
 "settingsviews_giveDexcomShareSerialNumber" = "Dexcom Alıcı Seri Numarasını girin";
-"settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Nightscout etkinleştirilsin mi";
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutEnabled" = "Nightscout etkinleştirilsin mi";
+"settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Yükleme Takvimi Kullanılsın mı";
 "schedule" = "Yükleme Takvimi";
-"settingsviews_giveNightScoutUrl" = "NightScout URL'nizi girin";
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
-"settingsviews_giveNightScoutAPIKey" = "API_SECRET'inizi girin";
+"settingsviews_giveNightscoutUrl" = "Nightscout URL'nizi girin";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "API_SECRET'inizi girin";
 "editScheduleTimePickerSubtitle" = "Değiştir: ";
 "timeScheduleViewTitle" = "Açık/Kapalı Zaman Çizelgesi için ";
 "uploadSensorStartTime" = "Sensör Başlangıç Zamanı Yüklensin mi";
@@ -100,7 +100,7 @@
 "volumeTestiOSSound" = "Test Ses (Mevcut iPhone Sesi)";
 "debugLevel" = "Hata Ayıklama Düzeyini Dahil Et";
 "warningChangeFromMasterToFollower" = "Sahip'ten Takipciye geçmek mevcut sensörünüzü durduracaktır. Devam etmek istiyor musun?";
-"nightScoutPort" = "Port";
+"nightscoutPort" = "Port";
 "developerSettings" = "Geliştirici Ayarları";
 "smoothLibreValues" = "Pürüzsüz Libre değerleri";
 "nslog" = "NSLog";
@@ -121,7 +121,7 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";

@@ -15,7 +15,7 @@ import CoreData
 /// "The client should not create the identifier, the server automatically assigns it when the document is inserted."
 public struct TreatmentNSResponse {
     
-    /// id received from NightScout , incusive the extension "-insulin", "-carbs" or "-exercise"
+    /// id received from Nightscout , incusive the extension "-insulin", "-carbs" or "-exercise"
 	public let id: String
     
 	public let createdAt: Date
@@ -24,12 +24,12 @@ public struct TreatmentNSResponse {
     /// - only used internally in the app
 	public let eventType: TreatmentType
     
-    /// - eventType received from NightScout (for downloaded treatments) or uploaded to NightScout (for treatments created in xdrip4ios)
+    /// - eventType received from Nightscout (for downloaded treatments) or uploaded to Nightscout (for treatments created in xdrip4ios)
     public let nightscoutEventType: String?
 	
     public let value: Double
     
-	/// Takes a NSDictionary from nightscout response and returns an array TreatmentNSResponse. Can be more than one, eg NightScout treatment of type 'Snack Bolus' could contain an insulin value and a carbs value
+	/// Takes a NSDictionary from nightscout response and returns an array TreatmentNSResponse. Can be more than one, eg Nightscout treatment of type 'Snack Bolus' could contain an insulin value and a carbs value
     ///
     /// id will be the id retrieved from nightscout + "-insulin", "-carbs", "-exercise", according to treatment type
     public static func fromNightscout(dictionary: NSDictionary) -> [TreatmentNSResponse] {
@@ -70,31 +70,31 @@ public struct TreatmentNSResponse {
         // first check that _id exists and that created_at was successfully converted into a Date
 		if let id = dictionary["_id"] as? String, let date = nightscoutDate {
 			
-            // retrieve nightScoutEventType from the nightscout response
+            // retrieve nightscoutEventType from the nightscout response
             // if not present then it's set to nil (it should be present)
-            let nightScoutEventType: String? = dictionary["eventType"] as? String
+            let nightscoutEventType: String? = dictionary["eventType"] as? String
             
             if let carbs = dictionary["carbs"] as? Double {
                 
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Carbs, nightscoutEventType: nightScoutEventType, value: carbs))
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Carbs, nightscoutEventType: nightscoutEventType, value: carbs))
                 
             }
             
             if let insulin = dictionary["insulin"] as? Double {
                 
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Insulin.idExtension(), createdAt: date, eventType: .Insulin, nightscoutEventType: nightScoutEventType, value: insulin))
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Insulin.idExtension(), createdAt: date, eventType: .Insulin, nightscoutEventType: nightscoutEventType, value: insulin))
                 
             }
             
-            if nightScoutEventType == "Exercise", let duration = dictionary["duration"] as? Double {
+            if nightscoutEventType == "Exercise", let duration = dictionary["duration"] as? Double {
                     
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Exercise, nightscoutEventType: nightScoutEventType, value: duration))
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Exercise, nightscoutEventType: nightscoutEventType, value: duration))
                 
             }
             
             if let glucose = dictionary["glucose"] as? Double, let units = dictionary["units"] as? String {
                 
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.BgCheck.idExtension(), createdAt: date, eventType: .BgCheck, nightscoutEventType: nightScoutEventType, value: units == "mg/dl" ? glucose : glucose.mmolToMgdl()))
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.BgCheck.idExtension(), createdAt: date, eventType: .BgCheck, nightscoutEventType: nightscoutEventType, value: units == "mg/dl" ? glucose : glucose.mmolToMgdl()))
                 
             }
             

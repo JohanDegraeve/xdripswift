@@ -7,14 +7,7 @@ public class BgReading: NSManagedObject {
     /// creates BgReading with given parameters.
     ///
     /// properties that are not in the parameter list get either value 0 or false (depending on type). id gets new value
-    init(
-        timeStamp:Date,
-        sensor:Sensor?,
-        calibration:Calibration?,
-        rawData:Double,
-        deviceName:String?,
-        nsManagedObjectContext:NSManagedObjectContext
-    ) {
+    init(timeStamp: Date, sensor: Sensor?, calibration:Calibration?, rawData: Double, deviceName: String?, nsManagedObjectContext: NSManagedObjectContext) {
         let entity = NSEntityDescription.entity(forEntityName: "BgReading", in: nsManagedObjectContext)!
         super.init(entity: entity, insertInto: nsManagedObjectContext)
         self.timeStamp = timeStamp
@@ -42,7 +35,7 @@ public class BgReading: NSManagedObject {
     }
     
     /// log the contents to a string
-    public func log(_ indentation:String) -> String {
+    public func log(_ indentation: String) -> String {
         var r:String = "bgreading = "
         r += "\n" + indentation + "timestamp = " + timeStamp.description + "\n"
         r += "\n" + indentation + "uniqueid = " + id
@@ -111,12 +104,13 @@ public class BgReading: NSManagedObject {
     }
     
     /// creates string with bg value in correct unit or "HIGH" or "LOW", or other like ???
-    func unitizedString(unitIsMgDl:Bool) -> String {
-        var returnValue:String
+    func unitizedString(unitIsMgDl: Bool) -> String {
+        var returnValue: String
+        
         if (calculatedValue >= 400) {
             returnValue = Texts_Common.HIGH
         } else if (calculatedValue >= 40) {
-            returnValue = calculatedValue.mgdlToMmolAndToString(mgdl: unitIsMgDl)
+            returnValue = calculatedValue.mgDlToMmolAndToString(mgDl: unitIsMgDl)
         } else if (calculatedValue > 12) {
             returnValue = Texts_Common.LOW
         } else {
@@ -154,7 +148,7 @@ public class BgReading: NSManagedObject {
     }
     
     /// creates string with difference from previous reading and also unit
-    func unitizedDeltaString(previousBgReading:BgReading?, showUnit:Bool, highGranularity:Bool, mgdl:Bool) -> String {
+    func unitizedDeltaString(previousBgReading: BgReading?, showUnit: Bool, highGranularity: Bool, mgDl: Bool) -> String {
         
         guard let previousBgReading = previousBgReading else {
             return "???"
@@ -162,43 +156,48 @@ public class BgReading: NSManagedObject {
         
         if timeStamp.timeIntervalSince(previousBgReading.timeStamp) > Double(ConstantsBGGraphBuilder.maxSlopeInMinutes * 60) {
             // don't show delta if there are not enough values or the values are more than 20 mintes apart
-            return "???";
+            return "???"
         }
-        
-        // delta value recalculated aligned with time difference between previous and this reading
-        let value = currentSlope(previousBgReading: previousBgReading) * timeStamp.timeIntervalSince(previousBgReading.timeStamp) * 1000;
 
-        if(abs(value) > 100){
-            // a delta > 100 will not happen with real BG values -> problematic sensor data
-            return "ERR";
+        var previousValueInUserUnit = previousBgReading.calculatedValue.mgDlToMmol(mgDl: mgDl)
+        var actualValueInUserUnit = calculatedValue.mgDlToMmol(mgDl: mgDl)
+        
+        // if the values are in mmol/L, then round them to the nearest decimal point in order to get the same precision out of the next operation
+        if !mgDl {
+            previousValueInUserUnit = (previousValueInUserUnit * 10).rounded() / 10
+            actualValueInUserUnit = (actualValueInUserUnit * 10).rounded() / 10
         }
         
-        let valueAsString = value.mgdlToMmolAndToString(mgdl: mgdl)
+        let deltaValueInUserUnit = actualValueInUserUnit - previousValueInUserUnit
         
-        var deltaSign:String = ""
-        if (value > 0) { deltaSign = "+"; }
+        // a delta > 100mg/dL will not happen with real BG values -> problematic sensor data
+        if abs(deltaValueInUserUnit.mmolToMgdl(mgDl: mgDl)) > 100 {
+            return "ERR"
+        }
+        
+        // let's carefully convert the delta value into a string
+        // if in mmol/L, then use a different function to keep everything aligned
+        let deltaValueAsString = mgDl ? deltaValueInUserUnit.mgDlToMmolAndToString(mgDl: mgDl) : deltaValueInUserUnit.mmolToString()
+        
+        var deltaSign: String = ""
+        
+        if deltaValueInUserUnit > 0 {
+            deltaSign = "+"
+        }
         
         // quickly check "value" and prevent "-0mg/dl" or "-0.0mmol/l" being displayed
         // show unitized zero deltas as +0 or +0.0 as per Nightscout format
-        if (mgdl) {
-            if (value > -1) && (value < 1) {
-                return "+0" + (showUnit ? (" " + Texts_Common.mgdl):"");
-            } else {
-                return deltaSign + valueAsString + (showUnit ? (" " + Texts_Common.mgdl):"");
-            }
+        if deltaValueInUserUnit == 0.0 {
+            return (mgDl ? "+0" : "+0.0") + (showUnit ? (" " + (mgDl ? Texts_Common.mgdl : Texts_Common.mmol)) : "")
         } else {
-            if (value > -0.1) && (value < 0.1) {
-                return "+0.0" + (showUnit ? (" " + Texts_Common.mmol):"");
-            } else {
-                return deltaSign + valueAsString + (showUnit ? (" " + Texts_Common.mmol):"");
-            }
+            return deltaSign + deltaValueAsString + (showUnit ? (" " + (mgDl ? Texts_Common.mgdl : Texts_Common.mmol)) : "")
         }
     }
     
-    func currentSlope(previousBgReading:BgReading?) -> Double {
+    func currentSlope(previousBgReading: BgReading?) -> Double {
         
         if let previousBgReading = previousBgReading {
-            let (slope,_) = calculateSlope(lastBgReading: previousBgReading);
+            let (slope,_) = calculateSlope(lastBgReading: previousBgReading)
             return slope
         } else {
             return 0.0
@@ -210,7 +209,7 @@ public class BgReading: NSManagedObject {
     func bgRangeDescription() -> BgRangeDescription {
         
         // Prepare the bgReading value
-        let bgValue = self.calculatedValue.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        let bgValue = self.calculatedValue.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
         
         if (bgValue >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit
             || bgValue <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit){
@@ -236,15 +235,14 @@ public class BgReading: NSManagedObject {
     /// - returns:
     ///     - calculated slope and hideSlope
     func calculateSlope(lastBgReading:BgReading) -> (Double, Bool) {
-        if timeStamp == lastBgReading.timeStamp
-            ||
-            timeStamp.toMillisecondsAsDouble() - lastBgReading.timeStamp.toMillisecondsAsDouble() > Double(ConstantsBGGraphBuilder.maxSlopeInMinutes * 60 * 1000) {
-            return (0,true)
+        if timeStamp == lastBgReading.timeStamp || timeStamp.toMillisecondsAsDouble() - lastBgReading.timeStamp.toMillisecondsAsDouble() > Double(ConstantsBGGraphBuilder.maxSlopeInMinutes * 60 * 1000) {
+            return (0, true)
         }
+        
         return ((lastBgReading.calculatedValue - calculatedValue) / (lastBgReading.timeStamp.toMillisecondsAsDouble() - timeStamp.toMillisecondsAsDouble()), false)
     }
     
-    /// slopeName for upload to NightScout
+    /// slopeName for upload to Nightscout
     public var slopeName:String {
         let slope_by_minute:Double = calculatedValueSlope * 60000
         var arrow = "NONE"

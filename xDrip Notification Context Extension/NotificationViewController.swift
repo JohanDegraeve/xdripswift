@@ -21,7 +21,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
     var bgReadingDates: [Date]?
     var isMgDl: Bool?
     var slopeOrdinal: Int?
-    var deltaChangeInMgDl: Double?
+    var deltaValueInUserUnit: Double?
     var urgentLowLimitInMgDl: Double?
     var lowLimitInMgDl: Double?
     var highLimitInMgDl: Double?
@@ -50,7 +50,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         bgReadingValues = userInfo["bgReadingValues"] as? [Double] ?? [0]
         isMgDl = userInfo["isMgDl"] as? Bool ?? true
         slopeOrdinal = userInfo["slopeOrdinal"] as? Int ?? 0
-        deltaChangeInMgDl = userInfo["deltaChangeInMgDl"] as? Double ?? 0
+        deltaValueInUserUnit = userInfo["deltaValueInUserUnit"] as? Double ?? 0
         urgentLowLimitInMgDl = userInfo["urgentLowLimitInMgDl"] as? Double ?? 0
         lowLimitInMgDl = userInfo["lowLimitInMgDl"] as? Double ?? 0
         highLimitInMgDl = userInfo["highLimitInMgDl"] as? Double ?? 0
@@ -65,7 +65,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         bgValueInMgDl = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0] : nil
         bgReadingDate = (bgReadingDates?.count ?? 0) > 0 ? bgReadingDates?[0] : nil
         
-        bgValueStringInUserChosenUnit = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0].mgdlToMmolAndToString(mgdl: isMgDl ?? true) ?? "" : ""
+        bgValueStringInUserChosenUnit = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0].mgDlToMmolAndToString(mgDl: isMgDl ?? true) ?? "" : ""
         
         let vc = UIHostingController(rootView: NotificationView(
             alertTitle: alertTitle,
@@ -73,7 +73,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             bgReadingDates: bgReadingDates,
             isMgDl: isMgDl,
             slopeOrdinal: slopeOrdinal,
-            deltaChangeInMgDl: deltaChangeInMgDl,
+            deltaValueInUserUnit: deltaValueInUserUnit,
             urgentLowLimitInMgDl: urgentLowLimitInMgDl,
             lowLimitInMgDl: lowLimitInMgDl,
             highLimitInMgDl: highLimitInMgDl,

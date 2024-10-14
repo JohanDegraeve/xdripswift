@@ -24,7 +24,7 @@
 "settingsviews_enterUsername" = "Entrar tu usuario (e-mail)";
 "settingsviews_enterPassword" = "Entrar tu contraseña";
 "settingsviews_libreLinkUpReAcceptNeeded" = "Aceptar terminos";
-"settingsviews_libreLinkUpNoActiveSensor" = "Sin sensor activo";
+"settingsviews_libreLinkUpNoActiveSensor" = "Sin datos de sensor activo";
 "settingsviews_translateOnlineHelp" = "Traducir Documentación";
 "settingsviews_showHelpIcon" = "Mostrar icono";
 "settingsviews_restartNeeded" = "(Pendiente reiniciar)";
@@ -69,6 +69,9 @@
 "settingsviews_resetDexcomTransmitterMessage" = "\nEsta opción intentará resetear el transmisor durante la próxima conexión.\n\nEsto solo puede funcionar con transmisores G5 y transmisores G6 Anubis.\n\nNo funciona para transmisores normales tipo G6 y One.";
 "settingsviews_nonfixedtransmitter" = "Habilitar Calibración Multi-punto";
 "settingsviews_labelNonFixed" = "Calibración Multi-punto";
+"settingsviews_labelAlgorithmType" = "Tipo de Algoritmo";
+"settingsviews_labelCalibrationTitle" = "Calibración de Sensor";
+"settingsviews_labelCalibrationType" = "Tipo de Calibración";
 "settingsviews_sectiontitlealerting" = "Alarmas";
 "settingsviews_row_alert_types" = "Tipos de Alarmas";
 "settingsviews_row_alerts" = "Alarmas";
@@ -82,12 +85,12 @@
 "settingsviews_giveDexcomShareAccountName" = "Entrar el Nombre de tu Cuenta Dexcom Share";
 "settingsviews_giveDexcomSharePassword" = "Entrar la  Contraseña para tu Cuenta Dexcom Share";
 "settingsviews_giveDexcomShareSerialNumber" = "Entrar el número de serie del receptor Dexcom";
-"settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Habilitar Nightscout";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutEnabled" = "Habilitar Nightscout";
 "settingsviews_useSchedule" = "Fijar Horario de Subida de Datos";
 "schedule" = "Horario";
-"settingsviews_giveNightScoutUrl" = "Entrar tu URL NightScout";
-"settingsviews_giveNightScoutAPIKey" = "Entrar tu API_SECRET";
+"settingsviews_giveNightscoutUrl" = "Entrar tu URL Nightscout";
+"settingsviews_giveNightscoutAPIKey" = "Entrar tu API_SECRET";
 "editScheduleTimePickerSubtitle" = "Cambiar: ";
 "timeScheduleViewTitle" = "Fijar horario para ";
 "uploadSensorStartTime" = "Subir Hora de Inicio de Sensor";
@@ -130,10 +133,10 @@
 "volumeTestiOSSound" = "Comprobar Volumen (volumen actual del iPhone)";
 "debugLevel" = "Incluir Datos Nivel Debug";
 "warningChangeFromMasterToFollower" = "Si cambias el modo de Master a Seguidor se parará la sesión del sensor actual. Quieres continuar?";
-"nightScoutPort" = "Puerto";
+"nightscoutPort" = "Puerto";
 "volumeTestSoundPlayerExplanation" = "Se está reproduciendo una alamra con el mismo volumen que usar un Tipo de Alarma con la opción de 'Ignorar Mode Silencio?' habilitado\n\nCambiar el volume con los botones del iPhone y apretar OK para confirmar";
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
+"settingsviews_nightscoutUrl" = "URL";
 "settingsviews_sectiontitleAbout" = "Sobre %@";
 "volumeTestiOSSoundExplanation" = "Se está reproduciendo una alamra con el mismo volumen que usar un Tipo de Alarma con la opción de 'Ignorar Mode Silencio?' deshabilitado\n\nCambiar el volume con los botones del iPhone y apretar OK para confirmar";
 "smoothLibreValues" = "Suavizar valores Libre";
@@ -143,7 +146,7 @@
 "settingsviews_sectiontitlehomescreen" = "Inicio";
 "settingsviews_infoContactsAccessRestricted" = "No has podido dar permiso a %@ para accesar a tus contactos. Esto es probablemente debido a restriciones como el control parental o similar.";
 "settingsviews_contactImageSectionTitle" = "Imagen de Contacto";
-"settingsviews_enableContactImage" = "Crear Contacto";
+"settingsviews_enableContactImage" = "Habilitar Contacto";
 "settingsviews_displayTrendInContactImage" = "Mostrar Tendencia";
 "settingsviews_contactImageCreatedByString" = "Contacto creado automáticamente por";
 

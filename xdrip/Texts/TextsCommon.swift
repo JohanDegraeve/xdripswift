@@ -225,4 +225,8 @@ class Texts_Common {
     static let disabled = {
         return NSLocalizedString("common_disabled", tableName: filename, bundle: Bundle.main, value: "Disabled", comment: "disabled")
     }()
+    
+    static let notRequired = {
+        return NSLocalizedString("common_notRequired", tableName: filename, bundle: Bundle.main, value: "Not required", comment: "not required")
+    }()
 }

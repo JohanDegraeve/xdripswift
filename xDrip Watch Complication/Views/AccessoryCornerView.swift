@@ -19,17 +19,17 @@ extension XDripWatchComplication.EntryView {
                 .minimumScaleFactor(0.2)
                 .widgetCurvesContent()
                 .widgetLabel {
-                    Gauge(value: entry.widgetState.bgValueInMgDl ?? 100, in: entry.widgetState.gaugeModel().minValue...entry.widgetState.gaugeModel().maxValue) {
+                    Gauge(value: entry.widgetState.bgValueInMgDl ?? entry.widgetState.gaugeModel().nilValue, in: entry.widgetState.gaugeModel().minValue...entry.widgetState.gaugeModel().maxValue) {
                         Text("Not shown")
                     } currentValueLabel: {
                         Text("Not shown")
                     } minimumValueLabel: {
-                        Text(entry.widgetState.gaugeModel().minValue.mgdlToMmolAndToString(mgdl: entry.widgetState.isMgDl))
+                        Text(entry.widgetState.gaugeModel().minValue.mgDlToMmolAndToString(mgDl: entry.widgetState.isMgDl))
                             .font(.system(size: 8))
                             .foregroundStyle(.colorPrimary)
                             .minimumScaleFactor(0.2)
                     } maximumValueLabel: {
-                        Text(entry.widgetState.gaugeModel().maxValue.mgdlToMmolAndToString(mgdl: entry.widgetState.isMgDl))
+                        Text(entry.widgetState.gaugeModel().maxValue.mgDlToMmolAndToString(mgDl: entry.widgetState.isMgDl))
                             .font(.system(size: 8))
                             .foregroundStyle(.colorPrimary)
                             .minimumScaleFactor(0.2)
