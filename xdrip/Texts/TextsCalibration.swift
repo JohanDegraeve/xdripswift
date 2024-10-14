@@ -17,11 +17,11 @@ enum Texts_Calibrations {
     }()
     
     static let singlePointCalibration:String = {
-        return NSLocalizedString("singlePointCalibration", tableName: filename, bundle: Bundle.main, value: "Standard Calibration", comment: "text for standard/single-point calibration")
+        return NSLocalizedString("singlePointCalibration", tableName: filename, bundle: Bundle.main, value: "Standard", comment: "text for standard/single-point calibration")
     }()
     
     static let multiPointCalibration:String = {
-        return NSLocalizedString("multiPointCalibration", tableName: filename, bundle: Bundle.main, value: "Multi-point Calibration", comment: "text for multi-point/non-fixed slope calibration")
+        return NSLocalizedString("multiPointCalibration", tableName: filename, bundle: Bundle.main, value: "Multi-point", comment: "text for multi-point/non-fixed slope calibration")
     }()
     
 }

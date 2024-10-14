@@ -3305,11 +3305,6 @@ final class RootViewController: UIViewController, ObservableObject {
                     dataSourceSensorMaxAgeOutlet.textColor = .systemRed
                     dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.libreLinkUpAccountCredentialsMissing
                     
-                } else if sensorStartDate == nil || sensorMaxAgeInMinutes == 0 {
-                    
-                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
-                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.noSensorData
-                    
                 }
                 
             }
@@ -3987,6 +3982,8 @@ extension RootViewController: FollowerDelegate {
                 
                 // ask calendarManager to process new reading, ignore last connection change timestamp because this is follower mode, there is no connection to a transmitter
                 calendarManager?.processNewReading(lastConnectionStatusChangeTimeStamp: nil)
+                
+                contactImageManager?.processNewReading()
                 
                 loopManager?.share()
 

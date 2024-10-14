@@ -11,7 +11,7 @@ enum ConstantsDexcomG7 {
     /// if there's a new connect within this period, but latest reading was less than this interval ago, then no need to request new reading
     static let minimumTimeBetweenTwoReadings = TimeInterval(minutes: 2.1)
     
-    /// how many days the sensor session lasts
-    static let maxSensorAgeInDays: Double = 10.0
+    /// how many days the sensor session lasts. In the case of G7/ONE+ it is 10 days + a 12 hour grace period = 10.5 days
+    static let maxSensorAgeInDays: Double = 10.5
     
 }

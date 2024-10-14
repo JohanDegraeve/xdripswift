@@ -51,12 +51,12 @@ enum ConstantsHomeView {
     
     /// urgent time left / colour
     static let sensorProgressViewUrgentInMinutes: Double = 60 * 12.0 // 12 hours before the sensor reaches max age
-    static let sensorProgressViewProgressColorUrgent: UIColor = .red
-    static let sensorProgressViewProgressColorUrgentSwiftUI: Color = .red
+    static let sensorProgressViewProgressColorUrgent: UIColor = .orange
+    static let sensorProgressViewProgressColorUrgentSwiftUI: Color = .orange
     
     /// colour for an expired sensor
-    static let sensorProgressExpired: UIColor = .purple
-    static let sensorProgressExpiredSwiftUI: Color = .purple
+    static let sensorProgressExpired: UIColor = .red
+    static let sensorProgressExpiredSwiftUI: Color = .red
     
     /// colour for an normal text
     static let sensorProgressNormalTextColor: UIColor = .lightGray

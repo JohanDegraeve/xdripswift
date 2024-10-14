@@ -29,7 +29,7 @@
 "settingsviews_enterUsername" = "Enter your username (e-mail)";
 "settingsviews_enterPassword" = "Enter your password";
 "settingsviews_libreLinkUpReAcceptNeeded" = "Need to accept terms";
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 "settingsviews_showReadingInNotification" = "Show BG in Notifications";
 "settingsviews_labelShowReadingInAppBadge" = "Show BG in the App Badge";
 "settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10";
@@ -76,6 +76,9 @@
 "settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
 "settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration";
 "settingsviews_labelNonFixed" = "Multi-point Calibration";
+"settingsviews_labelAlgorithmType" = "Algorithm Type";
+"settingsviews_labelCalibrationTitle" = "Sensor Calibration";
+"settingsviews_labelCalibrationType" = "Calibration Type";
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
 "settingsviews_sectiontitlealerting" = "Alarms";
 "settingsviews_row_alert_types" = "Alarm Types";
@@ -134,7 +137,7 @@
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
 "settingsviews_infoContactsAccessRestricted" = "You cannot give authorization to %@ to access your contacts. This is possibly due to active restrictions such as parental controls being in place.";
 "settingsviews_contactImageSectionTitle" = "Contact Image";
-"settingsviews_enableContactImage" = "Create Contact";
+"settingsviews_enableContactImage" = "Enable Contact Image";
 "settingsviews_displayTrendInContactImage" = "Show Trend";
 "settingsviews_contactImageCreatedByString" = "Contact automatically created by";
 "sectionTitleTrace" = "Issue Reporting";
