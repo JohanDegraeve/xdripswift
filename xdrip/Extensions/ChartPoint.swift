@@ -62,7 +62,7 @@ extension ChartPoint {
     
 }
 
-extension ChartPoint: @retroactive Comparable {
+extension ChartPoint: Comparable {
     
     public static func < (lhs: ChartPoint, rhs: ChartPoint) -> Bool {
         
