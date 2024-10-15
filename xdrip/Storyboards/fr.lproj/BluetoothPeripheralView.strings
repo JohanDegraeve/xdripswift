@@ -73,3 +73,7 @@
 
 "nativeAlgorithm" = "Algorithme natif";
 "xDripAlgorithm" = "Algorithme xDrip";
+"confirmAlgorithmChangeToTransmitterMessage" = "Confirmer le changement pour revenir à l'algorithme natif/transmetteur";
+"confirmAlgorithmChangeToxDripMessage" = "Confirmer le changement pour utiliser l'algorithme xDrip.\n\nLes lectures vont s'interrompre un moment et vous devrez insérer une valeur de calibration initiale.";
+"confirmCalibrationChangeToSinglePointMessage" = "Confirmer le changement du type de calibration à standard\n\nLes lectures vont s'interrompre un moment et vous devrez insérer une valeur de calibration initiale.";
+"confirmCalibrationChangeToMultiPointMessage" = "Confirmer le changement du type de calibration à multipoints\n\n⚠️ Notez que cette méthode est réservée aux utilisateurs expérimentés car elle peut générer des résultats dangereux en cas de calibration incorrecte.\n\nSi vous n'êtes pas sûr de savoir l'utiliser, sélectionnez Annuler.";
