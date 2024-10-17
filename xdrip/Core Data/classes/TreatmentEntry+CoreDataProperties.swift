@@ -25,6 +25,9 @@ extension TreatmentEntry {
 
 	/// Value represents the amount (e.g. insulin units, carbs grams, BG check glucose value).
 	@NSManaged public var value: Double
+    
+    /// Value represents a secondary amount (such as the duration of a basal rate)
+    @NSManaged public var valueSecondary: Double
 
 	/// Enum TreatmentType defines which treatment this instance is.
 	@NSManaged public var treatmentType: TreatmentType

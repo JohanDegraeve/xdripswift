@@ -29,6 +29,8 @@ public struct TreatmentNSResponse {
 	
     public let value: Double
     
+    public let valueSecondary: Double?
+    
 	/// Takes a NSDictionary from nightscout response and returns an array TreatmentNSResponse. Can be more than one, eg Nightscout treatment of type 'Snack Bolus' could contain an insulin value and a carbs value
     ///
     /// id will be the id retrieved from nightscout + "-insulin", "-carbs", "-exercise", according to treatment type
@@ -76,25 +78,31 @@ public struct TreatmentNSResponse {
             
             if let carbs = dictionary["carbs"] as? Double {
                 
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Carbs, nightscoutEventType: nightscoutEventType, value: carbs))
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Carbs, nightscoutEventType: nightscoutEventType, value: carbs, valueSecondary: nil))
                 
             }
             
             if let insulin = dictionary["insulin"] as? Double {
                 
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Insulin.idExtension(), createdAt: date, eventType: .Insulin, nightscoutEventType: nightscoutEventType, value: insulin))
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Insulin.idExtension(), createdAt: date, eventType: .Insulin, nightscoutEventType: nightscoutEventType, value: insulin, valueSecondary: nil))
                 
             }
             
             if nightscoutEventType == "Exercise", let duration = dictionary["duration"] as? Double {
                     
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Exercise, nightscoutEventType: nightscoutEventType, value: duration))
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Carbs.idExtension(), createdAt: date, eventType: .Exercise, nightscoutEventType: nightscoutEventType, value: duration, valueSecondary: nil))
                 
             }
             
             if let glucose = dictionary["glucose"] as? Double, let units = dictionary["units"] as? String {
                 
-                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.BgCheck.idExtension(), createdAt: date, eventType: .BgCheck, nightscoutEventType: nightscoutEventType, value: units == "mg/dl" ? glucose : glucose.mmolToMgdl()))
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.BgCheck.idExtension(), createdAt: date, eventType: .BgCheck, nightscoutEventType: nightscoutEventType, value: units == "mg/dl" ? glucose : glucose.mmolToMgdl(), valueSecondary: nil))
+                
+            }
+            
+            if let rate = dictionary["rate"] as? Double, let duration = dictionary["duration"] as? Double {
+                
+                treatmentNSResponses.append(TreatmentNSResponse(id: id + TreatmentType.Basal.idExtension(), createdAt: date, eventType: .Basal, nightscoutEventType: nightscoutEventType, value: rate, valueSecondary: duration))
                 
             }
             
@@ -148,7 +156,7 @@ public struct TreatmentNSResponse {
 	/// Be extra carefull when creating new TreatmentEntry, will create the new entry in CoreData but does not save in CoreData
 	public func asNewTreatmentEntry(nsManagedObjectContext: NSManagedObjectContext) -> TreatmentEntry? {
         
-        return TreatmentEntry(id: id, date: createdAt, value: value, treatmentType: eventType, nightscoutEventType: nightscoutEventType, nsManagedObjectContext: nsManagedObjectContext)
+        return TreatmentEntry(id: id, date: createdAt, value: value, valueSecondary: valueSecondary ?? 0, treatmentType: eventType, nightscoutEventType: nightscoutEventType, nsManagedObjectContext: nsManagedObjectContext)
         
 	}
 	

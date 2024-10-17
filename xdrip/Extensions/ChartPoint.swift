@@ -60,6 +60,48 @@ extension ChartPoint {
 
     }
     
+//    /// the basal rate chart point from a treatment entry
+//    convenience init(basalRateTreatmentEntry: TreatmentEntry, formatter: DateFormatter) {
+//        
+//            self.init(
+//                x: ChartAxisValueDate(date: basalRateTreatmentEntry.date, formatter: formatter),
+//                y: ChartAxisValueDouble(basalRateTreatmentEntry.value.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) * 20)
+//            )
+//
+//    }
+    
+    /// the basal rate chart point from a treatment entry.
+    /// If the previous basal rate is included, then it is used to create the ending point of the rate (i.e. new date but with previous value)
+    /// if the previous basal rate is not sent, then we'll assume we should just create a starting point of the rate (new date with new value)
+    convenience init(basalRateTreatmentEntry: TreatmentEntry, previousBasalRateTreatmentEntry: TreatmentEntry?, formatter: DateFormatter) {
+        
+            self.init(
+                x: ChartAxisValueDate(date: (previousBasalRateTreatmentEntry ?? basalRateTreatmentEntry).date, formatter: formatter),
+                y: ChartAxisValueDouble(basalRateTreatmentEntry.value.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) * 20)
+            )
+
+    }
+    
+    /// the basal rate chart point from a treatment entry
+    convenience init(lastBasalRateTreatmentEntry: TreatmentEntry, untilDate: Date, formatter: DateFormatter) {
+        
+            self.init(
+                x: ChartAxisValueDate(date: untilDate, formatter: formatter),
+                y: ChartAxisValueDouble(lastBasalRateTreatmentEntry.value.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) * 20)
+            )
+
+    }
+    
+    /// create a zero basal rate chart point from a treatment entry. This helps to close the fill area
+    convenience init(atDate: Date, formatter: DateFormatter) {
+        
+            self.init(
+                x: ChartAxisValueDate(date: atDate, formatter: formatter),
+                y: ChartAxisValueDouble(0.0)
+            )
+
+    }
+    
 }
 
 extension SwiftCharts.ChartPoint: Swift.Comparable {

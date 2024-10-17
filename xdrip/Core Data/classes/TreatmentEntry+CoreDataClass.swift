@@ -20,6 +20,7 @@ import CoreData
 	case Carbs
 	case Exercise
     case BgCheck
+    case Basal
 	
 	/// String representation.
 	public func asString() -> String {
@@ -32,6 +33,8 @@ import CoreData
 			return Texts_TreatmentsView.exercise
         case .BgCheck:
             return Texts_TreatmentsView.bgCheck
+        case .Basal:
+            return Texts_TreatmentsView.basalRate
 		default:
 			return Texts_TreatmentsView.questionMark
 		}
@@ -46,6 +49,8 @@ import CoreData
 			return Texts_TreatmentsView.carbsUnit
 		case .Exercise:
 			return Texts_TreatmentsView.exerciseUnit
+        case .Basal:
+            return Texts_TreatmentsView.basalRateUnit
         case .BgCheck:
             return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol
 		default:
@@ -76,6 +81,9 @@ import CoreData
             
         case .BgCheck:
             return "glucose"
+            
+        case .Basal:
+            return "rate"
             
         }
         
@@ -129,29 +137,31 @@ public class TreatmentEntry: NSManagedObject, Comparable {
     /// initializer with id default empty, uploaded default false
     /// - parameters:
     ///     -     nightscoutEventType : if it's a treatmentEntry that was downloaded from Nightscout, then this is the eventType as it was received form Nightscout. nil if not known or if it's a treatmentType that was not downloaded from Nightscout
-    convenience init(date: Date, value: Double, treatmentType: TreatmentType, nightscoutEventType: String?, nsManagedObjectContext:NSManagedObjectContext) {
+    convenience init(date: Date, value: Double, valueSecondary: Double? = 0.0, treatmentType: TreatmentType, nightscoutEventType: String?, nsManagedObjectContext:NSManagedObjectContext) {
         
 		// Id defaults to Empty
-        self.init(id: TreatmentEntry.EmptyId, date: date, value: value, treatmentType: treatmentType, uploaded: false, nightscoutEventType: nightscoutEventType, nsManagedObjectContext: nsManagedObjectContext)
+        self.init(id: TreatmentEntry.EmptyId, date: date, value: value, valueSecondary: valueSecondary, treatmentType: treatmentType, uploaded: false, nightscoutEventType: nightscoutEventType, nsManagedObjectContext: nsManagedObjectContext)
         
 	}
 	
     /// if id = TreatmentEntry.EmptyId then uploaded will get default value false
-	convenience init(id: String, date: Date, value: Double, treatmentType: TreatmentType, nightscoutEventType: String?, nsManagedObjectContext:NSManagedObjectContext) {
+	convenience init(id: String, date: Date, value: Double, valueSecondary: Double? = 0.0, treatmentType: TreatmentType, nightscoutEventType: String?, nsManagedObjectContext:NSManagedObjectContext) {
 		
 		let uploaded = id != TreatmentEntry.EmptyId
 		
-        self.init(id: id, date: date, value: value, treatmentType: treatmentType, uploaded: uploaded, nightscoutEventType: nightscoutEventType, nsManagedObjectContext: nsManagedObjectContext)
+        self.init(id: id, date: date, value: value, valueSecondary: valueSecondary, treatmentType: treatmentType, uploaded: uploaded, nightscoutEventType: nightscoutEventType, nsManagedObjectContext: nsManagedObjectContext)
         
 	}
 	
-    init(id: String, date: Date, value: Double, treatmentType: TreatmentType, uploaded: Bool, nightscoutEventType: String?, nsManagedObjectContext:NSManagedObjectContext) {
+    init(id: String, date: Date, value: Double, valueSecondary: Double? = 0.0, treatmentType: TreatmentType, uploaded: Bool, nightscoutEventType: String?, nsManagedObjectContext:NSManagedObjectContext) {
 		
 		let entity = NSEntityDescription.entity(forEntityName: "TreatmentEntry", in: nsManagedObjectContext)!
 		super.init(entity: entity, insertInto: nsManagedObjectContext)
 		
 		self.date = date
 		self.value = value
+        self.valueSecondary = valueSecondary ?? 33.0
+        self.value = value
 		self.treatmentType = treatmentType
 		self.id = id
 		self.uploaded = uploaded  // tracks upload to nightscout
@@ -196,6 +206,10 @@ public class TreatmentEntry: NSManagedObject, Comparable {
             dict["glucose"] = self.value
             dict["glucoseType"] = "Finger" + String(!UserDefaults.standard.bloodGlucoseUnitIsMgDl ? ": " + self.value.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) + " " + Texts_Common.mmol : "")
             dict["units"] = ConstantsNightscout.mgDlNightscoutUnitString
+        case .Basal:
+            dict["eventType"] = "Temp Basal" // maybe overwritten in next statement
+            dict["rate"] = self.value
+            dict["duration"] = self.valueSecondary
 		default:
 			break
 		}

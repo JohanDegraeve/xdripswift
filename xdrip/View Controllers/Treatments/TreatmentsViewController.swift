@@ -34,11 +34,9 @@ class TreatmentsViewController : UIViewController {
     @IBOutlet weak var filterLabelOutlet: UILabel!
     
     @IBOutlet weak var filterSmallBolusButtonOutlet: UIButton!
-    
     @IBOutlet weak var filterBolusButtonOutlet: UIButton!
-    
     @IBOutlet weak var filterCarbsButtonOutlet: UIButton!
-    
+    @IBOutlet weak var filterBasalButtonOutlet: UIButton!
     @IBOutlet weak var filterBgCheckButtonOutlet: UIButton!
     
     // Actions
@@ -84,6 +82,16 @@ class TreatmentsViewController : UIViewController {
         
     }
     
+    @IBAction func filterBasalButtonAction(_ sender: UIButton) {
+        
+        // invert the value. Changing this UserDefault will also trigger the observer to update the table
+        UserDefaults.standard.showBasalTreatmentsInList.toggle()
+        
+        // set the button state
+        filterBasalButtonOutlet.isSelected = UserDefaults.standard.showBasalTreatmentsInList
+        
+    }
+    
     @IBAction func filterBgCheckButtonAction(_ sender: UIButton) {
         
         // invert the value. Changing this UserDefault will also trigger the observer to update the table
@@ -114,6 +122,7 @@ class TreatmentsViewController : UIViewController {
         filterBolusButtonOutlet.isSelected = UserDefaults.standard.showBolusTreatmentsInList
         filterCarbsButtonOutlet.isSelected = UserDefaults.standard.showCarbsTreatmentsInList
         filterBgCheckButtonOutlet.isSelected = UserDefaults.standard.showBgCheckTreatmentsInList
+        filterBasalButtonOutlet.isSelected = UserDefaults.standard.showBasalTreatmentsInList
         
         // set up the button configuration to show the correct image (per state), text (i.e. nothing!) and size. The empty title is just a fix to prevent the default label being shown at runtime (it's doesn't happen in UIBuilder)
         filterBolusButtonOutlet.setImage(UIImage(systemName: "arrowtriangle.down"), for: .normal)
@@ -131,6 +140,10 @@ class TreatmentsViewController : UIViewController {
         filterCarbsButtonOutlet.setImage(UIImage(systemName: "circle.fill"), for: .selected)
         filterCarbsButtonOutlet.setTitle("", for: .normal)
         
+        filterBasalButtonOutlet.setImage(UIImage(systemName: "chart.bar"), for: .normal)
+        filterBasalButtonOutlet.setImage(UIImage(systemName: "chart.bar.fill"), for: .selected)
+        filterBasalButtonOutlet.setTitle("", for: .normal)
+        
         filterBgCheckButtonOutlet.setImage(UIImage(systemName: "drop"), for: .normal)
         filterBgCheckButtonOutlet.setImage(UIImage(systemName: "drop.fill"), for: .selected)
         filterBgCheckButtonOutlet.setTitle("", for: .normal)
@@ -141,25 +154,13 @@ class TreatmentsViewController : UIViewController {
         
         // check if the observers have already been added. If not, then add them
         if !didAddObservers {
-            // add observer for nightscoutTreatmentsUpdateCounter, to reload the screen whenever the value changes
             UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
-            
-            // add observer for bloodGlucoseUnitIsMgDl, to reload the screen whenever the bg unit changes
             UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
-            
-            // add observer for smallBolusTreatmentThreshold, to reload the screen whenever the user changes the threshold value (this can mean we need to show more, or less, bolus treatments)
             UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.smallBolusTreatmentThreshold.rawValue, options: .new, context: nil)
-            
-            // add observer for showSmallBolusTreatmentsInList, to reload the screen whenever the user wants to show or hide the micro-bolus treatments
             UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showSmallBolusTreatmentsInList.rawValue, options: .new, context: nil)
-            
-            // add observer for showBolusTreatmentsInList, to reload the screen whenever the user wants to show or hide the normal bolus treatments
             UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showBolusTreatmentsInList.rawValue, options: .new, context: nil)
-            
-            // add observer for showCarbsTreatmentsInList, to reload the screen whenever the user wants to show or hide the carb treatments
             UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showCarbsTreatmentsInList.rawValue, options: .new, context: nil)
-            
-            // add observer for showBgCheckTreatmentsInList, to reload the screen whenever the user wants to show or hide the BG Check treatments
+            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showBasalTreatmentsInList.rawValue, options: .new, context: nil)
             UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showBgCheckTreatmentsInList.rawValue, options: .new, context: nil)
             
             // change the flag to true so that we know they exist before we try and remove them later
@@ -175,26 +176,15 @@ class TreatmentsViewController : UIViewController {
         // as viewWillAppear could get called (or maybe not) several times, we need to check that the observers
         // have really been registered before we try and remove them
         if didAddObservers {
-            // add observer for nightscoutTreatmentsUpdateCounter, to reload the screen whenever the value changes
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
-            
-            // add observer for bloodGlucoseUnitIsMgDl, to reload the screen whenever the bg unit changes
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
-            
-            // add observer for smallBolusTreatmentThreshold, to reload the screen whenever the user changes the threshold value (this can mean we need to show more, or less, bolus treatments)
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.smallBolusTreatmentThreshold.rawValue, options: .new, context: nil)
-            
-            // add observer for showSmallBolusTreatmentsInList, to reload the screen whenever the user wants to show or hide the micro-bolus treatments
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showSmallBolusTreatmentsInList.rawValue, options: .new, context: nil)
-            
-            // add observer for showBolusTreatmentsInList, to reload the screen whenever the user wants to show or hide the normal bolus treatments
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showBolusTreatmentsInList.rawValue, options: .new, context: nil)
-            
-            // add observer for showCarbsTreatmentsInList, to reload the screen whenever the user wants to show or hide the carb treatments
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showCarbsTreatmentsInList.rawValue, options: .new, context: nil)
-            
-            // add observer for showBgCheckTreatmentsInList, to reload the screen whenever the user wants to show or hide the BG Check treatments
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showBgCheckTreatmentsInList.rawValue, options: .new, context: nil)
+            /*UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutTreatmentsUpdateCounter.rawValue, context: nil)
+            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, context: nil)
+            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.smallBolusTreatmentThreshold.rawValue, context: nil)
+            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.showSmallBolusTreatmentsInList.rawValue, context: nil)
+            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.showBolusTreatmentsInList.rawValue, context: nil)
+            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.showCarbsTreatmentsInList.rawValue, context: nil)
+            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.showCarbsTreatmentsInList.rawValue, context: nil)
+            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.showBasalTreatmentsInList.rawValue, context: nil)
+            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.showBgCheckTreatmentsInList.rawValue, context: nil)*/
             
             // change the flag back to false so that we don't accidentally try and remove them again before they are re-added
             didAddObservers = false
@@ -244,8 +234,8 @@ class TreatmentsViewController : UIViewController {
 	/// Reloads treatmentCollection and calls reloadData on tableView.
 	private func reload() {
         
-        // set an array to hold the latest 21 days worth of treatments. Filter out any deleted treatments.
-        var treatmentsArray = treatmentEntryAccessor.getLatestTreatments(howOld: TimeInterval(days: 21)).filter( { !$0.treatmentdeleted } )
+        // set an array to hold the latest 7 days worth of treatments. Filter out any deleted treatments.
+        var treatmentsArray = treatmentEntryAccessor.getLatestTreatments(howOld: TimeInterval(days: 7)).filter( { !$0.treatmentdeleted } )
         
         // filter out boluses if required
         if !UserDefaults.standard.showBolusTreatmentsInList {
@@ -261,6 +251,11 @@ class TreatmentsViewController : UIViewController {
         // filter out carbs if required
         if !UserDefaults.standard.showCarbsTreatmentsInList {
             treatmentsArray = treatmentsArray.filter( { $0.treatmentType != .Carbs } )
+        }
+        
+        // filter out Basal rates if required
+        if !UserDefaults.standard.showBasalTreatmentsInList {
+            treatmentsArray = treatmentsArray.filter( { $0.treatmentType != .Basal } )
         }
         
         // filter out BG Checks if required
@@ -285,7 +280,7 @@ class TreatmentsViewController : UIViewController {
                 
                 switch keyPathEnum {
                     
-                case UserDefaults.Key.nightscoutTreatmentsUpdateCounter, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.smallBolusTreatmentThreshold, UserDefaults.Key.showSmallBolusTreatmentsInList,  UserDefaults.Key.showBolusTreatmentsInList,  UserDefaults.Key.showCarbsTreatmentsInList,  UserDefaults.Key.showBgCheckTreatmentsInList:
+                case UserDefaults.Key.nightscoutTreatmentsUpdateCounter, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.smallBolusTreatmentThreshold, UserDefaults.Key.showSmallBolusTreatmentsInList,  UserDefaults.Key.showBolusTreatmentsInList, UserDefaults.Key.showCarbsTreatmentsInList, UserDefaults.Key.showBasalTreatmentsInList, UserDefaults.Key.showBgCheckTreatmentsInList:
                     // Reloads data and table.
                     self.reload()
                     
@@ -337,11 +332,18 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 		let treatment = treatmentCollection.getTreatment(dateIndex: indexPath.section, treatmentIndex: indexPath.row)
 		cell.setupWithTreatment(treatment)
         
-        // clicking the cell will always open a new screen which allows the user to edit the treatment
-        cell.accessoryType = .disclosureIndicator
+        // clicking the cell will always open a new screen which allows the user to edit the treatment *unless* it's a basal rate
+        switch treatment.treatmentType {
+        case .Basal:
+            cell.accessoryType = .disclosureIndicator
+            cell.accessoryView = nil
+        default:
+            cell.accessoryType = .disclosureIndicator
+            cell.accessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
+        }
         
         // set color of disclosureIndicator to ConstantsUI.disclosureIndicatorColor
-        cell.accessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
+//        cell.accessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
         
 		return cell
 	}
@@ -380,7 +382,7 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 		}
 	}
 	
-	func tableView( _ tableView : UITableView,  titleForHeaderInSection section: Int) -> String? {
+	func tableView( _ tableView : UITableView, titleForHeaderInSection section: Int) -> String? {
 		
 		guard let treatmentCollection = treatmentCollection else {
 			return ""
@@ -418,7 +420,9 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
         
         tableView.deselectRow(at: indexPath, animated: true)
         
-        self.performSegue(withIdentifier: TreatmentsViewController.SegueIdentifiers.TreatmentsToNewTreatmentsSegue.rawValue, sender: treatmentCollection?.getTreatment(dateIndex: indexPath.section, treatmentIndex: indexPath.row))
+        if treatmentCollection?.getTreatment(dateIndex: indexPath.section, treatmentIndex: indexPath.row).treatmentType != .Basal {
+            self.performSegue(withIdentifier: TreatmentsViewController.SegueIdentifiers.TreatmentsToNewTreatmentsSegue.rawValue, sender: treatmentCollection?.getTreatment(dateIndex: indexPath.section, treatmentIndex: indexPath.row))
+        }
         
     }
     

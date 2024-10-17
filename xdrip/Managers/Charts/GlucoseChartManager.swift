@@ -21,7 +21,7 @@ public class GlucoseChartManager {
     /// - mediumBolus = all boluses over the micro-bolus threshold ("normal" boluses and will be shown with a label)
     /// - smallCarbs / mediumCarbs / largeCarbs / veryLargeCarbs = groups of each aproximate size to be represented by a different size chart point. The exact carb size context is given using a label
     /// - bgCheck = blood glucose (finger) checks
-    typealias TreatmentChartPointsType = (smallBolus: [ChartPoint], mediumBolus: [ChartPoint], smallCarbs: [ChartPoint], mediumCarbs: [ChartPoint], largeCarbs: [ChartPoint], veryLargeCarbs: [ChartPoint], bgChecks: [ChartPoint])
+    typealias TreatmentChartPointsType = (smallBolus: [ChartPoint], mediumBolus: [ChartPoint], smallCarbs: [ChartPoint], mediumCarbs: [ChartPoint], largeCarbs: [ChartPoint], veryLargeCarbs: [ChartPoint], bgChecks: [ChartPoint], basalRates: [ChartPoint], basalRatesFill: [ChartPoint])
     
     // MARK: - private properties
     
@@ -38,7 +38,7 @@ public class GlucoseChartManager {
     private var calibrationChartPoints = [ChartPoint]()
         
     /// treatmentChartPoints to be shown on chart
-    private var treatmentChartPoints: TreatmentChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint]())
+    private var treatmentChartPoints: TreatmentChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint]())
         
     /// smallBolusTreatmentChartPoints to be shown on chart
     private var smallBolusTreatmentChartPoints = [ChartPoint]()
@@ -60,6 +60,12 @@ public class GlucoseChartManager {
     
     /// bgCheckTreatmentChartPoints to be shown on chart
     private var bgCheckTreatmentChartPoints = [ChartPoint]()
+    
+    /// basalRateTreatmentChartPoints to be shown on chart
+    private var basalRateTreatmentChartPoints = [ChartPoint]()
+    
+    /// basalRateTreatmentChartPoints to be shown on chart
+    private var basalRateFillTreatmentChartPoints = [ChartPoint]()
 
     /// ChartPoints to be shown on chart, processed only in main thread - urgent Range
     private var urgentRangeGlucoseChartPoints = [ChartPoint]()
@@ -305,11 +311,12 @@ public class GlucoseChartManager {
             // get calibrations from coredata
             let calibrationChartPoints = self.getCalibrationChartPoints(startDate: startDateToUse, endDate: endDate, calibrationsAccessor: self.data().calibrationsAccessor, on: self.coreDataManager.privateManagedObjectContext)
             
+            
             // only get and assign the treatment chartpoints if the user has chosen to show them on the chart
             if UserDefaults.standard.showTreatmentsOnChart {
                 
                 // get treatments from coredata
-                let treatmentChartPoints: TreatmentChartPointsType = self.getTreatmentEntryChartPoints(startDate: startDateToUse, endDate: endDate, treatmentEntryAccessor: self.data().treatmentEntryAccessor, bgReadingsAccessor: self.data().bgReadingsAccessor, on: self.coreDataManager.privateManagedObjectContext)
+                let treatmentChartPoints: TreatmentChartPointsType = self.getTreatmentChartPoints(startDate: startDateToUse, endDate: endDate, treatmentEntryAccessor: self.data().treatmentEntryAccessor, bgReadingsAccessor: self.data().bgReadingsAccessor, on: self.coreDataManager.privateManagedObjectContext)
                 
                 // assign treatment arrays
                 self.treatmentChartPoints.smallBolus = treatmentChartPoints.smallBolus
@@ -319,6 +326,8 @@ public class GlucoseChartManager {
                 self.treatmentChartPoints.largeCarbs = treatmentChartPoints.largeCarbs
                 self.treatmentChartPoints.veryLargeCarbs = treatmentChartPoints.veryLargeCarbs
                 self.treatmentChartPoints.bgChecks = treatmentChartPoints.bgChecks
+                self.treatmentChartPoints.basalRates = treatmentChartPoints.basalRates
+                self.treatmentChartPoints.basalRatesFill = treatmentChartPoints.basalRatesFill
                 
             }
             
@@ -348,6 +357,10 @@ public class GlucoseChartManager {
                 
                 // assign the BG check treatment chart points
                 self.bgCheckTreatmentChartPoints = self.treatmentChartPoints.bgChecks
+                
+                
+                self.basalRateTreatmentChartPoints = self.treatmentChartPoints.basalRates
+                self.basalRateFillTreatmentChartPoints = self.treatmentChartPoints.basalRatesFill
                     
                 // update the chart outlet
                 chartOutlet.reloadChart()
@@ -587,7 +600,8 @@ public class GlucoseChartManager {
         let unitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
         // create yAxisValues, start with 38 mgdl, this is to make sure we show a bit lower than the real lowest value which is usually 40 mgdl, make the label hidden. We must do this with by using a clear color label setting as the hidden property doesn't work (even if we don't know why).
-        let firstYAxisValue = ChartAxisValueDouble((ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl).mgDlToMmol(mgDl: unitIsMgDl), labelSettings: data().chartLabelSettingsHidden)
+//        let firstYAxisValue = ChartAxisValueDouble((ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl).mgDlToMmol(mgDl: unitIsMgDl), labelSettings: data().chartLabelSettingsHidden)
+        let firstYAxisValue = ChartAxisValueDouble((0.0).mgDlToMmol(mgDl: unitIsMgDl), labelSettings: data().chartLabelSettingsHidden)
         
         // create now the yAxisValues and add the first
         var yAxisValues = [firstYAxisValue as ChartAxisValue]
@@ -761,7 +775,7 @@ public class GlucoseChartManager {
         
         let smallBolusTriangleLayer = ChartPointsScatterDownTrianglesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: smallBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize * ConstantsGlucoseChart.smallBolusTreamentScale, height: (bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale) * ConstantsGlucoseChart.smallBolusTreamentScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
         
-        //  carb circle layers
+        // carb circle layers
         let smallCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: smallCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.smallCarbsTreamentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.smallCarbsTreamentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
         
         let mediumCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: mediumCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.mediumCarbsTreamentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.mediumCarbsTreamentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
@@ -769,6 +783,13 @@ public class GlucoseChartManager {
         let largeCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: largeCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.largeCarbsTreamentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.largeCarbsTreamentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
         
         let veryLargeCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: veryLargeCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.veryLargeCarbsTreamentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.veryLargeCarbsTreamentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
+
+        // Basal rate line + fill layers
+        let basalRateLayerLineModel = ChartLineModel(chartPoints: basalRateTreatmentChartPoints, lineColor: ConstantsGlucoseChart.basalRateTreatmentLineColor, lineWidth: ConstantsGlucoseChart.basalRateTreatmentLineWidth, animDuration: 0, animDelay: 0)
+        
+        let basalRateLayer = ChartPointsLineLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, lineModels: [basalRateLayerLineModel])
+        
+        let basalRateFillLayer = ChartPointsFillsLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, fills: [ChartPointsFill( chartPoints: basalRateFillTreatmentChartPoints, fillColor: ConstantsGlucoseChart.basalRateFillTreatmentColor, createContainerPoints: false)])
         
         // in Range circle layers
         let inRangeGlucoseCirclesLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: inRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter, height: glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseInRangeColor, optimized: true)
@@ -812,7 +833,9 @@ public class GlucoseChartManager {
                 mediumCarbsLayer,
                 smallCarbsLayer,
                 // bolus treatment layers
-                mediumBolusTriangleLayer
+                mediumBolusTriangleLayer,
+                basalRateFillLayer,
+                basalRateLayer
             ]
             
             layers.append(contentsOf: layersTreatments)
@@ -1025,22 +1048,25 @@ public class GlucoseChartManager {
     ///     - bgReadingsAccessor : bg readings accessor object
     ///     - managedObjectContext : the ManagedObjectContext to use
     /// - returns: a tuple with chart point arrays for each classification of treatment type + size
-    private func getTreatmentEntryChartPoints(startDate: Date, endDate: Date, treatmentEntryAccessor: TreatmentEntryAccessor, bgReadingsAccessor: BgReadingsAccessor, on managedObjectContext: NSManagedObjectContext) -> ([ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint]) {
+    private func getTreatmentChartPoints(startDate: Date, endDate: Date, treatmentEntryAccessor: TreatmentEntryAccessor, bgReadingsAccessor: BgReadingsAccessor, on managedObjectContext: NSManagedObjectContext) -> ([ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint]) {
 		
 		// get bgReadings between the two dates
 		// this will later be used to calculate the Y value for each carbsTreatment.
 		let bgReadings = bgReadingsAccessor.getBgReadings(from: startDate, to: endDate, on: managedObjectContext)
         
         // intialize the treatment chart point arrays
-        var smallBolusTreatmentEntryChartPoints = [ChartPoint]()
-        var mediumBolusTreatmentEntryChartPoints = [ChartPoint]()
+        var smallBolusTreatmentChartPoints = [ChartPoint]()
+        var mediumBolusTreatmentChartPoints = [ChartPoint]()
         
-        var smallCarbsTreatmentEntryChartPoints = [ChartPoint]()
-        var mediumCarbsTreatmentEntryChartPoints = [ChartPoint]()
-        var largeCarbsTreatmentEntryChartPoints = [ChartPoint]()
-        var veryLargeCarbsTreatmentEntryChartPoints = [ChartPoint]()
+        var smallCarbsTreatmentChartPoints = [ChartPoint]()
+        var mediumCarbsTreatmentChartPoints = [ChartPoint]()
+        var largeCarbsTreatmentChartPoints = [ChartPoint]()
+        var veryLargeCarbsTreatmentChartPoints = [ChartPoint]()
         
-        var bgCheckTreatmentEntryChartPoints = [ChartPoint]()
+        var bgCheckTreatmentChartPoints = [ChartPoint]()
+        
+        var basalRateTreatmentChartPoints = [ChartPoint]()
+        var basalRateFillTreatmentChartPoints = [ChartPoint]()
 		
 		managedObjectContext.performAndWait {
 			// get treaments between the two timestamps from coredata
@@ -1051,22 +1077,63 @@ public class GlucoseChartManager {
 			let insulinTreatments = treatmentEntries.filter { $0.treatmentType == .Insulin }
 			let carbsTreatments = treatmentEntries.filter { $0.treatmentType == .Carbs }
 			let bgCheckTreatments = treatmentEntries.filter { $0.treatmentType == .BgCheck }
+            let basalRateTreatments = treatmentEntries.filter { $0.treatmentType == .Basal }
 			
 			// For each insulin treatment, check it value and append to the correct list.
 			for insulinTreatment in insulinTreatments {
 				let chartPoint = ChartPoint(treatmentEntry: insulinTreatment, formatter: data().chartPointDateFormatter)
 				if insulinTreatment.value < UserDefaults.standard.smallBolusTreatmentThreshold {
-					smallBolusTreatmentEntryChartPoints.append(chartPoint)
+					smallBolusTreatmentChartPoints.append(chartPoint)
 				} else {
-					mediumBolusTreatmentEntryChartPoints.append(chartPoint)
+					mediumBolusTreatmentChartPoints.append(chartPoint)
 				}
 			}
 			
-			// For each bgCheckTreatment, create and append a ChartPoint to bgCheckTreatmentEntryChartPoints.
+			// For each bgCheckTreatment, create and append a ChartPoint to bgCheckTreatmentChartPoints.
 			for bgCheckTreatment in bgCheckTreatments {
-				bgCheckTreatmentEntryChartPoints.append(ChartPoint(bgCheck: bgCheckTreatment, formatter: data().chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl))
+				bgCheckTreatmentChartPoints.append(ChartPoint(bgCheck: bgCheckTreatment, formatter: data().chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl))
 			}
+            
+            
+            
+            var previousBasalRateTreatment: TreatmentEntry?
+            var isFirst: Bool = true
+            
+            // For each basalRateTreatment, create and append a ChartPoint to basalRateTreatmentChartPoints.
+            for basalRateTreatment in basalRateTreatments {
+                // add an extra chartpoint at the end of the basal chartpoints to push the current basal rate off the edge of the screen
+                if isFirst {
+                    basalRateFillTreatmentChartPoints.append(ChartPoint(atDate: endDate, formatter: data().chartPointDateFormatter))
+                    
+                    basalRateTreatmentChartPoints.append(ChartPoint(lastBasalRateTreatmentEntry: basalRateTreatment, untilDate: endDate, formatter: data().chartPointDateFormatter))
+                    isFirst.toggle()
+                }
+                
+                // TODO: check if the previous basal rate should have ended before the current one (due to duration expiry rather than the next rate)
+                
+                
+                // so if there was already a previous chartpoint, let's use the value to create a new chartpoint with the old value and the new timestamp. This is needed to make the step in the chart
+                if let previousBasalRateTreatment = previousBasalRateTreatment {
+                    basalRateTreatmentChartPoints.append(ChartPoint(basalRateTreatmentEntry: basalRateTreatment, previousBasalRateTreatmentEntry: previousBasalRateTreatment, formatter: data().chartPointDateFormatter))
+                }
+                
+                basalRateTreatmentChartPoints.append(ChartPoint(basalRateTreatmentEntry: basalRateTreatment, previousBasalRateTreatmentEntry: nil, formatter: data().chartPointDateFormatter))
+                
+                previousBasalRateTreatment = basalRateTreatment
+            }
+            
+            if let previousBasalRateTreatment = previousBasalRateTreatment {
+                basalRateTreatmentChartPoints.append(ChartPoint(lastBasalRateTreatmentEntry: previousBasalRateTreatment, untilDate: startDate, formatter: data().chartPointDateFormatter))
+            }
+            
+            let startX = ChartAxisValueDate(date: startDate, formatter: data().chartPointDateFormatter)
+            let endX = ChartAxisValueDate(date: endDate, formatter: data().chartPointDateFormatter)
+            
+            basalRateFillTreatmentChartPoints = [ChartPoint(x: endX, y: ChartAxisValueInt(0))] + basalRateTreatmentChartPoints + [ChartPoint(x: startX, y: ChartAxisValueInt(0))]
 			
+            
+            
+            
             // Calculate the Y value for each carbsTreatment.
 			let carbsYValues = calculateClosestYAxisValues(carbsTreatments: carbsTreatments, bgReadings: bgReadings)
 			
@@ -1081,20 +1148,20 @@ public class GlucoseChartManager {
 				
 				// cycle through the possible threshold values and append the carb chart point to the correct array.
 				if carbsTreatment.value < ConstantsGlucoseChart.smallCarbsTreamentThreshold {
-					smallCarbsTreatmentEntryChartPoints.append(chartPoint)
+					smallCarbsTreatmentChartPoints.append(chartPoint)
 				} else if carbsTreatment.value < ConstantsGlucoseChart.mediumCarbsTreamentThreshold {
-					mediumCarbsTreatmentEntryChartPoints.append(chartPoint)
+					mediumCarbsTreatmentChartPoints.append(chartPoint)
 				} else if carbsTreatment.value < ConstantsGlucoseChart.largeCarbsTreamentThreshold {
-					largeCarbsTreatmentEntryChartPoints.append(chartPoint)
+					largeCarbsTreatmentChartPoints.append(chartPoint)
 				} else {
-					veryLargeCarbsTreatmentEntryChartPoints.append(chartPoint)
+					veryLargeCarbsTreatmentChartPoints.append(chartPoint)
 				}
 			}
 		}
 
         
         // return all treatment arrays based upon treatment type and size (as defined by the threshold values)
-        return (smallBolusTreatmentEntryChartPoints, mediumBolusTreatmentEntryChartPoints, smallCarbsTreatmentEntryChartPoints, mediumCarbsTreatmentEntryChartPoints, largeCarbsTreatmentEntryChartPoints, veryLargeCarbsTreatmentEntryChartPoints, bgCheckTreatmentEntryChartPoints)
+        return (smallBolusTreatmentChartPoints, mediumBolusTreatmentChartPoints, smallCarbsTreatmentChartPoints, mediumCarbsTreatmentChartPoints, largeCarbsTreatmentChartPoints, veryLargeCarbsTreatmentChartPoints, bgCheckTreatmentChartPoints, basalRateTreatmentChartPoints, basalRateFillTreatmentChartPoints)
         
     }
 	
@@ -1346,7 +1413,7 @@ public class GlucoseChartManager {
         stopDeceleration()
         
         glucoseChartPoints = ([ChartPoint](), [ChartPoint](), [ChartPoint](), nil, nil, nil)
-        treatmentChartPoints = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint]())
+        treatmentChartPoints = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint]())
         
         calibrationChartPoints = [ChartPoint]()
         
@@ -1358,6 +1425,8 @@ public class GlucoseChartManager {
         largeCarbsTreatmentChartPoints = [ChartPoint]()
         
         bgCheckTreatmentChartPoints = [ChartPoint]()
+        
+        basalRateTreatmentChartPoints = [ChartPoint]()
         
         chartSettings = nil
         

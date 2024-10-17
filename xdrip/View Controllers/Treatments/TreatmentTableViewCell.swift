@@ -11,6 +11,7 @@ import Foundation
 class TreatmentTableViewCell: UITableViewCell {
 	@IBOutlet weak var typeLabel: UILabel!
     @IBOutlet weak var valueLabel: UILabel!
+    @IBOutlet weak var valueSecondaryLabel: UILabel!
     @IBOutlet weak var dateLabel: UILabel!
     @IBOutlet weak var unitLabel: UILabel!
     @IBOutlet weak var iconImageView: UIImageView!
@@ -24,69 +25,61 @@ class TreatmentTableViewCell: UITableViewCell {
         formatter.setLocalizedDateFormatFromTemplate(ConstantsUI.timeFormatHoursMins)
         self.dateLabel.text = formatter.string(from: treatment.date)
         
+        // save typing
+        let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
         // treatment type icon
         switch treatment.treatmentType {
-            
         case .Insulin:
+            self.iconImageView.image =  UIImage(systemName: "arrowtriangle.down.fill")!
             self.iconImageView.tintColor =  ConstantsGlucoseChart.bolusTreatmentColor
             
         case .Carbs:
+            self.iconImageView.image =  UIImage(systemName: "circle.fill")!
             self.iconImageView.tintColor =  ConstantsGlucoseChart.carbsTreatmentColor
             
         case .Exercise:
+            self.iconImageView.image =  UIImage(systemName: "heart.fill")!
             self.iconImageView.tintColor =  UIColor.magenta
             
         case .BgCheck:
+            self.iconImageView.image =  UIImage(systemName: "drop.fill") ?? nil
             self.iconImageView.tintColor =  ConstantsGlucoseChart.bgCheckTreatmentColorInner
             
-        }
-        
-        switch treatment.treatmentType {
-            
-        case .Insulin:
-            self.iconImageView.image =  UIImage(systemName: "arrowtriangle.down.fill")!
-            
-        case .Carbs:
-            self.iconImageView.image =  UIImage(systemName: "circle.fill")!
-            
-        case .Exercise:
-            self.iconImageView.image =  UIImage(systemName: "heart.fill")!
-            
-        case .BgCheck:
-            self.iconImageView.image =  UIImage(systemName: "drop.fill") ?? nil
-            
+        case .Basal:
+            self.iconImageView.image = UIImage(systemName: "chart.bar.fill")!
+            self.iconImageView.tintColor =  ConstantsGlucoseChart.basalTreatmentColor
         }
         
         // treatment type label
         self.typeLabel.text = treatment.treatmentType.asString()
         
         // treatment value label
-        if treatment.treatmentType == .BgCheck {
-            
-            // save typing
-            let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-            
+        switch treatment.treatmentType {
+        case .BgCheck:
             // convert to mmol/l if needed, round accordingly and add the correct units
             self.valueLabel.text = treatment.value.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).stringWithoutTrailingZeroes
-            
-        } else {
-            
+        case .Basal:
+            // convert to mmol/l if needed, round accordingly and add the correct units
+            self.valueLabel.text = (round(treatment.value * 100)/100).stringWithoutTrailingZeroes
+        default:
             self.valueLabel.text = treatment.value.stringWithoutTrailingZeroes
-            
         }
         
-        
         // treatment unit label
-        if treatment.treatmentType == .BgCheck {
-            
+        switch treatment.treatmentType {
+        case .BgCheck:
             // convert to mmol/l if needed, round accordingly and add the correct units
-            self.unitLabel.text =  String(UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
-            
-        } else {
-            
+            self.unitLabel.text =  String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+        default:
             self.unitLabel.text = treatment.treatmentType.unit()
-            
+        }
+        
+        if treatment.treatmentType == .Basal {
+            self.valueSecondaryLabel.isHidden = false
+            self.valueSecondaryLabel.text = "(\(Int(treatment.valueSecondary)) mins)"
+        } else {
+            self.valueSecondaryLabel.isHidden = true
         }
         
     }

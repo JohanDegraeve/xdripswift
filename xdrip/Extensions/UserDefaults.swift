@@ -115,6 +115,8 @@ extension UserDefaults {
         case showBolusTreatmentsInList = "showBolusTreatmentsInList"
         /// should the carbs be listed in the treatment list/table?
         case showCarbsTreatmentsInList = "showCarbsTreatmentsInList"
+        /// should the basal rates be listed in the treatment list/table?
+        case showBasalTreatmentsInList = "showBasalTreatmentsInList"
         /// should the BG Checks be listed in the treatment list/table?
         case showBgCheckTreatmentsInList = "showBgCheckTreatmentsInList"
         /// should the carbs be offset in the main chart?
@@ -1111,6 +1113,17 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.showCarbsTreatmentsInList.rawValue)
+        }
+    }
+    
+    /// should the app show the basal rate treatments in the treatments list/table?
+    @objc dynamic var showBasalTreatmentsInList: Bool {
+        // default value for bool in userdefaults is true, by default we want the app to *hide* the basal treatments in the treatments table
+        get {
+            return bool(forKey: Key.showBasalTreatmentsInList.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.showBasalTreatmentsInList.rawValue)
         }
     }
     

@@ -16,6 +16,7 @@ class TreatmentsInsertViewController : UIViewController {
 	@IBOutlet weak var carbsLabel: UILabel!
 	@IBOutlet weak var insulinLabel: UILabel!
 	@IBOutlet weak var exerciseLabel: UILabel!
+    @IBOutlet weak var basalRateLabel: UILabel!
     @IBOutlet weak var bgCheckLabel: UILabel!
     
 	@IBOutlet weak var doneButton: UIBarButtonItem!
@@ -25,16 +26,19 @@ class TreatmentsInsertViewController : UIViewController {
 	@IBOutlet weak var carbsTextField: UITextField!
 	@IBOutlet weak var insulinTextField: UITextField!
 	@IBOutlet weak var exerciseTextField: UITextField!
+    @IBOutlet weak var basalRateTextField: UITextField!
     @IBOutlet weak var bgCheckTextField: UITextField!
     
     @IBOutlet weak var carbsUnitLabel: UILabel!
     @IBOutlet weak var insulinUnitLabel: UILabel!
     @IBOutlet weak var exerciseUnitLabel: UILabel!
+    @IBOutlet weak var basalRateUnitLabel: UILabel!
     @IBOutlet weak var bgCheckUnitLabel: UILabel!
     
     @IBOutlet weak var carbsStackView: UIStackView!
     @IBOutlet weak var insulinStackView: UIStackView!
     @IBOutlet weak var exerciseStackView: UIStackView!
+    @IBOutlet weak var basalRateStackView: UIStackView!
     @IBOutlet weak var bgCheckStackView: UIStackView!
 
     // MARK: - private properties
@@ -59,6 +63,9 @@ class TreatmentsInsertViewController : UIViewController {
     // will assign datePicker.date to treatMentEntryToUpdate.date
     override func viewDidLoad() {
     
+        // let's hide the basal rates when adding a new treatment as it's not needed whilst we're just using it in Nightscout follower mode
+        basalRateStackView.isHidden = true
+        
         if let treatMentEntryToUpdate = treatMentEntryToUpdate {
             
             datePicker.date = treatMentEntryToUpdate.date
@@ -89,12 +96,14 @@ class TreatmentsInsertViewController : UIViewController {
 		self.insulinLabel.text = Texts_TreatmentsView.insulin
 		self.exerciseLabel.text = Texts_TreatmentsView.exercise
         self.bgCheckLabel.text = Texts_TreatmentsView.bgCheck
+        self.basalRateLabel.text = Texts_TreatmentsView.basalRate
 		
         // Unit labels for each TextField
         self.carbsUnitLabel.text = Texts_TreatmentsView.carbsUnit
         self.insulinUnitLabel.text = Texts_TreatmentsView.insulinUnit
         self.exerciseUnitLabel.text = Texts_TreatmentsView.exerciseUnit
         self.bgCheckUnitLabel.text = String(UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+        self.basalRateUnitLabel.text = Texts_TreatmentsView.basalRateUnit
         
 		// Done button
 		self.addDoneButtonOnNumpad(textField: self.carbsTextField)
@@ -115,8 +124,9 @@ class TreatmentsInsertViewController : UIViewController {
                 // hide the other stack views
                 insulinStackView.isHidden = true
                 exerciseStackView.isHidden = true
+                basalRateStackView.isHidden = true
                 bgCheckStackView.isHidden = true
-
+                
             case .Exercise:
                 // set text to value of treatMentEntryToUpdate
                 exerciseTextField.text = treatMentEntryToUpdate.value.stringWithoutTrailingZeroes
@@ -124,8 +134,9 @@ class TreatmentsInsertViewController : UIViewController {
                 // hide the other stack views
                 carbsStackView.isHidden = true
                 insulinStackView.isHidden = true
+                basalRateStackView.isHidden = true
                 bgCheckStackView.isHidden = true
-
+                
             case .Insulin:
                 // set text to value of treatMentEntryToUpdate
                 insulinTextField.text = treatMentEntryToUpdate.value.stringWithoutTrailingZeroes
@@ -133,6 +144,7 @@ class TreatmentsInsertViewController : UIViewController {
                 // hide the other stack views
                 carbsStackView.isHidden = true
                 exerciseStackView.isHidden = true
+                basalRateStackView.isHidden = true
                 bgCheckStackView.isHidden = true
                 
             case .BgCheck:
@@ -143,10 +155,19 @@ class TreatmentsInsertViewController : UIViewController {
                 // hide the other stack views
                 insulinStackView.isHidden = true
                 carbsStackView.isHidden = true
+                basalRateStackView.isHidden = true
                 exerciseStackView.isHidden = true
-
+                
+            case .Basal:
+                // set text to value of treatMentEntryToUpdate
+                basalRateTextField.text = treatMentEntryToUpdate.value.stringWithoutTrailingZeroes
+                
+                // hide the other stack views
+                insulinStackView.isHidden = true
+                carbsStackView.isHidden = true
+                exerciseStackView.isHidden = true
+                bgCheckStackView.isHidden = true
             }
-            
         }
 	}
 
@@ -256,11 +277,13 @@ class TreatmentsInsertViewController : UIViewController {
             case .BgCheck:
                 updateFunction(bgCheckTextField)
                 
+            case .Basal:
+                break
             }
             
         } else {
             
-            // viewcontroller is opened to create a new treatmenEntry
+            // viewcontroller is opened to create a new treatmentEntry
             
             // if there's more than one new treatmentEntry being created here, then each will be created with a small difference in timestamp, ie 1 millisecond
             // because, after uploading to Nightscout, the timestamp is is used to recognize/find back the actualy event, and so to find the id assigned by Nightscout

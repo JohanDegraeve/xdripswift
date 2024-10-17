@@ -57,6 +57,7 @@
 		4737758C2C14DDA700525B90 /* View.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4746068D2B963EA100AC9214 /* View.swift */; };
 		4737758D2C14DDC900525B90 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
 		473D9ECE2C2DC53A00364060 /* LoopShareType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473D9ECD2C2DC53A00364060 /* LoopShareType.swift */; };
+		473E67A62CC0E86D000362B4 /* ChartPointsContextFillLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473E67A52CC0E869000362B4 /* ChartPointsContextFillLayer.swift */; };
 		474606642B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474606632B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift */; };
 		474606652B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474606632B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift */; };
 		474606692B9616AA00AC9214 /* AccessoryRectangularView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474606682B9616AA00AC9214 /* AccessoryRectangularView.swift */; };
@@ -917,6 +918,7 @@
 		4734FF542BEFE3F200C7115A /* AlertNotificationDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertNotificationDictionary.swift; sourceTree = "<group>"; };
 		473775812C14D8C100525B90 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
 		473D9ECD2C2DC53A00364060 /* LoopShareType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopShareType.swift; sourceTree = "<group>"; };
+		473E67A52CC0E869000362B4 /* ChartPointsContextFillLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartPointsContextFillLayer.swift; sourceTree = "<group>"; };
 		474606632B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComplicationSharedUserDefaultsModel.swift; sourceTree = "<group>"; };
 		474606682B9616AA00AC9214 /* AccessoryRectangularView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessoryRectangularView.swift; sourceTree = "<group>"; };
 		4746066A2B96185C00AC9214 /* AccessoryCircularView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessoryCircularView.swift; sourceTree = "<group>"; };
@@ -3183,6 +3185,7 @@
 		F8BECB03235CE5970060DAE1 /* Charts */ = {
 			isa = PBXGroup;
 			children = (
+				473E67A52CC0E869000362B4 /* ChartPointsContextFillLayer.swift */,
 				47ADD2DE27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift */,
 				47ADD2E027FB05EB0025E2F4 /* ChartPointsScatterDownTrianglesWithDropdownLineLayer.swift */,
 				F8BECB04235CE5D80060DAE1 /* GlucoseChartManager.swift */,
@@ -4590,6 +4593,7 @@
 				F85542302B7573930058CE09 /* OmniPodHeartBeat+BluetoothPeripheral.swift in Sources */,
 				F8DF766023E38FC100063910 /* BLEPeripheral+CoreDataClass.swift in Sources */,
 				F80ED2EE236F68F90005C035 /* SettingsViewM5StackWiFiSettingsViewModel.swift in Sources */,
+				473E67A62CC0E86D000362B4 /* ChartPointsContextFillLayer.swift in Sources */,
 				F8FDD6CB2553385000625B49 /* Array.swift in Sources */,
 				F8EE3EB32B683B2100B27B96 /* DexcomG7HeartbeatBluetoothTransmitter.swift in Sources */,
 				F8A389C823203E3E0010F405 /* ConstantsM5Stack.swift in Sources */,

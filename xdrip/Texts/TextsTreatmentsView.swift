@@ -27,6 +27,10 @@ enum Texts_TreatmentsView {
 	static let exerciseUnit:String = {
 		return NSLocalizedString("treatments_exercise_unit", tableName: filename, bundle: Bundle.main, value: "mins", comment: "Exercise unit.")
 	}()
+    
+    static let basalRateUnit:String = {
+        return NSLocalizedString("treatments_basal_rate_unit", tableName: filename, bundle: Bundle.main, value: "U/hr", comment: "Basal rate unit.")
+    }()
 
 	static let carbs:String = {
 		return NSLocalizedString("treatments_carbs", tableName: filename, bundle: Bundle.main, value: "Carbs", comment: "Carbs.")
@@ -42,6 +46,10 @@ enum Texts_TreatmentsView {
     
     static let bgCheck:String = {
         return NSLocalizedString("treatments_bgcheck", tableName: filename, bundle: Bundle.main, value: "BG Check", comment: "Blood Glucose Check")
+    }()
+    
+    static let basalRate:String = {
+        return NSLocalizedString("treatments_basalRate", tableName: filename, bundle: Bundle.main, value: "Temp Basal", comment: "Temp Basal")
     }()
 
 	static let questionMark:String = {

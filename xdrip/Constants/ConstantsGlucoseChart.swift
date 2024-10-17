@@ -129,6 +129,11 @@ enum ConstantsGlucoseChart {
     /// make the triangle height slightly less than the width to prevent it looking too "pointy"
     static let bolusTriangleHeightScale: CGFloat = 0.9
     
+    // basal rate treatment color
+    
+    /// bolus treament marker colour
+    static let basalTreatmentColor = UIColor.systemMint
+    
     // carb treatment marker color/sizes
     
     /// carbs treament marker colour
@@ -168,6 +173,17 @@ enum ConstantsGlucoseChart {
     
     /// bg check inner circle scale factor compared to the chart glucose circle size
     static let bgCheckTreatmentScaleInner: CGFloat = 1.4
+    
+    // basal rate line + fill color
+    
+    /// basal rate line color
+    static let basalRateTreatmentLineColor = UIColor.systemMint
+    
+    /// basal rate line width
+    static let basalRateTreatmentLineWidth: CGFloat = 1
+    
+    /// basal rate fill color
+    static let basalRateFillTreatmentColor = basalRateTreatmentLineColor.withAlphaComponent(0.4)
     
     // treatment label font size/color/background
 
