@@ -85,7 +85,7 @@ enum CGMTransmitterType:String, CaseIterable {
     case dexcom = "Dexcom G5/G6/ONE"
     
     /// dexcom G7
-    case dexcomG7 = "Dexcom G7/ONE+"
+    case dexcomG7 = "Dexcom G7/ONE+/Stelo"
     
     /// miaomiao
     case miaomiao = "MiaoMiao"
@@ -312,7 +312,9 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .dexcomG7:
             if let transmitterIdString = UserDefaults.standard.activeSensorTransmitterId {
-                if transmitterIdString.startsWith("DX02") {
+                if transmitterIdString.startsWith("DX01") {
+                    return "Dexcom Stelo"
+                } else if transmitterIdString.startsWith("DX02") {
                     return "Dexcom ONE+"
                 }
             }

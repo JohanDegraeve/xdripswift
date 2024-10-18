@@ -132,3 +132,5 @@
 
 /// the words in user range
 "common_statistics_userRange" = "User Range";
+
+"common_notRequired" = "Nicht Erforderlich";

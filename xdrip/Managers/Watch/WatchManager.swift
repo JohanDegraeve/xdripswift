@@ -69,7 +69,7 @@ final class WatchManager: NSObject, ObservableObject {
         var deltaValueInUserUnit: Double = 0.0
         
         // add delta if available
-        if bgReadings.count > 0 {
+        if bgReadings.count > 1 {
 
             previousValueInUserUnit = bgReadings[1].calculatedValue.mgDlToMmol(mgDl: isMgDl)
             actualValueInUserUnit = bgReadings[0].calculatedValue.mgDlToMmol(mgDl: isMgDl)

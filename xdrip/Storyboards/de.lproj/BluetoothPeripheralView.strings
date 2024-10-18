@@ -135,3 +135,4 @@
 "confirmAlgorithmChangeToxDripMessage" = "itte um Bestätigung, dass zum xDrip Algorithmus gewechselt werden soll.\n\nDies stoppt für kurze Zeit die Datenübermittlung und Du wirst um einen initialen Kalibrierungswert (Blut) gebeten.";
 "confirmCalibrationChangeToSinglePointMessage" = "Bitte um Bestätigung, dass zur Standard Kalibrierung gewechselt werden soll.\n\nDies stoppt für kurze Zeit die Datenübermittlung und Du wirst um einen initialen Kalibrierungswert (Blut) gebeten.";
 "confirmCalibrationChangeToMultiPointMessage" = "Bitte um Bestätigung, dass zur Mehrpunkt Kalibrierung gewechselt werden soll.\n\n⚠️ Diese Methode ist nur  für erfahrene Benutzer, es könnte ein falscher und damit gefährlicher Wert angezeigt werden, wenn die Kalibrierung nicht korrekt durchgeführt wurde.\n\nWenn Du unsicher bist, bitte drücke Abbruch/Cancel.";
+"confirm" = "Bestätigen";

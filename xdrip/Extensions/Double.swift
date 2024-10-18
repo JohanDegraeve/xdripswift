@@ -1,6 +1,6 @@
 import Foundation
 
-extension Double: RawRepresentable {
+extension Swift.Double: Swift.RawRepresentable {
 
     //MARK: - copied from https://github.com/LoopKit/LoopKit
     

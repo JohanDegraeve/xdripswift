@@ -76,3 +76,4 @@
 "confirmAlgorithmChangeToxDripMessage" = "Bekräfta att du vill ändra till xDrip-algoritmen.\n\nDetta stoppar avläsningarna under en kort tid och du kommer få ange ett initialt kalibreringsvärde.";
 "confirmCalibrationChangeToSinglePointMessage" = "Bekräfta att du vill ändra kalibreringstypen till Standardkalibrering\n\nDetta stoppar avläsningarna under en kort tid och du kommer få ange ett initialt kalibreringsvärde.";
 "confirmCalibrationChangeToMultiPointMessage" = "Bekräfta att du vill ändra kalibreringstypen till Flerpunktskalibrering\n\n⚠️ Observera att denna metod endast är för avancerade användare och kan potentiellt ge farliga resultat om kalibreringen inte är korrekt utförd.\n\n Om du är osäker på hur man använder denna metod, vänligen tryck på avbryt.";
+"confirm" = "Bekräfta";
