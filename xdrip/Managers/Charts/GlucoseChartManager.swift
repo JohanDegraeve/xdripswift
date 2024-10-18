@@ -1077,8 +1077,11 @@ public class GlucoseChartManager {
 			let insulinTreatments = treatmentEntries.filter { $0.treatmentType == .Insulin }
 			let carbsTreatments = treatmentEntries.filter { $0.treatmentType == .Carbs }
 			let bgCheckTreatments = treatmentEntries.filter { $0.treatmentType == .BgCheck }
-            let basalRateTreatments = treatmentEntries.filter { $0.treatmentType == .Basal }
-			
+            // for the basal rate changes, we need to have the oldest one first and work forward so let's reverse the order
+            // it's needed to define the type [TreatmentEntry] explicity to prevent issues
+            let basalRateTreatments: [TreatmentEntry] = treatmentEntries.filter { $0.treatmentType == .Basal }.reversed()
+			        
+            
 			// For each insulin treatment, check it value and append to the correct list.
 			for insulinTreatment in insulinTreatments {
 				let chartPoint = ChartPoint(treatmentEntry: insulinTreatment, formatter: data().chartPointDateFormatter)
@@ -1094,45 +1097,54 @@ public class GlucoseChartManager {
 				bgCheckTreatmentChartPoints.append(ChartPoint(bgCheck: bgCheckTreatment, formatter: data().chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl))
 			}
             
-            
-            
+            // this is used to know where to end the line from the previous rate when we start a new one for the current basal rate
             var previousBasalRateTreatment: TreatmentEntry?
-            var isFirst: Bool = true
+            var isFirstEntry: Bool = true
             
             // For each basalRateTreatment, create and append a ChartPoint to basalRateTreatmentChartPoints.
             for basalRateTreatment in basalRateTreatments {
-                // add an extra chartpoint at the end of the basal chartpoints to push the current basal rate off the edge of the screen
-                if isFirst {
-                    basalRateFillTreatmentChartPoints.append(ChartPoint(atDate: endDate, formatter: data().chartPointDateFormatter))
-                    
-                    basalRateTreatmentChartPoints.append(ChartPoint(lastBasalRateTreatmentEntry: basalRateTreatment, untilDate: endDate, formatter: data().chartPointDateFormatter))
-                    isFirst.toggle()
-                }
                 
                 // TODO: check if the previous basal rate should have ended before the current one (due to duration expiry rather than the next rate)
                 
+                // if this is the first/earliest basal rate, then first we need to pull it back to the chart startDate and use the previous value (before startDate) for the chart to make sense and also to prevent a gap in the line
+                if isFirstEntry {
+                    // let's try and get a previous basal rate (i.e. the first one we find closest to, and before the startDate). Let's go back 90 minutes to make sure we get the previous basal rate
+                    let previousTreatmentEntries = treatmentEntryAccessor.getTreatments(fromDate: startDate.addingTimeInterval(-60 * 90), toDate: startDate, on: managedObjectContext).filter({ !$0.treatmentdeleted && $0.treatmentType == .Basal })
+                    
+                    if let initialBasalRateTreatment: TreatmentEntry = previousTreatmentEntries.first {
+                        // use the value previous to startDate to start the line at the correct value
+                        basalRateTreatmentChartPoints.append(ChartPoint(basalRate: initialBasalRateTreatment.value, date: startDate, formatter: data().chartPointDateFormatter))
+                        // and continue this line until we get to the first treatment entry
+                        basalRateTreatmentChartPoints.append(ChartPoint(basalRate: initialBasalRateTreatment.value, date: basalRateTreatment.date, formatter: data().chartPointDateFormatter))
+                    } else {
+                        basalRateTreatmentChartPoints.append(ChartPoint(basalRate: 0, date: startDate, formatter: data().chartPointDateFormatter))
+                    }
+                    
+                    isFirstEntry.toggle()
+                }
                 
-                // so if there was already a previous chartpoint, let's use the value to create a new chartpoint with the old value and the new timestamp. This is needed to make the step in the chart
+                // so if this isn't the first reading, then we'll have a previous basal rate. Create a chartpoint with the current date, but with the previous value. This creates the line "up until" the new basal rate change
                 if let previousBasalRateTreatment = previousBasalRateTreatment {
                     basalRateTreatmentChartPoints.append(ChartPoint(basalRateTreatmentEntry: basalRateTreatment, previousBasalRateTreatmentEntry: previousBasalRateTreatment, formatter: data().chartPointDateFormatter))
                 }
                 
+                // create a chartpoint with the current date and the current value. This is the start of a new basal rate
                 basalRateTreatmentChartPoints.append(ChartPoint(basalRateTreatmentEntry: basalRateTreatment, previousBasalRateTreatmentEntry: nil, formatter: data().chartPointDateFormatter))
                 
+                // assign the current treatment to the variable so that we can reuse the value in the next loop
                 previousBasalRateTreatment = basalRateTreatment
             }
             
+            // now that we're out of the loop, we've got the last basal rate in previousBasalRateTreatment
+            // let's create a chartpoint at this rate until the endDate to finish off the line nicely
             if let previousBasalRateTreatment = previousBasalRateTreatment {
-                basalRateTreatmentChartPoints.append(ChartPoint(lastBasalRateTreatmentEntry: previousBasalRateTreatment, untilDate: startDate, formatter: data().chartPointDateFormatter))
+                basalRateTreatmentChartPoints.append(ChartPoint(basalRateTreatmentEntry: previousBasalRateTreatment, date: endDate, formatter: data().chartPointDateFormatter))
             }
             
-            let startX = ChartAxisValueDate(date: startDate, formatter: data().chartPointDateFormatter)
-            let endX = ChartAxisValueDate(date: endDate, formatter: data().chartPointDateFormatter)
-            
-            basalRateFillTreatmentChartPoints = [ChartPoint(x: endX, y: ChartAxisValueInt(0))] + basalRateTreatmentChartPoints + [ChartPoint(x: startX, y: ChartAxisValueInt(0))]
-			
-            
-            
+            // create the fill chart points by using the line chart points and adding a zero value chartpoint to the start and end
+            basalRateFillTreatmentChartPoints.append(ChartPoint(basalRate: 0.0, date: startDate, formatter: data().chartPointDateFormatter))
+            basalRateFillTreatmentChartPoints.append(contentsOf: basalRateTreatmentChartPoints)
+            basalRateFillTreatmentChartPoints.append(ChartPoint(basalRate: 0.0, date: endDate, formatter: data().chartPointDateFormatter))
             
             // Calculate the Y value for each carbsTreatment.
 			let carbsYValues = calculateClosestYAxisValues(carbsTreatments: carbsTreatments, bgReadings: bgReadings)

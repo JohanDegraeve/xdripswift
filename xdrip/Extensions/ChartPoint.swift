@@ -60,46 +60,30 @@ extension ChartPoint {
 
     }
     
-//    /// the basal rate chart point from a treatment entry
-//    convenience init(basalRateTreatmentEntry: TreatmentEntry, formatter: DateFormatter) {
-//        
-//            self.init(
-//                x: ChartAxisValueDate(date: basalRateTreatmentEntry.date, formatter: formatter),
-//                y: ChartAxisValueDouble(basalRateTreatmentEntry.value.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) * 20)
-//            )
-//
-//    }
-    
-    /// the basal rate chart point from a treatment entry.
-    /// If the previous basal rate is included, then it is used to create the ending point of the rate (i.e. new date but with previous value)
-    /// if the previous basal rate is not sent, then we'll assume we should just create a starting point of the rate (new date with new value)
+    /// the basal rate chart point from a treatment entry. Optional previous treatment entry (i.e. basal rate)
+    /// If the previous basal rate is included, then it is used to create the ending point of the rate (i.e. current date but with previous value)
+    /// if the previous basal rate is not sent, then we'll assume we should just create a starting point of the rate (current date with current value)
     convenience init(basalRateTreatmentEntry: TreatmentEntry, previousBasalRateTreatmentEntry: TreatmentEntry?, formatter: DateFormatter) {
-        
             self.init(
-                x: ChartAxisValueDate(date: (previousBasalRateTreatmentEntry ?? basalRateTreatmentEntry).date, formatter: formatter),
-                y: ChartAxisValueDouble(basalRateTreatmentEntry.value.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) * 20)
+                x: ChartAxisValueDate(date: basalRateTreatmentEntry.date, formatter: formatter),
+                y: ChartAxisValueDouble((previousBasalRateTreatmentEntry ?? basalRateTreatmentEntry).value.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) * ConstantsGlucoseChart.basalRateTreatmentScale)
             )
-
     }
     
     /// the basal rate chart point from a treatment entry
-    convenience init(lastBasalRateTreatmentEntry: TreatmentEntry, untilDate: Date, formatter: DateFormatter) {
-        
+    convenience init(basalRateTreatmentEntry: TreatmentEntry, date: Date, formatter: DateFormatter) {
             self.init(
-                x: ChartAxisValueDate(date: untilDate, formatter: formatter),
-                y: ChartAxisValueDouble(lastBasalRateTreatmentEntry.value.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) * 20)
+                x: ChartAxisValueDate(date: date, formatter: formatter),
+                y: ChartAxisValueDouble(basalRateTreatmentEntry.value.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) * ConstantsGlucoseChart.basalRateTreatmentScale)
             )
-
     }
     
-    /// create a zero basal rate chart point from a treatment entry. This helps to close the fill area
-    convenience init(atDate: Date, formatter: DateFormatter) {
-        
+    /// create a specific basal rate chart point at a specific date. This helps to clean up the start/end of the line and fill areas
+    convenience init(basalRate: Double, date: Date, formatter: DateFormatter) {
             self.init(
-                x: ChartAxisValueDate(date: atDate, formatter: formatter),
-                y: ChartAxisValueDouble(0.0)
+                x: ChartAxisValueDate(date: date, formatter: formatter),
+                y: ChartAxisValueDouble(basalRate.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) * ConstantsGlucoseChart.basalRateTreatmentScale)
             )
-
     }
     
 }

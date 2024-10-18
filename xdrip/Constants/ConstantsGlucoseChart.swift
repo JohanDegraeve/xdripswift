@@ -185,6 +185,9 @@ enum ConstantsGlucoseChart {
     /// basal rate fill color
     static let basalRateFillTreatmentColor = basalRateTreatmentLineColor.withAlphaComponent(0.4)
     
+    /// basal rate scaling multplier
+    static let basalRateTreatmentScale: Double = 20.0
+    
     // treatment label font size/color/background
 
     /// default label settings for the treatments labels. These are set for 6hr chart width - they will be scaled accordingly as needed
