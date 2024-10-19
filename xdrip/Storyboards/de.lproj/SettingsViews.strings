@@ -320,7 +320,7 @@
 "settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
-"settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
+"settingsviews_labelWebOOP" = "xdrip oder nativer Algorithmus";
 
 "settingsviews_showHelpIcon" = "Hilfe-Symbol anzeigen";
 "settingsviews_restartNeeded" = "(Neustart notwendig)";

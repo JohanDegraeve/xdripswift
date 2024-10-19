@@ -62,7 +62,7 @@ extension ChartPoint {
     
 }
 
-extension ChartPoint: Comparable {
+extension SwiftCharts.ChartPoint: Swift.Comparable {
     
     public static func < (lhs: ChartPoint, rhs: ChartPoint) -> Bool {
         

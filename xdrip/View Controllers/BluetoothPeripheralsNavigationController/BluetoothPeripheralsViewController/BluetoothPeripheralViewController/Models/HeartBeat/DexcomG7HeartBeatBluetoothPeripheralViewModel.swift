@@ -37,7 +37,7 @@ extension DexcomG7HeartBeatBluetoothPeripheralViewModel: BluetoothPeripheralView
     func sectionTitle(forSection section: Int) -> String {
         
         // there's no section specific for this type of transmitter, this function will not be called
-        return "Dexcom G7/ONE+ Heartbeat ♥"
+        return "Dexcom G7/ONE+/Stelo Heartbeat ♥"
         
     }
     
