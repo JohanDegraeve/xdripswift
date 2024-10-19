@@ -4,7 +4,7 @@ import os
 
 class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
-    /// is the transmitter oop web enabled or not. For G7/ONE+ this must be set to true to use only the transmitter algorithm
+    /// is the transmitter oop web enabled or not. For G7/ONE+/Stelo this must be set to true to use only the transmitter algorithm
     private var webOOPEnabled: Bool
 
     /// stored when receiving single reading, needed when receiving backfill data
@@ -112,7 +112,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG7TransmitterDelegate: CGMG7TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate) {
         
         // assign addressname and name or expected devicename
-        // For G7/ONE+ we don't listen for a specific device name. Dexcom uses an advertising id, which already filters out all other devices (like tv's etc. We will verify in another way that we have the current active G7/ONE+, and not an old one, which is still near
+        // For G7/ONE+/Stelo we don't listen for a specific device name. Dexcom uses an advertising id, which already filters out all other devices (like tv's etc. We will verify in another way that we have the current active G7/ONE+/Stelo, and not an old one, which is still near
         var newAddressAndName: BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "DX")
         
         if let name = name {
@@ -210,10 +210,16 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                     return
                 }
                 
-                let maxSensorAgeInDays = ConstantsDexcomG7.maxSensorAgeInDays
+                var maxSensorAgeInDays = ConstantsDexcomG7.maxSensorAgeInDays
+                
+                // check if it's a Stelo and if so, update the maxSensorAge
+                if let transmitterIdString = UserDefaults.standard.activeSensorTransmitterId, transmitterIdString.startsWith("DX01") {
+                    maxSensorAgeInDays = ConstantsDexcomG7.maxSensorAgeInDaysStelo
+                }
+                
                 let sensorAgeInDays = Double(round((g7GlucoseMessage.sensorAge / 3600 / 24) * 10) / 10)
                 
-                // G7/ONE+ has the peculiarity that it will keep sending/repeating the same BG value (without ever changing) via BLE even after the session officially ends.
+                // G7/ONE+/Stelo has the peculiarity that it will keep sending/repeating the same BG value (without ever changing) via BLE even after the session officially ends.
                 // to avoid this, let's check if the sensor is still within maxSensorAge before we continue
                 guard sensorAgeInDays < maxSensorAgeInDays else {
                     trace("    G7 is expired so will not process reading. sensorAge: %{public}@ / maxSensorAgeInDays: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .error, sensorAgeInDays.description, maxSensorAgeInDays.description)
@@ -285,7 +291,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                     
                 } else {
                     
-                    trace("Connected to Dexcom G7 that is not paired and/or authenticated by other app. Will disconnect and scan for another Dexcom G7", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
+                    trace("Connected to Dexcom G7 that is not paired and/or authenticated by other app. Will disconnect and scan for another Dexcom G7/ONE+/Stelo", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
                     
                     disconnectAndForget()
                     
@@ -370,9 +376,11 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     
     
     func maxSensorAgeInDays() -> Double? {
-        
-        return ConstantsDexcomG7.maxSensorAgeInDays
-        
+        if let transmitterIdString = UserDefaults.standard.activeSensorTransmitterId, transmitterIdString.startsWith("DX01") {
+            return ConstantsDexcomG7.maxSensorAgeInDaysStelo
+        } else {
+            return ConstantsDexcomG7.maxSensorAgeInDays
+        }
     }
     
     func getCBUUID_Service() -> String {
@@ -392,7 +400,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     // MARK: - private functions
     @objc private func authenticationFailed() {
         
-        trace("Connected to Dexcom G7 but authentication not received. Will disconnect and scan for another Dexcom G7", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
+        trace("Connected to Dexcom G7 but authentication not received. Will disconnect and scan for another Dexcom G7/ONE+/Stelo", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
         
         disconnectAndForget()
         
