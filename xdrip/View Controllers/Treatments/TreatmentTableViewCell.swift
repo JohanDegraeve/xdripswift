@@ -40,6 +40,9 @@ class TreatmentTableViewCell: UITableViewCell {
         case .BgCheck:
             self.iconImageView.tintColor =  ConstantsGlucoseChart.bgCheckTreatmentColorInner
             
+        default:
+            self.iconImageView.tintColor =  nil
+            
         }
         
         switch treatment.treatmentType {
@@ -55,6 +58,9 @@ class TreatmentTableViewCell: UITableViewCell {
             
         case .BgCheck:
             self.iconImageView.image =  UIImage(systemName: "drop.fill") ?? nil
+            
+        default:
+            self.iconImageView.tintColor =  nil
             
         }
         
