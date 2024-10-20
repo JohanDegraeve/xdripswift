@@ -316,9 +316,11 @@ enum CGMTransmitterType:String, CaseIterable {
                     return "Dexcom Stelo"
                 } else if transmitterIdString.startsWith("DX02") {
                     return "Dexcom ONE+"
+                } else {
+                    return "Dexcom G7"
                 }
             }
-            return "Dexcom G7"
+            return "Dexcom - please wait..."
             
         case .Libre2:
             if let activeSensorMaxSensorAgeInDays = UserDefaults.standard.activeSensorMaxSensorAgeInDays, activeSensorMaxSensorAgeInDays >= 15 {
