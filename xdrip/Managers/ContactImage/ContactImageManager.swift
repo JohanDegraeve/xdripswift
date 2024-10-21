@@ -81,9 +81,12 @@ class ContactImageManager: NSObject {
             
             // check that access to contacts is authorized by the user
             guard CNContactStore.authorizationStatus(for: .contacts) == .authorized else {
-                trace("in updateContact, access to contacts is not authorized, setting enableContactImage to false", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
-                
-                UserDefaults.standard.enableContactImage = false
+                // if it isn't, and the user has enabled the feature, then disable it
+                if UserDefaults.standard.enableContactImage {
+                    trace("in updateContact, access to contacts is not authorized so setting enableContactImage to false", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
+                    
+                    UserDefaults.standard.enableContactImage = false
+                }
                 return
             }
             
@@ -124,7 +127,10 @@ class ContactImageManager: NSObject {
             // we'll search for all results and then just use the first one for now
             // we do it this way so that in the future we want to add a descriptor to the family name to have various contact images (such as "BG", "IOB", "COB" as needed)
             if let contacts = try? self.contactStore.unifiedContacts(matching: predicate, keysToFetch: keyToFetch), let contact = contacts.first {
-                trace("in updateContact, existing contact found. Updating it's contact image.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
+                
+                if lastReading.count > 0 {
+                    trace("in updateContact, '%{public}@' contact found. Updating the contact image to %{public}@ %{public}@.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+                }
                 
                 // create a mutableContact from the existing contact so that we can modify it
                 guard let mutableContact = contact.mutableCopy() as? CNMutableContact else { return }
@@ -135,7 +141,7 @@ class ContactImageManager: NSObject {
                 // we'll update the existing contact with the new data
                 saveRequest.update(mutableContact)
             } else {
-                trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' and adding a contact image.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName)
+                trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' and adding a contact image with %{public}@ %{public}@.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
                 
                 // create a new mutable contact instance and assign properties to it
                 let contact = CNMutableContact()
