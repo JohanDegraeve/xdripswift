@@ -210,25 +210,29 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                     return
                 }
                 
-                var maxSensorAgeInDays = ConstantsDexcomG7.maxSensorAgeInDays
-                
-                // check if it's a Stelo and if so, update the maxSensorAge
-                if let transmitterIdString = UserDefaults.standard.activeSensorTransmitterId, transmitterIdString.startsWith("DX01") {
-                    maxSensorAgeInDays = ConstantsDexcomG7.maxSensorAgeInDaysStelo
-                }
-                
                 let sensorAgeInDays = Double(round((g7GlucoseMessage.sensorAge / 3600 / 24) * 10) / 10)
                 
-                // G7/ONE+/Stelo has the peculiarity that it will keep sending/repeating the same BG value (without ever changing) via BLE even after the session officially ends.
-                // to avoid this, let's check if the sensor is still within maxSensorAge before we continue
-                guard sensorAgeInDays < maxSensorAgeInDays else {
-                    trace("    G7 is expired so will not process reading. sensorAge: %{public}@ / maxSensorAgeInDays: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .error, sensorAgeInDays.description, maxSensorAgeInDays.description)
-                    return
+                var maxSensorAgeInDays: Double = 0.0
+                
+                // check if we already have the transmitterId (or device name). If so, set the maxSensorAge and then perform a quick check to see if the sensor hasn't expired.
+                if let transmitterIdString = UserDefaults.standard.activeSensorTransmitterId {
+                    if transmitterIdString.startsWith("DX01") {
+                        maxSensorAgeInDays = ConstantsDexcomG7.maxSensorAgeInDaysStelo
+                    } else {
+                        maxSensorAgeInDays = ConstantsDexcomG7.maxSensorAgeInDays
+                    }
+                                        
+                    // G7/ONE+/Stelo has the peculiarity that it will keep sending/repeating the same BG value (without ever changing) via BLE even after the session officially ends.
+                    // to avoid this, let's check if the sensor is still within maxSensorAge before we continue
+                    if sensorAgeInDays > maxSensorAgeInDays {
+                        trace("    %{public}@ is expired so will not process reading. sensorAge: %{public}@ / maxSensorAgeInDays: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .error, UserDefaults.standard.activeSensorTransmitterId ?? "sensor", sensorAgeInDays.description, maxSensorAgeInDays.description)
+                        return
+                    }
                 }
                 
                 trace("    received g7GlucoseMessage mesage, calculatedValue = %{public}@, timeStamp = %{public}@, sensorAge = %{public}@ / %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, g7GlucoseMessage.calculatedValue.description, g7GlucoseMessage.timeStamp.description(with: .current))
                 
-                trace("    received g7GlucoseMessage mesage, sensorAge = %{public}@ / %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, sensorAgeInDays.description, maxSensorAgeInDays.description)
+                trace("    received g7GlucoseMessage mesage, sensorAge = %{public}@ / %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, sensorAgeInDays.description, maxSensorAgeInDays > 0 ? maxSensorAgeInDays.description : "waiting...")
                 
                 sensorAge = g7GlucoseMessage.sensorAge
                 
@@ -376,10 +380,15 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     
     
     func maxSensorAgeInDays() -> Double? {
-        if let transmitterIdString = UserDefaults.standard.activeSensorTransmitterId, transmitterIdString.startsWith("DX01") {
-            return ConstantsDexcomG7.maxSensorAgeInDaysStelo
+        if let transmitterIdString = UserDefaults.standard.activeSensorTransmitterId {
+            if transmitterIdString.startsWith("DX01") {
+                return ConstantsDexcomG7.maxSensorAgeInDaysStelo
+            } else {
+                return ConstantsDexcomG7.maxSensorAgeInDays
+            }
         } else {
-            return ConstantsDexcomG7.maxSensorAgeInDays
+            // if we haven't yet established the activeSensorTransmitterId (or device name) then return 0 - RVC will use this to know that we're still waiting
+            return 0
         }
     }
     

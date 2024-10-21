@@ -3102,16 +3102,11 @@ final class RootViewController: UIViewController, ObservableObject {
         // check if there is a transmitter connected (needed as Dexcom will only connect briefly every 5 minutes)
         // if there is a transmitter connected, pull the current maxSensorAgeInDays and store in in UserDefaults
         if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let maxDays = cgmTransmitter.maxSensorAgeInDays() {
-            
-            if maxDays > 0 {
-                UserDefaults.standard.activeSensorMaxSensorAgeInDays = maxDays
-            }
-            
+            UserDefaults.standard.activeSensorMaxSensorAgeInDays = maxDays
             UserDefaults.standard.activeSensorDescription = cgmTransmitter.cgmTransmitterType().detailedDescription()
             
             // update the sensor type - needed to make sure we test with the correct warm-up times later
             sensorType = cgmTransmitter.cgmTransmitterType().sensorType()
-            
         }
         
         // let's just check that we've got enough information to display the view
