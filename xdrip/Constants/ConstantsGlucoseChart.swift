@@ -7,7 +7,10 @@ enum ConstantsGlucoseChart {
     
     /// usually 40.0 mgdl is the lowest value that cgm's give, putting it to 38 guarantees the points will always be visible
     /// only in mgdl because the label will not be shown, hence no bizar values to be shown when going to mgdl
-    static let absoluteMinimumChartValueInMgdl = 38.0
+    static let absoluteMinimumChartValueInMgdl: Double = 38
+    
+    /// what should the x-axis start with then showing the basal render?
+    static let minimumChartValueInMgdlWithBasal: Double = -30
     
     /// if there's no readings to show with value higher than the maximum in this array, then this array will determine the maximum possible value in the chart, in mgdl
     static let initialGlucoseValueRangeInMgDl = [50.0, 100.0, 150.0, 200.0]
@@ -102,17 +105,23 @@ enum ConstantsGlucoseChart {
     /// bolus treament marker colour
     static let bolusTreatmentColor = UIColor.systemBlue
     
-    /// how far above the bottom of the chart should the bolus treatment start? 0 would be touching
-    static let bolusTreatmentChartPointYAxisOffsetInMgDl: Double = 2
-    
-    /// how should we scale the bolus values vertically? A value of 5-7 seems to be reasonable to give context to the bolus size without disturbing the rest of the elements
-    static let bolusTreatmentChartPointYAxisScaleFactor: Double = 6
-    
     /// values below this threshold will be shown as micro-boluses without labels and scaled accordingly
-    static let defaultSmallBolusTreamentThreshold: Double = 1.0
-    
+    static let smallBolusTreamentThreshold: Double = 0.8
     /// how much should we scale the size of the micro-bolus triangle compared to the bolus triangle. Should be less than 1 to make them smaller
     static let smallBolusTreamentScale: CGFloat = 0.6
+    
+    /// values below this threshold will be shown as micro-boluses without labels and scaled accordingly
+    static let mediumBolusTreamentThreshold: Double = 2
+    /// how much should we scale the size of the micro-bolus triangle compared to the bolus triangle. Should be less than 1 to make them smaller
+    static let mediumBolusTreamentScale: CGFloat = 0.9
+    
+    /// values below this threshold will be shown as micro-boluses without labels and scaled accordingly
+    static let largeBolusTreamentThreshold: Double = 5
+    /// how much should we scale the size of the micro-bolus triangle compared to the bolus triangle. Should be less than 1 to make them smaller
+    static let largeBolusTreamentScale: CGFloat = 1.2
+    
+    /// how much should we scale the size of the micro-bolus triangle compared to the bolus triangle. Should be less than 1 to make them smaller
+    static let veryLargeBolusTreamentScale: CGFloat = 1.5
     
     /// triangle size for bolus treatments with a 3h chart width. The more hours on the chart, the smaller the triangles should be.
     static let bolusTriangleSize3h: CGFloat = 16
@@ -129,10 +138,6 @@ enum ConstantsGlucoseChart {
     /// make the triangle height slightly less than the width to prevent it looking too "pointy"
     static let bolusTriangleHeightScale: CGFloat = 0.9
     
-    // basal rate treatment color
-    
-    /// bolus treament marker colour
-    static let basalTreatmentColor = UIColor.systemMint
     
     // carb treatment marker color/sizes
     
@@ -140,25 +145,22 @@ enum ConstantsGlucoseChart {
     static let carbsTreatmentColor = UIColor.systemOrange
     
     /// threshold below which carbs will be added to the smallCarbs array
-    static let smallCarbsTreamentThreshold: CGFloat = 6.0
-    
+    static let smallCarbsTreamentThreshold: CGFloat = 5.0
     /// The scale will determine how big the smallCarbs circle is scaled compared to the glucose point size)
-    static let smallCarbsTreamentScale: CGFloat = 2.3
+    static let smallCarbsTreamentScale: CGFloat = 1.1
     
     /// threshold below which carbs will be added to the mediumCarbs array (if not previously added to another array)
-    static let mediumCarbsTreamentThreshold: CGFloat = 15.0
-    
-    /// The scale will determine how big the mediumCarbs circle is scaled compared to the glucose point size)
-    static let mediumCarbsTreamentScale: CGFloat = 3.3
+    static let mediumCarbsTreamentThreshold: CGFloat = 20.0
+        /// The scale will determine how big the mediumCarbs circle is scaled compared to the glucose point size)
+    static let mediumCarbsTreamentScale: CGFloat = 2
     
     /// threshold below which carbs will be added to the largeCarbs array (if not previously added to another array)
     static let largeCarbsTreamentThreshold: CGFloat = 45.0
-    
     /// The scale will determine how big the largeCarbs circle is scaled compared to the glucose point size)
-    static let largeCarbsTreamentScale: CGFloat = 4.5
+    static let largeCarbsTreamentScale: CGFloat = 3.3
     
     /// The scale will determine how big the veryLargeCarbs circle is scaled compared to the glucose point size)
-    static let veryLargeCarbsTreamentScale: CGFloat = 6.6
+    static let veryLargeCarbsTreamentScale: CGFloat = 5
     
     // bg check circle fill/border color/sizes
     
@@ -174,7 +176,10 @@ enum ConstantsGlucoseChart {
     /// bg check inner circle scale factor compared to the chart glucose circle size
     static let bgCheckTreatmentScaleInner: CGFloat = 1.4
     
-    // basal rate line + fill color
+    // basal rate treatment color
+    
+    /// bolus treament marker colour
+    static let basalTreatmentColor = UIColor.systemMint
     
     /// basal rate line color
     static let basalRateTreatmentLineColor = UIColor.systemMint
@@ -185,8 +190,8 @@ enum ConstantsGlucoseChart {
     /// basal rate fill color
     static let basalRateFillTreatmentColor = basalRateTreatmentLineColor.withAlphaComponent(0.4)
     
-    /// basal rate scaling multplier
-    static let basalRateTreatmentScale: Double = 20.0
+    /// the amount of days we should use to calculate the max basal rate to allow scaling. It should be enough to allow casual scrolling back 1-2 days without forcing a re-scale
+    static let basalScaleDaysForCalculation: Double = 2
     
     // treatment label font size/color/background
 
@@ -200,25 +205,31 @@ enum ConstantsGlucoseChart {
     static let treatmentLabelBackgroundColor = UIColor.black.withAlphaComponent(0.4)
     
     /// additional label separation (in mg/dl) when using mmol/l (needed due to the scaling/conversion)
-    static let treatmentLabelMmolOffset: Double = 2
+    static let treatmentLabelMmolOffset: Double = 7
     
     /// how far should the label be separated from the bolus marker by default
     static let mediumBolusLabelSeparation: Double = 8
+    /// how far should the label be separated from the bolus marker by default
+    static let largeBolusLabelSeparation: Double = 10
+    /// how far should the label be separated from the bolus marker by default
+    static let veryLargeBolusLabelSeparation: Double = 13
     
     /// how far should the label be separated from the smallCarbs marker by default
-    static let smallCarbsLabelSeparation: Double = 7
-    
+    static let smallCarbsLabelSeparation: Double = 6
     /// how far should the label be separated from the mediumCarbs marker by default
-    static let mediumCarbsLabelSeparation: Double = 9
-    
+    static let mediumCarbsLabelSeparation: Double = 10
     /// how far should the label be separated from the largeCarbs marker by default
-    static let largeCarbsLabelSeparation: Double = 11
-    
+    static let largeCarbsLabelSeparation: Double = 15
     /// how far should the label be separated from the veryLargeCarbs marker by default
-    static let veryLargeCarbsLabelSeparation: Double = 15
+    static let veryLargeCarbsLabelSeparation: Double = 20
     
-    /// amount (in mg/dL) the carb marker be offset from the BG value marker if enabled
-    static let offsetCarbPositionFromBgMarker: Double = 25
+    /// amount (in mg/dL) the bolus marker be offset below the BG value marker
+    static let offsetBolusPositionFromBgMarker: Double = 25 // remove
+    /// amount (in mg/dL) the carb marker be offset above the BG value marker
+    static let offsetCarbPositionFromBgMarker: Double = 25 // remove
+    /// amount (in mg/dL) the carb marker be offset above the BG value marker
+    static let defaultOffsetTreatmentPositionFromBgMarker: Double = 25
+    
     
     // chart format parameters
     

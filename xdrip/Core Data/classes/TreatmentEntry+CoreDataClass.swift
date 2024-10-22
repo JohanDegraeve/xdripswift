@@ -88,39 +88,6 @@ import CoreData
         }
         
     }
-    
-    /// return the y-axis offset for the treatment type (as set in ConstantsGlucoseChart.swift) - if it isn't required for the treatment type, it should return 0
-    public func chartPointYAxisOffset() -> Double {
-        
-        switch self {
-            
-        case .Insulin:
-            return ConstantsGlucoseChart.bolusTreatmentChartPointYAxisOffsetInMgDl.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-            
-            // if no offset is defined or needed for this treatment type, just return zero offset
-        default:
-            return 0
-            
-        }
-        
-    }
-    
-    /// return the y-axis scale factor for the treatment type (as set in ConstantsGlucoseChart.swift) - if it isn't required for the treatment type, it should return 1
-    public func chartPointYAxisScaleFactor() -> Double {
-        
-        switch self {
-            
-        case .Insulin:
-            return ConstantsGlucoseChart.bolusTreatmentChartPointYAxisScaleFactor.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-            
-            // if no scale is defined or needed for this treatment type, just return a unity scale factor
-        default:
-            return 1
-            
-        }
-        
-    }
-	
 }
 
 

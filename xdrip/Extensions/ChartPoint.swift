@@ -21,10 +21,10 @@ extension ChartPoint {
 
     }
     
-    /// the chartpoints defined for bolus treatment entries are abolute-positioned in the chart and need to be scaled to fit the y-axis values of the glucose chart points (and therefore avoid needing a secondary axis). The offset from the bottom of the chart and the scale is pulled from the Treatment Type.
+    /// the chartpoints defined for bolus treatment entries are abolute-positioned in the chart and need to be scaled to fit the y-axis values of the glucose chart points (and therefore avoid needing a secondary axis).
     convenience init(treatmentEntry: TreatmentEntry, formatter: DateFormatter) {
         
-        let scaledValue = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) + treatmentEntry.treatmentType.chartPointYAxisOffset() + (treatmentEntry.value * treatmentEntry.treatmentType.chartPointYAxisScaleFactor())
+        let scaledValue = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) + treatmentEntry.value
         
         self.init(
             x: ChartAxisValueDate(date: treatmentEntry.date, formatter: formatter),
@@ -63,26 +63,26 @@ extension ChartPoint {
     /// the basal rate chart point from a treatment entry. Optional previous treatment entry (i.e. basal rate)
     /// If the previous basal rate is included, then it is used to create the ending point of the rate (i.e. current date but with previous value)
     /// if the previous basal rate is not sent, then we'll assume we should just create a starting point of the rate (current date with current value)
-    convenience init(basalRateTreatmentEntry: TreatmentEntry, previousBasalRateTreatmentEntry: TreatmentEntry?, formatter: DateFormatter) {
+    convenience init(basalRateTreatmentEntry: TreatmentEntry, previousBasalRateTreatmentEntry: TreatmentEntry?, basalRateScaler: Double, formatter: DateFormatter) {
             self.init(
                 x: ChartAxisValueDate(date: basalRateTreatmentEntry.date, formatter: formatter),
-                y: ChartAxisValueDouble((previousBasalRateTreatmentEntry ?? basalRateTreatmentEntry).value.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) * ConstantsGlucoseChart.basalRateTreatmentScale)
+                y: ChartAxisValueDouble(((previousBasalRateTreatmentEntry ?? basalRateTreatmentEntry).value.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) * basalRateScaler) + ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl))
             )
     }
     
     /// the basal rate chart point from a treatment entry
-    convenience init(basalRateTreatmentEntry: TreatmentEntry, date: Date, formatter: DateFormatter) {
+    convenience init(basalRateTreatmentEntry: TreatmentEntry, date: Date, basalRateScaler: Double, formatter: DateFormatter) {
             self.init(
                 x: ChartAxisValueDate(date: date, formatter: formatter),
-                y: ChartAxisValueDouble(basalRateTreatmentEntry.value.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) * ConstantsGlucoseChart.basalRateTreatmentScale)
+                y: ChartAxisValueDouble((basalRateTreatmentEntry.value.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) * basalRateScaler) + ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl))
             )
     }
     
     /// create a specific basal rate chart point at a specific date. This helps to clean up the start/end of the line and fill areas
-    convenience init(basalRate: Double, date: Date, formatter: DateFormatter) {
+    convenience init(basalRate: Double, date: Date, basalRateScaler: Double, formatter: DateFormatter) {
             self.init(
                 x: ChartAxisValueDate(date: date, formatter: formatter),
-                y: ChartAxisValueDouble(basalRate.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) * ConstantsGlucoseChart.basalRateTreatmentScale)
+                y: ChartAxisValueDouble((basalRate.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) * basalRateScaler) + ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl))
             )
     }
     

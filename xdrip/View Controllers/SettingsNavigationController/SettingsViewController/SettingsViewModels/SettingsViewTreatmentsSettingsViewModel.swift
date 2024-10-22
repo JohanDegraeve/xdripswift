@@ -11,43 +11,19 @@ import Foundation
 import UIKit
 
 fileprivate enum Setting:Int, CaseIterable {
-    
     //show the statistics on the home screen?
     case showTreatmentsOnChart = 0
-    
-    //should we use the user values for High + Low, or use the standard range?
-    case smallBolusTreatmentThreshold = 1
-    
-    //should we show the micro-boluses on the main chart?
-    case showSmallBolusTreatmentsOnChart = 2
-    
-    //should we offset the carbs on the main chart?
-    case offsetCarbTreatmentsOnChart = 3
-    
-    
 }
 
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
 struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
     
     func uiView(index: Int) -> UIView? {
-        
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-            
         case .showTreatmentsOnChart:
             return UISwitch(isOn: UserDefaults.standard.showTreatmentsOnChart, action: {(isOn:Bool) in UserDefaults.standard.showTreatmentsOnChart = isOn})
-            
-        case .smallBolusTreatmentThreshold:
-            return nil
-            
-        case .showSmallBolusTreatmentsOnChart:
-            return UISwitch(isOn: UserDefaults.standard.showSmallBolusTreatmentsOnChart, action: {(isOn:Bool) in UserDefaults.standard.showSmallBolusTreatmentsOnChart = isOn})
-            
-        case .offsetCarbTreatmentsOnChart:
-            return UISwitch(isOn: UserDefaults.standard.offsetCarbTreatmentsOnChart, action: {(isOn:Bool) in UserDefaults.standard.offsetCarbTreatmentsOnChart = isOn})
-            
         }
     }
     
@@ -72,7 +48,6 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-            
         case .showTreatmentsOnChart:
             return SettingsSelectedRowAction.callFunction(function: {
                 if UserDefaults.standard.showTreatmentsOnChart {
@@ -81,28 +56,6 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
                     UserDefaults.standard.showTreatmentsOnChart = true
                 }
             })
-            
-        case .smallBolusTreatmentThreshold:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_smallBolusTreatmentThreshold, message: Texts_SettingsView.settingsviews_smallBolusTreatmentThresholdMessage, keyboardType: .decimalPad, text: UserDefaults.standard.smallBolusTreatmentThreshold.description, placeHolder: "0.0", actionTitle: nil, cancelTitle: nil, actionHandler: {(threshold:String) in if let threshold = Double(threshold) {UserDefaults.standard.smallBolusTreatmentThreshold = Double(threshold)}}, cancelHandler: nil, inputValidator: nil)
-            
-        case .showSmallBolusTreatmentsOnChart:
-            return SettingsSelectedRowAction.callFunction(function: {
-                if UserDefaults.standard.showSmallBolusTreatmentsOnChart {
-                    UserDefaults.standard.showSmallBolusTreatmentsOnChart = false
-                } else {
-                    UserDefaults.standard.showSmallBolusTreatmentsOnChart = true
-                }
-            })
-            
-        case .offsetCarbTreatmentsOnChart:
-            return SettingsSelectedRowAction.callFunction(function: {
-                if UserDefaults.standard.offsetCarbTreatmentsOnChart {
-                    UserDefaults.standard.offsetCarbTreatmentsOnChart = false
-                } else {
-                    UserDefaults.standard.offsetCarbTreatmentsOnChart = true
-                }
-            })
-            
         }
     }
     
@@ -118,19 +71,8 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-            
         case .showTreatmentsOnChart:
             return Texts_SettingsView.settingsviews_showTreatmentsOnChart
-            
-        case .smallBolusTreatmentThreshold:
-            return Texts_SettingsView.settingsviews_smallBolusTreatmentThreshold
-            
-        case .showSmallBolusTreatmentsOnChart:
-            return Texts_SettingsView.settingsviews_showSmallBolusTreatmentsOnChart
-            
-        case .offsetCarbTreatmentsOnChart:
-            return Texts_SettingsView.settingsviews_offsetCarbTreatmentsOnChart
-            
         }
     }
     
@@ -138,13 +80,8 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-            
-        case .showTreatmentsOnChart, .showSmallBolusTreatmentsOnChart, .offsetCarbTreatmentsOnChart:
+        case .showTreatmentsOnChart:
             return UITableViewCell.AccessoryType.none
-            
-        case .smallBolusTreatmentThreshold:
-            return UITableViewCell.AccessoryType.disclosureIndicator
-            
         }
     }
     
@@ -152,14 +89,8 @@ struct SettingsViewTreatmentsSettingsViewModel:SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-            
-        case .showTreatmentsOnChart, .showSmallBolusTreatmentsOnChart, .offsetCarbTreatmentsOnChart:
+        case .showTreatmentsOnChart:
             return nil
-            
-        case .smallBolusTreatmentThreshold:
-            return UserDefaults.standard.smallBolusTreatmentThreshold.description
-            
         }
     }
-    
 }

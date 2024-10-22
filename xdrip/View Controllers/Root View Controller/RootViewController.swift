@@ -894,9 +894,6 @@ final class RootViewController: UIViewController, ObservableObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.lowMarkValue.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.highMarkValue.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.urgentHighMarkValue.rawValue, options: .new, context: nil)
-        
-        // updating the offset carbs on chart requires a redraw of the chart
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.offsetCarbTreatmentsOnChart.rawValue, options: .new, context: nil)
 
         // add observer for nightscoutTreatmentsUpdateCounter, to reload the chart whenever a treatment is added or updated or deleted changes
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
@@ -1654,11 +1651,6 @@ final class RootViewController: UIViewController, ObservableObject {
             watchManager?.updateWatchApp(forceComplicationUpdate: false)
 
             updateLiveActivityAndWidgets(forceRestart: false)
-            
-        case UserDefaults.Key.offsetCarbTreatmentsOnChart:
-            
-            // redraw chart is necessary
-            updateChartWithResetEndDate()
             
         case UserDefaults.Key.showMiniChart:
             

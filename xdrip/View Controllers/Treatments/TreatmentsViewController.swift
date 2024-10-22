@@ -152,44 +152,16 @@ class TreatmentsViewController : UIViewController {
         
 		self.titleNavigation.title = Texts_TreatmentsView.treatmentsTitle
         
-        // check if the observers have already been added. If not, then add them
-        if !didAddObservers {
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.smallBolusTreatmentThreshold.rawValue, options: .new, context: nil)
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showSmallBolusTreatmentsInList.rawValue, options: .new, context: nil)
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showBolusTreatmentsInList.rawValue, options: .new, context: nil)
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showCarbsTreatmentsInList.rawValue, options: .new, context: nil)
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showBasalTreatmentsInList.rawValue, options: .new, context: nil)
-            UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showBgCheckTreatmentsInList.rawValue, options: .new, context: nil)
-            
-            // change the flag to true so that we know they exist before we try and remove them later
-            didAddObservers = true
-        }
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutTreatmentsUpdateCounter.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.smallBolusTreatmentThreshold.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showSmallBolusTreatmentsInList.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showBolusTreatmentsInList.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showCarbsTreatmentsInList.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showBasalTreatmentsInList.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showBgCheckTreatmentsInList.rawValue, options: .new, context: nil)
+
 	}
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        // we need to remove all observers from the view controller before removing it from the navigation stack
-        // otherwise the app crashes when one of the userdefault values changes and the observer tries to
-        // update the UI (which isn't available any more)
-        
-        // as viewWillAppear could get called (or maybe not) several times, we need to check that the observers
-        // have really been registered before we try and remove them
-        if didAddObservers {
-            /*UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutTreatmentsUpdateCounter.rawValue, context: nil)
-            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, context: nil)
-            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.smallBolusTreatmentThreshold.rawValue, context: nil)
-            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.showSmallBolusTreatmentsInList.rawValue, context: nil)
-            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.showBolusTreatmentsInList.rawValue, context: nil)
-            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.showCarbsTreatmentsInList.rawValue, context: nil)
-            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.showCarbsTreatmentsInList.rawValue, context: nil)
-            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.showBasalTreatmentsInList.rawValue, context: nil)
-            UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.showBgCheckTreatmentsInList.rawValue, context: nil)*/
-            
-            // change the flag back to false so that we don't accidentally try and remove them again before they are re-added
-            didAddObservers = false
-        }
-    }
 	
 
 	/// Override prepare for segue, we must call configure on the TreatmentsInsertViewController.
@@ -238,14 +210,9 @@ class TreatmentsViewController : UIViewController {
         var treatmentsArray = treatmentEntryAccessor.getLatestTreatments(howOld: TimeInterval(days: 7)).filter( { !$0.treatmentdeleted } )
         
         // filter out boluses if required
-        if !UserDefaults.standard.showBolusTreatmentsInList {
-            
-            treatmentsArray = treatmentsArray.filter( { (($0.treatmentType != .Insulin) || ($0.treatmentType != .Insulin && $0.value >= UserDefaults.standard.smallBolusTreatmentThreshold)) } )
-            
-        } else if !UserDefaults.standard.showSmallBolusTreatmentsInList {
-            
+        if !UserDefaults.standard.showSmallBolusTreatmentsInList {
             // as the user wants to show boluses, let's check if they also want to just filter out micro-boluses
-            treatmentsArray = treatmentsArray.filter( { ($0.treatmentType != .Insulin) || ($0.treatmentType == .Insulin && $0.value >= UserDefaults.standard.smallBolusTreatmentThreshold) } )
+            treatmentsArray = treatmentsArray.filter( { ($0.treatmentType != .Insulin) || ($0.treatmentType == .Insulin && $0.value >= ConstantsGlucoseChart.smallBolusTreamentThreshold) } )
         }
 
         // filter out carbs if required

@@ -107,8 +107,6 @@ extension UserDefaults {
         case showTreatmentsOnChart = "showTreatmentsOnChart"
         /// micro-bolus threshold level in units
         case smallBolusTreatmentThreshold = "smallBolusTreatmentThreshold"
-        /// should the micro-boluses be shown on the main chart?
-        case showSmallBolusTreatmentsOnChart = "showSmallBolusTreatmentsOnChart"
         /// should the micro-boluses be listed in the treatment list/table?
         case showSmallBolusTreatmentsInList = "showSmallBolusTreatmentsInList"
         /// should the normal boluses be listed in the treatment list/table?
@@ -119,8 +117,6 @@ extension UserDefaults {
         case showBasalTreatmentsInList = "showBasalTreatmentsInList"
         /// should the BG Checks be listed in the treatment list/table?
         case showBgCheckTreatmentsInList = "showBgCheckTreatmentsInList"
-        /// should the carbs be offset in the main chart?
-        case offsetCarbTreatmentsOnChart = "offsetCarbTreatmentsOnChart"
         
         // Statistics settings
         
@@ -1040,46 +1036,6 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.showTreatmentsOnChart.rawValue)
-        }
-    }
-    
-    /// micro-bolus threshold level in units as a Double
-    @objc dynamic var smallBolusTreatmentThreshold:Double {
-        get {
-
-            var returnValue = double(forKey: Key.smallBolusTreatmentThreshold.rawValue)
-            // if 0 set to defaultvalue
-            if returnValue == 0.0 {
-                returnValue = ConstantsGlucoseChart.defaultSmallBolusTreamentThreshold
-            }
-
-            return returnValue
-        }
-        set {
-
-            set(newValue, forKey: Key.smallBolusTreatmentThreshold.rawValue)
-        }
-    }
-    
-    /// should the app show the micro-bolus treatments on the main chart?
-    @objc dynamic var showSmallBolusTreatmentsOnChart: Bool {
-        // default value for bool in userdefaults is false, by default we want the app to *show* the micro-bolus treatments on the chart
-        get {
-            return !bool(forKey: Key.showSmallBolusTreatmentsOnChart.rawValue)
-        }
-        set {
-            set(!newValue, forKey: Key.showSmallBolusTreatmentsOnChart.rawValue)
-        }
-    }
-    
-    /// should the app show carb treatments with an offset?
-    @objc dynamic var offsetCarbTreatmentsOnChart: Bool {
-        // default value for bool in userdefaults is false, by default we want the app to *not* offset the carb treatments on the chart
-        get {
-            return bool(forKey: Key.offsetCarbTreatmentsOnChart.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.offsetCarbTreatmentsOnChart.rawValue)
         }
     }
     

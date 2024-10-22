@@ -384,9 +384,6 @@ class Trace {
         
         traceInfo.appendStringAndNewLine("\nTreatments settings:")
         traceInfo.appendStringAndNewLine("    Show treatments: " + UserDefaults.standard.showTreatmentsOnChart.description)
-        traceInfo.appendStringAndNewLine("    Micro-bolus threshold: " + UserDefaults.standard.smallBolusTreatmentThreshold.description)
-        traceInfo.appendStringAndNewLine("    Show micro-bolus: " + UserDefaults.standard.showSmallBolusTreatmentsOnChart.description)
-        traceInfo.appendStringAndNewLine("    Offset carbs on chart: " + UserDefaults.standard.offsetCarbTreatmentsOnChart.description)
         
         traceInfo.appendStringAndNewLine("\nStatistics settings:")
         traceInfo.appendStringAndNewLine("    Show statistics: " + UserDefaults.standard.showStatistics.description)
