@@ -170,6 +170,8 @@ extension UserDefaults {
         
         /// should readings be uploaded to nightscout
         case nightscoutEnabled = "nightscoutEnabled"
+        /// should we try and follow any specific AID system (Loop, Trio, AAPS, OpenAPS etc)?
+        case nightscoutFollowType = "nightscoutFollowType"
         /// should schedule be used for nightscout upload ?
         case nightscoutUseSchedule = "nightscoutUseSchedule"
         /// - schedule for nightscout use, only applicable if nightscoutUseSchedule = true
@@ -188,7 +190,7 @@ extension UserDefaults {
         
         /// is a  nightscout sync of treatments required
         ///
-        /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightscoutUploadManager and when set to true, the manager knows a new sync is required
+        /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightscoutSyncManager and when set to true, the manager knows a new sync is required
         case nightscoutSyncTreatmentsRequired = "nightscoutSyncTreatmentsRequired"
 
         /// used to trigger view controllers that there's a change in TreatmentEntries
@@ -1292,6 +1294,18 @@ extension UserDefaults {
         }
     }
     
+    /// holds the enum integer of the type of nightscout follower type to be shown, if any
+    /// default to 0 (basic type - just standard treatments and basal from NS)
+    var nightscoutFollowType: NightscoutFollowType {
+        get {
+            let nightscoutFollowTypeAsInt = integer(forKey: Key.nightscoutFollowType.rawValue)
+            return NightscoutFollowType(rawValue: nightscoutFollowTypeAsInt) ?? .basic
+        }
+        set {
+            set(newValue.rawValue, forKey: Key.nightscoutFollowType.rawValue)
+        }
+    }
+    
     /// use schedule for nightscoutupload ?
     @objc dynamic var nightscoutUseSchedule: Bool {
         get {
@@ -1368,7 +1382,7 @@ extension UserDefaults {
     
     /// is a  nightscout sync of treatments required
     ///
-    /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightscoutUploadManager and when set to true, the manager knows a new sync is required
+    /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightscoutSyncManager and when set to true, the manager knows a new sync is required
     @objc dynamic var nightscoutSyncTreatmentsRequired: Bool {
         get {
             return bool(forKey: Key.nightscoutSyncTreatmentsRequired.rawValue)

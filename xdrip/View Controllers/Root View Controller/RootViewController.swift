@@ -445,7 +445,7 @@ final class RootViewController: UIViewController, ObservableObject {
     
     @IBSegueAction func segueToBgReadingsView(_ coder: NSCoder) -> UIViewController? {
                     
-        return UIHostingController(coder: coder, rootView: BgReadingsView().environmentObject(bgReadingsAccessor!).environmentObject(nightscoutUploadManager!))
+        return UIHostingController(coder: coder, rootView: BgReadingsView().environmentObject(bgReadingsAccessor!).environmentObject(nightscoutSyncManager!))
             
     }
     
@@ -507,8 +507,8 @@ final class RootViewController: UIViewController, ObservableObject {
     /// CalibrationsAccessor instance
     private var calibrationsAccessor: CalibrationsAccessor?
 	
-    /// NightscoutUploadManager instance
-    private var nightscoutUploadManager: NightscoutUploadManager?
+    /// NightscoutSyncManager instance
+    private var nightscoutSyncManager: NightscoutSyncManager?
     
     /// AlerManager instance
     private var alertManager: AlertManager?
@@ -1075,7 +1075,7 @@ final class RootViewController: UIViewController, ObservableObject {
         }
     }
     
-    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightscoutUploadManager, soundPlayer, dexcomShareUploadManager, nightscoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, calendarManager, housekeeper, contactImageManager
+    // creates activeSensor, bgreadingsAccessor, calibrationsAccessor, NightscoutSyncManager, soundPlayer, dexcomShareUploadManager, nightscoutFollowManager, alertManager, healthKitManager, bgReadingSpeaker, bluetoothPeripheralManager, calendarManager, housekeeper, contactImageManager
     private func setupApplicationData() {
         
         // setup Trace
@@ -1102,7 +1102,7 @@ final class RootViewController: UIViewController, ObservableObject {
         houseKeeper = HouseKeeper(coreDataManager: coreDataManager)
         
         // setup nightscout synchronizer
-        nightscoutUploadManager = NightscoutUploadManager(coreDataManager: coreDataManager, messageHandler: { (title:String, message:String) in
+        nightscoutSyncManager = NightscoutSyncManager(coreDataManager: coreDataManager, messageHandler: { (title:String, message:String) in
             
             let alert = UIAlertController(title: title, message: message, actionHandler: nil)
             
@@ -1503,7 +1503,7 @@ final class RootViewController: UIViewController, ObservableObject {
 
                 }
                 
-                nightscoutUploadManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 healthKitManager?.storeBgReadings()
                 
@@ -1976,8 +1976,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 coreDataManager.saveChanges()
                 
                 // initiate upload to Nightscout, if needed
-                if let nightscoutUploadManager = self.nightscoutUploadManager {
-                    nightscoutUploadManager.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
+                if let nightscoutSyncManager = self.nightscoutSyncManager {
+                    nightscoutSyncManager.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
                 }
                 
                 // initiate upload to Dexcom Share, if needed
@@ -3496,7 +3496,7 @@ final class RootViewController: UIViewController, ObservableObject {
     /// show the SwiftUI view via UIHostingController
     private func showBgReadingsView() {
         
-        let bgReadingsViewController = UIHostingController(rootView: BgReadingsView().environmentObject(self.bgReadingsAccessor!).environmentObject(nightscoutUploadManager!) as! BgReadingsView)
+        let bgReadingsViewController = UIHostingController(rootView: BgReadingsView().environmentObject(self.bgReadingsAccessor!).environmentObject(nightscoutSyncManager!) as! BgReadingsView)
         
         navigationController?.pushViewController(bgReadingsViewController, animated: true)
         
@@ -3952,7 +3952,7 @@ extension RootViewController: FollowerDelegate {
                 // (this will only happen if we're not following Nightscout
                 // and if the user has requested to upload follower BG values
                 // to Nightscout
-                nightscoutUploadManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 // check alerts, create notification, set app badge
                 checkAlertsCreateNotificationAndSetAppBadge()

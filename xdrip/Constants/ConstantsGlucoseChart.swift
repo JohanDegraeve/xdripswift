@@ -10,7 +10,7 @@ enum ConstantsGlucoseChart {
     static let absoluteMinimumChartValueInMgdl: Double = 38
     
     /// what should the x-axis start with then showing the basal render?
-    static let minimumChartValueInMgdlWithBasal: Double = -30
+    static let minimumChartValueInMgdlWithBasal: Double = -20
     
     /// if there's no readings to show with value higher than the maximum in this array, then this array will determine the maximum possible value in the chart, in mgdl
     static let initialGlucoseValueRangeInMgDl = [50.0, 100.0, 150.0, 200.0]
@@ -191,7 +191,7 @@ enum ConstantsGlucoseChart {
     static let basalRateFillTreatmentColor = basalRateTreatmentLineColor.withAlphaComponent(0.4)
     
     /// the amount of days we should use to calculate the max basal rate to allow scaling. It should be enough to allow casual scrolling back 1-2 days without forcing a re-scale
-    static let basalScaleDaysForCalculation: Double = 2
+    static let basalScaleDaysForCalculation: Double = 1
     
     // treatment label font size/color/background
 
