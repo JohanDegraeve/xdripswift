@@ -4,7 +4,11 @@ import UIKit
 
 public class NightscoutSyncManager: NSObject, ObservableObject {
     
-    // MARK: - properties
+    // MARK: - public properties
+    
+    var profile = NightscoutProfile()
+    
+    // MARK: - private properties
     
     /// path for readings and calibrations
     private let nightscoutEntriesPath = "/api/v1/entries"
@@ -65,6 +69,34 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     ///
     /// Must be read/written in main thread !!
     private var nightscoutTreatmentSyncRequired = false
+    
+    /// Must be read/written in main thread !!
+    //private var profileDictionary = ProfileResponse.self
+    
+//    private let iso8601DateFormatter = ISO8601DateFormatter()
+    
+    static let iso8601DateFormatter: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return formatter
+    }()
+    
+    /// dateFormatter to correctly decode the received timestamps into UTC
+    private lazy var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "M/d/yyyy h:mm:ss a"
+        formatter.timeZone = TimeZone(abbreviation: "UTC")
+        return formatter
+    }()
+    
+    /// generic jsonDecoder to format correctly the timestamps
+    private lazy var jsonDecoder: JSONDecoder? = {
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .formatted(dateFormatter)
+        return decoder
+    }()
+    
     
     // MARK: - initializer
     
@@ -495,6 +527,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     ///     - treatmentsToSync : main goal of the function is not to upload, but to download. However the response will be used to verify if it has any of the treatments that has no id yet and also to verify if existing treatments have changed
     private func getLatestTreatmentsNSResponses(treatmentsToSync: [TreatmentEntry], completionHandler: (@escaping (_ result: NightscoutResult) -> Void)) {
         
+        updateProfile()
+        
         trace("in getLatestTreatmentsNSResponses", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
 
         // query for treatments older than maxHoursTreatmentsToDownload
@@ -600,6 +634,135 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         }
         
     }
+    
+    
+    /// check if a new profile update is required, see if the downloaded response is newer than the stored one and then import it if necessary
+    public func updateProfile() {
+        
+        trace("in updateProfile", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+        
+        guard UserDefaults.standard.nightscoutUrl != nil else {
+            trace("    nightscoutUrl is nil", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+            return
+        }
+        
+        // just check in case there is something wrong with the dates (i.e. a phone setting change)
+        // if we detect this then reset the dates back to allow a profile download and overwrite
+        if profile.startDate > Date() || profile.updatedDate > Date() {
+            profile.startDate = .distantPast
+            profile.updatedDate = .distantPast
+        }
+        
+        // only allow the update check to happen if it's been at least 30 seconds since the last one.
+        // no need to update it too much as it doesn't generally change that often.
+        // TODO: using 30 seconds for development. Could probably be increased to once every few minutes for production
+        guard Date().timeIntervalSince(profile.updatedDate) > 30 else {
+            return
+        }
+        
+        Task {
+            do {
+                // download the profile(s) from Nightscout and process only the first one returned (which is always the "current" one)
+                let nsProfileResponse = try await downloadNightscoutProfile().first
+                
+                // check if there is the newly downloaded profile response has an newer date than the stored one
+                // if so, then import it and overwrite the previously stored one
+                if let nsProfileResponse = nsProfileResponse, let nsStartDate = NightscoutSyncManager.iso8601DateFormatter.date(from: nsProfileResponse.startDate) {
+                    if nsStartDate > profile.startDate {
+                        let previousStartDateForLogging = profile.startDate
+                        
+                        profile.startDate = nsStartDate
+                        profile.profileName = nsProfileResponse.defaultProfile
+                        profile.createdAt = NightscoutSyncManager.iso8601DateFormatter.date(from: nsProfileResponse.createdAt) ?? .distantPast
+                        profile.enteredBy = nsProfileResponse.enteredBy ?? ""
+                        profile.updatedDate = .now
+                        
+                        if previousStartDateForLogging == .distantPast {
+                            trace("    in updateProfile, no profile is stored yet. Importing Nightscout profile with date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, profile.startDate.formatted(date: .abbreviated, time: .shortened))
+                        } else {
+                            trace("    in updateProfile, found a newer Nightscout profile. Previous profile date = %{public}@, new profile date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, previousStartDateForLogging.formatted(date: .abbreviated, time: .shortened), profile.startDate.formatted(date: .abbreviated, time: .shortened))
+                        }
+                    } else {
+                        // downloaded profile start date is not newer than the existing profile so ignore it and do nothing
+                        return
+                    }
+                }
+                              
+                // now let's get in and parse out the actual profile data and store it
+                if let nsProfiles = nsProfileResponse?.store as? [String: NightscoutProfileResponse.Profile], let nsProfile = nsProfiles.first?.value {
+                    var basalRates: [NightscoutProfile.TimeValue] = []
+                    var carbRatios: [NightscoutProfile.TimeValue] = []
+                    var sensitivities: [NightscoutProfile.TimeValue] = []
+                    
+                    for basal in nsProfile.basal {
+                        basalRates.append(NightscoutProfile.TimeValue(timeAsSeconds: basal.timeAsSeconds, value: basal.value))
+                    }
+                    
+                    for carbratio in nsProfile.carbratio {
+                        carbRatios.append(NightscoutProfile.TimeValue(timeAsSeconds: carbratio.timeAsSeconds, value: carbratio.value))
+                    }
+                    
+                    for sensitivity in nsProfile.sens {
+                        sensitivities.append(NightscoutProfile.TimeValue(timeAsSeconds: sensitivity.timeAsSeconds, value: sensitivity.value))
+                    }
+                    
+                    profile.basal = basalRates
+                    profile.carbratio = carbRatios
+                    profile.sensitivity = sensitivities
+                    profile.dia = nsProfile.dia
+                    profile.carbsHr = nsProfile.carbsHr
+                    profile.timezone = nsProfile.timezone
+                    profile.isMgDl = nsProfile.units == "mg/dl" ? true : false
+                }
+            } catch let error {
+                // log the error that was thrown. As it doesn't have a specific handler, we'll assume no further actions are needed
+                trace("    in download, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
+                print("NightscoutSyncManager error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    
+    private func downloadNightscoutProfile() async throws -> [NightscoutProfileResponse] {
+        
+        if let nightscoutURL = UserDefaults.standard.nightscoutUrl, let url = URL(string: nightscoutURL), var uRLComponents = URLComponents(url: url.appendingPathComponent(nightscoutProfilePath), resolvingAgainstBaseURL: false) {
+            
+            if UserDefaults.standard.nightscoutPort != 0 {
+                uRLComponents.port = UserDefaults.standard.nightscoutPort
+            }
+            
+            if let url = uRLComponents.url {
+                var request = URLRequest(url: url)
+                request.setValue("application/json", forHTTPHeaderField:"Content-Type")
+                request.setValue("application/json", forHTTPHeaderField:"Accept")
+                
+                // if the API_SECRET is present, then hash it and pass it via http header. If it's missing but there is a token, then send this as plain text to allow the authentication check.
+                if let apiKey = UserDefaults.standard.nightscoutAPIKey {
+                    request.setValue(apiKey.sha1(), forHTTPHeaderField:"api-secret")
+                } else if let token = UserDefaults.standard.nightscoutToken {
+                    request.setValue(token, forHTTPHeaderField:"api-secret")
+                }
+                
+                let (data, response) = try await URLSession.shared.data(for: request)
+                let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+                
+                trace("    in requestProfile, server response status code: %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, statusCode.description)
+                
+                if statusCode == 200 {
+                    // store the current timestamp as a successful server connection with valid login
+                    //UserDefaults.standard.timeStampOfLastFollowerConnection = Date()
+                    
+                    return try decode([NightscoutProfileResponse].self, data: data)
+                }
+                
+                trace("    in requestProfile, unable to process response", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+                
+                throw NightscoutSyncError.decodingError
+            }
+        }
+        throw NightscoutSyncError.decodingError
+    }
+    
     
     // MARK: -- upload to Nightscout
     
@@ -1545,6 +1708,16 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         
     }
     
+    /// generic decoding function for all JSON struct types
+    private func decode<T: Decodable>(_ type: T.Type, data: Data) throws -> T {
+        
+        guard let jsonDecoder = jsonDecoder else {
+            throw NightscoutSyncError.decodingError
+        }
+        
+        return try jsonDecoder.decode(T.self, from: data)
+    }
+    
 }
 
 // MARK: - enum's
@@ -1594,4 +1767,69 @@ fileprivate enum NightscoutResult: Equatable {
         
     }
     
+}
+
+
+/// error throwing types for the follower
+private enum NightscoutSyncError: Error {
+    
+    case generalError
+    case missingCredentials
+    case urlError
+    case decodingError
+    case missingPayLoad
+    
+}
+
+/// make a custom description property to correctly log the error types
+extension NightscoutSyncError: CustomStringConvertible {
+    
+    var description: String {
+        
+        switch self {
+            
+        case .generalError:
+            return "General Error"
+        case .missingCredentials:
+            return "Missing Credentials"
+        case .urlError:
+            return "URL Error"
+        case .decodingError:
+            return "Error decoding JSON response"
+        case .missingPayLoad:
+            return "Either the user id or the authentication payload was missing or invalid"
+            
+        }
+        
+    }
+    
+}
+
+
+
+public extension Dictionary {
+    
+    func printAsJSON() {
+        if let theJSONData = try? JSONSerialization.data(withJSONObject: self, options: .prettyPrinted),
+            let theJSONText = String(data: theJSONData, encoding: String.Encoding.ascii) {
+            print("\(theJSONText)")
+        }
+    }
+}
+
+
+extension Data {
+    
+    func printAsJSON() {
+        if let theJSONData = try? JSONSerialization.jsonObject(with: self, options: []) as? NSDictionary {
+            var swiftDict: [String: Any] = [:]
+            for key in theJSONData.allKeys {
+                let stringKey = key as? String
+                if let key = stringKey, let keyValue = theJSONData.value(forKey: key) {
+                    swiftDict[key] = keyValue
+                }
+            }
+            swiftDict.printAsJSON()
+        }
+    }
 }
