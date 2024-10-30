@@ -10,6 +10,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     // MARK: - private properties
     
+    /// set the shared userdefaults 
+    private let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName)
+    
     /// path for readings and calibrations
     private let nightscoutEntriesPath = "/api/v1/entries"
     
@@ -70,11 +73,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// Must be read/written in main thread !!
     private var nightscoutTreatmentSyncRequired = false
     
-    /// Must be read/written in main thread !!
-    //private var profileDictionary = ProfileResponse.self
-    
-//    private let iso8601DateFormatter = ISO8601DateFormatter()
-    
     static let iso8601DateFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -115,6 +113,12 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
 		self.treatmentEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
         
         super.init()
+        
+        // let's try and import the nightscout profile data if stored in userdefaults
+        // this is useful as then we don't have to wait for it to download before displaying it
+        if let profileData = sharedUserDefaults?.object(forKey: "nightscoutProfile") as? Data, let nightscoutProfile = try? JSONDecoder().decode(NightscoutProfile.self, from: profileData) {
+            profile = nightscoutProfile
+        }
         
         // add observers for nightscout settings which may require testing and/or start upload
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutAPIKey.rawValue, options: .new, context: nil)
@@ -656,63 +660,66 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         // only allow the update check to happen if it's been at least 30 seconds since the last one.
         // no need to update it too much as it doesn't generally change that often.
         // TODO: using 30 seconds for development. Could probably be increased to once every few minutes for production
-        guard Date().timeIntervalSince(profile.updatedDate) > 30 else {
+        if Date().timeIntervalSince(profile.updatedDate) < 30 {
             return
         }
         
         Task {
             do {
                 // download the profile(s) from Nightscout and process only the first one returned (which is always the "current" one)
-                let nsProfileResponse = try await downloadNightscoutProfile().first
+                //let nsProfileResponse = try await downloadNightscoutProfile().first
                 
                 // check if there is the newly downloaded profile response has an newer date than the stored one
                 // if so, then import it and overwrite the previously stored one
-                if let nsProfileResponse = nsProfileResponse, let nsStartDate = NightscoutSyncManager.iso8601DateFormatter.date(from: nsProfileResponse.startDate) {
-                    if nsStartDate > profile.startDate {
-                        let previousStartDateForLogging = profile.startDate
-                        
-                        profile.startDate = nsStartDate
-                        profile.profileName = nsProfileResponse.defaultProfile
-                        profile.createdAt = NightscoutSyncManager.iso8601DateFormatter.date(from: nsProfileResponse.createdAt) ?? .distantPast
-                        profile.enteredBy = nsProfileResponse.enteredBy ?? ""
-                        profile.updatedDate = .now
-                        
-                        if previousStartDateForLogging == .distantPast {
+                if let profileResponse = try await downloadNightscoutProfile().first, let newStartDate = NightscoutSyncManager.iso8601DateFormatter.date(from: profileResponse.startDate) {
+                    if newStartDate > profile.startDate {                        
+                        if profile.startDate == .distantPast {
                             trace("    in updateProfile, no profile is stored yet. Importing Nightscout profile with date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, profile.startDate.formatted(date: .abbreviated, time: .shortened))
                         } else {
-                            trace("    in updateProfile, found a newer Nightscout profile. Previous profile date = %{public}@, new profile date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, previousStartDateForLogging.formatted(date: .abbreviated, time: .shortened), profile.startDate.formatted(date: .abbreviated, time: .shortened))
+                            trace("    in updateProfile, found a newer Nightscout profile online. Previous profile date = %{public}@, new profile date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, profile.startDate.formatted(date: .abbreviated, time: .shortened), newStartDate.formatted(date: .abbreviated, time: .shortened))
                         }
+                        
+                        profile.startDate = newStartDate
+                        profile.profileName = profileResponse.defaultProfile
+                        profile.createdAt = NightscoutSyncManager.iso8601DateFormatter.date(from: profileResponse.createdAt) ?? .distantPast
+                        profile.enteredBy = profileResponse.enteredBy ?? ""
+                        profile.updatedDate = .now
                     } else {
                         // downloaded profile start date is not newer than the existing profile so ignore it and do nothing
                         return
                     }
-                }
-                              
-                // now let's get in and parse out the actual profile data and store it
-                if let nsProfiles = nsProfileResponse?.store as? [String: NightscoutProfileResponse.Profile], let nsProfile = nsProfiles.first?.value {
-                    var basalRates: [NightscoutProfile.TimeValue] = []
-                    var carbRatios: [NightscoutProfile.TimeValue] = []
-                    var sensitivities: [NightscoutProfile.TimeValue] = []
                     
-                    for basal in nsProfile.basal {
-                        basalRates.append(NightscoutProfile.TimeValue(timeAsSeconds: basal.timeAsSeconds, value: basal.value))
+                    if let newProfile = profileResponse.store.first?.value {
+                        var basalRates: [NightscoutProfile.TimeValue] = []
+                        var carbRatios: [NightscoutProfile.TimeValue] = []
+                        var sensitivities: [NightscoutProfile.TimeValue] = []
+                        
+                        for basal in newProfile.basal {
+                            basalRates.append(NightscoutProfile.TimeValue(timeAsSecondsFromMidnight: basal.timeAsSeconds, value: basal.value))
+                        }
+                        
+                        for carbratio in newProfile.carbratio {
+                            carbRatios.append(NightscoutProfile.TimeValue(timeAsSecondsFromMidnight: carbratio.timeAsSeconds, value: carbratio.value))
+                        }
+                        
+                        for sensitivity in newProfile.sens {
+                            sensitivities.append(NightscoutProfile.TimeValue(timeAsSecondsFromMidnight: sensitivity.timeAsSeconds, value: sensitivity.value))
+                        }
+                        
+                        profile.basal = basalRates
+                        profile.carbratio = carbRatios
+                        profile.sensitivity = sensitivities
+                        profile.dia = newProfile.dia
+                        profile.carbsHr = newProfile.carbsHr
+                        profile.timezone = newProfile.timezone
+                        profile.isMgDl = newProfile.units == "mg/dl" ? true : false
+                        
+                        // now it's updated store the profile in userdefaults so that
+                        // we can quickly access it again when the app is reopened
+                        if let profileData = try? JSONEncoder().encode(profile) {
+                            UserDefaults.standard.nightscoutProfile = profileData
+                        }
                     }
-                    
-                    for carbratio in nsProfile.carbratio {
-                        carbRatios.append(NightscoutProfile.TimeValue(timeAsSeconds: carbratio.timeAsSeconds, value: carbratio.value))
-                    }
-                    
-                    for sensitivity in nsProfile.sens {
-                        sensitivities.append(NightscoutProfile.TimeValue(timeAsSeconds: sensitivity.timeAsSeconds, value: sensitivity.value))
-                    }
-                    
-                    profile.basal = basalRates
-                    profile.carbratio = carbRatios
-                    profile.sensitivity = sensitivities
-                    profile.dia = nsProfile.dia
-                    profile.carbsHr = nsProfile.carbsHr
-                    profile.timezone = nsProfile.timezone
-                    profile.isMgDl = nsProfile.units == "mg/dl" ? true : false
                 }
             } catch let error {
                 // log the error that was thrown. As it doesn't have a specific handler, we'll assume no further actions are needed
@@ -749,9 +756,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 trace("    in requestProfile, server response status code: %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, statusCode.description)
                 
                 if statusCode == 200 {
-                    // store the current timestamp as a successful server connection with valid login
-                    //UserDefaults.standard.timeStampOfLastFollowerConnection = Date()
-                    
                     return try decode([NightscoutProfileResponse].self, data: data)
                 }
                 

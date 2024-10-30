@@ -1228,7 +1228,7 @@ final class RootViewController: UIViewController, ObservableObject {
         contactImageManager = ContactImageManager(coreDataManager: coreDataManager)
 
         // initialize glucoseChartManager
-        glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager)
+        glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager!)
         
         // initialize glucoseMiniChartManager
         glucoseMiniChartManager = GlucoseMiniChartManager(coreDataManager: coreDataManager)

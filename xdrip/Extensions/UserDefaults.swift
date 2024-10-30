@@ -198,6 +198,9 @@ extension UserDefaults {
         /// value will be increased with 1 each time there's an update
         case nightscoutTreatmentsUpdateCounter = "nightscoutTreatmentsUpdateCounter"
         
+        /// Nightscout profile stored as a JSON data object
+        case nightscoutProfile = "nightscoutProfile"
+        
         // Dexcom Share
         
         /// should readings be uploaded to Dexcom share
@@ -1411,6 +1414,20 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.nightscoutTreatmentsUpdateCounter.rawValue)
+        }
+    }
+    
+    /// Nightscout profile stored as a JSON data object
+    var nightscoutProfile: Data? {
+        get {
+            if let data = object(forKey: Key.nightscoutProfile.rawValue) as? Data {
+                return data
+            } else {
+                return nil
+            }
+        }
+        set {
+            set(newValue, forKey: Key.nightscoutProfile.rawValue)
         }
     }
 

@@ -8,88 +8,94 @@
 
 import Foundation
 
-extension NightscoutSyncManager {
-    
-    // MARK: Internal Profile
-    
-    /// Struct to hold internal Nightscout profile
-    struct NightscoutProfile: Codable {
-        struct TimeValue: Codable {
-            var timeAsSeconds: Int
-            var value: Double
-        }
+// MARK: Internal Profile
+
+/// Struct to hold internal Nightscout profile
+struct NightscoutProfile: Codable {
+    struct TimeValue: Codable {
+        var timeAsSecondsFromMidnight: Int
+        var value: Double
         
-        var basal: [TimeValue]?
-        var carbratio: [TimeValue]?
-        var sensitivity: [TimeValue]?
-        var carbsHr: Int? = 0
-        var timezone: String = ""
-        var dia: Int = 0
-        var isMgDl: Bool = true
-        var startDate: Date = .distantPast
-        var createdAt: Date = .distantPast
-        var updatedDate: Date = .distantPast
-        var profileName: String = ""
-        var enteredBy: String? = ""
+        func toDate(date: Date) -> Date {
+            return date.addingTimeInterval(Double(timeAsSecondsFromMidnight))
+        }
     }
     
-    // MARK: External Nightscout Profile
+    var basal: [TimeValue]?
+    var carbratio: [TimeValue]?
+    var sensitivity: [TimeValue]?
+    var carbsHr: Int? = 0
+    var timezone: String = ""
+    var dia: Int = 0
+    var isMgDl: Bool = true
+    var startDate: Date = .distantPast
+    var createdAt: Date = .distantPast
+    var updatedDate: Date = .distantPast
+    var profileName: String = ""
+    var enteredBy: String? = ""
     
-    /// Struct to decode Nightscout profile response
-    struct NightscoutProfileResponse: Codable {
-        struct Profile: Codable {
-            struct ProfileEntry: Codable {
-                let time: String
-                let value: Double
-                let timeAsSeconds: Int
-            }
-            
-            let basal: [ProfileEntry]
-            let carbratio: [ProfileEntry]
-            let sens: [ProfileEntry]
-            let targetLow: [ProfileEntry]
-            let targetHigh: [ProfileEntry]
-            let carbsHr: Int?
-            let timezone: String
-            let dia: Int
-            let units: String
-            let delay: Int?
-            
-            private enum CodingKeys: String, CodingKey {
-                case carbratio
-                case sens
-                case carbsHr = "carbs_hr"
-                case targetHigh = "target_high"
-                case timezone
-                case dia
-                case targetLow = "target_low"
-                case basal
-                case units
-                case delay
-            }
+    // return true if data has been written after initialization
+    func profileHasData() -> Bool {
+        return updatedDate != .distantPast
+    }
+}
+
+
+// MARK: External downloaded Nightscout Profile
+
+/// Struct to decode Nightscout profile response
+struct NightscoutProfileResponse: Codable {
+    struct Profile: Codable {
+        struct ProfileEntry: Codable {
+            let time: String
+            let value: Double
+            let timeAsSeconds: Int
         }
         
-        let id: String
-        let store: [String: Profile]
-        let units: String?
-        let defaultProfile: String
-        let startDate: String
-        let createdAt: String
-        let mills: Int?
-        let enteredBy: String?
-        //    let date: Int?
+        let basal: [ProfileEntry]
+        let carbratio: [ProfileEntry]
+        let sens: [ProfileEntry]
+        let targetLow: [ProfileEntry]
+        let targetHigh: [ProfileEntry]
+        let carbsHr: Int?
+        let timezone: String
+        let dia: Int
+        let units: String
+        let delay: Int?
         
         private enum CodingKeys: String, CodingKey {
-            case id = "_id"
+            case carbratio
+            case sens
+            case carbsHr = "carbs_hr"
+            case targetHigh = "target_high"
+            case timezone
+            case dia
+            case targetLow = "target_low"
+            case basal
             case units
-            case startDate
-            case defaultProfile
-            case mills
-            case enteredBy
-            case store
-            case createdAt = "created_at"
-            //        case date
+            case delay
         }
     }
     
+    let id: String
+    let store: [String: Profile]
+    let units: String?
+    let defaultProfile: String
+    let startDate: String
+    let createdAt: String
+    let mills: Int?
+    let enteredBy: String?
+    //    let date: Int?
+    
+    private enum CodingKeys: String, CodingKey {
+        case id = "_id"
+        case units
+        case startDate
+        case defaultProfile
+        case mills
+        case enteredBy
+        case store
+        case createdAt = "created_at"
+        //        case date
+    }
 }

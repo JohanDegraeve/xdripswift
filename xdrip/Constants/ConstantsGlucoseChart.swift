@@ -10,7 +10,11 @@ enum ConstantsGlucoseChart {
     static let absoluteMinimumChartValueInMgdl: Double = 38
     
     /// what should the x-axis start with then showing the basal render?
-    static let minimumChartValueInMgdlWithBasal: Double = -20
+    static let minimumChartValueInMgdlWithBasal: Double = -10
+    
+    /// what should the x-axis start with then showing the basal render whilst in the 24 hour chart?
+    /// we should define a much higher "minimum value" to match the X-Y propor`
+    static let minimumChartValueInMgdlWithBasal24hrChart: Double = 10
     
     /// if there's no readings to show with value higher than the maximum in this array, then this array will determine the maximum possible value in the chart, in mgdl
     static let initialGlucoseValueRangeInMgDl = [50.0, 100.0, 150.0, 200.0]
@@ -178,14 +182,20 @@ enum ConstantsGlucoseChart {
     
     // basal rate treatment color
     
-    /// bolus treament marker colour
+    /// scheduled basal rate line color
+    static let scheduledBasalRateTreatmentLineColor = UIColor.systemMint
+    
+    /// scheduled basal rate line width
+    static let scheduledBasalRateTreatmentLineWidth: CGFloat = 1
+    
+    /// bolus treament color
     static let basalTreatmentColor = UIColor.systemMint
     
     /// basal rate line color
-    static let basalRateTreatmentLineColor = UIColor.systemMint
+    static let basalRateTreatmentLineColor = UIColor.systemMint.withAlphaComponent(0.7)
     
     /// basal rate line width
-    static let basalRateTreatmentLineWidth: CGFloat = 1
+    static let basalRateTreatmentLineWidth: CGFloat = 0.8
     
     /// basal rate fill color
     static let basalRateFillTreatmentColor = basalRateTreatmentLineColor.withAlphaComponent(0.4)
