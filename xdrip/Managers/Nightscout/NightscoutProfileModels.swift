@@ -35,7 +35,7 @@ struct NightscoutProfile: Codable {
     var enteredBy: String? = ""
     
     // return true if data has been written after initialization
-    func profileHasData() -> Bool {
+    func hasData() -> Bool {
         return updatedDate != .distantPast
     }
 }

@@ -201,6 +201,9 @@ extension UserDefaults {
         /// Nightscout profile stored as a JSON data object
         case nightscoutProfile = "nightscoutProfile"
         
+        /// Nightscout deviceStatus stored as a JSON data object
+        case nightscoutDeviceStatus = "nightscoutDeviceStatus"
+        
         // Dexcom Share
         
         /// should readings be uploaded to Dexcom share
@@ -1428,6 +1431,20 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.nightscoutProfile.rawValue)
+        }
+    }
+    
+    /// Nightscout device status stored as a JSON data object
+    var nightscoutDeviceStatus: Data? {
+        get {
+            if let data = object(forKey: Key.nightscoutDeviceStatus.rawValue) as? Data {
+                return data
+            } else {
+                return nil
+            }
+        }
+        set {
+            set(newValue, forKey: Key.nightscoutDeviceStatus.rawValue)
         }
     }
 

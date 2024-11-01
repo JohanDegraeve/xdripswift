@@ -1239,7 +1239,7 @@ public class GlucoseChartManager {
             var scheduledBasalRatesArray = [(date: Date, value: Double)]()
             
             // check first if there is any basal rate data in the Nightscout profile
-            if let scheduledBasalRatesFromProfile = nightscoutSyncManager?.profile.basal, let profileHasData = nightscoutSyncManager?.profile.profileHasData(), profileHasData {
+            if let scheduledBasalRatesFromProfile = nightscoutSyncManager?.profile.basal, let profileHasData = nightscoutSyncManager?.profile.hasData(), profileHasData {
                 // let's create an array with the rate times converted to start on the startDate of the chart
                 let startDateAtMidnight = startDate.toMidnight()
                 

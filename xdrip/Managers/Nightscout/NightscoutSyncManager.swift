@@ -8,6 +8,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     var profile = NightscoutProfile()
     
+    var deviceStatus = NightscoutDeviceStatus()
+    
     // MARK: - private properties
     
     /// set the shared userdefaults 
@@ -115,9 +117,13 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         super.init()
         
         // let's try and import the nightscout profile data if stored in userdefaults
-        // this is useful as then we don't have to wait for it to download before displaying it
         if let profileData = sharedUserDefaults?.object(forKey: "nightscoutProfile") as? Data, let nightscoutProfile = try? JSONDecoder().decode(NightscoutProfile.self, from: profileData) {
             profile = nightscoutProfile
+        }
+        
+        // let's try and import the nightscout device status data if stored in userdefaults
+        if let deviceStatusData = sharedUserDefaults?.object(forKey: "nightscoutDeviceStatus") as? Data, let nightscoutDeviceStatus = try? JSONDecoder().decode(NightscoutDeviceStatus.self, from: deviceStatusData) {
+            deviceStatus = nightscoutDeviceStatus
         }
         
         // add observers for nightscout settings which may require testing and/or start upload
@@ -201,7 +207,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         
     }
     
-    /// synchronize treatments with Nightscout
+    /// synchronize all treatments and other information with Nightscout
     private func syncWithNightscout() {
         
         // check that Nightscout is enabled
@@ -520,6 +526,189 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         }
     }
     
+    /// check if a new profile update is required, see if the downloaded response is newer than the stored one and then import it if necessary
+    private func updateProfile() {
+        
+        trace("in updateProfile", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+        
+        guard UserDefaults.standard.nightscoutUrl != nil else {
+            trace("    nightscoutUrl is nil", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+            return
+        }
+        
+        // just check in case there is something wrong with the dates (i.e. a phone setting change)
+        // if we detect this then reset the dates back to force a profile download and overwrite
+        if profile.startDate > Date() || profile.updatedDate > Date() {
+            profile.startDate = .distantPast
+            profile.updatedDate = .distantPast
+            profile.createdAt = .distantPast
+        }
+        
+        // only allow the update check to happen if it's been at least 30 seconds since the last one.
+        // no need to update it too much as it doesn't generally change that often.
+        // TODO: using 30 seconds for development. Could probably be increased to once every few minutes for production
+        if Date().timeIntervalSince(profile.updatedDate) < 30 {
+            return
+        }
+        
+        Task {
+            // download the profile(s) from Nightscout and process only the first one returned (which is always the "current" one)
+            do {
+                // check if there is the newly downloaded profile response has an newer date than the stored one
+                // if so, then import it and overwrite the previously stored one
+                if let profileResponse = try await getNightscoutProfile().first, let newStartDate = NightscoutSyncManager.iso8601DateFormatter.date(from: profileResponse.startDate) {
+                    if newStartDate > profile.startDate {
+                        if profile.startDate == .distantPast {
+                            trace("    in updateProfile, no profile is stored yet. Importing Nightscout profile with date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, profile.startDate.formatted(date: .abbreviated, time: .shortened))
+                        } else {
+                            trace("    in updateProfile, found a newer Nightscout profile online with date = %{public}@, old profile date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, newStartDate.formatted(date: .abbreviated, time: .shortened), profile.startDate.formatted(date: .abbreviated, time: .shortened))
+                        }
+                        
+                        profile.startDate = newStartDate
+                        profile.profileName = profileResponse.defaultProfile
+                        profile.createdAt = NightscoutSyncManager.iso8601DateFormatter.date(from: profileResponse.createdAt) ?? .distantPast
+                        profile.enteredBy = profileResponse.enteredBy ?? ""
+                        profile.updatedDate = .now
+                    } else {
+                        // downloaded profile start date is not newer than the existing profile so ignore it and do nothing
+                        return
+                    }
+                    
+                    if let newProfile = profileResponse.store.first?.value {
+                        var basalRates: [NightscoutProfile.TimeValue] = []
+                        var carbRatios: [NightscoutProfile.TimeValue] = []
+                        var sensitivities: [NightscoutProfile.TimeValue] = []
+                        
+                        for basal in newProfile.basal {
+                            basalRates.append(NightscoutProfile.TimeValue(timeAsSecondsFromMidnight: basal.timeAsSeconds, value: basal.value))
+                        }
+                        
+                        for carbratio in newProfile.carbratio {
+                            carbRatios.append(NightscoutProfile.TimeValue(timeAsSecondsFromMidnight: carbratio.timeAsSeconds, value: carbratio.value))
+                        }
+                        
+                        for sensitivity in newProfile.sens {
+                            sensitivities.append(NightscoutProfile.TimeValue(timeAsSecondsFromMidnight: sensitivity.timeAsSeconds, value: sensitivity.value))
+                        }
+                        
+                        profile.basal = basalRates
+                        profile.carbratio = carbRatios
+                        profile.sensitivity = sensitivities
+                        profile.dia = newProfile.dia
+                        profile.carbsHr = newProfile.carbsHr
+                        profile.timezone = newProfile.timezone
+                        profile.isMgDl = newProfile.units == "mg/dl" ? true : false
+                        
+                        // now it's updated store the profile in userdefaults so that
+                        // we can quickly access it again when the app is reopened
+                        if let profileData = try? JSONEncoder().encode(profile) {
+                            UserDefaults.standard.nightscoutProfile = profileData
+                        }
+                    }
+                }
+            } catch let error {
+                // log the error that was thrown. As it doesn't have a specific handler, we'll assume no further actions are needed
+                trace("    in updateProfile, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
+            }
+        }
+    }
+    
+    /// check if a new deviceStatus update is required, see if the downloaded response is newer than the stored one and then import it if necessary
+    private func updateDeviceStatus() {
+        
+        trace("in updateDeviceStatus", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+        
+        guard UserDefaults.standard.nightscoutUrl != nil else {
+            trace("    nightscoutUrl is nil", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+            return
+        }
+        
+        // just check in case there is something wrong with the dates (i.e. a phone setting change)
+        // if we detect this then reset the dates back to force a deviceStatus download and overwrite
+        if deviceStatus.createdAt > Date() || deviceStatus.updatedDate > Date() {
+            deviceStatus.createdAt = .distantPast
+            deviceStatus.updatedDate = .distantPast
+        }
+        
+        // only allow the update check to happen if it's been at least 30 seconds since the last one.
+        // no need to update it too much as it doesn't generally change that often.
+        // TODO: using 30 seconds for development. Could probably be increased to once every few minutes for production
+        if Date().timeIntervalSince(deviceStatus.updatedDate) < 30 {
+            return
+        }
+        
+        Task {
+            // download the profile(s) from Nightscout and process only the first one returned (which is always the "current" one)
+            do {
+                // check if there is the newly downloaded profile response has an newer date than the stored one
+                // if so, then import it and overwrite the previously stored one
+                let deviceStatusResponseArray = try await getNightscoutDeviceStatusTrio()
+                
+                let firstIndexWithOpenAPSData = deviceStatusResponseArray.firstIndex(where: {$0.openAPS?.enacted != nil} )
+                
+                let deviceStatusResponse = deviceStatusResponseArray[firstIndexWithOpenAPSData ?? 0]
+                
+                if let newCreatedAtDate = NightscoutSyncManager.iso8601DateFormatter.date(from: deviceStatusResponse.createdAt ?? "") {
+                    if newCreatedAtDate > deviceStatus.createdAt {
+                        if deviceStatus.createdAt == .distantPast {
+                            trace("    in updateDeviceStatus, no device status is stored yet. Importing Nightscout device status with date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened))
+                        } else {
+                            trace("    in updateDeviceStatus, found a newer Nightscout device status online with date = %{public}@, old profile date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, newCreatedAtDate.formatted(date: .abbreviated, time: .shortened), deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened))
+                        }
+                        
+                        deviceStatus.updatedDate = .now
+                        deviceStatus.createdAt = NightscoutSyncManager.iso8601DateFormatter.date(from: deviceStatusResponse.createdAt ?? "") ?? .distantPast
+                        deviceStatus.device = deviceStatusResponse.device
+                        deviceStatus.id = deviceStatusResponse.id ?? ""
+                        deviceStatus.mills = deviceStatusResponse.mills ?? 0
+                        deviceStatus.utcOffset = deviceStatusResponse.utcOffset ?? 0
+                        
+                        if let enacted = deviceStatusResponse.openAPS?.enacted {
+                            deviceStatus.cob = enacted.cob
+                            deviceStatus.currentTarget = enacted.currentTarget
+                            deviceStatus.duration = enacted.duration ?? 0
+                            deviceStatus.eventualBG = enacted.eventualBG ?? 0
+                            deviceStatus.iob = enacted.iob
+                            deviceStatus.isf = enacted.isf
+                            deviceStatus.insulinReq = enacted.insulinReq
+                            deviceStatus.rate = enacted.rate ?? 0
+                            deviceStatus.reason = enacted.reason ?? ""
+                            deviceStatus.reservoir = enacted.reservoir ?? 0
+                            deviceStatus.sensitivityRatio = enacted.sensitivityRatio ?? 0
+                            deviceStatus.tdd = enacted.tdd ?? 0
+                            deviceStatus.timestamp = NightscoutSyncManager.iso8601DateFormatter.date(from: enacted.timestamp ?? "")
+                        }
+                        
+                        if let pump = deviceStatusResponse.pump {
+                            deviceStatus.pumpBatteryPercent = pump.battery?.percent ?? 0
+                            deviceStatus.pumpClock = NightscoutSyncManager.iso8601DateFormatter.date(from: pump.clock ?? "")
+                            
+                            deviceStatus.pumpIsBolusing = pump.status?.bolusing
+                            deviceStatus.pumpStatus = pump.status?.status
+                            deviceStatus.pumpIsSuspended = pump.status?.suspended
+                            deviceStatus.pumpStatusTimestamp = pump.status?.timestamp
+                        }
+                        
+                        if let uploaderBattery = deviceStatusResponse.uploader {
+                            deviceStatus.uploaderBattery = uploaderBattery.battery
+                        }
+                        
+                        // now it's updated store the deviceStatus in userdefaults
+                        if let deviceStatusData = try? JSONEncoder().encode(deviceStatus) {
+                            UserDefaults.standard.nightscoutDeviceStatus = deviceStatusData
+                        }
+                    } else {
+                        // downloaded profile start date is not newer than the existing profile so ignore it and do nothing
+                        return
+                    }
+                }
+            } catch let error {
+                // log the error that was thrown. As it doesn't have a specific handler, we'll assume no further actions are needed
+                trace("    in updateDeviceStatus, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
+            }
+        }
+    }
+    
     
     // MARK: - private Nightscout functions
     
@@ -532,6 +721,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     private func getLatestTreatmentsNSResponses(treatmentsToSync: [TreatmentEntry], completionHandler: (@escaping (_ result: NightscoutResult) -> Void)) {
         
         updateProfile()
+        
+        updateDeviceStatus()
         
         trace("in getLatestTreatmentsNSResponses", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
 
@@ -640,97 +831,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     }
     
     
-    /// check if a new profile update is required, see if the downloaded response is newer than the stored one and then import it if necessary
-    public func updateProfile() {
-        
-        trace("in updateProfile", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
-        
-        guard UserDefaults.standard.nightscoutUrl != nil else {
-            trace("    nightscoutUrl is nil", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
-            return
-        }
-        
-        // just check in case there is something wrong with the dates (i.e. a phone setting change)
-        // if we detect this then reset the dates back to allow a profile download and overwrite
-        if profile.startDate > Date() || profile.updatedDate > Date() {
-            profile.startDate = .distantPast
-            profile.updatedDate = .distantPast
-        }
-        
-        // only allow the update check to happen if it's been at least 30 seconds since the last one.
-        // no need to update it too much as it doesn't generally change that often.
-        // TODO: using 30 seconds for development. Could probably be increased to once every few minutes for production
-        if Date().timeIntervalSince(profile.updatedDate) < 30 {
-            return
-        }
-        
-        Task {
-            do {
-                // download the profile(s) from Nightscout and process only the first one returned (which is always the "current" one)
-                //let nsProfileResponse = try await downloadNightscoutProfile().first
-                
-                // check if there is the newly downloaded profile response has an newer date than the stored one
-                // if so, then import it and overwrite the previously stored one
-                if let profileResponse = try await downloadNightscoutProfile().first, let newStartDate = NightscoutSyncManager.iso8601DateFormatter.date(from: profileResponse.startDate) {
-                    if newStartDate > profile.startDate {                        
-                        if profile.startDate == .distantPast {
-                            trace("    in updateProfile, no profile is stored yet. Importing Nightscout profile with date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, profile.startDate.formatted(date: .abbreviated, time: .shortened))
-                        } else {
-                            trace("    in updateProfile, found a newer Nightscout profile online. Previous profile date = %{public}@, new profile date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, profile.startDate.formatted(date: .abbreviated, time: .shortened), newStartDate.formatted(date: .abbreviated, time: .shortened))
-                        }
-                        
-                        profile.startDate = newStartDate
-                        profile.profileName = profileResponse.defaultProfile
-                        profile.createdAt = NightscoutSyncManager.iso8601DateFormatter.date(from: profileResponse.createdAt) ?? .distantPast
-                        profile.enteredBy = profileResponse.enteredBy ?? ""
-                        profile.updatedDate = .now
-                    } else {
-                        // downloaded profile start date is not newer than the existing profile so ignore it and do nothing
-                        return
-                    }
-                    
-                    if let newProfile = profileResponse.store.first?.value {
-                        var basalRates: [NightscoutProfile.TimeValue] = []
-                        var carbRatios: [NightscoutProfile.TimeValue] = []
-                        var sensitivities: [NightscoutProfile.TimeValue] = []
-                        
-                        for basal in newProfile.basal {
-                            basalRates.append(NightscoutProfile.TimeValue(timeAsSecondsFromMidnight: basal.timeAsSeconds, value: basal.value))
-                        }
-                        
-                        for carbratio in newProfile.carbratio {
-                            carbRatios.append(NightscoutProfile.TimeValue(timeAsSecondsFromMidnight: carbratio.timeAsSeconds, value: carbratio.value))
-                        }
-                        
-                        for sensitivity in newProfile.sens {
-                            sensitivities.append(NightscoutProfile.TimeValue(timeAsSecondsFromMidnight: sensitivity.timeAsSeconds, value: sensitivity.value))
-                        }
-                        
-                        profile.basal = basalRates
-                        profile.carbratio = carbRatios
-                        profile.sensitivity = sensitivities
-                        profile.dia = newProfile.dia
-                        profile.carbsHr = newProfile.carbsHr
-                        profile.timezone = newProfile.timezone
-                        profile.isMgDl = newProfile.units == "mg/dl" ? true : false
-                        
-                        // now it's updated store the profile in userdefaults so that
-                        // we can quickly access it again when the app is reopened
-                        if let profileData = try? JSONEncoder().encode(profile) {
-                            UserDefaults.standard.nightscoutProfile = profileData
-                        }
-                    }
-                }
-            } catch let error {
-                // log the error that was thrown. As it doesn't have a specific handler, we'll assume no further actions are needed
-                trace("    in download, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
-                print("NightscoutSyncManager error: \(error.localizedDescription)")
-            }
-        }
-    }
-    
-    
-    private func downloadNightscoutProfile() async throws -> [NightscoutProfileResponse] {
+    private func getNightscoutProfile() async throws -> [NightscoutProfileResponse] {
         
         if let nightscoutURL = UserDefaults.standard.nightscoutUrl, let url = URL(string: nightscoutURL), var uRLComponents = URLComponents(url: url.appendingPathComponent(nightscoutProfilePath), resolvingAgainstBaseURL: false) {
             
@@ -753,13 +854,51 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 let (data, response) = try await URLSession.shared.data(for: request)
                 let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
                 
-                trace("    in requestProfile, server response status code: %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, statusCode.description)
+                trace("    in getNightscoutProfile, server response status code: %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, statusCode.description)
                 
                 if statusCode == 200 {
                     return try decode([NightscoutProfileResponse].self, data: data)
                 }
                 
-                trace("    in requestProfile, unable to process response", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+                trace("    in getNightscoutProfile, unable to process response", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+                
+                throw NightscoutSyncError.decodingError
+            }
+        }
+        throw NightscoutSyncError.decodingError
+    }
+    
+    
+    private func getNightscoutDeviceStatusTrio() async throws -> [NightscoutDeviceStatusTrioResponse] {
+        
+        if let nightscoutURL = UserDefaults.standard.nightscoutUrl, let url = URL(string: nightscoutURL), var uRLComponents = URLComponents(url: url.appendingPathComponent(nightscoutDeviceStatusPath), resolvingAgainstBaseURL: false) {
+            
+            if UserDefaults.standard.nightscoutPort != 0 {
+                uRLComponents.port = UserDefaults.standard.nightscoutPort
+            }
+            
+            if let url = uRLComponents.url {
+                var request = URLRequest(url: url)
+                request.setValue("application/json", forHTTPHeaderField:"Content-Type")
+                request.setValue("application/json", forHTTPHeaderField:"Accept")
+                
+                // if the API_SECRET is present, then hash it and pass it via http header. If it's missing but there is a token, then send this as plain text to allow the authentication check.
+                if let apiKey = UserDefaults.standard.nightscoutAPIKey {
+                    request.setValue(apiKey.sha1(), forHTTPHeaderField:"api-secret")
+                } else if let token = UserDefaults.standard.nightscoutToken {
+                    request.setValue(token, forHTTPHeaderField:"api-secret")
+                }
+                
+                let (data, response) = try await URLSession.shared.data(for: request)
+                let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+                
+                trace("    in getNightscoutDeviceStatusTrio, server response status code: %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, statusCode.description)
+                
+                if statusCode == 200 {
+                    return try decode([NightscoutDeviceStatusTrioResponse].self, data: data)
+                }
+                
+                trace("    in getNightscoutDeviceStatusTrio, unable to process response", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
                 
                 throw NightscoutSyncError.decodingError
             }
