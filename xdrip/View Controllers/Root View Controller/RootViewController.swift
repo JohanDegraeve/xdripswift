@@ -19,6 +19,9 @@ final class RootViewController: UIViewController, ObservableObject {
     
     // MARK: - Properties - Outlets and Actions for buttons and labels in home screen
 
+    // *******************
+    // ***** Toolbar *****
+    // *******************
     @IBOutlet weak var toolbarOutlet: UIToolbar!
     
     @IBOutlet weak var preSnoozeToolbarButtonOutlet: UIBarButtonItem!
@@ -27,7 +30,6 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     @IBOutlet weak var bgReadingsToolbarButtonOutlet: UIBarButtonItem!
-    
     @IBAction func bgReadingsToolbarButtonAction(_ sender: UIBarButtonItem) {
         showBgReadingsView()
     }
@@ -38,62 +40,64 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     @IBOutlet weak var calibrateToolbarButtonOutlet: UIBarButtonItem!
-    
     @IBAction func calibrateToolbarButtonAction(_ sender: UIBarButtonItem) {
-        
         // if this is a transmitter that does not require and is not allowed to be calibrated, then give warning message
         if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), (cgmTransmitter.isWebOOPEnabled() && !cgmTransmitter.overruleIsWebOOPEnabled()) {
-            
             let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.calibrationNotNecessary, actionHandler: nil)
-            
             self.present(alert, animated: true, completion: nil)
-            
         } else {
-            
             trace("calibration : user clicked the calibrate button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-            
             requestCalibration(userRequested: true)
         }
-        
     }
     
-    
     @IBOutlet weak var helpToolbarButtonOutlet: UIBarButtonItem!
-    
     @IBAction func helpToolbarButtonAction(_ sender: UIBarButtonItem) {
-        
-        // get the 2 character language code for the App Locale (i.e. "en", "es", "nl", "fr")
         // get the 2 character language code for the App Locale (i.e. "en", "es", "nl", "fr")
         // if the user has the app in a language other than English and they have the "auto translate" option selected, then load the help pages through Google Translate
         // important to check the the URLs actually exist in ConstansHomeView before trying to open them
         if let languageCode = NSLocale.current.language.languageCode?.identifier, languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
-            
             guard let url = URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode + ConstantsHomeView.onlineHelpURLTranslated2) else { return }
-            
             UIApplication.shared.open(url)
-            
         } else {
-            
-            // so the user is running the app in English
-            // or
-            // NSLocale.current.languageCode returned a nil value
-            // or
-            // they don't want to translate so let's just load it directly
+            // so the user is running the app in English or NSLocale.current.languageCode returned a nil value
+            // or they don't want to translate so let's just load it directly
             guard let url = URL(string: ConstantsHomeView.onlineHelpURL) else { return }
-            
             UIApplication.shared.open(url)
-            
         }
     }
     
     /// outlet for the lock button - it will change text based upon whether they screen is locked or not
     @IBOutlet weak var screenLockToolbarButtonOutlet: UIBarButtonItem!
-    
     /// call the screen lock alert when the button is pressed
     @IBAction func screenLockToolbarButtonAction(_ sender: UIBarButtonItem) {
         screenLockAlert(nightMode: true)
     }
     
+    
+    // **************************
+    // ***** Pump Data View *****
+    // **************************
+    
+    
+    
+    
+    
+    
+    
+    // *******************************
+    // ***** Treatments/AID View *****
+    // *******************************
+    
+    
+    
+    
+    
+    
+    
+    // *****************************
+    // ***** BG and Delta View *****
+    // *****************************
     /// outlet for label that shows how many minutes ago and so on
     @IBOutlet weak var minutesLabelOutlet: UILabel!
     @IBOutlet weak var minutesAgoLabelOutlet: UILabel!
@@ -104,46 +108,45 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// outlet for label that shows the current reading
     @IBOutlet weak var valueLabelOutlet: UILabel!
-    
-    /// outlet for optional patient name to show who is being followed
-    @IBOutlet weak var followerPatientNameLabelOutlet: UILabel!
-    
     @IBAction func valueLabelLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
-        
         valueLabelLongPressed(sender)
-        
     }
     
     
+    // ***************************
+    // ***** Main Chart View *****
+    // ***************************
+    /// outlet for optional patient name to show who is being followed
+    @IBOutlet weak var followerPatientNameLabelOutlet: UILabel!
+        
     /// outlet for chart
     @IBOutlet weak var chartOutlet: BloodGlucoseChartView!
     
+    // ***************************
+    // ***** Mini Chart View *****
+    // ***************************
     /// outlet for mini-chart showing a fixed history of x hours
     @IBOutlet weak var miniChartOutlet: BloodGlucoseChartView!
     @IBOutlet weak var miniChartHoursLabelOutlet: UILabel!
     
     @IBOutlet weak var segmentedControlsView: UIView!
-    
     /// outlets for chart time period selector
     @IBOutlet weak var segmentedControlChartHours: UISegmentedControl!
     
+    /// update the chart period in hours
     @IBAction func chartHoursChanged(_ sender: Any) {
-        
-        // update the chart period in hours
-        switch segmentedControlChartHours.selectedSegmentIndex
-            {
-            case 0:
-                UserDefaults.standard.chartWidthInHours = 3
-            case 1:
-                UserDefaults.standard.chartWidthInHours = 5
-            case 2:
-                UserDefaults.standard.chartWidthInHours = 12
-            case 3:
-                UserDefaults.standard.chartWidthInHours = 24
-            default:
-                break
-            }
-        
+        switch segmentedControlChartHours.selectedSegmentIndex {
+        case 0:
+            UserDefaults.standard.chartWidthInHours = 3
+        case 1:
+            UserDefaults.standard.chartWidthInHours = 5
+        case 2:
+            UserDefaults.standard.chartWidthInHours = 12
+        case 3:
+            UserDefaults.standard.chartWidthInHours = 24
+        default:
+            break
+        }
     }
     
     /// create a view outlet (with the statistics day control inside) so that we can show/hide it as necessary
@@ -151,27 +154,28 @@ final class RootViewController: UIViewController, ObservableObject {
     
     @IBOutlet weak var segmentedControlStatisticsDays: UISegmentedControl!
     
+    /// update the days to use for statistics calculations
     @IBAction func statisticsDaysChanged(_ sender: Any) {
-        
-        // update the days to use for statistics calculations
-        switch segmentedControlStatisticsDays.selectedSegmentIndex
-            {
-            case 0:
-                UserDefaults.standard.daysToUseStatistics = 0
-            case 1:
-                UserDefaults.standard.daysToUseStatistics = 1
-            case 2:
-                UserDefaults.standard.daysToUseStatistics = 7
-            case 3:
-                UserDefaults.standard.daysToUseStatistics = 30
-            case 4:
-                UserDefaults.standard.daysToUseStatistics = 90
-            default:
-                break
-            }
-        
+        switch segmentedControlStatisticsDays.selectedSegmentIndex {
+        case 0:
+            UserDefaults.standard.daysToUseStatistics = 0
+        case 1:
+            UserDefaults.standard.daysToUseStatistics = 1
+        case 2:
+            UserDefaults.standard.daysToUseStatistics = 7
+        case 3:
+            UserDefaults.standard.daysToUseStatistics = 30
+        case 4:
+            UserDefaults.standard.daysToUseStatistics = 90
+        default:
+            break
+        }
     }
-        
+    
+    
+    // ***************************
+    // ***** Statistics View *****
+    // ***************************
     /// outlets for statistics view
     @IBOutlet weak var statisticsView: UIView!
     @IBOutlet weak var pieChartOutlet: PieChart!
@@ -194,15 +198,25 @@ final class RootViewController: UIViewController, ObservableObject {
     @IBOutlet weak var activityMonitorOutlet: UIActivityIndicatorView!
     
     
+    // **********************
+    // ***** Clock View *****
+    // **********************
     /// clock view
     @IBOutlet weak var clockView: UIView!
     @IBOutlet weak var clockLabelOutlet: UILabel!
     
     
+    // ********************************
+    // ***** Sensor Progress View *****
+    // ********************************
     /// sensor progress view - progress view
     @IBOutlet weak var sensorProgressViewOutlet: UIView!
     @IBOutlet weak var sensorProgressOutlet: UIProgressView!
     
+    
+    // ****************************
+    // ***** Data Source View *****
+    // ****************************
     /// data source info view - general info
     @IBOutlet weak var dataSourceViewOutlet: UIView!
     @IBOutlet weak var dataSourceConnectionStatusImage: UIImageView!
@@ -214,149 +228,112 @@ final class RootViewController: UIViewController, ObservableObject {
     /// used to temporarily hide the Nightscout URL from the data source info view
     /// this is to allow a user to make screenshots etc without any personal information
     @IBAction func urlDoubleTapGestureRecognizerAction(_ sender: UITapGestureRecognizer) {
-        
         // make sure we only act on the gesture if we're in Nightscout follower mode (i.e. with the URL visible)
         if !UserDefaults.standard.isMaster && UserDefaults.standard.nightscoutEnabled && UserDefaults.standard.followerDataSourceType == .nightscout && UserDefaults.standard.nightscoutUrl != nil {
-            
             dataSourceSensorMaxAgeOutlet.textColor = .systemRed
             dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.hidingUrlForXSeconds
             
             // wait and then fade out the text
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                
                 // make a animated transition with the label. Fade it out
                 UIView.transition(with: self.miniChartHoursLabelOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
-                    
                     self.dataSourceSensorMaxAgeOutlet.alpha = 0
-                    
                 }, completion: { _ in
-                    
                     // wait for a some time and then put the URL back as it was
                     DispatchQueue.main.asyncAfter(deadline: .now() + Double(ConstantsHomeView.hideUrlDuringTimeInSeconds)) {
-                        
                         // just copied directly from updateDataSourceInfo()
                         var nightscoutUrlString: String = UserDefaults.standard.nightscoutUrl ?? ""
                         
-                        if nightscoutUrlString.count > 36 {
-                            nightscoutUrlString = nightscoutUrlString.replacingOccurrences(of: nightscoutUrlString.dropFirst(33), with: "...")
+                        if nightscoutUrlString.count > 30 {
+                            nightscoutUrlString = nightscoutUrlString.replacingOccurrences(of: nightscoutUrlString.dropFirst(27), with: "...")
                         }
                         
                         self.dataSourceSensorMaxAgeOutlet.alpha = 1
                         self.dataSourceSensorMaxAgeOutlet.textColor = .systemGray
                         self.dataSourceSensorMaxAgeOutlet.text = nightscoutUrlString
-                        
                     }
-                    
                 })
-                
             }
-            
         }
-        
     }
     
     
+    // ******************************************
+    // ***** Main Chart Gesture Recognizers *****
+    // ******************************************
+    @IBOutlet var chartPanGestureRecognizerOutlet: UIPanGestureRecognizer!
     @IBAction func chartPanGestureRecognizerAction(_ sender: UIPanGestureRecognizer) {
-        
         guard let glucoseChartManager = glucoseChartManager else {return}
         
         glucoseChartManager.handleUIGestureRecognizer(recognizer: sender, chartOutlet: chartOutlet, completionHandler: {
-            
             // user has been panning, if chart is panned backward, then need to set valueLabel to value of latest chartPoint shown in the chart, and minutesAgo text to timeStamp of latestChartPoint
             if glucoseChartManager.chartIsPannedBackward {
-                
                 if let lastChartPointEarlierThanEndDate = glucoseChartManager.lastChartPointEarlierThanEndDate, let chartAxisValueDate = lastChartPointEarlierThanEndDate.x as? ChartAxisValueDate  {
                     
                     // valueLabel text should not be strikethrough (might still be strikethrough in case latest reading is older than 10 minutes
                     self.valueLabelOutlet.attributedText = nil
-                    
                     // set value to value of latest chartPoint
                     self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-                    
                     // set timestamp to timestamp of latest chartPoint, in red so user can notice this is an old value
                     self.minutesLabelOutlet.text =  self.dateTimeFormatterForMinutesLabelWhenPanning.string(from: chartAxisValueDate.date)
                     self.minutesLabelOutlet.textColor = UIColor.red
-                    
                     self.minutesAgoLabelOutlet.text = ""
-                    
                     self.valueLabelOutlet.textColor = UIColor.lightGray
                     
                     // apply strikethrough to the BG value text format
                     let attributedString = NSMutableAttributedString(string: self.valueLabelOutlet.text!)
                     attributedString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 1, range: NSMakeRange(0, attributedString.length))
-                    
                     self.valueLabelOutlet.attributedText = attributedString
                     
                     // don't show anything in diff outlet
                     self.diffLabelOutlet.text = ""
-                    
                     self.diffLabelUnitOutlet.text = ""
-                    
                 } else {
-                    
                     // this would only be the case if there's no readings withing the shown timeframe
                     self.updateLabelsAndChart(overrideApplicationState: false)
-                    
                 }
-                
             } else {
-                
                 // chart is not panned, update labels is necessary
                 self.updateLabelsAndChart(overrideApplicationState: false)
-                
             }
-            
         })
-        
     }
-    
-    @IBOutlet var chartPanGestureRecognizerOutlet: UIPanGestureRecognizer!
-    
+
+    @IBOutlet var chartLongPressGestureRecognizerOutlet: UILongPressGestureRecognizer!
     @IBAction func chartLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
-        
         // this one needs trigger in case user has panned, chart is decelerating, user clicks to stop the decleration, call to handleUIGestureRecognizer will stop the deceleration
         // there's no completionhandler needed because the call in chartPanGestureRecognizerAction to handleUIGestureRecognizer already includes a completionhandler
         glucoseChartManager?.handleUIGestureRecognizer(recognizer: sender, chartOutlet: chartOutlet, completionHandler: nil)
-        
     }
-    
-    @IBOutlet var chartLongPressGestureRecognizerOutlet: UILongPressGestureRecognizer!
     
     @IBAction func chartDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
-        
         // if the main chart is double-tapped then force a reset to return to the current date/time, refresh the chart and also all labels
         updateLabelsAndChart(forceReset: true)
-        
     }
     
     
+    // ******************************************
+    // ***** Mini Chart Gesture Recognizers *****
+    // ******************************************
     @IBAction func miniChartDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
-        
         // move the days range to the next one (or back to the first one) and also set the text. We'll use "24 hours" for the first range (to make it clear it's not a full day, but the last 24 hours), but to keep the UI simpler, we'll use "x days" for the rest.
         switch UserDefaults.standard.miniChartHoursToShow {
-            
         case ConstantsGlucoseChart.miniChartHoursToShow1:
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow2
             miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow / 24).description + " " + Texts_Common.days
-            
         case ConstantsGlucoseChart.miniChartHoursToShow2:
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow3
             miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow / 24).description + " " + Texts_Common.days
-            
         case ConstantsGlucoseChart.miniChartHoursToShow3:
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow4
             miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow / 24).description + " " + Texts_Common.days
-            
         case ConstantsGlucoseChart.miniChartHoursToShow4:
             // we're already on the last range, so roll back to the first range
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
             miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow).description + " " + Texts_Common.hours
-            
-        // the default will never get resolved as there is always an expected value assigned, but we need to include it to keep the compiler happy
-        default:
+        default: // the default will never get resolved as there is always an expected value assigned, but we need to include it to keep the compiler happy
             UserDefaults.standard.miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
             miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow).description + " " + Texts_Common.hours
-            
         }
         
         // increase alpha to fully brighten the label temporarily
@@ -364,12 +341,10 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // wait for a second and then fade the label back out
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            
             // make a animated transition with the label. Fade it out over a couple of seconds.
             UIView.transition(with: self.miniChartHoursLabelOutlet, duration: 2, options: .transitionCrossDissolve, animations: {
                 self.miniChartHoursLabelOutlet.alpha = ConstantsGlucoseChart.miniChartHoursToShowLabelAlpha
             })
-            
         }
     }
     
@@ -377,21 +352,15 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// can be used as a shortcut to switch between different TIR calculation methods. The user will be notified of the change via UI transitions to show what has changed in the calculation limits
     @IBAction func statisticsViewDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
-        
         let previousTimeInRangeType = UserDefaults.standard.timeInRangeType
-        
         var newTimeInRangeType: TimeInRangeType = previousTimeInRangeType
         
         // if we're at the last index in the enum, then go to the first one
         // otherwise, just set to the next index
         if previousTimeInRangeType == TimeInRangeType.allCases.last {
-            
             newTimeInRangeType = .standardRange
-            
         } else {
-            
             newTimeInRangeType = TimeInRangeType(rawValue: previousTimeInRangeType.rawValue + 1) ?? .tightRange
-            
         }
         
         // write the new index back to userdefaults (this will also trigger the observers to update the UI)
@@ -400,26 +369,19 @@ final class RootViewController: UIViewController, ObservableObject {
         updateStatistics(animate: false)
         
         let normalTitleColor: UIColor = lowTitleLabelOutlet.textColor
-        
         inRangeTitleLabelOutlet.textColor = ConstantsStatistics.highlightColorTitles
         
         if previousTimeInRangeType.lowerLimit != newTimeInRangeType.lowerLimit {
-            
             self.lowLabelOutlet.textColor = ConstantsStatistics.labelLowColor
-            
         }
         
-        
         if previousTimeInRangeType.higherLimit != newTimeInRangeType.higherLimit {
-            
             self.highLabelOutlet.textColor = ConstantsStatistics.labelHighColor
-            
         }
         
         // wait a short while and then fade the labels back out
         // even if some of the label colours weren't changed, it's easier to just fade them all every time.
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            
             UIView.transition(with: self.inRangeTitleLabelOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
                 self.inRangeTitleLabelOutlet.textColor = normalTitleColor
             })
@@ -431,24 +393,23 @@ final class RootViewController: UIViewController, ObservableObject {
             UIView.transition(with: self.highLabelOutlet, duration: 1, options: .transitionCrossDissolve, animations: {
                 self.highLabelOutlet.textColor = .lightGray
             })
-            
         }
-        
     }
     
+    // **********************************************************
+    // ***** Clock (dimming cover view) Gesture Recognizers *****
+    // **********************************************************
     /// function which is triggered when hideCoverView is called
     @objc func handleTapCoverView(_ sender: UITapGestureRecognizer) {
         screenLockUpdate(enabled: false)
     }
     
+    
     // MARK: - Actions for SwiftUI Hosting Controller integration
     
     @IBSegueAction func segueToBgReadingsView(_ coder: NSCoder) -> UIViewController? {
-                    
         return UIHostingController(coder: coder, rootView: BgReadingsView().environmentObject(bgReadingsAccessor!).environmentObject(nightscoutSyncManager!))
-            
     }
-    
     
     
     // MARK: - Constants for ApplicationManager usage
