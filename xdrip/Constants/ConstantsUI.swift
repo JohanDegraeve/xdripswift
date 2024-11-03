@@ -1,9 +1,8 @@
 import Foundation
-import UIKit
 import SwiftUI
+import UIKit
 
 enum ConstantsUI {
-    
     // MARK: - SwiftUI Colors
 
     /// color for section headers
@@ -37,7 +36,7 @@ enum ConstantsUI {
     /// segmentedControl font size
     static let segmentedControlFont = UIFont.systemFont(ofSize: 11)
     /// segmentedControl background color
-    static let segmentedControlBackgroundColor = UIColor.init(white: 0.05, alpha: 1)
+    static let segmentedControlBackgroundColor = UIColor(white: 0.05, alpha: 1)
     /// segmentedControl border width
     static let segmentedControlBorderWidth: CGFloat = 0.0
     /// segmentedControl font color
@@ -53,7 +52,7 @@ enum ConstantsUI {
     /// value label font size when the screen is in normal operation mode
     static let valueLabelFontSizeNormal = UIFont.systemFont(ofSize: 80)
     /// value label font bigger size when the screen is in screen lock mode
-    static let valueLabelFontSizeScreenLock = UIFont.systemFont(ofSize: 120)
+    static let valueLabelFontSizeScreenLock = UIFont.systemFont(ofSize: 100)
     
     /// clock label font color. It shouldn't be too white or it could be distracting at night.
     static let clockLabelColor = UIColor.lightGray
@@ -74,5 +73,4 @@ enum ConstantsUI {
     
     /// string to be used to show pm time if the user locale shows a 12 hour clock
     static let timeFormatPM = "pm"
-    
 }

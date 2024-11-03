@@ -78,21 +78,33 @@ final class RootViewController: UIViewController, ObservableObject {
     // **************************
     // ***** Pump Data View *****
     // **************************
-    
-    
-    
-    
-    
+    /// create a view outlet (with the statistics day control inside) so that we can show/hide it as necessary
+    @IBOutlet weak var pumpViewOutlet: UIView!
+    @IBOutlet weak var pumpBasalLabelOutlet: UILabel!
+    @IBOutlet weak var pumpBasalValueOutlet: UILabel!
+    @IBOutlet weak var pumpReservoirLabelOutlet: UILabel!
+    @IBOutlet weak var pumpReservoirValueOutlet: UILabel!
+    @IBOutlet weak var pumpBatteryLabelOutlet: UILabel!
+    @IBOutlet weak var pumpBatteryValueOutlet: UILabel!
+    @IBOutlet weak var pumpCAGELabelOutlet: UILabel!
+    @IBOutlet weak var pumpCAGEValueOutlet: UILabel!
     
     
     // *******************************
     // ***** Treatments/AID View *****
     // *******************************
+    @IBOutlet weak var infoViewOutlet: UIView!
+    @IBOutlet weak var infoIOBLabelOutlet: UILabel!
+    @IBOutlet weak var infoIOBValueOutlet: UILabel!
+    @IBOutlet weak var infoCOBLabelOutlet: UILabel!
+    @IBOutlet weak var infoCOBValueOutlet: UILabel!
+    @IBOutlet weak var infoStatusIconOutlet: UIImageView!
+    @IBOutlet weak var infoStatusTimeAgoOutlet: UILabel!
     
-    
-    
-    
-    
+    @IBOutlet weak var infoStatusButtonOutlet: UIButton!
+    @IBAction func infoStatusButtonAction(_ sender: UIButton) {
+        showAIDStatusView()
+    }
     
     
     // *****************************
@@ -121,6 +133,7 @@ final class RootViewController: UIViewController, ObservableObject {
         
     /// outlet for chart
     @IBOutlet weak var chartOutlet: BloodGlucoseChartView!
+    
     
     // ***************************
     // ***** Mini Chart View *****
@@ -411,6 +424,10 @@ final class RootViewController: UIViewController, ObservableObject {
         return UIHostingController(coder: coder, rootView: BgReadingsView().environmentObject(bgReadingsAccessor!).environmentObject(nightscoutSyncManager!))
     }
     
+    @IBSegueAction func segueToAIDStatusView(_ coder: NSCoder) -> UIViewController? {
+        return UIHostingController(coder: coder, rootView: AIDStatusView().environmentObject(nightscoutSyncManager!))
+    }
+    
     
     // MARK: - Constants for ApplicationManager usage
     
@@ -603,6 +620,8 @@ final class RootViewController: UIViewController, ObservableObject {
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
         updateLabelsAndChart(overrideApplicationState: true)
         
+        updatePumpAndAIDStatusViews()
+        
         // show the mini-chart and other info as required
         miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
         statisticsView.isHidden = !UserDefaults.standard.showStatistics
@@ -636,12 +655,12 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // if the user locks the screen before the update is called, then don't run the update
             if !self.screenIsLocked {
-                
                 self.updateDataSourceInfo(animate: false)
-                
             }
+            
             self.updateLabelsAndChart(overrideApplicationState: true)
             
+            self.updatePumpAndAIDStatusViews()
         }
         
         self.updateSnoozeStatus()
@@ -1449,6 +1468,8 @@ final class RootViewController: UIViewController, ObservableObject {
                     
                     // update all text in  first screen
                     updateLabelsAndChart(overrideApplicationState: false)
+                    
+                    updatePumpAndAIDStatusViews()
                     
                     // update mini-chart
                     updateMiniChart()
@@ -2371,7 +2392,7 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // first action is to show the status
         let sensorStatusAction = UIAlertAction(title: Texts_HomeView.statusActionTitle, style: .default) { (UIAlertAction) in
-            self.showStatus()
+            self.showSensorStatus()
         }
         
         listOfActions.append(sensorStatusAction)
@@ -2463,11 +2484,11 @@ final class RootViewController: UIViewController, ObservableObject {
         return result
     }
     
-    /// will show the status
-    private func showStatus() {
-        
+    /// will show the sensor status
+    private func showSensorStatus() {
         // first sensor status
         var textToShow = "\n" + Texts_HomeView.sensorStart + ":\n"
+        
         if let activeSensor = activeSensor {
             textToShow += activeSensor.startDate.toStringInUserLocale(timeStyle: .short, dateStyle: .short, showTimeZone: true)
             textToShow += "\n\n" + Texts_HomeView.sensorDuration + ":\n"
@@ -2491,7 +2512,6 @@ final class RootViewController: UIViewController, ObservableObject {
         let alert = UIAlertController(title: Texts_HomeView.statusActionTitle, message: textToShow, actionHandler: nil)
         
         self.present(alert, animated: true, completion: nil)
-        
     }
     
     /// start a new sensor, ask user for starttime
@@ -2902,6 +2922,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeScreenLock
                 
                 // de-clutter the screen. Hide the mini-chart, statistics view, controls and show the clock view
+                pumpViewOutlet.isHidden = true
                 miniChartOutlet.isHidden = true
                 statisticsView.isHidden = true
                 segmentedControlsView.isHidden = true
@@ -2972,6 +2993,7 @@ final class RootViewController: UIViewController, ObservableObject {
             valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeNormal
             
             // unhide as needed
+            pumpViewOutlet.isHidden = false
             segmentedControlsView.isHidden = false
             miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
             statisticsView.isHidden = !UserDefaults.standard.showStatistics
@@ -3265,6 +3287,8 @@ final class RootViewController: UIViewController, ObservableObject {
     /// this should be called when the data source view is refreshed or when called by the followerConnectionTimer object
     @objc private func setFollowerConnectionAndHeartbeatStatus() {
         
+        updatePumpAndAIDStatusViews()
+        
         // if in master mode, hide the connection status and destroy the timer if it was initialized
         // (for example if the user just changed from follower to master)
         if UserDefaults.standard.isMaster {
@@ -3454,16 +3478,22 @@ final class RootViewController: UIViewController, ObservableObject {
 
     }
     
-    /// show the SwiftUI view via UIHostingController
+    /// show the SwiftUI showBgReadingsView view via UIHostingController
     private func showBgReadingsView() {
-        
         let bgReadingsViewController = UIHostingController(rootView: BgReadingsView().environmentObject(self.bgReadingsAccessor!).environmentObject(nightscoutSyncManager!) as! BgReadingsView)
         
         navigationController?.pushViewController(bgReadingsViewController, animated: true)
-        
     }
     
-
+    /// show the SwiftUI Automated Insulin Devliery system info view via UIHostingController
+    private func showAIDStatusView() {
+        if let nightscoutSyncManager {
+            let aidStatusViewController = UIHostingController(rootView: AIDStatusView())//.environmentObject(nightscoutSyncManager) as! AIDStatusView)
+            
+            navigationController?.pushViewController(aidStatusViewController, animated: true)
+        }
+    }
+    
     /// check if the conditions are correct to start a live activity, update it, or end it
     /// also update the widget data stored in user defaults
     private func updateLiveActivityAndWidgets(forceRestart: Bool) {
@@ -3614,8 +3644,69 @@ final class RootViewController: UIViewController, ObservableObject {
             UserDefaults.standard.nightscoutSyncTreatmentsRequired = true
         }
     }
+    
+    private func updatePumpAndAIDStatusViews() {
+        // first set the labels to the localized version
+        
+        if let timestamp = nightscoutSyncManager?.deviceStatus.createdAt {
+            // now set the values
+            pumpBasalValueOutlet.text = String.localizedStringWithFormat("%.1f %@", nightscoutSyncManager?.deviceStatus.rate ?? 0, "U/hr")
+            pumpReservoirValueOutlet.text = String.localizedStringWithFormat("%.0f %@", nightscoutSyncManager?.deviceStatus.reservoir ?? 0, "U")
+            pumpBatteryValueOutlet.text = "\((nightscoutSyncManager?.deviceStatus.pumpBatteryPercent ?? 0).description) %"
+            
+            let iob = nightscoutSyncManager?.deviceStatus.iob?.round(toDecimalPlaces: 2) ?? -999
+            let cob = nightscoutSyncManager?.deviceStatus.cob ?? -10
+            
+            infoIOBValueOutlet.text = "\(iob > -999 ? iob.description : "-") U"
+            infoCOBValueOutlet.text = "\(cob >= 0 ? cob.description : "-") g"
+            
+            if timestamp > Date().addingTimeInterval(-60 * 8) {
+                infoStatusIconOutlet.image = UIImage(systemName: "checkmark.circle.fill")
+                infoStatusIconOutlet.tintColor = .systemGreen
+                infoStatusButtonOutlet.setTitle("Looping", for: .normal)
+                infoStatusButtonOutlet.setTitleColor(.systemGreen, for: .normal)
+                infoStatusTimeAgoOutlet.text = "(\(timestamp.daysAndHoursAgo()))"
+                infoStatusTimeAgoOutlet.textColor = UIColor(resource: .colorSecondary)
+                infoStatusTimeAgoOutlet.isHidden = false
+            } else if timestamp > Date().addingTimeInterval(-60 * 11) {
+                infoStatusIconOutlet.image = UIImage(systemName: "checkmark.circle")
+                infoStatusIconOutlet.tintColor = .systemOrange
+                infoStatusButtonOutlet.setTitle("Looping", for: .normal)
+                infoStatusButtonOutlet.setTitleColor(.systemOrange, for: .normal)
+                infoStatusTimeAgoOutlet.text = "(\(timestamp.daysAndHoursAgo()))"
+                infoStatusTimeAgoOutlet.textColor = UIColor(resource: .colorSecondary)
+                infoStatusTimeAgoOutlet.isHidden = false
+            } else {
+//                if timestamp == .distantPast {
+                    infoStatusTimeAgoOutlet.isHidden = true
+//                } else {
+//                    infoStatusTimeAgoOutlet.text = "(\(timestamp.daysAndHoursAgo()))"
+//                    infoStatusTimeAgoOutlet.isHidden = false
+//                }
+                infoStatusIconOutlet.image = UIImage(systemName: "slash.circle")
+                infoStatusIconOutlet.tintColor = .systemRed
+                infoStatusButtonOutlet.setTitle("Error", for: .normal)
+                infoStatusButtonOutlet.setTitleColor(.systemRed, for: .normal)
+                infoStatusTimeAgoOutlet.textColor = UIColor(resource: .colorSecondary)
+            }
+        } else {
+            pumpBasalValueOutlet.text = "- U/hr"
+            pumpReservoirValueOutlet.text = "- U"
+            pumpBatteryValueOutlet.text = "- %"
+            pumpCAGEValueOutlet.text = "-"
+            infoIOBValueOutlet.text = "- U"
+            infoCOBValueOutlet.text = "- g"
+            
+            infoStatusIconOutlet.image = UIImage(systemName: "xmark.circle")
+            infoStatusIconOutlet.tintColor = UIColor(resource: .colorSecondary)
+            infoStatusButtonOutlet.setTitle("No data", for: .normal)
+            infoStatusButtonOutlet.setTitleColor(UIColor(resource: .colorSecondary), for: .normal)
+//            infoStatusValueOutlet.text = "No data"
+//            infoStatusValueOutlet.textColor = UIColor(resource: .colorSecondary)
+            infoStatusTimeAgoOutlet.isHidden = true
+        }
+    }
 }
-
 
 // MARK: - conform to CGMTransmitter protocol
 
@@ -3962,4 +4053,13 @@ extension RootViewController: UIGestureRecognizerDelegate {
         
     }
     
+}
+
+// MARK: - conform to NightscoutSyncDelegate protocol
+
+extension RootViewController: NightscoutSyncDelegate {
+    
+    func newNightscoutDeviceStatusReceived() {
+        print("newNightscoutDeviceStatusReceived")
+    }
 }

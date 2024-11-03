@@ -12,6 +12,7 @@ import Foundation
 /// Struct to hold internal DeviceStatus
 struct NightscoutDeviceStatus: Codable {
     var updatedDate: Date = .distantPast
+    var lastCheckedDate: Date = .distantPast
     
     var createdAt: Date = .distantPast
     var device: String?
@@ -32,7 +33,7 @@ struct NightscoutDeviceStatus: Codable {
     var sensitivityRatio: Double?
     var tdd: Double?
     var timestamp: Date?
-    //let units: Double?
+    // let units: Double?
     
     var pumpBatteryPercent: Int?
     var pumpClock: Date?
@@ -44,12 +45,14 @@ struct NightscoutDeviceStatus: Codable {
     
     var uploaderBattery: Int?
     
+    // the canula age - not part of the nightscout Device Status, but we'll keep it here internally
+    var CAGE: Double?
+    
     // return true if data has been written after initialization
     func hasData() -> Bool {
         return updatedDate != .distantPast
     }
 }
-
 
 // MARK: Trio DeviceStatus model
 
@@ -58,7 +61,7 @@ struct NightscoutDeviceStatusTrioResponse: Codable {
     struct OpenAPS: Codable {
         struct Enacted: Codable {
             let cob: Int?
-            let cr: Int?
+            let cr: Double?
             let currentTarget: Int?
             let duration: Int?
             let eventualBG: Int?

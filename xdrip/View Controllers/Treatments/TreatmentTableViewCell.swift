@@ -62,11 +62,11 @@ class TreatmentTableViewCell: UITableViewCell {
         case .BgCheck:
             // convert to mmol/l if needed, round accordingly and add the correct units
             self.valueLabel.text = treatment.value.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).stringWithoutTrailingZeroes
-        case .Basal:
-            // convert to mmol/l if needed, round accordingly and add the correct units
-            self.valueLabel.text = (round(treatment.value * 100)/100).stringWithoutTrailingZeroes
+//        case .Basal:
+//            // convert to mmol/l if needed, round accordingly and add the correct units
+//            self.valueLabel.text = (round(treatment.value * 100)/100).stringWithoutTrailingZeroes
         default:
-            self.valueLabel.text = treatment.value.stringWithoutTrailingZeroes
+            self.valueLabel.text = (round(treatment.value * 100)/100).stringWithoutTrailingZeroes
         }
         
         // treatment unit label

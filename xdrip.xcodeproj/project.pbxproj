@@ -104,6 +104,7 @@
 		4779BCF42974308F00515714 /* PieCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 4779BCF32974308F00515714 /* PieCharts */; };
 		477B2C7E2B432775002F64A4 /* LiveActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477B2C7D2B432775002F64A4 /* LiveActivityType.swift */; };
 		477F45E6285B993200AC8475 /* GlucoseMiniChartManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477F45E5285B993100AC8475 /* GlucoseMiniChartManager.swift */; };
+		4781452C2CD6A35B00838CEB /* NightscoutSyncDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4781452B2CD6A34F00838CEB /* NightscoutSyncDelegate.swift */; };
 		4787058E2C4D76FE001C3170 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4787058D2C4D76FE001C3170 /* RootView.swift */; };
 		478705932C4D7B90001C3170 /* BigNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 478705922C4D7B90001C3170 /* BigNumberView.swift */; };
 		478A923E2B8B64DE0084C394 /* ConstantsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */; };
@@ -201,6 +202,7 @@
 		47DE41B32B8672F90041DA19 /* MainViewDataSourceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41B22B8672F90041DA19 /* MainViewDataSourceView.swift */; };
 		47DE41B52B8693CB0041DA19 /* MainViewHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41B42B8693CB0041DA19 /* MainViewHeaderView.swift */; };
 		47DE41B92B87B2680041DA19 /* ConstantsAppleWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41B82B87B2680041DA19 /* ConstantsAppleWatch.swift */; };
+		47E3BEC72CD780E300B794A0 /* AIDStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47E3BEC62CD780D900B794A0 /* AIDStatusView.swift */; };
 		47E3DB372C769C9600DE1AF0 /* AlgorithmType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47E3DB362C769C9600DE1AF0 /* AlgorithmType.swift */; };
 		47E3DB3A2C77C0D700DE1AF0 /* CalibrationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47E3DB392C77C0D700DE1AF0 /* CalibrationType.swift */; };
 		47E91BBA2B9A43F20063181B /* FollowerBackgroundKeepAliveType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */; };
@@ -951,6 +953,7 @@
 		476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsFollower.swift; sourceTree = "<group>"; };
 		477B2C7D2B432775002F64A4 /* LiveActivityType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityType.swift; sourceTree = "<group>"; };
 		477F45E5285B993100AC8475 /* GlucoseMiniChartManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseMiniChartManager.swift; sourceTree = "<group>"; };
+		4781452B2CD6A34F00838CEB /* NightscoutSyncDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutSyncDelegate.swift; sourceTree = "<group>"; };
 		4787058D2C4D76FE001C3170 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		478705922C4D7B90001C3170 /* BigNumberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigNumberView.swift; sourceTree = "<group>"; };
 		478A925E2B8FB5290084C394 /* XDripWatchComplication+Entry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "XDripWatchComplication+Entry.swift"; sourceTree = "<group>"; };
@@ -1027,6 +1030,7 @@
 		47DE41B22B8672F90041DA19 /* MainViewDataSourceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewDataSourceView.swift; sourceTree = "<group>"; };
 		47DE41B42B8693CB0041DA19 /* MainViewHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewHeaderView.swift; sourceTree = "<group>"; };
 		47DE41B82B87B2680041DA19 /* ConstantsAppleWatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsAppleWatch.swift; sourceTree = "<group>"; };
+		47E3BEC62CD780D900B794A0 /* AIDStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIDStatusView.swift; sourceTree = "<group>"; };
 		47E3DB362C769C9600DE1AF0 /* AlgorithmType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmType.swift; sourceTree = "<group>"; };
 		47E3DB392C77C0D700DE1AF0 /* CalibrationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibrationType.swift; sourceTree = "<group>"; };
 		47EDD13E2BDD4F5D00C5A286 /* ConstantsWidgetExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsWidgetExtension.swift; sourceTree = "<group>"; };
@@ -2521,6 +2525,7 @@
 				F821CF65229EE68B005C1E43 /* NightscoutFollowManager.swift */,
 				476A897D2CCA7E680073ED83 /* NightscoutFollowType.swift */,
 				476A897B2CC963AF0073ED83 /* NightscoutProfileModels.swift */,
+				4781452B2CD6A34F00838CEB /* NightscoutSyncDelegate.swift */,
 				F821CF60229BF4A2005C1E43 /* NightscoutSyncManager.swift */,
 			);
 			path = Nightscout;
@@ -2729,6 +2734,7 @@
 		F866974D2867A94D00025441 /* SwiftUIViews */ = {
 			isa = PBXGroup;
 			children = (
+				47E3BEC62CD780D900B794A0 /* AIDStatusView.swift */,
 				47D9BC942A78498500AB85B2 /* BgReadingsDetailView.swift */,
 				47228B142996BDD2008725DB /* BgReadingsView.swift */,
 				47B136DA2BC9BB55001E7ED3 /* ContactImageView.swift */,
@@ -4382,6 +4388,7 @@
 				F816E11A243923B2009EE65B /* Droplet+CoreDataClass.swift in Sources */,
 				F80D916D24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift in Sources */,
 				F8B955EB2591355200C06016 /* CGMLibre2Transmitter+TestData.swift in Sources */,
+				4781452C2CD6A35B00838CEB /* NightscoutSyncDelegate.swift in Sources */,
 				F8B3A85B2280CCD1004BA588 /* AlertSettingsViewController.swift in Sources */,
 				4767BDD62BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift in Sources */,
 				F8F9722E23A5915900C3F17D /* M5StackTransmitterOpCode.swift in Sources */,
@@ -4626,6 +4633,7 @@
 				F85FF39125288870004E6FF1 /* HouseKeeper.swift in Sources */,
 				F8CB59C42739D1CD00BA199E /* DexcomBackfillTxMessage.swift in Sources */,
 				F8F9721823A5915900C3F17D /* CGMBlueReaderTransmitter.swift in Sources */,
+				47E3BEC72CD780E300B794A0 /* AIDStatusView.swift in Sources */,
 				F8252867243E50FE0067AF77 /* ConstantsLibre.swift in Sources */,
 				F8F9720923A5915900C3F17D /* AESCrypt.m in Sources */,
 				F8CB59D3274D94AF00BA199E /* DexcomSessionStartTxMessage.swift in Sources */,

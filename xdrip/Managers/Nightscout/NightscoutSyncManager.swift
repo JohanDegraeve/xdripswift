@@ -75,6 +75,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// Must be read/written in main thread !!
     private var nightscoutTreatmentSyncRequired = false
     
+    /// delegate to inform back when there is new device status data
+    private(set) weak var nightscoutSyncDelegate: NightscoutSyncDelegate?
+    
     static let iso8601DateFormatter: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
@@ -122,9 +125,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         }
         
         // let's try and import the nightscout device status data if stored in userdefaults
-        if let deviceStatusData = sharedUserDefaults?.object(forKey: "nightscoutDeviceStatus") as? Data, let nightscoutDeviceStatus = try? JSONDecoder().decode(NightscoutDeviceStatus.self, from: deviceStatusData) {
-            deviceStatus = nightscoutDeviceStatus
-        }
+//        if let deviceStatusData = sharedUserDefaults?.object(forKey: "nightscoutDeviceStatus") as? Data, let nightscoutDeviceStatus = try? JSONDecoder().decode(NightscoutDeviceStatus.self, from: deviceStatusData) {
+//            deviceStatus = nightscoutDeviceStatus
+//        }
         
         // add observers for nightscout settings which may require testing and/or start upload
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutAPIKey.rawValue, options: .new, context: nil)
@@ -628,13 +631,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         if deviceStatus.createdAt > Date() || deviceStatus.updatedDate > Date() {
             deviceStatus.createdAt = .distantPast
             deviceStatus.updatedDate = .distantPast
-        }
-        
-        // only allow the update check to happen if it's been at least 30 seconds since the last one.
-        // no need to update it too much as it doesn't generally change that often.
-        // TODO: using 30 seconds for development. Could probably be increased to once every few minutes for production
-        if Date().timeIntervalSince(deviceStatus.updatedDate) < 30 {
-            return
         }
         
         Task {

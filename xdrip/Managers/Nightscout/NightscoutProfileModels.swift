@@ -21,6 +21,9 @@ struct NightscoutProfile: Codable {
         }
     }
     
+    var updatedDate: Date = .distantPast
+    var lastCheckedDate: Date = .distantPast
+    
     var basal: [TimeValue]?
     var carbratio: [TimeValue]?
     var sensitivity: [TimeValue]?
@@ -30,7 +33,6 @@ struct NightscoutProfile: Codable {
     var isMgDl: Bool = true
     var startDate: Date = .distantPast
     var createdAt: Date = .distantPast
-    var updatedDate: Date = .distantPast
     var profileName: String = ""
     var enteredBy: String? = ""
     
@@ -39,7 +41,6 @@ struct NightscoutProfile: Codable {
         return updatedDate != .distantPast
     }
 }
-
 
 // MARK: External downloaded Nightscout Profile
 
@@ -85,7 +86,7 @@ struct NightscoutProfileResponse: Codable {
     let createdAt: String
     let mills: Int?
     let enteredBy: String?
-    //    let date: Int?
+    // let date: Int?
     
     private enum CodingKeys: String, CodingKey {
         case id = "_id"
@@ -96,6 +97,6 @@ struct NightscoutProfileResponse: Codable {
         case enteredBy
         case store
         case createdAt = "created_at"
-        //        case date
+        // case date
     }
 }

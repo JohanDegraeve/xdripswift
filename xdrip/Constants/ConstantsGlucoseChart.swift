@@ -183,10 +183,10 @@ enum ConstantsGlucoseChart {
     // basal rate treatment color
     
     /// scheduled basal rate line color
-    static let scheduledBasalRateTreatmentLineColor = UIColor.systemMint
+    static let scheduledBasalRateTreatmentLineColor = UIColor.systemMint.withAlphaComponent(0.8)
     
     /// scheduled basal rate line width
-    static let scheduledBasalRateTreatmentLineWidth: CGFloat = 1
+    static let scheduledBasalRateTreatmentLineWidth: CGFloat = 0.8
     
     /// bolus treament color
     static let basalTreatmentColor = UIColor.systemMint
@@ -195,7 +195,7 @@ enum ConstantsGlucoseChart {
     static let basalRateTreatmentLineColor = UIColor.systemMint.withAlphaComponent(0.7)
     
     /// basal rate line width
-    static let basalRateTreatmentLineWidth: CGFloat = 0.8
+    static let basalRateTreatmentLineWidth: CGFloat = 0.9
     
     /// basal rate fill color
     static let basalRateFillTreatmentColor = basalRateTreatmentLineColor.withAlphaComponent(0.4)
@@ -233,12 +233,8 @@ enum ConstantsGlucoseChart {
     /// how far should the label be separated from the veryLargeCarbs marker by default
     static let veryLargeCarbsLabelSeparation: Double = 20
     
-    /// amount (in mg/dL) the bolus marker be offset below the BG value marker
-    static let offsetBolusPositionFromBgMarker: Double = 25 // remove
-    /// amount (in mg/dL) the carb marker be offset above the BG value marker
-    static let offsetCarbPositionFromBgMarker: Double = 25 // remove
-    /// amount (in mg/dL) the carb marker be offset above the BG value marker
-    static let defaultOffsetTreatmentPositionFromBgMarker: Double = 25
+    /// amount (in mg/dL) the treatments marker be offset above/below the BG value marker
+    static let defaultOffsetTreatmentPositionFromBgMarker: Double = 20
     
     
     // chart format parameters
