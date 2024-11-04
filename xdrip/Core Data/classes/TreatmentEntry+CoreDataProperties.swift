@@ -45,4 +45,7 @@ extension TreatmentEntry {
     /// - only used when updating an entry @ NS, to make sure the same eventType is used as the original one assigned by Nightscout
     @NSManaged public var nightscoutEventType: String?
     
+    /// - if it's a treatmentEntry that was downloaded from Nightscout, this will be set by the uploader device/app
+    @NSManaged public var enteredBy: String?
+    
 }

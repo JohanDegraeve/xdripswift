@@ -819,23 +819,23 @@ public class GlucoseChartManager {
         
         
         // bolus triangle layers
-        let smallBolusTriangleLayer = ChartPointsScatterDownTrianglesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: smallBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize * ConstantsGlucoseChart.smallBolusTreamentScale, height: (bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale) * ConstantsGlucoseChart.smallBolusTreamentScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
+        let smallBolusTriangleLayer = ChartPointsScatterDownTrianglesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: smallBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize * ConstantsGlucoseChart.smallBolusTreatmentScale, height: (bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale) * ConstantsGlucoseChart.smallBolusTreatmentScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
         
-        let mediumBolusTriangleLayer = ChartPointsScatterDownTrianglesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: mediumBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize * ConstantsGlucoseChart.mediumBolusTreamentScale, height: bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale * ConstantsGlucoseChart.mediumBolusTreamentScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
+        let mediumBolusTriangleLayer = ChartPointsScatterDownTrianglesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: mediumBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize * ConstantsGlucoseChart.mediumBolusTreatmentScale, height: bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale * ConstantsGlucoseChart.mediumBolusTreatmentScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
         
-        let largeBolusTriangleLayer = ChartPointsScatterDownTrianglesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: largeBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize * ConstantsGlucoseChart.largeBolusTreamentScale, height: bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale * ConstantsGlucoseChart.largeBolusTreamentScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
+        let largeBolusTriangleLayer = ChartPointsScatterDownTrianglesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: largeBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize * ConstantsGlucoseChart.largeBolusTreatmentScale, height: bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale * ConstantsGlucoseChart.largeBolusTreatmentScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
         
-        let veryLargeBolusTriangleLayer = ChartPointsScatterDownTrianglesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: veryLargeBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize * ConstantsGlucoseChart.veryLargeBolusTreamentScale, height: bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale * ConstantsGlucoseChart.veryLargeBolusTreamentScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
+        let veryLargeBolusTriangleLayer = ChartPointsScatterDownTrianglesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: veryLargeBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize * ConstantsGlucoseChart.veryLargeBolusTreatmentScale, height: bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale * ConstantsGlucoseChart.veryLargeBolusTreatmentScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
         
         
         // carb circle layers
-        let smallCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: smallCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.smallCarbsTreamentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.smallCarbsTreamentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
+        let smallCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: smallCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.smallCarbsTreatmentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.smallCarbsTreatmentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
         
-        let mediumCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: mediumCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.mediumCarbsTreamentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.mediumCarbsTreamentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
+        let mediumCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: mediumCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.mediumCarbsTreatmentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.mediumCarbsTreatmentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
         
-        let largeCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: largeCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.largeCarbsTreamentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.largeCarbsTreamentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
+        let largeCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: largeCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.largeCarbsTreatmentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.largeCarbsTreatmentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
         
-        let veryLargeCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: veryLargeCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.veryLargeCarbsTreamentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.veryLargeCarbsTreamentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
+        let veryLargeCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: veryLargeCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.veryLargeCarbsTreatmentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.veryLargeCarbsTreatmentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
 
         
         // Scheduled basal rate line
@@ -1155,13 +1155,13 @@ public class GlucoseChartManager {
         var basalRateFillTreatmentChartPoints = [ChartPoint]()
 		
 		managedObjectContext.performAndWait {
-			// get treaments between the two timestamps from coredata
+			// get Treatments between the two timestamps from coredata
 			// filter the treatment entries that have not been marked as deleted
 			let treatmentEntries = treatmentEntryAccessor.getTreatments(fromDate: startDate, toDate: endDate, on: managedObjectContext).filter({ !$0.treatmentdeleted })
             
             
             // *****************************
-            // ***** insulin treaments *****
+            // ***** insulin Treatments *****
             // *****************************
 			// Filter the treatments by treatmentType.
 			let insulinTreatments = treatmentEntries.filter { $0.treatmentType == .Insulin }
@@ -1186,11 +1186,11 @@ public class GlucoseChartManager {
                 let chartPoint = ChartPoint(treatmentEntry: insulinTreatment, formatter: data().chartPointDateFormatter, newYAxisValue: calculatedYAxisValue)
                 
                 // cycle through the possible threshold values and append the carb chart point to the correct array.
-                if insulinTreatment.value < ConstantsGlucoseChart.smallBolusTreamentThreshold {
+                if insulinTreatment.value < ConstantsGlucoseChart.smallBolusTreatmentThreshold {
                     smallBolusTreatmentChartPoints.append(chartPoint)
-                } else if insulinTreatment.value < ConstantsGlucoseChart.mediumBolusTreamentThreshold {
+                } else if insulinTreatment.value < ConstantsGlucoseChart.mediumBolusTreatmentThreshold {
                     mediumBolusTreatmentChartPoints.append(chartPoint)
-                } else if insulinTreatment.value < ConstantsGlucoseChart.largeBolusTreamentThreshold {
+                } else if insulinTreatment.value < ConstantsGlucoseChart.largeBolusTreatmentThreshold {
                     largeBolusTreatmentChartPoints.append(chartPoint)
                 } else {
                     veryLargeBolusTreatmentChartPoints.append(chartPoint)
@@ -1215,11 +1215,11 @@ public class GlucoseChartManager {
 				let chartPoint = ChartPoint(treatmentEntry: carbsTreatment, formatter: data().chartPointDateFormatter, newYAxisValue: calculatedYAxisValue)
 				
 				// cycle through the possible threshold values and append the carb chart point to the correct array.
-				if carbsTreatment.value < ConstantsGlucoseChart.smallCarbsTreamentThreshold {
+				if carbsTreatment.value < ConstantsGlucoseChart.smallCarbsTreatmentThreshold {
 					smallCarbsTreatmentChartPoints.append(chartPoint)
-				} else if carbsTreatment.value < ConstantsGlucoseChart.mediumCarbsTreamentThreshold {
+				} else if carbsTreatment.value < ConstantsGlucoseChart.mediumCarbsTreatmentThreshold {
 					mediumCarbsTreatmentChartPoints.append(chartPoint)
-				} else if carbsTreatment.value < ConstantsGlucoseChart.largeCarbsTreamentThreshold {
+				} else if carbsTreatment.value < ConstantsGlucoseChart.largeCarbsTreatmentThreshold {
 					largeCarbsTreatmentChartPoints.append(chartPoint)
 				} else {
 					veryLargeCarbsTreatmentChartPoints.append(chartPoint)
@@ -1289,7 +1289,7 @@ public class GlucoseChartManager {
             
             
             // ********************************
-            // ***** temp basal treaments *****
+            // ***** temp basal Treatments *****
             // ********************************
             // this is used to know where to end the line from the previous rate when we start a new one for the current basal rate
             var previousBasalRateTreatment: TreatmentEntry?
@@ -1582,7 +1582,7 @@ public class GlucoseChartManager {
     /// - returns: a double with the actual value for the treatment requested
     private func getTreatmentValueFromTimeStamp(treatmentDate: ChartAxisValueDate, treatmentType: TreatmentType, treatmentEntryAccessor: TreatmentEntryAccessor, on managedObjectContext: NSManagedObjectContext) -> Double {
         
-        // We need to increase slightly the "window" that we are using to locate the treament. The ChartPoint class seems to slightly round the values which might result in not getting an exact match. ±1ms seems to work, but we'll leave it at ±50ms just to be sure.
+        // We need to increase slightly the "window" that we are using to locate the Treatment. The ChartPoint class seems to slightly round the values which might result in not getting an exact match. ±1ms seems to work, but we'll leave it at ±50ms just to be sure.
         let treatmentEntries = treatmentEntryAccessor.getTreatments(fromDate: Date(timeInterval: -0.05, since: treatmentDate.date), toDate: Date(timeInterval: 0.05, since: treatmentDate.date), on: managedObjectContext)
         
         // intialize the treatmentValue that we will return

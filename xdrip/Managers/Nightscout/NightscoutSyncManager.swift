@@ -770,9 +770,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         
                         trace("    %{public}@ treatmentEntries found in response which were not yet marked as uploaded", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountMarkedAsUploaded.description)
 
-                        let amountOfUpdatedTreaments = self.checkIfChangedAtNightscout(forTreatmentEntries: treatmentsToSync, inTreatmentNSResponses: treatmentNSResponses, didFindTreatmentInDownload: &didFindTreatmentInDownload)
+                        let amountOfUpdatedTreatments = self.checkIfChangedAtNightscout(forTreatmentEntries: treatmentsToSync, inTreatmentNSResponses: treatmentNSResponses, didFindTreatmentInDownload: &didFindTreatmentInDownload)
                         
-                        trace("    %{public}@ treatmentEntries found that were updated at NS and updated locally", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfUpdatedTreaments.description)
+                        trace("    %{public}@ treatmentEntries found that were updated at NS and updated locally", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfUpdatedTreatments.description)
                         
                         // now for each treatmentEntry, less than maxHoursTreatmentsToDownload, check if it was found in the NS response
                         //    if not, it means it's been deleted at NS, also do the local deletion
@@ -797,7 +797,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         self.coreDataManager.saveChanges()
                         
                         // call completion handler with success, if amount and/or amountOfNewTreatments > 0 then it's success with localchanges
-                        completionHandler(.success(amountOfUpdatedTreaments + amountOfNewTreatments + amountOfLocallyDeletedTreatments))
+                        completionHandler(.success(amountOfUpdatedTreatments + amountOfNewTreatments + amountOfLocallyDeletedTreatments))
                         
                     }
 
@@ -1263,7 +1263,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// Upload treatments to nightscout, receives the JSON response with the asigned id's and sets the id's in Coredata.
     /// - parameters:
     ///     - completionHandler : to be called after completion, takes NightscoutResult as argument
-    ///     - treatmentsToUpload : treaments to upload
+    ///     - treatmentsToUpload : Treatments to upload
     private func uploadTreatmentsToNightscout(treatmentsToUpload: [TreatmentEntry], completionHandler: (@escaping (_ nightscoutResult: NightscoutResult) -> Void)) {
         
         trace("in uploadTreatmentsToNightscout", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
@@ -1400,7 +1400,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// update one single treatment to nightscout
     /// - parameters:
     ///     - completionHandler : to be called after completion, takes NightscoutResult as argument
-    ///     - treatmentToUpdate : treament to update
+    ///     - treatmentToUpdate : Treatment to update
     private func updateTreatmentToNightscout(treatmentToUpdate: TreatmentEntry, completionHandler: (@escaping (_ nightscoutResult: NightscoutResult) -> Void)) {
         
         trace("in updateTreatmentsToNightscout", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
@@ -1470,7 +1470,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// delete one single treatment at nightscout
     /// - parameters:
     ///     - completionHandler : to be called after completion, takes NightscoutResult as argument
-    ///     - treatmentToDelete : treament to delete
+    ///     - treatmentToDelete : Treatment to delete
     private func deleteTreatmentAtNightscout(treatmentToDelete: TreatmentEntry, completionHandler: (@escaping (_ nightscoutResult: NightscoutResult) -> Void)) {
 
         trace("in deleteTreatmentAtNightscout", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)

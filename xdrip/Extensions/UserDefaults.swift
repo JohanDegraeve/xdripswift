@@ -1102,6 +1102,24 @@ extension UserDefaults {
         }
     }
     
+    /// micro-bolus threshold level in units as a Double
+    @objc dynamic var smallBolusTreatmentThreshold:Double {
+        get {
+
+            var returnValue = double(forKey: Key.smallBolusTreatmentThreshold.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsGlucoseChart.defaultSmallBolusTreatmentThreshold
+            }
+
+            return returnValue
+        }
+        set {
+
+            set(newValue, forKey: Key.smallBolusTreatmentThreshold.rawValue)
+        }
+    }
+    
     
     // MARK: Statistics Settings
     

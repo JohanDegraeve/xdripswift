@@ -106,26 +106,28 @@ enum ConstantsGlucoseChart {
     
     // bolus treatment marker color/sizes
     
-    /// bolus treament marker colour
+    /// bolus Treatment marker colour
     static let bolusTreatmentColor = UIColor.systemBlue
     
-    /// values below this threshold will be shown as micro-boluses without labels and scaled accordingly
-    static let smallBolusTreamentThreshold: Double = 0.8
-    /// how much should we scale the size of the micro-bolus triangle compared to the bolus triangle. Should be less than 1 to make them smaller
-    static let smallBolusTreamentScale: CGFloat = 0.6
+    static let defaultSmallBolusTreatmentThreshold: Double = 1.0
     
     /// values below this threshold will be shown as micro-boluses without labels and scaled accordingly
-    static let mediumBolusTreamentThreshold: Double = 2
+    static let smallBolusTreatmentThreshold: Double = 0.8
     /// how much should we scale the size of the micro-bolus triangle compared to the bolus triangle. Should be less than 1 to make them smaller
-    static let mediumBolusTreamentScale: CGFloat = 0.9
+    static let smallBolusTreatmentScale: CGFloat = 0.6
     
     /// values below this threshold will be shown as micro-boluses without labels and scaled accordingly
-    static let largeBolusTreamentThreshold: Double = 5
+    static let mediumBolusTreatmentThreshold: Double = 2
     /// how much should we scale the size of the micro-bolus triangle compared to the bolus triangle. Should be less than 1 to make them smaller
-    static let largeBolusTreamentScale: CGFloat = 1.2
+    static let mediumBolusTreatmentScale: CGFloat = 0.9
+    
+    /// values below this threshold will be shown as micro-boluses without labels and scaled accordingly
+    static let largeBolusTreatmentThreshold: Double = 5
+    /// how much should we scale the size of the micro-bolus triangle compared to the bolus triangle. Should be less than 1 to make them smaller
+    static let largeBolusTreatmentScale: CGFloat = 1.2
     
     /// how much should we scale the size of the micro-bolus triangle compared to the bolus triangle. Should be less than 1 to make them smaller
-    static let veryLargeBolusTreamentScale: CGFloat = 1.5
+    static let veryLargeBolusTreatmentScale: CGFloat = 1.5
     
     /// triangle size for bolus treatments with a 3h chart width. The more hours on the chart, the smaller the triangles should be.
     static let bolusTriangleSize3h: CGFloat = 16
@@ -145,26 +147,26 @@ enum ConstantsGlucoseChart {
     
     // carb treatment marker color/sizes
     
-    /// carbs treament marker colour
+    /// carbs Treatment marker colour
     static let carbsTreatmentColor = UIColor.systemOrange
     
     /// threshold below which carbs will be added to the smallCarbs array
-    static let smallCarbsTreamentThreshold: CGFloat = 5.0
+    static let smallCarbsTreatmentThreshold: CGFloat = 5.0
     /// The scale will determine how big the smallCarbs circle is scaled compared to the glucose point size)
-    static let smallCarbsTreamentScale: CGFloat = 1.1
+    static let smallCarbsTreatmentScale: CGFloat = 1.1
     
     /// threshold below which carbs will be added to the mediumCarbs array (if not previously added to another array)
-    static let mediumCarbsTreamentThreshold: CGFloat = 20.0
+    static let mediumCarbsTreatmentThreshold: CGFloat = 20.0
         /// The scale will determine how big the mediumCarbs circle is scaled compared to the glucose point size)
-    static let mediumCarbsTreamentScale: CGFloat = 2
+    static let mediumCarbsTreatmentScale: CGFloat = 2
     
     /// threshold below which carbs will be added to the largeCarbs array (if not previously added to another array)
-    static let largeCarbsTreamentThreshold: CGFloat = 45.0
+    static let largeCarbsTreatmentThreshold: CGFloat = 45.0
     /// The scale will determine how big the largeCarbs circle is scaled compared to the glucose point size)
-    static let largeCarbsTreamentScale: CGFloat = 3.3
+    static let largeCarbsTreatmentScale: CGFloat = 3.3
     
     /// The scale will determine how big the veryLargeCarbs circle is scaled compared to the glucose point size)
-    static let veryLargeCarbsTreamentScale: CGFloat = 5
+    static let veryLargeCarbsTreatmentScale: CGFloat = 5
     
     // bg check circle fill/border color/sizes
     
@@ -188,7 +190,7 @@ enum ConstantsGlucoseChart {
     /// scheduled basal rate line width
     static let scheduledBasalRateTreatmentLineWidth: CGFloat = 0.8
     
-    /// bolus treament color
+    /// bolus Treatment color
     static let basalTreatmentColor = UIColor.systemMint
     
     /// basal rate line color
@@ -208,10 +210,10 @@ enum ConstantsGlucoseChart {
     /// default label settings for the treatments labels. These are set for 6hr chart width - they will be scaled accordingly as needed
     static let treatmentLabelFontSize: Double = 12
 
-    /// treament label font colour
+    /// Treatment label font colour
     static let treatmentLabelFontColor = UIColor.white
     
-    /// treament label background colour (should have some transparency)
+    /// Treatment label background colour (should have some transparency)
     static let treatmentLabelBackgroundColor = UIColor.black.withAlphaComponent(0.4)
     
     /// additional label separation (in mg/dl) when using mmol/l (needed due to the scaling/conversion)
