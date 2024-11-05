@@ -39,6 +39,9 @@ enum ConstantsHomeView {
     
     // MARK: - Sensor Info View
     
+    /// how many seconds the Nightscout URL (if displayed in the data source info view) should be hidden when double tapped
+    static let hideUrlDuringTimeInSeconds: Int = 10
+    
     /// progress view
     static let sensorProgressViewProgressColorInitial: UIColor = .white
     static let sensorProgressViewProgressColor: UIColor = .gray
@@ -63,6 +66,8 @@ enum ConstantsHomeView {
     static let sensorProgressNormalTextColorSwiftUI: Color = .white
     static let sensorProgressViewNormalColorSwiftUI: Color = .gray
     
+    // MARK: - Screen lock
+    
     /// colour for the dimmed screen lock overlay view
     static let screenLockDimmingOptionsDimmed: UIColor = .black.withAlphaComponent(0.3)
     
@@ -72,7 +77,12 @@ enum ConstantsHomeView {
     /// colour for the very dark screen lock overlay view
     static let screenLockDimmingOptionsVeryDark: UIColor = .black.withAlphaComponent(0.7)
     
-    /// how many seconds the Nightscout URL (if displayed in the data source info view) should be hidden when double tapped
-    static let hideUrlDuringTimeInSeconds: Int = 10
+    // MARK: - For loop/AID status
+    
+    /// after how many seconds should the loop status be shown as a warning
+    static let loopShowWarningAfterSeconds: TimeInterval = 60 * 8
+    
+    /// after how many seconds should the loop status be shown as having no current data to show
+    static let loopShowNoDataAfterSeconds: TimeInterval = 60 * 16
     
 }

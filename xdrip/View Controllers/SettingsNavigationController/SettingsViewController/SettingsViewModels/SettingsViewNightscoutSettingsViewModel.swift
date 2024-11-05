@@ -249,7 +249,7 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
                     
                     if index != selectedRow {
                         
-                        UserDefaults.standard.nightscoutFollowType = NightscoutFollowType(forRowAt: index) ?? .basic
+                        UserDefaults.standard.nightscoutFollowType = NightscoutFollowType(forRowAt: index) ?? .none
                         
                         let newNightscoutFollowType = UserDefaults.standard.nightscoutFollowType
                         
@@ -358,9 +358,9 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
         // if nightscout upload not enabled then only first row is shown
         if UserDefaults.standard.nightscoutEnabled {
             
-            // in follower mode, only 6 first rows to be shown : nightscout enabled button, url, port number, token, api key, option to test
+            // in follower mode, only 6 first rows to be shown : nightscout enabled button, follow type, url, port number, token, api key, option to test
             if !UserDefaults.standard.isMaster {
-                return 6
+                return 7
             }
             
             // if schedule not enabled then show all rows except the last which is to edit the schedule

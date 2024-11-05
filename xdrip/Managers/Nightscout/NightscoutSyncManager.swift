@@ -129,6 +129,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
 //            deviceStatus = nightscoutDeviceStatus
 //        }
         
+        self.deviceStatus.lastCheckedDate = .distantPast
+        
         // add observers for nightscout settings which may require testing and/or start upload
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutAPIKey.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutUrl.rawValue, options: .new, context: nil)
@@ -532,6 +534,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// check if a new profile update is required, see if the downloaded response is newer than the stored one and then import it if necessary
     private func updateProfile() {
         
+        // if the user doesn't want to follow any type of AID system, just do nothing and return
+        guard UserDefaults.standard.nightscoutFollowType != .none else { return }
+        
         trace("in updateProfile", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
         
         guard UserDefaults.standard.nightscoutUrl != nil else {
@@ -619,6 +624,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// check if a new deviceStatus update is required, see if the downloaded response is newer than the stored one and then import it if necessary
     private func updateDeviceStatus() {
         
+        // if the user doesn't want to follow any type of AID system, just do nothing and return
+        guard UserDefaults.standard.nightscoutFollowType != .none else { return }
+        
         trace("in updateDeviceStatus", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
         
         guard UserDefaults.standard.nightscoutUrl != nil else {
@@ -640,11 +648,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 // if so, then import it and overwrite the previously stored one
                 let deviceStatusResponseArray = try await getNightscoutDeviceStatusTrio()
                 
-                let firstIndexWithOpenAPSData = deviceStatusResponseArray.firstIndex(where: {$0.openAPS?.enacted != nil} )
+                deviceStatus.lastCheckedDate = .now
                 
-                let deviceStatusResponse = deviceStatusResponseArray[firstIndexWithOpenAPSData ?? 0]
-                
-                if let newCreatedAtDate = NightscoutSyncManager.iso8601DateFormatter.date(from: deviceStatusResponse.createdAt ?? "") {
+                if let deviceStatusResponse = deviceStatusResponseArray.first, let newCreatedAtDate = NightscoutSyncManager.iso8601DateFormatter.date(from: deviceStatusResponse.createdAt ?? "") {
                     if newCreatedAtDate > deviceStatus.createdAt {
                         if deviceStatus.createdAt == .distantPast {
                             trace("    in updateDeviceStatus, no device status is stored yet. Importing Nightscout device status with date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened))
@@ -654,51 +660,104 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         
                         deviceStatus.updatedDate = .now
                         deviceStatus.createdAt = NightscoutSyncManager.iso8601DateFormatter.date(from: deviceStatusResponse.createdAt ?? "") ?? .distantPast
-                        deviceStatus.device = deviceStatusResponse.device
+                        deviceStatus.device = deviceStatusResponse.device ?? ""
                         deviceStatus.id = deviceStatusResponse.id ?? ""
                         deviceStatus.mills = deviceStatusResponse.mills ?? 0
                         deviceStatus.utcOffset = deviceStatusResponse.utcOffset ?? 0
-                        
+                        deviceStatus.uploaderBattery = deviceStatusResponse.uploaderBattery // for AAPS
+                        deviceStatus.uploaderIsCharging = deviceStatusResponse.isCharging
+                                                    
                         if let enacted = deviceStatusResponse.openAPS?.enacted {
-                            deviceStatus.cob = enacted.cob
-                            deviceStatus.currentTarget = enacted.currentTarget
+                            // iAPS/Trio uses the enacted attribute when a loop cycle actually takes place
+                            deviceStatus.didLoop = true
+                            deviceStatus.lastLoopDate = deviceStatus.createdAt
+                            
+                            deviceStatus.cob = Int(enacted.cob ?? 0)
+                            deviceStatus.currentTarget = enacted.currentTarget ?? 0
                             deviceStatus.duration = enacted.duration ?? 0
                             deviceStatus.eventualBG = enacted.eventualBG ?? 0
-                            deviceStatus.iob = enacted.iob
-                            deviceStatus.isf = enacted.isf
-                            deviceStatus.insulinReq = enacted.insulinReq
+                            deviceStatus.iob = enacted.iob ?? 0
+                            deviceStatus.isf = enacted.isf ?? 0
+                            deviceStatus.insulinReq = enacted.insulinReq ?? 0
                             deviceStatus.rate = enacted.rate ?? 0
                             deviceStatus.reason = enacted.reason ?? ""
-                            deviceStatus.reservoir = enacted.reservoir ?? 0
                             deviceStatus.sensitivityRatio = enacted.sensitivityRatio ?? 0
                             deviceStatus.tdd = enacted.tdd ?? 0
-                            deviceStatus.timestamp = NightscoutSyncManager.iso8601DateFormatter.date(from: enacted.timestamp ?? "")
+                            deviceStatus.timestamp = NightscoutSyncManager.iso8601DateFormatter.date(from: enacted.timestamp ?? "") ?? .distantPast
+                            
+                        } else if let suggested = deviceStatusResponse.openAPS?.suggested {
+                            // AAPS always uses the suggested attribute even if not enacted
+                            // iAPS/Trio only uses the suggested attribute when not enacted
+                            deviceStatus.didLoop = (deviceStatus.device != "Trio")
+                            deviceStatus.lastLoopDate = (deviceStatus.device != "Trio" ? deviceStatus.createdAt : deviceStatus.lastLoopDate)
+                            
+                            deviceStatus.cob = Int(suggested.cob ?? 0)
+                            deviceStatus.currentTarget = suggested.currentTarget ?? 0
+                            deviceStatus.duration = suggested.duration ?? 0
+                            deviceStatus.eventualBG = suggested.eventualBG ?? 0
+                            deviceStatus.iob = suggested.iob ?? 0
+                            deviceStatus.isf = suggested.isf ?? 0
+                            deviceStatus.insulinReq = suggested.insulinReq ?? 0
+                            deviceStatus.rate = suggested.rate ?? 0
+                            deviceStatus.reason = suggested.reason ?? ""
+                            deviceStatus.sensitivityRatio = suggested.sensitivityRatio ?? 0
+                            deviceStatus.tdd = suggested.tdd ?? 0
+                            deviceStatus.timestamp = NightscoutSyncManager.iso8601DateFormatter.date(from: suggested.timestamp ?? "") ?? .distantPast
+                            
+                        } else {
+                            deviceStatus.didLoop = false
+                            
+                            deviceStatus.cob = nil
+                            deviceStatus.currentTarget = nil
+                            deviceStatus.duration = nil
+                            deviceStatus.eventualBG = nil
+                            deviceStatus.iob = nil
+                            deviceStatus.isf = nil
+                            deviceStatus.insulinReq = nil
+                            deviceStatus.rate = nil
+                            deviceStatus.reason = nil
+                            deviceStatus.sensitivityRatio = nil
+                            deviceStatus.tdd = nil
+                            deviceStatus.timestamp = nil
                         }
                         
                         if let pump = deviceStatusResponse.pump {
                             deviceStatus.pumpBatteryPercent = pump.battery?.percent ?? 0
                             deviceStatus.pumpClock = NightscoutSyncManager.iso8601DateFormatter.date(from: pump.clock ?? "")
-                            
+                            deviceStatus.pumpReservoir = pump.reservoir ?? 0
                             deviceStatus.pumpIsBolusing = pump.status?.bolusing
-                            deviceStatus.pumpStatus = pump.status?.status
-                            deviceStatus.pumpIsSuspended = pump.status?.suspended
-                            deviceStatus.pumpStatusTimestamp = pump.status?.timestamp
+                            deviceStatus.pumpStatus = pump.status?.status ?? ""
+                            deviceStatus.pumpIsSuspended = pump.status?.suspended ?? false
+                            deviceStatus.pumpStatusTimestamp = NightscoutSyncManager.iso8601DateFormatter.date(from: pump.status?.timestamp ?? "") ?? .distantPast
+                            deviceStatus.appVersion = pump.extended?.version
+                            deviceStatus.baseBasalRate = pump.extended?.baseBasalRate
+                            deviceStatus.activeProfile = pump.extended?.activeProfile
+                        }
+                        
+                        // iAPS and Trio use the openaps.version to send the app version number
+                        // let's check and set it after the suggested attribute has been checked/parsed to avoid accidentally overwriting the local struct
+                        if let version = deviceStatusResponse.openAPS?.version {
+                            deviceStatus.appVersion = version
                         }
                         
                         if let uploaderBattery = deviceStatusResponse.uploader {
                             deviceStatus.uploaderBattery = uploaderBattery.battery
+                            
                         }
                         
                         // now it's updated store the deviceStatus in userdefaults
-                        if let deviceStatusData = try? JSONEncoder().encode(deviceStatus) {
-                            UserDefaults.standard.nightscoutDeviceStatus = deviceStatusData
-                        }
+//                        if let deviceStatusData = try? JSONEncoder().encode(deviceStatus) {
+//                            UserDefaults.standard.nightscoutDeviceStatus = deviceStatusData
+//                        }
                     } else {
                         // downloaded profile start date is not newer than the existing profile so ignore it and do nothing
                         return
                     }
                 }
             } catch let error {
+                // set the last checked date even if the check was unsuccessful
+                deviceStatus.lastCheckedDate = .now
+                
                 // log the error that was thrown. As it doesn't have a specific handler, we'll assume no further actions are needed
                 trace("    in updateDeviceStatus, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
             }

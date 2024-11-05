@@ -91,6 +91,8 @@ class TreatmentsViewController: UIViewController {
             navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: UIColor.white]
         }
         
+        filterBasalButtonOutlet.isHidden = UserDefaults.standard.nightscoutFollowType == .none
+        
         // set the initial filter button states as per the values in UserDefaults
         filterSmallBolusButtonOutlet.isSelected = UserDefaults.standard.showSmallBolusTreatmentsInList
         filterBolusButtonOutlet.isSelected = UserDefaults.standard.showBolusTreatmentsInList
@@ -103,6 +105,7 @@ class TreatmentsViewController: UIViewController {
         filterBolusButtonOutlet.setTitle("", for: .normal)
         
         filterSmallBolusButtonOutlet.setImage(UIImage(systemName: "arrowtriangle.down"), for: .normal)
+        filterSmallBolusButtonOutlet.setImage(UIImage(systemName: "arrowtriangle.down"), for: .disabled)
         filterSmallBolusButtonOutlet.setImage(UIImage(systemName: "arrowtriangle.down.fill"), for: .selected)
         filterSmallBolusButtonOutlet.setTitle("", for: .normal)
         
@@ -128,6 +131,7 @@ class TreatmentsViewController: UIViewController {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showBolusTreatmentsInList.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showCarbsTreatmentsInList.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showBasalTreatmentsInList.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue, options: .new, context: nil)
     }
 	
     /// Override prepare for segue, we must call configure on the TreatmentsInsertViewController.
@@ -207,6 +211,9 @@ class TreatmentsViewController: UIViewController {
                 case UserDefaults.Key.nightscoutTreatmentsUpdateCounter, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.smallBolusTreatmentThreshold, UserDefaults.Key.showSmallBolusTreatmentsInList, UserDefaults.Key.showBolusTreatmentsInList, UserDefaults.Key.showCarbsTreatmentsInList, UserDefaults.Key.showBasalTreatmentsInList:
                     // Reloads data and table.
                     reload()
+                    
+                case UserDefaults.Key.nightscoutFollowType:
+                    filterBasalButtonOutlet.isHidden = UserDefaults.standard.nightscoutFollowType == .none
                     
                 default:
                     break

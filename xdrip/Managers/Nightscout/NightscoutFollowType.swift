@@ -16,34 +16,34 @@ public enum NightscoutFollowType: Int, CaseIterable, Codable {
     // override the allCases property to define our own order.
     // this must then be handled with the forRowAt options
     public static var allCasesForList: [NightscoutFollowType] {
-        return [.basic, .loop, .openAps]
+        return [.none, .loop, .openAPS]
     }
     
     // when adding to nightscoutFollowType, add new cases at the end (ie 3, ...)
     // if this is done in the middle then a database migration would be required, because the rawvalue is stored as Int16 in the coredata
     
-    case basic = 0 // default upon initialization
+    case none = 0 // default upon initialization
     case loop = 1
-    case openAps = 2
+    case openAPS = 2
     
     var description: String {
         switch self {
-        case .basic:
-            return Texts_SettingsView.nightscoutFollowTypeBasic
+        case .none:
+            return Texts_SettingsView.nightscoutFollowTypeNone
         case .loop:
             return Texts_SettingsView.nightscoutFollowTypeLoop
-        case .openAps:
+        case .openAPS:
             return Texts_SettingsView.nightscoutFollowTypeOpenAPS
         }
     }
     
     var descriptionExpanded: String {
         switch self {
-        case .basic:
-            return Texts_SettingsView.nightscoutFollowTypeBasicExpanded
+        case .none:
+            return Texts_SettingsView.nightscoutFollowTypeNoneExpanded
         case .loop:
             return Texts_SettingsView.nightscoutFollowTypeLoopExpanded
-        case .openAps:
+        case .openAPS:
             return Texts_SettingsView.nightscoutFollowTypeOpenAPSExpanded
         }
     }
@@ -52,11 +52,11 @@ public enum NightscoutFollowType: Int, CaseIterable, Codable {
     init?(forRowAt row: Int) {
         switch row {
         case 0:
-            self = .basic
+            self = .none
         case 1:
             self = .loop
         case 2:
-            self = .openAps
+            self = .openAPS
         default:
             fatalError("in nightscoutFollowType initializer init(forRowAt row: Int), there's no case for the rownumber")
         }

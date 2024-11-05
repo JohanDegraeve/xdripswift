@@ -468,31 +468,31 @@ class Texts_SettingsView {
     }()
     
     static let labelNightscoutFollowType = {
-        return NSLocalizedString("settingsviews_nightscoutFollowType", tableName: filename, bundle: Bundle.main, value: "Follow type", comment: "nightscout settings, select the type of follower to use")
+        return NSLocalizedString("settingsviews_nightscoutFollowType", tableName: filename, bundle: Bundle.main, value: "AID Follower type", comment: "nightscout settings, select the type of follower to use")
     }()
     
-    static let nightscoutFollowTypeBasic = {
-        return NSLocalizedString("nightscoutFollowTypeBasic", tableName: filename, bundle: Bundle.main, value: "Basic", comment: "nightscout settings, basic follower type")
+    static let nightscoutFollowTypeNone = {
+        return NSLocalizedString("nightscoutFollowTypeNone", tableName: filename, bundle: Bundle.main, value: "None", comment: "nightscout settings, no AID follower type")
     }()
     
-    static let nightscoutFollowTypeBasicExpanded = {
-        return NSLocalizedString("nightscoutFollowTypeBasicExpanded", tableName: filename, bundle: Bundle.main, value: "Basic (just treatments)", comment: "nightscout settings, basic follower type explanation")
+    static let nightscoutFollowTypeNoneExpanded = {
+        return NSLocalizedString("nightscoutFollowTypeNoneExpanded", tableName: filename, bundle: Bundle.main, value: "None (just treatments)", comment: "nightscout settings, basic follower type explanation")
     }()
     
     static let nightscoutFollowTypeLoop = {
-        return NSLocalizedString("nightscoutFollowTypeLoop", tableName: filename, bundle: Bundle.main, value: "AID (Loop)", comment: "nightscout settings, loop follower type")
+        return NSLocalizedString("nightscoutFollowTypeLoop", tableName: filename, bundle: Bundle.main, value: "Loop", comment: "nightscout settings, loop follower type")
     }()
     
     static let nightscoutFollowTypeLoopExpanded = {
-        return NSLocalizedString("nightscoutFollowTypeLoopExpanded", tableName: filename, bundle: Bundle.main, value: "AID (Loop)", comment: "nightscout settings, loop follower type explanation")
+        return NSLocalizedString("nightscoutFollowTypeLoopExpanded", tableName: filename, bundle: Bundle.main, value: "Loop", comment: "nightscout settings, loop follower type explanation")
     }()
     
     static let nightscoutFollowTypeOpenAPS = {
-        return NSLocalizedString("nightscoutFollowTypeOpenAPS", tableName: filename, bundle: Bundle.main, value: "AID (OpenAPS)", comment: "nightscout settings, openaps follower type")
+        return NSLocalizedString("nightscoutFollowTypeOpenAPS", tableName: filename, bundle: Bundle.main, value: "OpenAPS-based", comment: "nightscout settings, openaps based follower type")
     }()
     
     static let nightscoutFollowTypeOpenAPSExpanded = {
-        return NSLocalizedString("nightscoutFollowTypeOpenAPSExpanded", tableName: filename, bundle: Bundle.main, value: "AID (OpenAPS/Trio/iAPS/AAPS)", comment: "nightscout settings, openaps follower type explanation")
+        return NSLocalizedString("nightscoutFollowTypeOpenAPSExpanded", tableName: filename, bundle: Bundle.main, value: "OpenAPS/Trio/iAPS/AAPS", comment: "nightscout settings, openaps based follower type explanation")
     }()
     
     static let useSchedule = {

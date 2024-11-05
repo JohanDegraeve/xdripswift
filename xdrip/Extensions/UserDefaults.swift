@@ -172,6 +172,8 @@ extension UserDefaults {
         case nightscoutEnabled = "nightscoutEnabled"
         /// should we try and follow any specific AID system (Loop, Trio, AAPS, OpenAPS etc)?
         case nightscoutFollowType = "nightscoutFollowType"
+        /// should the app show the extended AID follow information?
+        case nightscoutFollowShowExpandedInfo = "nightscoutFollowShowExpandedInfo"
         /// should schedule be used for nightscout upload ?
         case nightscoutUseSchedule = "nightscoutUseSchedule"
         /// - schedule for nightscout use, only applicable if nightscoutUseSchedule = true
@@ -1323,10 +1325,21 @@ extension UserDefaults {
     var nightscoutFollowType: NightscoutFollowType {
         get {
             let nightscoutFollowTypeAsInt = integer(forKey: Key.nightscoutFollowType.rawValue)
-            return NightscoutFollowType(rawValue: nightscoutFollowTypeAsInt) ?? .basic
+            return NightscoutFollowType(rawValue: nightscoutFollowTypeAsInt) ?? .none
         }
         set {
             set(newValue.rawValue, forKey: Key.nightscoutFollowType.rawValue)
+        }
+    }
+    
+    /// show the expanded information views for AID follow
+    @objc dynamic var nightscoutFollowShowExpandedInfo: Bool {
+        // default value for bool in userdefaults is false, as default we want the app to show the expanded information
+        get {
+            return !bool(forKey: Key.nightscoutFollowShowExpandedInfo.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.nightscoutFollowShowExpandedInfo.rawValue)
         }
     }
     

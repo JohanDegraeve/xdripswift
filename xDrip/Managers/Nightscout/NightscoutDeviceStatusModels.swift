@@ -6,6 +6,7 @@
 //  Copyright © 2024 Johan Degraeve. All rights reserved.
 //
 import Foundation
+import SwiftUICore
 
 // MARK: Internal DeviceStatus model
 
@@ -14,12 +15,18 @@ struct NightscoutDeviceStatus: Codable {
     var updatedDate: Date = .distantPast
     var lastCheckedDate: Date = .distantPast
     
+    var didLoop: Bool = false
+    var lastLoopDate: Date = .distantPast
+    
     var createdAt: Date = .distantPast
     var device: String?
+    var appVersion: String?
     var id: String = ""
     var mills: Int = 0
     var utcOffset: Int = 0
     
+    var activeProfile: String?
+    var baseBasalRate: Double?
     var cob: Int?
     var currentTarget: Int?
     var duration: Int?
@@ -29,7 +36,6 @@ struct NightscoutDeviceStatus: Codable {
     var insulinReq: Double?
     var rate: Double?
     var reason: String?
-    var reservoir: Double?
     var sensitivityRatio: Double?
     var tdd: Double?
     var timestamp: Date?
@@ -37,20 +43,84 @@ struct NightscoutDeviceStatus: Codable {
     
     var pumpBatteryPercent: Int?
     var pumpClock: Date?
-    
+    var pumpReservoir: Double?
     var pumpIsBolusing: Bool?
     var pumpStatus: String?
     var pumpIsSuspended: Bool?
-    var pumpStatusTimestamp: String?
+    var pumpStatusTimestamp: Date?
     
     var uploaderBattery: Int?
-    
-    // the canula age - not part of the nightscout Device Status, but we'll keep it here internally
-    var CAGE: Double?
+    var uploaderIsCharging: Bool?
     
     // return true if data has been written after initialization
     func hasData() -> Bool {
         return updatedDate != .distantPast
+    }
+    
+    // return the AID system name
+    func systemName() -> String? {
+        if let device {
+            switch device {
+            case let str where str.startsWith("loop://"):
+                return "Loop"
+            case let str where str.startsWith("openaps://"):
+                return "AAPS"
+            case "Trio":
+                return "Trio"
+            default:
+                return nil
+            }
+        }
+        
+        return nil
+    }
+    
+    func reasonValuesArray() -> [String]? {
+        if let reason {
+            let array = reason.components(separatedBy: ", ")
+            return array
+        }
+        else {
+            return nil
+        }
+    }
+    
+    func uploaderBatteryImage() -> (batteryImage: Image, batteryColor: Color)? {
+        if let uploaderBattery {
+            var batteryImage = Image(systemName: "battery.100percent")
+            var batteryColor = Color(.colorSecondary)
+            
+            switch uploaderBattery {
+            case 0...10:
+                batteryImage = Image(systemName: "battery.0percent")
+                batteryColor = Color(.systemRed)
+            case 11...25:
+                batteryImage = Image(systemName: "battery.25percent")
+                batteryColor = Color(.systemYellow)
+            case 26...65:
+                batteryImage = Image(systemName: "battery.50percent")
+            case 66...90:
+                batteryImage = Image(systemName: "battery.75percent")
+            default:
+                break
+            }
+            
+            return (batteryImage, batteryColor)
+        }
+
+        return nil
+    }
+    
+    func uploaderBatteryChargingImage() -> (chargingImage: Image, chargingColor: Color)? {
+        if let uploaderIsCharging {
+            if uploaderIsCharging {
+                return (Image(systemName: "bolt"), Color(.systemGreen))
+            } else {
+                return nil //(Image(systemName: "bolt.slash"), Color(.colorTertiary))
+            }
+        }
+
+        return nil
     }
 }
 
@@ -60,7 +130,43 @@ struct NightscoutDeviceStatus: Codable {
 struct NightscoutDeviceStatusTrioResponse: Codable {
     struct OpenAPS: Codable {
         struct Enacted: Codable {
-            let cob: Int?
+            let cob: Double?
+            let cr: Double?
+            let currentTarget: Int?
+            let duration: Int?
+            let eventualBG: Int?
+            let iob: Double?
+            let isf: Int?
+            let insulinReq: Double?
+            let rate: Double?
+            let reason: String?
+            let reservoir: Double?
+            let sensitivityRatio: Double?
+            let tdd: Double?
+            let timestamp: String?
+            let units: Double?
+            
+            private enum CodingKeys: String, CodingKey {
+                case cob = "COB"
+                case cr = "CR"
+                case currentTarget = "current_target"
+                case duration
+                case eventualBG
+                case iob = "IOB"
+                case isf = "ISF"
+                case insulinReq
+                case rate
+                case reason
+                case reservoir
+                case sensitivityRatio
+                case tdd = "TDD"
+                case timestamp
+                case units
+            }
+        }
+        
+        struct Suggested: Codable {
+            let cob: Double?
             let cr: Double?
             let currentTarget: Int?
             let duration: Int?
@@ -96,9 +202,11 @@ struct NightscoutDeviceStatusTrioResponse: Codable {
         }
         
         let enacted: Enacted?
+        let suggested: Suggested?
+        let version: String?
         
         private enum CodingKeys: String, CodingKey {
-            case enacted
+            case enacted, suggested, version
         }
     }
     
@@ -114,9 +222,23 @@ struct NightscoutDeviceStatusTrioResponse: Codable {
             let timestamp: String?
         }
         
+        struct Extended: Codable {
+            let version: String?
+            let activeProfile: String?
+            let baseBasalRate: Double?
+            
+            private enum CodingKeys: String, CodingKey {
+                case version = "Version"
+                case activeProfile = "ActiveProfile"
+                case baseBasalRate = "BaseBasalRate"
+            }
+        }
+        
         let battery: Battery?
+        let reservoir: Double?
         let clock: String?
         let status: Status?
+        let extended: Extended?
     }
     
     struct Uploader: Codable {
@@ -126,20 +248,24 @@ struct NightscoutDeviceStatusTrioResponse: Codable {
     let createdAt: String?
     let device: String?
     let id: String?
+    let isCharging: Bool?
     let mills: Int?
     let openAPS: OpenAPS?
     let pump: Pump?
     let uploader: Uploader?
+    let uploaderBattery: Int?
     let utcOffset: Int?
     
     private enum CodingKeys: String, CodingKey {
         case createdAt = "created_at"
         case device
         case id = "_id"
+        case isCharging
         case mills
         case openAPS = "openaps"
         case pump
         case uploader
+        case uploaderBattery
         case utcOffset
     }
 }
