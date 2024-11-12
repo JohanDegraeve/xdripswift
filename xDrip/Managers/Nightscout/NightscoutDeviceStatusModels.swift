@@ -27,7 +27,7 @@ struct NightscoutDeviceStatus: Codable {
     
     var activeProfile: String?
     var baseBasalRate: Double?
-    var cob: Int?
+    var cob: Double?
     var currentTarget: Int?
     var duration: Int?
     var eventualBG: Int?
@@ -87,27 +87,35 @@ struct NightscoutDeviceStatus: Codable {
     
     func uploaderBatteryImage() -> (batteryImage: Image, batteryColor: Color)? {
         if let uploaderBattery {
-            var batteryImage = Image(systemName: "battery.100percent")
-            var batteryColor = Color(.colorSecondary)
-            
             switch uploaderBattery {
             case 0...10:
-                batteryImage = Image(systemName: "battery.0percent")
-                batteryColor = Color(.systemRed)
+                return (Image(systemName: "battery.0percent"), Color(.systemRed))
             case 11...25:
-                batteryImage = Image(systemName: "battery.25percent")
-                batteryColor = Color(.systemYellow)
+                return (Image(systemName: "battery.25percent"), Color(.systemYellow))
             case 26...65:
-                batteryImage = Image(systemName: "battery.50percent")
+                return (Image(systemName: "battery.50percent"), Color(.colorSecondary))
             case 66...90:
-                batteryImage = Image(systemName: "battery.75percent")
+                return (Image(systemName: "battery.75percent"), Color(.colorSecondary))
+            default:
+                return (Image(systemName: "battery.100percent"), Color(.colorSecondary))
+            }
+        }
+
+        return nil
+    }
+    
+    func uploaderBatteryImageUIKit() -> (batteryImageSystemName: String, batteryImageColor: UIColor)? {
+        if let uploaderBattery {
+            switch uploaderBattery {
+            case 0...10:
+                return ("battery.0percent", UIColor(.red))
+            case 11...25:
+                return ("battery.25percent", UIColor(.yellow))
             default:
                 break
             }
-            
-            return (batteryImage, batteryColor)
+            return nil
         }
-
         return nil
     }
     
@@ -124,47 +132,11 @@ struct NightscoutDeviceStatus: Codable {
     }
 }
 
-// MARK: Trio DeviceStatus model
+// MARK: OpenAPS DeviceStatus model
 
-/// Struct to parse Trio DeviceStatus downloaded from Nightscout
-struct NightscoutDeviceStatusTrioResponse: Codable {
+/// Struct to parse OpenAPS DeviceStatus downloaded from Nightscout
+struct NightscoutDeviceStatusOpenAPSResponse: Codable {
     struct OpenAPS: Codable {
-        struct Enacted: Codable {
-            let cob: Double?
-            let cr: Double?
-            let currentTarget: Int?
-            let duration: Int?
-            let eventualBG: Int?
-            let iob: Double?
-            let isf: Int?
-            let insulinReq: Double?
-            let rate: Double?
-            let reason: String?
-            let reservoir: Double?
-            let sensitivityRatio: Double?
-            let tdd: Double?
-            let timestamp: String?
-            let units: Double?
-            
-            private enum CodingKeys: String, CodingKey {
-                case cob = "COB"
-                case cr = "CR"
-                case currentTarget = "current_target"
-                case duration
-                case eventualBG
-                case iob = "IOB"
-                case isf = "ISF"
-                case insulinReq
-                case rate
-                case reason
-                case reservoir
-                case sensitivityRatio
-                case tdd = "TDD"
-                case timestamp
-                case units
-            }
-        }
-        
         struct Suggested: Codable {
             let cob: Double?
             let cr: Double?
@@ -201,7 +173,7 @@ struct NightscoutDeviceStatusTrioResponse: Codable {
             }
         }
         
-        let enacted: Enacted?
+        let enacted: Suggested?
         let suggested: Suggested?
         let version: String?
         

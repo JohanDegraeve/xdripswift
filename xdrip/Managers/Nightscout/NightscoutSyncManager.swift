@@ -120,14 +120,10 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         super.init()
         
         // let's try and import the nightscout profile data if stored in userdefaults
+        // we can do this as the profile isn't expected to change very often
         if let profileData = sharedUserDefaults?.object(forKey: "nightscoutProfile") as? Data, let nightscoutProfile = try? JSONDecoder().decode(NightscoutProfile.self, from: profileData) {
             profile = nightscoutProfile
         }
-        
-        // let's try and import the nightscout device status data if stored in userdefaults
-//        if let deviceStatusData = sharedUserDefaults?.object(forKey: "nightscoutDeviceStatus") as? Data, let nightscoutDeviceStatus = try? JSONDecoder().decode(NightscoutDeviceStatus.self, from: deviceStatusData) {
-//            deviceStatus = nightscoutDeviceStatus
-//        }
         
         self.deviceStatus.lastCheckedDate = .distantPast
         
@@ -240,6 +236,10 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         
         // set nightscoutSyncStartTimeStamp to now, because nightscout sync will start
         nightscoutSyncStartTimeStamp = Date()
+        
+        updateProfile()
+        
+        updateDeviceStatus()
         
         /// to keep track if one of the downloads resulted in creation or update of treatments
         var treatmentsLocallyCreatedOrUpdated = false
@@ -440,7 +440,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                                 DispatchQueue.main.async {
                                     self.callMessageHandler(withCredentialVerificationResult: success, error: error)
                                     if success {
-                                        
                                         // set lastConnectionStatusChangeTimeStamp to as late as possible, to make sure that the most recent reading is uploaded if user is testing the credentials
                                         self.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: Date())
                                         
@@ -463,7 +462,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                             testNightscoutCredentials({ (success, error) in
                                 DispatchQueue.main.async {
                                     if success {
-                                        
                                         // set lastConnectionStatusChangeTimeStamp to as late as possible, to make sure that the most recent reading is uploaded if user is testing the credentials
                                         self.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: Date())
                                         
@@ -487,6 +485,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         syncWithNightscout()
                         
                     }
+                    
+                case UserDefaults.Key.nightscoutFollowType:
+                    syncWithNightscout()
                     
                 default:
                     break
@@ -646,16 +647,16 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             do {
                 // check if there is the newly downloaded profile response has an newer date than the stored one
                 // if so, then import it and overwrite the previously stored one
-                let deviceStatusResponseArray = try await getNightscoutDeviceStatusTrio()
+                let deviceStatusResponseArray = try await getNightscoutDeviceStatusOpenAPS()
                 
                 deviceStatus.lastCheckedDate = .now
                 
                 if let deviceStatusResponse = deviceStatusResponseArray.first, let newCreatedAtDate = NightscoutSyncManager.iso8601DateFormatter.date(from: deviceStatusResponse.createdAt ?? "") {
                     if newCreatedAtDate > deviceStatus.createdAt {
                         if deviceStatus.createdAt == .distantPast {
-                            trace("    in updateDeviceStatus, no device status is stored yet. Importing Nightscout device status with date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened))
+                            trace("    in updateDeviceStatus, no device status is stored yet. Importing new Nightscout device status with date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened))
                         } else {
-                            trace("    in updateDeviceStatus, found a newer Nightscout device status online with date = %{public}@, old profile date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, newCreatedAtDate.formatted(date: .abbreviated, time: .shortened), deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened))
+                            trace("    in updateDeviceStatus, found a newer Nightscout device status online with date = %{public}@, old device status date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, newCreatedAtDate.formatted(date: .abbreviated, time: .shortened), deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened))
                         }
                         
                         deviceStatus.updatedDate = .now
@@ -672,18 +673,18 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                             deviceStatus.didLoop = true
                             deviceStatus.lastLoopDate = deviceStatus.createdAt
                             
-                            deviceStatus.cob = Int(enacted.cob ?? 0)
-                            deviceStatus.currentTarget = enacted.currentTarget ?? 0
-                            deviceStatus.duration = enacted.duration ?? 0
-                            deviceStatus.eventualBG = enacted.eventualBG ?? 0
+                            deviceStatus.cob = enacted.cob ?? 0
+                            deviceStatus.currentTarget = enacted.currentTarget
+                            deviceStatus.duration = enacted.duration
+                            deviceStatus.eventualBG = enacted.eventualBG
                             deviceStatus.iob = enacted.iob ?? 0
-                            deviceStatus.isf = enacted.isf ?? 0
-                            deviceStatus.insulinReq = enacted.insulinReq ?? 0
+                            deviceStatus.isf = enacted.isf
+                            deviceStatus.insulinReq = enacted.insulinReq
                             deviceStatus.rate = enacted.rate ?? 0
-                            deviceStatus.reason = enacted.reason ?? ""
-                            deviceStatus.sensitivityRatio = enacted.sensitivityRatio ?? 0
-                            deviceStatus.tdd = enacted.tdd ?? 0
-                            deviceStatus.timestamp = NightscoutSyncManager.iso8601DateFormatter.date(from: enacted.timestamp ?? "") ?? .distantPast
+                            deviceStatus.reason = enacted.reason
+                            deviceStatus.sensitivityRatio = enacted.sensitivityRatio
+                            deviceStatus.tdd = enacted.tdd
+                            deviceStatus.timestamp = NightscoutSyncManager.iso8601DateFormatter.date(from: enacted.timestamp ?? "")
                             
                         } else if let suggested = deviceStatusResponse.openAPS?.suggested {
                             // AAPS always uses the suggested attribute even if not enacted
@@ -691,20 +692,20 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                             deviceStatus.didLoop = (deviceStatus.device != "Trio")
                             deviceStatus.lastLoopDate = (deviceStatus.device != "Trio" ? deviceStatus.createdAt : deviceStatus.lastLoopDate)
                             
-                            deviceStatus.cob = Int(suggested.cob ?? 0)
-                            deviceStatus.currentTarget = suggested.currentTarget ?? 0
-                            deviceStatus.duration = suggested.duration ?? 0
-                            deviceStatus.eventualBG = suggested.eventualBG ?? 0
+                            deviceStatus.cob = suggested.cob ?? 0
+                            deviceStatus.currentTarget = suggested.currentTarget
+                            deviceStatus.duration = suggested.duration
+                            deviceStatus.eventualBG = suggested.eventualBG
                             deviceStatus.iob = suggested.iob ?? 0
-                            deviceStatus.isf = suggested.isf ?? 0
-                            deviceStatus.insulinReq = suggested.insulinReq ?? 0
+                            deviceStatus.isf = suggested.isf
+                            deviceStatus.insulinReq = suggested.insulinReq
                             deviceStatus.rate = suggested.rate ?? 0
-                            deviceStatus.reason = suggested.reason ?? ""
-                            deviceStatus.sensitivityRatio = suggested.sensitivityRatio ?? 0
-                            deviceStatus.tdd = suggested.tdd ?? 0
-                            deviceStatus.timestamp = NightscoutSyncManager.iso8601DateFormatter.date(from: suggested.timestamp ?? "") ?? .distantPast
+                            deviceStatus.reason = suggested.reason
+                            deviceStatus.sensitivityRatio = suggested.sensitivityRatio
+                            deviceStatus.tdd = suggested.tdd
+                            deviceStatus.timestamp = NightscoutSyncManager.iso8601DateFormatter.date(from: suggested.timestamp ?? "")
                             
-                        } else {
+                        } /*else {
                             deviceStatus.didLoop = false
                             
                             deviceStatus.cob = nil
@@ -719,16 +720,16 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                             deviceStatus.sensitivityRatio = nil
                             deviceStatus.tdd = nil
                             deviceStatus.timestamp = nil
-                        }
+                        }*/
                         
                         if let pump = deviceStatusResponse.pump {
-                            deviceStatus.pumpBatteryPercent = pump.battery?.percent ?? 0
+                            deviceStatus.pumpBatteryPercent = pump.battery?.percent
                             deviceStatus.pumpClock = NightscoutSyncManager.iso8601DateFormatter.date(from: pump.clock ?? "")
-                            deviceStatus.pumpReservoir = pump.reservoir ?? 0
+                            deviceStatus.pumpReservoir = pump.reservoir
                             deviceStatus.pumpIsBolusing = pump.status?.bolusing
-                            deviceStatus.pumpStatus = pump.status?.status ?? ""
-                            deviceStatus.pumpIsSuspended = pump.status?.suspended ?? false
-                            deviceStatus.pumpStatusTimestamp = NightscoutSyncManager.iso8601DateFormatter.date(from: pump.status?.timestamp ?? "") ?? .distantPast
+                            deviceStatus.pumpStatus = pump.status?.status
+                            deviceStatus.pumpIsSuspended = pump.status?.suspended
+                            deviceStatus.pumpStatusTimestamp = NightscoutSyncManager.iso8601DateFormatter.date(from: pump.status?.timestamp ?? "")
                             deviceStatus.appVersion = pump.extended?.version
                             deviceStatus.baseBasalRate = pump.extended?.baseBasalRate
                             deviceStatus.activeProfile = pump.extended?.activeProfile
@@ -744,11 +745,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                             deviceStatus.uploaderBattery = uploaderBattery.battery
                             
                         }
-                        
-                        // now it's updated store the deviceStatus in userdefaults
-//                        if let deviceStatusData = try? JSONEncoder().encode(deviceStatus) {
-//                            UserDefaults.standard.nightscoutDeviceStatus = deviceStatusData
-//                        }
                     } else {
                         // downloaded profile start date is not newer than the existing profile so ignore it and do nothing
                         return
@@ -774,10 +770,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     ///     - completionHandler : handler that will be called with the result TreatmentNSResponse array
     ///     - treatmentsToSync : main goal of the function is not to upload, but to download. However the response will be used to verify if it has any of the treatments that has no id yet and also to verify if existing treatments have changed
     private func getLatestTreatmentsNSResponses(treatmentsToSync: [TreatmentEntry], completionHandler: (@escaping (_ result: NightscoutResult) -> Void)) {
-        
-        updateProfile()
-        
-        updateDeviceStatus()
         
         trace("in getLatestTreatmentsNSResponses", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
 
@@ -888,13 +880,13 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     private func getNightscoutProfile() async throws -> [NightscoutProfileResponse] {
         
-        if let nightscoutURL = UserDefaults.standard.nightscoutUrl, let url = URL(string: nightscoutURL), var uRLComponents = URLComponents(url: url.appendingPathComponent(nightscoutProfilePath), resolvingAgainstBaseURL: false) {
+        if let nightscoutURL = UserDefaults.standard.nightscoutUrl, let url = URL(string: nightscoutURL), var URLComponents = URLComponents(url: url.appendingPathComponent(nightscoutProfilePath), resolvingAgainstBaseURL: false) {
             
             if UserDefaults.standard.nightscoutPort != 0 {
-                uRLComponents.port = UserDefaults.standard.nightscoutPort
+                URLComponents.port = UserDefaults.standard.nightscoutPort
             }
             
-            if let url = uRLComponents.url {
+            if let url = URLComponents.url {
                 var request = URLRequest(url: url)
                 request.setValue("application/json", forHTTPHeaderField:"Content-Type")
                 request.setValue("application/json", forHTTPHeaderField:"Accept")
@@ -924,15 +916,15 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     }
     
     
-    private func getNightscoutDeviceStatusTrio() async throws -> [NightscoutDeviceStatusTrioResponse] {
+    private func getNightscoutDeviceStatusOpenAPS() async throws -> [NightscoutDeviceStatusOpenAPSResponse] {
         
-        if let nightscoutURL = UserDefaults.standard.nightscoutUrl, let url = URL(string: nightscoutURL), var uRLComponents = URLComponents(url: url.appendingPathComponent(nightscoutDeviceStatusPath), resolvingAgainstBaseURL: false) {
+        if let nightscoutURL = UserDefaults.standard.nightscoutUrl, let url = URL(string: nightscoutURL), var URLComponents = URLComponents(url: url.appendingPathComponent(nightscoutDeviceStatusPath), resolvingAgainstBaseURL: false) {
             
             if UserDefaults.standard.nightscoutPort != 0 {
-                uRLComponents.port = UserDefaults.standard.nightscoutPort
+                URLComponents.port = UserDefaults.standard.nightscoutPort
             }
             
-            if let url = uRLComponents.url {
+            if let url = URLComponents.url {
                 var request = URLRequest(url: url)
                 request.setValue("application/json", forHTTPHeaderField:"Content-Type")
                 request.setValue("application/json", forHTTPHeaderField:"Accept")
@@ -950,7 +942,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 trace("    in getNightscoutDeviceStatusTrio, server response status code: %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, statusCode.description)
                 
                 if statusCode == 200 {
-                    return try decode([NightscoutDeviceStatusTrioResponse].self, data: data)
+                    return try decode([NightscoutDeviceStatusOpenAPSResponse].self, data: data)
                 }
                 
                 trace("    in getNightscoutDeviceStatusTrio, unable to process response", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)

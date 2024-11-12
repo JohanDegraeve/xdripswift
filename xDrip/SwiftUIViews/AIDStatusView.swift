@@ -43,7 +43,7 @@ struct AIDStatusView: View {
                     
                     Section(header: Text("System Status")) {
                         //                        let didLoop = (nightscoutSyncManager.deviceStatus.didLoop ?? false) ? Texts_Common.yes : Texts_Common.no
-                        let lastLoop = nightscoutSyncManager.deviceStatus.lastLoopDate != .distantPast ? nightscoutSyncManager.deviceStatus.lastLoopDate.formatted(date: .omitted, time: .standard) : nilString
+                        let lastLoop = nightscoutSyncManager.deviceStatus.lastLoopDate != .distantPast ? nightscoutSyncManager.deviceStatus.lastLoopDate.formatted(date: .omitted, time: .shortened) : nilString
                         let lastLoopAgo = nightscoutSyncManager.deviceStatus.lastLoopDate != .distantPast ? " (\(nightscoutSyncManager.deviceStatus.lastLoopDate.daysAndHoursAgo(appendAgo: true)))" : ""
                         
                         // show the app name and version number if available
@@ -76,26 +76,23 @@ struct AIDStatusView: View {
                             row(title: "Active profile", data: activeProfile)
                         }
                         
-                        if let uploaderBattery = nightscoutSyncManager.deviceStatus.uploaderBattery {
-                            HStack {
-                                Text("Uploader battery")
-                                Spacer()
-                                if let uploaderBatteryImage = nightscoutSyncManager.deviceStatus.uploaderBatteryImage() {
-                                    uploaderBatteryImage.batteryImage
-                                        .foregroundStyle(uploaderBatteryImage.batteryColor)
-                                }
-                                
-                                // show if the uploader is charging (AAPS)
-                                if let uploaderBatteryChargingImage = nightscoutSyncManager.deviceStatus.uploaderBatteryChargingImage() {
-                                    uploaderBatteryChargingImage.chargingImage
-                                        .foregroundStyle(uploaderBatteryChargingImage.chargingColor)
-                                }
-                                
-                                Text(uploaderBattery.description + " %")
-                                    .foregroundColor(.secondary)
+                        HStack {
+                            Text("Uploader battery")
+                            Spacer()
+                            // show if the uploader is charging (AAPS)
+                            if let uploaderBatteryChargingImage = nightscoutSyncManager.deviceStatus.uploaderBatteryChargingImage() {
+                                uploaderBatteryChargingImage.chargingImage
+                                    .foregroundStyle(uploaderBatteryChargingImage.chargingColor)
+                                    .imageScale(.small)
                             }
-                        } else {
-                            row(title: "Uploader battery", data: "- %")
+                            
+                            if let uploaderBatteryImage = nightscoutSyncManager.deviceStatus.uploaderBatteryImage() {
+                                uploaderBatteryImage.batteryImage
+                                    .foregroundStyle(uploaderBatteryImage.batteryColor)
+                            }
+                            
+                            Text("\(nightscoutSyncManager.deviceStatus.uploaderBattery?.description ?? nilString) %")
+                                .foregroundColor(.secondary)
                         }
                         
                         row(title: "Last loop cycle", data: "\(lastLoop)\(lastLoopAgo)")
@@ -106,24 +103,41 @@ struct AIDStatusView: View {
                     }
                     
                     Section(header: Text("AID Specific")) {
+                        row(title: "Temp basal rate", data: (nightscoutSyncManager.deviceStatus.rate?.round(toDecimalPlaces: 1).description ?? "-") + " U/hr")
                         
+                        row(title: "IOB", data: (nightscoutSyncManager.deviceStatus.iob?.round(toDecimalPlaces: 2).stringWithoutTrailingZeroes ?? nilString) + " U")
                         
+                        row(title: "COB", data: (nightscoutSyncManager.deviceStatus.cob?.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes ?? nilString) + " g")
                         
-                        row(title: "Temp basal rate", data: (nightscoutSyncManager.deviceStatus.rate ?? 0).round(toDecimalPlaces: 1).description + " U/hr")
-                        row(title: "IOB", data: (nightscoutSyncManager.deviceStatus.iob ?? 0).round(toDecimalPlaces: 2).description + " U")
-                        row(title: "COB", data: (nightscoutSyncManager.deviceStatus.cob ?? 0).description + " g")
-                        row(title: "ISF", data: (nightscoutSyncManager.deviceStatus.isf ?? 0).description)
-                        row(title: "Autosens", data: (nightscoutSyncManager.deviceStatus.sensitivityRatio ?? 0).round(toDecimalPlaces: 1).description)
-                        row(title: "Required insulin", data: (nightscoutSyncManager.deviceStatus.insulinReq ?? 0).round(toDecimalPlaces: 2).description + " U")
-                        row(title: "TDD", data: (nightscoutSyncManager.deviceStatus.tdd ?? 0).round(toDecimalPlaces: 1).description + " U")
-                        row(title: "Current target", data: (nightscoutSyncManager.deviceStatus.currentTarget ?? 0).description + " \(UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)")
-                        row(title: "Eventual BG", data: (nightscoutSyncManager.deviceStatus.eventualBG ?? 0).description + " \(UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)")
+                        if let isf = nightscoutSyncManager.deviceStatus.isf {
+                            row(title: "ISF", data: isf.description)
+                        }
+                        
+                        if let sensitivityRatio = nightscoutSyncManager.deviceStatus.sensitivityRatio {
+                            row(title: "Autosens", data: sensitivityRatio.round(toDecimalPlaces: 1).description)
+                        }
+                        
+                        if let insulinReq = nightscoutSyncManager.deviceStatus.insulinReq {
+                            row(title: "Required insulin", data: insulinReq.round(toDecimalPlaces: 2).description + " U")
+                        }
+                        
+                        if let tdd = nightscoutSyncManager.deviceStatus.tdd {
+                            row(title: "TDD", data: tdd.round(toDecimalPlaces: 1).description + " U")
+                        }
+                        
+                        if let currentTarget = nightscoutSyncManager.deviceStatus.currentTarget {
+                            row(title: "Current target", data: "\(currentTarget.description) \(UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)")
+                        }
+                        
+                        if let eventualBG = nightscoutSyncManager.deviceStatus.eventualBG {
+                            row(title: "Eventual BG", data: "\(eventualBG.description) \(UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)")
+                        }
                     }
                     
                     Section(header: Text("Pump")) {
                         row(title: "Status", data: nightscoutSyncManager.deviceStatus.pumpStatus?.capitalized ?? nilString)
-                        row(title: "Reservoir", data: (nightscoutSyncManager.deviceStatus.pumpReservoir ?? 0).round(toDecimalPlaces: 1).description + " U")
-                        row(title: "Battery", data: (nightscoutSyncManager.deviceStatus.pumpBatteryPercent ?? 0).description + " %")
+                        row(title: "Reservoir", data: (nightscoutSyncManager.deviceStatus.pumpReservoir?.round(toDecimalPlaces: 1).description ?? nilString) + " U")
+                        row(title: "Battery", data: (nightscoutSyncManager.deviceStatus.pumpBatteryPercent?.description ?? nilString) + " %")
                         
                         if let baseBasalRate = nightscoutSyncManager.deviceStatus.baseBasalRate {
                             row(title: "Scheduled basal rate", data: baseBasalRate.round(toDecimalPlaces: 1).description + " U/hr")
@@ -133,7 +147,7 @@ struct AIDStatusView: View {
                     Section(header: Text("AID response")) {
                         if let reasonValuesArray = nightscoutSyncManager.deviceStatus.reasonValuesArray() {
                             ForEach(reasonValuesArray, id: \.self) { reasonValue in
-                                Text(reasonValue)
+                                Text(reasonValue.trimmingCharacters(in: .whitespaces))
                                     .foregroundStyle(Color(.colorSecondary))
                             }
                         } else {
@@ -142,7 +156,7 @@ struct AIDStatusView: View {
                     }
                 }
             }
-            .navigationTitle("\(nightscoutSyncManager.deviceStatus.systemName() ?? "AID") Status")
+            .navigationTitle("AID Follow Status")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(Texts_Common.Cancel, action: {

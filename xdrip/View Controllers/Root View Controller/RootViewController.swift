@@ -98,6 +98,7 @@ final class RootViewController: UIViewController, ObservableObject {
     @IBOutlet weak var infoIOBValueOutlet: UILabel!
     @IBOutlet weak var infoCOBLabelOutlet: UILabel!
     @IBOutlet weak var infoCOBValueOutlet: UILabel!
+    @IBOutlet weak var infoUploaderBatteryOutlet: UIImageView!
     @IBOutlet weak var infoStatusActivityIndicatorOutlet: UIActivityIndicatorView!
     @IBOutlet weak var infoStatusIconOutlet: UIImageView!
     @IBOutlet weak var infoStatusTimeAgoOutlet: UILabel!
@@ -974,9 +975,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 self.screenLockUpdate(enabled: false)
             }
             
-            if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
-                self.infoStatusSecondaryIconOutlet.image = UIImage(systemName: "circle.dashed")
-                self.infoStatusSecondaryIconOutlet.tintColor = UIColor(resource: .colorSecondary)
+            if UserDefaults.standard.nightscoutFollowType != .none {
+                self.infoStatusSecondaryIconOutlet.isHidden = true
                 self.infoStatusButtonOutlet.setTitle("-", for: .normal)
                 self.infoStatusButtonOutlet.setTitleColor(UIColor(resource: .colorSecondary), for: .normal)
                 self.infoStatusTimeAgoOutlet.text = "(-)"
@@ -3652,7 +3652,7 @@ final class RootViewController: UIViewController, ObservableObject {
                     infoIOBValueOutlet.text = "- U"
                 }
                 
-                if let cob = deviceStatus.cob, showData {
+                if let cob = deviceStatus.cob?.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes, showData {
                     infoCOBValueOutlet.text = "\(cob) g"
                 } else {
                     infoCOBValueOutlet.text = "- g"
@@ -3672,6 +3672,13 @@ final class RootViewController: UIViewController, ObservableObject {
                 // if there is reasonably recent data, then show values
             } else if deviceStatus.createdAt > Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterSeconds) {
                 updateDeviceStatusValues(showData: true)
+                
+                // show the uploader battery status if needed
+                if let uploaderBatteryImageUIKit = deviceStatus.uploaderBatteryImageUIKit(), !UserDefaults.standard.isMaster {
+                    infoUploaderBatteryOutlet.isHidden = false
+                    infoUploaderBatteryOutlet.image = UIImage(systemName: uploaderBatteryImageUIKit.batteryImageSystemName)
+                    infoUploaderBatteryOutlet.tintColor = uploaderBatteryImageUIKit.batteryImageColor
+                }
                 
                 infoStatusActivityIndicatorOutlet.isHidden = true
                 infoStatusIconOutlet.isHidden = false

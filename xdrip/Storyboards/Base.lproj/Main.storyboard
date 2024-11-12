@@ -657,6 +657,11 @@
                                                                             <stackView opaque="NO" contentMode="scaleToFill" spacing="6" translatesAutoresizingMaskIntoConstraints="NO" id="HY0-PA-Tqo">
                                                                                 <rect key="frame" x="236" y="0.0" width="124" height="35"/>
                                                                                 <subviews>
+                                                                                    <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="l4G-CD-Uh0">
+                                                                                        <rect key="frame" x="0.0" y="4.6666666666666625" width="0.0" height="26.000000000000007"/>
+                                                                                        <imageReference key="image" image="battery.0percent" catalog="system" symbolScale="small" variableValue="1"/>
+                                                                                        <preferredSymbolConfiguration key="preferredSymbolConfiguration" scale="small"/>
+                                                                                    </imageView>
                                                                                     <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="o6d-4S-Akr">
                                                                                         <rect key="frame" x="0.0" y="0.0" width="20" height="35"/>
                                                                                         <color key="color" name="colorPrimary"/>
@@ -1219,6 +1224,7 @@
                         <outlet property="infoStatusIconOutlet" destination="y2g-rq-uFS" id="ELN-1E-5Gm"/>
                         <outlet property="infoStatusSecondaryIconOutlet" destination="cBP-Ia-vHz" id="8z9-7h-FfW"/>
                         <outlet property="infoStatusTimeAgoOutlet" destination="8RJ-QC-aTl" id="V1x-Hd-hM5"/>
+                        <outlet property="infoUploaderBatteryOutlet" destination="l4G-CD-Uh0" id="dhh-ZM-xnt"/>
                         <outlet property="infoViewOutlet" destination="F6K-De-dGi" id="P6X-iK-KoP"/>
                         <outlet property="lowLabelOutlet" destination="Ncy-6l-nO2" id="11g-UN-f9n"/>
                         <outlet property="lowStatisticLabelOutlet" destination="4LK-sw-cBS" id="0gk-05-iOl"/>
@@ -2718,6 +2724,7 @@
         <image name="Treatments" width="30" height="30"/>
         <image name="arrowtriangle.down" catalog="system" width="128" height="120"/>
         <image name="arrowtriangle.down.fill" catalog="system" width="128" height="120"/>
+        <image name="battery.0percent" catalog="system" width="128" height="59"/>
         <image name="chart.bar.fill" catalog="system" width="128" height="90"/>
         <image name="chevron.backward" catalog="system" width="97" height="128"/>
         <image name="chevron.forward" catalog="system" width="97" height="128"/>
