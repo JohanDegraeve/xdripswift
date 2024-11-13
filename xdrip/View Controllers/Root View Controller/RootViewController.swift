@@ -959,28 +959,38 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // add tracing when app goes from foreground to background
         ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyTraceAppGoesToBackGround, closure: {
-            
             trace("Application did enter background", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
             if !UserDefaults.standard.isMaster {
-                
                 trace("    follower background keep-alive type: %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, UserDefaults.standard.followerBackgroundKeepAliveType.description)
                 
                 self.followerConnectionTimer?.invalidate()
                 self.followerConnectionTimer = nil
-                
             }
             
             if self.screenIsLocked {
                 self.screenLockUpdate(enabled: false)
             }
             
+            // this is to dim (or hide) the AID status values when the app goes to the background
             if UserDefaults.standard.nightscoutFollowType != .none {
-                self.infoStatusSecondaryIconOutlet.isHidden = true
-                self.infoStatusButtonOutlet.setTitle("-", for: .normal)
-                self.infoStatusButtonOutlet.setTitleColor(UIColor(resource: .colorSecondary), for: .normal)
-                self.infoStatusTimeAgoOutlet.text = "(-)"
-                self.infoStatusTimeAgoOutlet.textColor = UIColor(resource: .colorSecondary)
+                self.pumpBasalValueOutlet.textColor = UIColor(resource: .colorTertiary)
+                self.pumpBatteryValueOutlet.textColor = UIColor(resource: .colorTertiary)
+                self.pumpReservoirValueOutlet.textColor = UIColor(resource: .colorTertiary)
+                self.pumpCAGEValueOutlet.textColor = UIColor(resource: .colorTertiary)
+                
+                self.infoIOBValueOutlet.textColor = UIColor(resource: .colorTertiary)
+                self.infoCOBValueOutlet.textColor = UIColor(resource: .colorTertiary)
+                
+                self.infoStatusActivityIndicatorOutlet.isHidden = true
+                self.infoUploaderBatteryOutlet.isHidden = true
+                self.infoStatusIconOutlet.tintColor = UIColor(resource: .colorTertiary)
+                self.infoStatusButtonOutlet.setTitleColor(UIColor(resource: .colorTertiary), for: .normal)
+                self.infoStatusTimeAgoOutlet.text = "(-m)"
+                self.infoStatusTimeAgoOutlet.textColor = UIColor(resource: .colorTertiary)
+                
+                // update secondary status icon in case the expanded view is hidden
+                self.infoStatusSecondaryIconOutlet.tintColor = UIColor(resource: .colorTertiary)
             }
             
         })
@@ -3673,17 +3683,31 @@ final class RootViewController: UIViewController, ObservableObject {
             } else if deviceStatus.createdAt > Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterSeconds) {
                 updateDeviceStatusValues(showData: true)
                 
+                // reset the text colours (they will be dimmed when the app goes to the background)
+                pumpBasalValueOutlet.textColor = UIColor(resource: .colorPrimary)
+                pumpBatteryValueOutlet.textColor = UIColor(resource: .colorPrimary)
+                pumpReservoirValueOutlet.textColor = UIColor(resource: .colorPrimary)
+                pumpCAGEValueOutlet.textColor = UIColor(resource: .colorPrimary)
+                infoIOBValueOutlet.textColor = UIColor(resource: .colorPrimary)
+                infoCOBValueOutlet.textColor = UIColor(resource: .colorPrimary)
+                
                 // show the uploader battery status if needed
-                if let uploaderBatteryImageUIKit = deviceStatus.uploaderBatteryImageUIKit(), !UserDefaults.standard.isMaster {
+                if let uploaderBatteryImageRVCStatusView = deviceStatus.uploaderBatteryImageRVCStatusView(), !UserDefaults.standard.isMaster {
                     infoUploaderBatteryOutlet.isHidden = false
-                    infoUploaderBatteryOutlet.image = UIImage(systemName: uploaderBatteryImageUIKit.batteryImageSystemName)
-                    infoUploaderBatteryOutlet.tintColor = uploaderBatteryImageUIKit.batteryImageColor
+                    infoUploaderBatteryOutlet.image = UIImage(systemName: uploaderBatteryImageRVCStatusView.batteryImageSystemName)
+                    infoUploaderBatteryOutlet.tintColor = uploaderBatteryImageRVCStatusView.batteryImageColor
+                } else {
+                    infoUploaderBatteryOutlet.isHidden = true
                 }
                 
                 infoStatusActivityIndicatorOutlet.isHidden = true
                 infoStatusIconOutlet.isHidden = false
                 infoStatusTimeAgoOutlet.isHidden = false
-                infoStatusTimeAgoOutlet.text = "(\(deviceStatus.createdAt.daysAndHoursAgo()))"
+                if deviceStatus.lastLoopDate != .distantPast {
+                    infoStatusTimeAgoOutlet.text = "(\(deviceStatus.lastLoopDate.daysAndHoursAgo()))"
+                } else {
+                    infoStatusTimeAgoOutlet.text = "(>\(deviceStatus.createdAt.daysAndHoursAgo()))"
+                }
                 infoStatusTimeAgoOutlet.textColor = UIColor(resource: .colorSecondary)
                 
                 // if it was very recent, then consider up-to-date and show green

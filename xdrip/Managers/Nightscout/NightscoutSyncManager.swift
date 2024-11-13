@@ -697,7 +697,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                             deviceStatus.duration = suggested.duration
                             deviceStatus.eventualBG = suggested.eventualBG
                             deviceStatus.iob = suggested.iob ?? 0
-                            deviceStatus.isf = suggested.isf
+                            deviceStatus.isf = suggested.isf ?? suggested.variableSens // AAPS uses variable_sens
                             deviceStatus.insulinReq = suggested.insulinReq
                             deviceStatus.rate = suggested.rate ?? 0
                             deviceStatus.reason = suggested.reason

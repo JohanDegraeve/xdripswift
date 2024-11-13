@@ -110,7 +110,7 @@ struct AIDStatusView: View {
                         row(title: "COB", data: (nightscoutSyncManager.deviceStatus.cob?.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes ?? nilString) + " g")
                         
                         if let isf = nightscoutSyncManager.deviceStatus.isf {
-                            row(title: "ISF", data: isf.description)
+                            row(title: "ISF", data: isf.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes)
                         }
                         
                         if let sensitivityRatio = nightscoutSyncManager.deviceStatus.sensitivityRatio {

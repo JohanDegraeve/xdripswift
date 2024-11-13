@@ -32,7 +32,7 @@ struct NightscoutDeviceStatus: Codable {
     var duration: Int?
     var eventualBG: Int?
     var iob: Double?
-    var isf: Int?
+    var isf: Double?
     var insulinReq: Double?
     var rate: Double?
     var reason: String?
@@ -104,18 +104,18 @@ struct NightscoutDeviceStatus: Codable {
         return nil
     }
     
-    func uploaderBatteryImageUIKit() -> (batteryImageSystemName: String, batteryImageColor: UIColor)? {
-        if let uploaderBattery {
+    func uploaderBatteryImageRVCStatusView() -> (batteryImageSystemName: String, batteryImageColor: UIColor)? {
+        if let uploaderBattery, let uploaderIsCharging, !uploaderIsCharging {
             switch uploaderBattery {
             case 0...10:
                 return ("battery.0percent", UIColor(.red))
             case 11...25:
                 return ("battery.25percent", UIColor(.yellow))
             default:
-                break
+                return nil
             }
-            return nil
         }
+        
         return nil
     }
     
@@ -144,7 +144,7 @@ struct NightscoutDeviceStatusOpenAPSResponse: Codable {
             let duration: Int?
             let eventualBG: Int?
             let iob: Double?
-            let isf: Int?
+            let isf: Double?
             let insulinReq: Double?
             let rate: Double?
             let reason: String?
@@ -153,6 +153,7 @@ struct NightscoutDeviceStatusOpenAPSResponse: Codable {
             let tdd: Double?
             let timestamp: String?
             let units: Double?
+            let variableSens: Double?
             
             private enum CodingKeys: String, CodingKey {
                 case cob = "COB"
@@ -170,6 +171,7 @@ struct NightscoutDeviceStatusOpenAPSResponse: Codable {
                 case tdd = "TDD"
                 case timestamp
                 case units
+                case variableSens = "variable_sens"
             }
         }
         
