@@ -451,7 +451,7 @@
                                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="- U/hr" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="O18-K8-DZW">
                                                                                 <rect key="frame" x="37" y="0.0" width="78" height="26.333333333333332"/>
                                                                                 <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
-                                                                                <color key="textColor" name="colorPrimary"/>
+                                                                                <color key="textColor" name="colorTertiary"/>
                                                                                 <nil key="highlightedColor"/>
                                                                             </label>
                                                                         </subviews>
@@ -459,7 +459,7 @@
                                                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6Bz-sA-Wpw">
                                                                         <rect key="frame" x="0.0" y="26.333333333333343" width="115" height="26.333333333333329"/>
                                                                         <subviews>
-                                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="Insulin" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="01u-AC-iAi">
+                                                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="Reservoir" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="01u-AC-iAi">
                                                                                 <rect key="frame" x="0.0" y="0.0" width="93" height="26.333333333333332"/>
                                                                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                                                                 <color key="textColor" name="colorSecondary"/>
@@ -468,7 +468,7 @@
                                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="- U" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="O9w-xa-Fpd">
                                                                                 <rect key="frame" x="93" y="0.0" width="22" height="26.333333333333332"/>
                                                                                 <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
-                                                                                <color key="textColor" name="colorPrimary"/>
+                                                                                <color key="textColor" name="colorTertiary"/>
                                                                                 <nil key="highlightedColor"/>
                                                                             </label>
                                                                         </subviews>
@@ -485,7 +485,7 @@
                                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="- %" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="doT-zV-4hv">
                                                                                 <rect key="frame" x="89.666666666666671" y="0.0" width="25.333333333333329" height="26"/>
                                                                                 <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
-                                                                                <color key="textColor" name="colorPrimary"/>
+                                                                                <color key="textColor" name="colorTertiary"/>
                                                                                 <nil key="highlightedColor"/>
                                                                             </label>
                                                                         </subviews>
@@ -502,7 +502,7 @@
                                                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="-" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vtm-Kh-9EP">
                                                                                 <rect key="frame" x="108" y="0.0" width="7" height="26.333333333333332"/>
                                                                                 <fontDescription key="fontDescription" type="system" weight="medium" pointSize="15"/>
-                                                                                <color key="textColor" name="colorPrimary"/>
+                                                                                <color key="textColor" name="colorTertiary"/>
                                                                                 <nil key="highlightedColor"/>
                                                                             </label>
                                                                         </subviews>
@@ -632,7 +632,7 @@
                                                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="- U" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2u5-Ow-wh6">
                                                                                         <rect key="frame" x="34.333333333333336" y="0.0" width="23" height="35"/>
                                                                                         <fontDescription key="fontDescription" type="system" weight="medium" pointSize="16"/>
-                                                                                        <color key="textColor" name="colorPrimary"/>
+                                                                                        <color key="textColor" name="colorTertiary"/>
                                                                                         <nil key="highlightedColor"/>
                                                                                     </label>
                                                                                 </subviews>
@@ -649,7 +649,7 @@
                                                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="- g" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hic-Sj-6Kk">
                                                                                         <rect key="frame" x="41.666666666666657" y="0.0" width="21.333333333333329" height="35"/>
                                                                                         <fontDescription key="fontDescription" type="system" weight="medium" pointSize="16"/>
-                                                                                        <color key="textColor" name="colorPrimary"/>
+                                                                                        <color key="textColor" name="colorTertiary"/>
                                                                                         <nil key="highlightedColor"/>
                                                                                     </label>
                                                                                 </subviews>
@@ -668,7 +668,7 @@
                                                                                     </activityIndicatorView>
                                                                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="y2g-rq-uFS">
                                                                                         <rect key="frame" x="26" y="0.33333333333333215" width="20" height="34.666666666666671"/>
-                                                                                        <color key="tintColor" name="colorSecondary"/>
+                                                                                        <color key="tintColor" name="colorTertiary"/>
                                                                                         <imageReference key="image" image="circle" catalog="system" symbolScale="medium"/>
                                                                                         <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="17" scale="default" weight="semibold"/>
                                                                                     </imageView>
@@ -678,14 +678,14 @@
                                                                                         <color key="tintColor" name="colorSecondary"/>
                                                                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                                                         <state key="normal" title="Waiting...">
-                                                                                            <color key="titleColor" name="colorSecondary"/>
+                                                                                            <color key="titleColor" name="colorTertiary"/>
                                                                                         </state>
                                                                                         <connections>
                                                                                             <action selector="infoStatusButtonAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="jWC-DW-EKP"/>
                                                                                             <segue destination="yPB-Ev-B9g" kind="show" identifier="RootViewToAIDStatusView" destinationCreationSelector="segueToAIDStatusView:" id="r4Y-tY-lZT"/>
                                                                                         </connections>
                                                                                     </button>
-                                                                                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(- mins)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8RJ-QC-aTl">
+                                                                                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(-m)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8RJ-QC-aTl">
                                                                                         <rect key="frame" x="124" y="0.0" width="0.0" height="35"/>
                                                                                         <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                                                         <color key="textColor" name="colorTertiary"/>

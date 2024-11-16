@@ -11,7 +11,7 @@ import Foundation
 /// type of nightscout follower to be used/displayed
 /// for most users, this will just be basic
 /// for users with AID, this choice will pull the correct data we need and adjust the UI to show the main available information
-public enum NightscoutFollowType: Int, CaseIterable, Codable {
+@objc public enum NightscoutFollowType: Int, CaseIterable, Codable {
     
     // override the allCases property to define our own order.
     // this must then be handled with the forRowAt options

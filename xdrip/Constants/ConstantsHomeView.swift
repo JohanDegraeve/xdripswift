@@ -83,6 +83,6 @@ enum ConstantsHomeView {
     static let loopShowWarningAfterSeconds: TimeInterval = 60 * 8
     
     /// after how many seconds should the loop status be shown as having no current data to show
-    static let loopShowNoDataAfterSeconds: TimeInterval = 60 * 16
+    static let loopShowNoDataAfterSeconds: TimeInterval = 60 * 30
     
 }

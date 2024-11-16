@@ -1466,7 +1466,7 @@ extension UserDefaults {
     }
     
     /// Nightscout device status stored as a JSON data object
-    var nightscoutDeviceStatus: Data? {
+    @objc dynamic var nightscoutDeviceStatus: Data? {
         get {
             if let data = object(forKey: Key.nightscoutDeviceStatus.rawValue) as? Data {
                 return data

@@ -920,7 +920,10 @@ final class RootViewController: UIViewController, ObservableObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.snoozeAllAlertsUntilDate.rawValue, options: .new, context: nil)
         
         // if the Nightscout Follower type changes, update the UI
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue, options: .new, context: nil)
+        //UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue, options: .new, context: nil)
+        
+        // if the Nightscout device status changes, update the UI
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutDeviceStatus.rawValue, options: .new, context: nil)
         
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
@@ -1732,9 +1735,6 @@ final class RootViewController: UIViewController, ObservableObject {
         case UserDefaults.Key.updateSnoozeStatus:
             updateSnoozeStatus()
             
-        case UserDefaults.Key.nightscoutFollowType:
-            updatePumpAndAIDStatusViews()
-            
         default:
             break
             
@@ -2279,6 +2279,10 @@ final class RootViewController: UIViewController, ObservableObject {
     @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
         
         setNightscoutSyncTreatmentsRequiredToTrue(forceNow: false)
+        
+        // this is not really the nicest place to do this, but it works well
+        // take advantage of the timer execution to update the AID status views
+        updatePumpAndAIDStatusViews()
         
         // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
         if let glucoseChartManager = glucoseChartManager  {
@@ -3271,8 +3275,6 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// this should be called when the data source view is refreshed or when called by the followerConnectionTimer object
     @objc private func setFollowerConnectionAndHeartbeatStatus() {
-        updatePumpAndAIDStatusViews()
-        
         // if in master mode, hide the connection status and destroy the timer if it was initialized
         // (for example if the user just changed from follower to master)
         if UserDefaults.standard.isMaster {
@@ -3641,11 +3643,15 @@ final class RootViewController: UIViewController, ObservableObject {
                 if let rate = deviceStatus.rate?.round(toDecimalPlaces: 1), showData {
                     pumpBasalValueOutlet.text = "\(rate) U/hr"
                 } else {
-                    pumpBasalValueOutlet.text = "- U/hr"
+                    pumpBasalValueOutlet.text = "? U/hr"
                 }
                 
-                if let pumpReservoir = deviceStatus.pumpReservoir?.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes, showData {
+                if deviceStatus.pumpManufacturer == "Insulet", deviceStatus.pumpReservoir == ConstantsNightscout.omniPodReservoirFlagNumber, showData {
+                    pumpReservoirValueOutlet.text = "50+ U"
+                    
+                } else if let pumpReservoir = deviceStatus.pumpReservoir?.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes, showData {
                     pumpReservoirValueOutlet.text = "\(pumpReservoir) U"
+
                 } else {
                     pumpReservoirValueOutlet.text = "- U"
                 }
@@ -3703,16 +3709,14 @@ final class RootViewController: UIViewController, ObservableObject {
                 infoStatusActivityIndicatorOutlet.isHidden = true
                 infoStatusIconOutlet.isHidden = false
                 infoStatusTimeAgoOutlet.isHidden = false
-                if deviceStatus.lastLoopDate != .distantPast {
-                    infoStatusTimeAgoOutlet.text = "(\(deviceStatus.lastLoopDate.daysAndHoursAgo()))"
-                } else {
-                    infoStatusTimeAgoOutlet.text = "(>\(deviceStatus.createdAt.daysAndHoursAgo()))"
-                }
+                
+                infoStatusTimeAgoOutlet.text = deviceStatus.lastLoopDate != .distantPast ? "(\(deviceStatus.lastLoopDate.daysAndHoursAgo()))" : ""
+                
                 infoStatusTimeAgoOutlet.textColor = UIColor(resource: .colorSecondary)
                 
                 // if it was very recent, then consider up-to-date and show green
                 if deviceStatus.lastLoopDate > Date().addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterSeconds) {
-                    infoStatusIconOutlet.image = deviceStatus.didLoop ? UIImage(systemName: "checkmark.circle.fill") : UIImage(systemName: "checkmark.circle")
+                    infoStatusIconOutlet.image = UIImage(systemName: "checkmark.circle.fill")
                     infoStatusIconOutlet.tintColor = .systemGreen
                     infoStatusButtonOutlet.setTitle("Looping", for: .normal)
                     infoStatusButtonOutlet.setTitleColor(.systemGreen, for: .normal)
@@ -3721,14 +3725,24 @@ final class RootViewController: UIViewController, ObservableObject {
                     infoStatusSecondaryIconOutlet.image = UIImage(systemName: "checkmark.circle.fill")
                     infoStatusSecondaryIconOutlet.tintColor = .systemGreen
                     
-                } else {
-                    infoStatusIconOutlet.image = deviceStatus.didLoop ? UIImage(systemName: "checkmark.circle") : UIImage(systemName: "circle.slash")
-                    infoStatusIconOutlet.tintColor = .systemOrange
-                    infoStatusButtonOutlet.setTitle(deviceStatus.didLoop ? "Looping" : "Not looping", for: .normal)
-                    infoStatusButtonOutlet.setTitleColor(.systemOrange, for: .normal)
+                } else if deviceStatus.lastLoopDate > Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterSeconds){
+                    infoStatusIconOutlet.image = UIImage(systemName: "checkmark.circle")
+                    infoStatusIconOutlet.tintColor = .systemGreen
+                    infoStatusButtonOutlet.setTitle("Looping", for: .normal)
+                    infoStatusButtonOutlet.setTitleColor(.systemGreen, for: .normal)
                     
                     // update secondary status icon in case the expanded view is hidden
                     infoStatusSecondaryIconOutlet.image = UIImage(systemName: "checkmark.circle")
+                    infoStatusSecondaryIconOutlet.tintColor = .systemOrange
+                    
+                } else {
+                    infoStatusIconOutlet.image = UIImage(systemName: "questionmark.circle")
+                    infoStatusIconOutlet.tintColor = .systemOrange
+                    infoStatusButtonOutlet.setTitle("Not looping", for: .normal)
+                    infoStatusButtonOutlet.setTitleColor(.systemOrange, for: .normal)
+                    
+                    // update secondary status icon in case the expanded view is hidden
+                    infoStatusSecondaryIconOutlet.image = UIImage(systemName: "questionmark.circle")
                     infoStatusSecondaryIconOutlet.tintColor = .systemOrange
                 }
                 
