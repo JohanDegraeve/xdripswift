@@ -116,9 +116,6 @@ final class RootViewController: UIViewController, ObservableObject {
     @IBOutlet weak var minutesLabelOutlet: UILabel!
     @IBOutlet weak var minutesAgoLabelOutlet: UILabel!
     
-    /// out for the looping status icon
-    @IBOutlet weak var infoStatusSecondaryIconOutlet: UIImageView!
-    
     /// outlet for label that shows difference with previous reading
     @IBOutlet weak var diffLabelOutlet: UILabel!
     @IBOutlet weak var diffLabelUnitOutlet: UILabel!
@@ -975,27 +972,35 @@ final class RootViewController: UIViewController, ObservableObject {
                 self.screenLockUpdate(enabled: false)
             }
             
-            // this is to dim (or hide) the AID status values when the app goes to the background
-            if UserDefaults.standard.nightscoutFollowType != .none {
-                self.pumpBasalValueOutlet.textColor = UIColor(resource: .colorTertiary)
-                self.pumpBatteryValueOutlet.textColor = UIColor(resource: .colorTertiary)
-                self.pumpReservoirValueOutlet.textColor = UIColor(resource: .colorTertiary)
-                self.pumpCAGEValueOutlet.textColor = UIColor(resource: .colorTertiary)
-                
-                self.infoIOBValueOutlet.textColor = UIColor(resource: .colorTertiary)
-                self.infoCOBValueOutlet.textColor = UIColor(resource: .colorTertiary)
-                
-                self.infoStatusActivityIndicatorOutlet.isHidden = true
-                self.infoUploaderBatteryOutlet.isHidden = true
-                self.infoStatusIconOutlet.tintColor = UIColor(resource: .colorTertiary)
-                self.infoStatusButtonOutlet.setTitleColor(UIColor(resource: .colorTertiary), for: .normal)
-                self.infoStatusTimeAgoOutlet.text = "(-m)"
-                self.infoStatusTimeAgoOutlet.textColor = UIColor(resource: .colorTertiary)
-                
-                // update secondary status icon in case the expanded view is hidden
-                self.infoStatusSecondaryIconOutlet.tintColor = UIColor(resource: .colorTertiary)
-            }
+            // dim active values when the app goes to the background
+            self.valueLabelOutlet.textColor = UIColor(resource: .colorTertiary)
+            self.minutesLabelOutlet.textColor = UIColor(resource: .colorSecondary) // don't overdim minsAgo or delta as it will look strange
+            self.diffLabelOutlet.textColor = UIColor(resource: .colorSecondary)
             
+            self.pumpBasalValueOutlet.textColor = UIColor(resource: .colorTertiary)
+            self.pumpBatteryValueOutlet.textColor = UIColor(resource: .colorTertiary)
+            self.pumpReservoirValueOutlet.textColor = UIColor(resource: .colorTertiary)
+            self.pumpCAGEValueOutlet.textColor = UIColor(resource: .colorTertiary)
+            
+            self.infoIOBValueOutlet.textColor = UIColor(resource: .colorTertiary)
+            self.infoCOBValueOutlet.textColor = UIColor(resource: .colorTertiary)
+            
+            self.infoStatusActivityIndicatorOutlet.isHidden = true
+            self.infoUploaderBatteryOutlet.isHidden = true
+            self.infoStatusIconOutlet.tintColor = UIColor(resource: .colorTertiary)
+            self.infoStatusButtonOutlet.setTitleColor(UIColor(resource: .colorTertiary), for: .normal)
+            self.infoStatusTimeAgoOutlet.textColor = UIColor(resource: .colorTertiary)
+            
+            self.lowStatisticLabelOutlet.textColor = UIColor(resource: .colorTertiary)
+            self.highStatisticLabelOutlet.textColor = UIColor(resource: .colorTertiary)
+            self.inRangeStatisticLabelOutlet.textColor = UIColor(resource: .colorTertiary)
+            self.averageStatisticLabelOutlet.textColor = UIColor(resource: .colorTertiary)
+            self.a1CStatisticLabelOutlet.textColor = UIColor(resource: .colorTertiary)
+            self.cVStatisticLabelOutlet.textColor = UIColor(resource: .colorTertiary)
+            
+            self.dataSourceConnectionStatusImage.tintColor = UIColor(resource: .colorTertiary)
+            self.dataSourceKeepAliveImageOutlet.tintColor = UIColor(resource: .colorTertiary)
+            self.pieChartOutlet.tintColor = UIColor(resource: .colorTertiary)
         })
         
         // add tracing when app comes to foreground
@@ -2306,7 +2311,8 @@ final class RootViewController: UIViewController, ObservableObject {
         followerPatientNameLabelOutlet.isHidden = UserDefaults.standard.isMaster
         
         // set minutesLabelOutlet.textColor to white, might still be red due to panning back in time
-        self.minutesLabelOutlet.textColor = UIColor.white
+        self.minutesLabelOutlet.textColor = UIColor(resource: .colorPrimary)
+        self.diffLabelOutlet.textColor = UIColor(resource: .colorPrimary)
         
         // get latest reading, doesn't matter if it's for an active sensor or not, but it needs to have calculatedValue > 0 / which means, if user would have started a new sensor, but didn't calibrate yet, and a reading is received, then there's not going to be a latestReading
         let latestReadings = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
@@ -2720,14 +2726,17 @@ final class RootViewController: UIViewController, ObservableObject {
         self.pieChartOutlet.clear()
         self.pieChartLabelOutlet.text = ""
         
-        self.lowStatisticLabelOutlet.textColor = UIColor.lightGray
+        self.lowStatisticLabelOutlet.textColor = UIColor(resource: .colorSecondary)
         self.lowStatisticLabelOutlet.text = "-"
-        self.inRangeStatisticLabelOutlet.textColor = UIColor.lightGray
+        self.inRangeStatisticLabelOutlet.textColor = UIColor(resource: .colorSecondary)
         self.inRangeStatisticLabelOutlet.text = "-"
-        self.highStatisticLabelOutlet.textColor = UIColor.lightGray
+        self.highStatisticLabelOutlet.textColor = UIColor(resource: .colorSecondary)
         self.highStatisticLabelOutlet.text = "-"
+        self.averageStatisticLabelOutlet.textColor = UIColor(resource: .colorSecondary)
         self.averageStatisticLabelOutlet.text = "-"
+        self.a1CStatisticLabelOutlet.textColor = UIColor(resource: .colorSecondary)
         self.a1CStatisticLabelOutlet.text = "-"
+        self.cVStatisticLabelOutlet.textColor = UIColor(resource: .colorSecondary)
         self.cVStatisticLabelOutlet.text = "-"
         self.timePeriodLabelOutlet.text = "- - -"
         
@@ -3334,7 +3343,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 dataSourceKeepAliveImageOutlet.tintColor = .systemRed
             }
         } else {
-            dataSourceKeepAliveImageOutlet.tintColor = .systemGray
+            dataSourceKeepAliveImageOutlet.tintColor = UIColor(resource: .colorTertiary)
         }
     }
     
@@ -3623,21 +3632,19 @@ final class RootViewController: UIViewController, ObservableObject {
     
     private func updatePumpAndAIDStatusViews() {
         // hide the views if not wanted/needed
-        let showAIDStatusViews = UserDefaults.standard.nightscoutFollowType == .none || !UserDefaults.standard.nightscoutFollowShowExpandedInfo
-        pumpViewOutlet.isHidden = showAIDStatusViews
-        infoViewOutlet.isHidden = showAIDStatusViews
-        
-        // and if they aren't, then show the secondary icon view if there is a loop follow enabled
-        infoStatusSecondaryIconOutlet.isHidden = (UserDefaults.standard.nightscoutFollowType == .none || UserDefaults.standard.nightscoutFollowShowExpandedInfo)
+//        let showAIDStatusViews = UserDefaults.standard.nightscoutFollowType == .none || !UserDefaults.standard.nightscoutFollowShowExpandedInfo
+        pumpViewOutlet.isHidden = UserDefaults.standard.nightscoutFollowType == .none || !UserDefaults.standard.nightscoutFollowShowExpandedInfo
+        infoViewOutlet.isHidden = UserDefaults.standard.nightscoutFollowType == .none
 
         // if the user doesn't want to follow any type of AID system, just do nothing and return
         //guard UserDefaults.standard.nightscoutFollowType != .none else { return }
         
         // now continue with updating the views as they are now visible in the UI
         if let deviceStatus = nightscoutSyncManager?.deviceStatus as? NightscoutDeviceStatus {
+            // set an array to hold the latest 90 days worth of site change treatments. Filter out any deleted treatments.
+            let siteChangeTreatments = treatmentEntryAccessor?.getLatestTreatments(howOld: TimeInterval(days: 90)).filter { !$0.treatmentdeleted && $0.treatmentType == .SiteChange }
+            
             func updateDeviceStatusValues(showData: Bool) {
-                // set an array to hold the latest 90 days worth of site change treatments. Filter out any deleted treatments.
-                let siteChangeTreatments = treatmentEntryAccessor?.getLatestTreatments(howOld: TimeInterval(days: 90)).filter { !$0.treatmentdeleted && $0.treatmentType == .SiteChange }
                 pumpCAGEValueOutlet.text = siteChangeTreatments?.first?.date.daysAndHoursAgo() ?? "-"
                 
                 if let rate = deviceStatus.rate?.round(toDecimalPlaces: 1), showData {
@@ -3646,11 +3653,11 @@ final class RootViewController: UIViewController, ObservableObject {
                     pumpBasalValueOutlet.text = "? U/hr"
                 }
                 
-                if deviceStatus.pumpManufacturer == "Insulet", deviceStatus.pumpReservoir == ConstantsNightscout.omniPodReservoirFlagNumber, showData {
+                if deviceStatus.pumpReservoir == ConstantsNightscout.omniPodReservoirFlagNumber, showData {
                     pumpReservoirValueOutlet.text = "50+ U"
                     
-                } else if let pumpReservoir = deviceStatus.pumpReservoir?.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes, showData {
-                    pumpReservoirValueOutlet.text = "\(pumpReservoir) U"
+                } else if let pumpReservoir = deviceStatus.pumpReservoir, showData {
+                    pumpReservoirValueOutlet.text = "\(pumpReservoir.round(toDecimalPlaces: pumpReservoir < ConstantsHomeView.pumpReservoirUrgent ? 1 : 0).stringWithoutTrailingZeroes) U"
 
                 } else {
                     pumpReservoirValueOutlet.text = "- U"
@@ -3686,16 +3693,38 @@ final class RootViewController: UIViewController, ObservableObject {
                 infoStatusTimeAgoOutlet.isHidden = true
                 
                 // if there is reasonably recent data, then show values
-            } else if deviceStatus.createdAt > Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterSeconds) {
+            } else if deviceStatus.createdAt > Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+                // TODO: DEBUG
+                trace("deviceStatus.createdAt > Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes). createdAt = %{public}@ > %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, deviceStatus.createdAt.formatted(date: .abbreviated, time: .standard), Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes).formatted(date: .abbreviated, time: .standard))
+                
                 updateDeviceStatusValues(showData: true)
                 
-                // reset the text colours (they will be dimmed when the app goes to the background)
+                // reset the text colours (in case they were dimmed when the app went to the background)
                 pumpBasalValueOutlet.textColor = UIColor(resource: .colorPrimary)
-                pumpBatteryValueOutlet.textColor = UIColor(resource: .colorPrimary)
-                pumpReservoirValueOutlet.textColor = UIColor(resource: .colorPrimary)
                 pumpCAGEValueOutlet.textColor = UIColor(resource: .colorPrimary)
                 infoIOBValueOutlet.textColor = UIColor(resource: .colorPrimary)
                 infoCOBValueOutlet.textColor = UIColor(resource: .colorPrimary)
+                
+                infoStatusActivityIndicatorOutlet.isHidden = true
+                infoStatusIconOutlet.isHidden = false
+                infoStatusTimeAgoOutlet.isHidden = false
+                
+                infoStatusTimeAgoOutlet.text = deviceStatus.lastLoopDate != .distantPast ? "(\(deviceStatus.lastLoopDate.daysAndHoursAgo()))" : ""
+                infoStatusTimeAgoOutlet.textColor = UIColor(resource: .colorSecondary)
+                
+                // set the formatting for values that need to show visibility to low levels (battery, remaining insulin and canula age)
+                pumpReservoirValueOutlet.textColor = deviceStatus.pumpReservoirUIColor() ?? UIColor(resource: .colorPrimary)
+                pumpBatteryValueOutlet.textColor = deviceStatus.pumpBatteryPercentUIColor() ?? UIColor(resource: .colorPrimary)
+                
+                if let siteChangeDate = siteChangeTreatments?.first?.date {
+                    if siteChangeDate.timeIntervalSinceNow < (-ConstantsHomeView.CAGEUrgentAfterHours) {
+                        pumpCAGEValueOutlet.textColor = UIColor.systemRed
+                    } else if siteChangeDate.timeIntervalSinceNow < (-ConstantsHomeView.CAGEWarningAfterHours) {
+                        pumpCAGEValueOutlet.textColor = UIColor.systemYellow
+                    } else {
+                        pumpCAGEValueOutlet.textColor = UIColor(resource: .colorPrimary)
+                    }
+                }
                 
                 // show the uploader battery status if needed
                 if let uploaderBatteryImageRVCStatusView = deviceStatus.uploaderBatteryImageRVCStatusView(), !UserDefaults.standard.isMaster {
@@ -3706,61 +3735,28 @@ final class RootViewController: UIViewController, ObservableObject {
                     infoUploaderBatteryOutlet.isHidden = true
                 }
                 
-                infoStatusActivityIndicatorOutlet.isHidden = true
-                infoStatusIconOutlet.isHidden = false
-                infoStatusTimeAgoOutlet.isHidden = false
-                
-                infoStatusTimeAgoOutlet.text = deviceStatus.lastLoopDate != .distantPast ? "(\(deviceStatus.lastLoopDate.daysAndHoursAgo()))" : ""
-                
-                infoStatusTimeAgoOutlet.textColor = UIColor(resource: .colorSecondary)
-                
-                // if it was very recent, then consider up-to-date and show green
-                if deviceStatus.lastLoopDate > Date().addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterSeconds) {
-                    infoStatusIconOutlet.image = UIImage(systemName: "checkmark.circle.fill")
-                    infoStatusIconOutlet.tintColor = .systemGreen
-                    infoStatusButtonOutlet.setTitle("Looping", for: .normal)
-                    infoStatusButtonOutlet.setTitleColor(.systemGreen, for: .normal)
-                    
-                    // update secondary status icon in case the expanded view is hidden
-                    infoStatusSecondaryIconOutlet.image = UIImage(systemName: "checkmark.circle.fill")
-                    infoStatusSecondaryIconOutlet.tintColor = .systemGreen
-                    
-                } else if deviceStatus.lastLoopDate > Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterSeconds){
-                    infoStatusIconOutlet.image = UIImage(systemName: "checkmark.circle")
-                    infoStatusIconOutlet.tintColor = .systemGreen
-                    infoStatusButtonOutlet.setTitle("Looping", for: .normal)
-                    infoStatusButtonOutlet.setTitleColor(.systemGreen, for: .normal)
-                    
-                    // update secondary status icon in case the expanded view is hidden
-                    infoStatusSecondaryIconOutlet.image = UIImage(systemName: "checkmark.circle")
-                    infoStatusSecondaryIconOutlet.tintColor = .systemOrange
-                    
-                } else {
-                    infoStatusIconOutlet.image = UIImage(systemName: "questionmark.circle")
-                    infoStatusIconOutlet.tintColor = .systemOrange
-                    infoStatusButtonOutlet.setTitle("Not looping", for: .normal)
-                    infoStatusButtonOutlet.setTitleColor(.systemOrange, for: .normal)
-                    
-                    // update secondary status icon in case the expanded view is hidden
-                    infoStatusSecondaryIconOutlet.image = UIImage(systemName: "questionmark.circle")
-                    infoStatusSecondaryIconOutlet.tintColor = .systemOrange
-                }
+                infoStatusIconOutlet.image = deviceStatus.deviceStatusIconUIImage() // UIImage(systemName: "checkmark.circle.fill")
+                infoStatusIconOutlet.tintColor = deviceStatus.deviceStatusUIColor()
+                infoStatusButtonOutlet.setTitleColor(deviceStatus.deviceStatusUIColor(), for: .normal) // .systemGreen
+                infoStatusButtonOutlet.setTitle(deviceStatus.deviceStatusTitle(), for: .normal)
                 
                 // so there is no recent data, so hide everything and show red
             } else {
+                // TODO: DEBUG
+                trace("no recent data. createdAt = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, deviceStatus.createdAt.formatted(date: .abbreviated, time: .standard))
+                
                 updateDeviceStatusValues(showData: false)
                 
                 infoStatusActivityIndicatorOutlet.isHidden = true
                 infoStatusTimeAgoOutlet.isHidden = true
                 infoStatusIconOutlet.isHidden = false
-                infoStatusIconOutlet.image = UIImage(systemName: "exclamationmark.circle")
-                infoStatusIconOutlet.tintColor = .systemRed
-                infoStatusButtonOutlet.setTitle("Error/No data", for: .normal)
-                infoStatusButtonOutlet.setTitleColor(.systemRed, for: .normal)
+                infoStatusIconOutlet.image = deviceStatus.deviceStatusIconUIImage()
+                infoStatusIconOutlet.tintColor = deviceStatus.deviceStatusUIColor()
+                infoStatusButtonOutlet.setTitle(deviceStatus.deviceStatusTitle(), for: .normal)
+                infoStatusButtonOutlet.setTitleColor(deviceStatus.deviceStatusUIColor(), for: .normal)
                 
-                // update secondary status icon in case the expanded view is hidden
-                infoStatusSecondaryIconOutlet.image = UIImage(systemName: "exclamationmark.circle")
-                infoStatusSecondaryIconOutlet.tintColor = .systemRed
+                // TODO: DEBUG
+                trace("RVC device status error: createdAt = %{public}@, lastChecked = %{public}@, lastLoopDate = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, nightscoutSyncManager?.deviceStatus.createdAt.formatted(date: .omitted, time: .standard) ?? "nil", nightscoutSyncManager?.deviceStatus.lastCheckedDate.formatted(date: .omitted, time: .standard) ?? "nil", nightscoutSyncManager?.deviceStatus.lastLoopDate.formatted(date: .omitted, time: .standard) ?? "nil")
             }
         }
     }

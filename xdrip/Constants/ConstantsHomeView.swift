@@ -80,9 +80,30 @@ enum ConstantsHomeView {
     // MARK: - For loop/AID status
     
     /// after how many seconds should the loop status be shown as a warning
-    static let loopShowWarningAfterSeconds: TimeInterval = 60 * 8
+    static let loopShowWarningAfterMinutes: TimeInterval = 60 * 8
     
     /// after how many seconds should the loop status be shown as having no current data to show
-    static let loopShowNoDataAfterSeconds: TimeInterval = 60 * 30
+    static let loopShowNoDataAfterMinutes: TimeInterval = 60 * 20
+    
+    /// opacity level for the background of the AID status banner
+    static let AIDStatusBannerBackgroundOpacity = 0.1
+    
+    /// after how many hows should we show the CAGE as a warning condition (yellow)?
+    static let CAGEWarningAfterHours: TimeInterval = 60 * 60 * 60
+    
+    /// after how many hows should we show the CAGE as an urgent condition (red)?
+    static let CAGEUrgentAfterHours: TimeInterval = 60 * 60 * 66
+    
+    /// below how many units should we show the pump reservoir  as a warning condition (yellow)?
+    static let pumpReservoirWarning: Double = 30
+    
+    /// below how many units should we show the pump reservoir as an urgent condition (red)?
+    static let pumpReservoirUrgent: Double = 10
+    
+    /// below what percentage should we show the pump battery as a warning condition (yellow)?
+    static let pumpBatteryPercentWarning: Int = 20
+    
+    /// below what percentage should we show the pump battery as an urgent condition (red)?
+    static let pumpBatteryPercentUrgent: Int = 10
     
 }

@@ -15,7 +15,6 @@ struct NightscoutDeviceStatus: Codable {
     var updatedDate: Date = .distantPast
     var lastCheckedDate: Date = .distantPast
     
-    var didLoop: Bool = false
     var lastLoopDate: Date = .distantPast
     
     var createdAt: Date = .distantPast
@@ -41,7 +40,12 @@ struct NightscoutDeviceStatus: Codable {
     var tdd: Double?
     var timestamp: Date?
     var error: String?
-    // let units: Double?
+    
+    var overrideActive: Bool?
+    var overrideName: String?
+    var overrideMaxValue: Double?
+    var overrideMinValue: Double?
+    var overrideMultiplier: Double?
     
     var pumpBatteryPercent: Int?
     var pumpClock: Date?
@@ -54,7 +58,7 @@ struct NightscoutDeviceStatus: Codable {
     var pumpModel: String?
     var pumpReservoir: Double?
     
-    var uploaderBattery: Int?
+    var uploaderBatteryPercent: Int?
     var uploaderIsCharging: Bool?
     
     // return true if data has been written after initialization
@@ -72,6 +76,28 @@ struct NightscoutDeviceStatus: Codable {
                 return "AAPS"
             case "Trio":
                 return "Trio"
+            case "iAPS":
+                return "iAPS"
+            default:
+                return nil
+            }
+        }
+        
+        return nil
+    }
+    
+    // return the AID system icon
+    func systemIcon() -> Image? {
+        if let device {
+            switch device {
+            case let str where str.startsWith("loop://"):
+                return Image("LoopIcon")
+            case let str where str.startsWith("openaps://"):
+                return Image("AAPSIcon")
+            case "Trio":
+                return Image("TrioIcon")
+            case "iAPS":
+                return Image("iAPSIcon")
             default:
                 return nil
             }
@@ -84,34 +110,30 @@ struct NightscoutDeviceStatus: Codable {
     func deviceName() -> String? {
         if let device {
             let deviceName = device.components(separatedBy: "://")
-            
-            if deviceName.count > 1 {
-                var deviceNameString = deviceName[1]
-                
-                if !deviceNameString.startsWith("iPhone") {
-                    deviceNameString = deviceNameString.capitalized
-                }
-                
-                return deviceNameString
-            }
+            return deviceName.count > 1 ? deviceName[1] : nil
         }
         
         return nil
     }
     
     func reasonValuesArray() -> [String]? {
-        if let reason {
-            let array = reason.components(separatedBy: ", ")
-            return array
-        }
-        else {
+        if var reason {
+            // replace the html character references with real symbols
+            reason = reason.replacingOccurrences(of: "&lt;", with: "<")
+            reason = reason.replacingOccurrences(of: "&gt;", with: ">")
+            reason = reason.replacingOccurrences(of: "&le;", with: "<=")
+            reason = reason.replacingOccurrences(of: "&ge;", with: ">=")
+            
+            return reason.components(separatedBy: ", ")
+            
+        } else {
             return nil
         }
     }
     
-    func uploaderBatteryImage() -> (batteryImage: Image, batteryColor: Color)? {
-        if let uploaderBattery {
-            switch uploaderBattery {
+    func batteryImage(percent: Int?) -> (image: Image, color: Color)? {
+        if let percent {
+            switch percent {
             case 0...10:
                 return (Image(systemName: "battery.0percent"), Color(.systemRed))
             case 11...25:
@@ -129,8 +151,8 @@ struct NightscoutDeviceStatus: Codable {
     }
     
     func uploaderBatteryImageRVCStatusView() -> (batteryImageSystemName: String, batteryImageColor: UIColor)? {
-        if let uploaderBattery, let uploaderIsCharging, !uploaderIsCharging {
-            switch uploaderBattery {
+        if let uploaderBatteryPercent, let uploaderIsCharging, !uploaderIsCharging {
+            switch uploaderBatteryPercent {
             case 0...10:
                 return ("battery.0percent", UIColor(.red))
             case 11...25:
@@ -143,12 +165,132 @@ struct NightscoutDeviceStatus: Codable {
         return nil
     }
     
-    func uploaderBatteryChargingImage() -> (chargingImage: Image, chargingColor: Color)? {
+    func uploaderBatteryChargingImage() -> (image: Image, color: Color)? {
         if let uploaderIsCharging {
             if uploaderIsCharging {
                 return (Image(systemName: "bolt"), Color(.systemGreen))
             } else {
-                return nil //(Image(systemName: "bolt.slash"), Color(.colorTertiary))
+                return nil
+            }
+        }
+        
+        return nil
+    }
+    
+    func deviceStatusColor() -> Color {
+        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
+            return .green
+        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+            return .green
+        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+            return .yellow
+        } else {
+            return .red
+        }
+    }
+    
+    func deviceStatusBannerBackgroundColor() -> Color {
+        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
+            return Color(red: 0, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
+        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+            return Color(red: 0, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
+        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+            return Color(red: 1, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
+        } else {
+            return Color(red: 1, green: 0, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
+        }
+    }
+    
+    func deviceStatusUIColor() -> UIColor {
+        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
+            return .systemGreen
+        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+            return .systemGreen
+        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+            return .systemYellow
+        } else {
+            return .systemRed
+        }
+    }
+    
+    func deviceStatusTitle() -> String {
+        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
+            return "Looping"
+        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+            return "Looping"
+        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+            return "Not looping"
+        } else {
+            return "Error/No data"
+        }
+    }
+    
+    func deviceStatusIconImage() -> Image {
+        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
+            return Image(systemName: "checkmark.circle.fill")
+        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+            return Image(systemName: "checkmark.circle")
+        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+            return Image(systemName: "questionmark.circle")
+        } else {
+            return Image(systemName: "exclamationmark.circle")
+        }
+    }
+    
+    func deviceStatusIconUIImage() -> UIImage {
+        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
+            return UIImage(systemName: "checkmark.circle.fill") ?? UIImage()
+        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+            return UIImage(systemName: "checkmark.circle") ?? UIImage()
+        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+            return UIImage(systemName: "questionmark.circle") ?? UIImage()
+        } else {
+            return UIImage(systemName: "exclamationmark.circle") ?? UIImage()
+        }
+    }
+    
+    func pumpReservoirColor() -> Color? {
+        if let pumpReservoir {
+            if pumpReservoir < ConstantsHomeView.pumpReservoirUrgent {
+                return .red
+            } else if pumpReservoir < ConstantsHomeView.pumpReservoirWarning {
+                return .yellow
+            }
+        }
+        
+        return nil
+    }
+    
+    func pumpReservoirUIColor() -> UIColor? {
+        if let pumpReservoir {
+            if pumpReservoir < ConstantsHomeView.pumpReservoirUrgent {
+                return UIColor.systemRed
+            } else if pumpReservoir < ConstantsHomeView.pumpReservoirWarning {
+                return UIColor.systemYellow
+            }
+        }
+        
+        return nil
+    }
+    
+    func pumpBatteryPercentColor() -> Color? {
+        if let pumpBatteryPercent {
+            if pumpBatteryPercent < ConstantsHomeView.pumpBatteryPercentUrgent {
+                return .red
+            } else if pumpBatteryPercent < ConstantsHomeView.pumpBatteryPercentWarning {
+                return .yellow
+            }
+        }
+        
+        return nil
+    }
+    
+    func pumpBatteryPercentUIColor() -> UIColor? {
+        if let pumpBatteryPercent {
+            if pumpBatteryPercent < ConstantsHomeView.pumpBatteryPercentUrgent {
+                return UIColor.systemRed
+            } else if pumpBatteryPercent < ConstantsHomeView.pumpBatteryPercentWarning {
+                return UIColor.systemYellow
             }
         }
         
@@ -172,6 +314,8 @@ struct NightscoutDeviceStatusOpenAPSResponse: Codable {
             let insulinReq: Double?
             let rate: Double?
             let reason: String?
+            let received: Bool?
+            let recieved: Bool? // spelt incorrectly in iAPS
             let reservoir: Double?
             let sensitivityRatio: Double?
             let tdd: Double?
@@ -190,6 +334,8 @@ struct NightscoutDeviceStatusOpenAPSResponse: Codable {
                 case insulinReq
                 case rate
                 case reason
+                case received
+                case recieved // spelt incorrectly in iAPS
                 case reservoir
                 case sensitivityRatio
                 case tdd = "TDD"
@@ -202,10 +348,6 @@ struct NightscoutDeviceStatusOpenAPSResponse: Codable {
         let enacted: Suggested?
         let suggested: Suggested?
         let version: String?
-        
-        private enum CodingKeys: String, CodingKey {
-            case enacted, suggested, version
-        }
     }
     
     struct Pump: Codable {
@@ -241,6 +383,7 @@ struct NightscoutDeviceStatusOpenAPSResponse: Codable {
     
     struct Uploader: Codable {
         let battery: Int?
+        let isCharging: Bool?
     }
     
     let createdAt: String?
@@ -297,8 +440,8 @@ struct NightscoutDeviceStatusLoopResponse: Codable {
         }
         
         struct Predicted: Codable {
-          let startDate: String?
-          let values: [Double]?
+            let startDate: String?
+            let values: [Double]?
         }
         
         let automaticDoseRecommendation: AutomaticDoseRecommendation?
@@ -314,11 +457,23 @@ struct NightscoutDeviceStatusLoopResponse: Codable {
     }
     
     struct Override: Codable {
+        struct CurrentCorrectionRange: Codable {
+            let maxValue: Double?
+            let minValue: Double?
+        }
+        
         let active: Bool?
-        let timestamp: String?
+        let currentCorrectionRange: CurrentCorrectionRange?
+        let name: String?
+        let multiplier: Double?
     }
     
     struct Pump: Codable {
+        struct Battery: Codable {
+            let percent: Int?
+        }
+        
+        let battery: Battery?
         let bolusing: Bool?
         let clock: String?
         let manufacturer: String?

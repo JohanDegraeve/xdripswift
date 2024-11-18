@@ -18,7 +18,8 @@ struct AIDStatusView: View {
     
     // MARK: - private properties
     
-    @State private var showingAlert = false
+    // store a boolean flag. We'll toggle this with the timer to refresh the view
+    @State private var refreshView = false
     
     // save typing
     /// is true if the user is using mg/dL units (pulled from UserDefaults)
@@ -27,60 +28,69 @@ struct AIDStatusView: View {
     /// a common string to show in case a property/value is nil
     private let nilString = "-"
     
+    /// used to refresh the view every few seconds in case the device status has been updated in the background
+    private let timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
+    
     // MARK: - SwiftUI views
     
     var body: some View {
-        @State var deviceStatus = nightscoutSyncManager.deviceStatus
+        let deviceStatus = nightscoutSyncManager.deviceStatus
         
         NavigationView {
             VStack {
-                List {
-                    if 1 == 2 {
-                        Section(header: Text("Debug")) {
-                            row(title: "Last Nightscout check", data: deviceStatus.lastCheckedDate.formatted(date: .omitted, time: .standard))
-                            row(title: "Last Updated", data: deviceStatus.updatedDate.formatted(date: .omitted, time: .standard))
-                            row(title: "Created At", data: deviceStatus.createdAt.formatted(date: .omitted, time: .standard))
+                // show a nice colourful header to represent the AID system being followed and the status.
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(spacing: 8) {
+                        if let systemIcon = deviceStatus.systemIcon() {
+                            systemIcon.scaledToFit()
+                        }
+                        
+                        VStack(alignment: .leading, spacing: 1) {
+                            Text(deviceStatus.systemName() ?? "Status")
+                                .font(.title2).bold()
+                                .id(refreshView) // places the refresh here as this text view will always be shown
+                            
+                            if let appVersion = deviceStatus.appVersion {
+                                Text(appVersion.components(separatedBy: "-").first ?? nilString)
+                                    .font(.callout).bold()
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.5)
+                                    .foregroundStyle(Color(.colorSecondary))
+                            }
+                        }
+                        
+                        Spacer()
+                        
+                        HStack {
+                            deviceStatus.deviceStatusIconImage()
+                                .font(.title3)
+                                .foregroundStyle(deviceStatus.deviceStatusColor())
+                            
+                            Text(deviceStatus.deviceStatusTitle())
+                                .font(.title3).fontWeight(.semibold)
+                                .foregroundStyle(deviceStatus.deviceStatusColor())
                         }
                     }
-                    
+                    .padding(EdgeInsets(top: 10, leading: 15, bottom: 10, trailing: 15))
+                    .background(deviceStatus.deviceStatusBannerBackgroundColor()).clipShape(RoundedRectangle(cornerRadius: 10))
+                }
+                .padding(EdgeInsets(top: 8, leading: 18, bottom: 5, trailing: 18))
+                
+                // this is the main list view for all AID parameters
+                List {
                     Section(header: Text("System Status")) {
-                        //                        let didLoop = (nightscoutSyncManager.deviceStatus.didLoop ?? false) ? Texts_Common.yes : Texts_Common.no
-                        let lastLoop = deviceStatus.lastLoopDate != .distantPast ? nightscoutSyncManager.deviceStatus.lastLoopDate.formatted(date: .omitted, time: .shortened) : nilString
-                        let lastLoopAgo = deviceStatus.lastLoopDate != .distantPast ? " (\(deviceStatus.lastLoopDate.daysAndHoursAgo(appendAgo: true)))" : ""
-                        let lastUpdate = deviceStatus.createdAt != .distantPast ? nightscoutSyncManager.deviceStatus.createdAt.formatted(date: .omitted, time: .shortened) : nilString
-                        let lastUpdateAgo = deviceStatus.createdAt != .distantPast ? " (\(deviceStatus.createdAt.daysAndHoursAgo(appendAgo: true)))" : ""
+                        // if more than a few seconds difference between the last connection and last loop date, then show the connection separately
+                        if deviceStatus.lastLoopDate.timeIntervalSince(deviceStatus.createdAt) > 5 {
+                            row(title: "Last cycle", data: "\(deviceStatus.createdAt.formatted(date: .omitted, time: .shortened)) (\(deviceStatus.createdAt.daysAndHoursAgo(appendAgo: true)))")
+                        }
                         
-                        // show the app name and version number if available
-                        if let appVersion = deviceStatus.appVersion {
-                            if appVersion.count < 10 {
-                                row(title: "App name", data: "\(deviceStatus.systemName() ?? nilString) (\(appVersion))")
-                                
-                                // if the version number string is too long, use two lines
-                            } else {
-                                HStack {
-                                    Text("App name")
-                                    Spacer()
-                                    VStack(alignment: .trailing, spacing: 0) {
-                                        Text(deviceStatus.systemName() ?? nilString)
-                                            .foregroundColor(.secondary)
-                                        Text(appVersion)
-                                            .foregroundColor(.secondary)
-                                            .font(.caption)
-                                    }
-                                }
-                            }
+                        // show the last loop date only if it exists
+                        if deviceStatus.lastLoopDate != .distantPast {
+                            row(title: "Last loop", data: "\(deviceStatus.lastLoopDate.formatted(date: .omitted, time: .shortened)) (\(deviceStatus.lastLoopDate.daysAndHoursAgo(appendAgo: true)))")
                             
-                            // no version number available, so show only the app name
+                            // if not, show the nil string rather than just hiding the row. This gives context.
                         } else {
-                            row(title: "AID app", data: deviceStatus.systemName() ?? nilString)
-                        }
-                        
-                        if let deviceName = deviceStatus.deviceName() {
-                            row(title: "Device", data: deviceName)
-                        }
-                        
-                        if let error = deviceStatus.error {
-                            row(title: "Error", data: error.capitalized)
+                            row(title: "Last loop", data: nilString)
                         }
                         
                         // show the active profile if available (AAPS)
@@ -88,35 +98,62 @@ struct AIDStatusView: View {
                             row(title: "Active profile", data: activeProfile)
                         }
                         
+                        // show the override enabled if application (Loop)
+                        if let overrideIsActive = deviceStatus.overrideActive, overrideIsActive, let overrideName = deviceStatus.overrideName {
+                            if let overrideMaxValue = deviceStatus.overrideMaxValue, let overrideMinValue = deviceStatus.overrideMinValue {
+                                row(title: "Override", data: "\(overrideName) (\(overrideMinValue.mgDlToMmolAndToString(mgDl: isMgDl))-\(overrideMaxValue.mgDlToMmolAndToString(mgDl: isMgDl)))")
+                            } else {
+                                row(title: "Override", data: "\(overrideName)")
+                            }
+                        }
+                        
+                        if let error = deviceStatus.error {
+                            HStack {
+                                Text("Error")
+                                
+                                Spacer()
+                                
+                                Text(error)
+                                    .foregroundColor(.red)
+                                    .lineLimit(1)
+                            }
+                        }
+                    }
+                    
+                    Section(header: Text("Uploader")) {
+                        if let deviceName = deviceStatus.deviceName() {
+                            row(title: "Device", data: deviceName)
+                        }
+                        
                         HStack {
-                            Text("Uploader battery")
+                            Text("Battery")
+                            
                             Spacer()
+                            
                             // show if the uploader is charging (AAPS)
                             if let uploaderBatteryChargingImage = deviceStatus.uploaderBatteryChargingImage() {
-                                uploaderBatteryChargingImage.chargingImage
-                                    .foregroundStyle(uploaderBatteryChargingImage.chargingColor)
+                                uploaderBatteryChargingImage.image
+                                    .foregroundStyle(uploaderBatteryChargingImage.color)
                                     .imageScale(.small)
                             }
                             
-                            if let uploaderBatteryImage = deviceStatus.uploaderBatteryImage() {
-                                uploaderBatteryImage.batteryImage
-                                    .foregroundStyle(uploaderBatteryImage.batteryColor)
+                            if let uploaderBatteryImage = deviceStatus.batteryImage(percent: deviceStatus.uploaderBatteryPercent) {
+                                uploaderBatteryImage.image
+                                    .foregroundStyle(uploaderBatteryImage.color)
                             }
                             
-                            Text("\(deviceStatus.uploaderBattery?.description ?? nilString) %")
+                            Text("\(deviceStatus.uploaderBatteryPercent?.description ?? nilString) %")
                                 .foregroundColor(.secondary)
                         }
-                        
-                        row(title: "Last cycle", data: "\(lastUpdate)\(lastUpdateAgo)")
-                        
-                        row(title: "Last enacted cycle", data: "\(lastLoop)\(lastLoopAgo)")
                     }
                     
-                    Section(header: Text("AID Specific")) {
-                        row(title: "Temp basal rate", data: (deviceStatus.rate?.round(toDecimalPlaces: 1).description ?? "-") + " U/hr (" + (deviceStatus.duration?.description ?? "-") + " mins)")
+                    Section(header: Text("\(deviceStatus.systemName() ?? "AID") Specific")) {
+                        row(title: "Temp basal rate", data: (deviceStatus.rate?.round(toDecimalPlaces: 1).description ?? "-") + " U/hr")
+                        
+                        row(title: "Temp basal duration", data: (deviceStatus.duration?.description ?? "-") + " mins")
                         
                         if let bolusVolume = deviceStatus.bolusVolume {
-                            row(title: "Auto-bolus given", data: bolusVolume.round(toDecimalPlaces: 2).stringWithoutTrailingZeroes + " U")
+                            row(title: "Auto-bolus given", data: bolusVolume.round(toDecimalPlaces: 2).description + " U")
                         }
                         
                         row(title: "IOB", data: (deviceStatus.iob?.round(toDecimalPlaces: 2).stringWithoutTrailingZeroes ?? nilString) + " U")
@@ -149,27 +186,39 @@ struct AIDStatusView: View {
                     }
                     
                     Section(header: Text("Pump")) {
-                        // show the pump type if available (Loop)
-                        if let pumpManufacturer = deviceStatus.pumpManufacturer {
-                            row(title: "Manufacturer", data: pumpManufacturer)
-                        }
-                        
+                        // show the pump type if available
                         if let pumpModel = deviceStatus.pumpModel {
-                            row(title: "Model", data: pumpModel)
+                            row(title: "Model", data: "\(deviceStatus.pumpManufacturer ?? "") \(pumpModel)")
                         }
                         
                         if let pumpStatus = deviceStatus.pumpStatus {
                             row(title: "Status", data: pumpStatus.capitalized)
                         }
                         
-                        if deviceStatus.pumpManufacturer == "Insulet", deviceStatus.pumpReservoir == ConstantsNightscout.omniPodReservoirFlagNumber {
-                            row(title: "Insulin remaining", data: "50+ U")
-                        } else {
-                            row(title: "Insulin remaining", data: (deviceStatus.pumpReservoir?.round(toDecimalPlaces: 1).description ?? nilString) + " U")
+                        HStack {
+                            Text("Battery")
+                            
+                            Spacer()
+                            
+                            if let pumpBatteryImage = deviceStatus.batteryImage(percent: deviceStatus.pumpBatteryPercent) {
+                                pumpBatteryImage.image
+                                    .foregroundStyle(pumpBatteryImage.color)
+                            }
+                            
+                            Text("\(deviceStatus.pumpBatteryPercent?.description ?? nilString) %")
+                                .foregroundColor(.secondary)
                         }
-                        
-                        if let pumpBatteryPercent = deviceStatus.pumpBatteryPercent {
-                            row(title: "Battery", data: pumpBatteryPercent.description + " %")
+                                                
+                        if let pumpReservoir = deviceStatus.pumpReservoir, pumpReservoir == ConstantsNightscout.omniPodReservoirFlagNumber {
+                            row(title: "Reservoir", data: "50+ U")
+                            
+                        } else {
+                            if let pumpReservoir = deviceStatus.pumpReservoir {
+                                // show one decimal place if available when less than 10 units
+                                row(title: "Reservoir", data: (pumpReservoir.round(toDecimalPlaces: pumpReservoir < ConstantsHomeView.pumpReservoirUrgent ? 1 : 0).stringWithoutTrailingZeroes) + " U")
+                            } else {
+                                row(title: "Reservoir", data: nilString + " U")
+                            }
                         }
                         
                         if let baseBasalRate = deviceStatus.baseBasalRate {
@@ -178,7 +227,7 @@ struct AIDStatusView: View {
                     }
                     
                     if deviceStatus.reason != nil {
-                        Section(header: Text("AID response")) {
+                        Section(header: Text("\(deviceStatus.systemName() ?? "AID") response")) {
                             if let reasonValuesArray = deviceStatus.reasonValuesArray() {
                                 ForEach(reasonValuesArray, id: \.self) { reasonValue in
                                     Text(reasonValue.trimmingCharacters(in: .whitespaces))
@@ -190,9 +239,18 @@ struct AIDStatusView: View {
                             }
                         }
                     }
+                    
+                    /*
+                     Section(header: Text("Debug")) {
+                     row(title: "Last Nightscout check", data: deviceStatus.lastCheckedDate.formatted(date: .omitted, time: .standard))
+                     row(title: "Last device status update", data: deviceStatus.updatedDate.formatted(date: .omitted, time: .standard))
+                     row(title: "Created at", data: deviceStatus.createdAt.formatted(date: .omitted, time: .standard))
+                     row(title: "Last loop date", data: deviceStatus.lastLoopDate.formatted(date: .omitted, time: .standard))
+                     }
+                     */
                 }
             }
-            .navigationTitle("AID Follow Status")
+            .navigationTitle("Follow Status")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(Texts_Common.Cancel, action: {
@@ -200,6 +258,9 @@ struct AIDStatusView: View {
                     })
                 }
             }
+            .onReceive(timer, perform: { _ in
+                refreshView.toggle()
+            })
         }
         .colorScheme(.dark)
     }
@@ -216,9 +277,11 @@ struct AIDStatusView: View {
         // wrap the HStack in an AnyView so that it can be returned back to the caller
         let rowView = AnyView(HStack {
             Text(title)
+            
             Spacer()
+            
             Text(data)
-                .foregroundColor(.secondary)
+                .foregroundStyle(Color(.colorSecondary))
         })
         
         return rowView
