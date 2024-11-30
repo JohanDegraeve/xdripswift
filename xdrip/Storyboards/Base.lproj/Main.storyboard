@@ -628,7 +628,7 @@
                                                                                 </subviews>
                                                                             </stackView>
                                                                             <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="cbf-K1-Ctf">
-                                                                                <rect key="frame" x="115.33333333333334" y="0.0" width="63" height="35"/>
+                                                                                <rect key="frame" x="115" y="0.0" width="63" height="35"/>
                                                                                 <subviews>
                                                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="COB" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VTt-wV-7Zg">
                                                                                         <rect key="frame" x="0.0" y="0.0" width="33.666666666666664" height="35"/>
@@ -645,7 +645,7 @@
                                                                                 </subviews>
                                                                             </stackView>
                                                                             <stackView opaque="NO" contentMode="scaleToFill" spacing="6" translatesAutoresizingMaskIntoConstraints="NO" id="HY0-PA-Tqo">
-                                                                                <rect key="frame" x="236" y="0.0" width="124" height="35"/>
+                                                                                <rect key="frame" x="235.66666666666666" y="0.0" width="124.33333333333334" height="35"/>
                                                                                 <subviews>
                                                                                     <imageView hidden="YES" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="l4G-CD-Uh0">
                                                                                         <rect key="frame" x="0.0" y="4.6666666666666625" width="0.0" height="26.000000000000007"/>
@@ -657,13 +657,13 @@
                                                                                         <color key="color" name="colorPrimary"/>
                                                                                     </activityIndicatorView>
                                                                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="y2g-rq-uFS">
-                                                                                        <rect key="frame" x="26" y="0.33333333333333215" width="20" height="34.666666666666671"/>
+                                                                                        <rect key="frame" x="26.000000000000028" y="-3.5527136788005009e-15" width="20.333333333333329" height="35"/>
                                                                                         <color key="tintColor" name="colorTertiary"/>
-                                                                                        <imageReference key="image" image="circle" catalog="system" symbolScale="medium"/>
-                                                                                        <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="17" scale="default" weight="semibold"/>
+                                                                                        <imageReference key="image" image="xmark.circle" catalog="system" symbolScale="medium"/>
+                                                                                        <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="17" scale="default" weight="bold"/>
                                                                                     </imageView>
                                                                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3iM-CG-kDl">
-                                                                                        <rect key="frame" x="52" y="0.0" width="72" height="35"/>
+                                                                                        <rect key="frame" x="52.333333333333343" y="0.0" width="72" height="35"/>
                                                                                         <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
                                                                                         <color key="tintColor" name="colorSecondary"/>
                                                                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
@@ -676,7 +676,7 @@
                                                                                         </connections>
                                                                                     </button>
                                                                                     <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(-m)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8RJ-QC-aTl">
-                                                                                        <rect key="frame" x="124" y="0.0" width="0.0" height="35"/>
+                                                                                        <rect key="frame" x="124.33333333333334" y="0.0" width="0.0" height="35"/>
                                                                                         <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                                                         <color key="textColor" name="colorTertiary"/>
                                                                                         <nil key="highlightedColor"/>
@@ -2717,7 +2717,6 @@
         <image name="chart.bar.fill" catalog="system" width="128" height="90"/>
         <image name="chevron.backward" catalog="system" width="97" height="128"/>
         <image name="chevron.forward" catalog="system" width="97" height="128"/>
-        <image name="circle" catalog="system" width="128" height="123"/>
         <image name="circle.fill" catalog="system" width="128" height="123"/>
         <image name="d.circle" catalog="system" width="128" height="123"/>
         <image name="drop.circle" catalog="system" width="128" height="123"/>
@@ -2727,6 +2726,7 @@
         <image name="questionmark.circle" catalog="system" width="128" height="123"/>
         <image name="scope" catalog="system" width="128" height="124"/>
         <image name="speaker.wave.2.circle" catalog="system" width="128" height="123"/>
+        <image name="xmark.circle" catalog="system" width="128" height="123"/>
         <namedColor name="colorPrimary">
             <color white="0.89999997615814209" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </namedColor>

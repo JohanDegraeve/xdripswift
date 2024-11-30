@@ -24,11 +24,17 @@ extension XDripWidget.EntryView {
                     
                     Spacer()
                     
-                    Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
-                        .font(.title).fontWeight(.semibold)
-                        .foregroundStyle(entry.widgetState.deltaChangeTextColor())
-                        .minimumScaleFactor(0.5)
-                        .lineLimit(1)
+                    if let deviceStatusIconImage = entry.widgetState.deviceStatusIconImage(), let deviceStatusColor = entry.widgetState.deviceStatusColor() {
+                        deviceStatusIconImage
+                            .font(.body).bold()
+                            .foregroundStyle(deviceStatusColor)
+                    } else {
+                        Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
+                            .font(.title2).fontWeight(.semibold)
+                            .foregroundStyle(entry.widgetState.deltaChangeTextColor())
+                            .minimumScaleFactor(0.5)
+                            .lineLimit(1)
+                    }
                 }
                 .padding(.top, -6)
                 .padding(.bottom, 6)
@@ -62,11 +68,19 @@ extension XDripWidget.EntryView {
                     
                     Spacer()
                     
-                    Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
-                        .font(.title).fontWeight(.bold)
-                        .foregroundStyle(isAtNight() ? .white : entry.widgetState.deltaChangeTextColor())
-                        .minimumScaleFactor(0.5)
-                        .lineLimit(1)
+                    if let deviceStatusIconImage = entry.widgetState.deviceStatusIconImage(), let deviceStatusColor = entry.widgetState.deviceStatusColor() {
+                        HStack(alignment: .firstTextBaseline, spacing: 4) {
+                            deviceStatusIconImage
+                                .font(.title2).bold()
+                                .foregroundStyle(isAtNight() ? .white : deviceStatusColor)
+                        }
+                    } else {
+                        Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
+                            .font(.title).fontWeight(.bold)
+                            .foregroundStyle(isAtNight() ? .white : entry.widgetState.deltaChangeTextColor())
+                            .minimumScaleFactor(0.5)
+                            .lineLimit(1)
+                    }
                 }
                 .padding(.top, 0)
                 .padding(.bottom, 2)

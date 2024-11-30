@@ -63,7 +63,7 @@ struct AIDStatusView: View {
                         
                         HStack {
                             deviceStatus.deviceStatusIconImage()
-                                .font(.title3)
+                                .font(.title3).bold()
                                 .foregroundStyle(deviceStatus.deviceStatusColor())
                             
                             Text(deviceStatus.deviceStatusTitle())
@@ -108,14 +108,13 @@ struct AIDStatusView: View {
                         }
                         
                         if let error = deviceStatus.error {
-                            HStack {
+                            HStack(spacing: 8) {
                                 Text("Error")
-                                
                                 Spacer()
-                                
                                 Text(error)
                                     .foregroundColor(.red)
-                                    .lineLimit(1)
+                                    .lineLimit(2)
+                                    .minimumScaleFactor(0.7)
                             }
                         }
                     }
@@ -277,9 +276,7 @@ struct AIDStatusView: View {
         // wrap the HStack in an AnyView so that it can be returned back to the caller
         let rowView = AnyView(HStack {
             Text(title)
-            
             Spacer()
-            
             Text(data)
                 .foregroundStyle(Color(.colorSecondary))
         })
