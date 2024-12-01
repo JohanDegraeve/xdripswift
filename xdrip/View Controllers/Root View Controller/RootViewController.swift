@@ -1271,7 +1271,7 @@ final class RootViewController: UIViewController, ObservableObject {
         statisticsManager = StatisticsManager(coreDataManager: coreDataManager)
         
         // initialize watchManager
-        watchManager = WatchManager(coreDataManager: coreDataManager)
+        watchManager = WatchManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager!)
         
         // initialize chartGenerator in chartOutlet
         self.chartOutlet.chartGenerator = { [weak self] (frame) in
@@ -1670,10 +1670,17 @@ final class RootViewController: UIViewController, ObservableObject {
             
             updateLiveActivityAndWidgets(forceRestart: false)
             
-        case UserDefaults.Key.liveActivityType, UserDefaults.Key.nightscoutFollowType:
+        case UserDefaults.Key.liveActivityType:
             
             // check and configure the live activity if applicable
             updateLiveActivityAndWidgets(forceRestart: false)
+            
+        case UserDefaults.Key.nightscoutFollowType:
+            
+            // check and configure the live activity if applicable
+            updateLiveActivityAndWidgets(forceRestart: false)
+            
+            watchManager?.updateWatchApp(forceComplicationUpdate: false)
             
         case UserDefaults.Key.urgentLowMarkValue, UserDefaults.Key.lowMarkValue, UserDefaults.Key.highMarkValue, UserDefaults.Key.urgentHighMarkValue, UserDefaults.Key.nightscoutTreatmentsUpdateCounter:
             
@@ -3768,6 +3775,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 trace("RVC device status error: createdAt = %{public}@, lastChecked = %{public}@, lastLoopDate = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, nightscoutSyncManager?.deviceStatus.createdAt.formatted(date: .omitted, time: .standard) ?? "nil", nightscoutSyncManager?.deviceStatus.lastCheckedDate.formatted(date: .omitted, time: .standard) ?? "nil", nightscoutSyncManager?.deviceStatus.lastLoopDate.formatted(date: .omitted, time: .standard) ?? "nil")
             }
         }
+        
+        watchManager?.updateWatchApp(forceComplicationUpdate: false)
     }
 }
 

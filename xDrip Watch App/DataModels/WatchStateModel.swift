@@ -15,7 +15,6 @@ import WidgetKit
 /// holds, the watch state and allows updates and computed properties/variables to be generated for the different views that use it
 /// also used to update the ComplicationSharedUserDefaultsModel in the app group so that the complication can access the data
 final class WatchStateModel: NSObject, ObservableObject {
-    
     /// the Watch Connectivity session
     var session: WCSession
     
@@ -37,13 +36,13 @@ final class WatchStateModel: NSObject, ObservableObject {
     @Published var lowLimitInMgDl: Double = 80
     @Published var highLimitInMgDl: Double = 170
     @Published var urgentHighLimitInMgDl: Double = 250
-    @Published var updatedDate: Date = Date()
+    @Published var updatedDate: Date = .now
     @Published var activeSensorDescription: String = ""
     @Published var sensorAgeInMinutes: Double = 0
     @Published var sensorMaxAgeInMinutes: Double = 14400
-    @Published var timeStampOfLastFollowerConnection: Date = Date()
+    @Published var timeStampOfLastFollowerConnection: Date = .now
     @Published var secondsUntilFollowerDisconnectWarning: Int = 60 * 6
-    @Published var timeStampOfLastHeartBeat: Date = Date()
+    @Published var timeStampOfLastHeartBeat: Date = .now
     @Published var secondsUntilHeartBeatDisconnectWarning: Int = 90
     @Published var isMaster: Bool = true
     @Published var followerDataSourceType: FollowerDataSourceType = .nightscout
@@ -60,10 +59,17 @@ final class WatchStateModel: NSObject, ObservableObject {
     @Published var requestingDataIconColor: Color = ConstantsAppleWatch.requestingDataIconColorInactive
     @Published var lastComplicationUpdateTimeStamp: Date = .distantPast
     
+    // use this to track the AID/looping status
+    @Published var deviceStatusCreatedAt: Date = .distantPast
+    @Published var deviceStatusLastLoopDate: Date = .distantPast
+    @Published var deviceStatusIOB: Double = 0
+    @Published var deviceStatusCOB: Double = 0
+    @Published var lastLoopDateTimeAgoString: String = ""
+    
     // we use the following to record when the user has manually requested a state update on each view so that we can trigger the animation on just this view
     // this is to prevent the UI animating "pending animations" when we switch view tabs
-    @Published var updateBigNumberViewDate: Date = Date()
-    @Published var updateMainViewDate: Date = Date()
+    @Published var updateBigNumberViewDate: Date = .now
+    @Published var updateMainViewDate: Date = .now
     
     init(session: WCSession = .default) {
         self.session = session
@@ -183,7 +189,7 @@ final class WatchStateModel: NSObject, ObservableObject {
         if let bgReadingDate = bgReadingDate(), bgReadingDate > Date().addingTimeInterval(-60 * 20) {
             let deltaValueAsString = isMgDl ? deltaValueInUserUnit.mgDlToMmolAndToString(mgDl: isMgDl) : deltaValueInUserUnit.mmolToString()
             
-            var deltaSign: String = ""
+            var deltaSign = ""
             
             if deltaValueInUserUnit > 0 {
                 deltaSign = "+"
@@ -222,17 +228,17 @@ final class WatchStateModel: NSObject, ObservableObject {
     /// check when the last follower connection was and compare that to the actual time
     /// - Returns: image and color of the correct follower connection status
     func getFollowerConnectionNetworkStatus() -> (image: Image, color: Color) {
-            if timeStampOfLastFollowerConnection > Date().addingTimeInterval(-Double(secondsUntilFollowerDisconnectWarning)) {
-                return(Image(systemName: "network"), .green)
+        if timeStampOfLastFollowerConnection > Date().addingTimeInterval(-Double(secondsUntilFollowerDisconnectWarning)) {
+            return (Image(systemName: "network"), .green)
+        } else {
+            if followerBackgroundKeepAliveType != .disabled {
+                return (Image(systemName: "network.slash"), .red)
             } else {
-                if followerBackgroundKeepAliveType != .disabled {
-                    return(Image(systemName: "network.slash"), .red)
-                } else {
-                    // if keep-alive is disabled, then this will never show a constant server connection so just "disable"
-                    // the icon when not recent. It would be incorrect to show a red error.
-                    return(Image(systemName: "network.slash"), .gray)
-                }
+                // if keep-alive is disabled, then this will never show a constant server connection so just "disable"
+                // the icon when not recent. It would be incorrect to show a red error.
+                return (Image(systemName: "network.slash"), .gray)
             }
+        }
     }
     
     /// check when the last heartbeat connection was and compare that to the actual time
@@ -262,8 +268,6 @@ final class WatchStateModel: NSObject, ObservableObject {
                 self.debugString = self.debugString.replacingOccurrences(of: "Idle", with: "Fetching")
             }
             
-            print("Requesting watch state update from iOS")
-            
             session.sendMessage(["requestWatchUpdate": "watchState"], replyHandler: nil) { error in
                 print("WatchStateModel error: " + error.localizedDescription)
             }
@@ -273,7 +277,6 @@ final class WatchStateModel: NSObject, ObservableObject {
     /// used to return values and colors used by a SwiftUI gauge view
     /// - Returns: minValue/maxValue - used to define the limits of the gauge. nilValue - used if there is currently no data present (basically puts the gauge at the 50% mark). gaugeGradient - the color ranges used
     func gaugeModel() -> (minValue: Double, maxValue: Double, nilValue: Double, gaugeGradient: Gradient) {
-        
         // now we've got the values, if there is no recent reading, return a gray gradient
         if let bgReadingDate = bgReadingDate(), bgReadingDate < Date().addingTimeInterval(-60 * 7) {
             return (0, 1, 0.5, Gradient(colors: [.gray]))
@@ -282,7 +285,6 @@ final class WatchStateModel: NSObject, ObservableObject {
         var minValue: Double = lowLimitInMgDl
         var maxValue: Double = highLimitInMgDl
         var colorArray = [Color]()
-        
         
         // let's put the min and max values into values/context that makes sense for the UI we show to the user
         if let bgValueInMgDl = bgValueInMgDl() {
@@ -300,13 +302,13 @@ final class WatchStateModel: NSObject, ObservableObject {
         }
         
         // calculate a nil value to show on the gauge (as it can't display nil). This should basically just peg the gauge indicator in the middle of the current range
-        let nilValue =  minValue + ((maxValue - minValue) / 2)
+        let nilValue = minValue + ((maxValue - minValue) / 2)
         
         // this means that there is a recent reading so we can show a colored gauge
         // let's round the min value down to nearest 10 and the max up to nearest 10
         // this is to start creating the gradient ranges
-        let minValueRoundedDown = Double(10 * Int(minValue/10))
-        let maxValueRoundedUp = Double(10 * Int(maxValue/10)) + 10
+        let minValueRoundedDown = Double(10 * Int(minValue / 10))
+        let maxValueRoundedUp = Double(10 * Int(maxValue / 10)) + 10
         
         // the prevent the gradient changes from being too sharp, we'll reduce the granularity if trying to show a bigger range (such as >200mg/dL)
         let reducedGranularity = (maxValueRoundedUp - minValueRoundedDown) > 200
@@ -325,6 +327,50 @@ final class WatchStateModel: NSObject, ObservableObject {
         return (minValue, maxValue, nilValue, Gradient(colors: colorArray))
     }
     
+    func deviceStatusColor() -> Color? {
+        if deviceStatusLastLoopDate != .distantPast {
+            if deviceStatusLastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
+                return .green
+            } else if deviceStatusLastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+                return .green
+            } else if deviceStatusCreatedAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+                return .yellow
+            } else {
+                return .red
+            }
+        } else {
+            return nil
+        }
+    }
+    
+    func deviceStatusIconImage() -> Image? {
+        if deviceStatusLastLoopDate != .distantPast {
+            if deviceStatusLastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
+                return Image(systemName: "checkmark.circle.fill")
+            } else if deviceStatusLastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+                return Image(systemName: "checkmark.circle")
+            } else if deviceStatusCreatedAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+                return Image(systemName: "questionmark.circle")
+            } else {
+                return Image(systemName: "exclamationmark.circle")
+            }
+        } else {
+            return nil
+        }
+    }
+    
+    /// returns the minutes ago string of the last loop time
+    /// check if more than 1 hour has passed. If so, then the amount of text to show would be too much so return the shorter version
+    /// - Returns: string representation of last loop time as "(xm)"
+    func deviceStatusLastLoopMinsAgoString() -> String {
+        let diffComponents = Calendar.current.dateComponents([.hour], from: deviceStatusLastLoopDate, to: Date())
+        
+        if let hours = diffComponents.hour, hours < 1 {
+            return "(\(deviceStatusLastLoopDate.daysAndHoursAgo(appendAgo: false)))"
+        } else {
+            return "(-m)"
+        }
+    }
     
     // MARK: - Private functions used to interact with the WCSession and prepare internal data
     
@@ -335,8 +381,7 @@ final class WatchStateModel: NSObject, ObservableObject {
         // this is to avoid long delays when re-opening a Watch app for the first time in days and waiting
         // whilst the whole queue of userInfo messages are processed
         if let lastBgReadingDateFromDictionaryReceived = bgReadingDatesFromDictionary.first, Date(timeIntervalSince1970: lastBgReadingDateFromDictionaryReceived) > Date(timeIntervalSinceNow: -3600 * 12) {
-            
-            bgReadingDates = bgReadingDatesFromDictionary.map { (bgReadingDateAsDouble) -> Date in
+            bgReadingDates = bgReadingDatesFromDictionary.map { bgReadingDateAsDouble -> Date in
                 return Date(timeIntervalSince1970: bgReadingDateAsDouble)
             }
             
@@ -363,6 +408,12 @@ final class WatchStateModel: NSObject, ObservableObject {
             keepAliveIsDisabled = dictionary["keepAliveIsDisabled"] as? Bool ?? false
             remainingComplicationUserInfoTransfers = dictionary["remainingComplicationUserInfoTransfers"] as? Int ?? 99
             liveDataIsEnabled = dictionary["liveDataIsEnabled"] as? Bool ?? false
+            
+            deviceStatusCreatedAt = Date(timeIntervalSince1970: dictionary["deviceStatusCreatedAt"] as? Double ?? 0)
+            deviceStatusLastLoopDate = Date(timeIntervalSince1970: dictionary["deviceStatusLastLoopDate"] as? Double ?? 0)
+            deviceStatusIOB = dictionary["deviceStatusIOB"] as? Double ?? 0
+            deviceStatusCOB = dictionary["deviceStatusCOB"] as? Double ?? 0
+            lastLoopDateTimeAgoString = deviceStatusLastLoopMinsAgoString()
             
             // check if there is any BG data available before updating the data source info strings accordingly
             if let bgReadingDate = bgReadingDate() {
@@ -404,10 +455,8 @@ final class WatchStateModel: NSObject, ObservableObject {
         lastComplicationUpdateTimeStamp = .now
     }
     
-    
     // generate a debugString
     private func generateDebugString() -> String {
-        
         var debugString = "Last state: \(Date().formatted(date: .omitted, time: .standard))"
         
         // check if there is any BG data available before updating the strings accordingly
@@ -447,12 +496,12 @@ extension WatchStateModel: WCSessionDelegate {
         }
     }
     
-    func sessionReachabilityDidChange(_ session: WCSession) {}
+    func sessionReachabilityDidChange(_: WCSession) {}
     
-    func session(_: WCSession, didReceiveMessageData messageData: Data) {}
+    func session(_: WCSession, didReceiveMessageData _: Data) {}
     
-    func session(_: WCSession, didReceiveMessage message: [String : Any]) {
-        let watchStateAsDictionary = message["watchState"] as! [String : Any]
+    func session(_: WCSession, didReceiveMessage message: [String: Any]) {
+        let watchStateAsDictionary = message["watchState"] as! [String: Any]
         
         DispatchQueue.main.async {
             self.processWatchStateFromDictionary(dictionary: watchStateAsDictionary)
@@ -468,10 +517,10 @@ extension WatchStateModel: WCSessionDelegate {
     
 //    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
     func session(_: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
-        let watchStateAsDictionary = userInfo["watchState"] as! [String : Any]
-            DispatchQueue.main.async {
-                self.processWatchStateFromDictionary(dictionary: watchStateAsDictionary)
-            }
+        let watchStateAsDictionary = userInfo["watchState"] as! [String: Any]
+        DispatchQueue.main.async {
+            self.processWatchStateFromDictionary(dictionary: watchStateAsDictionary)
+        }
 //        }
-     }
+    }
 }

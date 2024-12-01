@@ -15,16 +15,17 @@ public enum GlucoseChartType: Int, CaseIterable {
     case liveActivity = 0
     case dynamicIsland = 1
     case watchApp = 2
-    case watchAccessoryRectangular = 3
-    case widgetSystemSmall = 4
-    case widgetSystemSmallStandBy = 5
-    case widgetSystemMedium = 6
-    case widgetSystemLarge = 7
-    case widgetAccessoryRectangular = 8
-    case siriGlucoseIntent = 9
-    case notificationImageThumbnail = 10
-    case notificationExpanded = 11
-    case notificationWatch = 12
+    case watchAppWithAIDStatus = 3
+    case watchAccessoryRectangular = 4
+    case widgetSystemSmall = 5
+    case widgetSystemSmallStandBy = 6
+    case widgetSystemMedium = 7
+    case widgetSystemLarge = 8
+    case widgetAccessoryRectangular = 9
+    case siriGlucoseIntent = 10
+    case notificationImageThumbnail = 11
+    case notificationExpanded = 12
+    case notificationWatch = 13
     
     var description: String {
         switch self {
@@ -32,7 +33,7 @@ public enum GlucoseChartType: Int, CaseIterable {
             return "Live Activity Notification Chart"
         case .dynamicIsland:
             return "Dynamic Island (Expanded) Chart"
-        case .watchApp:
+        case .watchApp, .watchAppWithAIDStatus:
             return "Apple Watch Chart"
         case .watchAccessoryRectangular:
             return "Watch Chart .accessoryRectangular"
@@ -72,6 +73,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return (ConstantsGlucoseChartSwiftUI.viewWidthDynamicIsland, ConstantsGlucoseChartSwiftUI.viewHeightDynamicIsland)
         case .watchApp:
             return (ConstantsGlucoseChartSwiftUI.viewWidthWatchApp, ConstantsGlucoseChartSwiftUI.viewHeightWatchApp)
+        case .watchAppWithAIDStatus:
+            return (ConstantsGlucoseChartSwiftUI.viewWidthWatchApp, ConstantsGlucoseChartSwiftUI.viewHeightWatchAppWithAIDStatus)
         case .watchAccessoryRectangular:
             return (ConstantsGlucoseChartSwiftUI.viewWidthWatchAccessoryRectangular, ConstantsGlucoseChartSwiftUI.viewHeightWatchAccessoryRectangular)
         case .widgetSystemSmall:
@@ -106,7 +109,7 @@ public enum GlucoseChartType: Int, CaseIterable {
             }
         case .dynamicIsland:
             return ConstantsGlucoseChartSwiftUI.hoursToShowDynamicIsland
-        case .watchApp:
+        case .watchApp, .watchAppWithAIDStatus:
             return ConstantsGlucoseChartSwiftUI.hoursToShowWatchApp
         case .watchAccessoryRectangular:
             return ConstantsGlucoseChartSwiftUI.hoursToShowWatchAccessoryRectangular
@@ -144,7 +147,7 @@ public enum GlucoseChartType: Int, CaseIterable {
         }
         case .dynamicIsland:
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterDynamicIsland
-        case .watchApp:
+        case .watchApp, .watchAppWithAIDStatus:
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterWatchApp
         case .watchAccessoryRectangular:
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterWatchAccessoryRectangular

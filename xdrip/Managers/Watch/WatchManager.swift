@@ -7,12 +7,11 @@
 //
 
 import Foundation
+import OSLog
 import WatchConnectivity
 import WidgetKit
-import OSLog
 
 final class WatchManager: NSObject, ObservableObject {
-    
     // MARK: - private properties
     
     /// a watch connectivity session instance
@@ -23,6 +22,9 @@ final class WatchManager: NSObject, ObservableObject {
     
     /// a coreDataManager instance (must be passed from RVC in the initializer)
     private var coreDataManager: CoreDataManager
+    
+    /// NightscoutSyncManager instance
+    private var nightscoutSyncManager: NightscoutSyncManager
     
     /// hold the current watch state model
     private var watchState = WatchState()
@@ -35,11 +37,12 @@ final class WatchManager: NSObject, ObservableObject {
     
     // MARK: - intializer
     
-    init(coreDataManager: CoreDataManager, session: WCSession = .default) {
-        
+    init(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager, session: WCSession = .default) {
         // set coreDataManager and bgReadingsAccessor
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
+        self.nightscoutSyncManager = nightscoutSyncManager
+        
         self.session = session
         
         super.init()
@@ -50,7 +53,6 @@ final class WatchManager: NSObject, ObservableObject {
         }
         
         processWatchState(forceComplicationUpdate: false)
-        
     }
     
     private func processWatchState(forceComplicationUpdate: Bool) {
@@ -60,17 +62,16 @@ final class WatchManager: NSObject, ObservableObject {
         
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
-        let bgReadings = self.bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: .now.addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: .now.addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
         
         let slopeOrdinal: Int = !bgReadings.isEmpty ? bgReadings[0].slopeOrdinal() : 1
         
-        var previousValueInUserUnit: Double = 0.0
-        var actualValueInUserUnit: Double = 0.0
-        var deltaValueInUserUnit: Double = 0.0
+        var previousValueInUserUnit = 0.0
+        var actualValueInUserUnit = 0.0
+        var deltaValueInUserUnit = 0.0
         
         // add delta if available
         if bgReadings.count > 1 {
-
             previousValueInUserUnit = bgReadings[1].calculatedValue.mgDlToMmol(mgDl: isMgDl)
             actualValueInUserUnit = bgReadings[0].calculatedValue.mgDlToMmol(mgDl: isMgDl)
             
@@ -128,6 +129,12 @@ final class WatchManager: NSObject, ObservableObject {
             watchState.timeStampOfLastFollowerConnection = timeStampOfLastFollowerConnection
         }
         
+        // add AID/loop status data
+        watchState.deviceStatusCreatedAt = nightscoutSyncManager.deviceStatus.createdAt.timeIntervalSince1970
+        watchState.deviceStatusLastLoopDate = nightscoutSyncManager.deviceStatus.lastLoopDate.timeIntervalSince1970
+        watchState.deviceStatusIOB = nightscoutSyncManager.deviceStatus.iob
+        watchState.deviceStatusCOB = nightscoutSyncManager.deviceStatus.cob
+        
         watchState.remainingComplicationUserInfoTransfers = session.remainingComplicationUserInfoTransfers
         
         sendStateToWatch(forceComplicationUpdate: false)
@@ -135,18 +142,18 @@ final class WatchManager: NSObject, ObservableObject {
     
     func sendStateToWatch(forceComplicationUpdate: Bool) {
         guard session.isPaired else {
-            trace("no Watch is paired", log: self.log, category: ConstantsLog.categoryWatchManager, type: .debug)
+            trace("no Watch is paired", log: log, category: ConstantsLog.categoryWatchManager, type: .debug)
             return
         }
         
         guard session.isWatchAppInstalled else {
-            trace("watch app is not installed", log: self.log, category: ConstantsLog.categoryWatchManager, type: .debug)
+            trace("watch app is not installed", log: log, category: ConstantsLog.categoryWatchManager, type: .debug)
             return
         }
         
         guard session.activationState == .activated else {
             let activationStateString = "\(session.activationState)"
-            trace("watch session activationState = %{public}@. Reactivating", log: self.log, category: ConstantsLog.categoryWatchManager, type: .error, activationStateString)
+            trace("watch session activationState = %{public}@. Reactivating", log: log, category: ConstantsLog.categoryWatchManager, type: .error, activationStateString)
             session.activate()
             return
         }
@@ -157,21 +164,20 @@ final class WatchManager: NSObject, ObservableObject {
         // if not, then just send it as a normal priority transferUserInfo (but limit the sending to once every 5 minutes!) which will be queued and sent as soon as the watch app is reachable again (this will help get the app showing data quicker)
         if let userInfo: [String: Any] = watchState.asDictionary {
             if session.isReachable {
-                session.sendMessage(["watchState": userInfo], replyHandler: nil, errorHandler: { (error) -> Void in
+                session.sendMessage(["watchState": userInfo], replyHandler: nil, errorHandler: { error in
                     trace("error sending watch state, error = %{public}@", log: self.log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)
                 })
             } else {
                 if (lastForcedComplicationUpdateTimeStamp < .now.addingTimeInterval(-Double(UserDefaults.standard.forceComplicationUpdateInMinutes * 60)) && session.isComplicationEnabled && UserDefaults.standard.showDataInWatchComplications) || forceComplicationUpdate {
-                    
                     let updateType: String = forceComplicationUpdate ? "forcing" : "sending"
                     
-                    trace("%{public}@ background complication update every %{public}@ minutes, remaining complication transfers left today: %{public}@ / 50", log: self.log, category: ConstantsLog.categoryWatchManager, type: .info, updateType, UserDefaults.standard.forceComplicationUpdateInMinutes.description, session.remainingComplicationUserInfoTransfers.description)
+                    trace("%{public}@ background complication update every %{public}@ minutes, remaining complication transfers left today: %{public}@ / 50", log: log, category: ConstantsLog.categoryWatchManager, type: .info, updateType, UserDefaults.standard.forceComplicationUpdateInMinutes.description, session.remainingComplicationUserInfoTransfers.description)
                     
                     session.transferCurrentComplicationUserInfo(["watchState": userInfo])
                     lastForcedComplicationUpdateTimeStamp = .now
                     UserDefaults.standard.remainingComplicationUserInfoTransfers = session.remainingComplicationUserInfoTransfers
                 } else {
-                    trace("sending background watch state update", log: self.log, category: ConstantsLog.categoryWatchManager, type: .info)
+                    trace("sending background watch state update", log: log, category: ConstantsLog.categoryWatchManager, type: .info)
                     
                     session.transferUserInfo(["watchState": userInfo])
                 }
@@ -179,14 +185,12 @@ final class WatchManager: NSObject, ObservableObject {
         }
     }
     
-    
     // MARK: - Public functions
     
     func updateWatchApp(forceComplicationUpdate: Bool) {
         processWatchState(forceComplicationUpdate: forceComplicationUpdate)
     }
 }
-
 
 // MARK: - conform to WCSessionDelegate protocol
 
@@ -199,12 +203,10 @@ extension WatchManager: WCSessionDelegate {
         session.activate()
     }
     
-    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-    }
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {}
     
     // process any received messages from the watch app
-    func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-        
+    func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
         // check which type of update the Watch is requesting and call the correct sending function as needed
         if let requestWatchUpdate = message["requestWatchUpdate"] as? String {
             switch requestWatchUpdate {

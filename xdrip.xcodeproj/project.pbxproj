@@ -206,6 +206,7 @@
 		47E3DB372C769C9600DE1AF0 /* AlgorithmType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47E3DB362C769C9600DE1AF0 /* AlgorithmType.swift */; };
 		47E3DB3A2C77C0D700DE1AF0 /* CalibrationType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47E3DB392C77C0D700DE1AF0 /* CalibrationType.swift */; };
 		47E91BBA2B9A43F20063181B /* FollowerBackgroundKeepAliveType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */; };
+		47EBE8A42CFB8F9C00BB09F5 /* MainViewAIDStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47EBE8A32CFB8F9100BB09F5 /* MainViewAIDStatusView.swift */; };
 		47EDD1402BDD4F5D00C5A286 /* ConstantsWidgetExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47EDD13E2BDD4F5D00C5A286 /* ConstantsWidgetExtension.swift */; };
 		47EDD1422BDD4FE500C5A286 /* XDripWidgetAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A5042B40709E00419052 /* XDripWidgetAttributes.swift */; };
 		47EDD1432BDD4FE900C5A286 /* ConstantsWidgetExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47EDD13E2BDD4F5D00C5A286 /* ConstantsWidgetExtension.swift */; };
@@ -1033,6 +1034,7 @@
 		47E3BEC62CD780D900B794A0 /* AIDStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIDStatusView.swift; sourceTree = "<group>"; };
 		47E3DB362C769C9600DE1AF0 /* AlgorithmType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlgorithmType.swift; sourceTree = "<group>"; };
 		47E3DB392C77C0D700DE1AF0 /* CalibrationType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibrationType.swift; sourceTree = "<group>"; };
+		47EBE8A32CFB8F9100BB09F5 /* MainViewAIDStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewAIDStatusView.swift; sourceTree = "<group>"; };
 		47EDD13E2BDD4F5D00C5A286 /* ConstantsWidgetExtension.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsWidgetExtension.swift; sourceTree = "<group>"; };
 		47EDD1452BDD565A00C5A286 /* TextsWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsWatchApp.swift; sourceTree = "<group>"; };
 		47EDD1482BDD56C800C5A286 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/WatchApp.strings; sourceTree = "<group>"; };
@@ -2048,6 +2050,7 @@
 		478A92542B8F95930084C394 /* SubViews */ = {
 			isa = PBXGroup;
 			children = (
+				47EBE8A32CFB8F9100BB09F5 /* MainViewAIDStatusView.swift */,
 				47DE41B22B8672F90041DA19 /* MainViewDataSourceView.swift */,
 				47DE41B42B8693CB0041DA19 /* MainViewHeaderView.swift */,
 				479359992B8A2A4E007D3CEE /* MainViewInfoView.swift */,
@@ -4303,6 +4306,7 @@
 				47A6AC2B2B7D3DE30047A4BA /* GlucoseChartView.swift in Sources */,
 				47DE41B52B8693CB0041DA19 /* MainViewHeaderView.swift in Sources */,
 				47A6AC342B7D3E260047A4BA /* ConstantsBloodGlucose.swift in Sources */,
+				47EBE8A42CFB8F9C00BB09F5 /* MainViewAIDStatusView.swift in Sources */,
 				47A6AC2E2B7D3E170047A4BA /* Double.swift in Sources */,
 				47A6AC392B7D3E770047A4BA /* TextsHomeView.swift in Sources */,
 				47CA61E72B97948000C2A597 /* FollowerDataSourceType.swift in Sources */,

@@ -16,11 +16,9 @@ struct MainViewDataSourceView: View {
     
     var body: some View {
         VStack(spacing: 2) {
-            
             let textSize: CGFloat = isSmallScreen ? 12 : 14
             
             if (watchState.activeSensorDescription != "" || watchState.sensorAgeInMinutes > 0) || !watchState.isMaster {
-                
                 ProgressView(value: Float(watchState.activeSensorProgress().progress))
                     .tint(ConstantsHomeView.sensorProgressViewNormalColorSwiftUI)
                     .scaleEffect(x: 1, y: 0.3, anchor: .center)
@@ -72,7 +70,6 @@ struct MainViewDataSourceView: View {
 }
 
 struct MainViewDataSourceView_Previews: PreviewProvider {
-    
     static func bgDateArray() -> [Date] {
         let endDate = Date()
         let startDate = endDate.addingTimeInterval(-3600 * 12)
@@ -89,13 +86,12 @@ struct MainViewDataSourceView_Previews: PreviewProvider {
     }
     
     static func bgValueArray() -> [Double] {
-        
-        var bgValueArray:[Double] = Array(repeating: 0, count: 144)
+        var bgValueArray: [Double] = Array(repeating: 0, count: 144)
         var currentValue: Double = 120
-        var increaseValues: Bool = true
+        var increaseValues = true
         
         for index in bgValueArray.indices {
-            let randomValue = Double(Int.random(in: -10..<30))
+            let randomValue = Double(Int.random(in: -10 ..< 30))
             
             if currentValue < 70 {
                 increaseValues = true

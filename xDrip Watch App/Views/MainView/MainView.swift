@@ -39,7 +39,15 @@ struct MainView: View {
                         watchState.requestWatchStateUpdate()
                     }
                 
-                GlucoseChartView(glucoseChartType: .watchApp, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4, overrideChartHeight: overrideChartHeight, overrideChartWidth: overrideChartWidth, highContrast: nil)
+                if watchState.deviceStatusIconImage() != nil {
+                    MainViewAIDStatusView()
+                        .padding([.leading,], 0)
+                        .padding([.trailing], 10)
+                        .padding([.top], 2)
+                        .padding([.bottom], 6)
+                }
+                
+                GlucoseChartView(glucoseChartType: watchState.deviceStatusIconImage() == nil ? .watchApp : .watchAppWithAIDStatus, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4, overrideChartHeight: overrideChartHeight, overrideChartWidth: overrideChartWidth, highContrast: nil)
                     .gesture(
                         DragGesture(minimumDistance: 80, coordinateSpace: .local)
                             .onEnded({ value in
@@ -148,6 +156,10 @@ struct ContentView_Previews: PreviewProvider {
         watchState.isMaster = false
         watchState.followerDataSourceType = .libreLinkUp
         watchState.followerBackgroundKeepAliveType = .heartbeat
+        watchState.deviceStatusIOB = 2.25
+        watchState.deviceStatusCOB = 24
+        watchState.deviceStatusCreatedAt = Date().addingTimeInterval(-180)
+        watchState.deviceStatusLastLoopDate = Date().addingTimeInterval(-125)
         
         return Group {
             MainView()
