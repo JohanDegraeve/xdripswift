@@ -72,7 +72,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// a sync may have started, and while running, the user may have created a new treatment. In that case, a sync will not be restarted, but wait till the previous is finished. This variable is used to verify if a new sync is required after having finished one
     ///
     /// Must be read/written in main thread !!
-    private var nightscoutTreatmentSyncRequired = false
+    private var nightscoutSyncRequired = false
     
     static let iso8601DateFormatterWithoutFractionalSeconds: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
@@ -135,7 +135,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutUseSchedule.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutSchedule.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutToken.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutSyncTreatmentsRequired.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutSyncRequired.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerUploadDataToNightscout.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue, options: .new, context: nil)
     }
@@ -150,11 +150,11 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         // and nightscoutUrl exists
         guard UserDefaults.standard.nightscoutEnabled, UserDefaults.standard.nightscoutUrl != nil else { return }
         
-        if (UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
-            trace("    setting nightscoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+        if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+            trace("    setting nightscoutSyncRequired to true, this will also initiate a treatments/devicestatus sync", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
             
-            UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest = .now
-            UserDefaults.standard.nightscoutSyncTreatmentsRequired = true
+            UserDefaults.standard.timeStampLatestNightscoutSyncRequest = .now
+            UserDefaults.standard.nightscoutSyncRequired = true
         }
         
         // check that either master is enabled or if we're using a follower mode other than Nightscout and the user wants to upload the BG values
@@ -209,13 +209,13 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         // no sync needed if app is running in the background
         // guard UserDefaults.standard.appInForeGround else {return}
         
-        // if sync already running, then set nightscoutTreatmentSyncRequired to true
+        // if sync already running, then set nightscoutSyncRequired to true
         // sync is running already, once stopped it will rerun
         if let nightscoutSyncStartTimeStamp = nightscoutSyncStartTimeStamp {
             if Date().timeIntervalSince(nightscoutSyncStartTimeStamp) < maxDurationNightscoutSync {
                 trace("in syncWithNightscout but previous sync still running. Sync will be started after finishing the previous sync", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
                 
-                nightscoutTreatmentSyncRequired = true
+                nightscoutSyncRequired = true
                 
                 return
             }
@@ -335,9 +335,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                                         // next step in the sync process
                                         // sync again if necessary (user may have created or updated treatments while previous sync was running)
                                         // ********************************************************************************************
-                                        if self.nightscoutTreatmentSyncRequired {
+                                        if self.nightscoutSyncRequired {
                                             // set to false to avoid it starts again after having restarted it (unless off course it's set to true in another place by the time the sync has finished
-                                            self.nightscoutTreatmentSyncRequired = false
+                                            self.nightscoutSyncRequired = false
                                             
                                             trace("relaunching nightscoutsync", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
                                             
@@ -426,13 +426,13 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         }
                     }
                     
-                case UserDefaults.Key.nightscoutSyncTreatmentsRequired:
+                case UserDefaults.Key.nightscoutSyncRequired:
                     
                     if keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
-                        // if nightscoutSyncTreatmentsRequired didn't change to true then no further processing
-                        guard UserDefaults.standard.nightscoutSyncTreatmentsRequired else { return }
+                        // if nightscoutSyncRequired didn't change to true then no further processing
+                        guard UserDefaults.standard.nightscoutSyncRequired else { return }
                         
-                        UserDefaults.standard.nightscoutSyncTreatmentsRequired = false
+                        UserDefaults.standard.nightscoutSyncRequired = false
                         
                         syncWithNightscout()
                     }
@@ -477,10 +477,10 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     // set the flag to sync Nightscout treatments if a short time has passed since the last time
     // as accessing userdefaults is not thread-safe
-    private func setNightscoutSyncTreatmentsRequiredToTrue() {
-        if (UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
-            UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest = .now
-            UserDefaults.standard.nightscoutSyncTreatmentsRequired = true
+    private func setNightscoutSyncRequiredToTrue() {
+        if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+            UserDefaults.standard.timeStampLatestNightscoutSyncRequest = .now
+            UserDefaults.standard.nightscoutSyncRequired = true
         }
     }
     

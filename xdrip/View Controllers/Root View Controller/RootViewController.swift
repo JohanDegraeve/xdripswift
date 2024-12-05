@@ -850,7 +850,7 @@ final class RootViewController: UIViewController, ObservableObject {
             }
             
             // launch Nightscout sync
-            self.setNightscoutSyncTreatmentsRequiredToTrue(forceNow: true)
+            self.setNightscoutSyncRequiredToTrue(forceNow: true)
             
             self.updateLiveActivityAndWidgets(forceRestart: false)
             
@@ -1066,7 +1066,7 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // launch nightscout treatment sync whenever the app comes to the foreground
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyStartNightscoutTreatmentSync, closure: {
-            self.setNightscoutSyncTreatmentsRequiredToTrue(forceNow: true)
+            self.setNightscoutSyncRequiredToTrue(forceNow: true)
         })
         
     }
@@ -2290,7 +2290,7 @@ final class RootViewController: UIViewController, ObservableObject {
     ///     - forceReset : if true, then force the update to be done even if the main chart is panned back in time (used for the double tap gesture)
     @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
         
-        setNightscoutSyncTreatmentsRequiredToTrue(forceNow: false)
+        setNightscoutSyncRequiredToTrue(forceNow: false)
         
         // this is not really the nicest place to do this, but it works well
         // take advantage of the timer execution to update the AID status views
@@ -3639,10 +3639,10 @@ final class RootViewController: UIViewController, ObservableObject {
         }
     }
     
-    private func setNightscoutSyncTreatmentsRequiredToTrue(forceNow: Bool) {
-        if forceNow || (UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
-            UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest = .now
-            UserDefaults.standard.nightscoutSyncTreatmentsRequired = true
+    private func setNightscoutSyncRequiredToTrue(forceNow: Bool) {
+        if forceNow || (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+            UserDefaults.standard.timeStampLatestNightscoutSyncRequest = .now
+            UserDefaults.standard.nightscoutSyncRequired = true
         }
     }
     

@@ -201,11 +201,11 @@ class LibreLinkUpFollowManager: NSObject {
         
         trace("in download", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
         
-        if (UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow > 15 {
-            trace("    setting nightscoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
+        if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow > 15 {
+            trace("    setting nightscoutSyncRequired to true, this will also initiate a treatments/devicestatus sync", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
             
-            UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest = .now
-            UserDefaults.standard.nightscoutSyncTreatmentsRequired = true
+            UserDefaults.standard.timeStampLatestNightscoutSyncRequest = .now
+            UserDefaults.standard.nightscoutSyncRequired = true
         }
         
         guard !UserDefaults.standard.isMaster else {

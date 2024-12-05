@@ -193,7 +193,7 @@ extension UserDefaults {
         /// is a  nightscout sync of treatments required
         ///
         /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightscoutSyncManager and when set to true, the manager knows a new sync is required
-        case nightscoutSyncTreatmentsRequired = "nightscoutSyncTreatmentsRequired"
+        case nightscoutSyncRequired = "nightscoutSyncRequired"
 
         /// used to trigger view controllers that there's a change in TreatmentEntries
         ///
@@ -331,7 +331,7 @@ extension UserDefaults {
         /// timestamp lastest reading uploaded to Nightscout
         case timeStampLatestNSUploadedBgReadingToNightscout = "timeStampLatestUploadedBgReading"
         /// timestamp lastest treatment sync request to Nightscout
-        case timeStampLatestNightscoutTreatmentSyncRequest = "timeStampLatestNightscoutTreatmentSyncRequest"
+        case timeStampLatestNightscoutSyncRequest = "timeStampLatestNightscoutSyncRequest"
         /// timestamp latest calibration uploaded to Nightscout
         case timeStampLatestNSUploadedCalibrationToNightscout = "timeStampLatestUploadedCalibration"
         
@@ -1423,22 +1423,22 @@ extension UserDefaults {
     /// is a  nightscout sync of treatments required
     ///
     /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightscoutSyncManager and when set to true, the manager knows a new sync is required
-    @objc dynamic var nightscoutSyncTreatmentsRequired: Bool {
+    @objc dynamic var nightscoutSyncRequired: Bool {
         get {
-            return bool(forKey: Key.nightscoutSyncTreatmentsRequired.rawValue)
+            return bool(forKey: Key.nightscoutSyncRequired.rawValue)
         }
         set {
-            set(newValue, forKey: Key.nightscoutSyncTreatmentsRequired.rawValue)
+            set(newValue, forKey: Key.nightscoutSyncRequired.rawValue)
         }
     }
     
     /// timestamp lastest reading uploaded to Nightscout
-    var timeStampLatestNightscoutTreatmentSyncRequest: Date? {
+    var timeStampLatestNightscoutSyncRequest: Date? {
         get {
-            return object(forKey: Key.timeStampLatestNightscoutTreatmentSyncRequest.rawValue) as? Date
+            return object(forKey: Key.timeStampLatestNightscoutSyncRequest.rawValue) as? Date
         }
         set {
-            set(newValue, forKey: Key.timeStampLatestNightscoutTreatmentSyncRequest.rawValue)
+            set(newValue, forKey: Key.timeStampLatestNightscoutSyncRequest.rawValue)
         }
     }
     
@@ -1485,10 +1485,10 @@ extension UserDefaults {
     /// will be set to true when the nightscout device status has been updated fully
     @objc dynamic var nightscoutDeviceStatusWasUpdated: Bool {
         get {
-            return bool(forKey: Key.nightscoutSyncTreatmentsRequired.rawValue)
+            return bool(forKey: Key.nightscoutSyncRequired.rawValue)
         }
         set {
-            set(newValue, forKey: Key.nightscoutSyncTreatmentsRequired.rawValue)
+            set(newValue, forKey: Key.nightscoutSyncRequired.rawValue)
         }
     }
 

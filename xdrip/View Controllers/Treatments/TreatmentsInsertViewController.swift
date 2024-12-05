@@ -229,7 +229,7 @@ class TreatmentsInsertViewController: UIViewController {
                         treatMentEntryToUpdate.uploaded = false
 
                         // trigger nightscoutsync
-                        self.setNightscoutSyncTreatmentsRequiredToTrue()
+                        self.setNightscoutSyncRequiredToTrue()
                     }
                     
                 } else {
@@ -242,7 +242,7 @@ class TreatmentsInsertViewController: UIViewController {
                         treatMentEntryToUpdate.uploaded = false
                         
                         // trigger nightscoutsync
-                        self.setNightscoutSyncTreatmentsRequiredToTrue()
+                        self.setNightscoutSyncRequiredToTrue()
                         
                         self.treatMentEntryToUpdate = nil
                     }
@@ -298,7 +298,7 @@ class TreatmentsInsertViewController: UIViewController {
                     _ = TreatmentEntry(date: Date(timeInterval: dateOffset, since: datePicker.date), value: value, treatmentType: treatmentType, nightscoutEventType: nil, enteredBy: nil, nsManagedObjectContext: self.coreDataManager.mainManagedObjectContext)
                     
                     // trigger nightscoutsync
-                    setNightscoutSyncTreatmentsRequiredToTrue()
+                    setNightscoutSyncRequiredToTrue()
                     
                     // save to coredata
                     coreDataManager.saveChanges()
@@ -363,10 +363,10 @@ class TreatmentsInsertViewController: UIViewController {
     
     // set the flag to sync Nightscout treatments if a short time has passed since the last time
     // as accessing userdefaults is not thread-safe
-    private func setNightscoutSyncTreatmentsRequiredToTrue() {
-        if (UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
-            UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest = .now
-            UserDefaults.standard.nightscoutSyncTreatmentsRequired = true
+    private func setNightscoutSyncRequiredToTrue() {
+        if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+            UserDefaults.standard.timeStampLatestNightscoutSyncRequest = .now
+            UserDefaults.standard.nightscoutSyncRequired = true
         }
     }
 }
