@@ -17,40 +17,30 @@ struct MainViewAIDStatusView: View {
     var body: some View {
         let textSize: CGFloat = isSmallScreen ? 14 : 16
         
-        HStack(alignment: .center, spacing: 2) {
-//            HStack(alignment: .firstTextBaseline, spacing: -2) {
-                Text("\(watchState.deviceStatusIOB.round(toDecimalPlaces: 2).stringWithoutTrailingZeroes) U")
-                    .font(.system(size: textSize))
-                    .fontWeight(.medium)
-                    .foregroundStyle(.colorPrimary)
-                
-//                Text(" U")
-//                    .font(.system(size: textSize))
-//                    .foregroundStyle(.colorSecondary)
-//            }
+        HStack(alignment: .center, spacing: 0) {
+            Text("\(watchState.deviceStatusIOB.round(toDecimalPlaces: 2).stringWithoutTrailingZeroes)U")
+                .font(.system(size: textSize))
+                .fontWeight(.semibold)
+                .foregroundStyle(.colorPrimary)
             
             Spacer()
             
-//            HStack(alignment: .firstTextBaseline, spacing: -2) {
-                Text("\(watchState.deviceStatusCOB.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes) g")
-                    .font(.system(size: textSize))
-                    .fontWeight(.medium)
-                    .foregroundStyle(.colorPrimary)
-                
-//                Text(" g")
-//                    .font(.system(size: textSize))
-//                    .foregroundStyle(.colorSecondary)
-//            }
+            Text("\(watchState.deviceStatusCOB.round(toDecimalPlaces: 0).stringWithoutTrailingZeroes)g")
+                .font(.system(size: textSize))
+                .fontWeight(.semibold)
+                .foregroundStyle(.colorPrimary)
             
             Spacer()
             
-            HStack(alignment: .center, spacing: 4) {
+            HStack(alignment: .center, spacing: 5) {
                 watchState.deviceStatusIconImage()
-                    .font(.system(size: textSize)).bold()
+                    .font(.system(size: textSize))
+                    .fontWeight(.bold)
                     .foregroundStyle(watchState.deviceStatusColor() ?? .colorSecondary)
                 
-                Text(watchState.lastLoopDateTimeAgoString)
+                Text(watchState.deviceStatusLastLoopDateTimeAgoString)
                     .font(.system(size: textSize))
+                    .fontWeight(.semibold)
                     .foregroundStyle(.colorPrimary)
             }
         }

@@ -20,14 +20,12 @@ final class WatchStateModel: NSObject, ObservableObject {
     
     // set timer to automatically refresh the view
     // https://www.hackingwithswift.com/quick-start/swiftui/how-to-use-a-timer-with-swiftui
-    let timer = Timer.publish(every: 1, tolerance: 0.5, on: .main, in: .common).autoconnect()
+    let timer = Timer.publish(every: 2, tolerance: 0.5, on: .main, in: .common).autoconnect()
     @Published var timerControlDate = Date()
     
     var bgReadingValues: [Double] = []
     var bgReadingDates: [Date] = []
     var bgReadingDatesAsDouble: [Double] = []
-    
-//    @Published var updatedDatesString: String = ""
     
     @Published var isMgDl: Bool = true
     @Published var slopeOrdinal: Int = 2
@@ -60,11 +58,11 @@ final class WatchStateModel: NSObject, ObservableObject {
     @Published var lastComplicationUpdateTimeStamp: Date = .distantPast
     
     // use this to track the AID/looping status
-    @Published var deviceStatusCreatedAt: Date = .distantPast
-    @Published var deviceStatusLastLoopDate: Date = .distantPast
     @Published var deviceStatusIOB: Double = 0
     @Published var deviceStatusCOB: Double = 0
-    @Published var lastLoopDateTimeAgoString: String = ""
+    var deviceStatusCreatedAt: Date = .distantPast
+    var deviceStatusLastLoopDate: Date = .distantPast
+    @Published var deviceStatusLastLoopDateTimeAgoString: String = ""
     
     // we use the following to record when the user has manually requested a state update on each view so that we can trigger the animation on just this view
     // this is to prevent the UI animating "pending animations" when we switch view tabs
@@ -254,25 +252,6 @@ final class WatchStateModel: NSObject, ObservableObject {
             return .gray
         }
     }
-    
-    /// request a state update from the iOS companion app
-    func requestWatchStateUpdate() {
-        guard session.activationState == .activated else {
-            session.activate()
-            return
-        }
-        // change the text, this must be done in the main thread but only do it if the watch app is reachable
-        if session.isReachable {
-            DispatchQueue.main.async {
-                self.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorPending
-                self.debugString = self.debugString.replacingOccurrences(of: "Idle", with: "Fetching")
-            }
-            
-            session.sendMessage(["requestWatchUpdate": "watchState"], replyHandler: nil) { error in
-                print("WatchStateModel error: " + error.localizedDescription)
-            }
-        }
-    }
         
     /// used to return values and colors used by a SwiftUI gauge view
     /// - Returns: minValue/maxValue - used to define the limits of the gauge. nilValue - used if there is currently no data present (basically puts the gauge at the 50% mark). gaugeGradient - the color ranges used
@@ -366,9 +345,30 @@ final class WatchStateModel: NSObject, ObservableObject {
         let diffComponents = Calendar.current.dateComponents([.hour], from: deviceStatusLastLoopDate, to: Date())
         
         if let hours = diffComponents.hour, hours < 1 {
-            return "(\(deviceStatusLastLoopDate.daysAndHoursAgo(appendAgo: false)))"
+            return "\(deviceStatusLastLoopDate.daysAndHoursAgo(appendAgo: false))"
         } else {
-            return "(-m)"
+            return "-m"
+        }
+    }
+    
+    // MARK: - helper functions not related with the class structure
+    
+    /// request a state update from the iOS companion app
+    func requestWatchStateUpdate() {
+        guard session.activationState == .activated else {
+            session.activate()
+            return
+        }
+        // change the text, this must be done in the main thread but only do it if the watch app is reachable
+        if session.isReachable {
+            DispatchQueue.main.async {
+                self.requestingDataIconColor = ConstantsAppleWatch.requestingDataIconColorPending
+                self.debugString = self.debugString.replacingOccurrences(of: "Idle", with: "Fetching")
+            }
+            
+            session.sendMessage(["requestWatchUpdate": "watchState"], replyHandler: nil) { error in
+                print("WatchStateModel error: " + error.localizedDescription)
+            }
         }
     }
     
@@ -377,10 +377,10 @@ final class WatchStateModel: NSObject, ObservableObject {
     private func processWatchStateFromDictionary(dictionary: [String: Any]) {
         let bgReadingDatesFromDictionary: [Double] = dictionary["bgReadingDatesAsDouble"] as? [Double] ?? [0]
         
-        // let's make a quick check to see if the data about to be processed is from within the last 12 hours
+        // let's make a quick check to see if the data about to be processed is from within the last hour
         // this is to avoid long delays when re-opening a Watch app for the first time in days and waiting
         // whilst the whole queue of userInfo messages are processed
-        if let lastBgReadingDateFromDictionaryReceived = bgReadingDatesFromDictionary.first, Date(timeIntervalSince1970: lastBgReadingDateFromDictionaryReceived) > Date(timeIntervalSinceNow: -3600 * 12) {
+        if let lastBgReadingDateFromDictionaryReceived = bgReadingDatesFromDictionary.first, Date(timeIntervalSince1970: lastBgReadingDateFromDictionaryReceived) > Date(timeIntervalSinceNow: -60 * 60 * 1) {
             bgReadingDates = bgReadingDatesFromDictionary.map { bgReadingDateAsDouble -> Date in
                 return Date(timeIntervalSince1970: bgReadingDateAsDouble)
             }
@@ -409,11 +409,11 @@ final class WatchStateModel: NSObject, ObservableObject {
             remainingComplicationUserInfoTransfers = dictionary["remainingComplicationUserInfoTransfers"] as? Int ?? 99
             liveDataIsEnabled = dictionary["liveDataIsEnabled"] as? Bool ?? false
             
-            deviceStatusCreatedAt = Date(timeIntervalSince1970: dictionary["deviceStatusCreatedAt"] as? Double ?? 0)
-            deviceStatusLastLoopDate = Date(timeIntervalSince1970: dictionary["deviceStatusLastLoopDate"] as? Double ?? 0)
             deviceStatusIOB = dictionary["deviceStatusIOB"] as? Double ?? 0
             deviceStatusCOB = dictionary["deviceStatusCOB"] as? Double ?? 0
-            lastLoopDateTimeAgoString = deviceStatusLastLoopMinsAgoString()
+            deviceStatusCreatedAt = Date(timeIntervalSince1970: dictionary["deviceStatusCreatedAt"] as? Double ?? 0)
+            deviceStatusLastLoopDate = Date(timeIntervalSince1970: dictionary["deviceStatusLastLoopDate"] as? Double ?? 0)
+            deviceStatusLastLoopDateTimeAgoString = deviceStatusLastLoopMinsAgoString()
             
             // check if there is any BG data available before updating the data source info strings accordingly
             if let bgReadingDate = bgReadingDate() {

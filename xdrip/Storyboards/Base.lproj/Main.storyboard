@@ -610,8 +610,8 @@
                                                                     <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" translatesAutoresizingMaskIntoConstraints="NO" id="WA7-IJ-E3C">
                                                                         <rect key="frame" x="0.0" y="0.0" width="360" height="35"/>
                                                                         <subviews>
-                                                                            <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="C4k-9p-kkU">
-                                                                                <rect key="frame" x="0.0" y="0.0" width="57.333333333333336" height="35"/>
+                                                                            <stackView opaque="NO" contentMode="scaleToFill" spacing="6" translatesAutoresizingMaskIntoConstraints="NO" id="C4k-9p-kkU">
+                                                                                <rect key="frame" x="0.0" y="0.0" width="55.333333333333336" height="35"/>
                                                                                 <subviews>
                                                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="IOB" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="crT-lo-zXT">
                                                                                         <rect key="frame" x="0.0" y="0.0" width="26.333333333333332" height="35"/>
@@ -620,15 +620,15 @@
                                                                                         <nil key="highlightedColor"/>
                                                                                     </label>
                                                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="- U" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="2u5-Ow-wh6">
-                                                                                        <rect key="frame" x="34.333333333333336" y="0.0" width="23" height="35"/>
+                                                                                        <rect key="frame" x="32.333333333333336" y="0.0" width="23" height="35"/>
                                                                                         <fontDescription key="fontDescription" type="system" weight="medium" pointSize="16"/>
                                                                                         <color key="textColor" name="colorTertiary"/>
                                                                                         <nil key="highlightedColor"/>
                                                                                     </label>
                                                                                 </subviews>
                                                                             </stackView>
-                                                                            <stackView opaque="NO" contentMode="scaleToFill" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="cbf-K1-Ctf">
-                                                                                <rect key="frame" x="115" y="0.0" width="63" height="35"/>
+                                                                            <stackView opaque="NO" contentMode="scaleToFill" spacing="6" translatesAutoresizingMaskIntoConstraints="NO" id="cbf-K1-Ctf">
+                                                                                <rect key="frame" x="115" y="0.0" width="61" height="35"/>
                                                                                 <subviews>
                                                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="COB" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VTt-wV-7Zg">
                                                                                         <rect key="frame" x="0.0" y="0.0" width="33.666666666666664" height="35"/>
@@ -637,7 +637,7 @@
                                                                                         <nil key="highlightedColor"/>
                                                                                     </label>
                                                                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="- g" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hic-Sj-6Kk">
-                                                                                        <rect key="frame" x="41.666666666666657" y="0.0" width="21.333333333333329" height="35"/>
+                                                                                        <rect key="frame" x="39.666666666666657" y="0.0" width="21.333333333333329" height="35"/>
                                                                                         <fontDescription key="fontDescription" type="system" weight="medium" pointSize="16"/>
                                                                                         <color key="textColor" name="colorTertiary"/>
                                                                                         <nil key="highlightedColor"/>
@@ -675,10 +675,10 @@
                                                                                             <segue destination="yPB-Ev-B9g" kind="show" identifier="RootViewToAIDStatusView" destinationCreationSelector="segueToAIDStatusView:" id="r4Y-tY-lZT"/>
                                                                                         </connections>
                                                                                     </button>
-                                                                                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="(-m)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8RJ-QC-aTl">
+                                                                                    <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="-m" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8RJ-QC-aTl">
                                                                                         <rect key="frame" x="124.33333333333334" y="0.0" width="0.0" height="35"/>
                                                                                         <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                                                        <color key="textColor" name="colorTertiary"/>
+                                                                                        <color key="textColor" name="colorPrimary"/>
                                                                                         <nil key="highlightedColor"/>
                                                                                     </label>
                                                                                 </subviews>

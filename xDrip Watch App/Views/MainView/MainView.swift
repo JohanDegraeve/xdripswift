@@ -19,14 +19,17 @@ struct MainView: View {
     
     @State private var showDebug: Bool = false
     
+    // store a boolean flag. We'll toggle this to refresh as needed
+    @State private var refreshView = false
+    
     let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
     
     // MARK: -  Body
     var body: some View {
         
-        let overrideChartHeight: Double? = isSmallScreen ? ConstantsGlucoseChartSwiftUI.viewHeightWatchAppSmall : nil
+        let overrideChartHeight: Double? = isSmallScreen ? (watchState.deviceStatusIconImage() == nil ? ConstantsGlucoseChartSwiftUI.viewHeightWatchAppSmall : ConstantsGlucoseChartSwiftUI.viewHeightWatchAppSmallWithAIDStatus) : nil
         
-        let overrideChartWidth: Double? = isSmallScreen ? ConstantsGlucoseChartSwiftUI.viewWidthWatchAppSmall : nil
+        let overrideChartWidth: Double? = isSmallScreen ? (watchState.deviceStatusIconImage() == nil ? ConstantsGlucoseChartSwiftUI.viewWidthWatchAppSmallWithAIDStatus : ConstantsGlucoseChartSwiftUI.viewWidthWatchAppSmall) : nil
         
         ZStack(alignment: Alignment(horizontal: .center, vertical: .center), content: {
             VStack(spacing: 2) {
@@ -34,6 +37,7 @@ struct MainView: View {
                     .padding([.leading, .trailing], 5)
                     .padding([.top], -6)
                     .padding([.bottom], -6)
+                    .id(refreshView)
                     .onTapGesture(count: 2) {
                         watchState.updateMainViewDate = Date()
                         watchState.requestWatchStateUpdate()
@@ -84,10 +88,12 @@ struct MainView: View {
             if watchState.updatedDate.timeIntervalSinceNow < -5 {
                 watchState.timerControlDate = date
                 watchState.requestWatchStateUpdate()
+                refreshView.toggle()
             }
         }
         .onAppear {
             watchState.requestWatchStateUpdate()
+            refreshView.toggle()
         }
         .onTapGesture(count: 5) {
             showDebug = !showDebug

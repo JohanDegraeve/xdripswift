@@ -52,8 +52,36 @@ final class WatchManager: NSObject, ObservableObject {
             session.activate()
         }
         
+        // add observer to sync to the watch once the device status was updated
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutDeviceStatusWasUpdated.rawValue, options: .new, context: nil)
+        
         processWatchState(forceComplicationUpdate: false)
     }
+    
+    // MARK: - overriden functions
+    
+    /// when one of the observed settings get changed, possible actions to take
+    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
+        if let keyPath = keyPath {
+            if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
+                switch keyPathEnum {
+                case UserDefaults.Key.nightscoutDeviceStatusWasUpdated:
+                    // only ejecute if the key was set to true (to avoid a get-set loop)
+                    // if so, process the watch state and set it back to false
+                    if UserDefaults.standard.nightscoutDeviceStatusWasUpdated {
+                        DispatchQueue.main.sync {
+                            processWatchState(forceComplicationUpdate: false)
+                        }
+                        UserDefaults.standard.nightscoutDeviceStatusWasUpdated = false
+                    }
+                default:
+                    break
+                }
+            }
+        }
+    }
+    
+    // MARK: - private functions
     
     private func processWatchState(forceComplicationUpdate: Bool) {
         // create two simple arrays to send to the live activiy. One with the bg values in mg/dL and another with the corresponding timestamps

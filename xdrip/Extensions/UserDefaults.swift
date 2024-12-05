@@ -206,6 +206,9 @@ extension UserDefaults {
         /// Nightscout deviceStatus stored as a JSON data object
         case nightscoutDeviceStatus = "nightscoutDeviceStatus"
         
+        /// Nightscout deviceStatus update flag
+        case nightscoutDeviceStatusWasUpdated = "nightscoutDeviceStatusWasUpdated"
+        
         // Dexcom Share
         
         /// should readings be uploaded to Dexcom share
@@ -1476,6 +1479,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.nightscoutDeviceStatus.rawValue)
+        }
+    }
+    
+    /// will be set to true when the nightscout device status has been updated fully
+    @objc dynamic var nightscoutDeviceStatusWasUpdated: Bool {
+        get {
+            return bool(forKey: Key.nightscoutSyncTreatmentsRequired.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.nightscoutSyncTreatmentsRequired.rawValue)
         }
     }
 

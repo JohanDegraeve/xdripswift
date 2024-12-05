@@ -1,16 +1,16 @@
-import UIKit
 import CryptoSwift
+import UIKit
 
 extension String {
-    //https://stackoverflow.com/questions/39677330/how-does-string-substring-work-in-swift
-    //usage
-    //let s = "hello"
-    //s[0..<3] // "hel"
-    //s[3..<s.count] // "lo"
+    // https://stackoverflow.com/questions/39677330/how-does-string-substring-work-in-swift
+    // usage
+    // let s = "hello"
+    // s[0..<3] // "hel"
+    // s[3..<s.count] // "lo"
     subscript(_ range: CountableRange<Int>) -> String {
         let idx1 = index(startIndex, offsetBy: max(0, range.lowerBound))
         let idx2 = index(startIndex, offsetBy: min(self.count, range.upperBound))
-        return String(self[idx1..<idx2])
+        return String(self[idx1 ..< idx2])
     }
     
     /// validates if string matches regex
@@ -26,14 +26,13 @@ extension String {
     
     /// converts String to Double, works with decimal seperator . or , - if conversion fails then returns nil
     func toDouble() -> Double? {
-        
         // if string is empty then no further processing needed, return nil
         if self.count == 0 {
             return nil
         }
         
-        let returnValue:Double? = Double(self)
-        if let returnValue = returnValue  {
+        let returnValue: Double? = Double(self)
+        if let returnValue = returnValue {
             // Double value is correctly created, return it
             return returnValue
         } else {
@@ -50,10 +49,11 @@ extension String {
         return nil
     }
     
-    func contains(find: String) -> Bool{
+    func contains(find: String) -> Bool {
         return self.range(of: find) != nil
     }
-    func containsIgnoringCase(find: String) -> Bool{
+
+    func containsIgnoringCase(find: String) -> Bool {
         return self.range(of: find, options: .caseInsensitive) != nil
     }
     
@@ -68,14 +68,14 @@ extension String {
     }
     
     /// creates uicolor interpreting hex as hex color code, example #CED430
-    func hexStringToUIColor () -> UIColor {
-        var cString:String = self.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
+    func hexStringToUIColor() -> UIColor {
+        var cString: String = self.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
         
-        if (cString.hasPrefix("#")) {
+        if cString.hasPrefix("#") {
             cString.remove(at: cString.startIndex)
         }
         
-        if ((cString.count) != 6) {
+        if (cString.count) != 6 {
             return UIColor.gray
         }
         
@@ -94,7 +94,7 @@ extension String {
     ///
     /// useful for instance to verify textfield input, if user lenters string of length 0, then better set it to nil
     func toNilIfLength0() -> String? {
-        if self.count > 0 {return self}
+        if self.count > 0 { return self }
         return nil
     }
     
@@ -132,7 +132,6 @@ extension String {
     /// - string = 5-480-660-1080
     /// - between 00:00  and 00:04, the value is on, between 00:05 and 07:59  on, ...
     func indicatesOn(forWhen when: Date) -> Bool {
-        
         // minutes since midnight, for when
         let minutes = Int16(when.minutesSinceMidNightLocalTime())
         
@@ -140,7 +139,7 @@ extension String {
         var isOn = true
         
         // split by "-" into array of int
-        let schedule = self.split(separator: "-").map({Int($0) ?? 0})
+        let schedule = self.split(separator: "-").map { Int($0) ?? 0 }
         
         // loop through ints in the array, each time swap isOn, until entry > current minutes
         for entry in schedule {
@@ -151,7 +150,6 @@ extension String {
         }
         
         return isOn
-        
     }
     
     /// used for strings that represent a schedule
@@ -159,13 +157,11 @@ extension String {
     /// - string = 5-480-660-1080
     /// - will return  [5, 480, 660, 1080]
     func splitToInt() -> [Int] {
-        
         var schedule = [Int]()
         
-        schedule = self.split(separator: "-").map({Int($0) ?? 0})
+        schedule = self.split(separator: "-").map { Int($0) ?? 0 }
         
         return schedule
-        
     }
     
     /// creates Data using String in hex format, same result as Data(hexadecimalString: String)
@@ -194,26 +190,23 @@ extension String {
     }
     
     mutating func appendStringAndNewLine(_ stringToAdd: String) {
-        
         self = self + stringToAdd + "\n"
-        
     }
     
     /// use this to partially obscure a password, API-SECRET, token or other sensitive data. We want the user to see that something recognisable is there that makes sense to them, but it won't reveal any useful private information if they screenshot it
     func obscured() -> String {
-        
         var obscuredString = self
         
         let stringLength: Int = obscuredString.count
         
         // in order to avoid strange layouts if somebody uses a really long API_SECRET or token, then let's limit the displayed string size to something more manageable
-        let maxStringSizeToShow: Int = 12
+        let maxStringSizeToShow = 12
         
         // the characters we will use to obscure the sensitive data
-        let maskingCharacter: String = "*"
+        let maskingCharacter = "*"
         
         // based upon the length of the string, we will show more, or less, of the original characters at the beginning. This gives more context whilst maintaining privacy
-        var startCharsNotToObscure: Int = 0
+        var startCharsNotToObscure = 0
         
         switch stringLength {
         case 0...3:
@@ -237,21 +230,24 @@ extension String {
         obscuredString += String(repeating: maskingCharacter, count: stringLength > maxStringSizeToShow ? maxStringSizeToShow - obscuredString.count : stringLength - obscuredString.count)
         
         return obscuredString
-        
     }
     
+    var capitalizedSentence: String {
+        let firstLetter = self.prefix(1).capitalized
+        let remainingLetters = self.dropFirst().lowercased()
+        
+        return firstLetter + remainingLetters
+    }
 }
 
 extension Optional where Wrapped == String {
-    
     /// - if string doesn't start with http, then add https
     /// - if ending with /, remove it
     /// - convert to lowercase
     /// - if string nil, then returnvalue is nil
     func addHttpsIfNeeded() -> String? {
-        
         // if self nil, then return nil
-        guard var returnValue = self else {return nil}
+        guard var returnValue = self else { return nil }
         
         // if self doesn't start with http or https, then add https. This might not make sense, but it will guard against throwing fatal errors when trying to get the scheme of the Endpoint
         if !returnValue.startsWith("http://") && !returnValue.startsWith("https://") {
@@ -264,6 +260,5 @@ extension Optional where Wrapped == String {
         }
         
         return returnValue
-        
     }
 }

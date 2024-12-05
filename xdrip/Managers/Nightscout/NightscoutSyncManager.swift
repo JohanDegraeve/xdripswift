@@ -74,9 +74,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// Must be read/written in main thread !!
     private var nightscoutTreatmentSyncRequired = false
     
-    /// delegate to inform back when there is new device status data
-    private(set) weak var nightscoutSyncDelegate: NightscoutSyncDelegate?
-    
     static let iso8601DateFormatterWithoutFractionalSeconds: ISO8601DateFormatter = {
         let formatter = ISO8601DateFormatter()
         formatter.formatOptions = [.withInternetDateTime]
@@ -599,6 +596,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         
         Task {
             do {
+                var deviceStatusWasUpdated = false
+                
                 // get Nightscout Device Status response and process it for OpenAPS-based systems (including AAPS, Trio, iAPS)
                 switch nightscoutFollowType {
                 case .openAPS:
@@ -628,13 +627,10 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                             // AAPS always uses the suggested attribute even if enacted
                             // iAPS/Trio only uses the suggested attribute when not enacted
                             // so if not Trio then update the lastLoopDate to the current
-                            switch deviceStatus.device {
-                            case "Trio", "iAPS":
-                                break
-                            default:
+                            if deviceStatus.useSuggestedAsEnacted() {
                                 deviceStatus.lastLoopDate = createdAt
                             }
-                            //                                deviceStatus.lastLoopDate = (deviceStatus.device != "Trio" ? createdAt : deviceStatus.lastLoopDate)
+                            
                             trace("    in updateDeviceStatus (openAPS), suggestion processed", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
                             
                             deviceStatus.cob = suggested.cob ?? 0
@@ -677,6 +673,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         trace("    in updateDeviceStatus (openAPS), updated device status with createdAt = %{public}@. Last looping date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened), deviceStatus.lastLoopDate.formatted(date: .abbreviated, time: .shortened))
                         trace("    in updateDeviceStatus (openAPS), deviceStatus data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, String(describing: deviceStatus))
                         
+                        deviceStatusWasUpdated = true
+                        
                     } else {
                         // downloaded profile start date is not newer than the existing profile so ignore it and do nothing
                         return
@@ -690,6 +688,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                     if let enacted = deviceStatusResponseWithEnacted.openAPS?.enacted, let enactedAt = NightscoutSyncManager.iso8601DateFormatter.date(from: enacted.timestamp ?? ""), enactedAt > deviceStatus.lastLoopDate {
                         // TODO: DEBUG
                         trace("    in updateDeviceStatus (openAPS), was enacted", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+                        
                         if deviceStatus.lastLoopDate == .distantPast || enacted.received == true || enacted.recieved == true {
                             deviceStatus.lastLoopDate = enactedAt
                         }
@@ -706,6 +705,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         deviceStatus.sensitivityRatio = enacted.sensitivityRatio
                         deviceStatus.tdd = enacted.tdd
                         deviceStatus.timestamp = NightscoutSyncManager.iso8601DateFormatter.date(from: enacted.timestamp ?? "")
+                        
+                        deviceStatusWasUpdated = true
                         
                         // TODO: DEBUG
                     } else {
@@ -774,6 +775,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         trace("    in updateDeviceStatus (Loop), updated device status with createdAt = %{public}@. Last looping date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened), deviceStatus.lastLoopDate.formatted(date: .abbreviated, time: .shortened))
                         trace("    in updateDeviceStatus (Loop), deviceStatus data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, String(describing: deviceStatus))
                         
+                        deviceStatusWasUpdated = true
+                        
                     } else {
                         // downloaded profile start date is not newer than the existing profile so ignore it and do nothing
                         return
@@ -790,10 +793,16 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         deviceStatus.bolusVolume = enacted.bolusVolume
                         deviceStatus.duration = enacted.duration ?? deviceStatus.duration
                         deviceStatus.rate = enacted.rate ?? 0
+                        
+                        deviceStatusWasUpdated = true
                     }
                     
                 default:
                     break
+                }
+                
+                if deviceStatusWasUpdated {
+                    UserDefaults.standard.nightscoutDeviceStatusWasUpdated = true
                 }
             } catch {
                 // set the last checked date even if the check was unsuccessful

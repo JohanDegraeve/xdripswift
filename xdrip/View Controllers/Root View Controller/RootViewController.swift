@@ -3648,12 +3648,11 @@ final class RootViewController: UIViewController, ObservableObject {
     
     private func updatePumpAndAIDStatusViews() {
         // hide the views if not wanted/needed
-//        let showAIDStatusViews = UserDefaults.standard.nightscoutFollowType == .none || !UserDefaults.standard.nightscoutFollowShowExpandedInfo
         pumpViewOutlet.isHidden = UserDefaults.standard.nightscoutFollowType == .none || !UserDefaults.standard.nightscoutFollowShowExpandedInfo
         infoViewOutlet.isHidden = UserDefaults.standard.nightscoutFollowType == .none
 
         // if the user doesn't want to follow any type of AID system, just do nothing and return
-        //guard UserDefaults.standard.nightscoutFollowType != .none else { return }
+        guard UserDefaults.standard.nightscoutFollowType != .none else { return }
         
         // now continue with updating the views as they are now visible in the UI
         if let deviceStatus = nightscoutSyncManager?.deviceStatus as? NightscoutDeviceStatus {
@@ -3725,8 +3724,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 infoStatusIconOutlet.isHidden = false
                 infoStatusTimeAgoOutlet.isHidden = false
                 
-                infoStatusTimeAgoOutlet.text = deviceStatus.lastLoopDate != .distantPast ? "(\(deviceStatus.lastLoopDate.daysAndHoursAgo()))" : ""
-                infoStatusTimeAgoOutlet.textColor = UIColor(resource: .colorSecondary)
+                infoStatusTimeAgoOutlet.text = deviceStatus.lastLoopDate != .distantPast ? "\(deviceStatus.lastLoopDate.daysAndHoursAgo())" : ""
+                infoStatusTimeAgoOutlet.textColor = UIColor(resource: .colorPrimary)
                 
                 // set the formatting for values that need to show visibility to low levels (battery, remaining insulin and canula age)
                 pumpReservoirValueOutlet.textColor = deviceStatus.pumpReservoirUIColor() ?? UIColor(resource: .colorPrimary)
@@ -3775,8 +3774,6 @@ final class RootViewController: UIViewController, ObservableObject {
                 trace("RVC device status error: createdAt = %{public}@, lastChecked = %{public}@, lastLoopDate = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, nightscoutSyncManager?.deviceStatus.createdAt.formatted(date: .omitted, time: .standard) ?? "nil", nightscoutSyncManager?.deviceStatus.lastCheckedDate.formatted(date: .omitted, time: .standard) ?? "nil", nightscoutSyncManager?.deviceStatus.lastLoopDate.formatted(date: .omitted, time: .standard) ?? "nil")
             }
         }
-        
-        watchManager?.updateWatchApp(forceComplicationUpdate: false)
     }
 }
 
@@ -4125,13 +4122,4 @@ extension RootViewController: UIGestureRecognizerDelegate {
         
     }
     
-}
-
-// MARK: - conform to NightscoutSyncDelegate protocol
-
-extension RootViewController: NightscoutSyncDelegate {
-    
-    func newNightscoutDeviceStatusReceived() {
-        print("newNightscoutDeviceStatusReceived")
-    }
 }

@@ -110,10 +110,20 @@ struct NightscoutDeviceStatus: Codable {
     func deviceName() -> String? {
         if let device {
             let deviceName = device.components(separatedBy: "://")
-            return deviceName.count > 1 ? deviceName[1] : nil
+            return deviceName.count > 1 ? deviceName[1].capitalizedSentence : nil
         }
         
         return nil
+    }
+    
+    // should the response for this device type use the Suggested attribute as though it was Enacted (i.e. AAPS)
+    func useSuggestedAsEnacted() -> Bool {
+        switch device {
+        case "Trio", "iAPS":
+            return false
+        default:
+            return true
+        }
     }
     
     func reasonValuesArray() -> [String]? {

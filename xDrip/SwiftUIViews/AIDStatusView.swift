@@ -147,9 +147,9 @@ struct AIDStatusView: View {
                     }
                     
                     Section(header: Text("\(deviceStatus.systemName() ?? "AID") Specific")) {
-                        row(title: "Temp basal rate", data: (deviceStatus.rate?.round(toDecimalPlaces: 1).description ?? "-") + " U/hr")
+                        row(title: "Basal rate", data: (deviceStatus.rate?.round(toDecimalPlaces: 1).description ?? "-") + " U/hr")
                         
-                        row(title: "Temp basal duration", data: (deviceStatus.duration?.description ?? "-") + " mins")
+                        row(title: "Duration", data: (deviceStatus.duration?.description ?? "-") + " mins")
                         
                         if let bolusVolume = deviceStatus.bolusVolume {
                             row(title: "Auto-bolus given", data: bolusVolume.round(toDecimalPlaces: 2).description + " U")
