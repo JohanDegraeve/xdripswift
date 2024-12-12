@@ -3040,12 +3040,13 @@ final class RootViewController: UIViewController, ObservableObject {
             valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeNormal
             
             // unhide as needed
-            pumpViewOutlet.isHidden = false
             segmentedControlsView.isHidden = false
             miniChartOutlet.isHidden = !UserDefaults.standard.showMiniChart
             statisticsView.isHidden = !UserDefaults.standard.showStatistics
             sensorProgressViewOutlet.isHidden = false
             dataSourceViewOutlet.isHidden = false
+            
+            updatePumpAndAIDStatusViews()
             
             // hide
             clockView.isHidden = true
@@ -3648,8 +3649,8 @@ final class RootViewController: UIViewController, ObservableObject {
     
     private func updatePumpAndAIDStatusViews() {
         // hide the views if not wanted/needed
-        pumpViewOutlet.isHidden = UserDefaults.standard.nightscoutFollowType == .none || !UserDefaults.standard.nightscoutFollowShowExpandedInfo
-        infoViewOutlet.isHidden = UserDefaults.standard.nightscoutFollowType == .none
+        pumpViewOutlet.isHidden = !UserDefaults.standard.nightscoutEnabled || UserDefaults.standard.nightscoutUrl == nil || UserDefaults.standard.nightscoutFollowType == .none || !UserDefaults.standard.nightscoutFollowShowExpandedInfo
+        infoViewOutlet.isHidden = !UserDefaults.standard.nightscoutEnabled || UserDefaults.standard.nightscoutUrl == nil || UserDefaults.standard.nightscoutFollowType == .none
 
         // if the user doesn't want to follow any type of AID system, just do nothing and return
         guard UserDefaults.standard.nightscoutFollowType != .none else { return }

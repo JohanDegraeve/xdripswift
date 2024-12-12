@@ -13,8 +13,8 @@ enum ConstantsGlucoseChart {
     static let minimumChartValueInMgdlWithBasal: Double = -10
     
     /// what should the x-axis start with then showing the basal render whilst in the 24 hour chart?
-    /// we should define a much higher "minimum value" to match the X-Y propor`
-    static let minimumChartValueInMgdlWithBasal24hrChart: Double = 10
+    /// we should define a different "minimum value" to match the proportions and make the basal visible
+    static let minimumChartValueInMgdlWithBasal24hrChart: Double = -10
     
     /// if there's no readings to show with value higher than the maximum in this array, then this array will determine the maximum possible value in the chart, in mgdl
     static let initialGlucoseValueRangeInMgDl = [50.0, 100.0, 150.0, 200.0]

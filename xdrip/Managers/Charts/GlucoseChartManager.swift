@@ -1358,9 +1358,20 @@ public class GlucoseChartManager {
                     }
                     
                     // now that we're out of the loop, we've got the last basal rate in previousBasalRateTreatment
-                    // let's create a chartpoint at this rate until the endDate to finish off the line nicely
                     if let previousBasalRateTreatment = previousBasalRateTreatment {
-                        basalRateTreatmentChartPoints.append(ChartPoint(basalRateTreatmentEntry: previousBasalRateTreatment, date: endDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                        let basalRateEndDate = previousBasalRateTreatment.date.addingTimeInterval(previousBasalRateTreatment.valueSecondary * 60)
+                        
+                        // let's check if the chart enddate is beyond the basal rate treatment end date
+                        // this will only really happen if using the 0-24hr chart view
+                        if basalRateEndDate < endDate {
+                            // if so, then finish the basal rate and then peg it back to zero
+                            basalRateTreatmentChartPoints.append(ChartPoint(basalRateTreatmentEntry: previousBasalRateTreatment, date: basalRateEndDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                            basalRateTreatmentChartPoints.append(ChartPoint(basalRate: 0, date: basalRateEndDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                            basalRateTreatmentChartPoints.append(ChartPoint(basalRate: 0, date: endDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                        } else {
+                            // if not, then just peg it to the end date
+                            basalRateTreatmentChartPoints.append(ChartPoint(basalRateTreatmentEntry: previousBasalRateTreatment, date: endDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                        }
                     }
                     
                     // create the fill chart points by using the line chart points and adding a zero value chartpoint to the start and end
