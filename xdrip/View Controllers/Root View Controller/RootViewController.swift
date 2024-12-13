@@ -2963,7 +2963,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             if nightMode {
                 
-                screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock.circle.fill")
+                screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock.fill")
                 
                 // set the value label font size to big
                 valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeScreenLock
@@ -3035,7 +3035,7 @@ final class RootViewController: UIViewController, ObservableObject {
             screenLockToolbarButtonOutlet.tintColor = nil
             
             // set the lock icon back to the standard SF Symbol
-            screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock.circle")
+            screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock")
             
             valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeNormal
             
@@ -3623,19 +3623,19 @@ final class RootViewController: UIViewController, ObservableObject {
             case .allSnoozed:
                 // all alerts are snoozed so let's make it clear - change to red filled icon
                 preSnoozeToolbarButtonOutlet.tintColor = .red
-                preSnoozeToolbarButtonOutlet.image = UIImage(systemName: "speaker.slash.circle.fill")
+                preSnoozeToolbarButtonOutlet.image = UIImage(systemName: "speaker.slash.fill")
             case .urgent:
                 // urgent low, low or fast drop alerts are snoozed - change to red outline icon
                 preSnoozeToolbarButtonOutlet.tintColor = .red
-                preSnoozeToolbarButtonOutlet.image = UIImage(systemName: "speaker.slash.circle")
+                preSnoozeToolbarButtonOutlet.image = UIImage(systemName: "speaker.slash")
             case .notUrgent:
                 // some other alert except urgent low, low or fast drop is snoozed so let's just change the icon
                 preSnoozeToolbarButtonOutlet.tintColor = nil
-                preSnoozeToolbarButtonOutlet.image = UIImage(systemName: "speaker.slash.circle")
+                preSnoozeToolbarButtonOutlet.image = UIImage(systemName: "speaker.slash")
             default:
                 // no alerts are snoozed so show default icon/colour
                 preSnoozeToolbarButtonOutlet.tintColor = nil
-                preSnoozeToolbarButtonOutlet.image = UIImage(systemName: "speaker.wave.2.circle")
+                preSnoozeToolbarButtonOutlet.image = UIImage(systemName: "speaker.wave.2")
             }
         }
     }
@@ -3751,9 +3751,9 @@ final class RootViewController: UIViewController, ObservableObject {
                     infoUploaderBatteryOutlet.isHidden = true
                 }
                 
-                infoStatusIconOutlet.image = deviceStatus.deviceStatusIconUIImage() // UIImage(systemName: "checkmark.circle.fill")
+                infoStatusIconOutlet.image = deviceStatus.deviceStatusIconUIImage()
                 infoStatusIconOutlet.tintColor = deviceStatus.deviceStatusUIColor()
-                infoStatusButtonOutlet.setTitleColor(deviceStatus.deviceStatusUIColor(), for: .normal) // .systemGreen
+                infoStatusButtonOutlet.setTitleColor(deviceStatus.deviceStatusUIColor(), for: .normal)
                 infoStatusButtonOutlet.setTitle(deviceStatus.deviceStatusTitle(), for: .normal)
                 
                 // so there is no recent data, so hide everything and show red
