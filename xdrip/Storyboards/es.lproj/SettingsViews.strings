@@ -26,7 +26,6 @@
 "settingsviews_libreLinkUpReAcceptNeeded" = "Aceptar terminos";
 "settingsviews_libreLinkUpNoActiveSensor" = "Sin datos de sensor activo";
 "settingsviews_translateOnlineHelp" = "Traducir Documentación";
-"settingsviews_showHelpIcon" = "Mostrar icono";
 "settingsviews_restartNeeded" = "(Pendiente reiniciar)";
 "settingsviews_showReadingInNotification" = "Mostrar en Notificaciones";
 "settingsviews_labelShowReadingInAppBadge" = "Mostrar en el icono de la app";

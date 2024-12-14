@@ -21,9 +21,6 @@
 /// home screen settings, high value
 "settingsviews_highValue" = "High Value";
 
-/// help settings, should the help icon be shown on the toolbar
-"settingsviews_showHelpIcon" = "Show Help Icon";
-
 /// Calendar Events Settings - text in row where create event is enabled or disabled 
 "createCalendarEvent" = "Create Calendar Events";
 

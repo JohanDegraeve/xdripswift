@@ -278,9 +278,6 @@
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-/// help settings, should the help icon be shown on the toolbar
-"settingsviews_showHelpIcon" = "Show Help Icon";
-
 /// help settings, restart needed
 "settingsviews_restartNeeded" = "(Restart required)";
 

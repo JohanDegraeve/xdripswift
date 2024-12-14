@@ -338,7 +338,6 @@ class Trace {
         
         traceInfo.appendStringAndNewLine("Help settings:")
         traceInfo.appendStringAndNewLine("    Translate automatically: " + UserDefaults.standard.translateOnlineHelp.description)
-        traceInfo.appendStringAndNewLine("    Show help icon: " + UserDefaults.standard.showHelpIcon.description)
 
         // master or follower mode?
         traceInfo.appendStringAndNewLine("\nCGM Data Source: " + (UserDefaults.standard.isMaster ? "Master" : UserDefaults.standard.followerDataSourceType.descriptionForLogging()))

@@ -139,9 +139,6 @@
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip tai lähetin algoritmi";
 
-/// help settings, should the help icon be shown on the toolbar
-"settingsviews_showHelpIcon" = "Näytä ohjeen ikoni";
-
 /// help settings, restart needed
 "settingsviews_restartNeeded" = "(Uudelleenkäynnistys vaaditaan)";
 

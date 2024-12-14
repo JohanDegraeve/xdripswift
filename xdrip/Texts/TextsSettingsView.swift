@@ -30,10 +30,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_translateOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Translate Automatically", comment: "help settings, should the online help be translated automatically if needed")
     }()
     
-    static let showHelpIcon: String = {
-        return NSLocalizedString("settingsviews_showHelpIcon", tableName: filename, bundle: Bundle.main, value: "Show Help Icon", comment: "help settings, should the help icon be shown on the toolbar")
-    }()
-    
     static let restartNeeded: String = {
         return NSLocalizedString("settingsviews_restartNeeded", tableName: filename, bundle: Bundle.main, value: "(Restart required)", comment: "help settings, restart needed")
     }()

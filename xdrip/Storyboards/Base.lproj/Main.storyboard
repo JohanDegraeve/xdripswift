@@ -419,12 +419,6 @@
                                                     <action selector="screenLockToolbarButtonAction:" destination="9pv-A4-QxB" id="L14-hJ-4a9"/>
                                                 </connections>
                                             </barButtonItem>
-                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="a6G-aW-JeE"/>
-                                            <barButtonItem title="Help" image="questionmark" catalog="system" id="DuN-xR-xYB">
-                                                <connections>
-                                                    <action selector="helpToolbarButtonAction:" destination="9pv-A4-QxB" id="DGg-9c-TqQ"/>
-                                                </connections>
-                                            </barButtonItem>
                                         </items>
                                     </toolbar>
                                     <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="L8k-bo-9W9">
@@ -1199,7 +1193,6 @@
                         <outlet property="diffLabelOutlet" destination="7Wo-wd-80o" id="nnn-w9-1sX"/>
                         <outlet property="diffLabelUnitOutlet" destination="LHe-pP-hD1" id="VVb-Z0-rJZ"/>
                         <outlet property="followerPatientNameLabelOutlet" destination="4FR-qu-yXX" id="cqb-aO-6mG"/>
-                        <outlet property="helpToolbarButtonOutlet" destination="DuN-xR-xYB" id="TdW-5k-hgZ"/>
                         <outlet property="highLabelOutlet" destination="Xlz-6g-zzD" id="DyX-x0-PwZ"/>
                         <outlet property="highStatisticLabelOutlet" destination="EbR-T4-LIg" id="VZk-1K-BCq"/>
                         <outlet property="highTitleLabelOutlet" destination="bUK-pC-4bd" id="R8q-Q6-q9d"/>
@@ -2723,7 +2716,6 @@
         <image name="drop" catalog="system" width="96" height="128"/>
         <image name="lock" catalog="system" width="111" height="128"/>
         <image name="network" catalog="system" width="128" height="123"/>
-        <image name="questionmark" catalog="system" width="94" height="128"/>
         <image name="sensor.tag.radiowaves.forward" catalog="system" width="128" height="85"/>
         <image name="speaker.wave.2" catalog="system" width="128" height="88"/>
         <image name="xmark.circle" catalog="system" width="128" height="123"/>

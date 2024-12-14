@@ -25,8 +25,6 @@ extension UserDefaults {
         
         /// should the online help by automatically translated?
         case translateOnlineHelp = "translateOnlineHelp"
-        /// should the main screen help icon be shown?
-        case showHelpIcon = "showHelpIcon"
         
         // Data Source
         
@@ -460,17 +458,6 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.translateOnlineHelp.rawValue)
-        }
-    }
-    
-    /// should the app show the help icon on the main screen toolbar?
-    @objc dynamic var showHelpIcon: Bool {
-        // default value for bool in userdefaults is false, by default we want the app to show the help icon in the toolbar
-        get {
-            return !bool(forKey: Key.showHelpIcon.rawValue)
-        }
-        set {
-            set(!newValue, forKey: Key.showHelpIcon.rawValue)
         }
     }
     

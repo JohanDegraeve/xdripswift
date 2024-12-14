@@ -114,7 +114,6 @@
 
 /// general settings, should the online help be translated automatically if needed
 "settingsviews_translateOnlineHelp" = "Translate Automatically";
-"settingsviews_showHelpIcon" = "Visa hjälpikon";
 "settingsviews_restartNeeded" = "(Omstart krävs)";
 
 /// home screen settings, should the main glucose chart screen be allowed?

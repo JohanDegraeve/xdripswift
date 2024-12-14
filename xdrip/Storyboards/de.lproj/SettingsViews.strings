@@ -322,7 +322,6 @@
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xdrip oder nativer Algorithmus";
 
-"settingsviews_showHelpIcon" = "Hilfe-Symbol anzeigen";
 "settingsviews_restartNeeded" = "(Neustart notwendig)";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
