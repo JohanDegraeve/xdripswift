@@ -1773,6 +1773,12 @@ final class RootViewController: UIViewController, ObservableObject {
         self.chartOutlet.reloadChart()
         
         self.miniChartOutlet.reloadChart()
+		
+		// Circle Progress Bar 
+		let circleProgressBar = CircleProgressBarView(frame: CGRect(x: 0, y: 0, width: 300, height: 300))
+		circleProgressBar.center = view.center
+		circleProgressBar.setProgress(greenDuration: 30, yellowDuration: 30)
+		view.addSubview(circleProgressBar)
         
     }
     
