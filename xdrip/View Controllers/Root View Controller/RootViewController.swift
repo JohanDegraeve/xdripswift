@@ -619,6 +619,9 @@ final class RootViewController: UIViewController, ObservableObject {
 	
 	/// Circle Progress Bar
 	private var circleProgressBar: CircleProgressBarView?
+	
+	///
+	private var mockTimerNewValueCircleProgressBar: Timer?
     
     // MARK: - overriden functions
     
@@ -1784,14 +1787,44 @@ final class RootViewController: UIViewController, ObservableObject {
 			view.addSubview(progressBar)
 			
 			// add demo pressing for reset
-			let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap))
+			let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTapAction))
 			doubleTapGesture.numberOfTapsRequired = 2
 			progressBar.addGestureRecognizer(doubleTapGesture)
+			
+			// mock new value every 5 minutes - Timer
+			startUpdateCircleProgressBar()
 		}
         
     }
 	
-	@objc private func handleDoubleTap() {
+	// Demo reset double tap action
+	@objc private func handleDoubleTapAction() {
+		if let progressBar = circleProgressBar {
+			progressBar.restartProgress()
+			resetUpdateCircleProgressBar()
+		}
+	}
+	
+	// Mock configuration data update Circle Progress Bar
+	private func startUpdateCircleProgressBar() {
+		guard mockTimerNewValueCircleProgressBar == nil else {
+			return
+		}
+		
+		mockTimerNewValueCircleProgressBar = Timer.scheduledTimer(timeInterval: 30, target: self, selector: #selector(runUpdateCircleProgressBar), userInfo: nil, repeats: true)
+	}
+	
+	func stopRepeatingUpdateCircleProgressBar() {
+		mockTimerNewValueCircleProgressBar?.invalidate()
+		mockTimerNewValueCircleProgressBar = nil
+	}
+	
+	private func resetUpdateCircleProgressBar() {
+		  stopRepeatingUpdateCircleProgressBar()
+		  startUpdateCircleProgressBar()
+	}
+	
+	@objc private func runUpdateCircleProgressBar() {
 		if let progressBar = circleProgressBar {
 			progressBar.restartProgress()
 		}
