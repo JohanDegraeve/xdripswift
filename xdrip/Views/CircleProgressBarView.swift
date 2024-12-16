@@ -55,8 +55,8 @@ class CircleProgressBarView: UIView, CAAnimationDelegate {
 	private let timerLabel: UILabel = {
 		let label = UILabel()
 		label.textAlignment = .center
-		label.font = UIFont.systemFont(ofSize: 24, weight: .bold)
-		label.textColor = .black
+		label.font = UIFont.systemFont(ofSize: 10, weight: .regular)
+		label.textColor = .white
 		label.text = "00:00"
 		return label
 	}()
@@ -130,7 +130,6 @@ class CircleProgressBarView: UIView, CAAnimationDelegate {
 	
 	// MARK: - View Setup
 	private func setupView() {
-		backgroundColor = .white
 		yellowLayer.path = yellowPath.cgPath
 		greenLayer.path = greenPath.cgPath
 		redLayer.path = redPath.cgPath
@@ -147,7 +146,7 @@ class CircleProgressBarView: UIView, CAAnimationDelegate {
 	override func layoutSubviews() {
 		super.layoutSubviews()
 		updatePaths()
-		timerLabel.frame = CGRect(x: 0, y: 0, width: bounds.width, height: 50)
+		timerLabel.frame = CGRect(x: 0, y: 0, width: bounds.width, height: 20)
 		timerLabel.center = centerPoint
 	}
 	

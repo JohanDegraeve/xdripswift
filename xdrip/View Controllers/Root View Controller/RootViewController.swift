@@ -173,7 +173,8 @@ final class RootViewController: UIViewController, ObservableObject {
     }
         
     /// outlets for statistics view
-    @IBOutlet weak var statisticsView: UIView!
+	@IBOutlet weak var containerCircleProgressBar: UIView!
+	@IBOutlet weak var statisticsView: UIView!
     @IBOutlet weak var pieChartOutlet: PieChart!
     @IBOutlet weak var lowStatisticLabelOutlet: UILabel!
     @IBOutlet weak var inRangeStatisticLabelOutlet: UILabel!
@@ -377,6 +378,12 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// can be used as a shortcut to switch between different TIR calculation methods. The user will be notified of the change via UI transitions to show what has changed in the calculation limits
     @IBAction func statisticsViewDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
+		
+		// add demo pressing for reset circle progress bar
+		if let progressBar = circleProgressBar {
+			progressBar.restartProgress()
+			resetUpdateCircleProgressBar()
+		}
         
         let previousTimeInRangeType = UserDefaults.standard.timeInRangeType
         
@@ -1780,30 +1787,17 @@ final class RootViewController: UIViewController, ObservableObject {
         self.miniChartOutlet.reloadChart()
 		
 		// Setup Circle Progress Bar
-		circleProgressBar = CircleProgressBarView(frame: CGRect(x: 0, y: 0, width: 300, height: 300))
+		circleProgressBar = CircleProgressBarView(frame: CGRect(x: 0, y: 0, width: 75, height: 75))
 		if let progressBar = circleProgressBar {
-			progressBar.center = view.center
-			progressBar.setProgress(greenDuration: 30, yellowDuration: 30)
-			view.addSubview(progressBar)
-			
-			// add demo pressing for reset
-			let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTapAction))
-			doubleTapGesture.numberOfTapsRequired = 2
-			progressBar.addGestureRecognizer(doubleTapGesture)
-			
+			progressBar.center = containerCircleProgressBar.center
+			// set 5min green, 5min yellow
+			progressBar.setProgress(greenDuration: 300, yellowDuration: 300)
+			containerCircleProgressBar.addSubview(progressBar)
+		
 			// mock new value every 5 minutes - Timer
 			startUpdateCircleProgressBar()
 		}
-        
     }
-	
-	// Demo reset double tap action
-	@objc private func handleDoubleTapAction() {
-		if let progressBar = circleProgressBar {
-			progressBar.restartProgress()
-			resetUpdateCircleProgressBar()
-		}
-	}
 	
 	// Mock configuration data update Circle Progress Bar
 	private func startUpdateCircleProgressBar() {
@@ -1811,7 +1805,8 @@ final class RootViewController: UIViewController, ObservableObject {
 			return
 		}
 		
-		mockTimerNewValueCircleProgressBar = Timer.scheduledTimer(timeInterval: 30, target: self, selector: #selector(runUpdateCircleProgressBar), userInfo: nil, repeats: true)
+		// set 5 min reset
+		mockTimerNewValueCircleProgressBar = Timer.scheduledTimer(timeInterval: 5 * 60, target: self, selector: #selector(runUpdateCircleProgressBar), userInfo: nil, repeats: true)
 	}
 	
 	func stopRepeatingUpdateCircleProgressBar() {
