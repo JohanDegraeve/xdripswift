@@ -114,6 +114,9 @@ class CircleProgressBarView: UIView, CAAnimationDelegate {
 	private var timer: Timer?
 	private var elapsedTime: TimeInterval = 0
 	
+	private var greenDuration: CFTimeInterval = 0
+	private var yellowDuration: CFTimeInterval = 0
+	
 	// MARK: - Init
 	override init(frame: CGRect) {
 		super.init(frame: frame)
@@ -156,6 +159,9 @@ class CircleProgressBarView: UIView, CAAnimationDelegate {
 	
 	// MARK: - Set Progress
 	func setProgress(greenDuration: CFTimeInterval, yellowDuration: CFTimeInterval) {
+		self.greenDuration = greenDuration
+		self.yellowDuration = yellowDuration
+		
 		totalAnimations = 2
 		completedAnimations = 0
 		
@@ -200,5 +206,26 @@ class CircleProgressBarView: UIView, CAAnimationDelegate {
 			}
 		}
 	}
+	
+	func resetProgress() {
+		redLayer.isHidden = true
+		yellowLayer.removeAllAnimations()
+		greenLayer.removeAllAnimations()
+		yellowLayer.strokeEnd = 0
+		greenLayer.strokeEnd = 0
+		
+		timer?.invalidate()
+		timerLabel.text = "00:00"
+		timer = nil
+	}
+	
+	// MARK: - Restart Progress
+	func restartProgress() {
+		resetProgress()
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+			self.setProgress(greenDuration: self.greenDuration, yellowDuration: self.yellowDuration)
+		}
+	}
 }
+
 

@@ -616,7 +616,9 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// uiview to be used for the night-mode overlay to darken the app screen
     private var overlayView: UIView?
-
+	
+	/// Circle Progress Bar
+	private var circleProgressBar: CircleProgressBarView?
     
     // MARK: - overriden functions
     
@@ -1774,13 +1776,26 @@ final class RootViewController: UIViewController, ObservableObject {
         
         self.miniChartOutlet.reloadChart()
 		
-		// Circle Progress Bar 
-		let circleProgressBar = CircleProgressBarView(frame: CGRect(x: 0, y: 0, width: 300, height: 300))
-		circleProgressBar.center = view.center
-		circleProgressBar.setProgress(greenDuration: 30, yellowDuration: 30)
-		view.addSubview(circleProgressBar)
+		// Setup Circle Progress Bar
+		circleProgressBar = CircleProgressBarView(frame: CGRect(x: 0, y: 0, width: 300, height: 300))
+		if let progressBar = circleProgressBar {
+			progressBar.center = view.center
+			progressBar.setProgress(greenDuration: 30, yellowDuration: 30)
+			view.addSubview(progressBar)
+			
+			// add demo pressing for reset
+			let doubleTapGesture = UITapGestureRecognizer(target: self, action: #selector(handleDoubleTap))
+			doubleTapGesture.numberOfTapsRequired = 2
+			progressBar.addGestureRecognizer(doubleTapGesture)
+		}
         
     }
+	
+	@objc private func handleDoubleTap() {
+		if let progressBar = circleProgressBar {
+			progressBar.restartProgress()
+		}
+	}
     
     // MARK: - private helper functions
 
