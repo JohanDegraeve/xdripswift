@@ -1793,21 +1793,8 @@ final class RootViewController: UIViewController, ObservableObject {
 			// set 5min green, 5min yellow
 			progressBar.setProgress(greenDuration: 300, yellowDuration: 300)
 			containerCircleProgressBar.addSubview(progressBar)
-		
-			// mock new value every 5 minutes - Timer
-			startUpdateCircleProgressBar()
 		}
     }
-	
-	// Mock configuration data update Circle Progress Bar
-	private func startUpdateCircleProgressBar() {
-		guard mockTimerNewValueCircleProgressBar == nil else {
-			return
-		}
-		
-		// set 5 min reset
-		mockTimerNewValueCircleProgressBar = Timer.scheduledTimer(timeInterval: 5 * 60, target: self, selector: #selector(runUpdateCircleProgressBar), userInfo: nil, repeats: true)
-	}
 	
 	func stopRepeatingUpdateCircleProgressBar() {
 		mockTimerNewValueCircleProgressBar?.invalidate()
@@ -1816,7 +1803,6 @@ final class RootViewController: UIViewController, ObservableObject {
 	
 	private func resetUpdateCircleProgressBar() {
 		  stopRepeatingUpdateCircleProgressBar()
-		  startUpdateCircleProgressBar()
 	}
 	
 	@objc private func runUpdateCircleProgressBar() {
