@@ -2,7 +2,6 @@
 "settingsviews_sectiontitlehelp" = "Помощь и документация";
 "settingsviews_showOnlineHelp" = "Открыть онлайн документацию";
 "settingsviews_translateOnlineHelp" = "Переводить автоматически";
-"settingsviews_showHelpIcon" = "Показывать иконку помощи";
 "settingsviews_restartNeeded" = "(Требуется перезагрузка)";
 "settingsviews_sectiontitleNotifications" = "Общие";
 "settingsviews_selectbgunit" = "Единицы измерения глюкозы";
@@ -26,7 +25,6 @@
 "settingsviews_showTreatmentsOnChart" = "Показать лечение на графике";
 "settingsviews_smallBolusTreatmentThreshold" = "Пороговое значение микроболюса";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Ниже скольких единиц мы должны считать болюс микроболюсом?\n\n(Рекомендуемое значение: 1,0U)";
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Показывать микроболюс в графике";
 "settingsviews_sectiontitlestatistics" = "Статистика";
 "settingsviews_showStatistics" = "Показывать статистику";
 "settingsviews_daysToUseStatisticsTitle" = "Дней для расчета";
@@ -162,7 +160,6 @@
 "settingsviews_valueIsRequired" = "⚠️ Required";
 
 /// treatments settings, offset the carb treatments on main chart
-"settingsviews_offsetCarbTreatmentsOnChart" = "Offset Carbs on Chart";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";

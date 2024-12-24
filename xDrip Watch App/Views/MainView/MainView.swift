@@ -19,14 +19,17 @@ struct MainView: View {
     
     @State private var showDebug: Bool = false
     
+    // store a boolean flag. We'll toggle this to refresh as needed
+    @State private var refreshView = false
+    
     let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
     
     // MARK: -  Body
     var body: some View {
         
-        let overrideChartHeight: Double? = isSmallScreen ? ConstantsGlucoseChartSwiftUI.viewHeightWatchAppSmall : nil
+        let overrideChartHeight: Double? = isSmallScreen ? (watchState.deviceStatusIconImage() == nil ? ConstantsGlucoseChartSwiftUI.viewHeightWatchAppSmall : ConstantsGlucoseChartSwiftUI.viewHeightWatchAppSmallWithAIDStatus) : nil
         
-        let overrideChartWidth: Double? = isSmallScreen ? ConstantsGlucoseChartSwiftUI.viewWidthWatchAppSmall : nil
+        let overrideChartWidth: Double? = isSmallScreen ? (watchState.deviceStatusIconImage() == nil ? ConstantsGlucoseChartSwiftUI.viewWidthWatchAppSmallWithAIDStatus : ConstantsGlucoseChartSwiftUI.viewWidthWatchAppSmall) : nil
         
         ZStack(alignment: Alignment(horizontal: .center, vertical: .center), content: {
             VStack(spacing: 2) {
@@ -34,12 +37,21 @@ struct MainView: View {
                     .padding([.leading, .trailing], 5)
                     .padding([.top], -6)
                     .padding([.bottom], -6)
+                    .id(refreshView)
                     .onTapGesture(count: 2) {
                         watchState.updateMainViewDate = Date()
                         watchState.requestWatchStateUpdate()
                     }
                 
-                GlucoseChartView(glucoseChartType: .watchApp, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4, overrideChartHeight: overrideChartHeight, overrideChartWidth: overrideChartWidth, highContrast: nil)
+                if watchState.deviceStatusIconImage() != nil {
+                    MainViewAIDStatusView()
+                        .padding([.leading,], 0)
+                        .padding([.trailing], 10)
+                        .padding([.top], 2)
+                        .padding([.bottom], 6)
+                }
+                
+                GlucoseChartView(glucoseChartType: watchState.deviceStatusIconImage() == nil ? .watchApp : .watchAppWithAIDStatus, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4, overrideChartHeight: overrideChartHeight, overrideChartWidth: overrideChartWidth, highContrast: nil)
                     .gesture(
                         DragGesture(minimumDistance: 80, coordinateSpace: .local)
                             .onEnded({ value in
@@ -76,10 +88,12 @@ struct MainView: View {
             if watchState.updatedDate.timeIntervalSinceNow < -5 {
                 watchState.timerControlDate = date
                 watchState.requestWatchStateUpdate()
+                refreshView.toggle()
             }
         }
         .onAppear {
             watchState.requestWatchStateUpdate()
+            refreshView.toggle()
         }
         .onTapGesture(count: 5) {
             showDebug = !showDebug
@@ -148,6 +162,10 @@ struct ContentView_Previews: PreviewProvider {
         watchState.isMaster = false
         watchState.followerDataSourceType = .libreLinkUp
         watchState.followerBackgroundKeepAliveType = .heartbeat
+        watchState.deviceStatusIOB = 2.25
+        watchState.deviceStatusCOB = 24
+        watchState.deviceStatusCreatedAt = Date().addingTimeInterval(-180)
+        watchState.deviceStatusLastLoopDate = Date().addingTimeInterval(-125)
         
         return Group {
             MainView()

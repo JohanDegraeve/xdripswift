@@ -26,7 +26,6 @@
 "settingsviews_libreLinkUpReAcceptNeeded" = "Aceptar terminos";
 "settingsviews_libreLinkUpNoActiveSensor" = "Sin datos de sensor activo";
 "settingsviews_translateOnlineHelp" = "Traducir Documentación";
-"settingsviews_showHelpIcon" = "Mostrar icono";
 "settingsviews_restartNeeded" = "(Pendiente reiniciar)";
 "settingsviews_showReadingInNotification" = "Mostrar en Notificaciones";
 "settingsviews_labelShowReadingInAppBadge" = "Mostrar en el icono de la app";
@@ -49,8 +48,6 @@
 "settingsviews_showTreatmentsOnChart" = "Mostrar Tratamientos";
 "settingsviews_smallBolusTreatmentThreshold" = "Límite Micro-bolo";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Por debajo de cuántas unidades debemos considerar un bolo como micro-bolo?\n\n(Valor recomendado: 1.0U)";
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Mostrar Micro-bolos en Gráfica";
-"settingsviews_offsetCarbTreatmentsOnChart" = "Desplazar HC en Gráfica";
 "settingsviews_sectiontitlestatistics" = "Estadísticas";
 "settingsviews_showStatistics" = "Mostrar Estadísticas";
 "settingsviews_daysToUseStatisticsTitle" = "Días a Calcular";

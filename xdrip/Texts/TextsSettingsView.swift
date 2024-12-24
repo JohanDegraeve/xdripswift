@@ -30,10 +30,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_translateOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Translate Automatically", comment: "help settings, should the online help be translated automatically if needed")
     }()
     
-    static let showHelpIcon: String = {
-        return NSLocalizedString("settingsviews_showHelpIcon", tableName: filename, bundle: Bundle.main, value: "Show Help Icon", comment: "help settings, should the help icon be shown on the toolbar")
-    }()
-    
     static let restartNeeded: String = {
         return NSLocalizedString("settingsviews_restartNeeded", tableName: filename, bundle: Bundle.main, value: "(Restart required)", comment: "help settings, restart needed")
     }()
@@ -237,7 +233,7 @@ class Texts_SettingsView {
     }()
     
     static let showMiniChart: String = {
-        return NSLocalizedString("settingsviews_showMiniChart", tableName: filename, bundle: Bundle.main, value: "Show the Mini-Chart", comment: "home screen settings, should the mini-chart be shown")
+        return NSLocalizedString("settingsviews_showMiniChart", tableName: filename, bundle: Bundle.main, value: "Show Mini-Chart", comment: "home screen settings, should the mini-chart be shown")
     }()
 
     static let labelUrgentHighValue: String = {
@@ -284,14 +280,6 @@ class Texts_SettingsView {
     
     static let settingsviews_smallBolusTreatmentThresholdMessage = {
         return NSLocalizedString("settingsviews_smallBolusTreatmentThresholdMessage", tableName: filename, bundle: Bundle.main, value: "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)", comment: "When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus")
-    }()
-    
-    static let settingsviews_showSmallBolusTreatmentsOnChart: String = {
-        return NSLocalizedString("settingsviews_showSmallBolusTreatmentsOnChart", tableName: filename, bundle: Bundle.main, value: "Show Micro-bolus on Chart", comment: "treatments settings, show the micro-bolus on main chart")
-    }()
-    
-    static let settingsviews_offsetCarbTreatmentsOnChart: String = {
-        return NSLocalizedString("settingsviews_offsetCarbTreatmentsOnChart", tableName: filename, bundle: Bundle.main, value: "Offset Carbs on Chart", comment: "treatments settings, offset the carb treatments on main chart")
     }()
     
     // MARK: - Section Statistics
@@ -475,6 +463,34 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_nightscoutUrl", tableName: filename, bundle: Bundle.main, value: "URL:", comment: "nightscout settings, where user can set the nightscout url")
     }()
     
+    static let labelNightscoutFollowType = {
+        return NSLocalizedString("settingsviews_nightscoutFollowType", tableName: filename, bundle: Bundle.main, value: "AID Follower type", comment: "nightscout settings, select the type of follower to use")
+    }()
+    
+    static let nightscoutFollowTypeNone = {
+        return NSLocalizedString("nightscoutFollowTypeNone", tableName: filename, bundle: Bundle.main, value: "None", comment: "nightscout settings, no AID follower type")
+    }()
+    
+    static let nightscoutFollowTypeNoneExpanded = {
+        return NSLocalizedString("nightscoutFollowTypeNoneExpanded", tableName: filename, bundle: Bundle.main, value: "None (just treatments)", comment: "nightscout settings, basic follower type explanation")
+    }()
+    
+    static let nightscoutFollowTypeLoop = {
+        return NSLocalizedString("nightscoutFollowTypeLoop", tableName: filename, bundle: Bundle.main, value: "Loop", comment: "nightscout settings, loop follower type")
+    }()
+    
+    static let nightscoutFollowTypeLoopExpanded = {
+        return NSLocalizedString("nightscoutFollowTypeLoopExpanded", tableName: filename, bundle: Bundle.main, value: "Loop", comment: "nightscout settings, loop follower type explanation")
+    }()
+    
+    static let nightscoutFollowTypeOpenAPS = {
+        return NSLocalizedString("nightscoutFollowTypeOpenAPS", tableName: filename, bundle: Bundle.main, value: "OpenAPS-based", comment: "nightscout settings, openaps based follower type")
+    }()
+    
+    static let nightscoutFollowTypeOpenAPSExpanded = {
+        return NSLocalizedString("nightscoutFollowTypeOpenAPSExpanded", tableName: filename, bundle: Bundle.main, value: "OpenAPS/Trio/iAPS/AAPS", comment: "nightscout settings, openaps based follower type explanation")
+    }()
+    
     static let useSchedule = {
         return NSLocalizedString("settingsviews_useSchedule", tableName: filename, bundle: Bundle.main, value: "Use Upload Schedule", comment: "nightscout settings, where user can select to use schedule or not")
     }()
@@ -638,6 +654,10 @@ class Texts_SettingsView {
     
     static let allowStandByHighContrast: String = {
         return NSLocalizedString("allowStandByHighContrast", tableName: filename, bundle: Bundle.main, value: "StandBy Night Mode", comment: "should we allow the StandBy mode to show a specific high contrast view at night")
+    }()
+    
+    static let forceStandByBigNumbers: String = {
+        return NSLocalizedString("forceStandByBigNumbers", tableName: filename, bundle: Bundle.main, value: "StandBy Big Number View", comment: "should we force the StandBy mode to show a big number view")
     }()
     
     // MARK: - Calendar Events
@@ -842,6 +862,14 @@ class Texts_SettingsView {
     
     static let libreLinkUpVersionMessage = {
         return String(format: NSLocalizedString("libreLinkUpVersionMessage", tableName: filename, bundle: Bundle.main, value: "\nSetting this value incorrectly could result in your LibreLinkUp account being locked.\n\nDo not touch this setting unless instructed by an xDrip4iOS developer.\n\nThe default version is: %@", comment: "developer settings, ask the user for the libre link up version"), ConstantsLibreLinkUp.libreLinkUpVersionDefault)        
+    }()
+    
+    static let CAGEMaxHours: String = {
+        return NSLocalizedString("CAGEMaxHours", tableName: filename, bundle: Bundle.main, value: "CAGE Max Hours", comment: "developer settings, maximum hours for canula until it expires")
+    }()
+    
+    static let CAGEMaxHoursMessage = {
+        return String(format: NSLocalizedString("CAGEMaxHoursMessage", tableName: filename, bundle: Bundle.main, value: "\nHow many hours until the canula should be considered as expired\n\nEnter 0 to set it back to the default value of %@ hours", comment: "developer settings, message asking the user to enter the number of hours until the canula should be considered as expired"), ConstantsHomeView.CAGEDefaultMaxHours.description)
     }()
     
     // MARK: - Section Housekeeper

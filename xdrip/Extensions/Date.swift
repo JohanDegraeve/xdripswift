@@ -172,9 +172,9 @@ extension Date {
             if days == 0 && hours < 1 {
                 // show just minutes for less than one hour
                 daysAndHoursAgoString = abs(minutes).description + Texts_Common.minuteshort
-            } else if days == 0 && hours < 12 {
-                // show just hours and minutes for less than twelve hours
-                daysAndHoursAgoString = abs(hours).description + Texts_Common.hourshort + abs(minutes).description + Texts_Common.minuteshort
+            } else if days == 0 {
+                // show just hours if less than a day
+                daysAndHoursAgoString = abs(hours).description + Texts_Common.hourshort
             } else {
                 // default show days and hours
                 daysAndHoursAgoString = abs(days).description + Texts_Common.dayshort + abs(hours).description + Texts_Common.hourshort

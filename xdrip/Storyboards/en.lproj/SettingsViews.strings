@@ -3,7 +3,6 @@
 "settingsviews_sectiontitlehelp" = "Help & Documentation";
 "settingsviews_showOnlineHelp" = "Open Online Help";
 "settingsviews_translateOnlineHelp" = "Translate Automatically";
-"settingsviews_showHelpIcon" = "Show Help Icon";
 "settingsviews_restartNeeded" = "(Restart required)";
 "settingsviews_sectiontitleNotifications" = "Notifications";
 "settingsviews_selectbgunit" = "Blood Glucose Units";
@@ -36,7 +35,7 @@
 "settingsviews_IntervalTitle" = "Notification Interval";
 "settingsviews_IntervalMessage" = "Minimum interval between two notifications (mins)";
 "settingsviews_allowScreenRotation" = "Allow Chart Rotation";
-"settingsviews_showMiniChart" = "Show the Mini-Chart";
+"settingsviews_showMiniChart" = "Show Mini-Chart";
 "settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked";
 "settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
 "settingsviews_screenLockDimmingTypeDisabled" = "Disabled";
@@ -53,10 +52,7 @@
 "settingsviews_showtarget" = "Show Target Line";
 "settingsviews_sectiontitletreatments" = "Treatments";
 "settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart";
-"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart";
-"settingsviews_offsetCarbTreatmentsOnChart" = "Offset Carbs on Chart";
 "settingsviews_sectiontitlestatistics" = "Statistics";
 "settingsviews_showStatistics" = "Show Statistics";
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate";

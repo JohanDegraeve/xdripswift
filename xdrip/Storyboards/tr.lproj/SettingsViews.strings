@@ -2,7 +2,6 @@
 "settingsviews_sectiontitlehelp" = "Yardım & Dokümantasyon";
 "settingsviews_showOnlineHelp" = "Çevrimiçi Yardım'ı aç";
 "settingsviews_translateOnlineHelp" = "Otomatik Olarak Çevir";
-"settingsviews_showHelpIcon" = "Yardım Simgesini Göster";
 "settingsviews_restartNeeded" = "(Yeniden başlatmak gerekli)";
 "settingsviews_sectiontitleNotifications" = "Ana ayarlar";
 "settingsviews_selectbgunit" = "Kan Şekeri Birimleri";
@@ -154,7 +153,6 @@
 "settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart";
 
 /// treatments settings, offset the carb treatments on main chart
-"settingsviews_offsetCarbTreatmentsOnChart" = "Offset Carbs on Chart";
 
 /// Housekeeper settings, section title
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
@@ -164,9 +162,6 @@
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
-
-/// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart";
 
 /// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
 "warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
@@ -208,7 +203,7 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show the Mini-Chart";
+"settingsviews_showMiniChart" = "Show Mini-Chart";
 
 /// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
@@ -242,9 +237,6 @@
 
 /// Settings screen for loop delay, explanatory text for time
 "expanatoryTextSelectTime" = "As of what time should the value apply";
-
-/// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
-"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold";
 
 /// data source settings, data source region
 "settingsviews_labelFollowerDataSourceRegion" = "Server (Country)";

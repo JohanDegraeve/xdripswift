@@ -19,7 +19,6 @@ struct MainViewInfoView: View {
     @State private var minsAgoTextColor = Color.colorSecondary
     
     var body: some View {
-        
         let textSize: CGFloat = isSmallScreen ? 14 : 16
         
         HStack(alignment: .center, spacing: 3) {
@@ -33,15 +32,15 @@ struct MainViewInfoView: View {
                 .font(.system(size: textSize))
                 .foregroundStyle(minsAgoTextColor)
                 .animation(.easeOut(duration: 0.3), value: minsAgoTextColor)
-                .onChange(of: watchState.lastUpdatedMinsAgoString()) { oldState, newState in
+                .onChange(of: watchState.lastUpdatedMinsAgoString()) { _, _ in
                     animateTextColor()
                 }
         }
     }
     
-    func animateTextColor(){
+    func animateTextColor() {
         minsAgoTextColor = animatedMinsAgoTextColor
-        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.3){
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 0.3) {
             minsAgoTextColor = watchState.lastUpdatedTimeColor()
         }
     }
@@ -64,9 +63,9 @@ struct MainViewInfoView_Previews: PreviewProvider {
     }
     
     static func bgValueArray() -> [Double] {
-        var bgValueArray:[Double] = Array(repeating: 0, count: 144)
+        var bgValueArray: [Double] = Array(repeating: 0, count: 144)
         var currentValue: Double = 120
-        var increaseValues: Bool = true
+        var increaseValues = true
         
         for index in bgValueArray.indices {
             let randomValue = Double(Int.random(in: -10..<30))

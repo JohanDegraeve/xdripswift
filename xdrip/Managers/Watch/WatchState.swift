@@ -34,6 +34,12 @@ struct WatchState: Codable {
     var liveDataIsEnabled: Bool?
     var remainingComplicationUserInfoTransfers: Int?
     
+    // use this to track the AID/looping status if sent
+    var deviceStatusCreatedAt: Double?
+    var deviceStatusLastLoopDate: Double?
+    var deviceStatusIOB: Double?
+    var deviceStatusCOB: Double?
+    
     var asDictionary: [String: Any]? {
         guard let data = try? JSONEncoder().encode(self) else { return nil }
         return (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)).flatMap { $0 as? [String: Any] }

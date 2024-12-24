@@ -7,23 +7,21 @@
 //
 
 import ActivityKit
-import WidgetKit
 import SwiftUI
+import WidgetKit
 
 struct XDripWidgetLiveActivity: Widget {
-    
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: XDripWidgetAttributes.self) { context in
             
             if context.state.liveActivityType == .minimal {
-                
                 // 1 = minimal widget with no chart
                 HStack(alignment: .center) {
                     Text("\(context.state.bgValueStringInUserChosenUnit) \(context.state.trendArrow())")
-                        .font(.system(size: 35)).bold()
+                        .font(.largeTitle).bold()
                         .foregroundStyle(context.state.bgTextColor())
-                        .minimumScaleFactor(0.1)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.2)
                     
                     Spacer()
                     
@@ -39,18 +37,26 @@ struct XDripWidgetLiveActivity: Widget {
                         Spacer()
                     }
                     
-                    HStack(alignment: .firstTextBaseline, spacing: 4) {
-                        Text(context.state.deltaChangeStringInUserChosenUnit())
-                            .font(.title).fontWeight(.semibold)
-                            .foregroundStyle(context.state.deltaChangeTextColor())
-                            .minimumScaleFactor(0.2)
-                            .lineLimit(1)
+                    HStack(alignment: .center, spacing: 12) {
+                        HStack(alignment: .firstTextBaseline, spacing: 4) {
+                            Text(context.state.deltaChangeStringInUserChosenUnit())
+                                .font(.title).fontWeight(.semibold)
+                                .foregroundStyle(context.state.deltaChangeTextColor())
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.2)
+                            
+                            Text(context.state.bgUnitString)
+                                .font(.title)
+                                .foregroundStyle(.colorTertiary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.2)
+                        }
                         
-                        Text(context.state.bgUnitString)
-                            .font(.title)
-                            .foregroundStyle(.colorTertiary)
-                            .minimumScaleFactor(0.2)
-                            .lineLimit(1)
+                        if let deviceStatusIconImage = context.state.deviceStatusIconImage(), let deviceStatusColor = context.state.deviceStatusColor() {
+                            deviceStatusIconImage
+                                .font(.title2).bold()
+                                .foregroundStyle(deviceStatusColor)
+                        }
                     }
                 }
                 .activityBackgroundTint(.black)
@@ -58,28 +64,35 @@ struct XDripWidgetLiveActivity: Widget {
                 .padding([.leading, .trailing], 20)
                 
             } else if context.state.liveActivityType == .normal {
-                
                 // 0 = normal size chart
                 HStack(spacing: 30) {
                     VStack(spacing: 0) {
                         Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
-                            .font(.system(size: 44)).bold()
+                            .font(.largeTitle).bold()
                             .foregroundStyle(context.state.bgTextColor())
-                            .minimumScaleFactor(0.1)
                             .lineLimit(1)
+                            .minimumScaleFactor(0.2)
                         
-                        HStack(alignment: .firstTextBaseline, spacing: 4) {
-                            Text(context.state.deltaChangeStringInUserChosenUnit())
-                                .font(.system(size: 20)).fontWeight(.semibold)
-                                .foregroundStyle(context.state.deltaChangeTextColor())
-                                .minimumScaleFactor(0.2)
-                                .lineLimit(1)
-                            
-                            Text(context.state.bgUnitString)
-                                .font(.system(size: 20))
-                                .foregroundStyle(.colorTertiary)
-                                .minimumScaleFactor(0.2)
-                                .lineLimit(1)
+                        HStack(alignment: .center, spacing: 8) {
+                            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                                Text(context.state.deltaChangeStringInUserChosenUnit())
+                                    .font(.title2).fontWeight(.semibold)
+                                    .foregroundStyle(context.state.deltaChangeTextColor())
+                                    .lineLimit(1)
+                                    .minimumScaleFactor(0.2)
+                                
+                                if let deviceStatusIconImage = context.state.deviceStatusIconImage(), let deviceStatusColor = context.state.deviceStatusColor() {
+                                    deviceStatusIconImage
+                                        .font(.body).bold()
+                                        .foregroundStyle(deviceStatusColor)
+                                } else {
+                                    Text(context.state.bgUnitString)
+                                        .font(.title2)
+                                        .foregroundStyle(.colorTertiary)
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.2)
+                                }
+                            }
                         }
                     }
                     
@@ -107,30 +120,37 @@ struct XDripWidgetLiveActivity: Widget {
                 .padding(.bottom, 10)
                 
             } else {
-                
                 // 3 = large chart is final default option
                 ZStack {
-                    
                     VStack(spacing: 0) {
                         HStack(alignment: .center) {
                             Text("\(context.state.bgValueStringInUserChosenUnit) \(context.state.trendArrow())")
-                                .font(.system(size: 32)).fontWeight(.bold)
+                                .font(.largeTitle).fontWeight(.bold)
                                 .foregroundStyle(context.state.bgTextColor())
                                 .scaledToFill()
-                                .minimumScaleFactor(0.5)
                                 .lineLimit(1)
+                                .minimumScaleFactor(0.5)
                             
                             Spacer()
                             
-                            HStack(alignment: .firstTextBaseline, spacing: 4) {
-                                Text(context.state.deltaChangeStringInUserChosenUnit())
-                                    .font(.system(size: 28)).fontWeight(.semibold)
-                                    .foregroundStyle(context.state.deltaChangeTextColor())
-                                    .lineLimit(1)
-                                Text(context.state.bgUnitString)
-                                    .font(.system(size: 28))
-                                    .foregroundStyle(.colorTertiary)
-                                    .lineLimit(1)
+                            HStack(alignment: .center, spacing: 10) {
+                                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                                    Text(context.state.deltaChangeStringInUserChosenUnit())
+                                        .font(.title).fontWeight(.semibold)
+                                        .foregroundStyle(context.state.deltaChangeTextColor())
+                                        .lineLimit(1)
+                                    
+                                    Text(context.state.bgUnitString)
+                                        .font(.title)
+                                        .foregroundStyle(.colorTertiary)
+                                        .lineLimit(1)
+                                }
+                                
+                                if let deviceStatusIconImage = context.state.deviceStatusIconImage(), let deviceStatusColor = context.state.deviceStatusColor() {
+                                    deviceStatusIconImage
+                                        .font(.title3).bold()
+                                        .foregroundStyle(deviceStatusColor)
+                                }
                             }
                         }
                         .padding(.top, 8)
@@ -149,7 +169,7 @@ struct XDripWidgetLiveActivity: Widget {
                             
                             Text("Last reading at \(context.state.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
                                 .font(.caption)
-                                .foregroundStyle(.colorTertiary)
+                                .foregroundStyle(.colorSecondary)
                         }
                         .padding(.top, 6)
                         .padding(.bottom, 10)
@@ -176,27 +196,40 @@ struct XDripWidgetLiveActivity: Widget {
             
         } dynamicIsland: { context in
             DynamicIsland {
-                DynamicIslandExpandedRegion(.leading) {                    Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
-                        .font(.largeTitle).bold()
-                        .foregroundStyle(context.state.bgTextColor())
-                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                        .minimumScaleFactor(0.1)
-                        .lineLimit(1)
+                DynamicIslandExpandedRegion(.leading) { Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
+                    .font(.largeTitle).bold()
+                    .foregroundStyle(context.state.bgTextColor())
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.2)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
-                        Text(context.state.deltaChangeStringInUserChosenUnit())
-                            .font(.title).fontWeight(.semibold)
-                            .foregroundStyle(context.state.deltaChangeTextColor())
-                            .minimumScaleFactor(0.2)
-                            .lineLimit(1)
-                        
-                        Text(context.state.bgUnitString)
-                            .font(.title)
-                            .foregroundStyle(.colorSecondary)
-                            .minimumScaleFactor(0.2)
-                            .lineLimit(1)
+                        if let deviceStatusIconImage = context.state.deviceStatusIconImage(), let deviceStatusColor = context.state.deviceStatusColor() {
+                            HStack(alignment: .center, spacing: 10) {
+                                Text(context.state.deltaChangeStringInUserChosenUnit())
+                                    .font(.title).fontWeight(.semibold)
+                                    .foregroundStyle(context.state.deltaChangeTextColor())
+                                    .minimumScaleFactor(0.2)
+                                
+                                deviceStatusIconImage
+                                    .font(.title2).bold()
+                                    .foregroundStyle(deviceStatusColor)
+                            }
+                        } else {
+                            HStack(alignment: .firstTextBaseline, spacing: 4) {
+                                Text(context.state.deltaChangeStringInUserChosenUnit())
+                                    .font(.title).fontWeight(.semibold)
+                                    .foregroundStyle(context.state.deltaChangeTextColor())
+                                
+                                Text(context.state.bgUnitString)
+                                    .font(.title)
+                                    .foregroundStyle(.colorSecondary)
+                            }
+                        }
                     }
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.2)
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
@@ -205,15 +238,22 @@ struct XDripWidgetLiveActivity: Widget {
             } compactLeading: {
                 Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
                     .foregroundStyle(context.state.bgTextColor())
-                    .minimumScaleFactor(0.1)
+                    .minimumScaleFactor(0.2)
             } compactTrailing: {
-                Text(context.state.deltaChangeStringInUserChosenUnit())
-                    .foregroundStyle(context.state.deltaChangeTextColor())
-                    .minimumScaleFactor(0.1)
+                if let deviceStatusIconImage = context.state.deviceStatusIconImage(), let deviceStatusColor = context.state.deviceStatusColor() {
+                    deviceStatusIconImage
+                        .bold()
+                        .foregroundStyle(deviceStatusColor)
+                        .minimumScaleFactor(0.2)
+                } else {
+                    Text(context.state.deltaChangeStringInUserChosenUnit())
+                        .foregroundStyle(context.state.deltaChangeTextColor())
+                        .minimumScaleFactor(0.2)
+                }
             } minimal: {
                 Text("\(context.state.bgValueStringInUserChosenUnit)")
                     .foregroundStyle(context.state.bgTextColor())
-                    .minimumScaleFactor(0.1)
+                    .minimumScaleFactor(0.2)
             }
             .widgetURL(URL(string: "xdripswift"))
             .keylineTint(context.state.bgTextColor())
@@ -222,7 +262,6 @@ struct XDripWidgetLiveActivity: Widget {
 }
 
 struct XDripWidgetLiveActivity_Previews: PreviewProvider {
-    
     // generate some random dates for the preview
     static func bgDateArray() -> [Date] {
         let endDate = Date()
@@ -240,12 +279,12 @@ struct XDripWidgetLiveActivity_Previews: PreviewProvider {
     
     // generate some random bg values for the preview
     static func bgValueArray() -> [Double] {
-        var bgValueArray:[Double] = Array(repeating: 0, count: 144)
+        var bgValueArray: [Double] = Array(repeating: 0, count: 144)
         var currentValue: Double = 100
-        var increaseValues: Bool = true
+        var increaseValues = true
         
         for index in bgValueArray.indices {
-            let randomValue = Double(Int.random(in: -10..<10))
+            let randomValue = Double(Int.random(in: -10 ..< 10))
             
             if currentValue < 80 {
                 increaseValues = true
@@ -263,7 +302,7 @@ struct XDripWidgetLiveActivity_Previews: PreviewProvider {
     
     static let attributes = XDripWidgetAttributes()
     
-    static let contentState = XDripWidgetAttributes.ContentState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 5, deltaValueInUserUnit: -2, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, liveActivityType: .large, dataSourceDescription: "Dexcom G6")
+    static let contentState = XDripWidgetAttributes.ContentState(bgReadingValues: bgValueArray(), bgReadingDates: bgDateArray(), isMgDl: true, slopeOrdinal: 5, deltaValueInUserUnit: -2, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 80, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, liveActivityType: .large, dataSourceDescription: "Dexcom G6", deviceStatusCreatedAt: Date().addingTimeInterval(-300), deviceStatusLastLoopDate: Date().addingTimeInterval(-230))
     
     static var previews: some View {
         attributes
@@ -280,4 +319,3 @@ struct XDripWidgetLiveActivity_Previews: PreviewProvider {
             .previewDisplayName("Minimal")
     }
 }
-

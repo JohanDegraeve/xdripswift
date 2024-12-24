@@ -22,15 +22,23 @@ extension XDripWidget.EntryView {
                 
                 Spacer()
                 
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
-                        .font(.title).fontWeight(.semibold)
-                        .foregroundStyle(entry.widgetState.deltaChangeTextColor())
-                        .lineLimit(1)
-                    Text(entry.widgetState.bgUnitString)
-                        .font(.title)
-                        .foregroundStyle(.colorTertiary)
-                        .lineLimit(1)
+                HStack(alignment: .center, spacing: 10) {
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
+                            .font(.title).fontWeight(.semibold)
+                            .foregroundStyle(entry.widgetState.deltaChangeTextColor())
+                            .lineLimit(1)
+                        Text(entry.widgetState.bgUnitString)
+                            .font(.title)
+                            .foregroundStyle(.colorTertiary)
+                            .lineLimit(1)
+                    }
+                    
+                    if let deviceStatusIconImage = entry.widgetState.deviceStatusIconImage(), let deviceStatusColor = entry.widgetState.deviceStatusColor() {
+                        deviceStatusIconImage
+                            .font(.title3).bold()
+                            .foregroundStyle(deviceStatusColor)
+                    }
                 }
             }
             .padding(.bottom, 6)

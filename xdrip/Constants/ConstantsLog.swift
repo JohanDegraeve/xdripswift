@@ -89,7 +89,7 @@ enum ConstantsLog {
     static let categoryApplicationDataM5StackNames =    "ApplicationDataM5StackNames   "
     
     /// nightscout uploader
-    static let categoryNightscoutUploadManager =     "NightscoutUploadManager       "
+    static let categoryNightscoutSyncManager =     "NightscoutSyncManager       "
     
     /// nightscout follow
     static let categoryNightscoutFollowManager =     "NightscoutFollowManager       "
