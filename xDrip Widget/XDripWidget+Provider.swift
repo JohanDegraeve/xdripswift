@@ -52,7 +52,7 @@ extension XDripWidget.Provider {
                 Date(timeIntervalSince1970: date)
             }
             
-            return Entry.WidgetState(bgReadingValues: data.bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: data.isMgDl, slopeOrdinal: data.slopeOrdinal, deltaValueInUserUnit: data.deltaValueInUserUnit, urgentLowLimitInMgDl: data.urgentLowLimitInMgDl, lowLimitInMgDl: data.lowLimitInMgDl, highLimitInMgDl: data.highLimitInMgDl, urgentHighLimitInMgDl: data.urgentHighLimitInMgDl, dataSourceDescription: data.dataSourceDescription, deviceStatusCreatedAt: data.deviceStatusCreatedAt, deviceStatusLastLoopDate: data.deviceStatusLastLoopDate, keepAliveImageString: data.keepAliveImageString)
+            return Entry.WidgetState(bgReadingValues: data.bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: data.isMgDl, slopeOrdinal: data.slopeOrdinal, deltaValueInUserUnit: data.deltaValueInUserUnit, urgentLowLimitInMgDl: data.urgentLowLimitInMgDl, lowLimitInMgDl: data.lowLimitInMgDl, highLimitInMgDl: data.highLimitInMgDl, urgentHighLimitInMgDl: data.urgentHighLimitInMgDl, dataSourceDescription: data.dataSourceDescription, deviceStatusCreatedAt: data.deviceStatusCreatedAt, deviceStatusLastLoopDate: data.deviceStatusLastLoopDate, allowStandByHighContrast: data.allowStandByHighContrast, forceStandByBigNumbers: data.forceStandByBigNumbers, keepAliveImageString: data.keepAliveImageString)
         } catch {
             print(error.localizedDescription)
         }

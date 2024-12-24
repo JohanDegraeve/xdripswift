@@ -35,6 +35,7 @@ extension XDripWidget.Entry {
         var urgentHighLimitInMgDl: Double
         var dataSourceDescription: String
         var allowStandByHighContrast: Bool
+        var forceStandByBigNumbers: Bool
         var keepAliveImageString: String?
         
         var deviceStatusCreatedAt: Date?
@@ -45,7 +46,7 @@ extension XDripWidget.Entry {
         var bgReadingDate: Date?
         var bgValueStringInUserChosenUnit: String
                 
-        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaValueInUserUnit: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, dataSourceDescription: String? = "", deviceStatusCreatedAt: Date?, deviceStatusLastLoopDate: Date?, allowStandByHighContrast: Bool? = true, keepAliveImageString: String?) {
+        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaValueInUserUnit: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, dataSourceDescription: String? = "", deviceStatusCreatedAt: Date?, deviceStatusLastLoopDate: Date?, allowStandByHighContrast: Bool? = true, forceStandByBigNumbers: Bool? = false, keepAliveImageString: String?) {
             self.bgReadingValues = bgReadingValues
             self.bgReadingDates = bgReadingDates
             self.isMgDl = isMgDl ?? true
@@ -57,6 +58,7 @@ extension XDripWidget.Entry {
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl ?? 250
             self.dataSourceDescription = dataSourceDescription ?? ""
             self.allowStandByHighContrast = allowStandByHighContrast ?? true
+            self.forceStandByBigNumbers = forceStandByBigNumbers ?? false
             self.keepAliveImageString = keepAliveImageString
             
             self.deviceStatusCreatedAt = deviceStatusCreatedAt

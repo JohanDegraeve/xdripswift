@@ -254,7 +254,7 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show the Mini-Chart";
+"settingsviews_showMiniChart" = "Show Mini-Chart";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Patient Name";

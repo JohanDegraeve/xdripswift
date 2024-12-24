@@ -233,7 +233,7 @@ class Texts_SettingsView {
     }()
     
     static let showMiniChart: String = {
-        return NSLocalizedString("settingsviews_showMiniChart", tableName: filename, bundle: Bundle.main, value: "Show the Mini-Chart", comment: "home screen settings, should the mini-chart be shown")
+        return NSLocalizedString("settingsviews_showMiniChart", tableName: filename, bundle: Bundle.main, value: "Show Mini-Chart", comment: "home screen settings, should the mini-chart be shown")
     }()
 
     static let labelUrgentHighValue: String = {
@@ -656,6 +656,10 @@ class Texts_SettingsView {
         return NSLocalizedString("allowStandByHighContrast", tableName: filename, bundle: Bundle.main, value: "StandBy Night Mode", comment: "should we allow the StandBy mode to show a specific high contrast view at night")
     }()
     
+    static let forceStandByBigNumbers: String = {
+        return NSLocalizedString("forceStandByBigNumbers", tableName: filename, bundle: Bundle.main, value: "StandBy Big Number View", comment: "should we force the StandBy mode to show a big number view")
+    }()
+    
     // MARK: - Calendar Events
     
     static let calendarEventsSectionTitle: String = {
@@ -858,6 +862,14 @@ class Texts_SettingsView {
     
     static let libreLinkUpVersionMessage = {
         return String(format: NSLocalizedString("libreLinkUpVersionMessage", tableName: filename, bundle: Bundle.main, value: "\nSetting this value incorrectly could result in your LibreLinkUp account being locked.\n\nDo not touch this setting unless instructed by an xDrip4iOS developer.\n\nThe default version is: %@", comment: "developer settings, ask the user for the libre link up version"), ConstantsLibreLinkUp.libreLinkUpVersionDefault)        
+    }()
+    
+    static let CAGEMaxHours: String = {
+        return NSLocalizedString("CAGEMaxHours", tableName: filename, bundle: Bundle.main, value: "CAGE Max Hours", comment: "developer settings, maximum hours for canula until it expires")
+    }()
+    
+    static let CAGEMaxHoursMessage = {
+        return String(format: NSLocalizedString("CAGEMaxHoursMessage", tableName: filename, bundle: Bundle.main, value: "\nHow many hours until the canula should be considered as expired\n\nEnter 0 to set it back to the default value of %@ hours", comment: "developer settings, message asking the user to enter the number of hours until the canula should be considered as expired"), ConstantsHomeView.CAGEDefaultMaxHours.description)
     }()
     
     // MARK: - Section Housekeeper

@@ -17,7 +17,6 @@
 		470824D3297484B500C52317 /* SwiftCharts in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 470824D1297484B500C52317 /* SwiftCharts */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		470CE1FC246802EB00D5CB74 /* BluetoothPeripheralsView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 470CE1FE246802EB00D5CB74 /* BluetoothPeripheralsView.strings */; };
 		4713B0142BBAB12D009F2838 /* ConstantsAppleWatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DE41B82B87B2680041DA19 /* ConstantsAppleWatch.swift */; };
-		47150A4027F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47150A3F27F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift */; };
 		4715C32E2C9ED5E10052215F /* LiveActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477B2C7D2B432775002F64A4 /* LiveActivityType.swift */; };
 		4715C32F2C9ED5E10052215F /* LiveActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477B2C7D2B432775002F64A4 /* LiveActivityType.swift */; };
 		4715C3302C9ED5E10052215F /* LiveActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477B2C7D2B432775002F64A4 /* LiveActivityType.swift */; };
@@ -91,6 +90,7 @@
 		47503382247420A200D2260B /* BluetoothPeripheralView.strings in Resources */ = {isa = PBXBuildFile; fileRef = 47503384247420A200D2260B /* BluetoothPeripheralView.strings */; };
 		4752B400263570DA0081D551 /* ConstantsStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */; };
 		4752B4062635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */; };
+		475F2A872D0DA81400DE6019 /* ShowHideItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */; };
 		476698662BE2572C008EB2A9 /* ConstantsSettingsIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */; };
 		4767BDD62BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4767BDD52BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift */; };
 		476A897C2CC963C00073ED83 /* NightscoutProfileModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476A897B2CC963AF0073ED83 /* NightscoutProfileModels.swift */; };
@@ -899,7 +899,6 @@
 		47046EA82A6E8F7B00A6F736 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BgReadings.strings; sourceTree = "<group>"; };
 		47046EAA2A6E8F8200A6F736 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/BgReadings.strings; sourceTree = "<group>"; };
 		470CE1FF246802F400D5CB74 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/BluetoothPeripheralsView.strings; sourceTree = "<group>"; };
-		47150A3F27F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewTreatmentsSettingsViewModel.swift; sourceTree = "<group>"; };
 		4716A4ED2B406C3D00419052 /* xDrip Widget Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "xDrip Widget Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4716A4EE2B406C3D00419052 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		4716A4F02B406C3D00419052 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -943,6 +942,7 @@
 		4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsStatistics.swift; sourceTree = "<group>"; };
 		4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewStatisticsSettingsViewModel.swift; sourceTree = "<group>"; };
 		475DED96244AF92A00F78473 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Alerts.strings; sourceTree = "<group>"; };
+		475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowHideItemsView.swift; sourceTree = "<group>"; };
 		476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSettingsIcons.swift; sourceTree = "<group>"; };
 		4767BDD52BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewAppleWatchSettingsViewModel.swift; sourceTree = "<group>"; };
 		476A897B2CC963AF0073ED83 /* NightscoutProfileModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutProfileModels.swift; sourceTree = "<group>"; };
@@ -2739,6 +2739,7 @@
 				47228B142996BDD2008725DB /* BgReadingsView.swift */,
 				47B136DA2BC9BB55001E7ED3 /* ContactImageView.swift */,
 				47C210EF2B52A05B00005711 /* GlucoseChartView.swift */,
+				475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */,
 				F866974E2867A97000025441 /* Settings */,
 			);
 			path = SwiftUIViews;
@@ -3118,7 +3119,6 @@
 				F8B3A83D227F090D004BA588 /* SettingsViewSpeakSettingsViewModel.swift */,
 				4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */,
 				F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */,
-				47150A3F27F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift */,
 			);
 			path = SettingsViewModels;
 			sourceTree = "<group>";
@@ -4532,6 +4532,7 @@
 				F8025E5021EE746400ECF0C0 /* Calibrator.swift in Sources */,
 				F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */,
 				F8B3A844227F090E004BA588 /* SettingsViewAlertSettingsViewModel.swift in Sources */,
+				475F2A872D0DA81400DE6019 /* ShowHideItemsView.swift in Sources */,
 				F8D0587C24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift in Sources */,
 				F8A1586322EDB86E007F5B5D /* ConstantsSounds.swift in Sources */,
 				F8A1587322EDC893007F5B5D /* ConstantsDexcomShare.swift in Sources */,
@@ -4786,7 +4787,6 @@
 				F816E0ED2432A55F009EE65B /* BluconBluetoothPeripheralViewModel.swift in Sources */,
 				F8F9722923A5915900C3F17D /* CGMTransmitter.swift in Sources */,
 				474606822B96358E00AC9214 /* WidgetSharedUserDefaultsModel.swift in Sources */,
-				47150A4027F6211C00DB2994 /* SettingsViewTreatmentsSettingsViewModel.swift in Sources */,
 				F8A389ED23342EB10010F405 /* ConstantsNightscout.swift in Sources */,
 				F85FF3D1252F9FF9004E6FF1 /* SnoozeParameters+CoreDataClass.swift in Sources */,
 				F857A32A253E2D9E00951BB2 /* LibreAlgorithmThresholds.swift in Sources */,

@@ -25,5 +25,6 @@ struct WidgetSharedUserDefaultsModel: Codable {
     var deviceStatusLastLoopDate: Date?
     
     var allowStandByHighContrast: Bool
+    var forceStandByBigNumbers: Bool
     var keepAliveImageString: String?
 }

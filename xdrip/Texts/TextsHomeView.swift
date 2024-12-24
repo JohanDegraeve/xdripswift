@@ -239,4 +239,8 @@ enum Texts_HomeView {
         return NSLocalizedString("libreLinkUpAccountCredentialsMissing", tableName: filename, bundle: Bundle.main, value: "Username/password missing", comment: "username and/or password is missing for librelinkup")
     }()
     
+    static let showHideItemsTitle: String = {
+        return NSLocalizedString("showHideItemsTitle", tableName: filename, bundle: Bundle.main, value: "Quick Show/Hide", comment: "show or hide various interface items")
+    }()
+    
 }

@@ -115,6 +115,8 @@ extension UserDefaults {
         case showBasalTreatmentsInList = "showBasalTreatmentsInList"
         /// should the BG Checks be listed in the treatment list/table?
         case showBgCheckTreatmentsInList = "showBgCheckTreatmentsInList"
+        /// override the default canula age value (CAGE = time since site change)?
+        case CAGEMaxHours = "CAGEMaxHours"
         
         // Statistics settings
         
@@ -443,6 +445,9 @@ extension UserDefaults {
         
         /// should the app allow a high contrast mode for the .systemSmall widget when shown in StandBy mode at night?
         case allowStandByHighContrast = "allowStandByHighContrast"
+        
+        /// force StandBy mode to show a big number version of the widget
+        case forceStandByBigNumbers = "forceStandByBigNumbers"
     }
     
     
@@ -1109,6 +1114,23 @@ extension UserDefaults {
         set {
 
             set(newValue, forKey: Key.smallBolusTreatmentThreshold.rawValue)
+        }
+    }
+    
+    /// max canula age (CAGE) as Int - if nil, return default value
+    @objc dynamic var CAGEMaxHours: Int {
+        get {
+            var returnValue = integer(forKey: Key.CAGEMaxHours.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0 {
+                returnValue = ConstantsHomeView.CAGEDefaultMaxHours
+            }
+
+            return returnValue
+        }
+        
+        set {
+            set(newValue, forKey: Key.CAGEMaxHours.rawValue)
         }
     }
     
@@ -2165,6 +2187,17 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.allowStandByHighContrast.rawValue)
+        }
+    }
+    
+    /// force StandBy mode to show a big number version of the widget
+    var forceStandByBigNumbers: Bool {
+        // default value for bool in userdefaults is false, as default we want the app to not show big numbers
+        get {
+            return bool(forKey: Key.forceStandByBigNumbers.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.forceStandByBigNumbers.rawValue)
         }
     }
     

@@ -88,11 +88,14 @@ enum ConstantsHomeView {
     /// opacity level for the background of the AID status banner
     static let AIDStatusBannerBackgroundOpacity = 0.1
     
-    /// after how many hows should we show the CAGE as a warning condition (yellow)?
-    static let CAGEWarningAfterHours: TimeInterval = 60 * 60 * 60
+    /// number of hours for the default canula max age (usually 3 days = 72 hours)
+    static let CAGEDefaultMaxHours: Int = 72
     
-    /// after how many hows should we show the CAGE as an urgent condition (red)?
-    static let CAGEUrgentAfterHours: TimeInterval = 60 * 60 * 66
+    /// after much time *before max hours* should we show the CAGE as a warning condition (yellow)?
+    static let CAGEWarningTimeIntervalBeforeMaxHours: TimeInterval = 60 * 60 * 12
+    
+    /// after much time *before max hours* should we show the CAGE as an urgent condition (red)?
+    static let CAGEUrgentTimeIntervalBeforeMaxHours: TimeInterval = 60 * 60 * 6
     
     /// below how many units should we show the pump reservoir  as a warning condition (yellow)?
     static let pumpReservoirWarning: Double = 30

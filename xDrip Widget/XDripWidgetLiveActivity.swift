@@ -20,8 +20,8 @@ struct XDripWidgetLiveActivity: Widget {
                     Text("\(context.state.bgValueStringInUserChosenUnit) \(context.state.trendArrow())")
                         .font(.largeTitle).bold()
                         .foregroundStyle(context.state.bgTextColor())
-                        .minimumScaleFactor(0.1)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.2)
                     
                     Spacer()
                     
@@ -42,14 +42,14 @@ struct XDripWidgetLiveActivity: Widget {
                             Text(context.state.deltaChangeStringInUserChosenUnit())
                                 .font(.title).fontWeight(.semibold)
                                 .foregroundStyle(context.state.deltaChangeTextColor())
-                                .minimumScaleFactor(0.2)
                                 .lineLimit(1)
+                                .minimumScaleFactor(0.2)
                             
                             Text(context.state.bgUnitString)
                                 .font(.title)
                                 .foregroundStyle(.colorTertiary)
-                                .minimumScaleFactor(0.2)
                                 .lineLimit(1)
+                                .minimumScaleFactor(0.2)
                         }
                         
                         if let deviceStatusIconImage = context.state.deviceStatusIconImage(), let deviceStatusColor = context.state.deviceStatusColor() {
@@ -70,16 +70,16 @@ struct XDripWidgetLiveActivity: Widget {
                         Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
                             .font(.largeTitle).bold()
                             .foregroundStyle(context.state.bgTextColor())
-                            .minimumScaleFactor(0.1)
                             .lineLimit(1)
+                            .minimumScaleFactor(0.2)
                         
                         HStack(alignment: .center, spacing: 8) {
                             HStack(alignment: .firstTextBaseline, spacing: 4) {
                                 Text(context.state.deltaChangeStringInUserChosenUnit())
                                     .font(.title2).fontWeight(.semibold)
                                     .foregroundStyle(context.state.deltaChangeTextColor())
-                                    .minimumScaleFactor(0.2)
                                     .lineLimit(1)
+                                    .minimumScaleFactor(0.2)
                                 
                                 if let deviceStatusIconImage = context.state.deviceStatusIconImage(), let deviceStatusColor = context.state.deviceStatusColor() {
                                     deviceStatusIconImage
@@ -89,8 +89,8 @@ struct XDripWidgetLiveActivity: Widget {
                                     Text(context.state.bgUnitString)
                                         .font(.title2)
                                         .foregroundStyle(.colorTertiary)
-                                        .minimumScaleFactor(0.2)
                                         .lineLimit(1)
+                                        .minimumScaleFactor(0.2)
                                 }
                             }
                         }
@@ -201,23 +201,16 @@ struct XDripWidgetLiveActivity: Widget {
                     .foregroundStyle(context.state.bgTextColor())
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.1)
+                    .minimumScaleFactor(0.2)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
                         if let deviceStatusIconImage = context.state.deviceStatusIconImage(), let deviceStatusColor = context.state.deviceStatusColor() {
                             HStack(alignment: .center, spacing: 10) {
-                                VStack(alignment: .trailing, spacing: -6) {
-                                    Text(context.state.deltaChangeStringInUserChosenUnit())
-                                        .font(.title).fontWeight(.semibold)
-                                        .foregroundStyle(context.state.deltaChangeTextColor())
-                                        .minimumScaleFactor(0.2)
-                                    
-                                    Text(context.state.bgUnitString)
-                                        .font(.footnote)
-                                        .foregroundStyle(.colorSecondary)
-                                        .minimumScaleFactor(0.2)
-                                }
+                                Text(context.state.deltaChangeStringInUserChosenUnit())
+                                    .font(.title).fontWeight(.semibold)
+                                    .foregroundStyle(context.state.deltaChangeTextColor())
+                                    .minimumScaleFactor(0.2)
                                 
                                 deviceStatusIconImage
                                     .font(.title2).bold()
@@ -245,22 +238,22 @@ struct XDripWidgetLiveActivity: Widget {
             } compactLeading: {
                 Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
                     .foregroundStyle(context.state.bgTextColor())
-                    .minimumScaleFactor(0.1)
+                    .minimumScaleFactor(0.2)
             } compactTrailing: {
                 if let deviceStatusIconImage = context.state.deviceStatusIconImage(), let deviceStatusColor = context.state.deviceStatusColor() {
                     deviceStatusIconImage
                         .bold()
                         .foregroundStyle(deviceStatusColor)
-                        .minimumScaleFactor(0.1)
+                        .minimumScaleFactor(0.2)
                 } else {
                     Text(context.state.deltaChangeStringInUserChosenUnit())
                         .foregroundStyle(context.state.deltaChangeTextColor())
-                        .minimumScaleFactor(0.1)
+                        .minimumScaleFactor(0.2)
                 }
             } minimal: {
                 Text("\(context.state.bgValueStringInUserChosenUnit)")
                     .foregroundStyle(context.state.bgTextColor())
-                    .minimumScaleFactor(0.1)
+                    .minimumScaleFactor(0.2)
             }
             .widgetURL(URL(string: "xdripswift"))
             .keylineTint(context.state.bgTextColor())

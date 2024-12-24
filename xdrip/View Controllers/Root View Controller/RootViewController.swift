@@ -51,6 +51,10 @@ final class RootViewController: UIViewController, ObservableObject {
         }
     }
     
+    @IBOutlet weak var showHideItemsToolbarButtonOutlet: UIBarButtonItem!
+    @IBAction func showHideItemsToolbarButtonAction(_ sender: UIBarButtonItem) {
+    }
+    
     /// outlet for the lock button - it will change text based upon whether they screen is locked or not
     @IBOutlet weak var screenLockToolbarButtonOutlet: UIBarButtonItem!
     /// call the screen lock alert when the button is pressed
@@ -421,6 +425,10 @@ final class RootViewController: UIViewController, ObservableObject {
         return UIHostingController(coder: coder, rootView: BgReadingsView().environmentObject(bgReadingsAccessor!).environmentObject(nightscoutSyncManager!))
     }
     
+    @IBSegueAction func segueToShowHideItemsView(_ coder: NSCoder) -> UIViewController? {
+        return UIHostingController(coder: coder, rootView: ShowHideItemsView())
+    }
+    
     @IBSegueAction func segueToAIDStatusView(_ coder: NSCoder) -> UIViewController? {
         return UIHostingController(coder: coder, rootView: AIDStatusView().environmentObject(nightscoutSyncManager!))
     }
@@ -685,8 +693,7 @@ final class RootViewController: UIViewController, ObservableObject {
         clockDateFormatter.dateFormat = "HH:mm"
         clockLabelOutlet.font = ConstantsUI.clockLabelFontSize
         clockLabelOutlet.textColor = ConstantsUI.clockLabelColor
-        
-        
+                
         // ensure the screen layout
         screenLockUpdate(enabled: false)
         
@@ -697,8 +704,7 @@ final class RootViewController: UIViewController, ObservableObject {
         UserDefaults.standard.lowMarkValueInUserChosenUnit = UserDefaults.standard.lowMarkValueInUserChosenUnit
         UserDefaults.standard.highMarkValueInUserChosenUnit = UserDefaults.standard.highMarkValueInUserChosenUnit
         UserDefaults.standard.bloodGlucoseUnitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-        
-        
+                
         // set the localized text of the segmented controls
         segmentedControlChartHours.setTitle("3" + Texts_Common.hourshort, forSegmentAt: 0)
         segmentedControlChartHours.setTitle("6" + Texts_Common.hourshort, forSegmentAt: 1)
@@ -726,7 +732,6 @@ final class RootViewController: UIViewController, ObservableObject {
             break
         }
         
-        
         // update the segmented control of the statistics days
         switch UserDefaults.standard.daysToUseStatistics
         {
@@ -743,7 +748,6 @@ final class RootViewController: UIViewController, ObservableObject {
         default:
             break
         }
-        
         
         // format the segmented control of the chart hours. We basically want it to dissapear into the background
         segmentedControlChartHours.backgroundColor = ConstantsUI.segmentedControlBackgroundColor
@@ -848,6 +852,12 @@ final class RootViewController: UIViewController, ObservableObject {
         // showing or hiding the mini-chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showMiniChart.rawValue, options: .new, context: nil)
         
+        // showing or hiding the statistics view
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showStatistics.rawValue, options: .new, context: nil)
+        
+        // showing or hiding the treatments on the chart
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showTreatmentsOnChart.rawValue, options: .new, context: nil)
+        
         // see if the user has changed the statistic days to use
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.daysToUseStatistics.rawValue, options: .new, context: nil)
         
@@ -897,6 +907,13 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // if the Nightscout device status changes, update the UI
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutDeviceStatus.rawValue, options: .new, context: nil)
+        
+        // if the widget standby options change, update the widget data
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.allowStandByHighContrast.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.forceStandByBigNumbers.rawValue, options: .new, context: nil)
+        
+        // if the snooze all until data changes, update the UI
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.snoozeAllAlertsUntilDate.rawValue, options: .new, context: nil)
         
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
@@ -1646,9 +1663,9 @@ final class RootViewController: UIViewController, ObservableObject {
             
             updateLiveActivityAndWidgets(forceRestart: false)
             
-        case UserDefaults.Key.liveActivityType:
+        case UserDefaults.Key.liveActivityType, UserDefaults.Key.allowStandByHighContrast, UserDefaults.Key.forceStandByBigNumbers:
             
-            // check and configure the live activity if applicable
+            // check and configure the live activity and widgets if applicable
             updateLiveActivityAndWidgets(forceRestart: false)
             
         case UserDefaults.Key.nightscoutFollowType:
@@ -1681,10 +1698,11 @@ final class RootViewController: UIViewController, ObservableObject {
             // redraw mini-chart
             updateMiniChart()
             
-        case UserDefaults.Key.daysToUseStatistics:
+        case UserDefaults.Key.daysToUseStatistics, UserDefaults.Key.showStatistics:
+            updateStatistics(animate: false, overrideApplicationState: false)
             
-            // refresh statistics calculations/view is necessary
-            updateStatistics(animate: true, overrideApplicationState: false)
+        case UserDefaults.Key.showTreatmentsOnChart:
+            updateChartWithResetEndDate()
             
         case UserDefaults.Key.showClockWhenScreenIsLocked:
             
@@ -2677,6 +2695,12 @@ final class RootViewController: UIViewController, ObservableObject {
         // don't calculate statis if app is not running in the foreground
         guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
         
+        // show (or even hide) the view if required
+        statisticsView.isHidden = !UserDefaults.standard.showStatistics
+        
+        // show/hide the selector as needed
+        segmentedControlStatisticsDaysView.isHidden = !UserDefaults.standard.showStatistics
+        
         // if the user doesn't want to see the statistics, then just return without doing anything
         if !UserDefaults.standard.showStatistics {
             return
@@ -3449,11 +3473,18 @@ final class RootViewController: UIViewController, ObservableObject {
         
     }
     
-    /// show the SwiftUI showBgReadingsView view via UIHostingController
+    /// show the SwiftUI BgReadingsView view via UIHostingController
     private func showBgReadingsView() {
         let bgReadingsViewController = UIHostingController(rootView: BgReadingsView().environmentObject(self.bgReadingsAccessor!).environmentObject(nightscoutSyncManager!))
         
         navigationController?.pushViewController(bgReadingsViewController, animated: true)
+    }
+    
+    /// show the SwiftUI showHideItemsView view via UIHostingController
+    private func showShowHideItemsView() {
+        let showHideItemsViewController = UIHostingController(rootView: ShowHideItemsView())
+        
+        navigationController?.pushViewController(showHideItemsViewController, animated: true)
     }
     
     /// show the SwiftUI Automated Insulin Devliery system info view via UIHostingController
@@ -3542,7 +3573,7 @@ final class RootViewController: UIViewController, ObservableObject {
                     date.timeIntervalSince1970
                 }
                 
-                let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, dataSourceDescription: dataSourceDescription, deviceStatusCreatedAt: deviceStatusCreatedAt, deviceStatusLastLoopDate: deviceStatusLastLoopDate, allowStandByHighContrast: UserDefaults.standard.allowStandByHighContrast, keepAliveImageString: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImageString : nil)
+                let widgetSharedUserDefaultsModel = WidgetSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, dataSourceDescription: dataSourceDescription, deviceStatusCreatedAt: deviceStatusCreatedAt, deviceStatusLastLoopDate: deviceStatusLastLoopDate, allowStandByHighContrast: UserDefaults.standard.allowStandByHighContrast, forceStandByBigNumbers: UserDefaults.standard.forceStandByBigNumbers, keepAliveImageString: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImageString : nil)
                 
                 // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
                 // the user's device - this allows several copies of the app to be installed without cross-contamination of widget data
@@ -3708,10 +3739,13 @@ final class RootViewController: UIViewController, ObservableObject {
                 pumpReservoirValueOutlet.textColor = deviceStatus.pumpReservoirUIColor() ?? UIColor(resource: .colorPrimary)
                 pumpBatteryValueOutlet.textColor = deviceStatus.pumpBatteryPercentUIColor() ?? UIColor(resource: .colorPrimary)
                 
+                // set the formatting for the canula age. We can use purple to show an expired status (the same as with the sensor lifetime)
                 if let siteChangeDate = siteChangeTreatments?.first?.date {
-                    if siteChangeDate.timeIntervalSinceNow < (-ConstantsHomeView.CAGEUrgentAfterHours) {
+                    if siteChangeDate.timeIntervalSinceNow < TimeInterval(-UserDefaults.standard.CAGEMaxHours * 60 * 60) {
+                        pumpCAGEValueOutlet.textColor = UIColor.systemPurple
+                    } else if siteChangeDate.timeIntervalSinceNow < (TimeInterval(-UserDefaults.standard.CAGEMaxHours * 60 * 60) + ConstantsHomeView.CAGEUrgentTimeIntervalBeforeMaxHours) {
                         pumpCAGEValueOutlet.textColor = UIColor.systemRed
-                    } else if siteChangeDate.timeIntervalSinceNow < (-ConstantsHomeView.CAGEWarningAfterHours) {
+                    } else if siteChangeDate.timeIntervalSinceNow < (TimeInterval(-UserDefaults.standard.CAGEMaxHours * 60 * 60) + ConstantsHomeView.CAGEWarningTimeIntervalBeforeMaxHours) {
                         pumpCAGEValueOutlet.textColor = UIColor.systemYellow
                     } else {
                         pumpCAGEValueOutlet.textColor = UIColor(resource: .colorPrimary)

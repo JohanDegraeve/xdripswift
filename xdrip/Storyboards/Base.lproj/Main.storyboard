@@ -413,6 +413,13 @@
                                                     <action selector="calibrateToolbarButtonAction:" destination="9pv-A4-QxB" id="qNA-1R-UK5"/>
                                                 </connections>
                                             </barButtonItem>
+                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="y1I-g1-5hw"/>
+                                            <barButtonItem title="Show/Hide" image="rectangle.3.group" catalog="system" id="f26-wK-U2z">
+                                                <connections>
+                                                    <action selector="showHideItemsToolbarButtonAction:" destination="9pv-A4-QxB" id="vXN-re-hWX"/>
+                                                    <segue destination="J8I-o4-LCb" kind="show" identifier="RootViewToShowHideItemsView" destinationCreationSelector="segueToShowHideItemsView:" id="XSD-IA-PL7"/>
+                                                </connections>
+                                            </barButtonItem>
                                             <barButtonItem style="plain" systemItem="flexibleSpace" id="SlH-A4-F18"/>
                                             <barButtonItem title="Lock" image="lock" catalog="system" id="wfX-50-2w6">
                                                 <connections>
@@ -1236,6 +1243,7 @@
                         <outlet property="sensorProgressOutlet" destination="upb-Qe-tZf" id="9NY-uV-DIX"/>
                         <outlet property="sensorProgressViewOutlet" destination="5cH-2r-1eU" id="HEm-Ih-vwV"/>
                         <outlet property="sensorToolbarButtonOutlet" destination="ZIM-Wf-bUy" id="kjL-rX-6ZV"/>
+                        <outlet property="showHideItemsToolbarButtonOutlet" destination="f26-wK-U2z" id="SSG-0N-a7e"/>
                         <outlet property="statisticsView" destination="MtJ-rx-OB9" id="u5w-qN-5Tq"/>
                         <outlet property="timePeriodLabelOutlet" destination="On3-dy-RgB" id="hAe-Kx-vnM"/>
                         <outlet property="toolbarOutlet" destination="tVG-ML-9xd" id="p1N-b3-pnD"/>
@@ -1418,6 +1426,16 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="bae-g3-3wD" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3335" y="-837"/>
+        </scene>
+        <!--Hosting Controller-->
+        <scene sceneID="ixu-3S-Cyy">
+            <objects>
+                <hostingController id="J8I-o4-LCb" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="geY-Le-WCa"/>
+                </hostingController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="SrA-mt-Lv6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4068" y="-837"/>
         </scene>
         <!--Picker View Controller-->
         <scene sceneID="6RW-Ef-2Hm">
@@ -2716,6 +2734,7 @@
         <image name="drop" catalog="system" width="96" height="128"/>
         <image name="lock" catalog="system" width="111" height="128"/>
         <image name="network" catalog="system" width="128" height="123"/>
+        <image name="rectangle.3.group" catalog="system" width="128" height="80"/>
         <image name="sensor.tag.radiowaves.forward" catalog="system" width="128" height="85"/>
         <image name="speaker.wave.2" catalog="system" width="128" height="88"/>
         <image name="xmark.circle" catalog="system" width="128" height="123"/>

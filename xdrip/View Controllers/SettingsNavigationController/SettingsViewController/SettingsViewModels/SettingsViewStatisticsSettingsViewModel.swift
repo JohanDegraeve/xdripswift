@@ -205,6 +205,9 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
         // Listen for changes in the timeInRangeType to trigger the UI to be updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.timeInRangeType.rawValue, options: .new, context: nil)
         
+        // Listen for changes in the showStatistics to trigger the UI to be updated
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showStatistics.rawValue, options: .new, context: nil)
+        
     }
     
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
@@ -214,7 +217,7 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
         else { return }
         
         switch keyPathEnum {
-        case UserDefaults.Key.timeInRangeType:
+        case UserDefaults.Key.timeInRangeType, UserDefaults.Key.showStatistics:
             
             // we have to run this in the main thread to avoid access errors
             DispatchQueue.main.async {
