@@ -12,7 +12,7 @@ import Foundation
 
 /// Struct to hold internal Nightscout profile
 struct NightscoutProfile: Codable {
-    struct TimeValue: Codable {
+    struct TimeValue: Codable, Hashable {
         var timeAsSecondsFromMidnight: Int
         var value: Double
         
@@ -27,14 +27,14 @@ struct NightscoutProfile: Codable {
     var basal: [TimeValue]?
     var carbratio: [TimeValue]?
     var sensitivity: [TimeValue]?
-    var carbsHr: Int? = 0
-    var timezone: String = ""
-    var dia: Int = 0
-    var isMgDl: Bool = true
+    var carbsHr: Int?
+    var timezone: String?
+    var dia: Double?
+    var isMgDl: Bool?
     var startDate: Date = .distantPast
     var createdAt: Date = .distantPast
-    var profileName: String = ""
-    var enteredBy: String? = ""
+    var profileName: String?
+    var enteredBy: String?
     
     // return true if data has been written after initialization
     func hasData() -> Bool {
@@ -60,7 +60,7 @@ struct NightscoutProfileResponse: Codable {
         let targetHigh: [ProfileEntry]
         let carbsHr: Int?
         let timezone: String
-        let dia: Int
+        let dia: Double
         let units: String
         let delay: Int?
         
