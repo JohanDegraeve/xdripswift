@@ -392,6 +392,7 @@ class Trace {
           
         traceInfo.appendStringAndNewLine("\nNightscout settings:")
         traceInfo.appendStringAndNewLine("    Nightscout enabled: " + UserDefaults.standard.nightscoutEnabled.description)
+        traceInfo.appendStringAndNewLine("    AID Follow Type: " + UserDefaults.standard.nightscoutFollowType.description)
         if UserDefaults.standard.nightscoutEnabled {
             traceInfo.appendStringAndNewLine("    URL: " + ((UserDefaults.standard.nightscoutUrl?.description ?? "") != "" ? "present" : "missing"))
             traceInfo.appendStringAndNewLine("    API_SECRET: " + ((UserDefaults.standard.nightscoutAPIKey?.description ?? "") != "" ? "present" : "missing"))
@@ -427,6 +428,9 @@ class Trace {
         traceInfo.appendStringAndNewLine("    Show values in complications: " + UserDefaults.standard.showDataInWatchComplications.description)
         if let agreementDate = UserDefaults.standard.watchComplicationUserAgreementDate {
             traceInfo.appendStringAndNewLine("    User agreement date: " + agreementDate.toString(timeStyle: .short, dateStyle: .medium) + " (" + agreementDate.daysAndHoursAgo(appendAgo: true) + ")")
+            if let remainingComplicationUserInfoTransfers = UserDefaults.standard.remainingComplicationUserInfoTransfers {
+                traceInfo.appendStringAndNewLine("    Remaining complication updates: " + remainingComplicationUserInfoTransfers.description + " / 50")
+            }
         } else {
             traceInfo.appendStringAndNewLine("    User agreement date: nil")
         }
@@ -459,7 +463,11 @@ class Trace {
         traceInfo.appendStringAndNewLine("    OS log enabled: " + UserDefaults.standard.OSLogEnabled.description)
         traceInfo.appendStringAndNewLine("    Suppress unlock payload: " + UserDefaults.standard.suppressUnLockPayLoad.description)
         traceInfo.appendStringAndNewLine("    OS-AID share type: " + UserDefaults.standard.loopShareType.description)
+        traceInfo.appendStringAndNewLine("    OS-AID share every 5 mins?: " + UserDefaults.standard.shareToLoopOnceEvery5Minutes.description)
         traceInfo.appendStringAndNewLine("    LibreLinkUp version: " + (UserDefaults.standard.libreLinkUpVersion?.description ?? "nil"))
+        traceInfo.appendStringAndNewLine("    CAGE max hours: " + UserDefaults.standard.CAGEMaxHours.description + " (default: " + ConstantsHomeView.CAGEDefaultMaxHours.description + ")")
+        traceInfo.appendStringAndNewLine("    StandBy night mode enabled: " + UserDefaults.standard.allowStandByHighContrast.description)
+        traceInfo.appendStringAndNewLine("    StandBy big numbers enabled: " + UserDefaults.standard.forceStandByBigNumbers.description)
         
         // misc settings
         traceInfo.appendStringAndNewLine("\nMisc settings:")

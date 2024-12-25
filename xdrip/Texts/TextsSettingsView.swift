@@ -657,7 +657,7 @@ class Texts_SettingsView {
     }()
     
     static let forceStandByBigNumbers: String = {
-        return NSLocalizedString("forceStandByBigNumbers", tableName: filename, bundle: Bundle.main, value: "StandBy Big Number View", comment: "should we force the StandBy mode to show a big number view")
+        return NSLocalizedString("forceStandByBigNumbers", tableName: filename, bundle: Bundle.main, value: "StandBy Big Numbers", comment: "should we force the StandBy mode to show big numbers only")
     }()
     
     // MARK: - Calendar Events
