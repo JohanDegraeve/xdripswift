@@ -598,9 +598,12 @@ final class RootViewController: UIViewController, ObservableObject {
     /// UIAlertController to use when user chooses to lock the screen. Defined here so we can dismiss it when app goes to the background
     private var screenLockAlertController: UIAlertController?
     
-    /// create the landscape view
+    /// create the chart landscape view
     private var landscapeChartViewController: LandscapeChartViewController?
-    
+
+    /// create the value  landscape view
+    private var landscapeValueViewController: LandscapeValueViewController?
+
     /// uiview to be used for the night-mode overlay to darken the app screen
     private var overlayView: UIView?
     
@@ -1754,7 +1757,11 @@ final class RootViewController: UIViewController, ObservableObject {
             
             switch newCollection.verticalSizeClass {
             case .compact:
-                showLandscape(with: coordinator)
+                if screenIsLocked {
+                    showValueLandscape(with: coordinator)
+                } else {
+                    showChartLandscape(with: coordinator)
+                }
             case .regular, .unspecified:
                 hideLandscape(with: coordinator)
             @unknown default:
@@ -2276,6 +2283,7 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     /// - updates the labels and the chart,
+    ///    - also in the landscapeValueViewController, if it exists.
     /// - but only if the chart is not panned backward
     /// - and if app is in foreground
     /// - and if overrideApplicationState = false
@@ -2291,7 +2299,8 @@ final class RootViewController: UIViewController, ObservableObject {
         updatePumpAndAIDStatusViews()
         
         // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
-        if let glucoseChartManager = glucoseChartManager  {
+        // if landscapeValueViewController != nil then it means the device is in landscape mode and the value is shown, and that case ignore the status of the chart
+        if let glucoseChartManager = glucoseChartManager, landscapeValueViewController == nil {
             // check that app is in foreground, but only if overrideApplicationState = false
             // if we are not forcing to reset even if the chart is currently panned back in time (such as by double-tapping the main chart, then check if it is panned back in that case we don't update the labels
             if !forceReset {
@@ -2306,6 +2315,12 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // to make the following code a bit more readable
         let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        
+        // piece of code that is used at least two times
+        // it calls landscapeValueViewController.updateLabels
+        let updateLabelsInLandscapeValueViewController = { [self] in
+            landscapeValueViewController?.updateLabels(minutesLabelTextColor: minutesLabelOutlet.textColor, minutesLabelText: minutesLabelOutlet.text, minuteslabelAgoTextColor: minutesAgoLabelOutlet.textColor, minutesLabelAgoText: minutesAgoLabelOutlet.text, diffLabelTextColor: diffLabelOutlet.textColor, diffLabelText: diffLabelOutlet.text, diffLabelUnitTextColor: diffLabelUnitOutlet.textColor, diffLabelUnitText: diffLabelUnitOutlet.text, valueLabelTextColor: valueLabelOutlet.textColor, valueLabelText: valueLabelOutlet.text, valueLabelAttributedText: valueLabelOutlet.attributedText)
+        }
         
         // if in follower mode, show the patient name if one has been entered
         followerPatientNameLabelOutlet.text = UserDefaults.standard.followerPatientName ?? ""
@@ -2331,6 +2346,9 @@ final class RootViewController: UIViewController, ObservableObject {
             attributeString.addAttribute(.strikethroughStyle, value: 0, range: NSMakeRange(0, attributeString.length))
             
             valueLabelOutlet.attributedText = attributeString
+            
+            // possibly landscpaeValueViewController is on top now, let's update also the labels in that viewcontroller
+            updateLabelsInLandscapeValueViewController()
             
             return
         }
@@ -2413,6 +2431,9 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // force a snooze status update to see if the current snooze status has changed in the last minutes
         updateSnoozeStatus()
+        
+        // possibly landscpaeValueViewController is on top now, let's update also the labels in that viewcontroller
+        updateLabelsInLandscapeValueViewController()
         
     }
     
@@ -3019,9 +3040,6 @@ final class RootViewController: UIViewController, ObservableObject {
             // prevent screen dim/lock
             UIApplication.shared.isIdleTimerDisabled = true
             
-            // prevent screen rotation
-            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
-            
             // set the private var so that we can track the screen lock activation state within the RootViewController
             screenIsLocked = true
             
@@ -3060,9 +3078,6 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // make sure that the screen lock is deactivated
             UIApplication.shared.isIdleTimerDisabled = false
-            
-            // revert screen rotation settings
-            updateScreenRotationSettings()
             
             trace("screen lock / keep-awake disabled", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
@@ -3356,7 +3371,7 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     
-    func showLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
+    func showChartLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
         
         guard landscapeChartViewController == nil else { return }
         
@@ -3364,15 +3379,39 @@ final class RootViewController: UIViewController, ObservableObject {
             withIdentifier: "LandscapeChartViewController")
         as? LandscapeChartViewController
         
-        if let controller = landscapeChartViewController {
-            controller.view.frame = view.bounds
-            controller.view.alpha = 0
-            view.addSubview(controller.view)
-            addChild(controller)
+        if let landscapeChartViewController = landscapeChartViewController {
+            landscapeChartViewController.view.frame = view.bounds
+            landscapeChartViewController.view.alpha = 0
+            view.addSubview(landscapeChartViewController.view)
+            addChild(landscapeChartViewController)
             coordinator.animate(alongsideTransition: { _ in
-                controller.view.alpha = 1
+                landscapeChartViewController.view.alpha = 1
             }, completion: { _ in
-                controller.didMove(toParent: self)
+                landscapeChartViewController.didMove(toParent: self)
+            })
+            
+        }
+    }
+    
+    func showValueLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
+        
+        guard landscapeValueViewController == nil else { return }
+        
+        landscapeValueViewController = storyboard!.instantiateViewController(
+            withIdentifier: "LandscapeValueViewController")
+        as? LandscapeValueViewController
+        
+        if let landscapeValueViewController = landscapeValueViewController {
+            landscapeValueViewController.view.frame = view.bounds
+            landscapeValueViewController.view.alpha = 0
+            view.addSubview(landscapeValueViewController.view)
+            addChild(landscapeValueViewController)
+            coordinator.animate(alongsideTransition: { _ in
+                landscapeValueViewController.view.alpha = 1
+            }, completion: { _ in
+                landscapeValueViewController.didMove(toParent: self)
+                // this function updates also the labels in the landscapeChartViewController
+                self.updateLabelsAndChart()
             })
         }
     }
@@ -3389,17 +3428,20 @@ final class RootViewController: UIViewController, ObservableObject {
                 self.landscapeChartViewController = nil
             })
             
-            if let controller = landscapeChartViewController {
-                controller.willMove(toParent: nil)
-                coordinator.animate(alongsideTransition: { _ in
-                    controller.view.alpha = 0
-                }, completion: { _ in
-                    controller.view.removeFromSuperview()
-                    controller.removeFromParent()
-                    self.landscapeChartViewController = nil
-                })
-            }
         }
+
+        if let controller = landscapeValueViewController {
+            controller.willMove(toParent: nil)
+            coordinator.animate(alongsideTransition: { _ in
+                controller.view.alpha = 0
+            }, completion: { _ in
+                controller.view.removeFromSuperview()
+                controller.removeFromParent()
+                self.landscapeValueViewController = nil
+            })
+            
+        }
+        
     }
     
     /// if allowed set the main screen rotation settings
