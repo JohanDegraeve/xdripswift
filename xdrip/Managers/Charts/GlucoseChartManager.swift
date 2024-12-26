@@ -167,9 +167,6 @@ public class GlucoseChartManager {
     /// - the scaler to apply to the basal rates. Let's just set it at 20, we'll update it soon after
     private var basalRateScaler: Double = 20
     
-    /// - when was the scaler last calculated. No need to check if more than once every few hours
-    //private var basalScalerLastChecked: Date = .distantPast
-    
     /// if the class is iniatated by the view controller without specifying a Gesture Recogniser, then we are not displaying the main chart, but the static 24 hour chart from the landscape view controller
     private var isStatic24hrChart: Bool = false
     
@@ -178,6 +175,13 @@ public class GlucoseChartManager {
     
     /// is chart in panned state or not, meaning is it currently shifted back in time
     private(set) var chartIsPannedBackward: Bool = false
+    
+    /// array to hold the scheduled basal rates - they will be populated from NightscoutSyncManager.profile as required
+    private var scheduledBasalRatesArray = [(date: Date, value: Double)]()
+    
+    /// track when the scheduled basal rates array was populated. If chartStartDate changes by more than, say, 6 hours, then we'll repopulate
+    /// set the .distantPast on initialization so that a fresh population is forced
+    private var scheduledBasalRatesLastUpdatedForStartDate: Date = .distantPast
     
     // MARK: - intializer
     
@@ -1248,21 +1252,26 @@ public class GlucoseChartManager {
                     // *********************************
                     // ***** scheduled basal rates *****
                     // *********************************
-                    var scheduledBasalRatesArray = [(date: Date, value: Double)]()
                     
                     // check first if there is any basal rate data in the Nightscout profile
                     if let scheduledBasalRatesFromProfile = nightscoutSyncManager?.profile.basal, let profileHasData = nightscoutSyncManager?.profile.hasData(), profileHasData {
-                        // let's create an array with the rate times converted to start on the startDate of the chart
-                        let startDateAtMidnight = startDate.toMidnight()
-                        
-                        for scheduledBasalRate in scheduledBasalRatesFromProfile {
-                            scheduledBasalRatesArray.append((date: scheduledBasalRate.toDate(date: startDateAtMidnight), value: scheduledBasalRate.value))
-                        }
-                        
-                        // now get the first entry, add 24 hours to it and add it to the end
-                        // this makes sure we cover any before and after values of the current chart start/end dates
-                        if let firstScheduledBasalRate = scheduledBasalRatesArray.first {
-                            scheduledBasalRatesArray.append((date: firstScheduledBasalRate.date.addingTimeInterval(TimeInterval(60 * 60 * 24)), value: firstScheduledBasalRate.value))
+                        // check if the scheduled basal rate array should be refreshed for the current chart start date. This should happen at start-up and
+                        // also when the chart is scrolled more than 6 hours (could be more or less, but 6 hours seems reasonable to avoid unnecessary refreshes)
+                        if scheduledBasalRatesLastUpdatedForStartDate < startDate.addingTimeInterval(-60 * 60 * 6) || scheduledBasalRatesLastUpdatedForStartDate > startDate.addingTimeInterval(60 * 60 * 6) {
+                            // first empty the current array
+                            scheduledBasalRatesArray.removeAll()
+                            
+                            // let's create an array with the rate times converted to start from 24 hours before and up to 24 hours
+                            // after the startDate of the chart. This prevents false steps/changes when scrolling through midnight.
+                            // we need to stride until +25 or swift will exit the loop before adding the +24
+                            for hoursToAddToStartDate in stride(from: -24, to: 25, by: 24) {
+                                for scheduledBasalRate in scheduledBasalRatesFromProfile {
+                                    scheduledBasalRatesArray.append((date: scheduledBasalRate.toDate(date: startDate.toMidnight().addingTimeInterval(TimeInterval(60 * 60 * hoursToAddToStartDate))), value: scheduledBasalRate.value))
+                                }
+                            }
+                            
+                            // set the last updated date to the current start date
+                            scheduledBasalRatesLastUpdatedForStartDate = startDate
                         }
                         
                         // now we've got the scheduled basal rates in a nice array with the correct
@@ -1272,31 +1281,43 @@ public class GlucoseChartManager {
                         
                         let basalRates = scheduledBasalRatesArray.filter({ $0.date >= startDate && $0.date <= endDate })
                         
-                        for basalRate in basalRates {
-                            // filter out the dates that are later than startDate and then use the last one left.
-                            // this will be the value immediately before startDate
-                            if isFirstEntry, let initialBasalRate = scheduledBasalRatesArray.filter({ $0.date < startDate}).last {
-                                scheduledBasalRateTreatmentChartPoints.append(ChartPoint(basalRate: initialBasalRate.value, date: startDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
-                                previousScheduledBasalRate = initialBasalRate.value
-                                isFirstEntry.toggle()
+                        // check if the basal rate changes coincide with the current chart start/end dates
+                        if basalRates.count > 0 {
+                            for basalRate in basalRates {
+                                // filter out the dates that are later than startDate and then use the last one left.
+                                // this will be the value immediately before startDate
+                                if isFirstEntry, let initialBasalRate = scheduledBasalRatesArray.filter({ $0.date < startDate}).last {
+                                    scheduledBasalRateTreatmentChartPoints.append(ChartPoint(basalRate: initialBasalRate.value, date: startDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                                    previousScheduledBasalRate = initialBasalRate.value
+                                    isFirstEntry.toggle()
+                                }
+                                
+                                // use the previous value and current time to end the previous line at the correct value
+                                scheduledBasalRateTreatmentChartPoints.append(ChartPoint(basalRate: previousScheduledBasalRate, date: basalRate.date, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                                
+                                // use the current value and current time to start the new line at the correct value
+                                scheduledBasalRateTreatmentChartPoints.append(ChartPoint(basalRate: basalRate.value, date: basalRate.date, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                                
+                                previousScheduledBasalRate = basalRate.value
                             }
                             
-                            // use the previous value and current time to end the previous line at the correct value
-                            scheduledBasalRateTreatmentChartPoints.append(ChartPoint(basalRate: previousScheduledBasalRate, date: basalRate.date, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                            // add the final chart point to the end of the array
+                            scheduledBasalRateTreatmentChartPoints.append(
+                                ChartPoint(basalRate: previousScheduledBasalRate,
+                                           date: endDate, basalRateScaler: basalRateScaler,
+                                           minimumChartValueinMgdl: minimumChartValueInMgdl,
+                                           formatter: data().chartPointDateFormatter)
+                            )
                             
-                            // use the current value and current time to start the new line at the correct value
-                            scheduledBasalRateTreatmentChartPoints.append(ChartPoint(basalRate: basalRate.value, date: basalRate.date, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
-                            
-                            previousScheduledBasalRate = basalRate.value
+                        } else {
+                            // the basal rate start times don't happen within the current range of the chart, so let's add a basal rate
+                            // starting at the previous rate and then keep it there until the end date.
+                            if let initialBasalRate = scheduledBasalRatesArray.filter({ $0.date < startDate}).last {
+                                scheduledBasalRateTreatmentChartPoints.append(ChartPoint(basalRate: initialBasalRate.value, date: startDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                                
+                                scheduledBasalRateTreatmentChartPoints.append(ChartPoint(basalRate: initialBasalRate.value, date: endDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                            }
                         }
-                        
-                        // add the final chart point to the end of the array
-                        scheduledBasalRateTreatmentChartPoints.append(
-                            ChartPoint(basalRate: previousScheduledBasalRate,
-                                       date: endDate, basalRateScaler: basalRateScaler,
-                                       minimumChartValueinMgdl: minimumChartValueInMgdl,
-                                       formatter: data().chartPointDateFormatter)
-                        )
                     }
                     
                     
