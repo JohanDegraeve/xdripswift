@@ -635,6 +635,7 @@
 		F8CB59CC2744471100BA199E /* DexcomSessionStartResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59CB2744471000BA199E /* DexcomSessionStartResponse.swift */; };
 		F8CB59CE27444D6300BA199E /* DexcomSessionStopResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59CD27444D6300BA199E /* DexcomSessionStopResponse.swift */; };
 		F8CB59D3274D94AF00BA199E /* DexcomSessionStartTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59D2274D94AE00BA199E /* DexcomSessionStartTxMessage.swift */; };
+		F8CCBB4F2D1B6DF900F14867 /* LandscapeValueViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CCBB4E2D1B6DF900F14867 /* LandscapeValueViewController.swift */; };
 		F8D0587C24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D0587B24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift */; };
 		F8DB19D22B89583F00569C37 /* DexcomG7BackfillMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DB19D12B89583F00569C37 /* DexcomG7BackfillMessage.swift */; };
 		F8DF765323E34F4500063910 /* DexcomG5+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF765223E34F4500063910 /* DexcomG5+CoreDataClass.swift */; };
@@ -1721,6 +1722,7 @@
 		F8CB59CB2744471000BA199E /* DexcomSessionStartResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomSessionStartResponse.swift; sourceTree = "<group>"; };
 		F8CB59CD27444D6300BA199E /* DexcomSessionStopResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomSessionStopResponse.swift; sourceTree = "<group>"; };
 		F8CB59D2274D94AE00BA199E /* DexcomSessionStartTxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomSessionStartTxMessage.swift; sourceTree = "<group>"; };
+		F8CCBB4E2D1B6DF900F14867 /* LandscapeValueViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandscapeValueViewController.swift; sourceTree = "<group>"; };
 		F8D0587B24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewHomeScreenSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8D094EC2846BDD50087FFEA /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Treatments.strings; sourceTree = "<group>"; };
 		F8D094ED2846BDD50087FFEA /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Alerts.strings; sourceTree = "<group>"; };
@@ -2311,6 +2313,7 @@
 				47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */,
 				F8AC425F21ADEBD60078C348 /* RootViewController.swift */,
 				F8E6C78B24CDDB83007C1199 /* SnoozeViewController.swift */,
+				F8CCBB4E2D1B6DF900F14867 /* LandscapeValueViewController.swift */,
 			);
 			path = "Root View Controller";
 			sourceTree = "<group>";
@@ -4472,6 +4475,7 @@
 				47E3DB372C769C9600DE1AF0 /* AlgorithmType.swift in Sources */,
 				F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */,
 				F8A1585122EDB597007F5B5D /* ConstantsBGGraphBuilder.swift in Sources */,
+				F8CCBB4F2D1B6DF900F14867 /* LandscapeValueViewController.swift in Sources */,
 				F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */,
 				F8C9784D2428052E00A09483 /* CGMSensorType.swift in Sources */,
 				F8A1586B22EDB967007F5B5D /* ConstantsMaster.swift in Sources */,
