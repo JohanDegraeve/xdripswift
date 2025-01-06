@@ -272,12 +272,12 @@ struct AIDStatusView: View {
                         }
                         
                         // TODO: DEBUG
-                        Section(header: Text("Debug")) {
-                            row(title: "Last Nightscout check", data: deviceStatus.lastCheckedDate.formatted(date: .omitted, time: .standard))
-                            row(title: "Last device status update", data: deviceStatus.updatedDate.formatted(date: .omitted, time: .standard))
-                            row(title: "Created at", data: deviceStatus.createdAt.formatted(date: .omitted, time: .standard))
-                            row(title: "Last loop date", data: deviceStatus.lastLoopDate.formatted(date: .omitted, time: .standard))
-                        }
+//                        Section(header: Text("Debug")) {
+//                            row(title: "Last Nightscout check", data: deviceStatus.lastCheckedDate.formatted(date: .omitted, time: .standard))
+//                            row(title: "Last device status update", data: deviceStatus.updatedDate.formatted(date: .omitted, time: .standard))
+//                            row(title: "Created at", data: deviceStatus.createdAt.formatted(date: .omitted, time: .standard))
+//                            row(title: "Last loop date", data: deviceStatus.lastLoopDate.formatted(date: .omitted, time: .standard))
+//                        }
                         
                     }
                     

@@ -409,10 +409,15 @@ final class WatchStateModel: NSObject, ObservableObject {
             remainingComplicationUserInfoTransfers = dictionary["remainingComplicationUserInfoTransfers"] as? Int ?? 99
             liveDataIsEnabled = dictionary["liveDataIsEnabled"] as? Bool ?? false
             
+            if let lastLoopDateAsDouble = dictionary["deviceStatusLastLoopDate"] as? Double {
+                deviceStatusLastLoopDate = Date(timeIntervalSince1970: lastLoopDateAsDouble)
+            } else {
+                deviceStatusLastLoopDate = .distantPast
+            }
+            
             deviceStatusIOB = dictionary["deviceStatusIOB"] as? Double ?? 0
             deviceStatusCOB = dictionary["deviceStatusCOB"] as? Double ?? 0
             deviceStatusCreatedAt = Date(timeIntervalSince1970: dictionary["deviceStatusCreatedAt"] as? Double ?? 0)
-            deviceStatusLastLoopDate = Date(timeIntervalSince1970: dictionary["deviceStatusLastLoopDate"] as? Double ?? 0)
             deviceStatusLastLoopDateTimeAgoString = deviceStatusLastLoopMinsAgoString()
             
             // check if there is any BG data available before updating the data source info strings accordingly
@@ -479,6 +484,12 @@ final class WatchStateModel: NSObject, ObservableObject {
                 debugString += "\nLast hearbeat: \(timeStampOfLastHeartBeat.formatted(date: .omitted, time: .standard))"
             }
         }
+        if deviceStatusLastLoopDate != .distantPast {
+            debugString += "\nLast loop: \(deviceStatusLastLoopDate.formatted(date: .omitted, time: .standard))"
+        } else {
+            debugString += "\nLast loop: disabled"
+        }
+
         
         debugString += "\nScreen width: \(Int(WKInterfaceDevice.current().screenBounds.size.width))"
         debugString += "\niOS app: Idle"
