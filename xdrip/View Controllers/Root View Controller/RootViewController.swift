@@ -3795,12 +3795,12 @@ final class RootViewController: UIViewController, ObservableObject {
                 pumpReservoirValueOutlet.textColor = deviceStatus.pumpReservoirUIColor() ?? UIColor(resource: .colorPrimary)
                 pumpBatteryValueOutlet.textColor = deviceStatus.pumpBatteryPercentUIColor() ?? UIColor(resource: .colorPrimary)
                 
-                // set the formatting for the canula age. We can use purple to show an expired status (the same as with the sensor lifetime)
+                // set the formatting for the canula age. We can use red to show an expired status (the same as with the sensor lifetime)
                 if let siteChangeDate = siteChangeTreatments?.first?.date {
                     if siteChangeDate.timeIntervalSinceNow < TimeInterval(-UserDefaults.standard.CAGEMaxHours * 60 * 60) {
-                        pumpCAGEValueOutlet.textColor = UIColor.systemPurple
-                    } else if siteChangeDate.timeIntervalSinceNow < (TimeInterval(-UserDefaults.standard.CAGEMaxHours * 60 * 60) + ConstantsHomeView.CAGEUrgentTimeIntervalBeforeMaxHours) {
                         pumpCAGEValueOutlet.textColor = UIColor.systemRed
+                    } else if siteChangeDate.timeIntervalSinceNow < (TimeInterval(-UserDefaults.standard.CAGEMaxHours * 60 * 60) + ConstantsHomeView.CAGEUrgentTimeIntervalBeforeMaxHours) {
+                        pumpCAGEValueOutlet.textColor = UIColor.systemOrange
                     } else if siteChangeDate.timeIntervalSinceNow < (TimeInterval(-UserDefaults.standard.CAGEMaxHours * 60 * 60) + ConstantsHomeView.CAGEWarningTimeIntervalBeforeMaxHours) {
                         pumpCAGEValueOutlet.textColor = UIColor.systemYellow
                     } else {
