@@ -1764,6 +1764,11 @@ final class RootViewController: UIViewController, ObservableObject {
                 }
             case .regular, .unspecified:
                 hideLandscape(with: coordinator)
+                
+                // rezise the dimming overlay frame if we are returning from the "big numbers" landscape view and dimming is enabled
+                if screenIsLocked && UserDefaults.standard.screenLockDimmingType != .disabled {
+                    overlayView?.frame = UIScreen.main.bounds
+                }
             @unknown default:
                 fatalError()
             }
@@ -2991,6 +2996,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 // de-clutter the screen. Hide the mini-chart, statistics view, controls and show the clock view
                 pumpViewOutlet.isHidden = true
+                infoViewOutlet.isHidden = true
                 miniChartOutlet.isHidden = true
                 statisticsView.isHidden = true
                 segmentedControlsView.isHidden = true
@@ -3085,9 +3091,12 @@ final class RootViewController: UIViewController, ObservableObject {
                 overlayView?.removeFromSuperview()
             }
             
+            // set the flag to false. This must be done before we update the views
+            screenIsLocked = false
+            
             updateDataSourceInfo(animate: true)
             
-            screenIsLocked = false
+            updatePumpAndAIDStatusViews()
             
         }
         
@@ -3407,6 +3416,11 @@ final class RootViewController: UIViewController, ObservableObject {
             view.addSubview(landscapeValueViewController.view)
             addChild(landscapeValueViewController)
             coordinator.animate(alongsideTransition: { _ in
+                // if the screen dimming overlay is enabled, then resize it to fit the landscape view
+                if UserDefaults.standard.screenLockDimmingType != .disabled {
+                    self.overlayView?.frame = UIScreen.main.bounds
+                }
+                
                 landscapeValueViewController.view.alpha = 1
             }, completion: { _ in
                 landscapeValueViewController.didMove(toParent: self)
@@ -3698,8 +3712,8 @@ final class RootViewController: UIViewController, ObservableObject {
     
     private func updatePumpAndAIDStatusViews() {
         // hide the views if not wanted/needed
-        pumpViewOutlet.isHidden = !UserDefaults.standard.nightscoutEnabled || UserDefaults.standard.nightscoutUrl == nil || UserDefaults.standard.nightscoutFollowType == .none || !UserDefaults.standard.nightscoutFollowShowExpandedInfo
-        infoViewOutlet.isHidden = !UserDefaults.standard.nightscoutEnabled || UserDefaults.standard.nightscoutUrl == nil || UserDefaults.standard.nightscoutFollowType == .none
+        pumpViewOutlet.isHidden = !UserDefaults.standard.nightscoutEnabled || UserDefaults.standard.nightscoutUrl == nil || UserDefaults.standard.nightscoutFollowType == .none || !UserDefaults.standard.nightscoutFollowShowExpandedInfo || screenIsLocked
+        infoViewOutlet.isHidden = !UserDefaults.standard.nightscoutEnabled || UserDefaults.standard.nightscoutUrl == nil || UserDefaults.standard.nightscoutFollowType == .none || screenIsLocked
 
         // if the user doesn't want to follow any type of AID system, just do nothing and return
         guard UserDefaults.standard.nightscoutFollowType != .none else { return }
