@@ -148,7 +148,6 @@
 "settingsviews_nightscoutAPIKey" = "API_SECRET";
 
 /// transmitter settings, to explain that settings is about resetting the transmitter
-"settingsviews_resettransmitter" = "Reset Transmitter (Anubis only)";
 
 /// home screen settings, should the main glucose chart screen be allowed?
 "settingsviews_allowScreenRotation" = "Allow Chart Rotation";

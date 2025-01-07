@@ -658,7 +658,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                             deviceStatus.baseBasalRate = pump.extended?.baseBasalRate
                             deviceStatus.activeProfile = pump.extended?.activeProfile
                             
-                            // store 9999 if no reservoir reported as omnipod only reports battery below 50U
+                            // store 9999 if no reservoir reported as omnipod only reports reservoir below 50U
                             // we'll then just react to the 9999 value in the UI
                             // this could maybe be better by just leaving deviceStatus.pumpReservoir as nil, will consider later
                             deviceStatus.pumpReservoir = pump.reservoir ?? ConstantsNightscout.omniPodReservoirFlagNumber

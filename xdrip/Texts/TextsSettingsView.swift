@@ -355,8 +355,8 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_givetransmitterid", tableName: filename, bundle: Bundle.main, value: "Enter Transmitter ID", comment: "transmitter settings, pop up that asks user to inter transmitter id")
     }()
     
-    static let labelResetTransmitter:String = {
-        return NSLocalizedString("settingsviews_resettransmitter", tableName: filename, bundle: Bundle.main, value: "Reset Transmitter (Anubis only)", comment: "transmitter settings, to explain that settings is about resetting the transmitter")
+    static let labelResetTransmitter: String = {
+        return NSLocalizedString("settingsviews_resettransmitter", tableName: filename, bundle: Bundle.main, value: "Anubis Transmitter", comment: "transmitter settings, to explain that settings is about special functions for anubis transmitters")
     }()
     
     static let resetDexcomTransmitterMessage: String = {
@@ -657,7 +657,7 @@ class Texts_SettingsView {
     }()
     
     static let forceStandByBigNumbers: String = {
-        return NSLocalizedString("forceStandByBigNumbers", tableName: filename, bundle: Bundle.main, value: "StandBy Big Number View", comment: "should we force the StandBy mode to show a big number view")
+        return NSLocalizedString("forceStandByBigNumbers", tableName: filename, bundle: Bundle.main, value: "StandBy Big Numbers", comment: "should we force the StandBy mode to show big numbers only")
     }()
     
     // MARK: - Calendar Events

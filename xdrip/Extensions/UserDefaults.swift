@@ -159,6 +159,8 @@ extension UserDefaults {
         case activeSensorStartDate = "activeSensorStartDate"
         /// active sensor max days (lifetime)
         case activeSensorMaxSensorAgeInDays = "activeSensorMaxSensorAgeInDays"
+        /// overriden active sensor max days (lifetime) - only used for G6 Anubis transmitters
+        case activeSensorMaxSensorAgeInDaysOverridenAnubis = "activeSensorMaxSensorAgeInDaysOverridenAnubis"
         
         
         // Transmitter
@@ -1267,6 +1269,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.activeSensorMaxSensorAgeInDays.rawValue)
+        }
+    }
+    
+    /// overriden active sensor max sensor days. Optional as should be set to nil if the user isn't using a G6 and hasn't overriden manually the max days
+    var activeSensorMaxSensorAgeInDaysOverridenAnubis: Double? {
+        get {
+            return double(forKey: Key.activeSensorMaxSensorAgeInDaysOverridenAnubis.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.activeSensorMaxSensorAgeInDaysOverridenAnubis.rawValue)
         }
     }
     

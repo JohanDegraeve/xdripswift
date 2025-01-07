@@ -812,11 +812,14 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         return .dexcom
     }
     
-    
+    // for the G6, if the user has overriden the max days (for example when using an Anubis transmitter), we can return this value
+    // if not, return the standard maxSensorAgeInDays
     func maxSensorAgeInDays() -> Double? {
-        
-        return ConstantsDexcomG5.maxSensorAgeInDays
-        
+        if let activeSensorMaxSensorAgeInDaysOverridenAnubis = UserDefaults.standard.activeSensorMaxSensorAgeInDaysOverridenAnubis, activeSensorMaxSensorAgeInDaysOverridenAnubis > 0 {
+            return activeSensorMaxSensorAgeInDaysOverridenAnubis
+        } else {
+            return ConstantsDexcomG5.maxSensorAgeInDays
+        }
     }
     
     func overruleIsWebOOPEnabled() -> Bool {

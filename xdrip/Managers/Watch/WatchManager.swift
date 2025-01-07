@@ -158,10 +158,14 @@ final class WatchManager: NSObject, ObservableObject {
         }
         
         // add AID/loop status data
-        watchState.deviceStatusCreatedAt = nightscoutSyncManager.deviceStatus.createdAt.timeIntervalSince1970
-        watchState.deviceStatusLastLoopDate = nightscoutSyncManager.deviceStatus.lastLoopDate.timeIntervalSince1970
-        watchState.deviceStatusIOB = nightscoutSyncManager.deviceStatus.iob
-        watchState.deviceStatusCOB = nightscoutSyncManager.deviceStatus.cob
+        if UserDefaults.standard.nightscoutFollowType != .none {
+            watchState.deviceStatusCreatedAt = nightscoutSyncManager.deviceStatus.createdAt.timeIntervalSince1970
+            watchState.deviceStatusLastLoopDate = nightscoutSyncManager.deviceStatus.lastLoopDate.timeIntervalSince1970
+            watchState.deviceStatusIOB = nightscoutSyncManager.deviceStatus.iob
+            watchState.deviceStatusCOB = nightscoutSyncManager.deviceStatus.cob
+        } else {
+            watchState.deviceStatusLastLoopDate = nil
+        }
         
         watchState.remainingComplicationUserInfoTransfers = session.remainingComplicationUserInfoTransfers
         

@@ -17,7 +17,6 @@
 "settingsviews_transmitterid" = "Lähettimen ID";
 "settingsviews_transmitterid_text_for_button" = "Lähettimen ID";
 "settingsviews_givetransmitterid" = "Anna lähetettimen ID";
-"settingsviews_resettransmitter" = "Nollaa lähetin (Anubis)";
 "settingsviews_nonfixedtransmitter" = "Käytä monipistekalibrointia";
 "settingsviews_labelNonFixed" = "Monipistekalibrointi";
 "settingsviews_sectiontitlealerting" = "Hälytys";

@@ -176,4 +176,12 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("confirm", tableName: filename, bundle: Bundle.main, value: "Confirm", comment: "button text, confirm")
     }()
     
+    static let maxSensorAgeInDaysOverridenAnubis: String = {
+        return NSLocalizedString("maxSensorAgeInDaysOverridenAnubis", tableName: filename, bundle: Bundle.main, value: "Maximum Sensor Days", comment: "user can override the maximum sensor days if using an anubis transmitter")
+    }()
+    
+    static let maxSensorAgeInDaysOverridenAnubisMessage = {
+        return String(format: NSLocalizedString("maxSensorAgeInDaysOverridenAnubisMessage", tableName: filename, bundle: Bundle.main, value: "\nIf using an Anubis transmitter, you can enter here the maximum number of days for the sensor lifetime (maximum %@)\n\nEnter 0 to use the default of %@ days", comment: "user can override the maximum sensor days if using an anubis transmitter"), ConstantsDexcomG5.maxSensorAgeInDaysOverridenAnubisMaximum.stringWithoutTrailingZeroes, ConstantsDexcomG5.maxSensorAgeInDays.stringWithoutTrailingZeroes)
+    }()
+    
 }

@@ -77,9 +77,6 @@
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
 "settingsviews_nonfixedtransmitter" = "Aktiviere Mehrpunkt-Kalibrierung";
 
-/// transmitter settings, to explain that settings is about resetting the transmitter
-"settingsviews_resettransmitter" = "Transmitter zurücksetzten (Anubis)";
-
 /// used in settings, section Info, title of the license setting
 "settingsviews_license" = "Lizenz";
 

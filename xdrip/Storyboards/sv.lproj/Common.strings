@@ -10,7 +10,7 @@
 "common_low" = "LÅGT";
 "common_hour" = "timme";
 "common_hours" = "timmar";
-"common_minutes" = "minuter";
+"common_minutes" = "min"; // reduced from "minuter" to "min" to help fit easier in smaller screens - confirmed by Dan Kvistedal 25/12/2024
 "common_minute" = "min";
 "common_day" = "dag";
 "common_days" = "dagar";

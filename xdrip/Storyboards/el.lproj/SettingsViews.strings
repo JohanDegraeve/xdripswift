@@ -35,7 +35,6 @@
 "settingsviews_transmitterid" = "Αναγνωριστικό πομπού";
 "settingsviews_transmitterid_text_for_button"  = "Αναγνωριστικό πομπού";
 "settingsviews_givetransmitterid" = "Εισαγάγετε αναγνωριστικό πομπού";
-"settingsviews_resettransmitter" = "Επαναφορά πομπού (Anubis)";
 "settingsviews_webooptransmitter" = "Χρήση αλγόριθμου πομπού;";
 "settingsviews_nonfixedtransmitter" = "Ενεργοποίηση βαθμονόμησης πολλών σημείων;";
 "settingsviews_labelNonFixed" = "Βαθμονόμηση πολλαπλών σημείων";

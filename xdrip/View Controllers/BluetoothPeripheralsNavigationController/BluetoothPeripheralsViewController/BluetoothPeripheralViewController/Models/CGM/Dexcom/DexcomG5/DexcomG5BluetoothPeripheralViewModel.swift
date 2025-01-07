@@ -8,7 +8,7 @@ class DexcomG5BluetoothPeripheralViewModel {
     // MARK: - private and public properties
     
     /// settings specific for Dexcom G5
-    public enum Settings:Int, CaseIterable {
+    public enum Settings: Int, CaseIterable {
         
         /// sensor start time
         case sensorStartDate = 0
@@ -29,13 +29,16 @@ class DexcomG5BluetoothPeripheralViewModel {
         
     }
      
-    private enum ResetSettings:Int, CaseIterable {
+    private enum AnubisSettings: Int, CaseIterable {
         
         /// should reset be done yes or no
         case resetRequired = 0
         
         /// last time reset was done
         case lastResetTimeStamp = 1
+        
+        /// override sensor max days
+        case overrideSensorMaxDays = 2
         
     }
     
@@ -57,8 +60,8 @@ class DexcomG5BluetoothPeripheralViewModel {
         /// batterySettings
         case batterySettings = 1
         
-        /// reset settings
-        case resetSetings = 2
+        /// Anubis settings
+        case anubisSettings = 2
         
     }
     
@@ -196,7 +199,7 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         
         switch getDexcomSection(forSectionInTable: section) {
             
-        case .resetSetings:
+        case .anubisSettings:
             return Texts_SettingsView.labelResetTransmitter
 
         case .batterySettings:
@@ -317,15 +320,14 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                 
             }
 
-        case .resetSetings:
+        case .anubisSettings:
             
-            // reset  section
-            guard let setting = ResetSettings(rawValue: rawValue) else { fatalError("DexcomG5BluetoothPeripheralViewModel update, unexpected setting") }
+            // reset/anubis  section
+            guard let setting = AnubisSettings(rawValue: rawValue) else { fatalError("DexcomG5BluetoothPeripheralViewModel update, unexpected setting") }
             
             switch setting {
                 
             case .resetRequired:
-                
                 cell.textLabel?.text = Texts_BluetoothPeripheralView.resetRequired
                 cell.detailTextLabel?.text = nil //it's a UISwitch, no detailed text
                 cell.accessoryType = .none
@@ -352,7 +354,6 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                 })
                 
             case .lastResetTimeStamp:
-                
                 cell.textLabel?.text = Texts_BluetoothPeripheralView.lastResetTimeStamp
             
                 if let lastResetTimeStamp = dexcomG5.lastResetTimeStamp {
@@ -362,7 +363,16 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                 }
                 
                 cell.accessoryType = .none
-
+                
+            case .overrideSensorMaxDays:
+                cell.textLabel?.text = Texts_BluetoothPeripheralView.maxSensorAgeInDaysOverridenAnubis
+                if let maxSensorAgeInDaysOverridenAnubis = UserDefaults.standard.activeSensorMaxSensorAgeInDaysOverridenAnubis, maxSensorAgeInDaysOverridenAnubis > 0 {
+                    cell.detailTextLabel?.text = "\(maxSensorAgeInDaysOverridenAnubis.stringWithoutTrailingZeroes) \(Texts_Common.days)"
+                } else {
+                    cell.detailTextLabel?.text = "(\(Texts_Common.default0) \(ConstantsDexcomG5.maxSensorAgeInDays.stringWithoutTrailingZeroes) \(Texts_Common.days))"
+                }
+                cell.accessoryType = .disclosureIndicator
+                cell.accessoryView = disclosureAccessoryView
             }
             
         case .batterySettings:
@@ -406,12 +416,12 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     
     func userDidSelectRow(withSettingRawValue rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral, bluetoothPeripheralManager: BluetoothPeripheralManaging) -> SettingsSelectedRowAction {
         
-        guard let setting = Settings(rawValue: rawValue) else { fatalError("DexcomG5BluetoothPeripheralViewModel userDidSelectRow, unexpected setting") }
-        
         // just show select row actions for the general dexcom section
         switch section {
             
         case 1:
+            
+            guard let setting = Settings(rawValue: rawValue) else { fatalError("DexcomG5BluetoothPeripheralViewModel userDidSelectRow, unexpected setting") }
             
             switch setting {
                 
@@ -453,6 +463,25 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                 
             }
             
+        case 3:
+            guard let setting = AnubisSettings(rawValue: rawValue) else { fatalError("DexcomG5BluetoothPeripheralViewModel userDidSelectRow, unexpected setting") }
+            
+            switch setting {
+            case .overrideSensorMaxDays:
+                return SettingsSelectedRowAction.askText(title: Texts_BluetoothPeripheralView.maxSensorAgeInDaysOverridenAnubis, message:  Texts_BluetoothPeripheralView.maxSensorAgeInDaysOverridenAnubisMessage, keyboardType: .numberPad, text: (UserDefaults.standard.activeSensorMaxSensorAgeInDaysOverridenAnubis ?? ConstantsDexcomG5.maxSensorAgeInDays).stringWithoutTrailingZeroes , placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(activeSensorMaxSensorAgeInDaysOverridenAnubisString: String) in
+                    
+                    // check that the user entered a plausible value although set the userdefaults to nil if zero is entered
+                    if let activeSensorMaxSensorAgeInDaysOverridenAnubis = Double(activeSensorMaxSensorAgeInDaysOverridenAnubisString) {
+                        if activeSensorMaxSensorAgeInDaysOverridenAnubis >= 0 && activeSensorMaxSensorAgeInDaysOverridenAnubis <= ConstantsDexcomG5.maxSensorAgeInDaysOverridenAnubisMaximum {
+                            UserDefaults.standard.activeSensorMaxSensorAgeInDaysOverridenAnubis = activeSensorMaxSensorAgeInDaysOverridenAnubis
+                        }
+                    }
+                }, cancelHandler: nil, inputValidator: nil)
+                
+            default:
+                return .nothing
+            }
+                
         default:
             return .nothing
         }
@@ -472,8 +501,8 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         case .batterySettings:
             return TransmitterBatteryInfoSettings.allCases.count
 
-        case .resetSetings:
-            return ResetSettings.allCases.count
+        case .anubisSettings:
+            return AnubisSettings.allCases.count
             
         }
 
@@ -497,7 +526,7 @@ extension DexcomG5BluetoothPeripheralViewModel: CGMG5TransmitterDelegate {
         // update two rows
         if let bluetoothPeripheralViewController = bluetoothPeripheralViewController {
             
-            tableView?.reloadSections(IndexSet(integer: DexcomSection.resetSetings.rawValue +
+            tableView?.reloadSections(IndexSet(integer: DexcomSection.anubisSettings.rawValue +
                 bluetoothPeripheralViewController.numberOfGeneralSections()), with: .none)
             
         }

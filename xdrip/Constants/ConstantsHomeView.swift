@@ -80,7 +80,7 @@ enum ConstantsHomeView {
     // MARK: - For loop/AID status
     
     /// after how many seconds should the loop status be shown as a warning
-    static let loopShowWarningAfterMinutes: TimeInterval = 60 * 7
+    static let loopShowWarningAfterMinutes: TimeInterval = 60 * 9
     
     /// after how many seconds should the loop status be shown as having no current data to show
     static let loopShowNoDataAfterMinutes: TimeInterval = 60 * 17
