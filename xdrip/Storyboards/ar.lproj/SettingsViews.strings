@@ -24,7 +24,6 @@
 "settingsviews_transmitterid" = "رقم هوية جهاز الإرسال";
 "settingsviews_transmitterid_text_for_button" = "رقم هوية جهاز الإرسال";
 "settingsviews_givetransmitterid" = "أدخل رقم هوية جهاز الإرسال";
-"settingsviews_resettransmitter" = "إعادة تعيين جهاز الإرسال";
 "settingsviews_nonfixedtransmitter" = "تفعيل المعايرة متعددة النقاط ";
 "settingsviews_labelNonFixed" = "المعايرة متعددة النقاط";
 "settingsviews_sectiontitlealerting" = "التنبيهات";

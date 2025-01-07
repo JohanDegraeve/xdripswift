@@ -35,7 +35,6 @@
 "settingsviews_transmitterid" = "Идентификатор трансмиттера";
 "settingsviews_transmitterid_text_for_button"  = "Идентификатор трансмиттера";
 "settingsviews_givetransmitterid" = "Введите идентификатор трансмиттера";
-"settingsviews_resettransmitter" = "Перезапустить трансмиттер (Anubis)";
 "settingsviews_webooptransmitter" = "Калибровка трансмиттера";
 "settingsviews_nonfixedtransmitter" = "Многоточечная калибровка";
 "settingsviews_labelNonFixed" = "Многоточечная калибровка";

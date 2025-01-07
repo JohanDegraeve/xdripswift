@@ -29,7 +29,6 @@
 "settingsviews_transmitterid" = "Sändar-ID";
 "settingsviews_transmitterid_text_for_button"  = "Sändar-ID";
 "settingsviews_givetransmitterid" = "Ange sändar-ID";
-"settingsviews_resettransmitter" = "Återställ sändare (Anubis)";
 "settingsviews_nonfixedtransmitter" = "Använd flerpunktskalibrering";
 "settingsviews_labelNonFixed" = "Flerpunktskalibrering";
 

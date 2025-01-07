@@ -33,7 +33,6 @@
 "settingsviews_transmitterid" = "ID de Transmissor";
 "settingsviews_transmitterid_text_for_button" = "ID de Transmissor";
 "settingsviews_givetransmitterid" = "Introduzir ID Transmissor";
-"settingsviews_resettransmitter" = "Repor Transmissor (Anubis)";
 "settingsviews_nonfixedtransmitter" = "Activar Calibração Multi-ponto";
 "settingsviews_labelNonFixed" = "Calibração Multi-ponto";
 "settingsviews_sectiontitlealerting" = "Alarme";
