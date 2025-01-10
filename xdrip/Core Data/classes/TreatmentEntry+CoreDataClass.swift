@@ -136,7 +136,7 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 		self.id = id
 		self.uploaded = uploaded  // tracks upload to nightscout
         self.nightscoutEventType = nightscoutEventType
-        self.enteredBy = enteredBy ?? "xDrip4iOS"
+        self.enteredBy = enteredBy
 
     }
 
@@ -144,7 +144,7 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 		super.init(entity: entity, insertInto: context)
 	}
 	
-	/// - get the dictionary representation required for creating a new treatment @ NighScout using POST or updating an existing treatment @ Nightscout using PUT
+	/// - get the dictionary representation required for creating a new treatment @ Nightscout using POST or updating an existing treatment @ Nightscout using PUT
     /// - splits of "-carbs" "-insulin" or "-exercise" from the id
 	func dictionaryRepresentationForNightscoutUpload(reuseDateFormatter: DateFormatter? = nil) -> [String: Any] {
         
