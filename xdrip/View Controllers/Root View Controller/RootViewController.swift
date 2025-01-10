@@ -155,9 +155,9 @@ final class RootViewController: UIViewController, ObservableObject {
         case 1:
             UserDefaults.standard.chartWidthInHours = 5
         case 2:
-            UserDefaults.standard.chartWidthInHours = 12
+            UserDefaults.standard.chartWidthInHours = 8
         case 3:
-            UserDefaults.standard.chartWidthInHours = 24
+            UserDefaults.standard.chartWidthInHours = 12
         default:
             break
         }
@@ -708,11 +708,18 @@ final class RootViewController: UIViewController, ObservableObject {
         UserDefaults.standard.highMarkValueInUserChosenUnit = UserDefaults.standard.highMarkValueInUserChosenUnit
         UserDefaults.standard.bloodGlucoseUnitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
                 
+        // on 10Jan2025 the chart width options were changed from 3/5/12/24 to 3/5/8/12
+        // this is just a quick check to catch any users that had 24 selected when they updated
+        // NOTE: The UI showed 3/6/12/24, but it was actually using 3/5/12/24 for 4 years and nobody noticed the missing hour :)
+        if UserDefaults.standard.chartWidthInHours == 24 {
+            UserDefaults.standard.chartWidthInHours = 12
+        }
+        
         // set the localized text of the segmented controls
         segmentedControlChartHours.setTitle("3" + Texts_Common.hourshort, forSegmentAt: 0)
-        segmentedControlChartHours.setTitle("6" + Texts_Common.hourshort, forSegmentAt: 1)
-        segmentedControlChartHours.setTitle("12" + Texts_Common.hourshort, forSegmentAt: 2)
-        segmentedControlChartHours.setTitle("24" + Texts_Common.hourshort, forSegmentAt:3)
+        segmentedControlChartHours.setTitle("5" + Texts_Common.hourshort, forSegmentAt: 1)
+        segmentedControlChartHours.setTitle("8" + Texts_Common.hourshort, forSegmentAt: 2)
+        segmentedControlChartHours.setTitle("12" + Texts_Common.hourshort, forSegmentAt:3)
         
         segmentedControlStatisticsDays.setTitle(Texts_Common.todayshort, forSegmentAt: 0)
         segmentedControlStatisticsDays.setTitle("24" + Texts_Common.hourshort, forSegmentAt: 1)
@@ -725,11 +732,11 @@ final class RootViewController: UIViewController, ObservableObject {
         {
         case 3:
             segmentedControlChartHours.selectedSegmentIndex = 0
-        case 6:
+        case 5:
             segmentedControlChartHours.selectedSegmentIndex = 1
-        case 12:
+        case 8:
             segmentedControlChartHours.selectedSegmentIndex = 2
-        case 24:
+        case 12:
             segmentedControlChartHours.selectedSegmentIndex = 3
         default:
             break
