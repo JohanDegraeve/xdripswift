@@ -6,7 +6,7 @@
 //  Copyright © 2024 Johan Degraeve. All rights reserved.
 //
 import Foundation
-import SwiftUICore
+import SwiftUI
 
 // MARK: Internal DeviceStatus model
 
