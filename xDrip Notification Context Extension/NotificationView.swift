@@ -24,7 +24,6 @@ struct NotificationView: View {
     var bgUnitString: String?
     var bgValueInMgDl: Double?
     var bgReadingDate: Date?
-    var bgValueStringInUserChosenUnit: String?
     
     var body: some View {
         ZStack {
@@ -43,7 +42,7 @@ struct NotificationView: View {
                 
                 // this is the standard widget view
                 HStack(alignment: .center) {
-                    Text("\(bgValueStringInUserChosenUnit ?? "")\(trendArrow())")
+                    Text("\(bgValueStringInUserChosenUnit())\(trendArrow())")
                         .font(.system(size: 45)).fontWeight(.bold)
                         .foregroundStyle(bgTextColor())
                         .lineLimit(1)
@@ -83,6 +82,46 @@ struct NotificationView: View {
         }
         
         return .colorPrimary
+    }
+    
+    /// returns blood glucose value as a string in the user-defined measurement unit. Will check and display also high, low and error texts as required.
+    /// - Returns: a String with the formatted value/unit or error text
+    func bgValueStringInUserChosenUnit() -> String {
+        if let bgValueInMgDl = bgValueInMgDl, let isMgDl = isMgDl {
+            var returnValue: String
+            
+            if bgValueInMgDl >= 400 {
+                returnValue = Texts_Common.HIGH
+            } else if bgValueInMgDl >= 40 {
+                returnValue = bgValueInMgDl.mgDlToMmolAndToString(mgDl: isMgDl)
+            } else if bgValueInMgDl > 12 {
+                returnValue = Texts_Common.LOW
+            } else {
+                switch bgValueInMgDl {
+                case 0:
+                    returnValue = "??0"
+                case 1:
+                    returnValue = "?SN"
+                case 2:
+                    returnValue = "??2"
+                case 3:
+                    returnValue = "?NA"
+                case 5:
+                    returnValue = "?NC"
+                case 6:
+                    returnValue = "?CD"
+                case 9:
+                    returnValue = "?AD"
+                case 12:
+                    returnValue = "?RF"
+                default:
+                    returnValue = "???"
+                }
+            }
+            return returnValue
+        } else {
+            return isMgDl ?? true ? "---" : "-.-"
+        }
     }
     
     /// Blood glucose color dependant on the user defined limit values and based upon the time since the last reading

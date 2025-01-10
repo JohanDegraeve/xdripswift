@@ -37,7 +37,6 @@ extension XDripWatchComplication.Entry {
         var bgUnitString: String
         var bgValueInMgDl: Double?
         var bgReadingDate: Date?
-        var bgValueStringInUserChosenUnit: String
                 
         init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaValueInUserUnit: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, keepAliveIsDisabled: Bool? = false, remainingComplicationUserInfoTransfers: Int? = 99, liveDataIsEnabled: Bool? = false) {
             self.bgReadingValues = bgReadingValues
@@ -55,7 +54,46 @@ extension XDripWatchComplication.Entry {
             self.bgValueInMgDl = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0] : nil
             self.bgReadingDate = (bgReadingDates?.count ?? 0) > 0 ? bgReadingDates?[0] : nil
             self.bgUnitString = self.isMgDl ? Texts_Common.mgdl : Texts_Common.mmol
-            self.bgValueStringInUserChosenUnit = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0].mgDlToMmolAndToString(mgDl: self.isMgDl) ?? "" : ""
+        }
+        
+        /// returns blood glucose value as a string in the user-defined measurement unit. Will check and display also high, low and error texts as required.
+        /// - Returns: a String with the formatted value/unit or error text
+        func bgValueStringInUserChosenUnit() -> String {
+            if let bgValueInMgDl = bgValueInMgDl {
+                var returnValue: String
+                
+                if bgValueInMgDl >= 400 {
+                    returnValue = Texts_Common.HIGH
+                } else if bgValueInMgDl >= 40 {
+                    returnValue = bgValueInMgDl.mgDlToMmolAndToString(mgDl: isMgDl)
+                } else if bgValueInMgDl > 12 {
+                    returnValue = Texts_Common.LOW
+                } else {
+                    switch bgValueInMgDl {
+                    case 0:
+                        returnValue = "??0"
+                    case 1:
+                        returnValue = "?SN"
+                    case 2:
+                        returnValue = "??2"
+                    case 3:
+                        returnValue = "?NA"
+                    case 5:
+                        returnValue = "?NC"
+                    case 6:
+                        returnValue = "?CD"
+                    case 9:
+                        returnValue = "?AD"
+                    case 12:
+                        returnValue = "?RF"
+                    default:
+                        returnValue = "???"
+                    }
+                }
+                return returnValue
+            } else {
+                return isMgDl ? "---" : "-.-"
+            }
         }
         
         /// Blood glucose color dependant on the user defined limit values

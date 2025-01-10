@@ -13,7 +13,7 @@ extension XDripWatchComplication.EntryView {
     @ViewBuilder
     var accessoryInlineView: some View {
         if !entry.widgetState.keepAliveIsDisabled && entry.widgetState.liveDataIsEnabled {
-            Text("\(entry.widgetState.bgValueStringInUserChosenUnit) \(entry.widgetState.trendArrow())  \(entry.widgetState.deltaChangeStringInUserChosenUnit())")
+            Text("\(entry.widgetState.bgValueStringInUserChosenUnit()) \(entry.widgetState.trendArrow())  \(entry.widgetState.deltaChangeStringInUserChosenUnit())")
         } else {
             Text("\(ConstantsHomeView.applicationName)")
         }

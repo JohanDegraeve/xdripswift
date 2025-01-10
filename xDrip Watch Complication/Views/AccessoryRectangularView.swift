@@ -18,7 +18,7 @@ extension XDripWatchComplication.EntryView {
                 VStack(spacing: 0) {
                     HStack(alignment: .center) {
                         HStack(alignment: .center, spacing: 4) {
-                            Text("\(entry.widgetState.bgValueStringInUserChosenUnit)\(entry.widgetState.trendArrow()) ")
+                            Text("\(entry.widgetState.bgValueStringInUserChosenUnit())\(entry.widgetState.trendArrow()) ")
                                 .font(.system(size: entry.widgetState.isSmallScreen() ? 20 : 24)).bold()
                                 .foregroundStyle(entry.widgetState.bgTextColor())
                             

@@ -65,7 +65,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         bgValueInMgDl = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0] : nil
         bgReadingDate = (bgReadingDates?.count ?? 0) > 0 ? bgReadingDates?[0] : nil
         
-        bgValueStringInUserChosenUnit = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0].mgDlToMmolAndToString(mgDl: isMgDl ?? true) ?? "" : ""
+        bgValueStringInUserChosenUnit = funcBgValueStringInUserChosenUnit()
         
         let vc = UIHostingController(rootView: NotificationView(
             alertTitle: alertTitle,
@@ -81,8 +81,7 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
             alertUrgencyType: alertUrgencyType,
             bgUnitString: bgUnitString,
             bgValueInMgDl: bgValueInMgDl,
-            bgReadingDate: bgReadingDate,
-            bgValueStringInUserChosenUnit: bgValueStringInUserChosenUnit
+            bgReadingDate: bgReadingDate
         ))
 
         let swiftuiView = vc.view!
@@ -103,5 +102,45 @@ class NotificationViewController: UIViewController, UNNotificationContentExtensi
         self.preferredContentSize = CGSize(width: UIScreen.main.bounds.size.width, height: 320)
         self.view.setNeedsUpdateConstraints()
         self.view.setNeedsLayout()
+    }
+    
+    /// returns blood glucose value as a string in the user-defined measurement unit. Will check and display also high, low and error texts as required.
+    /// - Returns: a String with the formatted value/unit or error text
+    func funcBgValueStringInUserChosenUnit() -> String {
+        if let bgValueInMgDl = bgValueInMgDl, let isMgDl = isMgDl {
+            var returnValue: String
+            
+            if bgValueInMgDl >= 400 {
+                returnValue = Texts_Common.HIGH
+            } else if bgValueInMgDl >= 40 {
+                returnValue = bgValueInMgDl.mgDlToMmolAndToString(mgDl: isMgDl)
+            } else if bgValueInMgDl > 12 {
+                returnValue = Texts_Common.LOW
+            } else {
+                switch bgValueInMgDl {
+                case 0:
+                    returnValue = "??0"
+                case 1:
+                    returnValue = "?SN"
+                case 2:
+                    returnValue = "??2"
+                case 3:
+                    returnValue = "?NA"
+                case 5:
+                    returnValue = "?NC"
+                case 6:
+                    returnValue = "?CD"
+                case 9:
+                    returnValue = "?AD"
+                case 12:
+                    returnValue = "?RF"
+                default:
+                    returnValue = "???"
+                }
+            }
+            return returnValue
+        } else {
+            return isMgDl ?? true ? "---" : "-.-"
+        }
     }
 }
