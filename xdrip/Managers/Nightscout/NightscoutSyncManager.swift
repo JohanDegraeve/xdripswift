@@ -610,7 +610,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                     // check if there is the newly downloaded profile response has an newer date than the stored one
                     // if so, then import it and overwrite the previously stored one
                     if let deviceStatusResponse = deviceStatusResponseArray.first, let createdAt = NightscoutSyncManager.iso8601DateFormatter.date(from: deviceStatusResponse.createdAt ?? ""), createdAt > deviceStatus.createdAt {
-                        trace("    in updateDeviceStatus (openAPS), updating internal device status with new date %{public}@ whilst existing internal device status date was %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, createdAt.formatted(date: .abbreviated, time: .shortened), deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened))
+                        trace("in updateDeviceStatus (openAPS), updating internal device status with new date %{public}@ whilst existing internal device status date was %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, createdAt.formatted(date: .abbreviated, time: .shortened), deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened))
                         
                         deviceStatus.updatedDate = .now
                         deviceStatus.createdAt = createdAt
@@ -631,7 +631,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                                 deviceStatus.lastLoopDate = createdAt
                             }
                             
-                            trace("    in updateDeviceStatus (openAPS), suggestion processed", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+                            trace("in updateDeviceStatus (openAPS), suggestion processed", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
                             
                             deviceStatus.cob = suggested.cob ?? 0
                             deviceStatus.currentTarget = suggested.currentTarget
@@ -670,8 +670,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         }
                         
                         // TODO: DEBUG
-                        trace("    in updateDeviceStatus (openAPS), updated device status with createdAt = %{public}@. Last looping date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened), deviceStatus.lastLoopDate.formatted(date: .abbreviated, time: .shortened))
-                        trace("    in updateDeviceStatus (openAPS), deviceStatus data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, String(describing: deviceStatus))
+                        trace("in updateDeviceStatus (openAPS), updated device status with createdAt = %{public}@. Last looping date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened), deviceStatus.lastLoopDate.formatted(date: .abbreviated, time: .shortened))
+                        trace("in updateDeviceStatus (openAPS), deviceStatus data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, String(describing: deviceStatus))
                         
                         deviceStatusWasUpdated = true
                         
@@ -685,9 +685,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                     let firstIndexWithEnacted = deviceStatusResponseArray.firstIndex(where: {$0.openAPS?.enacted != nil} )
                     let deviceStatusResponseWithEnacted = deviceStatusResponseArray[firstIndexWithEnacted ?? 0]
                     
-                    if let enacted = deviceStatusResponseWithEnacted.openAPS?.enacted, let enactedAt = NightscoutSyncManager.iso8601DateFormatter.date(from: enacted.timestamp ?? ""), enactedAt > deviceStatus.lastLoopDate {
+                    if let enacted = deviceStatusResponseWithEnacted.openAPS?.enacted, let enactedAt = NightscoutSyncManager.iso8601DateFormatter.date(from: enacted.timestamp ?? ""), enactedAt > deviceStatus.lastLoopDate, enactedAt > Date().addingTimeInterval(-60 * 60 * 12) {
                         // TODO: DEBUG
-                        trace("    in updateDeviceStatus (openAPS), was enacted", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+                        trace("in updateDeviceStatus (openAPS), was enacted", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
                         
                         if deviceStatus.lastLoopDate == .distantPast || enacted.received == true || enacted.recieved == true {
                             deviceStatus.lastLoopDate = enactedAt
@@ -710,7 +710,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         
                         // TODO: DEBUG
                     } else {
-                        trace("    in updateDeviceStatus (openAPS), was NOT enacted", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+                        trace("in updateDeviceStatus (openAPS), was NOT enacted", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
                     }
                     
                     // get Nightscout Device Status response and process it for LoopKit-based systems (i.e. Loop)
@@ -724,7 +724,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                     // check if there is the newly downloaded profile response has an newer date than the stored one
                     // if so, then import it and overwrite the previously stored one
                     if let deviceStatusResponse = deviceStatusResponseArray.first, let createdAt = NightscoutSyncManager.iso8601DateFormatter.date(from: deviceStatusResponse.createdAt ?? ""), createdAt > deviceStatus.createdAt {
-                        trace("    in updateDeviceStatus ((Loop)), updating internal device status with new date %{public}@ whilst existing internal device status date was %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, createdAt.formatted(date: .abbreviated, time: .shortened), deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened))
+                        trace("in updateDeviceStatus ((Loop)), updating internal device status with new date %{public}@ whilst existing internal device status date was %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, createdAt.formatted(date: .abbreviated, time: .shortened), deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened))
                         
                         deviceStatus.updatedDate = .now
                         deviceStatus.createdAt = NightscoutSyncManager.iso8601DateFormatter.date(from: deviceStatusResponse.createdAt ?? "") ?? .distantPast
@@ -772,8 +772,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         }
                         
                         // TODO: DEBUG
-                        trace("    in updateDeviceStatus (Loop), updated device status with createdAt = %{public}@. Last looping date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened), deviceStatus.lastLoopDate.formatted(date: .abbreviated, time: .shortened))
-                        trace("    in updateDeviceStatus (Loop), deviceStatus data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, String(describing: deviceStatus))
+                        trace("in updateDeviceStatus (Loop), updated device status with createdAt = %{public}@. Last looping date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened), deviceStatus.lastLoopDate.formatted(date: .abbreviated, time: .shortened))
+                        trace("in updateDeviceStatus (Loop), deviceStatus data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, String(describing: deviceStatus))
                         
                         deviceStatusWasUpdated = true
                         
@@ -809,7 +809,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 deviceStatus.lastCheckedDate = .now
                 
                 // log the error that was thrown. As it doesn't have a specific handler, we'll assume no further actions are needed
-                trace("    in updateDeviceStatus, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
+                trace("in updateDeviceStatus, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
             }
         }
     }
@@ -934,10 +934,11 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 let (data, response) = try await URLSession.shared.data(for: request)
                 let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
                 
-                trace("    in getNightscoutProfile, server response status code: %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, statusCode.description)
-                
                 if statusCode == 200 {
+                    trace("    in getNightscoutProfile, server response status code: %{public}@, processing NightscoutProfileResponse", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, statusCode.description)
                     return try decode([NightscoutProfileResponse].self, data: data)
+                } else {
+                    trace("    in getNightscoutProfile, server response status code: %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, statusCode.description)
                 }
                 
                 trace("    in getNightscoutProfile, unable to process response", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
