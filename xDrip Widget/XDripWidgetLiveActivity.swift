@@ -17,7 +17,7 @@ struct XDripWidgetLiveActivity: Widget {
             if context.state.liveActivityType == .minimal {
                 // 1 = minimal widget with no chart
                 HStack(alignment: .center) {
-                    Text("\(context.state.bgValueStringInUserChosenUnit) \(context.state.trendArrow())")
+                    Text("\(context.state.bgValueStringInUserChosenUnit()) \(context.state.trendArrow())")
                         .font(.largeTitle).bold()
                         .foregroundStyle(context.state.bgTextColor())
                         .lineLimit(1)
@@ -67,7 +67,7 @@ struct XDripWidgetLiveActivity: Widget {
                 // 0 = normal size chart
                 HStack(spacing: 30) {
                     VStack(spacing: 0) {
-                        Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
+                        Text("\(context.state.bgValueStringInUserChosenUnit())\(context.state.trendArrow())")
                             .font(.largeTitle).bold()
                             .foregroundStyle(context.state.bgTextColor())
                             .lineLimit(1)
@@ -124,7 +124,7 @@ struct XDripWidgetLiveActivity: Widget {
                 ZStack {
                     VStack(spacing: 0) {
                         HStack(alignment: .center) {
-                            Text("\(context.state.bgValueStringInUserChosenUnit) \(context.state.trendArrow())")
+                            Text("\(context.state.bgValueStringInUserChosenUnit()) \(context.state.trendArrow())")
                                 .font(.largeTitle).fontWeight(.bold)
                                 .foregroundStyle(context.state.bgTextColor())
                                 .scaledToFill()
@@ -196,7 +196,7 @@ struct XDripWidgetLiveActivity: Widget {
             
         } dynamicIsland: { context in
             DynamicIsland {
-                DynamicIslandExpandedRegion(.leading) { Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
+                DynamicIslandExpandedRegion(.leading) { Text("\(context.state.bgValueStringInUserChosenUnit())\(context.state.trendArrow())")
                     .font(.largeTitle).bold()
                     .foregroundStyle(context.state.bgTextColor())
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
@@ -236,7 +236,7 @@ struct XDripWidgetLiveActivity: Widget {
                     GlucoseChartView(glucoseChartType: .dynamicIsland, bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
                 }
             } compactLeading: {
-                Text("\(context.state.bgValueStringInUserChosenUnit)\(context.state.trendArrow())")
+                Text("\(context.state.bgValueStringInUserChosenUnit())\(context.state.trendArrow())")
                     .foregroundStyle(context.state.bgTextColor())
                     .minimumScaleFactor(0.2)
             } compactTrailing: {
@@ -251,7 +251,7 @@ struct XDripWidgetLiveActivity: Widget {
                         .minimumScaleFactor(0.2)
                 }
             } minimal: {
-                Text("\(context.state.bgValueStringInUserChosenUnit)")
+                Text("\(context.state.bgValueStringInUserChosenUnit())")
                     .foregroundStyle(context.state.bgTextColor())
                     .minimumScaleFactor(0.2)
             }

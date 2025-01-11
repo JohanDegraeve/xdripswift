@@ -3,7 +3,7 @@ import UIKit
 enum ConstantsGlucoseChart {
     
     /// default value for glucosechart width in hours
-    static let defaultChartWidthInHours = 6.0;
+    static let defaultChartWidthInHours = 5.0;
     
     /// usually 40.0 mgdl is the lowest value that cgm's give, putting it to 38 guarantees the points will always be visible
     /// only in mgdl because the label will not be shown, hence no bizar values to be shown when going to mgdl

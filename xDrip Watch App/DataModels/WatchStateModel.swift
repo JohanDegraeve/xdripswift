@@ -85,11 +85,41 @@ final class WatchStateModel: NSObject, ObservableObject {
         return bgReadingValues.isEmpty ? nil : bgReadingValues[0]
     }
     
-    /// return the latest BG value in the user's chosen unit as a string
-    /// - Returns: a string with bgValueInMgDl() converted into the user unit
+    /// returns blood glucose value as a string in the user-defined measurement unit. Will check and display also high, low and error texts as required.
+    /// - Returns: a String with the formatted value/unit or error text
     func bgValueStringInUserChosenUnit() -> String {
         if let bgReadingDate = bgReadingDate(), let bgValueInMgDl = bgValueInMgDl(), bgReadingDate > Date().addingTimeInterval(-60 * 20) {
-            return bgReadingValues.isEmpty ? (isMgDl ? "---" : "-.-") : bgValueInMgDl.mgDlToMmolAndToString(mgDl: isMgDl)
+            var returnValue: String
+            
+            if bgValueInMgDl >= 400 {
+                returnValue = Texts_Common.HIGH
+            } else if bgValueInMgDl >= 40 {
+                returnValue = bgValueInMgDl.mgDlToMmolAndToString(mgDl: isMgDl)
+            } else if bgValueInMgDl > 12 {
+                returnValue = Texts_Common.LOW
+            } else {
+                switch bgValueInMgDl {
+                case 0:
+                    returnValue = "??0"
+                case 1:
+                    returnValue = "?SN"
+                case 2:
+                    returnValue = "??2"
+                case 3:
+                    returnValue = "?NA"
+                case 5:
+                    returnValue = "?NC"
+                case 6:
+                    returnValue = "?CD"
+                case 9:
+                    returnValue = "?AD"
+                case 12:
+                    returnValue = "?RF"
+                default:
+                    returnValue = "???"
+                }
+            }
+            return returnValue
         } else {
             return isMgDl ? "---" : "-.-"
         }

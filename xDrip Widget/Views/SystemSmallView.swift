@@ -15,7 +15,7 @@ extension XDripWidget.EntryView {
             if isNotBeingUsedInStandByMode {
                 // this is the standard widget view
                 HStack(alignment: .center) {
-                    Text("\(entry.widgetState.bgValueStringInUserChosenUnit)\(entry.widgetState.trendArrow())")
+                    Text("\(entry.widgetState.bgValueStringInUserChosenUnit())\(entry.widgetState.trendArrow())")
                         .font(.title).fontWeight(.bold)
                         .foregroundStyle(entry.widgetState.bgTextColor())
                         .lineLimit(1)
@@ -62,7 +62,7 @@ extension XDripWidget.EntryView {
                 if !entry.widgetState.forceStandByBigNumbers {
                     // this is the standard standby view
                     HStack(alignment: .center) {
-                        Text("\(entry.widgetState.bgValueStringInUserChosenUnit)\(entry.widgetState.trendArrow())")
+                        Text("\(entry.widgetState.bgValueStringInUserChosenUnit())\(entry.widgetState.trendArrow())")
                             .font(.largeTitle).fontWeight(.bold)
                             .foregroundStyle(isAtNight() ? .white : entry.widgetState.bgTextColor())
                             .lineLimit(1)
@@ -90,7 +90,7 @@ extension XDripWidget.EntryView {
                 } else {
                     // this is the "big number" standby view
                     VStack(alignment: .center, spacing: -10) {
-                        Text(entry.widgetState.bgValueStringInUserChosenUnit)
+                        Text(entry.widgetState.bgValueStringInUserChosenUnit())
                             .font(.system(size: 200)).fontWeight(.bold)
                             .foregroundStyle(isAtNight() ? .white : entry.widgetState.bgTextColor())
                             .lineLimit(1)

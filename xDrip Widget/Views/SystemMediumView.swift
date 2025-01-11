@@ -13,7 +13,7 @@ extension XDripWidget.EntryView {
     var systemMediumView: some View {
         VStack(spacing: 0) {
             HStack(alignment: .center) {
-                Text("\(entry.widgetState.bgValueStringInUserChosenUnit) \(entry.widgetState.trendArrow())")
+                Text("\(entry.widgetState.bgValueStringInUserChosenUnit()) \(entry.widgetState.trendArrow())")
                     .font(.title).fontWeight(.bold)
                     .foregroundStyle(entry.widgetState.bgTextColor())
                     .scaledToFill()

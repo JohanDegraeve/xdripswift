@@ -15,7 +15,7 @@ extension XDripWidget.EntryView {
         ZStack {
             AccessoryWidgetBackground()
                 .cornerRadius(8)
-            Text("\(entry.widgetState.bgValueStringInUserChosenUnit)\(entry.widgetState.trendArrow())")
+            Text("\(entry.widgetState.bgValueStringInUserChosenUnit())\(entry.widgetState.trendArrow())")
                 .font(.system(size: 50)).bold()
                 .minimumScaleFactor(0.2)
                 .foregroundStyle(.primary)
