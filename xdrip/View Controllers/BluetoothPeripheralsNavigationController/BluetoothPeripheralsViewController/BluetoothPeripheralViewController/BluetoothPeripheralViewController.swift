@@ -486,12 +486,12 @@ class BluetoothPeripheralViewController: UIViewController {
                     // mark web oop settings section as shown
                     webOOPSettingsSectionIsShown = true
                     numberOfGeneralSections += 1
-                }
-                
-                if expectedBluetoothPeripheralType.canUseNonFixedSlope() {
-                    // mark non fixed slope settings section as shown
-                    nonFixedSettingsSectionIsShown = true
-                    numberOfGeneralSections += 1
+                    
+                    if expectedBluetoothPeripheralType.canUseNonFixedSlope() {
+                        // mark non fixed slope settings section as shown
+                        nonFixedSettingsSectionIsShown = true
+                        numberOfGeneralSections += 1
+                    }
                 }
                 
                 return numberOfGeneralSections
@@ -1343,7 +1343,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                 }
                 
                 cell.textLabel?.text = Texts_SettingsView.labelAlgorithmType
-                cell.detailTextLabel?.text = currentWebOOPEnabledValue ? Texts_BluetoothPeripheralView.transmitterAlgorithm : Texts_BluetoothPeripheralView.xDripAlgorithm
+                cell.detailTextLabel?.text = currentWebOOPEnabledValue ? Texts_BluetoothPeripheralView.nativeAlgorithm : Texts_BluetoothPeripheralView.xDripAlgorithm
                 cell.accessoryType = .disclosureIndicator
                 cell.accessoryView =  disclosureAccessoryView
                 
@@ -1479,13 +1479,13 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             // first off all check that BluetoothPeripheral already exists
             guard let bluetoothPeripheral = bluetoothPeripheral else {return}
             
-            // data to be displayed in list from which user needs to pick a live activity type
+            // data to be displayed in list from which user needs to pick an algorithm type
             var data = [String]()
             var selectedRow: Int?
             var index = 0
-            let currentAlgorithmType = bluetoothPeripheral.blePeripheral.webOOPEnabled ? AlgorithmType.transmitterAlgorithm : AlgorithmType.xDripAlgorithm
+            let currentAlgorithmType = bluetoothPeripheral.blePeripheral.webOOPEnabled ? AlgorithmType.nativeAlgorithm : AlgorithmType.xDripAlgorithm
             
-            // get all data source types and add the description to data. Search for the type that matches the FollowerDataSourceType that is currently stored in userdefaults.
+            // get all data source types and add the description to data. Search for the type that matches the AlgorithmType that is currently stored in userdefaults.
             for algorithmType in AlgorithmType.allCases {
                 data.append(algorithmType.description)
                 
@@ -1502,20 +1502,20 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                 let oldAlgorithmType = currentAlgorithmType
                 
                 if index != selectedRow {
-                    let newAlgorithmType = AlgorithmType(rawValue: index) ?? .transmitterAlgorithm
+                    let newAlgorithmType = AlgorithmType(rawValue: index) ?? .nativeAlgorithm
                     
                     // create uialertcontroller to ask the user if they really want to change algorithm
-                    let confirmAlgorithmChangeAlertController = UIAlertController(title: Texts_SettingsView.labelAlgorithmType , message: newAlgorithmType == .transmitterAlgorithm ? Texts_BluetoothPeripheralView.confirmAlgorithmChangeToTransmitterMessage : Texts_BluetoothPeripheralView.confirmAlgorithmChangeToxDripMessage, preferredStyle: .alert)
+                    let confirmAlgorithmChangeAlertController = UIAlertController(title: Texts_SettingsView.labelAlgorithmType , message: newAlgorithmType == .nativeAlgorithm ? Texts_BluetoothPeripheralView.confirmAlgorithmChangeToTransmitterMessage : Texts_BluetoothPeripheralView.confirmAlgorithmChangeToxDripMessage, preferredStyle: .alert)
                     
                     // create buttons for UIAlertController
                     let OKAction = UIAlertAction(title: Texts_BluetoothPeripheralView.confirm, style: .default) {
                         (action:UIAlertAction!) in
                         
-                        bluetoothPeripheral.blePeripheral.webOOPEnabled = (newAlgorithmType == .transmitterAlgorithm) ? true : false
+                        bluetoothPeripheral.blePeripheral.webOOPEnabled = (newAlgorithmType == .nativeAlgorithm) ? true : false
                         
-                        bluetoothPeripheralManager.receivedNewValue(webOOPEnabled: (newAlgorithmType == .transmitterAlgorithm) ? true : false, for: bluetoothPeripheral)
+                        bluetoothPeripheralManager.receivedNewValue(webOOPEnabled: (newAlgorithmType == .nativeAlgorithm) ? true : false, for: bluetoothPeripheral)
                         
-                        if newAlgorithmType == .transmitterAlgorithm {
+                        if newAlgorithmType == .nativeAlgorithm {
                             bluetoothPeripheral.blePeripheral.nonFixedSlopeEnabled = false
                             bluetoothPeripheralManager.receivedNewValue(nonFixedSlopeEnabled: false, for: bluetoothPeripheral)
                         }
@@ -1564,7 +1564,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                 var index = 0
                 let currentCalibrationType = bluetoothPeripheral.blePeripheral.nonFixedSlopeEnabled ? CalibrationType.multiPoint : CalibrationType.singlePoint
                 
-                // get all data source types and add the description to data. Search for the type that matches the FollowerDataSourceType that is currently stored in userdefaults.
+                // get all data source types and add the description to data. Search for the type that matches the CalibrationType that is currently stored in userdefaults.
                 for calibrationType in CalibrationType.allCases {
                     data.append(calibrationType.description)
                     
@@ -1583,7 +1583,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                     if index != selectedRow {
                         let newCalibrationType = CalibrationType(rawValue: index) ?? .singlePoint
                         
-                        // create uialertcontroller to ask the user if they really want to change algorithm
+                        // create uialertcontroller to ask the user if they really want to change calibration type
                         let confirmCalibrationChangeAlertController = UIAlertController(title: Texts_SettingsView.labelCalibrationType , message: newCalibrationType == .singlePoint ? Texts_BluetoothPeripheralView.confirmCalibrationChangeToSinglePointMessage : Texts_BluetoothPeripheralView.confirmCalibrationChangeToMultiPointMessage, preferredStyle: .alert)
                         
                         // create buttons for UIAlertController

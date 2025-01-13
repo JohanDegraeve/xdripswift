@@ -129,11 +129,11 @@ class NightscoutFollowManager: NSObject {
             return
         }
         
-        if (UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
-            trace("    setting nightscoutSyncTreatmentsRequired to true, this will also initiate a treatments sync", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
+        if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+            trace("    setting nightscoutSyncRequired to true, this will also initiate a treatments/devicestatus sync", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
             
-            UserDefaults.standard.timeStampLatestNightscoutTreatmentSyncRequest = .now
-            UserDefaults.standard.nightscoutSyncTreatmentsRequired = true
+            UserDefaults.standard.timeStampLatestNightscoutSyncRequest = .now
+            UserDefaults.standard.nightscoutSyncRequired = true
         }
 
         guard !UserDefaults.standard.isMaster else {
@@ -223,7 +223,7 @@ class NightscoutFollowManager: NSObject {
     ///
     /// updates bgreading
     ///
-    private func findSlope() -> (calculatedValueSlope:Double, hideSlope:Bool) {
+    private func findSlope() -> (calculatedValueSlope: Double, hideSlope: Bool) {
         
         // init returnvalues
         var hideSlope = true
@@ -234,7 +234,7 @@ class NightscoutFollowManager: NSObject {
         
         // if more thant 2 readings, calculate slope and hie
         if last2Readings.count >= 2 {
-            let (slope, hide) = last2Readings[0].calculateSlope(lastBgReading:last2Readings[1]);
+            let (slope, hide) = last2Readings[0].calculateSlope(lastBgReading:last2Readings[1])
             calculatedValueSlope = slope
             hideSlope = hide
         }

@@ -525,7 +525,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                     
                     
                 } else {
-                    return ""
+                    return "-"
                 }
             default:
                 return ""
@@ -546,7 +546,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                     return returnString
                     
                 } else {
-                    return ""
+                    return "-"
                 }
                 
             default:

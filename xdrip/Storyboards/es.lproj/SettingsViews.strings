@@ -24,9 +24,8 @@
 "settingsviews_enterUsername" = "Entrar tu usuario (e-mail)";
 "settingsviews_enterPassword" = "Entrar tu contraseña";
 "settingsviews_libreLinkUpReAcceptNeeded" = "Aceptar terminos";
-"settingsviews_libreLinkUpNoActiveSensor" = "Sin sensor activo";
+"settingsviews_libreLinkUpNoActiveSensor" = "Sin datos de sensor activo";
 "settingsviews_translateOnlineHelp" = "Traducir Documentación";
-"settingsviews_showHelpIcon" = "Mostrar icono";
 "settingsviews_restartNeeded" = "(Pendiente reiniciar)";
 "settingsviews_showReadingInNotification" = "Mostrar en Notificaciones";
 "settingsviews_labelShowReadingInAppBadge" = "Mostrar en el icono de la app";
@@ -49,8 +48,6 @@
 "settingsviews_showTreatmentsOnChart" = "Mostrar Tratamientos";
 "settingsviews_smallBolusTreatmentThreshold" = "Límite Micro-bolo";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Por debajo de cuántas unidades debemos considerar un bolo como micro-bolo?\n\n(Valor recomendado: 1.0U)";
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Mostrar Micro-bolos en Gráfica";
-"settingsviews_offsetCarbTreatmentsOnChart" = "Desplazar HC en Gráfica";
 "settingsviews_sectiontitlestatistics" = "Estadísticas";
 "settingsviews_showStatistics" = "Mostrar Estadísticas";
 "settingsviews_daysToUseStatisticsTitle" = "Días a Calcular";
@@ -65,10 +62,13 @@
 "settingsviews_transmitterid" = "ID del Transmisor";
 "settingsviews_transmitterid_text_for_button" = "ID del Transmisor";
 "settingsviews_givetransmitterid" = "ID del Transmisor";
-"settingsviews_resettransmitter" = "Resetear Transmisor (solo G5/Anubis)";
+"settingsviews_resettransmitter" = "Transmisor Anubis";
 "settingsviews_resetDexcomTransmitterMessage" = "\nEsta opción intentará resetear el transmisor durante la próxima conexión.\n\nEsto solo puede funcionar con transmisores G5 y transmisores G6 Anubis.\n\nNo funciona para transmisores normales tipo G6 y One.";
 "settingsviews_nonfixedtransmitter" = "Habilitar Calibración Multi-punto";
 "settingsviews_labelNonFixed" = "Calibración Multi-punto";
+"settingsviews_labelAlgorithmType" = "Tipo de Algoritmo";
+"settingsviews_labelCalibrationTitle" = "Calibración de Sensor";
+"settingsviews_labelCalibrationType" = "Tipo de Calibración";
 "settingsviews_sectiontitlealerting" = "Alarmas";
 "settingsviews_row_alert_types" = "Tipos de Alarmas";
 "settingsviews_row_alerts" = "Alarmas";
@@ -143,7 +143,7 @@
 "settingsviews_sectiontitlehomescreen" = "Inicio";
 "settingsviews_infoContactsAccessRestricted" = "No has podido dar permiso a %@ para accesar a tus contactos. Esto es probablemente debido a restriciones como el control parental o similar.";
 "settingsviews_contactImageSectionTitle" = "Imagen de Contacto";
-"settingsviews_enableContactImage" = "Crear Contacto";
+"settingsviews_enableContactImage" = "Habilitar Contacto";
 "settingsviews_displayTrendInContactImage" = "Mostrar Tendencia";
 "settingsviews_contactImageCreatedByString" = "Contacto creado automáticamente por";
 

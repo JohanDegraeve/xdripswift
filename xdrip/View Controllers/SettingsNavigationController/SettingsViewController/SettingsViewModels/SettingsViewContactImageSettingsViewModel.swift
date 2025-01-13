@@ -29,7 +29,7 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
         // this ViewModel does need to send back messages to the viewcontroller asynchronously
     }
-
+    
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
     func sectionTitle() -> String? {
@@ -50,9 +50,9 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
             
         case .useHighContrastContactImage:
             return Texts_SettingsView.useHighContrastContactImage
-
+            
         }
-
+        
     }
     
     func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
@@ -62,42 +62,50 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
         switch setting {
             
         case .enableContactImage:
+            // check if in follower with keep-alive disabled. If so, disable this option
+            if !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
+                return .detailButton
+            }
+            
             // if access to Contacts was previously denied by user, then show disclosure indicator, clicking the row will give info how user should authorize access
             // also if access is restricted
             
             switch CNContactStore.authorizationStatus(for: .contacts) {
             case .denied:
                 // by clicking row, show info how to authorized
-                return UITableViewCell.AccessoryType.disclosureIndicator
+                return .disclosureIndicator
                 
             case .notDetermined:
-                return UITableViewCell.AccessoryType.none
+                return .none
                 
-            case .restricted, .limited:
+            case .restricted:
                 // by clicking row, show what it means to be restricted, according to Apple doc
-                return UITableViewCell.AccessoryType.disclosureIndicator
+                return .disclosureIndicator
                 
             case .authorized:
-                return UITableViewCell.AccessoryType.none
+                return .none
                 
             @unknown default:
                 trace("in SettingsViewContactImageSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
-                return UITableViewCell.AccessoryType.none
+                return .none
                 
             }
             
         case .displayTrend, .useHighContrastContactImage:
             return UITableViewCell.AccessoryType.none
-         
+            
         }
     }
-
+    
     func detailedText(index: Int) -> String? {
         
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-        case .enableContactImage, .displayTrend, .useHighContrastContactImage:
+        case .enableContactImage:
+            // check if in follower with keep-alive disabled. If so, disable this option
+            return (UserDefaults.standard.enableContactImage && !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled) ? "⚠️ No keep-alive" : nil
+        case .displayTrend, .useHighContrastContactImage:
             return nil
         }
     }
@@ -145,14 +153,10 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
                     trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access restricted, according to apple doc 'possibly due to active restrictions such as parental controls being in place'", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                     UserDefaults.standard.enableContactImage = false
                     
-                case .limited:
-                    trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access limited, ask the user to give full access", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
-                    UserDefaults.standard.enableContactImage = false
-                    
                 case .denied:
                     trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access denied by user", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                     UserDefaults.standard.enableContactImage = false
-
+                    
                 case .authorized:
                     trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access authorized", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
                     UserDefaults.standard.enableContactImage = true
@@ -169,7 +173,7 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
             
         case .useHighContrastContactImage:
             return UISwitch(isOn: UserDefaults.standard.useHighContrastContactImage, action: {(isOn:Bool) in UserDefaults.standard.useHighContrastContactImage = isOn})
-
+            
         }
         
     }
@@ -220,10 +224,6 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
             case .restricted:
                 // by clicking row, show what it means to be restricted, according to Apple doc
                 return SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.infoContactsAccessRestricted)
-                
-            case .limited:
-                // by clicking row, show what it means to be limited, according to Apple doc
-                return SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.infoContactsAccessLimited)
                 
             @unknown default:
                 trace("in SettingsViewContactImageSettingsViewModel, unknown case returned when authorizing CNContactStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)

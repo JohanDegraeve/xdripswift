@@ -20,13 +20,13 @@ enum BluetoothPeripheralType: String, CaseIterable {
     case MiaoMiaoType = "MiaoMiao"
     
     /// bubble
-    case BubbleType = "Bubble / Bubble Mini"
+    case BubbleType = "Nano / Bubble / Bubble Mini"
     
     /// Dexcom
     case DexcomType = "Dexcom G5 / G6 / ONE"
     
     /// Dexcom G7
-    case DexcomG7Type = "Dexcom G7 / ONE+"
+    case DexcomG7Type = "Dexcom G7 / ONE+ / Stelo"
     
     /// DexcomG4
     case DexcomG4Type = "Dexcom G4 (Bridge)"
@@ -53,8 +53,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
     case Libre3HeartBeatType = "Libre/Generic HeartBeat"
     
     /// DexcomG7 heartbeat
-    case DexcomG7HeartBeatType = "Dexcom G7/ONE+ HeartBeat"
-    
+    case DexcomG7HeartBeatType = "Dexcom G7/ONE+/Stelo HeartBeat"
     
     /// omnipod heartbeat
     case OmniPodHeartBeatType = "OmniPod HeartBeat"
@@ -267,7 +266,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .BubbleType, .MiaoMiaoType, .AtomType, .DexcomType:
+        case .BubbleType, .MiaoMiaoType, .AtomType: //, .DexcomType:
             return true
             
         case .Libre2Type:

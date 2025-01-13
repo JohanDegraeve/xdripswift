@@ -14,7 +14,7 @@ struct WatchState: Codable {
     var bgReadingDatesAsDouble: [Double] = []
     var isMgDl: Bool?
     var slopeOrdinal: Int?
-    var deltaChangeInMgDl: Double?
+    var deltaValueInUserUnit: Double?
     var urgentLowLimitInMgDl: Double?
     var lowLimitInMgDl: Double?
     var highLimitInMgDl: Double?
@@ -33,6 +33,12 @@ struct WatchState: Codable {
     var keepAliveIsDisabled: Bool?
     var liveDataIsEnabled: Bool?
     var remainingComplicationUserInfoTransfers: Int?
+    
+    // use this to track the AID/looping status if sent
+    var deviceStatusCreatedAt: Double?
+    var deviceStatusLastLoopDate: Double?
+    var deviceStatusIOB: Double?
+    var deviceStatusCOB: Double?
     
     var asDictionary: [String: Any]? {
         guard let data = try? JSONEncoder().encode(self) else { return nil }

@@ -2,3 +2,5 @@
 "calibration_title" = "Kalibratie";
 "calibration_notification_title" = "Kalibratie";
 "calibration_notification_body" = "Klik op de Notificatie om te Kalibreren";
+"singlePointCalibration" = "Standaard";
+"multiPointCalibration" = "Meerpunts";

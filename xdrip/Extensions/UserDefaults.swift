@@ -25,8 +25,6 @@ extension UserDefaults {
         
         /// should the online help by automatically translated?
         case translateOnlineHelp = "translateOnlineHelp"
-        /// should the main screen help icon be shown?
-        case showHelpIcon = "showHelpIcon"
         
         // Data Source
         
@@ -107,18 +105,18 @@ extension UserDefaults {
         case showTreatmentsOnChart = "showTreatmentsOnChart"
         /// micro-bolus threshold level in units
         case smallBolusTreatmentThreshold = "smallBolusTreatmentThreshold"
-        /// should the micro-boluses be shown on the main chart?
-        case showSmallBolusTreatmentsOnChart = "showSmallBolusTreatmentsOnChart"
         /// should the micro-boluses be listed in the treatment list/table?
         case showSmallBolusTreatmentsInList = "showSmallBolusTreatmentsInList"
         /// should the normal boluses be listed in the treatment list/table?
         case showBolusTreatmentsInList = "showBolusTreatmentsInList"
         /// should the carbs be listed in the treatment list/table?
         case showCarbsTreatmentsInList = "showCarbsTreatmentsInList"
+        /// should the basal rates be listed in the treatment list/table?
+        case showBasalTreatmentsInList = "showBasalTreatmentsInList"
         /// should the BG Checks be listed in the treatment list/table?
         case showBgCheckTreatmentsInList = "showBgCheckTreatmentsInList"
-        /// should the carbs be offset in the main chart?
-        case offsetCarbTreatmentsOnChart = "offsetCarbTreatmentsOnChart"
+        /// override the default canula age value (CAGE = time since site change)?
+        case CAGEMaxHours = "CAGEMaxHours"
         
         // Statistics settings
         
@@ -161,6 +159,8 @@ extension UserDefaults {
         case activeSensorStartDate = "activeSensorStartDate"
         /// active sensor max days (lifetime)
         case activeSensorMaxSensorAgeInDays = "activeSensorMaxSensorAgeInDays"
+        /// overriden active sensor max days (lifetime) - only used for G6 Anubis transmitters
+        case activeSensorMaxSensorAgeInDaysOverridenAnubis = "activeSensorMaxSensorAgeInDaysOverridenAnubis"
         
         
         // Transmitter
@@ -172,6 +172,10 @@ extension UserDefaults {
         
         /// should readings be uploaded to nightscout
         case nightscoutEnabled = "nightscoutEnabled"
+        /// should we try and follow any specific AID system (Loop, Trio, AAPS, OpenAPS etc)?
+        case nightscoutFollowType = "nightscoutFollowType"
+        /// should the app show the extended AID follow information?
+        case nightscoutFollowShowExpandedInfo = "nightscoutFollowShowExpandedInfo"
         /// should schedule be used for nightscout upload ?
         case nightscoutUseSchedule = "nightscoutUseSchedule"
         /// - schedule for nightscout use, only applicable if nightscoutUseSchedule = true
@@ -190,13 +194,22 @@ extension UserDefaults {
         
         /// is a  nightscout sync of treatments required
         ///
-        /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightscoutUploadManager and when set to true, the manager knows a new sync is required
-        case nightscoutSyncTreatmentsRequired = "nightscoutSyncTreatmentsRequired"
+        /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightscoutSyncManager and when set to true, the manager knows a new sync is required
+        case nightscoutSyncRequired = "nightscoutSyncRequired"
 
         /// used to trigger view controllers that there's a change in TreatmentEntries
         ///
         /// value will be increased with 1 each time there's an update
         case nightscoutTreatmentsUpdateCounter = "nightscoutTreatmentsUpdateCounter"
+        
+        /// Nightscout profile stored as a JSON data object
+        case nightscoutProfile = "nightscoutProfile"
+        
+        /// Nightscout deviceStatus stored as a JSON data object
+        case nightscoutDeviceStatus = "nightscoutDeviceStatus"
+        
+        /// Nightscout deviceStatus update flag
+        case nightscoutDeviceStatusWasUpdated = "nightscoutDeviceStatusWasUpdated"
         
         // Dexcom Share
         
@@ -320,7 +333,7 @@ extension UserDefaults {
         /// timestamp lastest reading uploaded to Nightscout
         case timeStampLatestNSUploadedBgReadingToNightscout = "timeStampLatestUploadedBgReading"
         /// timestamp lastest treatment sync request to Nightscout
-        case timeStampLatestNightscoutTreatmentSyncRequest = "timeStampLatestNightscoutTreatmentSyncRequest"
+        case timeStampLatestNightscoutSyncRequest = "timeStampLatestNightscoutSyncRequest"
         /// timestamp latest calibration uploaded to Nightscout
         case timeStampLatestNSUploadedCalibrationToNightscout = "timeStampLatestUploadedCalibration"
         
@@ -434,6 +447,9 @@ extension UserDefaults {
         
         /// should the app allow a high contrast mode for the .systemSmall widget when shown in StandBy mode at night?
         case allowStandByHighContrast = "allowStandByHighContrast"
+        
+        /// force StandBy mode to show a big number version of the widget
+        case forceStandByBigNumbers = "forceStandByBigNumbers"
     }
     
     
@@ -449,17 +465,6 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.translateOnlineHelp.rawValue)
-        }
-    }
-    
-    /// should the app show the help icon on the main screen toolbar?
-    @objc dynamic var showHelpIcon: Bool {
-        // default value for bool in userdefaults is false, by default we want the app to show the help icon in the toolbar
-        get {
-            return !bool(forKey: Key.showHelpIcon.rawValue)
-        }
-        set {
-            set(!newValue, forKey: Key.showHelpIcon.rawValue)
         }
     }
     
@@ -742,7 +747,7 @@ extension UserDefaults {
                 returnValue = ConstantsBGGraphBuilder.defaultUrgentHighMarkInMgdl
             }
             if !bloodGlucoseUnitIsMgDl {
-                returnValue = returnValue.mgdlToMmol()
+                returnValue = returnValue.mgDlToMmol()
             }
             return returnValue
         }
@@ -766,7 +771,7 @@ extension UserDefaults {
                 returnValue = ConstantsBGGraphBuilder.defaultHighMarkInMgdl
             }
             if !bloodGlucoseUnitIsMgDl {
-                returnValue = returnValue.mgdlToMmol()
+                returnValue = returnValue.mgDlToMmol()
             }
             return returnValue
         }
@@ -797,7 +802,7 @@ extension UserDefaults {
             //read currentvalue in mgdl
             var returnValue = double(forKey: Key.targetMarkValue.rawValue)
             if !bloodGlucoseUnitIsMgDl {
-                returnValue = returnValue.mgdlToMmol()
+                returnValue = returnValue.mgDlToMmol()
             }
             return returnValue
         }
@@ -817,7 +822,7 @@ extension UserDefaults {
                 returnValue = ConstantsBGGraphBuilder.defaultLowMarkInMgdl
             }
             if !bloodGlucoseUnitIsMgDl {
-                returnValue = returnValue.mgdlToMmol()
+                returnValue = returnValue.mgDlToMmol()
             }
             return returnValue
         }
@@ -852,7 +857,7 @@ extension UserDefaults {
                 returnValue = ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl
             }
             if !bloodGlucoseUnitIsMgDl {
-                returnValue = returnValue.mgdlToMmol()
+                returnValue = returnValue.mgDlToMmol()
             }
             return returnValue
         }
@@ -880,7 +885,7 @@ extension UserDefaults {
     /// the urgenthighmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var urgentHighMarkValueInUserChosenUnitRounded:String {
         get {
-            return urgentHighMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+            return urgentHighMarkValueInUserChosenUnit.bgValueToString(mgDl: bloodGlucoseUnitIsMgDl)
         }
         set {
             var value = newValue.toDouble()
@@ -911,7 +916,7 @@ extension UserDefaults {
     /// the highmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var highMarkValueInUserChosenUnitRounded:String {
         get {
-            return highMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+            return highMarkValueInUserChosenUnit.bgValueToString(mgDl: bloodGlucoseUnitIsMgDl)
         }
         set {
             var value = newValue.toDouble()
@@ -931,7 +936,7 @@ extension UserDefaults {
     /// the targetmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var targetMarkValueInUserChosenUnitRounded:String {
         get {
-            return targetMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+            return targetMarkValueInUserChosenUnit.bgValueToString(mgDl: bloodGlucoseUnitIsMgDl)
         }
         set {
             var value = newValue.toDouble()
@@ -945,7 +950,7 @@ extension UserDefaults {
     /// the lowmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var lowMarkValueInUserChosenUnitRounded:String {
         get {
-            return lowMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+            return lowMarkValueInUserChosenUnit.bgValueToString(mgDl: bloodGlucoseUnitIsMgDl)
         }
         set {
             var value = newValue.toDouble()
@@ -965,7 +970,7 @@ extension UserDefaults {
     /// the urgentlowmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var urgentLowMarkValueInUserChosenUnitRounded:String {
         get {
-            return urgentLowMarkValueInUserChosenUnit.bgValuetoString(mgdl: bloodGlucoseUnitIsMgDl)
+            return urgentLowMarkValueInUserChosenUnit.bgValueToString(mgDl: bloodGlucoseUnitIsMgDl)
         }
         set {
             var value = newValue.toDouble()
@@ -1041,46 +1046,6 @@ extension UserDefaults {
         }
     }
     
-    /// micro-bolus threshold level in units as a Double
-    @objc dynamic var smallBolusTreatmentThreshold:Double {
-        get {
-
-            var returnValue = double(forKey: Key.smallBolusTreatmentThreshold.rawValue)
-            // if 0 set to defaultvalue
-            if returnValue == 0.0 {
-                returnValue = ConstantsGlucoseChart.defaultSmallBolusTreamentThreshold
-            }
-
-            return returnValue
-        }
-        set {
-
-            set(newValue, forKey: Key.smallBolusTreatmentThreshold.rawValue)
-        }
-    }
-    
-    /// should the app show the micro-bolus treatments on the main chart?
-    @objc dynamic var showSmallBolusTreatmentsOnChart: Bool {
-        // default value for bool in userdefaults is false, by default we want the app to *show* the micro-bolus treatments on the chart
-        get {
-            return !bool(forKey: Key.showSmallBolusTreatmentsOnChart.rawValue)
-        }
-        set {
-            set(!newValue, forKey: Key.showSmallBolusTreatmentsOnChart.rawValue)
-        }
-    }
-    
-    /// should the app show carb treatments with an offset?
-    @objc dynamic var offsetCarbTreatmentsOnChart: Bool {
-        // default value for bool in userdefaults is false, by default we want the app to *not* offset the carb treatments on the chart
-        get {
-            return bool(forKey: Key.offsetCarbTreatmentsOnChart.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.offsetCarbTreatmentsOnChart.rawValue)
-        }
-    }
-    
     /// should the app show the micro-bolus treatments in the treatments list/table?
     @objc dynamic var showSmallBolusTreatmentsInList: Bool {
         // default value for bool in userdefaults is false, by default we want the app to *hide* the micro-bolus treatments in the treatments table
@@ -1114,6 +1079,17 @@ extension UserDefaults {
         }
     }
     
+    /// should the app show the basal rate treatments in the treatments list/table?
+    @objc dynamic var showBasalTreatmentsInList: Bool {
+        // default value for bool in userdefaults is true, by default we want the app to *hide* the basal treatments in the treatments table
+        get {
+            return bool(forKey: Key.showBasalTreatmentsInList.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.showBasalTreatmentsInList.rawValue)
+        }
+    }
+    
     /// should the app show the BG Check treatments in the treatments list/table?
     @objc dynamic var showBgCheckTreatmentsInList: Bool {
         // default value for bool in userdefaults is false, by default we want the app to *show* the BG Check treatments in the treatments table
@@ -1122,6 +1098,41 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.showBgCheckTreatmentsInList.rawValue)
+        }
+    }
+    
+    /// micro-bolus threshold level in units as a Double
+    @objc dynamic var smallBolusTreatmentThreshold:Double {
+        get {
+
+            var returnValue = double(forKey: Key.smallBolusTreatmentThreshold.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0.0 {
+                returnValue = ConstantsGlucoseChart.defaultSmallBolusTreatmentThreshold
+            }
+
+            return returnValue
+        }
+        set {
+
+            set(newValue, forKey: Key.smallBolusTreatmentThreshold.rawValue)
+        }
+    }
+    
+    /// max canula age (CAGE) as Int - if nil, return default value
+    @objc dynamic var CAGEMaxHours: Int {
+        get {
+            var returnValue = integer(forKey: Key.CAGEMaxHours.rawValue)
+            // if 0 set to defaultvalue
+            if returnValue == 0 {
+                returnValue = ConstantsHomeView.CAGEDefaultMaxHours
+            }
+
+            return returnValue
+        }
+        
+        set {
+            set(newValue, forKey: Key.CAGEMaxHours.rawValue)
         }
     }
     
@@ -1261,6 +1272,16 @@ extension UserDefaults {
         }
     }
     
+    /// overriden active sensor max sensor days. Optional as should be set to nil if the user isn't using a G6 and hasn't overriden manually the max days
+    var activeSensorMaxSensorAgeInDaysOverridenAnubis: Double? {
+        get {
+            return double(forKey: Key.activeSensorMaxSensorAgeInDaysOverridenAnubis.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.activeSensorMaxSensorAgeInDaysOverridenAnubis.rawValue)
+        }
+    }
+    
 
     // MARK: Housekeeper Settings
 
@@ -1320,6 +1341,29 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.nightscoutEnabled.rawValue)
+        }
+    }
+    
+    /// holds the enum integer of the type of nightscout follower type to be shown, if any
+    /// default to 0 (basic type - just standard treatments and basal from NS)
+    var nightscoutFollowType: NightscoutFollowType {
+        get {
+            let nightscoutFollowTypeAsInt = integer(forKey: Key.nightscoutFollowType.rawValue)
+            return NightscoutFollowType(rawValue: nightscoutFollowTypeAsInt) ?? .none
+        }
+        set {
+            set(newValue.rawValue, forKey: Key.nightscoutFollowType.rawValue)
+        }
+    }
+    
+    /// show the expanded information views for AID follow
+    @objc dynamic var nightscoutFollowShowExpandedInfo: Bool {
+        // default value for bool in userdefaults is false, as default we want the app to show the expanded information
+        get {
+            return !bool(forKey: Key.nightscoutFollowShowExpandedInfo.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.nightscoutFollowShowExpandedInfo.rawValue)
         }
     }
     
@@ -1399,23 +1443,23 @@ extension UserDefaults {
     
     /// is a  nightscout sync of treatments required
     ///
-    /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightscoutUploadManager and when set to true, the manager knows a new sync is required
-    @objc dynamic var nightscoutSyncTreatmentsRequired: Bool {
+    /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightscoutSyncManager and when set to true, the manager knows a new sync is required
+    @objc dynamic var nightscoutSyncRequired: Bool {
         get {
-            return bool(forKey: Key.nightscoutSyncTreatmentsRequired.rawValue)
+            return bool(forKey: Key.nightscoutSyncRequired.rawValue)
         }
         set {
-            set(newValue, forKey: Key.nightscoutSyncTreatmentsRequired.rawValue)
+            set(newValue, forKey: Key.nightscoutSyncRequired.rawValue)
         }
     }
     
     /// timestamp lastest reading uploaded to Nightscout
-    var timeStampLatestNightscoutTreatmentSyncRequest: Date? {
+    var timeStampLatestNightscoutSyncRequest: Date? {
         get {
-            return object(forKey: Key.timeStampLatestNightscoutTreatmentSyncRequest.rawValue) as? Date
+            return object(forKey: Key.timeStampLatestNightscoutSyncRequest.rawValue) as? Date
         }
         set {
-            set(newValue, forKey: Key.timeStampLatestNightscoutTreatmentSyncRequest.rawValue)
+            set(newValue, forKey: Key.timeStampLatestNightscoutSyncRequest.rawValue)
         }
     }
     
@@ -1428,6 +1472,44 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.nightscoutTreatmentsUpdateCounter.rawValue)
+        }
+    }
+    
+    /// Nightscout profile stored as a JSON data object
+    var nightscoutProfile: Data? {
+        get {
+            if let data = object(forKey: Key.nightscoutProfile.rawValue) as? Data {
+                return data
+            } else {
+                return nil
+            }
+        }
+        set {
+            set(newValue, forKey: Key.nightscoutProfile.rawValue)
+        }
+    }
+    
+    /// Nightscout device status stored as a JSON data object
+    @objc dynamic var nightscoutDeviceStatus: Data? {
+        get {
+            if let data = object(forKey: Key.nightscoutDeviceStatus.rawValue) as? Data {
+                return data
+            } else {
+                return nil
+            }
+        }
+        set {
+            set(newValue, forKey: Key.nightscoutDeviceStatus.rawValue)
+        }
+    }
+    
+    /// will be set to true when the nightscout device status has been updated fully
+    @objc dynamic var nightscoutDeviceStatusWasUpdated: Bool {
+        get {
+            return bool(forKey: Key.nightscoutSyncRequired.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.nightscoutSyncRequired.rawValue)
         }
     }
 
@@ -2117,6 +2199,17 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.allowStandByHighContrast.rawValue)
+        }
+    }
+    
+    /// force StandBy mode to show a big number version of the widget
+    var forceStandByBigNumbers: Bool {
+        // default value for bool in userdefaults is false, as default we want the app to not show big numbers
+        get {
+            return bool(forKey: Key.forceStandByBigNumbers.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.forceStandByBigNumbers.rawValue)
         }
     }
     

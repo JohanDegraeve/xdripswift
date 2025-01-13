@@ -13,7 +13,7 @@ extension XDripWidget.EntryView {
     var systemMediumView: some View {
         VStack(spacing: 0) {
             HStack(alignment: .center) {
-                Text("\(entry.widgetState.bgValueStringInUserChosenUnit) \(entry.widgetState.trendArrow())")
+                Text("\(entry.widgetState.bgValueStringInUserChosenUnit()) \(entry.widgetState.trendArrow())")
                     .font(.title).fontWeight(.bold)
                     .foregroundStyle(entry.widgetState.bgTextColor())
                     .scaledToFill()
@@ -22,15 +22,24 @@ extension XDripWidget.EntryView {
                 
                 Spacer()
                 
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
-                        .font(.title2).fontWeight(.semibold)
-                        .foregroundStyle(entry.widgetState.deltaChangeTextColor())
-                        .lineLimit(1)
-                    Text(entry.widgetState.bgUnitString)
-                        .font(.title2)
-                        .foregroundStyle(.colorTertiary)
-                        .lineLimit(1)
+                HStack(alignment: .center, spacing: 10) {
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        Text(entry.widgetState.deltaChangeStringInUserChosenUnit())
+                            .font(.title2).fontWeight(.semibold)
+                            .foregroundStyle(entry.widgetState.deltaChangeTextColor())
+                            .lineLimit(1)
+                        
+                        Text(entry.widgetState.bgUnitString)
+                            .font(.title2)
+                            .foregroundStyle(.colorTertiary)
+                            .lineLimit(1)
+                    }
+                    
+                    if let deviceStatusIconImage = entry.widgetState.deviceStatusIconImage(), let deviceStatusColor = entry.widgetState.deviceStatusColor() {
+                        deviceStatusIconImage
+                            .font(.headline).bold()
+                            .foregroundStyle(deviceStatusColor)
+                    }
                 }
             }
             .padding(.top, -6)

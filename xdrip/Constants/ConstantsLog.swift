@@ -37,7 +37,7 @@ enum ConstantsLog {
     static let categoryCGMG5 =                          "CGMG5                         "
     
     /// G7
-    static let categoryCGMG7 =                       "CGMG7                         "
+    static let categoryCGMG7 =                          "CGMG7                         "
     
     /// watlaa
     static let categoryWatlaa =                         "Watlaa"
@@ -89,85 +89,85 @@ enum ConstantsLog {
     static let categoryApplicationDataM5StackNames =    "ApplicationDataM5StackNames   "
     
     /// nightscout uploader
-    static let categoryNightscoutUploadManager =     "NightscoutUploadManager       "
+    static let categoryNightscoutSyncManager =          "NightscoutSyncManager         "
     
     /// nightscout follow
-    static let categoryNightscoutFollowManager =     "NightscoutFollowManager       "
+    static let categoryNightscoutFollowManager =        "NightscoutFollowManager       "
     
     /// nightscout follow
-    static let categoryLibreLinkUpFollowManager =    "LibreLinkUpFollowManager      "
+    static let categoryLibreLinkUpFollowManager =       "LibreLinkUpFollowManager      "
     
     /// alertmanager
-    static let categoryAlertManager =                "AlertManager                  "
+    static let categoryAlertManager =                   "AlertManager                  "
     
     /// playsound
-    static let categoryPlaySound =                   "PlaySound                     "
+    static let categoryPlaySound =                      "PlaySound                     "
     
     /// healthkit manager
-    static let categoryHealthKitManager =            "HealthKitManager              "
+    static let categoryHealthKitManager =               "HealthKitManager              "
     
     /// SettingsViewHealthKitSettingsViewModel
     static let categorySettingsViewHealthKitSettingsViewModel = "SettingsViewHealthKitSettingsViewModel"
     
     /// dexcom share upload manager
-    static let categoryDexcomShareUploadManager =    "DexcomShareUploadManager      "
+    static let categoryDexcomShareUploadManager =       "DexcomShareUploadManager      "
     
     /// droplet 1
-    static let categoryCGMDroplet1 =                 "CGMDroplet1                   "
+    static let categoryCGMDroplet1 =                    "CGMDroplet1                   "
     
     /// bluereader
-    static let categoryCGMBlueReader =               "CGMBlueReader                 "
+    static let categoryCGMBlueReader =                  "CGMBlueReader                 "
     
     /// atom
-    static let categoryCGMAtom =                     "categoryCGMAtom               "
+    static let categoryCGMAtom =                        "categoryCGMAtom               "
     
     /// LibreOOPClient
-    static let categoryLibreOOPClient =              "LibreOOPClient                "
+    static let categoryLibreOOPClient =                 "LibreOOPClient                "
     
     /// libreDataParser
-    static let categoryLibreDataParser =             "LibreDataParser               "
+    static let categoryLibreDataParser =                "LibreDataParser               "
     
     /// for use in M5Stack
-    static let categoryM5StackBluetoothTransmitter = "M5StackBluetoothTransmitter   "
+    static let categoryM5StackBluetoothTransmitter =    "M5StackBluetoothTransmitter   "
     
     /// BluetoothPeripheralManager logging
-    static let categoryBluetoothPeripheralManager =  "BluetoothPeripheralManager    "
+    static let categoryBluetoothPeripheralManager =     "BluetoothPeripheralManager    "
 
     /// StatusChartsManager logging
-    static let categoryGlucoseChartManager =         "GlucoseChartManager           "
+    static let categoryGlucoseChartManager =            "GlucoseChartManager           "
     
     /// SettingsViewCalendarEventsSettingsViewModel logging
     static let categorySettingsViewCalendarEventsSettingsViewModel =         "SettingsViewCalendarEventsSettingsViewModel"
     
     /// CalendarManager logging
-    static let categoryCalendarManager =                    "CalendarManager                "
+    static let categoryCalendarManager =                "CalendarManager               "
 
     /// SettingsViewContactImageSettingsViewModel logging
     static let categorySettingsViewContactImageSettingsViewModel =           "SettingsViewContactImageSettingsViewModel  "
 
     /// WatchManager logging
-    static let categoryWatchManager =                       "WatchManager                  "
+    static let categoryWatchManager =                   "WatchManager                  "
 
     /// ContactImageManager logging
-    static let categoryContactImageManager =                "ContactImageManager           "
+    static let categoryContactImageManager =            "ContactImageManager           "
 
     /// bluetoothPeripheralViewController
     static let categoryBluetoothPeripheralViewController =   "blePeripheralViewController   "
     
     /// nightscout view model
-    static let categoryNightscoutSettingsViewModel =         "nightscoutSettingsViewModel   "
+    static let categoryNightscoutSettingsViewModel =    "nightscoutSettingsViewModel   "
     
     /// trace
-    static let categoryTraceSettingsViewModel =      "TraceSettingsViewModel"
+    static let categoryTraceSettingsViewModel =         "TraceSettingsViewModel"
     
     /// housekeeping
-    static let categoryHouseKeeper =                 "HouseKeeper                   "
+    static let categoryHouseKeeper =                    "HouseKeeper                   "
     
     /// soonzeParameter accessor
-    static let categoryApplicationDataSnoozeParameter =      "ApplicationDataSnoozeParameter"
+    static let categoryApplicationDataSnoozeParameter = "ApplicationDataSnoozeParameter"
     
     /// libre NFC
-    static let categoryLibreNFC =                    "categoryLibreNFC"
+    static let categoryLibreNFC =                       "categoryLibreNFC"
     
     /// for use in cgm transmitter bubble
     static let categoryLibreSensorType =             "categoryLibreSensorType       "

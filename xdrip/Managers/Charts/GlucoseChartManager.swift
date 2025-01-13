@@ -21,7 +21,9 @@ public class GlucoseChartManager {
     /// - mediumBolus = all boluses over the micro-bolus threshold ("normal" boluses and will be shown with a label)
     /// - smallCarbs / mediumCarbs / largeCarbs / veryLargeCarbs = groups of each aproximate size to be represented by a different size chart point. The exact carb size context is given using a label
     /// - bgCheck = blood glucose (finger) checks
-    typealias TreatmentChartPointsType = (smallBolus: [ChartPoint], mediumBolus: [ChartPoint], smallCarbs: [ChartPoint], mediumCarbs: [ChartPoint], largeCarbs: [ChartPoint], veryLargeCarbs: [ChartPoint], bgChecks: [ChartPoint])
+    /// - scheduledBasalRates = the scheduled basal rate from the Nightscout profile
+    /// - basalRates/basalRatesFill = the temp basal rates (line and fill)
+    typealias TreatmentChartPointsType = (smallBolus: [ChartPoint], mediumBolus: [ChartPoint], largeBolus: [ChartPoint], veryLargeBolus: [ChartPoint], smallCarbs: [ChartPoint], mediumCarbs: [ChartPoint], largeCarbs: [ChartPoint], veryLargeCarbs: [ChartPoint], bgChecks: [ChartPoint], scheduledBasalRates: [ChartPoint], basalRates: [ChartPoint], basalRatesFill: [ChartPoint])
     
     // MARK: - private properties
     
@@ -38,13 +40,19 @@ public class GlucoseChartManager {
     private var calibrationChartPoints = [ChartPoint]()
         
     /// treatmentChartPoints to be shown on chart
-    private var treatmentChartPoints: TreatmentChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint]())
+    private var treatmentChartPoints: TreatmentChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint]())
         
     /// smallBolusTreatmentChartPoints to be shown on chart
     private var smallBolusTreatmentChartPoints = [ChartPoint]()
     
     /// mediumBolusTreatmentChartPoints to be shown on chart
     private var mediumBolusTreatmentChartPoints = [ChartPoint]()
+    
+    /// largeBolusTreatmentChartPoints to be shown on chart
+    private var largeBolusTreatmentChartPoints = [ChartPoint]()
+    
+    /// veryLargeBolusTreatmentChartPoints to be shown on chart
+    private var veryLargeBolusTreatmentChartPoints = [ChartPoint]()
     
     /// smallCarbsTreatmentChartPoints to be shown on chart
     private var smallCarbsTreatmentChartPoints = [ChartPoint]()
@@ -60,6 +68,15 @@ public class GlucoseChartManager {
     
     /// bgCheckTreatmentChartPoints to be shown on chart
     private var bgCheckTreatmentChartPoints = [ChartPoint]()
+    
+    /// scheduledBasalRateTreatmentChartPoints to be shown on chart
+    private var scheduledBasalRateTreatmentChartPoints = [ChartPoint]()
+    
+    /// basalRateTreatmentChartPoints to be shown on chart
+    private var basalRateTreatmentChartPoints = [ChartPoint]()
+    
+    /// basalRateTreatmentChartPoints to be shown on chart
+    private var basalRateFillTreatmentChartPoints = [ChartPoint]()
 
     /// ChartPoints to be shown on chart, processed only in main thread - urgent Range
     private var urgentRangeGlucoseChartPoints = [ChartPoint]()
@@ -115,6 +132,9 @@ public class GlucoseChartManager {
     /// initialise treatmentEntryAccessor
     private var treatmentEntryAccessor: TreatmentEntryAccessor?
     
+    /// initialise nightscoutSyncManager
+    private var nightscoutSyncManager: NightscoutSyncManager?
+    
     /// a coreDataManager
     private var coreDataManager: CoreDataManager
     
@@ -142,6 +162,11 @@ public class GlucoseChartManager {
     /// - in mgdl
     private var maximumValueInGlucoseChartPointsInMgDl: Double = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
     
+    /// - the scaler to apply to the basal rates. Let's just set it at 0, we'll update it soon after
+    private var basalRateMaximum: Double = 0
+    /// - the scaler to apply to the basal rates. Let's just set it at 20, we'll update it soon after
+    private var basalRateScaler: Double = 20
+    
     /// if the class is iniatated by the view controller without specifying a Gesture Recogniser, then we are not displaying the main chart, but the static 24 hour chart from the landscape view controller
     private var isStatic24hrChart: Bool = false
     
@@ -151,15 +176,25 @@ public class GlucoseChartManager {
     /// is chart in panned state or not, meaning is it currently shifted back in time
     private(set) var chartIsPannedBackward: Bool = false
     
+    /// array to hold the scheduled basal rates - they will be populated from NightscoutSyncManager.profile as required
+    private var scheduledBasalRatesArray = [(date: Date, value: Double)]()
+    
+    /// track when the scheduled basal rates array was populated. If chartStartDate changes by more than, say, 6 hours, then we'll repopulate
+    /// set the .distantPast on initialization so that a fresh population is forced
+    private var scheduledBasalRatesLastUpdatedForStartDate: Date = .distantPast
+    
     // MARK: - intializer
     
     /// - parameters:
     ///     - chartLongPressGestureRecognizer : defined here as parameter so that this class can handle the config of the recognizer
     ///     - chartLongPressGestureRecognizer has been made optional (initialized to nil) as it doesn't need to be used for the static landscape chart
-    init(chartLongPressGestureRecognizer: UILongPressGestureRecognizer? = nil, coreDataManager: CoreDataManager) {
+    init(chartLongPressGestureRecognizer: UILongPressGestureRecognizer? = nil, coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager) {
         
         // set coreDataManager
         self.coreDataManager = coreDataManager
+        
+        // set nightscoutSyncManager
+        self.nightscoutSyncManager = nightscoutSyncManager
         
         // if the call included the optional gesture recogniser, then for tapping the chart, we're using UILongPressGestureRecognizer because UITapGestureRecognizer doesn't react on touch down. With UILongPressGestureRecognizer and minimumPressDuration set to 0, we get a trigger as soon as the chart is touched
         if let chartLongPressGestureRecognizer = chartLongPressGestureRecognizer {
@@ -219,7 +254,7 @@ public class GlucoseChartManager {
             // and if there's more than a predefined amount of elements already in the array then we restart from scratch because (on an iPhone SE with iOS 13), the panning is getting slowed down when there's more than 1000 elements in the array
             var reUseExistingChartPointList = self.glucoseChartPoints.urgentRange
                 .count + self.glucoseChartPoints.inRange.count + self.glucoseChartPoints.notUrgentRange.count
-                <= ConstantsGlucoseChart.maximumElementsInGlucoseChartPointsArray ? true:false
+                <= ConstantsGlucoseChart.maximumElementsInGlucoseChartPointsArray ? true : false
             
             if let lastGlucoseChartPoint = self.glucoseChartPoints.lastGlucoseChartPoint, let lastGlucoseChartPointX = lastGlucoseChartPoint.x as? ChartAxisValueDate {
                 
@@ -305,20 +340,30 @@ public class GlucoseChartManager {
             // get calibrations from coredata
             let calibrationChartPoints = self.getCalibrationChartPoints(startDate: startDateToUse, endDate: endDate, calibrationsAccessor: self.data().calibrationsAccessor, on: self.coreDataManager.privateManagedObjectContext)
             
+            
             // only get and assign the treatment chartpoints if the user has chosen to show them on the chart
             if UserDefaults.standard.showTreatmentsOnChart {
                 
                 // get treatments from coredata
-                let treatmentChartPoints: TreatmentChartPointsType = self.getTreatmentEntryChartPoints(startDate: startDateToUse, endDate: endDate, treatmentEntryAccessor: self.data().treatmentEntryAccessor, bgReadingsAccessor: self.data().bgReadingsAccessor, on: self.coreDataManager.privateManagedObjectContext)
+                let treatmentChartPoints: TreatmentChartPointsType = self.getTreatmentChartPoints(startDate: startDateToUse, endDate: endDate, treatmentEntryAccessor: self.data().treatmentEntryAccessor, bgReadingsAccessor: self.data().bgReadingsAccessor, on: self.coreDataManager.privateManagedObjectContext)
                 
                 // assign treatment arrays
                 self.treatmentChartPoints.smallBolus = treatmentChartPoints.smallBolus
                 self.treatmentChartPoints.mediumBolus = treatmentChartPoints.mediumBolus
+                self.treatmentChartPoints.largeBolus = treatmentChartPoints.largeBolus
+                self.treatmentChartPoints.veryLargeBolus = treatmentChartPoints.veryLargeBolus
+                
                 self.treatmentChartPoints.smallCarbs = treatmentChartPoints.smallCarbs
                 self.treatmentChartPoints.mediumCarbs = treatmentChartPoints.mediumCarbs
                 self.treatmentChartPoints.largeCarbs = treatmentChartPoints.largeCarbs
                 self.treatmentChartPoints.veryLargeCarbs = treatmentChartPoints.veryLargeCarbs
+                
                 self.treatmentChartPoints.bgChecks = treatmentChartPoints.bgChecks
+                
+                self.treatmentChartPoints.scheduledBasalRates = treatmentChartPoints.scheduledBasalRates
+                
+                self.treatmentChartPoints.basalRates = treatmentChartPoints.basalRates
+                self.treatmentChartPoints.basalRatesFill = treatmentChartPoints.basalRatesFill
                 
             }
             
@@ -339,6 +384,8 @@ public class GlucoseChartManager {
                 // assign the bolus treatment chart points
                 self.smallBolusTreatmentChartPoints = self.treatmentChartPoints.smallBolus
                 self.mediumBolusTreatmentChartPoints = self.treatmentChartPoints.mediumBolus
+                self.largeBolusTreatmentChartPoints = self.treatmentChartPoints.largeBolus
+                self.veryLargeBolusTreatmentChartPoints = self.treatmentChartPoints.veryLargeBolus
                 
                 // assign the carbs treatment chart points
                 self.smallCarbsTreatmentChartPoints = self.treatmentChartPoints.smallCarbs
@@ -348,6 +395,11 @@ public class GlucoseChartManager {
                 
                 // assign the BG check treatment chart points
                 self.bgCheckTreatmentChartPoints = self.treatmentChartPoints.bgChecks
+                
+                // assign the basal rate treatment chart points
+                self.scheduledBasalRateTreatmentChartPoints = self.treatmentChartPoints.scheduledBasalRates
+                self.basalRateTreatmentChartPoints = self.treatmentChartPoints.basalRates
+                self.basalRateFillTreatmentChartPoints = self.treatmentChartPoints.basalRatesFill
                     
                 // update the chart outlet
                 chartOutlet.reloadChart()
@@ -587,7 +639,10 @@ public class GlucoseChartManager {
         let unitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
         // create yAxisValues, start with 38 mgdl, this is to make sure we show a bit lower than the real lowest value which is usually 40 mgdl, make the label hidden. We must do this with by using a clear color label setting as the hidden property doesn't work (even if we don't know why).
-        let firstYAxisValue = ChartAxisValueDouble((ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl).mgdlToMmol(mgdl: unitIsMgDl), labelSettings: data().chartLabelSettingsHidden)
+//        let firstYAxisValue = ChartAxisValueDouble((ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl).mgDlToMmol(mgDl: unitIsMgDl), labelSettings: data().chartLabelSettingsHidden)
+        let minimumChartValue = UserDefaults.standard.showTreatmentsOnChart ? (UserDefaults.standard.nightscoutFollowType != .none ? (isStatic24hrChart ? ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal24hrChart : ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal) : ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl) : ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
+        
+        let firstYAxisValue = ChartAxisValueDouble(minimumChartValue.mgDlToMmol(mgDl: unitIsMgDl), labelSettings: data().chartLabelSettingsHidden)
         
         // create now the yAxisValues and add the first
         var yAxisValues = [firstYAxisValue as ChartAxisValue]
@@ -598,18 +653,18 @@ public class GlucoseChartManager {
         }
         
         // start by adding the objective values as the axis values
-        yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsObjectivesSecondary) as ChartAxisValue]
+        yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.bgValueRounded(mgDl: unitIsMgDl), labelSettings: data().chartLabelSettingsObjectivesSecondary) as ChartAxisValue]
         
-        yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsObjectives) as ChartAxisValue]
+        yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValueRounded(mgDl: unitIsMgDl), labelSettings: data().chartLabelSettingsObjectives) as ChartAxisValue]
         
         // if the user has set the target value > 0, then enable the label too
         if UserDefaults.standard.targetMarkValueInUserChosenUnit > 0 {
-            yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.targetMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsTarget) as ChartAxisValue]
+            yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.targetMarkValueInUserChosenUnit.bgValueRounded(mgDl: unitIsMgDl), labelSettings: data().chartLabelSettingsTarget) as ChartAxisValue]
         }
         
-        yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.highMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsObjectives) as ChartAxisValue]
+        yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.highMarkValueInUserChosenUnit.bgValueRounded(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsObjectives) as ChartAxisValue]
         
-        yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.bgValueRounded(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), labelSettings: data().chartLabelSettingsObjectivesSecondary) as ChartAxisValue]
+        yAxisValues += [ChartAxisValueDouble(UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.bgValueRounded(mgDl: unitIsMgDl), labelSettings: data().chartLabelSettingsObjectivesSecondary) as ChartAxisValue]
         
         // once the objectives are added, let's build up with standard values every 50mg/dl (minimum 200mg/dl. We'll make these secondary values a dimmer color so that they don't stand out as much as the objective values. As there are more values on the axis (>250mg/dl) and they labels get more compressed, leave more space between the urgent high objective value and the standard grid value
         if UserDefaults.standard.urgentHighMarkValueInUserChosenUnit < (unitIsMgDl ? 135 : 8.1) {
@@ -624,19 +679,19 @@ public class GlucoseChartManager {
         }
         
         // now that we've build up the axis values to a minimum 200mg / 12 mmol, then we should continue as needed until we've covered the maximum glucose value to be displayed.
-        if (UserDefaults.standard.urgentHighMarkValueInUserChosenUnit < (unitIsMgDl ? 240 : 14)) && (yAxisValues.last!.scalar < maximumValueInGlucoseChartPointsInMgDl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) ) {
+        if (UserDefaults.standard.urgentHighMarkValueInUserChosenUnit < (unitIsMgDl ? 240 : 14)) && (yAxisValues.last!.scalar < maximumValueInGlucoseChartPointsInMgDl.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) ) {
             yAxisValues += [ChartAxisValueDouble((unitIsMgDl ? 250 : 15), labelSettings: data().chartLabelSettingsDimmed) as ChartAxisValue]
         }
         
-        if (UserDefaults.standard.urgentHighMarkValueInUserChosenUnit <= (unitIsMgDl ? 280 : 17)) && (yAxisValues.last!.scalar < maximumValueInGlucoseChartPointsInMgDl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) ) {
+        if (UserDefaults.standard.urgentHighMarkValueInUserChosenUnit <= (unitIsMgDl ? 280 : 17)) && (yAxisValues.last!.scalar < maximumValueInGlucoseChartPointsInMgDl.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) ) {
             yAxisValues += [ChartAxisValueDouble((unitIsMgDl ? 300 : 18), labelSettings: data().chartLabelSettingsDimmed) as ChartAxisValue]
         }
         
-        if (UserDefaults.standard.urgentHighMarkValueInUserChosenUnit <= (unitIsMgDl ? 330 : 20)) && (yAxisValues.last!.scalar < maximumValueInGlucoseChartPointsInMgDl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) ) {
+        if (UserDefaults.standard.urgentHighMarkValueInUserChosenUnit <= (unitIsMgDl ? 330 : 20)) && (yAxisValues.last!.scalar < maximumValueInGlucoseChartPointsInMgDl.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) ) {
             yAxisValues += [ChartAxisValueDouble((unitIsMgDl ? 350 : 21), labelSettings: data().chartLabelSettingsDimmed) as ChartAxisValue]
         }
         
-        if (UserDefaults.standard.urgentHighMarkValueInUserChosenUnit <= (unitIsMgDl ? 380 : 23)) && (yAxisValues.last!.scalar < maximumValueInGlucoseChartPointsInMgDl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) ) {
+        if (UserDefaults.standard.urgentHighMarkValueInUserChosenUnit <= (unitIsMgDl ? 380 : 23)) && (yAxisValues.last!.scalar < maximumValueInGlucoseChartPointsInMgDl.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) ) {
             yAxisValues += [ChartAxisValueDouble((unitIsMgDl ? 400 : 24), labelSettings: data().chartLabelSettingsDimmed) as ChartAxisValue]
         }
         
@@ -653,16 +708,20 @@ public class GlucoseChartManager {
         
         var bolusTriangleSize: CGFloat = 0
         
+        var treatmentSeparationOffset: CGFloat = 0
+        
         // define the fixed separation of each label from it's corresponding marker. The bigger markers need a bigger separation to stop the label from covering it
         // we also define a separation offset which is mutable and will be adjusted next to dynamically change based upon the chart width and height - this is used to keep everything looking the same no matter what scales are in use
-        let mediumBolusLabelSeparation: Double = ConstantsGlucoseChart.mediumBolusLabelSeparation
         var bolusLabelSeparationOffset: Double = 0
+        let mediumBolusLabelSeparation: Double = ConstantsGlucoseChart.mediumBolusLabelSeparation
+        let largeBolusLabelSeparation: Double = ConstantsGlucoseChart.largeBolusLabelSeparation
+        let veryLargeBolusLabelSeparation: Double = ConstantsGlucoseChart.veryLargeBolusLabelSeparation
         
-        let smallCarbsLabelSeparation: Double = ConstantsGlucoseChart.smallCarbsLabelSeparation
+        var carbsLabelSeparationOffset: Double = 0
+        //let smallCarbsLabelSeparation: Double = ConstantsGlucoseChart.smallCarbsLabelSeparation
         let mediumCarbsLabelSeparation: Double = ConstantsGlucoseChart.mediumCarbsLabelSeparation
         let largeCarbsLabelSeparation: Double = ConstantsGlucoseChart.largeCarbsLabelSeparation
         let veryLargeCarbsLabelSeparation: Double = ConstantsGlucoseChart.veryLargeCarbsLabelSeparation
-        var carbsLabelSeparationOffset: Double = 0
         
         var treatmentLabelFontSize: Double = ConstantsGlucoseChart.treatmentLabelFontSize
         
@@ -672,6 +731,7 @@ public class GlucoseChartManager {
         case 3:
             glucoseCircleDiameter = ConstantsGlucoseChart.glucoseCircleDiameter3h
             bolusTriangleSize = ConstantsGlucoseChart.bolusTriangleSize3h
+            treatmentSeparationOffset += 1
             treatmentLabelFontSize += 2
             bolusLabelSeparationOffset += 1
             carbsLabelSeparationOffset += 2
@@ -681,12 +741,14 @@ public class GlucoseChartManager {
         case 12:
             glucoseCircleDiameter = ConstantsGlucoseChart.glucoseCircleDiameter12h
             bolusTriangleSize = ConstantsGlucoseChart.bolusTriangleSize12h
+            treatmentSeparationOffset += 2
             treatmentLabelFontSize -= 1
             bolusLabelSeparationOffset -= 1
             carbsLabelSeparationOffset -= 2
         case 24:
             glucoseCircleDiameter = ConstantsGlucoseChart.glucoseCircleDiameter24h
             bolusTriangleSize = ConstantsGlucoseChart.bolusTriangleSize24h
+            treatmentSeparationOffset += 3
             treatmentLabelFontSize -= 2
             bolusLabelSeparationOffset -= 2
             carbsLabelSeparationOffset -= 3
@@ -700,11 +762,13 @@ public class GlucoseChartManager {
         switch yAxisValues.last!.scalar {
             
         case 199...299:
-            bolusLabelSeparationOffset += 2
-            carbsLabelSeparationOffset += 2
+            treatmentSeparationOffset += 5
+            bolusLabelSeparationOffset += 6
+            carbsLabelSeparationOffset += 6
         case 300...600:
-            bolusLabelSeparationOffset += 3
-            carbsLabelSeparationOffset += 3
+            treatmentSeparationOffset += 10
+            bolusLabelSeparationOffset += 16
+            carbsLabelSeparationOffset += 16
         default:
             break
             
@@ -714,6 +778,7 @@ public class GlucoseChartManager {
         if isStatic24hrChart {
             
             glucoseCircleDiameter = ConstantsGlucoseChart.glucoseCircleDiameter24h
+            treatmentSeparationOffset += 0
             treatmentLabelFontSize -= 1
             bolusLabelSeparationOffset += 2
             carbsLabelSeparationOffset += 1
@@ -756,39 +821,67 @@ public class GlucoseChartManager {
         
         let bgCheckCirclesInnerLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: bgCheckTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.bgCheckTreatmentScaleInner, height: glucoseCircleDiameter * ConstantsGlucoseChart.bgCheckTreatmentScaleInner), itemFillColor: ConstantsGlucoseChart.bgCheckTreatmentColorInner, optimized: true)
         
+        
         // bolus triangle layers
-        let mediumBolusTriangleLayer = ChartPointsScatterDownTrianglesWithDropdownLineLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: mediumBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize, height: bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
+        let smallBolusTriangleLayer = ChartPointsScatterDownTrianglesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: smallBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize * ConstantsGlucoseChart.smallBolusTreatmentScale, height: (bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale) * ConstantsGlucoseChart.smallBolusTreatmentScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
         
-        let smallBolusTriangleLayer = ChartPointsScatterDownTrianglesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: smallBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize * ConstantsGlucoseChart.smallBolusTreamentScale, height: (bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale) * ConstantsGlucoseChart.smallBolusTreamentScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
+        let mediumBolusTriangleLayer = ChartPointsScatterDownTrianglesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: mediumBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize * ConstantsGlucoseChart.mediumBolusTreatmentScale, height: bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale * ConstantsGlucoseChart.mediumBolusTreatmentScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
         
-        //  carb circle layers
-        let smallCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: smallCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.smallCarbsTreamentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.smallCarbsTreamentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
+        let largeBolusTriangleLayer = ChartPointsScatterDownTrianglesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: largeBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize * ConstantsGlucoseChart.largeBolusTreatmentScale, height: bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale * ConstantsGlucoseChart.largeBolusTreatmentScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
         
-        let mediumCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: mediumCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.mediumCarbsTreamentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.mediumCarbsTreamentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
+        let veryLargeBolusTriangleLayer = ChartPointsScatterDownTrianglesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: veryLargeBolusTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: bolusTriangleSize * ConstantsGlucoseChart.veryLargeBolusTreatmentScale, height: bolusTriangleSize * ConstantsGlucoseChart.bolusTriangleHeightScale * ConstantsGlucoseChart.veryLargeBolusTreatmentScale), itemFillColor: ConstantsGlucoseChart.bolusTreatmentColor)
         
-        let largeCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: largeCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.largeCarbsTreamentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.largeCarbsTreamentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
         
-        let veryLargeCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: veryLargeCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.veryLargeCarbsTreamentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.veryLargeCarbsTreamentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
+        // carb circle layers
+        let smallCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: smallCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.smallCarbsTreatmentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.smallCarbsTreatmentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
+        
+        let mediumCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: mediumCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.mediumCarbsTreatmentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.mediumCarbsTreatmentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
+        
+        let largeCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: largeCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.largeCarbsTreatmentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.largeCarbsTreatmentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
+        
+        let veryLargeCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: veryLargeCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.veryLargeCarbsTreatmentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.veryLargeCarbsTreatmentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
+
+        
+        // Scheduled basal rate line
+        let scheduledBasalRateLayerLineModel = ChartLineModel(chartPoints: scheduledBasalRateTreatmentChartPoints, lineColor: ConstantsGlucoseChart.scheduledBasalRateTreatmentLineColor, lineWidth: ConstantsGlucoseChart.scheduledBasalRateTreatmentLineWidth, animDuration: 0, animDelay: 0, dashPattern: [3, 2])
+        
+        let scheduledBasalRateLayer = ChartPointsLineLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, lineModels: [scheduledBasalRateLayerLineModel])
+        
+        
+        // Basal rate line + fill layers
+        let basalRateLayerLineModel = ChartLineModel(chartPoints: basalRateTreatmentChartPoints, lineColor: ConstantsGlucoseChart.basalRateTreatmentLineColor, lineWidth: ConstantsGlucoseChart.basalRateTreatmentLineWidth, animDuration: 0, animDelay: 0)
+        
+        let basalRateLayer = ChartPointsLineLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, lineModels: [basalRateLayerLineModel])
+        
+        let basalRateFillLayer = ChartPointsFillsLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, fills: [ChartPointsFill( chartPoints: basalRateFillTreatmentChartPoints, fillColor: ConstantsGlucoseChart.basalRateFillTreatmentColor, createContainerPoints: false)])
+        
         
         // in Range circle layers
         let inRangeGlucoseCirclesLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: inRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter, height: glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseInRangeColor, optimized: true)
-
+        
         // urgent Range circle layers
         let urgentRangeGlucoseCirclesLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: urgentRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter, height: glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseUrgentRangeColor, optimized: true)
-
-        // above target circle layers
+        
+        // not urgent Range circle layers
         let notUrgentRangeGlucoseCirclesLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: notUrgentRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter, height: glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseNotUrgentRangeColor, optimized: true)
         
+        
         // treatment labels layers
-        let bolusLabelsLayer = createTreatmentLabelsLayer(treatmentChartPoints: mediumBolusTreatmentChartPoints, labelSeparation: mediumBolusLabelSeparation, labelSeparationOffset: bolusLabelSeparationOffset, xAxisLayer: xAxisLayer, yAxisLayer: yAxisLayer, treatmentType: TreatmentType.Insulin, treatmentLabelFontSize: treatmentLabelFontSize, y: innerFrame.origin.y, height: innerFrame.size.height)
+        let mediumBolusLabelsLayer = createTreatmentLabelsLayer(treatmentChartPoints: mediumBolusTreatmentChartPoints, labelSeparation: mediumBolusLabelSeparation, labelSeparationOffset: bolusLabelSeparationOffset, xAxisLayer: xAxisLayer, yAxisLayer: yAxisLayer, treatmentType: TreatmentType.Insulin, treatmentLabelFontSize: treatmentLabelFontSize, showLabelBelow: true, y: innerFrame.origin.y, height: innerFrame.size.height)
         
-        let smallCarbsLabelsLayer = createTreatmentLabelsLayer(treatmentChartPoints: smallCarbsTreatmentChartPoints, labelSeparation: smallCarbsLabelSeparation, labelSeparationOffset: carbsLabelSeparationOffset, xAxisLayer: xAxisLayer, yAxisLayer: yAxisLayer, treatmentType: TreatmentType.Carbs, treatmentLabelFontSize: treatmentLabelFontSize, y: innerFrame.origin.y, height: innerFrame.size.height)
+        let largeBolusLabelsLayer = createTreatmentLabelsLayer(treatmentChartPoints: largeBolusTreatmentChartPoints, labelSeparation: largeBolusLabelSeparation, labelSeparationOffset: bolusLabelSeparationOffset, xAxisLayer: xAxisLayer, yAxisLayer: yAxisLayer, treatmentType: TreatmentType.Insulin, treatmentLabelFontSize: treatmentLabelFontSize, showLabelBelow: true, y: innerFrame.origin.y, height: innerFrame.size.height)
         
-        let mediumCarbsLabelsLayer = createTreatmentLabelsLayer(treatmentChartPoints: mediumCarbsTreatmentChartPoints, labelSeparation: mediumCarbsLabelSeparation, labelSeparationOffset: carbsLabelSeparationOffset, xAxisLayer: xAxisLayer, yAxisLayer: yAxisLayer, treatmentType: TreatmentType.Carbs, treatmentLabelFontSize: treatmentLabelFontSize, y: innerFrame.origin.y, height: innerFrame.size.height)
+        let veryLargeBolusLabelsLayer = createTreatmentLabelsLayer(treatmentChartPoints: veryLargeBolusTreatmentChartPoints, labelSeparation: veryLargeBolusLabelSeparation, labelSeparationOffset: bolusLabelSeparationOffset, xAxisLayer: xAxisLayer, yAxisLayer: yAxisLayer, treatmentType: TreatmentType.Insulin, treatmentLabelFontSize: treatmentLabelFontSize, showLabelBelow: true, y: innerFrame.origin.y, height: innerFrame.size.height)
         
-        let largeCarbsLabelsLayer = createTreatmentLabelsLayer(treatmentChartPoints: largeCarbsTreatmentChartPoints, labelSeparation: largeCarbsLabelSeparation, labelSeparationOffset: carbsLabelSeparationOffset, xAxisLayer: xAxisLayer, yAxisLayer: yAxisLayer, treatmentType: TreatmentType.Carbs, treatmentLabelFontSize: treatmentLabelFontSize, y: innerFrame.origin.y, height: innerFrame.size.height)
         
-        let veryLargeCarbsLabelsLayer = createTreatmentLabelsLayer(treatmentChartPoints: veryLargeCarbsTreatmentChartPoints, labelSeparation: veryLargeCarbsLabelSeparation, labelSeparationOffset: carbsLabelSeparationOffset, xAxisLayer: xAxisLayer, yAxisLayer: yAxisLayer, treatmentType: TreatmentType.Carbs, treatmentLabelFontSize: treatmentLabelFontSize, y: innerFrame.origin.y, height: innerFrame.size.height)
+        //let smallCarbsLabelsLayer = createTreatmentLabelsLayer(treatmentChartPoints: smallCarbsTreatmentChartPoints, labelSeparation: smallCarbsLabelSeparation, labelSeparationOffset: carbsLabelSeparationOffset, xAxisLayer: xAxisLayer, yAxisLayer: yAxisLayer, treatmentType: TreatmentType.Carbs, treatmentLabelFontSize: treatmentLabelFontSize, showLabelBelow: false, y: innerFrame.origin.y, height: innerFrame.size.height)
+        
+        let mediumCarbsLabelsLayer = createTreatmentLabelsLayer(treatmentChartPoints: mediumCarbsTreatmentChartPoints, labelSeparation: mediumCarbsLabelSeparation, labelSeparationOffset: carbsLabelSeparationOffset, xAxisLayer: xAxisLayer, yAxisLayer: yAxisLayer, treatmentType: TreatmentType.Carbs, treatmentLabelFontSize: treatmentLabelFontSize, showLabelBelow: false, y: innerFrame.origin.y, height: innerFrame.size.height)
+        
+        let largeCarbsLabelsLayer = createTreatmentLabelsLayer(treatmentChartPoints: largeCarbsTreatmentChartPoints, labelSeparation: largeCarbsLabelSeparation, labelSeparationOffset: carbsLabelSeparationOffset, xAxisLayer: xAxisLayer, yAxisLayer: yAxisLayer, treatmentType: TreatmentType.Carbs, treatmentLabelFontSize: treatmentLabelFontSize, showLabelBelow: false, y: innerFrame.origin.y, height: innerFrame.size.height)
+        
+        let veryLargeCarbsLabelsLayer = createTreatmentLabelsLayer(treatmentChartPoints: veryLargeCarbsTreatmentChartPoints, labelSeparation: veryLargeCarbsLabelSeparation, labelSeparationOffset: carbsLabelSeparationOffset, xAxisLayer: xAxisLayer, yAxisLayer: yAxisLayer, treatmentType: TreatmentType.Carbs, treatmentLabelFontSize: treatmentLabelFontSize, showLabelBelow: false, y: innerFrame.origin.y, height: innerFrame.size.height)
+        
         
         // create a ChartLayer array and append extra arrays if you user has configured them to show on the chart
         var layers: [ChartLayer?] = [
@@ -800,33 +893,41 @@ public class GlucoseChartManager {
             highLineLayer,
             targetLineLayer,
             lowLineLayer,
-            urgentLowLineLayer
+            urgentLowLineLayer,
         ]
         
-        if UserDefaults.standard.showTreatmentsOnChart {
+        if UserDefaults.standard.showTreatmentsOnChart, UserDefaults.standard.nightscoutFollowType != .none {
+            let layersAIDFollow: [ChartLayer?] = [
+                // basal rate layers
+                basalRateFillLayer,
+                basalRateLayer,
+                // scheduled basal rate layers
+                scheduledBasalRateLayer,
+            ]
             
+            layers.append(contentsOf: layersAIDFollow)
+        }
+        
+        if UserDefaults.standard.showTreatmentsOnChart {
             let layersTreatments: [ChartLayer?] = [
+                // basal rate layers
+                basalRateFillLayer,
+                basalRateLayer,
+                // scheduled basal rate layers
+                scheduledBasalRateLayer,
                 // carb treatment layers
                 veryLargeCarbsLayer,
                 largeCarbsLayer,
                 mediumCarbsLayer,
                 smallCarbsLayer,
                 // bolus treatment layers
-                mediumBolusTriangleLayer
+                smallBolusTriangleLayer,
+                mediumBolusTriangleLayer,
+                largeBolusTriangleLayer,
+                veryLargeBolusTriangleLayer,
             ]
             
             layers.append(contentsOf: layersTreatments)
-            
-        }
-        
-        if UserDefaults.standard.showTreatmentsOnChart && UserDefaults.standard.showSmallBolusTreatmentsOnChart {
-            
-            let layersTreatments: [ChartLayer?] = [
-                smallBolusTriangleLayer
-            ]
-            
-            layers.append(contentsOf: layersTreatments)
-            
         }
         
         let layersGlucoseCircles: [ChartLayer?] = [
@@ -836,27 +937,28 @@ public class GlucoseChartManager {
             urgentRangeGlucoseCirclesLayer,
             // calibrationPoint layers
             calibrationCirclesOuterLayer,
-            calibrationCirclesInnerLayer
+            calibrationCirclesInnerLayer,
         ]
         
         layers.append(contentsOf: layersGlucoseCircles)
         
         if UserDefaults.standard.showTreatmentsOnChart {
-            
             let layersTreatmentLabels: [ChartLayer?] = [
                 // bg check treatment layers
                 bgCheckCirclesOuterLayer,
                 bgCheckCirclesInnerLayer,
-                // treatment label layers
-                smallCarbsLabelsLayer,
+                // carb treatment label layers
+                //smallCarbsLabelsLayer,
                 mediumCarbsLabelsLayer,
                 largeCarbsLabelsLayer,
                 veryLargeCarbsLabelsLayer,
-                bolusLabelsLayer
+                // bolus treatment label layers
+                mediumBolusLabelsLayer,
+                largeBolusLabelsLayer,
+                veryLargeBolusLabelsLayer,
             ]
             
             layers.append(contentsOf: layersTreatmentLabels)
-            
         }
         
         return Chart(
@@ -974,7 +1076,7 @@ public class GlucoseChartManager {
                     
                     firstGlucoseChartPoint = (firstGlucoseChartPoint != nil ? min(firstGlucoseChartPoint!, newGlucoseChartPoint) : newGlucoseChartPoint)
                     
-                    maximumValueInGlucoseChartPoints = (maximumValueInGlucoseChartPoints != nil ? max(maximumValueInGlucoseChartPoints!, (reading.calculatedValue + (UserDefaults.standard.offsetCarbTreatmentsOnChart ? ConstantsGlucoseChart.offsetCarbPositionFromBgMarker : 0))) : reading.calculatedValue)
+                    maximumValueInGlucoseChartPoints = (maximumValueInGlucoseChartPoints != nil ? max(maximumValueInGlucoseChartPoints!, reading.calculatedValue) : reading.calculatedValue)
                     
                 }
                 
@@ -1025,119 +1127,422 @@ public class GlucoseChartManager {
     ///     - bgReadingsAccessor : bg readings accessor object
     ///     - managedObjectContext : the ManagedObjectContext to use
     /// - returns: a tuple with chart point arrays for each classification of treatment type + size
-    private func getTreatmentEntryChartPoints(startDate: Date, endDate: Date, treatmentEntryAccessor: TreatmentEntryAccessor, bgReadingsAccessor: BgReadingsAccessor, on managedObjectContext: NSManagedObjectContext) -> ([ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint]) {
+    private func getTreatmentChartPoints(startDate: Date, endDate: Date, treatmentEntryAccessor: TreatmentEntryAccessor, bgReadingsAccessor: BgReadingsAccessor, on managedObjectContext: NSManagedObjectContext) -> ([ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint]) {
 		
+        func treatmentSeparationOffset(maximumValueInGlucoseChartPointsInMgDl: Double) -> Double {
+            let defaultOffsetTreatmentPositionFromBgMarker = ConstantsGlucoseChart.defaultOffsetTreatmentPositionFromBgMarker
+            
+            switch maximumValueInGlucoseChartPointsInMgDl {
+            case 0...299:
+                return defaultOffsetTreatmentPositionFromBgMarker
+            case 199...299:
+                return defaultOffsetTreatmentPositionFromBgMarker + 5
+            default:
+                return defaultOffsetTreatmentPositionFromBgMarker + 15
+            }
+        }
+        
+        /// function to check and plot the chart points of the scheduled basal rates in case the previously enacted temp basal expires before the current temp-basal was enacted
+        /// we have to assume that there could be a large gap so we should cycle through the scheduled basal rates and plot them all to the chart until the current temp-basal is enacted
+        /// - Parameters:
+        ///   - isFirstEntry: boolean that indicates if this is the first chartpoints on the chart (important as we need ot treat them differently)
+        ///   - previousBasalRate: a double with the previous basal rate (used to cleanly finish the temp basal chart points)
+        ///   - previousBasalRateTreamentEndDate: a double which represents the temp basal finish date (temp basal timestamp + minutes duration)
+        ///   - basalRateTreamentDate: a date of the start of the new temp basal that has been enacted (used to cleanly finish the scheduled basal chart points at the correct time)
+        func checkAndAddScheduledBasalChartPointsIfNeeded(isFirstEntry: Bool, previousBasalRate: Double, previousBasalRateTreamentEndDate: Date, basalRateTreamentDate: Date?) {
+            // if this is the first entry, then we need to treat it differently to make sure we anchor the previously enacted rate to the start date
+            if isFirstEntry {
+                // check if the previous temp basal is still active at the start of the chart
+                // if so, then display it
+                if previousBasalRateTreamentEndDate > startDate {
+                    // start the previous temp basal at the start date
+                    basalRateTreatmentChartPoints.append(ChartPoint(basalRate: previousBasalRate, date: startDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                    
+                    // now finish the previous temp basal at the time it is supposed to finish
+                    basalRateTreatmentChartPoints.append(ChartPoint(basalRate: previousBasalRate, date: previousBasalRateTreamentEndDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                }
+            } else {
+                basalRateTreatmentChartPoints.append(ChartPoint(basalRate: previousBasalRate, date: previousBasalRateTreamentEndDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+            }
+            
+            // get the scheduled basal rate that was valid before the previous temp basal ended
+            if let previousScheduledBasalRateEntry = scheduledBasalRatesArray.filter({ $0.date <= max(previousBasalRateTreamentEndDate, startDate) }).last {
+                // track the scheduled basal rate being used - this will be updated as we cycle through any changes to this
+                var previousScheduledBasalRate = previousScheduledBasalRateEntry.value
+                
+                // start the scheduled basal rate at the time the previous temp basal finished
+                basalRateTreatmentChartPoints.append(ChartPoint(basalRate: previousScheduledBasalRate, date: max(previousBasalRateTreamentEndDate, startDate), basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                
+                // get any scheduled basal rate changes between the previous one ending and the current one starting
+                let nextScheduledBasalRateEntries = scheduledBasalRatesArray.filter({ $0.date >= max(previousBasalRateTreamentEndDate, startDate) && $0.date <= (basalRateTreamentDate ?? endDate) })
+                
+                // if there are some, then loop through them and create all the needed chart points
+                if nextScheduledBasalRateEntries.count > 0 {
+                    for nextScheduledBasalRateEntry in nextScheduledBasalRateEntries {
+                        // finish the previous scheduled basal rate at the time we change to the new one
+                        basalRateTreatmentChartPoints.append(ChartPoint(basalRate: previousScheduledBasalRate, date: nextScheduledBasalRateEntry.date, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                        
+                        // start a new scheduled basal rate
+                        basalRateTreatmentChartPoints.append(ChartPoint(basalRate: nextScheduledBasalRateEntry.value, date: nextScheduledBasalRateEntry.date, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                        
+                        // update the previous scheduled basal rate with the current value so that it becomes "previous" in the next loop
+                        previousScheduledBasalRate = nextScheduledBasalRateEntry.value
+                    }
+                }
+                
+                // now there are no more scheduled basal rates to display until the new temp basal,
+                // extend the previous scheduled basal rate until the new temp basal date
+                basalRateTreatmentChartPoints.append(ChartPoint(basalRate: previousScheduledBasalRate, date: basalRateTreamentDate ?? min(endDate, .now), basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+            }
+        }
+        
 		// get bgReadings between the two dates
 		// this will later be used to calculate the Y value for each carbsTreatment.
 		let bgReadings = bgReadingsAccessor.getBgReadings(from: startDate, to: endDate, on: managedObjectContext)
         
+        let minimumChartValueInMgdl = isStatic24hrChart ? ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal24hrChart : ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal
+        
         // intialize the treatment chart point arrays
-        var smallBolusTreatmentEntryChartPoints = [ChartPoint]()
-        var mediumBolusTreatmentEntryChartPoints = [ChartPoint]()
+        var smallBolusTreatmentChartPoints = [ChartPoint]()
+        var mediumBolusTreatmentChartPoints = [ChartPoint]()
+        var largeBolusTreatmentChartPoints = [ChartPoint]()
+        var veryLargeBolusTreatmentChartPoints = [ChartPoint]()
         
-        var smallCarbsTreatmentEntryChartPoints = [ChartPoint]()
-        var mediumCarbsTreatmentEntryChartPoints = [ChartPoint]()
-        var largeCarbsTreatmentEntryChartPoints = [ChartPoint]()
-        var veryLargeCarbsTreatmentEntryChartPoints = [ChartPoint]()
+        var smallCarbsTreatmentChartPoints = [ChartPoint]()
+        var mediumCarbsTreatmentChartPoints = [ChartPoint]()
+        var largeCarbsTreatmentChartPoints = [ChartPoint]()
+        var veryLargeCarbsTreatmentChartPoints = [ChartPoint]()
         
-        var bgCheckTreatmentEntryChartPoints = [ChartPoint]()
-		
-		managedObjectContext.performAndWait {
-			// get treaments between the two timestamps from coredata
-			// filter the treatment entries that have not been marked as deleted
-			let treatmentEntries = treatmentEntryAccessor.getTreatments(fromDate: startDate, toDate: endDate, on: managedObjectContext).filter({ !$0.treatmentdeleted })
-
-			// Filter the treatments by treatmentType.
-			let insulinTreatments = treatmentEntries.filter { $0.treatmentType == .Insulin }
-			let carbsTreatments = treatmentEntries.filter { $0.treatmentType == .Carbs }
-			let bgCheckTreatments = treatmentEntries.filter { $0.treatmentType == .BgCheck }
-			
-			// For each insulin treatment, check it value and append to the correct list.
-			for insulinTreatment in insulinTreatments {
-				let chartPoint = ChartPoint(treatmentEntry: insulinTreatment, formatter: data().chartPointDateFormatter)
-				if insulinTreatment.value < UserDefaults.standard.smallBolusTreatmentThreshold {
-					smallBolusTreatmentEntryChartPoints.append(chartPoint)
-				} else {
-					mediumBolusTreatmentEntryChartPoints.append(chartPoint)
-				}
-			}
-			
-			// For each bgCheckTreatment, create and append a ChartPoint to bgCheckTreatmentEntryChartPoints.
-			for bgCheckTreatment in bgCheckTreatments {
-				bgCheckTreatmentEntryChartPoints.append(ChartPoint(bgCheck: bgCheckTreatment, formatter: data().chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl))
-			}
-			
-            // Calculate the Y value for each carbsTreatment.
-			let carbsYValues = calculateClosestYAxisValues(carbsTreatments: carbsTreatments, bgReadings: bgReadings)
-			
-            // For each carbsTreatment, get its Y value from carbsYValues, create a ChartPoint
-            // and append it to the correct chart points list.
-			for (indexCarbsTreatment, carbsTreatment) in carbsTreatments.enumerated() {
-				// Retrieve the Y value from carbsYValues
-                let calculatedYAxisValue = carbsYValues[indexCarbsTreatment] + (UserDefaults.standard.offsetCarbTreatmentsOnChart ? ConstantsGlucoseChart.offsetCarbPositionFromBgMarker : 0)
-				
-				// We use an extended ChartPoint class to pass the new y axis value
-				let chartPoint = ChartPoint(treatmentEntry: carbsTreatment, formatter: data().chartPointDateFormatter, newYAxisValue: calculatedYAxisValue)
-				
-				// cycle through the possible threshold values and append the carb chart point to the correct array.
-				if carbsTreatment.value < ConstantsGlucoseChart.smallCarbsTreamentThreshold {
-					smallCarbsTreatmentEntryChartPoints.append(chartPoint)
-				} else if carbsTreatment.value < ConstantsGlucoseChart.mediumCarbsTreamentThreshold {
-					mediumCarbsTreatmentEntryChartPoints.append(chartPoint)
-				} else if carbsTreatment.value < ConstantsGlucoseChart.largeCarbsTreamentThreshold {
-					largeCarbsTreatmentEntryChartPoints.append(chartPoint)
-				} else {
-					veryLargeCarbsTreatmentEntryChartPoints.append(chartPoint)
-				}
-			}
-		}
+        var bgCheckTreatmentChartPoints = [ChartPoint]()
+        
+        var scheduledBasalRateTreatmentChartPoints = [ChartPoint]()
+        
+        var basalRateTreatmentChartPoints = [ChartPoint]()
+        var basalRateFillTreatmentChartPoints = [ChartPoint]()
+        
+        if UserDefaults.standard.showTreatmentsOnChart {
+            managedObjectContext.performAndWait {
+                // get Treatments between the two timestamps from coredata
+                // filter the treatment entries that have not been marked as deleted
+                let treatmentEntries = treatmentEntryAccessor.getTreatments(fromDate: startDate, toDate: endDate, on: managedObjectContext).filter({ !$0.treatmentdeleted })
+                
+                // Filter the treatments by treatmentType.
+                let insulinTreatments = treatmentEntries.filter { $0.treatmentType == .Insulin }
+                let carbsTreatments = treatmentEntries.filter { $0.treatmentType == .Carbs }
+                let bgCheckTreatments = treatmentEntries.filter { $0.treatmentType == .BgCheck }
+                // for the basal rate changes, we need to have the oldest one first and work forward so let's reverse the order
+                // it's needed to define the type [TreatmentEntry] explicity to prevent issues
+                let basalRateTreatments: [TreatmentEntry] = treatmentEntries.filter { $0.treatmentType == .Basal }.reversed()
+                
+                
+                // *****************************
+                // ***** insulin Treatments *****
+                // *****************************
+                // Calculate the Y value for each treatment.
+                let insulinYValues = calculateClosestYAxisValues(treatments: insulinTreatments, bgReadings: bgReadings)
+                
+                // For each carbsTreatment, get its Y value from insulinYValues, create a ChartPoint
+                // and append it to the correct chart points list.
+                for (indexInsulinTreatment, insulinTreatment) in insulinTreatments.enumerated() {
+                    // Retrieve the Y value from insulinYValues
+                    // note the - to show the bolus markers underneath the BG values
+                    let calculatedYAxisValue = insulinYValues[indexInsulinTreatment] - treatmentSeparationOffset(maximumValueInGlucoseChartPointsInMgDl: maximumValueInGlucoseChartPointsInMgDl)
+                    
+                    // We use an extended ChartPoint class to pass the new y axis value
+                    let chartPoint = ChartPoint(treatmentEntry: insulinTreatment, formatter: data().chartPointDateFormatter, newYAxisValue: calculatedYAxisValue)
+                    
+                    // cycle through the possible threshold values and append the carb chart point to the correct array.
+                    if insulinTreatment.value < ConstantsGlucoseChart.smallBolusTreatmentThreshold {
+                        smallBolusTreatmentChartPoints.append(chartPoint)
+                    } else if insulinTreatment.value < ConstantsGlucoseChart.mediumBolusTreatmentThreshold {
+                        mediumBolusTreatmentChartPoints.append(chartPoint)
+                    } else if insulinTreatment.value < ConstantsGlucoseChart.largeBolusTreatmentThreshold {
+                        largeBolusTreatmentChartPoints.append(chartPoint)
+                    } else {
+                        veryLargeBolusTreatmentChartPoints.append(chartPoint)
+                    }
+                }
+                
+                
+                // ***************************
+                // ***** carb treatments *****
+                // ***************************
+                // Calculate the Y value for each carbsTreatment.
+                let carbsYValues = calculateClosestYAxisValues(treatments: carbsTreatments, bgReadings: bgReadings)
+                
+                // For each carbsTreatment, get its Y value from carbsYValues, create a ChartPoint
+                // and append it to the correct chart points list.
+                for (indexCarbsTreatment, carbsTreatment) in carbsTreatments.enumerated() {
+                    // Retrieve the Y value from carbsYValues
+                    // note the + to show the bolus markers above the BG values
+                    let calculatedYAxisValue = carbsYValues[indexCarbsTreatment] + treatmentSeparationOffset(maximumValueInGlucoseChartPointsInMgDl: maximumValueInGlucoseChartPointsInMgDl)
+                    
+                    // We use an extended ChartPoint class to pass the new y axis value
+                    let chartPoint = ChartPoint(treatmentEntry: carbsTreatment, formatter: data().chartPointDateFormatter, newYAxisValue: calculatedYAxisValue)
+                    
+                    // cycle through the possible threshold values and append the carb chart point to the correct array.
+                    if carbsTreatment.value < ConstantsGlucoseChart.smallCarbsTreatmentThreshold {
+                        smallCarbsTreatmentChartPoints.append(chartPoint)
+                    } else if carbsTreatment.value < ConstantsGlucoseChart.mediumCarbsTreatmentThreshold {
+                        mediumCarbsTreatmentChartPoints.append(chartPoint)
+                    } else if carbsTreatment.value < ConstantsGlucoseChart.largeCarbsTreatmentThreshold {
+                        largeCarbsTreatmentChartPoints.append(chartPoint)
+                    } else {
+                        veryLargeCarbsTreatmentChartPoints.append(chartPoint)
+                    }
+                }
+                
+                
+                // *******************************
+                // ***** BG check treatments *****
+                // *******************************
+                // For each bgCheckTreatment, create and append a ChartPoint to bgCheckTreatmentChartPoints.
+                for bgCheckTreatment in bgCheckTreatments {
+                    bgCheckTreatmentChartPoints.append(ChartPoint(bgCheck: bgCheckTreatment, formatter: data().chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl))
+                }
+                
+                
+                // **********************************************
+                // ***** nightscout AID follower treatments *****
+                // **********************************************
+                if UserDefaults.standard.nightscoutFollowType != .none {
+                    // *********************************
+                    // ***** scheduled basal rates *****
+                    // *********************************
+                    // check first if there is any basal rate data in the Nightscout profile
+                    if let scheduledBasalRatesFromProfile = nightscoutSyncManager?.profile.basal, let profileHasData = nightscoutSyncManager?.profile.hasData(), profileHasData {
+                        // check if the scheduled basal rate array should be refreshed for the current chart start date. This should happen at start-up and
+                        // also when the chart is scrolled more than 6 hours (could be more or less, but 6 hours seems reasonable to avoid unnecessary refreshes)
+                        if scheduledBasalRatesLastUpdatedForStartDate < startDate.addingTimeInterval(-60 * 60 * 6) || scheduledBasalRatesLastUpdatedForStartDate > startDate.addingTimeInterval(60 * 60 * 6) {
+                            // first empty the current array
+                            scheduledBasalRatesArray.removeAll()
+                            
+                            // let's create an array with the rate times converted to start from 24 hours before and up to 24 hours
+                            // after the startDate of the chart. This prevents false steps/changes when scrolling through midnight.
+                            // we need to stride until +25 or swift will exit the loop before adding the +24
+                            for hoursToAddToStartDate in stride(from: -24, to: 25, by: 24) {
+                                for scheduledBasalRate in scheduledBasalRatesFromProfile {
+                                    scheduledBasalRatesArray.append((date: scheduledBasalRate.toDate(date: startDate.toMidnight().addingTimeInterval(TimeInterval(60 * 60 * hoursToAddToStartDate))), value: scheduledBasalRate.value))
+                                }
+                            }
+                            
+                            // set the last updated date to the current start date
+                            scheduledBasalRatesLastUpdatedForStartDate = startDate
+                        }
+                        
+                        // now we've got the scheduled basal rates in a nice array with the correct
+                        // dates relative to the chart date, let's start building up the chart points
+                        var previousScheduledBasalRate: Double = 0
+                        var isFirstEntry: Bool = true
+                        
+                        let basalRates = scheduledBasalRatesArray.filter({ $0.date >= startDate && $0.date <= endDate })
+                        
+                        // check if the basal rate changes coincide with the current chart start/end dates
+                        if basalRates.count > 0 {
+                            for basalRate in basalRates {
+                                // filter out the dates that are later than startDate and then use the last one left.
+                                // this will be the value immediately before startDate
+                                if isFirstEntry, let initialBasalRate = scheduledBasalRatesArray.filter({ $0.date < startDate}).last {
+                                    scheduledBasalRateTreatmentChartPoints.append(ChartPoint(basalRate: initialBasalRate.value, date: startDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                                    previousScheduledBasalRate = initialBasalRate.value
+                                    isFirstEntry.toggle()
+                                }
+                                
+                                // use the previous value and current time to end the previous line at the correct value
+                                scheduledBasalRateTreatmentChartPoints.append(ChartPoint(basalRate: previousScheduledBasalRate, date: basalRate.date, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                                
+                                // use the current value and current time to start the new line at the correct value
+                                scheduledBasalRateTreatmentChartPoints.append(ChartPoint(basalRate: basalRate.value, date: basalRate.date, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                                
+                                previousScheduledBasalRate = basalRate.value
+                            }
+                            
+                            // add the final chart point to the end of the array
+                            scheduledBasalRateTreatmentChartPoints.append(
+                                ChartPoint(basalRate: previousScheduledBasalRate,
+                                           date: endDate, basalRateScaler: basalRateScaler,
+                                           minimumChartValueinMgdl: minimumChartValueInMgdl,
+                                           formatter: data().chartPointDateFormatter)
+                            )
+                            
+                        } else {
+                            // the basal rate start times don't happen within the current range of the chart, so let's add a basal rate
+                            // starting at the previous rate and then keep it there until the end date.
+                            if let initialBasalRate = scheduledBasalRatesArray.filter({ $0.date < startDate}).last {
+                                scheduledBasalRateTreatmentChartPoints.append(ChartPoint(basalRate: initialBasalRate.value, date: startDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                                
+                                scheduledBasalRateTreatmentChartPoints.append(ChartPoint(basalRate: initialBasalRate.value, date: endDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                            }
+                        }
+                    }
+                    
+                    
+                    // *********************************
+                    // ***** Temp basal treatments *****
+                    // *********************************
+                    // this is used to know where to end the line from the previous rate when we start a new one for the current basal rate
+                    var previousBasalRateTreatment: TreatmentEntry?
+                    
+                    // for each basalRateTreatment, create and append the relevant ChartPoints to basalRateTreatmentChartPoints
+                    for basalRateTreatment in basalRateTreatments {
+                        
+                        // check the basal rates in for the previous days to calculate a starting scaling value. This is only done the first time
+                        if basalRateMaximum == 0 {
+                            let basalHistoryTreatmentEntries = treatmentEntryAccessor.getTreatments(fromDate: .now.addingTimeInterval(-60 * 60 * 24 * ConstantsGlucoseChart.basalScaleDaysForCalculation), toDate: .now, on: managedObjectContext).filter({ !$0.treatmentdeleted && $0.treatmentType == .Basal })
+                            
+                            // find the max basal rate on the chart so that we can scale everything to fit up until the minimum bg value (40mg/dL)
+                            // we'll also use the max scheduled basal rate values if bigger
+                            basalRateMaximum = max(basalHistoryTreatmentEntries.max(by: { $0.value < $1.value })?.value ?? 0, scheduledBasalRatesArray.max(by: { $0.value < $1.value })?.value ?? 0)
+                            basalRateScaler = (ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl - minimumChartValueInMgdl) / basalRateMaximum
+                            
+                            trace("in getTreatmentChartPoints, initial calculated max basal = %{public}@, basal scaler = %{public}@", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info, basalRateMaximum.description, basalRateScaler.description)
+                        } else if basalRateTreatment.value > basalRateMaximum {
+                            basalRateScaler = (ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl - minimumChartValueInMgdl) / basalRateMaximum
+                            
+                            trace("in getTreatmentChartPoints, recalculated max basal = %{public}@, basal scaler = %{public}@", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info, basalRateMaximum.description, basalRateScaler.description)
+                        }
+                        
+                        if let previousBasalRateTreatment = previousBasalRateTreatment {
+                            // check if the basal rate actually changes
+                            // if not, then don't add the extra set of chart points to keep the array as small as possible
+                            // must be checked further down also where the second point would be added
+                            if basalRateTreatment.value != previousBasalRateTreatment.value {
+                                // get the time when the previous temp basal should end (based upon its' start date and duration)
+                                let previousBasalRateTreamentEndDate = previousBasalRateTreatment.date.addingTimeInterval(TimeInterval(previousBasalRateTreatment.valueSecondary * 60))
+                                
+                                // check if the previous temp basal finishes before the next temp basal
+                                // most times this won't be the case as the AID system will usually enact a new temp basal on every cycle
+                                if previousBasalRateTreamentEndDate < basalRateTreatment.date && nightscoutSyncManager?.profile.hasData() == true {
+                                    checkAndAddScheduledBasalChartPointsIfNeeded(isFirstEntry: false, previousBasalRate: previousBasalRateTreatment.value, previousBasalRateTreamentEndDate: previousBasalRateTreamentEndDate, basalRateTreamentDate: basalRateTreatment.date)
+                                } else {
+                                    // in this case the new temp basal is enacted before the previous one runs out (this would be the normal condition)
+                                    // we'll just extend the previous temp basal line until the new temp basal date
+                                    basalRateTreatmentChartPoints.append(ChartPoint(basalRateTreatmentEntry: basalRateTreatment, previousBasalRateTreatmentEntry: previousBasalRateTreatment, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                                }
+                            }
+                        } else {
+                            // if no previous basal treatment exists, then this is because it is the first/earliest basal rate treatment in the array
+                            // first we need to pull it back to the chart startDate and use the previous value (before startDate)
+                            // for the chart to make sense and also to prevent a gap in the line
+                            
+                            // let's try and get a previous basal rate (i.e. the first one we find closest to, and before the startDate). Let's go back 120 minutes to make sure we get the previous basal rate (AID-enacted temp basals never usually last for more than 120 minutes)
+                            let previousTreatmentEntries = treatmentEntryAccessor.getTreatments(fromDate: startDate.addingTimeInterval(-60 * 120), toDate: startDate, on: managedObjectContext).filter({ !$0.treatmentdeleted && $0.treatmentType == .Basal })
+                            
+                            // so there is a previous basal rate treatment available
+                            if let previousBasalRateTreatment: TreatmentEntry = previousTreatmentEntries.first {
+                                // get the time when the previous temp basal should end (based upon its' start date and duration)
+                                let previousBasalRateTreamentEndDate = previousBasalRateTreatment.date.addingTimeInterval(TimeInterval(previousBasalRateTreatment.valueSecondary * 60))
+                                
+                                // check if the previous temp basal finishes before the start of the first temp basal
+                                // this would normally be the case for the first treatment in the list
+                                if previousBasalRateTreamentEndDate < basalRateTreatment.date && nightscoutSyncManager?.profile.hasData() == true {
+                                    checkAndAddScheduledBasalChartPointsIfNeeded(isFirstEntry: true, previousBasalRate: previousBasalRateTreatment.value, previousBasalRateTreamentEndDate: previousBasalRateTreamentEndDate, basalRateTreamentDate: basalRateTreatment.date)
+                                } else {
+                                    // use the previous basal rate to start the line at the correct value
+                                    basalRateTreatmentChartPoints.append(ChartPoint(basalRate: previousBasalRateTreatment.value, date: startDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                                    
+                                    // and continue this line until we get to the first treatment entry
+                                    basalRateTreatmentChartPoints.append(ChartPoint(basalRate: previousBasalRateTreatment.value, date: basalRateTreatment.date, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                                }
+                            } else {
+                                // this will never usually happen except if the users scrolls all the way back to before the very first basal entry
+                                basalRateTreatmentChartPoints.append(ChartPoint(basalRate: 0, date: basalRateTreatment.date, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                            }
+                        }
+                        
+                        // check if the basal rate actually changed
+                        // if not, then don't add the extra set of chart points to keep the array as small as possible
+                        // the first check is further up where the first point would be added
+                        if basalRateTreatment.value != previousBasalRateTreatment?.value {
+                            // create a chartpoint with the current date and the current value. This is the start of the new temp basal rate
+                            basalRateTreatmentChartPoints.append(ChartPoint(basalRateTreatmentEntry: basalRateTreatment, previousBasalRateTreatmentEntry: nil, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                        }
+                        
+                        // assign the current treatment to the variable so that we can reuse the value in the next loop
+                        previousBasalRateTreatment = basalRateTreatment
+                    }
+                    
+                    
+                    // now that we're out of the loop, we've got the last temp basal rate in previousBasalRateTreatment
+                    if let previousBasalRateTreatment = previousBasalRateTreatment {
+                        // get the time when the previous temp basal should end (based upon its' start date and duration)
+                        let previousBasalRateTreamentEndDate = previousBasalRateTreatment.date.addingTimeInterval(TimeInterval(previousBasalRateTreatment.valueSecondary * 60))
+                        
+                        // check if the previous temp basal finishes before the chart end date, or "now" - this is to detect the 24hr chart that is showing today.
+                        // most times this won't be the case as the AID system will usually enact a new temp basal on every cycle
+                        if previousBasalRateTreamentEndDate < min(endDate, .now) && nightscoutSyncManager?.profile.hasData() == true {
+                            checkAndAddScheduledBasalChartPointsIfNeeded(isFirstEntry: false, previousBasalRate: previousBasalRateTreatment.value, previousBasalRateTreamentEndDate: previousBasalRateTreamentEndDate, basalRateTreamentDate: nil)
+                        } else {
+                            // if not, then just peg it to the end date
+                            basalRateTreatmentChartPoints.append(ChartPoint(basalRateTreatmentEntry: previousBasalRateTreatment, date: min(endDate, .now), basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                        }
+                                        
+                        // if this is a 24 hour static chart, then continue the chart at 0 U/hr until the end date
+                        if endDate > .now {
+                            basalRateTreatmentChartPoints.append(ChartPoint(basalRate: 0, date: .now, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                            
+                            basalRateTreatmentChartPoints.append(ChartPoint(basalRate: 0, date: endDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                        }
+                    }
+                    
+                    
+                    // create the fill chart points. Start with an initial zero point...
+                    basalRateFillTreatmentChartPoints.append(ChartPoint(basalRate: 0, date: startDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                    // ...add the basal chart points in the middle...
+                    basalRateFillTreatmentChartPoints.append(contentsOf: basalRateTreatmentChartPoints)
+                    // ...and end with a final zero point
+                    basalRateFillTreatmentChartPoints.append(ChartPoint(basalRate: 0, date: endDate, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
+                    
+                }
+            }
+        }
 
         
         // return all treatment arrays based upon treatment type and size (as defined by the threshold values)
-        return (smallBolusTreatmentEntryChartPoints, mediumBolusTreatmentEntryChartPoints, smallCarbsTreatmentEntryChartPoints, mediumCarbsTreatmentEntryChartPoints, largeCarbsTreatmentEntryChartPoints, veryLargeCarbsTreatmentEntryChartPoints, bgCheckTreatmentEntryChartPoints)
+        return (smallBolusTreatmentChartPoints, mediumBolusTreatmentChartPoints, largeBolusTreatmentChartPoints, veryLargeBolusTreatmentChartPoints, smallCarbsTreatmentChartPoints, mediumCarbsTreatmentChartPoints, largeCarbsTreatmentChartPoints, veryLargeCarbsTreatmentChartPoints, bgCheckTreatmentChartPoints, scheduledBasalRateTreatmentChartPoints, basalRateTreatmentChartPoints, basalRateFillTreatmentChartPoints)
         
     }
 	
 	
-    /// Calculate the Y axis value for multiple carbsTreatments.
+    /// Calculate the Y axis value for multiple treatments.
     /// The calculation searches for the two closest bgReadings and interpolates
     /// the Y value between them.
     ///
     /// - parameters:
-    ///     - carbsTreatments : a list of TreatmentEntries to calculate the Y axis.
+    ///     - treatments : a list of TreatmentEntries to calculate the Y axis.
     ///     - bgReadings : list of BgReadings to be searched and calculate the Y axis
     ///         based on the nearby readings by date.
-    /// - returns: a list of Doubles, with the same amount of elements of carbsTreatments
-    ///       so that each carbTreatment maps to a Y axis (by index).
+    /// - returns: a list of Doubles, with the same amount of elements of treatments
+    ///       so that each treatment maps to a Y axis (by index).
 	/// IMPORTANT: Must be called inside managedObjectContext perfom block.
-	private func calculateClosestYAxisValues(carbsTreatments: [TreatmentEntry], bgReadings: [BgReading]) -> [Double] {
+	private func calculateClosestYAxisValues(treatments: [TreatmentEntry], bgReadings: [BgReading]) -> [Double] {
 		
 		// 0 bgReadings is an invalid argument.
 		guard bgReadings.count > 0 else {
-			return [Double](repeating: 120.0, count: carbsTreatments.count)
+			return [Double](repeating: 120.0, count: treatments.count)
 		}
 		
 		var calculatedYValues: [Double] = []
 		
-        // For each carbsTreatment, find the two closest BgReading.
+        // For each treatment, find the two closest BgReading.
         // Then calculates the Y value based on them.
-		for carbsTreatment in carbsTreatments {
+		for treatment in treatments {
             // Find the closest bgReading.
-			let indexOfClosest = findIndexOfNearestBgReadingToDate(carbsTreatment.date, bgReadings: bgReadings)
+			let indexOfClosest = findIndexOfNearestBgReadingToDate(treatment.date, bgReadings: bgReadings)
 			let closestBgReading = bgReadings[indexOfClosest]
 
             // Not always there will be a second closest one.
             // (If the closest reading is at the border of the graph, for exemple).
 			var secondClosestBgReading: BgReading? = nil
-			if carbsTreatment.date >= closestBgReading.timeStamp {
-                // If the carbsTreatment is newer than the closest bgReading,
+			if treatment.date >= closestBgReading.timeStamp {
+                // If the treatment is newer than the closest bgReading,
                 // attempt to get the one after it, if exists.
 				let nextIndex = indexOfClosest + 1
 				if nextIndex < bgReadings.count {
 					secondClosestBgReading = bgReadings[nextIndex]
 				}
 			} else {
-                // If the carbsTreatment is older than the closest bgReading,
+                // If the treatment is older than the closest bgReading,
                 // attempt to get the one before it, if exists.
 				let previousIndex = indexOfClosest - 1
 				if previousIndex >= 0 {
@@ -1146,7 +1551,7 @@ public class GlucoseChartManager {
 			}
 			
             // Calculate the Y value and append to the result list.
-			let yValue = calculateYValue(carbsDate: carbsTreatment.date, closestBgReading: closestBgReading, secondClosestBgReading: secondClosestBgReading)
+			let yValue = calculateYValue(treatmentDate: treatment.date, closestBgReading: closestBgReading, secondClosestBgReading: secondClosestBgReading)
 			calculatedYValues.append(yValue)
 		}
 		
@@ -1158,13 +1563,13 @@ public class GlucoseChartManager {
     /// Calculation is done using linear interpolation.
     ///
     /// - parameters:
-    ///     - carbsDate : the date to calculate the Y value of.
-    ///     - closestBgReading : the closest BgReading to carbsDate. 
-    ///     - secondClosestBgReading : the second closest BgReading to carbsDate,
+    ///     - treatmentDate : the date to calculate the Y value of.
+    ///     - closestBgReading : the closest BgReading to carbsDate.
+    ///     - secondClosestBgReading : the second closest BgReading to treatmentDate,
     ///           if it exists, optional.
     /// - returns: the result of the interpolation.
 	/// IMPORTANT: Must be called inside managedObjectContext perfom block.
-	private func calculateYValue(carbsDate: Date, closestBgReading: BgReading, secondClosestBgReading: BgReading?) -> Double {
+	private func calculateYValue(treatmentDate: Date, closestBgReading: BgReading, secondClosestBgReading: BgReading?) -> Double {
 		
 		// If there is no second closest, return the closestBgReading calculatedValue.
 		guard let secondClosestBgReading = secondClosestBgReading else {
@@ -1182,8 +1587,8 @@ public class GlucoseChartManager {
 		// Calculate the interpolation based on the time difference
 		// Time difference from newerBgReading to olderBgReading
 		let timeDifference: Double = newerBgReading.timeStamp.timeIntervalSince1970 - olderBgReading.timeStamp.timeIntervalSince1970
-		// Time difference from carbsDate to olderBgReading
-		let timeOffset: Double = carbsDate.timeIntervalSince1970 - olderBgReading.timeStamp.timeIntervalSince1970
+		// Time difference from treatmentDate to olderBgReading
+		let timeOffset: Double = treatmentDate.timeIntervalSince1970 - olderBgReading.timeStamp.timeIntervalSince1970
 		
 		// timeOffsetFactor as a double from 0 to 1.
 		let timeOffsetFactor: Double = timeOffset / timeDifference
@@ -1245,16 +1650,21 @@ public class GlucoseChartManager {
     ///     - y : the y position of the inner frame of the chart
     ///     - height : the height of the inner frame
     /// - returns: a view layer with the labels and their position
-    private func createTreatmentLabelsLayer(treatmentChartPoints: [ChartPoint], labelSeparation: Double, labelSeparationOffset: Double, xAxisLayer: ChartAxisLayer, yAxisLayer: ChartAxisLayer, treatmentType: TreatmentType, treatmentLabelFontSize: Double, y: Double, height: Double) -> ChartPointsViewsLayer<ChartPoint, UIView> {
+    private func createTreatmentLabelsLayer(treatmentChartPoints: [ChartPoint], labelSeparation: Double, labelSeparationOffset: Double, xAxisLayer: ChartAxisLayer, yAxisLayer: ChartAxisLayer, treatmentType: TreatmentType, treatmentLabelFontSize: Double, showLabelBelow: Bool, y: Double, height: Double) -> ChartPointsViewsLayer<ChartPoint, UIView> {
         
         // to save typing
         let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
-        let offsetIfMmol: Double = ConstantsGlucoseChart.treatmentLabelMmolOffset.mgdlToMmol(mgdl: isMgDl)
+//        if the label is to be shown below, then
+        let offsetIfMmol: Double = ConstantsGlucoseChart.treatmentLabelMmolOffset.mgDlToMmol(mgDl: isMgDl)
         
-        // creatte the chart point array of the label positions based upon the treatment chart point array
+        // create the chart point array of the label positions based upon the treatment chart point array
         let labelChartPoints = treatmentChartPoints.map { chartPoint in
-            ChartPoint(x: chartPoint.x, y: chartPoint.y.copy(chartPoint.y.scalar + labelSeparation.mgdlToMmol(mgdl: isMgDl) + labelSeparationOffset.mgdlToMmol(mgdl: isMgDl) + (isMgDl ? 0 : offsetIfMmol)))
+            if showLabelBelow {
+                ChartPoint(x: chartPoint.x, y: chartPoint.y.copy(chartPoint.y.scalar - labelSeparation.mgDlToMmol(mgDl: isMgDl) - labelSeparationOffset.mgDlToMmol(mgDl: isMgDl) - (isMgDl ? 0 : offsetIfMmol)))
+            } else {
+                ChartPoint(x: chartPoint.x, y: chartPoint.y.copy(chartPoint.y.scalar + labelSeparation.mgDlToMmol(mgDl: isMgDl) + labelSeparationOffset.mgDlToMmol(mgDl: isMgDl) + (isMgDl ? 0 : offsetIfMmol)))
+            }
         }
         
         // based upon the label array, we can return the UI view fully populated
@@ -1312,7 +1722,7 @@ public class GlucoseChartManager {
     /// - returns: a double with the actual value for the treatment requested
     private func getTreatmentValueFromTimeStamp(treatmentDate: ChartAxisValueDate, treatmentType: TreatmentType, treatmentEntryAccessor: TreatmentEntryAccessor, on managedObjectContext: NSManagedObjectContext) -> Double {
         
-        // We need to increase slightly the "window" that we are using to locate the treament. The ChartPoint class seems to slightly round the values which might result in not getting an exact match. ±1ms seems to work, but we'll leave it at ±50ms just to be sure.
+        // We need to increase slightly the "window" that we are using to locate the Treatment. The ChartPoint class seems to slightly round the values which might result in not getting an exact match. ±1ms seems to work, but we'll leave it at ±50ms just to be sure.
         let treatmentEntries = treatmentEntryAccessor.getTreatments(fromDate: Date(timeInterval: -0.05, since: treatmentDate.date), toDate: Date(timeInterval: 0.05, since: treatmentDate.date), on: managedObjectContext)
         
         // intialize the treatmentValue that we will return
@@ -1346,18 +1756,26 @@ public class GlucoseChartManager {
         stopDeceleration()
         
         glucoseChartPoints = ([ChartPoint](), [ChartPoint](), [ChartPoint](), nil, nil, nil)
-        treatmentChartPoints = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint]())
+        treatmentChartPoints = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint]())
         
         calibrationChartPoints = [ChartPoint]()
         
         smallBolusTreatmentChartPoints = [ChartPoint]()
         mediumBolusTreatmentChartPoints = [ChartPoint]()
+        largeBolusTreatmentChartPoints = [ChartPoint]()
+        veryLargeBolusTreatmentChartPoints = [ChartPoint]()
         
         smallCarbsTreatmentChartPoints = [ChartPoint]()
         mediumCarbsTreatmentChartPoints = [ChartPoint]()
         largeCarbsTreatmentChartPoints = [ChartPoint]()
+        veryLargeCarbsTreatmentChartPoints = [ChartPoint]()
         
         bgCheckTreatmentChartPoints = [ChartPoint]()
+        
+        scheduledBasalRateTreatmentChartPoints = [ChartPoint]()
+        
+        basalRateTreatmentChartPoints = [ChartPoint]()
+        basalRateFillTreatmentChartPoints = [ChartPoint]()
         
         chartSettings = nil
         
@@ -1539,7 +1957,7 @@ public class GlucoseChartManager {
             if let maximumValueInGlucoseChartPoints = glucoseChartPoints.maximumValueInGlucoseChartPoints {
                 return maximumValueInGlucoseChartPoints
             } else {
-                return ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgdlToMmol(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                return ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             }
             
         }

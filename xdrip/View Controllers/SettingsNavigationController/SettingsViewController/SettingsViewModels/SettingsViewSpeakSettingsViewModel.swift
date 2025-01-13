@@ -181,8 +181,12 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         
         switch keyPathEnum {
             case UserDefaults.Key.speakReadings:
+            
+            // we have to run this in the main thread to avoid access errors
+            DispatchQueue.main.async {
                 // Speak readings setting has been changed from other model, likely by a Quick Action. Update UI to reflect current state.
-                sectionReloadClosure?()
+                self.sectionReloadClosure?()
+            }
 
             default:
                 break

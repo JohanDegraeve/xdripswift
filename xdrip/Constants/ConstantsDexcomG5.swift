@@ -26,4 +26,7 @@ enum ConstantsDexcomG5 {
     /// how many days the sensor session lasts
     static let maxSensorAgeInDays: Double = 10.0
     
+    /// maximum days that a user can enter to override the max sensor days for an anubis transmitter
+    static let maxSensorAgeInDaysOverridenAnubisMaximum: Double = 60.0
+    
 }

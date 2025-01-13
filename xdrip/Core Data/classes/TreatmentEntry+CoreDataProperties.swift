@@ -25,6 +25,9 @@ extension TreatmentEntry {
 
 	/// Value represents the amount (e.g. insulin units, carbs grams, BG check glucose value).
 	@NSManaged public var value: Double
+    
+    /// Value represents a secondary amount (such as the duration of a basal rate)
+    @NSManaged public var valueSecondary: Double
 
 	/// Enum TreatmentType defines which treatment this instance is.
 	@NSManaged public var treatmentType: TreatmentType
@@ -41,5 +44,8 @@ extension TreatmentEntry {
     /// - if it's a treatmentEntry that was downloaded from Nightscout, then this is the eventType as it was received form Nightscout
     /// - only used when updating an entry @ NS, to make sure the same eventType is used as the original one assigned by Nightscout
     @NSManaged public var nightscoutEventType: String?
+    
+    /// - if it's a treatmentEntry that was downloaded from Nightscout, this will be set by the uploader device/app
+    @NSManaged public var enteredBy: String?
     
 }

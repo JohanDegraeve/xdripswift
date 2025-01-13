@@ -338,7 +338,6 @@ class Trace {
         
         traceInfo.appendStringAndNewLine("Help settings:")
         traceInfo.appendStringAndNewLine("    Translate automatically: " + UserDefaults.standard.translateOnlineHelp.description)
-        traceInfo.appendStringAndNewLine("    Show help icon: " + UserDefaults.standard.showHelpIcon.description)
 
         // master or follower mode?
         traceInfo.appendStringAndNewLine("\nCGM Data Source: " + (UserDefaults.standard.isMaster ? "Master" : UserDefaults.standard.followerDataSourceType.descriptionForLogging()))
@@ -366,9 +365,9 @@ class Trace {
         traceInfo.appendStringAndNewLine("\nNotifications settings:")
         traceInfo.appendStringAndNewLine("    Show BG in notifications: " + UserDefaults.standard.showReadingInNotification.description)
         traceInfo.appendStringAndNewLine("    Notification interval: " + UserDefaults.standard.notificationInterval.description + " minutes")
-        traceInfo.appendStringAndNewLine("    Live Activities Type: " + UserDefaults.standard.liveActivityType.debugDescription)
+        traceInfo.appendStringAndNewLine("    Live Activity type: " + UserDefaults.standard.liveActivityType.debugDescription)
         traceInfo.appendStringAndNewLine("    Show BG in app badge: " + UserDefaults.standard.showReadingInAppBadge.description)
-        traceInfo.appendStringAndNewLine("    Multiply app badge by 10: " + (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? "-" : UserDefaults.standard.multipleAppBadgeValueWith10.description))
+        traceInfo.appendStringAndNewLine("    Multiply app badge by 10: " + (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? "\(UserDefaults.standard.multipleAppBadgeValueWith10.description) (but not used in mg/dL)" : UserDefaults.standard.multipleAppBadgeValueWith10.description))
                 
         traceInfo.appendStringAndNewLine("\nHome screen settings:")
         traceInfo.appendStringAndNewLine("    Allow chart rotation: " + UserDefaults.standard.allowScreenRotation.description)
@@ -379,29 +378,26 @@ class Trace {
         traceInfo.appendStringAndNewLine("    Target: " + UserDefaults.standard.targetMarkValueInUserChosenUnitRounded.description)
         traceInfo.appendStringAndNewLine("    Low: " + UserDefaults.standard.lowMarkValueInUserChosenUnitRounded.description)
         traceInfo.appendStringAndNewLine("    Urgent low: " + UserDefaults.standard.urgentLowMarkValueInUserChosenUnitRounded.description)
+        traceInfo.appendStringAndNewLine("    Hours to show on main chart: " + UserDefaults.standard.chartWidthInHours.description)
+        traceInfo.appendStringAndNewLine("    Hours to show on mini-chart: " + UserDefaults.standard.miniChartHoursToShow.description)
         
         traceInfo.appendStringAndNewLine("\nTreatments settings:")
         traceInfo.appendStringAndNewLine("    Show treatments: " + UserDefaults.standard.showTreatmentsOnChart.description)
-        traceInfo.appendStringAndNewLine("    Micro-bolus threshold: " + UserDefaults.standard.smallBolusTreatmentThreshold.description)
-        traceInfo.appendStringAndNewLine("    Show micro-bolus: " + UserDefaults.standard.showSmallBolusTreatmentsOnChart.description)
-        traceInfo.appendStringAndNewLine("    Offset carbs on chart: " + UserDefaults.standard.offsetCarbTreatmentsOnChart.description)
         
         traceInfo.appendStringAndNewLine("\nStatistics settings:")
         traceInfo.appendStringAndNewLine("    Show statistics: " + UserDefaults.standard.showStatistics.description)
+        traceInfo.appendStringAndNewLine("    Statistics days: " + UserDefaults.standard.daysToUseStatistics.description)
         traceInfo.appendStringAndNewLine("    Time in Range type: " + UserDefaults.standard.timeInRangeType.description)
         traceInfo.appendStringAndNewLine("    Show HbA1c in mmols/mol: " + UserDefaults.standard.useIFCCA1C.description)
           
         traceInfo.appendStringAndNewLine("\nNightscout settings:")
         traceInfo.appendStringAndNewLine("    Nightscout enabled: " + UserDefaults.standard.nightscoutEnabled.description)
+        traceInfo.appendStringAndNewLine("    AID Follow Type: " + UserDefaults.standard.nightscoutFollowType.description)
         if UserDefaults.standard.nightscoutEnabled {
             traceInfo.appendStringAndNewLine("    URL: " + ((UserDefaults.standard.nightscoutUrl?.description ?? "") != "" ? "present" : "missing"))
             traceInfo.appendStringAndNewLine("    API_SECRET: " + ((UserDefaults.standard.nightscoutAPIKey?.description ?? "") != "" ? "present" : "missing"))
             traceInfo.appendStringAndNewLine("    Token: " + ((UserDefaults.standard.nightscoutToken?.description ?? "") != "" ? "present" : "missing"))
-            if UserDefaults.standard.nightscoutPort != 0 {
-                traceInfo.appendStringAndNewLine("    Port: " + UserDefaults.standard.nightscoutPort.description)
-            } else {
-                traceInfo.appendStringAndNewLine("    Port: Missing")
-            }
+            traceInfo.appendStringAndNewLine("    Port: " + ((UserDefaults.standard.nightscoutPort != 0) ? UserDefaults.standard.nightscoutPort.description : " missing"))
         }
         
         traceInfo.appendStringAndNewLine("\nDexcom Share settings:")
@@ -432,6 +428,9 @@ class Trace {
         traceInfo.appendStringAndNewLine("    Show values in complications: " + UserDefaults.standard.showDataInWatchComplications.description)
         if let agreementDate = UserDefaults.standard.watchComplicationUserAgreementDate {
             traceInfo.appendStringAndNewLine("    User agreement date: " + agreementDate.toString(timeStyle: .short, dateStyle: .medium) + " (" + agreementDate.daysAndHoursAgo(appendAgo: true) + ")")
+            if let remainingComplicationUserInfoTransfers = UserDefaults.standard.remainingComplicationUserInfoTransfers {
+                traceInfo.appendStringAndNewLine("    Remaining complication updates: " + remainingComplicationUserInfoTransfers.description + " / 50")
+            }
         } else {
             traceInfo.appendStringAndNewLine("    User agreement date: nil")
         }
@@ -450,8 +449,9 @@ class Trace {
         }
         
         traceInfo.appendStringAndNewLine("\nContact Image settings:")
-        traceInfo.appendStringAndNewLine("    Create contact: " + UserDefaults.standard.enableContactImage.description)
+        traceInfo.appendStringAndNewLine("    Enable contact image: " + UserDefaults.standard.enableContactImage.description)
         traceInfo.appendStringAndNewLine("    Show trend: " + UserDefaults.standard.displayTrendInContactImage.description)
+        traceInfo.appendStringAndNewLine("    Use high contrast: " + UserDefaults.standard.useHighContrastContactImage.description)
         
         traceInfo.appendStringAndNewLine("\nData management settings:")
         traceInfo.appendStringAndNewLine("    Retention period: " + UserDefaults.standard.retentionPeriodInDays.description + " days")
@@ -461,10 +461,17 @@ class Trace {
         traceInfo.appendStringAndNewLine("    Show developer settings: " + UserDefaults.standard.showDeveloperSettings.description)
         traceInfo.appendStringAndNewLine("    NS log enabled: " + UserDefaults.standard.NSLogEnabled.description)
         traceInfo.appendStringAndNewLine("    OS log enabled: " + UserDefaults.standard.OSLogEnabled.description)
-        traceInfo.appendStringAndNewLine("    Smooth Libre readings: " + UserDefaults.standard.smoothLibreValues.description)
         traceInfo.appendStringAndNewLine("    Suppress unlock payload: " + UserDefaults.standard.suppressUnLockPayLoad.description)
         traceInfo.appendStringAndNewLine("    OS-AID share type: " + UserDefaults.standard.loopShareType.description)
+        traceInfo.appendStringAndNewLine("    OS-AID share every 5 mins?: " + UserDefaults.standard.shareToLoopOnceEvery5Minutes.description)
         traceInfo.appendStringAndNewLine("    LibreLinkUp version: " + (UserDefaults.standard.libreLinkUpVersion?.description ?? "nil"))
+        traceInfo.appendStringAndNewLine("    CAGE max hours: " + UserDefaults.standard.CAGEMaxHours.description + " (default: " + ConstantsHomeView.CAGEDefaultMaxHours.description + ")")
+        traceInfo.appendStringAndNewLine("    StandBy night mode enabled: " + UserDefaults.standard.allowStandByHighContrast.description)
+        traceInfo.appendStringAndNewLine("    StandBy big numbers enabled: " + UserDefaults.standard.forceStandByBigNumbers.description)
+        
+        // misc settings
+        traceInfo.appendStringAndNewLine("\nMisc settings:")
+        traceInfo.appendStringAndNewLine("    Use debug level logs: " + UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog.description)
         
         traceInfo.appendStringAndNewLine(paragraphSeperator)
         
@@ -485,7 +492,7 @@ class Trace {
             } else {
                 traceInfo.appendStringAndNewLine("    Sensor start date: nil")
             }
-            traceInfo.appendStringAndNewLine("    Sensor max days: " + (Int(UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0)).description)
+            traceInfo.appendStringAndNewLine("    Sensor max days: " + (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0).description)
             traceInfo.appendStringAndNewLine("    Transmitter ID: " + (UserDefaults.standard.activeSensorTransmitterId?.description ?? "nil"))
         } else {
             traceInfo.appendStringAndNewLine("    Not used in Nightscout follower mode")
@@ -504,10 +511,10 @@ class Trace {
             let alertTypesAccessor = AlertTypesAccessor(coreDataManager: coreDataManager)
 
             // all bluetooth transmitters
-            traceInfo.appendStringAndNewLine("List of Bluetooth Peripherals:\n")
+            traceInfo.appendStringAndNewLine("List of Bluetooth Peripherals:")
             
             for blePeripheral in bLEPeripheralAccessor.getBLEPeripherals() {
-                traceInfo.appendStringAndNewLine("    Name: " + blePeripheral.name)
+                traceInfo.appendStringAndNewLine("\n    Name: " + blePeripheral.name)
                 traceInfo.appendStringAndNewLine("        Address: " + blePeripheral.address)
                 if let alias = blePeripheral.alias {
                     traceInfo.appendStringAndNewLine("        Alias: " + alias)
@@ -642,6 +649,7 @@ class Trace {
                         if blePeripheral.libre2 != nil {
                             
                             traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            traceInfo.appendStringAndNewLine("    Smooth Libre readings: " + UserDefaults.standard.smoothLibreValues.description)
                             
                         }
                         

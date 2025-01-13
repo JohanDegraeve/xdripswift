@@ -77,9 +77,6 @@
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
 "settingsviews_nonfixedtransmitter" = "Aktiviere Mehrpunkt-Kalibrierung";
 
-/// transmitter settings, to explain that settings is about resetting the transmitter
-"settingsviews_resettransmitter" = "Transmitter zurücksetzten (Anubis)";
-
 /// used in settings, section Info, title of the license setting
 "settingsviews_license" = "Lizenz";
 
@@ -91,6 +88,10 @@
 
 /// non fixed settings, title of the section
 "settingsviews_labelNonFixed" = "Mehrpunkt-Kalibrierung";
+
+"settingsviews_labelAlgorithmType" = "Algorithmus Typ";
+"settingsviews_labelCalibrationTitle" = "Sensor Kalibrierung";
+"settingsviews_labelCalibrationType" = "Kalibrierungs Typ";
 
 /// healthkit settings, literally 'healthkit'
 "settingsviews_healthkit" = "Apple Health nutzen";
@@ -316,17 +317,13 @@
 "settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
-"settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
+"settingsviews_labelWebOOP" = "xdrip oder nativer Algorithmus";
 
-"settingsviews_showHelpIcon" = "Hilfe-Symbol anzeigen";
 "settingsviews_restartNeeded" = "(Neustart notwendig)";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
-
-/// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
-"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold";
 
 /// treatments settings, section title
 "settingsviews_sectiontitletreatments" = "Treatments";
@@ -346,9 +343,6 @@
 
 /// Housekeeper settings, section title
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
-
-/// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart";
 
 /// When clicking the retention setting, a pop up asks for how many days should data be stored
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
@@ -370,7 +364,7 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
@@ -400,7 +394,6 @@
 "settingsviews_valueIsRequired" = "⚠️ Required";
 
 /// treatments settings, offset the carb treatments on main chart
-"settingsviews_offsetCarbTreatmentsOnChart" = "Offset Carbs on Chart";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
@@ -445,7 +438,7 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show the Mini-Chart";
+"settingsviews_showMiniChart" = "Show Mini-Chart";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Patient Name";

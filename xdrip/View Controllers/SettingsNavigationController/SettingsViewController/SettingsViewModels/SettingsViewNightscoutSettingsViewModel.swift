@@ -4,32 +4,35 @@ import Foundation
 
 fileprivate enum Setting:Int, CaseIterable {
     
-    ///should readings be uploaded or not
+    /// should readings be uploaded or not
     case nightscoutEnabled = 0
     
-    ///nightscout url
-    case nightscoutUrl = 1
+    /// nightscout follower type
+    case nightscoutFollowType = 1
+    
+    /// nightscout url
+    case nightscoutUrl = 2
     
     /// nightscout api key
-    case nightscoutAPIKey = 2
+    case nightscoutAPIKey = 3
     
     /// nightscout api key
-    case token = 3
+    case token = 4
     
     /// port
-    case port = 4
+    case port = 5
     
     /// to allow testing explicitly
-    case testUrlAndAPIKey = 5
+    case testUrlAndAPIKey = 6
     
     /// should sensor start time be uploaded to NS yes or no
-    case uploadSensorStartTime = 6
+    case uploadSensorStartTime = 7
     
     /// use nightscout schedule or not
-    case useSchedule = 7
+    case useSchedule = 8
     
     /// open uiviewcontroller to edit schedule
-    case schedule = 8
+    case schedule = 9
     
 }
 
@@ -220,6 +223,40 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
         case .nightscoutEnabled:
             return SettingsSelectedRowAction.nothing
             
+        case .nightscoutFollowType:
+                // data to be displayed in list from which user needs to pick a live activity type
+                var data = [String]()
+                var selectedRow: Int?
+                var index = 0
+                
+            let currentNightscoutFollowType = UserDefaults.standard.nightscoutFollowType
+                
+                // get all Nightscout follower types and add the description to data. Search for the type that matches the FightscoutFollowerType that is currently stored in userdefaults.
+                for nightscoutFollowType in NightscoutFollowType.allCasesForList {
+                    
+                    data.append(nightscoutFollowType.descriptionExpanded)
+                    
+                    if nightscoutFollowType == currentNightscoutFollowType {
+                        selectedRow = index
+                    }
+                    index += 1
+                }
+                
+                return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelNightscoutFollowType, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
+                    
+                    // we'll set this here so that we can use it in the else statement for logging
+                    let oldNightscoutFollowType = UserDefaults.standard.nightscoutFollowType
+                    
+                    if index != selectedRow {
+                        
+                        UserDefaults.standard.nightscoutFollowType = NightscoutFollowType(forRowAt: index) ?? .none
+                        
+                        let newNightscoutFollowType = UserDefaults.standard.nightscoutFollowType
+                        
+                        trace("Nightscout follower type was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categoryNightscoutSettingsViewModel, type: .info, oldNightscoutFollowType.description, newNightscoutFollowType.description)
+                    }
+                }, cancelHandler: nil, didSelectRowHandler: nil)
+            
         case .nightscoutUrl:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelNightscoutUrl, message: Texts_SettingsView.giveNightscoutUrl, keyboardType: .URL, text: UserDefaults.standard.nightscoutUrl != nil ? UserDefaults.standard.nightscoutUrl : ConstantsNightscout.defaultNightscoutUrl, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(nightscouturl: String) in
                 
@@ -321,9 +358,9 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
         // if nightscout upload not enabled then only first row is shown
         if UserDefaults.standard.nightscoutEnabled {
             
-            // in follower mode, only 6 first rows to be shown : nightscout enabled button, url, port number, token, api key, option to test
+            // in follower mode, only 6 first rows to be shown : nightscout enabled button, follow type, url, port number, token, api key, option to test
             if !UserDefaults.standard.isMaster {
-                return 6
+                return 7
             }
             
             // if schedule not enabled then show all rows except the last which is to edit the schedule
@@ -342,9 +379,10 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-            
         case .nightscoutEnabled:
             return Texts_SettingsView.labelNightscoutEnabled
+        case .nightscoutFollowType:
+            return Texts_SettingsView.labelNightscoutFollowType
         case .nightscoutUrl:
             return Texts_SettingsView.labelNightscoutUrl
         case .nightscoutAPIKey:
@@ -368,23 +406,9 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-        case .nightscoutEnabled:
-            return UITableViewCell.AccessoryType.none
-        case .nightscoutUrl:
-            return UITableViewCell.AccessoryType.disclosureIndicator
-        case .nightscoutAPIKey:
-            return UITableViewCell.AccessoryType.disclosureIndicator
-        case .port:
+        case .nightscoutFollowType, .nightscoutUrl, .nightscoutAPIKey, .port, .token, .schedule:
             return .disclosureIndicator
-        case .token:
-            return .disclosureIndicator
-        case .useSchedule:
-            return UITableViewCell.AccessoryType.none
-        case .schedule:
-            return UITableViewCell.AccessoryType.disclosureIndicator
-        case .uploadSensorStartTime:
-            return UITableViewCell.AccessoryType.none
-        case .testUrlAndAPIKey:
+        default:
             return .none
         }
     }
@@ -393,8 +417,8 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-        case .nightscoutEnabled:
-            return nil
+        case .nightscoutFollowType:
+            return UserDefaults.standard.nightscoutFollowType.description
         case .nightscoutUrl:
             return UserDefaults.standard.nightscoutUrl ?? Texts_SettingsView.valueIsRequired
         case .nightscoutAPIKey:
@@ -403,13 +427,7 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
             return UserDefaults.standard.nightscoutPort != 0 ? UserDefaults.standard.nightscoutPort.description : nil
         case .token:
             return UserDefaults.standard.nightscoutToken?.obscured() ?? ""
-        case .useSchedule:
-            return nil
-        case .schedule:
-            return nil
-        case .uploadSensorStartTime:
-            return nil
-        case .testUrlAndAPIKey:
+        default:
             return nil
         }
     }
@@ -418,34 +436,14 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-            
         case .nightscoutEnabled:
             return UISwitch(isOn: UserDefaults.standard.nightscoutEnabled, action: {(isOn: Bool) in UserDefaults.standard.nightscoutEnabled = isOn})
-        
-        case .nightscoutUrl:
-            return nil
-            
-        case .nightscoutAPIKey:
-            return nil
-            
-        case .port:
-            return nil
-            
-        case .token:
-            return nil
-            
         case .useSchedule:
             return UISwitch(isOn: UserDefaults.standard.nightscoutUseSchedule, action: {(isOn: Bool) in UserDefaults.standard.nightscoutUseSchedule = isOn})
-            
-        case .schedule:
-            return nil
-            
         case .uploadSensorStartTime:
             return UISwitch(isOn: UserDefaults.standard.uploadSensorStartTimeToNS, action: {(isOn: Bool) in UserDefaults.standard.uploadSensorStartTimeToNS = isOn})
-            
-        case .testUrlAndAPIKey:
+        default:
             return nil
-            
         }
     }
     

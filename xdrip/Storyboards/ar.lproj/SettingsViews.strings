@@ -24,7 +24,6 @@
 "settingsviews_transmitterid" = "رقم هوية جهاز الإرسال";
 "settingsviews_transmitterid_text_for_button" = "رقم هوية جهاز الإرسال";
 "settingsviews_givetransmitterid" = "أدخل رقم هوية جهاز الإرسال";
-"settingsviews_resettransmitter" = "إعادة تعيين جهاز الإرسال";
 "settingsviews_nonfixedtransmitter" = "تفعيل المعايرة متعددة النقاط ";
 "settingsviews_labelNonFixed" = "المعايرة متعددة النقاط";
 "settingsviews_sectiontitlealerting" = "التنبيهات";
@@ -104,15 +103,11 @@
 "settingsviews_showOnlineHelp" = "فتح المساعدة عبر الإنترنت؟";
 "settingsviews_webooptransmitter" = "استخدام خوارزمية جهاز الإرسال؟";
 "settingsviews_labelWebOOP" = "خوارزمية xDrip أو جهاز الإرسال";
-"settingsviews_showHelpIcon" = "إظهار رمز المساعدة؟";
 "settingsviews_restartNeeded" = "(مطلوب إعادة التشغيل) ";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
-
-/// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
-"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold";
 
 /// treatments settings, section title
 "settingsviews_sectiontitletreatments" = "Treatments";
@@ -132,9 +127,6 @@
 
 /// Housekeeper settings, section title
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
-
-/// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart";
 
 /// When clicking the retention setting, a pop up asks for how many days should data be stored
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
@@ -156,7 +148,7 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
@@ -186,7 +178,6 @@
 "settingsviews_valueIsRequired" = "⚠️ Required";
 
 /// treatments settings, offset the carb treatments on main chart
-"settingsviews_offsetCarbTreatmentsOnChart" = "Offset Carbs on Chart";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
@@ -231,7 +222,7 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show the Mini-Chart";
+"settingsviews_showMiniChart" = "Show Mini-Chart";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Patient Name";

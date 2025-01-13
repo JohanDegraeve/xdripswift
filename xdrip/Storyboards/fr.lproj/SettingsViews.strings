@@ -24,7 +24,6 @@
 "settingsviews_transmitterid" = "Transmetteur ID";
 "settingsviews_transmitterid_text_for_button" = "Transmetteur ID";
 "settingsviews_givetransmitterid" = "Entrer Transmetteur ID";
-"settingsviews_resettransmitter" = "Réinitialiser Transmetteur (Anubis)";
 "settingsviews_sectiontitlealerting" = "Alarme";
 "settingsviews_row_alert_types" = "Types d'alarme";
 "settingsviews_row_alerts" = "Alarmes";
@@ -113,6 +112,9 @@
 /// non fixed settings, title of the section
 "settingsviews_labelNonFixed" = "Calibration Multi-point";
 
+"settingsviews_labelAlgorithmType" = "Type d'algorithme";
+"settingsviews_labelCalibrationType" = "Type de calibration";
+
 /// In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row
 "volumeTestSoundPlayer" = "Test Volume (Si Ignorer Mode silencieux)";
 
@@ -153,7 +155,6 @@
 
 /// general settings, should the online help be translated automatically if needed
 "settingsviews_translateOnlineHelp" = "Traduire automatiquement";
-"settingsviews_showHelpIcon" = "Afficher l'icône d'aide";
 "settingsviews_restartNeeded" = "(Redémarrage requis)";
 
 /// home screen settings, should the main glucose chart screen be allowed?
@@ -188,9 +189,6 @@
 /// Housekeeper settings, section title
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
 
-/// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart";
-
 /// When clicking the retention setting, a pop up asks for how many days should data be stored
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 
@@ -211,7 +209,7 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
@@ -241,7 +239,6 @@
 "settingsviews_valueIsRequired" = "⚠️ Required";
 
 /// treatments settings, offset the carb treatments on main chart
-"settingsviews_offsetCarbTreatmentsOnChart" = "Offset Carbs on Chart";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
@@ -286,7 +283,7 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show the Mini-Chart";
+"settingsviews_showMiniChart" = "Show Mini-Chart";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Patient Name";

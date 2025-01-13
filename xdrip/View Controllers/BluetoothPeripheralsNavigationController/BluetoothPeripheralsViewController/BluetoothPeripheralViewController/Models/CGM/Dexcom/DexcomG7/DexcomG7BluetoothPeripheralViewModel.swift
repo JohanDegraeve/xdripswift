@@ -87,7 +87,7 @@ extension DexcomG7BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     }
     
     func sectionTitle(forSection section: Int) -> String {
-        return "Dexcom G7 / ONE+"
+        return "Dexcom G7 / ONE+ / Stelo"
     }
     
     func update(cell: UITableViewCell, forRow rawValue: Int, forSection section: Int, for bluetoothPeripheral: BluetoothPeripheral) {

@@ -120,7 +120,7 @@ class CalendarManager: NSObject {
         // add delta if needed
         if UserDefaults.standard.displayDeltaInCalendarEvent && lastReading.count > 1 {
             
-            title = title + " " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: UserDefaults.standard.displayUnitInCalendarEvent, highGranularity: true, mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            title = title + " " + lastReading[0].unitizedDeltaString(previousBgReading: lastReading[1], showUnit: UserDefaults.standard.displayUnitInCalendarEvent, highGranularity: true, mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
         } else if UserDefaults.standard.displayUnitInCalendarEvent {
             

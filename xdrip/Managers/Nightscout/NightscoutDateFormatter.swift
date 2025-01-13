@@ -1,5 +1,5 @@
 //
-//  NSDateFormatter.swift
+//  NightscoutDateFormatter.swift (renamed from original NSDateFormatter.swift)
 //  RileyLink
 //
 //  Created by Nate Racklyeft on 6/15/16.

@@ -14,12 +14,17 @@ struct WidgetSharedUserDefaultsModel: Codable {
     var bgReadingDatesAsDouble: [Double]
     var isMgDl: Bool
     var slopeOrdinal: Int
-    var deltaChangeInMgDl: Double
+    var deltaValueInUserUnit: Double
     var urgentLowLimitInMgDl: Double
     var lowLimitInMgDl: Double
     var highLimitInMgDl: Double
     var urgentHighLimitInMgDl: Double
     var dataSourceDescription: String
+    
+    var deviceStatusCreatedAt: Date?
+    var deviceStatusLastLoopDate: Date?
+    
     var allowStandByHighContrast: Bool
+    var forceStandByBigNumbers: Bool
     var keepAliveImageString: String?
 }

@@ -21,9 +21,6 @@
 /// home screen settings, high value
 "settingsviews_highValue" = "High Value";
 
-/// help settings, should the help icon be shown on the toolbar
-"settingsviews_showHelpIcon" = "Show Help Icon";
-
 /// Calendar Events Settings - text in row where create event is enabled or disabled 
 "createCalendarEvent" = "Create Calendar Events";
 
@@ -151,7 +148,6 @@
 "settingsviews_nightscoutAPIKey" = "API_SECRET";
 
 /// transmitter settings, to explain that settings is about resetting the transmitter
-"settingsviews_resettransmitter" = "Reset Transmitter (Anubis only)";
 
 /// home screen settings, should the main glucose chart screen be allowed?
 "settingsviews_allowScreenRotation" = "Allow Chart Rotation";
@@ -215,9 +211,6 @@
 
 /// statistics settings, how many days to use for calculations
 "settingsviews_daysToUseStatisticsMessage" = "Maximum days we should try to use to calculate the statistics?\n\n(Enter 0 to calculate today since midnight)";
-
-/// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart";
 
 /// general settings, literally follower
 "settingsviews_follower" = "Follower";
@@ -300,9 +293,6 @@
 /// Text in pop up shown when user wants to send the trace file
 "describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";
 
-/// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
-"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold";
-
 /// help settings, open the online help
 "settingsviews_showOnlineHelp" = "Open Online Help";
 
@@ -368,7 +358,7 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
@@ -398,7 +388,6 @@
 "settingsviews_valueIsRequired" = "⚠️ Required";
 
 /// treatments settings, offset the carb treatments on main chart
-"settingsviews_offsetCarbTreatmentsOnChart" = "Offset Carbs on Chart";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
@@ -443,7 +432,7 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show the Mini-Chart";
+"settingsviews_showMiniChart" = "Show Mini-Chart";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Patient Name";

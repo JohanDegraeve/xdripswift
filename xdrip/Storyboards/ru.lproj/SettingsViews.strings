@@ -2,7 +2,6 @@
 "settingsviews_sectiontitlehelp" = "Помощь и документация";
 "settingsviews_showOnlineHelp" = "Открыть онлайн документацию";
 "settingsviews_translateOnlineHelp" = "Переводить автоматически";
-"settingsviews_showHelpIcon" = "Показывать иконку помощи";
 "settingsviews_restartNeeded" = "(Требуется перезагрузка)";
 "settingsviews_sectiontitleNotifications" = "Общие";
 "settingsviews_selectbgunit" = "Единицы измерения глюкозы";
@@ -26,7 +25,6 @@
 "settingsviews_showTreatmentsOnChart" = "Показать лечение на графике";
 "settingsviews_smallBolusTreatmentThreshold" = "Пороговое значение микроболюса";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Ниже скольких единиц мы должны считать болюс микроболюсом?\n\n(Рекомендуемое значение: 1,0U)";
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Показывать микроболюс в графике";
 "settingsviews_sectiontitlestatistics" = "Статистика";
 "settingsviews_showStatistics" = "Показывать статистику";
 "settingsviews_daysToUseStatisticsTitle" = "Дней для расчета";
@@ -37,7 +35,6 @@
 "settingsviews_transmitterid" = "Идентификатор трансмиттера";
 "settingsviews_transmitterid_text_for_button"  = "Идентификатор трансмиттера";
 "settingsviews_givetransmitterid" = "Введите идентификатор трансмиттера";
-"settingsviews_resettransmitter" = "Перезапустить трансмиттер (Anubis)";
 "settingsviews_webooptransmitter" = "Калибровка трансмиттера";
 "settingsviews_nonfixedtransmitter" = "Многоточечная калибровка";
 "settingsviews_labelNonFixed" = "Многоточечная калибровка";
@@ -135,7 +132,7 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
@@ -162,7 +159,6 @@
 "settingsviews_valueIsRequired" = "⚠️ Required";
 
 /// treatments settings, offset the carb treatments on main chart
-"settingsviews_offsetCarbTreatmentsOnChart" = "Offset Carbs on Chart";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
