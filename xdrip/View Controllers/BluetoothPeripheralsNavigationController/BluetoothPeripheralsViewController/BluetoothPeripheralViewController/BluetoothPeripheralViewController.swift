@@ -417,6 +417,8 @@ class BluetoothPeripheralViewController: UIViewController {
                 // just go back to the BluetoothPeripheralsViewController and cancel the transmitter add
                 if let navigationController = self.navigationController {
                     
+                    self.tableView.removeFromSuperview()
+                    
                     navigationController.popViewController(animated: true)
                     
                 } else {
@@ -622,11 +624,13 @@ class BluetoothPeripheralViewController: UIViewController {
     
     /// setup datasource, delegate, seperatorInset
     private func setupTableView() {
-        if let tableView = tableView {
-            // insert slightly the separator text so that it doesn't touch the safe area limit
-            tableView.separatorInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
-            tableView.dataSource = self
-            tableView.delegate = self
+        DispatchQueue.main.async {
+            if let tableView = self.tableView {
+                // insert slightly the separator text so that it doesn't touch the safe area limit
+                tableView.separatorInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
+                tableView.dataSource = self
+                tableView.delegate = self
+            }
         }
     }
     
@@ -837,6 +841,9 @@ class BluetoothPeripheralViewController: UIViewController {
             self.bluetoothPeripheral = nil
             
             // close the viewcontroller
+            
+            self.tableView.removeFromSuperview()
+            
             self.navigationController?.popViewController(animated: true)
             self.dismiss(animated: true, completion: nil)
             

@@ -3133,6 +3133,10 @@ final class RootViewController: UIViewController, ObservableObject {
     private func updateDataSourceInfo() {
         let isMaster: Bool = UserDefaults.standard.isMaster
         
+        // use this as a flag to identify if an Anubis transmitter is being used
+        // this will only be returned as true by cgmTransmitter.isAnubis() for a detected G6 Anubis
+        var isAnubis = false
+        
         // reset relevant labels colors just in case they were changed the previous time this function was called
         dataSourceSensorMaxAgeOutlet.textColor = .lightGray
         
@@ -3153,6 +3157,9 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // update the sensor type - needed to make sure we test with the correct warm-up times later
             sensorType = cgmTransmitter.cgmTransmitterType().sensorType()
+            
+            // update the isAnubis flag
+            isAnubis = cgmTransmitter.isAnubisG6()
         }
         
         // let's just check that we've got enough information to display the view
@@ -3177,32 +3184,23 @@ final class RootViewController: UIViewController, ObservableObject {
                 // get 2 last Readings, with a calculatedValue
                 let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 0)
                 
-                // if no recent readings then check if the sensor is in warm-up
-                if lastReading.count == 0 {
-                    // set-up the labels for the sensor time, total and also if still considered in warm-up
-                    if !isMaster && UserDefaults.standard.followerDataSourceType == .libreLinkUp && sensorAgeInMinutes < ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre {
-                        // the LibreLinkUp active sensor is still in warm-up
-                        if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre * 60) {
-                            dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
-                        }
-                        
-                    } else if isMaster && sensorType == .Libre && sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutes {
-                        // the connected Libre sensor is still in warm-up (as per defined minimum warm-up time)
-                        if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutes * 60) {
-                            dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
-                        }
-                        
-                    } else if isMaster && sensorType == .Dexcom && sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6 {
-                        // the connected Dexcom sensor is still in warm-up (as per defined standard Dexcom warm-up time)
-                        if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6 * 60) {
-                            dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
-                            
-                        } else {
-                            // fill in the labels to show sensor time elapsed and max age
-                            dataSourceSensorCurrentAgeOutlet.text = sensorStartDate?.daysAndHoursAgo()
-                            
-                            dataSourceSensorMaxAgeOutlet.text = " / " + sensorMaxAgeInMinutes.minutesToDaysAndHours()
-                        }
+                // set-up the labels for the sensor time, total and also if still considered in warm-up
+                if !isMaster && UserDefaults.standard.followerDataSourceType == .libreLinkUp && sensorAgeInMinutes < ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre {
+                    // the LibreLinkUp active sensor is still in warm-up
+                    if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre * 60) {
+                        dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                    }
+                    
+                } else if isMaster && sensorType == .Libre && sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutes {
+                    // the connected Libre sensor is still in warm-up (as per defined minimum warm-up time)
+                    if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutes * 60) {
+                        dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                    }
+                    
+                } else if isMaster && sensorType == .Dexcom && sensorAgeInMinutes < (isAnubis ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis : ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6) {
+                    // the connected Dexcom sensor is still in warm-up
+                    if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval((isAnubis ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis : ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6) * 60) {
+                        dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
                     }
                     
                 } else {
@@ -3235,7 +3233,10 @@ final class RootViewController: UIViewController, ObservableObject {
             }
             
             // set the sensor/system description
-            dataSourceLabelOutlet.text = UserDefaults.standard.activeSensorDescription
+            // if using an Anubis G6 transmitter, let's add some more info. This is only done here in RVC because there is more room.
+            if let activeSensorDescription = UserDefaults.standard.activeSensorDescription {
+                dataSourceLabelOutlet.text = activeSensorDescription + (isAnubis ? " (Anubis)" : "")
+            }
             
             // let's run the progress update in an async thread with a really small delay so that the animation updates smoothly after the view has appeared
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {

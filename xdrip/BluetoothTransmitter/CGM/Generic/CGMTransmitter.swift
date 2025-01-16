@@ -2,7 +2,7 @@ import Foundation
 import CoreBluetooth
 
 /// defines functions that every cgm transmitter should conform to
-protocol CGMTransmitter:AnyObject {
+protocol CGMTransmitter: AnyObject {
     
     /// to set nonFixedSlopeEnabled - called when user changes the setting
     ///
@@ -33,6 +33,10 @@ protocol CGMTransmitter:AnyObject {
     /// - typicall for firefly, where webOOPEnabled false is not possible
     /// - default true
     func nonWebOOPAllowed() -> Bool
+    
+    /// is the transmitter a G6 Anubis with a 180 day expiry?
+    /// - default false
+    func isAnubisG6() -> Bool // append G6 to the protocol function name to avoid conflicts with the isAnubis public var of CGMG5Transmitter
     
     /// get cgmTransmitterType
     func cgmTransmitterType() -> CGMTransmitterType
@@ -344,22 +348,25 @@ extension CGMTransmitter {
     func setNonFixedSlopeEnabled(enabled: Bool) {}
 
     // default implementation, false
-    func isNonFixedSlopeEnabled() -> Bool {return false}
+    func isNonFixedSlopeEnabled() -> Bool { return false }
     
     // empty implementation for transmitter types that don't need this
     func setWebOOPEnabled(enabled:Bool) {}
     
     // default implementation, false
-    func isWebOOPEnabled() -> Bool {return false}
+    func isWebOOPEnabled() -> Bool { return false }
     
     // default implementation, false
-    func overruleIsWebOOPEnabled() -> Bool {return false}
+    func overruleIsWebOOPEnabled() -> Bool { return false }
+    
+    // default implementation, false
+    func isAnubisG6() -> Bool { return false }
     
     // empty implementation for transmitter types that don't need this
     func requestNewReading() {}
 
     // default implementation, nil
-    func maxSensorAgeInDays() -> Double? {return nil}
+    func maxSensorAgeInDays() -> Double? { return nil }
     
     // default implementation, does nothing
     func startSensor(sensorCode: String?, startDate: Date) {}
@@ -371,12 +378,12 @@ extension CGMTransmitter {
     func calibrate(calibration: Calibration) {}
     
     // default implementation, returns true
-    func needsSensorStartTime() -> Bool {return true}
+    func needsSensorStartTime() -> Bool { return true }
     
     // default implementation, returns false
-    func needsSensorStartCode() -> Bool {return false}
+    func needsSensorStartCode() -> Bool { return false }
     
     // default implementation, returns true
-    func nonWebOOPAllowed() -> Bool {return true}
+    func nonWebOOPAllowed() -> Bool { return true }
     
 }

@@ -37,4 +37,6 @@ extension DexcomG5 {
     /// if true then other app will be used in parallel with the same transmitter (only for firefly)
     @NSManaged public var useOtherApp: Bool
     
+    @NSManaged public var isAnubis: Bool
+    
 }

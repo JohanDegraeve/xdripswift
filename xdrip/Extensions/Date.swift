@@ -162,7 +162,7 @@ extension Date {
     /// Example return: "6d11h" if optional appendAgo is false or not used
     /// Example return: "6d11h ago" if optional appendAgo is true
     /// if less than 12 hours, return also minutes, e.g: "7h43m" or "58m" to give extra granularity
-    func daysAndHoursAgo(appendAgo: Bool? = false) -> String {
+    func daysAndHoursAgo(appendAgo: Bool? = false, showOnlyDays: Bool? = false) -> String {
         // set a default value assuming that we're unable to calculate the hours + days
         var daysAndHoursAgoString: String = "n/a"
 
@@ -177,7 +177,7 @@ extension Date {
                 daysAndHoursAgoString = abs(hours).description + Texts_Common.hourshort
             } else {
                 // default show days and hours
-                daysAndHoursAgoString = abs(days).description + Texts_Common.dayshort + abs(hours).description + Texts_Common.hourshort
+                daysAndHoursAgoString = abs(days).description + Texts_Common.dayshort + (!(showOnlyDays ?? false) ? abs(hours).description + Texts_Common.hourshort : "")
             }
             
             // if the function was called using appendAgo == true, then add the "ago" string
@@ -226,7 +226,7 @@ extension Date {
     /// Example return: "6d11h" if optional appendRemaining is false or not used
     /// Example return: "6d11h remaining" if optional appendRemaining is true
     /// if less than 12 hours, return also minutes, e.g: "7h43m" or "58m" to give extra granularity
-    func daysAndHoursRemaining(appendRemaining: Bool? = false) -> String {
+    func daysAndHoursRemaining(appendRemaining: Bool? = false, showOnlyDays: Bool? = false) -> String {
         // add a minute to the date stored in self. This avoids showing "0m" when 59 seconds is actually remaining.
         let roundedDateToUpperMinute = self.addingTimeInterval(60)
         
@@ -244,7 +244,7 @@ extension Date {
                 daysAndHoursRemainingString = abs(hours).description + Texts_Common.hourshort + abs(minutes).description + Texts_Common.minuteshort
             } else {
                 // default show days and hours
-                daysAndHoursRemainingString = abs(days).description + Texts_Common.dayshort + abs(hours).description + Texts_Common.hourshort
+                daysAndHoursRemainingString = abs(days).description + Texts_Common.dayshort + (!(showOnlyDays ?? false) ? abs(hours).description + Texts_Common.hourshort : "")
             }
             
             // if the function was called using appendRemaining == true, then add the "remaining" string
