@@ -501,7 +501,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         if profile.startDate > Date() || profile.updatedDate > Date() {
             profile.startDate = .distantPast
             profile.updatedDate = .distantPast
-            profile.createdAt = .distantPast
         }
         
         // only allow the update check to happen if it's been at least 30 seconds since the last one.
@@ -515,7 +514,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             do {
                 // check if there is the newly downloaded profile response has an newer date than the stored one
                 // if so, then import it and overwrite the previously stored one
-                if let profileResponse = try await getNightscoutProfile().first, let newStartDate = NightscoutSyncManager.iso8601DateFormatter.date(from: profileResponse.startDate) {
+                if let profileResponse = try await getNightscoutProfile().first, let newStartDate = (UserDefaults.standard.nightscoutFollowType == .loop ? NightscoutSyncManager.iso8601DateFormatterWithoutFractionalSeconds.date(from: profileResponse.startDate) : NightscoutSyncManager.iso8601DateFormatter.date(from: profileResponse.startDate)) {
                     if newStartDate > profile.startDate {
                         if profile.startDate == .distantPast {
                             trace("    in updateProfile, no profile is stored yet. Importing Nightscout profile with date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, profile.startDate.formatted(date: .abbreviated, time: .shortened))
@@ -525,7 +524,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         
                         profile.startDate = newStartDate
                         profile.profileName = profileResponse.defaultProfile
-                        profile.createdAt = NightscoutSyncManager.iso8601DateFormatter.date(from: profileResponse.createdAt) ?? .distantPast
                         profile.enteredBy = profileResponse.enteredBy ?? ""
                         profile.updatedDate = .now
                     } else {
@@ -554,7 +552,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         profile.carbratio = carbRatios
                         profile.sensitivity = sensitivities
                         profile.dia = newProfile.dia
-                        profile.carbsHr = newProfile.carbsHr
                         profile.timezone = newProfile.timezone
                         profile.isMgDl = newProfile.units == "mg/dl" ? true : false
                         
@@ -919,6 +916,14 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 URLComponents.port = UserDefaults.standard.nightscoutPort
             }
             
+            // if token not nil, then add also the token
+            if let token = UserDefaults.standard.nightscoutToken {
+                // Mutable copy used to add token if defined.
+                var queryItems = [URLQueryItem]()
+                queryItems.append(URLQueryItem(name: "token", value: token))
+                URLComponents.queryItems = queryItems
+            }
+            
             if let url = URLComponents.url {
                 var request = URLRequest(url: url)
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
@@ -953,6 +958,14 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         if let nightscoutURL = UserDefaults.standard.nightscoutUrl, let url = URL(string: nightscoutURL), var URLComponents = URLComponents(url: url.appendingPathComponent(nightscoutDeviceStatusPath), resolvingAgainstBaseURL: false) {
             if UserDefaults.standard.nightscoutPort != 0 {
                 URLComponents.port = UserDefaults.standard.nightscoutPort
+            }
+            
+            // if token not nil, then add also the token
+            if let token = UserDefaults.standard.nightscoutToken {
+                // Mutable copy used to add token if defined.
+                var queryItems = [URLQueryItem]()
+                queryItems.append(URLQueryItem(name: "token", value: token))
+                URLComponents.queryItems = queryItems
             }
             
             if let url = URLComponents.url {
@@ -990,6 +1003,14 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         if let nightscoutURL = UserDefaults.standard.nightscoutUrl, let url = URL(string: nightscoutURL), var URLComponents = URLComponents(url: url.appendingPathComponent(nightscoutDeviceStatusPath), resolvingAgainstBaseURL: false) {
             if UserDefaults.standard.nightscoutPort != 0 {
                 URLComponents.port = UserDefaults.standard.nightscoutPort
+            }
+            
+            // if token not nil, then add also the token
+            if let token = UserDefaults.standard.nightscoutToken {
+                // Mutable copy used to add token if defined.
+                var queryItems = [URLQueryItem]()
+                queryItems.append(URLQueryItem(name: "token", value: token))
+                URLComponents.queryItems = queryItems
             }
             
             if let url = URLComponents.url {

@@ -283,8 +283,15 @@ struct AIDStatusView: View {
                     
                     // using a simple if/else as only two options are to be used at the moment for the pickerview.
                 } else {
+                    
+                    if profile.profileName == nil {
+                        Text("No Profile Data Available")
+                            .foregroundStyle(Color(.systemRed))
+                            .padding()
+                    }
+                    
                     List {
-                        Section(header: Text("Profile Information")) {
+                        Section(header: Text("Current Profile Information")) {
                             if let profileName = profile.profileName {
                                 row(title: "Name", data: profileName)
                             }
@@ -299,7 +306,11 @@ struct AIDStatusView: View {
                                 row(title: "Units", data: isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
                             }
                             
-                            row(title: "DIA", data: "\(profile.dia?.stringWithoutTrailingZeroes ?? nilString) \(Texts_Common.hours)")
+                            if let dia = profile.dia {
+                                row(title: "DIA", data: "\(dia.stringWithoutTrailingZeroes) \(Texts_Common.hours)")
+                            } else {
+                                row(title: "DIA", data: nilString)
+                            }
                         }
                         
                         Section(header: Text("Scheduled Basal Rates")) {
