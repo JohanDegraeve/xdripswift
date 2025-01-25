@@ -3179,36 +3179,27 @@ final class RootViewController: UIViewController, ObservableObject {
             // blank out the current sensor age label by default. If the sensor isn't in warm-up, then it will be filled in later
             dataSourceSensorCurrentAgeOutlet.text = ""
             
-            // check if there are any recent bg readings. If not then check if the sensor is in warm-up time
-            if let bgReadingsAccessor = self.bgReadingsAccessor {
-                // get 2 last Readings, with a calculatedValue
-                let lastReading = bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 0)
-                
-                // set-up the labels for the sensor time, total and also if still considered in warm-up
-                if !isMaster && UserDefaults.standard.followerDataSourceType == .libreLinkUp && sensorAgeInMinutes < ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre {
-                    // the LibreLinkUp active sensor is still in warm-up
-                    if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre * 60) {
-                        dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
-                    }
-                    
-                } else if isMaster && sensorType == .Libre && sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutes {
-                    // the connected Libre sensor is still in warm-up (as per defined minimum warm-up time)
-                    if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutes * 60) {
-                        dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
-                    }
-                    
-                } else if isMaster && sensorType == .Dexcom && sensorAgeInMinutes < (isAnubis ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis : ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6) {
-                    // the connected Dexcom sensor is still in warm-up
-                    if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval((isAnubis ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis : ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6) * 60) {
-                        dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
-                    }
-                    
-                } else {
-                    // fill in the labels to show sensor time elapsed and max age
-                    dataSourceSensorCurrentAgeOutlet.text = sensorStartDate?.daysAndHoursAgo()
-                    
-                    dataSourceSensorMaxAgeOutlet.text = " / " + sensorMaxAgeInMinutes.minutesToDaysAndHours()
+            // set-up the labels for the sensor time, total and also if still considered in warm-up
+            if !isMaster && UserDefaults.standard.followerDataSourceType == .libreLinkUp && sensorAgeInMinutes < ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre {
+                // the LibreLinkUp active sensor is still in warm-up
+                if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre * 60) {
+                    dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
                 }
+                
+            } else if isMaster && sensorType == .Libre && sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutes {
+                // the connected Libre sensor is still in warm-up (as per defined minimum warm-up time)
+                if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutes * 60) {
+                    dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                }
+            } else if isMaster && sensorType == .Dexcom && sensorAgeInMinutes < (isAnubis ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis : ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6) {
+                // the connected Dexcom sensor is still in warm-up
+                if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval((isAnubis ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis : ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6) * 60) {
+                    dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+                }
+            } else {
+                // fill in the labels to show sensor time elapsed and max age
+                dataSourceSensorCurrentAgeOutlet.text = sensorStartDate?.daysAndHoursAgo()
+                dataSourceSensorMaxAgeOutlet.text = " / " + sensorMaxAgeInMinutes.minutesToDaysAndHours()
             }
             
             // set progress view colours and text colours from constants file
