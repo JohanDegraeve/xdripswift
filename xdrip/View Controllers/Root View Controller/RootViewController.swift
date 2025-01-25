@@ -3404,6 +3404,12 @@ final class RootViewController: UIViewController, ObservableObject {
             landscapeValueViewController.view.alpha = 0
             view.addSubview(landscapeValueViewController.view)
             addChild(landscapeValueViewController)
+
+            // disable user interaction, if user wants to interact then device needs to rotate back to portrait
+            if let overlayView = self.overlayView {
+                overlayView.isUserInteractionEnabled = false
+            }
+
             coordinator.animate(alongsideTransition: { _ in
                 // if the screen dimming overlay is enabled, then resize it to fit the landscape view
                 if UserDefaults.standard.screenLockDimmingType != .disabled {
@@ -3411,6 +3417,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 }
                 
                 landscapeValueViewController.view.alpha = 1
+                
             }, completion: { _ in
                 landscapeValueViewController.didMove(toParent: self)
                 // this function updates also the labels in the landscapeChartViewController
@@ -3444,6 +3451,12 @@ final class RootViewController: UIViewController, ObservableObject {
             })
             
         }
+        
+        // disable user interaction, if user wants to interact then device needs to rotate back to portrait
+        if let overlayView = self.overlayView {
+            overlayView.isUserInteractionEnabled = true
+        }
+
         
     }
     
