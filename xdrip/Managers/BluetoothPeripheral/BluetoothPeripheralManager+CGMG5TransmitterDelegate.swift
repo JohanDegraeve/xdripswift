@@ -78,6 +78,16 @@ extension BluetoothPeripheralManager: CGMG5TransmitterDelegate {
         
     }
     
+    func received(isAnubis: Bool, cGMG5Transmitter: CGMG5Transmitter) {
+        
+        guard let dexcomG5 = getDexcomG5(cGMG5Transmitter: cGMG5Transmitter) else { return }
+        
+        dexcomG5.isAnubis = isAnubis
+        
+        coreDataManager.saveChanges()
+        
+    }
+    
     private func getDexcomG5(cGMG5Transmitter: CGMG5Transmitter) -> DexcomG5? {
         
         guard let index = bluetoothTransmitters.firstIndex(of: cGMG5Transmitter), let dexcomG5 = bluetoothPeripherals[index] as? DexcomG5 else {return nil}

@@ -16,6 +16,15 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// created public because inheriting classes need it
     var transmitterStartDate: Date?
     
+    /// - if true then xDrip4iOS will not send anything to the transmitter, it will only listen
+    /// - sending should be done by other app (eg official Dexcom app)
+    /// - exception could be sending calibration request or start sensor request, because if user is calibrating or starting the sensor via xDrip4iOS then it would need to be send to the transmitter by xDrip4iOS
+    public var useOtherApp = false
+    
+    /// is the G6 transmitter Anubis-modified?
+    /// use this flag (once set by the TransmitterVersionRxMessage) to enable extra features as needed
+    public var isAnubis = false
+    
     /// CGMG5TransmitterDelegate
     public weak var cGMG5TransmitterDelegate: CGMG5TransmitterDelegate?
 
@@ -61,11 +70,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             }
         }
     }
-
-    /// - if true then xDrip4iOS will not send anything to the transmitter, it will only listen
-    /// - sending should be done by other app (eg official Dexcom app)
-    /// - exception could be sending calibration request or start sensor request, because if user is calibrating or starting the sensor via xDrip4iOS then it would need to be send to the transmitter by xDrip4iOS
-    public var useOtherApp = false
     
     // MARK: - private properties
     
@@ -173,7 +177,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - calibrationToSendToTransmitter : used to send calibration done by user via xDrip4iOS to Dexcom transmitter. For example, user may have give a calibration in the app, but it's not yet send to the transmitter. This needs to be verified in CGMG5Transmitter, which is why it's given here as parameter - when initializing, assign last known calibration for the active sensor, even if it's already sent.
     ///     - webOOPEnabled : enabled or not, if nil then default false
     ///     - userOtherApp
-    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG5TransmitterDelegate: CGMG5TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, transmitterStartDate: Date?, sensorStartDate: Date?, calibrationToSendToTransmitter: Calibration?, firmware: String?, webOOPEnabled: Bool?, useOtherApp: Bool) {
+    ///     - isAnubis: true or false. If true then we can take advantage of extra features
+    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG5TransmitterDelegate: CGMG5TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, transmitterStartDate: Date?, sensorStartDate: Date?, calibrationToSendToTransmitter: Calibration?, firmware: String?, webOOPEnabled: Bool?, useOtherApp: Bool, isAnubis: Bool) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "DEXCOM" + transmitterID[transmitterID.index(transmitterID.startIndex, offsetBy: 4)..<transmitterID.endIndex])
@@ -198,6 +203,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         // initialize firmware
         self.firmware = firmware
+        
+        // initialize isAnubis
+        self.isAnubis = isAnubis
         
         // assign calibrationToSendToTransmitter
         self.calibrationToSendToTransmitter = calibrationToSendToTransmitter
@@ -812,10 +820,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         return .dexcom
     }
     
-    // for the G6, if the user has overriden the max days (for example when using an Anubis transmitter), we can return this value
+    // if using an Anubis transmitter and the user has chosen to override the max days, we can return this value
     // if not, return the standard maxSensorAgeInDays
     func maxSensorAgeInDays() -> Double? {
-        if let activeSensorMaxSensorAgeInDaysOverridenAnubis = UserDefaults.standard.activeSensorMaxSensorAgeInDaysOverridenAnubis, activeSensorMaxSensorAgeInDaysOverridenAnubis > 0 {
+        if isAnubis, let activeSensorMaxSensorAgeInDaysOverridenAnubis = UserDefaults.standard.activeSensorMaxSensorAgeInDaysOverridenAnubis, activeSensorMaxSensorAgeInDaysOverridenAnubis > 0 {
             return activeSensorMaxSensorAgeInDaysOverridenAnubis
         } else {
             return ConstantsDexcomG5.maxSensorAgeInDays
@@ -935,6 +943,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     func getCBUUID_Receive() -> String {
         return CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue
+    }
+    
+    func isAnubisG6() -> Bool {
+        return isAnubis
     }
     
     // MARK: - private helper functions
@@ -1476,21 +1488,26 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     }
 
     private func processTransmitterVersionRxMessage(value:Data) {
-        
         if let transmitterVersionRxMessage = TransmitterVersionRxMessage(data: value) {
-            
             // assign transmitterVersion
             firmware = transmitterVersionRxMessage.firmwareVersionFormatted()
             
-            trace("in  processTransmitterVersionRxMessage, firmware = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, firmware!)
-
-            // send to delegate
-            cGMG5TransmitterDelegate?.received(firmware: firmware!, cGMG5Transmitter: self)
+            // unwrap it cleanly instead of force-unwrapping it in the call
+            if let firmware = firmware {
+                // send the firmware string to delegate
+                cGMG5TransmitterDelegate?.received(firmware: firmware, cGMG5Transmitter: self)
+                trace("in  processTransmitterVersionRxMessage, firmware = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, firmware)
+            }
             
+            // assign the isAnubis property
+            isAnubis = transmitterVersionRxMessage.isAnubis()
+            
+            // send the isAnubis boolean to delegate
+            cGMG5TransmitterDelegate?.received(isAnubis: isAnubis, cGMG5Transmitter: self)
+            trace("in  processTransmitterVersionRxMessage, isAnubis = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, isAnubis.description)
         } else {
-            trace("transmitterVersionRxMessage is nil or firmware to hex is  nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
+            trace("transmitterVersionRxMessage is nil or firmware to hex is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
         }
-        
     }
 
     /// calculates encryptionkey
