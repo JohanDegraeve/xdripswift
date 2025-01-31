@@ -1814,6 +1814,13 @@ final class RootViewController: UIViewController, ObservableObject {
         calibrateToolbarButtonOutlet.title = Texts_HomeView.calibrationButton
         screenLockToolbarButtonOutlet.title = screenIsLocked ? Texts_HomeView.unlockButton : Texts_HomeView.lockButton
         
+        // provide the older SF Symbol for the calibrate button for users below iOS17
+        if #available(iOS 17.0, *) {
+            calibrateToolbarButtonOutlet.image = UIImage(systemName: "dot.scope")
+        } else {
+            calibrateToolbarButtonOutlet.image = UIImage(systemName: "scope")
+        }
+        
         chartLongPressGestureRecognizerOutlet.delegate = self
         chartPanGestureRecognizerOutlet.delegate = self
         

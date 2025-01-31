@@ -141,19 +141,41 @@ struct NightscoutDeviceStatus: Codable {
         }
     }
     
+    // as the minimum deployment target is iOS16.2, we need to provide a nice option for people running it
+    // even if nearly all users will be running iOS18
     func batteryImage(percent: Int?) -> (image: Image, color: Color)? {
         if let percent {
             switch percent {
             case 0...10:
-                return (Image(systemName: "battery.0percent"), Color(.systemRed))
+                if #available(iOS 17.0, *) {
+                    return (Image(systemName: "battery.0percent"), Color(.systemRed))
+                } else {
+                    return (Image(systemName: "minus.plus.batteryblock.slash"), Color(.systemRed))
+                }
             case 11...25:
-                return (Image(systemName: "battery.25percent"), Color(.systemYellow))
+                if #available(iOS 17.0, *) {
+                    return (Image(systemName: "battery.25percent"), Color(.systemYellow))
+                } else {
+                    return (Image(systemName: "minus.plus.batteryblock"), Color(.systemYellow))
+                }
             case 26...65:
-                return (Image(systemName: "battery.50percent"), Color(.colorSecondary))
+                if #available(iOS 17.0, *) {
+                    return (Image(systemName: "battery.50percent"), Color(.colorSecondary))
+                } else {
+                    return (Image(systemName: "minus.plus.batteryblock"), Color(.colorSecondary))
+                }
             case 66...90:
-                return (Image(systemName: "battery.75percent"), Color(.colorSecondary))
+                if #available(iOS 17.0, *) {
+                    return (Image(systemName: "battery.75percent"), Color(.colorSecondary))
+                } else {
+                    return (Image(systemName: "minus.plus.batteryblock.fill"), Color(.colorSecondary))
+                }
             default:
-                return (Image(systemName: "battery.100percent"), Color(.colorSecondary))
+                if #available(iOS 17.0, *) {
+                    return (Image(systemName: "battery.100percent"), Color(.colorSecondary))
+                } else {
+                    return (Image(systemName: "minus.plus.batteryblock.fill"), Color(.colorSecondary))
+                }
             }
         }
         
