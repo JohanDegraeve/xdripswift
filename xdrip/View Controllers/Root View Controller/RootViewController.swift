@@ -3775,9 +3775,6 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 // if there is reasonably recent data, then show values
             } else if deviceStatus.createdAt > Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                // TODO: DEBUG
-                trace("deviceStatus.createdAt > Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes). createdAt = %{public}@ > %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, deviceStatus.createdAt.formatted(date: .abbreviated, time: .standard), Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes).formatted(date: .abbreviated, time: .standard))
-                
                 updateDeviceStatusValues(showData: true)
                 
                 // reset the text colours (in case they were dimmed when the app went to the background)
@@ -3826,9 +3823,6 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 // so there is no recent data, so hide everything and show red
             } else {
-                // TODO: DEBUG
-                trace("no recent data. createdAt = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, deviceStatus.createdAt.formatted(date: .abbreviated, time: .standard))
-                
                 updateDeviceStatusValues(showData: false)
                 
                 infoStatusActivityIndicatorOutlet.isHidden = true
@@ -3839,8 +3833,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 infoStatusButtonOutlet.setTitle(deviceStatus.deviceStatusTitle(), for: .normal)
                 infoStatusButtonOutlet.setTitleColor(deviceStatus.deviceStatusUIColor(), for: .normal)
                 
-                // TODO: DEBUG
-                trace("RVC device status error: createdAt = %{public}@, lastChecked = %{public}@, lastLoopDate = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, nightscoutSyncManager?.deviceStatus.createdAt.formatted(date: .omitted, time: .standard) ?? "nil", nightscoutSyncManager?.deviceStatus.lastCheckedDate.formatted(date: .omitted, time: .standard) ?? "nil", nightscoutSyncManager?.deviceStatus.lastLoopDate.formatted(date: .omitted, time: .standard) ?? "nil")
+                // only for debug trace file
+                trace("DeviceStatusUpdate - device status error. createdAt = %{public}@, lastChecked = %{public}@, lastLoopDate = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, nightscoutSyncManager?.deviceStatus.createdAt.formatted(date: .omitted, time: .standard) ?? "nil", nightscoutSyncManager?.deviceStatus.lastCheckedDate.formatted(date: .omitted, time: .standard) ?? "nil", nightscoutSyncManager?.deviceStatus.lastLoopDate.formatted(date: .omitted, time: .standard) ?? "nil")
             }
         }
     }

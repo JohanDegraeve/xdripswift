@@ -1398,8 +1398,6 @@ public class GlucoseChartManager {
                             trace("in getTreatmentChartPoints, initial calculated max basal = %{public}@, basal scaler = %{public}@", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info, basalRateMaximum.description, basalRateScaler.description)
                         } else if basalRateTreatment.value > basalRateMaximum {
                             basalRateScaler = (ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl - minimumChartValueInMgdl) / basalRateMaximum
-                            
-                            trace("in getTreatmentChartPoints, recalculated max basal = %{public}@, basal scaler = %{public}@", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info, basalRateMaximum.description, basalRateScaler.description)
                         }
                         
                         if let previousBasalRateTreatment = previousBasalRateTreatment {
