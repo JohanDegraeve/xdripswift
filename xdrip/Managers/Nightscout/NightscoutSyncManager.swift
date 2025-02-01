@@ -664,8 +664,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         }
                         
                         if let uploader = deviceStatusResponse.uploader {
-                            deviceStatus.uploaderBatteryPercent = uploader.battery
-                            deviceStatus.uploaderIsCharging = uploader.isCharging
+                            deviceStatus.uploaderBatteryPercent = uploader.battery ?? deviceStatus.uploaderBatteryPercent
+                            deviceStatus.uploaderIsCharging = uploader.isCharging ?? deviceStatus.uploaderIsCharging
                         }
                         
                         // TODO: DEBUG
