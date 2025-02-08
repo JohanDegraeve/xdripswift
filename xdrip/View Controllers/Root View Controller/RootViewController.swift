@@ -10,9 +10,7 @@ import PieCharts
 import WatchConnectivity
 import SwiftUI
 import WidgetKit
-#if canImport(AppIntents)
 import AppIntents
-#endif
 
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController, ObservableObject {
@@ -3589,11 +3587,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 // add delta if available
                 if bgReadings.count > 1 {
-                    var previousValueInUserUnit: Double = 0.0
-                    var actualValueInUserUnit: Double = 0.0
-                    
-                    previousValueInUserUnit = bgReadings[1].calculatedValue.mgDlToMmol(mgDl: isMgDl)
-                    actualValueInUserUnit = bgReadings[0].calculatedValue.mgDlToMmol(mgDl: isMgDl)
+                    var previousValueInUserUnit: Double = bgReadings[1].calculatedValue.mgDlToMmol(mgDl: isMgDl)
+                    var actualValueInUserUnit: Double = bgReadings[0].calculatedValue.mgDlToMmol(mgDl: isMgDl)
                     
                     // if the values are in mmol/L, then round them to the nearest decimal point in order to get the same precision out of the next operation
                     if !isMgDl {
@@ -3602,7 +3597,6 @@ final class RootViewController: UIViewController, ObservableObject {
                     }
                     
                     deltaValueInUserUnit = actualValueInUserUnit - previousValueInUserUnit
-                    
                     slopeOrdinal = bgReadings[0].slopeOrdinal()
                 }
                 

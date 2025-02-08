@@ -133,6 +133,7 @@
 		4796C6072B9516FD00DE2210 /* Bundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D602448E695001C9E5A /* Bundle.swift */; };
 		47976E362BF536BA005E86EC /* AlertSnoozeStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47976E352BF536BA005E86EC /* AlertSnoozeStatus.swift */; };
 		47976E372BFBB870005E86EC /* TextsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7B1226A0878004BA588 /* TextsAlerts.swift */; };
+		47A0E6442D4E263800B31C21 /* LiveActivityIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A0E6432D4E262A00B31C21 /* LiveActivityIntent.swift */; };
 		47A6ABE22B790CC60047A4BA /* xDripWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6ABE12B790CC60047A4BA /* xDripWatchApp.swift */; };
 		47A6ABE42B790CC60047A4BA /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6ABE32B790CC60047A4BA /* MainView.swift */; };
 		47A6ABE62B790CC70047A4BA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 47A6ABE52B790CC70047A4BA /* Assets.xcassets */; };
@@ -988,6 +989,7 @@
 		4798BADC27BA7965002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/LibreNFC.strings; sourceTree = "<group>"; };
 		4798BADD27BA7996002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/M5StackView.strings; sourceTree = "<group>"; };
 		4798BADE27BA79B8002583BC /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		47A0E6432D4E262A00B31C21 /* LiveActivityIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityIntent.swift; sourceTree = "<group>"; };
 		47A6ABDF2B790CC60047A4BA /* xDrip Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "xDrip Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		47A6ABE12B790CC60047A4BA /* xDripWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xDripWatchApp.swift; sourceTree = "<group>"; };
 		47A6ABE32B790CC60047A4BA /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
@@ -2240,6 +2242,7 @@
 		E4C0061F2B3DE8C100D59303 /* AppIntents */ = {
 			isa = PBXGroup;
 			children = (
+				47A0E6432D4E262A00B31C21 /* LiveActivityIntent.swift */,
 				E4D530622B418FF80018C6A4 /* AppShortcuts.swift */,
 				E4C006202B3DE8EC00D59303 /* GlucoseIntent.swift */,
 			);
@@ -4509,6 +4512,7 @@
 				4752B4062635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift in Sources */,
 				F897AAF92200F2D200CDDD10 /* CBPeripheralState.swift in Sources */,
 				F858CCED25AE4CD100786B91 /* LibreOOPWebError.swift in Sources */,
+				47A0E6442D4E263800B31C21 /* LiveActivityIntent.swift in Sources */,
 				F85542362B7575B40058CE09 /* OmniPodHeartBeatBluetoothPeripheralViewModel.swift in Sources */,
 				F8EE3EAC2B6834FD00B27B96 /* Libre2HeartBeat+CoreDataClass.swift in Sources */,
 				D4FD899727772F9100689788 /* TreatmentEntryAccessor.swift in Sources */,
