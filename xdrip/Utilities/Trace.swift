@@ -572,7 +572,7 @@ class Trace {
                             
                             traceInfo.appendStringAndNewLine("        Read from Dexcom app: " + dexcomG5.useOtherApp.description)
                             
-                            traceInfo.appendStringAndNewLine("        Is Anubis? " + dexcomG5.isAnubis.description)
+                            traceInfo.appendStringAndNewLine("        Is Anubis?: " + dexcomG5.isAnubis.description)
                             
                             traceInfo.appendStringAndNewLine("        Last reset: " + (dexcomG5.lastResetTimeStamp?.toString(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (dexcomG5.lastResetTimeStamp?.daysAndHoursAgo(appendAgo: true) ?? "nil") + ")")
                             
