@@ -232,7 +232,7 @@ class LibreLinkUpFollowManager: NSObject {
                         UserDefaults.standard.activeSensorSerialNumber = serialNumber
                         UserDefaults.standard.activeSensorStartDate = Date(timeIntervalSince1970: startDate)
                         
-                        UserDefaults.standard.activeSensorMaxSensorAgeInDays = ConstantsLibreLinkUp.libreLinkUpMaxSensorAgeInDays
+                        UserDefaults.standard.activeSensorMaxSensorAgeInDays = UserDefaults.standard.libreLinkUpIs15DaySensor ? ConstantsLibreLinkUp.libreLinkUpMaxSensorAgeInDaysLibrePlus : ConstantsLibreLinkUp.libreLinkUpMaxSensorAgeInDays
                         
                         var activeSensorDescription = ""
                         
