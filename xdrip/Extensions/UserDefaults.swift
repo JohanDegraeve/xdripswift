@@ -56,6 +56,8 @@ extension UserDefaults {
         case libreLinkUpVersion = "libreLinkUpVersion"
         /// LibreLinkUp terms need to be re-accepted
         case libreLinkUpReAcceptNeeded = "libreLinkUpReAcceptNeeded"
+        ///LibreLinkUp is a 15 day "Plus" sensor being used?
+        case libreLinkUpIs15DaySensor = "libreLinkUpIs15DaySensor"
         
         // General
         
@@ -596,6 +598,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.libreLinkUpReAcceptNeeded.rawValue)
+        }
+    }
+    
+    /// has the user marked their Libre sensor as the Plus version with a 15 day lifetime?
+    @objc dynamic var libreLinkUpIs15DaySensor: Bool {
+        get {
+            return bool(forKey: Key.libreLinkUpIs15DaySensor.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.libreLinkUpIs15DaySensor.rawValue)
         }
     }
     

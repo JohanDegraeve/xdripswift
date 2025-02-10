@@ -524,7 +524,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         
                         profile.startDate = newStartDate
                         profile.profileName = profileResponse.defaultProfile
-                        profile.createdAt = NightscoutSyncManager.iso8601DateFormatter.date(from: profileResponse.createdAt) ?? .distantPast
                         profile.enteredBy = profileResponse.enteredBy
                         profile.updatedDate = .now
                     } else {
@@ -586,7 +585,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         
         // just check in case there is something wrong with the dates (i.e. a phone setting change having created future dates)
         // if we detect this then reset the dates back to force a deviceStatus download and overwrite
-        if deviceStatus.createdAt > Date() || deviceStatus.updatedDate > Date() || deviceStatus.lastLoopDate > Date() {
+        // we'll act as if the current date is 20 seconds into the future, just to avoid any differences between timestamps between the Nightscout server and the user's device.
+        let currentDate = Date().addingTimeInterval(20)
+        if deviceStatus.createdAt > currentDate || deviceStatus.updatedDate > currentDate || deviceStatus.lastLoopDate > currentDate {
             deviceStatus.createdAt = .distantPast
             deviceStatus.updatedDate = .distantPast
             deviceStatus.lastLoopDate = .distantPast
@@ -607,13 +608,13 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                     // it doesn't matter if it wasn't enacted as that was already handled
                     // check if there is the newly downloaded profile response has an newer date than the stored one
                     // if so, then import it and overwrite the previously stored one
-                    if let deviceStatusResponse = deviceStatusResponseArray.first, let createdAt = NightscoutSyncManager.iso8601DateFormatter.date(from: deviceStatusResponse.createdAt ?? ""), createdAt > deviceStatus.createdAt {
-                        trace("in updateDeviceStatus (openAPS), updating internal device status with new date %{public}@ whilst existing internal device status date was %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, createdAt.formatted(date: .abbreviated, time: .shortened), deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened))
+                    if let deviceStatusResponse = deviceStatusResponseArray.first, let createdAt = NightscoutSyncManager.iso8601DateFormatter.date(from: deviceStatusResponse.createdAt ?? ""), createdAt > deviceStatus.createdAt, deviceStatusResponse.openAPS?.enacted != nil || deviceStatusResponse.openAPS?.suggested != nil {
+                        trace("in updateDeviceStatus (openAPS), updating device status with date %{public}@. Old device status date was %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, createdAt.formatted(date: .abbreviated, time: .shortened), deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened))
                         
                         deviceStatus.updatedDate = .now
                         deviceStatus.createdAt = createdAt
                         
-                        deviceStatus.device = deviceStatusResponse.device ?? ""
+                        deviceStatus.device = deviceStatusResponse.device
                         deviceStatus.id = deviceStatusResponse.id ?? ""
                         deviceStatus.mills = deviceStatusResponse.mills ?? 0
                         deviceStatus.utcOffset = deviceStatusResponse.utcOffset ?? 0
@@ -663,8 +664,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         }
                         
                         if let uploader = deviceStatusResponse.uploader {
-                            deviceStatus.uploaderBatteryPercent = uploader.battery
-                            deviceStatus.uploaderIsCharging = uploader.isCharging
+                            deviceStatus.uploaderBatteryPercent = uploader.battery ?? deviceStatus.uploaderBatteryPercent
+                            deviceStatus.uploaderIsCharging = uploader.isCharging ?? deviceStatus.uploaderIsCharging
                         }
                         
                         // TODO: DEBUG
@@ -675,6 +676,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         
                     } else {
                         // downloaded profile start date is not newer than the existing profile so ignore it and do nothing
+                        trace("in updateDeviceStatus (openAPS), no new loop cycle received. Exiting deviceStatus update", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
                         return
                     }
                     

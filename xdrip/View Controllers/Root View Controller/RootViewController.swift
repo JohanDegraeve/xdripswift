@@ -10,9 +10,7 @@ import PieCharts
 import WatchConnectivity
 import SwiftUI
 import WidgetKit
-#if canImport(AppIntents)
 import AppIntents
-#endif
 
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController, ObservableObject {
@@ -1814,6 +1812,13 @@ final class RootViewController: UIViewController, ObservableObject {
         calibrateToolbarButtonOutlet.title = Texts_HomeView.calibrationButton
         screenLockToolbarButtonOutlet.title = screenIsLocked ? Texts_HomeView.unlockButton : Texts_HomeView.lockButton
         
+        // provide the older SF Symbol for the calibrate button for users below iOS17
+        if #available(iOS 17.0, *) {
+            calibrateToolbarButtonOutlet.image = UIImage(systemName: "dot.scope")
+        } else {
+            calibrateToolbarButtonOutlet.image = UIImage(systemName: "scope")
+        }
+        
         chartLongPressGestureRecognizerOutlet.delegate = self
         chartPanGestureRecognizerOutlet.delegate = self
         
@@ -3582,11 +3587,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 // add delta if available
                 if bgReadings.count > 1 {
-                    var previousValueInUserUnit: Double = 0.0
-                    var actualValueInUserUnit: Double = 0.0
-                    
-                    previousValueInUserUnit = bgReadings[1].calculatedValue.mgDlToMmol(mgDl: isMgDl)
-                    actualValueInUserUnit = bgReadings[0].calculatedValue.mgDlToMmol(mgDl: isMgDl)
+                    var previousValueInUserUnit: Double = bgReadings[1].calculatedValue.mgDlToMmol(mgDl: isMgDl)
+                    var actualValueInUserUnit: Double = bgReadings[0].calculatedValue.mgDlToMmol(mgDl: isMgDl)
                     
                     // if the values are in mmol/L, then round them to the nearest decimal point in order to get the same precision out of the next operation
                     if !isMgDl {
@@ -3595,7 +3597,6 @@ final class RootViewController: UIViewController, ObservableObject {
                     }
                     
                     deltaValueInUserUnit = actualValueInUserUnit - previousValueInUserUnit
-                    
                     slopeOrdinal = bgReadings[0].slopeOrdinal()
                 }
                 
@@ -3775,9 +3776,6 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 // if there is reasonably recent data, then show values
             } else if deviceStatus.createdAt > Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                // TODO: DEBUG
-                trace("deviceStatus.createdAt > Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes). createdAt = %{public}@ > %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, deviceStatus.createdAt.formatted(date: .abbreviated, time: .standard), Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes).formatted(date: .abbreviated, time: .standard))
-                
                 updateDeviceStatusValues(showData: true)
                 
                 // reset the text colours (in case they were dimmed when the app went to the background)
@@ -3826,9 +3824,6 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 // so there is no recent data, so hide everything and show red
             } else {
-                // TODO: DEBUG
-                trace("no recent data. createdAt = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, deviceStatus.createdAt.formatted(date: .abbreviated, time: .standard))
-                
                 updateDeviceStatusValues(showData: false)
                 
                 infoStatusActivityIndicatorOutlet.isHidden = true
@@ -3839,8 +3834,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 infoStatusButtonOutlet.setTitle(deviceStatus.deviceStatusTitle(), for: .normal)
                 infoStatusButtonOutlet.setTitleColor(deviceStatus.deviceStatusUIColor(), for: .normal)
                 
-                // TODO: DEBUG
-                trace("RVC device status error: createdAt = %{public}@, lastChecked = %{public}@, lastLoopDate = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, nightscoutSyncManager?.deviceStatus.createdAt.formatted(date: .omitted, time: .standard) ?? "nil", nightscoutSyncManager?.deviceStatus.lastCheckedDate.formatted(date: .omitted, time: .standard) ?? "nil", nightscoutSyncManager?.deviceStatus.lastLoopDate.formatted(date: .omitted, time: .standard) ?? "nil")
+                // only for debug trace file
+                trace("DeviceStatusUpdate - device status error. createdAt = %{public}@, lastChecked = %{public}@, lastLoopDate = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, nightscoutSyncManager?.deviceStatus.createdAt.formatted(date: .omitted, time: .standard) ?? "nil", nightscoutSyncManager?.deviceStatus.lastCheckedDate.formatted(date: .omitted, time: .standard) ?? "nil", nightscoutSyncManager?.deviceStatus.lastLoopDate.formatted(date: .omitted, time: .standard) ?? "nil")
             }
         }
     }

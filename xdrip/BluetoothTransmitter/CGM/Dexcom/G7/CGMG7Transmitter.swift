@@ -179,10 +179,6 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
             return
         }
         
-        trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, characteristic_UUID.description)
-        
-        trace("in peripheralDidUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, value.hexEncodedString())
-        
         if let error = error {
             trace("error: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .error , error.localizedDescription)
         }
@@ -209,6 +205,10 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                     trace("    failed to create G7GlucoseMessage", log: log, category: ConstantsLog.categoryCGMG7, type: .error )
                     return
                 }
+                
+                trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, characteristic_UUID.description)
+                
+                trace("in peripheralDidUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, value.hexEncodedString())
                 
                 let sensorAgeInDays = Double(round((g7GlucoseMessage.sensorAge / 3600 / 24) * 10) / 10)
                 
@@ -269,11 +269,11 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
             break
             
         case .CBUUID_Backfill:
+            guard value.count == 9 else { return }
             
-            guard value.count == 9 else {
-                trace("    value.count != 9, no procesing", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
-                return
-            }
+            trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, characteristic_UUID.description)
+            
+            trace("in peripheralDidUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, value.hexEncodedString())
 
             if let sensorAge = sensorAge, sensorAge < (ConstantsDexcomG7.maxSensorAgeInDays * 24 * 3600), let dexcomG7BackfillMessage = DexcomG7BackfillMessage(data: value, sensorAge: sensorAge) {
                 trace("    received backfill mesage, calculatedValue = %{public}@, timeStamp = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, dexcomG7BackfillMessage.calculatedValue.description, dexcomG7BackfillMessage.timeStamp.description(with: .current))
@@ -282,6 +282,10 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
             }
             
         case .CBUUID_Receive_Authentication:
+            
+            trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, characteristic_UUID.description)
+            
+            trace("in peripheralDidUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, value.hexEncodedString())
             
             if let authChallengeRxMessage = AuthChallengeRxMessage(data: value) {
 

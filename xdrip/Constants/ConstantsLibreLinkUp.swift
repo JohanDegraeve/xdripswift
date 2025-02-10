@@ -14,9 +14,12 @@ enum ConstantsLibreLinkUp {
     static let libreLinkUpVersionDefault: String = "4.12.0"
     
     /// double to hold maximum sensor days for Libre sensors that upload to LibreLinkUp
-    /// currently easy as they are all the same at 14 days exactly (LibreLink doesn't upload the extra 12 hours)
     /// this is needed because we don't have a CGM transmitter class to pull the data from when in follower mode
     static let libreLinkUpMaxSensorAgeInDays: Double = 14.0
+    
+    /// double to hold maximum sensor days for Libre Plus sensors that upload to LibreLinkUp
+    /// this is needed because we don't have a CGM transmitter class to pull the data from when in follower mode
+    static let libreLinkUpMaxSensorAgeInDaysLibrePlus: Double = 15.0
     
     /// warm-up time considered for all libre sensors in LibreLinkUp follower mode
     static let sensorWarmUpRequiredInMinutesForLibre: Double = 60.0
