@@ -17,7 +17,6 @@
 "settingsviews_transmitterid" = "Lähettimen ID";
 "settingsviews_transmitterid_text_for_button" = "Lähettimen ID";
 "settingsviews_givetransmitterid" = "Anna lähetettimen ID";
-"settingsviews_resettransmitter" = "Nollaa lähetin (Anubis)";
 "settingsviews_nonfixedtransmitter" = "Käytä monipistekalibrointia";
 "settingsviews_labelNonFixed" = "Monipistekalibrointi";
 "settingsviews_sectiontitlealerting" = "Hälytys";
@@ -33,14 +32,14 @@
 "settingsviews_giveDexcomShareAccountName" = "Anna Dexcom Sharen käyttäjätunnus";
 "settingsviews_giveDexcomSharePassword" = "Anna Dexcom Sharen salasana";
 "settingsviews_giveDexcomShareSerialNumber" = "Anna Dexcom vastaanottimen sarjanumero";
-"settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Ota Nightscout käyttöön";
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutEnabled" = "Ota Nightscout käyttöön";
+"settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Käytä lähetysaikataulua";
 "schedule" = "Aikataulu";
-"settingsviews_giveNightScoutUrl" = "Anna NightScout palvelimesi URL";
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
-"settingsviews_giveNightScoutAPIKey" = "Anna API_SECRET";
+"settingsviews_giveNightscoutUrl" = "Anna Nightscout palvelimesi URL";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "Anna API_SECRET";
 "editScheduleTimePickerSubtitle" = "Muuta: ";
 "timeScheduleViewTitle" = "Päällä/pois aikataulu ";
 "uploadSensorStartTime" = "Lähetä sensorin aloitusaika";
@@ -83,7 +82,7 @@
 "volumeTestiOSSound" = "Testaa ääni (nykyinen iPhone voimakkuus)";
 "debugLevel" = "Sisällytä debug taso";
 "warningChangeFromMasterToFollower" = "Vaihtaminen masterista seuraajaan pysäyttää nykyisen anturin. Haluatko jatkaa?";
-"nightScoutPort" = "Portti";
+"nightscoutPort" = "Portti";
 "settingsviews_showcoloredobjectives" = "Näytä värilliset tavoiteviivat ";
 "settingsviews_showtarget" = "Näytä kohdeviiva";
 "settingsviews_targetValue" = "Tavoitearvo";
@@ -139,9 +138,6 @@
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip tai lähetin algoritmi";
 
-/// help settings, should the help icon be shown on the toolbar
-"settingsviews_showHelpIcon" = "Näytä ohjeen ikoni";
-
 /// help settings, restart needed
 "settingsviews_restartNeeded" = "(Uudelleenkäynnistys vaaditaan)";
 
@@ -163,9 +159,6 @@
 /// Housekeeper settings, section title
 "settingsviews_sectionTitleHousekeeper" = "Tiedon hallinta";
 
-/// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Näytä mikrobolus kaaviossa";
-
 /// When clicking the retention setting, a pop up asks for how many days should data be stored
 "settingsviews_housekeeperRetentionPeriodMessage" = "Montako päivää tietoja säilytetään (90-365)?\n\n(suositus: 90 päivää)";
 
@@ -180,19 +173,19 @@
 "Select Time" = "Select Time";
 
 /// transmitter settings, to explain that the reset option only works for certain transmitters
-"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or One transmitters.";
+"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
 
 /// data source settings, keep-alive mode is set to aggressive
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
 
 /// Settings screen for loop delay, explanatory text for value
-"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with Loop";
+"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
 
 /// statistics settings, prefer time in tight range
 "settingsviews_timeInRangeTypeTightRange" = "Tight Range";
@@ -216,7 +209,6 @@
 "settingsviews_valueIsRequired" = "⚠️ Required";
 
 /// treatments settings, offset the carb treatments on main chart
-"settingsviews_offsetCarbTreatmentsOnChart" = "Offset Carbs on Chart";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
@@ -261,7 +253,7 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show the Mini-Chart";
+"settingsviews_showMiniChart" = "Show Mini-Chart";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Patient Name";
@@ -309,7 +301,7 @@
 "settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
 
 /// Should loop data be shared only every 5 minutes
-"shareToLoopOnceEvery5Minutes" = "Share to Loop every 5 mins";
+"shareToLoopOnceEvery5Minutes" = "Share with OS-AID every 5 mins";
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";

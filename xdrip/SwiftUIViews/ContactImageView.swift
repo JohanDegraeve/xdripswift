@@ -9,6 +9,8 @@ struct ContactImageView: View {
     var slopeArrow: String
     var bgRangeDescription: BgRangeDescription
     var valueIsUpToDate: Bool
+    var useHighContrastContactImage: Bool
+    var disableContactImage: Bool
 
     var uiImage: UIImage {
         return getImage()
@@ -20,15 +22,26 @@ struct ContactImageView: View {
     }
     
     var bgColor: UIColor {
+        if disableContactImage {
+            return useHighContrastContactImage ? .white : .systemCyan
+        }
+        
         guard bgValue > 0, valueIsUpToDate else { return ConstantsContactImage.unknownColor }
         
-        switch bgRangeDescription {
-        case .inRange:
-            return ConstantsContactImage.inRangeColor
-        case .notUrgent:
-            return ConstantsContactImage.notUrgentColor
-        case .urgent:
-            return ConstantsContactImage.urgentColor
+        // if the user isn't requesting a high contrast image, then return the correct bg color
+        if !useHighContrastContactImage {
+            switch bgRangeDescription {
+            case .inRange:
+                return ConstantsContactImage.inRangeColor
+            case .notUrgent:
+                return ConstantsContactImage.notUrgentColor
+            case .urgent:
+                return ConstantsContactImage.urgentColor
+            }
+        } else {
+            // return white as this will render nicely on watchfaces
+            // with a color tint applied
+            return .white
         }
     }
     
@@ -46,7 +59,7 @@ struct ContactImageView: View {
                 fontSize = showSlopeArrow ? 90 : 100
             }
         } else {
-            switch bgValue.mgdlToMmol() {
+            switch bgValue.mgDlToMmol() {
             case 0.1..<10.0:
                 fontSize = showSlopeArrow ? 100 : 110
             case 10.0..<20.0:
@@ -56,42 +69,28 @@ struct ContactImageView: View {
             }
         }
         
+        if disableContactImage {
+            fontSize = 100
+        }
+        
         return UIFont.systemFont(ofSize: fontSize, weight: .bold)
     }
-    
-//    var slopeArrowFont: UIFont {
-//        var fontSize: CGFloat = 100
-//        
-//        if isMgDl {
-//            switch bgValue {
-//            case 1..<100:
-//                fontSize = 90
-//            case 100..<200:
-//                fontSize = 90
-//            default:
-//                fontSize = 100
-//            }
-//        } else {
-//            switch bgValue.mgdlToMmol() {
-//            case 0.1..<10.0:
-//                fontSize = 100
-//            case 10.0..<20.0:
-//                fontSize = 120
-//            default:
-//                fontSize = 120
-//            }
-//        }
-//        
-//        return UIFont.systemFont(ofSize: 80, weight: .bold)
-//    }
     
     func getImage() -> UIImage {
         let width = 256.0
         let height = 256.0
         let rect = CGRect(x: 0, y: 0, width: width, height: height)
         
-        let bgValueString: String = bgValue.mgdlToMmolAndToString(mgdl: isMgDl)
-        let showSlopeArrow: Bool = (valueIsUpToDate && slopeArrow != "") ? true : false
+        // if there is no current value, 0 will be received so show this as a relevant "---" string
+        var bgValueString: String = bgValue > 0 ? bgValue.mgDlToMmolAndToString(mgDl: isMgDl) : isMgDl ? "---" : "-.-"
+        
+        var showSlopeArrow: Bool = (valueIsUpToDate && slopeArrow != "") ? true : false
+        
+        // override the value and slope if the user is in follower mode and has disabled the keep-alive (to prevent showing an almost always out of date value)
+        if disableContactImage {
+            bgValueString = "OFF"
+            showSlopeArrow = false
+        }
                 
         UIGraphicsBeginImageContext(rect.size)
         
@@ -147,10 +146,12 @@ struct ContactImageViewPreview: View {
     var slopeArrow: String
     var bgRangeDescription: BgRangeDescription
     var valueIsUpToDate: Bool
+    var useHighContrastContactImage: Bool
+    var disableContactImage: Bool
     
     var body: some View {
         ZStack {
-            ContactImageView(bgValue: bgValue, isMgDl: isMgDl, slopeArrow: slopeArrow, bgRangeDescription: bgRangeDescription, valueIsUpToDate: valueIsUpToDate)
+            ContactImageView(bgValue: bgValue, isMgDl: isMgDl, slopeArrow: slopeArrow, bgRangeDescription: bgRangeDescription, valueIsUpToDate: valueIsUpToDate, useHighContrastContactImage: useHighContrastContactImage, disableContactImage: disableContactImage)
             Circle()
                 .stroke(lineWidth: 20)
                 .foregroundColor(.white)
@@ -164,22 +165,23 @@ struct ContactImageViewPreview: View {
 struct ContactImageView_Previews: PreviewProvider {
     struct Preview: View {
         var body: some View {
+            ContactImageViewPreview(bgValue: 88, isMgDl: true, slopeArrow: "", bgRangeDescription: BgRangeDescription.notUrgent, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: true).previewDisplayName("OFF")
             
-            ContactImageViewPreview(bgValue: 88, isMgDl: true, slopeArrow: "", bgRangeDescription: BgRangeDescription.notUrgent, valueIsUpToDate: true).previewDisplayName("88")
-            ContactImageViewPreview(bgValue: 88, isMgDl: true, slopeArrow: "\u{2192}" /* → */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("88 →")
-            ContactImageViewPreview(bgValue: 188, isMgDl: true, slopeArrow: "", bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("188")
-            ContactImageViewPreview(bgValue: 188, isMgDl: true, slopeArrow: "\u{2198}" /* ↘ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("188 ↘")
-            ContactImageViewPreview(bgValue: 388, isMgDl: true, slopeArrow: "", bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("388")
-            ContactImageViewPreview(bgValue: 388, isMgDl: true, slopeArrow: "\u{2191}\u{2191}" /* ↑↑ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("388 ↑↑")
+            ContactImageViewPreview(bgValue: 88, isMgDl: true, slopeArrow: "", bgRangeDescription: BgRangeDescription.notUrgent, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("88")
+            ContactImageViewPreview(bgValue: 88, isMgDl: true, slopeArrow: "\u{2192}" /* → */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: true, disableContactImage: false).previewDisplayName("88 →")
+            ContactImageViewPreview(bgValue: 188, isMgDl: true, slopeArrow: "", bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("188")
+            ContactImageViewPreview(bgValue: 188, isMgDl: true, slopeArrow: "\u{2198}" /* ↘ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("188 ↘")
+            ContactImageViewPreview(bgValue: 388, isMgDl: true, slopeArrow: "", bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("388")
+            ContactImageViewPreview(bgValue: 388, isMgDl: true, slopeArrow: "\u{2191}\u{2191}" /* ↑↑ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("388 ↑↑")
             
-            ContactImageViewPreview(bgValue: 160, isMgDl: false, slopeArrow: "",  bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("8.9") /* → */
-            ContactImageViewPreview(bgValue: 160, isMgDl: false, slopeArrow: "\u{2198}" /* ↘ */,  bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("8.9 ↘") /* → */
-            ContactImageViewPreview(bgValue: 188, isMgDl: false, slopeArrow: "", bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("10.4")
-            ContactImageViewPreview(bgValue: 188, isMgDl: false, slopeArrow: "\u{2198}" /* ↘ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("10.4 ↘")
-            ContactImageViewPreview(bgValue: 400, isMgDl: false, slopeArrow: "", bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("22.2")
-            ContactImageViewPreview(bgValue: 400, isMgDl: false, slopeArrow: "\u{2191}\u{2191}" /* ↑↑ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true).previewDisplayName("22.2 ↑↑")
+            ContactImageViewPreview(bgValue: 160, isMgDl: false, slopeArrow: "",  bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("8.9") /* → */
+            ContactImageViewPreview(bgValue: 160, isMgDl: false, slopeArrow: "\u{2198}" /* ↘ */,  bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("8.9 ↘") /* → */
+            ContactImageViewPreview(bgValue: 188, isMgDl: false, slopeArrow: "", bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("10.4")
+            ContactImageViewPreview(bgValue: 188, isMgDl: false, slopeArrow: "\u{2198}" /* ↘ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("10.4 ↘")
+            ContactImageViewPreview(bgValue: 400, isMgDl: false, slopeArrow: "", bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("22.2")
+            ContactImageViewPreview(bgValue: 400, isMgDl: false, slopeArrow: "\u{2191}\u{2191}" /* ↑↑ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("22.2 ↑↑")
             
-            ContactImageViewPreview(bgValue: 120, isMgDl: true, slopeArrow: "\u{2191}" /* ↑ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: false).previewDisplayName("120, not current")
+            ContactImageViewPreview(bgValue: 120, isMgDl: true, slopeArrow: "\u{2191}" /* ↑ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: false, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("120, not current")
         }
     }
     static var previews: some View {

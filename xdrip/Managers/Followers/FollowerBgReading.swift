@@ -22,7 +22,7 @@ struct FollowerBgReading {
         
     }
     
-    /// creates an instance with parameter a json array as received from NightScout
+    /// creates an instance with parameter a json array as received from Nightscout
     init?(json:[String:Any]) {
         
         guard let sgv = json["sgv"] as? Double, let date = json["date"] as? Double else {return nil}

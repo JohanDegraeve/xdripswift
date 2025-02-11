@@ -1,6 +1,6 @@
 import Foundation
 
-extension Double: RawRepresentable {
+extension Swift.Double: Swift.RawRepresentable {
 
     //MARK: - copied from https://github.com/LoopKit/LoopKit
     
@@ -26,30 +26,30 @@ extension Double: RawRepresentable {
 		return description
 	}
     
-    /// converts mgdl to mmol
-    func mgdlToMmol() -> Double {
+    /// converts mgDl to mmol
+    func mgDlToMmol() -> Double {
         return self * ConstantsBloodGlucose.mgDlToMmoll
     }
     
-    /// converts mgdl to mmol if parameter mgdl = false. If mgdl = true then just returns self
-    func mgdlToMmol(mgdl:Bool) -> Double {
-        if mgdl {
+    /// converts mgDl to mmol if parameter mgDl = false. If mgDl = true then just returns self
+    func mgDlToMmol(mgDl: Bool) -> Double {
+        if mgDl {
             return self
         } else {
             return self * ConstantsBloodGlucose.mgDlToMmoll
         }
     }
     
-    /// converts mmol to mgdl if parameter mgdl = false. If mgdl = true then just returns self
-    func mmolToMgdl(mgdl:Bool) -> Double {
-        if mgdl {
+    /// converts mmol to mgDl if parameter mgDl = false. If mgDl = true then just returns self
+    func mmolToMgdl(mgDl:Bool) -> Double {
+        if mgDl {
             return self
         } else {
             return self.mmolToMgdl()
         }
     }
     
-    /// converts mmol to mgdl
+    /// converts mmol to mgDl
     func mmolToMgdl() -> Double {
         return self * ConstantsBloodGlucose.mmollToMgdl
     }
@@ -61,18 +61,18 @@ extension Double: RawRepresentable {
     }
     
     /// takes self as Double as bloodglucose value, converts value to string, round. Number of digits after decimal seperator depends on the unit. For mg/dl 0 digits after decimal seperator, for mmol, 1 digit after decimal seperator
-    func bgValuetoString(mgdl:Bool) -> String {
-        if mgdl {
+    func bgValueToString(mgDl:Bool) -> String {
+        if mgDl {
             return String(format:"%.0f", self)
         } else {
             return String(format:"%.1f", self)
         }
     }
     
-    /// if mgdl, then returns self, unchanged. If not mgdl, return self rounded to 1 decimal place
-    func bgValueRounded(mgdl: Bool) -> Double {
+    /// if mgDl, then returns self, unchanged. If not mgDl, return self rounded to 1 decimal place
+    func bgValueRounded(mgDl: Bool) -> Double {
         
-        if mgdl {
+        if mgDl {
             
             return self.round(toDecimalPlaces: 0)
             
@@ -86,13 +86,18 @@ extension Double: RawRepresentable {
     
     /// converts mmol to mgdl if parametermgdl = false and, converts value to string, round. Number of digits after decimal seperator depends on the unit. For mg/dl 0 digits after decimal seperator, for mmol, 1 digit after decimal seperator
     ///
-    /// this function is actually a combination of mmolToMgdl if mgdl = true and bgValuetoString
-    func mgdlToMmolAndToString(mgdl:Bool) -> String {
-        if mgdl {
+    /// this function is actually a combination of mmolToMgDl if mgDl = true and bgValueToString
+    func mgDlToMmolAndToString(mgDl: Bool) -> String {
+        if mgDl {
             return String(format:"%.0f", self)
         } else {
-            return String(format:"%.1f", self.mgdlToMmol())
+            return String(format:"%.1f", self.mgDlToMmol())
         }
+    }
+    
+    /// converts mmol value to a string with 1 digit after decimal seperator
+    func mmolToString() -> String {
+        return String(format:"%.1f", self)
     }
     
     /// treats the double as timestamp in milliseconds, since 1970 and prints as date string

@@ -186,13 +186,13 @@ extension BluetoothPeripheralManager: M5StackBluetoothTransmitterDelegate {
         }
         
         // send nightscout url
-        if let url = UserDefaults.standard.nightScoutUrl {
-            if !m5StackBluetoothTransmitter.writeNightScoutUrl(url: url) {success = false}
+        if let url = UserDefaults.standard.nightscoutUrl {
+            if !m5StackBluetoothTransmitter.writeNightscoutUrl(url: url) {success = false}
         }
         
         // send nightscout token
-        if let token = UserDefaults.standard.nightScoutAPIKey {
-            if !m5StackBluetoothTransmitter.writeNightScoutAPIKey(apiKey: token) {success = false}
+        if let token = UserDefaults.standard.nightscoutAPIKey {
+            if !m5StackBluetoothTransmitter.writeNightscoutAPIKey(apiKey: token) {success = false}
         }
         
         // return success

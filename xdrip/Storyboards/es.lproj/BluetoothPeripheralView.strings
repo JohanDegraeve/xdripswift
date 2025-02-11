@@ -64,3 +64,12 @@
 
 /// Tell the user the scan was successful and to just wait now for connection
 "nfcScanSuccessfulMessage" = "\n✅ Scan successful ✅\n\nClick OK and just wait to allow the sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
+
+
+"nativeAlgorithm" = "Algoritmo nativo";
+"xDripAlgorithm" = "Algoritmo xDrip";
+"confirmAlgorithmChangeToTransmitterMessage" = "Por favor, confirmar que deseas cambiar al algoritmo nativo";
+"confirmAlgorithmChangeToxDripMessage" = "Por favor, confirmar que deseas cambiar al algoritmo de xDrip.\n\nEsto hará que dejes de recibir lecturas durante un breve tiempo y la app te pedirá introducir una calibración inicial en cuanto sea necesario.";
+"confirmCalibrationChangeToSinglePointMessage" = "Por favor, confirmar que deseas usar la calibración estándar.\n\nEsto hará que dejes de recibir lecturas durante un breve tiempo y la app te pedirá introducir una calibración inicial en cuanto sea necesario.";
+"confirmCalibrationChangeToMultiPointMessage" = "Por favor, confirmar que deseas usar la calibración multi-puntos.\n\n⚠️ Ten en cuenta que este método de calibración es únicamente para usuarios avanzados y podría ser incluso peligroso si no se hace correctamente.\n\nSi tienes claro cómo funciona esta opción, por favor, apreta Cancelar";
+"confirm" = "Confirmar";

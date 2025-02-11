@@ -2,7 +2,6 @@
 "settingsviews_sectiontitlehelp" = "Ajuda & Documentação";
 "settingsviews_showOnlineHelp" = "Abrir Ajuda Online";
 "settingsviews_translateOnlineHelp" = "Traduzir Automaticamente";
-"settingsviews_showHelpIcon" = "Mostrar Ícone de Ajuda";
 "settingsviews_restartNeeded" = "(É necessário reiniciar)";
 "settingsviews_sectiontitleNotifications" = "Geral";
 "settingsviews_selectbgunit" = "Unidades de Glicose";
@@ -34,7 +33,6 @@
 "settingsviews_transmitterid" = "ID de Transmissor";
 "settingsviews_transmitterid_text_for_button" = "ID de Transmissor";
 "settingsviews_givetransmitterid" = "Introduzir ID Transmissor";
-"settingsviews_resettransmitter" = "Repor Transmissor (Anubis)";
 "settingsviews_nonfixedtransmitter" = "Activar Calibração Multi-ponto";
 "settingsviews_labelNonFixed" = "Calibração Multi-ponto";
 "settingsviews_sectiontitlealerting" = "Alarme";
@@ -50,14 +48,14 @@
 "settingsviews_giveDexcomShareAccountName" = "Introduzir Nome da Conta Dexcom Share";
 "settingsviews_giveDexcomSharePassword" = "Introduzir Senha Dexcom Shared";
 "settingsviews_giveDexcomShareSerialNumber" = "Introduzir nº. de série do Receptor Dexcom";
-"settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Activar Nightscout";
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutEnabled" = "Activar Nightscout";
+"settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Utilizar Agendamento de Envio";
 "schedule" = "Agenda";
-"settingsviews_giveNightScoutUrl" = "Introduzir NightScout URL";
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
-"settingsviews_giveNightScoutAPIKey" = "Introduzir API_SECRET";
+"settingsviews_giveNightscoutUrl" = "Introduzir Nightscout URL";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "Introduzir API_SECRET";
 "editScheduleTimePickerSubtitle" = "Mudar: ";
 "timeScheduleViewTitle" = "Lig./Desl. Hora Agendamento por ";
 "uploadSensorStartTime" = "Enviar Hora de Início de Sensor";
@@ -100,7 +98,7 @@
 "volumeTestiOSSound" = "Testar Volume (Volume actual do iPhone)";
 "debugLevel" = "Incluir Nível de Depuração";
 "warningChangeFromMasterToFollower" = "Aterar de Mestre para Seguidor vai parar o actual sensor. Deseja continuar?";
-"nightScoutPort" = "Porto";
+"nightscoutPort" = "Porto";
 "smoothLibreValues" = "Suavizar Valores do Libre";
 "oslog" = "OSLog";
 "nslog" = "NSLog";
@@ -135,9 +133,6 @@
 /// Housekeeper settings, section title
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
 
-/// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart";
-
 /// When clicking the retention setting, a pop up asks for how many days should data be stored
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 
@@ -152,19 +147,19 @@
 "Select Time" = "Select Time";
 
 /// transmitter settings, to explain that the reset option only works for certain transmitters
-"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or One transmitters.";
+"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
 
 /// data source settings, keep-alive mode is set to aggressive
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
 
 /// Settings screen for loop delay, explanatory text for value
-"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with Loop";
+"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
 
 /// statistics settings, prefer time in tight range
 "settingsviews_timeInRangeTypeTightRange" = "Tight Range";
@@ -188,7 +183,6 @@
 "settingsviews_valueIsRequired" = "⚠️ Required";
 
 /// treatments settings, offset the carb treatments on main chart
-"settingsviews_offsetCarbTreatmentsOnChart" = "Offset Carbs on Chart";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
@@ -233,7 +227,7 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show the Mini-Chart";
+"settingsviews_showMiniChart" = "Show Mini-Chart";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Patient Name";
@@ -281,7 +275,7 @@
 "settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
 
 /// Should loop data be shared only every 5 minutes
-"shareToLoopOnceEvery5Minutes" = "Share to Loop every 5 mins";
+"shareToLoopOnceEvery5Minutes" = "Share with OS-AID every 5 mins";
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";

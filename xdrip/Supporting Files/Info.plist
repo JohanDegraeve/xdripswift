@@ -4,6 +4,8 @@
 <dict>
 	<key>AppGroupIdentifier</key>
 	<string>$(APP_GROUP_IDENTIFIER)</string>
+	<key>AppGroupIdentifierTrio</key>
+	<string>$(APP_GROUP_IDENTIFIER_TRIO)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -31,6 +33,21 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>INAlternativeAppNames</key>
+	<array>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>xDrip</string>
+			<key>INAlternativeAppNamePronunciationHint</key>
+			<string>ex drip</string>
+		</dict>
+		<dict>
+			<key>INAlternativeAppName</key>
+			<string>Drip</string>
+			<key>INAlternativeAppNamePronunciationHint</key>
+			<string>drip</string>
+		</dict>
+	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
@@ -49,6 +66,8 @@
 	<string>To create events with BG reading values, so that they can be viewed on Apple Watch and CarPlay</string>
 	<key>NSCalendarsUsageDescription</key>
 	<string>To create events with BG reading values, so that they can be viewed on Apple Watch and CarPlay</string>
+	<key>NSContactsUsageDescription</key>
+	<string>To update the contact photo with an image showing the current BG values</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Store bloodglucose readings</string>
 	<key>NSHealthUpdateUsageDescription</key>
@@ -98,24 +117,7 @@
 	</array>
 	<key>UIUserInterfaceStyle</key>
 	<string>Light</string>
-	<key>NSContactsUsageDescription</key>
-	<string>To update the contact photo with an image showing the current BG values</string>
 	<key>view controller-based status bar</key>
 	<false/>
-    <key>INAlternativeAppNames</key>
-        <array>
-            <dict>
-                <key>INAlternativeAppName</key>
-                <string>xDrip</string>
-                <key>INAlternativeAppNamePronunciationHint</key>
-                <string>ex drip</string>
-            </dict>
-            <dict>
-                <key>INAlternativeAppName</key>
-                <string>Drip</string>
-                <key>INAlternativeAppNamePronunciationHint</key>
-                <string>drip</string>
-            </dict>
-        </array>
 </dict>
 </plist>

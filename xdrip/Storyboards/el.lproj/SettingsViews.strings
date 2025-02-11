@@ -2,7 +2,6 @@
 "settingsviews_sectiontitlehelp" = "Βοήθεια & Τεκμηρίωση";
 "settingsviews_showOnlineHelp" = "Ανοίξτε τη Ηλεκτρονική Βοήθεια;";
 "settingsviews_translateOnlineHelp" = "Αυτόματη μετάφραση;";
-"settingsviews_showHelpIcon" = "Εμφάνιση εικονιδίου βοήθειας;";
 "settingsviews_restartNeeded" = "(Απαιτείται επανεκκίνηση)";
 "settingsviews_sectiontitleNotifications" = "Γενικά";
 "settingsviews_selectbgunit" = "Μονάδες μέτρησης γλυκόζης";
@@ -26,7 +25,6 @@
 "settingsviews_showTreatmentsOnChart" = "Εμφάνιση θεραπειών στο γράφημα;";
 "settingsviews_smallBolusTreatmentThreshold" = "Όριο Micro-bolus (ταχείας δράσης)";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Κάτω από πόσες μονάδες πρέπει να θεωρήσουμε ένα ταχείας δράσης ως μικροδιώρωση (micro-bolus);\n\n(Προτεινόμενη τιμή: 1,0U)";
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Εμφάνιση Micro-bolus στο γράφημα;";
 "settingsviews_sectiontitlestatistics" = "Στατιστικά";
 "settingsviews_showStatistics" = "Εμφάνιση στατιστικών;";
 "settingsviews_daysToUseStatisticsTitle" = "Μέρες για υπολογισμό;";
@@ -37,7 +35,6 @@
 "settingsviews_transmitterid" = "Αναγνωριστικό πομπού";
 "settingsviews_transmitterid_text_for_button"  = "Αναγνωριστικό πομπού";
 "settingsviews_givetransmitterid" = "Εισαγάγετε αναγνωριστικό πομπού";
-"settingsviews_resettransmitter" = "Επαναφορά πομπού (Anubis)";
 "settingsviews_webooptransmitter" = "Χρήση αλγόριθμου πομπού;";
 "settingsviews_nonfixedtransmitter" = "Ενεργοποίηση βαθμονόμησης πολλών σημείων;";
 "settingsviews_labelNonFixed" = "Βαθμονόμηση πολλαπλών σημείων";
@@ -55,14 +52,14 @@
 "settingsviews_giveDexcomShareAccountName" = "Εισαγάγετε όνομα λογαριασμού Dexcom Share";
 "settingsviews_giveDexcomSharePassword" = "Κοινοποίηση κωδικού πρόσβασης για κοινή χρήση Dexcom";
 "settingsviews_giveDexcomShareSerialNumber" = "Εισαγάγετε τον σειριακό αριθμό του δέκτη Dexcom";
-"settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Ενεργοποίηση του Nightscout";
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutEnabled" = "Ενεργοποίηση του Nightscout";
+"settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Μεταφόρτωση με χρονοδιάγραμμα;";
 "schedule" = "Χρονοδιάγραμμα";
-"settingsviews_giveNightScoutUrl" = "Εισαγάγετε το NightScout URL σας";
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
-"settingsviews_giveNightScoutAPIKey" = "Εισαγάγετε το API_SECRET σας";
+"settingsviews_giveNightscoutUrl" = "Εισαγάγετε το Nightscout URL σας";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "Εισαγάγετε το API_SECRET σας";
 "editScheduleTimePickerSubtitle" = "Αλλαγή: ";
 "timeScheduleViewTitle" = "Χρονοδιάγραμμα On/Off για ";
 "uploadSensorStartTime" = "Μεταφόρτωση ώρα έναρξης αισθητήρα;";
@@ -106,7 +103,7 @@
 "volumeTestiOSSound" = "Έλεγχος (τρέχουσας) έντασης ήχου";
 "debugLevel" = "Συμπεριλάβετε λεπτομερή διαγνωστικά";
 "warningChangeFromMasterToFollower" = "Η εναλλαγή από κύριο σε ακόλουθο θα σταματήσει τον τρέχοντα αισθητήρα σας. Θέλετε να συνεχίσετε;";
-"nightScoutPort" = "Θύρα";
+"nightscoutPort" = "Θύρα";
 "developerSettings" = "Ρυθμίσεις προγραμματιστή";
 "smoothLibreValues" = "Ομαλοποίηση τιμών Libre;";
 "nslog" = "NSLog";
@@ -129,13 +126,13 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// transmitter settings, to explain that the reset option only works for certain transmitters
-"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or One transmitters.";
+"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
 
 /// data source settings, keep-alive mode is set to aggressive
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
@@ -162,7 +159,6 @@
 "settingsviews_valueIsRequired" = "⚠️ Required";
 
 /// treatments settings, offset the carb treatments on main chart
-"settingsviews_offsetCarbTreatmentsOnChart" = "Offset Carbs on Chart";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
@@ -237,7 +233,7 @@
 "settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
 
 /// Should loop data be shared only every 5 minutes
-"shareToLoopOnceEvery5Minutes" = "Share to Loop every 5 mins";
+"shareToLoopOnceEvery5Minutes" = "Share with OS-AID every 5 mins";
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";

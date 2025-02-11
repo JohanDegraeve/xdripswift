@@ -16,6 +16,15 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// created public because inheriting classes need it
     var transmitterStartDate: Date?
     
+    /// - if true then xDrip4iOS will not send anything to the transmitter, it will only listen
+    /// - sending should be done by other app (eg official Dexcom app)
+    /// - exception could be sending calibration request or start sensor request, because if user is calibrating or starting the sensor via xDrip4iOS then it would need to be send to the transmitter by xDrip4iOS
+    public var useOtherApp = false
+    
+    /// is the G6 transmitter Anubis-modified?
+    /// use this flag (once set by the TransmitterVersionRxMessage) to enable extra features as needed
+    public var isAnubis = false
+    
     /// CGMG5TransmitterDelegate
     public weak var cGMG5TransmitterDelegate: CGMG5TransmitterDelegate?
 
@@ -61,11 +70,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             }
         }
     }
-
-    /// - if true then xDrip4iOS will not send anything to the transmitter, it will only listen
-    /// - sending should be done by other app (eg official Dexcom app)
-    /// - exception could be sending calibration request or start sensor request, because if user is calibrating or starting the sensor via xDrip4iOS then it would need to be send to the transmitter by xDrip4iOS
-    public var useOtherApp = false
     
     // MARK: - private properties
     
@@ -173,7 +177,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     ///     - calibrationToSendToTransmitter : used to send calibration done by user via xDrip4iOS to Dexcom transmitter. For example, user may have give a calibration in the app, but it's not yet send to the transmitter. This needs to be verified in CGMG5Transmitter, which is why it's given here as parameter - when initializing, assign last known calibration for the active sensor, even if it's already sent.
     ///     - webOOPEnabled : enabled or not, if nil then default false
     ///     - userOtherApp
-    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG5TransmitterDelegate: CGMG5TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, transmitterStartDate: Date?, sensorStartDate: Date?, calibrationToSendToTransmitter: Calibration?, firmware: String?, webOOPEnabled: Bool?, useOtherApp: Bool) {
+    ///     - isAnubis: true or false. If true then we can take advantage of extra features
+    init(address:String?, name: String?, transmitterID:String, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG5TransmitterDelegate: CGMG5TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, transmitterStartDate: Date?, sensorStartDate: Date?, calibrationToSendToTransmitter: Calibration?, firmware: String?, webOOPEnabled: Bool?, useOtherApp: Bool, isAnubis: Bool) {
         
         // assign addressname and name or expected devicename
         var newAddressAndName:BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "DEXCOM" + transmitterID[transmitterID.index(transmitterID.startIndex, offsetBy: 4)..<transmitterID.endIndex])
@@ -198,6 +203,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         // initialize firmware
         self.firmware = firmware
+        
+        // initialize isAnubis
+        self.isAnubis = isAnubis
         
         // assign calibrationToSendToTransmitter
         self.calibrationToSendToTransmitter = calibrationToSendToTransmitter
@@ -812,11 +820,14 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         return .dexcom
     }
     
-    
+    // if using an Anubis transmitter and the user has chosen to override the max days, we can return this value
+    // if not, return the standard maxSensorAgeInDays
     func maxSensorAgeInDays() -> Double? {
-        
-        return ConstantsDexcomG5.maxSensorAgeInDays
-        
+        if isAnubis, let activeSensorMaxSensorAgeInDaysOverridenAnubis = UserDefaults.standard.activeSensorMaxSensorAgeInDaysOverridenAnubis, activeSensorMaxSensorAgeInDaysOverridenAnubis > 0 {
+            return activeSensorMaxSensorAgeInDaysOverridenAnubis
+        } else {
+            return ConstantsDexcomG5.maxSensorAgeInDays
+        }
     }
     
     func overruleIsWebOOPEnabled() -> Bool {
@@ -932,6 +943,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     func getCBUUID_Receive() -> String {
         return CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue
+    }
+    
+    func isAnubisG6() -> Bool {
+        return isAnubis
     }
     
     // MARK: - private helper functions
@@ -1284,13 +1299,19 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             // setting glucoseTxSent to true, because we received just glucose data
             // possibly a glucoseTx message (was sent by other app on the same device, so it's not necessary to send a new one
             glucoseTxSent = true
+            
+            var forceNewSensor = false
+            
+            if let sensorStartDate = self.sensorStartDate, let activeSensorStartDate = UserDefaults.standard.activeSensorStartDate, activeSensorStartDate < sensorStartDate.addingTimeInterval(-15.0) || activeSensorStartDate > sensorStartDate.addingTimeInterval(15.0) {
+                forceNewSensor = true
+            }
 
             // this is a valid sensor state, now it's time to process receivedSensorStartDate if it exists
             if let receivedSensorStartDate = receivedSensorStartDate {
                 
                 // if current sensorStartDate is < receivedSensorStartDate then it seems a new sensor
                 // adding an interval of 15 seconds, because sensorStartDate reported by transmitter can vary a second
-                if sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate.addingTimeInterval(-15.0)) {
+                if forceNewSensor || sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate.addingTimeInterval(-15.0)) {
                     
                     if let sensorStartDate = sensorStartDate {
                         trace("    Currently known sensorStartDate = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, sensorStartDate.toString(timeStyle: .long, dateStyle: .long))
@@ -1311,11 +1332,48 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 sensorStartDate = receivedSensorStartDate
                 
                 // reset receivedSensorStartDate to nil
-                self.receivedSensorStartDate = nil
+                //self.receivedSensorStartDate = nil
                 
             }
             
             break
+            
+        case .SensorWarmup:
+            
+            var forceNewSensor = false
+            
+            if let sensorStartDate = self.sensorStartDate, let activeSensorStartDate = UserDefaults.standard.activeSensorStartDate, activeSensorStartDate < sensorStartDate.addingTimeInterval(-15.0) || activeSensorStartDate > sensorStartDate.addingTimeInterval(15.0) {
+                forceNewSensor = true
+            }
+            
+            // this is a valid sensor state, now it's time to process receivedSensorStartDate if it exists
+            if let receivedSensorStartDate = receivedSensorStartDate {
+                
+                // if current sensorStartDate is < receivedSensorStartDate then it seems a new sensor
+                // adding an interval of 15 seconds, because sensorStartDate reported by transmitter can vary a second
+                if forceNewSensor || sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate.addingTimeInterval(-15.0)) {
+                    
+                    if let sensorStartDate = sensorStartDate {
+                        trace("    Currently known sensorStartDate = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, sensorStartDate.toString(timeStyle: .long, dateStyle: .long))
+                    } else {
+                        trace("    current sensorStartDate is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                    }
+                    trace("    received sensorStartDate minus 15 seconds = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, receivedSensorStartDate.addingTimeInterval(-15.0).toString(timeStyle: .long, dateStyle: .long))
+                    
+                    trace("    Seems a new sensor is detected.", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                    
+                    self.receivedSensorStartDate = receivedSensorStartDate
+                    
+                    cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: receivedSensorStartDate)
+                    
+                }
+                
+                // assign sensorStartDate to receivedSensorStartDate
+                sensorStartDate = receivedSensorStartDate
+            }
+            
+            // for safety assign nil to lastGlucoseInSensorDataRxReading
+            lastGlucoseInSensorDataRxReading = nil
             
         case .SessionStopped:
             
@@ -1391,7 +1449,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 timeStampLastSensorStartTimeRead = Date()
                 
                 // if current sensorStartDate is < from receivedSensorStartDate then it seems a new sensor
-                if sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate.addingTimeInterval(-15.0)) {
+                if self.receivedSensorStartDate == nil || sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate.addingTimeInterval(-15.0)) {
                    
                     if let sensorStartDate = sensorStartDate {
                         trace("    Currently known sensorStartDate = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, sensorStartDate.toString(timeStyle: .long, dateStyle: .long))
@@ -1403,7 +1461,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                     trace("    Temporary storing the received SensorStartDate till a glucoseRx message is received with valid sensor status", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
                     
                     self.receivedSensorStartDate = receivedSensorStartDate
-                    
                 }
                 
             } else {
@@ -1431,21 +1488,26 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     }
 
     private func processTransmitterVersionRxMessage(value:Data) {
-        
         if let transmitterVersionRxMessage = TransmitterVersionRxMessage(data: value) {
-            
             // assign transmitterVersion
             firmware = transmitterVersionRxMessage.firmwareVersionFormatted()
             
-            trace("in  processTransmitterVersionRxMessage, firmware = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, firmware!)
-
-            // send to delegate
-            cGMG5TransmitterDelegate?.received(firmware: firmware!, cGMG5Transmitter: self)
+            // unwrap it cleanly instead of force-unwrapping it in the call
+            if let firmware = firmware {
+                // send the firmware string to delegate
+                cGMG5TransmitterDelegate?.received(firmware: firmware, cGMG5Transmitter: self)
+                trace("in  processTransmitterVersionRxMessage, firmware = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, firmware)
+            }
             
+            // assign the isAnubis property
+            isAnubis = transmitterVersionRxMessage.isAnubis()
+            
+            // send the isAnubis boolean to delegate
+            cGMG5TransmitterDelegate?.received(isAnubis: isAnubis, cGMG5Transmitter: self)
+            trace("in  processTransmitterVersionRxMessage, isAnubis = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, isAnubis.description)
         } else {
-            trace("transmitterVersionRxMessage is nil or firmware to hex is  nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
+            trace("transmitterVersionRxMessage is nil or firmware to hex is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
         }
-        
     }
 
     /// calculates encryptionkey

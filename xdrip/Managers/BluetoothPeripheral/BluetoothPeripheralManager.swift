@@ -52,8 +52,8 @@ class BluetoothPeripheralManager: NSObject {
                 
                 cgmTransmitterInfoChanged()
 
-                // share new address with loop, but not if suppressLoopShare is on
-                if !UserDefaults.standard.suppressLoopShare {
+                // share new address with loop, but not if loop share is disabled
+                if UserDefaults.standard.loopShareType != .disabled {
 
                     setCGMTransmitterInSharedUserDefaults()
 
@@ -242,7 +242,7 @@ class BluetoothPeripheralManager: NSObject {
                     
                     if let dexcomG7 = bluetoothPeripheral as? DexcomG7, let cgmTransmitterDelegate = cgmTransmitterDelegate {
                         
-                        newTransmitter = CGMG7Transmitter(address: dexcomG7.blePeripheral.address, name: dexcomG7.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, webOOPEnabled: dexcomG7.blePeripheral.webOOPEnabled)
+                        newTransmitter = CGMG7Transmitter(address: dexcomG7.blePeripheral.address, name: dexcomG7.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
                         
                     } else {
                         
@@ -256,7 +256,7 @@ class BluetoothPeripheralManager: NSObject {
                         
                         if let transmitterId = dexcomG5orG6.blePeripheral.transmitterId, let cgmTransmitterDelegate = cgmTransmitterDelegate {
                             
-                            newTransmitter = CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: sensorsAccessor.fetchActiveSensor()), firmware: dexcomG5orG6.firmwareVersion, webOOPEnabled: dexcomG5orG6.blePeripheral.webOOPEnabled, useOtherApp: dexcomG5orG6.useOtherApp)
+                            newTransmitter = CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: sensorsAccessor.fetchActiveSensor()), firmware: dexcomG5orG6.firmwareVersion, webOOPEnabled: dexcomG5orG6.blePeripheral.webOOPEnabled, useOtherApp: dexcomG5orG6.useOtherApp, isAnubis: dexcomG5orG6.isAnubis)
                             
                             
                         } else {
@@ -576,7 +576,7 @@ class BluetoothPeripheralManager: NSObject {
                 fatalError("in createNewTransmitter, type DexcomType, transmitterId is nil or cgmTransmitterDelegate is nil")
             }
             
-            return CGMG5Transmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: nil, sensorStartDate: nil, calibrationToSendToTransmitter: nil, firmware: nil, webOOPEnabled: nil, useOtherApp: false)
+            return CGMG5Transmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: nil, sensorStartDate: nil, calibrationToSendToTransmitter: nil, firmware: nil, webOOPEnabled: nil, useOtherApp: false, isAnubis: false)
             
         case .BubbleType:
             
@@ -677,7 +677,7 @@ class BluetoothPeripheralManager: NSObject {
                 fatalError("in createNewTransmitter, DexcomG7Type, cgmTransmitterDelegate is nil")
             }
             
-            return CGMG7Transmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, webOOPEnabled: nil)
+            return CGMG7Transmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
             
         }
         
@@ -719,7 +719,7 @@ class BluetoothPeripheralManager: NSObject {
     ///  for use with xdrip-client-swift
     private func setCGMTransmitterInSharedUserDefaults() {
      
-        if let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) {
+        if let sharedUserDefaults = UserDefaults(suiteName: UserDefaults.standard.loopShareType.sharedUserDefaultsSuiteName) {
             
             if let cgmTransmitter = getCGMTransmitter(), let cgmtransmitterAddress = currentCgmTransmitterAddress {
 
@@ -757,8 +757,8 @@ class BluetoothPeripheralManager: NSObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.m5StackWiFiPassword3.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.m5StackBlePassword.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutUrl.rawValue, options: .new, context: nil)
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightScoutAPIKey.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutUrl.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutAPIKey.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
 
     }
@@ -906,7 +906,7 @@ class BluetoothPeripheralManager: NSObject {
 
                                 // create an instance of CGMG5Transmitter, will automatically try to connect to the dexcom with the address that is stored in dexcom
                                 // add it to the array of bluetoothTransmitters
-                                bluetoothTransmitters.insert(CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: sensorsAccessor.fetchActiveSensor()), firmware: dexcomG5orG6.firmwareVersion, webOOPEnabled: dexcomG5orG6.blePeripheral.webOOPEnabled, useOtherApp: dexcomG5orG6.useOtherApp), at: index)
+                                bluetoothTransmitters.insert(CGMG5Transmitter(address: dexcomG5orG6.blePeripheral.address, name: dexcomG5orG6.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self, cGMG5TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, transmitterStartDate: dexcomG5orG6.transmitterStartDate, sensorStartDate: dexcomG5orG6.sensorStartDate, calibrationToSendToTransmitter: calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: sensorsAccessor.fetchActiveSensor()), firmware: dexcomG5orG6.firmwareVersion, webOOPEnabled: dexcomG5orG6.blePeripheral.webOOPEnabled, useOtherApp: dexcomG5orG6.useOtherApp, isAnubis: dexcomG5orG6.isAnubis), at: index)
 
                                 // if DexcomG5Type is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
                                 if bluetoothPeripheralType.category() == .CGM {
@@ -1290,7 +1290,7 @@ class BluetoothPeripheralManager: NSObject {
 
                             // create an instance of CGMG7Transmitter, CGMG7Transmitter will automatically try to connect to the dexcomg7 with the address that is stored in bubble
                             // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(CGMG7Transmitter(address: dexcomG7.blePeripheral.address, name: dexcomG7.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate, webOOPEnabled: dexcomG7.blePeripheral.webOOPEnabled), at: index)
+                            bluetoothTransmitters.insert(CGMG7Transmitter(address: dexcomG7.blePeripheral.address, name: dexcomG7.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
                             
                             // if CGMG7Transmitter is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
                             if bluetoothPeripheralType.category() == .CGM {
@@ -1335,7 +1335,7 @@ class BluetoothPeripheralManager: NSObject {
         // first check keyValueObserverTimeKeeper
         switch keyPathEnum {
             
-        case UserDefaults.Key.m5StackWiFiName1, UserDefaults.Key.m5StackWiFiName2, UserDefaults.Key.m5StackWiFiName3, UserDefaults.Key.m5StackWiFiPassword1, UserDefaults.Key.m5StackWiFiPassword2, UserDefaults.Key.m5StackWiFiPassword3, UserDefaults.Key.nightScoutAPIKey, UserDefaults.Key.nightScoutUrl, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.m5StackBlePassword :
+        case UserDefaults.Key.m5StackWiFiName1, UserDefaults.Key.m5StackWiFiName2, UserDefaults.Key.m5StackWiFiName3, UserDefaults.Key.m5StackWiFiPassword1, UserDefaults.Key.m5StackWiFiPassword2, UserDefaults.Key.m5StackWiFiPassword3, UserDefaults.Key.nightscoutAPIKey, UserDefaults.Key.nightscoutUrl, UserDefaults.Key.bloodGlucoseUnitIsMgDl, UserDefaults.Key.m5StackBlePassword :
             
             // transmittertype change triggered by user, should not be done within 200 ms
             if !keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
@@ -1434,11 +1434,11 @@ class BluetoothPeripheralManager: NSObject {
                 case UserDefaults.Key.bloodGlucoseUnitIsMgDl:
                     success = m5StackBluetoothTransmitter.writeBloodGlucoseUnit(isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
                     
-                case UserDefaults.Key.nightScoutAPIKey:
-                    success = m5StackBluetoothTransmitter.writeNightScoutAPIKey(apiKey: UserDefaults.standard.nightScoutAPIKey)
+                case UserDefaults.Key.nightscoutAPIKey:
+                    success = m5StackBluetoothTransmitter.writeNightscoutAPIKey(apiKey: UserDefaults.standard.nightscoutAPIKey)
                     
-                case UserDefaults.Key.nightScoutUrl:
-                    success = m5StackBluetoothTransmitter.writeNightScoutUrl(url: UserDefaults.standard.nightScoutUrl)
+                case UserDefaults.Key.nightscoutUrl:
+                    success = m5StackBluetoothTransmitter.writeNightscoutUrl(url: UserDefaults.standard.nightscoutUrl)
                     
                 default:
                     break

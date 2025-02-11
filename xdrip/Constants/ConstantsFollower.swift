@@ -11,7 +11,7 @@ enum ConstantsFollower {
     static let secondsUsedByFollowerConnectionTimer: Double = 5
     
     /// number of seconds without a successful follower connection before a warning is shown when in Nightscout follower mode
-    static let secondsUntilFollowerDisconnectWarningNightscout: Int = 35
+    static let secondsUntilFollowerDisconnectWarningNightscout: Int = 310
     
     /// number of seconds without a successful follower connection before a warning is shown when in LibreLinkUp follower mode
     static let secondsUntilFollowerDisconnectWarningLibreLinkUp: Int = 70

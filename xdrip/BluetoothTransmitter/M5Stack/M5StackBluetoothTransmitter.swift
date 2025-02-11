@@ -30,7 +30,7 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     private var blePasswordM5StackPacket:M5StackPacket?
     
     /// is the transmitter ready to receive data like parameter updates or reading values
-    private (set) var isReadyToReceiveData: Bool = false
+    private(set) var isReadyToReceiveData: Bool = false
     
     /// possible rotation values, , the value is how it will be sent to the M5Stack but not  how it's stored in the M5Stack object - In the M5Stack object we store an Int value which is used as index in rotationValues and rotationStrings
     private let rotationValues: [UInt16] = [ 1, 2, 3, 0]
@@ -245,10 +245,10 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     /// - parameters:
     ///     - url : the nightscout url, if nil then nothing is sent
     /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
-    func writeNightScoutUrl(url: String?) -> Bool {
+    func writeNightscoutUrl(url: String?) -> Bool {
         
         if let url = url {
-            return writeStringToPeripheral(text: url, opCode: .writeNightScoutUrlTx)
+            return writeStringToPeripheral(text: url, opCode: .writeNightscoutUrlTx)
         } else {return false}
         
     }
@@ -257,10 +257,10 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     /// - parameters:
     ///     - apikey : the apikeyl, if nil then nothing is sent
     /// - returns: true if successfully called writeDataToPeripheral, doesn't mean it's been successfully received by the M5Stack
-    func writeNightScoutAPIKey(apiKey: String?) -> Bool {
+    func writeNightscoutAPIKey(apiKey: String?) -> Bool {
         
         if let apiKey = apiKey {
-            return writeStringToPeripheral(text: apiKey, opCode: .writeNightScoutAPIKeyTx)
+            return writeStringToPeripheral(text: apiKey, opCode: .writeNightscoutAPIKeyTx)
         } else {return false}
         
     }

@@ -67,3 +67,10 @@
 
 /// sensor warm-up text
 "warmingUpUntil" = "Warming up until";
+
+"nativeAlgorithm" = "Native algoritme";
+"xDripAlgorithm" = "xDrip algoritme";
+"confirmAlgorithmChangeToTransmitterMessage" = "Je wil dus terug naar het native algoritme?";
+"confirmAlgorithmChangeToxDripMessage" = "Je wil dus naar het xDrip algoritme?\n\nJe zult na de aanpassing gedurende korte tijd geen metingen krijgen en er zal je gevraagd worden om te kalibreren.";
+"confirmCalibrationChangeToSinglePointMessage" = "Je wil dus het kalibratie type veranderen naar standaard kalibratie?\n\nJe zult na de aanpassing gedurende korte tijd geen metingen krijgen en er zal je gevraagd worden om te kalibreren.";
+"confirmCalibrationChangeToMultiPointMessage" = "Je wil dus het kalibratie type veranderen naar meerpunts kalibratie?\n\n⚠️ Dit kalibratietype is voor ervaren gebruikers en kan bij foute kalibratie gevaarlijke resultaten geven.\n\nAls je niet zeker bent dat je deze methode goed kunt gebruiken, kies dan Annuleer.";

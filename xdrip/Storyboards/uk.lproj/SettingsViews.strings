@@ -21,9 +21,6 @@
 /// home screen settings, high value
 "settingsviews_highValue" = "High Value";
 
-/// help settings, should the help icon be shown on the toolbar
-"settingsviews_showHelpIcon" = "Show Help Icon";
-
 /// Calendar Events Settings - text in row where create event is enabled or disabled 
 "createCalendarEvent" = "Create Calendar Events";
 
@@ -46,7 +43,7 @@
 "settingsviews_givetransmitterid" = "Enter Transmitter ID";
 
 /// nightscout settings, where user can set the nightscout url
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_nightscoutUrl" = "URL";
 
 /// general settings, should reading be multiplied with 10 yes or no
 "settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10";
@@ -67,7 +64,7 @@
 "settingsviews_speakDelta" = "Speak Delta";
 
 /// nightscout settings, port to use
-"nightScoutPort" = "Port";
+"nightscoutPort" = "Port";
 
 /// healthkit settings, section title
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
@@ -103,7 +100,7 @@
 "settingsviews_housekeeperExportAllData" = "Export All Data";
 
 /// nightscout settings, where user can enable or disable nightscout
-"settingsviews_nightScoutEnabled" = "Enable Nightscout";
+"settingsviews_nightscoutEnabled" = "Enable Nightscout";
 
 /// home screen settings, urgent high value
 "settingsviews_urgentHighValue" = "Urgent High Value";
@@ -148,10 +145,9 @@
 "settingsviews_speakBgReadingslanguage" = "Language";
 
 /// nightscout settings, where user can set the nightscout api key
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
 
 /// transmitter settings, to explain that settings is about resetting the transmitter
-"settingsviews_resettransmitter" = "Reset Transmitter (Anubis only)";
 
 /// home screen settings, should the main glucose chart screen be allowed?
 "settingsviews_allowScreenRotation" = "Allow Chart Rotation";
@@ -186,7 +182,7 @@
 /// transmitter settings, section title
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 
-/// used for editing schedule for NightScout upload and Dexcom Share upload
+/// used for editing schedule for Nightscout upload and Dexcom Share upload
 "editScheduleTimePickerSubtitle" = "Change: ";
 
 /// In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row
@@ -216,14 +212,11 @@
 /// statistics settings, how many days to use for calculations
 "settingsviews_daysToUseStatisticsMessage" = "Maximum days we should try to use to calculate the statistics?\n\n(Enter 0 to calculate today since midnight)";
 
-/// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart";
-
 /// general settings, literally follower
 "settingsviews_follower" = "Follower";
 
 /// nightscout settings, pop up that asks user to enter nightscout api key
-"settingsviews_giveNightScoutAPIKey" = "Enter your API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "Enter your API_SECRET";
 
 /// Calendar Events Settings - text in row where user needs to select a calendar
 "calenderId" = "Calendar To Use";
@@ -241,7 +234,7 @@
 "settingsviews_restartNeeded" = "(Restart required)";
 
 /// nightscout settings, section title
-"settingsviews_sectiontitlenightscout" = "NightScout";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
 
 /// used in settings, section Info, title of the build setting
 "settingsviews_build" = "Build";
@@ -286,7 +279,7 @@
 "settingsviews_showtarget" = "Show Target Line";
 
 /// nightscout  settings, pop up that asks user to enter nightscout url
-"settingsviews_giveNightScoutUrl" = "Enter your NightScout URL";
+"settingsviews_giveNightscoutUrl" = "Enter your Nightscout URL";
 
 /// Calendar Events Settings - text in row where user needs to say if delta should be displayed or not
 "displayDeltaInCalendarEvent" = "Display Delta";
@@ -299,9 +292,6 @@
 
 /// Text in pop up shown when user wants to send the trace file
 "describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";
-
-/// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
-"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold";
 
 /// help settings, open the online help
 "settingsviews_showOnlineHelp" = "Open Online Help";
@@ -362,19 +352,19 @@
 "Select Time" = "Select Time";
 
 /// transmitter settings, to explain that the reset option only works for certain transmitters
-"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or One transmitters.";
+"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
 
 /// data source settings, keep-alive mode is set to aggressive
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
 
 /// Settings screen for loop delay, explanatory text for value
-"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with Loop";
+"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
 
 /// statistics settings, prefer time in tight range
 "settingsviews_timeInRangeTypeTightRange" = "Tight Range";
@@ -398,7 +388,6 @@
 "settingsviews_valueIsRequired" = "⚠️ Required";
 
 /// treatments settings, offset the carb treatments on main chart
-"settingsviews_offsetCarbTreatmentsOnChart" = "Offset Carbs on Chart";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
@@ -443,7 +432,7 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show the Mini-Chart";
+"settingsviews_showMiniChart" = "Show Mini-Chart";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Patient Name";
@@ -491,7 +480,7 @@
 "settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
 
 /// Should loop data be shared only every 5 minutes
-"shareToLoopOnceEvery5Minutes" = "Share to Loop every 5 mins";
+"shareToLoopOnceEvery5Minutes" = "Share with OS-AID every 5 mins";
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";

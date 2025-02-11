@@ -1,0 +1,17 @@
+
+/// POP up after verifying nightscout credentials, to say that verification of url and api key were successful - this is the body
+"nightscouttestresult_verificationsuccessfulalertbody" = "Ihre Nightscout Anmeldung war erfolgreich";
+
+/// in settings screen, user clicked test button for nightscout url and apikey
+"nightscoutAPIKeyAndURLStartedBody" = "Nightscout Verifizierung Test gestartet\n\nDiese Nachricht sollte kurzfristig automatisch verschwinden";
+
+/// POP up after verifying nightscout credentials, to say that verification of url and api key were successful - this is the title
+"nightscouttestresult_verificationsuccessfulalerttitle" = "Überprüfung erfolgreich";
+
+/// in settings screen, user tries to test url and API Key but one of them is not set
+"warningAPIKeyOrURLIsnil" = "Deine Nightscout URL (und optional API_SECRET oder Token) müssen gesetzt sein bevor du den Test laufen lassen kannst";
+
+/// POP up after verifying nightscout credentials, to say that verification of url and api key was not successful - this is the title
+"nightscouttestresult_verificationerroralerttitle" = "Fehler währed der Prüfung";
+
+"nightscoutAPIKeyAndURLStartedTitle" = "Verifizieren...";

@@ -2,7 +2,7 @@ import Foundation
 import CoreBluetooth
 
 /// defines functions that every cgm transmitter should conform to
-protocol CGMTransmitter:AnyObject {
+protocol CGMTransmitter: AnyObject {
     
     /// to set nonFixedSlopeEnabled - called when user changes the setting
     ///
@@ -33,6 +33,10 @@ protocol CGMTransmitter:AnyObject {
     /// - typicall for firefly, where webOOPEnabled false is not possible
     /// - default true
     func nonWebOOPAllowed() -> Bool
+    
+    /// is the transmitter a G6 Anubis with a 180 day expiry?
+    /// - default false
+    func isAnubisG6() -> Bool // append G6 to the protocol function name to avoid conflicts with the isAnubis public var of CGMG5Transmitter
     
     /// get cgmTransmitterType
     func cgmTransmitterType() -> CGMTransmitterType
@@ -82,10 +86,10 @@ enum CGMTransmitterType:String, CaseIterable {
     case dexcomG4 = "Dexcom G4"
     
     /// dexcom G5, G6
-    case dexcom = "Dexcom"
+    case dexcom = "Dexcom G5/G6/ONE"
     
     /// dexcom G7
-    case dexcomG7 = "Dexcom G7"
+    case dexcomG7 = "Dexcom G7/ONE+/Stelo"
     
     /// miaomiao
     case miaomiao = "MiaoMiao"
@@ -298,11 +302,11 @@ enum CGMTransmitterType:String, CaseIterable {
                     
                 } else if transmitterIdString.startsWith("5") {
                     
-                    return "Dexcom One (5xxxxx)"
+                    return "Dexcom ONE"
                     
                 } else if transmitterIdString.startsWith("C") {
                     
-                    return "Dexcom One"
+                    return "Dexcom ONE"
                     
                 }
                 
@@ -310,8 +314,24 @@ enum CGMTransmitterType:String, CaseIterable {
             
             return "Dexcom"
             
+        case .dexcomG7:
+            if let transmitterIdString = UserDefaults.standard.activeSensorTransmitterId {
+                if transmitterIdString.startsWith("DX01") {
+                    return "Dexcom Stelo"
+                } else if transmitterIdString.startsWith("DX02") {
+                    return "Dexcom ONE+"
+                } else {
+                    return "Dexcom G7"
+                }
+            }
+            return "Dexcom - please wait..."
+            
         case .Libre2:
-            return "Libre 2 Direct"
+            if let activeSensorMaxSensorAgeInDays = UserDefaults.standard.activeSensorMaxSensorAgeInDays, activeSensorMaxSensorAgeInDays >= 15 {
+                return "Libre 2 Plus EU"
+            } else {
+                return "Libre 2 EU"
+            }
             
         default:
             return self.rawValue
@@ -328,22 +348,25 @@ extension CGMTransmitter {
     func setNonFixedSlopeEnabled(enabled: Bool) {}
 
     // default implementation, false
-    func isNonFixedSlopeEnabled() -> Bool {return false}
+    func isNonFixedSlopeEnabled() -> Bool { return false }
     
     // empty implementation for transmitter types that don't need this
     func setWebOOPEnabled(enabled:Bool) {}
     
     // default implementation, false
-    func isWebOOPEnabled() -> Bool {return false}
+    func isWebOOPEnabled() -> Bool { return false }
     
     // default implementation, false
-    func overruleIsWebOOPEnabled() -> Bool {return false}
+    func overruleIsWebOOPEnabled() -> Bool { return false }
+    
+    // default implementation, false
+    func isAnubisG6() -> Bool { return false }
     
     // empty implementation for transmitter types that don't need this
     func requestNewReading() {}
 
     // default implementation, nil
-    func maxSensorAgeInDays() -> Double? {return nil}
+    func maxSensorAgeInDays() -> Double? { return nil }
     
     // default implementation, does nothing
     func startSensor(sensorCode: String?, startDate: Date) {}
@@ -355,12 +378,12 @@ extension CGMTransmitter {
     func calibrate(calibration: Calibration) {}
     
     // default implementation, returns true
-    func needsSensorStartTime() -> Bool {return true}
+    func needsSensorStartTime() -> Bool { return true }
     
     // default implementation, returns false
-    func needsSensorStartCode() -> Bool {return false}
+    func needsSensorStartCode() -> Bool { return false }
     
     // default implementation, returns true
-    func nonWebOOPAllowed() -> Bool {return true}
+    func nonWebOOPAllowed() -> Bool { return true }
     
 }

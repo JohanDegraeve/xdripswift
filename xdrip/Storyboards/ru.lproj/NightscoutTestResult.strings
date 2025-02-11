@@ -1,0 +1,6 @@
+"nightscouttestresult_verificationsuccessfulalerttitle" = "Проверка прошла успешно";
+"nightscouttestresult_verificationsuccessfulalertbody" = "Ваш Nightscout успешно подтвержден";
+"nightscouttestresult_verificationerroralerttitle" = "Ошибка проверки";
+"warningAPIKeyOrURLIsnil" = "Ваш URL-адрес Nightscout (и, возможно, API_SECRET или токен) должен быть установлен, прежде чем вы сможете запустить тест";
+"nightscoutAPIKeyAndURLStartedTitle" = "Проверка...";
+"nightscoutAPIKeyAndURLStartedBody" = "Nightscout тест верификации начат\n\nЭто сообщение вскоре автоматически исчезнет";

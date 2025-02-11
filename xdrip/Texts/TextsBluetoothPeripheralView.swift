@@ -104,6 +104,10 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("transmittterStartDate", tableName: filename, bundle: Bundle.main, value: "Transmitter Started", comment: "cell text, transmitter start time")
     }()
     
+    static let transmittterExpiryDate: String = {
+        return NSLocalizedString("transmittterExpiryDate", tableName: filename, bundle: Bundle.main, value: "Transmitter Expires", comment: "cell text, transmitter expiry date")
+    }()
+    
     static let sensorStartDate: String = {
         return NSLocalizedString("sensorStartDate", tableName: filename, bundle: Bundle.main, value: "Sensor Started", comment: "cell text, sensor start time")
     }()
@@ -146,6 +150,46 @@ class Texts_BluetoothPeripheralView {
     
     static let warmingUpUntil: String = {
         return NSLocalizedString("warmingUpUntil", tableName: filename, bundle: Bundle.main, value: "Warming up until", comment: "sensor warm-up text")
+    }()
+    
+    static let nativeAlgorithm: String = {
+        return NSLocalizedString("nativeAlgorithm", tableName: filename, bundle: Bundle.main, value: "Native Algorithm", comment: "native or transmitter algorithm type text")
+    }()
+    
+    static let xDripAlgorithm: String = {
+        return NSLocalizedString("xDripAlgorithm", tableName: filename, bundle: Bundle.main, value: "xDrip Algorithm", comment: "xDrip algorithm type text")
+    }()
+    
+    static let confirmAlgorithmChangeToTransmitterMessage: String = {
+        return NSLocalizedString("confirmAlgorithmChangeToTransmitterMessage", tableName: filename, bundle: Bundle.main, value: "Please confirm that you want to change back to the native/transmitter algorithm.", comment: "Confirm that the user wants to really change the transmitter or native algorithm type, message")
+    }()
+    
+    static let confirmAlgorithmChangeToxDripMessage: String = {
+        return NSLocalizedString("confirmAlgorithmChangeToxDripMessage", tableName: filename, bundle: Bundle.main, value: "Please confirm that you want to change the the xDrip algorithm.\n\nThis will stop readings for a short time and ask you for a initial calibration value when ready.", comment: "Confirm that the user wants to really change the xDrip algorithm type, message")
+    }()
+    
+    static let confirmCalibrationChangeToSinglePointMessage: String = {
+        return NSLocalizedString("confirmCalibrationChangeToSinglePointMessage", tableName: filename, bundle: Bundle.main, value: "Please confirm that you want to change the calibration type to the standard calibration\n\nThis will stop readings for a short time and ask you for a initial calibration value when ready.", comment: "Confirm that the user wants to really change the calibration type to multi-point, message")
+    }()
+    
+    static let confirmCalibrationChangeToMultiPointMessage: String = {
+        return NSLocalizedString("confirmCalibrationChangeToMultiPointMessage", tableName: filename, bundle: Bundle.main, value: "Please confirm that you want to change the calibration type to multi-point\n\n⚠️ Please note that this method is only for advanced users and could potentially give dangerous results if not correctly calibrated.\n\nIf you are unsure how to use this method, please press Cancel.", comment: "Confirm that the user wants to really change the calibration type to multi-point, message")
+    }()
+    
+    static let confirm: String = {
+        return NSLocalizedString("confirm", tableName: filename, bundle: Bundle.main, value: "Confirm", comment: "button text, confirm")
+    }()
+    
+    static let maxSensorAgeInDaysOverridenAnubis: String = {
+        return NSLocalizedString("maxSensorAgeInDaysOverridenAnubis", tableName: filename, bundle: Bundle.main, value: "Maximum Sensor Days", comment: "user can override the maximum sensor days if using an anubis transmitter")
+    }()
+    
+    static let maxSensorAgeInDaysOverridenAnubisMessage = {
+        return String(format: NSLocalizedString("maxSensorAgeInDaysOverridenAnubisMessage", tableName: filename, bundle: Bundle.main, value: "\nIf using an Anubis transmitter, you can enter here the maximum number of days for the sensor lifetime (maximum %@)\n\nNote that this is only a visual reminder. It will not end the sensor session when reached.\n\nEnter 0 to use the default of %@ days", comment: "user can override the maximum sensor days if using an anubis transmitter"), ConstantsDexcomG5.maxSensorAgeInDaysOverridenAnubisMaximum.stringWithoutTrailingZeroes, ConstantsDexcomG5.maxSensorAgeInDays.stringWithoutTrailingZeroes)
+    }()
+    
+    static let isAnubis: String = {
+        return NSLocalizedString("isAnubis", tableName: filename, bundle: Bundle.main, value: "Is Anubis?", comment: "Dexcom bluetooth screen. Is it an anubis transmitter")
     }()
     
 }

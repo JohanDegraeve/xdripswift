@@ -34,7 +34,10 @@ class ContactImageManager: NSObject {
         
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.enableContactImage.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.displayTrendInContactImage.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.useHighContrastContactImage.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
         
         
     }
@@ -62,18 +65,7 @@ class ContactImageManager: NSObject {
     
     /// used by observevalue for UserDefaults.Key
     private func evaluateUserDefaultsChange(keyPathEnum: UserDefaults.Key) {
-        switch keyPathEnum {
-            
-        case UserDefaults.Key.enableContactImage:
-            UserDefaults.standard.enableContactImage ? updateContact() : deleteContact()
-            
-        case UserDefaults.Key.displayTrendInContactImage, UserDefaults.Key.bloodGlucoseUnitIsMgDl:
-            updateContact()
-            
-        default:
-            break
-            
-        }
+        updateContact()
     }
     
     /// this function will perform the following actions:
@@ -87,24 +79,30 @@ class ContactImageManager: NSObject {
             self.workItem?.cancel()
             self.workItem = nil
             
-            guard UserDefaults.standard.enableContactImage else { return }
-            
             // check that access to contacts is authorized by the user
             guard CNContactStore.authorizationStatus(for: .contacts) == .authorized else {
-                trace("in updateContact, access to contacts is not authorized, setting enableContactImage to false", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
-                
-                UserDefaults.standard.enableContactImage = false
+                // if it isn't, and the user has enabled the feature, then disable it
+                if UserDefaults.standard.enableContactImage {
+                    trace("in updateContact, access to contacts is not authorized so setting enableContactImage to false", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
+                    
+                    UserDefaults.standard.enableContactImage = false
+                }
                 return
             }
             
             // create a contact image view
             // get 2 last Readings, with a calculatedValue
             let lastReading = self.bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
-            let valueIsUpToDate = abs(lastReading[0].timeStamp.timeIntervalSinceNow) < 7 * 60
             var contactImageView: ContactImageView
             
+            // disable the image (show "OFF") if the function is disabled or if the user is in follower mode with background keep-alive disabled
+            // as otherwise it would always be out of date
+            let disableContactImage: Bool = !UserDefaults.standard.enableContactImage || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled)
+            
             if lastReading.count > 0  {
-                contactImageView = ContactImageView(bgValue: lastReading[0].calculatedValue, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: UserDefaults.standard.displayTrendInContactImage ? lastReading[0].slopeArrow() : "", bgRangeDescription: lastReading[0].bgRangeDescription(), valueIsUpToDate: valueIsUpToDate)
+                let valueIsUpToDate = abs(lastReading[0].timeStamp.timeIntervalSinceNow) < 7 * 60
+                
+                contactImageView = ContactImageView(bgValue: lastReading[0].calculatedValue, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: UserDefaults.standard.displayTrendInContactImage ? lastReading[0].slopeArrow() : "", bgRangeDescription: lastReading[0].bgRangeDescription(), valueIsUpToDate: valueIsUpToDate, useHighContrastContactImage: UserDefaults.standard.useHighContrastContactImage, disableContactImage:  disableContactImage)
                 
                 // schedule an update in 5 min 15 seconds - if no new data is received until then, the empty value will get rendered into the contact (this update will be canceled if new data is received)
                 self.workItem = DispatchWorkItem(block: {
@@ -115,7 +113,7 @@ class ContactImageManager: NSObject {
                 DispatchQueue.main.asyncAfter(deadline: .now() + (5 * 60) + 15, execute: self.workItem!)
             } else {
                 // create an 'empty' image view if there is no BG data to show
-                contactImageView = ContactImageView(bgValue: 0, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: "", bgRangeDescription: .inRange, valueIsUpToDate: valueIsUpToDate)
+                contactImageView = ContactImageView(bgValue: 0, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: "", bgRangeDescription: .inRange, valueIsUpToDate: false, useHighContrastContactImage: false, disableContactImage:  disableContactImage)
             }
             
             // we're going to use the app name as the given name of the contact we want to use/create/update
@@ -129,7 +127,10 @@ class ContactImageManager: NSObject {
             // we'll search for all results and then just use the first one for now
             // we do it this way so that in the future we want to add a descriptor to the family name to have various contact images (such as "BG", "IOB", "COB" as needed)
             if let contacts = try? self.contactStore.unifiedContacts(matching: predicate, keysToFetch: keyToFetch), let contact = contacts.first {
-                trace("in updateContact, existing contact found. Updating it's contact image.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
+                
+                if lastReading.count > 0 {
+                    trace("in updateContact, '%{public}@' contact found. Updating the contact image to %{public}@ %{public}@.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+                }
                 
                 // create a mutableContact from the existing contact so that we can modify it
                 guard let mutableContact = contact.mutableCopy() as? CNMutableContact else { return }
@@ -140,7 +141,7 @@ class ContactImageManager: NSObject {
                 // we'll update the existing contact with the new data
                 saveRequest.update(mutableContact)
             } else {
-                trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' and adding a contact image.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName)
+                trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' and adding a contact image with %{public}@ %{public}@.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
                 
                 // create a new mutable contact instance and assign properties to it
                 let contact = CNMutableContact()

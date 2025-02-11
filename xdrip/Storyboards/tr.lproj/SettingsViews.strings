@@ -2,7 +2,6 @@
 "settingsviews_sectiontitlehelp" = "Yardım & Dokümantasyon";
 "settingsviews_showOnlineHelp" = "Çevrimiçi Yardım'ı aç";
 "settingsviews_translateOnlineHelp" = "Otomatik Olarak Çevir";
-"settingsviews_showHelpIcon" = "Yardım Simgesini Göster";
 "settingsviews_restartNeeded" = "(Yeniden başlatmak gerekli)";
 "settingsviews_sectiontitleNotifications" = "Ana ayarlar";
 "settingsviews_selectbgunit" = "Kan Şekeri Birimleri";
@@ -31,7 +30,6 @@
 "settingsviews_transmitterid" = "Verici Kimliği";
 "settingsviews_transmitterid_text_for_button"  = "Verici Kimliği";
 "settingsviews_givetransmitterid" = "Verici Kimliğine Gir";
-"settingsviews_resettransmitter" = "Vericiyi Sıfırla (Anubis)";
 "settingsviews_webooptransmitter" = "Verici algorithması Kullanılsın mı";
 "settingsviews_nonfixedtransmitter" = "Çok Noktalı Kalibrasyon Etkinleştirilsin mi";
 "settingsviews_labelNonFixed" = "Çok Noktalı Kalibrasyon";
@@ -49,14 +47,14 @@
 "settingsviews_giveDexcomShareAccountName" = "Dexcom Share Hesabı Adını Girin";
 "settingsviews_giveDexcomSharePassword" = "Dexcom Share Parolasını Girin";
 "settingsviews_giveDexcomShareSerialNumber" = "Dexcom Alıcı Seri Numarasını girin";
-"settingsviews_sectiontitlenightscout" = "NightScout";
-"settingsviews_nightScoutEnabled" = "Nightscout etkinleştirilsin mi";
-"settingsviews_nightScoutUrl" = "URL";
+"settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutEnabled" = "Nightscout etkinleştirilsin mi";
+"settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Yükleme Takvimi Kullanılsın mı";
 "schedule" = "Yükleme Takvimi";
-"settingsviews_giveNightScoutUrl" = "NightScout URL'nizi girin";
-"settingsviews_nightScoutAPIKey" = "API_SECRET";
-"settingsviews_giveNightScoutAPIKey" = "API_SECRET'inizi girin";
+"settingsviews_giveNightscoutUrl" = "Nightscout URL'nizi girin";
+"settingsviews_nightscoutAPIKey" = "API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "API_SECRET'inizi girin";
 "editScheduleTimePickerSubtitle" = "Değiştir: ";
 "timeScheduleViewTitle" = "Açık/Kapalı Zaman Çizelgesi için ";
 "uploadSensorStartTime" = "Sensör Başlangıç Zamanı Yüklensin mi";
@@ -100,7 +98,7 @@
 "volumeTestiOSSound" = "Test Ses (Mevcut iPhone Sesi)";
 "debugLevel" = "Hata Ayıklama Düzeyini Dahil Et";
 "warningChangeFromMasterToFollower" = "Sahip'ten Takipciye geçmek mevcut sensörünüzü durduracaktır. Devam etmek istiyor musun?";
-"nightScoutPort" = "Port";
+"nightscoutPort" = "Port";
 "developerSettings" = "Geliştirici Ayarları";
 "smoothLibreValues" = "Pürüzsüz Libre değerleri";
 "nslog" = "NSLog";
@@ -115,19 +113,19 @@
 "Select Time" = "Select Time";
 
 /// transmitter settings, to explain that the reset option only works for certain transmitters
-"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or One transmitters.";
+"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
 
 /// data source settings, keep-alive mode is set to aggressive
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
-"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor";
+"settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
 
 /// Settings screen for loop delay, explanatory text for value
-"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with Loop";
+"expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
 
 /// statistics settings, prefer time in tight range
 "settingsviews_timeInRangeTypeTightRange" = "Tight Range";
@@ -154,7 +152,6 @@
 "settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart";
 
 /// treatments settings, offset the carb treatments on main chart
-"settingsviews_offsetCarbTreatmentsOnChart" = "Offset Carbs on Chart";
 
 /// Housekeeper settings, section title
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
@@ -164,9 +161,6 @@
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
-
-/// treatments settings, show the micro-bolus on main chart
-"settingsviews_showSmallBolusTreatmentsOnChart" = "Show Micro-bolus on Chart";
 
 /// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
 "warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
@@ -208,7 +202,7 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
 
 /// home screen settings, should the mini-chart be shown
-"settingsviews_showMiniChart" = "Show the Mini-Chart";
+"settingsviews_showMiniChart" = "Show Mini-Chart";
 
 /// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
@@ -243,9 +237,6 @@
 /// Settings screen for loop delay, explanatory text for time
 "expanatoryTextSelectTime" = "As of what time should the value apply";
 
-/// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
-"settingsviews_smallBolusTreatmentThreshold" = "Micro-bolus Threshold";
-
 /// data source settings, data source region
 "settingsviews_labelFollowerDataSourceRegion" = "Server (Country)";
 
@@ -271,7 +262,7 @@
 "settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
 
 /// Should loop data be shared only every 5 minutes
-"shareToLoopOnceEvery5Minutes" = "Share to Loop every 5 mins";
+"shareToLoopOnceEvery5Minutes" = "Share with OS-AID every 5 mins";
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";

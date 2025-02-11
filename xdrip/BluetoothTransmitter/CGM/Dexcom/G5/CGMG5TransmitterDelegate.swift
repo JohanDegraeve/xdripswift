@@ -22,5 +22,8 @@ protocol CGMG5TransmitterDelegate: AnyObject {
     /// - sensorStatus if not known
     func received(sensorStatus: String?, cGMG5Transmitter: CGMG5Transmitter)
     
+    /// isAnubis flag as decoded from the transmitterVersionRxMessage received from the transmitter
+    func received(isAnubis: Bool, cGMG5Transmitter: CGMG5Transmitter)
+    
 }
 

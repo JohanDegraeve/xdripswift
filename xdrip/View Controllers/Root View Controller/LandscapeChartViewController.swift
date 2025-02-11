@@ -56,6 +56,9 @@ class LandscapeChartViewController: UIViewController {
     /// BgReadingsAccessor instance
     private var bgReadingsAccessor:BgReadingsAccessor?
     
+    /// NightscoutSyncManager instance
+    private var nightscoutSyncManager: NightscoutSyncManager?
+    
     /// coreDataManager to be used throughout the project
     private var coreDataManager: CoreDataManager?
     
@@ -97,8 +100,18 @@ class LandscapeChartViewController: UIViewController {
             
         })
         
+        
+        // setup nightscout sync manager
+        nightscoutSyncManager = NightscoutSyncManager(coreDataManager: coreDataManager!, messageHandler: { (title:String, message:String) in
+            
+            let alert = UIAlertController(title: title, message: message, actionHandler: nil)
+            
+            self.present(alert, animated: true, completion: nil)
+            
+        })
+        
         // initialize glucoseChartManager
-        glucoseChartManager = GlucoseChartManager(coreDataManager: coreDataManager!)
+        glucoseChartManager = GlucoseChartManager(coreDataManager: coreDataManager!, nightscoutSyncManager: nightscoutSyncManager!)
         
         // initialize statisticsManager
         statisticsManager = StatisticsManager(coreDataManager: coreDataManager!)

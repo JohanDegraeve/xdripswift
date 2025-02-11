@@ -74,7 +74,7 @@ public enum TimeInRangeType: Int, CaseIterable {
         
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
-        return " (" + self.lowerLimit.bgValuetoString(mgdl: isMgDl) + "-" + self.higherLimit.bgValuetoString(mgdl: isMgDl) + ")"
+        return " (" + self.lowerLimit.bgValueToString(mgDl: isMgDl) + "-" + self.higherLimit.bgValueToString(mgDl: isMgDl) + ")"
         
     }
     

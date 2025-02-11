@@ -174,7 +174,7 @@ extension AlertsSettingsViewController:UITableViewDataSource, UITableViewDelegat
         if alertKind.needsAlertValue() && alertEntry.alertType.enabled {
             // only bg level alerts would need conversion
             if alertKind.valueNeedsConversionToMmol() {
-                textLabelToUse = textLabelToUse + Double(alertValue).mgdlToMmolAndToString(mgdl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                textLabelToUse = textLabelToUse + Double(alertValue).mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             } else {
                 textLabelToUse = textLabelToUse + alertValue.description
             }

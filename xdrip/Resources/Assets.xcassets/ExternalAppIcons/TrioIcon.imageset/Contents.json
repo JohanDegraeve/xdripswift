@@ -1,0 +1,12 @@
+{
+  "images" : [
+    {
+      "filename" : "Trio_Logo.png",
+      "idiom" : "universal"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

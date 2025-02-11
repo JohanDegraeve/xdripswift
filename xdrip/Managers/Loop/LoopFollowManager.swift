@@ -10,7 +10,7 @@ class LoopFollowManager: NSObject {
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryLoopFollowManager)
     
     /// delegate to pass back glucosedata
-    private (set) weak var followerDelegate:FollowerDelegate?
+    private(set) weak var followerDelegate:FollowerDelegate?
     
     // MARK: - initializer
         
@@ -32,7 +32,8 @@ class LoopFollowManager: NSObject {
         // check that app is in follower mode
         guard !UserDefaults.standard.isMaster else {return}
         
-        guard let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) else {return}
+        // use the app group suite name that is chosen in the settings (i.e. Loop/iAPS or Trio)
+        guard let sharedUserDefaults = UserDefaults(suiteName: UserDefaults.standard.loopShareType.sharedUserDefaultsSuiteName) else {return}
         
         guard let encodedLatestReadings = sharedUserDefaults.data(forKey: "latestReadingsFromLoop") else {return}
 
