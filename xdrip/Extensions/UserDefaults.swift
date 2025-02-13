@@ -141,6 +141,8 @@ extension UserDefaults {
         case snoozeAllAlertsFromDate = "snoozeAllAlertsFromDate"
         /// for how long did the user snooze all alarms
         case snoozeAllAlertsUntilDate = "snoozeAllAlertsUntilDate"
+        /// hide slope in alarms
+        case hideSlopeInAlarms = "hideSlopeInAlarms"
         
         // Housekeeper settings
 
@@ -1208,6 +1210,15 @@ extension UserDefaults {
         }
     }
     
+    /// - show slopes in alarms
+    var showSlopeInAlarms: Bool {
+        get {
+            return !bool(forKey: Key.hideSlopeInAlarms.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.hideSlopeInAlarms.rawValue)
+        }
+    }
     
     // MARK: Alert Settings
     
