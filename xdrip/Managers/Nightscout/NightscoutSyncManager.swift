@@ -1616,13 +1616,15 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             urlComponents.port = UserDefaults.standard.nightscoutPort
         }
         
+        // Mutable copy used to add token if defined.
+        var queryItems = queries
+        
         // if token not nil, then add also the token
         if let token = UserDefaults.standard.nightscoutToken {
-            // Mutable copy used to add token if defined.
-            var queryItems = queries
             queryItems.append(URLQueryItem(name: "token", value: token))
-            urlComponents.queryItems = queryItems
         }
+        
+        urlComponents.queryItems = queryItems
         
         if let url = urlComponents.url {
             // Create Request
