@@ -624,13 +624,11 @@ class BluetoothPeripheralViewController: UIViewController {
     
     /// setup datasource, delegate, seperatorInset
     private func setupTableView() {
-        DispatchQueue.main.async {
-            if let tableView = self.tableView {
-                // insert slightly the separator text so that it doesn't touch the safe area limit
-                tableView.separatorInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
-                tableView.dataSource = self
-                tableView.delegate = self
-            }
+        if let tableView = self.tableView {
+            // insert slightly the separator text so that it doesn't touch the safe area limit
+            tableView.separatorInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
+            tableView.dataSource = self
+            tableView.delegate = self
         }
     }
     
