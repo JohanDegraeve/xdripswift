@@ -3277,7 +3277,6 @@ final class RootViewController: UIViewController, ObservableObject {
             
             switch UserDefaults.standard.followerDataSourceType {
             case .nightscout:
-                
                 if !UserDefaults.standard.nightscoutEnabled {
                     dataSourceSensorMaxAgeOutlet.textColor = .systemRed
                     dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.nightscoutNotEnabled
@@ -3298,11 +3297,13 @@ final class RootViewController: UIViewController, ObservableObject {
                     dataSourceSensorMaxAgeOutlet.text = nightscoutUrlString
                 }
                 
-            case .libreLinkUp:
-                
+            case .libreLinkUp, .libreLinkUpRussia:
                 if UserDefaults.standard.libreLinkUpEmail == nil || UserDefaults.standard.libreLinkUpPassword == nil {
                     dataSourceSensorMaxAgeOutlet.textColor = .systemRed
                     dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.libreLinkUpAccountCredentialsMissing
+                } else if UserDefaults.standard.libreLinkUpPreventLogin {
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.libreLinkUpAccountCredentialsInvalid
                 }
             }
         }
@@ -4096,7 +4097,7 @@ extension RootViewController: FollowerDelegate {
                             _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
                         }
                         
-                    case .libreLinkUp:
+                    case .libreLinkUp, .libreLinkUpRussia:
                         
                         if let followManager = libreLinkUpFollowManager {
                             _ = followManager.createBgReading(followGlucoseData: followGlucoseData)

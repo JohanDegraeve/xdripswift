@@ -190,7 +190,7 @@ class LibreLinkUpFollowManager: NSObject {
             return
         }
         
-        guard UserDefaults.standard.followerDataSourceType == .libreLinkUp else {
+        guard UserDefaults.standard.followerDataSourceType == .libreLinkUp || UserDefaults.standard.followerDataSourceType == .libreLinkUpRussia else {
             trace("    followerDataSourceType is not libreLinkUp", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
             return
         }
@@ -227,27 +227,13 @@ class LibreLinkUpFollowManager: NSObject {
                     let graphResponse = try await requestGraph(patientId: patientId)
                     
                     // before processing the glucoseMeasurement values, let's set up the sensor info in coredata so that we can show it to the user in the settings screen
-                    // starting with LLU 4.12.0 this data sometimes isn't sent for some users so we'll try and use it if available and if not, just continue as normal without throwing an error
-                    if let startDate = graphResponse.data?.activeSensors?.first?.sensor?.a, let serialNumber = graphResponse.data?.activeSensors?.first?.sensor?.sn {
-                        UserDefaults.standard.activeSensorSerialNumber = serialNumber
-                        UserDefaults.standard.activeSensorStartDate = Date(timeIntervalSince1970: startDate)
+                    // starting with LLU 4.12.0 this data sometimes isn't sent for some users so we'll try and use it if available and if not, just try to get it from the data.connection and if not, just continue as normal without throwing an error
+                    if let startDate = graphResponse.data?.activeSensors?.first?.sensor?.a, let serialNumber = graphResponse.data?.activeSensors?.first?.sensor?.sn, serialNumber != "" {
+                        setActiveSensorInfo(serialNumber: serialNumber, startDateAsDouble: startDate)
                         
-                        UserDefaults.standard.activeSensorMaxSensorAgeInDays = UserDefaults.standard.libreLinkUpIs15DaySensor ? ConstantsLibreLinkUp.libreLinkUpMaxSensorAgeInDaysLibrePlus : ConstantsLibreLinkUp.libreLinkUpMaxSensorAgeInDays
-                        
-                        var activeSensorDescription = ""
-                        
-                        if serialNumber.range(of: #"^MH"#, options: .regularExpression) != nil {
-                            // MHxxxxxxxx
-                            // must be a L2 (or Libre 2 Plus) sensor
-                            activeSensorDescription = "Libre 2"
-                            
-                        } else if serialNumber.range(of: #"^0D"#, options: .regularExpression) != nil || serialNumber.range(of: #"^0E"#, options: .regularExpression) != nil || serialNumber.range(of: #"^0F"#, options: .regularExpression) != nil {
-                            // must be a Libre 3 (or Libre 3 Plus) sensor
-                            activeSensorDescription = "Libre 3"
-                        }
-                        
-                        UserDefaults.standard.activeSensorDescription = UserDefaults.standard.followerDataSourceType.fullDescription + " (" + activeSensorDescription + ")"
-                        
+                        // if no sensor info was found in data.activeSensor attributes, try and find it in the data.connection response
+                    } else if let startDate = graphResponse.data?.connection?.sensor?.a, let serialNumber = graphResponse.data?.connection?.sensor?.sn, serialNumber != "" {
+                        setActiveSensorInfo(serialNumber: serialNumber, startDateAsDouble: startDate)
                     } else {
                         // this will only happen if the account doesn't have an active sensor connected
                         // reset the data just in case it was previously stored
@@ -294,6 +280,34 @@ class LibreLinkUpFollowManager: NSObject {
                 self.scheduleNewDownload()
             }
         }
+    }
+    
+    /// store the active sensor serial number and start date in userdefaults
+    /// also calculate and store the max sensor age
+    /// the serial number will be re-constructed to add the missing digits as needed
+    private func setActiveSensorInfo(serialNumber: String, startDateAsDouble: Double) {
+        
+        guard serialNumber != "" else { return }
+        
+        UserDefaults.standard.activeSensorSerialNumber = serialNumber
+        UserDefaults.standard.activeSensorStartDate = Date(timeIntervalSince1970: startDateAsDouble)
+        UserDefaults.standard.activeSensorMaxSensorAgeInDays = UserDefaults.standard.libreLinkUpIs15DaySensor ? ConstantsLibreLinkUp.libreLinkUpMaxSensorAgeInDaysLibrePlus : ConstantsLibreLinkUp.libreLinkUpMaxSensorAgeInDays
+        
+        var activeSensorDescription = ""
+        
+        if serialNumber.range(of: #"^MH"#, options: .regularExpression) != nil {
+            // MHxxxxxxxx
+            // must be a L2 (or Libre 2 Plus) sensor
+            activeSensorDescription = "Libre 2"
+            
+        } else if serialNumber.range(of: #"^0D"#, options: .regularExpression) != nil || serialNumber.range(of: #"^0E"#, options: .regularExpression) != nil || serialNumber.range(of: #"^0F"#, options: .regularExpression) != nil {
+            // must be a Libre 3 (or Libre 3 Plus) sensor
+            activeSensorDescription = "Libre 3"
+        }
+        
+        UserDefaults.standard.activeSensorDescription = UserDefaults.standard.followerDataSourceType.fullDescription + " (" + activeSensorDescription + ")"
+        
+        return
     }
     
     /// if needed, perform a login request and retreive authentication token and expiry date. Then retreive the patient ID.
@@ -693,7 +707,7 @@ class LibreLinkUpFollowManager: NSObject {
     
     /// verifies values of applicable UserDefaults and either starts or stops follower mode, inclusive call to enableSuspensionPrevention or disableSuspensionPrevention - also first download is started if applicable
     private func verifyUserDefaultsAndStartOrStopFollowMode() {
-        if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .libreLinkUp && UserDefaults.standard.libreLinkUpEmail != nil && UserDefaults.standard.libreLinkUpPassword != nil {
+        if !UserDefaults.standard.isMaster && (UserDefaults.standard.followerDataSourceType == .libreLinkUp || UserDefaults.standard.followerDataSourceType == .libreLinkUpRussia) && UserDefaults.standard.libreLinkUpEmail != nil && UserDefaults.standard.libreLinkUpPassword != nil {
             // this will enable the suspension prevention sound playing if background keep-alive is needed
             // (i.e. not disabled and not using a heartbeat)
             if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
@@ -726,6 +740,9 @@ class LibreLinkUpFollowManager: NSObject {
                     
                     // change by user, should not be done within 200 ms
                     if self.keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
+                        // re-allow login to be attempted if the user has changed data source type or other items
+                        UserDefaults.standard.libreLinkUpPreventLogin = false
+                        
                         // reset the token so that a new login process is forced when the download() function is later run
                         // this will also reset all activeSensor coredata values to update the UI
                         self.resetActiveSensorData()
