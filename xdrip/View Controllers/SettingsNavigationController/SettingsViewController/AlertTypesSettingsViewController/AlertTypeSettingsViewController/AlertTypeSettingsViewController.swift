@@ -384,7 +384,7 @@ extension AlertTypeSettingsViewController: UITableViewDataSource, UITableViewDel
             })
             
             // create and present pickerviewcontroller
-            PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+            PickerViewControllerModal.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
 
         case .overridemute:
             break // status is changed only when clicking the switch, not the row

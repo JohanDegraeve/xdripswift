@@ -155,7 +155,7 @@ class SettingsViewUtilities {
                 })
                 
                 // create and present pickerviewcontroller
-                PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: uIViewController)
+                PickerViewControllerModal.displayPickerViewController(pickerViewData: pickerViewData, parentController: uIViewController)
                 
                 break
                 
