@@ -17,6 +17,7 @@ public enum FollowerDataSourceType: Int, CaseIterable {
 
     case nightscout = 0
     case libreLinkUp = 1
+    case libreLinkUpRussia = 2
     
     public var rawValue: Int {
         switch self {
@@ -24,6 +25,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return 0
         case .libreLinkUp:
             return 1
+        case .libreLinkUpRussia:
+            return 2
         }
     }
     
@@ -33,6 +36,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return "Nightscout"
         case .libreLinkUp:
             return "LibreLinkUp"
+        case .libreLinkUpRussia:
+            return "LibreLinkUp Russia"
         }
     }
     
@@ -44,6 +49,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return "Nightscout"
         case .libreLinkUp:
             return "LibreLinkUp"
+        case .libreLinkUpRussia:
+            return "LibreLinkUp Russia"
         }
     }
     
@@ -51,7 +58,7 @@ public enum FollowerDataSourceType: Int, CaseIterable {
         switch self {
         case .nightscout:
             return "NS"
-        case .libreLinkUp:
+        case .libreLinkUp, .libreLinkUpRussia:
             return "LL"
         }
     }
@@ -60,7 +67,7 @@ public enum FollowerDataSourceType: Int, CaseIterable {
         switch self {
         case .nightscout:
             return ConstantsFollower.secondsUntilFollowerDisconnectWarningNightscout
-        case .libreLinkUp:
+        case .libreLinkUp, .libreLinkUpRussia:
             return ConstantsFollower.secondsUntilFollowerDisconnectWarningLibreLinkUp
         }
     }
@@ -70,7 +77,7 @@ public enum FollowerDataSourceType: Int, CaseIterable {
         switch self {
         case .nightscout:
             return false
-        case .libreLinkUp:
+        case .libreLinkUp, .libreLinkUpRussia:
             return true
         }
     }
@@ -83,6 +90,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return "Nightscout Follower"
         case .libreLinkUp:
             return "LibreLinkUp Follower"
+        case .libreLinkUpRussia:
+            return "LibreLinkUp Russia Follower"
         }
     }
     

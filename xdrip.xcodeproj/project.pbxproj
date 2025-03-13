@@ -31,8 +31,6 @@
 		4716A5052B40709E00419052 /* XDripWidgetAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A5042B40709E00419052 /* XDripWidgetAttributes.swift */; };
 		4716A50D2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A50C2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift */; };
 		4716A5142B41CAD000419052 /* LiveActivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4716A5132B41CAD000419052 /* LiveActivityManager.swift */; };
-		471C9BFF2B932952005E1326 /* LibreLinkUpModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E82A715FD900267BE3 /* LibreLinkUpModels.swift */; };
-		471C9C002B932957005E1326 /* LibreLinkUpModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E82A715FD900267BE3 /* LibreLinkUpModels.swift */; };
 		471C9C082B94F0F0005E1326 /* Bundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D602448E695001C9E5A /* Bundle.swift */; };
 		472134DD2BC6A63100729850 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
 		472134DE2BC6A63100729850 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
@@ -4227,7 +4225,6 @@
 			files = (
 				47A6AC2A2B7D3DE30047A4BA /* GlucoseChartView.swift in Sources */,
 				47A6AC2D2B7D3E170047A4BA /* Date.swift in Sources */,
-				471C9C002B932957005E1326 /* LibreLinkUpModels.swift in Sources */,
 				47CA61E42B965E7100C2A597 /* AccessoryCircularView.swift in Sources */,
 				471C9C082B94F0F0005E1326 /* Bundle.swift in Sources */,
 				4746067E2B962FBD00AC9214 /* SystemLargeView.swift in Sources */,
@@ -4285,7 +4282,6 @@
 				4715C3302C9ED5E10052215F /* LiveActivityType.swift in Sources */,
 				474606892B9637F600AC9214 /* TextsSettingsView.swift in Sources */,
 				47EDD15A2BE01E9000C5A286 /* ConstantsWatchComplication.swift in Sources */,
-				471C9BFF2B932952005E1326 /* LibreLinkUpModels.swift in Sources */,
 				478A923E2B8B64DE0084C394 /* ConstantsHomeView.swift in Sources */,
 				4796C6072B9516FD00DE2210 /* Bundle.swift in Sources */,
 				47E91BBA2B9A43F20063181B /* FollowerBackgroundKeepAliveType.swift in Sources */,
