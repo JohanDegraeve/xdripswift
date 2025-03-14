@@ -792,6 +792,10 @@ class Texts_SettingsView {
         return NSLocalizedString("volumeTestiOSSound", tableName: filename, bundle: Bundle.main, value: "Volume Test (Current iPhone Volume)", comment: "In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row")
     }()
 
+    static let showSlopeInAlarms: String = {
+        return NSLocalizedString("showSlopeInAlarms", tableName: filename, bundle: Bundle.main, value: "Show Slope in Alarms", comment: "In Settings, Alerts section, there's an option to show the slopes in the alarms")
+    }()
+
     static let volumeTestiOSSoundExplanation: String = {
         return NSLocalizedString("volumeTestiOSSoundExplanation", tableName: filename, bundle: Bundle.main, value: "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.", comment: "In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test")
     }()
