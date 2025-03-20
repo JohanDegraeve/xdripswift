@@ -1535,9 +1535,6 @@ final class RootViewController: UIViewController, ObservableObject {
                     // update data source info
                     updateDataSourceInfo()
                     
-                    // try and reload the widget timeline(s)
-                    WidgetCenter.shared.reloadAllTimelines()
-                    
                 }
                 
                 nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
