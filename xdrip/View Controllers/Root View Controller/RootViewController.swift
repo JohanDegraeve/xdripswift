@@ -3612,7 +3612,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 var deviceStatusCreatedAt: Date?
                 var deviceStatusLastLoopDate: Date?
                 
-                if let deviceStatus = nightscoutSyncManager?.deviceStatus as? NightscoutDeviceStatus, UserDefaults.standard.nightscoutFollowType != .none, deviceStatus.createdAt != .distantPast {
+                if let deviceStatus = nightscoutSyncManager?.deviceStatus as? NightscoutDeviceStatus, UserDefaults.standard.nightscoutEnabled, UserDefaults.standard.nightscoutFollowType != .none, deviceStatus.createdAt != .distantPast {
                     deviceStatusCreatedAt = deviceStatus.createdAt
                     deviceStatusLastLoopDate = deviceStatus.lastLoopDate
                 }
