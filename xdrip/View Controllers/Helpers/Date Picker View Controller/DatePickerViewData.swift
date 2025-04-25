@@ -2,18 +2,17 @@ import UIKit
 
 /// defines data typically available in a view that allows user to pick a date
 public class DatePickerViewData {
-    
-    var mainTitle:String?
-    var subTitle:String?
-    var okTitle:String?
-    var cancelTitle:String?
-    var okHandler: ((_ date: Date) -> Void)
+    var mainTitle: String?
+    var subTitle: String?
+    var okTitle: String?
+    var cancelTitle: String?
+    var okHandler: (_ date: Date) -> Void
     var cancelHandler: (() -> Void)?
-    var datePickerMode:UIDatePicker.Mode
-    var date:Date?
-    var minimumDate:Date?
-    var maximumDate:Date?
-    
+    var datePickerMode: UIDatePicker.Mode
+    var date: Date?
+    var minimumDate: Date?
+    var maximumDate: Date?
+    var fullScreen: Bool?
     
     /// initializes DataPickerViewData.
     /// - parameters:
@@ -27,8 +26,8 @@ public class DatePickerViewData {
     ///     - minimuDate : minimum allowed date that user can set
     ///     - maximumDate : maximum allowed date that user can set
     ///     - datePickerMode : DatePickerMode to use
-    init(withMainTitle mainTitle:String?, withSubTitle subTitle:String?, datePickerMode:UIDatePicker.Mode, date:Date?, minimumDate:Date?, maximumDate:Date?, okButtonText okTitle:String?, cancelButtonText cancelTitle:String?, onOkClick okHandler: @escaping ((_ date: Date) -> Void), onCancelClick cancelHandler: (() -> Void)?) {
-        
+    ///     - fullScreen: true if to be displayed over a full screen view without nagivation controller
+    init(withMainTitle mainTitle: String?, withSubTitle subTitle: String?, datePickerMode: UIDatePicker.Mode, date: Date?, minimumDate: Date?, maximumDate: Date?, okButtonText okTitle: String?, cancelButtonText cancelTitle: String?, isFullScreen fullScreen: Bool? = false, onOkClick okHandler: @escaping ((_ date: Date) -> Void), onCancelClick cancelHandler: (() -> Void)?) {
         self.mainTitle = mainTitle
         self.subTitle = subTitle
         self.okTitle = okTitle
@@ -39,6 +38,6 @@ public class DatePickerViewData {
         self.date = date
         self.minimumDate = minimumDate
         self.maximumDate = maximumDate
-        
+        self.fullScreen = fullScreen
     }
 }

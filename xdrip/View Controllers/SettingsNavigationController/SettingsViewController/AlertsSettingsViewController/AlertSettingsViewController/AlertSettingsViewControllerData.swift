@@ -221,7 +221,7 @@ extension AlertSettingsViewControllerData {
             }, onCancelClick: nil)
             
             // present datepickerview
-            DatePickerViewController.displayDatePickerViewController(datePickerViewData: datePickerViewData, parentController: uIViewController)
+            DatePickerViewControllerModal.displayDatePickerViewController(datePickerViewData: datePickerViewData, parentController: uIViewController)
             
         case .value:
             // for keyboard type : normally keyboard type is numeric only, except if value is bg value, and userdefaults is mmol
@@ -281,8 +281,9 @@ extension AlertSettingsViewControllerData {
                 
             }, onCancelClick: {}, didSelectRowHandler: nil)
             
+            // TODO: crash here with modal
             // create and present pickerviewcontroller
-            PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: uIViewController)
+            PickerViewControllerModal.displayPickerViewController(pickerViewData: pickerViewData, parentController: uIViewController)
             
         }
     }
