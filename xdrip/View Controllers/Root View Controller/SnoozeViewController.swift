@@ -34,6 +34,7 @@ final class SnoozeViewController: UIViewController {
                                                 withPriority: .high,
                                                 actionButtonText: Texts_Common.Ok,
                                                 cancelButtonText: Texts_Common.Cancel,
+                                                isFullScreen: true,
                                                 onActionClick: {
                 (snoozeIndex:Int) -> Void in
                 
@@ -54,7 +55,7 @@ final class SnoozeViewController: UIViewController {
             )
             
             // create and display pickerViewData
-            PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+            PickerViewControllerModal.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
         } else {
             UserDefaults.standard.snoozeAllAlertsFromDate = nil
             UserDefaults.standard.snoozeAllAlertsUntilDate = nil
@@ -219,22 +220,20 @@ extension SnoozeViewController: UITableViewDataSource {
             
             // changing from off to on. Means user wants to pre-snooze
             if isOn {
-                
                 // create and display pickerViewData
-                PickerViewController.displayPickerViewController(pickerViewData: alertManager.createPickerViewData(forAlertKind: alertKind, content: nil, actionHandler: {
+                PickerViewControllerModal.displayPickerViewController(pickerViewData: alertManager.createPickerViewData(forAlertKind: alertKind, content: nil, actionHandler: {
                     reloadRow()
                     self.configureSnoozeAllView()
-                }, cancelHandler: { reloadRow() }), parentController: self)
+                }, cancelHandler: {
+                    reloadRow()
+                    alertManager.unSnooze(alertKind: alertKind)
+                }), parentController: self)
                 
             } else {
                 // changing from on to off. Means user wants to unsnooze
-                
                 alertManager.unSnooze(alertKind: alertKind)
-                
                 self.configureSnoozeAllView()
-                
                 reloadRow()
-                
             }
         })
         
