@@ -82,6 +82,10 @@ extension UserDefaults {
         case miniChartHoursToShow = "miniChartHoursToShow"
         /// should the screen/chart be allowed to rotate?
         case allowScreenRotation = "allowScreenRotation"
+        /// should the progress bar be animated?
+        case animateProgressBar = "animateProgressBar"
+        /// should the progress bar be towards 0?
+        case reverseProgressBar = "reverseProgressBar"
         /// should the clock view be shown when the screen is locked?
         case showClockWhenScreenIsLocked = "showClockWhenScreenIsLocked"
         /// how (and if) the screen should be dimmed when screen lock is enabled
@@ -1018,6 +1022,27 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.allowScreenRotation.rawValue)
+        }
+    }
+    
+    /// should the progress bar be animated?
+    @objc dynamic var animateProgressBar: Bool {
+        // default value for bool in userdefaults is false, as default we want the chart to animate
+        get {
+            return !bool(forKey: Key.animateProgressBar.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.animateProgressBar.rawValue)
+        }
+    }
+    
+    /// should the progress bar be towards 0?
+    @objc dynamic var reverseProgressBar: Bool {
+        get {
+            return bool(forKey: Key.reverseProgressBar.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.reverseProgressBar.rawValue)
         }
     }
     
