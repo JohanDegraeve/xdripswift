@@ -39,7 +39,6 @@ class DatePickerViewControllerModal: UIViewController {
         
         let button = UIButton(type: .system, primaryAction: UIAction(handler: { _ in
             if let cancelHandler = self.cancelHandler { cancelHandler() }
-            self.dismiss(animated: true, completion: nil)
         }))
         
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -57,7 +56,6 @@ class DatePickerViewControllerModal: UIViewController {
         
         let button = UIButton(type: .system, primaryAction: UIAction(handler: { _ in
             self.okHandler(self.datePickerView.date)
-            self.dismiss(animated: true, completion: nil)
         }))
         
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -164,12 +162,6 @@ class DatePickerViewControllerModal: UIViewController {
         setupPanGesture()
     }
     
-//    override func viewWillAppear(_ animated: Bool) {
-//        super.viewWillAppear(animated)
-//
-//        setupView()
-//    }
-    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         animateShowDimmedView()
@@ -185,21 +177,7 @@ class DatePickerViewControllerModal: UIViewController {
         
         datePickerView.setValue(UIColor(resource: .colorPrimary), forKey: "textColor")
         datePickerView.translatesAutoresizingMaskIntoConstraints = false
-        /*
-        // set okTitle
-        if let addButtonTitle = addButtonTitle {
-            okButton.setTitle(addButtonTitle, for: .normal)
-        } else {
-            okButton.setTitle(Texts_Common.Ok, for: .normal)
-        }
         
-        // set cancelTitle
-        if let cancelButtonTitle = cancelButtonTitle {
-            cancelButton.setTitle(cancelButtonTitle, for: .normal)
-        } else {
-            cancelButton.setTitle(Texts_Common.Cancel, for: .normal)
-        }
-        */
         if let date = date { datePickerView.setDate(date, animated: true) }
         
         if let datePickerMode = datePickerMode { datePickerView.datePickerMode = datePickerMode }
@@ -384,14 +362,18 @@ class DatePickerViewControllerModal: UIViewController {
         datePickerViewController.minimumDate = datePickerViewData.minimumDate
         datePickerViewController.maximumDate = datePickerViewData.maximumDate
         
+        if datePickerViewController.datePickerMode == .time {
+            datePickerViewController.datePickerView.minuteInterval = 10
+        }
+        
         datePickerViewController.okHandler = { (_ date: Date) in
-            datePickerViewData.okHandler(date)
             datePickerViewController.dismiss(animated: true, completion: nil)
+            datePickerViewData.okHandler(date)
         }
         
         datePickerViewController.cancelHandler = {
-            if let cancelHandler = datePickerViewData.cancelHandler { cancelHandler() }
             datePickerViewController.dismiss(animated: true, completion: nil)
+            if let cancelHandler = datePickerViewData.cancelHandler { cancelHandler() }
         }
         
         parentController.present(datePickerViewController, animated: false)

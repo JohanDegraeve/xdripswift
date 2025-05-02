@@ -3993,7 +3993,7 @@ extension RootViewController: UNUserNotificationCenterDelegate {
             // this will verify if it concerns an alert notification, if not pickerviewData will be nil
         } else if let pickerViewData = alertManager?.userNotificationCenter(center, willPresent: notification, withCompletionHandler: completionHandler) {
             
-            PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+            PickerViewControllerModal.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
             
         }  else if notification.request.identifier == ConstantsNotifications.notificationIdentifierForVolumeTest {
             
@@ -4041,7 +4041,7 @@ extension RootViewController: UNUserNotificationCenterDelegate {
             if let pickerViewData = alertManager?.userNotificationCenter(center, didReceive: response) {
                 
                 trace("     userNotificationCenter didReceive, user pressed an alert notification to open the app", log: log, category: ConstantsLog.categoryRootView, type: .info)
-                PickerViewController.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+                PickerViewControllerModal.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
                 
             } else {
                 // it as also not an alert notification that the user clicked, there might come in other types of notifications in the future

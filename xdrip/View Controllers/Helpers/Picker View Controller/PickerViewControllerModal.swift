@@ -9,7 +9,6 @@
 import UIKit
 
 class PickerViewControllerModal: UIViewController {
-    
     // MARK: - Lazy views
     
     lazy var pickerViewMainTitle: UILabel = {
@@ -39,7 +38,9 @@ class PickerViewControllerModal: UIViewController {
         
         let button = UIButton(type: .system, primaryAction: UIAction(handler: { _ in
             if let cancelHandler = self.cancelHandler { cancelHandler() }
-            self.dismiss(animated: true, completion: nil)
+            
+            // force a state change so that the observer in RVC will pick it up and refresh the snooze icon state
+            UserDefaults.standard.updateSnoozeStatus = !UserDefaults.standard.updateSnoozeStatus
         }))
         
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -57,7 +58,6 @@ class PickerViewControllerModal: UIViewController {
         
         let button = UIButton(type: .system, primaryAction: UIAction(handler: { _ in
             if let selectedIndex = self.selectedRow { self.addHandler(selectedIndex) }
-            self.dismiss(animated: true, completion: nil)
             
             // force a state change so that the observer in RVC will pick it up and refresh the snooze icon state
             UserDefaults.standard.updateSnoozeStatus = !UserDefaults.standard.updateSnoozeStatus
@@ -200,7 +200,7 @@ class PickerViewControllerModal: UIViewController {
         }
     }
     
-    //MARK: Setup Constraints
+    // MARK: Setup Constraints
     
     func setupConstraints() {
         // Add subviews
@@ -355,7 +355,8 @@ class PickerViewControllerModal: UIViewController {
             pickerViewController.pickerViewMainTitle.text = pickerViewData.mainTitle
         } else {
             pickerViewController.pickerViewMainTitle.text = ""
-            pickerViewController.defaultHeight -= 30        }
+            pickerViewController.defaultHeight -= 30
+        }
         
         if pickerViewData.subTitle != nil {
             pickerViewController.pickerViewSubtitle.text = pickerViewData.subTitle
@@ -373,7 +374,7 @@ class PickerViewControllerModal: UIViewController {
         pickerViewController.selectedRow = pickerViewData.selectedRow
         pickerViewController.priority = pickerViewData.priority
         
-        pickerViewController.addHandler = {(_ index: Int) in
+        pickerViewController.addHandler = { (_ index: Int) in
             pickerViewController.dismiss(animated: true, completion: nil)
             pickerViewData.actionHandler(index)
         }

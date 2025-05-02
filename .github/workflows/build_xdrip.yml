@@ -136,12 +136,14 @@ jobs:
     
     # Keep repository "alive": add empty commits to ALIVE_BRANCH after "time_elapsed" days of inactivity to avoid inactivation of scheduled workflows
     - name: Keep alive
-      if: |
-        needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' &&
-        (vars.SCHEDULED_BUILD != 'false' || vars.SCHEDULED_SYNC != 'false')
-      uses: gautamkrishnar/keepalive-workflow@v1 # using the workflow with default settings
-      with:
-        time_elapsed: 20 # Time elapsed from the previous commit to trigger a new automated commit (in days)
+      run: |
+        echo "Keep Alive temporarily removed while gautamkrishnar/keepalive-workflow is not available"
+    #  if: |
+    #    needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION == 'true' &&
+    #    (vars.SCHEDULED_BUILD != 'false' || vars.SCHEDULED_SYNC != 'false')
+    #  uses: gautamkrishnar/keepalive-workflow@v1 # using the workflow with default settings
+    #  with:
+    #    time_elapsed: 20 # Time elapsed from the previous commit to trigger a new automated commit (in days)
     
     - name: Show scheduled build configuration message
       if: needs.check_alive_and_permissions.outputs.WORKFLOW_PERMISSION != 'true'
