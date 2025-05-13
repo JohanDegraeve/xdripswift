@@ -159,7 +159,7 @@ public class AlertManager:NSObject {
                 let checkAlertAndFireHelper = { (_ alertKind : AlertKind) -> Bool in self.checkAlertAndFire(alertKind: alertKind, lastBgReading: lastBgReading, lastButOneBgReading: lastButOneBgReading, lastCalibration: lastCalibration, transmitterBatteryInfo: transmitterBatteryInfo) }
                 
                 // specify the order in which alerts should be checked and group those with related snoozes
-                let alertGroupsByPreference: [[AlertKind]] = [[.fastdrop], [.verylow, .low], [.fastrise], [.veryhigh, .high], [.calibration], [.batterylow]]
+                let alertGroupsByPreference: [[AlertKind]] = [[.fastdrop], [.verylow, .low], [.fastrise], [.veryhigh, .high], [.calibration], [.batterylow], [.phonebatterylow]]
                 
                 // only raise first alert group that's been tripped
                 // check the result to see if it's an alert kind that creates an immediate notification that contains the reading value
@@ -178,8 +178,8 @@ public class AlertManager:NSObject {
                     
                 }
                     
-                    // the missed reading alert will be a future planned alert
-                    _ = checkAlertAndFireHelper(.missedreading)
+                // the missed reading alert will be a future planned alert
+                _ = checkAlertAndFireHelper(.missedreading)
                 
             } else {
                 trace("in checkAlerts, latestBgReadings is older than %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, maxAgeOfLastBgReadingInSeconds.description)
@@ -566,7 +566,7 @@ public class AlertManager:NSObject {
 
                 } // if snoozePeriodInMinutes or snoozeTimeStamp is nil (which shouldn't be the case) continue without taking into account the snooze status
                 
-            case .calibration, .batterylow, .low, .high, .verylow, .veryhigh, .fastdrop, .fastrise:
+            case .calibration, .batterylow, .phonebatterylow, .low, .high, .verylow, .veryhigh, .fastdrop, .fastrise:
                 trace("in checkAlertAndFire, alert %{public}@ is currently snoozed", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
                 return false
             }
