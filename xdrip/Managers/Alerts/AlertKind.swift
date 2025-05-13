@@ -16,6 +16,7 @@ public enum AlertKind:Int, CaseIterable {
     case batterylow = 6
     case fastdrop = 7
     case fastrise = 8
+    case phonebatterylow = 9
 
     /// this is used for presentation in UI table view. It allows to order the alert kinds in the view, different than they case ordering, and so allows to add new cases
     init?(forSection section: Int) {
@@ -40,7 +41,8 @@ public enum AlertKind:Int, CaseIterable {
             self = .calibration
         case 8:
             self = .batterylow
-            
+        case 9:
+            self = .phonebatterylow
         default:
             fatalError("in AlertKind initializer init(forRowAt row: Int), there's no case for the rownumber")
         }
@@ -69,6 +71,8 @@ public enum AlertKind:Int, CaseIterable {
             return 5
         case 8://battery low
             return 6
+        case 9://phone battery low
+            return 9
         default:
             fatalError("in alertKindRawValue, unknown case")
         }
@@ -79,7 +83,7 @@ public enum AlertKind:Int, CaseIterable {
         switch self {
         case .low, .high, .verylow, .veryhigh, .fastdrop, .fastrise:
             return true
-        case .missedreading, .batterylow, .calibration:
+        case .missedreading, .batterylow, .calibration, .phonebatterylow:
             return false
         }
     }
@@ -89,7 +93,7 @@ public enum AlertKind:Int, CaseIterable {
     /// probably only useful in UI - named AlertKind and not AlertType because there's already an AlertType which has a different goal
     func needsAlertValue() -> Bool {
         switch self {
-        case .low, .high, .verylow, .veryhigh, .missedreading, .calibration, .batterylow, .fastdrop, .fastrise:
+        case .low, .high, .verylow, .veryhigh, .missedreading, .calibration, .batterylow, .fastdrop, .fastrise, .phonebatterylow:
             return true
         }
     }
@@ -101,7 +105,7 @@ public enum AlertKind:Int, CaseIterable {
         switch self {
         case .low, .high, .verylow, .veryhigh, .fastdrop, .fastrise:
             return true
-        case .missedreading, .calibration, .batterylow:
+        case .missedreading, .calibration, .batterylow, .phonebatterylow:
             return false
         }
     }
@@ -131,6 +135,8 @@ public enum AlertKind:Int, CaseIterable {
             return ConstantsDefaultAlertLevels.fastdrop;
         case .fastrise:
             return ConstantsDefaultAlertLevels.fastrise;
+        case .phonebatterylow:
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelPhone
         }
     }
     
@@ -155,6 +161,8 @@ public enum AlertKind:Int, CaseIterable {
             return "fastdrop"
         case .fastrise:
             return "fastrise"
+        case .phonebatterylow:
+            return "phonebatterylow"
         }
     }
     
@@ -365,7 +373,22 @@ public enum AlertKind:Int, CaseIterable {
                 }
                 
                 return (false, nil, nil, nil)
+
+        case .phonebatterylow:
+            // if alertEntry not enabled, return false
+            if !currentAlertEntry.alertType.enabled {return (false, nil, nil, nil)}
+            
+            // Create battery info similar to transmitter battery info
+            UIDevice.current.isBatteryMonitoringEnabled = true
+            let phoneBatteryLevel = Int(UIDevice.current.batteryLevel * 100)
+            
+            // Check if battery level is below threshold, similar to transmitter check
+            if currentAlertEntry.value > phoneBatteryLevel {
+                return (true, "", Texts_Alerts.phoneBatteryLowAlertTitle, nil)
             }
+            
+            return (false, nil, nil, nil)
+        }
     }
     
     /// returns notification identifier for local notifications, for specific alertKind.
@@ -390,6 +413,8 @@ public enum AlertKind:Int, CaseIterable {
             return ConstantsNotifications.NotificationIdentifiersForAlerts.fastDropAlert
         case .fastrise:
             return ConstantsNotifications.NotificationIdentifiersForAlerts.fastRiseAlert
+        case .phonebatterylow:
+            return ConstantsNotifications.NotificationIdentifiersForAlerts.phoneBatteryLow
         }
     }
     
@@ -415,6 +440,8 @@ public enum AlertKind:Int, CaseIterable {
             return Texts_Alerts.fastDropTitle
         case .fastrise:
             return Texts_Alerts.fastRiseTitle
+        case .phonebatterylow:
+            return Texts_Alerts.phoneBatteryLowAlertTitle
         }
     }
     
@@ -435,6 +462,8 @@ public enum AlertKind:Int, CaseIterable {
             } else {
                 return ""// even though 20 is used as default alert level (assuming 20%) give as default value empty string
             }
+        case .phonebatterylow:
+            return "%"
         }
     }
     
@@ -469,7 +498,7 @@ fileprivate func createAlertTitleForBgReadingAlerts(alertKind: AlertKind) -> Str
         return Texts_Alerts.fastDropTitle
     case .fastrise:
         return Texts_Alerts.fastRiseTitle
-    case .missedreading, .calibration, .batterylow:
+    case .missedreading, .calibration, .batterylow, .phonebatterylow:
         return ""
     }
 }
