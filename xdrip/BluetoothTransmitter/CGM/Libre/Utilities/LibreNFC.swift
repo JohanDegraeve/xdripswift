@@ -49,7 +49,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
     /// use to keep track of the sensor serial number so that we can pass it back to the delegate
     private var serialNumber: String = ""
     
-    /// use to jeeo track of the sensor mac address so that we can pass it back to the delegate (for new Libre 2 Plus)
+    /// use to keep track of the sensor mac address so that we can pass it back to the delegate (for new Libre 2 Plus)
     private var macAddress: String = ""
     
     // MARK: - initalizer
