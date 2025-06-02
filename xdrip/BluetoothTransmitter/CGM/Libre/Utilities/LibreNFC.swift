@@ -49,6 +49,9 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
     /// use to keep track of the sensor serial number so that we can pass it back to the delegate
     private var serialNumber: String = ""
     
+    /// use to keep track of the sensor mac address so that we can pass it back to the delegate (for new Libre 2 Plus)
+    private var macAddress: String = ""
+    
     // MARK: - initalizer
     
     init(libreNFCDelegate: LibreNFCDelegate) {
@@ -121,7 +124,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                 
                 libreNFCDelegate?.nfcScanResult(successful: true)
                 
-                libreNFCDelegate?.nfcScanSerialNumber(sensorSerialNumber: serialNumber)
+                libreNFCDelegate?.nfcScanExpectedDevice(serialNumber: serialNumber, macAddress: macAddress)
                 
                 libreNFCDelegate?.startBLEScanning()
                 
@@ -467,7 +470,9 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                             
                                             self.serialNumber = LibreSensorSerialNumber(withUID: sensorUID, with: LibreSensorType.type(patchInfo: patchInfo.toHexString()))?.serialNumber ?? "unknown"
                                             
-                                            let debugInfo = "NFC: successfully enabled BLE streaming on Libre 2 " + self.serialNumber + " unlock code: " + self.unlockCode.description + " MAC address: " + Data(response.reversed()).hexAddress
+                                            self.macAddress = Data(response.reversed()).hexEncodedString().uppercased()
+                                            
+                                            let debugInfo = "NFC: successfully enabled BLE streaming on Libre 2 " + self.serialNumber + " unlock code: " + self.unlockCode.description + " MAC address: " + self.macAddress
                                             
                                             xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
                                             
@@ -719,6 +724,8 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
         var manufacturer = String(tag.icManufacturerCode)
         if manufacturer == "7" {
             manufacturer.append(" (Texas Instruments)")
+        } else if manufacturer == "122" {
+            manufacturer.append(" (Abbott Diabetes Care)")
         }
 
         xdrip.trace("NFC: IC manufacturer code: %{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, manufacturer)
@@ -737,7 +744,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
         switch tag.identifier[2] {
         case 0xA0: rom += "TAL152H Libre 1 A0"
         case 0xA4: rom += "TAL160H Libre 2 A4"
-        default:   rom += " unknown"
+        default:   rom = String(tag.identifier[2])
         }
 
         xdrip.trace("NFC: %{public}@ ROM", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, rom)

@@ -253,7 +253,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 // if firmware < 2.6, libre2 and libreUS will decrypt fram local
                                 // after decryptFRAM, the libre2 and libreUS 344 will be libre1 344 data format
                                 // firmware >= 2.6, then bubble already decrypted the data, no need for decryption we already have the 344 bytes
-                                if libreSensorType == .libre2 || libreSensorType == .libre2C5 || libreSensorType == .libre2C6 || libreSensorType == .libreUS || libreSensorType == .libreUSE6 {
+                                if libreSensorType == .libre2 || libreSensorType == .libre2C5 || libreSensorType == .libre2C6 || libreSensorType == .libre27F || libreSensorType == .libreUS || libreSensorType == .libreUSE6 {
                                     
                                     if let firmware = firmware?.toDouble(), firmware < 2.6 {
                                         

@@ -16,6 +16,6 @@ protocol LibreNFCDelegate: AnyObject {
     func startBLEScanning()
     
     /// used to pass the recently scanned serial number back
-    func nfcScanSerialNumber(sensorSerialNumber: String)
+    func nfcScanExpectedDevice(serialNumber: String, macAddress: String)
     
 }
