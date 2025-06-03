@@ -14,9 +14,9 @@ public enum LibreSensorType: String {
     
     case libre2C5 = "C5"
     
-    case libre2C6 = "C6" // EU Libre 2 Plus
+    case libre2C6 = "C6" // EU Libre 2 Plus (May 2024)
     
-    case libre27F = "7F" // new EU Libre 2 Plus (May 2025)
+    case libre27F = "7F" // EU Libre 2 Plus (May 2025)
     
     case libreUS = "E5"
     
@@ -41,10 +41,10 @@ public enum LibreSensorType: String {
             return "Libre 2 EU C5"
             
         case .libre2C6:
-            return "Libre 2 Plus EU"
+            return "Libre 2 Plus EU C6"
             
         case .libre27F:
-            return "Libre 2 Plus EU (New)"
+            return "Libre 2 Plus EU 7F"
             
         case .libreUS:
             return "Libre US"
@@ -144,6 +144,9 @@ public enum LibreSensorType: String {
         case "C6":
             return .libre2C6 // new Libre 2 Plus EU type (May 2024)
             
+        case "7F":
+            return .libre27F // new Libre 2 Plus EU type (May 2025)
+            
         case "E5":
             return .libreUS
             
@@ -152,9 +155,6 @@ public enum LibreSensorType: String {
             
         case "70":
             return .libreProH
-            
-        case "7F":
-            return .libre27F // newer non-Gen2 European Libre 2+ May 2025
             
         default:
             return nil
