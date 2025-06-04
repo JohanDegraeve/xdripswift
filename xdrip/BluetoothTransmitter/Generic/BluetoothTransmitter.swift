@@ -291,9 +291,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     }
     
     /// called by the delegate in the case of a transmitter that needs an NFC scan and used to update the expected name to include the recently scanned sensor serial number. This ensures that we only allow this sensor to connect.
-    func updateExpectedDeviceName(sensorSerialNumber: String) {
+    func updateExpectedDeviceName(name: String) {
         
-        self.expectedName = "ABBOTT" + sensorSerialNumber
+        self.expectedName = name
         
     }
     
@@ -408,7 +408,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                     stopScanAndconnect(to: peripheral)
                 } else {
                     // peripheral.name is nil or does not contain expectedName
-                    trace("    new peripheral doesn't have device name as expected, ignoring this device", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+                    trace("    new peripheral doesn't have device name as expected (%{public}@), ignoring this device", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, expectedName)
                 }
             } else {
                 // we don't expect any specific device name, so let's connect

@@ -296,9 +296,14 @@ class LibreLinkUpFollowManager: NSObject {
         var activeSensorDescription = ""
         
         if serialNumber.range(of: #"^MH"#, options: .regularExpression) != nil {
-            // MHxxxxxxxx
-            // must be a L2 (or Libre 2 Plus) sensor
+            // 3MHxxxxxxxx
+            // must be a Libre 2 or Libre 2 Plus sensor
             activeSensorDescription = "Libre 2"
+            
+        } else if serialNumber.range(of: #"^01"#, options: .regularExpression) != nil {
+            // 301xxxxxxxx
+            // must be a Libre 2 Plus sensor
+            activeSensorDescription = "Libre 2 Plus"
             
         } else if serialNumber.range(of: #"^0D"#, options: .regularExpression) != nil || serialNumber.range(of: #"^0E"#, options: .regularExpression) != nil || serialNumber.range(of: #"^0F"#, options: .regularExpression) != nil {
             // must be a Libre 3 (or Libre 3 Plus) sensor
