@@ -36,6 +36,9 @@
 "settingsviews_IntervalMessage" = "Minimum interval between two notifications (mins)";
 "settingsviews_allowScreenRotation" = "Allow Chart Rotation";
 "settingsviews_showMiniChart" = "Show Mini-Chart";
+"settingsviews_animateProgressBar" = "Animate Progress Bar";
+"settingsviews_reverseProgressBar" = "Reverse Progress Bar";
+"settingsviews_showMiniChart" = "Show the Mini-Chart";
 "settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked";
 "settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
 "settingsviews_screenLockDimmingTypeDisabled" = "Disabled";
