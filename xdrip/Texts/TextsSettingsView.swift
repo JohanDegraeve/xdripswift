@@ -421,6 +421,36 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_healthkit", tableName: filename, bundle: Bundle.main, value: "Write Data to Apple Health", comment: "healthkit settings, literally 'healthkit'")
     }()
     
+    // MARK: - Section OpenGlück
+
+    static let sectionTitleOpenGlück: String = {
+        return NSLocalizedString("settingsviews_sectiontitleopenglück", tableName: filename, bundle: Bundle.main, value: "OpenGlück", comment: "openglück settings, section title")
+    }()
+
+    static let labelOpenGlückEnabled = {
+        return NSLocalizedString("settingsviews_openGlückEnabled", tableName: filename, bundle: Bundle.main, value: "Upload To OpenGlück?", comment: "openglück settings, is it enabled")
+    }()
+
+    static let labelOpenGlückUploadEnabled = {
+        return NSLocalizedString("settingsviews_openGlückUploadEnabled", tableName: filename, bundle: Bundle.main, value: "Upload Historic/Scan?", comment: "openglück settings, is it enabled to upload historic and scan records")
+    }()
+
+    static let labelOpenGlückHostname = {
+        return NSLocalizedString("settingsviews_openGlückHostname", tableName: filename, bundle: Bundle.main, value: "Hostname:", comment: "openglück settings, hostname")
+    }()
+
+    static let labelOpenGlückToken = {
+        return NSLocalizedString("settingsviews_openGlückToken", tableName: filename, bundle: Bundle.main, value: "Token:", comment: "openglück settings, token")
+    }()
+
+    static let giveOpenGlückHostname = {
+        return NSLocalizedString("settingsviews_openGlückHostname", tableName: filename, bundle: Bundle.main, value: "Enter OpenGlück Hostname", comment: "openglück settings, pop up that asks user to enter openglück hostname")
+    }()
+    
+    static let giveOpenGlückToken = {
+        return NSLocalizedString("settingsviews_openGlückToken", tableName: filename, bundle: Bundle.main, value: "Enter OpenGlück Token", comment: "openglück settings, pop up that asks user to enter openglück token")
+    }()
+
     // MARK: - Section Dexcom Share
     
     static let sectionTitleDexcomShare: String = {
