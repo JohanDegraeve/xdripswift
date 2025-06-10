@@ -1294,6 +1294,13 @@ final class RootViewController: UIViewController, ObservableObject {
         
     }
     
+    /// Timer callback method that updates labels and chart with predictions
+    /// This is called by the regular update timer to ensure predictions are always visible
+    @objc private func updateLabelsAndChartWithPredictions() {
+        // Always update predictions when called by the timer to prevent them from disappearing
+        updateLabelsAndChart(updatePredictions: UserDefaults.standard.predictionEnabled)
+    }
+    
     /// process new glucose data received from transmitter.
     /// - parameters:
     ///     - glucoseData : array with new readings
@@ -1607,7 +1614,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 // Reset to current time (Date()) instead of using glucoseChartManager.endDate
                 // This ensures the chart shows the most recent data when time window buttons are tapped
-                glucoseChartManager.updateChartPoints(endDate: Date(), startDate: Date().addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, completionHandler: nil)
+                // Also update predictions to ensure they are recalculated for the new time window
+                glucoseChartManager.updateChartPoints(endDate: Date(), startDate: Date().addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, completionHandler: nil, updatePredictions: UserDefaults.standard.predictionEnabled)
                 
             }
             
@@ -1916,7 +1924,7 @@ final class RootViewController: UIViewController, ObservableObject {
             // check if timer already exists, if so invalidate it
             invalidateUpdateLabelsAndChartTimer()
             // now recreate, schedule and return
-            return Timer.scheduledTimer(timeInterval: ConstantsHomeView.updateHomeViewIntervalInSeconds, target: self, selector: #selector(self.updateLabelsAndChart), userInfo: nil, repeats: true)
+            return Timer.scheduledTimer(timeInterval: ConstantsHomeView.updateHomeViewIntervalInSeconds, target: self, selector: #selector(self.updateLabelsAndChartWithPredictions), userInfo: nil, repeats: true)
         }
         
         // call scheduleUpdateLabelsAndChartTimer function now - as the function setupUpdateLabelsAndChartTimer is called from viewdidload, it will be called immediately after app launch

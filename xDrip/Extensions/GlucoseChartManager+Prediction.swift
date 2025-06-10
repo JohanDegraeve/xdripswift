@@ -41,8 +41,12 @@ extension GlucoseChartManager {
         }
         
         guard !validReadings.isEmpty else {
+            os_log("No valid readings found for predictions", log: .default, type: .info)
             return []
         }
+        
+        // Log the readings being used for predictions
+        os_log("Generating predictions with %{public}d valid readings", log: .default, type: .info, validReadings.count)
         
         // Get prediction time horizon based on chart width (1/4 of chart width)
         let chartWidthHours = UserDefaults.standard.chartWidthInHours
@@ -62,6 +66,11 @@ extension GlucoseChartManager {
         // Convert PredictionPoint objects to ChartPoint objects
         let chartPoints = predictions.map { prediction in
             createPredictionChartPoint(from: prediction, endDate: endDate)
+        }
+        
+        // Log successful prediction generation
+        if !chartPoints.isEmpty {
+            os_log("Successfully generated %{public}d prediction points", log: .default, type: .info, chartPoints.count)
         }
         
         return chartPoints

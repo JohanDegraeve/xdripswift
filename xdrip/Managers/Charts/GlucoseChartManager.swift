@@ -977,7 +977,14 @@ public class GlucoseChartManager {
         
         // Add prediction layers if enabled and available
         if UserDefaults.standard.predictionEnabled && !predictionChartPoints.isEmpty {
-            let predictionLineModel = ChartLineModel(chartPoints: predictionChartPoints, lineColor: ConstantsGlucoseChart.predictionLineColor, lineWidth: ConstantsGlucoseChart.predictionLineWidth, animDuration: 0, animDelay: 0)
+            let predictionLineModel = ChartLineModel(
+                chartPoints: predictionChartPoints, 
+                lineColor: ConstantsGlucoseChart.predictionLineColor, 
+                lineWidth: ConstantsGlucoseChart.predictionLineWidth, 
+                animDuration: 0, 
+                animDelay: 0,
+                dashPattern: [6, 3] // Make predictions a dashed line for clarity
+            )
             let predictionLayer = ChartPointsLineLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, lineModels: [predictionLineModel])
             layers.append(predictionLayer)
         }
