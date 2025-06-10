@@ -38,6 +38,9 @@ public class GlucoseChartManager {
 
     /// CalibrationPoints to be shown on chart
     private var calibrationChartPoints = [ChartPoint]()
+    
+    /// PredictionPoints to be shown on chart
+    private var predictionChartPoints = [ChartPoint]()
         
     /// treatmentChartPoints to be shown on chart
     private var treatmentChartPoints: TreatmentChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint]())
@@ -340,6 +343,14 @@ public class GlucoseChartManager {
             // get calibrations from coredata
             let calibrationChartPoints = self.getCalibrationChartPoints(startDate: startDateToUse, endDate: endDate, calibrationsAccessor: self.data().calibrationsAccessor, on: self.coreDataManager.privateManagedObjectContext)
             
+            // get predictions if enabled
+            let predictionChartPoints = [ChartPoint]()
+            // Temporarily disabled until all files are properly added to project
+            if UserDefaults.standard.predictionEnabled {
+                let recentReadings = self.data().bgReadingsAccessor.getBgReadings(from: startDateToUse.addingTimeInterval(-3600), to: endDate, on: self.coreDataManager.privateManagedObjectContext)
+                let predictionChartPoints = self.generatePredictionChartPoints(bgReadings: recentReadings, endDate: endDate)
+            }
+            
             
             // only get and assign the treatment chartpoints if the user has chosen to show them on the chart
             if UserDefaults.standard.showTreatmentsOnChart {
@@ -380,6 +391,9 @@ public class GlucoseChartManager {
                 
                 // assign calibrationChartPoints to newCalibrationChartPoints
                 self.calibrationChartPoints = calibrationChartPoints
+                
+                // assign predictionChartPoints
+                self.predictionChartPoints = predictionChartPoints
                 
                 // assign the bolus treatment chart points
                 self.smallBolusTreatmentChartPoints = self.treatmentChartPoints.smallBolus
@@ -941,6 +955,12 @@ public class GlucoseChartManager {
         ]
         
         layers.append(contentsOf: layersGlucoseCircles)
+        
+        // Add prediction layers if enabled and available
+        // Temporarily disabled until all files are properly added to project
+        // if UserDefaults.standard.predictionEnabled && !predictionChartPoints.isEmpty {
+        //     // Prediction layers would be added here
+        // }
         
         if UserDefaults.standard.showTreatmentsOnChart {
             let layersTreatmentLabels: [ChartLayer?] = [
@@ -1757,6 +1777,7 @@ public class GlucoseChartManager {
         treatmentChartPoints = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint]())
         
         calibrationChartPoints = [ChartPoint]()
+        predictionChartPoints = [ChartPoint]()
         
         smallBolusTreatmentChartPoints = [ChartPoint]()
         mediumBolusTreatmentChartPoints = [ChartPoint]()
