@@ -9,30 +9,59 @@ extension GlucoseChartManager {
     
     /// Generates prediction chart points for display on the glucose chart
     /// - Parameters:
-    ///   - bgReadings: Array of recent GlucoseReading objects for prediction input
+    ///   - bgReadings: Array of BgReading objects for prediction input
     ///   - endDate: The end date of the chart (latest time displayed)
     /// - Returns: Array of ChartPoint objects representing glucose predictions
-    func generatePredictionChartPoints(bgReadings: [GlucoseReading], endDate: Date) -> [ChartPoint] {
+    func generatePredictionChartPoints(bgReadings: [BgReading], endDate: Date) -> [ChartPoint] {
         
         // Check if predictions are enabled in user settings
         guard UserDefaults.standard.predictionEnabled else {
             return []
         }
         
-        // Get prediction time horizon from settings (default: 30 minutes)
-        let timeHorizonMinutes = UserDefaults.standard.predictionTimeHorizon
-        let timeHorizon = TimeInterval(timeHorizonMinutes * 60)
+        // Filter out any readings with invalid data
+        // Ensure Core Data objects are properly faulted and have valid data
+        let validReadings = bgReadings.compactMap { reading -> BgReading? in
+            // Check if the reading is a fault and fire it if needed
+            if reading.isFault {
+                // Access a property to fire the fault
+                _ = reading.timeStamp
+            }
+            
+            // Ensure the reading has valid data
+            guard reading.calculatedValue > 0,
+                  reading.calculatedValue < 1000, // sanity check for unrealistic values
+                  !reading.timeStamp.timeIntervalSince1970.isNaN,
+                  reading.timeStamp.timeIntervalSinceNow < 0 // ensure it's not a future date
+            else {
+                return nil
+            }
+            
+            return reading
+        }
+        
+        guard !validReadings.isEmpty else {
+            return []
+        }
+        
+        // Get prediction time horizon based on chart width (1/4 of chart width)
+        let chartWidthHours = UserDefaults.standard.chartWidthInHours
+        let predictionHours = chartWidthHours / 4.0
+        let timeHorizon = TimeInterval(predictionHours * 3600)
+        
+        // Create PredictionManager with coreDataManager for IOB/COB calculations
+        let predictionManager = PredictionManager(coreDataManager: coreDataManager)
         
         // Generate predictions using PredictionManager
-        let predictions = PredictionManager.shared.generatePredictions(
-            readings: bgReadings,
+        let predictions = predictionManager.generatePredictions(
+            readings: validReadings,
             timeHorizon: timeHorizon,
             intervalMinutes: 5
         )
         
         // Convert PredictionPoint objects to ChartPoint objects
         let chartPoints = predictions.map { prediction in
-            createPredictionChartPoint(from: prediction)
+            createPredictionChartPoint(from: prediction, endDate: endDate)
         }
         
         return chartPoints
@@ -124,7 +153,10 @@ extension GlucoseChartManager {
         
         let threshold = UserDefaults.standard.lowGlucosePredictionThreshold
         
-        return PredictionManager.shared.predictLowGlucose(
+        // Create PredictionManager with coreDataManager for IOB/COB calculations
+        let predictionManager = PredictionManager(coreDataManager: coreDataManager)
+        
+        return predictionManager.predictLowGlucose(
             readings: bgReadings,
             threshold: threshold,
             maxHoursAhead: 4.0
@@ -134,8 +166,12 @@ extension GlucoseChartManager {
     // MARK: - Private Helper Methods
     
     /// Creates a ChartPoint from a PredictionPoint
-    private func createPredictionChartPoint(from prediction: PredictionPoint) -> ChartPoint {
-        let xValue = ChartAxisValueDate(date: prediction.timestamp, formatter: chartPointDateFormatter)
+    private func createPredictionChartPoint(from prediction: PredictionPoint, endDate: Date) -> ChartPoint {
+        // Create a simple formatter for the chart - this matches the pattern used elsewhere
+        let formatter = DateFormatter()
+        formatter.dateFormat = "HH:mm"
+        
+        let xValue = ChartAxisValueDate(date: prediction.timestamp, formatter: formatter)
         
         let glucoseValue = UserDefaults.standard.bloodGlucoseUnitIsMgDl 
             ? prediction.value 
@@ -175,14 +211,6 @@ extension GlucoseChartManager {
         }
         
         return confidenceBandPoints
-    }
-    
-    /// Access to the private chartPointDateFormatter
-    private var chartPointDateFormatter: DateFormatter {
-        // Create a new formatter with the expected format used by the chart
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH:mm"
-        return formatter
     }
 }
 

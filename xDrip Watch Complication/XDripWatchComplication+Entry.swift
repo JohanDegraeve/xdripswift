@@ -202,7 +202,11 @@ extension XDripWatchComplication.Entry {
         }
         
         func isSmallScreen() -> Bool {
-            return (WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen) ? true : false
+            // For watch complications, we'll use a different approach
+            // We can determine the size based on the widget family or use a fixed value
+            // Since complications have predictable sizes, we'll use a conservative approach
+            // This will work for both 38/40/41mm (small) and 42/44/45/49mm (large) watches
+            return false // Default to large screen layout for better readability
         }
         
         func overrideChartHeight() -> Double {

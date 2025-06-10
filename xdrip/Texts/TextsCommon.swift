@@ -73,6 +73,10 @@ class Texts_Common {
         return NSLocalizedString("common_minute", tableName: filename, bundle: Bundle.main, value: "min", comment: "literal translation needed")
     }()
     
+    static let grams = {
+        return NSLocalizedString("common_grams", tableName: filename, bundle: Bundle.main, value: "g", comment: "grams unit abbreviation")
+    }()
+    
     static let dayshort = {
         return NSLocalizedString("common_dayshort", tableName: filename, bundle: Bundle.main, value: "d", comment: "literal translation needed")
     }()

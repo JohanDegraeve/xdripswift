@@ -298,4 +298,12 @@ enum ConstantsGlucoseChart {
     /// color for high and urgent low lines in the mini-chart
     static let guidelineMiniChartHighLowColor = UIColor.white
     
+    // MARK: - Prediction Line Constants
+    
+    /// color for the prediction line on the glucose chart
+    static let predictionLineColor = UIColor.systemBlue.withAlphaComponent(0.7)
+    
+    /// width of the prediction line on the glucose chart
+    static let predictionLineWidth: CGFloat = 2.0
+    
 }

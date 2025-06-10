@@ -18,6 +18,12 @@ public class PredictionManager {
     /// Maximum number of readings to use for prediction (performance optimization)
     private let maximumReadingsToUse = 20
     
+    /// IOB calculator
+    private let iobCalculator: IOBCalculator?
+    
+    /// COB calculator
+    private let cobCalculator: COBCalculator?
+    
     // MARK: - Public Properties
     
     /// Shared singleton instance
@@ -25,8 +31,18 @@ public class PredictionManager {
     
     // MARK: - Initialization
     
-    public init() {
+    public init(coreDataManager: CoreDataManager? = nil) {
         self.models = TrendLineModelFactory.createAllModels()
+        
+        // Initialize IOB/COB calculators if core data is available
+        if let coreDataManager = coreDataManager {
+            self.iobCalculator = IOBCalculator(coreDataManager: coreDataManager)
+            self.cobCalculator = COBCalculator(coreDataManager: coreDataManager)
+        } else {
+            self.iobCalculator = nil
+            self.cobCalculator = nil
+        }
+        
         os_log("PredictionManager initialized with %{public}d models", log: trace, type: .info, models.count)
     }
     
@@ -50,21 +66,67 @@ public class PredictionManager {
             return []
         }
         
+        // Ensure Core Data objects are properly loaded and filter invalid readings
+        let validReadings = readings.compactMap { reading -> GlucoseReading? in
+            // For Core Data objects, ensure they're not faulted
+            if let bgReading = reading as? BgReading, bgReading.isFault {
+                // Access a property to fire the fault
+                _ = bgReading.timeStamp
+            }
+            
+            // Ensure the reading has valid data
+            guard reading.calculatedValue > 0,
+                  reading.calculatedValue < 1000, // sanity check
+                  !reading.timeStamp.timeIntervalSince1970.isNaN,
+                  reading.timeStamp.timeIntervalSinceNow < 0 // not future date
+            else {
+                os_log("Filtered out invalid reading: value=%{public}f, timestamp=%{public}@", 
+                       log: trace, type: .debug, 
+                       reading.calculatedValue, 
+                       reading.timeStamp.description)
+                return nil
+            }
+            return reading
+        }
+        
+        guard validReadings.count >= minimumReadingsRequired else {
+            os_log("Insufficient valid readings after filtering: %{public}d", 
+                   log: trace, type: .info, validReadings.count)
+            return []
+        }
+        
         // Sort readings by timestamp and take most recent ones
-        let sortedReadings = readings.sorted { $0.timeStamp < $1.timeStamp }
+        let sortedReadings = validReadings.sorted { $0.timeStamp < $1.timeStamp }
         let recentReadings = Array(sortedReadings.suffix(maximumReadingsToUse))
         
         // Extract glucose values and time points
         let values = recentReadings.map { $0.calculatedValue }
-        let timePoints = recentReadings.map { $0.timeStamp.timeIntervalSince1970 }
         
-        // Select the best model based on error variance
-        guard let bestModel = selectBestModel(values: values, timePoints: timePoints) else {
-            os_log("No suitable model found for prediction", log: trace, type: .error)
-            return []
+        // Normalize time points to hours from first reading for numerical stability
+        guard let firstTimeStamp = recentReadings.first?.timeStamp else { return [] }
+        let timePoints = recentReadings.map { reading in
+            reading.timeStamp.timeIntervalSince(firstTimeStamp) / 3600.0 // Convert to hours
         }
         
-        os_log("Selected model: %{public}@ for prediction", log: trace, type: .info, bestModel.modelType.rawValue)
+        // Select model based on user preference
+        let bestModel: TrendLineModel
+        
+        if UserDefaults.standard.predictionAutoSelectAlgorithm {
+            // Auto-select best model based on error variance
+            guard let selectedModel = selectBestModel(values: values, timePoints: timePoints) else {
+                os_log("No suitable model found for prediction", log: trace, type: .error)
+                return []
+            }
+            bestModel = selectedModel
+            os_log("Auto-selected model: %{public}@ for prediction", log: trace, type: .info, bestModel.modelType.rawValue)
+        } else {
+            // Use user-selected model
+            let selectedType = UserDefaults.standard.predictionAlgorithmType
+            // For polynomial, use degree 2 (quadratic) for curved predictions
+            let degree = selectedType == .polynomial ? 2 : 1
+            bestModel = TrendLineModelFactory.createModel(type: selectedType, degree: degree)
+            os_log("User-selected model: %{public}@ for prediction", log: trace, type: .info, bestModel.modelType.rawValue)
+        }
         
         // Generate predictions at specified intervals
         var predictions: [PredictionPoint] = []
@@ -74,12 +136,13 @@ public class PredictionManager {
         
         for i in 1...numberOfPredictions {
             let futureTime = startTime.addingTimeInterval(TimeInterval(i) * intervalSeconds)
-            let futureTimeInterval = futureTime.timeIntervalSince1970
+            // Normalize future time point to same scale as historical data
+            let futureTimeNormalized = futureTime.timeIntervalSince(firstTimeStamp) / 3600.0
             
             let predictedValue = bestModel.predict(
                 values: values,
                 timePoints: timePoints,
-                futureTime: futureTimeInterval
+                futureTime: futureTimeNormalized
             )
             
             // Ensure predicted value is within reasonable bounds
@@ -104,6 +167,23 @@ public class PredictionManager {
         
         os_log("Generated %{public}d predictions up to %{public}.1f minutes ahead", 
                log: trace, type: .info, predictions.count, timeHorizon / 60.0)
+        
+        // Apply IOB/COB adjustments if enabled and calculators are available
+        if UserDefaults.standard.predictionIncludeTreatments,
+           let iobCalculator = iobCalculator,
+           let cobCalculator = cobCalculator {
+            
+            os_log("Applying IOB/COB adjustments to predictions", log: trace, type: .info)
+            
+            let adjustedPredictions = applyTreatmentEffects(
+                predictions: predictions,
+                startTime: startTime,
+                iobCalculator: iobCalculator,
+                cobCalculator: cobCalculator
+            )
+            
+            return adjustedPredictions
+        }
         
         return predictions
     }
@@ -232,6 +312,75 @@ public class PredictionManager {
         } else {
             return .watch
         }
+    }
+    
+    /// Applies IOB and COB effects to predictions
+    private func applyTreatmentEffects(
+        predictions: [PredictionPoint],
+        startTime: Date,
+        iobCalculator: IOBCalculator,
+        cobCalculator: COBCalculator
+    ) -> [PredictionPoint] {
+        
+        // Get user settings
+        let insulinType = UserDefaults.standard.insulinType
+        let insulinSensitivity = UserDefaults.standard.insulinSensitivityMgDl
+        let carbRatio = UserDefaults.standard.carbRatio
+        let carbAbsorptionRate = UserDefaults.standard.carbAbsorptionRate
+        let carbAbsorptionDelay = UserDefaults.standard.carbAbsorptionDelay
+        
+        // Calculate IOB and COB effects for each prediction point
+        var adjustedPredictions: [PredictionPoint] = []
+        
+        for prediction in predictions {
+            // Calculate IOB at this future time
+            let iobValue = iobCalculator.calculateIOB(
+                at: prediction.timestamp,
+                insulinType: insulinType,
+                insulinSensitivity: insulinSensitivity
+            )
+            
+            // Calculate COB at this future time
+            let cobValue = cobCalculator.calculateCOB(
+                at: prediction.timestamp,
+                absorptionRate: carbAbsorptionRate,
+                delay: carbAbsorptionDelay,
+                carbRatio: carbRatio,
+                insulinSensitivity: insulinSensitivity
+            )
+            
+            // Calculate the net glucose change per minute
+            let netGlucoseChangePerMinute = cobValue.glucoseRiseRatePerMinute - iobValue.glucoseDropRatePerMinute
+            
+            // Calculate minutes from now to prediction time
+            let minutesToPrediction = prediction.timestamp.timeIntervalSince(startTime) / 60.0
+            
+            // Apply the cumulative effect
+            let cumulativeEffect = netGlucoseChangePerMinute * minutesToPrediction
+            
+            // Create adjusted prediction
+            let adjustedValue = clampGlucoseValue(prediction.value + cumulativeEffect)
+            
+            let adjustedPrediction = PredictionPoint(
+                timestamp: prediction.timestamp,
+                value: adjustedValue,
+                confidence: prediction.confidence * 0.9, // Slightly lower confidence with treatments
+                modelType: prediction.modelType
+            )
+            
+            adjustedPredictions.append(adjustedPrediction)
+            
+            os_log("Prediction adjustment at %{public}.0f min: IOB=%.2f units (drop %.1f mg/dL/min), COB=%.1f g (rise %.1f mg/dL/min), net effect=%.1f mg/dL",
+                   log: trace, type: .debug,
+                   minutesToPrediction,
+                   iobValue.iob,
+                   iobValue.glucoseDropRatePerMinute,
+                   cobValue.cob,
+                   cobValue.glucoseRiseRatePerMinute,
+                   cumulativeEffect)
+        }
+        
+        return adjustedPredictions
     }
 }
 

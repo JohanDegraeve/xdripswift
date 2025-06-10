@@ -866,6 +866,9 @@ final class RootViewController: UIViewController, ObservableObject {
         // showing or hiding the treatments on the chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showTreatmentsOnChart.rawValue, options: .new, context: nil)
         
+        // predictions need update flag
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.predictionsUpdateNeeded.rawValue, options: .new, context: nil)
+        
         // see if the user has changed the statistic days to use
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.daysToUseStatistics.rawValue, options: .new, context: nil)
         
@@ -1284,6 +1287,11 @@ final class RootViewController: UIViewController, ObservableObject {
             return self?.glucoseMiniChartManager?.glucoseChartWithFrame(frame)?.view
         }
         
+        // Disable pan and tap gestures on the chart to prevent zoom changes
+        // The time range should only change via the 3h, 5h, 8h, 12h buttons
+        chartPanGestureRecognizerOutlet.isEnabled = false
+        chartLongPressGestureRecognizerOutlet.isEnabled = false
+        
     }
     
     /// process new glucose data received from transmitter.
@@ -1522,7 +1530,7 @@ final class RootViewController: UIViewController, ObservableObject {
                     checkAlertsCreateNotificationAndSetAppBadge()
                     
                     // update all text in  first screen
-                    updateLabelsAndChart(overrideApplicationState: false)
+                    updateLabelsAndChart(overrideApplicationState: false, updatePredictions: true)
                     
                     updatePumpAndAIDStatusViews()
                     
@@ -1594,10 +1602,12 @@ final class RootViewController: UIViewController, ObservableObject {
             
         case UserDefaults.KeysCharts.chartWidthInHours:
             
-            // redraw chart is necessary
+            // redraw chart is necessary - reset to current time when time window is changed
             if let glucoseChartManager = glucoseChartManager {
                 
-                glucoseChartManager.updateChartPoints(endDate: glucoseChartManager.endDate, startDate: glucoseChartManager.endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, completionHandler: nil)
+                // Reset to current time (Date()) instead of using glucoseChartManager.endDate
+                // This ensures the chart shows the most recent data when time window buttons are tapped
+                glucoseChartManager.updateChartPoints(endDate: Date(), startDate: Date().addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, completionHandler: nil)
                 
             }
             
@@ -1746,6 +1756,14 @@ final class RootViewController: UIViewController, ObservableObject {
         case UserDefaults.Key.updateSnoozeStatus:
             updateSnoozeStatus()
             
+        case UserDefaults.Key.predictionsUpdateNeeded:
+            if UserDefaults.standard.predictionsUpdateNeeded {
+                // update chart with predictions
+                updateLabelsAndChart(updatePredictions: true)
+                // reset the flag
+                UserDefaults.standard.predictionsUpdateNeeded = false
+            }
+            
         default:
             break
             
@@ -1862,9 +1880,10 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     /// will update the chart with endDate = currentDate
-    private func updateChartWithResetEndDate() {
+    /// - parameter updatePredictions: if true, predictions will be recalculated
+    private func updateChartWithResetEndDate(updatePredictions: Bool = false) {
         
-        glucoseChartManager?.updateChartPoints(endDate: Date(), startDate: nil, chartOutlet: chartOutlet, completionHandler: nil)
+        glucoseChartManager?.updateChartPoints(endDate: Date(), startDate: nil, chartOutlet: chartOutlet, completionHandler: nil, updatePredictions: updatePredictions)
         
     }
     
@@ -2304,7 +2323,7 @@ final class RootViewController: UIViewController, ObservableObject {
     /// - parameters:
     ///     - overrideApplicationState : if true, then update will be done even if state is not .active
     ///     - forceReset : if true, then force the update to be done even if the main chart is panned back in time (used for the double tap gesture)
-    @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
+    @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false, updatePredictions: Bool = false) {
         
         setNightscoutSyncRequiredToTrue(forceNow: false)
         
@@ -2439,7 +2458,7 @@ final class RootViewController: UIViewController, ObservableObject {
         diffLabelUnitOutlet.text = diffLabelUnitText
         
         // update the chart up to now
-        updateChartWithResetEndDate()
+        updateChartWithResetEndDate(updatePredictions: updatePredictions)
         
         self.updateMiniChart()
         

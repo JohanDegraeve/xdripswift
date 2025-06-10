@@ -241,6 +241,70 @@ class Texts_SettingsView {
     static let showMiniChart: String = {
         return NSLocalizedString("settingsviews_showMiniChart", tableName: filename, bundle: Bundle.main, value: "Show Mini-Chart", comment: "home screen settings, should the mini-chart be shown")
     }()
+    
+    static let showPredictions: String = {
+        return NSLocalizedString("settingsviews_showPredictions", tableName: filename, bundle: Bundle.main, value: "Show Predictions", comment: "home screen settings, should glucose predictions be shown on the main chart")
+    }()
+    
+    static let sectionTitlePredictions: String = {
+        return NSLocalizedString("settingsviews_sectionTitlePredictions", tableName: filename, bundle: Bundle.main, value: "Predictions", comment: "prediction settings section title")
+    }()
+    
+    static let autoSelectPredictionAlgorithm: String = {
+        return NSLocalizedString("settingsviews_autoSelectPredictionAlgorithm", tableName: filename, bundle: Bundle.main, value: "Automatic Algorithm Selection", comment: "prediction settings, automatic algorithm selection based on best fit")
+    }()
+    
+    static let selectPredictionAlgorithm: String = {
+        return NSLocalizedString("settingsviews_selectPredictionAlgorithm", tableName: filename, bundle: Bundle.main, value: "Prediction Algorithm", comment: "prediction settings, manual algorithm selection")
+    }()
+    
+    static let automatic: String = {
+        return NSLocalizedString("settingsviews_automatic", tableName: filename, bundle: Bundle.main, value: "Automatic", comment: "automatic selection")
+    }()
+    
+    static let includeTreatmentsInPredictions: String = {
+        return NSLocalizedString("settingsviews_includeTreatmentsInPredictions", tableName: filename, bundle: Bundle.main, value: "Include Insulin & Carbs", comment: "prediction settings, include treatments (IOB/COB) in predictions")
+    }()
+    
+    static let insulinSensitivityFactor: String = {
+        return NSLocalizedString("settingsviews_insulinSensitivityFactor", tableName: filename, bundle: Bundle.main, value: "Insulin Sensitivity (ISF)", comment: "prediction settings, insulin sensitivity factor")
+    }()
+    
+    static let insulinSensitivityFactorMessage: String = {
+        return NSLocalizedString("settingsviews_insulinSensitivityFactorMessage", tableName: filename, bundle: Bundle.main, value: "How much 1 unit of insulin lowers your glucose (%@ per unit)", comment: "prediction settings, ISF message with unit placeholder")
+    }()
+    
+    static let carbRatio: String = {
+        return NSLocalizedString("settingsviews_carbRatio", tableName: filename, bundle: Bundle.main, value: "Carb Ratio (ICR)", comment: "prediction settings, carb ratio")
+    }()
+    
+    static let carbRatioMessage: String = {
+        return NSLocalizedString("settingsviews_carbRatioMessage", tableName: filename, bundle: Bundle.main, value: "How many grams of carbs are covered by 1 unit of insulin", comment: "prediction settings, carb ratio message")
+    }()
+    
+    static let insulinType: String = {
+        return NSLocalizedString("settingsviews_insulinType", tableName: filename, bundle: Bundle.main, value: "Insulin Type", comment: "prediction settings, insulin type selection")
+    }()
+    
+    static let carbAbsorptionRate: String = {
+        return NSLocalizedString("settingsviews_carbAbsorptionRate", tableName: filename, bundle: Bundle.main, value: "Carb Absorption Rate", comment: "prediction settings, carb absorption rate")
+    }()
+    
+    static let carbAbsorptionRateMessage: String = {
+        return NSLocalizedString("settingsviews_carbAbsorptionRateMessage", tableName: filename, bundle: Bundle.main, value: "How many grams of carbs are absorbed per hour (typical: 20-40 g/hr)", comment: "prediction settings, carb absorption rate message")
+    }()
+    
+    static let carbAbsorptionDelay: String = {
+        return NSLocalizedString("settingsviews_carbAbsorptionDelay", tableName: filename, bundle: Bundle.main, value: "Carb Absorption Delay", comment: "prediction settings, carb absorption delay")
+    }()
+    
+    static let carbAbsorptionDelayMessage: String = {
+        return NSLocalizedString("settingsviews_carbAbsorptionDelayMessage", tableName: filename, bundle: Bundle.main, value: "Delay in minutes before carbs start being absorbed (typical: 10-20 min)", comment: "prediction settings, carb absorption delay message")
+    }()
+    
+    static let gramsPerHour: String = {
+        return NSLocalizedString("settingsviews_gramsPerHour", tableName: filename, bundle: Bundle.main, value: "g/hr", comment: "grams per hour unit")
+    }()
 
     static let labelUrgentHighValue: String = {
         return NSLocalizedString("settingsviews_urgentHighValue", tableName: filename, bundle: Bundle.main, value: "Urgent High Value", comment: "home screen settings, urgent high value")

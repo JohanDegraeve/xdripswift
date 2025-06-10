@@ -139,7 +139,7 @@ public class GlucoseChartManager {
     private var nightscoutSyncManager: NightscoutSyncManager?
     
     /// a coreDataManager
-    private var coreDataManager: CoreDataManager
+    internal var coreDataManager: CoreDataManager
     
     /// difference in seconds between two pixels (or x values, not sure if it's pixels)
     private var diffInSecondsBetweenTwoPoints: Double  {
@@ -232,7 +232,7 @@ public class GlucoseChartManager {
     ///
     /// update of chartPoints array will be done on background thread. The actual redrawing of the chartoutlet is  done on the main thread. Also the completionHandler runs in the main thread.
     /// While updating glucoseChartPoints in background thread, the main thread may call again updateChartPoints with a new endDate (because the user is panning or zooming). A new block will be added in the operation queue and processed later. If there's multiple operations waiting in the queue, only the last one will be executed. This can be the case when the user is doing a fast panning.
-    public func updateChartPoints(endDate: Date, startDate: Date?, chartOutlet: BloodGlucoseChartView, completionHandler: (() -> ())?) {
+    public func updateChartPoints(endDate: Date, startDate: Date?, chartOutlet: BloodGlucoseChartView, completionHandler: (() -> ())?, updatePredictions: Bool = false) {
         
         // create a new operation
         let operation = BlockOperation(block: {
@@ -242,8 +242,19 @@ public class GlucoseChartManager {
                 return
             }
             
+            // Extend endDate into the future when predictions are enabled
+            // Use 1/4 of the chart width as the prediction extension
+            let endDateToUse: Date
+            if UserDefaults.standard.predictionEnabled {
+                let chartWidthHours = UserDefaults.standard.chartWidthInHours
+                let predictionExtensionHours = chartWidthHours / 4.0
+                endDateToUse = endDate.addingTimeInterval(.hours(predictionExtensionHours))
+            } else {
+                endDateToUse = endDate
+            }
+            
             // startDateToUse is either parameter value or (if nil), endDate minutes current chartwidth
-            let startDateToUse = startDate != nil ? startDate! : Date(timeInterval: -self.endDate.timeIntervalSince(self.startDate), since: endDate)
+            let startDateToUse = startDate != nil ? startDate! : Date(timeInterval: -self.endDate.timeIntervalSince(self.startDate), since: endDateToUse)
             
             // we're going to check if we have already all chartpoints in the arrays self.glucoseChartPoints for the new start and date time. If not we're going to prepand a arrays and/or append a arrays
             
@@ -341,14 +352,16 @@ public class GlucoseChartManager {
             
 
             // get calibrations from coredata
-            let calibrationChartPoints = self.getCalibrationChartPoints(startDate: startDateToUse, endDate: endDate, calibrationsAccessor: self.data().calibrationsAccessor, on: self.coreDataManager.privateManagedObjectContext)
+            let calibrationChartPoints = self.getCalibrationChartPoints(startDate: startDateToUse, endDate: endDateToUse, calibrationsAccessor: self.data().calibrationsAccessor, on: self.coreDataManager.privateManagedObjectContext)
             
-            // get predictions if enabled
-            let predictionChartPoints = [ChartPoint]()
-            // Temporarily disabled until all files are properly added to project
-            if UserDefaults.standard.predictionEnabled {
+            // get predictions if enabled and updatePredictions is true
+            var predictionChartPoints = [ChartPoint]()
+            if UserDefaults.standard.predictionEnabled && updatePredictions {
                 let recentReadings = self.data().bgReadingsAccessor.getBgReadings(from: startDateToUse.addingTimeInterval(-3600), to: endDate, on: self.coreDataManager.privateManagedObjectContext)
-                let predictionChartPoints = self.generatePredictionChartPoints(bgReadings: recentReadings, endDate: endDate)
+                predictionChartPoints = self.generatePredictionChartPoints(bgReadings: recentReadings, endDate: endDate)
+            } else if UserDefaults.standard.predictionEnabled {
+                // reuse existing prediction points if not updating
+                predictionChartPoints = self.predictionChartPoints
             }
             
             
@@ -356,7 +369,7 @@ public class GlucoseChartManager {
             if UserDefaults.standard.showTreatmentsOnChart {
                 
                 // get treatments from coredata
-                let treatmentChartPoints: TreatmentChartPointsType = self.getTreatmentChartPoints(startDate: startDateToUse, endDate: endDate, treatmentEntryAccessor: self.data().treatmentEntryAccessor, bgReadingsAccessor: self.data().bgReadingsAccessor, on: self.coreDataManager.privateManagedObjectContext)
+                let treatmentChartPoints: TreatmentChartPointsType = self.getTreatmentChartPoints(startDate: startDateToUse, endDate: endDateToUse, treatmentEntryAccessor: self.data().treatmentEntryAccessor, bgReadingsAccessor: self.data().bgReadingsAccessor, on: self.coreDataManager.privateManagedObjectContext)
                 
                 // assign treatment arrays
                 self.treatmentChartPoints.smallBolus = treatmentChartPoints.smallBolus
@@ -381,8 +394,14 @@ public class GlucoseChartManager {
             DispatchQueue.main.async {
                 
                 // so we're in the main thread, now endDate and startDate and glucoseChartPoints can be safely assigned to value that was passed in the call to updateChartPoints
-                self.endDate = endDate
+                self.endDate = endDateToUse
                 self.startDate = startDateToUse
+                
+                // if endDate is within 1 minute of current time, reset chartIsPannedBackward to false
+                // this ensures that when time window buttons are tapped, the chart returns to normal state
+                if abs(endDateToUse.timeIntervalSinceNow) < 60 {
+                    self.chartIsPannedBackward = false
+                }
                 
                 // also assign urgentRangeGlucoseChartPoints, urgentRangeGlucoseChartPoints and urgentRangeGlucoseChartPoints to the corresponding arrays in glucoseChartPoints - can also be safely done because we're in the main thread
                 self.urgentRangeGlucoseChartPoints = self.glucoseChartPoints.urgentRange
@@ -957,10 +976,11 @@ public class GlucoseChartManager {
         layers.append(contentsOf: layersGlucoseCircles)
         
         // Add prediction layers if enabled and available
-        // Temporarily disabled until all files are properly added to project
-        // if UserDefaults.standard.predictionEnabled && !predictionChartPoints.isEmpty {
-        //     // Prediction layers would be added here
-        // }
+        if UserDefaults.standard.predictionEnabled && !predictionChartPoints.isEmpty {
+            let predictionLineModel = ChartLineModel(chartPoints: predictionChartPoints, lineColor: ConstantsGlucoseChart.predictionLineColor, lineWidth: ConstantsGlucoseChart.predictionLineWidth, animDuration: 0, animDelay: 0)
+            let predictionLayer = ChartPointsLineLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, lineModels: [predictionLineModel])
+            layers.append(predictionLayer)
+        }
         
         if UserDefaults.standard.showTreatmentsOnChart {
             let layersTreatmentLabels: [ChartLayer?] = [
