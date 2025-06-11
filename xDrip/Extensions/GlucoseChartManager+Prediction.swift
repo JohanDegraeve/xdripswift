@@ -57,6 +57,7 @@ extension GlucoseChartManager {
         let predictionManager = PredictionManager(coreDataManager: coreDataManager)
         
         // Generate predictions using PredictionManager
+        // BgReading already conforms to GlucoseReading protocol
         let predictions = predictionManager.generatePredictions(
             readings: validReadings,
             timeHorizon: timeHorizon,
@@ -152,9 +153,9 @@ extension GlucoseChartManager {
     }
     
     /// Checks for low glucose predictions and returns warning information
-    /// - Parameter bgReadings: Array of recent GlucoseReading objects
+    /// - Parameter bgReadings: Array of recent BgReading objects
     /// - Returns: Tuple containing time to low and severity, or nil if no low predicted
-    func checkLowGlucosePrediction(bgReadings: [GlucoseReading]) -> (timeToLow: TimeInterval, severity: LowPredictionSeverity)? {
+    func checkLowGlucosePrediction(bgReadings: [BgReading]) -> (timeToLow: TimeInterval, severity: LowPredictionSeverity)? {
         
         guard UserDefaults.standard.lowGlucosePredictionEnabled else {
             return nil
@@ -165,6 +166,7 @@ extension GlucoseChartManager {
         // Create PredictionManager with coreDataManager for IOB/COB calculations
         let predictionManager = PredictionManager(coreDataManager: coreDataManager)
         
+        // BgReading already conforms to GlucoseReading protocol
         return predictionManager.predictLowGlucose(
             readings: bgReadings,
             threshold: threshold,

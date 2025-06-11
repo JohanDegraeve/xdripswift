@@ -2,8 +2,25 @@ import Foundation
 import CoreData
 import os.log
 
+/// Protocol defining the interface for prediction managers
+protocol PredictionManagerProtocol {
+    /// Generates glucose predictions
+    func generatePredictions(
+        readings: [GlucoseReading],
+        timeHorizon: TimeInterval,
+        intervalMinutes: Int
+    ) -> [PredictionPoint]
+    
+    /// Predicts if glucose will go low
+    func predictLowGlucose(
+        readings: [GlucoseReading],
+        threshold: Double,
+        maxHoursAhead: Double
+    ) -> (timeToLow: TimeInterval, severity: LowPredictionSeverity)?
+}
+
 /// Manages glucose prediction calculations using multiple mathematical models
-public class PredictionManager {
+public class PredictionManager: PredictionManagerProtocol {
     
     // MARK: - Private Properties
     
