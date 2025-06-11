@@ -117,6 +117,9 @@ public class GlucoseChartManager {
     /// The earliest date on the X-axis
     private var startDate: Date
     
+    /// The earliest available glucose reading date (to prevent panning beyond this)
+    private var earliestGlucoseReadingDate: Date?
+    
     /// the chart with glucose values
     private var glucoseChart: Chart?
     
@@ -159,6 +162,10 @@ public class GlucoseChartManager {
     
     /// used when user touches the chart. Deceleration is maybe still ongoing (from a previous pan). If set to true, then deceleration needs to be stopped
     private var stopDecelerationNextGestureTimerRun = false
+    
+    /// Track the accumulated pan offset to avoid jumpy scrolling
+    private var panStartDate: Date?
+    private var panStartEndDate: Date?
     
     /// - the maximum value in glucoseChartPoints array between start and endPoint
     /// - the value will never get smaller during the run time of the app
@@ -360,11 +367,16 @@ public class GlucoseChartManager {
             // get predictions if enabled and updatePredictions is true
             var predictionChartPoints = [ChartPoint]()
             var shouldGeneratePredictions = false
-            var recentBgReadings = [BgReading]()
+            
+            // Use tuples to pass reading data to main thread
+            var readingDataArray: [(timestamp: Date, value: Double)] = []
             
             if UserDefaults.standard.predictionEnabled && updatePredictions {
-                // Get readings but defer prediction generation to main thread
-                recentBgReadings = self.data().bgReadingsAccessor.getBgReadings(from: startDateToUse.addingTimeInterval(-3600), to: endDate, on: self.coreDataManager.privateManagedObjectContext)
+                // Get readings and extract data on background thread
+                let recentBgReadings = self.data().bgReadingsAccessor.getBgReadings(from: startDateToUse.addingTimeInterval(-3600), to: endDate, on: self.coreDataManager.privateManagedObjectContext)
+                
+                // Extract data from Core Data objects while still on background thread
+                readingDataArray = recentBgReadings.map { (timestamp: $0.timeStamp, value: $0.calculatedValue) }
                 shouldGeneratePredictions = true
             } else if UserDefaults.standard.predictionEnabled {
                 // reuse existing prediction points if not updating
@@ -419,8 +431,10 @@ public class GlucoseChartManager {
                 self.calibrationChartPoints = calibrationChartPoints
                 
                 // Generate predictions on main thread if needed
-                if shouldGeneratePredictions && !recentBgReadings.isEmpty {
-                    predictionChartPoints = self.generatePredictionChartPoints(bgReadings: recentBgReadings, endDate: endDateToUse)
+                if shouldGeneratePredictions && !readingDataArray.isEmpty {
+                    // Convert ReadingData to BgReading-like objects for prediction generation
+                    // We'll modify generatePredictionChartPoints to accept the reading data directly
+                    predictionChartPoints = self.generatePredictionChartPointsFromData(readingData: readingDataArray, endDate: endDateToUse)
                 }
                 
                 // assign predictionChartPoints
@@ -536,6 +550,10 @@ public class GlucoseChartManager {
             // user touches the chart, possibily chart is still decelerating from a previous pan. Needs to be stopped
             stopDeceleration()
             
+            // Store the initial dates when pan begins
+            panStartDate = startDate
+            panStartEndDate = endDate
+            
         }
         
         let translationX = uiPanGestureRecognizer.translation(in: uiPanGestureRecognizer.view).x
@@ -543,9 +561,7 @@ public class GlucoseChartManager {
         // if translationX negative and if not chartIsPannedBackward, then stop processing, we're not going back to the future
         if !chartIsPannedBackward && translationX < 0 {
             uiPanGestureRecognizer.setTranslation(CGPoint.zero, in: chartOutlet)
-            
             return
-            
         }
         
         // user either started panning backward or continues panning (back or forward). Assume chart is currently in backward panned state, which is not necessarily true
@@ -565,21 +581,44 @@ public class GlucoseChartManager {
                 
             })
             
+            // Clear the pan start dates
+            panStartDate = nil
+            panStartEndDate = nil
+            
         } else {
             
             // ongoing panning
             
-            // this will update the chart and set new start and enddate, for specific translation
-            setNewStartAndEndDate(translationX: translationX, chartOutlet: chartOutlet, completionHandler: {
+            // Calculate new dates based on the ORIGINAL position when pan started
+            if let panStartEndDate = panStartEndDate {
                 
-                uiPanGestureRecognizer.setTranslation(CGPoint.zero, in: chartOutlet)
+                let chartWidthInSeconds = Double(UserDefaults.standard.chartWidthInHours) * 3600.0
+                let secondsPerPixel = chartWidthInSeconds / Double(innerFrameWidth)
+                let timeShift = -secondsPerPixel * Double(translationX)
                 
-                // call the completion handler that was created by the original caller, in this case RootViewController created this code block
-                if let completionHandler = completionHandler {
-                    completionHandler()
+                var newEndDate = panStartEndDate.addingTimeInterval(timeShift)
+                
+                // maximum value should be current date
+                if newEndDate > Date() {
+                    newEndDate = Date()
+                    chartIsPannedBackward = false
+                    stopDeceleration()
                 }
                 
-            })
+                let newStartDate = newEndDate.addingTimeInterval(-chartWidthInSeconds)
+                
+                // Update the chart directly with the calculated dates
+                updateChartPoints(endDate: newEndDate, startDate: newStartDate, chartOutlet: chartOutlet, completionHandler: {
+                    
+                    // Don't reset translation during ongoing pan
+                    
+                    // call the completion handler that was created by the original caller, in this case RootViewController created this code block
+                    if let completionHandler = completionHandler {
+                        completionHandler()
+                    }
+                    
+                })
+            }
             
         }
         
@@ -649,11 +688,17 @@ public class GlucoseChartManager {
     /// - calls block in completion handler.
     private func setNewStartAndEndDate(translationX: CGFloat, chartOutlet: BloodGlucoseChartView, completionHandler: @escaping () -> ()) {
         
-        // Store the current time window to maintain it
-        let currentTimeWindow = self.endDate.timeIntervalSince(self.startDate)
+        // IMPORTANT: Always use the user's selected chart width, not the current time window
+        // This prevents the chart from zooming out
+        let chartWidthInSeconds = Double(UserDefaults.standard.chartWidthInHours) * 3600.0
+        
+        // Calculate how many seconds to shift based on the pan translation
+        // Use the INTENDED chart width for consistent scaling
+        let secondsPerPixel = chartWidthInSeconds / Double(innerFrameWidth)
+        let timeShift = -secondsPerPixel * Double(translationX)
         
         // calculate new start and enddate, based on how much the user's been panning
-        var newEndDate = endDate.addingTimeInterval(-diffInSecondsBetweenTwoPoints * Double(translationX))
+        var newEndDate = endDate.addingTimeInterval(timeShift)
         
         // maximum value should be current date
         if newEndDate > Date() {
@@ -668,8 +713,12 @@ public class GlucoseChartManager {
             
         }
         
-        // newStartDate = enddate minus the SAME time window to maintain consistent chart width
-        let newStartDate = newEndDate.addingTimeInterval(-currentTimeWindow)
+        // ALWAYS use the user's selected chart width to maintain consistent window size
+        let newStartDate = newEndDate.addingTimeInterval(-chartWidthInSeconds)
+        
+        // trace("setNewStartAndEndDate: newStartDate=%{public}@, newEndDate=%{public}@, timeWindow=%.0f seconds", 
+        //       log: log, category: ConstantsLog.categoryGlucoseChartManager, type: .info,
+        //       newStartDate.description, newEndDate.description, newEndDate.timeIntervalSince(newStartDate))
         
         updateChartPoints(endDate: newEndDate, startDate: newStartDate, chartOutlet: chartOutlet, completionHandler: completionHandler)
         
@@ -834,7 +883,11 @@ public class GlucoseChartManager {
         }
                 
         // now that we know innerFrame we can set innerFrameWidth
+        let oldInnerFrameWidth = innerFrameWidth
         innerFrameWidth = Double(innerFrame.width)
+        if abs(oldInnerFrameWidth - innerFrameWidth) > 1 {
+            // trace("innerFrameWidth changed from %.0f to %.0f", log: log, category: ConstantsLog.categoryGlucoseChartManager, type: .info, oldInnerFrameWidth, innerFrameWidth)
+        }
         
         chartGuideLinesLayerSettings = ChartGuideLinesLayerSettings(linesColor: ConstantsGlucoseChart.gridColorObjectives, linesWidth: 0.5)
         
@@ -1023,12 +1076,14 @@ public class GlucoseChartManager {
             layers.append(contentsOf: layersTreatmentLabels)
         }
         
-        return Chart(
+        let chart = Chart(
             frame: frame,
             innerFrame: innerFrame,
             settings: data().chartSettings,
             layers: layers.compactMap { $0 }
         )
+        
+        return chart
     }
     
     private func generateXAxisValues() -> [ChartAxisValue] {
