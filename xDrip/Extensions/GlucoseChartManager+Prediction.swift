@@ -64,6 +64,68 @@ extension GlucoseChartManager {
         return chartPoints
     }
     
+    /// Generates prediction chart points from reading data (thread-safe version)
+    /// - Parameters:
+    ///   - readingData: Array of ReadingData structs with timestamp and value
+    ///   - endDate: The end date of the chart (latest time displayed)
+    /// - Returns: Array of ChartPoint objects representing glucose predictions
+    func generatePredictionChartPointsFromData(readingData: [(timestamp: Date, value: Double)], endDate: Date) -> [ChartPoint] {
+        
+        // Check if predictions are enabled in user settings
+        guard UserDefaults.standard.predictionEnabled else {
+            return []
+        }
+        
+        // Filter out any readings with invalid data
+        let validReadings = readingData.filter { reading in
+            // Ensure the reading has valid data
+            return reading.value > 0 &&
+                   reading.value < 1000 && // sanity check for unrealistic values
+                   reading.timestamp.timeIntervalSinceNow < 0 // ensure it's not a future date
+        }
+        
+        guard !validReadings.isEmpty else {
+            os_log("No valid readings found for predictions", log: .default, type: .info)
+            return []
+        }
+        
+        // Log the readings being used for predictions
+        os_log("Generating predictions with %{public}d valid readings", log: .default, type: .info, validReadings.count)
+        
+        // Get prediction time horizon based on chart width (1/4 of chart width)
+        let chartWidthHours = UserDefaults.standard.chartWidthInHours
+        let predictionHours = chartWidthHours / 4.0
+        let timeHorizon = TimeInterval(predictionHours * 3600)
+        
+        // Create GlucoseReading objects from the reading data
+        let glucoseReadings: [GlucoseReading] = validReadings.map { reading in
+            // Create a simple GlucoseReading implementation
+            SimpleGlucoseReading(timeStamp: reading.timestamp, calculatedValue: reading.value)
+        }
+        
+        // Create PredictionManager with coreDataManager for IOB/COB calculations
+        let predictionManager = PredictionManager(coreDataManager: coreDataManager)
+        
+        // Generate predictions using PredictionManager
+        let predictions = predictionManager.generatePredictions(
+            readings: glucoseReadings,
+            timeHorizon: timeHorizon,
+            intervalMinutes: 5
+        )
+        
+        // Convert PredictionPoint objects to ChartPoint objects
+        let chartPoints = predictions.map { prediction in
+            createPredictionChartPoint(from: prediction, endDate: endDate)
+        }
+        
+        // Log successful prediction generation
+        if !chartPoints.isEmpty {
+            os_log("Successfully generated %{public}d prediction points", log: .default, type: .info, chartPoints.count)
+        }
+        
+        return chartPoints
+    }
+    
     /// Creates a prediction chart layer for display on the glucose chart
     /// - Parameters:
     ///   - predictionChartPoints: Array of prediction chart points
@@ -276,4 +338,12 @@ extension UserDefaults {
         }
         set { set(newValue, forKey: "lowGlucosePredictionThreshold") }
     }
+}
+
+// MARK: - Simple GlucoseReading Implementation for Thread Safety
+
+/// A simple implementation of GlucoseReading protocol that doesn't depend on Core Data
+private struct SimpleGlucoseReading: GlucoseReading {
+    let timeStamp: Date
+    let calculatedValue: Double
 }
