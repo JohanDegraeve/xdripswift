@@ -242,6 +242,9 @@ public class GlucoseChartManager {
                 return
             }
             
+            // Store original time interval to maintain consistent window
+            let originalTimeInterval = self.endDate.timeIntervalSince(self.startDate)
+            
             // Extend endDate into the future when predictions are enabled
             // Use 1/4 of the chart width as the prediction extension
             let endDateToUse: Date
@@ -253,8 +256,8 @@ public class GlucoseChartManager {
                 endDateToUse = endDate
             }
             
-            // startDateToUse is either parameter value or (if nil), endDate minutes current chartwidth
-            let startDateToUse = startDate != nil ? startDate! : Date(timeInterval: -self.endDate.timeIntervalSince(self.startDate), since: endDateToUse)
+            // startDateToUse is either parameter value or (if nil), maintain the original time window
+            let startDateToUse = startDate != nil ? startDate! : endDate.addingTimeInterval(-originalTimeInterval)
             
             // we're going to check if we have already all chartpoints in the arrays self.glucoseChartPoints for the new start and date time. If not we're going to prepand a arrays and/or append a arrays
             
@@ -356,9 +359,13 @@ public class GlucoseChartManager {
             
             // get predictions if enabled and updatePredictions is true
             var predictionChartPoints = [ChartPoint]()
+            var shouldGeneratePredictions = false
+            var recentBgReadings = [BgReading]()
+            
             if UserDefaults.standard.predictionEnabled && updatePredictions {
-                let recentReadings = self.data().bgReadingsAccessor.getBgReadings(from: startDateToUse.addingTimeInterval(-3600), to: endDate, on: self.coreDataManager.privateManagedObjectContext)
-                predictionChartPoints = self.generatePredictionChartPoints(bgReadings: recentReadings, endDate: endDate)
+                // Get readings but defer prediction generation to main thread
+                recentBgReadings = self.data().bgReadingsAccessor.getBgReadings(from: startDateToUse.addingTimeInterval(-3600), to: endDate, on: self.coreDataManager.privateManagedObjectContext)
+                shouldGeneratePredictions = true
             } else if UserDefaults.standard.predictionEnabled {
                 // reuse existing prediction points if not updating
                 predictionChartPoints = self.predictionChartPoints
@@ -410,6 +417,11 @@ public class GlucoseChartManager {
                 
                 // assign calibrationChartPoints to newCalibrationChartPoints
                 self.calibrationChartPoints = calibrationChartPoints
+                
+                // Generate predictions on main thread if needed
+                if shouldGeneratePredictions && !recentBgReadings.isEmpty {
+                    predictionChartPoints = self.generatePredictionChartPoints(bgReadings: recentBgReadings, endDate: endDateToUse)
+                }
                 
                 // assign predictionChartPoints
                 self.predictionChartPoints = predictionChartPoints
@@ -637,6 +649,9 @@ public class GlucoseChartManager {
     /// - calls block in completion handler.
     private func setNewStartAndEndDate(translationX: CGFloat, chartOutlet: BloodGlucoseChartView, completionHandler: @escaping () -> ()) {
         
+        // Store the current time window to maintain it
+        let currentTimeWindow = self.endDate.timeIntervalSince(self.startDate)
+        
         // calculate new start and enddate, based on how much the user's been panning
         var newEndDate = endDate.addingTimeInterval(-diffInSecondsBetweenTwoPoints * Double(translationX))
         
@@ -653,8 +668,8 @@ public class GlucoseChartManager {
             
         }
         
-        // newStartDate = enddate minus current difference between endDate and startDate
-        let newStartDate = Date(timeInterval: -self.endDate.timeIntervalSince(self.startDate), since: newEndDate)
+        // newStartDate = enddate minus the SAME time window to maintain consistent chart width
+        let newStartDate = newEndDate.addingTimeInterval(-currentTimeWindow)
         
         updateChartPoints(endDate: newEndDate, startDate: newStartDate, chartOutlet: chartOutlet, completionHandler: completionHandler)
         

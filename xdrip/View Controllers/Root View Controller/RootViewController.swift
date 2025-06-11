@@ -1287,9 +1287,8 @@ final class RootViewController: UIViewController, ObservableObject {
             return self?.glucoseMiniChartManager?.glucoseChartWithFrame(frame)?.view
         }
         
-        // Enable pan and long press gestures on the chart
-        chartPanGestureRecognizerOutlet.isEnabled = true
-        chartLongPressGestureRecognizerOutlet.isEnabled = true
+        // Keep gestures enabled as they were originally
+        // Pan gesture allows horizontal scrolling through time
         
     }
     

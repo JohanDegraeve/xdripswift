@@ -20,24 +20,11 @@ extension GlucoseChartManager {
         }
         
         // Filter out any readings with invalid data
-        // Ensure Core Data objects are properly faulted and have valid data
-        let validReadings = bgReadings.compactMap { reading -> BgReading? in
-            // Check if the reading is a fault and fire it if needed
-            if reading.isFault {
-                // Access a property to fire the fault
-                _ = reading.timeStamp
-            }
-            
+        let validReadings = bgReadings.filter { reading in
             // Ensure the reading has valid data
-            guard reading.calculatedValue > 0,
-                  reading.calculatedValue < 1000, // sanity check for unrealistic values
-                  !reading.timeStamp.timeIntervalSince1970.isNaN,
-                  reading.timeStamp.timeIntervalSinceNow < 0 // ensure it's not a future date
-            else {
-                return nil
-            }
-            
-            return reading
+            return reading.calculatedValue > 0 &&
+                   reading.calculatedValue < 1000 && // sanity check for unrealistic values
+                   reading.timeStamp.timeIntervalSinceNow < 0 // ensure it's not a future date
         }
         
         guard !validReadings.isEmpty else {
