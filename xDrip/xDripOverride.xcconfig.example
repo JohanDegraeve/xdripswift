@@ -1,0 +1,26 @@
+// xDripOverride.xcconfig.example
+//
+// This is an example of how to create a local override file for xDrip development.
+// 
+// To use this file:
+// 1. Copy this file to xDripOverride.xcconfig (without .example extension)
+// 2. Update the values below with your personal development settings
+// 3. The xDripOverride.xcconfig file is already in .gitignore, so it won't be committed
+//
+// This allows you to maintain personal development settings without affecting the 
+// shared repository configuration.
+//
+// Example overrides:
+
+// Your personal Apple Developer Team ID
+// Find this in Xcode: Preferences > Accounts > Select your account > Team ID
+// XDRIP_DEVELOPMENT_TEAM = YOUR_TEAM_ID_HERE
+
+// Example with actual format (replace with your own):
+// XDRIP_DEVELOPMENT_TEAM = ABC123DEF4
+
+// You can override any other build settings here as needed
+// For example:
+// PRODUCT_BUNDLE_IDENTIFIER = com.yourcompany.xdripswift
+// CODE_SIGN_STYLE = Manual
+// PROVISIONING_PROFILE_SPECIFIER = your-provisioning-profile-name
