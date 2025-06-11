@@ -628,7 +628,7 @@ final class RootViewController: UIViewController, ObservableObject {
         updateScreenRotationSettings()
         
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
-        updateLabelsAndChart(overrideApplicationState: true)
+        updateLabelsAndChart(overrideApplicationState: true, updatePredictions: UserDefaults.standard.predictionEnabled)
         
         updatePumpAndAIDStatusViews()
         
@@ -668,7 +668,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 self.updateDataSourceInfo()
             }
             
-            self.updateLabelsAndChart(overrideApplicationState: true)
+            self.updateLabelsAndChart(overrideApplicationState: true, updatePredictions: UserDefaults.standard.predictionEnabled)
             
             self.updatePumpAndAIDStatusViews()
         }
@@ -804,7 +804,7 @@ final class RootViewController: UIViewController, ObservableObject {
             self.houseKeeper?.doAppStartUpHouseKeeping()
             
             // update label texts, minutes ago, diff and value
-            self.updateLabelsAndChart(overrideApplicationState: true)
+            self.updateLabelsAndChart(overrideApplicationState: true, updatePredictions: UserDefaults.standard.predictionEnabled)
             
             // update the mini-chart
             self.updateMiniChart()
@@ -1041,7 +1041,7 @@ final class RootViewController: UIViewController, ObservableObject {
             // Schedule a call to updateLabelsAndChart when the app comes to the foreground, with a delay of 0.5 seconds. Because the application state is not immediately to .active, as a result, updates may not happen - especially the synctreatments may not happen because this may depend on the application state - by making a call just half a second later, when the status is surely = .active, the UI updates will be done correctly.
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 
-                self.updateLabelsAndChart(overrideApplicationState: true)
+                self.updateLabelsAndChart(overrideApplicationState: true, updatePredictions: UserDefaults.standard.predictionEnabled)
                 
                 self.updateMiniChart()
                 
@@ -1287,10 +1287,9 @@ final class RootViewController: UIViewController, ObservableObject {
             return self?.glucoseMiniChartManager?.glucoseChartWithFrame(frame)?.view
         }
         
-        // Disable pan and tap gestures on the chart to prevent zoom changes
-        // The time range should only change via the 3h, 5h, 8h, 12h buttons
-        chartPanGestureRecognizerOutlet.isEnabled = false
-        chartLongPressGestureRecognizerOutlet.isEnabled = false
+        // Enable pan and long press gestures on the chart
+        chartPanGestureRecognizerOutlet.isEnabled = true
+        chartLongPressGestureRecognizerOutlet.isEnabled = true
         
     }
     
