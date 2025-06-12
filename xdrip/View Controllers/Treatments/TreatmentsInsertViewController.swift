@@ -373,6 +373,7 @@ class TreatmentsInsertViewController: UIViewController {
         if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
             UserDefaults.standard.timeStampLatestNightscoutSyncRequest = .now
             UserDefaults.standard.nightscoutSyncRequired = true
+            UserDefaults.standard.timeStampLatestTreatmentModification = Date()
         }
     }
 }

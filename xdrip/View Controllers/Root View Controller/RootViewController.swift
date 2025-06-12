@@ -2337,20 +2337,20 @@ final class RootViewController: UIViewController, ObservableObject {
         // take advantage of the timer execution to update the AID status views
         updatePumpAndAIDStatusViews()
         
-        // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
-        // if landscapeValueViewController != nil then it means the device is in landscape mode and the value is shown, and that case ignore the status of the chart
-        if let glucoseChartManager = glucoseChartManager, landscapeValueViewController == nil {
-            // check that app is in foreground, but only if overrideApplicationState = false
-            // if we are not forcing to reset even if the chart is currently panned back in time (such as by double-tapping the main chart, then check if it is panned back in that case we don't update the labels
-            if !forceReset {
-                guard !glucoseChartManager.chartIsPannedBackward else {return}
-            }
-        }
+        // Update labels
+        updateLabels()
         
-        guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
+        // Update chart if needed
+        updateChartIfNeeded(overrideApplicationState: overrideApplicationState, forceReset: forceReset, updatePredictions: updatePredictions)
         
-        // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabelsAndChart is called from viewDidload at app launch
-        guard let bgReadingsAccessor = bgReadingsAccessor else {return}
+    }
+    
+    /// Updates only the UI labels without updating the chart
+    /// This method is extracted from updateLabelsAndChart to allow independent label updates
+    private func updateLabels() {
+        
+        // check that bgReadingsAccessor exists, otherwise return
+        guard let bgReadingsAccessor = bgReadingsAccessor else { return }
         
         // to make the following code a bit more readable
         let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
@@ -2463,17 +2463,53 @@ final class RootViewController: UIViewController, ObservableObject {
         let diffLabelUnitText = mgdl ? Texts_Common.mgdl : Texts_Common.mmol
         diffLabelUnitOutlet.text = diffLabelUnitText
         
-        // update the chart up to now
-        updateChartWithResetEndDate(updatePredictions: updatePredictions)
-        
-        self.updateMiniChart()
-        
         // force a snooze status update to see if the current snooze status has changed in the last minutes
         updateSnoozeStatus()
         
         // possibly landscpaeValueViewController is on top now, let's update also the labels in that viewcontroller
         updateLabelsInLandscapeValueViewController()
+    }
+    
+    /// Updates the chart if needed (considering pan state and application state)
+    /// - Parameters:
+    ///   - overrideApplicationState: if true, then update will be done even if state is not .active
+    ///   - forceReset: if true, then force the update to be done even if the main chart is panned back in time
+    ///   - updatePredictions: if true, predictions will be recalculated
+    private func updateChartIfNeeded(overrideApplicationState: Bool = false, forceReset: Bool = false, updatePredictions: Bool = false) {
         
+        // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
+        // if landscapeValueViewController != nil then it means the device is in landscape mode and the value is shown, and that case ignore the status of the chart
+        if let glucoseChartManager = glucoseChartManager, landscapeValueViewController == nil {
+            // check that app is in foreground, but only if overrideApplicationState = false
+            // if we are not forcing to reset even if the chart is currently panned back in time (such as by double-tapping the main chart, then check if it is panned back in that case we don't update the chart
+            if !forceReset {
+                guard !glucoseChartManager.chartIsPannedBackward else { return }
+            }
+        }
+        
+        guard UIApplication.shared.applicationState == .active || overrideApplicationState else { return }
+        
+        // Check if chart update is actually needed using cache
+        if let glucoseChartManager = glucoseChartManager, !forceReset {
+            // Get latest reading timestamp
+            let latestReadingTimestamp: Date? = bgReadingsAccessor?.getLatestBgReadings(limit: 1, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false).first?.timeStamp
+            
+            // Get latest treatment timestamp
+            let latestTreatmentTimestamp = UserDefaults.standard.timeStampLatestTreatmentModification
+            
+            // Check if update is needed
+            if !glucoseChartManager.chartNeedsUpdate(latestBgReadingTimestamp: latestReadingTimestamp, latestTreatmentTimestamp: latestTreatmentTimestamp) {
+                // Cache is still valid, only update mini chart if needed
+                updateMiniChart()
+                return
+            }
+        }
+        
+        // update the chart up to now
+        updateChartWithResetEndDate(updatePredictions: updatePredictions)
+        
+        // update the mini chart
+        updateMiniChart()
     }
     
     /// if the user has chosen to show the mini-chart, then update it. If not, just return without doing anything.

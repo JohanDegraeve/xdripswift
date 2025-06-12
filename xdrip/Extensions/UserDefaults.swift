@@ -204,6 +204,9 @@ extension UserDefaults {
         /// value will be increased with 1 each time there's an update
         case nightscoutTreatmentsUpdateCounter = "nightscoutTreatmentsUpdateCounter"
         
+        /// timestamp when treatments were last modified locally
+        case timeStampLatestTreatmentModification = "timeStampLatestTreatmentModification"
+        
         /// Nightscout profile stored as a JSON data object
         case nightscoutProfile = "nightscoutProfile"
         
@@ -1622,6 +1625,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.nightscoutTreatmentsUpdateCounter.rawValue)
+        }
+    }
+    
+    /// timestamp when treatments were last modified locally
+    var timeStampLatestTreatmentModification: Date? {
+        get {
+            return object(forKey: Key.timeStampLatestTreatmentModification.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampLatestTreatmentModification.rawValue)
         }
     }
     

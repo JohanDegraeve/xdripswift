@@ -5,6 +5,150 @@ import os.log
 import UIKit
 import CoreData
 
+/// Manages caching of glucose chart data to prevent unnecessary recalculations
+class GlucoseChartCache {
+    
+    // MARK: - Private Properties
+    
+    /// Timestamp of the last chart update
+    private var lastChartUpdateTimestamp: Date?
+    
+    /// Timestamp of the most recent glucose reading when chart was last updated
+    private var lastReadingTimestamp: Date?
+    
+    /// Timestamp of the most recent treatment when chart was last updated
+    private var lastTreatmentTimestamp: Date?
+    
+    /// Width of the chart in hours when last updated
+    private var lastChartWidthInHours: Double?
+    
+    /// Cached chart points from last update
+    private var cachedChartPoints: [ChartPoint]?
+    
+    /// Cached prediction points from last update
+    private var cachedPredictionPoints: [ChartPoint]?
+    
+    /// Last target values used for chart generation
+    private var lastLowTarget: Double?
+    private var lastHighTarget: Double?
+    
+    /// Last display settings
+    private var lastShowTreatments: Bool?
+    private var lastShowPredictions: Bool?
+    
+    // MARK: - Public Methods
+    
+    /// Checks if the chart needs to be updated based on changed data
+    /// - Parameters:
+    ///   - currentReadingTimestamp: Timestamp of the most recent glucose reading
+    ///   - currentTreatmentTimestamp: Timestamp of the most recent treatment
+    ///   - currentChartWidthInHours: Current chart width setting
+    ///   - lowTarget: Current low target value
+    ///   - highTarget: Current high target value
+    ///   - showTreatments: Whether treatments are currently shown
+    ///   - showPredictions: Whether predictions are currently shown
+    /// - Returns: True if chart needs updating, false if cached data is still valid
+    func needsUpdate(currentReadingTimestamp: Date?,
+                     currentTreatmentTimestamp: Date?,
+                     currentChartWidthInHours: Double,
+                     lowTarget: Double,
+                     highTarget: Double,
+                     showTreatments: Bool,
+                     showPredictions: Bool) -> Bool {
+        
+        // If we have no cached data, always update
+        guard cachedChartPoints != nil else {
+            return true
+        }
+        
+        // Check if glucose data has changed
+        if currentReadingTimestamp != lastReadingTimestamp {
+            return true
+        }
+        
+        // Check if treatment data has changed
+        if showTreatments && currentTreatmentTimestamp != lastTreatmentTimestamp {
+            return true
+        }
+        
+        // Check if chart width has changed
+        if currentChartWidthInHours != lastChartWidthInHours {
+            return true
+        }
+        
+        // Check if target values have changed
+        if lowTarget != lastLowTarget || highTarget != lastHighTarget {
+            return true
+        }
+        
+        // Check if display settings have changed
+        if showTreatments != lastShowTreatments || showPredictions != lastShowPredictions {
+            return true
+        }
+        
+        // No changes detected, cache is still valid
+        return false
+    }
+    
+    /// Updates the cache with new chart data
+    /// - Parameters:
+    ///   - chartPoints: The generated chart points
+    ///   - predictionPoints: The generated prediction points (if any)
+    ///   - readingTimestamp: Timestamp of the most recent glucose reading
+    ///   - treatmentTimestamp: Timestamp of the most recent treatment
+    ///   - chartWidthInHours: Chart width used for generation
+    ///   - lowTarget: Low target value used
+    ///   - highTarget: High target value used
+    ///   - showTreatments: Whether treatments were shown
+    ///   - showPredictions: Whether predictions were shown
+    func updateCache(chartPoints: [ChartPoint],
+                     predictionPoints: [ChartPoint]?,
+                     readingTimestamp: Date?,
+                     treatmentTimestamp: Date?,
+                     chartWidthInHours: Double,
+                     lowTarget: Double,
+                     highTarget: Double,
+                     showTreatments: Bool,
+                     showPredictions: Bool) {
+        
+        self.cachedChartPoints = chartPoints
+        self.cachedPredictionPoints = predictionPoints
+        self.lastReadingTimestamp = readingTimestamp
+        self.lastTreatmentTimestamp = treatmentTimestamp
+        self.lastChartWidthInHours = chartWidthInHours
+        self.lastLowTarget = lowTarget
+        self.lastHighTarget = highTarget
+        self.lastShowTreatments = showTreatments
+        self.lastShowPredictions = showPredictions
+        self.lastChartUpdateTimestamp = Date()
+    }
+    
+    /// Invalidates the cache, forcing the next update check to return true
+    func invalidate() {
+        cachedChartPoints = nil
+        cachedPredictionPoints = nil
+        lastChartUpdateTimestamp = nil
+    }
+    
+    /// Returns cached chart points if available
+    /// - Returns: Cached chart points or nil if cache is empty
+    func getCachedChartPoints() -> [ChartPoint]? {
+        return cachedChartPoints
+    }
+    
+    /// Returns cached prediction points if available
+    /// - Returns: Cached prediction points or nil if cache is empty
+    func getCachedPredictionPoints() -> [ChartPoint]? {
+        return cachedPredictionPoints
+    }
+    
+    /// Returns the date when the chart was last updated
+    /// - Returns: Last update date or nil if never updated
+    func getLastUpdateTimestamp() -> Date? {
+        return lastChartUpdateTimestamp
+    }
+}
+
 public class GlucoseChartManager {
     
     /// to hold range of glucose chartpoints
@@ -26,6 +170,15 @@ public class GlucoseChartManager {
     typealias TreatmentChartPointsType = (smallBolus: [ChartPoint], mediumBolus: [ChartPoint], largeBolus: [ChartPoint], veryLargeBolus: [ChartPoint], smallCarbs: [ChartPoint], mediumCarbs: [ChartPoint], largeCarbs: [ChartPoint], veryLargeCarbs: [ChartPoint], bgChecks: [ChartPoint], scheduledBasalRates: [ChartPoint], basalRates: [ChartPoint], basalRatesFill: [ChartPoint])
     
     // MARK: - private properties
+    
+    /// Cache instance to prevent unnecessary chart recalculations
+    private let chartCache = GlucoseChartCache()
+    
+    /// Last known BG reading timestamp for cache validation
+    private var lastKnownBgReadingTimestamp: Date?
+    
+    /// Last known treatment timestamp for cache validation
+    private var lastKnownTreatmentTimestamp: Date?
     
     /// glucoseChartPoints to reuse for each iteration, or for each redrawing of glucose chart
     ///
@@ -413,12 +566,14 @@ public class GlucoseChartManager {
             DispatchQueue.main.async {
                 
                 // so we're in the main thread, now endDate and startDate and glucoseChartPoints can be safely assigned to value that was passed in the call to updateChartPoints
-                self.endDate = endDateToUse
+                // IMPORTANT: Store the original endDate, not the extended one used for predictions
+                // This prevents the chart from gradually zooming out over time
+                self.endDate = endDate
                 self.startDate = startDateToUse
                 
                 // if endDate is within 1 minute of current time, reset chartIsPannedBackward to false
                 // this ensures that when time window buttons are tapped, the chart returns to normal state
-                if abs(endDateToUse.timeIntervalSinceNow) < 60 {
+                if abs(endDate.timeIntervalSinceNow) < 60 {
                     self.chartIsPannedBackward = false
                 }
                 
@@ -432,9 +587,26 @@ public class GlucoseChartManager {
                 
                 // Generate predictions on main thread if needed
                 if shouldGeneratePredictions && !readingDataArray.isEmpty {
-                    // Convert ReadingData to BgReading-like objects for prediction generation
-                    // We'll modify generatePredictionChartPoints to accept the reading data directly
-                    predictionChartPoints = self.generatePredictionChartPointsFromData(readingData: readingDataArray, endDate: endDateToUse)
+                    trace("Generating predictions - shouldGenerate: true, readings: %{public}d", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info, readingDataArray.count)
+                    // Fetch BgReadings from Core Data for prediction generation
+                    // We need actual BgReading objects, not just the data tuples
+                    let bgReadingsAccessor = BgReadingsAccessor(coreDataManager: self.coreDataManager)
+                    let bgReadings = bgReadingsAccessor.getBgReadings(
+                        from: startDateToUse,
+                        to: endDate,
+                        on: self.coreDataManager.mainManagedObjectContext
+                    )
+                    
+                    // Generate predictions using the actual BgReading objects
+                    if !bgReadings.isEmpty {
+                        trace("Calling generatePredictionChartPoints with %{public}d readings", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info, bgReadings.count)
+                        predictionChartPoints = self.generatePredictionChartPoints(bgReadings: bgReadings, endDate: endDateToUse)
+                        trace("Generated %{public}d prediction points", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info, predictionChartPoints.count)
+                    } else {
+                        trace("No BgReadings found for prediction generation", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info)
+                    }
+                } else {
+                    trace("Not generating predictions - shouldGenerate: %{public}@, readings: %{public}d", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info, shouldGeneratePredictions.description, readingDataArray.count)
                 }
                 
                 // assign predictionChartPoints
@@ -498,6 +670,11 @@ public class GlucoseChartManager {
         
         if glucoseChart == nil {
             glucoseChart = generateGlucoseChartWithFrame(frame)
+            
+            // Update cache after successful chart generation
+            if glucoseChart != nil {
+                updateChartCache()
+            }
         }
         
         return glucoseChart
@@ -519,6 +696,64 @@ public class GlucoseChartManager {
             
         }
         
+    }
+    
+    /// Checks if the chart needs to be updated based on cached data
+    /// - parameters:
+    ///     - latestBgReadingTimestamp: Timestamp of the most recent BG reading
+    ///     - latestTreatmentTimestamp: Timestamp of the most recent treatment modification
+    /// - returns: true if chart needs updating, false if cached data is still valid
+    public func chartNeedsUpdate(latestBgReadingTimestamp: Date?, latestTreatmentTimestamp: Date?) -> Bool {
+        
+        // Get current chart settings
+        let currentChartWidthInHours = UserDefaults.standard.chartWidthInHours
+        let currentLowTarget = UserDefaults.standard.urgentLowMarkValue
+        let currentHighTarget = UserDefaults.standard.urgentHighMarkValue
+        let showTreatments = UserDefaults.standard.showTreatmentsOnChart
+        let showPredictions = UserDefaults.standard.predictionEnabled
+        
+        // Check if cache indicates update is needed
+        let needsUpdate = chartCache.needsUpdate(
+            currentReadingTimestamp: latestBgReadingTimestamp,
+            currentTreatmentTimestamp: latestTreatmentTimestamp,
+            currentChartWidthInHours: currentChartWidthInHours,
+            lowTarget: currentLowTarget,
+            highTarget: currentHighTarget,
+            showTreatments: showTreatments,
+            showPredictions: showPredictions
+        )
+        
+        // If update is needed, store the timestamps for next comparison
+        if needsUpdate {
+            lastKnownBgReadingTimestamp = latestBgReadingTimestamp
+            lastKnownTreatmentTimestamp = latestTreatmentTimestamp
+        }
+        
+        return needsUpdate
+    }
+    
+    /// Updates the cache after chart generation
+    /// This should be called after successfully generating new chart points
+    private func updateChartCache() {
+        
+        // Combine all glucose chart points into a single array
+        var allGlucosePoints = [ChartPoint]()
+        allGlucosePoints.append(contentsOf: glucoseChartPoints.urgentRange)
+        allGlucosePoints.append(contentsOf: glucoseChartPoints.inRange)
+        allGlucosePoints.append(contentsOf: glucoseChartPoints.notUrgentRange)
+        
+        // Update the cache with current data
+        chartCache.updateCache(
+            chartPoints: allGlucosePoints,
+            predictionPoints: predictionChartPoints,
+            readingTimestamp: lastKnownBgReadingTimestamp,
+            treatmentTimestamp: lastKnownTreatmentTimestamp,
+            chartWidthInHours: UserDefaults.standard.chartWidthInHours,
+            lowTarget: UserDefaults.standard.urgentLowMarkValue,
+            highTarget: UserDefaults.standard.urgentHighMarkValue,
+            showTreatments: UserDefaults.standard.showTreatmentsOnChart,
+            showPredictions: UserDefaults.standard.predictionEnabled
+        )
     }
     
     // MARK: - private functions
@@ -1045,6 +1280,7 @@ public class GlucoseChartManager {
         
         // Add prediction layers if enabled and available
         if UserDefaults.standard.predictionEnabled && !predictionChartPoints.isEmpty {
+            trace("Adding prediction layer with %{public}d points", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info, predictionChartPoints.count)
             let predictionLineModel = ChartLineModel(
                 chartPoints: predictionChartPoints, 
                 lineColor: ConstantsGlucoseChart.predictionLineColor, 
@@ -1055,6 +1291,8 @@ public class GlucoseChartManager {
             )
             let predictionLayer = ChartPointsLineLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, lineModels: [predictionLineModel])
             layers.append(predictionLayer)
+        } else {
+            trace("Predictions not shown - enabled: %{public}@, points: %{public}d", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info, UserDefaults.standard.predictionEnabled.description, predictionChartPoints.count)
         }
         
         if UserDefaults.standard.showTreatmentsOnChart {
@@ -1088,13 +1326,22 @@ public class GlucoseChartManager {
     
     private func generateXAxisValues() -> [ChartAxisValue] {
         
+        // When predictions are enabled, extend the endDate for x-axis generation
+        let endDateForAxis: Date
+        if UserDefaults.standard.predictionEnabled {
+            let chartWidthHours = UserDefaults.standard.chartWidthInHours
+            let predictionExtensionHours = chartWidthHours / 4.0
+            endDateForAxis = endDate.addingTimeInterval(.hours(predictionExtensionHours))
+        } else {
+            endDateForAxis = endDate
+        }
         
         if !isStatic24hrChart {
             
             // in the comments, assume it is now 13:26 and width is 6 hours, that means startDate = 07:26, endDate = 13:26
             
             /// how many full hours between startdate and enddate
-            let amountOfFullHours = Int(ceil(endDate.timeIntervalSince(startDate).hours))
+            let amountOfFullHours = Int(ceil(endDateForAxis.timeIntervalSince(startDate).hours))
             
             /// create array that goes from 1 to number of full hours, as helper to map to array of ChartAxisValueDate - array will go from 1 to 6
             let mappingArray = Array(1...amountOfFullHours)
@@ -1119,7 +1366,7 @@ public class GlucoseChartManager {
             xAxisValues.insert(ChartAxisValueDate(date: startDate, formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings), at: 0)
             
             /// now append the endDate as last element, in this example 13:26
-            xAxisValues.append(ChartAxisValueDate(date: endDate, formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings))
+            xAxisValues.append(ChartAxisValueDate(date: endDateForAxis, formatter: data().axisLabelTimeFormatter, labelSettings: data().chartLabelSettings))
             
             /// don't show the first and last hour, because this is usually not something like 13 but rather 13:26
             xAxisValues.first?.hidden = true

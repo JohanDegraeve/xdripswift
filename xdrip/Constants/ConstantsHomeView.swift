@@ -6,7 +6,11 @@ import SwiftUI
 enum ConstantsHomeView {
     
     /// how often to update the labels in the homeview (ie label with latest reading, minutes ago, etc..)
-    static let updateHomeViewIntervalInSeconds = 15.0
+    /// Changed from 15.0 to 60.0 seconds as part of chart caching optimization
+    /// - Labels only need updating once per minute for "minutes ago" display
+    /// - Libre 2 provides new data every minute anyway
+    /// - Reduces timer wake-ups by 75%
+    static let updateHomeViewIntervalInSeconds = 60.0
     
     /// info email adres, appears in licenseInfo
     static let infoEmailAddress = "xdrip@proximus.be"

@@ -326,6 +326,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                                     } else {
                                         if treatmentsLocallyCreatedOrUpdated {
                                             UserDefaults.standard.nightscoutTreatmentsUpdateCounter = UserDefaults.standard.nightscoutTreatmentsUpdateCounter + 1
+                                            UserDefaults.standard.timeStampLatestTreatmentModification = Date()
                                         }
                                         
                                         // this sync session has finished, set nightscoutSyncStartTimeStamp to nil
