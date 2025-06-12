@@ -26,6 +26,7 @@ enum ConstantsSettingsIcons {
     static let m5StackSettingsIcon: String = "📺 "
     static let nightscoutSettingsIcon: String = "↕️ "
     static let notificationsSettingsIcon: String = "📢 "
+    static let predictionsSettingsIcon: String = "🔮 "
     static let speakSettingsIcon: String = "🗣️ "
     static let statisticsSettingsIcon: String = "📊 "
     static let traceSettingsIcon: String = "📤 "

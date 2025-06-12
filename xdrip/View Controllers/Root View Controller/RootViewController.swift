@@ -628,7 +628,7 @@ final class RootViewController: UIViewController, ObservableObject {
         updateScreenRotationSettings()
         
         // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
-        updateLabelsAndChart(overrideApplicationState: true)
+        updateLabelsAndChart(overrideApplicationState: true, updatePredictions: UserDefaults.standard.predictionEnabled)
         
         updatePumpAndAIDStatusViews()
         
@@ -668,7 +668,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 self.updateDataSourceInfo()
             }
             
-            self.updateLabelsAndChart(overrideApplicationState: true)
+            self.updateLabelsAndChart(overrideApplicationState: true, updatePredictions: UserDefaults.standard.predictionEnabled)
             
             self.updatePumpAndAIDStatusViews()
         }
@@ -804,7 +804,7 @@ final class RootViewController: UIViewController, ObservableObject {
             self.houseKeeper?.doAppStartUpHouseKeeping()
             
             // update label texts, minutes ago, diff and value
-            self.updateLabelsAndChart(overrideApplicationState: true)
+            self.updateLabelsAndChart(overrideApplicationState: true, updatePredictions: UserDefaults.standard.predictionEnabled)
             
             // update the mini-chart
             self.updateMiniChart()
@@ -865,6 +865,9 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // showing or hiding the treatments on the chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showTreatmentsOnChart.rawValue, options: .new, context: nil)
+        
+        // predictions need update flag
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.predictionsUpdateNeeded.rawValue, options: .new, context: nil)
         
         // see if the user has changed the statistic days to use
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.daysToUseStatistics.rawValue, options: .new, context: nil)
@@ -1038,7 +1041,7 @@ final class RootViewController: UIViewController, ObservableObject {
             // Schedule a call to updateLabelsAndChart when the app comes to the foreground, with a delay of 0.5 seconds. Because the application state is not immediately to .active, as a result, updates may not happen - especially the synctreatments may not happen because this may depend on the application state - by making a call just half a second later, when the status is surely = .active, the UI updates will be done correctly.
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 
-                self.updateLabelsAndChart(overrideApplicationState: true)
+                self.updateLabelsAndChart(overrideApplicationState: true, updatePredictions: UserDefaults.standard.predictionEnabled)
                 
                 self.updateMiniChart()
                 
@@ -1284,6 +1287,16 @@ final class RootViewController: UIViewController, ObservableObject {
             return self?.glucoseMiniChartManager?.glucoseChartWithFrame(frame)?.view
         }
         
+        // Keep gestures enabled as they were originally
+        // Pan gesture allows horizontal scrolling through time
+        
+    }
+    
+    /// Timer callback method that updates labels and chart with predictions
+    /// This is called by the regular update timer to ensure predictions are always visible
+    @objc private func updateLabelsAndChartWithPredictions() {
+        // Always update predictions when called by the timer to prevent them from disappearing
+        updateLabelsAndChart(updatePredictions: UserDefaults.standard.predictionEnabled)
     }
     
     /// process new glucose data received from transmitter.
@@ -1522,7 +1535,7 @@ final class RootViewController: UIViewController, ObservableObject {
                     checkAlertsCreateNotificationAndSetAppBadge()
                     
                     // update all text in  first screen
-                    updateLabelsAndChart(overrideApplicationState: false)
+                    updateLabelsAndChart(overrideApplicationState: false, updatePredictions: true)
                     
                     updatePumpAndAIDStatusViews()
                     
@@ -1594,10 +1607,13 @@ final class RootViewController: UIViewController, ObservableObject {
             
         case UserDefaults.KeysCharts.chartWidthInHours:
             
-            // redraw chart is necessary
+            // redraw chart is necessary - reset to current time when time window is changed
             if let glucoseChartManager = glucoseChartManager {
                 
-                glucoseChartManager.updateChartPoints(endDate: glucoseChartManager.endDate, startDate: glucoseChartManager.endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, completionHandler: nil)
+                // Reset to current time (Date()) instead of using glucoseChartManager.endDate
+                // This ensures the chart shows the most recent data when time window buttons are tapped
+                // Also update predictions to ensure they are recalculated for the new time window
+                glucoseChartManager.updateChartPoints(endDate: Date(), startDate: Date().addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, completionHandler: nil, updatePredictions: UserDefaults.standard.predictionEnabled)
                 
             }
             
@@ -1746,6 +1762,14 @@ final class RootViewController: UIViewController, ObservableObject {
         case UserDefaults.Key.updateSnoozeStatus:
             updateSnoozeStatus()
             
+        case UserDefaults.Key.predictionsUpdateNeeded:
+            if UserDefaults.standard.predictionsUpdateNeeded {
+                // update chart with predictions
+                updateLabelsAndChart(updatePredictions: true)
+                // reset the flag
+                UserDefaults.standard.predictionsUpdateNeeded = false
+            }
+            
         default:
             break
             
@@ -1862,9 +1886,10 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     /// will update the chart with endDate = currentDate
-    private func updateChartWithResetEndDate() {
+    /// - parameter updatePredictions: if true, predictions will be recalculated
+    private func updateChartWithResetEndDate(updatePredictions: Bool = false) {
         
-        glucoseChartManager?.updateChartPoints(endDate: Date(), startDate: nil, chartOutlet: chartOutlet, completionHandler: nil)
+        glucoseChartManager?.updateChartPoints(endDate: Date(), startDate: nil, chartOutlet: chartOutlet, completionHandler: nil, updatePredictions: updatePredictions)
         
     }
     
@@ -1897,7 +1922,7 @@ final class RootViewController: UIViewController, ObservableObject {
             // check if timer already exists, if so invalidate it
             invalidateUpdateLabelsAndChartTimer()
             // now recreate, schedule and return
-            return Timer.scheduledTimer(timeInterval: ConstantsHomeView.updateHomeViewIntervalInSeconds, target: self, selector: #selector(self.updateLabelsAndChart), userInfo: nil, repeats: true)
+            return Timer.scheduledTimer(timeInterval: ConstantsHomeView.updateHomeViewIntervalInSeconds, target: self, selector: #selector(self.updateLabelsAndChartWithPredictions), userInfo: nil, repeats: true)
         }
         
         // call scheduleUpdateLabelsAndChartTimer function now - as the function setupUpdateLabelsAndChartTimer is called from viewdidload, it will be called immediately after app launch
@@ -2304,7 +2329,7 @@ final class RootViewController: UIViewController, ObservableObject {
     /// - parameters:
     ///     - overrideApplicationState : if true, then update will be done even if state is not .active
     ///     - forceReset : if true, then force the update to be done even if the main chart is panned back in time (used for the double tap gesture)
-    @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false) {
+    @objc private func updateLabelsAndChart(overrideApplicationState: Bool = false, forceReset: Bool = false, updatePredictions: Bool = false) {
         
         setNightscoutSyncRequiredToTrue(forceNow: false)
         
@@ -2312,20 +2337,20 @@ final class RootViewController: UIViewController, ObservableObject {
         // take advantage of the timer execution to update the AID status views
         updatePumpAndAIDStatusViews()
         
-        // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
-        // if landscapeValueViewController != nil then it means the device is in landscape mode and the value is shown, and that case ignore the status of the chart
-        if let glucoseChartManager = glucoseChartManager, landscapeValueViewController == nil {
-            // check that app is in foreground, but only if overrideApplicationState = false
-            // if we are not forcing to reset even if the chart is currently panned back in time (such as by double-tapping the main chart, then check if it is panned back in that case we don't update the labels
-            if !forceReset {
-                guard !glucoseChartManager.chartIsPannedBackward else {return}
-            }
-        }
+        // Update labels
+        updateLabels()
         
-        guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
+        // Update chart if needed
+        updateChartIfNeeded(overrideApplicationState: overrideApplicationState, forceReset: forceReset, updatePredictions: updatePredictions)
         
-        // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabelsAndChart is called from viewDidload at app launch
-        guard let bgReadingsAccessor = bgReadingsAccessor else {return}
+    }
+    
+    /// Updates only the UI labels without updating the chart
+    /// This method is extracted from updateLabelsAndChart to allow independent label updates
+    private func updateLabels() {
+        
+        // check that bgReadingsAccessor exists, otherwise return
+        guard let bgReadingsAccessor = bgReadingsAccessor else { return }
         
         // to make the following code a bit more readable
         let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
@@ -2438,17 +2463,53 @@ final class RootViewController: UIViewController, ObservableObject {
         let diffLabelUnitText = mgdl ? Texts_Common.mgdl : Texts_Common.mmol
         diffLabelUnitOutlet.text = diffLabelUnitText
         
-        // update the chart up to now
-        updateChartWithResetEndDate()
-        
-        self.updateMiniChart()
-        
         // force a snooze status update to see if the current snooze status has changed in the last minutes
         updateSnoozeStatus()
         
         // possibly landscpaeValueViewController is on top now, let's update also the labels in that viewcontroller
         updateLabelsInLandscapeValueViewController()
+    }
+    
+    /// Updates the chart if needed (considering pan state and application state)
+    /// - Parameters:
+    ///   - overrideApplicationState: if true, then update will be done even if state is not .active
+    ///   - forceReset: if true, then force the update to be done even if the main chart is panned back in time
+    ///   - updatePredictions: if true, predictions will be recalculated
+    private func updateChartIfNeeded(overrideApplicationState: Bool = false, forceReset: Bool = false, updatePredictions: Bool = false) {
         
+        // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
+        // if landscapeValueViewController != nil then it means the device is in landscape mode and the value is shown, and that case ignore the status of the chart
+        if let glucoseChartManager = glucoseChartManager, landscapeValueViewController == nil {
+            // check that app is in foreground, but only if overrideApplicationState = false
+            // if we are not forcing to reset even if the chart is currently panned back in time (such as by double-tapping the main chart, then check if it is panned back in that case we don't update the chart
+            if !forceReset {
+                guard !glucoseChartManager.chartIsPannedBackward else { return }
+            }
+        }
+        
+        guard UIApplication.shared.applicationState == .active || overrideApplicationState else { return }
+        
+        // Check if chart update is actually needed using cache
+        if let glucoseChartManager = glucoseChartManager, !forceReset {
+            // Get latest reading timestamp
+            let latestReadingTimestamp: Date? = bgReadingsAccessor?.getLatestBgReadings(limit: 1, howOld: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false).first?.timeStamp
+            
+            // Get latest treatment timestamp
+            let latestTreatmentTimestamp = UserDefaults.standard.timeStampLatestTreatmentModification
+            
+            // Check if update is needed
+            if !glucoseChartManager.chartNeedsUpdate(latestBgReadingTimestamp: latestReadingTimestamp, latestTreatmentTimestamp: latestTreatmentTimestamp) {
+                // Cache is still valid, only update mini chart if needed
+                updateMiniChart()
+                return
+            }
+        }
+        
+        // update the chart up to now
+        updateChartWithResetEndDate(updatePredictions: updatePredictions)
+        
+        // update the mini chart
+        updateMiniChart()
     }
     
     /// if the user has chosen to show the mini-chart, then update it. If not, just return without doing anything.

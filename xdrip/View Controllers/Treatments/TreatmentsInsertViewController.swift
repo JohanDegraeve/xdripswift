@@ -230,6 +230,9 @@ class TreatmentsInsertViewController: UIViewController {
 
                         // trigger nightscoutsync
                         self.setNightscoutSyncRequiredToTrue()
+                        
+                        // trigger prediction update
+                        UserDefaults.standard.predictionsUpdateNeeded = true
                     }
                     
                 } else {
@@ -243,6 +246,9 @@ class TreatmentsInsertViewController: UIViewController {
                         
                         // trigger nightscoutsync
                         self.setNightscoutSyncRequiredToTrue()
+                        
+                        // trigger prediction update
+                        UserDefaults.standard.predictionsUpdateNeeded = true
                         
                         self.treatMentEntryToUpdate = nil
                     }
@@ -367,6 +373,7 @@ class TreatmentsInsertViewController: UIViewController {
         if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
             UserDefaults.standard.timeStampLatestNightscoutSyncRequest = .now
             UserDefaults.standard.nightscoutSyncRequired = true
+            UserDefaults.standard.timeStampLatestTreatmentModification = Date()
         }
     }
 }

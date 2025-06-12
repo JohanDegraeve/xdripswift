@@ -218,6 +218,15 @@
 		47F7B1C62C68BBE100609DA7 /* ConstantsCalibrationAlgorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585422EDB706007F5B5D /* ConstantsCalibrationAlgorithms.swift */; };
 		47F7B1CD2C68CC3000609DA7 /* ConstantsCalibrationAlgorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585422EDB706007F5B5D /* ConstantsCalibrationAlgorithms.swift */; };
 		47FB28082636B04200042FFB /* StatisticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47FB28072636B04200042FFB /* StatisticsManager.swift */; };
+		8C1E7CA42DF88C81003BFF4B /* InsulinProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C1E7CA22DF88C81003BFF4B /* InsulinProfile.swift */; };
+		8C1E7CA52DF88C81003BFF4B /* COBCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C1E7CA12DF88C81003BFF4B /* COBCalculator.swift */; };
+		8C1E7CA62DF88C81003BFF4B /* IOBCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C1E7CA32DF88C81003BFF4B /* IOBCalculator.swift */; };
+		8CA98B372DF83C9800399CE8 /* GlucoseChartManager+Prediction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CA98B322DF83C9800399CE8 /* GlucoseChartManager+Prediction.swift */; };
+		8CA98B382DF83C9800399CE8 /* Array+Regression.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CA98B312DF83C9800399CE8 /* Array+Regression.swift */; };
+		8CA98B4A2DF83CB300399CE8 /* GlucoseReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CA98B3D2DF83CB300399CE8 /* GlucoseReading.swift */; };
+		8CA98B4B2DF83CB300399CE8 /* PredictionPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CA98B3F2DF83CB300399CE8 /* PredictionPoint.swift */; };
+		8CA98B4C2DF83CB300399CE8 /* TrendLineModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CA98B402DF83CB300399CE8 /* TrendLineModel.swift */; };
+		8CA98B4D2DF83CB300399CE8 /* PredictionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CA98B3E2DF83CB300399CE8 /* PredictionManager.swift */; };
 		CE1B2FE025D0264B00F642F5 /* LaunchScreen.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */; };
 		CE1B2FE125D0264B00F642F5 /* Main.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD425D0264900F642F5 /* Main.strings */; };
 		D400F8032778BD8000B57648 /* TextsTreatmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D400F8022778BD8000B57648 /* TextsTreatmentsView.swift */; };
@@ -1054,6 +1063,15 @@
 		47FB28072636B04200042FFB /* StatisticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsManager.swift; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xdrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xdrip/Version.xcconfig; sourceTree = "<group>"; };
+		8C1E7CA12DF88C81003BFF4B /* COBCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = COBCalculator.swift; sourceTree = "<group>"; };
+		8C1E7CA22DF88C81003BFF4B /* InsulinProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsulinProfile.swift; sourceTree = "<group>"; };
+		8C1E7CA32DF88C81003BFF4B /* IOBCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOBCalculator.swift; sourceTree = "<group>"; };
+		8CA98B312DF83C9800399CE8 /* Array+Regression.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Array+Regression.swift"; sourceTree = "<group>"; };
+		8CA98B322DF83C9800399CE8 /* GlucoseChartManager+Prediction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GlucoseChartManager+Prediction.swift"; sourceTree = "<group>"; };
+		8CA98B3D2DF83CB300399CE8 /* GlucoseReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseReading.swift; sourceTree = "<group>"; };
+		8CA98B3E2DF83CB300399CE8 /* PredictionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PredictionManager.swift; sourceTree = "<group>"; };
+		8CA98B3F2DF83CB300399CE8 /* PredictionPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PredictionPoint.swift; sourceTree = "<group>"; };
+		8CA98B402DF83CB300399CE8 /* TrendLineModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrendLineModel.swift; sourceTree = "<group>"; };
 		CE1B2FC825D0261500F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Alerts.strings; sourceTree = "<group>"; };
 		CE1B2FCD25D0264900F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
 		CE1B2FCE25D0264900F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/WatlaaView.strings; sourceTree = "<group>"; };
@@ -2222,6 +2240,20 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		8CA98B412DF83CB300399CE8 /* Prediction */ = {
+			isa = PBXGroup;
+			children = (
+				8C1E7CA12DF88C81003BFF4B /* COBCalculator.swift */,
+				8C1E7CA22DF88C81003BFF4B /* InsulinProfile.swift */,
+				8C1E7CA32DF88C81003BFF4B /* IOBCalculator.swift */,
+				8CA98B3D2DF83CB300399CE8 /* GlucoseReading.swift */,
+				8CA98B3E2DF83CB300399CE8 /* PredictionManager.swift */,
+				8CA98B3F2DF83CB300399CE8 /* PredictionPoint.swift */,
+				8CA98B402DF83CB300399CE8 /* TrendLineModel.swift */,
+			);
+			path = Prediction;
+			sourceTree = "<group>";
+		};
 		D4028CBE2774A4B900341476 /* Treatments */ = {
 			isa = PBXGroup;
 			children = (
@@ -2272,6 +2304,8 @@
 		F8025C0B21D9513400ECF0C0 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				8CA98B312DF83C9800399CE8 /* Array+Regression.swift */,
+				8CA98B322DF83C9800399CE8 /* GlucoseChartManager+Prediction.swift */,
 				F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */,
 				F8FDD6CA2553385000625B49 /* Array.swift */,
 				F8E51D602448E695001C9E5A /* Bundle.swift */,
@@ -2656,6 +2690,7 @@
 		F85DC2F621D25E3A00B9F74A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				8CA98B412DF83CB300399CE8 /* Prediction */,
 				F821CF48229BF43A005C1E43 /* Alerts */,
 				F821CF54229BF43A005C1E43 /* Application */,
 				F8297F42238DC4AC00D74D66 /* BluetoothPeripheral */,
@@ -4403,6 +4438,9 @@
 				F8B3A85B2280CCD1004BA588 /* AlertSettingsViewController.swift in Sources */,
 				4767BDD62BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift in Sources */,
 				F8F9722E23A5915900C3F17D /* M5StackTransmitterOpCode.swift in Sources */,
+				8C1E7CA42DF88C81003BFF4B /* InsulinProfile.swift in Sources */,
+				8C1E7CA52DF88C81003BFF4B /* COBCalculator.swift in Sources */,
+				8C1E7CA62DF88C81003BFF4B /* IOBCalculator.swift in Sources */,
 				47D9BC952A78498500AB85B2 /* BgReadingsDetailView.swift in Sources */,
 				F816E0E22432A4D1009EE65B /* Blucon+BluetoothPeripheral.swift in Sources */,
 				F897E24B23FC86CF0075E0E8 /* CGMG5TransmitterDelegate.swift in Sources */,
@@ -4697,6 +4735,8 @@
 				F80D916024F45EB3006840B5 /* LibreError.swift in Sources */,
 				F856CE5B22EDC8E50083E436 /* ConstantsBluetoothPairing.swift in Sources */,
 				F8F971B823A5914D00C3F17D /* BluetoothPeripheral.swift in Sources */,
+				8CA98B372DF83C9800399CE8 /* GlucoseChartManager+Prediction.swift in Sources */,
+				8CA98B382DF83C9800399CE8 /* Array+Regression.swift in Sources */,
 				F8F9721723A5915900C3F17D /* CGMDroplet1Transmitter.swift in Sources */,
 				F8A2BC2E25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMDropletTransmitterDelegate.swift in Sources */,
 				F8C5EBE722F38F0E00563B5F /* Trace.swift in Sources */,
@@ -4820,6 +4860,10 @@
 				F8284230274ED56A0097E0C9 /* DexcomCalibrationParameters.swift in Sources */,
 				F8A1586522EDB89D007F5B5D /* ConstantsDefaultAlertTypeSettings.swift in Sources */,
 				D41F32922827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift in Sources */,
+				8CA98B4A2DF83CB300399CE8 /* GlucoseReading.swift in Sources */,
+				8CA98B4B2DF83CB300399CE8 /* PredictionPoint.swift in Sources */,
+				8CA98B4C2DF83CB300399CE8 /* TrendLineModel.swift in Sources */,
+				8CA98B4D2DF83CB300399CE8 /* PredictionManager.swift in Sources */,
 				F816E11624391A02009EE65B /* Droplet+BluetoothPeripheral.swift in Sources */,
 				F8FDFEAD260DE1B90047597D /* ConstantsUI.swift in Sources */,
 			);
@@ -5476,7 +5520,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "xDrip Widget/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_CFBundleDisplayName = xDrip;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 Johan Degraeve. All rights reserved.";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -5487,6 +5531,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).xDripWidget";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.ricardosllm.xdripswift.xDripWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
@@ -5512,7 +5557,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "xDrip Widget/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_CFBundleDisplayName = xDrip;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 Johan Degraeve. All rights reserved.";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -5523,6 +5568,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).xDripWidget";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.ricardosllm.xdripswift.xDripWidget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -5546,7 +5592,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "xDrip Watch Complication/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_CFBundleDisplayName = xDrip;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Johan Degraeve. All rights reserved.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5557,6 +5603,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).watchkitapp.xDripWatchComplication";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=watchos*]" = com.ricardosllm.xdripswift.watchkitapp.xDripWatchComplication;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -5583,7 +5630,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "xDrip Watch Complication/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_CFBundleDisplayName = xDrip;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Johan Degraeve. All rights reserved.";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5594,6 +5641,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).watchkitapp.xDripWatchComplication";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=watchos*]" = com.ricardosllm.xdripswift.watchkitapp.xDripWatchComplication;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -5621,9 +5669,9 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "xDrip-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_CFBundleDisplayName = xDrip;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.ricardosllm.xdripswift;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5633,6 +5681,7 @@
 				MAIN_APP_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).watchkitapp";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=watchos*]" = com.ricardosllm.xdripswift.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -5661,9 +5710,9 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "xDrip-Watch-App-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_CFBundleDisplayName = xDrip;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = com.ricardosllm.xdripswift;
 				INFOPLIST_KEY_WKRunsIndependentlyOfCompanionApp = NO;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -5673,6 +5722,7 @@
 				MAIN_APP_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).watchkitapp";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=watchos*]" = com.ricardosllm.xdripswift.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -5698,7 +5748,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "xDrip Notification Context Extension/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_CFBundleDisplayName = xDrip;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Johan Degraeve. All rights reserved.";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -5709,6 +5759,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).xDripNotificationContextExtension";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.ricardosllm.xdripswift.xDripNotificationContextExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
@@ -5733,7 +5784,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu17;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "xDrip Notification Context Extension/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "$(MAIN_APP_DISPLAY_NAME)";
+				INFOPLIST_KEY_CFBundleDisplayName = xDrip;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2024 Johan Degraeve. All rights reserved.";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -5744,6 +5795,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER).xDripNotificationContextExtension";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.ricardosllm.xdripswift.xDripNotificationContextExtension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -5892,7 +5944,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = "$(XDRIP_CODE_SIGN_STYLE)";
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
-				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
+				DEVELOPMENT_TEAM = 87HW4T2K5J;
 				INFOPLIST_FILE = "xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -5901,6 +5953,7 @@
 				);
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.ricardosllm.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
@@ -5921,7 +5974,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = "$(XDRIP_CODE_SIGN_STYLE)";
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
-				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
+				DEVELOPMENT_TEAM = 87HW4T2K5J;
 				INFOPLIST_FILE = "xdrip/Supporting Files/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -5930,6 +5983,7 @@
 				);
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.ricardosllm.xdripswift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";

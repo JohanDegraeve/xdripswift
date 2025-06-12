@@ -208,5 +208,8 @@ enum ConstantsLog {
     
     /// for use in Omni¨PodHeartBeatTransmitter
     static let categoryHeartBeatOmnipod =                      "HeartBeatOmnipod         "
+    
+    /// for use in PredictionManager
+    static let categoryPredictionManager =                     "PredictionManager        "
 }
 

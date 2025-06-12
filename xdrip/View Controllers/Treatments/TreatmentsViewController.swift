@@ -291,6 +291,9 @@ extension TreatmentsViewController: UITableViewDelegate, UITableViewDataSource {
 			
             coreDataManager.saveChanges()
             
+            // Update treatment modification timestamp
+            UserDefaults.standard.timeStampLatestTreatmentModification = Date()
+            
             // trigger nightscoutsync
             if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
                 UserDefaults.standard.timeStampLatestNightscoutSyncRequest = .now

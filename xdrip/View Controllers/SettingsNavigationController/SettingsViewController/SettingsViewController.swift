@@ -41,6 +41,9 @@ final class SettingsViewController: UIViewController {
         /// statistics settings
         case statistics
         
+        /// predictions settings - integrated into home screen settings
+        // case predictions
+        
         /// alarms
         case alarms
         
@@ -93,6 +96,8 @@ final class SettingsViewController: UIViewController {
                 return SettingsViewHomeScreenSettingsViewModel()
             case .statistics:
                 return SettingsViewStatisticsSettingsViewModel()
+            // case .predictions:
+            //     return SettingsViewPredictionSettingsViewModel()
             case .alarms:
                 return SettingsViewAlertSettingsViewModel()
             case .nightscout:

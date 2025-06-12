@@ -6,9 +6,10 @@
 //  Copyright © 2024 Johan Degraeve. All rights reserved.
 //
 
-import WatchKit
 import SwiftUI
 import UserNotifications
+#if os(watchOS)
+import WatchKit
 
 class NotificationController: WKUserNotificationHostingController<NotificationView> {
     var alertTitle: String?
@@ -80,3 +81,24 @@ class NotificationController: WKUserNotificationHostingController<NotificationVi
         
     }
 }
+#else
+// For non-watchOS platforms, provide a stub implementation
+class NotificationController: NSObject {
+    var alertTitle: String?
+    var bgReadingValues: [Double]?
+    var bgReadingDates: [Date]?
+    var isMgDl: Bool?
+    var slopeOrdinal: Int?
+    var deltaValueInUserUnit: Double?
+    var urgentLowLimitInMgDl: Double?
+    var lowLimitInMgDl: Double?
+    var highLimitInMgDl: Double?
+    var urgentHighLimitInMgDl: Double?
+    var alertUrgencyType: AlertUrgencyType?
+    
+    var bgUnitString: String?
+    var bgValueInMgDl: Double?
+    var bgReadingDate: Date?
+    var bgValueStringInUserChosenUnit: String?
+}
+#endif

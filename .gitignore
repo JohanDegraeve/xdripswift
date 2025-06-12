@@ -122,3 +122,5 @@ xdripswift.wiki/
 commit.txt
 
 *.bak
+xdrip/xDrip.xcconfig
+xdrip/xDripOverride.xcconfig

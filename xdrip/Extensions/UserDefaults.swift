@@ -204,6 +204,9 @@ extension UserDefaults {
         /// value will be increased with 1 each time there's an update
         case nightscoutTreatmentsUpdateCounter = "nightscoutTreatmentsUpdateCounter"
         
+        /// timestamp when treatments were last modified locally
+        case timeStampLatestTreatmentModification = "timeStampLatestTreatmentModification"
+        
         /// Nightscout profile stored as a JSON data object
         case nightscoutProfile = "nightscoutProfile"
         
@@ -452,6 +455,36 @@ extension UserDefaults {
         
         /// force StandBy mode to show a big number version of the widget
         case forceStandByBigNumbers = "forceStandByBigNumbers"
+        
+        /// enable glucose prediction on the main chart
+        case predictionEnabled = "predictionEnabled"
+        
+        /// flag to indicate that predictions need to be updated due to treatment changes
+        case predictionsUpdateNeeded = "predictionsUpdateNeeded"
+        
+        /// selected prediction algorithm type
+        case predictionAlgorithmType = "predictionAlgorithmType"
+        
+        /// whether to use automatic algorithm selection based on best fit
+        case predictionAutoSelectAlgorithm = "predictionAutoSelectAlgorithm"
+        
+        /// whether to include treatments (IOB/COB) in predictions
+        case predictionIncludeTreatments = "predictionIncludeTreatments"
+        
+        /// insulin sensitivity factor (ISF) - how much 1 unit drops glucose in mg/dL
+        case insulinSensitivityMgDl = "insulinSensitivityMgDl"
+        
+        /// carb ratio (ICR) - grams of carbs per 1 unit of insulin
+        case carbRatio = "carbRatio"
+        
+        /// selected insulin type for IOB calculations
+        case insulinType = "insulinType"
+        
+        /// carb absorption rate in grams per hour
+        case carbAbsorptionRate = "carbAbsorptionRate"
+        
+        /// carb absorption delay in minutes
+        case carbAbsorptionDelay = "carbAbsorptionDelay"
     }
     
     
@@ -1149,6 +1182,114 @@ extension UserDefaults {
     }
     
     
+    /// flag to indicate predictions need update
+    @objc dynamic var predictionsUpdateNeeded: Bool {
+        get {
+            return bool(forKey: Key.predictionsUpdateNeeded.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.predictionsUpdateNeeded.rawValue)
+        }
+    }
+    
+    /// selected prediction algorithm type
+    var predictionAlgorithmType: PredictionModelType {
+        get {
+            if let savedType = string(forKey: Key.predictionAlgorithmType.rawValue),
+               let modelType = PredictionModelType(rawValue: savedType) {
+                return modelType
+            }
+            return .polynomial // Default to polynomial
+        }
+        set {
+            set(newValue.rawValue, forKey: Key.predictionAlgorithmType.rawValue)
+        }
+    }
+    
+    /// whether to use automatic algorithm selection based on best fit
+    @objc dynamic var predictionAutoSelectAlgorithm: Bool {
+        get {
+            // Default to true for automatic selection
+            return object(forKey: Key.predictionAutoSelectAlgorithm.rawValue) as? Bool ?? true
+        }
+        set {
+            set(newValue, forKey: Key.predictionAutoSelectAlgorithm.rawValue)
+        }
+    }
+    
+    /// whether to include treatments (IOB/COB) in predictions
+    @objc dynamic var predictionIncludeTreatments: Bool {
+        get {
+            // Default to true to include treatments
+            return object(forKey: Key.predictionIncludeTreatments.rawValue) as? Bool ?? true
+        }
+        set {
+            set(newValue, forKey: Key.predictionIncludeTreatments.rawValue)
+        }
+    }
+    
+    /// insulin sensitivity factor (ISF) - how much 1 unit drops glucose
+    var insulinSensitivityMgDl: Double {
+        get {
+            let stored = double(forKey: Key.insulinSensitivityMgDl.rawValue)
+            if stored > 0 {
+                return stored
+            }
+            // Return default - always stored in mg/dL internally
+            return InsulinDefaults.insulinSensitivityMgDl
+        }
+        set {
+            set(newValue, forKey: Key.insulinSensitivityMgDl.rawValue)
+        }
+    }
+    
+    /// carb ratio (ICR) - grams of carbs per 1 unit of insulin
+    var carbRatio: Double {
+        get {
+            let stored = double(forKey: Key.carbRatio.rawValue)
+            return stored > 0 ? stored : InsulinDefaults.carbRatio
+        }
+        set {
+            set(newValue, forKey: Key.carbRatio.rawValue)
+        }
+    }
+    
+    /// selected insulin type for IOB calculations
+    var insulinType: InsulinType {
+        get {
+            if let savedType = string(forKey: Key.insulinType.rawValue),
+               let insulinType = InsulinType(rawValue: savedType) {
+                return insulinType
+            }
+            return .humalogNovolog // Default to most common
+        }
+        set {
+            set(newValue.rawValue, forKey: Key.insulinType.rawValue)
+        }
+    }
+    
+    /// carb absorption rate in grams per hour
+    var carbAbsorptionRate: Double {
+        get {
+            let stored = double(forKey: Key.carbAbsorptionRate.rawValue)
+            return stored > 0 ? stored : InsulinDefaults.carbAbsorptionRate
+        }
+        set {
+            set(newValue, forKey: Key.carbAbsorptionRate.rawValue)
+        }
+    }
+    
+    /// carb absorption delay in minutes
+    var carbAbsorptionDelay: Double {
+        get {
+            let stored = double(forKey: Key.carbAbsorptionDelay.rawValue)
+            return stored >= 0 ? stored : InsulinDefaults.carbAbsorptionDelay
+        }
+        set {
+            set(newValue, forKey: Key.carbAbsorptionDelay.rawValue)
+        }
+    }
+    
     // MARK: Statistics Settings
     
     
@@ -1484,6 +1625,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.nightscoutTreatmentsUpdateCounter.rawValue)
+        }
+    }
+    
+    /// timestamp when treatments were last modified locally
+    var timeStampLatestTreatmentModification: Date? {
+        get {
+            return object(forKey: Key.timeStampLatestTreatmentModification.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.timeStampLatestTreatmentModification.rawValue)
         }
     }
     
