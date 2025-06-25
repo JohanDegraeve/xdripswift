@@ -236,6 +236,14 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                 
                 sensorAge = g7GlucoseMessage.sensorAge
                 
+                // check if more than 5 equal values are received, if so ignore, might be faulty sensor
+                addGlucoseValueToUserDefaults(Int(g7GlucoseMessage.calculatedValue))
+                if (hasSixIdenticalValues()) {
+                    trace("    received 6 equal values, ignoring, value = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, g7GlucoseMessage.calculatedValue.description)
+                    return
+                }
+                
+                
                 let newGlucoseData = GlucoseData(timeStamp: g7GlucoseMessage.timeStamp, glucoseLevelRaw: g7GlucoseMessage.calculatedValue)
                 
                 // add glucoseData to backfill
@@ -428,6 +436,30 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                 self.authenticationTimeOutTimer = nil
             }
         }
+    }
+    
+    private func addGlucoseValueToUserDefaults(_ newValue: Int) {
+        // Als de array nil is, initialiseer ze
+        if UserDefaults.standard.previousRawGlucoseValues == nil {
+            UserDefaults.standard.previousRawGlucoseValues = []
+        }
+
+        // Voeg de nieuwe waarde toe aan het begin van de array
+        UserDefaults.standard.previousRawGlucoseValues!.insert(newValue, at: 0)
+
+        // Als er meer dan 6 waarden zijn, verwijder de laatste
+        if UserDefaults.standard.previousRawGlucoseValues!.count > 6 {
+            UserDefaults.standard.previousRawGlucoseValues!.removeLast()
+        }
+    }
+
+    func hasSixIdenticalValues() -> Bool {
+        guard let values = UserDefaults.standard.previousRawGlucoseValues, values.count == 6 else {
+            return false
+        }
+        
+        // Controleer of alle waarden gelijk zijn aan de eerste
+        return values.allSatisfy { $0 == values[0] }
     }
     
 }
