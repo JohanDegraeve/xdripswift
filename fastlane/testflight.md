@@ -101,7 +101,7 @@ A private Match-Secrets repository is automatically created under your GitHub us
     * `GH_PAT`
     * `MATCH_PASSWORD`
 
-> Note: At this time, the Variable `ENABLE_NUKE_CERTS` is not used by xdripswift. The annual Distribution Certificate renewnal is manual if this is the only Open Source app in the iOS OS AID ecosystem you are using. There will be more information about this in [Annual Certificate Renewal](#annual-certificate-renewal).
+> Note: At this time, the Variable `ENABLE_NUKE_CERTS` is not used by xdripswift. The annual Distribution Certificate renewnal is manual if this is the only Open Source app in the iOS OS AID ecosystem you are using. There is more information about this in [Annual Certificate Renewal](#annual-certificate-renewal).
 
 ## Validate repository secrets
 
@@ -209,7 +209,13 @@ Once a year, you will get an email from Apple indicating your Distribution Certi
 * You can wait until the certificate actually expires and Apple removes it from your account
 * Your next build will then fail
 
-> If you are building other apps like Loop or Trio, those automatically update the Distribution Certificate. Build one of those apps first and then run Create Certificates for xdripswift.
+> If you are building other apps like Loop or Trio, the first one run after the Distribution Certificate is removed will automatically:
+>
+> * for all apps, clear out old profiles and remove build credentials from your Match-Secrets repository
+> * create a new Distribution Certificate
+> * create new profiles and new build credentials just for the one app in question and store those in your Match-Secrets repository
+
+Build one of those apps first and then run Create Certificates for xdripswift.
 
 **Manual Renewal**
 
