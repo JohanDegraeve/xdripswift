@@ -18,7 +18,7 @@ These instructions allow you to build your app without having access to a Mac.
 >
 > The [**Optional**](#optional) section provides instructions to modify the default behavior if desired. 
 
-This method for building without a Mac was ported from Loop. If you have used this method for Loop or one of the other DIY apps (Loop Caregiver, Loop Follow or iAPS), some of the steps can be re-used and the full set of instructions does not need to be repeated. This will be mentioned in relevant sections below.
+This method for building without a Mac was ported from Loop. If you have used this method for Loop or one of the other DIY apps (Loop Caregiver, Loop Follow, Trio or iAPS), some of the steps can be re-used and the full set of instructions does not need to be repeated. This will be mentioned in relevant sections below.
 
 > **Repeat Builders**
 > - to enable automatic build, your `GH_PAT` token must have `workflow` scope
@@ -33,7 +33,7 @@ There are more detailed instructions in LoopDocs for using GitHub for Browser Bu
 * [LoopDocs: Browser Overview](https://loopkit.github.io/loopdocs/browser/bb-overview/)
 * [LoopDocs: Errors with Browser](https://loopkit.github.io/loopdocs/browser/bb-errors/)
 
-Note that installing with TestFlight, (in the US), requires the Apple ID account holder to be 13 years or older. For younger users, an adult must log into Media & Purchase on the child's phone to install Loop. More details on this can be found in [LoopDocs](https://loopkit.github.io/loopdocs/browser/phone-install/#testflight-for-a-child).
+Note that installing with TestFlight, (in the US), requires the Apple ID account holder to be 13 years or older. For younger users, an adult must log into Media & Purchase on the child's phone to install xDrip4iOS. More details on this can be found in [LoopDocs](https://loopkit.github.io/loopdocs/browser/phone-install/#testflight-for-a-child).
 
 If you build multiple apps, it is strongly recommended that you configure a free *GitHub* organization and do all your building in the organization. This means you enter items one time for the organization (6 SECRETS required to build and 1 VARIABLE required to automatically update your certificates annually). Otherwise, those 6 SECRETS must be entered for every repository. Please refer to [LoopDocs: Create a *GitHub* Organization](https://loopkit.github.io/loopdocs/browser/secrets/#create-a-free-github-organization).
 
@@ -45,7 +45,7 @@ If you build multiple apps, it is strongly recommended that you configure a free
 
 ## Save 6 Secrets
 
-You require 6 Secrets (alphanumeric items) to use the GitHub build method and if you use the GitHub method to build more than xDrip4iOS, e.g., Loop Follow or other apps, you will use the same 6 Secrets for each app you build with this method. Each secret is indentified below by `ALL_CAPITAL_LETTER_NAMES`.
+You require 6 Secrets (alphanumeric items) to use the GitHub build method and if you use the GitHub method to build more than xDrip4iOS, e.g., Trio, LoopFollow or other apps, you will use the same 6 Secrets for each app you build with this method. Each secret is indentified below by `ALL_CAPITAL_LETTER_NAMES`.
 
 * Four Secrets are from your Apple Account
 * Two Secrets are from your GitHub account
@@ -101,7 +101,7 @@ A private Match-Secrets repository is automatically created under your GitHub us
     * `GH_PAT`
     * `MATCH_PASSWORD`
 
-> Note: At this time, the Variable `ENABLE_NUKE_CERTS` is not used by xdripswift. The annual certificate renewnal is manual if this is the only Open Source app in the iOS OS AID ecosystem you are using. If you are building other apps like Loop or Trio, those automatically update the certificate. The same certificate is used for all your apps.
+> Note: At this time, the Variable `ENABLE_NUKE_CERTS` is not used by xdripswift. The annual Distribution Certificate renewnal is manual if this is the only Open Source app in the iOS OS AID ecosystem you are using. There will be more information about this in [Annual Certificate Renewal](#annual-certificate-renewal).
 
 ## Validate repository secrets
 
@@ -196,12 +196,24 @@ You do not need to fill out the next form. That is for submitting to the app sto
 1. On the right side, click "Run Workflow", and tap the green `Run workflow` button.
 1. Wait, and within a minute or two you should see a green checkmark indicating the workflow succeeded.
 
-Once a year, you will get an email from Apple indicating your certificate will expire in 30 days.
+> The Create Certificate action:
+>
+> * generates a new Distribution Certificate if needed, or uses the existing one
+> * generates new profiles if needed, or uses existing ones
+> * creates credentials used during building if needed, or uses existing ones; these are stored in your Match-Secrets repository using the your MATCH_PASSWORD as the passphrase
 
-* You can wait until the certificate actually expires and Apple removes it from your account. 
-* Your next build will then fail.
+### Annual Certificate Renewal
 
-When the certificate does expire, you need to manually clear out information in your Match-Secrets repository that uses the old (expired) certificate. The easiest way to do this is to delete your Match-Secrets repository and then run Create Certificates.
+Once a year, you will get an email from Apple indicating your Distribution Certificate will expire in 30 days. One Distribution Certificate is used for all your apps.
+
+* You can wait until the certificate actually expires and Apple removes it from your account
+* Your next build will then fail
+
+> If you are building other apps like Loop or Trio, those automatically update the Distribution Certificate. Build one of those apps first and then run Create Certificates for xdripswift.
+
+**Manual Renewal**
+
+If you only build xDrip4iOS, you need to manually clear out information in your Match-Secrets repository that uses the old (expired) Distribution Certificate. The easiest way to do this is to delete your Match-Secrets repository and then run Create Certificates.
 
 * [LoopDocs: Delete Match Secrets](https://loopkit.github.io/loopdocs/browser/bb-errors/#delete-match-secrets)
 
