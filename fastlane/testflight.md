@@ -1,10 +1,10 @@
 # Using GitHub Actions + FastLane to deploy to TestFlight
 
-These instructions allow you to build xDrip4iOS without having access to a Mac.
+These instructions allow you to build your app without having access to a Mac.
 
-* You can install xDrip4iOS on phones via TestFlight that are not connected to your computer
+* You can install your app on phones using TestFlight that are not connected to your computer
 * You can send builds and updates to those you care for
-* You can install xDrip4iOS on your phone using only the TestFlight app if a phone was lost or the app is accidentally deleted
+* You can install your app on your phone using only the TestFlight app if a phone was lost or the app is accidentally deleted
 * You do not need to worry about specific Xcode/Mac versions for a given iOS
 
 ## **Automatic Builds**
@@ -18,7 +18,7 @@ These instructions allow you to build xDrip4iOS without having access to a Mac.
 >
 > The [**Optional**](#optional) section provides instructions to modify the default behavior if desired. 
 
-This method for building without a Mac was ported from Loop. If you have used this method for Loop or one of the other DIY apps (Loop Caregiver, Loop Follow or iAPS), some of the steps can be re-used and the full set of instructions does not need to be repeated. This will be mentioned in relevant sections below.
+This method for building without a Mac was ported from Loop. If you have used this method for Loop or one of the other DIY apps (Loop Caregiver, Loop Follow, Trio or iAPS), some of the steps can be re-used and the full set of instructions does not need to be repeated. This will be mentioned in relevant sections below.
 
 > **Repeat Builders**
 > - to enable automatic build, your `GH_PAT` token must have `workflow` scope
@@ -30,10 +30,12 @@ The setup steps are somewhat involved, but nearly all are one time steps. Subseq
 
 There are more detailed instructions in LoopDocs for using GitHub for Browser Builds of Loop, including troubleshooting and build errors. Please refer to:
 
-* [LoopDocs: GitHub Overview](https://loopkit.github.io/loopdocs/gh-actions/gh-overview/)
-* [LoopDocs: GitHub Errors](https://loopkit.github.io/loopdocs/gh-actions/gh-errors/)
+* [LoopDocs: Browser Overview](https://loopkit.github.io/loopdocs/browser/bb-overview/)
+* [LoopDocs: Errors with Browser](https://loopkit.github.io/loopdocs/browser/bb-errors/)
 
-Note that installing with TestFlight, (in the US), requires the Apple ID account holder to be 13 years or older. For younger users, an adult must log into Media & Purchase on the child's phone to install Loop. More details on this can be found in [LoopDocs](https://loopkit.github.io/loopdocs/gh-actions/gh-deploy/#install-testflight-loop-for-child).
+Note that installing with TestFlight, (in the US), requires the Apple ID account holder to be 13 years or older. For younger users, an adult must log into Media & Purchase on the child's phone to install xDrip4iOS. More details on this can be found in [LoopDocs](https://loopkit.github.io/loopdocs/browser/phone-install/#testflight-for-a-child).
+
+If you build multiple apps, it is strongly recommended that you configure a free *GitHub* organization and do all your building in the organization. This means you enter items one time for the organization (6 SECRETS required to build and 1 VARIABLE required to automatically update your certificates annually). Otherwise, those 6 SECRETS must be entered for every repository. Please refer to [LoopDocs: Create a *GitHub* Organization](https://loopkit.github.io/loopdocs/browser/secrets/#create-a-free-github-organization).
 
 ## Prerequisites
 
@@ -43,12 +45,14 @@ Note that installing with TestFlight, (in the US), requires the Apple ID account
 
 ## Save 6 Secrets
 
-You require 6 Secrets (alphanumeric items) to use the GitHub build method and if you use the GitHub method to build more than xDrip4iOS, e.g., Loop Follow or other apps, you will use the same 6 Secrets for each app you build with this method. Each secret is indentified below by `ALL_CAPITAL_LETTER_NAMES`.
+You require 6 Secrets (alphanumeric items) to use the GitHub build method and if you use the GitHub method to build more than xDrip4iOS, e.g., Trio, LoopFollow or other apps, you will use the same 6 Secrets for each app you build with this method. Each secret is indentified below by `ALL_CAPITAL_LETTER_NAMES`.
 
 * Four Secrets are from your Apple Account
 * Two Secrets are from your GitHub account
 * Be sure to save the 6 Secrets in a text file using a text editor
     - Do **NOT** use a smart editor, which might auto-correct and change case, because these Secrets are case sensitive
+
+Refer to [LoopDocs: Make a Secrets Reference File](https://loopkit.github.io/loopdocs/browser/intro-summary/#make-a-secrets-reference-file) for a handy template to use when saving your Secrets.
 
 ## Generate App Store Connect API Key
 
@@ -62,6 +66,8 @@ This step is common for all GitHub Browser Builds; do this step only once. You w
 1. Download the API key itself, and open it in a text editor. The contents of this file will be used for `FASTLANE_KEY`. Copy the full text, including the "-----BEGIN PRIVATE KEY-----" and "-----END PRIVATE KEY-----" lines.
 
 ## Create GitHub Personal Access Token
+
+If you have previously built another app using the "browser build" method, you use the same personal access token (`GH_PAT`), so skip this step. If you use a free GitHub organization to build, you still use the same personal access token. This is created using your personal GitHub username.
 
 Log into your GitHub account to create a personal access token; this is one of two GitHub secrets needed for your build.
 
@@ -80,16 +86,13 @@ The first time you build with the GitHub Browser Build method for any DIY app, y
 
 ## Setup GitHub Match-Secrets Repository
 
-The creation of the Match-Secrets repository is a common step for all GitHub Browser Builds; do this step only once. You must be logged into your GitHub account.
-
-1. Create a [new empty repository](https://github.com/new) titled `Match-Secrets`. It should be private.
-
-Once created, you will not take any direct actions with this repository; it needs to be there for the GitHub to use as you progress through the steps.
+A private Match-Secrets repository is automatically created under your GitHub username the first time you run a GitHub Action. Because it is a private repository - only you can see it. You will not take any direct actions with this repository; it needs to be there for GitHub to use as you progress through the steps.
 
 ## Setup GitHub xdripswift Repository
 
-1. Fork https://github.com/JohanDegraeve/xdripswift into your account.
-1. In the forked xdripswift repo, go to Settings -> Secrets and variables -> Actions.
+1. Fork https://github.com/JohanDegraeve/xdripswift into your GitHub username (using your organization if you have one).
+1. If you are using an organization, do this step at the organization level, e.g., username-org. If you are not using an organization, do this step at the repository level, e.g., username/xdripswift:
+    * Go to Settings -> Secrets and variables -> Actions and make sure the Secrets tab is open
 1. For each of the following secrets, tap on "New repository secret", then add the name of the secret, along with the value you recorded for it:
     * `TEAMID`
     * `FASTLANE_ISSUER_ID`
@@ -97,6 +100,8 @@ Once created, you will not take any direct actions with this repository; it need
     * `FASTLANE_KEY`
     * `GH_PAT`
     * `MATCH_PASSWORD`
+
+> Note: At this time, the Variable `ENABLE_NUKE_CERTS` is not used by xdripswift. The annual Distribution Certificate renewnal is manual if this is the only Open Source app in the iOS OS AID ecosystem you are using. There is more information about this in [Annual Certificate Renewal](#annual-certificate-renewal).
 
 ## Validate repository secrets
 
@@ -107,6 +112,8 @@ This step validates most of your six Secrets and provides error messages if it d
 1. On the right side, click "Run Workflow", and tap the green `Run workflow` button.
 1. Wait, and within a minute or two you should see a green checkmark indicating the workflow succeeded.
 1. The workflow will check if the required secrets are added and that they are correctly formatted. If errors are detected, please check the run log for details.
+
+There can be a delay after you start a workflow before the screen changes. Refresh your browser to see if it started. And if it seems to take a long time to finish - refresh your browser to see if it is done.
 
 ## Add Identifiers for xDrip4iOS App
 
@@ -137,16 +144,17 @@ If you have already built Trio or xDrip4iOS via Xcode using this Apple ID, you c
 
 ## Add App Groups to Bundle Identifiers
 
-Note 1 - If you previously built with Xcode, the `Names` listed below may be different, but the `Identifiers` will match. A table is provided below the steps to assist. The Add Identifier Action that you completed above generates 6 identifiers, but only 4 need to be modified as indicated in this step.
+Note 1 - If you previously built with Xcode, the `Names` listed below may be different, but the `Identifiers` will match. A table is provided below the steps to assist. The Add Identifier Action that you completed above generates 5 identifiers, and all 5 need to be modified as indicated in this step.
 
 Note 2 - Depending on your build history, you may find some of the Identifiers are already configured - and you are just verifying the status; but in other cases, you will need to configure the Identifiers.
 
 1. Go to [Certificates, Identifiers & Profiles](https://developer.apple.com/account/resources/identifiers/list) on the apple developer site.
 1. For each of the following identifier names:
-    * xdripswift
-    * xDrip Widget Extension
+    * xdrip
+    * xDrip Notification Context Extension
     * xDrip Watch App
     * xDrip Watch Complication Extension
+    * xDrip Widget Extension
 1. Click on the identifier's name.
 1. On the "App Groups" capabilies, click on the "Configure" button.
 1. Select the "Loop App Group". _(yes, "Loop App Group" is correct)_
@@ -155,6 +163,16 @@ Note 2 - Depending on your build history, you may find some of the Identifiers a
 1. Click "Save".
 1. Click "Confirm".
 1. Remember to do this for each of the identifiers above.
+
+#### Table with Name and Identifier for xDrip4iOS
+
+| NAME | IDENTIFIER |
+|-------|------------|
+| xdrip | com.TEAMID.xdripswift |
+| xDrip Notification Context Extension | com.TEAMID.xDripNotificationContextExtension |
+| xDrip Watch App | com.TEAMID.xdripswift.watchkitapp |
+| xDrip Watch Complication Extension | com.TEAMID.xdripswift.watchkitapp.xDripWatchComplication |
+| xDrip Widget Extension | com.TEAMID.xdripswift.xDripWidget |
 
 ## Create Xdrip4iOS App in App Store Connect
 
@@ -178,12 +196,39 @@ You do not need to fill out the next form. That is for submitting to the app sto
 1. On the right side, click "Run Workflow", and tap the green `Run workflow` button.
 1. Wait, and within a minute or two you should see a green checkmark indicating the workflow succeeded.
 
+> The Create Certificate action:
+>
+> * generates a new Distribution Certificate if needed, or uses the existing one
+> * generates new profiles if needed, or uses existing ones
+> * creates credentials used during building if needed, or uses existing ones; these are stored in your Match-Secrets repository using the your MATCH_PASSWORD as the passphrase
+
+### Annual Certificate Renewal
+
+Once a year, you will get an email from Apple indicating your Distribution Certificate will expire in 30 days. One Distribution Certificate is used for all your apps.
+
+* You can wait until the certificate actually expires and Apple removes it from your account
+* Your next build will then fail
+
+> If you are building other apps like Loop or Trio, the first one run after the Distribution Certificate is removed will automatically:
+>
+> * for all apps, clear out old profiles and remove build credentials from your Match-Secrets repository
+> * create a new Distribution Certificate
+> * create new profiles and new build credentials just for the one app in question and store those in your Match-Secrets repository
+
+Build one of those apps first and then run Create Certificates for xdripswift.
+
+**Manual Renewal**
+
+If you only build xDrip4iOS, you need to manually clear out information in your Match-Secrets repository that uses the old (expired) Distribution Certificate. The easiest way to do this is to delete your Match-Secrets repository and then run Create Certificates.
+
+* [LoopDocs: Delete Match Secrets](https://loopkit.github.io/loopdocs/browser/bb-errors/#delete-match-secrets)
+
 ## Build Xdrip4iOS!
 
 1. Click on the "Actions" tab of your xdripswift repository.
 1. On the left side, select "4. Build xDrip4iOS".
 1. On the right side, click "Run Workflow", and tap the green `Run workflow` button.
-1. You have some time now. Go enjoy a coffee. The build should take about 20-30 minutes.
+1. You have some time now. Go enjoy a coffee. The build should take about 10 minutes.
 1. Your app should eventually appear on [App Store Connect](https://appstoreconnect.apple.com/apps).
 1. For each phone/person you would like to support xDrip4iOS on:
     * Add them in [Users and Access](https://appstoreconnect.apple.com/access/users) on App Store Connect.
@@ -191,7 +236,7 @@ You do not need to fill out the next form. That is for submitting to the app sto
 
 ## TestFlight and Deployment Details
 
-Please refer to [LoopDocs: Set Up Users](https://loopkit.github.io/loopdocs/gh-actions/gh-first-time/#set-up-users-and-access-testflight) and [LoopDocs: Deploy](https://loopkit.github.io/loopdocs/gh-actions/gh-deploy/)
+Please refer to [LoopDocs: TestFlight Overview](https://loopkit.github.io/loopdocs/browser/tf-users) and [LoopDocs: Install on Phone](https://loopkit.github.io/loopdocs/browser/phone-install/)
 
 ## Automatic Build FAQs
 
