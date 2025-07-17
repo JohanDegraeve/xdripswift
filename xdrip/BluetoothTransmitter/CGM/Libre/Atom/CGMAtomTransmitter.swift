@@ -205,7 +205,7 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 self.libreSensorType = libreSensorType
                                 
                                 // decrypt of libre2 or libreUS
-                                dataIsDecryptedToLibre1Format = libreSensorType.decryptIfPossibleAndNeeded(rxBuffer: &rxBuffer[0..<344], headerLength: 0, log: log, patchInfo: patchInfo, uid: sensorSerialNumberAsData.bytes)
+                                dataIsDecryptedToLibre1Format = libreSensorType.decryptIfPossibleAndNeeded(rxBuffer: &rxBuffer[0..<344], headerLength: 0, log: log, patchInfo: patchInfo, uid: Array(sensorSerialNumberAsData))
                                 
                                 // now except libreProH, all libres' 344 data is libre1 format
                                 // should crc check
