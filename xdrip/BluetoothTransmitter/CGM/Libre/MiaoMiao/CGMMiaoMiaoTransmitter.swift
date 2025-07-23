@@ -178,7 +178,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 cGMMiaoMiaoTransmitterDelegate?.received(libreSensorType: libreSensorType, from: self)
 
                                 // decrypt of libre2 or libreUS
-                                dataIsDecryptedToLibre1Format = libreSensorType.decryptIfPossibleAndNeeded(rxBuffer: &rxBuffer, headerLength: miaoMiaoHeaderLength, log: log, patchInfo: patchInfo, uid: rxBuffer[5..<13].bytes)
+                                dataIsDecryptedToLibre1Format = libreSensorType.decryptIfPossibleAndNeeded(rxBuffer: &rxBuffer, headerLength: miaoMiaoHeaderLength, log: log, patchInfo: patchInfo, uid: Array(rxBuffer[5..<13]))
                                 
                                 // now except libreProH, all libres' 344 data is libre1 format
                                 // should crc check
@@ -481,7 +481,7 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                             // note that we should always have a libreSensorType
                             
                             // decrypt of libre2 or libreUS
-                            dataIsDecryptedToLibre1Format = libreSensorType.decryptIfPossibleAndNeeded(rxBuffer: &rxBuffer, headerLength: miaoMiaoHeaderLength, log: nil, patchInfo: patchInfo, uid: rxBuffer[5..<13].bytes)
+                            dataIsDecryptedToLibre1Format = libreSensorType.decryptIfPossibleAndNeeded(rxBuffer: &rxBuffer, headerLength: miaoMiaoHeaderLength, log: nil, patchInfo: patchInfo, uid: Array(rxBuffer[5..<13]))
                             
                             // now except libreProH, all libres' 344 data is libre1 format
                             // should crc check
