@@ -74,6 +74,10 @@
 	<string>Store bloodglucose readings</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
