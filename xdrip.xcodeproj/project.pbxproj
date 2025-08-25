@@ -164,6 +164,7 @@
 		47A6AC452B7D43100047A4BA /* Common.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD444221C9D0D006EAB84 /* Common.strings */; };
 		47A6AC462B7D43110047A4BA /* Common.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD444221C9D0D006EAB84 /* Common.strings */; };
 		47A7DFB62BE4BE4900F1DA5F /* UIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A7DFB52BE4BE4900F1DA5F /* UIView.swift */; };
+		47A8B8872E392BFE00081CBD /* LiveActivityViewContentActivityFamilies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A8B8862E392BF700081CBD /* LiveActivityViewContentActivityFamilies.swift */; };
 		47AB72F327105EF4005E7CAB /* SettingsViewHelpSettingModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47AB72F227105EF4005E7CAB /* SettingsViewHelpSettingModel.swift */; };
 		47ACB9292D835841001EC891 /* DatePickerViewControllerModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47ACB9282D835838001EC891 /* DatePickerViewControllerModal.swift */; };
 		47ADD2DF27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47ADD2DE27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift */; };
@@ -171,6 +172,8 @@
 		47B136DB2BC9BB55001E7ED3 /* ContactImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B136DA2BC9BB55001E7ED3 /* ContactImageView.swift */; };
 		47B136DD2BCA9151001E7ED3 /* ConstantsContactImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B136DC2BCA9151001E7ED3 /* ConstantsContactImage.swift */; };
 		47B60F3726F389E2003198D3 /* LandscapeChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */; };
+		47B65D412E3A31B100C3140B /* LiveActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B65D402E3A319D00C3140B /* LiveActivityView.swift */; };
+		47B65D452E3A756300C3140B /* LiveActivityViewContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B65D442E3A755900C3140B /* LiveActivityViewContent.swift */; };
 		47B731412B83DD3C00B0A450 /* ConstantsLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7313F2B83DC0200B0A450 /* ConstantsLiveActivity.swift */; };
 		47B7FC722B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */; };
 		47CA61E42B965E7100C2A597 /* AccessoryCircularView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47CA61E32B965E7100C2A597 /* AccessoryCircularView.swift */; };
@@ -999,6 +1002,7 @@
 		47A6ABE82B790CC70047A4BA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		47A6ABEE2B7949B80047A4BA /* WatchStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchStateModel.swift; sourceTree = "<group>"; };
 		47A7DFB52BE4BE4900F1DA5F /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
+		47A8B8862E392BF700081CBD /* LiveActivityViewContentActivityFamilies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityViewContentActivityFamilies.swift; sourceTree = "<group>"; };
 		47AB72F227105EF4005E7CAB /* SettingsViewHelpSettingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewHelpSettingModel.swift; sourceTree = "<group>"; };
 		47ACB9282D835838001EC891 /* DatePickerViewControllerModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerViewControllerModal.swift; sourceTree = "<group>"; };
 		47ADD2DE27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartPointsScatterDownTrianglesLayer.swift; sourceTree = "<group>"; };
@@ -1006,6 +1010,8 @@
 		47B136DA2BC9BB55001E7ED3 /* ContactImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactImageView.swift; sourceTree = "<group>"; };
 		47B136DC2BCA9151001E7ED3 /* ConstantsContactImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsContactImage.swift; sourceTree = "<group>"; };
 		47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandscapeChartViewController.swift; sourceTree = "<group>"; };
+		47B65D402E3A319D00C3140B /* LiveActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityView.swift; sourceTree = "<group>"; };
+		47B65D442E3A755900C3140B /* LiveActivityViewContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityViewContent.swift; sourceTree = "<group>"; };
 		47B7313F2B83DC0200B0A450 /* ConstantsLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsLiveActivity.swift; sourceTree = "<group>"; };
 		47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBackgroundKeepAliveType.swift; sourceTree = "<group>"; };
 		47C210ED2B5298EB00005711 /* GlucoseChartType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlucoseChartType.swift; sourceTree = "<group>"; };
@@ -2012,6 +2018,9 @@
 			children = (
 				47CA61E32B965E7100C2A597 /* AccessoryCircularView.swift */,
 				47CA61E52B966A9700C2A597 /* AccessoryRectangularView.swift */,
+				47B65D402E3A319D00C3140B /* LiveActivityView.swift */,
+				47B65D442E3A755900C3140B /* LiveActivityViewContent.swift */,
+				47A8B8862E392BF700081CBD /* LiveActivityViewContentActivityFamilies.swift */,
 				4746067D2B962FBD00AC9214 /* SystemLargeView.swift */,
 				4746067B2B962F8500AC9214 /* SystemMediumView.swift */,
 				474606792B962F4C00AC9214 /* SystemSmallView.swift */,
@@ -4246,9 +4255,11 @@
 				474606772B962CCD00AC9214 /* XDripWidget+Provider.swift in Sources */,
 				4746067C2B962F8500AC9214 /* SystemMediumView.swift in Sources */,
 				4716A4F62B406C3D00419052 /* XDripWidgetLiveActivity.swift in Sources */,
+				47B65D452E3A756300C3140B /* LiveActivityViewContent.swift in Sources */,
 				4716A4F42B406C3D00419052 /* XDripWidgetBundle.swift in Sources */,
 				474606752B962C4D00AC9214 /* XDripWidget+EntryView.swift in Sources */,
 				4716A4F82B406C3D00419052 /* XDripWidget.swift in Sources */,
+				47A8B8872E392BFE00081CBD /* LiveActivityViewContentActivityFamilies.swift in Sources */,
 				4715C32E2C9ED5E10052215F /* LiveActivityType.swift in Sources */,
 				4716A50D2B416EE100419052 /* ConstantsGlucoseChartSwiftUI.swift in Sources */,
 				47A6AC312B7D3E250047A4BA /* ConstantsBloodGlucose.swift in Sources */,
@@ -4260,6 +4271,7 @@
 				47A6AC412B7D42EC0047A4BA /* TextsCommon.swift in Sources */,
 				478A92572B8FA1E30084C394 /* ConstantsBGGraphBuilder.swift in Sources */,
 				4746068F2B963EA100AC9214 /* View.swift in Sources */,
+				47B65D412E3A31B100C3140B /* LiveActivityView.swift in Sources */,
 				47A6AC322B7D3E250047A4BA /* ConstantsUI.swift in Sources */,
 				474606802B96308A00AC9214 /* WidgetSharedUserDefaultsModel.swift in Sources */,
 				47A6AC362B7D3E640047A4BA /* GlucoseChartType.swift in Sources */,
