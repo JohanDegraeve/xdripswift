@@ -217,7 +217,21 @@ struct GlucoseChartView: View {
         }
         .chartYAxis(chartType.yAxisShowLabels())
         .chartYScale(domain: domain)
-        .background(chartType.backgroundColor())
+        .modifier(ChartBackgroundModifier(chartType: chartType))
         .clipShape(RoundedRectangle(cornerRadius: chartType.cornerRadius()))
+    }
+}
+
+// apply a view modifier so that we can correctly show the chart views when displayed as a widget
+// this ensures that the widgets can be displayed in tinted or clear styles (in iOS26)
+private struct ChartBackgroundModifier: ViewModifier {
+    let chartType: GlucoseChartType
+    
+    func body(content: Content) -> some View {
+        if #available(iOS 17.0, *) {
+            content.containerBackground(.clear, for: .widget)
+        } else {
+            content.background(chartType.backgroundColor())
+        }
     }
 }
