@@ -22,20 +22,23 @@ fileprivate enum Setting:Int, CaseIterable {
     // show a fixed scale mini-chart under the main scrollable chart?
     case showMiniChart = 3
     
+    // allow the main chart y-axis to auto rescale to the current chart values?
+    case allowMainChartAutoReset = 4
+    
     //urgent high value
-    case urgentHighMarkValue = 4
+    case urgentHighMarkValue = 5
     
     //high value
-    case highMarkValue = 5
+    case highMarkValue = 6
     
     //target value
-    case targetMarkValue = 6
+    case targetMarkValue = 7
     
     //low value
-    case lowMarkValue = 7
+    case lowMarkValue = 8
     
     //urgent low value
-    case urgentLowMarkValue = 8
+    case urgentLowMarkValue = 9
     
 }
 
@@ -57,7 +60,10 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .showMiniChart:
             return UISwitch(isOn: UserDefaults.standard.showMiniChart, action: {(isOn:Bool) in UserDefaults.standard.showMiniChart = isOn})
             
-        case  .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .targetMarkValue, .lowMarkValue, .urgentLowMarkValue:
+        case .allowMainChartAutoReset:
+            return UISwitch(isOn: UserDefaults.standard.allowMainChartAutoReset, action: {(isOn:Bool) in UserDefaults.standard.allowMainChartAutoReset = isOn})
+            
+        case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .targetMarkValue, .lowMarkValue, .urgentLowMarkValue:
             return nil
             
         }
@@ -160,6 +166,15 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
                     UserDefaults.standard.showMiniChart = true
                 }
             })
+            
+        case .allowMainChartAutoReset:
+            return SettingsSelectedRowAction.callFunction(function: {
+                if UserDefaults.standard.allowMainChartAutoReset {
+                    UserDefaults.standard.allowMainChartAutoReset = false
+                } else {
+                    UserDefaults.standard.allowMainChartAutoReset = true
+                }
+            })
         }
     }
     
@@ -188,6 +203,9 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .showMiniChart:
             return Texts_SettingsView.showMiniChart
             
+        case .allowMainChartAutoReset:
+            return Texts_SettingsView.allowMainChartAutoReset
+            
         case .urgentHighMarkValue:
             return "🔴 " + Texts_SettingsView.labelUrgentHighValue
             
@@ -213,7 +231,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .lowMarkValue, .urgentLowMarkValue, .targetMarkValue:
             return UITableViewCell.AccessoryType.disclosureIndicator
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset:
             return UITableViewCell.AccessoryType.none
             
         }
@@ -242,7 +260,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .screenLockDimmingType:
             return UserDefaults.standard.screenLockDimmingType.description
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset:
             return nil
             
         }

@@ -35,13 +35,13 @@ public class GlucoseChartManager {
             glucoseChart = nil
         }
     }
-
+    
     /// CalibrationPoints to be shown on chart
     private var calibrationChartPoints = [ChartPoint]()
-        
+    
     /// treatmentChartPoints to be shown on chart
     private var treatmentChartPoints: TreatmentChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint]())
-        
+    
     /// smallBolusTreatmentChartPoints to be shown on chart
     private var smallBolusTreatmentChartPoints = [ChartPoint]()
     
@@ -77,7 +77,7 @@ public class GlucoseChartManager {
     
     /// basalRateTreatmentChartPoints to be shown on chart
     private var basalRateFillTreatmentChartPoints = [ChartPoint]()
-
+    
     /// ChartPoints to be shown on chart, processed only in main thread - urgent Range
     private var urgentRangeGlucoseChartPoints = [ChartPoint]()
     
@@ -200,7 +200,7 @@ public class GlucoseChartManager {
         if let chartLongPressGestureRecognizer = chartLongPressGestureRecognizer {
             
             chartLongPressGestureRecognizer.minimumPressDuration = 0
-        
+            
         } else {
             
             // as the call didn't pass a gesture recogniser, we must be initiating from the landscape view controller
@@ -222,14 +222,15 @@ public class GlucoseChartManager {
     /// - if called multiple times after each other (eg because user is panning or zooming fast) there might be calls skipped,
     /// - completionhandler will be called when chartOutlet is updated
     /// - parameters:
-    ///     - completionHandler : will be called when glucoseChartPoints and chartOutlet are updated
-    ///     - endDate :endDate to apply
-    ///     - startDate :startDate to apply, if nil then no change will be done in chart width, ie current difference between start and end will be reused
-    ///     - coreDataManager : needed to create a private managed object context, which will be used to fetch readings from CoreData
+    ///     - endDate: endDate to apply
+    ///     - startDate: startDate to apply, if nil then no change will be done in chart width, ie current difference between start and end will be reused
+    ///     - chartOutlet: the view that contains the chart
+    ///     - forceReset: used to indicate that we should rescale the y-axis (done by simply setting maximumValueInGlucoseChartPointsInMgDl to it's initial value)
+    ///     - completionHandler: will be called when glucoseChartPoints and chartOutlet are updated
     ///
     /// update of chartPoints array will be done on background thread. The actual redrawing of the chartoutlet is  done on the main thread. Also the completionHandler runs in the main thread.
     /// While updating glucoseChartPoints in background thread, the main thread may call again updateChartPoints with a new endDate (because the user is panning or zooming). A new block will be added in the operation queue and processed later. If there's multiple operations waiting in the queue, only the last one will be executed. This can be the case when the user is doing a fast panning.
-    public func updateChartPoints(endDate: Date, startDate: Date?, chartOutlet: BloodGlucoseChartView, completionHandler: (() -> ())?) {
+    public func updateChartPoints(endDate: Date, startDate: Date?, chartOutlet: BloodGlucoseChartView, forceReset: Bool = false, completionHandler: (() -> ())?) {
         
         // create a new operation
         let operation = BlockOperation(block: {
@@ -237,6 +238,12 @@ public class GlucoseChartManager {
             // if there's more than one operation waiting for execution, it makes no sense to execute this one, the next one has a newer endDate to use
             guard self.data().operationQueue.operations.count <= 1 else {
                 return
+            }
+            
+            // if the forceReset parameter has been set, then set maximumValueInGlucoseChartPointsInMgDl to it's initial value
+            // this will force the y-axis to be reset to it's initial state
+            if forceReset {
+                self.maximumValueInGlucoseChartPointsInMgDl = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
             }
             
             // startDateToUse is either parameter value or (if nil), endDate minutes current chartwidth
@@ -253,8 +260,7 @@ public class GlucoseChartManager {
             // do we reuse the existing list ? for instance if new startDate > date of currently stored last chartpoint, then we don't reuse the existing list, probably better to reinitialize from scratch to avoid ending up with too long lists
             // and if there's more than a predefined amount of elements already in the array then we restart from scratch because (on an iPhone SE with iOS 13), the panning is getting slowed down when there's more than 1000 elements in the array
             var reUseExistingChartPointList = self.glucoseChartPoints.urgentRange
-                .count + self.glucoseChartPoints.inRange.count + self.glucoseChartPoints.notUrgentRange.count
-                <= ConstantsGlucoseChart.maximumElementsInGlucoseChartPointsArray ? true : false
+                .count + self.glucoseChartPoints.inRange.count + self.glucoseChartPoints.notUrgentRange.count <= ConstantsGlucoseChart.maximumElementsInGlucoseChartPointsArray ? true : false
             
             if let lastGlucoseChartPoint = self.glucoseChartPoints.lastGlucoseChartPoint, let lastGlucoseChartPointX = lastGlucoseChartPoint.x as? ChartAxisValueDate {
                 
@@ -272,7 +278,7 @@ public class GlucoseChartManager {
                     
                     // lastChartPointEarlierThanEndDate is the last chartPoint in the array to append
                     self.lastChartPointEarlierThanEndDate = newGlucoseChartPointsToAppend.lastGlucoseChartPoint
-
+                    
                     // maybe there's a higher value now
                     self.maximumValueInGlucoseChartPointsInMgDl = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPointsInMgDl, glucoseChartPoints: newGlucoseChartPointsToAppend)
                     
@@ -286,7 +292,7 @@ public class GlucoseChartManager {
                     
                     // maybe there's a higher value now for maximumValueInGlucoseChartPoints
                     self.maximumValueInGlucoseChartPointsInMgDl = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPointsInMgDl, glucoseChartPoints: newGlucoseChartPointsToAppend)
-
+                    
                 } else {
                     
                     // append glucseChartpoints with date > x.date up to endDate
@@ -297,7 +303,7 @@ public class GlucoseChartManager {
                     
                     // maybe there's a higher value now for maximumValueInGlucoseChartPoints
                     self.maximumValueInGlucoseChartPointsInMgDl = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPointsInMgDl, glucoseChartPoints: newGlucoseChartPointsToAppend)
-
+                    
                 }
                 
                 // now see if we need to prepend
@@ -310,7 +316,7 @@ public class GlucoseChartManager {
                         
                         // maybe there's a higher value now for maximumValueInGlucoseChartPoints
                         self.maximumValueInGlucoseChartPointsInMgDl = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPointsInMgDl, glucoseChartPoints: newGlucoseChartPointsToPrepend)
-
+                        
                     }
                     
                 }
@@ -327,7 +333,7 @@ public class GlucoseChartManager {
                 
                 // maybe there's a higher value now for maximumValueInGlucoseChartPoints
                 self.maximumValueInGlucoseChartPointsInMgDl = self.getNewMaximumValueInGlucoseChartPoints(currentMaximumValueInGlucoseChartPoints: self.maximumValueInGlucoseChartPointsInMgDl, glucoseChartPoints: newGlucoseChartPointsToAppend)
-
+                
             }
             
             // now assign glucoseChartPoints = range to prepend + existing array + range to append
@@ -336,7 +342,7 @@ public class GlucoseChartManager {
             self.glucoseChartPoints.inRange = newGlucoseChartPointsToPrepend.inRange + (reUseExistingChartPointList ? self.glucoseChartPoints.inRange : [ChartPoint]()) + newGlucoseChartPointsToAppend.inRange
             self.glucoseChartPoints.notUrgentRange = newGlucoseChartPointsToPrepend.notUrgentRange + (reUseExistingChartPointList ? self.glucoseChartPoints.notUrgentRange : [ChartPoint]()) + newGlucoseChartPointsToAppend.notUrgentRange
             
-
+            
             // get calibrations from coredata
             let calibrationChartPoints = self.getCalibrationChartPoints(startDate: startDateToUse, endDate: endDate, calibrationsAccessor: self.data().calibrationsAccessor, on: self.coreDataManager.privateManagedObjectContext)
             
@@ -400,7 +406,7 @@ public class GlucoseChartManager {
                 self.scheduledBasalRateTreatmentChartPoints = self.treatmentChartPoints.scheduledBasalRates
                 self.basalRateTreatmentChartPoints = self.treatmentChartPoints.basalRates
                 self.basalRateFillTreatmentChartPoints = self.treatmentChartPoints.basalRatesFill
-                    
+                
                 // update the chart outlet
                 chartOutlet.reloadChart()
                 
@@ -576,10 +582,10 @@ public class GlucoseChartManager {
             
             // calculate additional distance to travel the chart - this is the integral function again that is used
             let additionalDistanceToTravel = CGFloat(round(0.001*(
-                                                            
-                                                            Double(velocityX) *  pow(Double(ConstantsGlucoseChart.decelerationRate), timeSinceStart) / log(Double(ConstantsGlucoseChart.decelerationRate))
-                                                                
-                                                                - constant))) - distanceTravelled
+                
+                Double(velocityX) *  pow(Double(ConstantsGlucoseChart.decelerationRate), timeSinceStart) / log(Double(ConstantsGlucoseChart.decelerationRate))
+                
+                - constant))) - distanceTravelled
             
             // if less than 2 pixels then stop the gestureTimer
             if abs(additionalDistanceToTravel) < 2 {
@@ -623,7 +629,7 @@ public class GlucoseChartManager {
         // newStartDate = enddate minus current difference between endDate and startDate
         let newStartDate = Date(timeInterval: -self.endDate.timeIntervalSince(self.startDate), since: newEndDate)
         
-        updateChartPoints(endDate: newEndDate, startDate: newStartDate, chartOutlet: chartOutlet, completionHandler: completionHandler)
+        updateChartPoints(endDate: newEndDate, startDate: newStartDate, chartOutlet: chartOutlet, forceReset: false, completionHandler: completionHandler)
         
     }
     
@@ -639,14 +645,14 @@ public class GlucoseChartManager {
         let unitIsMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
         // create yAxisValues, start with 38 mgdl, this is to make sure we show a bit lower than the real lowest value which is usually 40 mgdl, make the label hidden. We must do this with by using a clear color label setting as the hidden property doesn't work (even if we don't know why).
-//        let firstYAxisValue = ChartAxisValueDouble((ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl).mgDlToMmol(mgDl: unitIsMgDl), labelSettings: data().chartLabelSettingsHidden)
+        //        let firstYAxisValue = ChartAxisValueDouble((ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl).mgDlToMmol(mgDl: unitIsMgDl), labelSettings: data().chartLabelSettingsHidden)
         let minimumChartValue = UserDefaults.standard.showTreatmentsOnChart ? (UserDefaults.standard.nightscoutFollowType != .none ? (isStatic24hrChart ? ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal24hrChart : ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal) : ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl) : ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
         
         let firstYAxisValue = ChartAxisValueDouble(minimumChartValue.mgDlToMmol(mgDl: unitIsMgDl), labelSettings: data().chartLabelSettingsHidden)
         
         // create now the yAxisValues and add the first
         var yAxisValues = [firstYAxisValue as ChartAxisValue]
-            
+        
         // if the user has a low urgent value > 50 (which *should* be the case), let's add a dimmed axis value of 40 to give the graph more context. If not, then just ignore it and their low urgent value will become the lowest label value
         if UserDefaults.standard.urgentLowMarkValueInUserChosenUnit >= (unitIsMgDl ? 50 : 2.7) {
             yAxisValues += [ChartAxisValueDouble(unitIsMgDl ? 40 : 2.2, labelSettings: data().chartLabelSettingsDimmed) as ChartAxisValue]
@@ -784,7 +790,7 @@ public class GlucoseChartManager {
             carbsLabelSeparationOffset += 1
             
         }
-                
+        
         // now that we know innerFrame we can set innerFrameWidth
         innerFrameWidth = Double(innerFrame.width)
         
@@ -840,7 +846,7 @@ public class GlucoseChartManager {
         let largeCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: largeCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.largeCarbsTreatmentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.largeCarbsTreatmentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
         
         let veryLargeCarbsLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: veryLargeCarbsTreatmentChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter * ConstantsGlucoseChart.veryLargeCarbsTreatmentScale, height: glucoseCircleDiameter * ConstantsGlucoseChart.veryLargeCarbsTreatmentScale), itemFillColor: ConstantsGlucoseChart.carbsTreatmentColor, optimized: true)
-
+        
         
         // Scheduled basal rate line
         let scheduledBasalRateLayerLineModel = ChartLineModel(chartPoints: scheduledBasalRateTreatmentChartPoints, lineColor: ConstantsGlucoseChart.scheduledBasalRateTreatmentLineColor, lineWidth: ConstantsGlucoseChart.scheduledBasalRateTreatmentLineWidth, animDuration: 0, animDelay: 0, dashPattern: [3, 2])
@@ -984,14 +990,14 @@ public class GlucoseChartManager {
             
             /// set the stride count interval to make sure we don't add too many labels to the x-axis if the user wants to view >6 hours
             var intervalBetweenAxisValues: Int = 1
-                
+            
             switch UserDefaults.standard.chartWidthInHours {
-                case 12.0:
-                    intervalBetweenAxisValues = 2
-                case 24.0:
-                    intervalBetweenAxisValues = 4
-                default:
-                    break
+            case 12.0:
+                intervalBetweenAxisValues = 2
+            case 24.0:
+                intervalBetweenAxisValues = 4
+            default:
+                break
             }
             
             /// first, for each int in mappingArray, we create a ChartAxisValueDate, which will have as date one of the hours, starting with the lower hour + 1 hour - we will create 5 in this example, starting with hour 08 (7 + 3600 seconds)
@@ -1033,7 +1039,7 @@ public class GlucoseChartManager {
         
         // get bgReadings between the two dates
         let bgReadings = bgReadingsAccessor.getBgReadings(from: startDate, to: endDate, on: managedObjectContext)
-
+        
         // intialize the three arrays
         var urgentRangeChartPoints = [ChartPoint]()
         var inRangeChartPoints = [ChartPoint]()
@@ -1081,43 +1087,43 @@ public class GlucoseChartManager {
                 }
                 
             }
-
+            
         }
         
         return (urgentRangeChartPoints, inRangeChartPoints, notUrgentRangeChartPoints, firstGlucoseChartPoint, lastGlucoseChartPoint, maximumValueInGlucoseChartPoints)
         
     }
-
+    
     
     private func getCalibrationChartPoints(startDate: Date, endDate: Date, calibrationsAccessor: CalibrationsAccessor, on managedObjectContext: NSManagedObjectContext) -> [ChartPoint] {
         
         // get calibrations between the two dates
         let calibrations = calibrationsAccessor.getCalibrations(from: startDate, to: endDate, on: managedObjectContext)
-
+        
         // intialize the calibration chart point array
         var calibrationChartPoints = [ChartPoint]()
         
         managedObjectContext.performAndWait {
-        
-            for calibration in calibrations {
             
+            for calibration in calibrations {
+                
                 if calibration.bg.value > 0.0 {
                     
                     let newCalibrationChartPoint = ChartPoint(calibration: calibration, formatter: data().chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-
+                    
                     calibrationChartPoints.append(newCalibrationChartPoint)
                     
                 }
                 
             }
-        
+            
         }
         
         return (calibrationChartPoints)
         
     }
     
-        
+    
     /// Receives a start and end date and returns the treatment entries from coredata between these dates. These dates will typically be the start and end dates of the chart x-axis. These individual treatment entries are returned as a tuple with multiple chartPoint arrays as defined in TreatmentChartPointsTypes.
     ///
     /// - parameters:
@@ -1128,7 +1134,7 @@ public class GlucoseChartManager {
     ///     - managedObjectContext : the ManagedObjectContext to use
     /// - returns: a tuple with chart point arrays for each classification of treatment type + size
     private func getTreatmentChartPoints(startDate: Date, endDate: Date, treatmentEntryAccessor: TreatmentEntryAccessor, bgReadingsAccessor: BgReadingsAccessor, on managedObjectContext: NSManagedObjectContext) -> ([ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint], [ChartPoint]) {
-		
+        
         func treatmentSeparationOffset(maximumValueInGlucoseChartPointsInMgDl: Double) -> Double {
             let defaultOffsetTreatmentPositionFromBgMarker = ConstantsGlucoseChart.defaultOffsetTreatmentPositionFromBgMarker
             
@@ -1196,9 +1202,9 @@ public class GlucoseChartManager {
             }
         }
         
-		// get bgReadings between the two dates
-		// this will later be used to calculate the Y value for each carbsTreatment.
-		let bgReadings = bgReadingsAccessor.getBgReadings(from: startDate, to: endDate, on: managedObjectContext)
+        // get bgReadings between the two dates
+        // this will later be used to calculate the Y value for each carbsTreatment.
+        let bgReadings = bgReadingsAccessor.getBgReadings(from: startDate, to: endDate, on: managedObjectContext)
         
         let minimumChartValueInMgdl = isStatic24hrChart ? ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal24hrChart : ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal
         
@@ -1474,7 +1480,7 @@ public class GlucoseChartManager {
                             // if not, then just peg it to the end date
                             basalRateTreatmentChartPoints.append(ChartPoint(basalRateTreatmentEntry: previousBasalRateTreatment, date: min(endDate, .now), basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
                         }
-                                        
+                        
                         // if this is a 24 hour static chart, then continue the chart at 0 U/hr until the end date
                         if endDate > .now {
                             basalRateTreatmentChartPoints.append(ChartPoint(basalRate: 0, date: .now, basalRateScaler: basalRateScaler, minimumChartValueinMgdl: minimumChartValueInMgdl, formatter: data().chartPointDateFormatter))
@@ -1494,14 +1500,14 @@ public class GlucoseChartManager {
                 }
             }
         }
-
+        
         
         // return all treatment arrays based upon treatment type and size (as defined by the threshold values)
         return (smallBolusTreatmentChartPoints, mediumBolusTreatmentChartPoints, largeBolusTreatmentChartPoints, veryLargeBolusTreatmentChartPoints, smallCarbsTreatmentChartPoints, mediumCarbsTreatmentChartPoints, largeCarbsTreatmentChartPoints, veryLargeCarbsTreatmentChartPoints, bgCheckTreatmentChartPoints, scheduledBasalRateTreatmentChartPoints, basalRateTreatmentChartPoints, basalRateFillTreatmentChartPoints)
         
     }
-	
-	
+    
+    
     /// Calculate the Y axis value for multiple treatments.
     /// The calculation searches for the two closest bgReadings and interpolates
     /// the Y value between them.
@@ -1512,51 +1518,51 @@ public class GlucoseChartManager {
     ///         based on the nearby readings by date.
     /// - returns: a list of Doubles, with the same amount of elements of treatments
     ///       so that each treatment maps to a Y axis (by index).
-	/// IMPORTANT: Must be called inside managedObjectContext perfom block.
-	private func calculateClosestYAxisValues(treatments: [TreatmentEntry], bgReadings: [BgReading]) -> [Double] {
-		
-		// 0 bgReadings is an invalid argument.
-		guard bgReadings.count > 0 else {
-			return [Double](repeating: 120.0, count: treatments.count)
-		}
-		
-		var calculatedYValues: [Double] = []
-		
+    /// IMPORTANT: Must be called inside managedObjectContext perfom block.
+    private func calculateClosestYAxisValues(treatments: [TreatmentEntry], bgReadings: [BgReading]) -> [Double] {
+        
+        // 0 bgReadings is an invalid argument.
+        guard bgReadings.count > 0 else {
+            return [Double](repeating: 120.0, count: treatments.count)
+        }
+        
+        var calculatedYValues: [Double] = []
+        
         // For each treatment, find the two closest BgReading.
         // Then calculates the Y value based on them.
-		for treatment in treatments {
+        for treatment in treatments {
             // Find the closest bgReading.
-			let indexOfClosest = findIndexOfNearestBgReadingToDate(treatment.date, bgReadings: bgReadings)
-			let closestBgReading = bgReadings[indexOfClosest]
-
+            let indexOfClosest = findIndexOfNearestBgReadingToDate(treatment.date, bgReadings: bgReadings)
+            let closestBgReading = bgReadings[indexOfClosest]
+            
             // Not always there will be a second closest one.
             // (If the closest reading is at the border of the graph, for exemple).
-			var secondClosestBgReading: BgReading? = nil
-			if treatment.date >= closestBgReading.timeStamp {
+            var secondClosestBgReading: BgReading? = nil
+            if treatment.date >= closestBgReading.timeStamp {
                 // If the treatment is newer than the closest bgReading,
                 // attempt to get the one after it, if exists.
-				let nextIndex = indexOfClosest + 1
-				if nextIndex < bgReadings.count {
-					secondClosestBgReading = bgReadings[nextIndex]
-				}
-			} else {
+                let nextIndex = indexOfClosest + 1
+                if nextIndex < bgReadings.count {
+                    secondClosestBgReading = bgReadings[nextIndex]
+                }
+            } else {
                 // If the treatment is older than the closest bgReading,
                 // attempt to get the one before it, if exists.
-				let previousIndex = indexOfClosest - 1
-				if previousIndex >= 0 {
-					secondClosestBgReading = bgReadings[previousIndex]
-				}
-			}
-			
+                let previousIndex = indexOfClosest - 1
+                if previousIndex >= 0 {
+                    secondClosestBgReading = bgReadings[previousIndex]
+                }
+            }
+            
             // Calculate the Y value and append to the result list.
-			let yValue = calculateYValue(treatmentDate: treatment.date, closestBgReading: closestBgReading, secondClosestBgReading: secondClosestBgReading)
-			calculatedYValues.append(yValue)
-		}
-		
-		return calculatedYValues
-	}
-	
-	
+            let yValue = calculateYValue(treatmentDate: treatment.date, closestBgReading: closestBgReading, secondClosestBgReading: secondClosestBgReading)
+            calculatedYValues.append(yValue)
+        }
+        
+        return calculatedYValues
+    }
+    
+    
     /// Calculate the Y axis value for a date between two bgReadings.
     /// Calculation is done using linear interpolation.
     ///
@@ -1566,72 +1572,72 @@ public class GlucoseChartManager {
     ///     - secondClosestBgReading : the second closest BgReading to treatmentDate,
     ///           if it exists, optional.
     /// - returns: the result of the interpolation.
-	/// IMPORTANT: Must be called inside managedObjectContext perfom block.
-	private func calculateYValue(treatmentDate: Date, closestBgReading: BgReading, secondClosestBgReading: BgReading?) -> Double {
-		
-		// If there is no second closest, return the closestBgReading calculatedValue.
-		guard let secondClosestBgReading = secondClosestBgReading else {
-			return closestBgReading.calculatedValue
-		}
-
-		// If there is a second closest, interpolate the Y value using a linear aproach.
-		
+    /// IMPORTANT: Must be called inside managedObjectContext perfom block.
+    private func calculateYValue(treatmentDate: Date, closestBgReading: BgReading, secondClosestBgReading: BgReading?) -> Double {
+        
+        // If there is no second closest, return the closestBgReading calculatedValue.
+        guard let secondClosestBgReading = secondClosestBgReading else {
+            return closestBgReading.calculatedValue
+        }
+        
+        // If there is a second closest, interpolate the Y value using a linear aproach.
+        
         // First, figure out which of the bgReadings is the oldest.
         // It is safe to unwrap the first and last elements.
-		let sortedReadings = [closestBgReading, secondClosestBgReading].sorted(by: { $0.timeStamp < $1.timeStamp })
-		let olderBgReading = sortedReadings.first!
-		let newerBgReading = sortedReadings.last!
-		
-		// Calculate the interpolation based on the time difference
-		// Time difference from newerBgReading to olderBgReading
-		let timeDifference: Double = newerBgReading.timeStamp.timeIntervalSince1970 - olderBgReading.timeStamp.timeIntervalSince1970
-		// Time difference from treatmentDate to olderBgReading
-		let timeOffset: Double = treatmentDate.timeIntervalSince1970 - olderBgReading.timeStamp.timeIntervalSince1970
-		
-		// timeOffsetFactor as a double from 0 to 1.
-		let timeOffsetFactor: Double = timeOffset / timeDifference
-		
+        let sortedReadings = [closestBgReading, secondClosestBgReading].sorted(by: { $0.timeStamp < $1.timeStamp })
+        let olderBgReading = sortedReadings.first!
+        let newerBgReading = sortedReadings.last!
+        
+        // Calculate the interpolation based on the time difference
+        // Time difference from newerBgReading to olderBgReading
+        let timeDifference: Double = newerBgReading.timeStamp.timeIntervalSince1970 - olderBgReading.timeStamp.timeIntervalSince1970
+        // Time difference from treatmentDate to olderBgReading
+        let timeOffset: Double = treatmentDate.timeIntervalSince1970 - olderBgReading.timeStamp.timeIntervalSince1970
+        
+        // timeOffsetFactor as a double from 0 to 1.
+        let timeOffsetFactor: Double = timeOffset / timeDifference
+        
         // Calculate the SGV difference between the readings.
-		let yDifference: Double = newerBgReading.calculatedValue - olderBgReading.calculatedValue
+        let yDifference: Double = newerBgReading.calculatedValue - olderBgReading.calculatedValue
         // Linear interpolation for Y
-		let yValue = olderBgReading.calculatedValue + (yDifference * timeOffsetFactor)
-
-		return yValue
-	}
-	
-	
+        let yValue = olderBgReading.calculatedValue + (yDifference * timeOffsetFactor)
+        
+        return yValue
+    }
+    
+    
     /// Given a date and list of BgReadings, find the index of the bgReading closest to the date.
     ///
     /// - parameters:
     ///     - date : the date to find the index of the bgReading closest to.
-    ///     - bgReadings : list of bgReading to find the closest. 
+    ///     - bgReadings : list of bgReading to find the closest.
     /// - returns: the index of the nearest bgReading.
     ///
-	/// IMPORTANT: Must be called inside managedObjectContext perfom block.
+    /// IMPORTANT: Must be called inside managedObjectContext perfom block.
     ///
     /// About performance and optimization:
     ///     The complexity of this search algorithm is O(n).
     ///     This may seen like a good place to optimize and implement a binary search, since it is O(log n).
     ///     However, profiling did not show any significant differece between the two possible implementations, since the amount of elements in bgReadings is relative small (50-200).
     ///
-	private func findIndexOfNearestBgReadingToDate(_ date: Date, bgReadings: [BgReading]) -> Int {
-		
+    private func findIndexOfNearestBgReadingToDate(_ date: Date, bgReadings: [BgReading]) -> Int {
+        
         // Variables to keep track of the nearest
-		var indexOfNearest = 0
-		var nearestDiff: Double = Double.greatestFiniteMagnitude
-
+        var indexOfNearest = 0
+        var nearestDiff: Double = Double.greatestFiniteMagnitude
+        
         // Iterate over bgReadings and compare the date difference to see if it is less than the previous nearestDiff.
-		for (i, bgReading) in bgReadings.enumerated() {
-			let difference: Double = (bgReading.timeStamp.timeIntervalSince1970 - date.timeIntervalSince1970).magnitude
-
-			if difference < nearestDiff {
-				nearestDiff = difference
-				indexOfNearest = i
-			}
-		}
-
-		return indexOfNearest
-	}
+        for (i, bgReading) in bgReadings.enumerated() {
+            let difference: Double = (bgReading.timeStamp.timeIntervalSince1970 - date.timeIntervalSince1970).magnitude
+            
+            if difference < nearestDiff {
+                nearestDiff = difference
+                indexOfNearest = i
+            }
+        }
+        
+        return indexOfNearest
+    }
     
     
     /// Receives a view layer with treatment labels (text and position).
@@ -1653,7 +1659,7 @@ public class GlucoseChartManager {
         // to save typing
         let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
-//        if the label is to be shown below, then
+        //        if the label is to be shown below, then
         let offsetIfMmol: Double = ConstantsGlucoseChart.treatmentLabelMmolOffset.mgDlToMmol(mgDl: isMgDl)
         
         // create the chart point array of the label positions based upon the treatment chart point array
@@ -1743,10 +1749,10 @@ public class GlucoseChartManager {
         }
         
         return treatmentValue
-            
+        
     }
     
-
+    
     /// - set data to nil, will be called eg to clean up memory when going to the background
     /// - all needed variables will will be reinitialized as soon as data() is called
     private func nillifyData() {
@@ -1794,9 +1800,9 @@ public class GlucoseChartManager {
         treatmentEntryAccessor = nil
         
         urgentRangeGlucoseChartPoints = []
-
+        
         inRangeGlucoseChartPoints = []
-
+        
         notUrgentRangeGlucoseChartPoints = []
         
         chartLabelSettingsObjectives = nil
@@ -1808,7 +1814,7 @@ public class GlucoseChartManager {
         chartLabelSettingsDimmed = nil
         
         chartLabelSettingsHidden = nil
-
+        
     }
     
     /// function which gives is variables that are set back to nil when nillifyData is called
@@ -1939,10 +1945,10 @@ public class GlucoseChartManager {
             
             // check if there's a new value
             if let newMaximumValueInGlucoseChartPoints = glucoseChartPoints.maximumValueInGlucoseChartPoints {
-
+                
                 // return the maximum of the two
                 return max(currentMaximumValueInGlucoseChartPoints, newMaximumValueInGlucoseChartPoints)
-
+                
             } else {
                 
                 return currentMaximumValueInGlucoseChartPoints
@@ -1950,7 +1956,7 @@ public class GlucoseChartManager {
             }
             
         } else {
-
+            
             // there's no currentMaximumValueInGlucoseChartPoints, if glucoseChartPoints.maximumValueInGlucoseChartPoints not nil, return it
             if let maximumValueInGlucoseChartPoints = glucoseChartPoints.maximumValueInGlucoseChartPoints {
                 return maximumValueInGlucoseChartPoints
@@ -1959,7 +1965,7 @@ public class GlucoseChartManager {
             }
             
         }
-
+        
     }
     
 }
