@@ -31,7 +31,7 @@
 "confirmDisconnectMessage" = "Click 'Disconnect' to confirm that you really want to disconnect from the transmitter.";
 "transmittterStartDate" = "Transmitter Started";
 "sensorStartDate" = "Sensor Started";
-"useOtherDexcomApp" = "Read from Dexcom app";
+"useOtherDexcomApp" = "Use With Other App";
 "nfcScanNeeded" = "NFC scan needed";
 "nfcScanFailedTitle" = "Sensor Scan Failed";
 "nfcScanFailedMessage" = "\n⚠️ Please scan again ⚠️";

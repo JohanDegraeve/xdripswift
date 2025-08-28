@@ -95,7 +95,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Read from Dexcom app";
+"useOtherDexcomApp" = "Use With Other App";
 
 /// Disconnect transmitter, title
 "confirmDisconnectTitle" = "Confirm Disconnect";

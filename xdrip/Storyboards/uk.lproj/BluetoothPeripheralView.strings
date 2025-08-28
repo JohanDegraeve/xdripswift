@@ -94,7 +94,7 @@
 "serialNumber" = "Serial Number";
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Read from Dexcom app";
+"useOtherDexcomApp" = "Use With Other App";
 
 /// To give result about transitter result in notification body
 "transmitterResultResult" = "Transmitter Reset Result";
