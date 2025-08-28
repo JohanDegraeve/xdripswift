@@ -274,6 +274,11 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                     if let cGMG5Transmitter = self.getTransmitter(for: dexcomG5) {
                         // set isOn value to cGMG5Transmitter
                         cGMG5Transmitter.useOtherApp = isOn
+                        
+                        // define and present alertcontroller, this will show a message to explain that another app must be running in parallel to handle G6 authentication or we won't get any readings. Change the message to show the enabled/disabled version.
+                        let alert = UIAlertController(title: Texts_BluetoothPeripheralView.useOtherDexcomApp, message: isOn ? Texts_BluetoothPeripheralView.useOtherDexcomAppMessageEnabled : Texts_BluetoothPeripheralView.useOtherDexcomAppMessageDisabled, actionHandler: nil)
+                        
+                        self.bluetoothPeripheralViewController?.present(alert, animated: true, completion: nil)
                     }
                 })
             }

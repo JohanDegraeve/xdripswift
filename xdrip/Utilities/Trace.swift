@@ -570,7 +570,7 @@ class Trace {
                             
                             traceInfo.appendStringAndNewLine("        Firmware: " + (dexcomG5.firmwareVersion?.description ?? "nil"))
                             
-                            traceInfo.appendStringAndNewLine("        Read from Dexcom app: " + dexcomG5.useOtherApp.description)
+                            traceInfo.appendStringAndNewLine("        Use With Other App: " + dexcomG5.useOtherApp.description)
                             
                             traceInfo.appendStringAndNewLine("        Is Anubis?: " + dexcomG5.isAnubis.description)
                             
