@@ -34,19 +34,39 @@ class LandscapeValueViewController: UIViewController {
     /// outlet for label that shows the current reading
     @IBOutlet weak var valueLabelOutlet: UILabel!
     
+    /// outlet for label that shows the clock
+    @IBOutlet weak var clockLabelOutlet: UILabel!
+    
+    /// date formatter for the clock view
+    private var clockDateFormatter = DateFormatter()
+    
+    /// initiate a Timer object that we will use later to keep the clock view updated if the user activates the screen lock
+    private var clockTimer: Timer?
+    
 
     // MARK: - overriden functions
     
     override func viewDidLoad() {
         
         super.viewDidLoad()
-        
+                
         // set height of stackview with the minutes and diff labels to 20% of toal screen height, the remaining 80% is used to show the value and trend
         //   and width of stackview with just the minutes, 60% of total width?
         minutesAndDiffLabelStackView.translatesAutoresizingMaskIntoConstraints = false
-        minutesAndDiffLabelStackView.heightAnchor.constraint(equalTo: allViewsStackView.heightAnchor, multiplier: 0.2).isActive = true
+        minutesAndDiffLabelStackView.heightAnchor.constraint(equalTo: allViewsStackView.heightAnchor, multiplier: UserDefaults.standard.showClockWhenScreenIsLocked ? 0.12 : 0.2).isActive = true
         minutesLabelStackView.widthAnchor.constraint(equalTo: minutesAndDiffLabelStackView.widthAnchor, multiplier: 0.6).isActive = true
         
+        if UserDefaults.standard.showClockWhenScreenIsLocked {
+            // set up the clock view
+            clockDateFormatter.dateStyle = .none
+            clockDateFormatter.timeStyle = .short
+            
+            // set the format for the clock view and update it to show the current time
+            updateClockView()
+            
+            // set a timer instance to update the clock view label every second
+            clockTimer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateClockView), userInfo: nil, repeats:true)
+        }
     }
     
     override func viewDidLayoutSubviews() {
@@ -64,7 +84,24 @@ class LandscapeValueViewController: UIViewController {
         // adjust also font size for value label
         LandscapeValueViewController.adjustFontSizeToFitHeight(for: valueLabelOutlet)
         
+        if UserDefaults.standard.showClockWhenScreenIsLocked {
+            LandscapeValueViewController.adjustFontSizeToFitHeight(for: clockLabelOutlet)
+            clockLabelOutlet.font = UIFont.systemFont(ofSize: clockLabelOutlet.font!.pointSize, weight: .heavy)
+        } else {
+            clockLabelOutlet.isHidden = true
+        }
+        
     }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        if UserDefaults.standard.showClockWhenScreenIsLocked {
+            // destroy the timer instance so that it doesn't keep using resources
+            clockTimer?.invalidate()
+        }
+    }
+    
 
     
     // MARK: - public functions
@@ -118,6 +155,11 @@ class LandscapeValueViewController: UIViewController {
                 break
             }
         }
+    }
+    
+    /// update the label in the clock view every time this function is called
+    @objc private func updateClockView() {
+        self.clockLabelOutlet.text = clockDateFormatter.string(from: Date())
     }
 
 }

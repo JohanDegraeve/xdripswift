@@ -699,7 +699,6 @@ final class RootViewController: UIViewController, ObservableObject {
         // set up the clock view
         clockDateFormatter.dateStyle = .none
         clockDateFormatter.timeStyle = .short
-        clockDateFormatter.dateFormat = "HH:mm"
         clockLabelOutlet.font = ConstantsUI.clockLabelFontSize
         clockLabelOutlet.textColor = ConstantsUI.clockLabelColor
                 
@@ -2754,11 +2753,13 @@ final class RootViewController: UIViewController, ObservableObject {
         // don't calculate statis if app is not running in the foreground
         guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
         
-        // show (or even hide) the view if required
-        statisticsView.isHidden = !UserDefaults.standard.showStatistics
-        
-        // show/hide the selector as needed
-        segmentedControlStatisticsDaysView.isHidden = !UserDefaults.standard.showStatistics
+        if !screenIsLocked {
+            // show (or even hide) the view if required
+            statisticsView.isHidden = !UserDefaults.standard.showStatistics
+            
+            // show/hide the selector as needed
+            segmentedControlStatisticsDaysView.isHidden = !UserDefaults.standard.showStatistics
+        }
         
         // if the user doesn't want to see the statistics, then just return without doing anything
         if !UserDefaults.standard.showStatistics {
