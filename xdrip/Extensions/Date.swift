@@ -102,6 +102,17 @@ extension Date {
         return dateFormatter.string(from: self)
     }
     
+    /// date to string, with date and time as specified by one of the values in DateFormatter.Style
+    /// this is a special version of this function used only for the trace/log files and sets the locale to British
+    /// so that we can get the date string in English irrespective of the user locale/settings
+    func toStringForTrace(timeStyle: DateFormatter.Style, dateStyle: DateFormatter.Style) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale(identifier: "en_GB")
+        dateFormatter.timeStyle = timeStyle
+        dateFormatter.dateStyle = dateStyle
+        return dateFormatter.string(from: self)
+    }
+    
     /// date to string, with date and time as specified by one of the values in DateFormatter.Style and formatted to match the user's locale
     /// Example return: "31/12/2022, 17:48" (spain locale)
     /// Example return: "12/31/2022, 5:48 pm" (us locale)
