@@ -544,6 +544,10 @@ class Texts_SettingsView {
     static let nightscoutToken: String = {
         return NSLocalizedString("nightscoutToken", tableName: filename, bundle: Bundle.main, value: "Token", comment: "nightscout settings, token to use")
     }()
+    
+    static let openNightscout: String = {
+        return NSLocalizedString("openNightscout", tableName: filename, bundle: Bundle.main, value: "Open Nightscout", comment: "nightscout settings, when clicking the cell, open the nightscout url")
+    }()
 
     // MARK: - Section Speak
     
