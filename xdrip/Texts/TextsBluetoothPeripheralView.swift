@@ -137,7 +137,15 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let useOtherDexcomApp: String = {
-        return NSLocalizedString("useOtherDexcomApp", tableName: filename, bundle: Bundle.main, value: "Read from Dexcom app", comment: "Dexcom bluetooth screen. Is another app used in parallel or not")
+        return NSLocalizedString("useOtherDexcomApp", tableName: filename, bundle: Bundle.main, value: "Use With Other App", comment: "Dexcom bluetooth screen. Is another app used in parallel or not")
+    }()
+    
+    static let useOtherDexcomAppMessageEnabled: String = {
+        return String(format: NSLocalizedString("useOtherDexcomAppMessageEnabled", tableName: filename, bundle: Bundle.main, value: "Enabling this option will allow another app (such as Dexcom G6 or CamAPS apps) to run at the same time and connect to the G6 transmitter.\r\n\nThe other app will be responsible for providing authentication to the transmitter and must ALWAYS be running in the background or %@ will not get any readings.", comment: "Dexcom bluetooth screen. Message to explain that another app must be running to handle the authentication with the transmitter."), ConstantsHomeView.applicationName)
+    }()
+    
+    static let useOtherDexcomAppMessageDisabled: String = {
+        return String(format: NSLocalizedString("useOtherDexcomAppMessageDisabled", tableName: filename, bundle: Bundle.main, value: "Disabling this option means that %@ must be the only app connecting and authenticating with the G6 transmitter.\r\n\nIf any other app is also left open and connected, then it is likely that either %@ or the other app will not get readings.", comment: "Dexcom bluetooth screen. Message to explain that this app is the only one running to handle the authentication with the transmitter"), ConstantsHomeView.applicationName, ConstantsHomeView.applicationName)
     }()
     
     static let nfcScanNeeded: String = {

@@ -35,13 +35,13 @@
 "settingsviews_IntervalTitle" = "Notification Interval";
 "settingsviews_IntervalMessage" = "Minimum interval between two notifications (mins)";
 "settingsviews_allowScreenRotation" = "Allow Chart Rotation";
-"settingsviews_showMiniChart" = "Show Mini-Chart";
 "settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked";
 "settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
 "settingsviews_screenLockDimmingTypeDisabled" = "Disabled";
 "settingsviews_screenLockDimmingTypeDimmed" = "Dimmed";
 "settingsviews_screenLockDimmingTypeDark" = "Dark";
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+"settingsviews_allowMainChartAutoReset" = "Auto Reset Main Chart";
 "settingsviews_urgentHighValue" = "Urgent High Value";
 "settingsviews_highValue" = "High Value";
 "settingsviews_targetValue" = "Target Value";

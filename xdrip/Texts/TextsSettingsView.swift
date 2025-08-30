@@ -241,6 +241,10 @@ class Texts_SettingsView {
     static let showMiniChart: String = {
         return NSLocalizedString("settingsviews_showMiniChart", tableName: filename, bundle: Bundle.main, value: "Show Mini-Chart", comment: "home screen settings, should the mini-chart be shown")
     }()
+    
+    static let allowMainChartAutoReset: String = {
+        return NSLocalizedString("settingsviews_allowMainChartAutoReset", tableName: filename, bundle: Bundle.main, value: "Auto Reset Main Chart", comment: "home screen settings, should the main chart automatically reset the y-axis and date to current values every 15 seconds")
+    }()
 
     static let labelUrgentHighValue: String = {
         return NSLocalizedString("settingsviews_urgentHighValue", tableName: filename, bundle: Bundle.main, value: "Urgent High Value", comment: "home screen settings, urgent high value")
@@ -539,6 +543,10 @@ class Texts_SettingsView {
     
     static let nightscoutToken: String = {
         return NSLocalizedString("nightscoutToken", tableName: filename, bundle: Bundle.main, value: "Token", comment: "nightscout settings, token to use")
+    }()
+    
+    static let openNightscout: String = {
+        return NSLocalizedString("openNightscout", tableName: filename, bundle: Bundle.main, value: "Open Nightscout", comment: "nightscout settings, when clicking the cell, open the nightscout url")
     }()
 
     // MARK: - Section Speak
