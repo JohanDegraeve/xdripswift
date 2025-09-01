@@ -76,7 +76,7 @@ struct XDripWidgetLiveActivity: Widget {
                     .foregroundStyle(context.state.bgTextColor())
                     .minimumScaleFactor(0.2)
             }
-            .widgetURL(URL(string: "xdripswift"))
+            .widgetURL(URL(string: "xdripswift://open"))
             .keylineTint(context.state.bgTextColor())
         }
         .addSupplementalActivityFamilies()
