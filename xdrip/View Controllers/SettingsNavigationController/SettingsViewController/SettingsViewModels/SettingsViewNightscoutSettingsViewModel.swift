@@ -371,8 +371,19 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
                 return .nothing
             
         case .openNightscout:
-            if let url = URL(string: UserDefaults.standard.nightscoutUrl ?? "") {
-                openWeb(url)
+            if let nightscoutURL = UserDefaults.standard.nightscoutUrl, let url = URL(string: nightscoutURL), var URLComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) {
+                if UserDefaults.standard.nightscoutPort != 0 {
+                    URLComponents.port = UserDefaults.standard.nightscoutPort
+                }
+                
+                // if token not nil, then add also the token
+                if let token = UserDefaults.standard.nightscoutToken {
+                    URLComponents.queryItems = [URLQueryItem(name: "token", value: token)]
+                }
+                
+                if let url = URLComponents.url {
+                    openWeb(url)
+                }
             }
             
             return .nothing
