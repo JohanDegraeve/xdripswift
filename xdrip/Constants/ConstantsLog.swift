@@ -106,6 +106,9 @@ enum ConstantsLog {
     /// healthkit manager
     static let categoryHealthKitManager =               "HealthKitManager              "
     
+    /// openglück
+    static let categoryOpenGlückManager =            "OpenGlückManager              "
+    
     /// SettingsViewHealthKitSettingsViewModel
     static let categorySettingsViewHealthKitSettingsViewModel = "SettingsViewHealthKitSettingsViewModel"
     
