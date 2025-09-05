@@ -238,6 +238,14 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_allowScreenRotation", tableName: filename, bundle: Bundle.main, value: "Allow Chart Rotation", comment: "home screen settings, should the main glucose chart screen be allowed")
     }()
     
+    static let animateProgressBar: String = {
+        return NSLocalizedString("settingsviews_animateProgressBar", tableName: filename, bundle: Bundle.main, value: "Animate Progress Bar", comment: "home screen settings, should the progress bar be animated")
+    }()
+    
+    static let reverseProgressBar: String = {
+        return NSLocalizedString("settingsviews_reverseProgressBar", tableName: filename, bundle: Bundle.main, value: "Reverse Progress Bar", comment: "home screen settings, should the progress bar be reversed, and exhausted when the sensor ends")
+    }()
+    
     static let showMiniChart: String = {
         return NSLocalizedString("settingsviews_showMiniChart", tableName: filename, bundle: Bundle.main, value: "Show Mini-Chart", comment: "home screen settings, should the mini-chart be shown")
     }()
