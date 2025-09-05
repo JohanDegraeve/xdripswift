@@ -41,14 +41,14 @@
 "settingsviews_row_alerts" = "Larm";
 "settingsviews_sectiontitlehealthkit" = "Apple Hälsa";
 "settingsviews_healthkit" = "Skriv data till Apple Hälsa";
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
 "settingsviews_uploadReadingstoDexcomShare" = "Ladda upp till Dexcom Share";
-"settingsviews_dexcomShareSerialNumber" = "Sändarens serienummer";
+"settingsviews_dexcomShareUploadSerialNumber" = "Sändarens serienummer";
 "settingsviews_useUSDexcomShareurl" = "Använd Dexcom-server i USA";
 "settingsviews_dexcomShareAccountName" = "Användarnamn";
 "settingsviews_giveDexcomShareAccountName" = "Ange Dexcom Share användarnamn";
 "settingsviews_giveDexcomSharePassword" = "Ange Dexcom Share lösenord";
-"settingsviews_giveDexcomShareSerialNumber" = "Ange Dexcom mottagares serienummer";
+"settingsviews_givedexcomShareUploadSerialNumber" = "Ange Dexcom mottagares serienummer";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutEnabled" = "Slå på Nightscout";
 "settingsviews_nightscoutUrl" = "URL";

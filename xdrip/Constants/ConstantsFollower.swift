@@ -16,4 +16,7 @@ enum ConstantsFollower {
     /// number of seconds without a successful follower connection before a warning is shown when in LibreLinkUp follower mode
     static let secondsUntilFollowerDisconnectWarningLibreLinkUp: Int = 70
     
+    /// number of seconds without a successful follower connection before a warning is shown when in Dexcom Share follower mode
+    static let secondsUntilFollowerDisconnectWarningDexcomShare: Int = 310
+    
 }

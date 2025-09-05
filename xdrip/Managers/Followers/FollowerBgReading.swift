@@ -12,8 +12,8 @@ import Foundation
 /// this could be Nightscout for example
 struct FollowerBgReading {
     
-    var timeStamp:Date
-    var sgv:Double
+    var timeStamp: Date
+    var sgv: Double
     
     init(timeStamp:Date, sgv:Double) {
 

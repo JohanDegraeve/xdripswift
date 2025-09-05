@@ -425,18 +425,18 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_healthkit", tableName: filename, bundle: Bundle.main, value: "Write Data to Apple Health", comment: "healthkit settings, literally 'healthkit'")
     }()
     
-    // MARK: - Section Dexcom Share
+    // MARK: - Section Dexcom Share Upload (including Share Follower)
     
-    static let sectionTitleDexcomShare: String = {
-        return NSLocalizedString("settingsviews_sectiontitledexcomshare", tableName: filename, bundle: Bundle.main, value: "Dexcom Share", comment: "dexcom share settings, section title")
+    static let sectionTitleDexcomShareUpload: String = {
+        return NSLocalizedString("settingsviews_sectiontitledexcomshareupload", tableName: filename, bundle: Bundle.main, value: "Dexcom Share Upload", comment: "dexcom share upload settings, section title")
     }()
     
     static let labelUploadReadingstoDexcomShare = {
         return NSLocalizedString("settingsviews_uploadReadingstoDexcomShare", tableName: filename, bundle: Bundle.main, value: "Upload to Dexcom Share", comment: "dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no")
     }()
 
-    static let labelDexcomShareSerialNumber = {
-        return NSLocalizedString("settingsviews_dexcomShareSerialNumber", tableName: filename, bundle: Bundle.main, value: "Receiver Serial Number:", comment: "dexcom share settings settings, where user can set dexcom serial number to be used for dexcom share upload")
+    static let labeldexcomShareUploadSerialNumber = {
+        return NSLocalizedString("settingsviews_dexcomShareUploadSerialNumber", tableName: filename, bundle: Bundle.main, value: "Receiver Serial Number:", comment: "dexcom share settings settings, where user can set dexcom serial number to be used for dexcom share upload")
     }()
     
     static let labelUseUSDexcomShareurl = {
@@ -455,8 +455,8 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_giveDexcomSharePassword", tableName: filename, bundle: Bundle.main, value: "Enter Dexcom Share Password", comment: "dexcom share settings, pop up that asks user to enter dexcom share password")
     }()
     
-    static let giveDexcomShareSerialNumber = {
-        return NSLocalizedString("settingsviews_giveDexcomShareSerialNumber", tableName: filename, bundle: Bundle.main, value: "Enter the Dexcom Receiver Serial Number", comment: "dexcom share settings, pop up that asks user to enter dexcom share serial number")
+    static let givedexcomShareUploadSerialNumber = {
+        return NSLocalizedString("settingsviews_givedexcomShareUploadSerialNumber", tableName: filename, bundle: Bundle.main, value: "Enter the Dexcom Receiver Serial Number", comment: "dexcom share settings, pop up that asks user to enter dexcom share serial number")
     }()
     
     // MARK: - Section Nightscout

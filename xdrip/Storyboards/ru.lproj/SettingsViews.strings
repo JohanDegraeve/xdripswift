@@ -44,14 +44,14 @@
 "settingsviews_row_alerts" = "Уведомления";
 "settingsviews_sectiontitlehealthkit" = "Apple Здоровье";
 "settingsviews_healthkit" = "Записывать данные в Здоровье";
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
 "settingsviews_uploadReadingstoDexcomShare" = "Загружать в Dexcom Share";
-"settingsviews_dexcomShareSerialNumber" = "Серийный номер приемника";
+"settingsviews_dexcomShareUploadSerialNumber" = "Серийный номер приемника";
 "settingsviews_useUSDexcomShareurl" = "Использовать Dexcom US сервер";
 "settingsviews_dexcomShareAccountName" = "Имя аккаунта";
 "settingsviews_giveDexcomShareAccountName" = "Введите Dexcom Share имя аккаунта";
 "settingsviews_giveDexcomSharePassword" = "Введите Dexcom Share пароль";
-"settingsviews_giveDexcomShareSerialNumber" = "Введите Dexcom приемника серийный номер";
+"settingsviews_givedexcomShareUploadSerialNumber" = "Введите Dexcom приемника серийный номер";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutEnabled" = "Интеграция Nightscout";
 "settingsviews_nightscoutUrl" = "URL";

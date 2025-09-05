@@ -509,6 +509,9 @@ final class RootViewController: UIViewController, ObservableObject {
     /// LibreLinkUpFollowManager instance
     private var libreLinkUpFollowManager: LibreLinkUpFollowManager?
     
+    /// DexcomShareFollowManager instance
+    private var dexcomShareFollowManager: DexcomShareFollowManager?
+    
     /// LoopFollowManager instance
     private var loopFollowManager: LoopFollowManager?
     
@@ -1161,8 +1164,11 @@ final class RootViewController: UIViewController, ObservableObject {
         // setup nightscoutmanager
         nightscoutFollowManager = NightscoutFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
         
-        // setup nightscoutmanager
+        // setup libreLinkUpFollowManager
         libreLinkUpFollowManager = LibreLinkUpFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
+        
+        // setup dexcomShareFollowManager
+        dexcomShareFollowManager = DexcomShareFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
         
         // setup loop follow manager
         loopFollowManager = LoopFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
@@ -1254,6 +1260,8 @@ final class RootViewController: UIViewController, ObservableObject {
             self.nightscoutFollowManager?.download()
             
             self.libreLinkUpFollowManager?.download()
+            
+            self.dexcomShareFollowManager?.download()
             
         }, cgmTransmitterInfoChanged: cgmTransmitterInfoChanged)
         
@@ -3322,10 +3330,16 @@ final class RootViewController: UIViewController, ObservableObject {
             case .libreLinkUp, .libreLinkUpRussia:
                 if UserDefaults.standard.libreLinkUpEmail == nil || UserDefaults.standard.libreLinkUpPassword == nil {
                     dataSourceSensorMaxAgeOutlet.textColor = .systemRed
-                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.libreLinkUpAccountCredentialsMissing
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.followerAccountCredentialsMissing
                 } else if UserDefaults.standard.libreLinkUpPreventLogin {
                     dataSourceSensorMaxAgeOutlet.textColor = .systemRed
-                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.libreLinkUpAccountCredentialsInvalid
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.followerAccountCredentialsInvalid
+                }
+                
+            case .dexcomShare:
+                if UserDefaults.standard.dexcomShareAccountName == nil || UserDefaults.standard.dexcomSharePassword == nil {
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.followerAccountCredentialsMissing
                 }
             }
         }
@@ -4112,7 +4126,6 @@ extension RootViewController: FollowerDelegate {
                     // create a new reading
                     // we'll need to check which should be the active followerManager to know where to call the function
                     switch UserDefaults.standard.followerDataSourceType {
-                        
                     case .nightscout:
                         
                         if let followManager = nightscoutFollowManager {
@@ -4122,6 +4135,12 @@ extension RootViewController: FollowerDelegate {
                     case .libreLinkUp, .libreLinkUpRussia:
                         
                         if let followManager = libreLinkUpFollowManager {
+                            _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
+                        }
+                        
+                    case .dexcomShare:
+                        
+                        if let followManager = dexcomShareFollowManager {
                             _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
                         }
                         

@@ -31,14 +31,14 @@
 "settingsviews_row_alerts" = "التنبيهات";
 "settingsviews_sectiontitlehealthkit" = "تطبيق صحتي";
 "settingsviews_healthkit" = "كتابة البيانات إلى تطبيق صحتي؟";
-"settingsviews_sectiontitledexcomshare" = "ديكسكوم شير";
+"settingsviews_sectiontitledexcomshareupload" = "ديكسكوم شير";
 "settingsviews_uploadReadingstoDexcomShare" = "التحميل إلى ديكسكوم شير؟";
-"settingsviews_dexcomShareSerialNumber" = "الرمز التسلسلي لجهاز الإستقبال";
+"settingsviews_dexcomShareUploadSerialNumber" = "الرمز التسلسلي لجهاز الإستقبال";
 "settingsviews_useUSDexcomShareurl" = "استخدم سيرفرات ديكسكوم الأمريكية؟";
 "settingsviews_dexcomShareAccountName" = "اسم الحساب";
 "settingsviews_giveDexcomShareAccountName" = "أدخل اسم الحساب لديكسكوم شير";
 "settingsviews_giveDexcomSharePassword" = "أعط ديكسكوم شير كلمة مرور";
-"settingsviews_giveDexcomShareSerialNumber" = "أدخل الرقم التسلسلي لجهاز استقبال ديكسكوم";
+"settingsviews_givedexcomShareUploadSerialNumber" = "أدخل الرقم التسلسلي لجهاز استقبال ديكسكوم";
 "settingsviews_sectiontitlenightscout" = "نايتسكاوت";
 "settingsviews_nightscoutEnabled" = "تفعيل نايتسكاوت؟";
 "settingsviews_nightscoutUrl" = "الرابط";

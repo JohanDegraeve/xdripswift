@@ -406,8 +406,8 @@ class Trace {
             traceInfo.appendStringAndNewLine("    Account name: " + ((UserDefaults.standard.dexcomShareAccountName?.description ?? "") != "" ? "present" : "missing"))
             traceInfo.appendStringAndNewLine("    Password: " + ((UserDefaults.standard.dexcomSharePassword?.description ?? "") != "" ? "present" : "missing"))
             traceInfo.appendStringAndNewLine("    Use US servers: " + UserDefaults.standard.useUSDexcomShareurl .description)
-            traceInfo.appendStringAndNewLine("    Receiver serial number: " + (UserDefaults.standard.dexcomShareSerialNumber?.description ?? "nil"))
-            traceInfo.appendStringAndNewLine("    Use upload schedule: " + UserDefaults.standard.dexcomShareUseSchedule.description)
+            traceInfo.appendStringAndNewLine("    Receiver serial number: " + (UserDefaults.standard.dexcomShareUploadSerialNumber?.description ?? "nil"))
+            traceInfo.appendStringAndNewLine("    Use upload schedule: " + UserDefaults.standard.dexcomShareUploadUseSchedule.description)
         }
                                              
         traceInfo.appendStringAndNewLine("\nApple Health settings:")

@@ -29,14 +29,14 @@
 "settingsviews_row_alerts" = "Alarmes";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
 "settingsviews_healthkit" = "Sauver les données dans Apple Health";
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
 "settingsviews_uploadReadingstoDexcomShare" = "Charger dans le Dexcom Share";
-"settingsviews_dexcomShareSerialNumber" = "Numéro de série du receveur";
+"settingsviews_dexcomShareUploadSerialNumber" = "Numéro de série du receveur";
 "settingsviews_useUSDexcomShareurl" = "Utiliser les serveurs US Dexcom US";
 "settingsviews_dexcomShareAccountName" = "Nom du compte";
 "settingsviews_giveDexcomShareAccountName" = "Entrer le nom du compte Dexcom";
 "settingsviews_giveDexcomSharePassword" = "Entrer le mot de passe Dexcom Share";
-"settingsviews_giveDexcomShareSerialNumber" = "Entrer le numéro de série Dexcom Receiver";
+"settingsviews_givedexcomShareUploadSerialNumber" = "Entrer le numéro de série Dexcom Receiver";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutEnabled" = "Connecter à Nightscout";
 "settingsviews_nightscoutUrl" = "URL";

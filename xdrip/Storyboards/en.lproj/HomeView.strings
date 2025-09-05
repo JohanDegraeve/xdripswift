@@ -48,4 +48,4 @@
 "hidingUrlForXSeconds" = "Hiding URL for %@s...";
 "nightscoutNotEnabled" = "Nightscout is disabled";
 "nightscoutURLMissing" = "Nightscout URL missing";
-"libreLinkUpAccountCredentialsMissing" = "Username/password missing";
+"followerAccountCredentialsMissing" = "Username/password missing";

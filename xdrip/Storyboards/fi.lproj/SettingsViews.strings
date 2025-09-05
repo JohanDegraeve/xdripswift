@@ -24,14 +24,14 @@
 "settingsviews_row_alerts" = "Hälytykset";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
 "settingsviews_healthkit" = "Kirjoita data Apple Healthiin";
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
 "settingsviews_uploadReadingstoDexcomShare" = "Lähetä Dexcom Share palveluun";
-"settingsviews_dexcomShareSerialNumber" = "Vastaanottimen sarjanumero";
+"settingsviews_dexcomShareUploadSerialNumber" = "Vastaanottimen sarjanumero";
 "settingsviews_useUSDexcomShareurl" = "Käytä Dexcom US palvelimia";
 "settingsviews_dexcomShareAccountName" = "Käyttäjätunnus";
 "settingsviews_giveDexcomShareAccountName" = "Anna Dexcom Sharen käyttäjätunnus";
 "settingsviews_giveDexcomSharePassword" = "Anna Dexcom Sharen salasana";
-"settingsviews_giveDexcomShareSerialNumber" = "Anna Dexcom vastaanottimen sarjanumero";
+"settingsviews_givedexcomShareUploadSerialNumber" = "Anna Dexcom vastaanottimen sarjanumero";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutEnabled" = "Ota Nightscout käyttöön";
 "settingsviews_nightscoutUrl" = "URL";

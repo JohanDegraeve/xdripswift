@@ -103,7 +103,7 @@
 "settingsviews_Version" = "Version";
 
 /// dexcom share settings settings, where user can set dexcom serial number to be used for dexcom share upload
-"settingsviews_dexcomShareSerialNumber" = "Receiver Serial Number";
+"settingsviews_dexcomShareUploadSerialNumber" = "Receiver Serial Number";
 
 /// used in settings, section Info, title of the build setting
 "settingsviews_build" = "Build";
@@ -171,7 +171,7 @@
 "settingsviews_labelNonFixed" = "Multi-point Calibration";
 
 /// dexcom share settings, pop up that asks user to enter dexcom share serial number
-"settingsviews_giveDexcomShareSerialNumber" = "Enter the Dexcom Receiver Serial Number";
+"settingsviews_givedexcomShareUploadSerialNumber" = "Enter the Dexcom Receiver Serial Number";
 
 /// nightscout settings, when clicking the cell, test the url and api key
 "testUrlAndAPIKey" = "Test Connection";
@@ -216,7 +216,7 @@
 "appleWatchSectionTitle" = "Apple Watch";
 
 /// dexcom share settings, section title
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
 
 /// Text in pop up shown when user wants to send the trace file
 "describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";

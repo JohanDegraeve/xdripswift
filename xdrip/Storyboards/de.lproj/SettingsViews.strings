@@ -15,7 +15,7 @@
 "createCalendarEvent" = "Kalendereinträge anlegen";
 
 /// dexcom share settings, section title
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
 
 /// in Settings, section title for Trace
 "sectionTitleTrace" = "Fehlerbericht";
@@ -222,7 +222,7 @@
 "settingsviews_lowValue" = "Niedriger Wert";
 
 /// dexcom share settings, pop up that asks user to enter dexcom share serial number
-"settingsviews_giveDexcomShareSerialNumber" = "Eingabe der Dexcom Receiver Seriennummer";
+"settingsviews_givedexcomShareUploadSerialNumber" = "Eingabe der Dexcom Receiver Seriennummer";
 
 /// Apple Watch Settings - text in row where user needs to select a calendar
 "calenderId" = "Kalender auswählen";
@@ -261,7 +261,7 @@
 "settingsviews_masterorfollower" = "Master or Follower";
 
 /// dexcom share settings settings, where user can set dexcom serial number to be used for dexcom share upload
-"settingsviews_dexcomShareSerialNumber" = "Empfänger Seriennummer";
+"settingsviews_dexcomShareUploadSerialNumber" = "Empfänger Seriennummer";
 
 /// deloper settings, row title for 'Smooth Libre Values?'
 "smoothLibreValues" = "Libre Werte glätten";

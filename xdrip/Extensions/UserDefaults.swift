@@ -226,12 +226,12 @@ extension UserDefaults {
         /// use US dexcomshare url true or false
         case useUSDexcomShareurl = "useUSDexcomShareurl"
         /// dexcom share serial number
-        case dexcomShareSerialNumber = "dexcomShareSerialNumber"
+        case dexcomShareUploadSerialNumber = "dexcomShareUploadSerialNumber"
         /// should schedule be used for dexcom share upload ?
-        case dexcomShareUseSchedule = "dexcomShareUseSchedule"
-        /// - schedule for dexcomShare use, only applicable if dexcomShareUseSchedule = true
+        case dexcomShareUploadUseSchedule = "dexcomShareUploadUseSchedule"
+        /// - schedule for dexcomShare upload use, only applicable if dexcomShareUploadUseSchedule = true
         /// - string of values, seperate by '-', values are int values and represent minutes
-        case dexcomShareSchedule = "dexcomShareSchedule"
+        case dexcomShareUploadSchedule = "dexcomShareUploadSchedule"
 
         // Healthkit
         
@@ -1581,33 +1581,33 @@ extension UserDefaults {
     }
 
     /// dexcom share serial number
-    @objc dynamic var dexcomShareSerialNumber:String? {
+    @objc dynamic var dexcomShareUploadSerialNumber:String? {
         get {
-            return string(forKey: Key.dexcomShareSerialNumber.rawValue)
+            return string(forKey: Key.dexcomShareUploadSerialNumber.rawValue)
         }
         set {
-            set(newValue, forKey: Key.dexcomShareSerialNumber.rawValue)
+            set(newValue, forKey: Key.dexcomShareUploadSerialNumber.rawValue)
         }
     }
     
-    /// - schedule for dexcomShare use, only applicable if dexcomShareUseSchedule = true
+    /// - schedule for dexcomShare use, only applicable if dexcomShareUploadUseSchedule = true
     /// - string of values, seperate by '-', values are int values and represent minutes
-    var dexcomShareSchedule: String? {
+    var dexcomShareUploadSchedule: String? {
         get {
-            return string(forKey: Key.dexcomShareSchedule.rawValue)
+            return string(forKey: Key.dexcomShareUploadSchedule.rawValue)
         }
         set {
-            set(newValue, forKey: Key.dexcomShareSchedule.rawValue)
+            set(newValue, forKey: Key.dexcomShareUploadSchedule.rawValue)
         }
     }
     
     /// use schedule for dexcomShareupload ?
-    @objc dynamic var dexcomShareUseSchedule: Bool {
+    @objc dynamic var dexcomShareUploadUseSchedule: Bool {
         get {
-            return bool(forKey: Key.dexcomShareUseSchedule.rawValue)
+            return bool(forKey: Key.dexcomShareUploadUseSchedule.rawValue)
         }
         set {
-            set(newValue, forKey: Key.dexcomShareUseSchedule.rawValue)
+            set(newValue, forKey: Key.dexcomShareUploadUseSchedule.rawValue)
         }
     }
 

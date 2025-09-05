@@ -39,14 +39,14 @@
 "settingsviews_row_alerts" = "Uyarılar";
 "settingsviews_sectiontitlehealthkit" = "Apple Sağlık";
 "settingsviews_healthkit" = "Apple Sağlığa Veri Yazılsın mı";
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
 "settingsviews_uploadReadingstoDexcomShare" = "Dexcom Share'e yüklensin mi";
-"settingsviews_dexcomShareSerialNumber" = "Alıcı Seri Numarası";
+"settingsviews_dexcomShareUploadSerialNumber" = "Alıcı Seri Numarası";
 "settingsviews_useUSDexcomShareurl" = "Dexcom ABD Sunucuları Kullanılsın mı";
 "settingsviews_dexcomShareAccountName" = "Hesap Adı";
 "settingsviews_giveDexcomShareAccountName" = "Dexcom Share Hesabı Adını Girin";
 "settingsviews_giveDexcomSharePassword" = "Dexcom Share Parolasını Girin";
-"settingsviews_giveDexcomShareSerialNumber" = "Dexcom Alıcı Seri Numarasını girin";
+"settingsviews_givedexcomShareUploadSerialNumber" = "Dexcom Alıcı Seri Numarasını girin";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutEnabled" = "Nightscout etkinleştirilsin mi";
 "settingsviews_nightscoutUrl" = "URL";

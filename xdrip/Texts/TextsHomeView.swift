@@ -235,12 +235,12 @@ enum Texts_HomeView {
         return NSLocalizedString("nightscoutURLMissing", tableName: filename, bundle: Bundle.main, value: "Nightscout URL missing", comment: "nightscout is not enabled")
     }()
     
-    static let libreLinkUpAccountCredentialsMissing: String = {
-        return NSLocalizedString("libreLinkUpAccountCredentialsMissing", tableName: filename, bundle: Bundle.main, value: "Username/password missing", comment: "username and/or password is missing for librelinkup")
+    static let followerAccountCredentialsMissing: String = {
+        return NSLocalizedString("followerAccountCredentialsMissing", tableName: filename, bundle: Bundle.main, value: "Username/password missing", comment: "username and/or password is missing")
     }()
     
-    static let libreLinkUpAccountCredentialsInvalid: String = {
-        return NSLocalizedString("libreLinkUpAccountCredentialsInvalid", tableName: filename, bundle: Bundle.main, value: "Invalid User/Password", comment: "username and/or password is invalid for librelinkup")
+    static let followerAccountCredentialsInvalid: String = {
+        return NSLocalizedString("followerAccountCredentialsInvalid", tableName: filename, bundle: Bundle.main, value: "Invalid User/Password", comment: "username and/or password is invalid")
     }()
     
     static let showHideItemsTitle: String = {

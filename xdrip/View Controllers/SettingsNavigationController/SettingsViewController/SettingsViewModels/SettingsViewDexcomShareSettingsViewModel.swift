@@ -7,8 +7,8 @@ fileprivate enum Setting:Int, CaseIterable {
     case dexcomShareAccountName = 1
     /// dexcomSharePassword
     case dexcomSharePassword = 2
-    /// dexcomShareSerialNumber
-    case dexcomShareSerialNumber = 3
+    /// dexcomShareUploadSerialNumber
+    case dexcomShareUploadSerialNumber = 3
     /// should us url be used true or false
     case useUSDexcomShareurl = 4
     /// use dexcom share schedule or not
@@ -18,8 +18,8 @@ fileprivate enum Setting:Int, CaseIterable {
 
 }
 
-/// conforms to SettingsViewModelProtocol for all Dexcom Share settings in the first sections screen
-class SettingsViewDexcomShareSettingsViewModel:SettingsViewModelProtocol {
+/// conforms to SettingsViewModelProtocol for all Dexcom Share Upload settings in the first sections screen
+class SettingsViewDexcomShareUploadSettingsViewModel:SettingsViewModelProtocol {
     
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
@@ -53,19 +53,19 @@ class SettingsViewDexcomShareSettingsViewModel:SettingsViewModelProtocol {
         case .dexcomSharePassword:
             return SettingsSelectedRowAction.askText(title: Texts_Common.password, message: Texts_SettingsView.giveDexcomSharePassword, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomSharePassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(password:String) in UserDefaults.standard.dexcomSharePassword = password.toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
             
-        case .dexcomShareSerialNumber:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelDexcomShareSerialNumber, message: Texts_SettingsView.giveDexcomShareSerialNumber, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareSerialNumber, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in
+        case .dexcomShareUploadSerialNumber:
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labeldexcomShareUploadSerialNumber, message: Texts_SettingsView.givedexcomShareUploadSerialNumber, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareUploadSerialNumber, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in
                 
                 // convert to uppercase
                 let serialNumberUpper = serialNumber.uppercased()
                 
                 // if changed then store new value
-                if let currentSerialNumber = UserDefaults.standard.dexcomShareSerialNumber {
+                if let currentSerialNumber = UserDefaults.standard.dexcomShareUploadSerialNumber {
                     if currentSerialNumber != serialNumberUpper {
-                        UserDefaults.standard.dexcomShareSerialNumber = serialNumberUpper.toNilIfLength0()
+                        UserDefaults.standard.dexcomShareUploadSerialNumber = serialNumberUpper.toNilIfLength0()
                     }
                 } else {
-                    UserDefaults.standard.dexcomShareSerialNumber = serialNumberUpper.toNilIfLength0()
+                    UserDefaults.standard.dexcomShareUploadSerialNumber = serialNumberUpper.toNilIfLength0()
                 }
 
             }, cancelHandler: nil, inputValidator: nil)
@@ -83,7 +83,7 @@ class SettingsViewDexcomShareSettingsViewModel:SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return ConstantsSettingsIcons.dexcomSettingsIcon + " " + Texts_SettingsView.sectionTitleDexcomShare
+        return ConstantsSettingsIcons.dexcomSettingsIcon + " " + Texts_SettingsView.sectionTitleDexcomShareUpload
     }
 
     func numberOfRows() -> Int {
@@ -92,7 +92,7 @@ class SettingsViewDexcomShareSettingsViewModel:SettingsViewModelProtocol {
             return 1
         }
         else {
-            if !UserDefaults.standard.dexcomShareUseSchedule {
+            if !UserDefaults.standard.dexcomShareUploadUseSchedule {
                 return Setting.allCases.count - 1
             }
             return Setting.allCases.count
@@ -107,8 +107,8 @@ class SettingsViewDexcomShareSettingsViewModel:SettingsViewModelProtocol {
             return Texts_SettingsView.labelUploadReadingstoDexcomShare
         case .dexcomSharePassword:
             return Texts_Common.password
-        case .dexcomShareSerialNumber:
-            return Texts_SettingsView.labelDexcomShareSerialNumber
+        case .dexcomShareUploadSerialNumber:
+            return Texts_SettingsView.labeldexcomShareUploadSerialNumber
         case .useUSDexcomShareurl:
             return Texts_SettingsView.labelUseUSDexcomShareurl
         case .dexcomShareAccountName:
@@ -130,7 +130,7 @@ class SettingsViewDexcomShareSettingsViewModel:SettingsViewModelProtocol {
             return UITableViewCell.AccessoryType.disclosureIndicator
         case .dexcomSharePassword:
             return UITableViewCell.AccessoryType.disclosureIndicator
-        case .dexcomShareSerialNumber:
+        case .dexcomShareUploadSerialNumber:
             return UITableViewCell.AccessoryType.disclosureIndicator
         case .useUSDexcomShareurl:
             return UITableViewCell.AccessoryType.none
@@ -153,8 +153,8 @@ class SettingsViewDexcomShareSettingsViewModel:SettingsViewModelProtocol {
             return UserDefaults.standard.dexcomSharePassword?.obscured() ?? Texts_SettingsView.valueIsRequired
         case .useUSDexcomShareurl:
             return nil
-        case .dexcomShareSerialNumber:
-            return UserDefaults.standard.dexcomShareSerialNumber ?? Texts_SettingsView.valueIsRequired
+        case .dexcomShareUploadSerialNumber:
+            return UserDefaults.standard.dexcomShareUploadSerialNumber ?? Texts_SettingsView.valueIsRequired
         case .useSchedule:
             return nil
         case .schedule:
@@ -170,10 +170,10 @@ class SettingsViewDexcomShareSettingsViewModel:SettingsViewModelProtocol {
             return UISwitch(isOn: UserDefaults.standard.uploadReadingstoDexcomShare, action: {(isOn:Bool) in UserDefaults.standard.uploadReadingstoDexcomShare = isOn})
         case .useUSDexcomShareurl:
             return UISwitch(isOn: UserDefaults.standard.useUSDexcomShareurl, action: {(isOn:Bool) in UserDefaults.standard.useUSDexcomShareurl = isOn})
-        case .dexcomShareAccountName,.dexcomSharePassword,.dexcomShareSerialNumber:
+        case .dexcomShareAccountName,.dexcomSharePassword,.dexcomShareUploadSerialNumber:
             return nil
         case .useSchedule:
-            return UISwitch(isOn: UserDefaults.standard.dexcomShareUseSchedule, action: {(isOn:Bool) in UserDefaults.standard.dexcomShareUseSchedule = isOn})
+            return UISwitch(isOn: UserDefaults.standard.dexcomShareUploadUseSchedule, action: {(isOn:Bool) in UserDefaults.standard.dexcomShareUploadUseSchedule = isOn})
             
         case .schedule:
             return nil
@@ -181,7 +181,7 @@ class SettingsViewDexcomShareSettingsViewModel:SettingsViewModelProtocol {
     }
 }
 
-extension SettingsViewDexcomShareSettingsViewModel: TimeSchedule {
+extension SettingsViewDexcomShareUploadSettingsViewModel: TimeSchedule {
     
     func serviceName() -> String {
         return "Dexcom Share"
@@ -191,7 +191,7 @@ extension SettingsViewDexcomShareSettingsViewModel: TimeSchedule {
         
         var schedule = [Int]()
         
-        if let scheduleInSettings = UserDefaults.standard.dexcomShareSchedule {
+        if let scheduleInSettings = UserDefaults.standard.dexcomShareUploadSchedule {
             
             schedule = scheduleInSettings.split(separator: "-").map({Int($0) ?? 0})
             
@@ -219,7 +219,7 @@ extension SettingsViewDexcomShareSettingsViewModel: TimeSchedule {
             
         }
         
-        UserDefaults.standard.dexcomShareSchedule = scheduleToStore
+        UserDefaults.standard.dexcomShareUploadSchedule = scheduleToStore
         
     }
     

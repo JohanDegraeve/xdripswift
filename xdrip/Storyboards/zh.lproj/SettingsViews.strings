@@ -12,10 +12,10 @@
 "settingsviews_row_alert_types" = "警报类型";
 "settingsviews_row_alerts" = "警报";
 "settingsviews_sectiontitlehealthkit" = "苹果健康";
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
 "settingsviews_uploadReadingstoDexcomShare" = "上传到德康服务器";
-"settingsviews_dexcomShareSerialNumber" = "序列号";
-"settingsviews_giveDexcomShareSerialNumber" = "输入Dexcom Share 序列号";
+"settingsviews_dexcomShareUploadSerialNumber" = "序列号";
+"settingsviews_givedexcomShareUploadSerialNumber" = "输入Dexcom Share 序列号";
 "settingsviews_useUSDexcomShareurl" = "使用美国德康服务器";
 "settingsviews_dexcomShareAccountName" = "德康账号";
 "settingsviews_giveDexcomShareAccountName" = "输入Dexcom APP用户名";

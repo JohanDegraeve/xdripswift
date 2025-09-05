@@ -44,14 +44,14 @@
 "settingsviews_row_alerts" = "Ειδοποιήσεις";
 "settingsviews_sectiontitlehealthkit" = "Apple Health (Υγεία)";
 "settingsviews_healthkit" = "Εγγραφή δεδομένων στο Apple Health;";
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
 "settingsviews_uploadReadingstoDexcomShare" = "Μεταφόρτωση σε Dexcom Share;";
-"settingsviews_dexcomShareSerialNumber" = "Σειριακός αριθμός δέκτη";
+"settingsviews_dexcomShareUploadSerialNumber" = "Σειριακός αριθμός δέκτη";
 "settingsviews_useUSDexcomShareurl" = "Να χρησιμοποιηθούν διακομιστές Dexcom US;";
 "settingsviews_dexcomShareAccountName" = "Όνομα λογαριασμού";
 "settingsviews_giveDexcomShareAccountName" = "Εισαγάγετε όνομα λογαριασμού Dexcom Share";
 "settingsviews_giveDexcomSharePassword" = "Κοινοποίηση κωδικού πρόσβασης για κοινή χρήση Dexcom";
-"settingsviews_giveDexcomShareSerialNumber" = "Εισαγάγετε τον σειριακό αριθμό του δέκτη Dexcom";
+"settingsviews_givedexcomShareUploadSerialNumber" = "Εισαγάγετε τον σειριακό αριθμό του δέκτη Dexcom";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutEnabled" = "Ενεργοποίηση του Nightscout";
 "settingsviews_nightscoutUrl" = "URL";

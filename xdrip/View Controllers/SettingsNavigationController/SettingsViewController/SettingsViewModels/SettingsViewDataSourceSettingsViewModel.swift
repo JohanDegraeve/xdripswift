@@ -246,6 +246,19 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                     self.resetLibreLinkUpData()
                         
                 }, cancelHandler: nil, inputValidator: nil)
+                
+            case .dexcomShare:
+                return SettingsSelectedRowAction.askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterUsername, keyboardType: .default, text: UserDefaults.standard.dexcomShareAccountName, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (dexcomShareAccountName: String) in
+                        
+                    UserDefaults.standard.dexcomShareAccountName = dexcomShareAccountName.toNilIfLength0()
+                        
+                    // if the user has changed their account name, then let's also nillify the password for them so that we don't try and login with bad credentials
+                    UserDefaults.standard.dexcomSharePassword = nil
+                        
+                    // reset all data used in the UI
+                    //self.resetLibreLinkUpData()
+                        
+                }, cancelHandler: nil, inputValidator: nil)
                     
             default:
                 return .nothing
@@ -260,6 +273,16 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                         
                     // reset all data used in the UI
                     self.resetLibreLinkUpData()
+                        
+                }, cancelHandler: nil, inputValidator: nil)
+                
+            case .dexcomShare:
+                return SettingsSelectedRowAction.askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterPassword, keyboardType: .default, text: UserDefaults.standard.dexcomSharePassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (dexcomSharePassword: String) in
+    
+                    UserDefaults.standard.dexcomSharePassword = dexcomSharePassword.toNilIfLength0()
+                        
+                    // reset all data used in the UI
+                    //self.resetLibreLinkUpData()
                         
                 }, cancelHandler: nil, inputValidator: nil)
                     
@@ -304,6 +327,10 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             case .libreLinkUp, .libreLinkUpRussia:
                 // show all sections if needed. If there is no active sensor data then just hide some of the rows
                 return UserDefaults.standard.activeSensorSerialNumber != nil ? count : count - (UserDefaults.standard.libreLinkUpPassword == nil || UserDefaults.standard.libreLinkUpEmail == nil ? 4 : 3)
+                
+            case .dexcomShare:
+                // no need to show any extra rows/settings (beyond patient name) as all Nightscout required parameters are set in the Nightscout section
+                return 5
             }
         }
     }
@@ -418,7 +445,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                         // nicely format the (incomplete) serial numbers from LibreLinkUp
                         return processLibreLinkUpSensorInfo(sn: UserDefaults.standard.activeSensorSerialNumber)
                     } else if UserDefaults.standard.libreLinkUpPreventLogin {
-                        return "⚠️ " + Texts_HomeView.libreLinkUpAccountCredentialsInvalid
+                        return "⚠️ " + Texts_HomeView.followerAccountCredentialsInvalid
                     } else {
                         return "⚠️ " + Texts_SettingsView.libreLinkUpNoActiveSensor
                     }
