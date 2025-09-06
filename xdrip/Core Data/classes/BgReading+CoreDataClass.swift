@@ -267,6 +267,15 @@ public class BgReading: NSManagedObject {
         }
         return arrow
     }
+}
 
+// MARK: - SNAPSHOT STRUCT
 
+/// Thread/Queue-safe snapshot of a BgReading (detached from Core Data)
+public struct BgReadingSnapshot: Sendable {
+    public let timeStamp: Date
+    public let calculatedValue: Double
+    public let rawData: Double
+    public let sensorID: String?
+    public let objectID: NSManagedObjectID
 }

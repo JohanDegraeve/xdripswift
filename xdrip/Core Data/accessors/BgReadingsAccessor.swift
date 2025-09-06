@@ -126,6 +126,70 @@ class BgReadingsAccessor: ObservableObject {
         return returnValue
     }
     
+    /// Snapshot variant that returns value types (thread-safe, no Core Data objects escape)
+    ///
+    /// Gives readings for which calculatedValue != 0, rawdata != 0, matching sensorid if sensorid not nil, with timestamp higher than fromDate
+    ///
+    /// - parameters:
+    ///     - limit : maximum amount of readings to return, if nil then no limit in amount
+    ///     - fromDate : reading must have date > fromDate
+    ///     - forSensor : if not nil, then only readings for the given sensor will be returned - if nil, then sensor is ignored
+    ///     - if ignoreRawData = true, then value of rawdata will be ignored
+    ///     - if ignoreCalculatedValue = true, then value of calculatedValue will be ignored
+    /// - returns: an array with 'Snapshot" readings, can be empty array.
+    ///     Order by timestamp, descending meaning the reading at index 0 is the youngest
+    func getLatestBgReadingSnapshots(limit: Int?, fromDate: Date?, forSensor sensor: Sensor?, ignoreRawData: Bool, ignoreCalculatedValue: Bool) -> [BgReadingSnapshot] {
+        var returnValue: [BgReadingSnapshot] = []
+        
+        // Core Data contexts are not thread-safe. We must run fetches/updates inside
+        // performAndWait to ensure all access happens on the context's own queue.
+        coreDataManager.mainManagedObjectContext.performAndWait {
+            let fetchRequest: NSFetchRequest<BgReading> = BgReading.fetchRequest()
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BgReading.timeStamp), ascending: false)]
+            fetchRequest.returnsObjectsAsFaults = false
+            fetchRequest.includesPropertyValues = true
+            fetchRequest.relationshipKeyPathsForPrefetching = ["sensor"]
+
+            if let fromDate = fromDate {
+                fetchRequest.predicate = NSPredicate(format: "timeStamp > %@", NSDate(timeIntervalSince1970: fromDate.timeIntervalSince1970))
+            }
+            
+            if let limit = limit, limit >= 0 {
+                fetchRequest.fetchLimit = limit
+            }
+
+            do {
+                let bgReadings = try fetchRequest.execute()
+                let sensorId = sensor?.id
+                let ignoreSensorId = (sensorId == nil)
+
+                for bgReading in bgReadings {
+                    if !ignoreSensorId {
+                        guard let fetchedSensor = bgReading.sensor, fetchedSensor.id == sensorId else { continue }
+                    }
+
+//                    let passCalc = ignoreCalculatedValue || bgReading.calculatedValue != 0.0
+//                    let passRaw  = ignoreRawData || bgReading.rawData != 0.0
+                    
+                    guard (ignoreCalculatedValue || bgReading.calculatedValue != 0.0) && (ignoreRawData || bgReading.rawData != 0.0) else { continue }
+
+                    // this is the big difference here.
+                    // Use snapshots instead of BgReading objects to avoid Core Data crashes.
+                    // They’re plain value types, detached from the context, and safe to use on any thread.
+                    returnValue.append(BgReadingSnapshot(timeStamp: bgReading.timeStamp, calculatedValue: bgReading.calculatedValue, rawData: bgReading.rawData, sensorID: bgReading.sensor?.id, objectID: bgReading.objectID))
+
+                    if let limit = limit, returnValue.count == limit { break }
+                }
+            } catch {
+                let fetchError = error as NSError
+                
+                trace("in getLatestBgReadingSnapshots, Unable to Execute BgReading Fetch Request: %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, fetchError.localizedDescription)
+            }
+        }
+
+        return returnValue
+    }
+    
     /// gets last reading, ignores rawData and calculatedValue
     /// - parameters:
     ///     - sensor: sensor for which reading is asked, if nil then sensor value is ignored
@@ -136,6 +200,15 @@ class BgReadingsAccessor: ObservableObject {
         } else {
             return nil
         }
+    }
+    
+    /// Convenience: last snapshot, ignoring value filters
+    ///
+    /// gets last reading, ignores rawData and calculatedValue
+    /// - parameters:
+    ///     - sensor: sensor for which reading is asked, if nil then sensor value is ignored
+    func lastSnapshot(forSensor sensor: Sensor?) -> BgReadingSnapshot? {
+        getLatestBgReadingSnapshots(limit: 1, fromDate: nil, forSensor: sensor, ignoreRawData: true, ignoreCalculatedValue: true).first
     }
     
     /// gets bgReadings, synchronously, in the managedObjectContext's thread
