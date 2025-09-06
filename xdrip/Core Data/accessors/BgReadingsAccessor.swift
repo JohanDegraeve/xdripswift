@@ -93,36 +93,51 @@ class BgReadingsAccessor: ObservableObject {
     ///     - if ignoreCalculatedValue = true, then value of calculatedValue will be ignored
     /// - returns: an array with readings, can be empty array.
     ///     Order by timestamp, descending meaning the reading at index 0 is the youngest
-   func getLatestBgReadings(limit:Int?, fromDate:Date?, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool) -> [BgReading] {
-        
-        var returnValue:[BgReading] = []
-        
-        let ignoreSensorId = sensor == nil ? true:false
-        
-        let bgReadings = fetchBgReadings(limit: limit, fromDate: fromDate)
-        
-        loop: for (_,bgReading) in bgReadings.enumerated() {
-            if ignoreSensorId {
-                if (bgReading.calculatedValue != 0.0 || ignoreCalculatedValue) && (bgReading.rawData != 0.0 || ignoreRawData) {
-                    returnValue.append(bgReading)
-                }
-            } else {
-                if let readingsensor = bgReading.sensor {
-                    if readingsensor.id == sensor!.id {
-                        if (bgReading.calculatedValue != 0.0 || ignoreCalculatedValue) && (bgReading.rawData != 0.0 || ignoreRawData) {
-                            returnValue.append(bgReading)
-                        }
-                    }
-                }
+
+    func getLatestBgReadings(limit: Int?, fromDate: Date?, forSensor sensor: Sensor?, ignoreRawData: Bool, ignoreCalculatedValue: Bool) -> [BgReading] {
+
+        var returnValue: [BgReading] = []
+
+        // Core Data contexts are not thread-safe. We must run fetches/updates inside
+        // performAndWait to ensure all access happens on the context's own queue.
+        coreDataManager.mainManagedObjectContext.performAndWait {
+            let fetchRequest: NSFetchRequest<BgReading> = BgReading.fetchRequest()
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BgReading.timeStamp), ascending: false)]
+            fetchRequest.returnsObjectsAsFaults = false
+            fetchRequest.includesPropertyValues = true
+            fetchRequest.relationshipKeyPathsForPrefetching = ["sensor"]
+
+            if let fromDate = fromDate {
+                fetchRequest.predicate = NSPredicate(format: "timeStamp > %@", NSDate(timeIntervalSince1970: fromDate.timeIntervalSince1970))
             }
             
-            if let limit = limit {
-                if returnValue.count == limit {
-                    break loop
+            if let limit = limit, limit >= 0 {
+                fetchRequest.fetchLimit = limit
+            }
+
+            do {
+                let bgReadings = try fetchRequest.execute()
+                let sensorId = sensor?.id
+                let ignoreSensorId = (sensorId == nil)
+
+                for bgReading in bgReadings {
+                    if !ignoreSensorId {
+                        guard let fetchedSensor = bgReading.sensor, fetchedSensor.id == sensorId else { continue }
+                    }
+                    
+                    guard (ignoreCalculatedValue || bgReading.calculatedValue != 0.0) && (ignoreRawData || bgReading.rawData != 0.0) else { continue }
+
+                    returnValue.append(bgReading)
+
+                    if let limit = limit, returnValue.count == limit { break }
                 }
+            } catch {
+                let fetchError = error as NSError
+                
+                trace("in getLatestBgReading, Unable to Execute BgReading Fetch Request: %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, fetchError.localizedDescription)
             }
         }
-        
+
         return returnValue
     }
     
@@ -167,9 +182,6 @@ class BgReadingsAccessor: ObservableObject {
                     if !ignoreSensorId {
                         guard let fetchedSensor = bgReading.sensor, fetchedSensor.id == sensorId else { continue }
                     }
-
-//                    let passCalc = ignoreCalculatedValue || bgReading.calculatedValue != 0.0
-//                    let passRaw  = ignoreRawData || bgReading.rawData != 0.0
                     
                     guard (ignoreCalculatedValue || bgReading.calculatedValue != 0.0) && (ignoreRawData || bgReading.rawData != 0.0) else { continue }
 
