@@ -252,17 +252,14 @@ class DexcomShareFollowManager: NSObject {
         
         // use the last 24 hours as maximum as per the community documentation
         let minutesBackMax = 24 * 60
-        let maxCountMax = 24 * 5
+        let maxCountMax = minutesBackMax / 5
         
         // set the default as just getting the last reading in the last 6 minutes
         var minutesBack = 6
         var maxCount = 1
         
-        // DEBUG: the bgReadingsAccessor.last() crashes due to an exception.
-        // Core Data concurrency/faulting issue and the accessor returns a data fault
-        // just forcing this to fail for now so that it defaults to full fetch for testing
-        
-        /*if let lastBgReading = bgReadingsAccessor.last(forSensor: nil) {
+        // using the snapshot method for thread-safety
+        if let lastBgReading = bgReadingsAccessor.lastSnapshot(forSensor: nil) {
             let minutesSinceLastBgReading = Int((Date().timeIntervalSince1970 - lastBgReading.timeStamp.timeIntervalSince1970)/60)
             
             guard minutesSinceLastBgReading >= 5 else {
@@ -272,7 +269,7 @@ class DexcomShareFollowManager: NSObject {
             }
             
             // if more than 5 minutes since last reading, let's adjust the fetch window
-            if minutesSinceLastBgReading > 5 {
+            if minutesSinceLastBgReading > 9 {
                 minutesBack = minutesSinceLastBgReading
                 // with one reading every 5 minutes, cap at 24 hours (288 readings)
                 maxCount = min(minutesSinceLastBgReading / 5, maxCountMax)
@@ -296,7 +293,6 @@ class DexcomShareFollowManager: NSObject {
             // DEBUG
             print("no data found, pulling 24 hours")
         }
-         */
         
         do {
             // try and fetch values based upon the number of "missing" readings since the last succesful fetch
@@ -363,6 +359,9 @@ class DexcomShareFollowManager: NSObject {
             self.dexcomShareSessionId = nil
             throw DexcomShareFollowError.sessionExpired
         }
+        
+        // store the current timestamp as a successful server connection
+        UserDefaults.standard.timeStampOfLastFollowerConnection = Date()
         
         return try JSONDecoder().decode([DexcomEGV].self, from: data)
     }
