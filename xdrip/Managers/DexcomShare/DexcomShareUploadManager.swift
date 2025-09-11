@@ -227,19 +227,18 @@ class DexcomShareUploadManager:NSObject {
         let sharedSession = URLSession.shared
 
         // Create upload Task
-        let task = sharedSession.uploadTask(with: request, from: "".data(using: .utf8), completionHandler: { (data, response, error) -> Void in
+        let task = sharedSession.uploadTask(with: request, from: "".data(using: .utf8), completionHandler: { [weak self] (data, response, error) -> Void in
+            guard let self = self else { return }
             
             trace("in startRemoteMonitoringSessionAndStartUpload, finished task", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
             
             // log the data when existing the scope
             defer {
-                if let data = data {
-                    if let dataAsString = String(bytes: data, encoding: .utf8) {
-                        trace("    data = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, dataAsString)
-                    }
+                if let data = data, let dataAsString = String(bytes: data, encoding: .utf8) {
+                    trace("    data = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, dataAsString)
                 }
             }
-
+            
             // error cases
             if let error = error {
                 trace("    error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, error.localizedDescription)
@@ -388,7 +387,8 @@ class DexcomShareUploadManager:NSObject {
             let uploadData = try JSONSerialization.data(withJSONObject: uploadDataAsDictionary, options: [])
             
             // Create upload Task
-            let task = URLSession.shared.uploadTask(with: request, from: uploadData, completionHandler: { (data, response, error) -> Void in
+            let task = URLSession.shared.uploadTask(with: request, from: uploadData, completionHandler: { [weak self] (data, response, error) -> Void in
+                guard let self = self else { return }
                 
                 trace("in uploadBgReadingsToDexcomShare, finished task", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                 
@@ -571,7 +571,8 @@ class DexcomShareUploadManager:NSObject {
             let sharedSession = URLSession.shared
             
             // Create upload Task
-            let task = sharedSession.uploadTask(with: request, from: uploadData, completionHandler: { (data, response, error) -> Void in
+            let task = sharedSession.uploadTask(with: request, from: uploadData, completionHandler: { [weak self] (data, response, error) -> Void in
+                guard let self = self else { return }
                 
                 trace("in loginAndStoreSessionId, finished task", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                 
@@ -756,5 +757,14 @@ class DexcomShareUploadManager:NSObject {
         request.setValue("Dexcom Share/3.0.2.11 CFNetwork/711.2.23 Darwin/14.0.0", forHTTPHeaderField: "User-Agent")
         
         return request
+    }
+    deinit {
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.dexcomSharePassword.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.dexcomShareAccountName.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.useUSDexcomShareurl.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.uploadReadingstoDexcomShare.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.dexcomShareUploadSerialNumber.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.dexcomShareUploadUseSchedule.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.dexcomShareUploadSchedule.rawValue)
     }
 }
