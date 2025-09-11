@@ -196,12 +196,12 @@ public final class CoreDataManager {
         }
         
         privateManagedObjectContext.performAndWait {
-            do {
-                if self.privateManagedObjectContext.hasChanges {
+            if self.privateManagedObjectContext.hasChanges {
+                do {
                     try self.privateManagedObjectContext.save()
+                } catch {
+                    trace("in saveChangesAtTermination, failed to save private context: %{public}@", log: self.log, category: ConstantsLog.categoryCoreDataManager, type: .error, error.localizedDescription)
                 }
-            } catch {
-                trace("in saveChangesAtTermination,  Unable to Save Changes of Private Managed Object Context, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryCoreDataManager, type: .info, error.localizedDescription)
             }
         }
     }
