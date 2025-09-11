@@ -38,7 +38,10 @@ class CalendarManager: NSObject {
         
         // check if createCalenderEvent is enabled in the settings and if so create calender event
         if UserDefaults.standard.createCalendarEvent  {
-            createCalendarEvent(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.createCalendarEvent(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
+            }
         }
         
     }
@@ -49,7 +52,7 @@ class CalendarManager: NSObject {
         
         // check that access to calendar is authorized by the user
         guard EKEventStore.authorizationStatus(for: .event) == .authorized else {
-            trace("in createCalendarEvent, createCalendarEvent is enabled but access to calendar is not authorized, setting UserDefaults.standard.createCalendarEvent to false", log: log, category: ConstantsLog.categoryCalendarManager, type: .info)
+            trace("in createCalendarEvent, createCalendarEvent is enabled but access to calendar is not authorized", log: log, category: ConstantsLog.categoryCalendarManager, type: .info)
             return
         }
         
@@ -64,7 +67,7 @@ class CalendarManager: NSObject {
         // example user selects 10 minutes interval, next reading will arrive in exactly 10 minutes, time interval to be checked will be 590 seconds
         if Int(Date().timeIntervalSince(timeStampLastProcessedReading)) < (UserDefaults.standard.calendarInterval * 60 - 10) {
             
-            trace("in createCalendarEvent, less than %{public}@ minutes since last event, will not create a new event", log: log, category: ConstantsLog.categoryCalendarManager, type: .info, UserDefaults.standard.calendarInterval.description)
+            trace("in createCalendarEvent, less than %{public}@ minutes since last event, will not create a new event", log: log, category: ConstantsLog.categoryCalendarManager, type: .debug, UserDefaults.standard.calendarInterval.description)
             
             return
             
@@ -75,13 +78,13 @@ class CalendarManager: NSObject {
         
         // there should be at least one reading
         guard lastReading.count > 0 else {
-            trace("in createCalendarEvent, there are no new readings to process", log: log, category: ConstantsLog.categoryCalendarManager, type: .info)
+            trace("in createCalendarEvent, there are no new readings to process", log: log, category: ConstantsLog.categoryCalendarManager, type: .debug)
             return
         }
         
         // latest reading should be less than 5 minutes old
         guard abs(lastReading[0].timeStamp.timeIntervalSinceNow) < 5 * 60 else {
-            trace("in createCalendarEvent, the latest reading is older than 5 minutes", log: log, category: ConstantsLog.categoryCalendarManager, type: .info)
+            trace("in createCalendarEvent, the latest reading is older than 5 minutes", log: log, category: ConstantsLog.categoryCalendarManager, type: .debug)
             return        }
         
         // time to delete any existing events
