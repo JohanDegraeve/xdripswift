@@ -178,7 +178,7 @@ class LibreLinkUpFollowManager: NSObject {
     @objc public func download() {
         trace("in download", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
         
-        if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow > 15 {
+        if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? .distantPast).timeIntervalSinceNow < -15 {
             trace("    setting nightscoutSyncRequired to true, this will also initiate a treatments/devicestatus sync", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
             
             UserDefaults.standard.timeStampLatestNightscoutSyncRequest = .now
@@ -257,8 +257,9 @@ class LibreLinkUpFollowManager: NSObject {
                         
                         self.processDownloadResponse(data: glucoseMeasurementsArray, followGlucoseDataArray: &followGlucoseDataArray)
                         
-                        // call to delegate and rescheduling the timer must be done in main thread;
-                        DispatchQueue.main.sync {
+                        // call to delegate and rescheduling the timer must be done in main thread
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else { return }
                             // call delegate followerInfoReceived which will process the new readings
                             if let followerDelegate = self.followerDelegate {
                                 followerDelegate.followerInfoReceived(followGlucoseDataArray: &followGlucoseDataArray)
@@ -275,7 +276,8 @@ class LibreLinkUpFollowManager: NSObject {
             
             // rescheduling the timer must be done in main thread
             // we do it here at the end of the function so that it is always rescheduled once a valid connection is established, irrespective of whether we get values.
-            DispatchQueue.main.sync {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
                 // schedule new download
                 self.scheduleNewDownload()
             }
@@ -456,7 +458,6 @@ class LibreLinkUpFollowManager: NSObject {
             throw LibreLinkUpFollowError.urlErrorLogin
         }
         
-        print(loginUrl.description)
         trace("    in requestLogin, processing login request with URL: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, loginUrl)
         
         guard let url = URL(string: loginUrl) else {
@@ -626,30 +627,27 @@ class LibreLinkUpFollowManager: NSObject {
     private func processDownloadResponse(data: [RequestGraphResponseGlucoseMeasurement?], followGlucoseDataArray: inout [FollowerBgReading]) {
         // if data not nil then check if response is nil
         if !data.isEmpty {
-            let bgReadings = data.enumerated()
-            
-            for (_, element) in bgReadings {
-                if let followGlucoseData = FollowerBgReading(entry: element!) {
-                    // insert entry chronologically sorted, first is the youngest
-                    if followGlucoseDataArray.count == 0 {
+            for element in data {
+                guard let gm = element, let followGlucoseData = FollowerBgReading(entry: gm) else { continue }
+                // insert entry chronologically sorted, first is the youngest
+                if followGlucoseDataArray.isEmpty {
+                    followGlucoseDataArray.append(followGlucoseData)
+                } else {
+                    var elementInserted = false
+                    loop: for (index, existing) in followGlucoseDataArray.enumerated() {
+                        if existing.timeStamp < followGlucoseData.timeStamp {
+                            followGlucoseDataArray.insert(followGlucoseData, at: index)
+                            elementInserted = true
+                            break loop
+                        }
+                    }
+                    if !elementInserted {
                         followGlucoseDataArray.append(followGlucoseData)
-                    } else {
-                        var elementInserted = false
-                        loop: for (index, element) in followGlucoseDataArray.enumerated() {
-                            if element.timeStamp < followGlucoseData.timeStamp {
-                                followGlucoseDataArray.insert(followGlucoseData, at: index)
-                                elementInserted = true
-                                break loop
-                            }
-                        }
-                        if !elementInserted {
-                            followGlucoseDataArray.append(followGlucoseData)
-                        }
                     }
                 }
             }
         } else {
-            trace("    data is nil", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error)
+            trace("    no glucose measurement elements to process", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error)
         }
     }
     
@@ -679,11 +677,10 @@ class LibreLinkUpFollowManager: NSObject {
         let interval = UserDefaults.standard.followerBackgroundKeepAliveType == .normal ? ConstantsSuspensionPrevention.intervalNormal : ConstantsSuspensionPrevention.intervalAggressive
         
         // create playSoundTimer depending on the keep-alive type selected
-        self.playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(interval)), eventHandler: {
+        self.playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(interval)), eventHandler: { [weak self] in
+            guard let self = self else { return }
             // play the sound
-            
             trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
-            
             if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
                 trace("playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, interval.description, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
                 audioPlayer.play()
@@ -691,7 +688,8 @@ class LibreLinkUpFollowManager: NSObject {
         })
         
         // schedulePlaySoundTimer needs to be created when app goes to background
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: self.applicationManagerKeyResumePlaySoundTimer, closure: {
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: self.applicationManagerKeyResumePlaySoundTimer, closure: { [weak self] in
+            guard let self = self else { return }
             if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
                 if let playSoundTimer = self.playSoundTimer {
                     playSoundTimer.resume()
@@ -703,7 +701,8 @@ class LibreLinkUpFollowManager: NSObject {
         })
         
         // schedulePlaySoundTimer needs to be invalidated when app goes to foreground
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeySuspendPlaySoundTimer, closure: {
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeySuspendPlaySoundTimer, closure: { [weak self] in
+            guard let self = self else { return }
             if let playSoundTimer = self.playSoundTimer {
                 playSoundTimer.suspend()
             }
@@ -733,6 +732,20 @@ class LibreLinkUpFollowManager: NSObject {
                 invalidateDownLoadTimerClosure()
             }
         }
+    }
+    
+    deinit {
+        // clean observers to avoid KVO crashes
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.libreLinkUpEmail.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.libreLinkUpPassword.rawValue)
+
+        // stop keep-alive helpers
+        disableSuspensionPrevention()
+
+        // invalidate any pending download timer
+        invalidateDownLoadTimerClosure?()
     }
     
     // MARK: - overriden function
