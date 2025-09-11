@@ -79,7 +79,7 @@ class DexcomShareFollowManager: NSObject {
                 self.audioPlayer = try AVAudioPlayer(contentsOf: url)
                 
             } catch {
-                trace("in init, exception while trying to create audoplayer, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, error.localizedDescription)
+                trace("in init, exception while trying to create audoplayer, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .error, error.localizedDescription)
             }
         }
         
@@ -100,7 +100,7 @@ class DexcomShareFollowManager: NSObject {
     
     // MARK: - public functions
     
-    /// creates a bgReading for reading downloaded from LibreLinkUp
+    /// creates a bgReading for a reading downloaded from Dexcom Share
     /// - parameters:
     ///     - followGlucoseData : glucose data from which new BgReading needs to be created
     /// - returns:
@@ -145,14 +145,19 @@ class DexcomShareFollowManager: NSObject {
     
     /// schedule new download with timer, when timer expires download() will be called
     private func scheduleNewDownload() {
-        
         guard UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
-        
-        trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info)
-        
+
+        // invalidate any previously scheduled download timer before creating a new one
+        if let invalidateDownLoadTimerClosure = invalidateDownLoadTimerClosure {
+            invalidateDownLoadTimerClosure()
+            self.invalidateDownLoadTimerClosure = nil
+        }
+
+        trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug)
+
         // schedule a timer for 60 seconds and assign it to a let property
         let downloadTimer = Timer.scheduledTimer(timeInterval: 60, target: self, selector: #selector(self.download), userInfo: nil, repeats: false)
-        
+
         // assign invalidateDownLoadTimerClosure to a closure that will invalidate the downloadTimer
         self.invalidateDownLoadTimerClosure = {
             downloadTimer.invalidate()
@@ -161,46 +166,49 @@ class DexcomShareFollowManager: NSObject {
     
     /// download recent readings from Dexcom Share, send result to delegate, and schedule new download
     @objc public func download() {
-        trace("in download", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
-        
-        if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow > 15 {
-            trace("    setting nightscoutSyncRequired to true, this will also initiate a treatments/devicestatus sync", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info)
-            
+        trace("in download", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug)
+
+        if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? .distantPast).timeIntervalSinceNow < -15 {
+            trace("    setting nightscoutSyncRequired to true, this will also initiate a treatments/devicestatus sync", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug)
             UserDefaults.standard.timeStampLatestNightscoutSyncRequest = .now
             UserDefaults.standard.nightscoutSyncRequired = true
         }
-        
+
         guard !UserDefaults.standard.isMaster else {
-            trace("    not follower", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info)
+            trace("    not follower", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug)
             return
         }
-        
+
         guard UserDefaults.standard.followerDataSourceType == .dexcomShare else {
-            trace("    followerDataSourceType is not Dexcom Share", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info)
+            trace("    followerDataSourceType is not Dexcom Share", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug)
             return
         }
-        
+
         guard let username = UserDefaults.standard.dexcomShareAccountName, let password = UserDefaults.standard.dexcomSharePassword else { return }
-        
-//        Task.detached { [weak self] in
-//            guard let self = self else { return }
-            
-        Task {
+
+        Task { [weak self] in
+            guard let self = self else { return }
             do {
                 // try and download, if it returns nil it's because we need to login
                 if (try? await self.downloadAndProcessEGVs()) == nil {
-                    // re-login once then fetch
-                    try await login(username: username, password: password)
-                    
+                    try await self.login(username: username, password: password)
                     _ = try await self.downloadAndProcessEGVs() // ignore returned array here; delegate call happens inside
+                }
+            } catch DexcomShareFollowError.sessionExpired {
+                // re-login once and retry on expired session
+                do {
+                    try await self.login(username: username, password: password)
+                    _ = try await self.downloadAndProcessEGVs()
+                } catch {
+                    trace("    in download, session expired and re-login failed: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .error, error.localizedDescription)
                 }
             } catch {
                 trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .error, error.localizedDescription)
             }
-            
             // rescheduling the timer must be done in main thread
             // we do it here at the end of the function so that it is always rescheduled once a valid connection is established, irrespective of whether we get values.
-            DispatchQueue.main.sync {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
                 // schedule new download
                 self.scheduleNewDownload()
             }
@@ -226,9 +234,9 @@ class DexcomShareFollowManager: NSObject {
         let (data, response) = try await URLSession.shared.data(for: request)
         let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
         
-        trace("    in login, server response status code: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info, statusCode.description)
-        
-        trace("    in login, server response: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info, String(data: data, encoding: String.Encoding.utf8) ?? "nil")
+        trace("    in login, server response status code: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, statusCode.description)
+
+        trace("    in login, server response: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, String(data: data, encoding: String.Encoding.utf8) ?? "nil")
         
         if statusCode >= 400 {
             throw DexcomShareFollowError.loginFailed
@@ -263,8 +271,7 @@ class DexcomShareFollowManager: NSObject {
             let minutesSinceLastBgReading = Int((Date().timeIntervalSince1970 - lastBgReading.timeStamp.timeIntervalSince1970)/60)
             
             guard minutesSinceLastBgReading >= 5 else {
-                // DEBUG
-                print("last BG readings was \(minutesSinceLastBgReading) minute(s) ago -> aborting fetch")
+                trace("    last BG reading was %{public}@ minute(s) ago -> aborting fetch", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, minutesSinceLastBgReading)
                 return []
             }
             
@@ -274,13 +281,9 @@ class DexcomShareFollowManager: NSObject {
                 // with one reading every 5 minutes, cap at 24 hours (288 readings)
                 maxCount = min(minutesSinceLastBgReading / 5, maxCountMax)
                 
-                trace("    in downloadAndProcessEGVs, last BG reading was %{public}@ minutes ago. Widening window to request %{public}@ previous readings to backfill", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info, minutesSinceLastBgReading, maxCount)
-                
-                // DEBUG
-                print("in downloadAndProcessEGVs, last BG reading was \(minutesSinceLastBgReading) minutes ago. Widening window to request \(maxCount) previous readings to backfill")
+                trace("    last BG reading was %{public}@ minutes ago. Widening window to request %{public}@ previous readings to backfill", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, minutesSinceLastBgReading, maxCount)
             } else {
-                // DEBUG
-                print("no changes made, just going to pull the last \(maxCount) readings")
+                trace("    no changes made, just going to pull the last %{public}@ readings", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, maxCount)
             }
         } else {
             // this will only usually happen if no BG readings are in core data,
@@ -288,10 +291,8 @@ class DexcomShareFollowManager: NSObject {
             minutesBack = minutesBackMax
             maxCount = maxCountMax
             
-            trace("    in downloadAndProcessEGVs, no previous BG values so will fetch 24 hours of data", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info)
-            
-            // DEBUG
-            print("no data found, pulling 24 hours")
+            trace("    in downloadAndProcessEGVs, no previous BG values so will fetch 24 hours of data", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug)
+            trace("    no data found, pulling 24 hours", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug)
         }
         
         do {
@@ -319,10 +320,14 @@ class DexcomShareFollowManager: NSObject {
             // sort by newest first
             followGlucoseDataArray.sort { $0.timeStamp > $1.timeStamp }
             
-            // Dispatch to delegate on main thread
-            DispatchQueue.main.sync {
+            // Dispatch to delegate on main thread (use a local copy for the inout parameter)
+            let localCopy = followGlucoseDataArray
+            
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
                 if let followerDelegate = self.followerDelegate {
-                    followerDelegate.followerInfoReceived(followGlucoseDataArray: &followGlucoseDataArray)
+                    var array = localCopy
+                    followerDelegate.followerInfoReceived(followGlucoseDataArray: &array)
                 }
             }
             
@@ -335,9 +340,9 @@ class DexcomShareFollowManager: NSObject {
     
     private func downloadLatestEGVs(minutes: Int = 1440, maxCount: Int = 3) async throws -> [DexcomEGV] {
         guard let dexcomShareSessionId else { throw DexcomShareFollowError.noSessionID }
-        guard let dexcomShareUrl = URL(string: dexcomShareUrlString) else { throw DexcomShareFollowError.urlError }
-        
-        var components = URLComponents(url: dexcomShareUrl.appendingPathComponent("/Publisher/ReadPublisherLatestGlucoseValues"), resolvingAgainstBaseURL: false)!
+        guard let baseURL = URL(string: dexcomShareUrlString) else { throw DexcomShareFollowError.urlError }
+        guard let componentsInitial = URLComponents(url: baseURL.appendingPathComponent("/Publisher/ReadPublisherLatestGlucoseValues"), resolvingAgainstBaseURL: false) else { throw DexcomShareFollowError.urlError }
+        var components = componentsInitial
         
         components.queryItems = [
             .init(name: "sessionId", value: dexcomShareSessionId),
@@ -345,7 +350,8 @@ class DexcomShareFollowManager: NSObject {
             .init(name: "maxCount", value: String(maxCount))
         ]
         
-        var request = URLRequest(url: components.url!)
+        guard let url = components.url else { throw DexcomShareFollowError.urlError }
+        var request = URLRequest(url: url)
         
         request.httpMethod = "POST"
         request.addValue("application/json", forHTTPHeaderField: "Accept")
@@ -385,7 +391,7 @@ class DexcomShareFollowManager: NSObject {
     private func enableSuspensionPrevention() {
         // if keep-alive is disabled or if using a heartbeat, then just return and do nothing
         if !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-            print("not enabling suspension prevention as keep-alive type is:  \(UserDefaults.standard.followerBackgroundKeepAliveType.description)")
+            trace("not enabling suspension prevention as keep-alive type is: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .debug, UserDefaults.standard.followerBackgroundKeepAliveType.description)
             
             return
         }
@@ -393,19 +399,19 @@ class DexcomShareFollowManager: NSObject {
         let interval = UserDefaults.standard.followerBackgroundKeepAliveType == .normal ? ConstantsSuspensionPrevention.intervalNormal : ConstantsSuspensionPrevention.intervalAggressive
         
         // create playSoundTimer depending on the keep-alive type selected
-        self.playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(interval)), eventHandler: {
+        self.playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(interval)), eventHandler: { [weak self] in
+            guard let self = self else { return }
             // play the sound
-            
-            trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
-            
+            trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info)
             if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                trace("playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, interval.description, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
+                trace("playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .info, interval.description, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
                 audioPlayer.play()
             }
         })
         
         // schedulePlaySoundTimer needs to be created when app goes to background
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: self.applicationManagerKeyResumePlaySoundTimer, closure: {
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: self.applicationManagerKeyResumePlaySoundTimer, closure: { [weak self] in
+            guard let self = self else { return }
             if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
                 if let playSoundTimer = self.playSoundTimer {
                     playSoundTimer.resume()
@@ -417,7 +423,8 @@ class DexcomShareFollowManager: NSObject {
         })
         
         // schedulePlaySoundTimer needs to be invalidated when app goes to foreground
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeySuspendPlaySoundTimer, closure: {
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: self.applicationManagerKeySuspendPlaySoundTimer, closure: { [weak self] in
+            guard let self = self else { return }
             if let playSoundTimer = self.playSoundTimer {
                 playSoundTimer.suspend()
             }
@@ -462,6 +469,20 @@ class DexcomShareFollowManager: NSObject {
         }
         
         return nil
+    }
+    
+    deinit {
+        // remove UserDefaults observers to avoid KVO crashes
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.dexcomShareAccountName.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.dexcomSharePassword.rawValue)
+        
+        // stop keep-alive helpers
+        self.disableSuspensionPrevention()
+        
+        // invalidate any pending download timer
+        self.invalidateDownLoadTimerClosure?()
     }
     
     // MARK: - overriden function
