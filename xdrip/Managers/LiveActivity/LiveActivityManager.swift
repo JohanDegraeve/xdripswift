@@ -52,14 +52,14 @@ extension LiveActivityManager {
             if eventActivity == nil {
                 startActivity(contentState: contentState)
                 trace("in runActivity, starting new live activity", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
-            } else if forceRestart, eventStartDate < Date().addingTimeInterval(-ConstantsLiveActivity.allowLiveActivityRestartAfterMinutes) {
+            } else if forceRestart, eventStartDate < Date().addingTimeInterval(-ConstantsLiveActivity.allowLiveActivityRestartAfterSeconds) {
                 // force an end/start cycle of the activity when the app comes to the foreground assuming at least 'x' hours have passed. This restarts the 8 hour limit.
                 Task {
                     await endActivity()
                     startActivity(contentState: contentState)
                 }
                 trace("in runActivity, restarting live activity", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
-            } else if eventStartDate < Date().addingTimeInterval(-ConstantsLiveActivity.endLiveActivityAfterMinutes) {
+            } else if eventStartDate < Date().addingTimeInterval(-ConstantsLiveActivity.endLiveActivityAfterSeconds) {
                 // if the activity has been running for almost 8 hours, proactively end the activity before it goes stale
                 Task {
                     await endActivity()
@@ -70,7 +70,7 @@ extension LiveActivityManager {
                 Task {
                     await updateActivity(to: contentState)
                 }
-                trace("in runActivity, updating live activity", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+                trace("in runActivity, updating live activity", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .debug)
             }
         } else {
             trace("in runActivity, live activities are disabled in the iPhone Settings or permission has not been given.", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
@@ -98,7 +98,7 @@ extension LiveActivityManager {
         
         Task {
             for activity in Activity<XDripWidgetAttributes>.activities {
-                trace("Ending live activity: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, String(describing: eventActivity?.id))
+                trace("Ending live activity: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, String(describing: activity.id))
                 
                 await activity.end(nil, dismissalPolicy: .immediate)
             }
@@ -132,7 +132,7 @@ extension LiveActivityManager {
             
             trace("new live activity started: %{public}@", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info, String(describing: eventActivity?.id))
         } catch {
-            trace("error: %{public}@", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info, error.localizedDescription)
+            trace("error: %{public}@", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .error, error.localizedDescription)
         }
     }
     
@@ -152,7 +152,7 @@ extension LiveActivityManager {
             var updatedContentState = contentState
             
             // if the event was started more than 'x' time ago, then let's inform the user that the live activity will soon end so that they open the app
-            updatedContentState.warnUserToOpenApp = eventStartDate < Date().addingTimeInterval(-ConstantsLiveActivity.warnLiveActivityAfterMinutes) ? true : false
+            updatedContentState.warnUserToOpenApp = eventStartDate < Date().addingTimeInterval(-ConstantsLiveActivity.warnLiveActivityAfterSeconds) ? true : false
             
             // update the persistent content state with the new/updated content state
             persistentContentState = updatedContentState
@@ -167,7 +167,7 @@ extension LiveActivityManager {
             Task {
                 for activity in Activity<XDripWidgetAttributes>.activities {
                     await activity.end(nil, dismissalPolicy: .immediate)
-                    trace("Ending live activity: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, String(describing: eventActivity?.id))
+                    trace("Ending live activity: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, String(describing: activity.id))
                 }
             }
             eventActivity = nil
