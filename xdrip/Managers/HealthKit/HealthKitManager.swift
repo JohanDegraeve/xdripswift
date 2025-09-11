@@ -88,6 +88,8 @@ public class HealthKitManager:NSObject {
             break
         @unknown default:
             trace("unknown authorizationstatus for healthkit - HealthKitManager.swift", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error)
+            UserDefaults.standard.storeReadingsInHealthkitAuthorized = false
+            return false
         }
         
         // all checks ok , return true
@@ -120,14 +122,13 @@ public class HealthKitManager:NSObject {
                 // store the timestamp of the last reading to upload, here in the main thread, because we use a bgReading for it, which is retrieved in the main mangedObjectContext
                 let timeStampLastReadingToUpload = bgReading.timeStamp
                 
-                healthStore.save(sample, withCompletion: {
+                healthStore.save(sample, withCompletion: { [weak self]
                     (success:Bool, error:Error?) in
+                    guard let self = self else { return }
                     if success {
                         UserDefaults.standard.timeStampLatestHealthKitStoreBgReading = timeStampLastReadingToUpload
-                    } else {
-                        if let error = error {
-                            trace("failed store reading in healthkit, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, error.localizedDescription)
-                        }
+                    } else if let error = error {
+                        trace("failed store reading in healthkit, error = %{public}@", log: self.log, category: ConstantsLog.categoryHealthKitManager, type: .error, error.localizedDescription)
                     }
                 })
             }
@@ -163,5 +164,10 @@ public class HealthKitManager:NSObject {
                 }
             }
         }
+    }
+    
+    deinit {
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.storeReadingsInHealthkitAuthorized.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.storeReadingsInHealthkit.rawValue)
     }
 }
