@@ -145,19 +145,28 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         // backfill should not contain at leats the latest reading, and possibly also real backfill data
         // this is the right moment to send it to the delegate
         
-        // sort backfill, first element should be youngest
-        backfill = backfill.sorted(by: { $0.timeStamp > $1.timeStamp })
-        
-        // send glucoseData to cgmTransmitterDelegate
-        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &backfill, transmitterBatteryInfo: nil, sensorAge: sensorAge)
-
-        // set timeStampLastReading to timestamp of the most recent reading, which is the first
-        if let firstReading = backfill.first {
-            timeStampLastReading = firstReading.timeStamp
+        // if nothing to deliver, skip
+        if backfill.isEmpty == false {
+            // sort backfill, first element should be youngest
+            backfill = backfill.sorted(by: { $0.timeStamp > $1.timeStamp })
+            
+            // send glucoseData to cgmTransmitterDelegate on main (UI/Core Data safety); use a local copy for inout
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                
+                var copy = self.backfill
+                self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
+            }
+            
+            // set timeStampLastReading to timestamp of the most recent reading, which is the first
+            if let firstReading = backfill.first {
+                timeStampLastReading = firstReading.timeStamp
+            }
+            
+            // reset backfill
+            backfill = [GlucoseData]()
         }
-        
-        // reset backfill
-        backfill = [GlucoseData]()
+
         
         // setting characteristics to nil, they will be reinitialized at next connect
         writeControlCharacteristic = nil
@@ -254,15 +263,24 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                 if let timeStampLastReading = timeStampLastReading {
                     if abs(timeStampLastReading.timeIntervalSinceNow) < 330.0 {
                         var newGlucoseDataArray = [newGlucoseData]
-                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &newGlucoseDataArray, transmitterBatteryInfo: nil, sensorAge: sensorAge)
+                        
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else { return }
+                            
+                            var copy = newGlucoseDataArray
+                            self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
+                        }
                     }
                 }
                 
-                // send algorithm status of the transmitter to cGMG7TransmitterDelegate
-                cGMG7TransmitterDelegate?.received(sensorStatus: g7GlucoseMessage.algorithmStatus.description, cGMG7Transmitter: self)
-                
-                // send sensorStartDate to cGMG7TransmitterDelegate
-                cGMG7TransmitterDelegate?.received(sensorStartDate: Date(timeIntervalSinceNow: -g7GlucoseMessage.sensorAge), cGMG7Transmitter: self)
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    
+                    self.cGMG7TransmitterDelegate?.received(sensorStatus: g7GlucoseMessage.algorithmStatus.description, cGMG7Transmitter: self)
+                    
+                    // send sensorStartDate to cGMG7TransmitterDelegate
+                    self.cGMG7TransmitterDelegate?.received(sensorStartDate: Date(timeIntervalSinceNow: -g7GlucoseMessage.sensorAge), cGMG7Transmitter: self)
+                }
                         
             case .backfillFinished:
                 
@@ -301,7 +319,11 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                     
                     trace("Connected to Dexcom G7 that is paired and authenticated by other app. Will stay connected to this one.", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
                     
-                    bluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: self)
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        
+                        self.bluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: self)
+                    }
                     
                     cancelAuthenticationTimer()
                     
@@ -351,14 +373,17 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
             for characteristic in characteristics {
                 trace("    characteristic: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, String(describing: characteristic.uuid))
                 
-                    peripheral.setNotifyValue(true, for: characteristic)
+                setNotifyValue(true, for: characteristic)
                 
-                    if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue) {
+                if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue) {
                     
-                        // this is the authentication characteristic, if the authentication is not successful within 2 seconds, then this is not the device that is currently being used by the official dexcom app, so let's forget it
-                        authenticationTimeOutTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(authenticationFailed), userInfo: nil, repeats: false)
-                    
+                    // this is the authentication characteristic, if the authentication is not successful within 2 seconds, then this is not the device that is currently being used by the official dexcom app, so let's forget it
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        self.authenticationTimeOutTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(CGMG7Transmitter.authenticationFailed), userInfo: nil, repeats: false)
                     }
+                    
+                }
 
             }
         } else {

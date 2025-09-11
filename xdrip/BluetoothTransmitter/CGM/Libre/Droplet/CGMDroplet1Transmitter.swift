@@ -86,7 +86,9 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
             
             // if firstfield equals "000000" or "000999" then sensor detection failure - inform delegate and return
             guard firstField != "000000" && firstField != "000999" else {
-                cgmTransmitterDelegate?.sensorNotDetected()
+                DispatchQueue.main.async { [weak self] in
+                    self?.cgmTransmitterDelegate?.sensorNotDetected()
+                }
                 return
             }
             
@@ -113,12 +115,14 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
                 return
             }
             
-            // send glucoseDataArray, transmitterBatteryInfo and sensorAge to cgmTransmitterDelegate
+            // send glucoseDataArray, transmitterBatteryInfo and sensorAge to cgmTransmitterDelegate (main thread)
             var glucoseDataArray = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: rawValueAsDouble)]
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorAge: TimeInterval(minutes: Double(sensorAgeInMinutes * 10) ))
-            
-            // send transmitterBatteryInfo to delegate
-            cGMDropletTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                var copy = glucoseDataArray
+                self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorAge: TimeInterval(minutes: Double(sensorAgeInMinutes * 10)))
+                self.cGMDropletTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
+            }
 
         } else {
             trace("    value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .error)

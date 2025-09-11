@@ -144,9 +144,10 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
                 actualSerialNumber = String(data: value, encoding: String.Encoding.utf8)
                 
                 if let actualSerialNumber = actualSerialNumber {
-
-                    cGMGNSEntryTransmitterDelegate?.received(serialNumber: actualSerialNumber, from: self)
-
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        self.cGMGNSEntryTransmitterDelegate?.received(serialNumber: actualSerialNumber, from: self)
+                    }
                 }
 
             case .CBUUID_Firmware:
@@ -154,9 +155,10 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
                 actualFirmWareVersion = String(data: value, encoding: String.Encoding.utf8)
 
                 if let actualFirmWareVersion = actualFirmWareVersion {
-                    
-                    cGMGNSEntryTransmitterDelegate?.received(firmwareVersion: actualFirmWareVersion, from: self)
-                    
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        self.cGMGNSEntryTransmitterDelegate?.received(firmwareVersion: actualFirmWareVersion, from: self)
+                    }
                 }
                 
             case .CBUUID_Bootloader:
@@ -164,9 +166,10 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
                 actualBootLoader = String(data: value, encoding: String.Encoding.utf8)
 
                 if let actualBootLoader = actualFirmWareVersion {
-                    
-                    cGMGNSEntryTransmitterDelegate?.received(bootLoader: actualBootLoader, from: self)
-                    
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        self.cGMGNSEntryTransmitterDelegate?.received(bootLoader: actualBootLoader, from: self)
+                    }
                 }
                 
             case .CBUUID_BatteryLevel:
@@ -229,7 +232,11 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
                         i = i + 1
                     }
                     
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &readings, transmitterBatteryInfo: nil, sensorAge: TimeInterval(minutes: Double(sensorElapsedTimeInMinutes)))
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        var copy = readings
+                        self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: TimeInterval(minutes: Double(sensorElapsedTimeInMinutes)))
+                    }
                     
                 }
             }

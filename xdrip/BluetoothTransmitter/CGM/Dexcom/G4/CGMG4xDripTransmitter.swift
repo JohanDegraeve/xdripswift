@@ -106,11 +106,20 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
                     
                     transmitterBatteryInfo = TransmitterBatteryInfo.DexcomG4(level: level)
                     
-                    cGMDexcomG4TransmitterDelegate?.received(batteryLevel: level, from: self)
+                    // delegate may touch UI/Core Data → ensure main thread
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        self.cGMDexcomG4TransmitterDelegate?.received(batteryLevel: level, from: self)
+                    }
                     
                 }
                 
-                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorAge: nil)
+                // deliver glucose data to delegate on main; use a local copy for inout
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    var copy = glucoseDataArray
+                    self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: transmitterBatteryInfo, sensorAge: nil)
+                }
                 
             }
             
@@ -146,10 +155,20 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
                     
                     transmitterBatteryInfo = TransmitterBatteryInfo.DexcomG4(level: level)
                     
-                    cGMDexcomG4TransmitterDelegate?.received(batteryLevel: level, from: self)
+                    // delegate may touch UI/Core Data → ensure main thread
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        self.cGMDexcomG4TransmitterDelegate?.received(batteryLevel: level, from: self)
+                    }
                     
                 }
-                cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transmitterBatteryInfo, sensorAge: nil)
+                
+                // deliver glucose data to delegate on main; use a local copy for inout
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    var copy = glucoseDataArray
+                    self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: transmitterBatteryInfo, sensorAge: nil)
+                }
             }
         }
         

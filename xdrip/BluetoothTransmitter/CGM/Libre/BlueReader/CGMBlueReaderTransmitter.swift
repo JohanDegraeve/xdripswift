@@ -112,9 +112,13 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
             //    transMitterBatteryInfo = TransmitterBatteryInfo.percentage(percentage: batteryLevelAsInt)
             //}
             
-            // send to delegate
+            // send to delegate (UI/Core Data) on main thread
             var glucoseDataArray = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: rawDataAsDouble)]
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transMitterBatteryInfo, sensorAge: nil)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                var copy = glucoseDataArray
+                self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: transMitterBatteryInfo, sensorAge: nil)
+            }
             
         } else {
             trace("    value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMBlueReader, type: .error)

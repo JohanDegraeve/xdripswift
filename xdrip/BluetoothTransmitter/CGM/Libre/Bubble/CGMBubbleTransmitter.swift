@@ -178,13 +178,15 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         let firmware = value[2].description + "." + value[3].description
                         let batteryPercentage = Int(value[4])
                         
-                        // send firmware, hardware and battery to delegeate
-                        cGMBubbleTransmitterDelegate?.received(firmware: firmware, from: self)
-                        cGMBubbleTransmitterDelegate?.received(hardware: hardware, from: self)
-                        cGMBubbleTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
-                        
-                        // send batteryPercentage to delegate
-                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorAge: nil)
+                        // send firmware, hardware and battery to delegate on main
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else { return }
+                            self.cGMBubbleTransmitterDelegate?.received(firmware: firmware, from: self)
+                            self.cGMBubbleTransmitterDelegate?.received(hardware: hardware, from: self)
+                            self.cGMBubbleTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
+                            var empty = self.emptyArray
+                            self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &empty, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorAge: nil)
+                        }
                         
                         // store received firmware local
                         self.firmware = firmware
@@ -290,10 +292,11 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                     
                                     // inform cgmTransmitterDelegate about new sensor detected
                                     // assign sensorStartDate, for this type of transmitter the sensorAge is passed in another call to cgmTransmitterDelegate
-                                    cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
-
-                                    // inform cGMBubbleTransmitterDelegate about new sensor detected
-                                    cGMBubbleTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
+                                    DispatchQueue.main.async { [weak self] in
+                                        guard let self = self else { return }
+                                        self.cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
+                                        self.cGMBubbleTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
+                                    }
                                     
                                 }
 
@@ -302,9 +305,12 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                             libreDataParser.libreDataProcessor(libreSensorSerialNumber: libreSensorSerialNumber?.serialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, libreData:  (rxBuffer.subdata(in: bubbleHeaderLength..<(344 + bubbleHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: nil) { (sensorState: LibreSensorState?, xDripError: XdripError?) in
                                 
                                 self.lastGlucoseDate = Date()
-
+                                
                                 if let sensorState = sensorState {
-                                    self.cGMBubbleTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
+                                    DispatchQueue.main.async { [weak self] in
+                                        guard let self = self else { return }
+                                        self.cGMBubbleTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
+                                    }
                                 }
                             }
                             lastDataTime=Date().timeIntervalSince1970
@@ -315,9 +321,11 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         
                     case .noSensor:
                         if(Date().timeIntervalSince1970-lastDataTime>10000){
-                            cgmTransmitterDelegate?.sensorNotDetected()
+                            DispatchQueue.main.async { [weak self] in
+                                self?.cgmTransmitterDelegate?.sensorNotDetected()
+                            }
                         }
-                      
+                        
                         
                     case .patchInfo:
                         if value.count >= 10 {
@@ -330,7 +338,10 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
 
                             // send libreSensorType to delegate
                             if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
-                                cGMBubbleTransmitterDelegate?.received(libreSensorType: libreSensorType, from: self)
+                                DispatchQueue.main.async { [weak self] in
+                                    guard let self = self else { return }
+                                    self.cGMBubbleTransmitterDelegate?.received(libreSensorType: libreSensorType, from: self)
+                                }
                             }
                             
                             // we have the patchInfo now, so recalculate the sensorSerialNumber
