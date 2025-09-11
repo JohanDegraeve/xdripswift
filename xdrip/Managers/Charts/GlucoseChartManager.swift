@@ -983,7 +983,7 @@ public class GlucoseChartManager {
             // in the comments, assume it is now 13:26 and width is 6 hours, that means startDate = 07:26, endDate = 13:26
             
             /// how many full hours between startdate and enddate
-            let amountOfFullHours = Int(ceil(endDate.timeIntervalSince(startDate).hours))
+            let amountOfFullHours = max(1, Int(ceil(endDate.timeIntervalSince(startDate).hours)))
             
             /// create array that goes from 1 to number of full hours, as helper to map to array of ChartAxisValueDate - array will go from 1 to 6
             let mappingArray = Array(1...amountOfFullHours)
@@ -1398,12 +1398,25 @@ public class GlucoseChartManager {
                             
                             // find the max basal rate on the chart so that we can scale everything to fit up until the minimum bg value (40mg/dL)
                             // we'll also use the max scheduled basal rate values if bigger
-                            basalRateMaximum = max(basalHistoryTreatmentEntries.max(by: { $0.value < $1.value })?.value ?? 0, scheduledBasalRatesArray.max(by: { $0.value < $1.value })?.value ?? 0)
-                            basalRateScaler = (ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl - minimumChartValueInMgdl) / basalRateMaximum
-                            
+                            basalRateMaximum = max(
+                                basalHistoryTreatmentEntries.max(by: { $0.value < $1.value })?.value ?? 0,
+                                scheduledBasalRatesArray.max(by: { $0.value < $1.value })?.value ?? 0
+                            )
+
+                            if basalRateMaximum > 0 {
+                                basalRateScaler = (ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl - minimumChartValueInMgdl) / basalRateMaximum
+                            } else {
+                                basalRateScaler = 0
+                            }
+
                             trace("in getTreatmentChartPoints, initial calculated max basal = %{public}@, basal scaler = %{public}@", log: self.oslog, category: ConstantsLog.categoryGlucoseChartManager, type: .info, basalRateMaximum.description, basalRateScaler.description)
                         } else if basalRateTreatment.value > basalRateMaximum {
-                            basalRateScaler = (ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl - minimumChartValueInMgdl) / basalRateMaximum
+                            basalRateMaximum = basalRateTreatment.value
+                            if basalRateMaximum > 0 {
+                                basalRateScaler = (ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl - minimumChartValueInMgdl) / basalRateMaximum
+                            } else {
+                                basalRateScaler = 0
+                            }
                         }
                         
                         if let previousBasalRateTreatment = previousBasalRateTreatment {
@@ -1585,15 +1598,19 @@ public class GlucoseChartManager {
         // First, figure out which of the bgReadings is the oldest.
         // It is safe to unwrap the first and last elements.
         let sortedReadings = [closestBgReading, secondClosestBgReading].sorted(by: { $0.timeStamp < $1.timeStamp })
-        let olderBgReading = sortedReadings.first!
-        let newerBgReading = sortedReadings.last!
-        
+        guard let olderBgReading = sortedReadings.first, let newerBgReading = sortedReadings.last else {
+            return closestBgReading.calculatedValue
+        }
+
         // Calculate the interpolation based on the time difference
         // Time difference from newerBgReading to olderBgReading
         let timeDifference: Double = newerBgReading.timeStamp.timeIntervalSince1970 - olderBgReading.timeStamp.timeIntervalSince1970
+        guard timeDifference != 0 else {
+            return olderBgReading.calculatedValue
+        }
         // Time difference from treatmentDate to olderBgReading
         let timeOffset: Double = treatmentDate.timeIntervalSince1970 - olderBgReading.timeStamp.timeIntervalSince1970
-        
+
         // timeOffsetFactor as a double from 0 to 1.
         let timeOffsetFactor: Double = timeOffset / timeDifference
         
@@ -1693,10 +1710,13 @@ public class GlucoseChartManager {
             }
             
             // we need to find out the original treatment value to use in the label as the chart point has a scaled value
-            let originalTreatmentValue = self.getTreatmentValueFromTimeStamp(treatmentDate: chartPointModel.chartPoint.x as! ChartAxisValueDate, treatmentType: treatmentType, treatmentEntryAccessor: self.data().treatmentEntryAccessor, on: self.coreDataManager.privateManagedObjectContext)
-            
+            guard let xDate = chartPointModel.chartPoint.x as? ChartAxisValueDate else { return nil }
+            let originalTreatmentValue = self.getTreatmentValueFromTimeStamp(treatmentDate: xDate, treatmentType: treatmentType, treatmentEntryAccessor: self.data().treatmentEntryAccessor, on: self.coreDataManager.privateManagedObjectContext)
+
             // format the label with the correct value, decimal places, unit and also the position and font size/color/weight
-            label.text = " \(labelFormatter.string(from: NSNumber(value: originalTreatmentValue))! + treatmentType.unit()) "
+            let formatted = labelFormatter.string(from: NSNumber(value: originalTreatmentValue)) ?? String(originalTreatmentValue)
+            
+            label.text = " \(formatted + treatmentType.unit()) "
             label.font = UIFont.systemFont(ofSize: treatmentLabelFontSize, weight: UIFont.Weight.bold)
             label.backgroundColor = ConstantsGlucoseChart.treatmentLabelBackgroundColor
             label.textColor = ConstantsGlucoseChart.treatmentLabelFontColor
