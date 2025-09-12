@@ -98,7 +98,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
             // if glucoseData received, send to delegate. If transmitterBatteryInfo available, then also send this to cGMDexcomG4TransmitterDelegate
             if let glucoseData = result.glucoseData {
                 
-                var glucoseDataArray = [glucoseData]
+                let glucoseDataArray = [glucoseData]
                 
                 var transmitterBatteryInfo:TransmitterBatteryInfo? = nil
                 
@@ -149,7 +149,7 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
             //process value and get result, send it to delegate
             let result = processBasicXdripDataPacket(value: value)
             if let glucoseData = result.glucoseData {
-                var glucoseDataArray = [glucoseData]
+                let glucoseDataArray = [glucoseData]
                 var transmitterBatteryInfo:TransmitterBatteryInfo? = nil
                 if let level = result.batteryLevel {
                     
@@ -174,6 +174,12 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
         
     }
     
+    override func prepareForRelease() {
+        // Clear base CB delegates + unsubscribe common receiveCharacteristic synchronously on main
+        super.prepareForRelease()
+        // CGMG4xDrip-specific: no additional timers/characteristics cached here
+    }
+
     // MARK: - CGMTransmitter protocol functions
     
     func cgmTransmitterType() -> CGMTransmitterType {
@@ -236,6 +242,10 @@ final class CGMG4xDripTransmitter: BluetoothTransmitter, CGMTransmitter {
         if let bufferAsString = String(bytes: value, encoding: .utf8) {
             //find indexes of " " and store in array
             let indexesOfSplitter = bufferAsString.indexes(of: " ")
+            guard !indexesOfSplitter.isEmpty else {
+                trace("processBasicXdripDataPacket, no space separators found in payload string", log: log, category: ConstantsLog.categoryCGMxDripG4, type: .info)
+                return (nil, nil)
+            }
             // start with finding rawData
             var range = bufferAsString.startIndex..<indexesOfSplitter[0]
             let rawData:Int? = Int(bufferAsString[range])

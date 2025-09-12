@@ -195,14 +195,14 @@ class NightscoutFollowManager: NSObject {
                 
                 trace("    finished download,  %{public}@ readings", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info, followGlucoseDataArray.count.description)
                 
-                // call to delegate and rescheduling the timer must be done in main thread;
+                // Dispatch to delegate on the main actor (use a local copy for the inout parameter)
                 let localCopy = followGlucoseDataArray
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
                     // call delegate followerInfoReceived which will process the new readings
                     if let followerDelegate = self.followerDelegate {
-                        var arr = localCopy
-                        followerDelegate.followerInfoReceived(followGlucoseDataArray: &arr)
+                        var array = localCopy
+                        followerDelegate.followerInfoReceived(followGlucoseDataArray: &array)
                     }
                     // schedule new download
                     self.scheduleNewDownload()

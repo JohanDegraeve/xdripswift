@@ -2,7 +2,8 @@ import Foundation
 import CoreBluetooth
 import os
 
-class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
+@objcMembers
+class CGMAtomTransmitter: BluetoothTransmitter, CGMTransmitter {
     
     // MARK: - properties
     
@@ -261,6 +262,11 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                     case .transmitterInfo:
                         
                         trace("in peripheral didUpdateValueFor, transmitterInfo received", log: log, category: ConstantsLog.categoryCGMAtom, type: .error)
+
+                        guard value.count >= 5 else {
+                            trace("in peripheral didUpdateValueFor, transmitterInfo too short", log: log, category: ConstantsLog.categoryCGMAtom, type: .error)
+                            return
+                        }
                         
                         let transmitterBatteryPercentage = Int(value[4])
                         
@@ -273,8 +279,9 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                         // send transmitterBatteryInfo and battery percentage to delegates on main
                         DispatchQueue.main.async { [weak self] in
                             guard let self = self else { return }
-                            var empty = self.emptyArray
-                            self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &empty, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: transmitterBatteryPercentage), sensorAge: nil)
+                            let empty = self.emptyArray
+                            var copy = empty
+                            self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: transmitterBatteryPercentage), sensorAge: nil)
                             self.cGMAtomTransmitterDelegate?.received(batteryLevel: transmitterBatteryPercentage, from: self)
                             if let firmWare = self.firmWare {
                                 self.cGMAtomTransmitterDelegate?.received(firmware: firmWare, from: self)
@@ -379,6 +386,39 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
         }
         
         
+    }
+    
+    override func prepareForRelease() {
+        // Clear base CB delegates + unsubscribe common receiveCharacteristic synchronously on main
+        super.prepareForRelease()
+        // Atom-specific cleanup
+        let tearDown = {
+            // clear buffer and counters to avoid stale data
+            self.rxBuffer = Data()
+            self.resendPacketCounter = 0
+            // nil optional state vars
+            self.sensorSerialNumberAsData = nil
+            self.patchInfo = nil
+            self.firmWare = nil
+            self.sensorSerialNumber = nil
+            self.libreSensorType = nil
+        }
+        if Thread.isMainThread {
+            tearDown()
+        } else {
+            DispatchQueue.main.sync(execute: tearDown)
+        }
+    }
+
+    deinit {
+        // Defensive cleanup beyond base class
+        rxBuffer = Data()
+        resendPacketCounter = 0
+        sensorSerialNumberAsData = nil
+        patchInfo = nil
+        firmWare = nil
+        sensorSerialNumber = nil
+        libreSensorType = nil
     }
     
     // MARK: - helpers

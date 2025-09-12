@@ -252,12 +252,12 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     /// for testing, used by temptesting
     @objc private func createTestReading() {
-        let testdata = GlucoseData(timeStamp: Date(), glucoseLevelRaw: testAmount)
-        debuglogging("timestamp testdata = " + testdata.timeStamp.description + ", with amount = " + testAmount.description)
-        var testdataasarray = [testdata]
+        let testData = GlucoseData(timeStamp: Date(), glucoseLevelRaw: testAmount)
+        debuglogging("timestamp testdata = " + testData.timeStamp.description + ", with amount = " + testAmount.description)
+        let testDataAsArray = [testData]
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            var copy = testdataasarray
+            var copy = testDataAsArray
             self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: nil)
         }
         testAmount = testAmount + 1
@@ -302,13 +302,29 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         G5ResetRequested = requested
     }
     
-    // MARK: - deinit
+    // MARK: - Resource teardown for ARC safety
+
+    override func prepareForRelease() {
+        // First clear CoreBluetooth delegates synchronously on main via base class
+        super.prepareForRelease()
+        // Then synchronously clear characteristic references on main to avoid races
+        let tearDown = {
+            self.writeControlCharacteristic = nil
+            self.receiveAuthenticationCharacteristic = nil
+            self.communicationCharacteristic = nil
+            self.backfillCharacteristic = nil
+        }
+        if Thread.isMainThread {
+            tearDown()
+        } else {
+            DispatchQueue.main.sync(execute: tearDown)
+        }
+    }
 
     deinit {
-        
-        // if deinit is called, it means user deletes the transmitter or clicks 'stop scanning' or 'disconnect'.  TimeStampOfLastBatteryReading must be set to nil to make sure if new transmitter is added, battery read is done again
+        // if deinit is called, it means user deletes the transmitter or clicks 'stop scanning' or 'disconnect'.
         UserDefaults.standard.timeStampOfLastBatteryReading = nil
-        
+        // Delegate cleanup is performed in prepareForRelease() on the main queue
     }
 
     // MARK: - BluetoothTransmitter overriden functions
@@ -588,7 +604,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                                         
                                         let glucoseData = GlucoseData(timeStamp: sensorDataRxMessage.timestamp, glucoseLevelRaw: scaleRawValue(firmwareVersion: firmware, rawValue: sensorDataRxMessage.unfiltered))
                                         
-                                        var glucoseDataArray = [glucoseData]
+                                        let glucoseDataArray = [glucoseData]
                                         
                                         DispatchQueue.main.async { [weak self] in
                                             guard let self = self else { return }

@@ -5,7 +5,8 @@ import CoreBluetooth
 #if canImport(CoreNFC)
 import CoreNFC
 
-class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
+@objcMembers
+class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
     
     // MARK: - properties
     
@@ -254,6 +255,29 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
         
     }
     
+    override func prepareForRelease() {
+        // Clear base CB delegates + unsubscribe common receiveCharacteristic synchronously on main
+        super.prepareForRelease()
+        // Libre2-specific transient state cleanup
+        let tearDown = {
+            self.rxBuffer = Data()
+            self.startDate = Date()
+            self.tempSensorSerialNumber = nil
+            self.libreNFC = nil
+            self.libreSensorType = nil
+        }
+        if Thread.isMainThread {
+            tearDown()
+        } else {
+            DispatchQueue.main.sync(execute: tearDown)
+        }
+    }
+
+    deinit {
+        // Defensive: clear transient buffers
+        rxBuffer = Data()
+    }
+
     // MARK: - helpers
     
     /// reset rxBuffer, reset startDate, stop packetRxMonitorTimer, set resendPacketCounter to 0
@@ -300,7 +324,7 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
                 
                 // decrypt buffer and parse
                 // if oop web not enabled, then don't pass libre1DerivedAlgorithmParameters
-                var parsedBLEData = Libre2BLEUtilities.parseBLEData(Data(try Libre2BLEUtilities.decryptBLE(sensorUID: sensorUID, data: rxBuffer)), libre1DerivedAlgorithmParameters: isWebOOPEnabled() ? UserDefaults.standard.libre1DerivedAlgorithmParameters : nil)
+                let parsedBLEData = Libre2BLEUtilities.parseBLEData(Data(try Libre2BLEUtilities.decryptBLE(sensorUID: sensorUID, data: rxBuffer)), libre1DerivedAlgorithmParameters: isWebOOPEnabled() ? UserDefaults.standard.libre1DerivedAlgorithmParameters : nil)
                 
                 // deliver glucose data and sensor age to delegates on main; use local copy for inout
                 DispatchQueue.main.async { [weak self] in
@@ -376,7 +400,8 @@ class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
 
 #else
 
-class CGMLibre2Transmitter:BluetoothTransmitter, CGMTransmitter {
+@objcMembers
+class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
     
 }
 

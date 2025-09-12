@@ -14,6 +14,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     public weak var bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
 
     // MARK: - private properties
+    /// whether we should auto‑reconnect after a disconnect callback
+    private var autoReconnectEnabled = true
     
     /// the address of the transmitter. If nil then transmitter never connected, so we don't know the address.
     private(set) var deviceAddress:String?
@@ -78,6 +80,10 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     /// when trying to connect to a discovered device for the first time, a timer will be used to avoid that connection attempts take forever
     private var connectTimeOutTimer: Timer?
+
+    /// De-dup state for connection log spam
+    private var lastConnectLogAt: Date = .distantPast
+    private var lastConnectLogName: String? = nil
     
     // MARK: - Initialization
     
@@ -125,21 +131,39 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     // MARK: - De-initialization
     
     deinit {
-        
-        // disconnect the device on the central queue to avoid any race conditions with CoreBluetooth
-        centralQueue.async { [weak self] in
-            self?.disconnect()
+        // Clear CoreBluetooth delegates synchronously on main as last resort
+        let clear = {
+            self.centralManager?.delegate = nil
+            self.peripheral?.delegate = nil
         }
-        
+        if Thread.isMainThread {
+            clear()
+        } else {
+            DispatchQueue.main.sync(execute: clear)
+        }
     }
     
     // MARK: - public functions
+
+    /// Hook for subclasses to clear CoreBluetooth delegates/timers before ARC release.
+    /// Default clears CoreBluetooth delegates on the main thread synchronously to avoid races with CB callbacks.
+    @objc func prepareForRelease() {
+        let clear = {
+            self.centralManager?.delegate = nil
+            self.peripheral?.delegate = nil
+        }
+        if Thread.isMainThread {
+            clear()
+        } else {
+            DispatchQueue.main.sync(execute: clear)
+        }
+    }
     
     /// will try to connect to the device, first by calling retrievePeripherals, if peripheral not known, then by calling startScanning
     func connect() {
         centralQueue.async { [weak self] in
             guard let self = self else { return }
-            
+            self.autoReconnectEnabled = true
             if let centralManager = self.centralManager, !self.retrievePeripherals(centralManager) {
                 _ = self.startScanning()
             }
@@ -155,8 +179,14 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func disconnect() {
         centralQueue.async { [weak self] in
             guard let self = self else { return }
-            
+            // Manual disconnects should not auto‑reconnect
+            self.autoReconnectEnabled = false
+            // Clear delegates synchronously on main to avoid Obj‑C weak ref issues
+            self.prepareForRelease()
             if let peripheral = self.peripheral {
+                if let rc = self.receiveCharacteristic {
+                    peripheral.setNotifyValue(false, for: rc)
+                }
                 if let centralManager = self.centralManager {
                     trace("in disconnect, disconnecting, for peripheral with name %{public}@", log: self.log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, self.deviceName ?? "'unknown'")
                     centralManager.cancelPeripheralConnection(peripheral)
@@ -167,15 +197,16 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     /// in case a new device is being scanned for, and we connected (because name matched) but later we want to forget that device, then call this function
     func disconnectAndForget() {
-        
+        // do not auto‑reconnect after a user‑initiated forget
+        autoReconnectEnabled = false
+        // clear delegates before requesting disconnect
+        prepareForRelease()
         // force disconnect
         disconnect()
-
-        // set to nil
+        // clear local references
         peripheral = nil
         deviceName = nil
         deviceAddress = nil
-        
     }
     
     /// stops scanning
@@ -319,7 +350,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         if let peripheral = peripheral {
             trace("setNotifyValue, for peripheral with name %{public}@, setting notify for characteristic %{public}@, to %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'", characteristic.uuid.uuidString, enabled.description)
 
-            centralQueue.async { [weak self] in
+            centralQueue.async {
                 peripheral.setNotifyValue(enabled, for: characteristic)
             }
         } else {
@@ -464,7 +495,13 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         timeStampLastStatusUpdate = Date()
         
-        trace("connected to peripheral with name %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'")
+        let now = Date()
+        let name = deviceName ?? "'unknown'"
+        if now.timeIntervalSince(lastConnectLogAt) > 2.0 || lastConnectLogName != name {
+            trace("connected to peripheral with name %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug, name)
+            lastConnectLogAt = now
+            lastConnectLogName = name
+        }
         
         // delegate can update UI / Core Data. Ensure main thread
         dispatchToMain { [weak self] in
@@ -532,11 +569,11 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         // if self.peripheral == nil, then a manual disconnect or something like that has occured, no need to reconnect
         // otherwise disconnect occurred because of other (like out of range), so let's try to reconnect
-        if let ownPeripheral = self.peripheral {
+        if autoReconnectEnabled, let ownPeripheral = self.peripheral {
             trace("    Will try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
             centralManager?.connect(ownPeripheral, options: nil)
         } else {
-            trace("    peripheral is nil, will not try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+            trace("    autoReconnect disabled or peripheral is nil, will not try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
         }
 
     }

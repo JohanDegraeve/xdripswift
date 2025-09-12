@@ -11,6 +11,7 @@ import os
 import CoreBluetooth
 import AVFoundation
 
+@objcMembers
 class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
     
     // MARK: - properties
@@ -64,12 +65,19 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
         if (Date()).timeIntervalSince(timeStampOfLastHeartBeat) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
             
             timeStampOfLastHeartBeat = Date()
-            
-            UserDefaults.standard.timeStampOfLastHeartBeat = timeStampOfLastHeartBeat
-            
+
+            let timeStamp = timeStampOfLastHeartBeat
+            if Thread.isMainThread {
+                UserDefaults.standard.timeStampOfLastHeartBeat = timeStamp
+            } else {
+                DispatchQueue.main.async {
+                    UserDefaults.standard.timeStampOfLastHeartBeat = timeStamp
+                }
+            }
+
             // wait for a second to allow the official app to upload to LibreView before triggering the heartbeat announcement to the delegate
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                self.bluetoothTransmitterDelegate?.heartBeat()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                self?.bluetoothTransmitterDelegate?.heartBeat()
             }
         }
 
@@ -86,12 +94,19 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
         if (Date()).timeIntervalSince(timeStampOfLastHeartBeat) > ConstantsHeartBeat.minimumTimeBetweenTwoHeartBeats {
             
             timeStampOfLastHeartBeat = Date()
-            
-            UserDefaults.standard.timeStampOfLastHeartBeat = timeStampOfLastHeartBeat
-            
+
+            let ts = timeStampOfLastHeartBeat
+            if Thread.isMainThread {
+                UserDefaults.standard.timeStampOfLastHeartBeat = ts
+            } else {
+                DispatchQueue.main.async {
+                    UserDefaults.standard.timeStampOfLastHeartBeat = ts
+                }
+            }
+
             // wait for a second to allow the official app to upload to LibreView before triggering the heartbeat announcement to the delegate
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                self.bluetoothTransmitterDelegate?.heartBeat()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                self?.bluetoothTransmitterDelegate?.heartBeat()
             }
         }
         
@@ -114,4 +129,17 @@ class Libre3HeartBeatBluetoothTransmitter: BluetoothTransmitter {
         }
     }
     
+    override func prepareForRelease() {
+        // Clear base CB delegates + unsubscribe common receiveCharacteristic synchronously on main
+        super.prepareForRelease()
+        // Libre3-specific transient state cleanup
+        let tearDown = {
+            self.timeStampOfLastHeartBeat = Date(timeIntervalSince1970: 0)
+        }
+        if Thread.isMainThread {
+            tearDown()
+        } else {
+            DispatchQueue.main.sync(execute: tearDown)
+        }
+    }
 }

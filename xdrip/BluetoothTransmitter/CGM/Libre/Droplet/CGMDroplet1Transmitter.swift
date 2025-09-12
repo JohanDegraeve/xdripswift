@@ -2,7 +2,8 @@ import Foundation
 import os
 import CoreBluetooth
 
-class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
+@objcMembers
+class CGMDroplet1Transmitter: BluetoothTransmitter, CGMTransmitter {
     
     // MARK: - properties
     
@@ -34,7 +35,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
-    ///     - bluetoothTransmitterDelegate : a NluetoothTransmitterDelegate
+    ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
     init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMDropletTransmitterDelegate : CGMDropletTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, nonFixedSlopeEnabled: Bool?) {
         
@@ -116,7 +117,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
             }
             
             // send glucoseDataArray, transmitterBatteryInfo and sensorAge to cgmTransmitterDelegate (main thread)
-            var glucoseDataArray = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: rawValueAsDouble)]
+            let glucoseDataArray = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: rawValueAsDouble)]
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 var copy = glucoseDataArray
@@ -128,6 +129,26 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
             trace("    value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .error)
         }
         
+    }
+    
+    override func prepareForRelease() {
+        // Clear base CB delegates + unsubscribe common receiveCharacteristic synchronously on main
+        super.prepareForRelease()
+        // Droplet-specific: clear transient state synchronously on main
+        let tearDown = {
+            self.emptyArray.removeAll()
+            self.nonFixedSlopeEnabled = false
+        }
+        if Thread.isMainThread {
+            tearDown()
+        } else {
+            DispatchQueue.main.sync(execute: tearDown)
+        }
+    }
+
+    deinit {
+        // Defensive cleanup beyond base class
+        emptyArray.removeAll()
     }
     
     // MARK: CGMTransmitter protocol functions

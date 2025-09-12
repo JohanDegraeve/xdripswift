@@ -2,7 +2,8 @@ import Foundation
 import CoreBluetooth
 import os
 
-class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
+@objcMembers
+class CGMMiaoMiaoTransmitter: BluetoothTransmitter, CGMTransmitter {
     
     // MARK: - properties
     
@@ -1012,7 +1013,26 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         }
 
     }
-    
+    override func prepareForRelease() {
+        super.prepareForRelease()
+        let tearDown = {
+            self.rxBuffer = Data()
+            self.sensorSerialNumber = nil
+            self.libreSensorType = nil
+        }
+        if Thread.isMainThread {
+            tearDown()
+        } else {
+            DispatchQueue.main.sync(execute: tearDown)
+        }
+    }
+
+    deinit {
+        // Defensive cleanup beyond base class
+        rxBuffer = Data()
+        sensorSerialNumber = nil
+        libreSensorType = nil
+    }
 }
 
 

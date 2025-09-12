@@ -2,7 +2,8 @@ import Foundation
 import CoreBluetooth
 import os
 
-class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
+@objcMembers
+class CGMGNSEntryTransmitter: BluetoothTransmitter, CGMTransmitter {
     
     // MARK: - properties
     
@@ -91,6 +92,39 @@ class CGMGNSEntryTransmitter:BluetoothTransmitter, CGMTransmitter {
     /// used as parameter in call to cgmTransmitterDelegate.cgmTransmitterInfoReceived, when there's no glucosedata to send
     var emptyArray: [GlucoseData] = []
     
+    override func prepareForRelease() {
+        // Clear base CB delegates + unsubscribe common receiveCharacteristic synchronously on main
+        super.prepareForRelease()
+        // GNS Entry-specific cleanup
+        let tearDown = {
+            self.serialNumberCharacteristic = nil
+            self.firmwareCharacteristic = nil
+            self.bootLoaderCharacteristic = nil
+            self.batteryLevelCharacteristic = nil
+            self.GNWWriteCharacteristic = nil
+            self.GNWNotifyCharacteristic = nil
+            self.actualSerialNumber = nil
+            self.actualFirmWareVersion = nil
+            self.actualBootLoader = nil
+            self.emptyArray.removeAll()
+        }
+        if Thread.isMainThread {
+            tearDown()
+        } else {
+            DispatchQueue.main.sync(execute: tearDown)
+        }
+    }
+
+    deinit {
+        // Defensive cleanup beyond base class
+        serialNumberCharacteristic = nil
+        firmwareCharacteristic = nil
+        bootLoaderCharacteristic = nil
+        batteryLevelCharacteristic = nil
+        GNWWriteCharacteristic = nil
+        GNWNotifyCharacteristic = nil
+    }
+
     // MARK: - public functions
     
     /// - parameters:

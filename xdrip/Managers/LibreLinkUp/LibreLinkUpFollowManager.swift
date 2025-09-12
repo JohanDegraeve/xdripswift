@@ -257,12 +257,14 @@ class LibreLinkUpFollowManager: NSObject {
                         
                         self.processDownloadResponse(data: glucoseMeasurementsArray, followGlucoseDataArray: &followGlucoseDataArray)
                         
-                        // call to delegate and rescheduling the timer must be done in main thread
-                        DispatchQueue.main.async { [weak self] in
+                        // Dispatch to delegate on the main actor (use a local copy for the inout parameter)
+                        let localCopy = followGlucoseDataArray
+                        await MainActor.run { [weak self] in
                             guard let self = self else { return }
                             // call delegate followerInfoReceived which will process the new readings
                             if let followerDelegate = self.followerDelegate {
-                                followerDelegate.followerInfoReceived(followGlucoseDataArray: &followGlucoseDataArray)
+                                var array = localCopy
+                                followerDelegate.followerInfoReceived(followGlucoseDataArray: &array)
                             }
                         }
                     } else {
@@ -274,11 +276,10 @@ class LibreLinkUpFollowManager: NSObject {
                 trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .error, error.localizedDescription)
             }
             
-            // rescheduling the timer must be done in main thread
+            // rescheduling the timer must be done on the main actor
             // we do it here at the end of the function so that it is always rescheduled once a valid connection is established, irrespective of whether we get values.
-            DispatchQueue.main.async { [weak self] in
+            await MainActor.run { [weak self] in
                 guard let self = self else { return }
-                // schedule new download
                 self.scheduleNewDownload()
             }
         }

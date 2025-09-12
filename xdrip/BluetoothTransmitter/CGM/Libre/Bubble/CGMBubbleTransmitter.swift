@@ -2,7 +2,8 @@ import Foundation
 import CoreBluetooth
 import os
 
-class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
+@objcMembers
+class CGMBubbleTransmitter: BluetoothTransmitter, CGMTransmitter {
     let appId:UInt8=0xA0;
     var lastDataTime:Double=0;
     // MARK: - properties
@@ -143,6 +144,21 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
         }
     }
     
+    override func prepareForRelease() {
+        // Clear base CB delegates + unsubscribe common receiveCharacteristic synchronously on main
+        super.prepareForRelease()
+        // Bubble-specific: clear buffers and transient state synchronously on main
+        let tearDown = {
+            self.rxBuffer = Data()
+            self.startDate = Date()
+            self.libreSensorSerialNumber = nil
+            self.patchInfo = nil
+            self.firmware = nil
+            self.libreSensorType = nil
+        }
+        if Thread.isMainThread { tearDown() } else { DispatchQueue.main.sync(execute: tearDown) }
+    }
+
     // MARK: - overriden  BluetoothTransmitter functions
     
     override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
@@ -172,26 +188,28 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                     switch bubbleResponseState {
                         
                     case .dataInfo:
-                        
+                        trace("in .dataInfo, value: %{public}@", log: log, category: ConstantsLog.categoryCGMBubble, type: .info, value.hexEncodedString())
+                        guard value.count >= 5 else { return }
                         // get hardware, firmware and batteryPercentage
                         let hardware = value[value.count-2].description + "." + value[value.count-1].description
                         let firmware = value[2].description + "." + value[3].description
                         let batteryPercentage = Int(value[4])
-                        
+
                         // send firmware, hardware and battery to delegate on main
                         DispatchQueue.main.async { [weak self] in
                             guard let self = self else { return }
                             self.cGMBubbleTransmitterDelegate?.received(firmware: firmware, from: self)
                             self.cGMBubbleTransmitterDelegate?.received(hardware: hardware, from: self)
                             self.cGMBubbleTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
-                            var empty = self.emptyArray
-                            self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &empty, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorAge: nil)
+                            let empty = self.emptyArray
+                            var copy = empty
+                            self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorAge: nil)
                         }
-                        
+
                         // store received firmware local
                         self.firmware = firmware
                         lastDataTime=0
-                        
+
                         if let last = lastGlucoseDate {
                             if Date().timeIntervalSince(last) < 4 * 60 {
                                 return
@@ -199,7 +217,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         }
 
                         //deviceName
-                        if(deviceName!=="Bubble Nano"){
+                        if deviceName == "Bubble Nano" {
                             _ = writeDataToPeripheral(data: Data([0x08, appId, 0x00, 0x00, 0x00, 0x2B]), type: .withoutResponse)
                         } else {
                             if firmware.toDouble() ?? 0 >= 8.1 && libreSensorType == .libre1 {
@@ -213,8 +231,7 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                         // confirm receipt
                         // if firmware >= 2.6, write [0x08, 0x01, 0x00, 0x00, 0x00, 0x2B]
                         // bubble will decrypt the libre2 data and return it
-                  
-                        
+
                     case .serialNumber:
                         
                         guard value.count >= 10 else { return }
@@ -344,14 +361,15 @@ class CGMBubbleTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 }
                             }
                             
-                            // we have the patchInfo now, so recalculate the sensorSerialNumber
-                            guard let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 0..<8)), with: LibreSensorType.type(patchInfo: patchInfo)) else {
-                                trace("    could not create libreSensorSerialNumber", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
-                                return
-                            }
-                            
-                            // assign self.libreSensorSerialNumber to received libreSensorSerialNumber
-                            self.libreSensorSerialNumber = libreSensorSerialNumber
+                        // we have the patchInfo now, so recalculate the sensorSerialNumber
+                        guard rxBuffer.count >= 8,
+                              let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 0..<8)), with: LibreSensorType.type(patchInfo: patchInfo)) else {
+                            trace("    could not create libreSensorSerialNumber (rxBuffer too short or invalid UID)", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                            return
+                        }
+                        
+                        // assign self.libreSensorSerialNumber to received libreSensorSerialNumber
+                        self.libreSensorSerialNumber = libreSensorSerialNumber
 
                         }
                         

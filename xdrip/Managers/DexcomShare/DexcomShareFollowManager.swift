@@ -205,9 +205,9 @@ class DexcomShareFollowManager: NSObject {
             } catch {
                 trace("    in download, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareFollowManager, type: .error, error.localizedDescription)
             }
-            // rescheduling the timer must be done in main thread
+            // rescheduling the timer must be done on the main actor
             // we do it here at the end of the function so that it is always rescheduled once a valid connection is established, irrespective of whether we get values.
-            DispatchQueue.main.async { [weak self] in
+            await MainActor.run { [weak self] in
                 guard let self = self else { return }
                 // schedule new download
                 self.scheduleNewDownload()
@@ -320,11 +320,11 @@ class DexcomShareFollowManager: NSObject {
             // sort by newest first
             followGlucoseDataArray.sort { $0.timeStamp > $1.timeStamp }
             
-            // Dispatch to delegate on main thread (use a local copy for the inout parameter)
+            // Dispatch to delegate on the main actor (use a local copy for the inout parameter)
             let localCopy = followGlucoseDataArray
-            
-            DispatchQueue.main.async { [weak self] in
+            await MainActor.run { [weak self] in
                 guard let self = self else { return }
+                // call delegate followerInfoReceived which will process the new readings
                 if let followerDelegate = self.followerDelegate {
                     var array = localCopy
                     followerDelegate.followerInfoReceived(followGlucoseDataArray: &array)

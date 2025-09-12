@@ -786,8 +786,19 @@ class BluetoothPeripheralManager: NSObject {
             callcgmTransmitterInfoChanged = true
         }
         
-        // set bluetoothTransmitter to nil, this will also initiate a disconnect
-        bluetoothTransmitters[index] = nil
+        // make sure any CoreBluetooth delegates/timers are cleared before releasing the transmitter
+        if let transmitter = bluetoothTransmitters[index] {
+            // first ask the transmitter to clear CB delegates/timers
+            transmitter.prepareForRelease()
+            // then request a clean disconnect
+            transmitter.disconnect()
+            // perform the ARC release on the next main runloop tick to avoid racing CB callbacks
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(50)) { [weak self] in
+                self?.bluetoothTransmitters[index] = nil
+            }
+        } else {
+            bluetoothTransmitters[index] = nil
+        }
         
         if callcgmTransmitterInfoChanged {
             

@@ -2,6 +2,7 @@ import Foundation
 import CoreBluetooth
 import os
 
+@objcMembers
 class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
     /// is the transmitter oop web enabled or not. For G7/ONE+/Stelo this must be set to true to use only the transmitter algorithm
@@ -139,6 +140,35 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         
     }
     
+    override func prepareForRelease() {
+        // First let the base class clear CoreBluetooth delegates synchronously on main
+        super.prepareForRelease()
+
+        let tearDown = {
+            // Stop and clear timers that could keep self alive or fire after release
+            self.authenticationTimeOutTimer?.invalidate()
+            self.authenticationTimeOutTimer = nil
+            self.backfillFlushTimer?.invalidate()
+            self.backfillFlushTimer = nil
+            // Clear characteristic strong refs so no accidental retains persist
+            self.writeControlCharacteristic = nil
+            self.receiveAuthenticationCharacteristic = nil
+            self.communicationCharacteristic = nil
+            self.backfillCharacteristic = nil
+        }
+        if Thread.isMainThread {
+            tearDown()
+        } else {
+            DispatchQueue.main.sync(execute: tearDown)
+        }
+    }
+    
+    deinit {
+        // Delegate cleanup is handled by the base class in prepareForRelease()/deinit.
+        authenticationTimeOutTimer?.invalidate()
+        backfillFlushTimer?.invalidate()
+    }
+
     // MARK: - BluetoothTransmitter overriden functions
 
     override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
