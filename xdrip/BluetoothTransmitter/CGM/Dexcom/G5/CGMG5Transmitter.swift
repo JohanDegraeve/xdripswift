@@ -368,7 +368,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         // get characteristic description and trace
         var characteristicDescription = characteristic.uuid.uuidString
         if let characteristic = CBUUID_Characteristic_UUID(rawValue: characteristic.uuid.uuidString) { characteristicDescription = characteristic.description}
-        trace("in peripheralDidUpdateNotificationStateFor. characteristic = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, characteristicDescription)
+        trace("in peripheralDidUpdateNotificationStateFor. characteristic = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, characteristicDescription)
         
         if let error = error {
             trace("    error: %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .error , error.localizedDescription)
@@ -376,7 +376,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let characteristicValue = CBUUID_Characteristic_UUID(rawValue: characteristic.uuid.uuidString) {
             
-            trace("    characteristic : %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, characteristicValue.description)
+            trace("    characteristic : %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, characteristicValue.description)
             
             switch characteristicValue {
                 
@@ -442,7 +442,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             return
         }
         
-        trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, characteristic_UUID.description)
+        trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, characteristic_UUID.description)
         
         if let error = error {
             trace("error: %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .error , error.localizedDescription)
@@ -497,17 +497,17 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                                     // subscribe to writeControlCharacteristic
                                     if let writeControlCharacteristic = writeControlCharacteristic {
                                         
-                                        trace("    will set notifyValue for writeControlCharacteristic to true", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                                        trace("    will set notifyValue for writeControlCharacteristic to true", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
                                         setNotifyValue(true, for: writeControlCharacteristic)
                                         
                                     } else {
-                                        trace("    writeControlCharacteristic is nil, can not set notifyValue", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                                        trace("    writeControlCharacteristic is nil, can not set notifyValue", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
                                     }
                                     
                                     // subscribe to backfillCharacteristic
                                     if let backfillCharacteristic = backfillCharacteristic {
                                         
-                                        trace("    will set notifyValue for backfillCharacteristic to true", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                                        trace("    will set notifyValue for backfillCharacteristic to true", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
                                         setNotifyValue(true, for: backfillCharacteristic)
                                         
                                     } else {
@@ -709,14 +709,14 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                             if useFireFlyFlow() { fireflyMessageFlow() }
                             
                         default:
-                            trace("    unknown opcode received ", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
+                            trace("    unknown opcode received ", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
                             break
                         }
                     } else {
-                        trace("    value doesn't start with a known opcode = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .error, firstByte)
+                        trace("    value doesn't start with a known opcode = %{public}d", log: log, category: ConstantsLog.categoryCGMG5, type: .error, Int(firstByte))
                     }
                 } else {
-                    trace("    characteristic.value is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
+                    trace("    value is empty (no first byte)", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
                 }
             }
             
@@ -821,7 +821,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         // not using super.didDiscoverCharacteristicsFor here
         
-        trace("didDiscoverCharacteristicsFor", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+        trace("didDiscoverCharacteristicsFor", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
         
         // log error if any
         if let error = error {
@@ -834,7 +834,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 
                 if let characteristicValue = CBUUID_Characteristic_UUID(rawValue: characteristic.uuid.uuidString) {
 
-                    trace("    characteristic : %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, characteristicValue.description)
+                    trace("    characteristic : %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, characteristicValue.description)
                     
                     switch characteristicValue {
                     case .CBUUID_Backfill:
@@ -850,13 +850,13 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                         
                         receiveAuthenticationCharacteristic = characteristic
                         
-                        trace("    calling setNotifyValue true for characteristic %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.description)
+                        trace("    calling setNotifyValue true for characteristic %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.description)
                         
                         setNotifyValue(true, for: characteristic)
                         
                     }
                 } else {
-                    trace("    characteristic UUID unknown : %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .error, characteristic.uuid.uuidString)
+                    trace("    characteristic UUID unknown : %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, characteristic.uuid.uuidString)
                 }
             }
         } else {
@@ -1062,7 +1062,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// sends SensorTxMessage to transmitter
     private func getSensorData() {
         
-        trace("trying to send SensorDataTxMessage", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+        trace("trying to send SensorDataTxMessage", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
         
         if let writeControlCharacteristic = writeControlCharacteristic {
             
@@ -1103,7 +1103,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let writeControlCharacteristic = writeControlCharacteristic {
     
-            trace("sending transmitterTimeTxMessage with data %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, transmitterTimeTxMessage.data.hexEncodedString())
+            trace("sending transmitterTimeTxMessage with data %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, transmitterTimeTxMessage.data.hexEncodedString())
 
             _ = writeDataToPeripheral(data: transmitterTimeTxMessage.data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
             
@@ -1122,7 +1122,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let writeControlCharacteristic = writeControlCharacteristic {
             
-            trace("sending glucoseDataTxMessage with data %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, glucoseDataTxMessage.data.hexEncodedString())
+            trace("sending glucoseDataTxMessage with data %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, glucoseDataTxMessage.data.hexEncodedString())
             
             _ = writeDataToPeripheral(data: glucoseDataTxMessage.data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
             
@@ -1195,7 +1195,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     private func sendBackfillTxMessage(startTime: Date, endTime: Date, transmitterStartDate: Date) {
         
         if useOtherApp {
-            trace("coexistence: suppress backfillTx", log:log, category:ConstantsLog.categoryCGMG5, type:.info)
+            trace("use other app/coexistence: suppress backfillTx", log:log, category:ConstantsLog.categoryCGMG5, type:.debug)
             return
         }
         
@@ -1218,7 +1218,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// sends AuthRequestTxMessage to transmitter
     private func sendAuthRequestTxMessage() {
         if useOtherApp {
-            trace("coexistence: suppress authRequestTx", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+            trace("use other app/coexistence: suppress authRequestTx", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
             return
         }
         
@@ -1226,7 +1226,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let receiveAuthenticationCharacteristic = receiveAuthenticationCharacteristic {
 
-            trace("sending authMessage with data %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, authMessage.data.hexEncodedString())
+            trace("sending authMessage with data %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, authMessage.data.hexEncodedString())
 
             _ = writeDataToPeripheral(data: authMessage.data, characteristicToWriteTo: receiveAuthenticationCharacteristic, type: .withResponse)
             
@@ -1243,7 +1243,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let writeControlCharacteristic = writeControlCharacteristic {
             
-            trace("sending transmitterVersionTxMessage with data %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, transmitterVersionTxMessage.data.hexEncodedString())
+            trace("sending transmitterVersionTxMessage with data %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, transmitterVersionTxMessage.data.hexEncodedString())
 
             _ = writeDataToPeripheral(data: transmitterVersionTxMessage.data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
             
@@ -1284,17 +1284,12 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             // possibly other app is running in parallel and also requested battery info, in that case don't store it again
             if Date() > Date(timeInterval: ConstantsDexcomG5.batteryReadPeriod, since: UserDefaults.standard.timeStampOfLastBatteryReading != nil ? UserDefaults.standard.timeStampOfLastBatteryReading! : Date(timeIntervalSince1970: 0)) {
 
-                // cGMG5TransmitterDelegate for showing info on bluetoothviewcontroller and store in coredata
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
-                    self.cGMG5TransmitterDelegate?.received(transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), cGMG5Transmitter: self)
-                }
-                
-                // cgmTransmitterDelegate , because rootviewcontroller also shows battery info in home screen
-                DispatchQueue.main.async { [weak self] in
-                    guard let self = self else { return }
+                    let batteryInfo = TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature)
+                    self.cGMG5TransmitterDelegate?.received(transmitterBatteryInfo: batteryInfo, cGMG5Transmitter: self)
                     var empty: [GlucoseData] = []
-                    self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &empty, transmitterBatteryInfo: TransmitterBatteryInfo.DexcomG5(voltageA: batteryStatusRxMessage.voltageA, voltageB: batteryStatusRxMessage.voltageB, resist: batteryStatusRxMessage.resist, runtime: batteryStatusRxMessage.runtime, temperature: batteryStatusRxMessage.temperature), sensorAge: nil)
+                    self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &empty, transmitterBatteryInfo: batteryInfo, sensorAge: nil)
                 }
 
             }
@@ -1429,7 +1424,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             // Record last transmitter timestamp and (re)arm predictive window
             lastTxGlucoseTimestamp = timeStamp
             if let cap = nextPredictiveReconnectDeadline() {
-                trace("predictive: next tick at %{public}@; will aim to be connected by %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, timeStamp.addingTimeInterval(5*60).toString(timeStyle: .long, dateStyle: .none), cap.toString(timeStyle: .long, dateStyle: .none))
+                trace("    predictive: next tick at %{public}@; will aim to be connected by %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, timeStamp.addingTimeInterval(5*60).toString(timeStyle: .long, dateStyle: .none), cap.toString(timeStyle: .long, dateStyle: .none))
             }
 
             // it's a valid sensor state, so it's ok to send a backfill request after this message is processed
@@ -1568,7 +1563,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let transmitterStartDate = transmitterStartDate, let glucoseDataRxMessage = DexcomG6GlucoseDataRxMessage(data: value, transmitterStartDate: transmitterStartDate) {
             
-            trace("in processGlucoseG6DataRxMessage, received glucoseDataRxMessage, value = %{public}@, timeStamp = %{public}@, algorithmState = %{public}@, transmitterStatus = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, glucoseDataRxMessage.calculatedValue.description, glucoseDataRxMessage.timeStamp.toString(timeStyle: .long, dateStyle: .none), glucoseDataRxMessage.algorithmStatus.description,
+            trace("in processGlucoseG6DataRxMessage, received glucoseDataRxMessage, value = %{public}@, timeStamp = %{public}@, algorithmState = %{public}@, transmitterStatus = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, glucoseDataRxMessage.calculatedValue.description, glucoseDataRxMessage.timeStamp.toString(timeStyle: .long, dateStyle: .none), glucoseDataRxMessage.algorithmStatus.description,
                 glucoseDataRxMessage.transmitterStatus.description)
             
             processGlucoseG6DataRxMessageOrGlucoseDataRxMessage(calculatedValue: glucoseDataRxMessage.calculatedValue, algorithmStatus: glucoseDataRxMessage.algorithmStatus, timeStamp: glucoseDataRxMessage.timeStamp)
@@ -1586,11 +1581,11 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let transmitterTimeRxMessage = DexcomTransmitterTimeRxMessage(data: value) {
             
-            trace("in processTransmitterTimeRxMessage", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+            trace("in processTransmitterTimeRxMessage", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
 
             if let receivedSensorStartDate = transmitterTimeRxMessage.sensorStartDate {
                 
-                trace("    receivedSensorStartDate = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, receivedSensorStartDate.toString(timeStyle: .long, dateStyle: .long))
+                trace("    receivedSensorStartDate = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, receivedSensorStartDate.toString(timeStyle: .long, dateStyle: .long))
                 
                 // send to delegate (UI/Core Data) on main thread
                 DispatchQueue.main.async { [weak self] in
@@ -1631,7 +1626,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                     self.cGMG5TransmitterDelegate?.received(transmitterStartDate: transmitterStartDate, cGMG5Transmitter: self)
                 }
 
-                trace("    transmitterStartDate = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, transmitterStartDate.toString(timeStyle: .long, dateStyle: .long))
+                trace("    transmitterStartDate = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, transmitterStartDate.toString(timeStyle: .long, dateStyle: .long))
 
             } else {
                 trace("    transmitterStartDate is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
@@ -1760,7 +1755,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         // subscribe to writeControlCharacteristic
         if let writeControlCharacteristic = writeControlCharacteristic {
             
-            trace("    calling setNotifyValue true for characteristic %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, CBUUID_Characteristic_UUID.CBUUID_Write_Control.description)
+            trace("    calling setNotifyValue true for characteristic %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, CBUUID_Characteristic_UUID.CBUUID_Write_Control.description)
             
             setNotifyValue(true, for: writeControlCharacteristic)
             
@@ -1773,7 +1768,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         // if firefly, then subscribe to backfillCharacteristic
         if useFireFlyFlow(), let backfillCharacteristic = backfillCharacteristic {
             
-            trace("    calling setNotifyValue true for characteristic %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, CBUUID_Characteristic_UUID.CBUUID_Backfill.description)
+            trace("    calling setNotifyValue true for characteristic %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, CBUUID_Characteristic_UUID.CBUUID_Backfill.description)
             
             setNotifyValue(true, for: backfillCharacteristic)
             
@@ -1789,14 +1784,14 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// - and sends that message
     private func fireflyMessageFlow() {
         if useOtherApp {
-            trace("firefly flow suppressed (coexistence)", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+            trace("firefly flow suppressed (use other app/coexistence)", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
             return
         }
         
         // first of all check that the transmitter is really a firefly, if not stop processing
         if !useFireFlyFlow() { return }
         
-        trace("start of firefly flow", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+        trace("start of firefly flow", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
         
         // check if firmware is known, if not ask it
         guard firmware != nil else {
@@ -1894,15 +1889,15 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                     
                 } else {
                     
-                    trace("    end of firefly flow", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                    trace("    end of firefly flow", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
                     
                     if useOtherApp {
 
-                        trace("    useOtherApp = true, will not disconnect", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                        trace("    useOtherApp = true, will not disconnect", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
 
                     } else {
 
-                        trace("    will disconnect", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                        trace("    will disconnect", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
 
                         // disconnect
                         disconnect()
@@ -1939,7 +1934,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             return
         }
         
-        trace("in sendGlucoseDataToDelegate", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+        trace("in sendGlucoseDataToDelegate", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
         
         // initialize glucoseDataArray, in this array we will store the glucose values in the backfillStream and also othe lastGlucoseInSensorDataRxReading
         var glucoseDataArray = [GlucoseData]()
@@ -1949,7 +1944,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if backFills.count > 0 {
 
-            trace("    start processing backfillstream", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+            trace("    start processing backfillstream", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
             
             // iterate through backfill's
             for backFill in backFills {
@@ -1963,7 +1958,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 
                 glucoseDataArray.insert(GlucoseData(timeStamp: backfillDate, glucoseLevelRaw: Double(backFill.glucose)), at: 0)
                 
-                trace("    new backfill, value = %{public}@, date = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, backFill.glucose.description, backfillDate.toString(timeStyle: .long, dateStyle: .long))
+                trace("    new backfill, value = %{public}@, date = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, backFill.glucose.description, backfillDate.toString(timeStyle: .long, dateStyle: .long))
                 
             }
 
@@ -1984,7 +1979,16 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             timeStampOfLastG5Reading = glucoseDataArray.first!.timeStamp
             
             trace("    calling cgmTransmitterInfoReceived with %{public}@ values", log: log, category: ConstantsLog.categoryCGMG5, type: .info, glucoseDataArray.count.description)
-            
+
+            // Emit summary before dispatching to main so logs reflect BLE flow chronology
+            if let latest = glucoseDataArray.first {
+                let v = String(format: "%.1f", latest.glucoseLevelRaw)
+                let t = DateFormatter.localizedString(from: latest.timeStamp, dateStyle: .none, timeStyle: .medium)
+                trace("    G5/G6 connection cycle summary: value = %{public}@ mg/dL at %{public}@",
+                      log: log, category: ConstantsLog.categoryCGMG5, type: .info,
+                      v, t)
+            }
+
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 var copy = glucoseDataArray
@@ -1993,7 +1997,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
         } else {
             
-            trace("    glucoseDataArray has no values", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+            trace("    glucoseDataArray has no values", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
             
         }
         
