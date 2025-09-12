@@ -16,6 +16,9 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     /// if timeStampLastReading > 5 min + 30 seconds, then, when receiving a new reading, it means there's a gap, and most likely the official Dexcom app will request for backfill data. So in that case we'll not immediately send the reading to the  delegate, but wait for the backfill to arrive
     private var timeStampLastReading: Date?
 
+    /// debounce timer to flush backfill while still connected
+    private var backfillFlushTimer: Timer?
+
     // MARK: UUID's
     
     /// advertisement
@@ -167,7 +170,10 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
             backfill = [GlucoseData]()
         }
 
-        
+        // invalidate any pending backfill flush timer
+        backfillFlushTimer?.invalidate() // stability: avoid stray timer after disconnect
+        backfillFlushTimer = nil
+
         // setting characteristics to nil, they will be reinitialized at next connect
         writeControlCharacteristic = nil
         receiveAuthenticationCharacteristic = nil
@@ -252,25 +258,40 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                     return
                 }
                 
-                
                 let newGlucoseData = GlucoseData(timeStamp: g7GlucoseMessage.timeStamp, glucoseLevelRaw: g7GlucoseMessage.calculatedValue)
                 
                 // add glucoseData to backfill
                 // possibly we will send it still later, if we receive also backfill data.
                 backfill.append(newGlucoseData)
-                
+
                 // if it's been more than 5 min + 30 seconds since previous reading, then it means there's a gap, and most likely the official Dexcom app will request for backfill data. So in that case we'll not immediately send the reading to the  delegate, but wait for the backfill to arrive
                 if let timeStampLastReading = timeStampLastReading {
                     if abs(timeStampLastReading.timeIntervalSinceNow) < 330.0 {
-                        var newGlucoseDataArray = [newGlucoseData]
-                        
+                        let newGlucoseDataArray = [newGlucoseData]
+
                         DispatchQueue.main.async { [weak self] in
                             guard let self = self else { return }
-                            
+
                             var copy = newGlucoseDataArray
                             self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
                         }
+                        // stability: keep gap logic accurate by advancing last delivered timestamp on immediate delivery
+                        self.timeStampLastReading = g7GlucoseMessage.timeStamp
+                    } else {
+                        // stability: we expect backfill soon, debounce a short flush so UI doesn't look stuck if Dexcom keeps link open
+                        scheduleBackfillFlush()
                     }
+                } else {
+                    // no previous reading; deliver immediately and advance last timestamp
+                    let newGlucoseDataArray = [newGlucoseData]
+
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+
+                        var copy = newGlucoseDataArray
+                        self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
+                    }
+                    self.timeStampLastReading = g7GlucoseMessage.timeStamp // stability
                 }
                 
                 DispatchQueue.main.async { [weak self] in
@@ -284,8 +305,8 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                         
             case .backfillFinished:
                 
-                // we don't use this, backfill data will be sent to the delegate at disconnect (because I didn't receive the backfillFinished opcode during tests)
-                break
+                // stability: flush any accumulated backfill immediately when Dexcom signals completion
+                flushBackfillDeliveringToDelegate()
                 
             default:
                 break
@@ -305,10 +326,19 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                 trace("    received backfill mesage, calculatedValue = %{public}@, timeStamp = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, dexcomG7BackfillMessage.calculatedValue.description, dexcomG7BackfillMessage.timeStamp.description(with: .current))
                 
                 backfill.append(GlucoseData(timeStamp: dexcomG7BackfillMessage.timeStamp, glucoseLevelRaw: dexcomG7BackfillMessage.calculatedValue))
+
+                // stability: keep last timestamp up to date when we see newer backfill
+                if timeStampLastReading == nil || dexcomG7BackfillMessage.timeStamp > timeStampLastReading! {
+                    timeStampLastReading = dexcomG7BackfillMessage.timeStamp
+                }
+
+                // debounce a short flush so we don't wait for a disconnect to deliver
+                scheduleBackfillFlush()
             }
             
         case .CBUUID_Receive_Authentication:
             
+            cancelAuthenticationTimer() // stability: any auth traffic means the device is responding; avoid premature timeout
             trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, characteristic_UUID.description)
             
             trace("in peripheralDidUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, value.hexEncodedString())
@@ -373,14 +403,19 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
             for characteristic in characteristics {
                 trace("    characteristic: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, String(describing: characteristic.uuid))
                 
-                setNotifyValue(true, for: characteristic)
+                // subscribe only to characteristics we actually need notifications from (stability)
+                if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue)
+                    || characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Write_Control.rawValue)
+                    || characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Backfill.rawValue) {
+                    setNotifyValue(true, for: characteristic)
+                }
                 
                 if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue) {
                     
-                    // this is the authentication characteristic, if the authentication is not successful within 2 seconds, then this is not the device that is currently being used by the official dexcom app, so let's forget it
+                    // this is the authentication characteristic, if the authentication is not successful within 5 seconds, then this is not the device that is currently being used by the official dexcom app, so let's forget it
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self else { return }
-                        self.authenticationTimeOutTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(CGMG7Transmitter.authenticationFailed), userInfo: nil, repeats: false)
+                        self.authenticationTimeOutTimer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(CGMG7Transmitter.authenticationFailed), userInfo: nil, repeats: false) // stability: allow slower auth contention with Dexcom app
                     }
                     
                 }
@@ -461,6 +496,37 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                 self.authenticationTimeOutTimer = nil
             }
         }
+    }
+
+    private func scheduleBackfillFlush() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.backfillFlushTimer?.invalidate()
+            self.backfillFlushTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { [weak self] _ in
+                self?.flushBackfillDeliveringToDelegate()
+            }
+        }
+    }
+
+    private func flushBackfillDeliveringToDelegate() {
+        guard backfill.isEmpty == false else { return }
+        // sort backfill, first element should be youngest
+        backfill = backfill.sorted(by: { $0.timeStamp > $1.timeStamp })
+
+        // send glucoseData to cgmTransmitterDelegate on main (UI/Core Data safety); use a local copy for inout
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            var copy = self.backfill
+            self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
+        }
+
+        // set timeStampLastReading to timestamp of the most recent reading, which is the first
+        if let firstReading = backfill.first {
+            timeStampLastReading = firstReading.timeStamp
+        }
+
+        // reset backfill
+        backfill = [GlucoseData]()
     }
     
     private func addGlucoseValueToUserDefaults(_ newValue: Int) {
