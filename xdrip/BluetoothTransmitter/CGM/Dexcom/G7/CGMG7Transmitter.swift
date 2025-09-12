@@ -231,34 +231,34 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         switch characteristic_UUID {
 
         case .CBUUID_Write_Control:
-            
+
             guard let firstByte = value.first else {
                 trace("    value has no contents", log: log, category: ConstantsLog.categoryCGMG7, type: .error )
                 return
             }
-            
+
             guard let opCode = DexcomTransmitterOpCode(rawValue: firstByte) else {
                 trace("    unknown opCode", log: log, category: ConstantsLog.categoryCGMG7, type: .error )
                 return
             }
-            
+
             switch opCode {
-                
+
             case .glucoseG6Tx:
-                
+
                 guard let g7GlucoseMessage = G7GlucoseMessage(data: value) else {
                     trace("    failed to create G7GlucoseMessage", log: log, category: ConstantsLog.categoryCGMG7, type: .error )
                     return
                 }
-                
-                trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, characteristic_UUID.description)
-                
-                trace("in peripheralDidUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, value.hexEncodedString())
-                
+
+                trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, characteristic_UUID.description)
+
+                trace("in peripheralDidUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, value.hexEncodedString())
+
                 let sensorAgeInDays = Double(round((g7GlucoseMessage.sensorAge / 3600 / 24) * 10) / 10)
-                
+
                 var maxSensorAgeInDays: Double = 0.0
-                
+
                 // check if we already have the transmitterId (or device name). If so, set the maxSensorAge and then perform a quick check to see if the sensor hasn't expired.
                 if let transmitterIdString = UserDefaults.standard.activeSensorTransmitterId {
                     if transmitterIdString.startsWith("DX01") {
@@ -266,7 +266,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                     } else {
                         maxSensorAgeInDays = ConstantsDexcomG7.maxSensorAgeInDays
                     }
-                                        
+
                     // G7/ONE+/Stelo has the peculiarity that it will keep sending/repeating the same BG value (without ever changing) via BLE even after the session officially ends.
                     // to avoid this, let's check if the sensor is still within maxSensorAge before we continue
                     if sensorAgeInDays > maxSensorAgeInDays {
@@ -274,22 +274,22 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                         return
                     }
                 }
-                
-                trace("    received g7GlucoseMessage mesage, calculatedValue = %{public}@, timeStamp = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, g7GlucoseMessage.calculatedValue.description, g7GlucoseMessage.timeStamp.description(with: .current))
-                
-                trace("    received g7GlucoseMessage mesage, sensorAge = %{public}@ / %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, sensorAgeInDays.description, maxSensorAgeInDays > 0 ? maxSensorAgeInDays.description : "waiting...")
-                
+
+                trace("    received g7GlucoseMessage mesage, calculatedValue = %{public}@, timeStamp = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, g7GlucoseMessage.calculatedValue.description, g7GlucoseMessage.timeStamp.description(with: .current))
+
+                trace("    received g7GlucoseMessage mesage, sensorAge = %{public}@ / %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, sensorAgeInDays.description, maxSensorAgeInDays > 0 ? maxSensorAgeInDays.description : "waiting...")
+
                 sensorAge = g7GlucoseMessage.sensorAge
-                
+
                 // check if more than 5 equal values are received, if so ignore, might be faulty sensor
                 addGlucoseValueToUserDefaults(Int(g7GlucoseMessage.calculatedValue))
                 if (hasSixIdenticalValues()) {
                     trace("    received 6 equal values, ignoring, value = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, g7GlucoseMessage.calculatedValue.description)
                     return
                 }
-                
+
                 let newGlucoseData = GlucoseData(timeStamp: g7GlucoseMessage.timeStamp, glucoseLevelRaw: g7GlucoseMessage.calculatedValue)
-                
+
                 // add glucoseData to backfill
                 // possibly we will send it still later, if we receive also backfill data.
                 backfill.append(newGlucoseData)
@@ -298,10 +298,12 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                 if let timeStampLastReading = timeStampLastReading {
                     if abs(timeStampLastReading.timeIntervalSinceNow) < 330.0 {
                         let newGlucoseDataArray = [newGlucoseData]
-
+                        // Per-cycle summary log before delegate dispatch
+                        let v = String(format: "%.1f", newGlucoseData.glucoseLevelRaw)
+                        let t = DateFormatter.localizedString(from: newGlucoseData.timeStamp, dateStyle: .none, timeStyle: .medium)
+                        trace("    G7 connection cycle summary: value = %{public}@ mg/dL at %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, v, t)
                         DispatchQueue.main.async { [weak self] in
                             guard let self = self else { return }
-
                             var copy = newGlucoseDataArray
                             self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
                         }
@@ -314,47 +316,49 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                 } else {
                     // no previous reading; deliver immediately and advance last timestamp
                     let newGlucoseDataArray = [newGlucoseData]
-
+                    // Per-cycle summary log before delegate dispatch
+                    let v = String(format: "%.1f", newGlucoseData.glucoseLevelRaw)
+                    let t = DateFormatter.localizedString(from: newGlucoseData.timeStamp, dateStyle: .none, timeStyle: .medium)
+                    trace("    G7 connection cycle summary: value = %{public}@ mg/dL at %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, v, t)
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self else { return }
-
                         var copy = newGlucoseDataArray
                         self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
                     }
                     self.timeStampLastReading = g7GlucoseMessage.timeStamp // stability
                 }
-                
+
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
-                    
+
                     self.cGMG7TransmitterDelegate?.received(sensorStatus: g7GlucoseMessage.algorithmStatus.description, cGMG7Transmitter: self)
-                    
+
                     // send sensorStartDate to cGMG7TransmitterDelegate
                     self.cGMG7TransmitterDelegate?.received(sensorStartDate: Date(timeIntervalSinceNow: -g7GlucoseMessage.sensorAge), cGMG7Transmitter: self)
                 }
-                        
+
             case .backfillFinished:
-                
+
                 // stability: flush any accumulated backfill immediately when Dexcom signals completion
                 flushBackfillDeliveringToDelegate()
-                
+
             default:
                 break
-                
+
             }
 
             break
-            
+
         case .CBUUID_Backfill:
             guard value.count == 9 else { return }
-            
-            trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, characteristic_UUID.description)
-            
-            trace("in peripheralDidUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, value.hexEncodedString())
+
+            trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, characteristic_UUID.description)
+
+            trace("in peripheralDidUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, value.hexEncodedString())
 
             if let sensorAge = sensorAge, sensorAge < (ConstantsDexcomG7.maxSensorAgeInDays * 24 * 3600), let dexcomG7BackfillMessage = DexcomG7BackfillMessage(data: value, sensorAge: sensorAge) {
                 trace("    received backfill mesage, calculatedValue = %{public}@, timeStamp = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, dexcomG7BackfillMessage.calculatedValue.description, dexcomG7BackfillMessage.timeStamp.description(with: .current))
-                
+
                 backfill.append(GlucoseData(timeStamp: dexcomG7BackfillMessage.timeStamp, glucoseLevelRaw: dexcomG7BackfillMessage.calculatedValue))
 
                 // stability: keep last timestamp up to date when we see newer backfill
@@ -365,46 +369,46 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                 // debounce a short flush so we don't wait for a disconnect to deliver
                 scheduleBackfillFlush()
             }
-            
+
         case .CBUUID_Receive_Authentication:
-            
+
             cancelAuthenticationTimer() // stability: any auth traffic means the device is responding; avoid premature timeout
-            trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, characteristic_UUID.description)
-            
-            trace("in peripheralDidUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, value.hexEncodedString())
-            
+            trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, characteristic_UUID.description)
+
+            trace("in peripheralDidUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, value.hexEncodedString())
+
             if let authChallengeRxMessage = AuthChallengeRxMessage(data: value) {
 
                 if authChallengeRxMessage.paired, authChallengeRxMessage.authenticated {
-                    
+
                     trace("Connected to Dexcom G7 that is paired and authenticated by other app. Will stay connected to this one.", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
-                    
+
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self else { return }
-                        
+
                         self.bluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: self)
                     }
-                    
+
                     cancelAuthenticationTimer()
-                    
+
                 } else {
-                    
+
                     trace("Connected to Dexcom G7 that is not paired and/or authenticated by other app. Will disconnect and scan for another Dexcom G7/ONE+/Stelo", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
-                    
+
                     disconnectAndForget()
-                    
+
                     _ = startScanning()
-                    
+
                 }
 
             }
-            
+
             break
-            
+
         default:
-            
+
             break
-            
+
         }
         
     }
@@ -422,39 +426,37 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     }
     
     override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        trace("didDiscoverCharacteristicsFor for peripheral with name %{public}@, for service with uuid %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, deviceName ?? "'unknown'", String(describing:service.uuid))
 
-        trace("didDiscoverCharacteristicsFor for peripheral with name %{public}@, for service with uuid %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, deviceName ?? "'unknown'", String(describing:service.uuid))
-        
         if let error = error {
             trace("    didDiscoverCharacteristicsFor error: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .error , error.localizedDescription)
         }
-        
+
         if let characteristics = service.characteristics {
             for characteristic in characteristics {
-                trace("    characteristic: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, String(describing: characteristic.uuid))
-                
+                trace("    characteristic: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, String(describing: characteristic.uuid))
+
                 // subscribe only to characteristics we actually need notifications from (stability)
                 if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue)
                     || characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Write_Control.rawValue)
                     || characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Backfill.rawValue) {
                     setNotifyValue(true, for: characteristic)
                 }
-                
+
                 if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue) {
-                    
+
                     // this is the authentication characteristic, if the authentication is not successful within 5 seconds, then this is not the device that is currently being used by the official dexcom app, so let's forget it
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self else { return }
                         self.authenticationTimeOutTimer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(CGMG7Transmitter.authenticationFailed), userInfo: nil, repeats: false) // stability: allow slower auth contention with Dexcom app
                     }
-                    
+
                 }
 
             }
         } else {
             trace("    Did discover characteristics, but no characteristics listed. There must be some error.", log: log, category: ConstantsLog.categoryCGMG7, type: .error)
         }
-
     }
     
     override func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
@@ -548,6 +550,11 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
             guard let self = self else { return }
             var copy = self.backfill
             self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
+            if let latest = copy.first {
+                let v = String(format: "%.1f", latest.glucoseLevelRaw)
+                let t = DateFormatter.localizedString(from: latest.timeStamp, dateStyle: .none, timeStyle: .medium)
+                trace("G7 backfill summary: count=%{public}d, latest=%{public}@ mg/dL @ %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, copy.count, v, t)
+            }
         }
 
         // set timeStampLastReading to timestamp of the most recent reading, which is the first
