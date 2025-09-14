@@ -175,6 +175,11 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     /// is the transmitter oop web enabled or not
     private var webOOPEnabled: Bool
+    
+    // Primary-mode guards (reset each connection)
+    private var writeControlNotifyConfigured = false
+    private var backfillNotifyConfigured = false
+    private var authChallengeTxSent = false
 
     // MARK: - public functions
     
@@ -473,57 +478,52 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                         trace("    opcode = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, opCode.description)
                         
                         switch opCode {
-                            
                         case .authChallengeRx:
-                            
                             if let authChallengeRxMessage = AuthChallengeRxMessage(data: value) {
-                                
                                 // if not paired, then send message to delegate
                                 if !authChallengeRxMessage.paired {
-                                    
                                     trace("    transmitter needs pairing, calling sendKeepAliveMessage", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
-                                    
                                     // will send keep alive message
                                     sendKeepAliveMessage()
-                                    
                                     // delegate needs to be informed that pairing is needed
                                     DispatchQueue.main.async { [weak self] in
                                         guard let self = self else { return }
                                         self.bluetoothTransmitterDelegate?.transmitterNeedsPairing(bluetoothTransmitter: self)
                                     }
-                                    
                                 } else {
-                                    
-                                    // subscribe to writeControlCharacteristic
-                                    if let writeControlCharacteristic = writeControlCharacteristic {
-                                        
+                                    // Configure required notifies once per connection (no abbreviations)
+                                    if let writeControlCharacteristic = writeControlCharacteristic, !writeControlNotifyConfigured {
                                         trace("    will set notifyValue for writeControlCharacteristic to true", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
                                         setNotifyValue(true, for: writeControlCharacteristic)
-                                        
-                                    } else {
+                                        writeControlNotifyConfigured = true
+                                    } else if writeControlCharacteristic == nil {
                                         trace("    writeControlCharacteristic is nil, can not set notifyValue", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
                                     }
-                                    
-                                    // subscribe to backfillCharacteristic
-                                    if let backfillCharacteristic = backfillCharacteristic {
-                                        
-                                        trace("    will set notifyValue for backfillCharacteristic to true", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
-                                        setNotifyValue(true, for: backfillCharacteristic)
-                                        
-                                    } else {
-                                        trace("    backfillCharacteristic is nil, can not set notifyValue", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+
+                                    if useFireFlyFlow() {
+                                        if let backfillCharacteristic = backfillCharacteristic, !backfillNotifyConfigured {
+                                            trace("    will set notifyValue for backfillCharacteristic to true", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
+                                            setNotifyValue(true, for: backfillCharacteristic)
+                                            backfillNotifyConfigured = true
+                                        } else if backfillCharacteristic == nil {
+                                            // expected in non-Firefly or when discovery has not yet delivered it
+                                            trace("    backfillCharacteristic is nil, can not set notifyValue", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
+                                        }
                                     }
-                                    
                                 }
-                                
                             } else {
                                 trace("    failed to create authChallengeRxMessage", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
                             }
                             
                         case .authRequestRx:
-                            
                             if useOtherApp {
                                 trace("    authRequestRx, useOtherApp = true, no further processing", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                                return
+                            }
+
+                            // Primary mode: if we've already sent the challenge this session, ignore duplicates
+                            if authChallengeTxSent {
+                                trace("authRequestRx (primary): authChallengeTx already sent, ignoring duplicate", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
                                 return
                             }
 
@@ -539,6 +539,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                                 trace("sending authChallengeTxMessage with data %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, authChallengeTxMessage.data.hexEncodedString())
                                 
                                 _ = writeDataToPeripheral(data: authChallengeTxMessage.data, characteristicToWriteTo: receiveAuthenticationCharacteristic, type: .withResponse)
+                                
+                                // Mark that the AuthChallengeTx was sent to avoid duplicate sends within the same connection session.
+                                authChallengeTxSent = true
                                 
                             } else {
                                 trace("    writeControlCharacteristic is nil or authRequestRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
@@ -814,6 +817,11 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
         // to be sure waitingPairingConfirmation is reset to false
         waitingPairingConfirmation = false
+        
+        // reset per-connection guards
+        writeControlNotifyConfigured = false
+        backfillNotifyConfigured = false
+        authChallengeTxSent = false
         
     }
     
@@ -1752,30 +1760,31 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// - if not firefly then only calls setNotifyValue(true) for both writeControlCharacteristic
     private func subscribeToWriteControlAndBackFillCharacteristic() {
         
-        // subscribe to writeControlCharacteristic
+        // subscribe to writeControlCharacteristic once
         if let writeControlCharacteristic = writeControlCharacteristic {
-            
-            trace("    calling setNotifyValue true for characteristic %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, CBUUID_Characteristic_UUID.CBUUID_Write_Control.description)
-            
-            setNotifyValue(true, for: writeControlCharacteristic)
-            
+            if !writeControlNotifyConfigured {
+                trace("    calling setNotifyValue true for characteristic %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, CBUUID_Characteristic_UUID.CBUUID_Write_Control.description)
+                setNotifyValue(true, for: writeControlCharacteristic)
+                writeControlNotifyConfigured = true
+            }
         } else {
-            
             trace("    writeControlCharacteristic is nil, can not set notifyValue", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
-            
         }
         
-        // if firefly, then subscribe to backfillCharacteristic
-        if useFireFlyFlow(), let backfillCharacteristic = backfillCharacteristic {
-            
-            trace("    calling setNotifyValue true for characteristic %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, CBUUID_Characteristic_UUID.CBUUID_Backfill.description)
-            
-            setNotifyValue(true, for: backfillCharacteristic)
-            
+        // backfill characteristic only applies to Firefly
+        if useFireFlyFlow() {
+            if let backfillCharacteristic = backfillCharacteristic {
+                if !backfillNotifyConfigured {
+                    trace("    calling setNotifyValue true for characteristic %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, CBUUID_Characteristic_UUID.CBUUID_Backfill.description)
+                    setNotifyValue(true, for: backfillCharacteristic)
+                    backfillNotifyConfigured = true
+                }
+            } else {
+                trace("    backfillCharacteristic is nil, can not set notifyValue", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
+            }
         } else {
-            
-            trace("    backfillCharacteristic is nil, can not set notifyValue", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
-            
+            // Not Firefly: this is expected; avoid noisy error logs.
+            trace("    backfill subscription not applicable (non-Firefly)", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
         }
         
     }

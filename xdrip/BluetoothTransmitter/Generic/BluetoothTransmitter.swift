@@ -14,8 +14,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     public weak var bluetoothTransmitterDelegate: BluetoothTransmitterDelegate?
 
     // MARK: - private properties
-    /// whether we should auto‑reconnect after a disconnect callback
-    private var autoReconnectEnabled = true
+    /// whether we should auto‑reconnect after the *next* disconnect callback (explicitly controlled)
+    private var shouldReconnectOnNextDisconnect = true
     
     /// the address of the transmitter. If nil then transmitter never connected, so we don't know the address.
     private(set) var deviceAddress:String?
@@ -163,7 +163,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func connect() {
         centralQueue.async { [weak self] in
             guard let self = self else { return }
-            self.autoReconnectEnabled = true
             if let centralManager = self.centralManager, !self.retrievePeripherals(centralManager) {
                 _ = self.startScanning()
             }
@@ -175,15 +174,13 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         return peripheral?.state
     }
     
-    /// disconnect the device
+    /// disconnect the device (reconnect policy unchanged; see `disconnectAndForget()` to disable)
     func disconnect() {
         centralQueue.async { [weak self] in
             guard let self = self else { return }
-            // Manual disconnects should not auto‑reconnect
-            self.autoReconnectEnabled = false
             if let peripheral = self.peripheral {
-                if let rc = self.receiveCharacteristic {
-                    peripheral.setNotifyValue(false, for: rc)
+                if let receiveCharacteristic = self.receiveCharacteristic {
+                    peripheral.setNotifyValue(false, for: receiveCharacteristic)
                 }
                 if let centralManager = self.centralManager {
                     trace("in disconnect, disconnecting, for peripheral with name %{public}@", log: self.log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, self.deviceName ?? "'unknown'")
@@ -195,8 +192,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     /// in case a new device is being scanned for, and we connected (because name matched) but later we want to forget that device, then call this function
     func disconnectAndForget() {
-        // do not auto‑reconnect after a user‑initiated forget
-        autoReconnectEnabled = false
+        // do not auto‑reconnect after a user‑initiated forget (for the next disconnect only)
+        shouldReconnectOnNextDisconnect = false
         // request disconnect first so OS callbacks can complete
         disconnect()
         // clear local references (we are intentionally *not* clearing central/peripheral delegates here;
@@ -573,17 +570,16 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
 
         // Keep noisy reconnect intent at debug
-        trace("    Will try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug)
-        
-        
         // if self.peripheral == nil, then a manual disconnect or something like that has occured, no need to reconnect
         // otherwise disconnect occurred because of other (like out of range), so let's try to reconnect
-        if autoReconnectEnabled, let ownPeripheral = self.peripheral {
+        if shouldReconnectOnNextDisconnect, let ownPeripheral = self.peripheral {
             trace("    Will try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug)
             centralManager?.connect(ownPeripheral, options: nil)
         } else {
-            trace("    autoReconnect disabled or peripheral is nil, will not try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+            trace("    reconnect disabled for this disconnect or peripheral is nil, will not try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
         }
+        // Reset policy back to default (reconnect) after handling one disconnect
+        shouldReconnectOnNextDisconnect = true
 
     }
     
