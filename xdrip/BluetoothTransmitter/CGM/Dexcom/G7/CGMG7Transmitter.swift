@@ -395,6 +395,9 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
                     trace("Connected to Dexcom G7 that is not paired and/or authenticated by other app. Will disconnect and scan for another Dexcom G7/ONE+/Stelo", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
 
+                    // deliver any pending readings/backfill before disconnecting
+                    flushBackfillDeliveringToDelegate()
+
                     disconnectAndForget()
 
                     _ = startScanning()
@@ -467,9 +470,12 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
             // it's not the device we're interested in, disconnect, forget this device, and restart scanning for a new, other device
             
             cancelAuthenticationTimer()
-            
+
+            // deliver any pending readings/backfill before disconnecting
+            flushBackfillDeliveringToDelegate()
+
             disconnectAndForget()
-            
+
             _ = startScanning()
             
         }
@@ -514,9 +520,12 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     @objc private func authenticationFailed() {
         
         trace("Connected to Dexcom G7 but authentication not received. Will disconnect and scan for another Dexcom G7/ONE+/Stelo", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
-        
+
+        // deliver any pending readings/backfill before disconnecting
+        flushBackfillDeliveringToDelegate()
+
         disconnectAndForget()
-        
+
         _ = startScanning()
         
     }
