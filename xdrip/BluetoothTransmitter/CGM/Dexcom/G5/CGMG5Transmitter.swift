@@ -1899,10 +1899,22 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
                         trace("    will disconnect", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
 
+                        // deliver any accumulated readings before disconnecting
+                        sendGlucoseDataToDelegate()
+
                         // disconnect
                         disconnect()
                         
                     }
+    // Deliver any accumulated data before state is reset on OS-driven disconnects
+    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        // Let base class do its logging/state hooks first
+        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
+
+        // Deliver any accumulated data (backfill + last reading) on disconnect
+        // This mirrors the last known good behavior and ensures UI/Core Data sees readings
+        sendGlucoseDataToDelegate()
+    }
                     
                 }
                 

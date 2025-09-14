@@ -181,8 +181,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             guard let self = self else { return }
             // Manual disconnects should not auto‑reconnect
             self.autoReconnectEnabled = false
-            // Clear delegates synchronously on main to avoid Obj‑C weak ref issues
-            self.prepareForRelease()
             if let peripheral = self.peripheral {
                 if let rc = self.receiveCharacteristic {
                     peripheral.setNotifyValue(false, for: rc)
@@ -199,11 +197,10 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func disconnectAndForget() {
         // do not auto‑reconnect after a user‑initiated forget
         autoReconnectEnabled = false
-        // clear delegates before requesting disconnect
-        prepareForRelease()
-        // force disconnect
+        // request disconnect first so OS callbacks can complete
         disconnect()
-        // clear local references
+        // clear local references (we are intentionally *not* clearing central/peripheral delegates here;
+        // final teardown should call prepareForRelease() when the instance is actually being released)
         peripheral = nil
         deviceName = nil
         deviceAddress = nil
@@ -348,6 +345,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// calls setNotifyValue for characteristic with value enabled
     func setNotifyValue(_ enabled: Bool, for characteristic: CBCharacteristic) {
         if let peripheral = peripheral {
+            trace("setNotifyValue, for peripheral with name %{public}@, setting notify for characteristic %{public}@, to %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug, deviceName ?? "'unknown'", characteristic.uuid.uuidString, enabled.description)
 
             centralQueue.async {
                 peripheral.setNotifyValue(enabled, for: characteristic)
@@ -839,6 +837,3 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
     }
 }
-
-
-
