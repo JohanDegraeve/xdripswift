@@ -172,6 +172,8 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     // MARK: - BluetoothTransmitter overriden functions
 
     override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        // ensure any pending auth timeout cannot fire after this disconnect
+        cancelAuthenticationTimer()
         
         super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
 
@@ -209,7 +211,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         receiveAuthenticationCharacteristic = nil
         communicationCharacteristic = nil
         backfillCharacteristic = nil
-        
+
     }
 
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
@@ -372,7 +374,6 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
         case .CBUUID_Receive_Authentication:
 
-            cancelAuthenticationTimer() // stability: any auth traffic means the device is responding; avoid premature timeout
             trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, characteristic_UUID.description)
 
             trace("in peripheralDidUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, value.hexEncodedString())
