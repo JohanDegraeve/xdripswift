@@ -382,7 +382,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
                 if authChallengeRxMessage.paired, authChallengeRxMessage.authenticated {
 
-                    trace("Connected to Dexcom G7 that is paired and authenticated by other app. Will stay connected to this one.", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
+                    trace("    connected to Dexcom G7 that is paired and authenticated by other app. Will stay connected to this one.", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
 
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self else { return }
@@ -391,15 +391,26 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                     }
 
                     cancelAuthenticationTimer()
-
+                    
+                    // Now that we know we're paired & authenticated by the other app, enable additional notifies we need
+                    if let writeControlCharacteristic = writeControlCharacteristic, !writeControlCharacteristic.isNotifying {
+                        setNotifyValue(true, for: writeControlCharacteristic)
+                    }
+                    if let backfillCharacteristic = backfillCharacteristic, !backfillCharacteristic.isNotifying {
+                        setNotifyValue(true, for: backfillCharacteristic)
+                    }
                 } else {
 
-                    trace("Connected to Dexcom G7 that is not paired and/or authenticated by other app. Will disconnect and scan for another Dexcom G7/ONE+/Stelo", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
+                    trace("    connected to Dexcom G7 that is not paired and/or authenticated by other app. Will disconnect and scan for another Dexcom G7/ONE+/Stelo", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
 
                     // deliver any pending readings/backfill before disconnecting
                     flushBackfillDeliveringToDelegate()
 
-                    disconnectAndForget()
+                    if shouldForgetCurrentPeripheral() {
+                        disconnectAndForget()
+                    } else {
+                        disconnect()
+                    }
 
                     _ = startScanning()
 
@@ -435,28 +446,33 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         if let error = error {
             trace("    didDiscoverCharacteristicsFor error: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .error , error.localizedDescription)
         }
-
+        
         if let characteristics = service.characteristics {
             for characteristic in characteristics {
                 trace("    characteristic: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, String(describing: characteristic.uuid))
-
-                // subscribe only to characteristics we actually need notifications from (stability)
-                if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue)
-                    || characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Write_Control.rawValue)
-                    || characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Backfill.rawValue) {
-                    setNotifyValue(true, for: characteristic)
-                }
-
+                
+                // Store references to discovered characteristics
                 if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue) {
-
-                    // this is the authentication characteristic, if the authentication is not successful within 5 seconds, then this is not the device that is currently being used by the official dexcom app, so let's forget it
+                    receiveAuthenticationCharacteristic = characteristic
+                } else if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Write_Control.rawValue) {
+                    writeControlCharacteristic = characteristic
+                } else if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Backfill.rawValue) {
+                    backfillCharacteristic = characteristic
+                } else if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Communication.rawValue) {
+                    communicationCharacteristic = characteristic
+                }
+                
+                // Initially subscribe only to Receive_Authentication; defer other notifies until after paired & authenticated
+                if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue) {
+                    
+                    setNotifyValue(true, for: characteristic)
+                    
+                    // this is the authentication characteristic, if the authentication is not successful within 2 seconds, then this is not the device that is currently being used by the official dexcom app, so let's disconnect and scan again
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self else { return }
-                        self.authenticationTimeOutTimer = Timer.scheduledTimer(timeInterval: 5.0, target: self, selector: #selector(CGMG7Transmitter.authenticationFailed), userInfo: nil, repeats: false) // stability: allow slower auth contention with Dexcom app
+                        self.authenticationTimeOutTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(CGMG7Transmitter.authenticationFailed), userInfo: nil, repeats: false)
                     }
-
                 }
-
             }
         } else {
             trace("    Did discover characteristics, but no characteristics listed. There must be some error.", log: log, category: ConstantsLog.categoryCGMG7, type: .error)
@@ -468,17 +484,19 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         if let error = error, error.localizedDescription.contains(find: "Encryption is insufficient") {
             trace("didUpdateNotificationStateFor for peripheral with name %{public}@, characteristic %{public}@, error contains Encryption is insufficient. This is not the device we're looking for.", log: log, category: ConstantsLog.categoryCGMG7, type: .info, (deviceName != nil ? deviceName! : "unknown"), String(describing: characteristic.uuid))
             
-            // it's not the device we're interested in, disconnect, forget this device, and restart scanning for a new, other device
-            
+            // it's not the device we're interested in; restart scanning. Forget only during new-device discovery
             cancelAuthenticationTimer()
 
             // deliver any pending readings/backfill before disconnecting
             flushBackfillDeliveringToDelegate()
 
-            disconnectAndForget()
+            if shouldForgetCurrentPeripheral() {
+                disconnectAndForget()
+            } else {
+                disconnect()
+            }
 
             _ = startScanning()
-            
         }
         
     }
@@ -518,14 +536,23 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     }
     
     // MARK: - private functions
+    /// Forget peripherals only during new-device discovery; once an active transmitter id is known, avoid blacklisting in coexistence
+    private func shouldForgetCurrentPeripheral() -> Bool {
+        return UserDefaults.standard.activeSensorTransmitterId == nil
+    }
+    
     @objc private func authenticationFailed() {
         
-        trace("Connected to Dexcom G7 but authentication not received. Will disconnect and scan for another Dexcom G7/ONE+/Stelo", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
+        trace("connected to Dexcom G7 but authentication not received. Will disconnect and scan for another Dexcom G7/ONE+/Stelo", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
 
         // deliver any pending readings/backfill before disconnecting
         flushBackfillDeliveringToDelegate()
 
-        disconnectAndForget()
+        if shouldForgetCurrentPeripheral() {
+            disconnectAndForget()
+        } else {
+            disconnect()
+        }
 
         _ = startScanning()
         

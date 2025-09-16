@@ -341,8 +341,18 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
     override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         
-        // Immediately hand reconnect duty to the superclass (OS-managed). Keep this on bt.central for queue discipline.
-        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
+        // In coexistence, defer OS-managed reconnect until the next allowed window (quiet window or predictive cap), whichever is later.
+        if useOtherApp {
+            let earliest = Date().addingTimeInterval(2.0)
+            let resumeAt = max(earliest, suppressReconnectUntil)
+            let delay = max(0, resumeAt.timeIntervalSinceNow)
+            DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + delay) { [weak self] in
+                self?.delayedSuperDidDisconnect(central: central, peripheral: peripheral, error: error)
+            }
+        } else {
+            // Primary mode: keep current snappy behavior.
+            super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
+        }
         
         if waitingPairingConfirmation {
             // device has requested a pairing request and is now in a status of verifying if pairing was successfull or not, this by doing setNotify to writeCharacteristic. If a disconnect occurs now, it means pairing has failed (probably because user didn't approve it
@@ -392,12 +402,12 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 break
                 
             case .CBUUID_Backfill:
-                // ensure we stay subscribed to Backfill; retry once if needed
+                // ensure we stay subscribed to Backfill. Retry once if needed
                 if !characteristic.isNotifying { setNotifyValue(true, for: characteristic) } // keep notify on
                 break
 
             case .CBUUID_Write_Control:
-                // ensure we stay subscribed to Write_Control; retry once if needed
+                // ensure we stay subscribed to Write_Control. Retry once if needed
                 if !characteristic.isNotifying { setNotifyValue(true, for: characteristic) } // keep notify on
                 
                 if (G5ResetRequested) {
@@ -479,6 +489,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                         
                         switch opCode {
                         case .authChallengeRx:
+                            
                             if let authChallengeRxMessage = AuthChallengeRxMessage(data: value) {
                                 // if not paired, then send message to delegate
                                 if !authChallengeRxMessage.paired {
@@ -516,17 +527,15 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                             }
                             
                         case .authRequestRx:
+                            // In coexistence, do not participate in the authentication handshake; remain passive so the transmitter drops us quickly.
                             if useOtherApp {
-                                trace("    authRequestRx, useOtherApp = true, no further processing", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+                                trace("authRequestRx: coexistence mode, remaining passive (no AuthChallengeTx).", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
                                 return
                             }
-
-                            // Primary mode: if we've already sent the challenge this session, ignore duplicates
                             if authChallengeTxSent {
                                 trace("authRequestRx (primary): authChallengeTx already sent, ignoring duplicate", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
                                 return
                             }
-
                             if let authRequestRxMessage = AuthRequestRxMessage(data: value), let receiveAuthenticationCharacteristic = receiveAuthenticationCharacteristic {
                                 
                                 guard let challengeHash = CGMG5Transmitter.computeHash(transmitterId, of: authRequestRxMessage.challenge) else {
@@ -546,7 +555,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                             } else {
                                 trace("    writeControlCharacteristic is nil or authRequestRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
                             }
-                            
                         case .sensorDataRx:
                             
                             // if this is the first sensorDataRx after a successful pairing, then inform delegate that pairing is finished
@@ -749,64 +757,86 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         // not calling super.didconnect here
         
+        // Coexistence quiet-window. If Dexcom app isn’t driving (we inferred earlier), avoid camping until the next tick window.
+        if useOtherApp && Date() < suppressReconnectUntil {
+            trace("coexistence: in quiet window (until %{public}@). Staying idle and letting the transmitter drop us (no immediate reconnect).", log: log, category: ConstantsLog.categoryCGMG5, type: .info, suppressReconnectUntil.toString(timeStyle: .long, dateStyle: .none))
+            // Do not call super and do not actively disconnect; avoid camping the radio and let the transmitter end the link.
+            return
+        }
+        
         // only throttle if we are already fully configured (characteristics discovered + kept)
         let fullyConfigured = (writeControlCharacteristic != nil && receiveAuthenticationCharacteristic != nil) // throttle only when configured
         
-        // Predictive gating (audio-agnostic): only bounce connections that are *way* too early; allow near-tick ones to proceed.
+        // Predictive gating (coexistence stays passive): only bounce connections that are *way* too early in primary. Coexistence stays subscribed.
         let cap = nextPredictiveReconnectDeadline()
         let tooEarly: Bool
-        if useOtherApp {
-            tooEarly = false      // Coexistence: never bounce early connects—stay subscribed
-        } else if let cap = cap {
+        if let cap = cap {
             // Fixed margin without any audio heuristics: only bounce if we're more than ~90s before the cap
             tooEarly = Date() < cap.addingTimeInterval(-90.0)
         } else {
             tooEarly = false
         }
         
+        // Coexistence hard guard: if we are too early, do not camp even if characteristics are not yet discovered
+        if useOtherApp && tooEarly {
+            trace("coexistence: connected too early, staying idle and letting the transmitter drop us (pre-config). Backing off next reconnect.", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
+            backoffCoexistenceUntilNextTick()
+            // Do not call super and do not actively disconnect; avoid immediate reconnect loops.
+            return
+        }
+
         // if last reading was less than 2.1 minutes ago, or last connection less than 2.1 minutes ago, then no need to continue, otherwise continue with process by calling super.centralManager(central, didConnect: peripheral)
         // except if calibrationToSendToTransmitter or sensorStartToSendToTransmitter or dexcomSessionStopTxMessageToSendTransmitter not nil
         if fullyConfigured && calibrationToSendToTransmitter == nil && sensorStartToSendToTransmitter == nil && dexcomSessionStopTxMessageToSendToTransmitter == nil {
             
             if tooEarly && Date() < Date(timeInterval: ConstantsDexcomG5.minimumTimeBetweenTwoReadings, since: timeStampOfLastG5Reading) {
-                // compute the next safe time we’d be willing to connect again
-                let nextByReading = Date(timeInterval: ConstantsDexcomG5.minimumTimeBetweenTwoReadings, since: timeStampOfLastG5Reading)
-                let nextByConnect = Date(timeInterval: TimeInterval(minutes: 2.1), since: timeStampLastConnection)
-                
-                suppressReconnectUntil = (nextByReading > nextByConnect ? nextByReading : nextByConnect)
-                if let cap = nextPredictiveReconnectDeadline(), cap < suppressReconnectUntil {
-                    
-                    suppressReconnectUntil = cap
-                    
-                    trace("didConnect: applying predictive cap; will not delay past %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, cap.toString(timeStyle: .long, dateStyle: .none))
-                }
-                
-                trace("didConnect: throttling; suppressing reconnects until %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, suppressReconnectUntil.toString(timeStyle: .long, dateStyle: .none))
                 trace("connected to peripheral with name %{public}@, but last reading was less than %{public}@ minute ago, will let the connection timeout", log: log, category: ConstantsLog.categoryCGMG5, type: .info, (deviceName != nil ? deviceName! : "unknown"), ConstantsDexcomG5.minimumTimeBetweenTwoReadings.minutes.description)
-                
-                // don't disconnect here, keep the connection open, the transmitter will disconnect in a few seconds, assumption is that this will increase battery life, because otherwise there's lot of unnecessary data communication
-                return
-                
-            } else if tooEarly && Date() < Date(timeInterval: TimeInterval(minutes: 2.1), since: timeStampLastConnection) {
-                // compute the next safe time we’d be willing to connect again
-                let nextByReading = Date(timeInterval: ConstantsDexcomG5.minimumTimeBetweenTwoReadings, since: timeStampOfLastG5Reading)
-                let nextByConnect = Date(timeInterval: TimeInterval(minutes: 2.1), since: timeStampLastConnection)
-                
-                suppressReconnectUntil = (nextByReading > nextByConnect ? nextByReading : nextByConnect)
-                
-                if let cap = nextPredictiveReconnectDeadline(), cap < suppressReconnectUntil {
-                    suppressReconnectUntil = cap
-                    
-                    trace("didConnect: applying predictive cap; will not delay past %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, cap.toString(timeStyle: .long, dateStyle: .none))
+
+                // Re-arm notifies only in primary mode. Remain passive in coexistence
+                if !useOtherApp {
+                    if let receiveAuthenticationCharacteristic = receiveAuthenticationCharacteristic, !receiveAuthenticationCharacteristic.isNotifying {
+                        setNotifyValue(true, for: receiveAuthenticationCharacteristic)
+                    }
+
+                    if let writeControlCharacteristic = writeControlCharacteristic, !writeControlCharacteristic.isNotifying {
+                        setNotifyValue(true, for: writeControlCharacteristic)
+                    }
+
+                    if useFireFlyFlow(), let backfillCharacteristic = backfillCharacteristic, !backfillCharacteristic.isNotifying {
+                        setNotifyValue(true, for: backfillCharacteristic)
+                    }
                 }
                 
-                trace("didConnect: throttling; suppressing reconnects until %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, suppressReconnectUntil.toString(timeStyle: .long, dateStyle: .none))
-                
-                trace("connected to peripheral with name %{public}@, but last connection was less than 2.1 minutes ago, will let the connection timeout", log: log, category: ConstantsLog.categoryCGMG5, type: .info, (deviceName != nil ? deviceName! : "unknown"))
-                // don't disconnect here, keep the connection open, the transmitter will disconnect in a few seconds, assumption is that this will increase battery life, because otherwise there's lot of unnecessary data communication
-                
+                // coexistence mode: do not actively disconnect; back off and let the transmitter drop us
+                if useOtherApp {
+                    backoffCoexistenceUntilNextTick()
+                }
                 return
-                
+
+            } else if tooEarly && Date() < Date(timeInterval: TimeInterval(minutes: 2.1), since: timeStampLastConnection) {
+                trace("connected to peripheral with name %{public}@, but last connection was less than 2.1 minutes ago, will let the connection timeout", log: log, category: ConstantsLog.categoryCGMG5, type: .info, (deviceName != nil ? deviceName! : "unknown"))
+
+                // Re-arm notifies only in primary mode. Remain passive in coexistence
+                if !useOtherApp {
+                    if let receiveAuthenticationCharacteristic = receiveAuthenticationCharacteristic, !receiveAuthenticationCharacteristic.isNotifying {
+                        setNotifyValue(true, for: receiveAuthenticationCharacteristic)
+                    }
+
+                    if let writeControlCharacteristic = writeControlCharacteristic, !writeControlCharacteristic.isNotifying {
+                        setNotifyValue(true, for: writeControlCharacteristic)
+                    }
+
+                    if useFireFlyFlow(), let backfillCharacteristic = backfillCharacteristic, !backfillCharacteristic.isNotifying {
+                        setNotifyValue(true, for: backfillCharacteristic)
+                    }
+                }
+
+                // coexistence mode: do not actively disconnect; back off and let the transmitter drop us
+                if useOtherApp {
+                    backoffCoexistenceUntilNextTick()
+                }
+                return
+
             }
             
         }
@@ -1263,6 +1293,34 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
     }
     
+    /// In coexistence (useOtherApp = true) back off reconnects until the next expected tick window.
+    private func backoffCoexistenceUntilNextTick() {
+        // Prefer the predictive cap; otherwise wait ~4 minutes to avoid camping.
+        // Aim to reconnect shortly BEFORE the cap to avoid missing the reading.
+        let defaultCap = Date().addingTimeInterval(4 * 60)
+        let cap = nextPredictiveReconnectDeadline() ?? defaultCap
+        
+        // Target a point slightly before the expected tick
+        var target = cap.addingTimeInterval(-95) // 95s before expected tick
+        
+        // Do not schedule in the past; if already passed, fall back to now + 90s
+        if target <= Date() {
+            target = Date().addingTimeInterval(90)
+        }
+        
+        // Never move the suppress window backward
+        if target > suppressReconnectUntil {
+            suppressReconnectUntil = target
+        }
+        
+        trace("coexistence: backing off reconnects until %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, suppressReconnectUntil.toString(timeStyle: .long, dateStyle: .none))
+    }
+    
+    /// Helper to allow calling super.didDisconnectPeripheral from a delayed closure
+    private func delayedSuperDidDisconnect(central: CBCentralManager, peripheral: CBPeripheral, error: Error?) {
+        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
+    }
+
     private func processResetRxMessage(value:Data) {
         
         if let resetRxMessage = ResetRxMessage(data: value) {
@@ -1432,7 +1490,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             // Record last transmitter timestamp and (re)arm predictive window
             lastTxGlucoseTimestamp = timeStamp
             if let cap = nextPredictiveReconnectDeadline() {
-                trace("    predictive: next tick at %{public}@; will aim to be connected by %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, timeStamp.addingTimeInterval(5*60).toString(timeStyle: .long, dateStyle: .none), cap.toString(timeStyle: .long, dateStyle: .none))
+                trace("    predictive: next tick at %{public}@. Will aim to be connected by %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, timeStamp.addingTimeInterval(5*60).toString(timeStyle: .long, dateStyle: .none), cap.toString(timeStyle: .long, dateStyle: .none))
             }
 
             // it's a valid sensor state, so it's ok to send a backfill request after this message is processed
@@ -1783,7 +1841,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 trace("    backfillCharacteristic is nil, can not set notifyValue", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
             }
         } else {
-            // Not Firefly: this is expected; avoid noisy error logs.
+            // Not Firefly: this is expected. Avoid noisy error logs.
             trace("    backfill subscription not applicable (non-Firefly)", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
         }
         
@@ -1915,16 +1973,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                         disconnect()
                         
                     }
-    // Deliver any accumulated data before state is reset on OS-driven disconnects
-    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        // Let base class do its logging/state hooks first
-        super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
-
-        // Deliver any accumulated data (backfill + last reading) on disconnect
-        // This mirrors the last known good behavior and ensures UI/Core Data sees readings
-        sendGlucoseDataToDelegate()
-    }
-                    
                 }
                 
                 // reset okToRequestBackfill to false
@@ -2083,7 +2131,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// Returns the latest time we should delay a reconnect to still hit the next sensor tick (nextTick - predictiveLeadSeconds)
     private func nextPredictiveReconnectDeadline() -> Date? {
         guard let last = lastTxGlucoseTimestamp else { return nil }
-        // Dexcom transmits every 5 minutes; aim to be connected slightly before the next tick.
+        // Dexcom transmits every 5 minutes. Aim to be connected slightly before the next tick.
         let nextTick = last.addingTimeInterval(5 * 60)
         let lead: TimeInterval = predictiveLeadSeconds
         return nextTick.addingTimeInterval(-lead)

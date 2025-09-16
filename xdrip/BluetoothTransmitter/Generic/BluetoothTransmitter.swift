@@ -196,7 +196,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         shouldReconnectOnNextDisconnect = false
         // request disconnect first so OS callbacks can complete
         disconnect()
-        // clear local references (we are intentionally *not* clearing central/peripheral delegates here;
+        // clear local references (we are intentionally *not* clearing central/peripheral delegates here
         // final teardown should call prepareForRelease() when the instance is actually being released)
         peripheral = nil
         deviceName = nil
@@ -667,36 +667,31 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
     }
     
-    func centralManager(_ central: CBCentralManager,
-                        willRestoreState dict: [String : Any]) {
+    func centralManager(_ central: CBCentralManager, willRestoreState dict: [String : Any]) {
         trace("in willRestoreState", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
 
         // Attempt to reuse the restored peripheral (if any) without forcing a rescan.
-        if let restoredPeripherals = dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral],
-           let restored = restoredPeripherals.first {
+        if let restoredPeripherals = dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral], let restoredPeripheral = restoredPeripherals.first {
 
             // Re-attach references and delegates
-            self.peripheral = restored
-            self.deviceAddress = restored.identifier.uuidString
-            self.deviceName = restored.name
-            restored.delegate = self
+            self.peripheral = restoredPeripheral
+            self.deviceAddress = restoredPeripheral.identifier.uuidString
+            self.deviceName = restoredPeripheral.name
+            restoredPeripheral.delegate = self
 
-            trace("    willRestoreState: restored peripheral %{public}@ (state=%{public}@)", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, restored.name ?? "'unknown'", restored.state.description())
+            trace("    willRestoreState: restored peripheral %{public}@ (state = %{public}@)", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, restoredPeripheral.name ?? "'unknown'", restoredPeripheral.state.description())
 
-            switch restored.state {
+            switch restoredPeripheral.state {
             case .connected:
-                // If receiveCharacteristic is already cached, ensure notifications are enabled; otherwise re-discover services
-                if let rc = self.receiveCharacteristic {
-                    setNotifyValue(true, for: rc)
-                } else {
-                    restored.discoverServices(self.servicesCBUUIDs)
-                }
+                // On restore while connected, always rediscover services so subclasses can resubscribe ALL required characteristics (not just the cached receive one).
+                trace("    willRestoreState: connected; rediscovering services for full resubscribe", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+                restoredPeripheral.discoverServices(self.servicesCBUUIDs)
             case .connecting:
-                // Nothing to do; CoreBluetooth will finish the connection
+                // Nothing to do. CoreBluetooth will finish the connection
                 break
             default:
-                // Ask CoreBluetooth to reconnect to the restored device to minimize races with scanning
-                central.connect(restored, options: nil)
+                // Reconnect restored peripheral to resume subscriptions after OS restore
+                central.connect(restoredPeripheral, options: nil)
             }
         }
     }
