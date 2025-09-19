@@ -220,6 +220,10 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         // and nightscoutURL exists
         guard UserDefaults.standard.nightscoutEnabled, UserDefaults.standard.nightscoutUrl != nil else { return }
         
+        updateProfile()
+        
+        updateDeviceStatus()
+        
         // no sync needed if app is running in the background
         // guard UserDefaults.standard.appInForeGround else {return}
         
@@ -237,10 +241,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         
         // set nightscoutSyncStartTimeStamp to now, because nightscout sync will start
         nightscoutSyncStartTimeStamp = Date()
-        
-        updateProfile()
-        
-        updateDeviceStatus()
         
         /// to keep track if one of the downloads resulted in creation or update of treatments
         var treatmentsLocallyCreatedOrUpdated = false
