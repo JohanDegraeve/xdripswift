@@ -17,8 +17,6 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     /// if timeStampLastReading > 5 min + 30 seconds, then, when receiving a new reading, it means there's a gap, and most likely the official Dexcom app will request for backfill data. So in that case we'll not immediately send the reading to the  delegate, but wait for the backfill to arrive
     private var timeStampLastReading: Date?
 
-    /// debounce timer to flush backfill while still connected
-    private var backfillFlushTimer: Timer?
 
     // MARK: UUID's
     
@@ -82,20 +80,9 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     /// the backfill Characteristic
     private var backfillCharacteristic:CBCharacteristic?
     
-    /// Per-connection guard to avoid missing data notifies due to timing
-    private var didRequestDataNotifiesThisConnection: Bool = false
-    
     /// Rolling connection id for log correlation (increments on each didConnect)
     private var cycleId: Int = 0
-
-    /// Adaptive auth-timeout control to reduce flap-induced misses
-    private var consecutiveAuthTimeouts: Int = 0
     
-    /// used to track the last auth-timeout timestamp
-    private var lastAuthTimeoutAt: Date?
-
-    /// used to track the last auth-timeout value used for this connection (for summary logs)
-    private var lastAuthTimeoutIntervalUsed: TimeInterval = 2.0
     
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
@@ -117,8 +104,6 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         }
     }
 
-    /// after subscribing to receiveAuthenticationCharacteristic (which is also used for authentication), and if not receiving a successful authentication within 2 seconds, then this is not the correct device
-    private var authenticationTimeOutTimer: Timer?
 
     // MARK: - public functions
     
@@ -160,11 +145,6 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         super.prepareForRelease()
 
         let tearDown = {
-            // Stop and clear timers that could keep self alive or fire after release
-            self.authenticationTimeOutTimer?.invalidate()
-            self.authenticationTimeOutTimer = nil
-            self.backfillFlushTimer?.invalidate()
-            self.backfillFlushTimer = nil
             // Clear characteristic strong refs so no accidental retains persist
             self.writeControlCharacteristic = nil
             self.receiveAuthenticationCharacteristic = nil
@@ -180,16 +160,11 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     
     deinit {
         // Delegate cleanup is handled by the base class in prepareForRelease()/deinit.
-        authenticationTimeOutTimer?.invalidate()
-        backfillFlushTimer?.invalidate()
     }
 
     // MARK: - BluetoothTransmitter overriden functions
 
     override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        // ensure any pending auth timeout cannot fire after this disconnect
-        cancelAuthenticationTimer()
-        
         super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
 
         // backfill should not contain at leats the latest reading, and possibly also real backfill data
@@ -217,19 +192,11 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
             backfill = [GlucoseData]()
         }
 
-        // invalidate any pending backfill flush timer
-        backfillFlushTimer?.invalidate() // stability: avoid stray timer after disconnect
-        backfillFlushTimer = nil
-
         // setting characteristics to nil, they will be reinitialized at next connect
         writeControlCharacteristic = nil
         receiveAuthenticationCharacteristic = nil
         communicationCharacteristic = nil
         backfillCharacteristic = nil
-        
-        // reset per-connection request flag
-        didRequestDataNotifiesThisConnection = false
-
     }
 
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
@@ -325,7 +292,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                         let writeControlCharacteristicIsNotifying = self.writeControlCharacteristic?.isNotifying ?? false
                         let backfillCharacteristicIsNotifying = self.backfillCharacteristic?.isNotifying ?? false
                         
-                        trace("    G7 connection cycle summary: value = %{public}@ mg/dL at %{public}@ (cid=%{public}d; extra flow: wc_notify_on = %{public}@, bf_notify_on = %{public}@, auth_timeout = %{public}@s)", log: log, category: ConstantsLog.categoryCGMG7, type: .info, glucoseLevelRawString, timeStampString, self.cycleId, String(writeControlCharacteristicIsNotifying), String(backfillCharacteristicIsNotifying), String(format: "%.1f", self.lastAuthTimeoutIntervalUsed))
+                        trace("    G7 connection cycle summary: value = %{public}@ mg/dL at %{public}@ (cid=%{public}d; extra flow: wc_notify_on = %{public}@, bf_notify_on = %{public}@)", log: log, category: ConstantsLog.categoryCGMG7, type: .info, glucoseLevelRawString, timeStampString, self.cycleId, String(writeControlCharacteristicIsNotifying), String(backfillCharacteristicIsNotifying))
                         
                         DispatchQueue.main.async { [weak self] in
                             guard let self = self else { return }
@@ -336,7 +303,6 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                         self.timeStampLastReading = g7GlucoseMessage.timeStamp
                     } else {
                         // stability: we expect backfill soon, debounce a short flush so UI doesn't look stuck if Dexcom keeps link open
-                        scheduleBackfillFlush()
                     }
                 } else {
                     // no previous reading; deliver immediately and advance last timestamp
@@ -348,7 +314,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                     let writeControlCharacteristicIsNotifying = self.writeControlCharacteristic?.isNotifying ?? false
                     let backfillCharacteristicIsNotifying = self.backfillCharacteristic?.isNotifying ?? false
                     
-                    trace("    G7 connection cycle summary: value = %{public}@ mg/dL at %{public}@ (cid=%{public}d; extra flow: wc_notify_on = %{public}@, bf_notify_on = %{public}@, auth_timeout = %{public}@s)", log: log, category: ConstantsLog.categoryCGMG7, type: .info, glucoseLevelRawString, timeStampString, self.cycleId, String(writeControlCharacteristicIsNotifying), String(backfillCharacteristicIsNotifying), String(format: "%.1f", self.lastAuthTimeoutIntervalUsed))
+                    trace("    G7 connection cycle summary: value = %{public}@ mg/dL at %{public}@ (cid=%{public}d; extra flow: wc_notify_on = %{public}@, bf_notify_on = %{public}@)", log: log, category: ConstantsLog.categoryCGMG7, type: .info, glucoseLevelRawString, timeStampString, self.cycleId, String(writeControlCharacteristicIsNotifying), String(backfillCharacteristicIsNotifying))
                     
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self else { return }
@@ -395,9 +361,6 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                 if timeStampLastReading == nil || dexcomG7BackfillMessage.timeStamp > timeStampLastReading! {
                     timeStampLastReading = dexcomG7BackfillMessage.timeStamp
                 }
-
-                // debounce a short flush so we don't wait for a disconnect to deliver
-                scheduleBackfillFlush()
             }
 
         case .CBUUID_Receive_Authentication:
@@ -407,9 +370,6 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
             trace("in peripheralDidUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, value.hexEncodedString())
 
             if let authChallengeRxMessage = AuthChallengeRxMessage(data: value) {
-                
-                // Arm data notifies as soon as we see any auth traffic (one-shot per connection)
-                armDataNotifiesIfNeeded()
 
                 if authChallengeRxMessage.paired, authChallengeRxMessage.authenticated {
 
@@ -420,29 +380,10 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
                         self.bluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: self)
                     }
-
-                    cancelAuthenticationTimer()
-                    
-                    // reset adaptive auth-timeout counters on successful auth
-                    consecutiveAuthTimeouts = 0
-                    lastAuthTimeoutAt = nil
-                    
-                    // Ensure data notifies are armed (will no-op if already requested this connection)
-                    armDataNotifiesIfNeeded()
                 } else {
 
-                    trace("    connected to Dexcom G7 that is not paired and/or authenticated by other app. Will disconnect and scan for another Dexcom G7/ONE+/Stelo", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
-
-                    // deliver any pending readings/backfill before disconnecting
-                    flushBackfillDeliveringToDelegate()
-
-                    if shouldForgetCurrentPeripheral() {
-                        disconnectAndForget()
-                    } else {
-                        disconnect()
-                    }
-
-                    _ = startScanning()
+                    trace("    connected to Dexcom G7 that is not paired and/or authenticated by other app. Waiting briefly for data (coexistence)", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
+                    // Do nothing here; the generic data-timeout will disconnect if no data arrives.
 
                 }
 
@@ -465,8 +406,6 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         cancelConnectionTimer()
         
         cycleId += 1
-        
-        didRequestDataNotifiesThisConnection = false
         
         trace("connected to peripheral with name %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, deviceName ?? "'unknown'")
         
@@ -500,27 +439,16 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                 let have = [receiveAuthenticationCharacteristic != nil, writeControlCharacteristic != nil, backfillCharacteristic != nil, communicationCharacteristic != nil]
                 trace("G7 notify: discovered refs - auth: %{public}@ write: %{public}@ backfill: %{public}@ comm: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, String(have[0]), String(have[1]), String(have[2]), String(have[3]))
                 
-                // Initially subscribe only to Receive_Authentication; defer other notifies until after paired & authenticated
+                // Subscribe to all relevant characteristics immediately (coexistence: read-only notifies)
                 if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue) {
-                    
-                    // DEBUG
                     traceNotifyState(characteristic, label: "notify requested (we issued setNotifyValue)")
-                    setNotifyValue(true, for: characteristic)
-                    
-                    // this is the authentication characteristic, if the authentication is not successful within 2 seconds, then this is not the device that is currently being used by the official dexcom app, so let's disconnect and scan again
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self = self else { return }
-                        // adaptive: if we previously timed out auth, give the next attempt a bit more room (3s) for one cycle
-                        let within5m = (self.lastAuthTimeoutAt != nil) ? (abs(self.lastAuthTimeoutAt!.timeIntervalSinceNow) < (5 * 60)) : false
-                        
-                        let interval: TimeInterval = (self.consecutiveAuthTimeouts > 0 && within5m) ? 3.0 : 2.0
-                        
-                        self.lastAuthTimeoutIntervalUsed = interval
-                        
-                        trace("G7 auth-timeout set to %{public}@s (consecutive = %{public}d)", log: self.log, category: ConstantsLog.categoryCGMG7, type: .debug, String(format: "%.1f", interval), self.consecutiveAuthTimeouts)
-                        
-                        authenticationTimeOutTimer = Timer.scheduledTimer(timeInterval: interval, target: self, selector: #selector(CGMG7Transmitter.authenticationFailed), userInfo: nil, repeats: false)
-                    }
+                    if !characteristic.isNotifying { setNotifyValue(true, for: characteristic) }
+                } else if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Write_Control.rawValue) {
+                    traceNotifyState(characteristic, label: "notify requested (we issued setNotifyValue)")
+                    if !characteristic.isNotifying { setNotifyValue(true, for: characteristic) }
+                } else if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Backfill.rawValue) {
+                    traceNotifyState(characteristic, label: "notify requested (we issued setNotifyValue)")
+                    if !characteristic.isNotifying { setNotifyValue(true, for: characteristic) }
                 }
             }
         } else {
@@ -545,7 +473,6 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
             trace("didUpdateNotificationStateFor for peripheral with name %{public}@, characteristic %{public}@, error contains Encryption is insufficient. This is not the device we're looking for.", log: log, category: ConstantsLog.categoryCGMG7, type: .info, (deviceName != nil ? deviceName! : "unknown"), String(describing: characteristic.uuid))
             
             // it's not the device we're interested in; restart scanning. Forget only during new-device discovery
-            cancelAuthenticationTimer()
 
             // deliver any pending readings/backfill before disconnecting
             flushBackfillDeliveringToDelegate()
@@ -601,20 +528,6 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         return UserDefaults.standard.activeSensorTransmitterId == nil
     }
     
-    /// Ensure data notifies are armed once per connection as soon as we see auth traffic
-    private func armDataNotifiesIfNeeded() {
-        guard didRequestDataNotifiesThisConnection == false else { return }
-        if let writeControlCharacteristic = writeControlCharacteristic {
-            traceNotifyState(writeControlCharacteristic, label: "notify requested (we issued setNotifyValue)")
-            if !writeControlCharacteristic.isNotifying { setNotifyValue(true, for: writeControlCharacteristic) }
-        }
-        if let backfillCharacteristic = backfillCharacteristic {
-            traceNotifyState(backfillCharacteristic, label: "notify requested (we issued setNotifyValue)")
-            if !backfillCharacteristic.isNotifying { setNotifyValue(true, for: backfillCharacteristic) }
-        }
-        didRequestDataNotifiesThisConnection = true
-    }
-    
     // DEBUG
     private func traceNotifyState(_ characteristic: CBCharacteristic, label: String) {
         let name: String
@@ -633,45 +546,6 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         trace("G7 notify: %{public}@ - %{public}@ isNotifying = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, label, name, String(characteristic.isNotifying))
     }
     
-    @objc private func authenticationFailed() {
-        
-        trace("connected to Dexcom G7 but authentication not received. Will disconnect and scan for another Dexcom G7/ONE+/Stelo", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
-        
-        consecutiveAuthTimeouts += 1
-        lastAuthTimeoutAt = Date()
-        
-        // deliver any pending readings/backfill before disconnecting
-        flushBackfillDeliveringToDelegate()
-
-        if shouldForgetCurrentPeripheral() {
-            disconnectAndForget()
-        } else {
-            disconnect()
-        }
-
-        _ = startScanning()
-        
-    }
-    
-    private func cancelAuthenticationTimer() {
-        if let authenticationTimeOutTimer = authenticationTimeOutTimer {
-            if authenticationTimeOutTimer.isValid {
-                authenticationTimeOutTimer.invalidate()
-                self.authenticationTimeOutTimer = nil
-            }
-        }
-    }
-
-    private func scheduleBackfillFlush() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
-            self.backfillFlushTimer?.invalidate()
-            self.backfillFlushTimer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: false) { [weak self] _ in
-                self?.flushBackfillDeliveringToDelegate()
-            }
-        }
-    }
-
     private func flushBackfillDeliveringToDelegate() {
         guard backfill.isEmpty == false else { return }
         // sort backfill, first element should be youngest
