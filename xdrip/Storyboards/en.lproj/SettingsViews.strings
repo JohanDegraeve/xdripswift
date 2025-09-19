@@ -11,7 +11,7 @@
 "settingsviews_follower" = "Follower";
 "settingsviews_sectionTitleDataSource" = "CGM Data Source";
 "settingsviews_labelFollowerDataSourceType" = "Follower Data Source";
-"settingsviews_labelUploadFollowerDataToNightscout" = "Upload to Nightscout";
+"settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
 "settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
 "settingsviews_followerKeepAliveTypeDisabled" = "Disabled";
 "settingsviews_followerKeepAliveTypeNormal" = "Normal";
@@ -22,7 +22,7 @@
 "settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Background keep-alive is set to use an external heartbeat. ❤️\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
 "settingsviews_followerPatientName" = "Patient Name";
 "settingsviews_followerPatientNameMessage" = "Here you can write the name of the person you are following.\n\nThis can be useful if you are following several different people with several different apps.\n\nThis is optional and would normally be left empty.";
-"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload follower BG values to Nightscout, you must enable it in the Nightscout section.";
+"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
 "settingsviews_nightscoutNotEnabledRowText" = "Disabled";
 "settingsviews_labelFollowerDataSourceRegion" = "Server (Country)";
 "settingsviews_enterUsername" = "Enter your username (e-mail)";
@@ -146,7 +146,9 @@
 "volumeTestSoundPlayer" = "Test Volume (if Override Mute On)";
 "volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
 "debugLevel" = "Include Debug Level";
-"warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
+"warningChangeFromMasterToFollower" = "Switching from Master to Follower will stop your current sensor. Do you want to continue?";
+"warningChangeFromMasterToFollowerDexcomShare" = "Switch from Master to Dexcom Share Follower will stop your current sensor and will also disable 'Upload to Dexcom Share'. Do you want to continue?";
+"warningChangeToFollowerDexcomShare" = "Switching to Dexcom Share Follower mode will disable 'Upload to Dexcom Share'.";
 "nightscoutPort" = "Port";
 "developerSettings" = "Developer Settings";
 "smoothLibreValues" = "Smooth Libre Values";

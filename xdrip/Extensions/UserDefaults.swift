@@ -30,6 +30,8 @@ extension UserDefaults {
         
         /// is master mode selected?
         case isMaster = "isMaster"
+        /// should master data be uploaded to Nightscout?
+        case masterUploadDataToNightscout = "masterUploadDataToNightscout"
         /// which follower mode is selected?
         case followerDataSourceType = "followerDataSourceType"
         /// should follower data (if not from Nightscout) be uploaded to Nightscout?
@@ -482,6 +484,17 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.isMaster.rawValue)
+        }
+    }
+    
+    /// should the master CGM data be uploaded to Nightscout?
+    @objc dynamic var masterUploadDataToNightscout: Bool {
+        // default value for bool in userdefaults is false
+        get {
+            return !bool(forKey: Key.masterUploadDataToNightscout.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.masterUploadDataToNightscout.rawValue)
         }
     }
     

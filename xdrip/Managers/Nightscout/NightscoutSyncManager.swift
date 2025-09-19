@@ -164,15 +164,11 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         // and nightscoutURL exists
         guard UserDefaults.standard.nightscoutEnabled, UserDefaults.standard.nightscoutUrl != nil else { return }
         
-        if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
-            trace("    setting nightscoutSyncRequired to true, this will also initiate a treatments/devicestatus sync", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
-            
-            UserDefaults.standard.timeStampLatestNightscoutSyncRequest = .now
-            UserDefaults.standard.nightscoutSyncRequired = true
-        }
-        
-        // check that either master is enabled or if we're using a follower mode other than Nightscout and the user wants to upload the BG values
-        if (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .nightscout) || (!UserDefaults.standard.isMaster && !UserDefaults.standard.followerUploadDataToNightscout) {
+        // check and exit without uploading BG values if any of the following conditions are true:
+        // - follower mode but the follower source is also Nightscout
+        // - follower mode but upload follower data to Nightscout if false
+        // - master mode but upload master to Nightscout is false
+        if (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .nightscout) || (!UserDefaults.standard.isMaster && !UserDefaults.standard.followerUploadDataToNightscout) || (UserDefaults.standard.isMaster && !UserDefaults.standard.masterUploadDataToNightscout) {
             return
         }
         
@@ -188,6 +184,13 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                     return
                 }
             }
+        }
+        
+        if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+            trace("    setting nightscoutSyncRequired to true, this will also initiate a treatments/devicestatus sync", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+            
+            UserDefaults.standard.timeStampLatestNightscoutSyncRequest = .now
+            UserDefaults.standard.nightscoutSyncRequired = true
         }
         
         // upload readings

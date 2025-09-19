@@ -1,6 +1,6 @@
 import UIKit
 
-fileprivate enum Setting:Int, CaseIterable {
+fileprivate enum Setting: Int, CaseIterable {
     ///should readings be uploaded or not
     case uploadReadingstoDexcomShare = 0
     ///dexcomShareAccountName
@@ -19,7 +19,7 @@ fileprivate enum Setting:Int, CaseIterable {
 }
 
 /// conforms to SettingsViewModelProtocol for all Dexcom Share Upload settings in the first sections screen
-class SettingsViewDexcomShareUploadSettingsViewModel:SettingsViewModelProtocol {
+class SettingsViewDexcomShareUploadSettingsViewModel: SettingsViewModelProtocol {
     
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
@@ -45,16 +45,20 @@ class SettingsViewDexcomShareUploadSettingsViewModel:SettingsViewModelProtocol {
         switch setting {
             
         case .uploadReadingstoDexcomShare:
-            return SettingsSelectedRowAction.nothing
+            if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .dexcomShare {
+                return .showInfoText(title: Texts_SettingsView.sectionTitleDexcomShareUpload, message: Texts_SettingsView.labelUploadReadingstoDexcomShareDisabledMessage)
+            } else {
+                return .nothing
+            }
             
         case .dexcomShareAccountName:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelDexcomShareAccountName, message: Texts_SettingsView.giveDexcomShareAccountName, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareAccountName, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(accountName:String) in UserDefaults.standard.dexcomShareAccountName = accountName.toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
+            return .askText(title: Texts_SettingsView.labelDexcomShareAccountName, message: Texts_SettingsView.giveDexcomShareAccountName, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareAccountName, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(accountName:String) in UserDefaults.standard.dexcomShareAccountName = accountName.toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
             
         case .dexcomSharePassword:
-            return SettingsSelectedRowAction.askText(title: Texts_Common.password, message: Texts_SettingsView.giveDexcomSharePassword, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomSharePassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(password:String) in UserDefaults.standard.dexcomSharePassword = password.toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
+            return .askText(title: Texts_Common.password, message: Texts_SettingsView.giveDexcomSharePassword, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomSharePassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(password:String) in UserDefaults.standard.dexcomSharePassword = password.toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
             
         case .dexcomShareUploadSerialNumber:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labeldexcomShareUploadSerialNumber, message: Texts_SettingsView.givedexcomShareUploadSerialNumber, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareUploadSerialNumber, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in
+            return .askText(title: Texts_SettingsView.labeldexcomShareUploadSerialNumber, message: Texts_SettingsView.givedexcomShareUploadSerialNumber, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareUploadSerialNumber, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in
                 
                 // convert to uppercase
                 let serialNumberUpper = serialNumber.uppercased()
@@ -71,7 +75,7 @@ class SettingsViewDexcomShareUploadSettingsViewModel:SettingsViewModelProtocol {
             }, cancelHandler: nil, inputValidator: nil)
             
         case .useUSDexcomShareurl:
-            return SettingsSelectedRowAction.nothing
+            return .nothing
             
         case .useSchedule:
             return .nothing
@@ -146,7 +150,8 @@ class SettingsViewDexcomShareUploadSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
         case .uploadReadingstoDexcomShare:
-            return nil
+            // show the disabled text if we're in dexcom share follower mode
+            return (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .dexcomShare) ? Texts_Common.disabled : nil
         case .dexcomShareAccountName:
             return UserDefaults.standard.dexcomShareAccountName ?? Texts_SettingsView.valueIsRequired
         case .dexcomSharePassword:
@@ -167,7 +172,8 @@ class SettingsViewDexcomShareUploadSettingsViewModel:SettingsViewModelProtocol {
         
         switch setting {
         case .uploadReadingstoDexcomShare:
-            return UISwitch(isOn: UserDefaults.standard.uploadReadingstoDexcomShare, action: {(isOn:Bool) in UserDefaults.standard.uploadReadingstoDexcomShare = isOn})
+            // hide the UISwitch if we're in dexcom share follower mode
+            return (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .dexcomShare) ? nil : UISwitch(isOn: UserDefaults.standard.uploadReadingstoDexcomShare, action: {(isOn:Bool) in UserDefaults.standard.uploadReadingstoDexcomShare = isOn})
         case .useUSDexcomShareurl:
             return UISwitch(isOn: UserDefaults.standard.useUSDexcomShareurl, action: {(isOn:Bool) in UserDefaults.standard.useUSDexcomShareurl = isOn})
         case .dexcomShareAccountName,.dexcomSharePassword,.dexcomShareUploadSerialNumber:

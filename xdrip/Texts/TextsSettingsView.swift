@@ -76,12 +76,24 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_masterorfollower", tableName: filename, bundle: Bundle.main, value: "Use as Master or Follower", comment: "data source settings, master or follower")
     }()
     
+    static let warningChangeFromMasterToFollower: String = {
+        return NSLocalizedString("warningChangeFromMasterToFollower", tableName: filename, bundle: Bundle.main, value: "Switching from Master to Follower will stop your current sensor. Do you want to continue?", comment: "general settings, when switching from master to follower, if confirmation is asked, this message will be shown.")
+    }()
+    
+    static let warningChangeFromMasterToFollowerDexcomShare: String = {
+        return NSLocalizedString("warningChangeFromMasterToFollowerDexcomShare", tableName: filename, bundle: Bundle.main, value: "Switch from Master to Dexcom Share Follower will stop your current sensor and will also disable 'Upload to Dexcom Share'. Do you want to continue?", comment: "general settings, when switching from master to follower if upload to dexcom share is enabled, if confirmation is asked, this message will be shown.")
+    }()
+    
+    static let warningChangeToFollowerDexcomShare: String = {
+        return NSLocalizedString("warningChangeToFollowerDexcomShare", tableName: filename, bundle: Bundle.main, value: "Switching to Dexcom Share Follower mode will disable 'Upload to Dexcom Share'.", comment: "general settings, if he user selects dexcom share follower and upload to dexcom share is enabled, we will disable the upload function")
+    }()
+    
     static let labelFollowerDataSourceType: String = {
         return NSLocalizedString("settingsviews_labelFollowerDataSourceType", tableName: filename, bundle: Bundle.main, value: "Follower Data Source", comment: "data source settings, data source")
     }()
     
-    static let labelUploadFollowerDataToNightscout: String = {
-        return NSLocalizedString("settingsviews_labelUploadFollowerDataToNightscout", tableName: filename, bundle: Bundle.main, value: "Upload to Nightscout", comment: "data source settings, enable Nightscout upload")
+    static let labelUploadDataToNightscout: String = {
+        return NSLocalizedString("settingsviews_labelUploadDataToNightscout", tableName: filename, bundle: Bundle.main, value: "Upload to Nightscout", comment: "data source settings, enable Nightscout upload")
     }()
     
     static let labelfollowerKeepAliveType: String = {
@@ -129,7 +141,7 @@ class Texts_SettingsView {
     }()
     
     static let nightscoutNotEnabled: String = {
-        return NSLocalizedString("settingsviews_nightscoutNotEnabled", tableName: filename, bundle: Bundle.main, value: "Nightscout is disabled\n\nTo upload follower BG values to Nightscout, you must enable it in the Nightscout section.", comment: "data source settings, enable Nightscout in the Nightscout section")
+        return NSLocalizedString("settingsviews_nightscoutNotEnabled", tableName: filename, bundle: Bundle.main, value: "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.", comment: "data source settings, enable Nightscout in the Nightscout section")
     }()
     
     static let nightscoutNotEnabledRowText: String = {
@@ -190,10 +202,6 @@ class Texts_SettingsView {
     
     static let multipleAppBadgeValueWith10: String = {
         return NSLocalizedString("settingsviews_multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "Multiply App Badge Reading by 10", comment: "general settings, should reading be multiplied with 10 yes or no")
-    }()
-    
-    static let warningChangeFromMasterToFollower: String = {
-        return NSLocalizedString("warningChangeFromMasterToFollower", tableName: filename, bundle: Bundle.main, value: "Switch from master to follower will stop your current sensor. Do you want to continue ?", comment: "general settings, when switching from master to follower, if confirmation is asked, this message will be shown.")
     }()
     
     static let settingsviews_IntervalTitle = {
@@ -433,6 +441,10 @@ class Texts_SettingsView {
     
     static let labelUploadReadingstoDexcomShare = {
         return NSLocalizedString("settingsviews_uploadReadingstoDexcomShare", tableName: filename, bundle: Bundle.main, value: "Upload to Dexcom Share", comment: "dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no")
+    }()
+    
+    static let labelUploadReadingstoDexcomShareDisabledMessage = {
+        return NSLocalizedString("settingsviews_uploadReadingstoDexcomShareDisabledMessage", tableName: filename, bundle: Bundle.main, value: "Upload to Dexcom Share is disabled when using Dexcom Share Follower Mode", comment: "dexcom share settings, tell the user that upload to dexcom share is disabled when using dexcom share follower mode")
     }()
 
     static let labeldexcomShareUploadSerialNumber = {
