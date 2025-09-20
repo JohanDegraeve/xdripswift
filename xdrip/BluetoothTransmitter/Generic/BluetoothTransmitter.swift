@@ -704,6 +704,19 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func initiatePairing() {return}
     
     private func initialize() {
+        // Prevent re-initialization when a central manager already exists for this instance.
+        if centralManager != nil {
+            trace("initialize: centralManager already initialized for this instance, skipping re-init", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug)
+            // Refresh handles to known peripherals if we already know the address
+            if let centralManager = centralManager, let deviceAddress = deviceAddress, let uuid = UUID(uuidString: deviceAddress) {
+                let peripherals = centralManager.retrievePeripherals(withIdentifiers: [uuid])
+                if let reusedPeripheral = peripherals.first {
+                    self.peripheral = reusedPeripheral
+                    self.deviceName = reusedPeripheral.name
+                }
+            }
+            return
+        }
         
         // create centralManager with a CBCentralManagerOptionRestoreIdentifierKey. This to ensure that iOS relaunches the app whenever it's killed either due to a crash or due to lack of memory
         // iOS will restart the app as soon as a bluetooth transmitter tries to connect (which is under normal circumtances immediately)
