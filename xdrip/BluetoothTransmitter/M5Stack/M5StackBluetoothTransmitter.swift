@@ -379,7 +379,10 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
                 
                 self.blePassword = newBlePassword
                 
-                m5StackBluetoothTransmitterDelegate?.newBlePassWord(newBlePassword: newBlePassword, m5StackBluetoothTransmitter: self)
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    self.m5StackBluetoothTransmitterDelegate?.newBlePassWord(newBlePassword: newBlePassword, m5StackBluetoothTransmitter: self)
+                }
                 
                 // memory clean up
                 blePasswordM5StackPacket = nil
@@ -394,21 +397,32 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
             trace("    successfully authenticated", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             
             // inform delegates
-            m5StackBluetoothTransmitterDelegate?.authentication(success: true, m5StackBluetoothTransmitter: self)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.m5StackBluetoothTransmitterDelegate?.authentication(success: true, m5StackBluetoothTransmitter: self)
+            }
             
             // final steps after successful communication
             finalizeConnectionSetup()
             
         case .authenticateFailureRx:
             // received authentication failure, inform delegates
-
-            m5StackBluetoothTransmitterDelegate?.authentication(success: false, m5StackBluetoothTransmitter: self)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.m5StackBluetoothTransmitterDelegate?.authentication(success: false, m5StackBluetoothTransmitter: self)
+            }
             
         case .readBlePassWordError1Rx:
-            m5StackBluetoothTransmitterDelegate?.blePasswordMissing(m5StackBluetoothTransmitter: self)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.m5StackBluetoothTransmitterDelegate?.blePasswordMissing(m5StackBluetoothTransmitter: self)
+            }
             
         case .readBlePassWordError2Rx:
-            m5StackBluetoothTransmitterDelegate?.m5StackResetRequired(m5StackBluetoothTransmitter: self)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.m5StackBluetoothTransmitterDelegate?.m5StackResetRequired(m5StackBluetoothTransmitter: self)
+            }
             
         case .readTimeStampRx:
             
@@ -418,7 +432,10 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         case .readAllParametersRx:
             
             // M5Stack is asking for all parameters
-            m5StackBluetoothTransmitterDelegate?.isAskingForAllParameters(m5StackBluetoothTransmitter: self)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.m5StackBluetoothTransmitterDelegate?.isAskingForAllParameters(m5StackBluetoothTransmitter: self)
+            }
             
         case .readBatteryLevelRx:
             
@@ -431,11 +448,17 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
             let receivedBatteryLevel = Int(value[1])
             
             // M5Stack is sending batteryLevel, which is in the second byte
-            m5StackBluetoothTransmitterDelegate?.receivedBattery(level: receivedBatteryLevel, m5StackBluetoothTransmitter: self)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.m5StackBluetoothTransmitterDelegate?.receivedBattery(level: receivedBatteryLevel, m5StackBluetoothTransmitter: self)
+            }
             
         case .heartbeat:
             // this is a trigger for calling the heartbeat
-            bluetoothTransmitterDelegate?.heartBeat()
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.bluetoothTransmitterDelegate?.heartBeat()
+            }
         }
 
     }
@@ -571,8 +594,10 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         // this is the time when the M5stack is ready to receive readings or parameter updates
         isReadyToReceiveData = true
         
-        m5StackBluetoothTransmitterDelegate?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
-
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.m5StackBluetoothTransmitterDelegate?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
+        }
     }
     
 }
