@@ -85,6 +85,11 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     private var lastConnectLogAt: Date = .distantPast
     private var lastConnectLogName: String? = nil
     
+    /// set the connection options
+    private var connectOptions: [String: Any] {
+        [CBConnectPeripheralOptionNotifyOnConnectionKey: true, CBConnectPeripheralOptionNotifyOnDisconnectionKey: true]
+    }
+    
     // MARK: - Initialization
     
     /// - parameters:
@@ -381,7 +386,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 self?.connectTimeOutTimer = Timer.scheduledTimer(timeInterval: 5.0, target: self as Any, selector: #selector(BluetoothTransmitter.stopConnectAndRestartScanning), userInfo: nil, repeats: false)
             }
             
-            centralManager?.connect(peripheral, options: nil)
+            centralManager?.connect(peripheral, options: connectOptions)
             
         } else {
             if let newCentralManager = centralManager {
@@ -426,7 +431,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                     if let peripheral = peripheral {
                         trace("    trying to connect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
                         peripheral.delegate = self
-                        central.connect(peripheral, options: nil)
+                        central.connect(peripheral, options: connectOptions)
                         return true
                     } else {
                         trace("     peripheral is nil", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
@@ -517,7 +522,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             trace("failed to connect, for peripheral with name %{public}@, will try again", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error, deviceName ?? "'unknown'")
         }
         
-        centralManager?.connect(peripheral, options: nil)
+        centralManager?.connect(peripheral, options: connectOptions)
         
     }
 
@@ -574,7 +579,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         // otherwise disconnect occurred because of other (like out of range), so let's try to reconnect
         if shouldReconnectOnNextDisconnect, let ownPeripheral = self.peripheral {
             trace("    Will try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug)
-            centralManager?.connect(ownPeripheral, options: nil)
+            centralManager?.connect(ownPeripheral, options: connectOptions)
         } else {
             trace("    reconnect disabled for this disconnect or peripheral is nil, will not try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
         }
@@ -691,7 +696,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 break
             default:
                 // Reconnect restored peripheral to resume subscriptions after OS restore
-                central.connect(restoredPeripheral, options: nil)
+                central.connect(restoredPeripheral, options: connectOptions)
             }
         }
     }
