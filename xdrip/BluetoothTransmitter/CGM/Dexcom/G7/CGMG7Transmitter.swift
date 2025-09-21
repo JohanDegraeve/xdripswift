@@ -355,9 +355,17 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
             if let sensorAge = sensorAge, sensorAge < (ConstantsDexcomG7.maxSensorAgeInDays * 24 * 3600), let dexcomG7BackfillMessage = DexcomG7BackfillMessage(data: value, sensorAge: sensorAge) {
                 trace("    received backfill mesage, calculatedValue = %{public}@, timeStamp = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, dexcomG7BackfillMessage.calculatedValue.description, dexcomG7BackfillMessage.timeStamp.description(with: .current))
 
-                backfill.append(GlucoseData(timeStamp: dexcomG7BackfillMessage.timeStamp, glucoseLevelRaw: dexcomG7BackfillMessage.calculatedValue))
+                let newBackfillGlucoseData = GlucoseData(timeStamp: dexcomG7BackfillMessage.timeStamp, glucoseLevelRaw: dexcomG7BackfillMessage.calculatedValue)
 
-                // stability: keep last timestamp up to date when we see newer backfill
+                backfill.append(newBackfillGlucoseData)
+
+                // Immediately deliver this backfill item so it is not lost if no "current" value arrives in the same cycle.
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    var copy = [newBackfillGlucoseData]
+                    self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
+                }
+
                 if timeStampLastReading == nil || dexcomG7BackfillMessage.timeStamp > timeStampLastReading! {
                     timeStampLastReading = dexcomG7BackfillMessage.timeStamp
                 }
