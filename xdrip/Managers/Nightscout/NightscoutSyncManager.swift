@@ -661,12 +661,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         deviceStatus.appVersion = deviceStatusResponse.openAPS?.version
 
                         if let suggested = deviceStatusResponse.openAPS?.suggested {
-                            if let suggestedTimestampString = suggested.timestamp {
-                                if let suggestedTimestamp = NightscoutSyncManager.iso8601DateFormatter.date(from: suggestedTimestampString) ?? NightscoutSyncManager.iso8601DateFormatterWithoutFractionalSeconds.date(from: suggestedTimestampString), suggestedTimestamp > deviceStatus.lastLoopDate, suggestedTimestamp > Date().addingTimeInterval(-60 * 60 * 12) {
-                                    deviceStatus.lastLoopDate = suggestedTimestamp
-                                }
-                            }
-
                             trace("in updateDeviceStatus (openAPS), suggestion processed", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug)
 
                             deviceStatus.cob = suggested.cob ?? 0
@@ -754,41 +748,19 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         trace("in updateDeviceStatus (openAPS), no newer enacted cycle found (or older than 12h)", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug)
                     }
 
-                    // Also consider suggested timestamps across the array in case createdAt didn't advance or there was no enacted
-                    let suggestedCandidates: [Date] = deviceStatusResponseArray.compactMap { resp in
-                        guard let suggestedTimestampString = resp.openAPS?.suggested?.timestamp else { return nil }
-                        return NightscoutSyncManager.iso8601DateFormatter.date(from: suggestedTimestampString) ?? NightscoutSyncManager.iso8601DateFormatterWithoutFractionalSeconds.date(from: suggestedTimestampString)
-                    }
-                    trace("in updateDeviceStatus (openAPS), suggestedCandidates count = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, suggestedCandidates.count.description)
-                    if let newestSuggested = suggestedCandidates.max(), newestSuggested > deviceStatus.lastLoopDate, newestSuggested > Date().addingTimeInterval(-60 * 60 * 12) {
-                        trace("in updateDeviceStatus (openAPS), promoting lastLoopDate from newest suggested at %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, newestSuggested.formatted(date: .abbreviated, time: .shortened))
-                        deviceStatus.lastLoopDate = newestSuggested
-                        deviceStatusWasUpdated = true
-                    }
-
-                    // Final safeguard: choose the newest loop timestamp in the entire response (enacted preferred, suggested allowed if configured)
                     do {
-                        var newestLoopTimestampCandidates: [Date] = []
+                        // Final safeguard: only consider ENACTED timestamps when promoting lastLoopDate
+                        if let newestEnactedOnly = deviceStatusResponseArray.compactMap({ response -> Date? in
+                            guard let enactedTimestampString = response.openAPS?.enacted?.timestamp else { return nil }
+                            return NightscoutSyncManager.iso8601DateFormatter.date(from: enactedTimestampString)
+                                ?? NightscoutSyncManager.iso8601DateFormatterWithoutFractionalSeconds.date(from: enactedTimestampString)
+                        }).max(),
+                           newestEnactedOnly > deviceStatus.lastLoopDate,
+                           newestEnactedOnly > Date().addingTimeInterval(-60 * 60 * 12) {
 
-                        // Collect enacted timestamps (most authoritative)
-                        let enactedTimestampDates: [Date] = deviceStatusResponseArray.compactMap { openAPSResponse in
-                            guard let enactedTimestampString = openAPSResponse.openAPS?.enacted?.timestamp else { return nil }
-                            return NightscoutSyncManager.iso8601DateFormatter.date(from: enactedTimestampString) ?? NightscoutSyncManager.iso8601DateFormatterWithoutFractionalSeconds.date(from: enactedTimestampString)
-                        }
-                        newestLoopTimestampCandidates.append(contentsOf: enactedTimestampDates)
+                            trace("in updateDeviceStatus (openAPS), final safeguard promoting lastLoopDate to newest enacted timestamp %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, newestEnactedOnly.formatted(date: .abbreviated, time: .shortened))
 
-                        // Collect suggested timestamps (treat as loop cycles even if not enacted)
-                        let suggestedTimestampDates: [Date] = deviceStatusResponseArray.compactMap { suggestedTimestampDatesResponse in
-                            guard let suggestedTimestampString = suggestedTimestampDatesResponse.openAPS?.suggested?.timestamp else { return nil }
-                            return NightscoutSyncManager.iso8601DateFormatter.date(from: suggestedTimestampString) ?? NightscoutSyncManager.iso8601DateFormatterWithoutFractionalSeconds.date(from: suggestedTimestampString)
-                        }
-                        newestLoopTimestampCandidates.append(contentsOf: suggestedTimestampDates)
-
-                        if let newestLoopTimestamp = newestLoopTimestampCandidates.max(), newestLoopTimestamp > deviceStatus.lastLoopDate, newestLoopTimestamp > Date().addingTimeInterval(-60 * 60 * 12) {
-
-                            trace("in updateDeviceStatus (openAPS), final safeguard promoting lastLoopDate to newest loop timestamp %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, newestLoopTimestamp.formatted(date: .abbreviated, time: .shortened))
-
-                            deviceStatus.lastLoopDate = newestLoopTimestamp
+                            deviceStatus.lastLoopDate = newestEnactedOnly
                             deviceStatusWasUpdated = true
                         }
                     }
@@ -1070,6 +1042,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 var request = URLRequest(url: url)
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 request.setValue("application/json", forHTTPHeaderField: "Accept")
+                request.cachePolicy = .reloadIgnoringLocalCacheData
                 
                 // if the API_SECRET is present, then hash it and pass it via http header. If it's missing but there is a token, then send this as plain text to allow the authentication check.
                 if let apiKey = UserDefaults.standard.nightscoutAPIKey {
@@ -1118,6 +1091,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 var request = URLRequest(url: url)
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 request.setValue("application/json", forHTTPHeaderField: "Accept")
+                request.cachePolicy = .reloadIgnoringLocalCacheData
                 
                 // if the API_SECRET is present, then hash it and pass it via http header. If it's missing but there is a token, then send this as plain text to allow the authentication check.
                 if let apiKey = UserDefaults.standard.nightscoutAPIKey {
@@ -1167,6 +1141,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 var request = URLRequest(url: url)
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 request.setValue("application/json", forHTTPHeaderField: "Accept")
+                request.cachePolicy = .reloadIgnoringLocalCacheData
                 
                 // if the API_SECRET is present, then hash it and pass it via http header. If it's missing but there is a token, then send this as plain text to allow the authentication check.
                 if let apiKey = UserDefaults.standard.nightscoutAPIKey {
