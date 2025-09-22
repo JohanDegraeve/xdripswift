@@ -259,7 +259,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .followerExtraRow4:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.followerPatientName, message: Texts_SettingsView.followerPatientNameMessage, keyboardType: .default, text: UserDefaults.standard.followerPatientName, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (followerPatientName: String) in
                 
-                UserDefaults.standard.followerPatientName = followerPatientName.toNilIfLength0()
+                UserDefaults.standard.followerPatientName = followerPatientName.trimmingCharacters(in: .whitespaces).toNilIfLength0()
                 
             }, cancelHandler: nil, inputValidator: nil)
             
@@ -271,7 +271,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             case .libreLinkUp, .libreLinkUpRussia:
                 return SettingsSelectedRowAction.askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterUsername, keyboardType: .default, text: UserDefaults.standard.libreLinkUpEmail, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (libreLinkUpEmail: String) in
                         
-                    UserDefaults.standard.libreLinkUpEmail = libreLinkUpEmail.toNilIfLength0()
+                    UserDefaults.standard.libreLinkUpEmail = libreLinkUpEmail.trimmingCharacters(in: .whitespaces).toNilIfLength0()
                         
                     // if the user has changed their account name, then let's also nillify the password for them so that we don't try and login with bad credentials
                     UserDefaults.standard.libreLinkUpPassword = nil
@@ -284,7 +284,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             case .dexcomShare:
                 return SettingsSelectedRowAction.askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterUsername, keyboardType: .default, text: UserDefaults.standard.dexcomShareAccountName, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (dexcomShareAccountName: String) in
                         
-                    UserDefaults.standard.dexcomShareAccountName = dexcomShareAccountName.toNilIfLength0()
+                    UserDefaults.standard.dexcomShareAccountName = dexcomShareAccountName.trimmingCharacters(in: .whitespaces).toNilIfLength0()
                         
                     // if the user has changed their account name, then let's also nillify the password for them so that we don't try and login with bad credentials
                     UserDefaults.standard.dexcomSharePassword = nil
@@ -300,7 +300,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             case .libreLinkUp, .libreLinkUpRussia:
                 return SettingsSelectedRowAction.askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterPassword, keyboardType: .default, text: UserDefaults.standard.libreLinkUpPassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (libreLinkUpPassword: String) in
     
-                    UserDefaults.standard.libreLinkUpPassword = libreLinkUpPassword.toNilIfLength0()
+                    UserDefaults.standard.libreLinkUpPassword = libreLinkUpPassword.trimmingCharacters(in: .whitespaces).toNilIfLength0()
                         
                     // reset all data used in the UI
                     self.resetLibreLinkUpData()
@@ -310,7 +310,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             case .dexcomShare:
                 return SettingsSelectedRowAction.askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterPassword, keyboardType: .default, text: UserDefaults.standard.dexcomSharePassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (dexcomSharePassword: String) in
     
-                    UserDefaults.standard.dexcomSharePassword = dexcomSharePassword.toNilIfLength0()
+                    UserDefaults.standard.dexcomSharePassword = dexcomSharePassword.trimmingCharacters(in: .whitespaces).toNilIfLength0()
                         
                     // reset all data used in the UI
                     //self.resetLibreLinkUpData()
