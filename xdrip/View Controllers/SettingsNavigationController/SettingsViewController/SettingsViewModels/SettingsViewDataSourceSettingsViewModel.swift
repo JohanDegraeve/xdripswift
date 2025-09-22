@@ -23,7 +23,7 @@ fileprivate enum Setting: Int, CaseIterable {
     /// - Follower: should we try and keep the app alive in the background
     case followerExtraRow3 = 3
     
-    /// - Follower: patient name/alias (optional) - useful for users who follow various people
+    /// - Follower: patient name/alias (optional) - useful for users who follow various people or just want to have the name visible
     case followerExtraRow4 = 4
     
     /// - Follower: if follower data source is not Nightscout, should we upload the BG values to Nightscout?
@@ -452,7 +452,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             return UserDefaults.standard.followerBackgroundKeepAliveType.description
             
         case .followerExtraRow4:
-            return UserDefaults.standard.followerPatientName ?? "(optional)"
+            return UserDefaults.standard.followerPatientName ?? nil
             
         case .followerExtraRow5:
             return UserDefaults.standard.nightscoutEnabled ? nil : Texts_SettingsView.nightscoutNotEnabledRowText

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24123.1" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24127" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="49e-Tb-3d3">
     <device id="retina6_0" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24062"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
@@ -80,7 +80,7 @@
                                 </subviews>
                             </stackView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="12:34" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Tqm-Qh-Jin">
-                                <rect key="frame" x="91" y="10" width="208" height="95.666666666666657"/>
+                                <rect key="frame" x="91" y="10" width="208" height="95.666666666666671"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="80"/>
                                 <color key="textColor" name="colorPrimary"/>
                                 <nil key="highlightedColor"/>
@@ -835,19 +835,7 @@
                                             </view>
                                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0nE-AX-r0w" customClass="BloodGlucoseChartView" customModule="xdrip" customModuleProvider="target">
                                                 <rect key="frame" x="10" y="0.0" width="380" height="26.666666666666668"/>
-                                                <subviews>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4FR-qu-yXX">
-                                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="18"/>
-                                                        <color key="textColor" systemColor="systemGrayColor"/>
-                                                        <nil key="highlightedColor"/>
-                                                    </label>
-                                                </subviews>
                                                 <gestureRecognizers/>
-                                                <constraints>
-                                                    <constraint firstItem="4FR-qu-yXX" firstAttribute="top" secondItem="0nE-AX-r0w" secondAttribute="top" id="eUY-Fv-CUz"/>
-                                                    <constraint firstItem="4FR-qu-yXX" firstAttribute="leading" secondItem="0nE-AX-r0w" secondAttribute="leading" id="gH1-zo-AgG"/>
-                                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="4FR-qu-yXX" secondAttribute="trailing" constant="20" symbolic="YES" id="jtf-4M-neE"/>
-                                                </constraints>
                                                 <connections>
                                                     <outletCollection property="gestureRecognizers" destination="KGx-wX-6Ap" appends="YES" id="VDW-BI-6so"/>
                                                     <outletCollection property="gestureRecognizers" destination="axt-dD-sCA" appends="YES" id="Bxm-Qp-L3P"/>
@@ -1313,7 +1301,6 @@
                         <outlet property="dataSourceViewOutlet" destination="bjv-fG-4ZY" id="uQ3-Rj-HOQ"/>
                         <outlet property="diffLabelOutlet" destination="7Wo-wd-80o" id="nnn-w9-1sX"/>
                         <outlet property="diffLabelUnitOutlet" destination="LHe-pP-hD1" id="VVb-Z0-rJZ"/>
-                        <outlet property="followerPatientNameLabelOutlet" destination="4FR-qu-yXX" id="cqb-aO-6mG"/>
                         <outlet property="highLabelOutlet" destination="Xlz-6g-zzD" id="DyX-x0-PwZ"/>
                         <outlet property="highStatisticLabelOutlet" destination="EbR-T4-LIg" id="VZk-1K-BCq"/>
                         <outlet property="highTitleLabelOutlet" destination="bUK-pC-4bd" id="R8q-Q6-q9d"/>

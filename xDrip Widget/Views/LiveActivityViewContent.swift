@@ -160,16 +160,35 @@ struct LiveActivityViewContent : View {
                     
                     GlucoseChartView(glucoseChartType: .liveActivity, bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityType: .large, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
                     
-                    HStack {
-                        Text(context.state.dataSourceDescription)
-                            .font(.caption).bold()
-                            .foregroundStyle(.colorSecondary)
-                        
-                        Spacer()
-                        
-                        Text("Last reading at \(context.state.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
-                            .font(.caption)
-                            .foregroundStyle(.colorSecondary)
+                    HStack(alignment: .center) {
+                        // if we're in follower mode and a patient name exists, let's use it with preference over the data source
+                        // we'll also show a reduced "last reading at..." display to allow for the room needed for the patient name
+                        if let followerPatientName = context.state.followerPatientName {
+                            Text(followerPatientName)
+                                .font(.caption).bold()
+                                .foregroundStyle(.colorSecondary)
+                                .padding(.trailing, -4)
+                            
+                            Text("(\(context.state.dataSourceDescription))")
+                                .font(.caption)
+                                .foregroundStyle(.colorTertiary)
+                            
+                            Spacer()
+                            
+                            Text(context.state.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")
+                                .font(.caption)
+                                .foregroundStyle(.colorSecondary)
+                        } else {
+                            Text(context.state.dataSourceDescription)
+                                .font(.caption).bold()
+                                .foregroundStyle(.colorSecondary)
+                            
+                            Spacer()
+                            
+                            Text("Last reading at \(context.state.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
+                                .font(.caption)
+                                .foregroundStyle(.colorSecondary)
+                        }
                     }
                     .padding(.top, 6)
                     .padding(.bottom, 10)

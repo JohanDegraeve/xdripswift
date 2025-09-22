@@ -137,7 +137,7 @@ class Texts_SettingsView {
     }()
     
     static let followerPatientNameMessage: String = {
-        return NSLocalizedString("settingsviews_followerPatientNameMessage", tableName: filename, bundle: Bundle.main, value: "Here you can write the name of the person you are following.\n\nThis can be useful if you are following several different people with several different apps.\n\nThis is optional and would normally be left empty.", comment: "data source settings, ask the user to enter the name of the person we are following if they want to - it's optional")
+        return NSLocalizedString("settingsviews_followerPatientNameMessage", tableName: filename, bundle: Bundle.main, value: "Here you can optionally write the name of the person you are following.", comment: "data source settings, ask the user to enter the name of the person we are following if they want to")
     }()
     
     static let nightscoutNotEnabled: String = {

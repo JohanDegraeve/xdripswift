@@ -53,6 +53,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var warnUserToOpenApp: Bool = true
         var liveActivityType: LiveActivityType
         var dataSourceDescription: String
+        var followerPatientName: String?
         
         var deviceStatusCreatedAt: Date?
         var deviceStatusLastLoopDate: Date?
@@ -69,7 +70,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             bgReadingDates[0]
         }
 
-        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, dataSourceDescription: String? = "", deviceStatusCreatedAt: Date?, deviceStatusLastLoopDate: Date?) {
+        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, dataSourceDescription: String? = "", followerPatientName: String? = nil, deviceStatusCreatedAt: Date?, deviceStatusLastLoopDate: Date?) {
         
             self.bgReadingFloats = bgReadingValues.map(Float16.init)
 
@@ -86,6 +87,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl            
             self.liveActivityType = liveActivityType
             self.dataSourceDescription = dataSourceDescription ?? ""
+            self.followerPatientName = followerPatientName
             
             self.deviceStatusCreatedAt = deviceStatusCreatedAt
             self.deviceStatusLastLoopDate = deviceStatusLastLoopDate
