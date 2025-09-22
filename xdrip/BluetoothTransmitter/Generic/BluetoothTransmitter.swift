@@ -8,6 +8,13 @@ import UIKit
 /// The class assumes that the transmitter has a receive and transmit characterisitc (which is mostly the case) - incase there's more characteristics to be processed, then the derived class will need to override didUpdateValueFor function
 class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate {
     
+    // MARK: - persistence (UserDefaults keys)
+    /// we use this to store the required info needed to restore a random ID if it was created that way during the init
+    private enum DefaultsKey {
+        static let lastKnownDeviceAddress = "bt.lastKnownDeviceAddress"
+        static let lastKnownDeviceName    = "bt.lastKnownDeviceName"
+    }
+
     // MARK: - public properties
     
     /// variable : it can get a new value during app run, will be used by rootviewcontroller's that want to receive info
@@ -81,9 +88,12 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// when trying to connect to a discovered device for the first time, a timer will be used to avoid that connection attempts take forever
     private var connectTimeOutTimer: Timer?
 
-    /// De-dup state for connection log spam
+    /// de-dup state for connection log spam
     private var lastConnectLogAt: Date = .distantPast
     private var lastConnectLogName: String? = nil
+    
+    /// whether the currently-instantiated central was created with a stable restore ID (i.e., we knew the device address at creation time).
+    private var centralUsesStableRestoreID = false
     
     /// set the connection options
     private var connectOptions: [String: Any] {
@@ -112,7 +122,13 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             
         case .notYetConnected(let newexpectedName):
             expectedName = newexpectedName
-            
+            // opportunistically preload persisted address/name so we can use a stable restore ID on first init.
+            if deviceAddress == nil, let savedAddress = UserDefaults.standard.string(forKey: DefaultsKey.lastKnownDeviceAddress) {
+                deviceAddress = savedAddress
+                deviceName = UserDefaults.standard.string(forKey: DefaultsKey.lastKnownDeviceName)
+                trace("preloaded device from defaults: address = %{public}@, name = %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, savedAddress, deviceName ?? "'unknown'")
+                // We still keep expectedName if provided. It's harmless and only used on first-ever scan paths.
+            }
         }
         
         //assign uuid's
@@ -508,6 +524,29 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             self.bluetoothTransmitterDelegate?.didConnectTo(bluetoothTransmitter: self)
         }
 
+        // persist a newly learned address/name ASAP (covers first-ever connect on a random-restore-ID run).
+        if let uuidString = peripheral.identifier.uuidString as String? {
+            if deviceAddress != uuidString {
+                deviceAddress = uuidString
+            }
+            
+            if deviceName == nil {
+                deviceName = peripheral.name
+            }
+            
+            UserDefaults.standard.setValue(deviceAddress, forKey: DefaultsKey.lastKnownDeviceAddress)
+            UserDefaults.standard.setValue(deviceName,    forKey: DefaultsKey.lastKnownDeviceName)
+            
+            trace("persisted device to defaults: address=%{public}@, name=%{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceAddress ?? "'nil'", deviceName ?? "'unknown'")
+        }
+
+        // if this central was created with a random restore ID, immediately recreate with the stable ID.
+        if centralUsesStableRestoreID == false, deviceAddress != nil {
+            recreateCentralWithStableRestoreID()
+            // avoid racing discoverServices on a soon-to-be-torn-down central.
+            return
+        }
+
         peripheral.discoverServices(servicesCBUUIDs)
         
     }
@@ -706,7 +745,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// to ask transmitter that it initiates pairing
     ///
     /// to be overriden. For transmitter types that don't need pairing, or that don't need pairing initiated by user/view controller, this function does not need to be overriden
-    func initiatePairing() {return}
+    func initiatePairing() { return }
     
     private func initialize() {
         // Prevent re-initialization when a central manager already exists for this instance.
@@ -729,7 +768,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         // see https://developer.apple.com/library/archive/qa/qa1962/_index.html
         //
         // the value used for CBCentralManagerOptionRestoreIdentifierKey depends :
-        // - when scanning for a new device (or peripheral), use a random string. Disadvantage of using a random string is that willRestoreState doesn't get called when the app relaunches, because not the same value will be used (as it's a random string)
+        // - when scanning for a new device (or peripheral), use a random string. Disadvantage of using a random string is that willRestoreState doesn't get called when the app relaunches, because not the same value will be used (as it's a random string) - for this reason, we'll store this string in userdefaults (not shared, just local to this scope) and use when relaunching.
         // - when scanning for (better : trying to connect to) a known device, the device's mac address is used. In that case, after restart, it will be the same value. In this case the function willRestoreState gets called
         //
         // additional notes :
@@ -745,21 +784,51 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             // if it's an existing device, then restore identifier key will contain the device address, which is unique worldwide
             // the application name is also in the identifier key
             cBCentralManagerOptionRestoreIdentifierKeyToUse = ConstantsHomeView.applicationName + "-" + deviceAddress
+            centralUsesStableRestoreID = true
+            trace("restoreID created (stable from address): %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, cBCentralManagerOptionRestoreIdentifierKeyToUse!)
             
         } else {
-
             trace("in initialize, creating centralManager for new peripheral", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
 
-            // if it's a new device, then restore identifier key will contain random string
-            // the application name is also in the identifier key
-            cBCentralManagerOptionRestoreIdentifierKeyToUse = ConstantsHomeView.applicationName + "-" + String((0..<24).map{ _ in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".randomElement()!})
+            // if it's a new device, then restore identifier key will contain random string. The application name is also in the identifier key
+            let randomPart = String((0..<24).map{ _ in "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".randomElement()!})
             
+            cBCentralManagerOptionRestoreIdentifierKeyToUse = ConstantsHomeView.applicationName + "-" + randomPart
+            
+            centralUsesStableRestoreID = false
+            
+            trace("restoreID created (random, no known address yet): %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, cBCentralManagerOptionRestoreIdentifierKeyToUse!)
         }
-        
         
         // Create central manager on dedicated bt.central queue so all delegate callbacks arrive off the main thread
         centralManager = CBCentralManager(delegate: self, queue: centralQueue, options: [CBCentralManagerOptionShowPowerAlertKey: true, CBCentralManagerOptionRestoreIdentifierKey: cBCentralManagerOptionRestoreIdentifierKeyToUse!])
-        
+    }
+    
+    /// Recreate the central with a stable restore ID as soon as we know the address.
+    private func recreateCentralWithStableRestoreID() {
+        centralQueue.async { [weak self] in
+            guard let self = self else { return }
+            guard self.centralUsesStableRestoreID == false, let address = self.deviceAddress else { return }
+
+            trace("recreating CBCentralManager with stable restore ID for address %{public}@",
+                  log: self.log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, address)
+
+            // Best effort, cancel live connection and tear down the old central.
+            if let centralManager = self.centralManager, let peripheral = self.peripheral {
+                centralManager.cancelPeripheralConnection(peripheral)
+            }
+            
+            self.centralManager?.delegate = nil
+            self.centralManager = nil
+
+            // Recreate with stable ID and immediately reattach to the known peripheral.
+            self.initialize()
+            if let centralManager = self.centralManager {
+                if !self.retrievePeripherals(centralManager) {
+                    _ = self.startScanning()
+                }
+            }
+        }
     }
     
     // MARK: - enum's
