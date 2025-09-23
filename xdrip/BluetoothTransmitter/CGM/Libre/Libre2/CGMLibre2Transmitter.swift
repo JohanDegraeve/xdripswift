@@ -192,17 +192,6 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
             return
             
         }
-            
-        // logging libreSensorUID and libre1DerivedAlgorithmParameters just in case it's needed for debugging purposes
-        var libre1DerivedAlgorithmParametersAsString: String!
-        if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters {
-            libre1DerivedAlgorithmParametersAsString = libre1DerivedAlgorithmParameters.description
-        } else {
-            libre1DerivedAlgorithmParametersAsString = "unknown"
-        }
-        
-        trace("in peripheral didUpdateValueFor libreSensorUID = %{public}@, libre1DerivedAlgorithmParameters = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, libreSensorUID.toHexString(), libre1DerivedAlgorithmParametersAsString)
-
         
         if let value = characteristic.value {
             
@@ -292,7 +281,7 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
         //check if buffer needs to be reset
         if (Date() > startDate.addingTimeInterval(CGMLibre2Transmitter.maxWaitForpacketInSeconds)) {
             
-            trace("in peripheral didUpdateValueFor, more than %{public}@ seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, CGMLibre2Transmitter.maxWaitForpacketInSeconds.description)
+            trace("in peripheral didUpdateValueFor, more than %{public}@ seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryCGMLibre2, type: .debug, CGMLibre2Transmitter.maxWaitForpacketInSeconds.description)
             
             resetRxBuffer()
             
@@ -303,6 +292,17 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
         
         // check if enough bytes are received, and if yes start processing
         if rxBuffer.count == expectedBufferSize {
+            
+            // Log once per completed Libre2 frame (moved from didUpdateValueFor to avoid per-fragment duplication)
+            do {
+                var libre1DerivedAlgorithmParametersAsString: String!
+                if let libre1DerivedAlgorithmParameters = UserDefaults.standard.libre1DerivedAlgorithmParameters {
+                    libre1DerivedAlgorithmParametersAsString = libre1DerivedAlgorithmParameters.description
+                } else {
+                    libre1DerivedAlgorithmParametersAsString = "unknown"
+                }
+                trace("in peripheral didUpdateValueFor libreSensorUID = %{public}@, libre1DerivedAlgorithmParameters = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .debug, sensorUID.toHexString(), libre1DerivedAlgorithmParametersAsString)
+            }
             
             do {
                 
