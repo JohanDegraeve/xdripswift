@@ -310,6 +310,16 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
     }
     
+    /// can we show the transmitter read sucess row?
+    /// basically only show it for CGM transmitters and hide for heartbeat and M5Stack types
+    func canShowTransmitterReadSuccess() -> Bool {
+        switch self.category() {
+        case .CGM:
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 

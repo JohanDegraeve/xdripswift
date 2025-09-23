@@ -36,6 +36,8 @@
 		472134DE2BC6A63100729850 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
 		472134DF2BC6A63100729850 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
 		47228B152996BDD2008725DB /* BgReadingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47228B142996BDD2008725DB /* BgReadingsView.swift */; };
+		47244D662E8318DB007357C3 /* TransmitterReadSuccessManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47244D652E8318D0007357C3 /* TransmitterReadSuccessManager.swift */; };
+		47244D682E8318E7007357C3 /* TransmitterReadSuccessResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47244D672E8318E0007357C3 /* TransmitterReadSuccessResult.swift */; };
 		472596052B76301F00459D12 /* WatchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 472596042B76301F00459D12 /* WatchManager.swift */; };
 		4733B93E2AD17C99001D609D /* FollowerBgReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4733B93D2AD17C99001D609D /* FollowerBgReading.swift */; };
 		4733B9402AD17D15001D609D /* FollowerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4733B93F2AD17D15001D609D /* FollowerDelegate.swift */; };
@@ -923,6 +925,8 @@
 		471C9C052B94DFAE005E1326 /* xDrip-Watch-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "xDrip-Watch-App-Info.plist"; sourceTree = SOURCE_ROOT; };
 		471C9C062B94E2B3005E1326 /* xDrip Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "xDrip Watch App.entitlements"; sourceTree = "<group>"; };
 		47228B142996BDD2008725DB /* BgReadingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadingsView.swift; sourceTree = "<group>"; };
+		47244D652E8318D0007357C3 /* TransmitterReadSuccessManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmitterReadSuccessManager.swift; sourceTree = "<group>"; };
+		47244D672E8318E0007357C3 /* TransmitterReadSuccessResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmitterReadSuccessResult.swift; sourceTree = "<group>"; };
 		472596042B76301F00459D12 /* WatchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchManager.swift; sourceTree = "<group>"; };
 		4733B93D2AD17C99001D609D /* FollowerBgReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBgReading.swift; sourceTree = "<group>"; };
 		4733B93F2AD17D15001D609D /* FollowerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerDelegate.swift; sourceTree = "<group>"; };
@@ -1989,6 +1993,15 @@
 			path = LiveActivity;
 			sourceTree = "<group>";
 		};
+		47244D642E8318B9007357C3 /* TransmitterReadSuccess */ = {
+			isa = PBXGroup;
+			children = (
+				47244D652E8318D0007357C3 /* TransmitterReadSuccessManager.swift */,
+				47244D672E8318E0007357C3 /* TransmitterReadSuccessResult.swift */,
+			);
+			path = TransmitterReadSuccess;
+			sourceTree = "<group>";
+		};
 		472596032B76300800459D12 /* Watch */ = {
 			isa = PBXGroup;
 			children = (
@@ -2689,6 +2702,7 @@
 				F64039AE281C3F8D0051EFFE /* QuickActions */,
 				F821CF9922AEF2DF005C1E43 /* Speak */,
 				47FB28052636AFE700042FFB /* Statistics */,
+				47244D642E8318B9007357C3 /* TransmitterReadSuccess */,
 				472596032B76300800459D12 /* Watch */,
 				474606812B96357200AC9214 /* Widgets */,
 			);
@@ -4564,6 +4578,7 @@
 				F8025E5021EE746400ECF0C0 /* Calibrator.swift in Sources */,
 				F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */,
 				F8B3A844227F090E004BA588 /* SettingsViewAlertSettingsViewModel.swift in Sources */,
+				47244D662E8318DB007357C3 /* TransmitterReadSuccessManager.swift in Sources */,
 				475F2A872D0DA81400DE6019 /* ShowHideItemsView.swift in Sources */,
 				F8D0587C24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift in Sources */,
 				F8A1586322EDB86E007F5B5D /* ConstantsSounds.swift in Sources */,
@@ -4586,6 +4601,7 @@
 				D417E51C282EC8DB008DC467 /* ProgressBarViewController.swift in Sources */,
 				47DB06C62A6FC72000267BE3 /* SettingsViewCalendarEventsSettingsViewModel.swift in Sources */,
 				F830991C23C2909E005741DF /* Watlaa+CoreDataClass.swift in Sources */,
+				47244D682E8318E7007357C3 /* TransmitterReadSuccessResult.swift in Sources */,
 				47EDD1422BDD4FE500C5A286 /* XDripWidgetAttributes.swift in Sources */,
 				F808D2CC240328FA0084B5DB /* Bubble+CoreDataClass.swift in Sources */,
 				F8A1586122EDB844007F5B5D /* ConstantsNotifications.swift in Sources */,

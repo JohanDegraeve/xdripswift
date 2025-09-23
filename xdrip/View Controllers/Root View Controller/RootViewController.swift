@@ -526,7 +526,7 @@ final class RootViewController: UIViewController, ObservableObject {
     private var healthKitManager:HealthKitManager?
     
     /// reference to activeSensor
-    private var activeSensor:Sensor?
+    private(set) var activeSensor:Sensor?
     
     /// reference to bgReadingSpeaker
     private var bgReadingSpeaker:BGReadingSpeaker?
@@ -606,6 +606,8 @@ final class RootViewController: UIViewController, ObservableObject {
     /// uiview to be used for the night-mode overlay to darken the app screen
     private var overlayView: UIView?
     
+    /// Last timestamp when a log line was produced by TransmitterReadSuccessManager
+    private var transmitterReadSuccessTimeStampOfLastLogCreated: Date?
     
     // MARK: - overriden functions
     
@@ -3946,7 +3948,7 @@ extension RootViewController: CGMTransmitterDelegate {
                 
                 supressReadingIfSensorIsWarmingUp = true
                 
-                trace("Sensor is still warming up. BG reading processing will remain suppressed for another %{public}@ minutes. (%{public}@ minutes warm-up required).", log: log, category: ConstantsLog.categoryRootView, type: .info, Int(secondsUntilWarmUpComplete/60).description, ConstantsMaster.minimumSensorWarmUpRequiredInMinutes.description)
+                trace("sensor is still warming up. BG reading processing will remain suppressed for another %{public}@ minutes. (%{public}@ minutes warm-up required).", log: log, category: ConstantsLog.categoryRootView, type: .info, Int(secondsUntilWarmUpComplete/60).description, ConstantsMaster.minimumSensorWarmUpRequiredInMinutes.description)
                 
             }
             
@@ -3957,9 +3959,32 @@ extension RootViewController: CGMTransmitterDelegate {
             
             processNewGlucoseData(glucoseData: &glucoseData, sensorAge: sensorAge)
             
+            // now try and log a transmitter read success line to the trace files.
+            // this will only happen once per hour after launching the app
+            if let activeSensor = activeSensor, let bgReadingsAccessor = bgReadingsAccessor, let transmitterReadSuccessDisplay = TransmitterReadSuccessManager(bgReadingsAccessor: bgReadingsAccessor).getReadSuccessForLogs(forSensor: activeSensor, notBefore: UserDefaults.standard.smoothLibreValuesChangedAtTimeStamp, timeStampOfLastLogCreated: transmitterReadSuccessTimeStampOfLastLogCreated), transmitterReadSuccessDisplay.expected24h > 0 {
+                
+                // Libre 2 + smoothing => success is effectively 100%
+                let success24h: Double = (transmitterReadSuccessDisplay.nominalGapInSeconds == 60 && UserDefaults.standard.smoothLibreValues) ? 100.0 : transmitterReadSuccessDisplay.success24h
+                
+                // Compute how much history we actually have (after cutoff, capped to 24h)
+                let now = Date()
+                let hoursAvailable: Double = {
+                    guard let earliest = transmitterReadSuccessDisplay.earliestTimestampInLast24h else { return 0 }
+                    return min(24.0, max(0, now.timeIntervalSince(earliest) / 3600.0))
+                }()
+                
+                // Decide the window label to use
+                let gap = transmitterReadSuccessDisplay.nominalGapInSeconds
+                let fullExpected24h = Int(floor((24.0 * 3600.0) / Double(gap)))
+                let label: String = (transmitterReadSuccessDisplay.expected24h >= fullExpected24h) ? "24h" : String(format: "~%.0fh", hoursAvailable)
+                
+                trace("transmitter Read Success: %{public}@% over the last %{public}@. %{public}@ missed readings from %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .info, Int(success24h.round(toDecimalPlaces: 2)).description, label, (transmitterReadSuccessDisplay.expected24h - transmitterReadSuccessDisplay.actual24h).description, transmitterReadSuccessDisplay.expected24h.description)
+                
+                transmitterReadSuccessTimeStampOfLastLogCreated = .now
+            } else {
+                trace("cannot calculate hourly transmitter Read Success.", log: log, category: ConstantsLog.categoryRootView, type: .error)
+            }
         }
-        
-        
     }
     
     func errorOccurred(xDripError: XdripError) {
@@ -3988,6 +4013,8 @@ extension RootViewController: UITabBarControllerDelegate {
         } else if let navigationController = viewController as? BluetoothPeripheralNavigationController, let bluetoothPeripheralManager = bluetoothPeripheralManager, let coreDataManager = coreDataManager {
             
             navigationController.configure(coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
+            // Inject provider at the navigation-controller level so it forwards to all BPVC children
+            navigationController.sensorProvider = self
             
         } else if let navigationController = viewController as? TreatmentsNavigationController, let coreDataManager = coreDataManager {
             navigationController.configure(coreDataManager: coreDataManager)
@@ -4226,3 +4253,7 @@ extension RootViewController: UIGestureRecognizerDelegate {
     }
     
 }
+
+// MARK: - conform to ActiveSensorProviding protocol
+
+extension RootViewController: ActiveSensorProviding { }

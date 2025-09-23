@@ -794,10 +794,20 @@ class BluetoothPeripheralManager: NSObject {
             transmitter.disconnect()
             // perform the ARC release on the next main runloop tick to avoid racing CB callbacks
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(50)) { [weak self] in
-                self?.bluetoothTransmitters[index] = nil
+                guard let self = self else { return }
+                // The array may have been mutated between scheduling and execution; re-validate the index.
+                guard index >= 0 && index < self.bluetoothTransmitters.count else {
+                    trace("in setTransmitterToNilAndCallcgmTransmitterInfoChangedIfNecessary, index %{public}d out of range (count=%{public}d), skipping", log: self.log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error, index, self.bluetoothTransmitters.count)
+                    return
+                }
+                self.bluetoothTransmitters[index] = nil
             }
         } else {
-            bluetoothTransmitters[index] = nil
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                guard index >= 0 && index < self.bluetoothTransmitters.count else { return }
+                self.bluetoothTransmitters[index] = nil
+            }
         }
         
         if callcgmTransmitterInfoChanged {

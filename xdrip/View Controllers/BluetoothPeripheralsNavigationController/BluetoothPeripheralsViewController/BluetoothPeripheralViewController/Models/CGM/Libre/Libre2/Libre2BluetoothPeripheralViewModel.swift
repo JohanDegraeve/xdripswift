@@ -161,6 +161,9 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             cell.detailTextLabel?.text = nil // it's a UISwitch,  no detailed text
             cell.accessoryView = UISwitch(isOn: UserDefaults.standard.smoothLibreValues, action: { (isOn:Bool) in
                 UserDefaults.standard.smoothLibreValues = isOn
+                // set the time at which this option was changed.
+                // this is later used to make a cut-off in the read success calculations
+                UserDefaults.standard.smoothLibreValuesChangedAtTimeStamp = .now
             })
         }
     }

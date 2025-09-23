@@ -8,7 +8,6 @@ fileprivate let generalSettingSectionNumber = 0
 /// - a case per attribute that can be set in BluetoothPeripheralViewController
 /// - these are applicable to all types of bluetoothperipheral types (M5Stack ...)
 fileprivate enum Setting:Int, CaseIterable {
-    
     /// the name received from bluetoothTransmitter, ie the name hardcoded in the BluetoothPeripheral
     case name = 0
     
@@ -21,8 +20,11 @@ fileprivate enum Setting:Int, CaseIterable {
     /// timestamp when connection changed to connected or not connected
     case connectOrDisconnectTimeStamp = 3
     
-    /// transmitterID, only for devices that need it
-    case transmitterId = 4
+    /// can be used to show transmitterID or (transmitterReadSuccess if transmitterID is not shown)
+    case transmitterExtraRow4 = 4
+    
+    /// can be used to show transmitterReadSuccess if transmitterID is also shown
+    case transmitterExtraRow5 = 5
     
 }
 
@@ -42,6 +44,9 @@ fileprivate enum NonFixedCalibrationSlopesSettings: Int, CaseIterable {
 
 /// base class for UIViewController's that allow to edit specific type of bluetooth transmitters to show
 class BluetoothPeripheralViewController: UIViewController {
+    
+    // Dynamic reference to the current active sensor (owned by RootViewController)
+    weak var sensorProvider: ActiveSensorProviding?
     
     // MARK: - IBOutlet's and IBAction's
     
@@ -70,10 +75,13 @@ class BluetoothPeripheralViewController: UIViewController {
     // MARK: - private properties
     
     /// the BluetoothPeripheral being edited
-    private var bluetoothPeripheral:BluetoothPeripheral?
+    private var bluetoothPeripheral: BluetoothPeripheral?
     
     /// reference to coreDataManager
-    private var coreDataManager:CoreDataManager?
+    private var coreDataManager: CoreDataManager?
+    
+    /// BgReadingsAccessor instance
+    private var bgReadingsAccessor: BgReadingsAccessor?
     
     /// a BluetoothPeripheralManager
     private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging?
@@ -128,6 +136,14 @@ class BluetoothPeripheralViewController: UIViewController {
     /// keep track of whether the observers were already added/registered (to make sure before we try to remove them)
     private var didAddObservers: Bool = false
     
+    /// Cached summary text for the Transmitter Read Success row
+    private var cachedTransmitterReadSuccessSummaryText: String?
+    
+    /// Cached summary message  for the Transmitter Read Success row
+    private var cachedTransmitterReadSuccessSummaryMessage: String?
+    
+    /// Periodic refresher for Transmitter Read Success while the view is visible
+    private var transmitterReadSuccessTimer: Timer?
     
     // MARK: - public functions
     
@@ -140,6 +156,8 @@ class BluetoothPeripheralViewController: UIViewController {
         self.expectedBluetoothPeripheralType = type
         self.transmitterIdTempValue = bluetoothPeripheral?.blePeripheral.transmitterId
         
+        let bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
+        self.bgReadingsAccessor = bgReadingsAccessor
     }
     
     /// - sets text in connect button (only applicable to BluetoothPeripheralViewController) and gets status text
@@ -308,7 +326,9 @@ class BluetoothPeripheralViewController: UIViewController {
                 self.bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: self.tableView, bluetoothPeripheralViewController: self)
                 
                 // delegate doesn't work here anymore, because the delegate is set to zero, so reset the row with the connection status by calling reloadRows
-                self.tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+                DispatchQueue.main.async { [weak self] in
+                    self?.tableView.reloadSections(IndexSet(integer: 0), with: .none)
+                }
                 
             }
             
@@ -352,94 +372,13 @@ class BluetoothPeripheralViewController: UIViewController {
             self.bluetoothPeripheralViewModel?.configure(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager, tableView: self.tableView, bluetoothPeripheralViewController: self)
             
             // delegate doesn't work here anymore, because the delegate is set to zero, so reset the row with the connection status by calling reloadRows
-            self.tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
-            
-        }
-        
-    }
-    
-    
-    /// based upon setShouldConnectToFalse(), this function will be called by the observer if the Libre 2 NFC scan fails
-    /// the actions will depend on if a valid bluetoothPeripheral is passed to it (existing sensor) or if it is nil (adding a new sensor)
-    /// after disconnecting the transmitter (if required), it will open a dialog to ask the user if they want to try scanning again
-    ///
-    /// - parameters:
-    ///     - bluetoothPeripheral - the currently set bluetooth peripheral as defined by the delegate
-    private func nfcScanFailed(for bluetoothPeripheral: BluetoothPeripheral?) {
-        
-        // unwrap bluetoothPeripheralManager
-        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
-        
-        // check if there is an existing transmitter configured. If so, disconnect it using setShouldConnectToFalse (this will also update the table and button labels)
-        if let bluetoothPeripheral = bluetoothPeripheral {
-            
-            setShouldConnectToFalse(for: bluetoothPeripheral, askUser: false)
-            
-        } else {
-            
-            // connect button label text needs to change because shouldconnect value has changed
-            _ = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: self.isScanning, nfcScanNeeded: self.nfcScanNeeded, nfcScanSuccessful: self.nfcScanSuccessful, connectButtonOutlet: self.connectButtonOutlet, expectedBluetoothPeripheralType: self.expectedBluetoothPeripheralType, transmitterId: self.transmitterIdTempValue, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
-            
-            // TODO: need to fix crash: This reload can sometimes cause a crash under certain circumstances
-            // delegate doesn't work here anymore, because the delegate is set to zero, so reset the row with the connection status by calling reloadRows
-            self.tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
-        }
-        
-        // create UIAlertController to ask the user if they want to try running a new NFC scan, or just stay disconnected
-        let nfcScanFailedAlert = UIAlertController(title: TextsLibreNFC.nfcScanFailedTitle , message: TextsLibreNFC.nfcScanFailedMessage, preferredStyle: .alert)
-        
-        // create a scan again button. If the user clicks it, update everything and initiate a new connection (which will initiate an NFC scan first in this case).
-        let scanAgainAction = UIAlertAction(title: TextsLibreNFC.nfcScanFailedScanAgainButton, style: .default) {
-            (action:UIAlertAction!) in
-            
-            AudioServicesPlaySystemSound(1102)
-            
-            self.checkIfNFCScanIsNeeded()
-            
-            self.connectButtonHandler()
-            
-        }
-        
-        // create a cancel button
-        let cancelAction = UIAlertAction(title: Texts_Common.Cancel, style: .cancel) {
-            (action:UIAlertAction!) in
-            
-            // check if an existing transmitter exists
-            if bluetoothPeripheral != nil {
-                
-                // no need to do anything else except reset the private vars and userdefaults as needed
-                self.checkIfNFCScanIsNeeded()
-                
-            } else {
-                
-                // no transmitter has been added yet so just go back to the previous view
-                
-                // just go back to the BluetoothPeripheralsViewController and cancel the transmitter add
-                if let navigationController = self.navigationController {
-                    
-                    self.tableView.removeFromSuperview()
-                    
-                    navigationController.popViewController(animated: true)
-                    
-                } else {
-                    
-                    self.dismiss(animated: true, completion: nil)
-                    
-                }
-                
+            DispatchQueue.main.async { [weak self] in
+                self?.tableView.reloadSections(IndexSet(integer: 0), with: .none)
             }
             
         }
         
-        // add the buttons to the UI alert
-        nfcScanFailedAlert.addAction(scanAgainAction)
-        nfcScanFailedAlert.addAction(cancelAction)
-        
-        // show the UI alert
-        present(nfcScanFailedAlert, animated: true, completion:nil)
-        
     }
-    
     
     /// The BluetoothPeripheralViewController has already a few sections defined (bluetooth, weboop, nonfixedslopeenabled). This function gives the amount of general sections to be shown. This depends on the availability of weboop and nonfixedslopeenabled for the transmitter
     public func numberOfGeneralSections() -> Int {
@@ -542,9 +481,18 @@ class BluetoothPeripheralViewController: UIViewController {
             // Listen for changes in the nfcScanSuccessful setting when it is changed by the delegate after a successful NFC scan
             UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nfcScanSuccessful.rawValue, options: .new, context: nil)
         }
+        
+        updateTransmitterReadSuccess()
+        tableView.reloadSections(IndexSet(integer: 0), with: .none)
+        startTransmitterReadSuccessTimer()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
+        stopTransmitterReadSuccessTimer()
         // we need to remove all observers from the view controller before removing it from the navigation stack
         // otherwise the app crashes when one of the userdefault values changes and the observer tries to
         // update the UI (which isn't available any more)
@@ -746,8 +694,8 @@ class BluetoothPeripheralViewController: UIViewController {
             // disable the connect button
             self.connectButtonOutlet.disable()
             
-            // app should be scanning now, update of cell is needed
-            tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+            // app should be scanning now, refresh full general section to keep row counts consistent
+            tableView.reloadSections(IndexSet(integer: 0), with: .none)
             
             // disable screen lock
             UIApplication.shared.isIdleTimerDisabled = true
@@ -995,8 +943,8 @@ class BluetoothPeripheralViewController: UIViewController {
             
             self.transmitterIdTempValue = transmitterIdUpper
             
-            // reload the specific row in the table
-            self.tableView.reloadRows(at: [IndexPath(row: Setting.transmitterId.rawValue, section: 0)], with: .none)
+            // reload the specific row in the table - this will always be extraRow4 for the transmitter ID
+            self.tableView.reloadRows(at: [IndexPath(row: Setting.transmitterExtraRow4.rawValue, section: 0)], with: .none)
             
             // as transmitter id has been set (or set to nil), connect button label text must change
             _ = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: self.bluetoothPeripheral, isScanning: self.isScanning, nfcScanNeeded: self.nfcScanNeeded, nfcScanSuccessful: self.nfcScanSuccessful, connectButtonOutlet: self.connectButtonOutlet, expectedBluetoothPeripheralType: self.expectedBluetoothPeripheralType, transmitterId: transmitterIdUpper, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
@@ -1005,7 +953,7 @@ class BluetoothPeripheralViewController: UIViewController {
             
             return self.expectedBluetoothPeripheralType?.validateTransmitterId(transmitterId: transmitterId)
             
-        }), forRowWithIndex: Setting.transmitterId.rawValue, forSectionWithIndex: generalSettingSectionNumber, withSettingsViewModel: nil, tableView: tableView, forUIViewController: self)
+        }), forRowWithIndex: Setting.transmitterExtraRow4.rawValue, forSectionWithIndex: generalSettingSectionNumber, withSettingsViewModel: nil, tableView: tableView, forUIViewController: self)
         
     }
     
@@ -1055,6 +1003,246 @@ class BluetoothPeripheralViewController: UIViewController {
         
     }
     
+    /// based upon setShouldConnectToFalse(), this function will be called by the observer if the Libre 2 NFC scan fails
+    /// the actions will depend on if a valid bluetoothPeripheral is passed to it (existing sensor) or if it is nil (adding a new sensor)
+    /// after disconnecting the transmitter (if required), it will open a dialog to ask the user if they want to try scanning again
+    ///
+    /// - parameters:
+    ///     - bluetoothPeripheral - the currently set bluetooth peripheral as defined by the delegate
+    private func nfcScanFailed(for bluetoothPeripheral: BluetoothPeripheral?) {
+        
+        // unwrap bluetoothPeripheralManager
+        guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {return}
+        
+        // check if there is an existing transmitter configured. If so, disconnect it using setShouldConnectToFalse (this will also update the table and button labels)
+        if let bluetoothPeripheral = bluetoothPeripheral {
+            
+            setShouldConnectToFalse(for: bluetoothPeripheral, askUser: false)
+            
+        } else {
+            
+            // connect button label text needs to change because shouldconnect value has changed
+            _ = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: self.isScanning, nfcScanNeeded: self.nfcScanNeeded, nfcScanSuccessful: self.nfcScanSuccessful, connectButtonOutlet: self.connectButtonOutlet, expectedBluetoothPeripheralType: self.expectedBluetoothPeripheralType, transmitterId: self.transmitterIdTempValue, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
+            
+            // Reload the whole general section to avoid invalid batch updates if row counts changed
+            DispatchQueue.main.async { [weak self] in
+                self?.tableView.reloadSections(IndexSet(integer: 0), with: .none)
+            }
+        }
+        
+        // create UIAlertController to ask the user if they want to try running a new NFC scan, or just stay disconnected
+        let nfcScanFailedAlert = UIAlertController(title: TextsLibreNFC.nfcScanFailedTitle , message: TextsLibreNFC.nfcScanFailedMessage, preferredStyle: .alert)
+        
+        // create a scan again button. If the user clicks it, update everything and initiate a new connection (which will initiate an NFC scan first in this case).
+        let scanAgainAction = UIAlertAction(title: TextsLibreNFC.nfcScanFailedScanAgainButton, style: .default) {
+            (action:UIAlertAction!) in
+            
+            AudioServicesPlaySystemSound(1102)
+            
+            self.checkIfNFCScanIsNeeded()
+            
+            self.connectButtonHandler()
+            
+        }
+        
+        // create a cancel button
+        let cancelAction = UIAlertAction(title: Texts_Common.Cancel, style: .cancel) {
+            (action:UIAlertAction!) in
+            
+            // check if an existing transmitter exists
+            if bluetoothPeripheral != nil {
+                
+                // no need to do anything else except reset the private vars and userdefaults as needed
+                self.checkIfNFCScanIsNeeded()
+                
+            } else {
+                
+                // no transmitter has been added yet so just go back to the previous view
+                
+                // just go back to the BluetoothPeripheralsViewController and cancel the transmitter add
+                if let navigationController = self.navigationController {
+                    
+                    self.tableView.removeFromSuperview()
+                    
+                    navigationController.popViewController(animated: true)
+                    
+                } else {
+                    
+                    self.dismiss(animated: true, completion: nil)
+                    
+                }
+                
+            }
+            
+        }
+        
+        // add the buttons to the UI alert
+        nfcScanFailedAlert.addAction(scanAgainAction)
+        nfcScanFailedAlert.addAction(cancelAction)
+        
+        // show the UI alert
+        present(nfcScanFailedAlert, animated: true, completion:nil)
+        
+    }
+    
+    /// Refreshes the Transmitter Read Success row if it should be visible for the current peripheral
+    /// Starts a timer to refresh the Transmitter Read Success row while the view is visible
+    private func startTransmitterReadSuccessTimer() {
+        transmitterReadSuccessTimer?.invalidate()
+        transmitterReadSuccessTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+            guard let self = self else { return }
+            self.updateTransmitterReadSuccess()
+        }
+        // Ensure timer fires during UI interactions
+        RunLoop.main.add(transmitterReadSuccessTimer!, forMode: .common)
+    }
+
+    /// Stops the refresh timer
+    private func stopTransmitterReadSuccessTimer() {
+        transmitterReadSuccessTimer?.invalidate()
+        transmitterReadSuccessTimer = nil
+    }
+
+    /// When a setting change can alter which general sections are visible (e.g., algorithm toggles),
+    /// invalidate the cached visibility and reload the full table to avoid batch update mismatches.
+    func reloadAllSectionsAfterGeneralStructureChange() {
+        // Force a fresh calculation of webOOP/non-fixed slope section visibility
+        webOOpSettingsAndNonFixedSlopeSectionIsShownIsKnown = false
+        DispatchQueue.main.async { [weak self] in
+            self?.tableView.reloadData()
+        }
+    }
+    
+    func updateTransmitterReadSuccess() {
+        // internal helper function to make the correct text description
+        func windowLabel(for nominalHours: Int, expected: Int, fullExpected: Int) -> String {
+            if expected >= fullExpected {
+                return Date().addingTimeInterval(-Double(nominalHours) * 60 * 60).daysAndHoursAgo(showOnlyHours: true)
+            }
+            let shown = min(availableHours, Double(nominalHours))
+            return Date().addingTimeInterval(-Double(shown) * 60 * 60).daysAndHoursAgo()
+        }
+        
+        guard let expectedType = expectedBluetoothPeripheralType, expectedType.canShowTransmitterReadSuccess(), let bluetoothPeripheralManager = bluetoothPeripheralManager, let bluetoothPeripheral = bluetoothPeripheral, let bgReadingsAccessor = bgReadingsAccessor, let activeSensor = sensorProvider?.activeSensor else {
+            cachedTransmitterReadSuccessSummaryText = "Waiting..."
+            cachedTransmitterReadSuccessSummaryMessage = ""
+            // reload general section to reflect any row-count changes safely
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.tableView.reloadSections(IndexSet(integer: 0), with: .none)
+            }
+            return
+        }
+        
+        // Do not hard‑gate on connection state here: we want to compute based on recent data even if CoreBluetooth state is stale.
+        // If you still want to hide when explicitly disconnected and not attempting to connect, early‑return in that narrow case only.
+        if let status = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false)?.getConnectionStatus(), status == CBPeripheralState.disconnected, bluetoothPeripheral.blePeripheral.shouldconnect == false {
+            return
+        }
+        
+        // let's pull the result from the manager - we're using it as a stateless instance as there is nothing to persist in the manager itself. We'll use the last time that the smooth libre values
+        // was changed to make the cut off for the calculations in order to avoid screwing up the statistics
+        let display = TransmitterReadSuccessManager(bgReadingsAccessor: bgReadingsAccessor).getReadSuccess(forSensor: activeSensor, now: nil, notBefore: UserDefaults.standard.smoothLibreValuesChangedAtTimeStamp)
+
+        // Compute how many hours of data we actually have within the last 24h
+        let now = Date()
+        let availableHours: Double = {
+            guard let e = display.earliestTimestampInLast24h else { return 0 }
+            let sec = max(0, now.timeIntervalSince(e))
+            return sec / 3600.0
+        }()
+
+        // first let's set the threshold defaults
+        // we'll reduce these thresholds for the 60-second Libre 2 as it
+        // is much more prone to drop readings or not send them so it's fine
+        // to get lower values and still consider that it's working well
+        let okSuccessPercentage = display.nominalGapInSeconds > 180 ? 95.0 : 90.0
+        let warningSuccessPercentage = display.nominalGapInSeconds > 180 ? 90.0 : 80.0
+            
+        var visualIndicator6h: String  = "🔴"
+        var visualIndicator12h: String  = "🔴"
+        var visualIndicator24h: String  = "🔴"
+        
+        if display.success6h >= okSuccessPercentage {
+            visualIndicator6h = "🟢"
+        } else if display.success6h >= warningSuccessPercentage {
+            visualIndicator6h = "🟡"
+        }
+        
+        if display.success12h >= okSuccessPercentage {
+            visualIndicator12h = "🟢"
+        } else if display.success12h >= warningSuccessPercentage {
+            visualIndicator12h = "🟡"
+        }
+        
+        if display.success24h >= okSuccessPercentage {
+            visualIndicator24h = "🟢"
+        } else if display.success24h >= warningSuccessPercentage {
+            visualIndicator24h = "🟡"
+        }
+
+        // calculate number of expected slots for 6h, 12h, 24h windows using the nominal gap
+        let gap = display.nominalGapInSeconds
+        let fullExpected6h  = Int(floor((6.0  * 3600.0) / Double(gap)))
+        let fullExpected12h = Int(floor((12.0 * 3600.0) / Double(gap)))
+        let fullExpected24h = Int(floor((24.0 * 3600.0) / Double(gap)))
+
+        // Prefer 24h; if not full, label will show ~Nh automatically. If no data at all, show a simple placeholder.
+        if display.expected24h == 0 {
+            cachedTransmitterReadSuccessSummaryText = "Waiting..."
+            cachedTransmitterReadSuccessSummaryMessage = ""
+            // reload general section to reflect row-count changes safely
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.tableView.reloadSections(IndexSet(integer: 0), with: .none)
+            }
+            return
+        }
+
+        // build the main row text
+        cachedTransmitterReadSuccessSummaryText = "\(visualIndicator24h) \(String(format: "%0.0f", display.success24h))% (\(windowLabel(for: 24, expected: display.expected24h, fullExpected: fullExpected24h)))"
+        
+        // build the popup message with the summary - use adaptive labels, when we have less than the window length, label shows Xh
+        let label6h  = windowLabel(for: 6, expected: display.expected6h,  fullExpected: fullExpected6h)
+        let label12h = windowLabel(for: 12, expected: display.expected12h, fullExpected: fullExpected12h)
+        let label24h = windowLabel(for: 24, expected: display.expected24h, fullExpected: fullExpected24h)
+
+        var summaryMessageLines: [String] = []
+        
+        // we need to add a small text to explain that if Libre smoothing has been changed in the last 24 hours
+        // then we will calculate read success only since then to avoid mistakes in the calculations
+        if let smoothLibreValuesChangedAtTimeStamp = UserDefaults.standard.smoothLibreValuesChangedAtTimeStamp, (Date().timeIntervalSince(smoothLibreValuesChangedAtTimeStamp) < (1*60*60)), expectedType == .Libre2Type {
+            summaryMessageLines.append("Please note that you changed the Libre 2 smoothing option \(smoothLibreValuesChangedAtTimeStamp.daysAndHoursAgoFull(appendAgo: true)). We will only calculate the read success since then.")
+        } else if expectedType == .Libre2Type && UserDefaults.standard.smoothLibreValues {
+            // if using Libre 2 (60 second readings) and also smoothing, then the results are not reliable as we will fill in any gaps!
+            summaryMessageLines.append("You're using Libre 2 smoothing, so you will always get 100% success!")
+        } else {
+            // if not (as should usually be the case), then just show how often we're calculating the expected readings to arrive
+            summaryMessageLines.append("Expecting \(expectedBluetoothPeripheralType?.rawValue ?? "to get") readings every \(display.nominalGapInSeconds) seconds.")
+        }
+        
+        // always include the first line (6h window). If we have <6h data, the label already shows X.Xh.
+        let line6h = "\(visualIndicator6h) \(String(format: "%0.1f", display.success6h))% (\(label6h): \(display.expected6h - display.actual6h) dropped)"
+        summaryMessageLines.append(line6h)
+
+        // only append longer windows when we have at least that much data based on expected slots
+        if display.expected12h >= fullExpected6h {
+            let line12h = "\(visualIndicator12h) \(String(format: "%0.1f", display.success12h))% (\(label12h): \(display.expected12h - display.actual12h) dropped)"
+            summaryMessageLines.append(line12h)
+        }
+        if display.expected24h >= fullExpected12h {
+            let line24h = "\(visualIndicator24h) \(String(format: "%0.1f", display.success24h))% (\(label24h): \(display.expected24h - display.actual24h) dropped)"
+            summaryMessageLines.append(line24h)
+        }
+        
+        cachedTransmitterReadSuccessSummaryMessage = summaryMessageLines.joined(separator: "\n\n")
+        
+        // reload general section to reflect any row-count changes safely
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.tableView.reloadSections(IndexSet(integer: 0), with: .none)
+        }
+    }
     
     // MARK: - observe functions
     
@@ -1108,8 +1296,8 @@ class BluetoothPeripheralViewController: UIViewController {
             // connect button label text needs to change because we should now be scanning
             _ = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: bluetoothPeripheral, isScanning: self.isScanning, nfcScanNeeded: self.nfcScanNeeded, nfcScanSuccessful: self.nfcScanSuccessful, connectButtonOutlet: self.connectButtonOutlet, expectedBluetoothPeripheralType: self.expectedBluetoothPeripheralType, transmitterId: self.transmitterIdTempValue, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
             
-            // TODO: need to fix crash: This reload can sometimes cause a crash under certain circumstances
-            self.tableView.reloadRows(at: [IndexPath(row: Setting.connectionStatus.rawValue, section: 0)], with: .none)
+            // reload general section atomically to avoid invalid batch updates
+            self.tableView.reloadSections(IndexSet(integer: 0), with: .none)
             
         default:
             break
@@ -1175,8 +1363,14 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             // number of rows will be calculated, starting with all rows
             var numberOfRows = Setting.allCases.count
             
-            // if bluetooth transmitter does not need transmitterId then don't show that row
+            // if bluetooth transmitter does not need transmitterId then show one less row
             if !expectedBluetoothPeripheralType.needsTransmitterId() {
+                numberOfRows = numberOfRows - 1
+            }
+            
+            // if bluetooth transmitter type does not need to show ReadSuccess
+            // or if there is no active sensor, then show one less row
+            if !expectedBluetoothPeripheralType.canShowTransmitterReadSuccess() || sensorProvider?.activeSensor == nil {
                 numberOfRows = numberOfRows - 1
             }
             
@@ -1293,17 +1487,6 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                     cell.accessoryView =  disclosureAccessoryView
                 }
                 
-            case .transmitterId:
-                
-                cell.textLabel?.text = Texts_SettingsView.labelTransmitterId
-                cell.detailTextLabel?.text = transmitterIdTempValue
-                
-                // if transmitterId already has a value, then it can't be changed anymore. To change it, user must delete the transmitter and recreate one.
-                cell.accessoryType = transmitterIdTempValue == nil ? .disclosureIndicator : .none
-                if (transmitterIdTempValue == nil) {
-                    cell.accessoryView =  disclosureAccessoryView
-                }
-                
             case .connectOrDisconnectTimeStamp:
                 
                 if let bluetoothPeripheral = bluetoothPeripheral, let lastConnectionStatusChangeTimeStamp = bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp {
@@ -1327,6 +1510,42 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                 
                 cell.accessoryType = .none
                 
+            case .transmitterExtraRow4:
+                if expectedBluetoothPeripheralType.needsTransmitterId() {
+                    // if we need to show the transmitter ID, set it up
+                    cell.textLabel?.text = Texts_SettingsView.labelTransmitterId
+                    cell.detailTextLabel?.text = transmitterIdTempValue
+                    
+                    // if transmitterId already has a value, then it can't be changed anymore. To change it, user must delete the transmitter and recreate one.
+                    cell.accessoryType = transmitterIdTempValue == nil ? .disclosureIndicator : .none
+                    if (transmitterIdTempValue == nil) {
+                        cell.accessoryView =  disclosureAccessoryView
+                    }
+                } else if expectedBluetoothPeripheralType.canShowTransmitterReadSuccess() && sensorProvider?.activeSensor != nil {
+                    // if we don't need to show the transmitter ID, but we *do* need to show the transmitter read success, set it up
+                    cell.textLabel?.text = Texts_BluetoothPeripheralView.readSuccess
+                    cell.detailTextLabel?.text = cachedTransmitterReadSuccessSummaryText ?? ""
+                    cell.accessoryType = .disclosureIndicator
+                    cell.accessoryView = disclosureAccessoryView
+                } else {
+                    cell.textLabel?.text = ""
+                    cell.detailTextLabel?.text = ""
+                    cell.accessoryType = .none
+                }
+                
+            case .transmitterExtraRow5:
+                if expectedBluetoothPeripheralType.canShowTransmitterReadSuccess() && sensorProvider?.activeSensor != nil {
+                    // if we need to show the transmitter read success then set it up
+                    cell.textLabel?.text = Texts_BluetoothPeripheralView.readSuccess
+                    cell.detailTextLabel?.text = cachedTransmitterReadSuccessSummaryText ?? ""
+                    cell.accessoryType = .disclosureIndicator
+                    cell.accessoryView = disclosureAccessoryView
+                } else {
+                    // leave everything blank
+                    cell.textLabel?.text = ""
+                    cell.detailTextLabel?.text = ""
+                    cell.accessoryType = .none
+                }
             }
             
         } else if indexPath.section == 1 && webOOPSettingsSectionIsShown {
@@ -1466,12 +1685,38 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
             case .connectOrDisconnectTimeStamp:
                 break
                 
-            case .transmitterId:
+            case .transmitterExtraRow4:
+                guard let bluetoothPeripheral = bluetoothPeripheral else {return}
                 
-                // if transmitterId already has a value, then it can't be changed anymore. To change it, user must delete the transmitter and recreate one.
-                if transmitterIdTempValue != nil {return}
+                if bluetoothPeripheral.bluetoothPeripheralType().needsTransmitterId() {
+                    // if transmitterId already has a value, then it can't be changed anymore. To change it, user must delete the transmitter and recreate one.
+                    if transmitterIdTempValue != nil {return}
+                    
+                    requestTransmitterId()
+                } else if bluetoothPeripheral.bluetoothPeripheralType().canShowTransmitterReadSuccess() && sensorProvider?.activeSensor != nil {
+                    // check if the summary message is a blank string. If so, it's because there
+                    // is no data to show. So don't do anything.
+                    guard let message = cachedTransmitterReadSuccessSummaryMessage, message.isEmpty == false else { return }
+                    
+                    let alert = UIAlertController(title: Texts_BluetoothPeripheralView.readSuccess, message: message, actionHandler: {
+                        self.dismiss(animated: true, completion: nil)
+                        return
+                    })
+                    self.present(alert, animated:true)
+                } else {
+                    break
+                }
                 
-                requestTransmitterId()
+            case .transmitterExtraRow5:
+                // check if the summary message is a blank string. If so, it's because there
+                // is no data to show. So don't do anything.
+                guard let message = cachedTransmitterReadSuccessSummaryMessage, message.isEmpty == false, sensorProvider?.activeSensor != nil else { return }
+                
+                let alert = UIAlertController(title: Texts_BluetoothPeripheralView.readSuccess, message: message, actionHandler: {
+                    self.dismiss(animated: true, completion: nil)
+                    return
+                })
+                self.present(alert, animated:true)
             }
             
         } else if indexPath.section == 1 && webOOPSettingsSectionIsShown {
@@ -1528,9 +1773,8 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                         // make sure that new value is stored in coredata, because a crash may happen here
                         self.coreDataManager?.saveChanges()
                         
-                        // reload the section for nonFixedSettingsSectionNumber, even though the value may not have changed, because possibly isUserInteractionEnabled needs to be set to false for the nonFixedSettingsSectionNumber UISwitch
-                        // also reload webOOPSettingsSectionNumber
-                        tableView.reloadSections(IndexSet(arrayLiteral: self.nonFixedSettingsSectionNumber, self.webOOPSettingsSectionNumber), with: .none)
+                        // The algorithm toggle can change which general sections are visible. Reload the entire table safely.
+                        self.reloadAllSectionsAfterGeneralStructureChange()
                         
                         print("Algorithm changed from: \(oldAlgorithmType.description) -> \(newAlgorithmType.description)")
                         
@@ -1711,9 +1955,12 @@ extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
         // handled in BluetoothPeripheralManager
         bluetoothPeripheralManager?.didConnectTo(bluetoothTransmitter: bluetoothTransmitter)
         
+        updateTransmitterReadSuccess()
+        
+        startTransmitterReadSuccessTimer()
+        
         // refresh complete first section (only status and connection timestamp changed but reload complete section)
         tableView.reloadSections(IndexSet(integer: 0), with: .none)
-        
     }
     
     func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
@@ -1721,15 +1968,28 @@ extension BluetoothPeripheralViewController: BluetoothTransmitterDelegate {
         // handled in BluetoothPeripheralManager
         bluetoothPeripheralManager?.didDisconnectFrom(bluetoothTransmitter: bluetoothTransmitter)
         
+        updateTransmitterReadSuccess()
+        
         // refresh complete first section (only status and connection timestamp changed but reload complete section)
         tableView.reloadSections(IndexSet(integer: 0), with: .none)
+        /*
+        let rowsInGeneral = tableView.numberOfRows(inSection: 0)
         
+        if Setting.transmitterExtraRow4.rawValue < rowsInGeneral {
+            tableView.reloadRows(at: [IndexPath(row: Setting.transmitterExtraRow4.rawValue, section: 0)], with: .none)
+        }
+        
+        if Setting.transmitterExtraRow5.rawValue < rowsInGeneral {
+            tableView.reloadRows(at: [IndexPath(row: Setting.transmitterExtraRow5.rawValue, section: 0)], with: .none)
+        }*/
     }
     
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
         
         // handled in BluetoothPeripheralManager
         bluetoothPeripheralManager?.deviceDidUpdateBluetoothState(state: state, bluetoothTransmitter: bluetoothTransmitter)
+        
+        updateTransmitterReadSuccess()
         
         // when bluetooth status changes to powered off, the device, if connected, will disconnect, however didDisConnect doesn't get call (looks like an error in iOS) - so let's reload the cell that shows the connection status, this will refresh the cell
         // do this whenever the bluetooth status changes

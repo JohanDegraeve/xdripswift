@@ -121,13 +121,6 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             
         case .notYetConnected(let newexpectedName):
             expectedName = newexpectedName
-            // opportunistically preload persisted address/name so we can use a stable restore ID on first init.
-            if deviceAddress == nil, let savedAddress = UserDefaults.standard.string(forKey: DefaultsKey.lastKnownDeviceAddress) {
-                deviceAddress = savedAddress
-                deviceName = UserDefaults.standard.string(forKey: DefaultsKey.lastKnownDeviceName)
-                trace("preloaded device from defaults: address = %{public}@, name = %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, savedAddress, deviceName ?? "'unknown'")
-                // We still keep expectedName if provided. It's harmless and only used on first-ever scan paths.
-            }
         }
         
         //assign uuid's
