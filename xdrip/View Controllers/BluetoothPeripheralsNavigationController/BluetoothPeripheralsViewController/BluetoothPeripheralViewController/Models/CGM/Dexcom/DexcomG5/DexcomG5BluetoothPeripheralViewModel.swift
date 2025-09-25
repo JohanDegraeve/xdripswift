@@ -546,6 +546,18 @@ extension DexcomG5BluetoothPeripheralViewModel: CGMG5TransmitterDelegate {
     }
     
     private func reloadRow(row: Int, section: Int) {
-        tableView?.reloadRows(at: [IndexPath(row: row, section: section)], with: .none)
+        DispatchQueue.main.async {
+            guard let tableView = self.tableView else { return }
+
+            // Always reload the general section (0) first, because its row count may have changed.
+            tableView.reloadSections(IndexSet(integer: 0), with: .none)
+
+            // Then safely refresh the target section: reload the row if it still exists; otherwise reload the whole section.
+            if row < tableView.numberOfRows(inSection: section) {
+                tableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none)
+            } else {
+                tableView.reloadSections(IndexSet(integer: section), with: .none)
+            }
+        }
     }
 }

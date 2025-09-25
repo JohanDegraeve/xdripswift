@@ -302,11 +302,20 @@ extension MiaoMiaoBluetoothPeripheralViewModel: CGMMiaoMiaoTransmitterDelegate {
     }
     
     private func reloadRow(row: Int) {
-        
-        if let bluetoothPeripheralViewController = bluetoothPeripheralViewController {
-            
-            tableView?.reloadRows(at: [IndexPath(row: row, section: bluetoothPeripheralViewController.numberOfGeneralSections() + sectionNumberForMiaoMiaoSpecificSettings)], with: .none)
-        
+        DispatchQueue.main.async {
+            guard let tableView = self.tableView,
+                  let bluetoothPeripheralViewController = self.bluetoothPeripheralViewController else { return }
+
+            // Always reload the general section (0) first, because its row count may have changed.
+            tableView.reloadSections(IndexSet(integer: 0), with: .none)
+
+            // Then safely refresh the target section: reload the row if it still exists; otherwise reload the whole section.
+            let section = bluetoothPeripheralViewController.numberOfGeneralSections() + self.sectionNumberForMiaoMiaoSpecificSettings
+            if row < tableView.numberOfRows(inSection: section) {
+                tableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none)
+            } else {
+                tableView.reloadSections(IndexSet(integer: section), with: .none)
+            }
         }
     }
     

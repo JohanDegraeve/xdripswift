@@ -161,8 +161,10 @@ class M5StackBluetoothPeripheralViewModel {
                         }
 
                         // reload table
-                        self.tableView?.reloadRows(at: [IndexPath(row: CommonM5Setting.textColor.rawValue, section: 1)], with: .none)
-                        
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self, let tableView = self.tableView else { return }
+                            tableView.reloadRows(at: [IndexPath(row: CommonM5Setting.textColor.rawValue, section: 1)], with: .none)
+                        }
                     }
                     
                 }, cancelHandler: nil, didSelectRowHandler: nil)
@@ -202,8 +204,10 @@ class M5StackBluetoothPeripheralViewModel {
                         }
 
                         // reload table
-                        self.tableView?.reloadRows(at: [IndexPath(row: CommonM5Setting.backGroundColor.rawValue, section: 1)], with: .none)
-                        
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self, let tableView = self.tableView else { return }
+                            tableView.reloadRows(at: [IndexPath(row: CommonM5Setting.backGroundColor.rawValue, section: 1)], with: .none)
+                        }
                     }
                     
                     
@@ -230,13 +234,12 @@ class M5StackBluetoothPeripheralViewModel {
                         }
                         
                         // reload table
-                        self.tableView?.reloadRows(at: [IndexPath(row: CommonM5Setting.rotation.rawValue, section: 1)], with: .none)
-                        
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self, let tableView = self.tableView else { return }
+                            tableView.reloadRows(at: [IndexPath(row: CommonM5Setting.rotation.rawValue, section: 1)], with: .none)
+                        }
                     }
-                    
-                    
                 }, cancelHandler: nil, didSelectRowHandler: nil)
-                
             }
 
         case 2:
@@ -267,11 +270,11 @@ class M5StackBluetoothPeripheralViewModel {
                         }
                         
                         // reload table
-                        self.tableView?.reloadRows(at: [IndexPath(row: SpecificM5StackSettings.brightness.rawValue, section: M5StackSections.allCases.count)], with: .none)
-                        
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self, let tableView = self.tableView else { return }
+                            tableView.reloadRows(at: [IndexPath(row: SpecificM5StackSettings.brightness.rawValue, section: M5StackSections.allCases.count)], with: .none)
+                        }
                     }
-                    
-                    
                 }, cancelHandler: nil, didSelectRowHandler: nil)
                 
             case .batteryLevel:
@@ -345,8 +348,10 @@ class M5StackBluetoothPeripheralViewModel {
                         }
                     }
                     
-                    self.tableView?.reloadRows(at: [IndexPath(row: CommonM5Setting.connectToWiFi.rawValue, section: 1)], with: .none)
-                    
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self, let tableView = self.tableView else { return }
+                        tableView.reloadRows(at: [IndexPath(row: CommonM5Setting.connectToWiFi.rawValue, section: 1)], with: .none)
+                    }
                 })
                 
             case .m5StackHelpText:
@@ -469,8 +474,10 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
         (bluetoothPeripheralManager as? M5StackBluetoothTransmitterDelegate)?.receivedBattery(level: level, m5StackBluetoothTransmitter: m5StackBluetoothTransmitter)
         
         // batteryLevel should get updated in M5Stack object by bluetoothPeripheralManager, here's the trigger to update the table
-        tableView?.reloadRows(at: [IndexPath(row: SpecificM5StackSettings.batteryLevel.rawValue, section: M5StackSections.specificM5StackSettings.rawValue)], with: .none)
-        
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self, let tableView = self.tableView else { return }
+            tableView.reloadRows(at: [IndexPath(row: SpecificM5StackSettings.batteryLevel.rawValue, section: M5StackSections.specificM5StackSettings.rawValue)], with: .none)
+        }
     }
     
     func isAskingForAllParameters(m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
@@ -499,10 +506,11 @@ extension M5StackBluetoothPeripheralViewModel: M5StackBluetoothTransmitterDelega
             
             m5StackPeripheral.blepassword = newBlePassword
             
-            tableView?.reloadRows(at: [IndexPath(row: CommonM5Setting.blePassword.rawValue, section: 1)], with: .none)
-            
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self, let tableView = self.tableView else { return }
+                tableView.reloadRows(at: [IndexPath(row: CommonM5Setting.blePassword.rawValue, section: 1)], with: .none)
+            }
         }
-        
     }
     
     func authentication(success: Bool, m5StackBluetoothTransmitter: M5StackBluetoothTransmitter) {
