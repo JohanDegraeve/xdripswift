@@ -2344,9 +2344,9 @@
 			isa = PBXGroup;
 			children = (
 				47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */,
+				F8CCBB4E2D1B6DF900F14867 /* LandscapeValueViewController.swift */,
 				F8AC425F21ADEBD60078C348 /* RootViewController.swift */,
 				F8E6C78B24CDDB83007C1199 /* SnoozeViewController.swift */,
-				F8CCBB4E2D1B6DF900F14867 /* LandscapeValueViewController.swift */,
 			);
 			path = "Root View Controller";
 			sourceTree = "<group>";
@@ -3977,7 +3977,7 @@
 				BuildIndependentTargetsInParallel = YES;
 				DefaultBuildSystemTypeForWorkspace = Latest;
 				LastSwiftUpdateCheck = 1530;
-				LastUpgradeCheck = 1620;
+				LastUpgradeCheck = 2600;
 				ORGANIZATIONNAME = "Johan Degraeve";
 				TargetAttributes = {
 					4716A4EC2B406C3D00419052 = {
@@ -5849,6 +5849,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SHARED_PRECOMPS_DIR = "";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -5910,6 +5911,7 @@
 				OBJROOT = "";
 				SDKROOT = iphoneos;
 				SHARED_PRECOMPS_DIR = "";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SYMROOT = "";
