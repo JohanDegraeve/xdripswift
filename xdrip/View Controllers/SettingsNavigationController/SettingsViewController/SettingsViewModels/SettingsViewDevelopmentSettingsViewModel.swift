@@ -40,6 +40,12 @@ fileprivate enum Setting:Int, CaseIterable {
     /// force StandBy mode to show a big number version of the widget
     case forceStandByBigNumbers = 11
     
+    /// should we allow 60-second writes to Nightscout (in the case of Libre 2 Direct as an example)?
+    case storeFrequentReadingsInNightscout = 12
+    
+    /// should we allow 60-second writes to HealthKit (in the case of Libre 2 Direct as an example)?
+    case storeFrequentReadingsInHealthKit = 13
+    
 }
 
 class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProtocol {
@@ -103,6 +109,12 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             
         case .forceStandByBigNumbers:
             return Texts_SettingsView.forceStandByBigNumbers
+            
+        case .storeFrequentReadingsInNightscout:
+            return Texts_SettingsView.labelStoreFrequentReadingsInNightscout
+            
+        case .storeFrequentReadingsInHealthKit:
+            return Texts_SettingsView.labelStoreFrequentReadingsInHealthKit
         }
     }
     
@@ -112,7 +124,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .allowStandByHighContrast, .forceStandByBigNumbers:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit:
             return .none
             
         case .loopShareType, .loopDelay, .libreLinkUpVersion, .remainingComplicationUserInfoTransfers, .CAGEMaxHours:
@@ -127,7 +139,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .loopDelay, .allowStandByHighContrast, .forceStandByBigNumbers:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .loopDelay, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit:
             return nil
             
         case .loopShareType:
@@ -220,6 +232,12 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                 
             })
             
+        case .storeFrequentReadingsInNightscout:
+            return UISwitch(isOn: UserDefaults.standard.storeFrequentReadingsInNightscout, action: {(isOn:Bool) in UserDefaults.standard.storeFrequentReadingsInNightscout = isOn})
+            
+        case .storeFrequentReadingsInHealthKit:
+            return UISwitch(isOn: UserDefaults.standard.storeFrequentReadingsInHealthKit, action: {(isOn:Bool) in UserDefaults.standard.storeFrequentReadingsInHealthKit = isOn})
+            
         case .loopShareType, .loopDelay, .remainingComplicationUserInfoTransfers, .libreLinkUpVersion, .CAGEMaxHours:
             return nil
             
@@ -306,6 +324,16 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                     }
                 }
             }, cancelHandler: nil, inputValidator: nil)
+            
+        case .storeFrequentReadingsInHealthKit:
+            // unfortunately this won't do anything when the use enables the option, but
+            // it will show if the tap the row itself. Not perfect, but better than nothing.
+            return .showInfoText(title: Texts_SettingsView.labelStoreFrequentReadingsInHealthKit, message: "\n" + Texts_SettingsView.labelStoreFrequentReadingsInHealthKitMessage)
+            
+        case .storeFrequentReadingsInNightscout:
+            // unfortunately this won't do anything when the use enables the option, but
+            // it will show if the tap the row itself. Not perfect, but better than nothing.
+            return .showInfoText(title: Texts_SettingsView.labelStoreFrequentReadingsInNightscout, message: "\n" + Texts_SettingsView.labelStoreFrequentReadingsInNightscoutKitMessage)
         }
     }
     

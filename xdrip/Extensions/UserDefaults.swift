@@ -242,6 +242,12 @@ extension UserDefaults {
         /// should readings be stored in healthkit, true or false
         case storeReadingsInHealthkit = "storeReadingsInHealthkit"
         
+        /// did user authorize the storage of readings in healthkit or not
+        case storeReadingsInHealthkitAuthorized = "storeReadingsInHealthkitAuthorized"
+        
+        /// timestamp of last bgreading that was stored in healthkit
+        case timeStampLatestHealthKitStoreBgReading = "timeStampLatestHealthKitStoreBgReading"
+        
         // Speak readings
         
         /// speak readings
@@ -351,13 +357,6 @@ extension UserDefaults {
         /// timestamp last battery reading (will only be used for dexcom G5 where we need to explicitly ask for the battery)
         case timeStampOfLastBatteryReading = "timeStampOfLastBatteryReading"
         
-        // HealthKit
-        /// did user authorize the storage of readings in healthkit or not
-        case storeReadingsInHealthkitAuthorized = "storeReadingsInHealthkitAuthorized"
-        
-        /// timestamp of last bgreading that was stored in healthkit
-        case timeStampLatestHealthKitStoreBgReading = "timeStampLatestHealthKitStoreBgReading"
-        
         // Dexcom Share
         /// timestamp of latest reading uploaded to Dexcom Share
         case timeStampLatestDexcomShareUploadedBgReading = "timeStampLatestDexcomShareUploadedBgReading"
@@ -412,8 +411,11 @@ extension UserDefaults {
         case suppressUnLockPayLoad = "suppressUnLockPayLoad"
         /// should the BG values be written to a shared app group?
         case loopShareType = "loopShareType"
+        /// did user authorize the storage of "frequent" writes to Nightscout or not (i.e. every 60 seconds instead of every 5 minutes)
+        case storeFrequentReadingsInNightscout = "storeFrequentReadingsInNightscout"
+        /// did user authorize the storage of "frequent" readings in healthkit or not (i.e. every 60 seconds instead of every 5 minutes)
+        case storeFrequentReadingsInHealthKit = "storeFrequentReadingsInHealthKit"
         /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
-        ///
         /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
         case loopDelaySchedule = "loopDelaySchedule"
         case loopDelayValueInMinutes = "loopDelayValueInMinutes"
@@ -2275,6 +2277,30 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.forceStandByBigNumbers.rawValue)
+        }
+    }
+    
+    /// should readings be stored much more frequentyly in Nightscout ? true or false
+    ///
+    /// Only really useful for master with Libre 2 Direct connection (60 second readings). Default is false/disabled.
+    @objc dynamic var storeFrequentReadingsInNightscout: Bool {
+        get {
+            return bool(forKey: Key.storeFrequentReadingsInNightscout.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.storeFrequentReadingsInNightscout.rawValue)
+        }
+    }
+    
+    /// should readings be stored much more frequentyly in healthkit ? true or false
+    ///
+    /// Only really useful for master with Libre 2 Direct connection (60 second readings). Default is false/disabled.
+    @objc dynamic var storeFrequentReadingsInHealthKit: Bool {
+        get {
+            return bool(forKey: Key.storeFrequentReadingsInHealthKit.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.storeFrequentReadingsInHealthKit.rawValue)
         }
     }
     

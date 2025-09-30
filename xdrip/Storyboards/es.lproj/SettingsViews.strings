@@ -228,3 +228,8 @@
 
 /// Should loop data be shared only every 5 minutes
 "shareToLoopOnceEvery5Minutes" = "Share with OS-AID every 5 mins";
+
+"settingsviews_storeFrequentReadingsInNightscout" = "Subir Nightscout Frecuentamente";
+"settingsviews_storeFrequentReadingsInNightscoutMessage" = "Esta opción permitirá subir datos cada vez que entre una lectura de glucosa nueva en lugar de limitar a una vez cada 5 minutos. Solo sirve para sensors que envíen valores cada 60 segundos como Libre 2 EU con conexión directo.\n\nUtilizad esta opción con mucho cuidado y solo si lo ves realmente necesario. La mayoría de los usuarios deben dejar esta opción DESHABILITADA.";
+"settingsviews_storeFrequentReadingsInHealthKit" = "Grabar HealthKit Frecuentamente";
+"settingsviews_storeFrequentReadingsInHealthKitMessage" = "Esta opción permitirá grabar datos cada vez que entre una lectura de glucosa nueva en lugar de limitar a una vez cada 5 minutos. Solo sirve para sensors que envíen valores cada 60 segundos como Libre 2 EU con conexión directo.\n\nUtilizad esta opción con mucho cuidado y solo si lo ves realmente necesario. La mayoría de los usuarios deben dejar esta opción DESHABILITADA.";

@@ -172,3 +172,7 @@
 "appleWatchShowDataInComplicationsMessage" = "Please note that Apple Watch complications will not update in real-time. They will only update 2-3 times per hour.\n\nDO NOT rely on values in the complication for treatment decisions.\n\nFor real-time values, open the %@ Watch app.\n\nOnly click 'OK' if you understand and agree.";
 "appleWatchComplicationUserAgreementDate" = "User Agreement";
 "appleWatchRemainingComplicationUserInfoTransfers" = "Remaining Complication Updates";
+"settingsviews_storeFrequentReadingsInNightscout" = "Frequent Nightscout Uploads";
+"settingsviews_storeFrequentReadingsInHealthKitMessage" = "This option will override the 5-minute upload limits and allow much frequent BG data to be uploaded to Nightscout. Such as for 60-second Libre 2 Direct values.\n\nPlease only enable this option if you really need/want more frequent data. Most users should leave this option disabled.";
+"settingsviews_storeFrequentReadingsInHealthKit" = "Frequent HealthKit Writes";
+"settingsviews_storeFrequentReadingsInHealthKitMessage" = "This option will override the 5-minute write limits and allow much frequent data to be added to Apple Health. Such as for 60-second Libre 2 Direct values.\n\nPlease only enable this option if you really need/want more frequent data. Most users should leave this option disabled.";

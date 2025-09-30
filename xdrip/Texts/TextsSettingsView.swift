@@ -429,7 +429,7 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_sectiontitlehealthkit", tableName: filename, bundle: Bundle.main, value: "Apple Health", comment: "healthkit settings, section title")
     }()
     
-    static let labelHealthKit:String = {
+    static let labelHealthKit: String = {
         return NSLocalizedString("settingsviews_healthkit", tableName: filename, bundle: Bundle.main, value: "Write Data to Apple Health", comment: "healthkit settings, literally 'healthkit'")
     }()
     
@@ -914,6 +914,22 @@ class Texts_SettingsView {
     
     static let settingsviews_housekeeperRetentionPeriodMessage = {
         return NSLocalizedString("settingsviews_housekeeperRetentionPeriodMessage", tableName: filename, bundle: Bundle.main, value: "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)", comment: "When clicking the retention setting, a pop up asks for how many days should data be stored")
+    }()
+    
+    static let labelStoreFrequentReadingsInNightscout: String = {
+        return NSLocalizedString("settingsviews_storeFrequentReadingsInNightscout", tableName: filename, bundle: Bundle.main, value: "Frequent Nightscout Uploads", comment: "developer settings, should we allow the app to perform very frequent uploads to nightscout if the CGM data is more often than every 5 minutes")
+    }()
+    
+    static let labelStoreFrequentReadingsInNightscoutKitMessage: String = {
+        return NSLocalizedString("settingsviews_storeFrequentReadingsInNightscoutMessage", tableName: filename, bundle: Bundle.main, value: "This option will override the 5-minute upload limits and allow much frequent BG data to be uploaded to Nightscout. Such as for 60-second Libre 2 Direct values.\n\nPlease only enable this option if you really need/want more frequent data. Most users should leave this option disabled.", comment: "developer settings, should we allow the app to perform very frequent uploads to Nightscout if the CGM data is more often than every 5 minutes")
+    }()
+    
+    static let labelStoreFrequentReadingsInHealthKit: String = {
+        return NSLocalizedString("settingsviews_storeFrequentReadingsInHealthKit", tableName: filename, bundle: Bundle.main, value: "Frequent HealthKit Writes", comment: "developer settings, should we allow the app to perform very frequent writes to healthkit if the CGM data is more often than every 5 minutes")
+    }()
+    
+    static let labelStoreFrequentReadingsInHealthKitMessage: String = {
+        return NSLocalizedString("settingsviews_storeFrequentReadingsInHealthKitMessage", tableName: filename, bundle: Bundle.main, value: "This option will override the 5-minute write limits and allow much frequent data to be added to Apple Health. Such as for 60-second Libre 2 Direct values.\n\nPlease only enable this option if you really need/want more frequent data. Most users should leave this option disabled.", comment: "developer settings, should we allow the app to perform very frequent writes to healthkit if the CGM data is more often than every 5 minutes")
     }()
     
 }
