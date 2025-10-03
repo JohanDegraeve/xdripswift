@@ -111,9 +111,9 @@
 "common_today" = "Heute";
 
 "common_statistics_low" = "Niedrig";
-"common_statistics_inRange" = "im Zielbereich";
+"common_statistics_inRange" = "Zielbereich";
 "common_statistics_high" = "Hoch";
-"common_statistics_average" = "Durchschnitt";
+"common_statistics_average" = "Mittelwert";
 "common_statistics_a1c" = "HbA1c";
 "common_statistics_cv" = "CV";
 

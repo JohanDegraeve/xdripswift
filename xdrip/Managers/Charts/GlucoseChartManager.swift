@@ -183,6 +183,9 @@ public class GlucoseChartManager {
     /// set the .distantPast on initialization so that a fresh population is forced
     private var scheduledBasalRatesLastUpdatedForStartDate: Date = .distantPast
     
+    /// persisted value to indicate if we should show the treatments on the chart being managed by this instance
+    private var showTreatmentsOnChart: Bool = false
+    
     // MARK: - intializer
     
     /// - parameters:
@@ -226,11 +229,12 @@ public class GlucoseChartManager {
     ///     - startDate: startDate to apply, if nil then no change will be done in chart width, ie current difference between start and end will be reused
     ///     - chartOutlet: the view that contains the chart
     ///     - forceReset: used to indicate that we should rescale the y-axis (done by simply setting maximumValueInGlucoseChartPointsInMgDl to it's initial value)
+    ///     - showTreatments: used to indicate that we should show the treatments on this chart view
     ///     - completionHandler: will be called when glucoseChartPoints and chartOutlet are updated
     ///
     /// update of chartPoints array will be done on background thread. The actual redrawing of the chartoutlet is  done on the main thread. Also the completionHandler runs in the main thread.
     /// While updating glucoseChartPoints in background thread, the main thread may call again updateChartPoints with a new endDate (because the user is panning or zooming). A new block will be added in the operation queue and processed later. If there's multiple operations waiting in the queue, only the last one will be executed. This can be the case when the user is doing a fast panning.
-    public func updateChartPoints(endDate: Date, startDate: Date?, chartOutlet: BloodGlucoseChartView, forceReset: Bool = false, completionHandler: (() -> ())?) {
+    public func updateChartPoints(endDate: Date, startDate: Date?, chartOutlet: BloodGlucoseChartView, forceReset: Bool = false, showTreaments: Bool? = false, completionHandler: (() -> ())?) {
         
         // create a new operation
         let operation = BlockOperation(block: {
@@ -245,6 +249,8 @@ public class GlucoseChartManager {
             if forceReset {
                 self.maximumValueInGlucoseChartPointsInMgDl = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
             }
+            
+            self.showTreatmentsOnChart = showTreaments ?? false
             
             // startDateToUse is either parameter value or (if nil), endDate minutes current chartwidth
             let startDateToUse = startDate != nil ? startDate! : Date(timeInterval: -self.endDate.timeIntervalSince(self.startDate), since: endDate)
@@ -348,7 +354,7 @@ public class GlucoseChartManager {
             
             
             // only get and assign the treatment chartpoints if the user has chosen to show them on the chart
-            if UserDefaults.standard.showTreatmentsOnChart {
+            if self.showTreatmentsOnChart {
                 
                 // get treatments from coredata
                 let treatmentChartPoints: TreatmentChartPointsType = self.getTreatmentChartPoints(startDate: startDateToUse, endDate: endDate, treatmentEntryAccessor: self.data().treatmentEntryAccessor, bgReadingsAccessor: self.data().bgReadingsAccessor, on: self.coreDataManager.privateManagedObjectContext)
@@ -629,7 +635,7 @@ public class GlucoseChartManager {
         // newStartDate = enddate minus current difference between endDate and startDate
         let newStartDate = Date(timeInterval: -self.endDate.timeIntervalSince(self.startDate), since: newEndDate)
         
-        updateChartPoints(endDate: newEndDate, startDate: newStartDate, chartOutlet: chartOutlet, forceReset: false, completionHandler: completionHandler)
+        updateChartPoints(endDate: newEndDate, startDate: newStartDate, chartOutlet: chartOutlet, forceReset: false, showTreaments: showTreatmentsOnChart, completionHandler: completionHandler)
         
     }
     
@@ -646,7 +652,7 @@ public class GlucoseChartManager {
         
         // create yAxisValues, start with 38 mgdl, this is to make sure we show a bit lower than the real lowest value which is usually 40 mgdl, make the label hidden. We must do this with by using a clear color label setting as the hidden property doesn't work (even if we don't know why).
         //        let firstYAxisValue = ChartAxisValueDouble((ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl).mgDlToMmol(mgDl: unitIsMgDl), labelSettings: data().chartLabelSettingsHidden)
-        let minimumChartValue = UserDefaults.standard.showTreatmentsOnChart ? (UserDefaults.standard.nightscoutFollowType != .none ? (isStatic24hrChart ? ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal24hrChart : ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal) : ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl) : ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
+        let minimumChartValue = showTreatmentsOnChart ? (UserDefaults.standard.nightscoutFollowType != .none ? (isStatic24hrChart ? ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal24hrChart : ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal) : ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl) : ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
         
         let firstYAxisValue = ChartAxisValueDouble(minimumChartValue.mgDlToMmol(mgDl: unitIsMgDl), labelSettings: data().chartLabelSettingsHidden)
         
@@ -902,7 +908,7 @@ public class GlucoseChartManager {
             urgentLowLineLayer,
         ]
         
-        if UserDefaults.standard.showTreatmentsOnChart, UserDefaults.standard.nightscoutFollowType != .none {
+        if self.showTreatmentsOnChart, UserDefaults.standard.nightscoutFollowType != .none {
             let layersAIDFollow: [ChartLayer?] = [
                 // basal rate layers
                 basalRateFillLayer,
@@ -914,7 +920,7 @@ public class GlucoseChartManager {
             layers.append(contentsOf: layersAIDFollow)
         }
         
-        if UserDefaults.standard.showTreatmentsOnChart {
+        if self.showTreatmentsOnChart {
             let layersTreatments: [ChartLayer?] = [
                 // basal rate layers
                 basalRateFillLayer,
@@ -948,7 +954,7 @@ public class GlucoseChartManager {
         
         layers.append(contentsOf: layersGlucoseCircles)
         
-        if UserDefaults.standard.showTreatmentsOnChart {
+        if self.showTreatmentsOnChart {
             let layersTreatmentLabels: [ChartLayer?] = [
                 // bg check treatment layers
                 bgCheckCirclesOuterLayer,
@@ -1226,7 +1232,7 @@ public class GlucoseChartManager {
         var basalRateTreatmentChartPoints = [ChartPoint]()
         var basalRateFillTreatmentChartPoints = [ChartPoint]()
         
-        if UserDefaults.standard.showTreatmentsOnChart {
+        if showTreatmentsOnChart {
             managedObjectContext.performAndWait {
                 // get Treatments between the two timestamps from coredata
                 // filter the treatment entries that have not been marked as deleted

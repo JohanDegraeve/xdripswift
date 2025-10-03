@@ -109,6 +109,8 @@ extension UserDefaults {
         
         /// should the treatments be shown on the main chart?
         case showTreatmentsOnChart = "showTreatmentsOnChart"
+        /// should the treatments be shown on the landscape chart?
+        case showTreatmentsOnLandscapeChart = "showTreatmentsOnLandscapeChart"
         /// micro-bolus threshold level in units
         case smallBolusTreatmentThreshold = "smallBolusTreatmentThreshold"
         /// should the micro-boluses be listed in the treatment list/table?
@@ -1083,6 +1085,18 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.showTreatmentsOnChart.rawValue)
+        }
+    }
+    
+    /// should the app show the treatments on the landscape chart?
+    @objc dynamic var showTreatmentsOnLandscapeChart: Bool {
+        // default value for bool in userdefaults is false, as default we want the app to hide the treatments
+        // on the landscape chart even if they are shown on the main screen/chart
+        get {
+            return bool(forKey: Key.showTreatmentsOnLandscapeChart.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.showTreatmentsOnLandscapeChart.rawValue)
         }
     }
     

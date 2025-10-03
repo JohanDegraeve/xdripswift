@@ -1612,7 +1612,7 @@ final class RootViewController: UIViewController, ObservableObject {
             // redraw chart is necessary
             if let glucoseChartManager = glucoseChartManager {
                 
-                glucoseChartManager.updateChartPoints(endDate: glucoseChartManager.endDate, startDate: glucoseChartManager.endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, forceReset: false, completionHandler: nil)
+                glucoseChartManager.updateChartPoints(endDate: glucoseChartManager.endDate, startDate: glucoseChartManager.endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, forceReset: false, showTreaments: UserDefaults.standard.showTreatmentsOnChart, completionHandler: nil)
                 
             }
             
@@ -1881,7 +1881,7 @@ final class RootViewController: UIViewController, ObservableObject {
     ///     - forceReset : if true, then we'll force a rescale of the chart y-axis
     private func updateChartWithResetEndDate(forceReset: Bool = false) {
         
-        glucoseChartManager?.updateChartPoints(endDate: Date(), startDate: nil, chartOutlet: chartOutlet, forceReset: forceReset, completionHandler: nil)
+        glucoseChartManager?.updateChartPoints(endDate: Date(), startDate: nil, chartOutlet: chartOutlet, forceReset: forceReset, showTreaments: UserDefaults.standard.showTreatmentsOnChart, completionHandler: nil)
         
     }
     
