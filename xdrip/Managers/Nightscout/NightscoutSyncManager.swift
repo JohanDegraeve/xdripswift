@@ -219,6 +219,13 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     /// synchronize all treatments and other information with Nightscout
     private func syncWithNightscout() {
+        // Ensure Core Data main-context objects are always accessed on the main thread
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { [weak self] in
+                self?.syncWithNightscout()
+            }
+            return
+        }
         // check that Nightscout is enabled
         // and nightscoutURL exists
         guard UserDefaults.standard.nightscoutEnabled, UserDefaults.standard.nightscoutUrl != nil else { return }
@@ -455,14 +462,18 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         
                         UserDefaults.standard.nightscoutSyncRequired = false
                         
-                        syncWithNightscout()
+                        DispatchQueue.main.async { [weak self] in
+                            self?.syncWithNightscout()
+                        }
                     }
                     
                 case UserDefaults.Key.nightscoutFollowType:
                     // nillify the deviceStatus to force a new sync/parse using the new model selected
                     deviceStatus = NightscoutDeviceStatus()
                     
-                    syncWithNightscout()
+                    DispatchQueue.main.async { [weak self] in
+                        self?.syncWithNightscout()
+                    }
                     
                 default:
                     break
