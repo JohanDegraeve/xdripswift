@@ -288,8 +288,8 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_sectiontitletreatments", tableName: filename, bundle: Bundle.main, value: "Treatments", comment: "treatments settings, section title")
     }()
 
-    static let settingsviews_showTreatmentsOnChart: String = {
-        return NSLocalizedString("settingsviews_showTreatmentsOnChart", tableName: filename, bundle: Bundle.main, value: "Show Treatments on Chart", comment: "treatments settings, show the treatments on main chart")
+    static let settingsviews_showTreatments: String = {
+        return NSLocalizedString("settingsviews_showTreatments", tableName: filename, bundle: Bundle.main, value: "Show Treatments", comment: "treatments settings, show the treatments on main chart")
     }()
     
     static let settingsviews_smallBolusTreatmentThreshold = {

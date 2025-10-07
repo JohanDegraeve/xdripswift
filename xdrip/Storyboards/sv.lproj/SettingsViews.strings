@@ -16,7 +16,7 @@
 "settingsviews_showcoloredobjectives" = "Visa färgade linjer";
 "settingsviews_showtarget" = "Visa målvärdeslinje";
 "settingsviews_sectiontitletreatments" = "Behandlingar";
-"settingsviews_showTreatmentsOnChart" = "Visa behandlingar i diagram";
+"settingsviews_showTreatments" = "Visa behandlingar i diagram";
 "settingsviews_smallBolusTreatmentThreshold" = "Tröskelvärde för mikrobolus";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Under vilket värde ska det visas som en mikrobolus?\n\n(Rekommenderat värde: 1,0 IE)";
 "settingsviews_sectiontitlestatistics" = "Statistik";

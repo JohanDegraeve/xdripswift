@@ -151,7 +151,7 @@
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Kuinka monen yksikön alapuolella bolusta pitäisi pitää mikroboluksena?\n\n(Suositeltu arvo: 1,0 U)";
 
 /// treatments settings, show the treatments on main chart
-"settingsviews_showTreatmentsOnChart" = "Näytä hoidot kaaviossa";
+"settingsviews_showTreatments" = "Näytä hoidot kaaviossa";
 
 /// Button to export all data
 "settingsviews_housekeeperExportAllData" = "Vie kaikki tiedot";

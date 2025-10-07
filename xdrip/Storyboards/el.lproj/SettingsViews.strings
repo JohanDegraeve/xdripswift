@@ -22,7 +22,7 @@
 "settingsviews_showcoloredobjectives" = "Εμφάνιση έγχρωμων γραμμών;";
 "settingsviews_showtarget" = "Εμφάνιση γραμμής στόχου;";
 "settingsviews_sectiontitletreatments" = "Θεραπείες";
-"settingsviews_showTreatmentsOnChart" = "Εμφάνιση θεραπειών στο γράφημα;";
+"settingsviews_showTreatments" = "Εμφάνιση θεραπειών στο γράφημα;";
 "settingsviews_smallBolusTreatmentThreshold" = "Όριο Micro-bolus (ταχείας δράσης)";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Κάτω από πόσες μονάδες πρέπει να θεωρήσουμε ένα ταχείας δράσης ως μικροδιώρωση (micro-bolus);\n\n(Προτεινόμενη τιμή: 1,0U)";
 "settingsviews_sectiontitlestatistics" = "Στατιστικά";

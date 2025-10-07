@@ -20,7 +20,7 @@
 "settingsviews_showcoloredobjectives" = "Mostrar Linhas Coloridas";
 "settingsviews_showtarget" = "Mostrar Linha Alvo";
 "settingsviews_sectiontitletreatments" = "Tratamentos";
-"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart";
+"settingsviews_showTreatments" = "Show Treatments";
 "settingsviews_smallBolusTreatmentThreshold" = "Limiar Micro-bolus";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Abaixo de quantas unidades devemos considerar um bolus como micro-bolus?\n\n(Valor recomendado: 1.0U)";
 "settingsviews_sectiontitlestatistics" = "Estatísticas";

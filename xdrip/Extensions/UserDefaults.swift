@@ -136,6 +136,8 @@ extension UserDefaults {
         case useIFCCA1C = "useIFCCA1C"
         /// which type of TIR calculation is selected?
         case timeInRangeType = "timeInRangeType"
+        /// should the TIR chart use a dynamic Y axis? If not, then it will be fixed from 0-100%
+        case tirChartHasDynamicYAxis = "tirChartHasDynamicYAxis"
         /// no longer used, but will leave it here to prevent compiler coredata warnings
         case useStandardStatisticsRange = "useStandardStatisticsRange"
         /// use the newer TITR of 70-140mg/dL to calculate the statistics? If false, we will use the conventional TIR of 70-180mg/dL
@@ -1249,6 +1251,17 @@ extension UserDefaults {
         }
         set {
             set(newValue.rawValue, forKey: Key.timeInRangeType.rawValue)
+        }
+    }
+    
+    /// should the TIR chart use a dynamic Y axis? If not, then it will be fixed from 0-100%
+    @objc dynamic var tirChartHasDynamicYAxis: Bool {
+        // default value for bool in userdefaults is false, by default we want the the dynamic y-axis to be fixed (false)
+        get {
+            return bool(forKey: Key.tirChartHasDynamicYAxis.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.tirChartHasDynamicYAxis.rawValue)
         }
     }
     

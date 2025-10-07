@@ -247,4 +247,8 @@ enum Texts_HomeView {
         return NSLocalizedString("showHideItemsTitle", tableName: filename, bundle: Bundle.main, value: "Quick Show/Hide", comment: "show or hide various interface items")
     }()
     
+    static let showTreatments: String = {
+        return NSLocalizedString("showTreatments", tableName: filename, bundle: Bundle.main, value: "Show Treatments", comment: "show the treatments on the chart")
+    }()
+    
 }

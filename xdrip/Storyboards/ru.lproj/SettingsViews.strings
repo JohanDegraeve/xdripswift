@@ -22,7 +22,7 @@
 "settingsviews_showcoloredobjectives" = "Показывать цветные линии";
 "settingsviews_showtarget" = "Показать целевую линию";
 "settingsviews_sectiontitletreatments" = "Терапия";
-"settingsviews_showTreatmentsOnChart" = "Показать лечение на графике";
+"settingsviews_showTreatments" = "Показать лечение на графике";
 "settingsviews_smallBolusTreatmentThreshold" = "Пороговое значение микроболюса";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Ниже скольких единиц мы должны считать болюс микроболюсом?\n\n(Рекомендуемое значение: 1,0U)";
 "settingsviews_sectiontitlestatistics" = "Статистика";

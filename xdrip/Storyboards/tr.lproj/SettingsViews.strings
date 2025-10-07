@@ -149,7 +149,7 @@
 "settingsviews_valueIsRequired" = "⚠️ Required";
 
 /// treatments settings, show the treatments on main chart
-"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart";
+"settingsviews_showTreatments" = "Show Treatments";
 
 /// treatments settings, offset the carb treatments on main chart
 
