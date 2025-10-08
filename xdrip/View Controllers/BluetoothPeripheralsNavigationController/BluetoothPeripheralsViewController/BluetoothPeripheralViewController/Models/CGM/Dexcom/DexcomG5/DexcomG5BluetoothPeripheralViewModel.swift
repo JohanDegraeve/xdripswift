@@ -551,6 +551,15 @@ extension DexcomG5BluetoothPeripheralViewModel: CGMG5TransmitterDelegate {
 
             // Always reload the general section (0) first, because its row count may have changed.
             tableView.reloadSections(IndexSet(integer: 0), with: .none)
+            
+            // Guard against invalid section index. A mismatch between calculated section and the current
+            // table structure can occur during updates, which previously caused a crash in
+            // -[UITableViewRowData numberOfRowsInSection:]. If the section is gone/shifted, fall back to a full reload.
+            let totalSections = tableView.numberOfSections
+            guard section < totalSections else {
+                tableView.reloadData()
+                return
+            }
 
             // Then safely refresh the target section: reload the row if it still exists; otherwise reload the whole section.
             if row < tableView.numberOfRows(inSection: section) {
