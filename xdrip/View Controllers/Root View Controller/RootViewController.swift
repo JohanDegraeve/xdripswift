@@ -3333,12 +3333,17 @@ final class RootViewController: UIViewController, ObservableObject {
                 } else if UserDefaults.standard.libreLinkUpPreventLogin {
                     dataSourceSensorMaxAgeOutlet.textColor = .systemRed
                     dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.followerAccountCredentialsInvalid
+                } else if let followerPatientName = UserDefaults.standard.followerPatientName {
+                    dataSourceSensorMaxAgeOutlet.text = followerPatientName
                 }
                 
             case .dexcomShare:
                 if UserDefaults.standard.dexcomShareAccountName == nil || UserDefaults.standard.dexcomSharePassword == nil {
                     dataSourceSensorMaxAgeOutlet.textColor = .systemRed
                     dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.followerAccountCredentialsMissing
+                } else if let followerPatientName = UserDefaults.standard.followerPatientName {
+                    dataSourceSensorMaxAgeOutlet.text = followerPatientName
+                    
                 }
             }
         }
