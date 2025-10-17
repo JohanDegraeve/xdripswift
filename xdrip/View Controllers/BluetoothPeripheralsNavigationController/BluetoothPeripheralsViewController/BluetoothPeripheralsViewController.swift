@@ -172,11 +172,23 @@ final class BluetoothPeripheralsViewController: UIViewController {
         }
     }
 
-    /// calls tableView.reloadRows for the row where bluetoothPeripheral is shown
+    /// calls tableView.reloadRows for the row where bluetoothPeripheral is shown, main-thread safe and resilient to index changes
     private func updateRow(for bluetoothPeripheral: BluetoothPeripheral) {
-        // possibly an instance of BluetoothPeripheralViewController is on top of this UIViewController, in which case it's better not to update the rows (xcode creates warnings if this would be done)
-        if isViewLoaded && (view.window != nil) {
-            tableView.reloadRows(at: [IndexPath(row: getIndexInSection(for: bluetoothPeripheral), section: bluetoothPeripheral.bluetoothPeripheralType().category().index())], with: .none)
+        // Only update UI when visible
+        guard isViewLoaded, view.window != nil else { return }
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self, let tableView = self.tableView else { return }
+
+            let section = bluetoothPeripheral.bluetoothPeripheralType().category().index()
+            let row = self.getIndexInSection(for: bluetoothPeripheral)
+
+            // If the row is still valid in this section, reload just that row; otherwise reload the whole section.
+            if row >= 0 && row < tableView.numberOfRows(inSection: section) {
+                tableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none)
+            } else {
+                tableView.reloadSections(IndexSet(integer: section), with: .none)
+            }
         }
     }
     

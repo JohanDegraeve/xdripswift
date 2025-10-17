@@ -160,10 +160,12 @@ struct LiveActivityViewContent : View {
                     
                     GlucoseChartView(glucoseChartType: .liveActivity, bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityType: .large, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
                     
-                    HStack {
-                        Text(context.state.dataSourceDescription)
+                    HStack(alignment: .center) {
+                        // if we're in follower mode and a patient name exists, let's use it with preference over the data source     
+                        Text(context.state.followerPatientName ?? context.state.dataSourceDescription)
                             .font(.caption).bold()
                             .foregroundStyle(.colorSecondary)
+                            .padding(.trailing, -4)
                         
                         Spacer()
                         

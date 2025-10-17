@@ -2,7 +2,8 @@ import Foundation
 import CoreBluetooth
 import os
 
-class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
+@objcMembers
+class CGMAtomTransmitter: BluetoothTransmitter, CGMTransmitter {
     
     // MARK: - properties
     
@@ -206,7 +207,7 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 
                                 // decrypt of libre2 or libreUS
                                 dataIsDecryptedToLibre1Format = libreSensorType.decryptIfPossibleAndNeeded(rxBuffer: &rxBuffer[0..<344], headerLength: 0, log: log, patchInfo: patchInfo, uid: Array(sensorSerialNumberAsData))
-                                
+                               
                                 // now except libreProH, all libres' 344 data is libre1 format
                                 // should crc check
                                 guard libreSensorType.crcIsOk(rxBuffer: &self.rxBuffer[0..<344], headerLength: 0, log: log) else {
@@ -245,7 +246,10 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                             libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: sensorSerialNumberAsData, with: LibreSensorType.type(patchInfo: patchInfo))?.serialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, libreData: (rxBuffer[0..<344]), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: nil, completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
                                 
                                 if let sensorState = sensorState {
-                                    self.cGMAtomTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
+                                    DispatchQueue.main.async { [weak self] in
+                                        guard let self = self else { return }
+                                        self.cGMAtomTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
+                                    }
                                 }
                                 
                             })
@@ -258,28 +262,32 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                     case .transmitterInfo:
                         
                         trace("in peripheral didUpdateValueFor, transmitterInfo received", log: log, category: ConstantsLog.categoryCGMAtom, type: .error)
+
+                        guard value.count >= 5 else {
+                            trace("in peripheral didUpdateValueFor, transmitterInfo too short", log: log, category: ConstantsLog.categoryCGMAtom, type: .error)
+                            return
+                        }
                         
                         let transmitterBatteryPercentage = Int(value[4])
-                        
-                        // send transmitterBatteryInfo to cgmTransmitterDelegate
-                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: transmitterBatteryPercentage), sensorAge: nil)
-                        
-                        // send transmitter battery percentage to cGMAtomTransmitterDelegate
-                        cGMAtomTransmitterDelegate?.received(batteryLevel: transmitterBatteryPercentage, from: self)
                         
                         // get firmware, byte 2 to hex + "." + byte 3 to hex
                         firmWare = String(describing: value[2..<3].hexEncodedString()) + "." + String(describing: value[3..<4].hexEncodedString())
                         
-                        // send firmware to cGMAtomTransmitterDelegate
-                        if let firmWare = firmWare {
-                            cGMAtomTransmitterDelegate?.received(firmware: firmWare, from: self)
-                        }
-                        
                         // get hardware, last but one byte to hex + "." + last byte to hex
                         let hardWare = String(describing: value[(value.count - 2)..<(value.count - 1)].hexEncodedString()) + "." + String(describing: value[(value.count - 1)..<value.count].hexEncodedString())
                         
-                        // send hardware to cGMAtomTransmitterDelegate
-                        cGMAtomTransmitterDelegate?.received(hardware: hardWare, from: self)
+                        // send transmitterBatteryInfo and battery percentage to delegates on main
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else { return }
+                            let empty = self.emptyArray
+                            var copy = empty
+                            self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: transmitterBatteryPercentage), sensorAge: nil)
+                            self.cGMAtomTransmitterDelegate?.received(batteryLevel: transmitterBatteryPercentage, from: self)
+                            if let firmWare = self.firmWare {
+                                self.cGMAtomTransmitterDelegate?.received(firmware: firmWare, from: self)
+                            }
+                            self.cGMAtomTransmitterDelegate?.received(hardware: hardWare, from: self)
+                        }
                         
                         // send ack message
                         _ = sendAtomResponse()
@@ -288,8 +296,10 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                         
                         trace("in peripheral didUpdateValueFor, received sensorNotDetected", log: log, category: ConstantsLog.categoryCGMAtom, type: .info)
                         
-                        // call cgmTransmitterDelegate sensorNotDetected
-                        cgmTransmitterDelegate?.sensorNotDetected()
+                        // call cgmTransmitterDelegate sensorNotDetected on main
+                        DispatchQueue.main.async { [weak self] in
+                            self?.cgmTransmitterDelegate?.sensorNotDetected()
+                        }
                         
                     case .sensorUID:
                         
@@ -335,39 +345,28 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
                             
                         }
                         
-                        // send libreSensorType to delegate
+                        // send libreSensorType to delegate on main
                         if let libreSensorType = LibreSensorType.type(patchInfo: patchInfo) {
-                            
-                            cGMAtomTransmitterDelegate?.received(libreSensorType: libreSensorType, from: self)
-                            
-                        }
-                        
-                        // recalculate serial number and send to delegate
-                        if let sensorSerialNumberAsData = sensorSerialNumberAsData, let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: sensorSerialNumberAsData, with: LibreSensorType.type(patchInfo: patchInfo))  {
-                            
-                            // call to delegate, received sensor serialNumber
-                            cGMAtomTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
-                            
-                            if self.sensorSerialNumber != libreSensorSerialNumber.serialNumber {
-                                
-                                // assign self.sensorSerialNumber to libreSensorSerialNumber.serialNumber
-                                self.sensorSerialNumber = libreSensorSerialNumber.serialNumber
-                                
-                                // call delegate, to inform that a new sensor is detected
-                                // assign sensorStartDate, for this type of transmitter the sensorAge is passed in another call to cgmTransmitterDelegate
-                                cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
-
+                            DispatchQueue.main.async { [weak self] in
+                                guard let self = self else { return }
+                                self.cGMAtomTransmitterDelegate?.received(libreSensorType: libreSensorType, from: self)
                             }
-
-                        } else {
-                            
-                            trace("in peripheral didUpdateValueFor, could not create libreSensorSerialNumber", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
-                            
-                            return
-                            
                         }
-                    
                         
+                        // recalculate serial number and send to delegate on main
+                        if let sensorSerialNumberAsData = sensorSerialNumberAsData, let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: sensorSerialNumberAsData, with: LibreSensorType.type(patchInfo: patchInfo))  {
+                            DispatchQueue.main.async { [weak self] in
+                                guard let self = self else { return }
+                                self.cGMAtomTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
+                                if self.sensorSerialNumber != libreSensorSerialNumber.serialNumber {
+                                    self.sensorSerialNumber = libreSensorSerialNumber.serialNumber
+                                    self.cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
+                                }
+                            }
+                        } else {
+                            trace("in peripheral didUpdateValueFor, could not create libreSensorSerialNumber", log: self.log, category: ConstantsLog.categoryCGMBubble, type: .info)
+                            return
+                        }
                     }
                 } else {
                     
@@ -387,6 +386,39 @@ class CGMAtomTransmitter:BluetoothTransmitter, CGMTransmitter {
         }
         
         
+    }
+    
+    override func prepareForRelease() {
+        // Clear base CB delegates + unsubscribe common receiveCharacteristic synchronously on main
+        super.prepareForRelease()
+        // Atom-specific cleanup
+        let tearDown = {
+            // clear buffer and counters to avoid stale data
+            self.rxBuffer = Data()
+            self.resendPacketCounter = 0
+            // nil optional state vars
+            self.sensorSerialNumberAsData = nil
+            self.patchInfo = nil
+            self.firmWare = nil
+            self.sensorSerialNumber = nil
+            self.libreSensorType = nil
+        }
+        if Thread.isMainThread {
+            tearDown()
+        } else {
+            DispatchQueue.main.sync(execute: tearDown)
+        }
+    }
+
+    deinit {
+        // Defensive cleanup beyond base class
+        rxBuffer = Data()
+        resendPacketCounter = 0
+        sensorSerialNumberAsData = nil
+        patchInfo = nil
+        firmWare = nil
+        sensorSerialNumber = nil
+        libreSensorType = nil
     }
     
     // MARK: - helpers

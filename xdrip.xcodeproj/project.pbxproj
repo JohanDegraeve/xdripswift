@@ -36,6 +36,8 @@
 		472134DE2BC6A63100729850 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
 		472134DF2BC6A63100729850 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
 		47228B152996BDD2008725DB /* BgReadingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47228B142996BDD2008725DB /* BgReadingsView.swift */; };
+		47244D662E8318DB007357C3 /* TransmitterReadSuccessManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47244D652E8318D0007357C3 /* TransmitterReadSuccessManager.swift */; };
+		47244D682E8318E7007357C3 /* TransmitterReadSuccessResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47244D672E8318E0007357C3 /* TransmitterReadSuccessResult.swift */; };
 		472596052B76301F00459D12 /* WatchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 472596042B76301F00459D12 /* WatchManager.swift */; };
 		4733B93E2AD17C99001D609D /* FollowerBgReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4733B93D2AD17C99001D609D /* FollowerBgReading.swift */; };
 		4733B9402AD17D15001D609D /* FollowerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4733B93F2AD17D15001D609D /* FollowerDelegate.swift */; };
@@ -90,6 +92,7 @@
 		4752B4062635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */; };
 		475F2A872D0DA81400DE6019 /* ShowHideItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */; };
 		475FBA082D7312DE004D068E /* PickerViewControllerModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475FBA072D7312D5004D068E /* PickerViewControllerModal.swift */; };
+		476404892EA29034006CBE03 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476404882EA29034006CBE03 /* SceneDelegate.swift */; };
 		476698662BE2572C008EB2A9 /* ConstantsSettingsIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */; };
 		4767BDD62BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4767BDD52BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift */; };
 		476A897C2CC963C00073ED83 /* NightscoutProfileModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476A897B2CC963AF0073ED83 /* NightscoutProfileModels.swift */; };
@@ -217,6 +220,8 @@
 		47EDD1492BDD56C800C5A286 /* WatchApp.strings in Resources */ = {isa = PBXBuildFile; fileRef = 47EDD1472BDD56C800C5A286 /* WatchApp.strings */; };
 		47EDD15A2BE01E9000C5A286 /* ConstantsWatchComplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47EDD1592BE01E9000C5A286 /* ConstantsWatchComplication.swift */; };
 		47F2E5C32D7CD45F00EDA930 /* ConstantsPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F2E5C22D7CD45500EDA930 /* ConstantsPickerView.swift */; };
+		47F4E09C2E699D6B00087889 /* DexcomShareFollowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F4E09B2E699D6500087889 /* DexcomShareFollowManager.swift */; };
+		47F4E09E2E69C5A300087889 /* DexcomShareModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47F4E09D2E69C59A00087889 /* DexcomShareModels.swift */; };
 		47F7B1C52C68BBE000609DA7 /* ConstantsCalibrationAlgorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585422EDB706007F5B5D /* ConstantsCalibrationAlgorithms.swift */; };
 		47F7B1C62C68BBE100609DA7 /* ConstantsCalibrationAlgorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585422EDB706007F5B5D /* ConstantsCalibrationAlgorithms.swift */; };
 		47F7B1CD2C68CC3000609DA7 /* ConstantsCalibrationAlgorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585422EDB706007F5B5D /* ConstantsCalibrationAlgorithms.swift */; };
@@ -921,6 +926,8 @@
 		471C9C052B94DFAE005E1326 /* xDrip-Watch-App-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "xDrip-Watch-App-Info.plist"; sourceTree = SOURCE_ROOT; };
 		471C9C062B94E2B3005E1326 /* xDrip Watch App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "xDrip Watch App.entitlements"; sourceTree = "<group>"; };
 		47228B142996BDD2008725DB /* BgReadingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgReadingsView.swift; sourceTree = "<group>"; };
+		47244D652E8318D0007357C3 /* TransmitterReadSuccessManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmitterReadSuccessManager.swift; sourceTree = "<group>"; };
+		47244D672E8318E0007357C3 /* TransmitterReadSuccessResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmitterReadSuccessResult.swift; sourceTree = "<group>"; };
 		472596042B76301F00459D12 /* WatchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchManager.swift; sourceTree = "<group>"; };
 		4733B93D2AD17C99001D609D /* FollowerBgReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBgReading.swift; sourceTree = "<group>"; };
 		4733B93F2AD17D15001D609D /* FollowerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerDelegate.swift; sourceTree = "<group>"; };
@@ -950,6 +957,7 @@
 		475DED96244AF92A00F78473 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Alerts.strings; sourceTree = "<group>"; };
 		475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowHideItemsView.swift; sourceTree = "<group>"; };
 		475FBA072D7312D5004D068E /* PickerViewControllerModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerViewControllerModal.swift; sourceTree = "<group>"; };
+		476404882EA29034006CBE03 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = "xDrip/Supporting Files/SceneDelegate.swift"; sourceTree = SOURCE_ROOT; };
 		476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSettingsIcons.swift; sourceTree = "<group>"; };
 		4767BDD52BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewAppleWatchSettingsViewModel.swift; sourceTree = "<group>"; };
 		476A897B2CC963AF0073ED83 /* NightscoutProfileModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutProfileModels.swift; sourceTree = "<group>"; };
@@ -1057,6 +1065,8 @@
 		47EDD15B2BE0286000C5A286 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/WatchApp.strings; sourceTree = "<group>"; };
 		47EDD15C2BE028A200C5A286 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/WatchComplication.strings; sourceTree = "<group>"; };
 		47F2E5C22D7CD45500EDA930 /* ConstantsPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsPickerView.swift; sourceTree = "<group>"; };
+		47F4E09B2E699D6500087889 /* DexcomShareFollowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomShareFollowManager.swift; sourceTree = "<group>"; };
+		47F4E09D2E69C59A00087889 /* DexcomShareModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomShareModels.swift; sourceTree = "<group>"; };
 		47FB28072636B04200042FFB /* StatisticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsManager.swift; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xdrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xdrip/Version.xcconfig; sourceTree = "<group>"; };
@@ -1985,6 +1995,15 @@
 			path = LiveActivity;
 			sourceTree = "<group>";
 		};
+		47244D642E8318B9007357C3 /* TransmitterReadSuccess */ = {
+			isa = PBXGroup;
+			children = (
+				47244D652E8318D0007357C3 /* TransmitterReadSuccessManager.swift */,
+				47244D672E8318E0007357C3 /* TransmitterReadSuccessResult.swift */,
+			);
+			path = TransmitterReadSuccess;
+			sourceTree = "<group>";
+		};
 		472596032B76300800459D12 /* Watch */ = {
 			isa = PBXGroup;
 			children = (
@@ -2327,9 +2346,9 @@
 			isa = PBXGroup;
 			children = (
 				47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */,
+				F8CCBB4E2D1B6DF900F14867 /* LandscapeValueViewController.swift */,
 				F8AC425F21ADEBD60078C348 /* RootViewController.swift */,
 				F8E6C78B24CDDB83007C1199 /* SnoozeViewController.swift */,
-				F8CCBB4E2D1B6DF900F14867 /* LandscapeValueViewController.swift */,
 			);
 			path = "Root View Controller";
 			sourceTree = "<group>";
@@ -2346,6 +2365,7 @@
 		F8025E5B21F7AFC600ECF0C0 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				476404882EA29034006CBE03 /* SceneDelegate.swift */,
 				F8AC426B21ADEBD70078C348 /* Info.plist */,
 			);
 			path = "Supporting Files";
@@ -2508,6 +2528,8 @@
 			isa = PBXGroup;
 			children = (
 				F81D6D5122C27F18005EFAE2 /* BgReading+DexcomShare.swift */,
+				47F4E09B2E699D6500087889 /* DexcomShareFollowManager.swift */,
+				47F4E09D2E69C59A00087889 /* DexcomShareModels.swift */,
 				F81D6D4722BD5F62005EFAE2 /* DexcomShareUploadManager.swift */,
 			);
 			path = DexcomShare;
@@ -2683,6 +2705,7 @@
 				F64039AE281C3F8D0051EFFE /* QuickActions */,
 				F821CF9922AEF2DF005C1E43 /* Speak */,
 				47FB28052636AFE700042FFB /* Statistics */,
+				47244D642E8318B9007357C3 /* TransmitterReadSuccess */,
 				472596032B76300800459D12 /* Watch */,
 				474606812B96357200AC9214 /* Widgets */,
 			);
@@ -3957,7 +3980,7 @@
 				BuildIndependentTargetsInParallel = YES;
 				DefaultBuildSystemTypeForWorkspace = Latest;
 				LastSwiftUpdateCheck = 1530;
-				LastUpgradeCheck = 1620;
+				LastUpgradeCheck = 2600;
 				ORGANIZATIONNAME = "Johan Degraeve";
 				TargetAttributes = {
 					4716A4EC2B406C3D00419052 = {
@@ -4482,6 +4505,7 @@
 				F8F9722223A5915900C3F17D /* CRC.swift in Sources */,
 				F8CB59C02734976D00BA199E /* DexcomTransmitterTimeTxMessage.swift in Sources */,
 				F821CF6F229FC280005C1E43 /* Endpoint+Nightscout.swift in Sources */,
+				47F4E09E2E69C5A300087889 /* DexcomShareModels.swift in Sources */,
 				F8F9722A23A5915900C3F17D /* TransmitterBatteryInfo.swift in Sources */,
 				F821CF5D229BF43A005C1E43 /* NightscoutDateFormatter.swift in Sources */,
 				F8F16715272745A2001AA3D8 /* DexcomCalibrationResponseType.swift in Sources */,
@@ -4557,6 +4581,7 @@
 				F8025E5021EE746400ECF0C0 /* Calibrator.swift in Sources */,
 				F85DC2F421CFE3D400B9F74A /* Sensor+CoreDataClass.swift in Sources */,
 				F8B3A844227F090E004BA588 /* SettingsViewAlertSettingsViewModel.swift in Sources */,
+				47244D662E8318DB007357C3 /* TransmitterReadSuccessManager.swift in Sources */,
 				475F2A872D0DA81400DE6019 /* ShowHideItemsView.swift in Sources */,
 				F8D0587C24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift in Sources */,
 				F8A1586322EDB86E007F5B5D /* ConstantsSounds.swift in Sources */,
@@ -4572,6 +4597,7 @@
 				F8A2BC3325DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMDexcomG4TransmitterDelegate.swift in Sources */,
 				F816E10E2437EAC9009EE65B /* BlueReader+CoreDataProperties.swift in Sources */,
 				F8B3A830227F085A004BA588 /* SettingsTableViewCell.swift in Sources */,
+				476404892EA29034006CBE03 /* SceneDelegate.swift in Sources */,
 				F82436FC24BE014000BED341 /* TextsLibreStates.swift in Sources */,
 				F8F71D7A2B7E9DFB005076E8 /* ConstantsDexcomG7.swift in Sources */,
 				47DB06C22A6FC02200267BE3 /* SettingsViewDataSourceSettingsViewModel.swift in Sources */,
@@ -4579,6 +4605,7 @@
 				D417E51C282EC8DB008DC467 /* ProgressBarViewController.swift in Sources */,
 				47DB06C62A6FC72000267BE3 /* SettingsViewCalendarEventsSettingsViewModel.swift in Sources */,
 				F830991C23C2909E005741DF /* Watlaa+CoreDataClass.swift in Sources */,
+				47244D682E8318E7007357C3 /* TransmitterReadSuccessResult.swift in Sources */,
 				47EDD1422BDD4FE500C5A286 /* XDripWidgetAttributes.swift in Sources */,
 				F808D2CC240328FA0084B5DB /* Bubble+CoreDataClass.swift in Sources */,
 				F8A1586122EDB844007F5B5D /* ConstantsNotifications.swift in Sources */,
@@ -4601,6 +4628,7 @@
 				F8C97859242AAE7B00A09483 /* MiaoMiao+BluetoothPeripheral.swift in Sources */,
 				476FE8FF2B2F1D1700537E0A /* ConstantsFollower.swift in Sources */,
 				F8EEDD5422FF685400D2D610 /* NSMutableURLRequest.swift in Sources */,
+				47F4E09C2E699D6B00087889 /* DexcomShareFollowManager.swift in Sources */,
 				47930E822BC5A001000BD8A1 /* ConstantsWidget.swift in Sources */,
 				F897AAFB2201018800CDDD10 /* String.swift in Sources */,
 				F85542342B7574330058CE09 /* OmniPodHeartBeat+CoreDataProperties.swift in Sources */,
@@ -5825,6 +5853,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SHARED_PRECOMPS_DIR = "";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_COMPILATION_MODE = singlefile;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -5886,6 +5915,7 @@
 				OBJROOT = "";
 				SDKROOT = iphoneos;
 				SHARED_PRECOMPS_DIR = "";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SYMROOT = "";

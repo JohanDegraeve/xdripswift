@@ -11,7 +11,7 @@
 "settingsviews_follower" = "Follower";
 "settingsviews_sectionTitleDataSource" = "CGM Data Source";
 "settingsviews_labelFollowerDataSourceType" = "Follower Data Source";
-"settingsviews_labelUploadFollowerDataToNightscout" = "Upload to Nightscout";
+"settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
 "settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
 "settingsviews_followerKeepAliveTypeDisabled" = "Disabled";
 "settingsviews_followerKeepAliveTypeNormal" = "Normal";
@@ -21,8 +21,8 @@
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 "settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Background keep-alive is set to use an external heartbeat. ❤️\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
 "settingsviews_followerPatientName" = "Patient Name";
-"settingsviews_followerPatientNameMessage" = "Here you can write the name of the person you are following.\n\nThis can be useful if you are following several different people with several different apps.\n\nThis is optional and would normally be left empty.";
-"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload follower BG values to Nightscout, you must enable it in the Nightscout section.";
+"settingsviews_followerPatientNameMessage" = "Here you can optionally write the name of the person you are following.";
+"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
 "settingsviews_nightscoutNotEnabledRowText" = "Disabled";
 "settingsviews_labelFollowerDataSourceRegion" = "Server (Country)";
 "settingsviews_enterUsername" = "Enter your username (e-mail)";
@@ -51,7 +51,7 @@
 "settingsviews_showcoloredobjectives" = "Show Colored Lines";
 "settingsviews_showtarget" = "Show Target Line";
 "settingsviews_sectiontitletreatments" = "Treatments";
-"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart";
+"settingsviews_showTreatments" = "Show Treatments";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
 "settingsviews_sectiontitlestatistics" = "Statistics";
 "settingsviews_showStatistics" = "Show Statistics";
@@ -80,14 +80,14 @@
 "settingsviews_row_alerts" = "Alarms";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
 "settingsviews_healthkit" = "Write Data to Apple Health";
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
 "settingsviews_uploadReadingstoDexcomShare" = "Upload to Dexcom Share";
-"settingsviews_dexcomShareSerialNumber" = "Receiver Serial Number";
+"settingsviews_dexcomShareUploadSerialNumber" = "Receiver Serial Number";
 "settingsviews_useUSDexcomShareurl" = "Use Dexcom US Servers";
 "settingsviews_dexcomShareAccountName" = "Account Name";
 "settingsviews_giveDexcomShareAccountName" = "Enter Dexcom Share Account Name";
 "settingsviews_giveDexcomSharePassword" = "Give Dexcom Share Password";
-"settingsviews_giveDexcomShareSerialNumber" = "Enter the Dexcom Receiver Serial Number";
+"settingsviews_givedexcomShareUploadSerialNumber" = "Enter the Dexcom Receiver Serial Number";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutEnabled" = "Enable Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
@@ -146,7 +146,9 @@
 "volumeTestSoundPlayer" = "Test Volume (if Override Mute On)";
 "volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
 "debugLevel" = "Include Debug Level";
-"warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
+"warningChangeFromMasterToFollower" = "Switching from Master to Follower will stop your current sensor. Do you want to continue?";
+"warningChangeFromMasterToFollowerDexcomShare" = "Switch from Master to Dexcom Share Follower will stop your current sensor and will also disable 'Upload to Dexcom Share'. Do you want to continue?";
+"warningChangeToFollowerDexcomShare" = "Switching to Dexcom Share Follower mode will disable 'Upload to Dexcom Share'.";
 "nightscoutPort" = "Port";
 "developerSettings" = "Developer Settings";
 "smoothLibreValues" = "Smooth Libre Values";
@@ -170,3 +172,7 @@
 "appleWatchShowDataInComplicationsMessage" = "Please note that Apple Watch complications will not update in real-time. They will only update 2-3 times per hour.\n\nDO NOT rely on values in the complication for treatment decisions.\n\nFor real-time values, open the %@ Watch app.\n\nOnly click 'OK' if you understand and agree.";
 "appleWatchComplicationUserAgreementDate" = "User Agreement";
 "appleWatchRemainingComplicationUserInfoTransfers" = "Remaining Complication Updates";
+"settingsviews_storeFrequentReadingsInNightscout" = "Frequent Nightscout Uploads";
+"settingsviews_storeFrequentReadingsInHealthKitMessage" = "This option will override the 5-minute upload limits and allow much frequent BG data to be uploaded to Nightscout. Such as for 60-second Libre 2 Direct values.\n\nPlease only enable this option if you really need/want more frequent data. Most users should leave this option disabled.";
+"settingsviews_storeFrequentReadingsInHealthKit" = "Frequent HealthKit Writes";
+"settingsviews_storeFrequentReadingsInHealthKitMessage" = "This option will override the 5-minute write limits and allow much frequent data to be added to Apple Health. Such as for 60-second Libre 2 Direct values.\n\nPlease only enable this option if you really need/want more frequent data. Most users should leave this option disabled.";

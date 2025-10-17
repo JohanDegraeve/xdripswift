@@ -105,10 +105,11 @@ class ContactImageManager: NSObject {
                 contactImageView = ContactImageView(bgValue: lastReading[0].calculatedValue, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: UserDefaults.standard.displayTrendInContactImage ? lastReading[0].slopeArrow() : "", bgRangeDescription: lastReading[0].bgRangeDescription(), valueIsUpToDate: valueIsUpToDate, useHighContrastContactImage: UserDefaults.standard.useHighContrastContactImage, disableContactImage:  disableContactImage)
                 
                 // schedule an update in 5 min 15 seconds - if no new data is received until then, the empty value will get rendered into the contact (this update will be canceled if new data is received)
-                self.workItem = DispatchWorkItem(block: {
+                self.workItem = DispatchWorkItem { [weak self] in
+                    guard let self = self else { return }
                     trace("in updateContact, no updates received for more than 5 minutes", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error)
                     self.updateContact()
-                })
+                }
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + (5 * 60) + 15, execute: self.workItem!)
             } else {
@@ -141,7 +142,11 @@ class ContactImageManager: NSObject {
                 // we'll update the existing contact with the new data
                 saveRequest.update(mutableContact)
             } else {
-                trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' and adding a contact image with %{public}@ %{public}@.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+                if lastReading.count > 0 {
+                    trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' and adding a contact image with %{public}@ %{public}@.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+                } else {
+                    trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' with empty contact image (no BG data).", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName)
+                }
                 
                 // create a new mutable contact instance and assign properties to it
                 let contact = CNMutableContact()
@@ -174,7 +179,7 @@ class ContactImageManager: NSObject {
         if let contacts = try? self.contactStore.unifiedContacts(matching: predicate, keysToFetch: keyToFetch), let contact = contacts.first {
             trace("in deleteContact, existing contact found. Will try and delete it.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
             
-            let mutableContact = contact.mutableCopy() as! CNMutableContact
+            guard let mutableContact = contact.mutableCopy() as? CNMutableContact else { return }
             saveRequest.delete(mutableContact)
             
             executeSaveRequest(saveRequest: saveRequest)
@@ -206,6 +211,16 @@ class ContactImageManager: NSObject {
         } catch {
             trace("in executeSaveRequest, failed to update/add/delete the contact: %{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, error.localizedDescription)
         }
+    }
+    
+    deinit {
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.enableContactImage.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.displayTrendInContactImage.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.useHighContrastContactImage.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue)
+        workItem?.cancel()
     }
 }
 

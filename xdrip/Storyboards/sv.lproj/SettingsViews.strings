@@ -16,7 +16,7 @@
 "settingsviews_showcoloredobjectives" = "Visa färgade linjer";
 "settingsviews_showtarget" = "Visa målvärdeslinje";
 "settingsviews_sectiontitletreatments" = "Behandlingar";
-"settingsviews_showTreatmentsOnChart" = "Visa behandlingar i diagram";
+"settingsviews_showTreatments" = "Visa behandlingar i diagram";
 "settingsviews_smallBolusTreatmentThreshold" = "Tröskelvärde för mikrobolus";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Under vilket värde ska det visas som en mikrobolus?\n\n(Rekommenderat värde: 1,0 IE)";
 "settingsviews_sectiontitlestatistics" = "Statistik";
@@ -41,14 +41,14 @@
 "settingsviews_row_alerts" = "Larm";
 "settingsviews_sectiontitlehealthkit" = "Apple Hälsa";
 "settingsviews_healthkit" = "Skriv data till Apple Hälsa";
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
 "settingsviews_uploadReadingstoDexcomShare" = "Ladda upp till Dexcom Share";
-"settingsviews_dexcomShareSerialNumber" = "Sändarens serienummer";
+"settingsviews_dexcomShareUploadSerialNumber" = "Sändarens serienummer";
 "settingsviews_useUSDexcomShareurl" = "Använd Dexcom-server i USA";
 "settingsviews_dexcomShareAccountName" = "Användarnamn";
 "settingsviews_giveDexcomShareAccountName" = "Ange Dexcom Share användarnamn";
 "settingsviews_giveDexcomSharePassword" = "Ange Dexcom Share lösenord";
-"settingsviews_giveDexcomShareSerialNumber" = "Ange Dexcom mottagares serienummer";
+"settingsviews_givedexcomShareUploadSerialNumber" = "Ange Dexcom mottagares serienummer";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutEnabled" = "Slå på Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
@@ -226,7 +226,7 @@
 "settingsviews_CalenderIntervalTitle" = "Event Interval";
 
 /// data source settings, enable Nightscout in the Nightscout section
-"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload follower BG values to Nightscout, you must enable it in the Nightscout section.";
+"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
 
 /// screen dimming is disabled
 "settingsviews_screenLockDimmingTypeDisabled" = "Disabled";
@@ -271,10 +271,10 @@
 "settingsviews_labelFollowerDataSourceType" = "Follower Data Source";
 
 /// data source settings, enable Nightscout upload
-"settingsviews_labelUploadFollowerDataToNightscout" = "Upload to Nightscout";
+"settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
 
 /// data source settings, ask the user to enter the name of the person we are following if they want to - it's optional
-"settingsviews_followerPatientNameMessage" = "Here you can write the name of the person you are following.\n\nThis can be useful if you are following several different people with several different apps.\n\nThis is optional and would normally be left empty.";
+"settingsviews_followerPatientNameMessage" = "Here you can optionally write the name of the person you are following.";
 
 /// follower settings, pop up that asks user to enter their password
 "settingsviews_enterPassword" = "Enter your password";

@@ -258,7 +258,10 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
         // Watlaa is sending batteryLevel, which is in the first byte
         let receivedBatteryLevel = Int(value[0])
         
-        watlaaBluetoothTransmitterDelegate?.received(watlaaBatteryLevel: receivedBatteryLevel, watlaaBluetoothTransmitter: self)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.watlaaBluetoothTransmitterDelegate?.received(watlaaBatteryLevel: receivedBatteryLevel, watlaaBluetoothTransmitter: self)
+        }
 
     }
     
@@ -304,19 +307,23 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
                                     
                                     // inform delegate about new sensor detected
                                     // assign sensorStartDate, for this type of transmitter the sensorAge is passed in another call to cgmTransmitterDelegate
-                                    cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
-                                    
-                                    watlaaBluetoothTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
+                                    DispatchQueue.main.async { [weak self] in
+                                        guard let self = self else { return }
+                                        self.cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
+                                        self.watlaaBluetoothTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
+                                    }
                                     
                                 }
                                 
                             }
                             
-                            // send battery level to delegate
-                            watlaaBluetoothTransmitterDelegate?.received(transmitterBatteryLevel: batteryPercentage, watlaaBluetoothTransmitter: self)
-                            
-                            // send batteryPercentage to delegate
-                            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorAge: nil)
+                            // send battery level to delegate and batteryPercentage to delegate on main thread
+                            DispatchQueue.main.async { [weak self] in
+                                guard let self = self else { return }
+                                self.watlaaBluetoothTransmitterDelegate?.received(transmitterBatteryLevel: batteryPercentage, watlaaBluetoothTransmitter: self)
+                                var emptyArrayCopy = self.emptyArray
+                                self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArrayCopy, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorAge: nil)
+                            }
                             
                             libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)), with: nil)?.serialNumber, patchInfo: nil, webOOPEnabled: webOOPEnabled, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: false, testTimeStamp: nil, completionHandler:  { (sensorState: LibreSensorState?, xDripError: XdripError?) in
                                 
@@ -353,7 +360,10 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
                     trace("in peripheral didUpdateValueFor, new sensor detected", log: log, category: ConstantsLog.categoryWatlaa, type: .info)
 
                     // assign sensorStartDate, for this type of transmitter the sensorAge is passed in another call to cgmTransmitterDelegate
-                    cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        self.cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
+                    }
 
                     // send 0xD3 and 0x01 to confirm sensor change as defined in MiaoMiao protocol documentation
                     // after that send start reading command, each with delay of 500 milliseconds
@@ -418,7 +428,10 @@ final class WatlaaBluetoothTransmitter: BluetoothTransmitter {
         }
         
         // here all characteristics should be known, we can call isReadyToReceiveData
-        watlaaBluetoothTransmitterDelegate?.isReadyToReceiveData(watlaaBluetoothTransmitter: self)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.watlaaBluetoothTransmitterDelegate?.isReadyToReceiveData(watlaaBluetoothTransmitter: self)
+        }
         
     }
     

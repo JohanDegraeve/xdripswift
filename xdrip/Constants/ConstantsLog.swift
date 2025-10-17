@@ -97,6 +97,9 @@ enum ConstantsLog {
     /// nightscout follow
     static let categoryLibreLinkUpFollowManager =       "LibreLinkUpFollowManager      "
     
+    /// nightscout follow
+    static let categoryDexcomShareFollowManager =       "DexcomShareFollowManager      "
+    
     /// alertmanager
     static let categoryAlertManager =                   "AlertManager                  "
     

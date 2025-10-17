@@ -350,14 +350,14 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
 
         case .nightscoutAPIKey:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelNightscoutAPIKey, message:  Texts_SettingsView.giveNightscoutAPIKey, keyboardType: .default, text: UserDefaults.standard.nightscoutAPIKey, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(apiKey: String) in
-                UserDefaults.standard.nightscoutAPIKey = apiKey.toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
+                UserDefaults.standard.nightscoutAPIKey = apiKey.trimmingCharacters(in: .whitespaces).toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
 
         case .port:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.nightscoutPort, message: nil, keyboardType: .numberPad, text: UserDefaults.standard.nightscoutPort != 0 ? UserDefaults.standard.nightscoutPort.description : nil, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(port: String) in if let port = port.toNilIfLength0() { UserDefaults.standard.nightscoutPort = Int(port) ?? 0 } else {UserDefaults.standard.nightscoutPort = 0}}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.nightscoutPort, message: nil, keyboardType: .numberPad, text: UserDefaults.standard.nightscoutPort != 0 ? UserDefaults.standard.nightscoutPort.description : nil, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(port: String) in if let port = port.trimmingCharacters(in: .whitespaces).toNilIfLength0() { UserDefaults.standard.nightscoutPort = Int(port) ?? 0 } else {UserDefaults.standard.nightscoutPort = 0}}, cancelHandler: nil, inputValidator: nil)
         
         case .token:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.nightscoutToken, message:  nil, keyboardType: .default, text: UserDefaults.standard.nightscoutToken, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(token: String) in
-                UserDefaults.standard.nightscoutToken = token.toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
+                UserDefaults.standard.nightscoutToken = token.trimmingCharacters(in: .whitespaces).toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
             
         case .testUrlAndAPIKey:
 

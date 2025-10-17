@@ -102,15 +102,15 @@
 /// cell text, transmitter start time
 "transmittterStartDate" = "Transmitter Started";
 
-"nfcScanFailedTitle" = "Scan gescheitert";
+"nfcScanFailedTitle" = "⚠️ Scan gescheitert";
 
-"nfcScanFailedMessage" = "\n⚠️ Bitte erneut Scannen ⚠️";
+"nfcScanFailedMessage" = "\nBitte erneut Scannen";
 
 "nfcScanFailedScanAgainButton" = "Erneut Scannen";
 
-"nfcScanSuccessfulTitle" = "Sensor Scan erfolgreich!";
+"nfcScanSuccessfulTitle" = "✅ Sensor Scan erfolgreich!";
 
-"nfcScanSuccessfulMessage" = "\n✅ Scan erfolgreich ✅\n\nDrücken Sie OK und warten Sie bis der Sensor die Verbindung über Bluetooth hergestellt hat.\n\nIn Kürze wird der Status zu 'Verbunden' wechseln.";
+"nfcScanSuccessfulMessage" = "Drücken Sie OK und warten Sie bis der Sensor die Verbindung über Bluetooth hergestellt hat.\n\nIn Kürze wird der Status zu 'Verbunden' wechseln.";
 
 "nfcErrorMessageScanErrorRetrying" = "Sensor Scan Fehler\n\nWiederhole!... # ";
 

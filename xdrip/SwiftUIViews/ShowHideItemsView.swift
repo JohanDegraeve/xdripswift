@@ -47,7 +47,7 @@ struct ShowHideItemsView: View {
                     }
                     
                     Section(header: Text("Glucose Chart")) {
-                        Toggle(Texts_SettingsView.settingsviews_showTreatmentsOnChart, isOn: $showTreatmentsOnChart)
+                        Toggle(Texts_SettingsView.settingsviews_showTreatments, isOn: $showTreatmentsOnChart)
                             .onChange(of: showTreatmentsOnChart) { newValue in
                                 UserDefaults.standard.showTreatmentsOnChart = newValue
                             }

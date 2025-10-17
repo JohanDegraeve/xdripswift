@@ -14,19 +14,19 @@ enum BluetoothPeripheralType: String, CaseIterable {
     case M5StickCType = "M5StickC"
     
     /// Libre 2
-    case Libre2Type = "Libre 2 EU / 2+ EU"
+    case Libre2Type = "Libre 2/2+ EU"
     
     /// MiaoMiao
     case MiaoMiaoType = "MiaoMiao"
     
     /// bubble
-    case BubbleType = "Nano / Bubble / Bubble Mini"
+    case BubbleType = "Nano/Bubble/Bubble Mini"
     
     /// Dexcom
-    case DexcomType = "Dexcom G5 / G6 / ONE"
+    case DexcomType = "Dexcom G5/G6/ONE"
     
     /// Dexcom G7
-    case DexcomG7Type = "Dexcom G7 / ONE+ / Stelo"
+    case DexcomG7Type = "Dexcom G7/ONE+/Stelo"
     
     /// DexcomG4
     case DexcomG4Type = "Dexcom G4 (Bridge)"
@@ -310,6 +310,16 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
     }
     
+    /// can we show the transmitter read sucess row?
+    /// basically only show it for CGM transmitters and hide for heartbeat and M5Stack types
+    func canShowTransmitterReadSuccess() -> Bool {
+        switch self.category() {
+        case .CGM:
+            return true
+        default:
+            return false
+        }
+    }
 }
 
 

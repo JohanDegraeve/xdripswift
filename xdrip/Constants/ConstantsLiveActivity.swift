@@ -9,14 +9,14 @@
 import Foundation
 
 enum ConstantsLiveActivity {
-    // restart the live activity after time in (minutes)
+    // restart the live activity after time in hours (converted to seconds)
     // this is to prevent it being restarted too often
-    static let allowLiveActivityRestartAfterMinutes: Double = 4 * 60 * 60
+    static let allowLiveActivityRestartAfterSeconds: Double = 4 * 60 * 60
     
-    // warn that live activity will soon end (in minutes)
-    static let warnLiveActivityAfterMinutes: Double = 7.25 * 60 * 60
+    // warn that live activity will soon end (in hours, converted to seconds)
+    static let warnLiveActivityAfterSeconds: Double = 7.25 * 60 * 60
     
-    // end live activity after time in (minutes) we give a bit of margin
+    // end live activity after time in hours (converted to seconds). We give a bit of margin
     // in case there is a missed reading (and therefore no update cycle) towards the end
-    static let endLiveActivityAfterMinutes: Double = 7.75 * 60 * 60
+    static let endLiveActivityAfterSeconds: Double = 7.75 * 60 * 60
 }

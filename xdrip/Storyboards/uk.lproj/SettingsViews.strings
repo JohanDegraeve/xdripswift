@@ -25,7 +25,7 @@
 "createCalendarEvent" = "Create Calendar Events";
 
 /// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
-"warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
+"warningChangeFromMasterToFollower" = "Switching from Master to Follower will stop your current sensor. Do you want to continue?";
 
 /// name of setting for back ground color
 "m5stack_settingsviews_backGroundColor" = "Background Color";
@@ -109,7 +109,7 @@
 "settingsviews_useIFCCA1C" = "Show HbA1c in mmols/mol";
 
 /// dexcom share settings settings, where user can set dexcom serial number to be used for dexcom share upload
-"settingsviews_dexcomShareSerialNumber" = "Receiver Serial Number";
+"settingsviews_dexcomShareUploadSerialNumber" = "Receiver Serial Number";
 
 /// for text in pop up where user can select bg unit
 "settingsviews_selectbgunit" = "Blood Glucose Units";
@@ -192,7 +192,7 @@
 "settingsviews_speakTrend" = "Speak Trend";
 
 /// dexcom share settings, pop up that asks user to enter dexcom share serial number
-"settingsviews_giveDexcomShareSerialNumber" = "Enter the Dexcom Receiver Serial Number";
+"settingsviews_givedexcomShareUploadSerialNumber" = "Enter the Dexcom Receiver Serial Number";
 
 /// Housekeeper retention period, for how long to store data
 "settingsviews_housekeeperRetentionPeriod" = "Retention Period (days)";
@@ -204,7 +204,7 @@
 "settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked";
 
 /// dexcom share settings, section title
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
 
 /// user tries to send trace file but there's no native email account configured
 "emailNotConfigured" = "You must configure an e-mail account on your iOS device.";
@@ -243,7 +243,7 @@
 "settingsviews_Version" = "Version";
 
 /// treatments settings, show the treatments on main chart
-"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart";
+"settingsviews_showTreatments" = "Show Treatments";
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Settings";
@@ -417,7 +417,7 @@
 "settingsviews_CalenderIntervalTitle" = "Event Interval";
 
 /// data source settings, enable Nightscout in the Nightscout section
-"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload follower BG values to Nightscout, you must enable it in the Nightscout section.";
+"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
 
 /// screen dimming is disabled
 "settingsviews_screenLockDimmingTypeDisabled" = "Disabled";
@@ -462,10 +462,10 @@
 "settingsviews_labelFollowerDataSourceType" = "Follower Data Source";
 
 /// data source settings, enable Nightscout upload
-"settingsviews_labelUploadFollowerDataToNightscout" = "Upload to Nightscout";
+"settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
 
 /// data source settings, ask the user to enter the name of the person we are following if they want to - it's optional
-"settingsviews_followerPatientNameMessage" = "Here you can write the name of the person you are following.\n\nThis can be useful if you are following several different people with several different apps.\n\nThis is optional and would normally be left empty.";
+"settingsviews_followerPatientNameMessage" = "Here you can optionally write the name of the person you are following.";
 
 /// follower settings, pop up that asks user to enter their password
 "settingsviews_enterPassword" = "Enter your password";

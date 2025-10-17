@@ -88,7 +88,7 @@ public class LoopManager: NSObject {
             // if needed, remove readings less than loopDelay minutes old from glucoseData
             if loopDelay > 0 {
                 
-                trace("    loopDelay = %{public}@. Deleting %{public}@ minutes of readings from glucoseData.",log: log, category: ConstantsLog.categoryLoopManager, type: .info, loopDelay.description)
+                trace("    loopDelay = %{public}@. Deleting %{public}@ minutes of readings from glucoseData.",log: log, category: ConstantsLog.categoryLoopManager, type: .debug, loopDelay.description)
                 
                 while glucoseData.count > 0 &&  glucoseData[0].timeStamp.addingTimeInterval(loopDelay) > Date() {
                     
@@ -189,41 +189,35 @@ public class LoopManager: NSObject {
                 
             }
             
-            // get Dictionary stored in UserDefaults from previous session
-            // append readings already stored in this storedDictionary so that we get dictionary filled with maxReadingsToShareWithLoop readings, if possible
-            if let storedDictionary = UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary, storedDictionary.count > 0 {
-                
-                let maxAmountsOfReadingsToAppend = ConstantsShareWithLoop.maxReadingsToShareWithLoop - dictionary.count
-                
-                if maxAmountsOfReadingsToAppend > 0 {
-                    
-                    let rangeToAppend = 0..<(min(storedDictionary.count, maxAmountsOfReadingsToAppend))
-                    
-                    for value in storedDictionary[rangeToAppend] {
-                        
-                        dictionary.append(value)
-                        
-                    }
-                    
-                }
-                
+            // If there are no readings to share, clear the shared container to avoid stale entries
+            if dictionary.isEmpty {
+                sharedUserDefaults.removeObject(forKey: "latestReadings")
+                UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = nil
+                return
             }
             
             guard let data = try? JSONSerialization.data(withJSONObject: dictionary) else {
                 return
             }
             
+            // add a trace at debug level to record the data we're going to write to the shared container
+            if let debugJSON = String(data: data, encoding: .utf8) {
+                trace("in share: latestReadings JSON = %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .debug, debugJSON)
+            } else {
+                trace("in share: latestReadings JSON = (unavailable UTF8). count = %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .debug, dictionary.count.description)
+            }
+            
             // write readings to shared user defaults
             sharedUserDefaults.set(data, forKey: "latestReadings")
             
-            // store in local userdefaults
-            if !dictionary.isEmpty {
-                UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = dictionary
-            }
+            // mirror exactly what we wrote so local deletions are reflected immediately
+            UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = dictionary
             
             // initially set timeStampLatestLoopSharedBgReading to timestamp of first reading - may get another value later, in case loopdelay > 0
             // add 5 seconds to last Readings timestamp, because due to the way timestamp for libre readings is calculated, it may happen that the same reading shifts 1 or 2 seconds in next reading cycle
-            UserDefaults.standard.timeStampLatestLoopSharedBgReading = lastReadings.first!.timeStamp.addingTimeInterval(5.0)
+            if let first = lastReadings.first {
+                UserDefaults.standard.timeStampLatestLoopSharedBgReading = first.timeStamp.addingTimeInterval(5.0)
+            }
             
             // in case loopdelay is used, then update UserDefaults.standard.timeStampLatestLoopSharedBgReading with value of timestamp of first element in the dictionary
             if let element = dictionary.first, loopDelay > 0 {
@@ -250,6 +244,19 @@ public class LoopManager: NSObject {
         
     }
     
+    /// Clear all glucose data previously shared with Loop / OS-AID from the shared app group container.
+    /// Call this when BG readings are deleted to ensure stale values do not remain in the shared container.
+    public func clearSharedLoopReadings() {
+        let suiteName = UserDefaults.standard.loopShareType.sharedUserDefaultsSuiteName
+        guard suiteName != "" else { return }
+        
+        if let sharedUserDefaults = UserDefaults(suiteName: suiteName) {
+            sharedUserDefaults.removeObject(forKey: "latestReadings")
+        }
+        
+        UserDefaults.standard.readingsStoredInSharedUserDefaultsAsDictionary = nil
+    }
+
     /// calculate loop delay to use dependent on the time of the day, based on UserDefaults loopDelaySchedule and loopDelayValueInMinutes
     ///
     /// finds element in loopDelaySchedule with value > actual minutes and uses previous element in loopDelayValueInMinutes as value to use as loopDelay

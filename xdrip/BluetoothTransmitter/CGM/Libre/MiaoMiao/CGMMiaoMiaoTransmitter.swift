@@ -2,7 +2,8 @@ import Foundation
 import CoreBluetooth
 import os
 
-class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
+@objcMembers
+class CGMMiaoMiaoTransmitter: BluetoothTransmitter, CGMTransmitter {
     
     // MARK: - properties
     
@@ -174,8 +175,11 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                                 // note that we should always have a libreSensorType
                                 
                                 self.libreSensorType = libreSensorType
-                                
-                                cGMMiaoMiaoTransmitterDelegate?.received(libreSensorType: libreSensorType, from: self)
+
+                                DispatchQueue.main.async { [weak self] in
+                                    guard let self = self else { return }
+                                    self.cGMMiaoMiaoTransmitterDelegate?.received(libreSensorType: libreSensorType, from: self)
+                                }
 
                                 // decrypt of libre2 or libreUS
                                 dataIsDecryptedToLibre1Format = libreSensorType.decryptIfPossibleAndNeeded(rxBuffer: &rxBuffer, headerLength: miaoMiaoHeaderLength, log: log, patchInfo: patchInfo, uid: Array(rxBuffer[5..<13]))
@@ -206,13 +210,15 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                             let hardware = String(describing: rxBuffer[16...17].hexEncodedString())
                             let batteryPercentage = Int(rxBuffer[13])
                             
-                            // send firmware, hardware, battery level to delegate
-                            cGMMiaoMiaoTransmitterDelegate?.received(firmware: firmware, from: self)
-                            cGMMiaoMiaoTransmitterDelegate?.received(hardware: hardware, from: self)
-                            cGMMiaoMiaoTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
-                            
-                            // send batteryPercentage to delegate
-                            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorAge: nil)
+                            // send firmware, hardware and battery to delegates on main
+                            DispatchQueue.main.async { [weak self] in
+                                guard let self = self else { return }
+                                self.cGMMiaoMiaoTransmitterDelegate?.received(firmware: firmware, from: self)
+                                self.cGMMiaoMiaoTransmitterDelegate?.received(hardware: hardware, from: self)
+                                self.cGMMiaoMiaoTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
+                                var empty = self.emptyArray
+                                self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &empty, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorAge: nil)
+                            }
 
                             // get sensor serialNumber and if changed inform delegate
                             if let libreSensorSerialNumber = LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)), with: LibreSensorType.type(patchInfo: patchInfo)) {
@@ -224,25 +230,43 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                                     
                                     trace("    new sensor detected :  %{public}@", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info, libreSensorSerialNumber.serialNumber)
                                     
-                                    // inform delegate about new sensor detected
-                                    // assign sensorStartDate, for this type of transmitter the sensorAge is passed in another call to cgmTransmitterDelegate
-                                    cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
-
-                                    cGMMiaoMiaoTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
+                                    // inform delegates on main about new sensor detected
+                                    DispatchQueue.main.async { [weak self] in
+                                        guard let self = self else { return }
+                                        self.cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
+                                        self.cGMMiaoMiaoTransmitterDelegate?.received(serialNumber: libreSensorSerialNumber.serialNumber, from: self)
+                                    }
                                     
                                 }
                                 
                             }
                             
-                            libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)), with: LibreSensorType.type(patchInfo: patchInfo))?.serialNumber, patchInfo: patchInfo, webOOPEnabled: webOOPEnabled, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cgmTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: nil, completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
-                                
-                                if let sensorState = sensorState {
-                                    self.cGMMiaoMiaoTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
-                                }
-                                
-                            })
-                            
-                            //reset the buffer
+                            // capture a copy of rxBuffer for parsing before we reset it
+                            let rxBufferForParse = self.rxBuffer
+
+                            DispatchQueue.main.async { [weak self] in
+                                guard let self = self else { return }
+                                self.libreDataParser.libreDataProcessor(
+                                    libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBufferForParse.subdata(in: 5..<13)), with: LibreSensorType.type(patchInfo: patchInfo))?.serialNumber,
+                                    patchInfo: patchInfo,
+                                    webOOPEnabled: self.webOOPEnabled,
+                                    libreData: (rxBufferForParse.subdata(in: self.miaoMiaoHeaderLength..<(344 + self.miaoMiaoHeaderLength))),
+                                    cgmTransmitterDelegate: self.cgmTransmitterDelegate,
+                                    dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format,
+                                    testTimeStamp: nil,
+                                    completionHandler: { [weak self] (sensorState: LibreSensorState?, xDripError: XdripError?) in
+                                        guard let self = self else { return }
+                                        if let sensorState = sensorState {
+                                            DispatchQueue.main.async { [weak self] in
+                                                guard let self = self else { return }
+                                                self.cGMMiaoMiaoTransmitterDelegate?.received(sensorStatus: sensorState, from: self)
+                                            }
+                                        }
+                                    }
+                                )
+                            }
+
+                            // reset the buffer after scheduling parsing
                             resetRxBuffer()
 
                         }
@@ -253,7 +277,9 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                     case .newSensor:
                         trace("in peripheral didUpdateValueFor, new sensor detected", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info)
                         // assign sensorStartDate, for this type of transmitter the sensorAge is passed in another call to cgmTransmitterDelegate
-                        cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
+                        DispatchQueue.main.async { [weak self] in
+                            self?.cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
+                        }
 
                         // send 0xD3 and 0x01 to confirm sensor change as defined in MiaoMiao protocol documentation
                         // after that send start reading command, each with delay of 500 milliseconds
@@ -274,8 +300,10 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                         
                     case .noSensor:
                         trace("in peripheral didUpdateValueFor, sensor not detected", log: log, category: ConstantsLog.categoryCGMMiaoMiao, type: .info)
-                        // call to delegate
-                        cgmTransmitterDelegate?.sensorNotDetected()
+                        // call to delegate on main
+                        DispatchQueue.main.async { [weak self] in
+                            self?.cgmTransmitterDelegate?.sensorNotDetected()
+                        }
                         
                     }
                 } else {
@@ -512,9 +540,20 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
                             
                         }
                         
-                        libreDataParser.libreDataProcessor(libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)), with: LibreSensorType.type(patchInfo: patchInfo))?.serialNumber, patchInfo: patchInfo, webOOPEnabled: true, libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))), cgmTransmitterDelegate: cGMTransmitterDelegate, dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format, testTimeStamp: testTimeStamp, completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
-                            
-                        })
+                        DispatchQueue.main.async {
+                            libreDataParser.libreDataProcessor(
+                                libreSensorSerialNumber: LibreSensorSerialNumber(withUID: Data(rxBuffer.subdata(in: 5..<13)), with: LibreSensorType.type(patchInfo: patchInfo))?.serialNumber,
+                                patchInfo: patchInfo,
+                                webOOPEnabled: true,
+                                libreData: (rxBuffer.subdata(in: miaoMiaoHeaderLength..<(344 + miaoMiaoHeaderLength))),
+                                cgmTransmitterDelegate: cGMTransmitterDelegate,
+                                dataIsDecryptedToLibre1Format: dataIsDecryptedToLibre1Format,
+                                testTimeStamp: testTimeStamp,
+                                completionHandler: { (sensorState: LibreSensorState?, xDripError: XdripError?) in
+                                    
+                                }
+                            )
+                        }
                         
                         
                     }
@@ -974,7 +1013,26 @@ class CGMMiaoMiaoTransmitter:BluetoothTransmitter, CGMTransmitter {
         }
 
     }
-    
+    override func prepareForRelease() {
+        super.prepareForRelease()
+        let tearDown = {
+            self.rxBuffer = Data()
+            self.sensorSerialNumber = nil
+            self.libreSensorType = nil
+        }
+        if Thread.isMainThread {
+            tearDown()
+        } else {
+            DispatchQueue.main.sync(execute: tearDown)
+        }
+    }
+
+    deinit {
+        // Defensive cleanup beyond base class
+        rxBuffer = Data()
+        sensorSerialNumber = nil
+        libreSensorType = nil
+    }
 }
 
 

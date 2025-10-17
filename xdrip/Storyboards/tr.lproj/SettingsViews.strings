@@ -39,14 +39,14 @@
 "settingsviews_row_alerts" = "Uyarılar";
 "settingsviews_sectiontitlehealthkit" = "Apple Sağlık";
 "settingsviews_healthkit" = "Apple Sağlığa Veri Yazılsın mı";
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
 "settingsviews_uploadReadingstoDexcomShare" = "Dexcom Share'e yüklensin mi";
-"settingsviews_dexcomShareSerialNumber" = "Alıcı Seri Numarası";
+"settingsviews_dexcomShareUploadSerialNumber" = "Alıcı Seri Numarası";
 "settingsviews_useUSDexcomShareurl" = "Dexcom ABD Sunucuları Kullanılsın mı";
 "settingsviews_dexcomShareAccountName" = "Hesap Adı";
 "settingsviews_giveDexcomShareAccountName" = "Dexcom Share Hesabı Adını Girin";
 "settingsviews_giveDexcomSharePassword" = "Dexcom Share Parolasını Girin";
-"settingsviews_giveDexcomShareSerialNumber" = "Dexcom Alıcı Seri Numarasını girin";
+"settingsviews_givedexcomShareUploadSerialNumber" = "Dexcom Alıcı Seri Numarasını girin";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutEnabled" = "Nightscout etkinleştirilsin mi";
 "settingsviews_nightscoutUrl" = "URL";
@@ -149,7 +149,7 @@
 "settingsviews_valueIsRequired" = "⚠️ Required";
 
 /// treatments settings, show the treatments on main chart
-"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart";
+"settingsviews_showTreatments" = "Show Treatments";
 
 /// treatments settings, offset the carb treatments on main chart
 
@@ -187,7 +187,7 @@
 "settingsviews_CalenderIntervalTitle" = "Event Interval";
 
 /// data source settings, enable Nightscout in the Nightscout section
-"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload follower BG values to Nightscout, you must enable it in the Nightscout section.";
+"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
 
 /// screen dimming is disabled
 "settingsviews_screenLockDimmingTypeDisabled" = "Disabled";
@@ -244,10 +244,10 @@
 "settingsviews_labelFollowerDataSourceType" = "Follower Data Source";
 
 /// data source settings, enable Nightscout upload
-"settingsviews_labelUploadFollowerDataToNightscout" = "Upload to Nightscout";
+"settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
 
 /// data source settings, ask the user to enter the name of the person we are following if they want to - it's optional
-"settingsviews_followerPatientNameMessage" = "Here you can write the name of the person you are following.\n\nThis can be useful if you are following several different people with several different apps.\n\nThis is optional and would normally be left empty.";
+"settingsviews_followerPatientNameMessage" = "Here you can optionally write the name of the person you are following.";
 
 /// follower settings, pop up that asks user to enter their password
 "settingsviews_enterPassword" = "Enter your password";

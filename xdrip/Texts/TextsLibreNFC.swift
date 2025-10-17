@@ -34,11 +34,11 @@ class TextsLibreNFC {
     }()
         
     static let nfcScanFailedTitle: String = {
-        return NSLocalizedString("nfcScanFailedTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Scan Failed", comment: "Sensor scan error, title")
+        return NSLocalizedString("nfcScanFailedTitle", tableName: filename, bundle: Bundle.main, value: "⚠️ Sensor Scan Failed", comment: "Sensor scan error, title")
     }()
     
     static let nfcScanFailedMessage: String = {
-        return NSLocalizedString("nfcScanFailedMessage", tableName: filename, bundle: Bundle.main, value: "\n⚠️ Please scan again ⚠️", comment: "Ask if the user wants to try and scan the sensor again")
+        return NSLocalizedString("nfcScanFailedMessage", tableName: filename, bundle: Bundle.main, value: "Please scan again", comment: "Ask if the user wants to try and scan the sensor again")
     }()
     
     static let nfcScanFailedScanAgainButton: String = {
@@ -46,11 +46,11 @@ class TextsLibreNFC {
     }()
     
     static let nfcScanSuccessfulTitle: String = {
-        return NSLocalizedString("nfcScanSuccessfulTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Scan Successful!", comment: "Sensor scan successful, title")
+        return NSLocalizedString("nfcScanSuccessfulTitle", tableName: filename, bundle: Bundle.main, value: "✅ Sensor Scan Successful!", comment: "Sensor scan successful, title")
     }()
     
     static let nfcScanSuccessfulMessage: String = {
-        return NSLocalizedString("nfcScanSuccessfulMessage", tableName: filename, bundle: Bundle.main, value: "\n✅ Scan successful ✅\n\nClick OK and just wait to allow the sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.", comment: "Tell the user the scan was successful and to just wait now for connection")
+        return NSLocalizedString("nfcScanSuccessfulMessage", tableName: filename, bundle: Bundle.main, value: "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.", comment: "Tell the user the scan was successful and to just wait now for connection")
     }()
     
     static let nfcErrorMessageScanErrorRetrying: String = {

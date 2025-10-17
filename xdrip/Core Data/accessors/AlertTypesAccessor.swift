@@ -20,7 +20,7 @@ class AlertTypesAccessor {
 
     // MARK: - functions
     
-    // wil get the first created alertType, if there isn't any, then it will create one that is not enabled and that one will be the 
+    // wil get the first created alertType, if there isn't any, then it will create one that is not enabled and that one will be the
     public func getDefaultAlertType() -> AlertType {
         
         // create fetchRequest
@@ -29,29 +29,35 @@ class AlertTypesAccessor {
         fetchRequest.fetchLimit = 1
         
         // predicate to get only alertType with name default
-        let predicate = NSPredicate(format: "name = %@", Texts_Common.default0)
-        fetchRequest.predicate = predicate
+        fetchRequest.predicate = NSPredicate(format: "name = %@", Texts_Common.default0)
         
-        // fetch the alerttype
+        fetchRequest.returnsObjectsAsFaults = false
+        fetchRequest.includesPropertyValues = true
+        
         var alertTypes = [AlertType]()
         coreDataManager.mainManagedObjectContext.performAndWait {
             do {
                 // Execute Fetch Request
                 alertTypes = try fetchRequest.execute()
+                if alertTypes.first == nil {
+                    let defaultAlertType =  AlertType(enabled: ConstantsDefaultAlertTypeSettings.enabled, name: Texts_Common.default0, overrideMute: ConstantsDefaultAlertTypeSettings.overrideMute, snooze: ConstantsDefaultAlertTypeSettings.snooze, snoozePeriod: Int(ConstantsDefaultAlertTypeSettings.snoozePeriod), vibrate: ConstantsDefaultAlertTypeSettings.vibrate, soundName: ConstantsSounds.getSoundName(forSound: .xdripalert), alertEntries: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                    try? coreDataManager.mainManagedObjectContext.save()
+                    alertTypes = [defaultAlertType]
+                }
             } catch {
                 let fetchError = error as NSError
                 trace("in getAlertType, Unable to Execute alertTypes Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataAlertTypes, type: .error, fetchError.localizedDescription)
             }
         }
-
-        // if alertType found then return it, if not create one
-        if let alertType = alertTypes.first {
-            return alertType
-        } else {
-            let defaultAlertType =  AlertType(enabled: ConstantsDefaultAlertTypeSettings.enabled, name: Texts_Common.default0, overrideMute: ConstantsDefaultAlertTypeSettings.overrideMute, snooze: ConstantsDefaultAlertTypeSettings.snooze, snoozePeriod: Int(ConstantsDefaultAlertTypeSettings.snoozePeriod), vibrate: ConstantsDefaultAlertTypeSettings.vibrate, soundName: ConstantsSounds.getSoundName(forSound: .xdripalert), alertEntries: nil, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-            coreDataManager.saveChanges()
-            return defaultAlertType
+        
+        // There will always be at least one AlertType (fetched or just created).
+        // If not, something is fundamentally wrong, so fail fast with a clear message.
+        guard let alertType = alertTypes.first else {
+            fatalError("getDefaultAlertType: failed to fetch or create a default AlertType")
         }
+        
+        // due to the above guard, we don't need to force-unwrap here
+        return alertType
     }
     
     /// get all alert types, if there's no alerttypes yet, then the default alerttpye will be returned

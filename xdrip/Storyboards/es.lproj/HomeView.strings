@@ -47,7 +47,7 @@
 "hidingUrlForXSeconds" = "Ocultando URL durante %@s...";
 "nightscoutNotEnabled" = "Nightscout está deshabilitado";
 "nightscoutURLMissing" = "Falta la URL de Nightscout";
-"libreLinkUpAccountCredentialsMissing" = "Falta usuario/contraseña";
+"followerAccountCredentialsMissing" = "Falta usuario/contraseña";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

@@ -21,7 +21,7 @@
 "settingsviews_showcoloredobjectives" = "Show Colored Lines";
 "settingsviews_showtarget" = "Show Target Line";
 "settingsviews_sectiontitletreatments" = "Treatments";
-"settingsviews_showTreatmentsOnChart" = "Show Treatments on Chart";
+"settingsviews_showTreatments" = "Show Treatments";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
 "settingsviews_sectiontitlestatistics" = "Statistics";
 "settingsviews_showStatistics" = "Show Statistics";
@@ -42,14 +42,14 @@
 "settingsviews_row_alerts" = "Alarms";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
 "settingsviews_healthkit" = "Write Data to Apple Health";
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
 "settingsviews_uploadReadingstoDexcomShare" = "Upload to Dexcom Share";
-"settingsviews_dexcomShareSerialNumber" = "Receiver Serial Number";
+"settingsviews_dexcomShareUploadSerialNumber" = "Receiver Serial Number";
 "settingsviews_useUSDexcomShareurl" = "Use Dexcom US Servers";
 "settingsviews_dexcomShareAccountName" = "Account Name";
 "settingsviews_giveDexcomShareAccountName" = "Enter Dexcom Share Account Name";
 "settingsviews_giveDexcomSharePassword" = "Give Dexcom Share Password";
-"settingsviews_giveDexcomShareSerialNumber" = "Enter the Dexcom Receiver Serial Number";
+"settingsviews_givedexcomShareUploadSerialNumber" = "Enter the Dexcom Receiver Serial Number";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutEnabled" = "Enable Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
@@ -100,7 +100,7 @@
 "volumeTestSoundPlayer" = "Test Volume (if Override Mute On)";
 "volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
 "debugLevel" = "Include Debug Level";
-"warningChangeFromMasterToFollower" = "Switching from master to follower will stop your current sensor. Do you want to continue?";
+"warningChangeFromMasterToFollower" = "Switching from Master to Follower will stop your current sensor. Do you want to continue?";
 "nightscoutPort" = "Port";
 "developerSettings" = "Developer Settings";
 "smoothLibreValues" = "Smooth Libre Values";
@@ -198,7 +198,7 @@
 "settingsviews_CalenderIntervalTitle" = "Event Interval";
 
 /// data source settings, enable Nightscout in the Nightscout section
-"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload follower BG values to Nightscout, you must enable it in the Nightscout section.";
+"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
 
 /// screen dimming is disabled
 "settingsviews_screenLockDimmingTypeDisabled" = "Disabled";
@@ -243,10 +243,10 @@
 "settingsviews_labelFollowerDataSourceType" = "Follower Data Source";
 
 /// data source settings, enable Nightscout upload
-"settingsviews_labelUploadFollowerDataToNightscout" = "Upload to Nightscout";
+"settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
 
 /// data source settings, ask the user to enter the name of the person we are following if they want to - it's optional
-"settingsviews_followerPatientNameMessage" = "Here you can write the name of the person you are following.\n\nThis can be useful if you are following several different people with several different apps.\n\nThis is optional and would normally be left empty.";
+"settingsviews_followerPatientNameMessage" = "Here you can optionally write the name of the person you are following.";
 
 /// follower settings, pop up that asks user to enter their password
 "settingsviews_enterPassword" = "Enter your password";

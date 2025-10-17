@@ -200,4 +200,7 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("isAnubis", tableName: filename, bundle: Bundle.main, value: "Is Anubis?", comment: "Dexcom bluetooth screen. Is it an anubis transmitter")
     }()
     
+    static let readSuccess: String = {
+        return NSLocalizedString("readSuccess", tableName: filename, bundle: Bundle.main, value: "Read Success", comment: "Bluetooth peripheral screen. row title for the read success line")
+    }()
 }

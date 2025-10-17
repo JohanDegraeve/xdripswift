@@ -301,7 +301,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     
     func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
         
-        trace("in didDisconnectFrom", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
+        trace("in didDisconnectFrom", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .debug)
         
         // set lastConnectionStatusChangeTimeStamp in blePeripheral to now
         if let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter) {

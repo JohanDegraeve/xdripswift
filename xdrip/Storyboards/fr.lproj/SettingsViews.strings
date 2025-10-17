@@ -11,7 +11,7 @@
 "settingsviews_multipleAppBadgeValueWith10" = "Multiplier par 10 dans le badge";
 "settingsviews_showClockWhenScreenIsLocked" = "Visualiser l'heure sur écran verrouillé";
 "settingsviews_sectiontitletreatments" = "Traitements";
-"settingsviews_showTreatmentsOnChart" = "Visualiser les traitements";
+"settingsviews_showTreatments" = "Visualiser les traitements";
 "settingsviews_smallBolusTreatmentThreshold" = "Seuil des micro-bolus";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "En dessous de combien d'unités un bolus est considéré micro-bolus?\n\n(Valeur conseillée: 1.0U)";
 "settingsviews_sectiontitlestatistics" = "Statistiques";
@@ -29,14 +29,14 @@
 "settingsviews_row_alerts" = "Alarmes";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
 "settingsviews_healthkit" = "Sauver les données dans Apple Health";
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
 "settingsviews_uploadReadingstoDexcomShare" = "Charger dans le Dexcom Share";
-"settingsviews_dexcomShareSerialNumber" = "Numéro de série du receveur";
+"settingsviews_dexcomShareUploadSerialNumber" = "Numéro de série du receveur";
 "settingsviews_useUSDexcomShareurl" = "Utiliser les serveurs US Dexcom US";
 "settingsviews_dexcomShareAccountName" = "Nom du compte";
 "settingsviews_giveDexcomShareAccountName" = "Entrer le nom du compte Dexcom";
 "settingsviews_giveDexcomSharePassword" = "Entrer le mot de passe Dexcom Share";
-"settingsviews_giveDexcomShareSerialNumber" = "Entrer le numéro de série Dexcom Receiver";
+"settingsviews_givedexcomShareUploadSerialNumber" = "Entrer le numéro de série Dexcom Receiver";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutEnabled" = "Connecter à Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
@@ -268,7 +268,7 @@
 "settingsviews_CalenderIntervalTitle" = "Event Interval";
 
 /// data source settings, enable Nightscout in the Nightscout section
-"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload follower BG values to Nightscout, you must enable it in the Nightscout section.";
+"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
 
 /// screen dimming is disabled
 "settingsviews_screenLockDimmingTypeDisabled" = "Disabled";
@@ -313,10 +313,10 @@
 "settingsviews_labelFollowerDataSourceType" = "Follower Data Source";
 
 /// data source settings, enable Nightscout upload
-"settingsviews_labelUploadFollowerDataToNightscout" = "Upload to Nightscout";
+"settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
 
 /// data source settings, ask the user to enter the name of the person we are following if they want to - it's optional
-"settingsviews_followerPatientNameMessage" = "Here you can write the name of the person you are following.\n\nThis can be useful if you are following several different people with several different apps.\n\nThis is optional and would normally be left empty.";
+"settingsviews_followerPatientNameMessage" = "Here you can optionally write the name of the person you are following.";
 
 /// follower settings, pop up that asks user to enter their password
 "settingsviews_enterPassword" = "Enter your password";

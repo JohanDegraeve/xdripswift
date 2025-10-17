@@ -29,10 +29,11 @@ class SensorsAccessor {
         let fetchRequest: NSFetchRequest<Sensor> = Sensor.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Sensor.startDate), ascending: false)]
         fetchRequest.fetchLimit = 1
+        fetchRequest.returnsObjectsAsFaults = false
+        fetchRequest.includesPropertyValues = true
         
         // only sensors with endDate nil, ie not started, should be only one in the end
-        let predicate = NSPredicate(format: "endDate == nil")
-        fetchRequest.predicate = predicate
+        fetchRequest.predicate = NSPredicate(format: "endDate == nil")
 
         // define returnvalue
         var returnValue:Sensor?
@@ -42,14 +43,12 @@ class SensorsAccessor {
                 // Execute Fetch Request
                 let sensors = try fetchRequest.execute()
                 
-                if sensors.count > 0 {
-                    if sensors[0].endDate == nil {
-                        returnValue = sensors[0]
-                    }
+                if let sensor = sensors.first {
+                    returnValue = sensor
                 }
             } catch {
                 let fetchError = error as NSError
-                trace("Unable to Execute Sensor Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryCoreDataManager, type: .error, fetchError.localizedDescription)
+                trace("Unable to Execute Sensor Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataSensors, type: .error, fetchError.localizedDescription)
             }
         }
         
