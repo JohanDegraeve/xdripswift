@@ -92,6 +92,7 @@
 		4752B4062635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */; };
 		475F2A872D0DA81400DE6019 /* ShowHideItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */; };
 		475FBA082D7312DE004D068E /* PickerViewControllerModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475FBA072D7312D5004D068E /* PickerViewControllerModal.swift */; };
+		476404892EA29034006CBE03 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476404882EA29034006CBE03 /* SceneDelegate.swift */; };
 		476698662BE2572C008EB2A9 /* ConstantsSettingsIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */; };
 		4767BDD62BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4767BDD52BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift */; };
 		476A897C2CC963C00073ED83 /* NightscoutProfileModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476A897B2CC963AF0073ED83 /* NightscoutProfileModels.swift */; };
@@ -956,6 +957,7 @@
 		475DED96244AF92A00F78473 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Alerts.strings; sourceTree = "<group>"; };
 		475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowHideItemsView.swift; sourceTree = "<group>"; };
 		475FBA072D7312D5004D068E /* PickerViewControllerModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerViewControllerModal.swift; sourceTree = "<group>"; };
+		476404882EA29034006CBE03 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = "xDrip/Supporting Files/SceneDelegate.swift"; sourceTree = SOURCE_ROOT; };
 		476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSettingsIcons.swift; sourceTree = "<group>"; };
 		4767BDD52BD51E36009BC2EC /* SettingsViewAppleWatchSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewAppleWatchSettingsViewModel.swift; sourceTree = "<group>"; };
 		476A897B2CC963AF0073ED83 /* NightscoutProfileModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutProfileModels.swift; sourceTree = "<group>"; };
@@ -2363,6 +2365,7 @@
 		F8025E5B21F7AFC600ECF0C0 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				476404882EA29034006CBE03 /* SceneDelegate.swift */,
 				F8AC426B21ADEBD70078C348 /* Info.plist */,
 			);
 			path = "Supporting Files";
@@ -4594,6 +4597,7 @@
 				F8A2BC3325DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMDexcomG4TransmitterDelegate.swift in Sources */,
 				F816E10E2437EAC9009EE65B /* BlueReader+CoreDataProperties.swift in Sources */,
 				F8B3A830227F085A004BA588 /* SettingsTableViewCell.swift in Sources */,
+				476404892EA29034006CBE03 /* SceneDelegate.swift in Sources */,
 				F82436FC24BE014000BED341 /* TextsLibreStates.swift in Sources */,
 				F8F71D7A2B7E9DFB005076E8 /* ConstantsDexcomG7.swift in Sources */,
 				47DB06C22A6FC02200267BE3 /* SettingsViewDataSourceSettingsViewModel.swift in Sources */,
