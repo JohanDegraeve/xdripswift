@@ -103,7 +103,6 @@ final class LandscapeChartViewController: UIViewController {
     @IBOutlet weak var lowStatisticLabelOutlet: UILabel!
     
     @IBOutlet weak var pieChartOutlet: PieChart!
-    @IBOutlet weak var pieChartLabelOutlet: UILabel!
     
     @IBOutlet weak var averageTitleLabelOutlet: UILabel!
     @IBOutlet weak var averageStatisticLabelOutlet: UILabel!
