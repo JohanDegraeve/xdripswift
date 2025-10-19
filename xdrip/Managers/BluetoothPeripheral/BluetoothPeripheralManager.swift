@@ -795,7 +795,7 @@ class BluetoothPeripheralManager: NSObject {
             // perform the ARC release on the next main runloop tick to avoid racing CB callbacks
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(50)) { [weak self] in
                 guard let self = self else { return }
-                // The array may have been mutated between scheduling and execution; re-validate the index.
+                // The array may have been mutated between scheduling and execution, re-validate the index.
                 guard index >= 0 && index < self.bluetoothTransmitters.count else {
                     trace("in setTransmitterToNilAndCallcgmTransmitterInfoChangedIfNecessary, index %{public}d out of range (count=%{public}d), skipping", log: self.log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error, index, self.bluetoothTransmitters.count)
                     return
