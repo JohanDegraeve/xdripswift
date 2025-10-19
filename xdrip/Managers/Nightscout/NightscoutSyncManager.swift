@@ -1306,7 +1306,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             uploadData(dataToUpload: bgReadingsDictionaryRepresentation, httpMethod: nil, path: nightscoutEntriesPath, completionHandler: {
                 // change timeStampLatestNightscoutUploadedBgReading
                 if let timeStampLastReadingToUpload = timeStampLastReadingToUpload {
-                    trace("    in uploadBgReadingsToNightscout, upload succeeded, setting timeStampLatestNightscoutUploadedBgReading to %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, timeStampLastReadingToUpload.description(with: .current))
+                    trace("    in uploadBgReadingsToNightscout, upload succeeded, timeStampLatestNightscoutUploadedBgReading = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, timeStampLastReadingToUpload.formatted(date: .abbreviated, time: .standard))
                     
                     UserDefaults.standard.timeStampLatestNightscoutUploadedBgReading = timeStampLastReadingToUpload
                     

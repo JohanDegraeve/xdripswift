@@ -670,7 +670,7 @@ class BluetoothPeripheralViewController: UIViewController {
             
         case .unknown:
             
-            trace("in handleScanningResult, scanning not started. Scanning result = unknown - this is always occuring when a BluetoothTransmitter starts scanning the first time. You should see now a new call to handleScanningResult", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .info)
+            trace("in handleScanningResult, scanning not started. This always happens when a BluetoothTransmitter starts scanning. We should now see a new call to handleScanningResult", log: log, category: ConstantsLog.categoryBluetoothPeripheralViewController, type: .info)
             
         case .nfcScanNeeded:
             

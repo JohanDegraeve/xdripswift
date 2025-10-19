@@ -405,7 +405,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
                 if authChallengeRxMessage.paired, authChallengeRxMessage.authenticated {
 
-                    trace("    connected to Dexcom G7 that is paired and authenticated by other app. Will stay connected to this one.", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
+                    trace("    connected to Dexcom G7/ONE+ that is paired and authenticated by other app. Will stay connected to this one.", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
 
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self else { return }
@@ -414,7 +414,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                     }
                 } else {
 
-                    trace("    connected to Dexcom G7 that is not paired and/or authenticated by other app. Waiting briefly for data (coexistence)", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
+                    trace("    connected to Dexcom G7/ONE+ that is not paired and/or authenticated by other app. Waiting briefly for data (coexistence)", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
                     // Do nothing here; the generic data-timeout will disconnect if no data arrives.
 
                 }
