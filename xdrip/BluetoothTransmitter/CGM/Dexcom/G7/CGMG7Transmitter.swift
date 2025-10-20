@@ -85,6 +85,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     
     /// Rolling connection id for log correlation (increments on each didConnect)
     private var cycleId: Int = 0
+
     
     
     /// will be used to pass back bluetooth and cgm related events
@@ -181,7 +182,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
             // sort backfill, first element should be youngest
             backfill = backfill.sorted(by: { $0.timeStamp > $1.timeStamp })
             
-            // send glucoseData to cgmTransmitterDelegate on main (UI/Core Data safety); use a local copy for inout
+            // send glucoseData to cgmTransmitterDelegate on main (UI/Core Data safety), use a local copy for inout
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 
@@ -302,7 +303,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                         let writeControlCharacteristicIsNotifying = self.writeControlCharacteristic?.isNotifying ?? false
                         let backfillCharacteristicIsNotifying = self.backfillCharacteristic?.isNotifying ?? false
                         
-                        trace("    G7 connection cycle summary: value = %{public}@ mg/dL at %{public}@ (cid=%{public}d; extra flow: wc_notify_on = %{public}@, bf_notify_on = %{public}@)", log: log, category: ConstantsLog.categoryCGMG7, type: .info, glucoseLevelRawString, timeStampString, self.cycleId, String(writeControlCharacteristicIsNotifying), String(backfillCharacteristicIsNotifying))
+                        trace("    G7 connection cycle summary: value = %{public}@ mg/dL at %{public}@ (cid=%{public}d, extra flow: wc_notify_on = %{public}@, bf_notify_on = %{public}@)", log: log, category: ConstantsLog.categoryCGMG7, type: .info, glucoseLevelRawString, timeStampString, self.cycleId, String(writeControlCharacteristicIsNotifying), String(backfillCharacteristicIsNotifying))
                         
                         DispatchQueue.main.async { [weak self] in
                             guard let self = self else { return }
@@ -315,7 +316,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                         // stability: we expect backfill soon, debounce a short flush so UI doesn't look stuck if Dexcom keeps link open
                     }
                 } else {
-                    // no previous reading; deliver immediately and advance last timestamp
+                    // no previous reading, deliver immediately and advance last timestamp
                     let newGlucoseDataArray = [newGlucoseData]
                     
                     // Per-cycle summary log before delegate dispatch
@@ -324,7 +325,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                     let writeControlCharacteristicIsNotifying = self.writeControlCharacteristic?.isNotifying ?? false
                     let backfillCharacteristicIsNotifying = self.backfillCharacteristic?.isNotifying ?? false
                     
-                    trace("    G7 connection cycle summary: value = %{public}@ mg/dL at %{public}@ (cid=%{public}d; extra flow: wc_notify_on = %{public}@, bf_notify_on = %{public}@)", log: log, category: ConstantsLog.categoryCGMG7, type: .info, glucoseLevelRawString, timeStampString, self.cycleId, String(writeControlCharacteristicIsNotifying), String(backfillCharacteristicIsNotifying))
+                    trace("    G7 connection cycle summary: value = %{public}@ mg/dL at %{public}@ (cid=%{public}d, extra flow: wc_notify_on = %{public}@, bf_notify_on = %{public}@)", log: log, category: ConstantsLog.categoryCGMG7, type: .info, glucoseLevelRawString, timeStampString, self.cycleId, String(writeControlCharacteristicIsNotifying), String(backfillCharacteristicIsNotifying))
                     
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self else { return }
@@ -389,7 +390,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                     processPendingBackfillFramesIfPossible()
                 }
             } else {
-                // Sensor age not yet known; queue raw frame until it becomes available.
+                // Sensor age not yet known, queue raw frame until it becomes available.
                 pendingBackfillRawFrames.append(value)
                 trace("    queued backfill frame pending sensorAge. raw = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, value.hexEncodedString())
                 processPendingBackfillFramesIfPossible()
@@ -405,8 +406,14 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
                 if authChallengeRxMessage.paired, authChallengeRxMessage.authenticated {
 
-                    trace("    connected to Dexcom G7 that is paired and authenticated by other app. Will stay connected to this one.", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
-
+                    trace("    connected to Dexcom G7/ONE+ that is paired and authenticated by other app. Will stay connected to this one.", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
+                    
+                    // Set active transmitter id only once we have a paired & authenticated link to avoid pinning to a nearby stale transmitter
+                    if UserDefaults.standard.activeSensorTransmitterId == nil, let authenticatedDeviceName = self.deviceName, authenticatedDeviceName.hasPrefix("DX") {
+                        UserDefaults.standard.activeSensorTransmitterId = authenticatedDeviceName
+                        trace("    active transmitter id set after authentication: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, authenticatedDeviceName)
+                    }
+                    
                     DispatchQueue.main.async { [weak self] in
                         guard let self = self else { return }
 
@@ -414,8 +421,8 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                     }
                 } else {
 
-                    trace("    connected to Dexcom G7 that is not paired and/or authenticated by other app. Waiting briefly for data (coexistence)", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
-                    // Do nothing here; the generic data-timeout will disconnect if no data arrives.
+                    trace("    connected to Dexcom G7/ONE+ that is not paired and/or authenticated by other app. Waiting briefly for data (coexistence)", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
+                    // Do nothing here, the generic data-timeout will disconnect if no data arrives.
 
                 }
 
@@ -438,9 +445,15 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         cancelConnectionTimer()
         
         cycleId += 1
-        
+
         trace("connected to peripheral with name %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, deviceName ?? "'unknown'")
-        
+
+
+        // Use descriptive name for deviceName
+        if let detectedDeviceName = deviceName, detectedDeviceName.hasPrefix("DX02") {
+            trace("DX02 detected (ONE+). Proceeding with coexistence notify subscription.", log: log, category: ConstantsLog.categoryCGMG7, type: .info)
+        }
+
         peripheral.discoverServices([CBUUID(string: CBUUID_Service_G7)])
         
     }
@@ -502,20 +515,20 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         }
         
         if let error = error, error.localizedDescription.contains(find: "Encryption is insufficient") {
-            trace("didUpdateNotificationStateFor for peripheral with name %{public}@, characteristic %{public}@, error contains Encryption is insufficient. This is not the device we're looking for.", log: log, category: ConstantsLog.categoryCGMG7, type: .info, (deviceName != nil ? deviceName! : "unknown"), String(describing: characteristic.uuid))
-            
-            // it's not the device we're interested in; restart scanning. Forget only during new-device discovery
+            trace("didUpdateNotificationStateFor: transient auth state (Encryption is insufficient) for %{public}@, characteristic %{public}@. Coexistence: disconnect only, no forget.",
+                  log: log, category: ConstantsLog.categoryCGMG7, type: .info,
+                  (deviceName != nil ? deviceName! : "unknown"), String(describing: characteristic.uuid))
 
-            // deliver any pending readings/backfill before disconnecting
+            // Deliver any pending readings/backfill before disconnecting
             flushBackfillDeliveringToDelegate()
 
-            if shouldForgetCurrentPeripheral() {
-                disconnectAndForget()
-            } else {
-                disconnect()
+            // Schedule a one-shot temporary rejection for this device name to prevent immediate reconnect loop
+            if let dxName = deviceName {
+                scheduleTemporaryRejectionOnNextDisconnect(forDeviceName: dxName)
             }
-
-            _ = startScanning()
+            
+            // Coexistence: do NOT forget. Allow quick retry without blacklisting the peripheral
+            disconnect()
         }
         
     }
@@ -555,9 +568,11 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     }
     
     // MARK: - private functions
-    /// Forget peripherals only during new-device discovery; once an active transmitter id is known, avoid blacklisting in coexistence
+    /// Forget peripherals only during new-device discovery, once an active transmitter id is known, avoid blacklisting in coexistence
     private func shouldForgetCurrentPeripheral() -> Bool {
-        return UserDefaults.standard.activeSensorTransmitterId == nil
+        // In coexistence (G7/ONE+/Stelo) never blacklist/forget on transient authentication states.
+        // Returning false prevents forget+rescan loops on brand-new sensors during first contact and avoids pinning to the wrong nearby transmitter.
+        return false
     }
     
     // DEBUG
@@ -618,7 +633,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         // sort backfill, first element should be youngest
         backfill = backfill.sorted(by: { $0.timeStamp > $1.timeStamp })
 
-        // send glucoseData to cgmTransmitterDelegate on main (UI/Core Data safety); use a local copy for inout
+        // send glucoseData to cgmTransmitterDelegate on main (UI/Core Data safety), use a local copy for inout
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
             var copy = self.backfill
