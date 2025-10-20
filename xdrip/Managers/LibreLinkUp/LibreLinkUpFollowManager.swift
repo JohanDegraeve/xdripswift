@@ -308,7 +308,7 @@ class LibreLinkUpFollowManager: NSObject {
             // must be a Libre 2 Plus sensor
             activeSensorDescription = "Libre 2 Plus"
             
-        } else if serialNumber.range(of: #"^0D"#, options: .regularExpression) != nil || serialNumber.range(of: #"^0E"#, options: .regularExpression) != nil || serialNumber.range(of: #"^0F"#, options: .regularExpression) != nil || serialNumber.range(of: #"^0G"#, options: .regularExpression) != nil || serialNumber.range(of: #"^0H"#, options: .regularExpression) != nil {
+        } else if serialNumber.range(of: #"^0[D-Z]"#, options: .regularExpression) != nil {
             // must be a Libre 3 (or Libre 3 Plus) sensor
             activeSensorDescription = "Libre 3"
             // overwrite and drop the last digit for L3 serial number: https://github.com/JohanDegraeve/xdripswift/issues/666
