@@ -169,41 +169,29 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             if UserDefaults.standard.isMaster {
                 return UserDefaults.standard.nightscoutEnabled ? .nothing : SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.nightscoutNotEnabled)
             } else {
-                // in Follower mode, data to be displayed in list from which user needs to pick a follower data source
-                var data = [String]()
-                var selectedRow: Int?
-                var index = 0
+                // Build list from the enabled cases only. This allows for ignored follower types
+                let enabled = FollowerDataSourceType.allEnabledCases
+                let data = enabled.map { $0.description }
                 let currentFollowerDataSourceType = UserDefaults.standard.followerDataSourceType
-                
-                // get all data source types and add the description to data. Search for the type that matches the FollowerDataSourceType that is currently stored in userdefaults.
-                for dataSourceType in FollowerDataSourceType.allCases {
-                    data.append(dataSourceType.description)
-                    
-                    if dataSourceType == currentFollowerDataSourceType {
-                        selectedRow = index
-                    }
-                    
-                    index += 1
-                }
+                let selectedRow = enabled.firstIndex(of: currentFollowerDataSourceType)
                 
                 return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelFollowerDataSourceType, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: { (index: Int) in
+                    let enabled = FollowerDataSourceType.allEnabledCases
+                    // Safety: ensure index is valid
+                    guard index >= 0, index < enabled.count else { return }
                     
-                    // we'll set this here so that we can use it in the else statement for logging
                     let oldFollowerDataSourceType = UserDefaults.standard.followerDataSourceType
+                    let newFollowerDataSourceType = enabled[index]
                     
-                    if index != selectedRow {
-                        UserDefaults.standard.followerDataSourceType = FollowerDataSourceType(rawValue: index) ?? .nightscout
-                        
-                        let newFollowerDataSourceType = UserDefaults.standard.followerDataSourceType
+                    if newFollowerDataSourceType != oldFollowerDataSourceType {
+                        UserDefaults.standard.followerDataSourceType = newFollowerDataSourceType
                         
                         trace("follower source data type was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, oldFollowerDataSourceType.description, newFollowerDataSourceType.description)
                         
-                        if newFollowerDataSourceType == .dexcomShare {
-                            // make sure we disable dexcom share upload if we are using the share follow option
-                            if UserDefaults.standard.uploadReadingstoDexcomShare {
-                                self.callMessageHandlerInMainThread(title: FollowerDataSourceType.dexcomShare.fullDescription, message: Texts_SettingsView.warningChangeToFollowerDexcomShare)
-                                UserDefaults.standard.uploadReadingstoDexcomShare = false
-                            }
+                        // make sure we disable dexcom share upload if we are using the share follow option
+                        if newFollowerDataSourceType == .dexcomShare && UserDefaults.standard.uploadReadingstoDexcomShare {
+                            self.callMessageHandlerInMainThread(title: FollowerDataSourceType.dexcomShare.fullDescription, message: Texts_SettingsView.warningChangeToFollowerDexcomShare)
+                            UserDefaults.standard.uploadReadingstoDexcomShare = false
                         }
                     }
                     
