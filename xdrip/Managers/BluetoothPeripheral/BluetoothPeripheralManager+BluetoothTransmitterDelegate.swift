@@ -188,27 +188,23 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         }
         
         // check that it's a peripheral for which we don't know yet the address
-        for buetoothPeripheral in bluetoothPeripherals {
+        for bluetoothPeripheral in bluetoothPeripherals {
             
-            if buetoothPeripheral.blePeripheral.address == deviceAddressNewTransmitter {
+            if bluetoothPeripheral.blePeripheral.address == deviceAddressNewTransmitter {
                 
-                trace("in didConnect, transmitter address already known. This is not a new device, will disconnect", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
-                
-                // It's an already known BluetoothTransmitter, not storing this, on the contrary disconnecting because maybe it's a bluetoothTransmitter already known for which user has preferred not to connect to
-                // but before that store the current bluetoothTransmitterDelegate
-                let bluetoothTransmitterDelegate = bluetoothTransmitter.bluetoothTransmitterDelegate
-                bluetoothTransmitter.disconnect()
-                
-                // If we're actually waiting for a new scan result, then there's an instance of BluetoothTransmitter stored in tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral - but this one stopped scanning, so let's recreate an instance of BluetoothTransmitter
-                // transmitterTypeBeingScannedFor should be non nil here, unwrap
-                if let transmitterTypeBeingScannedFor = transmitterTypeBeingScannedFor {
+                trace("in didConnect, transmitter address already known. Treating as existing device, continuing setup (no disconnect)", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
 
-                    self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = createNewTransmitter(type: transmitterTypeBeingScannedFor, transmitterId: buetoothPeripheral.blePeripheral.transmitterId, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
-                    
-                    _ = self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral?.startScanning()
+                // This is an already known BluetoothTransmitter. Do not disconnect, avoid creating a duplicate entry.
+                // Clear the temporary scanning transmitter so we do not go through the "new device" creation path below.
+                self.tempBlueToothTransmitterWhileScanningForNewBluetoothPeripheral = nil
 
-                }
-                
+                // Ensure current CGM transmitter address is set if needed.
+                checkCurrentCGMTransmitterHelper()
+
+                // Update the existing peripheral's last connection status change timestamp to now.
+                bluetoothPeripheral.blePeripheral.lastConnectionStatusChangeTimeStamp = Date()
+
+                // Continue normal flow without creating a new BluetoothPeripheral and without disconnecting.
                 return
                 
             }
@@ -301,7 +297,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     
     func didDisconnectFrom(bluetoothTransmitter: BluetoothTransmitter) {
         
-        trace("in didDisconnectFrom", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
+        trace("in didDisconnectFrom", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .debug)
         
         // set lastConnectionStatusChangeTimeStamp in blePeripheral to now
         if let bluetoothPeripheral = getBluetoothPeripheral(for: bluetoothTransmitter) {

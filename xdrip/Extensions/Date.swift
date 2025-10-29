@@ -173,18 +173,22 @@ extension Date {
     /// Example return: "6d11h" if optional appendAgo is false or not used
     /// Example return: "6d11h ago" if optional appendAgo is true
     /// if less than 12 hours, return also minutes, e.g: "7h43m" or "58m" to give extra granularity
-    func daysAndHoursAgo(appendAgo: Bool? = false, showOnlyDays: Bool? = false) -> String {
+    func daysAndHoursAgo(appendAgo: Bool? = false, showOnlyDays: Bool? = false, showOnlyHours: Bool? = false) -> String {
         // set a default value assuming that we're unable to calculate the hours + days
         var daysAndHoursAgoString: String = "n/a"
 
         let diffComponents = Calendar.current.dateComponents([.day, .hour, .minute], from: self, to: Date())
 
         if let days = diffComponents.day, let hours = diffComponents.hour, let minutes = diffComponents.minute {
-            if days == 0 && hours < 1 {
+            if let showOnlyHours = showOnlyHours, showOnlyHours {
+                // show just the total hours
+                daysAndHoursAgoString = abs((days * 24) + hours).description + Texts_Common.hourshort
+            } else if days == 0 && hours < 1 {
                 // show just minutes for less than one hour
                 daysAndHoursAgoString = abs(minutes).description + Texts_Common.minuteshort
             } else if days == 0 {
                 // show just hours if less than a day
+                // also show only hours if requested (i.e. 24h instead of 1d0h)
                 daysAndHoursAgoString = abs(hours).description + Texts_Common.hourshort
             } else {
                 // default show days and hours

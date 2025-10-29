@@ -47,11 +47,11 @@
 "transmittterStartDate" = "Transmitter Started";
 
 
-"nfcScanFailedTitle" = "Sensor Scan mislukt";
-"nfcScanFailedMessage" = "\n⚠️ Scan opnieuw ⚠️";
+"nfcScanFailedTitle" = "⚠️ Sensor Scan mislukt";
+"nfcScanFailedMessage" = "\nScan opnieuw";
 "nfcScanFailedScanAgainButton" = "Scan Opnieuw";
-"nfcScanSuccessfulTitle" = "Sensor Scan gelukt!";
-"nfcScanSuccessfulMessage" = "\n✅ Scan gelukt ✅\n\nKlik 'Ok' en wacht tot de sensor connectie heeft gemaakt met de app.\n\nBinnen enkele ogenblikken moet de status veranderen naar 'Verbonden'.";
+"nfcScanSuccessfulTitle" = "✅ Sensor Scan gelukt!";
+"nfcScanSuccessfulMessage" = "Klik 'Ok' en wacht tot de sensor connectie heeft gemaakt met de app.\n\nBinnen enkele ogenblikken moet de status veranderen naar 'Verbonden'.";
 "nfcErrorMessageScanErrorRetrying" = "Sensor scan fout\n\nBezig met opnieuw proberen... # ";
 "nfcErrorMessageScanFailed" = "Sensor scan mislukt";
 

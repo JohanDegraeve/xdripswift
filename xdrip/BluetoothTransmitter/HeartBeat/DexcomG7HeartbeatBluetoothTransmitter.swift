@@ -10,6 +10,7 @@ import AVFoundation
 /**
  DexcomG7HeartbeatBluetoothTransmitter is not a real CGMTransmitter but used as workaround to make clear in bluetoothperipheral manager that libreview is used as CGM
  */
+@objcMembers
 class DexcomG7HeartbeatBluetoothTransmitter: BluetoothTransmitter {
     
     // MARK: - properties
@@ -54,6 +55,12 @@ class DexcomG7HeartbeatBluetoothTransmitter: BluetoothTransmitter {
         
     }
     
+    override func prepareForRelease() {
+        // Clear base CB delegates + unsubscribe common receiveCharacteristic synchronously on main
+        super.prepareForRelease()
+        // No additional state to clear for heartbeat transmitter
+    }
+    
     // MARK: CBCentralManager overriden functions
     
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
@@ -70,11 +77,19 @@ class DexcomG7HeartbeatBluetoothTransmitter: BluetoothTransmitter {
             
             timeStampOfLastHeartBeat = Date()
             
-            UserDefaults.standard.timeStampOfLastHeartBeat = timeStampOfLastHeartBeat
+            // bump the UserDefaults write onto the main thread so KVO/UI observers fire on main
+            let timeStamp = timeStampOfLastHeartBeat
+            if Thread.isMainThread {
+                UserDefaults.standard.timeStampOfLastHeartBeat = timeStamp
+            } else {
+                DispatchQueue.main.async {
+                    UserDefaults.standard.timeStampOfLastHeartBeat = timeStamp
+                }
+            }
             
             // wait for a second to allow the official app to upload to LibreView before triggering the heartbeat announcement to the delegate
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                self.bluetoothTransmitterDelegate?.heartBeat()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                self?.bluetoothTransmitterDelegate?.heartBeat()
             }
         }
         
@@ -89,11 +104,21 @@ class DexcomG7HeartbeatBluetoothTransmitter: BluetoothTransmitter {
             
             timeStampOfLastHeartBeat = Date()
             
-            UserDefaults.standard.timeStampOfLastHeartBeat = timeStampOfLastHeartBeat
+            // bump the UserDefaults write onto the main thread so KVO/UI observers fire on main
+            let ts = timeStampOfLastHeartBeat
+            if Thread.isMainThread {
+                UserDefaults.standard.timeStampOfLastHeartBeat = ts
+            } else {
+                DispatchQueue.main.async {
+                    UserDefaults.standard.timeStampOfLastHeartBeat = ts
+                }
+            }
             
             // no need to wait for a second, because the disconnect usually happens about 1' seconds after connect
             // this case is for when a follower would be using an expired Dexcom G7 as a heartbeat
-            self.bluetoothTransmitterDelegate?.heartBeat()
+            DispatchQueue.main.async { [weak self] in
+                self?.bluetoothTransmitterDelegate?.heartBeat()
+            }
         }
     }
             

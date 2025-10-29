@@ -275,7 +275,7 @@ enum ConstantsGlucoseChart {
     static let dateFormatLatestChartPointWhenPanning = "E d MMM jj:mm"
     
     /// dateformat for the date label in the 24 hours static landscape chart
-    static let dateFormatLandscapeChart = "EEEE dd/MM/yyyy"
+    static let dateFormatLandscapeChart = "dd/MM/yyyy EEEE"
     
     /// the amount of hours of bg readings that the mini-chart should show (first range)
     static let miniChartHoursToShow1: Double = 24

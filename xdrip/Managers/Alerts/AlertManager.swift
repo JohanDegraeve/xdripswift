@@ -119,7 +119,7 @@ public class AlertManager:NSObject {
         
         // check if "Snooze All" is activated. If so, then just return with nothing.
         if let snoozeAllAlertsUntilDate = UserDefaults.standard.snoozeAllAlertsUntilDate, snoozeAllAlertsUntilDate > Date() {
-            trace("in alertNcheckAlertseeded, skipping all alarms as Snooze All is enabled until %{public}@.", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, snoozeAllAlertsUntilDate.formatted(date: .abbreviated, time: .standard))
+            trace("in alertNcheckAlertseeded, skipping all alert checks as Snooze All is enabled until %{public}@.", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, snoozeAllAlertsUntilDate.formatted(date: .abbreviated, time: .standard))
             return false
         }
         
@@ -363,7 +363,7 @@ public class AlertManager:NSObject {
             let snoozePeriod = self.snoozeValueMinutes[snoozeIndex]
             
             // snooze
-            trace("    snoozing alert %{public}@ for %{public}@ minutes (1)", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), snoozePeriod.description)
+            trace("    snoozing alert '%{public}@' for %{public}@ minutes (1)", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), snoozePeriod.description)
             self.getSnoozeParameters(alertKind: alertKind).snooze(snoozePeriodInMinutes: snoozePeriod)
             
             // save changes in coredata
@@ -429,7 +429,7 @@ public class AlertManager:NSObject {
             
             // any other type of alert, set it to snoozed
             getSnoozeParameters(alertKind: alertKind).snooze(snoozePeriodInMinutes: snoozePeriodInMinutes)
-            trace("Snoozing alert %{public}@ for %{public}@ minutes (2)", log: log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), snoozePeriodInMinutes.description)
+            trace("Snoozing alert '%{public}@' for %{public}@ minutes (2)", log: log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), snoozePeriodInMinutes.description)
             
             // save changes in coredata
             coreDataManager.saveChanges()
@@ -496,7 +496,7 @@ public class AlertManager:NSObject {
             
             if let remainingSeconds = getSnoozeParameters(alertKind: alertKind).getSnoozeValue().remainingSeconds {
 
-                trace("in checkAlertGroupAndFire before calling getSnoozeValue for alert %{public}@, remaining seconds = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), remainingSeconds.description)
+                trace("in checkAlertGroupAndFire before calling getSnoozeValue for alert '%{public}@', remaining seconds = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .debug, alertKind.descriptionForLogging(), remainingSeconds.description)
 
             }
             
@@ -536,8 +536,6 @@ public class AlertManager:NSObject {
     
     /// will check if the alert of type alertKind needs to be fired and also fires it, plays the sound, and if yes returns true, otherwise false
     private func checkAlertAndFire(alertKind:AlertKind, lastBgReading:BgReading?, lastButOneBgReading:BgReading?, lastCalibration:Calibration?, transmitterBatteryInfo:TransmitterBatteryInfo?) -> Bool {
-
-        trace("in checkAlertAndFire for alert = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
         
         /// This is only for missed reading alert. How many minutes between now and the moment the snooze expires (meaning when is it not snoozed anymore)
         ///
@@ -547,8 +545,9 @@ public class AlertManager:NSObject {
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
         if let remainingSeconds = getSnoozeParameters(alertKind: alertKind).getSnoozeValue().remainingSeconds {
-
-            trace("in checkAlertAndFire before calling getSnoozeValue for alert %{public}@, remaining seconds = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), remainingSeconds.description)
+            
+            // snoozed state is informational, not an actual alert. Moved to .debug
+            trace("in checkAlertAndFire before calling getSnoozeValue for alert '%{public}@', remaining seconds = %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .debug, alertKind.descriptionForLogging(), remainingSeconds.description)
 
         }
 
@@ -567,7 +566,7 @@ public class AlertManager:NSObject {
                 } // if snoozePeriodInMinutes or snoozeTimeStamp is nil (which shouldn't be the case) continue without taking into account the snooze status
                 
             case .calibration, .batterylow, .phonebatterylow, .low, .high, .verylow, .veryhigh, .fastdrop, .fastrise:
-                trace("in checkAlertAndFire, alert %{public}@ is currently snoozed", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
+                trace("in checkAlertAndFire, alert '%{public}@' is currently snoozed", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
                 return false
             }
             
@@ -586,7 +585,8 @@ public class AlertManager:NSObject {
         if let minimumDelayInSecondsToUse = minimumDelayInSecondsToUse {
             
             if minimumDelayInSecondsToUse > delayInSecondsToUse {
-                trace("    increasing delayInSecondsToUse to %{public}@, because the alert is snoozed", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, minimumDelayInSecondsToUse.description)
+                // internal scheduling detail moved to debug
+                trace("    increasing delayInSecondsToUse to %{public}@, because the alert is snoozed", log: self.log, category: ConstantsLog.categoryAlertManager, type: .debug, minimumDelayInSecondsToUse.description)
                 delayInSecondsToUse = minimumDelayInSecondsToUse
             }
             
@@ -782,7 +782,7 @@ public class AlertManager:NSObject {
             // snooze default period, to avoid that alert goes off every minute for Libre 2, except if it's a delayed alert (for delayed alerts it looks a bit risky to me)
             if delayInSecondsToUse == 0 {
                 
-                trace("in checkAlert, snoozing alert %{public}@ for %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes.description)
+                trace("in checkAlert, snoozing alert '%{public}@' for %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes.description)
                 
                 getSnoozeParameters(alertKind: alertKind).snooze(snoozePeriodInMinutes: ConstantsAlerts.defaultDelayBetweenAlertsOfSameKindInMinutes)
                 
@@ -795,9 +795,9 @@ public class AlertManager:NSObject {
             
             // log the result
             if delayInSecondsToUse == 0 {
-                trace("in checkAlert, raising alert %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
+                trace("in checkAlert, raising alert '%{public}@'", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
             } else {
-                trace("in checkAlert, raising alert %{public}@ with a delay of %{public}@ minutes - this is a scheduled future alert, it will not go off now", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), ((Int(round(Double(delayInSecondsToUse)/60*10))/10)).description)
+                trace("in checkAlert, scheduling future alert '%{public}@' with a delay of %{public}@ minutes", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), ((Int(round(Double(delayInSecondsToUse)/60*10))/10)).description)
             }
 
             // check if app is allowed to send local notification and if not write info to trace
@@ -823,9 +823,9 @@ public class AlertManager:NSObject {
             
         } else {
             if !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
-                trace("in checkAlert, there's no need to raise alert '%{public}@' because we're in follower mode and keep-alive is disabled", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
+                trace("in checkAlert, there's no need to raise alert '%{public}@' because we're in follower mode and keep-alive is disabled", log: self.log, category: ConstantsLog.categoryAlertManager, type: .debug, alertKind.descriptionForLogging())
             } else {
-                trace("in checkAlert, there's no need to raise alert %{public}@", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
+                trace("in checkAlert, there's no need to raise alert '%{public}@'", log: self.log, category: ConstantsLog.categoryAlertManager, type: .debug, alertKind.descriptionForLogging())
             }
             return false
         }

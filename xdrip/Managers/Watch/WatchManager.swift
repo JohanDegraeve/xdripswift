@@ -69,8 +69,8 @@ final class WatchManager: NSObject, ObservableObject {
                     // only ejecute if the key was set to true (to avoid a get-set loop)
                     // if so, process the watch state and set it back to false
                     if UserDefaults.standard.nightscoutDeviceStatusWasUpdated {
-                        DispatchQueue.main.sync {
-                            processWatchState(forceComplicationUpdate: false)
+                        DispatchQueue.main.async { [weak self] in
+                            self?.processWatchState(forceComplicationUpdate: false)
                         }
                         UserDefaults.standard.nightscoutDeviceStatusWasUpdated = false
                     }
@@ -138,7 +138,8 @@ final class WatchManager: NSObject, ObservableObject {
         watchState.liveDataIsEnabled = UserDefaults.standard.showDataInWatchComplications
         
         if let sensorStartDate = UserDefaults.standard.activeSensorStartDate {
-            watchState.sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: .now).minute!)
+            let minutes = Calendar.current.dateComponents([.minute], from: sensorStartDate, to: .now).minute ?? 0
+            watchState.sensorAgeInMinutes = Double(minutes)
         } else {
             watchState.sensorAgeInMinutes = 0
         }
@@ -185,7 +186,7 @@ final class WatchManager: NSObject, ObservableObject {
         
         guard session.activationState == .activated else {
             let activationStateString = "\(session.activationState)"
-            trace("watch session activationState = %{public}@. Reactivating", log: log, category: ConstantsLog.categoryWatchManager, type: .error, activationStateString)
+            trace("watch session activationState = %{public}@. Reactivating", log: log, category: ConstantsLog.categoryWatchManager, type: .debug, activationStateString)
             session.activate()
             return
         }
@@ -196,7 +197,8 @@ final class WatchManager: NSObject, ObservableObject {
         // if not, then just send it as a normal priority transferUserInfo (but limit the sending to once every 5 minutes!) which will be queued and sent as soon as the watch app is reachable again (this will help get the app showing data quicker)
         if let userInfo: [String: Any] = watchState.asDictionary {
             if session.isReachable {
-                session.sendMessage(["watchState": userInfo], replyHandler: nil, errorHandler: { error in
+                session.sendMessage(["watchState": userInfo], replyHandler: nil, errorHandler: { [weak self] error in
+                    guard let self = self else { return }
                     trace("error sending watch state, error = %{public}@", log: self.log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)
                 })
             } else {
@@ -209,7 +211,7 @@ final class WatchManager: NSObject, ObservableObject {
                     lastForcedComplicationUpdateTimeStamp = .now
                     UserDefaults.standard.remainingComplicationUserInfoTransfers = session.remainingComplicationUserInfoTransfers
                 } else {
-                    trace("sending background watch state update", log: log, category: ConstantsLog.categoryWatchManager, type: .info)
+                    trace("sending background watch state update", log: log, category: ConstantsLog.categoryWatchManager, type: .debug)
                     
                     session.transferUserInfo(["watchState": userInfo])
                 }
@@ -221,6 +223,10 @@ final class WatchManager: NSObject, ObservableObject {
     
     func updateWatchApp(forceComplicationUpdate: Bool) {
         processWatchState(forceComplicationUpdate: forceComplicationUpdate)
+    }
+    
+    deinit {
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutDeviceStatusWasUpdated.rawValue)
     }
 }
 

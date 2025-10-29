@@ -185,8 +185,8 @@ class NightscoutFollowManager: NSObject {
                 request.setValue(apiKey.sha1(), forHTTPHeaderField:"api-secret")
             }
             
-            let task = URLSession.shared.dataTask(with: request, completionHandler: { data, response, error in
-                
+            let task = URLSession.shared.dataTask(with: request, completionHandler: { [weak self] data, response, error in
+                guard let self = self else { return }
                 trace("in download, finished task", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
                 
                 // get array of FollowGlucoseData from json
@@ -195,19 +195,18 @@ class NightscoutFollowManager: NSObject {
                 
                 trace("    finished download,  %{public}@ readings", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info, followGlucoseDataArray.count.description)
                 
-                // call to delegate and rescheduling the timer must be done in main thread;
-                DispatchQueue.main.sync {
-                    
+                // Dispatch to delegate on the main actor (use a local copy for the inout parameter)
+                let localCopy = followGlucoseDataArray
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
                     // call delegate followerInfoReceived which will process the new readings
                     if let followerDelegate = self.followerDelegate {
-                        followerDelegate.followerInfoReceived(followGlucoseDataArray: &followGlucoseDataArray)
+                        var array = localCopy
+                        followerDelegate.followerInfoReceived(followGlucoseDataArray: &array)
                     }
-                    
                     // schedule new download
                     self.scheduleNewDownload()
-
                 }
-                
             })
             
             trace("in download, calling task.resume", log: log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
@@ -246,14 +245,15 @@ class NightscoutFollowManager: NSObject {
     
     /// schedule new download with timer, when timer expires download() will be called
     private func scheduleNewDownload() {
-        
         guard UserDefaults.standard.followerBackgroundKeepAliveType != .heartbeat else { return }
-        
+        // invalidate previous timer if any before scheduling a new one
+        if let invalidateDownLoadTimerClosure = invalidateDownLoadTimerClosure {
+            invalidateDownLoadTimerClosure()
+            self.invalidateDownLoadTimerClosure = nil
+        }
         trace("in scheduleNewDownload", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
-        
         // schedule a timer for 15 seconds and assign it to a let property
         let downloadTimer = Timer.scheduledTimer(timeInterval: 15, target: self, selector: #selector(self.download), userInfo: nil, repeats: false)
-        
         // assign invalidateDownLoadTimerClosure to a closure that will invalidate the downloadTimer
         invalidateDownLoadTimerClosure = {
             downloadTimer.invalidate()
@@ -365,32 +365,25 @@ class NightscoutFollowManager: NSObject {
     
     /// launches timer that will regular play sound - this will be played only when app goes to background and only if the user wants to keep the app alive
     private func enableSuspensionPrevention() {
-        
         // if keep-alive is not needed, then just return and do nothing
         if !UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
-            
-            print("not enabling suspension prevention as keep-alive type is:  \(UserDefaults.standard.followerBackgroundKeepAliveType.description)")
-            
+            trace("not enabling suspension prevention as keep-alive type is: %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .debug, UserDefaults.standard.followerBackgroundKeepAliveType.description)
             return
-            
         }
-        
         let interval = UserDefaults.standard.followerBackgroundKeepAliveType == .normal ? ConstantsSuspensionPrevention.intervalNormal : ConstantsSuspensionPrevention.intervalAggressive
-        
         // create playSoundTimer depending on the keep-alive type selected
-        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(interval)), eventHandler: {
+        playSoundTimer = RepeatingTimer(timeInterval: TimeInterval(Double(interval)), eventHandler: { [weak self] in
+            guard let self = self else { return }
             // play the sound
-            
-            trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info)
-            
+            trace("in eventhandler checking if audioplayer exists", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info)
             if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
-                trace("playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryLibreLinkUpFollowManager, type: .info, interval.description, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
+                trace("playing audio every %{public}@ seconds. %{public}@ keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryNightscoutFollowManager, type: .info, interval.description, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
                 audioPlayer.play()
             }
         })
-        
         // schedulePlaySoundTimer needs to be created when app goes to background
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer, closure: {
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer, closure: { [weak self] in
+            guard let self = self else { return }
             if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
                 if let playSoundTimer = self.playSoundTimer {
                     playSoundTimer.resume()
@@ -400,9 +393,9 @@ class NightscoutFollowManager: NSObject {
                 }
             }
         })
-
         // schedulePlaySoundTimer needs to be invalidated when app goes to foreground
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeySuspendPlaySoundTimer, closure: {
+        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeySuspendPlaySoundTimer, closure: { [weak self] in
+            guard let self = self else { return }
             if let playSoundTimer = self.playSoundTimer {
                 playSoundTimer.suspend()
             }
@@ -463,5 +456,15 @@ class NightscoutFollowManager: NSObject {
         }
     }
     
-
+    deinit {
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutUrl.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutAPIKey.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutToken.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutEnabled.rawValue)
+        invalidateDownLoadTimerClosure?()
+        playSoundTimer?.suspend()
+    }
 }

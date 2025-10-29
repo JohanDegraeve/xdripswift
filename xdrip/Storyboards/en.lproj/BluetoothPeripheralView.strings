@@ -33,11 +33,11 @@
 "sensorStartDate" = "Sensor Started";
 "useOtherDexcomApp" = "Use With Other App";
 "nfcScanNeeded" = "NFC scan needed";
-"nfcScanFailedTitle" = "Sensor Scan Failed";
-"nfcScanFailedMessage" = "\n⚠️ Please scan again ⚠️";
+"nfcScanFailedTitle" = "⚠️ Sensor Scan Failed";
+"nfcScanFailedMessage" = "Please scan again";
 "nfcScanFailedScanAgainButton" = "Scan Again";
-"nfcScanSuccessfulTitle" = "Sensor Scan Successful!";
-"nfcScanSuccessfulMessage" = "\n✅ Scan successful ✅\n\nClick OK and just wait to allow the sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
+"nfcScanSuccessfulTitle" = "✅ Sensor Scan Successful!";
+"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
 "nfcErrorMessageScanErrorRetrying" = "Sensor scan error\n\nRetrying... # ";
 "nfcErrorMessageScanFailed" = "Sensor scan has failed";
 "nonFixedSlopeWarning" = "Multi-point calibration is an advanced feature.\n\nPlease do not use this feature until you have read the calibration section of the online help and understand how it works.";

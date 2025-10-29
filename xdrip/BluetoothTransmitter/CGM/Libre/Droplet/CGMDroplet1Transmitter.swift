@@ -2,7 +2,8 @@ import Foundation
 import os
 import CoreBluetooth
 
-class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
+@objcMembers
+class CGMDroplet1Transmitter: BluetoothTransmitter, CGMTransmitter {
     
     // MARK: - properties
     
@@ -34,7 +35,7 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
-    ///     - bluetoothTransmitterDelegate : a NluetoothTransmitterDelegate
+    ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
     init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMDropletTransmitterDelegate : CGMDropletTransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate, nonFixedSlopeEnabled: Bool?) {
         
@@ -86,7 +87,9 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
             
             // if firstfield equals "000000" or "000999" then sensor detection failure - inform delegate and return
             guard firstField != "000000" && firstField != "000999" else {
-                cgmTransmitterDelegate?.sensorNotDetected()
+                DispatchQueue.main.async { [weak self] in
+                    self?.cgmTransmitterDelegate?.sensorNotDetected()
+                }
                 return
             }
             
@@ -113,17 +116,39 @@ class CGMDroplet1Transmitter:BluetoothTransmitter, CGMTransmitter {
                 return
             }
             
-            // send glucoseDataArray, transmitterBatteryInfo and sensorAge to cgmTransmitterDelegate
-            var glucoseDataArray = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: rawValueAsDouble)]
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorAge: TimeInterval(minutes: Double(sensorAgeInMinutes * 10) ))
-            
-            // send transmitterBatteryInfo to delegate
-            cGMDropletTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
+            // send glucoseDataArray, transmitterBatteryInfo and sensorAge to cgmTransmitterDelegate (main thread)
+            let glucoseDataArray = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: rawValueAsDouble)]
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                var copy = glucoseDataArray
+                self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: batteryPercentage), sensorAge: TimeInterval(minutes: Double(sensorAgeInMinutes * 10)))
+                self.cGMDropletTransmitterDelegate?.received(batteryLevel: batteryPercentage, from: self)
+            }
 
         } else {
             trace("    value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMDroplet1, type: .error)
         }
         
+    }
+    
+    override func prepareForRelease() {
+        // Clear base CB delegates + unsubscribe common receiveCharacteristic synchronously on main
+        super.prepareForRelease()
+        // Droplet-specific: clear transient state synchronously on main
+        let tearDown = {
+            self.emptyArray.removeAll()
+            self.nonFixedSlopeEnabled = false
+        }
+        if Thread.isMainThread {
+            tearDown()
+        } else {
+            DispatchQueue.main.sync(execute: tearDown)
+        }
+    }
+
+    deinit {
+        // Defensive cleanup beyond base class
+        emptyArray.removeAll()
     }
     
     // MARK: CGMTransmitter protocol functions

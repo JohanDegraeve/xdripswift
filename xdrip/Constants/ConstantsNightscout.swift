@@ -13,6 +13,9 @@ enum ConstantsNightscout {
     /// if the time between the last and last but one reading is less than minimiumTimeBetweenTwoReadingsInMinutes, then the last reading will not be uploaded - except if there's been a disconnect in between these two readings
     static let minimiumTimeBetweenTwoReadingsInMinutes = 4.75
     
+    /// use a modified time between readings if the user has enabled this option in developer settings. This will allow uploads of 60-second CGM values to Nightscout
+    static let minimiumTimeBetweenTwoReadingsInMinutesFrequentUploads = 0.75
+    
     /// maximum amount of treatments to upload to Nightscout (inclusive updated treatments and treatments marked as deleted)
     static let maxTreatmentsToUpload = 50
     

@@ -64,7 +64,7 @@ fileprivate var traceFileName:URL?
 /// - category is the same as used for creating the log (see class ConstantsLog), it's repeated here to use in NSLog
 /// - args : optional list of parameters that will be used. MAXIMUM 10 !
 ///
-/// Example 
+/// Example
 func trace(_ message: StaticString, log:OSLog, category: String, type: OSLogType, _ args: CVarArg...) {
 
     // initialize traceFileName if needed
@@ -210,10 +210,16 @@ func trace(_ message: StaticString, log:OSLog, category: String, type: OSLogType
    
     
     // check if tracefile has reached limit size and if yes rotate the files
-    if traceFileName.fileSize > ConstantsTrace.maximumFileSizeInMB * 1024 * 1024 {
-        
-        rotateTraceFiles()
-        
+    // NOTE: Changed implementation after TestFlight crash report showing "URL.fileSize.getter + 20".
+    // The old version used the extension fileSize which called FileManager.attributesOfItem(atPath:) - this could
+    // crash if the file was being rotated or removed concurrently (race condition during trace log writes).
+    // Using URL.resourceValues(forKeys:) makes the lookup safe and avoids trapping on transient I/O states.
+    if let resourceValues = try? traceFileName.resourceValues(forKeys: [.fileSizeKey]),
+       let fileSizeInt = resourceValues.fileSize {
+        let maxBytes = UInt64(ConstantsTrace.maximumFileSizeInMB) * 1024 * 1024
+        if UInt64(fileSizeInt) > maxBytes {
+            rotateTraceFiles()
+        }
     }
     
 }
@@ -406,8 +412,8 @@ class Trace {
             traceInfo.appendStringAndNewLine("    Account name: " + ((UserDefaults.standard.dexcomShareAccountName?.description ?? "") != "" ? "present" : "missing"))
             traceInfo.appendStringAndNewLine("    Password: " + ((UserDefaults.standard.dexcomSharePassword?.description ?? "") != "" ? "present" : "missing"))
             traceInfo.appendStringAndNewLine("    Use US servers: " + UserDefaults.standard.useUSDexcomShareurl .description)
-            traceInfo.appendStringAndNewLine("    Receiver serial number: " + (UserDefaults.standard.dexcomShareSerialNumber?.description ?? "nil"))
-            traceInfo.appendStringAndNewLine("    Use upload schedule: " + UserDefaults.standard.dexcomShareUseSchedule.description)
+            traceInfo.appendStringAndNewLine("    Receiver serial number: " + (UserDefaults.standard.dexcomShareUploadSerialNumber?.description ?? "nil"))
+            traceInfo.appendStringAndNewLine("    Use upload schedule: " + UserDefaults.standard.dexcomShareUploadUseSchedule.description)
         }
                                              
         traceInfo.appendStringAndNewLine("\nApple Health settings:")

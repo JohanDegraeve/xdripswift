@@ -48,14 +48,8 @@ extension XDripWidget.EntryView {
             GlucoseChartView(glucoseChartType: .widgetSystemMedium, bgReadingValues: entry.widgetState.bgReadingValues, bgReadingDates: entry.widgetState.bgReadingDates, isMgDl: entry.widgetState.isMgDl, urgentLowLimitInMgDl: entry.widgetState.urgentLowLimitInMgDl, lowLimitInMgDl: entry.widgetState.lowLimitInMgDl, highLimitInMgDl: entry.widgetState.highLimitInMgDl, urgentHighLimitInMgDl: entry.widgetState.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
             
             HStack(alignment: .center) {
-                if let keepAliveImageString = entry.widgetState.keepAliveImageString {
-                    Image(systemName: keepAliveImageString)
-                        .font(.caption)
-                        .foregroundStyle(.colorTertiary)
-                        .padding(.trailing, -4)
-                }
-                    
-                Text(entry.widgetState.dataSourceDescription)
+                // if we're in follower mode and a patient name exists, let's use it with preference over the data source
+                Text(entry.widgetState.followerPatientName ?? entry.widgetState.dataSourceDescription)
                     .font(.caption).bold()
                     .foregroundStyle(.colorSecondary)
                 
@@ -63,7 +57,7 @@ extension XDripWidget.EntryView {
                 
                 Text("Last reading at \(entry.widgetState.bgReadingDate?.formatted(date: .omitted, time: .shortened) ?? "--:--")")
                     .font(.caption)
-                    .foregroundStyle(.colorTertiary)
+                    .foregroundStyle(.colorSecondary)
             }
             .padding(.top, 6)
         }

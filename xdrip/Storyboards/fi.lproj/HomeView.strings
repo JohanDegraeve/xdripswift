@@ -81,7 +81,7 @@
 "dexcomBatteryTooLow" = "The Transmitter battery is too low!";
 
 /// username and/or password is missing for librelinkup
-"libreLinkUpAccountCredentialsMissing" = "Username/password missing";
+"followerAccountCredentialsMissing" = "Username/password missing";
 
 /// no data source is enabled or connected
 "noDataSourceConnected" = "No CGM data source connected";

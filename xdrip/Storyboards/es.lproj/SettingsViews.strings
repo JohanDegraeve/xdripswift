@@ -8,7 +8,7 @@
 
 "settingsviews_sectionTitleDataSource" = "Fuente de datos MGC";
 "settingsviews_labelFollowerDataSourceType" = "Fuente de datos de seguidor";
-"settingsviews_labelUploadFollowerDataToNightscout" = "Subir a Nightscout";
+"settingsviews_labelUploadDataToNightscout" = "Subir a Nightscout";
 "settingsviews_labelfollowerKeepAliveType" = "Mantener en segundo plano";
 "settingsviews_followerKeepAliveTypeDisabled" = "Deshabilitado";
 "settingsviews_followerKeepAliveTypeNormal" = "Normal";
@@ -17,8 +17,8 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Mantener en segundo plan está en modo normal.\n\nCuando la app está en segundo plano, intentaremos mantenerla funcionando para que reciba actualizaciones de los valores de glucosa y que sea posible saltar alarmas y notificaciones.\n\nEste modo consume bastante batería.";
 "settingsviews_followerKeepAliveTypeAggressiveMessage" = "Mantener en segundo plan está en modo agresivo.\n\nCuando la app está en segundo plano, intentaremos, de forma agresiva, mantenerla funcionando para que reciba actualizaciones de los valores de glucosa y que sea posible saltar alarmas y notificaciones.\n\nEste modo consume mucha batería.";
 "settingsviews_followerPatientName" = "Nombre del paciente";
-"settingsviews_followerPatientNameMessage" = "Aquí puedes entrar el nombre de la persona que estás seguiendo.\n\nPuede ser útil si estás siguiendo varias personas con diferentes apps.\n\nEs opcional y lo normal sería dejarlo en blanco.";
-"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload follower BG values to Nightscout, you must enable it in the Nightscout section.";
+"settingsviews_followerPatientNameMessage" = "Aquí puedes escribir el nombre de la persona que estás seguiendo.";
+"settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
 "settingsviews_nightscoutNotEnabledRowText" = "Deshabilitado";
 "settingsviews_labelFollowerDataSourceRegion" = "Servidor (País)";
 "settingsviews_enterUsername" = "Entrar tu usuario (e-mail)";
@@ -45,7 +45,7 @@
 "settingsviews_showcoloredobjectives" = "Mostrar Colores";
 "settingsviews_showtarget" = "Mostrar Línea Target";
 "settingsviews_sectiontitletreatments" = "Tratamientos";
-"settingsviews_showTreatmentsOnChart" = "Mostrar Tratamientos";
+"settingsviews_showTreatments" = "Mostrar Tratamientos";
 "settingsviews_smallBolusTreatmentThreshold" = "Límite Micro-bolo";
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Por debajo de cuántas unidades debemos considerar un bolo como micro-bolo?\n\n(Valor recomendado: 1.0U)";
 "settingsviews_sectiontitlestatistics" = "Estadísticas";
@@ -74,14 +74,14 @@
 "settingsviews_row_alerts" = "Alarmas";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
 "settingsviews_healthkit" = "Grabar Datos en Apple Health";
-"settingsviews_sectiontitledexcomshare" = "Dexcom Share";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
 "settingsviews_uploadReadingstoDexcomShare" = "Subir Datos a Dexcom Share";
-"settingsviews_dexcomShareSerialNumber" = "Número de Serie del Receptor";
+"settingsviews_dexcomShareUploadSerialNumber" = "Número de Serie del Receptor";
 "settingsviews_useUSDexcomShareurl" = "Usar Servidores Dexcom EEUU";
 "settingsviews_dexcomShareAccountName" = "Nombre de Cuenta";
 "settingsviews_giveDexcomShareAccountName" = "Entrar el Nombre de tu Cuenta Dexcom Share";
 "settingsviews_giveDexcomSharePassword" = "Entrar la  Contraseña para tu Cuenta Dexcom Share";
-"settingsviews_giveDexcomShareSerialNumber" = "Entrar el número de serie del receptor Dexcom";
+"settingsviews_givedexcomShareUploadSerialNumber" = "Entrar el número de serie del receptor Dexcom";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 "settingsviews_nightscoutEnabled" = "Habilitar Nightscout";
 "settingsviews_useSchedule" = "Fijar Horario de Subida de Datos";
@@ -130,6 +130,8 @@
 "volumeTestiOSSound" = "Comprobar Volumen (volumen actual del iPhone)";
 "debugLevel" = "Incluir Datos Nivel Debug";
 "warningChangeFromMasterToFollower" = "Si cambias el modo de Master a Seguidor se parará la sesión del sensor actual. Quieres continuar?";
+"warningChangeFromMasterToFollowerDexcomShare" = "Cambiando de modo Master a Seguidor de Dexcom Share parará la sesión del sensor actual y deshabilitará 'Subir datos a Dexcom Share'. Quieres continuar?";
+"warningChangeToFollowerDexcomShare" = "Cambiando Seguidor de Dexcom Share deshabilitará 'Subir datos a Dexcom Share'.";
 "nightscoutPort" = "Puerto";
 "volumeTestSoundPlayerExplanation" = "Se está reproduciendo una alamra con el mismo volumen que usar un Tipo de Alarma con la opción de 'Ignorar Mode Silencio?' habilitado\n\nCambiar el volume con los botones del iPhone y apretar OK para confirmar";
 "settingsviews_nightscoutAPIKey" = "API_SECRET";
@@ -226,3 +228,8 @@
 
 /// Should loop data be shared only every 5 minutes
 "shareToLoopOnceEvery5Minutes" = "Share with OS-AID every 5 mins";
+
+"settingsviews_storeFrequentReadingsInNightscout" = "Subir Nightscout Frecuentamente";
+"settingsviews_storeFrequentReadingsInNightscoutMessage" = "Esta opción permitirá subir datos cada vez que entre una lectura de glucosa nueva en lugar de limitar a una vez cada 5 minutos. Solo sirve para sensors que envíen valores cada 60 segundos como Libre 2 EU con conexión directo.\n\nUtilizad esta opción con mucho cuidado y solo si lo ves realmente necesario. La mayoría de los usuarios deben dejar esta opción DESHABILITADA.";
+"settingsviews_storeFrequentReadingsInHealthKit" = "Grabar HealthKit Frecuentamente";
+"settingsviews_storeFrequentReadingsInHealthKitMessage" = "Esta opción permitirá grabar datos cada vez que entre una lectura de glucosa nueva en lugar de limitar a una vez cada 5 minutos. Solo sirve para sensors que envíen valores cada 60 segundos como Libre 2 EU con conexión directo.\n\nUtilizad esta opción con mucho cuidado y solo si lo ves realmente necesario. La mayoría de los usuarios deben dejar esta opción DESHABILITADA.";

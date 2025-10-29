@@ -5,6 +5,7 @@ import os
 /// bluetoothTransmitter for an M5Stack
 /// - will start scanning as soon as created or as soon as bluetooth is switched on
 /// - there's only one characteristic which is used for write and notify, not read. To get data from the M5Stack, xdrip app will write a specific opcode, then M5Stack will reply and the reply will arrive as notify. So we don't use .withResponse
+@objcMembers
 final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     
     // MARK: - public properties
@@ -164,11 +165,12 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     /// - parameters:
     ///     rotation value as expected by M5Stack, 0 is horizontal, 1
     func writeRotation(rotation: Int) -> Bool {
-        
         trace("in writeRotation, attempting to send", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
-
+        guard rotation >= 0 && rotation < rotationValues.count else {
+            trace("in writeRotation, invalid rotation index %{public}@", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error, String(rotation))
+            return false
+        }
         return writeDataToPeripheral(data: rotationValues[rotation].data, opCode: .writeRotationTx)
-        
     }
     
     /// writes brightness to the M5Stack
@@ -191,18 +193,18 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     ///
     /// byte 0 will be opcode, byte 1 and 2 packetnumber and number of packets respectively, byte 3 will number of the wifi converted to string, next bytes are the actually name
     func writeWifiName(name: String?, number: UInt8) -> Bool {
-        
         guard let name = name else {
             trace("    name is nil", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
             return false
         }
-        
+        guard (1...10).contains(number) else {
+            trace("    wifi slot out of range (1-10): %{public}@", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error, String(number))
+            return false
+        }
         // we will send the number as a string followed by the actual wifiname
         let numberAndName = number.description + name
-        
         // use writeStringToPeripheral to send it
         return writeStringToPeripheral(text: numberAndName, opCode: .writeWlanSSIDTx)
-        
     }
 
     /// writes a wifi password
@@ -213,15 +215,16 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
     ///
     /// byte 0 will be opcode, byte 1 and 2 packetnumber and number of packets respectively, byte 3 will number of the wifi converted to string, next bytes are the actually password
     func writeWifiPassword(password: String?, number: UInt8) -> Bool {
-        
         guard let password = password else {
             trace("    password is nil", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .info)
             return false
         }
-        
+        guard (1...10).contains(number) else {
+            trace("    wifi slot out of range (1-10): %{public}@", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error, String(number))
+            return false
+        }
         // we will send the number as a string followed by the actual password
         let numberAndPassword = number.description + password
-        
         return writeStringToPeripheral(text: numberAndPassword, opCode: .writeWlanPassTx)
     }
 
@@ -275,6 +278,26 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         return writeOpCodeToPeripheral(opCode: .writepowerOffTx)
     }
     
+    override func prepareForRelease() {
+        // Clear base CB delegates + unsubscribe common receiveCharacteristic synchronously on main
+        super.prepareForRelease()
+        // M5Stack-specific: clear transient state synchronously on main
+        let tearDown = {
+            self.blePasswordM5StackPacket = nil
+            self.isReadyToReceiveData = false
+        }
+        if Thread.isMainThread {
+            tearDown()
+        } else {
+            DispatchQueue.main.sync(execute: tearDown)
+        }
+    }
+
+    deinit {
+        // Delegate cleanup is handled in the base class; just clear packet buffer
+        blePasswordM5StackPacket = nil
+    }
+
     // MARK: - overriden BluetoothTransmitter functions
     
     override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
@@ -356,7 +379,10 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
                 
                 self.blePassword = newBlePassword
                 
-                m5StackBluetoothTransmitterDelegate?.newBlePassWord(newBlePassword: newBlePassword, m5StackBluetoothTransmitter: self)
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    self.m5StackBluetoothTransmitterDelegate?.newBlePassWord(newBlePassword: newBlePassword, m5StackBluetoothTransmitter: self)
+                }
                 
                 // memory clean up
                 blePasswordM5StackPacket = nil
@@ -371,21 +397,32 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
             trace("    successfully authenticated", log: log, category: ConstantsLog.categoryM5StackBluetoothTransmitter, type: .error)
             
             // inform delegates
-            m5StackBluetoothTransmitterDelegate?.authentication(success: true, m5StackBluetoothTransmitter: self)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.m5StackBluetoothTransmitterDelegate?.authentication(success: true, m5StackBluetoothTransmitter: self)
+            }
             
             // final steps after successful communication
             finalizeConnectionSetup()
             
         case .authenticateFailureRx:
             // received authentication failure, inform delegates
-
-            m5StackBluetoothTransmitterDelegate?.authentication(success: false, m5StackBluetoothTransmitter: self)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.m5StackBluetoothTransmitterDelegate?.authentication(success: false, m5StackBluetoothTransmitter: self)
+            }
             
         case .readBlePassWordError1Rx:
-            m5StackBluetoothTransmitterDelegate?.blePasswordMissing(m5StackBluetoothTransmitter: self)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.m5StackBluetoothTransmitterDelegate?.blePasswordMissing(m5StackBluetoothTransmitter: self)
+            }
             
         case .readBlePassWordError2Rx:
-            m5StackBluetoothTransmitterDelegate?.m5StackResetRequired(m5StackBluetoothTransmitter: self)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.m5StackBluetoothTransmitterDelegate?.m5StackResetRequired(m5StackBluetoothTransmitter: self)
+            }
             
         case .readTimeStampRx:
             
@@ -395,7 +432,10 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         case .readAllParametersRx:
             
             // M5Stack is asking for all parameters
-            m5StackBluetoothTransmitterDelegate?.isAskingForAllParameters(m5StackBluetoothTransmitter: self)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.m5StackBluetoothTransmitterDelegate?.isAskingForAllParameters(m5StackBluetoothTransmitter: self)
+            }
             
         case .readBatteryLevelRx:
             
@@ -408,11 +448,17 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
             let receivedBatteryLevel = Int(value[1])
             
             // M5Stack is sending batteryLevel, which is in the second byte
-            m5StackBluetoothTransmitterDelegate?.receivedBattery(level: receivedBatteryLevel, m5StackBluetoothTransmitter: self)
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.m5StackBluetoothTransmitterDelegate?.receivedBattery(level: receivedBatteryLevel, m5StackBluetoothTransmitter: self)
+            }
             
         case .heartbeat:
             // this is a trigger for calling the heartbeat
-            bluetoothTransmitterDelegate?.heartBeat()
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.bluetoothTransmitterDelegate?.heartBeat()
+            }
         }
 
     }
@@ -548,8 +594,10 @@ final class M5StackBluetoothTransmitter: BluetoothTransmitter {
         // this is the time when the M5stack is ready to receive readings or parameter updates
         isReadyToReceiveData = true
         
-        m5StackBluetoothTransmitterDelegate?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
-
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.m5StackBluetoothTransmitterDelegate?.isReadyToReceiveData(m5StackBluetoothTransmitter: self)
+        }
     }
     
 }

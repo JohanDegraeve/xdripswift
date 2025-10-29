@@ -110,16 +110,16 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Sensor scan successful, title
-"nfcScanSuccessfulTitle" = "Sensor Scan Successful!";
+"nfcScanSuccessfulTitle" = "✅ Sensor Scan Successful!";
 
 /// text to inform the user that multi-point calibration is an advanced option and could be dangerous if used incorrectly
 "nonFixedSlopeWarning" = "Multi-point calibration is an advanced feature.\n\nPlease do not use this feature until you have read the calibration section of the online help and understand how it works.";
 
 /// Ask if the user wants to try and scan the sensor again
-"nfcScanFailedMessage" = "\n⚠️ Please scan again ⚠️";
+"nfcScanFailedMessage" = "Please scan again";
 
 /// Sensor scan error, title
-"nfcScanFailedTitle" = "Sensor Scan Failed";
+"nfcScanFailedTitle" = "⚠️ Sensor Scan Failed";
 
 /// Tell the user the scan has failed and we're retrying several times
 "nfcErrorMessageScanFailed" = "Sensor scan has failed";
@@ -137,4 +137,4 @@
 "nfcScanFailedScanAgainButton" = "Scan Again";
 
 /// Tell the user the scan was successful and to just wait now for connection
-"nfcScanSuccessfulMessage" = "\n✅ Scan successful ✅\n\nClick OK and just wait to allow the sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";
+"nfcScanSuccessfulMessage" = "Click OK and just wait to allow the Libre sensor to finish connecting via bluetooth.\n\nIn a short while the status should change to 'Connected'.";;

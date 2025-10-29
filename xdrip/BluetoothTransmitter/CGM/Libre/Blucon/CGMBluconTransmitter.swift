@@ -2,6 +2,7 @@ import Foundation
 import CoreBluetooth
 import os
 
+@objcMembers
 class CGMBluconTransmitter: BluetoothTransmitter {
     
     // MARK: - properties
@@ -138,7 +139,12 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     private func sendCommandToBlucon(opcode:BluconTransmitterOpCode) {
 
         trace("    send opcode %{public}@ to Blucon", log: log, category: ConstantsLog.categoryBlucon, type: .info, opcode.description)
-        _ = writeDataToPeripheral(data: Data(hexadecimalString: opcode.rawValue)!, type: .withResponse)
+        
+        if let bytes = Data(hexadecimalString: opcode.rawValue) {
+            _ = writeDataToPeripheral(data: bytes, type: .withResponse)
+        } else {
+            trace("    invalid opcode hex string: %{public}@", log: log, category: ConstantsLog.categoryBlucon, type: .error, opcode.rawValue)
+        }
 
     }
     
@@ -157,12 +163,16 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         //check if buffer needs to be reset
         if let timestampFirstPacketReception = timestampFirstPacketReception {
             if (Date() > timestampFirstPacketReception.addingTimeInterval(maxWaitForHistoricDataInSeconds - 1)) {
-                trace("in handleNewHistoricData, more than %{public}d seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryBlucon, type: .info,maxWaitForHistoricDataInSeconds)
+                trace("in handleNewHistoricData, more than %{public}@ seconds since last update - or first update since app launch, resetting buffer", log: log, category: ConstantsLog.categoryBlucon, type: .info, String(Int(maxWaitForHistoricDataInSeconds)))
                 resetRxBuffer()
             }
         }
 
         //add new packet to buffer, ignoring the opcode (2 bytes), the number of the next block (1 byte), and the number of blocks in the data (1 byte)
+        guard block.count >= 4 else {
+            trace("in handleNewHistoricData, block too short (len=%{public}@)", log: log, category: ConstantsLog.categoryBlucon, type: .error, String(block.count))
+            return false
+        }
         rxBuffer.append(block[4..<block.count])
         
         // if rxBuffer has reached minimum lenght, then start processing
@@ -198,7 +208,8 @@ class CGMBluconTransmitter: BluetoothTransmitter {
     
     private func blockNumberForNowGlucoseData(input:Data) -> String? {
         
-        var nowGlucoseIndex2 = (Int) (input[5])
+        guard input.count > 5 else { return nil }
+        var nowGlucoseIndex2 = Int(input[5])
         
         // calculate byte position in sensor body
         nowGlucoseIndex2 = (nowGlucoseIndex2 * 6) + 4;
@@ -226,8 +237,12 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         // value 1 = 0F
         // value 2 = 04
         //rawGlucose = (input[3 + nowGlucoseOffset + 1] & 0x0F) * 256 + input[3 + nowGlucoseOffset] = 1039
-        let value1 = input[3 + Int(nowGlucoseOffset)]
-        let value2 = input[3 + Int(nowGlucoseOffset) + 1]
+        let base = 3 + Int(nowGlucoseOffset)
+        
+        guard input.count > base + 1 else { return 0 }
+        
+        let value1 = input[base]
+        let value2 = input[base + 1]
         
         let rawGlucose = Double((UInt16(value2 & 0x0F)<<8) | UInt16(value1 & 0xFF))
         
@@ -235,6 +250,24 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         let curGluc = rawGlucose * ConstantsBloodGlucose.libreMultiplier
         
         return(curGluc)
+    }
+    
+    override func prepareForRelease() {
+        // Clear base CB delegates + unsubscribe common receiveCharacteristic synchronously on main
+        super.prepareForRelease()
+        // Blucon-specific: clear rx buffer and reset session state
+        let tearDown = {
+            self.rxBuffer = Data()
+            self.waitingForGlucoseData = false
+            self.timestampFirstPacketReception = nil
+            self.timeStampLastWakeUpResponse = nil
+            self.shouldSendUnknown1CommandAfterReceivingBluconAckResponse = false
+        }
+        if Thread.isMainThread {
+            tearDown()
+        } else {
+            DispatchQueue.main.sync(execute: tearDown)
+        }
     }
 
     // MARK: - overriden  BluetoothTransmitter functions
@@ -253,16 +286,20 @@ class CGMBluconTransmitter: BluetoothTransmitter {
             // check if it's an encryption error, if so call cGMTransmitterDelegate
             if error.localizedDescription.uppercased().contains(find: "ENCRYPTION IS INSUFFICIENT") {
                 
-
-                // inform delegate
-                bluetoothTransmitterDelegate?.transmitterNeedsPairing(bluetoothTransmitter: self)
+                // inform delegate on main
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    self.bluetoothTransmitterDelegate?.transmitterNeedsPairing(bluetoothTransmitter: self)
+                }
 
                 waitingSuccessfulPairing = true
             }
         } else {
             if waitingSuccessfulPairing {
-                // inform delegate
-                bluetoothTransmitterDelegate?.pairingFailed()
+                // inform delegate on main
+                DispatchQueue.main.async { [weak self] in
+                    self?.bluetoothTransmitterDelegate?.pairingFailed()
+                }
                 waitingSuccessfulPairing = false
             }
         }
@@ -278,7 +315,9 @@ class CGMBluconTransmitter: BluetoothTransmitter {
         
         // this is only applicable the very first time that blucon connects and pairing is done
         if waitingSuccessfulPairing {
-            bluetoothTransmitterDelegate?.successfullyPaired()
+            DispatchQueue.main.async { [weak self] in
+                self?.bluetoothTransmitterDelegate?.successfullyPaired()
+            }
             waitingSuccessfulPairing = false
         }
         
@@ -312,9 +351,13 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                     sendCommandToBlucon(opcode: BluconTransmitterOpCode.getPatchInfoRequest)
                     
                     // by default set battery level to 100
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 100), sensorAge: nil)
-                    
-                    cGMBluconTransmitterDelegate?.received(batteryLevel: 100, from: self)
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        let empty = self.emptyArray
+                        var copy = empty
+                        self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 100), sensorAge: nil)
+                        self.cGMBluconTransmitterDelegate?.received(batteryLevel: 100, from: self)
+                    }
 
                 case .error14:
                     
@@ -326,8 +369,10 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                     
                 case .sensorNotDetected:
                     
-                    // Blucon didn't detect sensor, call cGMTransmitterDelegate
-                    cgmTransmitterDelegate?.sensorNotDetected()
+                    // Blucon didn't detect sensor, call cGMTransmitterDelegate on main
+                    DispatchQueue.main.async { [weak self] in
+                        self?.cgmTransmitterDelegate?.sensorNotDetected()
+                    }
                     
                     // and send Blucon to sleep
                     sendCommandToBlucon(opcode: .sleep)
@@ -346,14 +391,20 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                         
                         // inform cGMTransmitterDelegate about new sensor detected
                         // assign sensorStartDate, for this type of transmitter the sensorAge is passed in another call to cgmTransmitterDelegate
-                        cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
-
-                        cGMBluconTransmitterDelegate?.received(serialNumber: sensorSerialNumber, from: self)
-
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else { return }
+                            self.cgmTransmitterDelegate?.newSensorDetected(sensorStartDate: nil)
+                            self.cGMBluconTransmitterDelegate?.received(serialNumber: self.sensorSerialNumber, from: self)
+                        }
                         
                     }
                     
                     // read sensorState
+                    guard value.count > 17 else {
+                        trace("    getPatchInfoResponse too short (no state byte)", log: log, category: ConstantsLog.categoryBlucon, type: .error)
+                        return
+                    }
+                    
                     let sensorState = LibreSensorState(stateByte: value[17])
                     
                     // if sensor is ready then send Ack, otherwise send sleep
@@ -372,8 +423,13 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                         
                     }
                     
-                    // inform cGMTransmitterDelegate about sensorSerialNumber and sensorState
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: nil, sensorAge: nil)
+                    // inform cGMTransmitterDelegate about sensorSerialNumber and sensorState (on main)
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        let empty = self.emptyArray
+                        var copy = empty
+                        self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: nil)
+                    }
                     
                     return
                     
@@ -408,10 +464,13 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                     if valueAsString.startsWith(unknownCommand2BatteryLowIndicator) {
                         
                         // this is considered as battery level 5%
-                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 5),  sensorAge: nil)
-                        
-                        cGMBluconTransmitterDelegate?.received(batteryLevel: 5, from: self)
-
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else { return }
+                            let empty = self.emptyArray
+                            var copy = empty
+                            self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 5),  sensorAge: nil)
+                            self.cGMBluconTransmitterDelegate?.received(batteryLevel: 5, from: self)
+                        }
                         
                     }
                     
@@ -493,8 +552,12 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                         let glucoseValue = nowGetGlucoseValue(input: value)
                         
                         let glucoseData = GlucoseData(timeStamp: Date(), glucoseLevelRaw: glucoseValue)
-                        var glucoseDataArray = [glucoseData]
-                        cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: nil,  sensorAge: nil)
+                        let glucoseDataArray = [glucoseData]
+                        DispatchQueue.main.async { [weak self] in
+                            guard let self = self else { return }
+                            var copy = glucoseDataArray
+                            self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil,  sensorAge: nil)
+                        }
 
                         sendCommandToBlucon(opcode: .sleep)
                         
@@ -503,16 +566,24 @@ class CGMBluconTransmitter: BluetoothTransmitter {
                 case .bluconBatteryLowIndication1:
                     
                     // this is considered as battery level 3%
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 3), sensorAge: nil)
-                    
-                    cGMBluconTransmitterDelegate?.received(batteryLevel: 3, from: self)
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        let empty = self.emptyArray
+                        var copy = empty
+                        self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 3), sensorAge: nil)
+                        self.cGMBluconTransmitterDelegate?.received(batteryLevel: 3, from: self)
+                    }
 
                 case .bluconBatteryLowIndication2:
                     
                     // this is considered as battery level 2%
-                    cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &emptyArray, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 2), sensorAge: nil)
-                    
-                    cGMBluconTransmitterDelegate?.received(batteryLevel: 2, from: self)
+                    DispatchQueue.main.async { [weak self] in
+                        guard let self = self else { return }
+                        let empty = self.emptyArray
+                        var copy = empty
+                        self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: TransmitterBatteryInfo.percentage(percentage: 2), sensorAge: nil)
+                        self.cGMBluconTransmitterDelegate?.received(batteryLevel: 2, from: self)
+                    }
                     
                 }
                 

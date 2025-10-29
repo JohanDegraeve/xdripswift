@@ -2,7 +2,8 @@ import Foundation
 import os
 import CoreBluetooth
 
-class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
+@objcMembers
+class CGMBlueReaderTransmitter: BluetoothTransmitter, CGMTransmitter {
     
     // MARK: - properties
     
@@ -112,14 +113,38 @@ class CGMBlueReaderTransmitter:BluetoothTransmitter, CGMTransmitter {
             //    transMitterBatteryInfo = TransmitterBatteryInfo.percentage(percentage: batteryLevelAsInt)
             //}
             
-            // send to delegate
-            var glucoseDataArray = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: rawDataAsDouble)]
-            cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &glucoseDataArray, transmitterBatteryInfo: transMitterBatteryInfo, sensorAge: nil)
+            // send to delegate (UI/Core Data) on main thread
+            let glucoseDataArray = [GlucoseData(timeStamp: Date(), glucoseLevelRaw: rawDataAsDouble)]
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                var copy = glucoseDataArray
+                self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: transMitterBatteryInfo, sensorAge: nil)
+            }
             
         } else {
             trace("    value is nil, no further processing", log: log, category: ConstantsLog.categoryCGMBlueReader, type: .error)
         }
         
+    }
+
+    override func prepareForRelease() {
+        // Clear base CB delegates + unsubscribe common receiveCharacteristic synchronously on main
+        super.prepareForRelease()
+        // BlueReader-specific: clear state synchronously
+        let tearDown = {
+            self.emptyArray.removeAll()
+            self.nonFixedSlopeEnabled = false
+        }
+        if Thread.isMainThread {
+            tearDown()
+        } else {
+            DispatchQueue.main.sync(execute: tearDown)
+        }
+    }
+
+    deinit {
+        // Defensive: clear delegates already handled in base, just ensure emptyArray is cleared
+        emptyArray.removeAll()
     }
     
     // MARK: CGMTransmitter protocol functions
