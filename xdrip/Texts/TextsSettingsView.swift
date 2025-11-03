@@ -149,7 +149,7 @@ class Texts_SettingsView {
     }()
     
     static let labelFollowerDataSourceRegion: String = {
-        return NSLocalizedString("settingsviews_labelFollowerDataSourceRegion", tableName: filename, bundle: Bundle.main, value: "Server (Country)", comment: "data source settings, data source region")
+        return NSLocalizedString("settingsviews_labelFollowerDataSourceRegion", tableName: filename, bundle: Bundle.main, value: "Region", comment: "data source settings, data source server or account region")
     }()
     
     // this is a default text for the settings row and should never really be used as we'll
@@ -159,7 +159,7 @@ class Texts_SettingsView {
     }()
     
     static let enterUsername = {
-        return NSLocalizedString("settingsviews_enterUsername", tableName: filename, bundle: Bundle.main, value: "Enter your username (e-mail)", comment: "follower settings, pop up that asks user to enter their username")
+        return NSLocalizedString("settingsviews_enterUsername", tableName: filename, bundle: Bundle.main, value: "Enter your username", comment: "follower settings, pop up that asks user to enter their username")
     }()
     
     static let enterPassword = {

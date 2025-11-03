@@ -3224,7 +3224,6 @@ final class RootViewController: UIViewController, ObservableObject {
                 if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsLibreLinkUp.sensorWarmUpRequiredInMinutesForLibre * 60) {
                     dataSourceSensorMaxAgeOutlet.text = Texts_BluetoothPeripheralView.warmingUpUntil + " " + sensorReadyDateTime.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
                 }
-                
             } else if isMaster && sensorType == .Libre && sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutes {
                 // the connected Libre sensor is still in warm-up (as per defined minimum warm-up time)
                 if let sensorReadyDateTime = sensorStartDate?.addingTimeInterval(ConstantsMaster.minimumSensorWarmUpRequiredInMinutes * 60) {
@@ -3349,9 +3348,11 @@ final class RootViewController: UIViewController, ObservableObject {
                 if UserDefaults.standard.dexcomShareAccountName == nil || UserDefaults.standard.dexcomSharePassword == nil {
                     dataSourceSensorMaxAgeOutlet.textColor = .systemRed
                     dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.followerAccountCredentialsMissing
+                } else if UserDefaults.standard.dexcomShareRegion == .none {
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.followerAccountCredentialsInvalid
                 } else if let followerPatientName = UserDefaults.standard.followerPatientName {
                     dataSourceSensorMaxAgeOutlet.text = followerPatientName
-                    
                 }
             }
         }

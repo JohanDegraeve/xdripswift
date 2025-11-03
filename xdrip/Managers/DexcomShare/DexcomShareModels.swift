@@ -22,3 +22,47 @@ struct DexcomEGV: Codable {
 //    let Trend: Int
     let Value: Int
 }
+
+/// Dexcom Share server regions with descriptions and URLs
+enum DexcomShareRegion: Int, CaseIterable, Codable {
+    case none = 0
+    case us = 1
+    case global = 2
+    case jp = 3
+
+    var description: String {
+        switch self {
+        case .none:
+            return "None"
+        case .us:
+            return "US"
+        case .global:
+            return "Global"
+        case .jp:
+            return "Japan"
+        }
+    }
+
+    // https://github.com/LoopKit/dexcom-share-client-swift/blob/82a9179d444b3e79d5e9cfe99bbe7f298c4e8b40/ShareClient/ShareClient.swift#L30
+    var baseURL: URL {
+        switch self {
+        case .us:
+            return URL(string: ConstantsDexcomShare.usBaseShareUrl)!
+        case .jp:
+            return URL(string: ConstantsDexcomShare.japanBaseShareUrl)!
+        default:
+            return URL(string: ConstantsDexcomShare.globalBaseShareUrl)!
+        }
+    }
+    
+    // https://github.com/LoopKit/dexcom-share-client-swift/blob/82a9179d444b3e79d5e9cfe99bbe7f298c4e8b40/ShareClient/ShareClient.swift#L37
+    var applicationID: String {
+        switch self {
+        case .jp:
+            return ConstantsDexcomShare.applicationIdJapan
+        default:
+            // all other markets use the original Application ID
+            return ConstantsDexcomShare.applicationId
+        }
+    }
+}

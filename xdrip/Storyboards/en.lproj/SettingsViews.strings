@@ -24,8 +24,8 @@
 "settingsviews_followerPatientNameMessage" = "Here you can optionally write the name of the person you are following.";
 "settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
 "settingsviews_nightscoutNotEnabledRowText" = "Disabled";
-"settingsviews_labelFollowerDataSourceRegion" = "Server (Country)";
-"settingsviews_enterUsername" = "Enter your username (e-mail)";
+"settingsviews_labelFollowerDataSourceRegion" = "Region";
+"settingsviews_enterUsername" = "Enter your username";
 "settingsviews_enterPassword" = "Enter your password";
 "settingsviews_libreLinkUpReAcceptNeeded" = "Need to accept terms";
 "settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";

@@ -170,7 +170,7 @@
 "settingsviews_sectionTitleDataSource" = "CGM Data Source";
 
 /// follower settings, pop up that asks user to enter their username
-"settingsviews_enterUsername" = "Enter your username (e-mail)";
+"settingsviews_enterUsername" = "Enter your username";
 
 /// data source settings, show that Nightscout is disabled
 "settingsviews_nightscoutNotEnabledRowText" = "Disabled";
@@ -209,7 +209,7 @@
 "settingsviews_screenLockDimmingTypeDimmed" = "Dimmed";
 
 /// data source settings, data source region
-"settingsviews_labelFollowerDataSourceRegion" = "Server (Country)";
+"settingsviews_labelFollowerDataSourceRegion" = "Region";
 
 /// data source settings, data source
 "settingsviews_labelFollowerDataSourceType" = "Follower Data Source";
