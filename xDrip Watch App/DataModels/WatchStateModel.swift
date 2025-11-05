@@ -286,6 +286,11 @@ final class WatchStateModel: NSObject, ObservableObject {
     /// used to return values and colors used by a SwiftUI gauge view
     /// - Returns: minValue/maxValue - used to define the limits of the gauge. nilValue - used if there is currently no data present (basically puts the gauge at the 50% mark). gaugeGradient - the color ranges used
     func gaugeModel() -> (minValue: Double, maxValue: Double, nilValue: Double, gaugeGradient: Gradient) {
+        // if no readings are available yet, return a gray gradient
+        if bgValueInMgDl() == nil {
+            return (0, 1, 0.5, Gradient(colors: [.gray]))
+        }
+        
         // now we've got the values, if there is no recent reading, return a gray gradient
         if let bgReadingDate = bgReadingDate(), bgReadingDate < Date().addingTimeInterval(-60 * 7) {
             return (0, 1, 0.5, Gradient(colors: [.gray]))
@@ -556,12 +561,10 @@ extension WatchStateModel: WCSessionDelegate {
         }
     }
     
-//    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
     func session(_: WCSession, didReceiveUserInfo userInfo: [String: Any] = [:]) {
         let watchStateAsDictionary = userInfo["watchState"] as! [String: Any]
         DispatchQueue.main.async {
             self.processWatchStateFromDictionary(dictionary: watchStateAsDictionary)
         }
-//        }
     }
 }
