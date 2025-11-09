@@ -25,9 +25,9 @@ class BgReadingsAccessor: ObservableObject {
     public struct TransmitterReadSuccessWindowCounts {
         public let earliestTimestampInLast24h: Date?
         public let latestTimestampInLast24h: Date?
-        public let distinctCountLast6h: Int
-        public let distinctCountLast12h: Int
-        public let distinctCountLast24h: Int
+        public var distinctCountLast6h: Int
+        public var distinctCountLast12h: Int
+        public var distinctCountLast24h: Int
     }
 
 
@@ -214,6 +214,52 @@ class BgReadingsAccessor: ObservableObject {
         return returnValue
     }
     
+    /// Returns plain Date timestamps for readings in the last 24 hours up to endingAt.
+    /// Only readings with meaningful values are included (calculatedValue != 0.0 OR rawData != 0.0).
+    /// - Parameters:
+    ///   - forSensor: If not nil, restrict results to this sensor.
+    ///   - endingAt: The window end time; the window start is "endingAt - 24h".
+    /// - Returns: An array of timestamps sorted ascending. May be empty.
+    func getReadingTimestampsForLast24h(forSensor sensor: Sensor?, endingAt endDate: Date) -> [Date] {
+        var timestamps: [Date] = []
+        let twentyFourHoursBefore = endDate.addingTimeInterval(-24 * 3600)
+
+        coreDataManager.mainManagedObjectContext.performAndWait {
+            let fetchRequest: NSFetchRequest<BgReading> = BgReading.fetchRequest()
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BgReading.timeStamp), ascending: true)]
+            fetchRequest.returnsObjectsAsFaults = false
+            fetchRequest.includesPropertyValues = true
+            fetchRequest.fetchBatchSize = 512
+
+            var subpredicates: [NSPredicate] = []
+            // Meaningful values only
+            subpredicates.append(NSCompoundPredicate(orPredicateWithSubpredicates: [
+                NSPredicate(format: "calculatedValue != 0.0"),
+                NSPredicate(format: "rawData != 0.0")
+            ]))
+            // Time window
+            subpredicates.append(NSPredicate(format: "timeStamp >= %@ AND timeStamp <= %@", NSDate(timeIntervalSince1970: twentyFourHoursBefore.timeIntervalSince1970), NSDate(timeIntervalSince1970: endDate.timeIntervalSince1970)))
+            // Sensor filter if provided
+            if let sensorId = sensor?.id {
+                subpredicates.append(NSPredicate(format: "sensor.id == %@", sensorId as CVarArg))
+            }
+            fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: subpredicates)
+
+            do {
+                let results = try fetchRequest.execute()
+                timestamps.reserveCapacity(results.count)
+                for reading in results {
+                    timestamps.append(reading.timeStamp)
+                }
+            } catch {
+                let fetchError = error as NSError
+                trace("in getReadingTimestampsForLast24h, fetch error: %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, fetchError.localizedDescription)
+            }
+        }
+
+        return timestamps
+    }
+
     /// gets last reading, ignores rawData and calculatedValue
     /// - parameters:
     ///     - sensor: sensor for which reading is asked, if nil then sensor value is ignored

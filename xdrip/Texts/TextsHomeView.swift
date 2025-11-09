@@ -240,7 +240,7 @@ enum Texts_HomeView {
     }()
     
     static let followerAccountCredentialsInvalid: String = {
-        return NSLocalizedString("followerAccountCredentialsInvalid", tableName: filename, bundle: Bundle.main, value: "Invalid User/Password", comment: "username and/or password is invalid")
+        return NSLocalizedString("followerAccountCredentialsInvalid", tableName: filename, bundle: Bundle.main, value: "Invalid Account", comment: "username and/or password is invalid")
     }()
     
     static let showHideItemsTitle: String = {
