@@ -37,7 +37,7 @@ fileprivate enum Setting: Int, CaseIterable {
     
     /// - Follower
     ///  - LibreLinkUp: followerSensorSerialNumber (web follower sensor serial number - will not always be available)
-    ///  - Follower Dexcom Share: Use US servers
+    ///  - Follower Dexcom Share: Dexcom Share Region as detected (or error message)
     case followerExtraRow8 = 8
     
     /// - Follower
@@ -169,41 +169,29 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             if UserDefaults.standard.isMaster {
                 return UserDefaults.standard.nightscoutEnabled ? .nothing : SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.nightscoutNotEnabled)
             } else {
-                // in Follower mode, data to be displayed in list from which user needs to pick a follower data source
-                var data = [String]()
-                var selectedRow: Int?
-                var index = 0
+                // Build list from the enabled cases only. This allows for ignored follower types
+                let enabled = FollowerDataSourceType.allEnabledCases
+                let data = enabled.map { $0.description }
                 let currentFollowerDataSourceType = UserDefaults.standard.followerDataSourceType
-                
-                // get all data source types and add the description to data. Search for the type that matches the FollowerDataSourceType that is currently stored in userdefaults.
-                for dataSourceType in FollowerDataSourceType.allCases {
-                    data.append(dataSourceType.description)
-                    
-                    if dataSourceType == currentFollowerDataSourceType {
-                        selectedRow = index
-                    }
-                    
-                    index += 1
-                }
+                let selectedRow = enabled.firstIndex(of: currentFollowerDataSourceType)
                 
                 return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.labelFollowerDataSourceType, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: { (index: Int) in
+                    let enabled = FollowerDataSourceType.allEnabledCases
+                    // Safety: ensure index is valid
+                    guard index >= 0, index < enabled.count else { return }
                     
-                    // we'll set this here so that we can use it in the else statement for logging
                     let oldFollowerDataSourceType = UserDefaults.standard.followerDataSourceType
+                    let newFollowerDataSourceType = enabled[index]
                     
-                    if index != selectedRow {
-                        UserDefaults.standard.followerDataSourceType = FollowerDataSourceType(rawValue: index) ?? .nightscout
-                        
-                        let newFollowerDataSourceType = UserDefaults.standard.followerDataSourceType
+                    if newFollowerDataSourceType != oldFollowerDataSourceType {
+                        UserDefaults.standard.followerDataSourceType = newFollowerDataSourceType
                         
                         trace("follower source data type was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, oldFollowerDataSourceType.description, newFollowerDataSourceType.description)
                         
-                        if newFollowerDataSourceType == .dexcomShare {
-                            // make sure we disable dexcom share upload if we are using the share follow option
-                            if UserDefaults.standard.uploadReadingstoDexcomShare {
-                                self.callMessageHandlerInMainThread(title: FollowerDataSourceType.dexcomShare.fullDescription, message: Texts_SettingsView.warningChangeToFollowerDexcomShare)
-                                UserDefaults.standard.uploadReadingstoDexcomShare = false
-                            }
+                        // make sure we disable dexcom share upload if we are using the share follow option
+                        if newFollowerDataSourceType == .dexcomShare && UserDefaults.standard.uploadReadingstoDexcomShare {
+                            self.callMessageHandlerInMainThread(title: FollowerDataSourceType.dexcomShare.fullDescription, message: Texts_SettingsView.warningChangeToFollowerDexcomShare)
+                            UserDefaults.standard.uploadReadingstoDexcomShare = false
                         }
                     }
                     
@@ -397,7 +385,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .followerExtraRow8:
             switch UserDefaults.standard.followerDataSourceType {
             case .dexcomShare:
-                return Texts_SettingsView.labelUseUSDexcomShareurl
+                return Texts_SettingsView.labelFollowerDataSourceRegion
             default:
                 return Texts_HomeView.sensor
             }
@@ -493,6 +481,16 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                         return "⚠️ " + Texts_SettingsView.libreLinkUpNoActiveSensor
                     }
                 }
+            case .dexcomShare:
+                if UserDefaults.standard.dexcomShareAccountName == nil || UserDefaults.standard.dexcomSharePassword == nil {
+                    return "-"
+                } else if UserDefaults.standard.dexcomShareRegion == .none && UserDefaults.standard.dexcomShareLoginFailedTimestamp != nil {
+                    return "⚠️ " + Texts_HomeView.followerAccountCredentialsInvalid
+                } else if UserDefaults.standard.dexcomShareRegion == .none {
+                    return "Checking..."
+                } else {
+                    return UserDefaults.standard.dexcomShareRegion.description + " ✅"
+                }
                 
             default:
                 return nil
@@ -534,7 +532,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                         returnString += " (" + country + ")"
                     }
                     
-                    return returnString
+                    return returnString + " ✅"
                 } else {
                     return "-"
                 }
@@ -571,9 +569,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             
         case .followerExtraRow8:
             switch UserDefaults.standard.followerDataSourceType {
-            case .dexcomShare:
-                return UISwitch(isOn: UserDefaults.standard.useUSDexcomShareurl, action: { (isOn: Bool) in
-                    UserDefaults.standard.useUSDexcomShareurl = isOn } )
+//            case .dexcomShare:
+//                return UISwitch(isOn: UserDefaults.standard.useUSDexcomShareurl, action: { (isOn: Bool) in
+//                    UserDefaults.standard.useUSDexcomShareurl = isOn } )
             default:
                 return nil
             }
@@ -624,6 +622,12 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
     private func addObservers() {
         // Listen for changes in the active sensor value to trigger the UI to be updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.activeSensorSerialNumber.rawValue, options: .new, context: nil)
+        
+        // Listen for changes in the detected dexcom server region to trigger the UI to be updated
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomShareRegion.rawValue, options: .new, context: nil)
+        
+        // Listen for changes in the login status to trigger the UI to be updated
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomShareLoginFailedTimestamp.rawValue, options: .new, context: nil)
     }
     
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
@@ -632,7 +636,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         else { return }
         
         switch keyPathEnum {
-        case UserDefaults.Key.activeSensorSerialNumber:
+        case UserDefaults.Key.activeSensorSerialNumber, UserDefaults.Key.dexcomShareRegion, UserDefaults.Key.dexcomShareLoginFailedTimestamp:
             // we have to run this in the main thread to avoid access errors
             DispatchQueue.main.async {
                 self.sectionReloadClosure?()

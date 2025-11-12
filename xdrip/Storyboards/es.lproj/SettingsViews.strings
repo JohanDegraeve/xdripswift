@@ -21,7 +21,7 @@
 "settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
 "settingsviews_nightscoutNotEnabledRowText" = "Deshabilitado";
 "settingsviews_labelFollowerDataSourceRegion" = "Servidor (País)";
-"settingsviews_enterUsername" = "Entrar tu usuario (e-mail)";
+"settingsviews_enterUsername" = "Entrar tu usuario";
 "settingsviews_enterPassword" = "Entrar tu contraseña";
 "settingsviews_libreLinkUpReAcceptNeeded" = "Aceptar terminos";
 "settingsviews_libreLinkUpNoActiveSensor" = "Sin datos de sensor activo";

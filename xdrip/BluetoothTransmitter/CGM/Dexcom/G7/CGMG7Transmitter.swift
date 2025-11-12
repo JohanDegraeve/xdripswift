@@ -86,7 +86,8 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     /// Rolling connection id for log correlation (increments on each didConnect)
     private var cycleId: Int = 0
 
-    
+    /// Tracks the name of the authenticated transmitter while a valid coexistence session is active
+    private var currentlyAuthenticatedDeviceName: String?
     
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
@@ -110,6 +111,12 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
 
     // MARK: - public functions
+
+    // Helper to check whether we are discovering a brand-new device
+    // (set when initializer used .notYetConnected(expectedName: ...))
+    var isNewDeviceDiscovery: Bool {
+        return deviceName == nil
+    }
     
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
@@ -168,8 +175,24 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
     // MARK: - BluetoothTransmitter overriden functions
 
+    // Intercept BluetoothTransmitter's discovery logic to avoid auto-connecting the previous transmitter in new-device discovery mode.
+    override func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+        trace("Did discover peripheral with name: %{public}@", log: self.log, category: ConstantsLog.categoryCGMG7, type: .info, peripheral.name ?? "nil")
+        // New-device flow: never connect to the *previously active* transmitter.
+        // This prevents immediately latching onto DXCMx5 and allows the scan to find the *new* DXCMxx.
+        if self.isNewDeviceDiscovery, let activeId = UserDefaults.standard.activeSensorTransmitterId, let discoveredName = peripheral.name, discoveredName == activeId {
+            trace("    skipping previous active transmitter (%{public}@) during new device discovery, keep scanning for the new sensor.", log: self.log, category: ConstantsLog.categoryCGMG7, type: .info, activeId)
+            return
+        }
+        // Call super to retain normal discovery/connect behavior for all other cases
+        super.centralManager(central, didDiscover: peripheral, advertisementData: advertisementData, rssi: RSSI)
+    }
+
     override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
+
+        // Clear authenticated session tracking on disconnect
+        self.currentlyAuthenticatedDeviceName = nil
 
         // Ensure any queued raw backfill frames are parsed before flushing
         processPendingBackfillFramesIfPossible()
@@ -407,9 +430,10 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                 if authChallengeRxMessage.paired, authChallengeRxMessage.authenticated {
 
                     trace("    connected to Dexcom G7/ONE+ that is paired and authenticated by other app. Will stay connected to this one.", log: log, category: ConstantsLog.categoryCGMG7, type: .info )
+                    self.currentlyAuthenticatedDeviceName = self.deviceName
                     
-                    // Set active transmitter id only once we have a paired & authenticated link to avoid pinning to a nearby stale transmitter
-                    if UserDefaults.standard.activeSensorTransmitterId == nil, let authenticatedDeviceName = self.deviceName, authenticatedDeviceName.hasPrefix("DX") {
+                    // when paired && authenticated:
+                    if let authenticatedDeviceName = self.deviceName, authenticatedDeviceName.hasPrefix("DX"), UserDefaults.standard.activeSensorTransmitterId != authenticatedDeviceName {
                         UserDefaults.standard.activeSensorTransmitterId = authenticatedDeviceName
                         trace("    active transmitter id set after authentication: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, authenticatedDeviceName)
                     }
@@ -573,6 +597,13 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         // In coexistence (G7/ONE+/Stelo) never blacklist/forget on transient authentication states.
         // Returning false prevents forget+rescan loops on brand-new sensors during first contact and avoids pinning to the wrong nearby transmitter.
         return false
+    }
+
+    /// Returns true only if we are currently authenticated with the active transmitter id kept in UserDefaults
+    private func isCurrentlyConnectedToActiveTransmitter() -> Bool {
+        guard let activeId = UserDefaults.standard.activeSensorTransmitterId,
+              let current = currentlyAuthenticatedDeviceName else { return false }
+        return current == activeId
     }
     
     // DEBUG

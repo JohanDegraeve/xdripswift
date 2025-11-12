@@ -8,7 +8,28 @@
 
 import Foundation
 
-/// data source types such as nightscout, librelink, carelink, dexcom share etc...
+/// To hide/ignore follower types at runtime, provide a key in the override file using rawValues in an array:
+/// IGNORE_FOLLOWER_TYPES = [1,2]
+
+/// Resolved disabled set (Info.plist wins, falls back to default, i.e. nothing ignored)
+private var disabledFollowerDataSources: Set<FollowerDataSourceType> {
+    let followerTypeArray = parseIgnoredFollowerTypes()
+    return !followerTypeArray.isEmpty ? followerTypeArray : []
+}
+
+/// Read IgnoreFollowerTypes from Info.plist. Expects a JSON array of integer raw values (e.g. [1,3]).
+private func parseIgnoredFollowerTypes() -> Set<FollowerDataSourceType> {
+    guard let raw = Bundle.main.object(forInfoDictionaryKey: "IgnoreFollowerTypes") as? String,
+          !raw.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty,
+          let data = raw.data(using: .utf8),
+          let ints = try? JSONDecoder().decode([Int].self, from: data) else {
+        return []
+    }
+    // ensure that Nightscout cannot be disabled ever - we need to have one fallback FollowerDataSourceType
+    return Set(ints.compactMap { FollowerDataSourceType(rawValue: $0) }).filter { $0 != .nightscout }
+}
+
+/// Note: Use FollowerDataSourceType.allEnabledCases to respect disabled sources when presenting choices in the picker list.
 public enum FollowerDataSourceType: Int, CaseIterable {
     
     // when adding followerDataSourceTypes, add new cases at the end (ie 3, ...)
@@ -19,18 +40,24 @@ public enum FollowerDataSourceType: Int, CaseIterable {
     case libreLinkUp = 1
     case libreLinkUpRussia = 2
     case dexcomShare = 3
+
+    /// All cases filtered to those currently enabled. Prefer this over 'allCases' when populating UI.
+    static var allEnabledCases: [FollowerDataSourceType] {
+        Self.allCases.filter { $0.isEnabled }
+    }
     
-    public var rawValue: Int {
-        switch self {
-        case .nightscout:
-            return 0
-        case .libreLinkUp:
-            return 1
-        case .libreLinkUpRussia:
-            return 2
-        case .dexcomShare:
-            return 3
+    /// Validate a stored selection against current enabled cases. If invalid, return the first enabled case
+    /// or fall back to the first declared case.
+    static func validatedSelection(storedRawValue: Int?) -> FollowerDataSourceType {
+        if let raw = storedRawValue, let type = FollowerDataSourceType(rawValue: raw), type.isEnabled {
+            return type
         }
+        return Self.allEnabledCases.first ?? Self.allCases.first!
+    }
+    
+    /// Whether this data source is enabled for use (controlled by disabledFollowerDataSources).
+    var isEnabled: Bool {
+        !disabledFollowerDataSources.contains(self)
     }
     
     var description: String {
@@ -96,7 +123,6 @@ public enum FollowerDataSourceType: Int, CaseIterable {
     /// description of the follower mode to be used for logging
     func descriptionForLogging() -> String {
         switch self {
-            
         case .nightscout:
             return "Nightscout Follower"
         case .libreLinkUp:
