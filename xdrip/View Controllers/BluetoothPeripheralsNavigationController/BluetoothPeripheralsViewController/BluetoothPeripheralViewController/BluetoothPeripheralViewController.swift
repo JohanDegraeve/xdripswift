@@ -826,20 +826,20 @@ class BluetoothPeripheralViewController: UIViewController {
             transmitterIdTitleText = Texts_SettingsView.labelBluetoothDeviceName
             transmitterIdMessageText = Texts_SettingsView.heartbeatLibreMessage
             placeHolder = "000000000000"
-        case .DexcomG7HeartBeatType:
-            transmitterIdTitleText = Texts_SettingsView.labelBluetoothDeviceName
-            transmitterIdMessageText = Texts_SettingsView.heartbeatG7Message
-            placeHolder = "DXCM00"
+        case .DexcomG7Type, .DexcomG7HeartBeatType:
+            transmitterIdTitleText = ""
+            transmitterIdMessageText = Texts_SettingsView.dexcomG7Message
+            placeHolder = "DX0000"
         default:
             break
         }
         
-        SettingsViewUtilities.runSelectedRowAction(selectedRowAction: SettingsSelectedRowAction.askText(title: transmitterIdTitleText, message: transmitterIdMessageText, keyboardType: UIKeyboardType.alphabet, text: transmitterIdTempValue, placeHolder: placeHolder, actionTitle: nil, cancelTitle: nil, actionHandler: { (transmitterId: String) in
+        SettingsViewUtilities.runSelectedRowAction(selectedRowAction: SettingsSelectedRowAction.askText(title: (transmitterIdTitleText == "" ? nil : transmitterIdTitleText), message: transmitterIdMessageText, keyboardType: UIKeyboardType.alphabet, text: transmitterIdTempValue, placeHolder: placeHolder, actionTitle: nil, cancelTitle: nil, actionHandler: { (transmitterId: String) in
             
             // convert to uppercase
             let transmitterIdUpper = transmitterId.uppercased().toNilIfLength0()
             
-            self.transmitterIdTempValue = transmitterIdUpper
+            self.transmitterIdTempValue = transmitterIdUpper ?? ConstantsBluetoothPairing.dummyDexcomG7TypeTransmitterId
             
             // reload the specific row in the table - this will always be extraRow4 for the transmitter ID
             self.tableView.reloadRows(at: [IndexPath(row: Setting.transmitterExtraRow4.rawValue, section: 0)], with: .none)
@@ -1344,7 +1344,7 @@ extension BluetoothPeripheralViewController: UITableViewDataSource, UITableViewD
                 if expectedBluetoothPeripheralType.needsTransmitterId() {
                     // if we need to show the transmitter ID, set it up
                     cell.textLabel?.text = Texts_SettingsView.labelTransmitterId
-                    cell.detailTextLabel?.text = transmitterIdTempValue
+                    cell.detailTextLabel?.text = (transmitterIdTempValue == ConstantsBluetoothPairing.dummyDexcomG7TypeTransmitterId || transmitterIdTempValue == "DX") ? "Automatic" : transmitterIdTempValue
                     
                     // if transmitterId already has a value, then it can't be changed anymore. To change it, user must delete the transmitter and recreate one.
                     cell.accessoryType = transmitterIdTempValue == nil ? .disclosureIndicator : .none
