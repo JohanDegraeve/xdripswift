@@ -1029,7 +1029,7 @@ final class RootViewController: UIViewController, ObservableObject {
         ApplicationManager.shared.addClosureToRunWhenAppWillTerminate(key: applicationManagerKeyTraceAppWillTerminate, closure: {
             
             // force the live activity to end if it exists to prevent it becoming "orphaned" and unclosable by the app
-            LiveActivityManager.shared.endAllActivities()
+            Task { await LiveActivityManager.shared.endAllActivities() }
             
             trace("Application will terminate - it has probably been force-closed by the user", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
@@ -3672,9 +3672,9 @@ final class RootViewController: UIViewController, ObservableObject {
                     // create the contentState that will update the dynamic attributes of the Live Activity Widget
                     let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: UserDefaults.standard.liveActivityType, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, deviceStatusCreatedAt: deviceStatusCreatedAt, deviceStatusLastLoopDate: deviceStatusLastLoopDate)
                     
-                    LiveActivityManager.shared.runActivity(contentState: contentState, forceRestart: forceRestart)
+                    Task { LiveActivityManager.shared.update(contentState: contentState, forceRestart: forceRestart) }
                 } else {
-                    LiveActivityManager.shared.endAllActivities()
+                    Task { await LiveActivityManager.shared.endAllActivities() }
                 }
                 
                 // update the widget data stored in user defaults
@@ -3690,7 +3690,7 @@ final class RootViewController: UIViewController, ObservableObject {
                     UserDefaults.storeInSharedUserDefaults(value: widgetData, forKey: "widgetSharedUserDefaults.\(Bundle.main.mainAppBundleIdentifier)")
                 }
             } else {
-                LiveActivityManager.shared.endAllActivities()
+                Task { await LiveActivityManager.shared.endAllActivities() }
             }
             WidgetCenter.shared.reloadAllTimelines()
         }
