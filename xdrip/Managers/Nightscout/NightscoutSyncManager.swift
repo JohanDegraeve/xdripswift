@@ -62,6 +62,14 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// temp storate uploader battery level, if changed then upload to Nightscout will be done
     private var latestUploaderBatteryLevel: Float?
     
+    /// timestamp of the last actual sync (for global throttling)
+    private var lastActualSyncTime: Date? = nil
+    
+    // Relaunch debouncing to avoid multiple immediate sync restarts
+    private var relaunchScheduled: Bool = false
+    private var lastRelaunchAt: Date = .distantPast
+    private let relaunchDebounceInterval: TimeInterval = 1.0
+    
     /// - when was the sync of treatments with Nightscout started.
     /// - if nil then there's no sync running
     /// - if not nil then the value tells when nightscout sync was started, without having finished (otherwise it should be nil)
@@ -285,9 +293,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         guard UserDefaults.standard.nightscoutSyncRequired else { return }
                         
                         UserDefaults.standard.nightscoutSyncRequired = false
-                        
+                        // Debounce and coalesce relaunch requests
                         DispatchQueue.main.async { [weak self] in
-                            self?.syncWithNightscout()
+                            self?.scheduleNightscoutSyncRelaunch()
                         }
                     }
                     
@@ -310,6 +318,14 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     /// synchronize all treatments and other information with Nightscout
     private func syncWithNightscout() {
+        // Global throttle: do not allow sync more often than the minimum interval
+        if let last = lastActualSyncTime, Date().timeIntervalSince(last) < ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+            return
+        }
+        
+        // Only update lastActualSyncTime after a real sync is about to start
+        lastActualSyncTime = Date()
+        
         // Ensure Core Data main-context objects are always accessed on the main thread
         if !Thread.isMainThread {
             DispatchQueue.main.async { [weak self] in
@@ -325,15 +341,12 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         
         updateDeviceStatus()
         
-        // no sync needed if app is running in the background
-        // guard UserDefaults.standard.appInForeGround else {return}
-        
         // if sync already running, then set nightscoutSyncRequired to true
         // sync is running already, once stopped it will rerun
         if let nightscoutSyncStartTimeStamp = nightscoutSyncStartTimeStamp {
             if Date().timeIntervalSince(nightscoutSyncStartTimeStamp) < maxDurationNightscoutSync {
-                trace("in syncWithNightscout but previous sync still running. Sync will be started after finishing the previous sync", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
-                
+                // Coalesce multiple relaunch requests within same active sync window
+                trace("in syncWithNightscout but previous sync still running. Marking required=true for coalesced relaunch", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug)
                 nightscoutSyncRequired = true
                 
                 return
@@ -457,10 +470,11 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                                         if self.nightscoutSyncRequired {
                                             // set to false to avoid it starts again after having restarted it (unless off course it's set to true in another place by the time the sync has finished
                                             self.nightscoutSyncRequired = false
-                                            
-                                            trace("relaunching nightscoutsync", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug)
-                                            
-                                            self.syncWithNightscout()
+                                            // Schedule relaunch on main after short delay to avoid immediate recursion and allow UI/main-thread breathing room
+                                            trace("relaunching nightscoutsync (coalesced)", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug)
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+                                                self?.syncWithNightscout()
+                                            }
                                         }
                                     }
                                 }
@@ -481,6 +495,24 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 UserDefaults.standard.nightscoutSyncRequired = false
             }
         }
+    }
+    
+    /// Schedules a Nightscout sync relaunch respecting debounce interval.
+    private func scheduleNightscoutSyncRelaunch() {
+        // If a relaunch is already scheduled or we've relaunched very recently, skip.
+        if relaunchScheduled || Date().timeIntervalSince(lastRelaunchAt) < relaunchDebounceInterval {
+            trace("scheduleNightscoutSyncRelaunch: skipping (scheduled=%{public}@, sinceLast=%{public}@s)", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, relaunchScheduled.description, String(format: "%.2f", Date().timeIntervalSince(lastRelaunchAt)))
+            return
+        }
+        relaunchScheduled = true
+        let workItem = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+            self.relaunchScheduled = false
+            self.lastRelaunchAt = Date()
+            trace("scheduleNightscoutSyncRelaunch: performing relaunch", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug)
+            self.syncWithNightscout()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: workItem)
     }
     
     /// check if a new profile update is required, see if the downloaded response is newer than the stored one and then import it if necessary
@@ -657,11 +689,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 trace("    data is nil", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error)
                 completionHandler(.failed)
                 return
-            }
-            
-            // trace data to upload as string in debug  mode
-            if let dataAsString = String(bytes: data, encoding: .utf8) {
-                trace("    data : %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, dataAsString)
             }
             
             do {
