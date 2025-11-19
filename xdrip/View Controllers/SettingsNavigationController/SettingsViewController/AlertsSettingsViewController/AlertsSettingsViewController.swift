@@ -1,14 +1,14 @@
 import UIKit
 
-final class AlertsSettingsViewController: UIViewController {
+// MARK: - AlertsSettingsViewController
 
-    // MARK: - Properties
+final class AlertsSettingsViewController: UIViewController {
+    // MARK: - Outlets and Actions
     
     @IBOutlet weak var tableView: UITableView!
  
     // unwind segue, from AlertSettingsViewController to AlertsSettingsViewController
     @IBAction func unwindToAlertsSettingsViewController(segue: UIStoryboardSegue) {
-        
         // for in case an alertEntry got deleted, reinitialize alertEntriesPerAlertKind - otherwise alertEntriesPerAlertKind would have an empty value and an empty row would be shown
         resetAlertEntriesPerAlertKind()
         
@@ -17,9 +17,11 @@ final class AlertsSettingsViewController: UIViewController {
             toDoWhenUnwinding()
         }
     }
+    
+    // MARK: - Private properties
 
     // reference to coreDataManager
-    private var coreDataManager:CoreDataManager?
+    private var coreDataManager: CoreDataManager?
     
     /// to read alertEntries from coredata manager
     private lazy var alertEntriesAccessor:AlertEntriesAccessor = {
@@ -31,12 +33,10 @@ final class AlertsSettingsViewController: UIViewController {
     }()
     
     /// all alertEntries, one array of alertEntries per alertKind
-    private lazy var alertEntriesPerAlertKind:[[AlertEntry]] = {
-        return alertEntriesAccessor.getAllEntriesPerAlertKind(alertTypesAccessor: alertTypesAccessor)
-    }()
+    private lazy var alertEntriesPerAlertKind: [[AlertEntry]] = alertEntriesAccessor.getAllEntriesPerAlertKind(alertTypesAccessor: alertTypesAccessor)
     
     /// reset alertEntriesPerAlertKind
-    private func resetAlertEntriesPerAlertKind()  {
+    private func resetAlertEntriesPerAlertKind() {
         alertEntriesPerAlertKind = alertEntriesAccessor.getAllEntriesPerAlertKind(alertTypesAccessor: alertTypesAccessor)
     }
     
@@ -47,7 +47,7 @@ final class AlertsSettingsViewController: UIViewController {
     
     // MARK: - Public functions
     
-    public func configure(coreDataManager:CoreDataManager?) {
+    public func configure(coreDataManager: CoreDataManager?) {
         self.coreDataManager = coreDataManager
     }
 
@@ -72,30 +72,29 @@ final class AlertsSettingsViewController: UIViewController {
         }
         
         switch segueIdentifierAsCase {
-            
         case AlertSettingsViewController.SegueIdentifiers.alertsToAlertSettings:
-            guard let vc = segue.destination as? AlertSettingsViewController, let (section, row) = sender as? (Int,Int), let coreDataManager = coreDataManager else {
-                fatalError("In AlertsSettingsViewController, prepare for segue, viewcontroller is not AlertSettingsViewController or sender is not (Int,Int)) or coreDataManager is nil" )
+            guard let vc = segue.destination as? AlertSettingsViewController, let (section, row) = sender as? (Int, Int), let coreDataManager = coreDataManager else {
+                fatalError("In AlertsSettingsViewController, prepare for segue, viewcontroller is not AlertSettingsViewController or sender is not (Int,Int)) or coreDataManager is nil")
             }
             
             // function to run when unwinding from AlertSettingsViewController tp AlertsSettingsViewController occurs
-            toDoWhenUnwinding = {self.tableView.reloadSections(IndexSet(integer: section), with: .none)}
+            toDoWhenUnwinding = { self.tableView.reloadSections(IndexSet(integer: section), with: .none) }
             
             // do the mapping for section number. The sections in the view are ordered differently than the cases in AlertKind.
             let mappedSectionNumber = AlertKind.alertKindRawValue(forSection: section)
             
             // minimumStart should be 1 minute higher than start of previous row, except if this is the first row, then minimumStart is 0
-            var minimumStart:Int16 = 0
-            if row > 0 {minimumStart = alertEntriesPerAlertKind[mappedSectionNumber][row - 1].start + 1}
+            var minimumStart: Int16 = 0
+            if row > 0 { minimumStart = alertEntriesPerAlertKind[mappedSectionNumber][row - 1].start + 1 }
             
             // maximumStart is start of next row - 1 minute, except if this is the last row
-            var maximumStart:Int16 = 24 * 60 - 1
+            var maximumStart: Int16 = 24 * 60 - 1
             if row < alertEntriesPerAlertKind[mappedSectionNumber].count - 1 {
                 maximumStart = alertEntriesPerAlertKind[mappedSectionNumber][row + 1].start - 1
             }
             
             // configure view controller
-            vc.configure(alertEntry: alertEntriesPerAlertKind[mappedSectionNumber][row], minimumStart: minimumStart, maximumStart: maximumStart, coreDataManager: coreDataManager )
+            vc.configure(alertEntry: alertEntriesPerAlertKind[mappedSectionNumber][row], minimumStart: minimumStart, maximumStart: maximumStart, coreDataManager: coreDataManager)
         default:
             // shouldn't happen because we're in alertssettings view here
             break
@@ -127,25 +126,27 @@ final class AlertsSettingsViewController: UIViewController {
             tableView.delegate = self
         }
     }
-    
 }
 
-extension AlertsSettingsViewController:UITableViewDataSource, UITableViewDelegate {
-    
+// MARK: UITableViewDataSource, UITableViewDelegate
+
+extension AlertsSettingsViewController: UITableViewDataSource, UITableViewDelegate {
     // MARK: - UITableViewDataSource and UITableViewDelegate protocol Methods
     
     func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        
         if let view = view as? UITableViewHeaderFooterView {
-            
             view.textLabel?.textColor = ConstantsUI.tableViewHeaderTextColor
-            
         }
-        
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return alertEntriesPerAlertKind[AlertKind.alertKindRawValue(forSection: section)].count
+        let alertEntries = alertEntriesPerAlertKind[AlertKind.alertKindRawValue(forSection: section)]
+        
+        if let firstEntry = alertEntries.first, firstEntry.isDisabled {
+            return 1
+        }
+        
+        return alertEntries.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -158,35 +159,49 @@ extension AlertsSettingsViewController:UITableViewDataSource, UITableViewDelegat
         
         // get the alertEntry
         let alertEntry = alertEntriesPerAlertKind[alertKind.rawValue][indexPath.row]
-
-        // get alertValue as Double
-        let alertValue = alertEntry.value
-        
-        // start creating the textLabel, start with start time in user's locale and region format
-        var textLabelToUse = (Int(alertEntry.start)).convertMinutesToTimeAsString()
-        
-        // add a space
-        textLabelToUse = textLabelToUse + "   "
-        
-        // do we add the alert value or not ?
-        //   - is the alerttype enabled ? If it's not no need to show the value (it was like that in iosxdrip, seems a good approach)
-        //   - does the alert type need a value ? at the moment al do, iphone muted alert (not present) yet would need it
-        if alertKind.needsAlertValue() && alertEntry.alertType.enabled {
-            // only bg level alerts would need conversion
-            if alertKind.valueNeedsConversionToMmol() {
-                textLabelToUse = textLabelToUse + Double(alertValue).mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-            } else {
-                textLabelToUse = textLabelToUse + alertValue.description
+                
+        if !alertEntry.isDisabled {
+            let alertValue = alertEntry.value
+            let alertTriggerValue = alertEntry.triggerValue
+            
+            // start creating the textLabel, start with start time in user's locale and region format
+            var textLabelToUse = Int(alertEntry.start).convertMinutesToTimeAsString()
+            
+            // add a space
+            textLabelToUse += " \u{00B7} " // use a 'mid-dot' as a separator
+            
+            // do we add the alert value or not ?
+            //   - is the alerttype enabled ? If it's not no need to show the value (it was like that in iosxdrip, seems a good approach)
+            //   - does the alert type need a value ? at the moment al do, iphone muted alert (not present) yet would need it
+            if alertKind.needsAlertValue() && alertEntry.alertType.enabled {
+                // only bg level alerts would need conversion
+                textLabelToUse += alertKind.valueIsABgValue() ? Double(alertValue).mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) : alertValue.description
             }
-            textLabelToUse = textLabelToUse + "   "
+            
+            if alertKind.needsAlertTriggerValue() {
+                switch alertKind {
+                case .fastdrop:
+                    textLabelToUse += " (<"
+                case .fastrise:
+                    textLabelToUse += " (>"
+                default:
+                    break
+                }
+                textLabelToUse += alertKind.valueIsABgValue() ? Double(alertTriggerValue).mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) : alertTriggerValue.description
+                textLabelToUse += ")"
+            }
+            
+            textLabelToUse += " \u{00B7} "
+            
+            // and now the name of the alerttype
+            textLabelToUse += alertEntry.alertType.name
+            cell.textLabel?.text = textLabelToUse
+            cell.textLabel?.textColor = UIColor(resource: .colorPrimary)
+        } else {
+            cell.textLabel?.text = "\u{26A0} " + Texts_Common.disabled
+            cell.textLabel?.textColor = UIColor(resource: .colorTertiary)
         }
         
-        // and now the name of the alerttype
-        textLabelToUse = textLabelToUse + alertEntry.alertType.name
-        
-        cell.textLabel?.text = textLabelToUse
-        
-        // no detail text to be shown
         cell.detailTextLabel?.text = nil
         
         // clicking the cell will always open a new screen which allows the user to edit the alert type
@@ -204,13 +219,13 @@ extension AlertsSettingsViewController:UITableViewDataSource, UITableViewDelegat
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
         tableView.deselectRow(at: indexPath, animated: true)
         // sender = tuple with section and row index
-        self.performSegue(withIdentifier:AlertSettingsViewController.SegueIdentifiers.alertsToAlertSettings.rawValue, sender: (indexPath.section, indexPath.row))
+        performSegue(withIdentifier: AlertSettingsViewController.SegueIdentifiers.alertsToAlertSettings.rawValue, sender: (indexPath.section, indexPath.row))
     }
     
     func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return AlertKind(forSection: section)?.alertTitle()
+        let alertKind = AlertKind(forSection: section)
+        return (alertKind?.alertUrgencyType() == .urgent ? "\u{2757}" : "") + (alertKind?.alertTitle() ?? "")
     }
 }

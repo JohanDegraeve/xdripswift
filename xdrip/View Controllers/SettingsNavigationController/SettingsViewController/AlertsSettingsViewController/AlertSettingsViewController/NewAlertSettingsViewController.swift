@@ -1,8 +1,9 @@
 import UIKit
 
+// MARK: - NewAlertSettingsViewController
+
 /// to create a new alertentry
-final class NewAlertSettingsViewController:UIViewController {
- 
+final class NewAlertSettingsViewController: UIViewController {
     // MARK: - Properties
     
     @IBOutlet weak var tableView: UITableView!
@@ -11,12 +12,11 @@ final class NewAlertSettingsViewController:UIViewController {
     
     // MARK: - Properties
     
-    var alertSettingsViewControllerData:AlertSettingsViewControllerData!
+    var alertSettingsViewControllerData: AlertSettingsViewControllerData!
 
     @IBAction func doneButtonAction(_ sender: UIBarButtonItem) {
-        
         // initialize new alertentry, will be saved in coredata when calling coreDataManager.savechanges()
-        _ = AlertEntry(value: Int(alertSettingsViewControllerData.value), alertKind: AlertSettingsViewControllerData.getAlertKind(alertKind: alertSettingsViewControllerData.alertKind), start: Int(alertSettingsViewControllerData.start), alertType: alertSettingsViewControllerData.alertType, nsManagedObjectContext: alertSettingsViewControllerData.coreDataManager.mainManagedObjectContext)
+        _ = AlertEntry(isDisabled: alertSettingsViewControllerData.isDisabled, value: Int(alertSettingsViewControllerData.value), triggerValue: Int(alertSettingsViewControllerData.triggerValue), alertKind: AlertSettingsViewControllerData.getAlertKind(alertKind: alertSettingsViewControllerData.alertKind), start: Int(alertSettingsViewControllerData.start), alertType: alertSettingsViewControllerData.alertType, nsManagedObjectContext: alertSettingsViewControllerData.coreDataManager.mainManagedObjectContext)
 
         // save the alertentry
         alertSettingsViewControllerData.coreDataManager.saveChanges()
@@ -25,7 +25,7 @@ final class NewAlertSettingsViewController:UIViewController {
         performSegue(withIdentifier: SegueIdentifiers.unwindToAlertsSettingsViewController.rawValue, sender: self)
     }
     
-    @IBOutlet weak var doneButtonOutlet: UIBarButtonItem!    
+    @IBOutlet weak var doneButtonOutlet: UIBarButtonItem!
     
     /// to be called by viewcontroller that opens this viewcontroller
     /// - parameters:
@@ -33,15 +33,13 @@ final class NewAlertSettingsViewController:UIViewController {
     ///     - minimumStart : what's the minimum allowed value for the start
     ///     - maximumStart : what's the maximum allowed value for the start
     ///     - coreDataManager : reference to the coredatamanager
-    public func configure(alertKind:AlertKind, minimumStart:Int16, maximumStart:Int16, coreDataManager:CoreDataManager) {
-        
+    public func configure(alertKind: AlertKind, minimumStart: Int16, maximumStart: Int16, coreDataManager: CoreDataManager) {
         // initialize alertSettingsViewControllerData
-        alertSettingsViewControllerData = AlertSettingsViewControllerData(start: minimumStart, value: Int16(alertKind.defaultAlertValue()), alertKind: Int16(alertKind.rawValue), alertType: AlertTypesAccessor(coreDataManager: coreDataManager).getDefaultAlertType(), minimumStart: minimumStart, maximumStart: maximumStart, uIViewController: self, toCallWhenUserResetsProperties: {
+        alertSettingsViewControllerData = AlertSettingsViewControllerData(isDisabled: false, start: minimumStart, value: Int16(alertKind.defaultAlertValue()), triggerValue: Int16(alertKind.defaultAlertTriggerValue()), alertKind: Int16(alertKind.rawValue), alertType: AlertTypesAccessor(coreDataManager: coreDataManager).getDefaultAlertType(), minimumStart: minimumStart, maximumStart: maximumStart, uIViewController: self, toCallWhenUserResetsProperties: {
             self.doneButtonOutlet.disable()
         }, toCallWhenUserChangesProperties: {
             self.doneButtonOutlet.enable()
         }, coreDataManager: coreDataManager)
-        
     }
     
     // MARK: - View Life Cycle
@@ -55,7 +53,6 @@ final class NewAlertSettingsViewController:UIViewController {
     // MARK: - View Methods
     
     private func setupView() {
-        
         // set title of the screen to empty string
         title = ""
         
@@ -72,19 +69,18 @@ final class NewAlertSettingsViewController:UIViewController {
     }
     
     // MARK: - private helper functions
-    
 }
 
-//alertToNewAlertSettings
+// MARK: NewAlertSettingsViewController.SegueIdentifiers
+
+// alertToNewAlertSettings
 /// defines perform segue identifiers used within AlertSettingsViewController
 extension NewAlertSettingsViewController {
-    
-    public enum SegueIdentifiers:String {
+    public enum SegueIdentifiers: String {
         /// to go from alert settings screen to new alert  settings screen
-        case alertToNewAlertSettings = "alertToNewAlertSettings"
+        case alertToNewAlertSettings
         /// to go back from newalert settings screen to alerts settings screen
         /// value is actually the same as in AlertSettingsViewController
-        case unwindToAlertsSettingsViewController = "unwindToAlertsSettingsViewController"
+        case unwindToAlertsSettingsViewController
     }
-    
 }

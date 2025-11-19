@@ -16,3 +16,5 @@
 "confirmdeletionalert" = "Borrar la Alarma?";
 "alerts_fastrise" = "Alarma Subida Rápida";
 "alerts_fastdrop" = "Alarma Bajada Rápida";
+"alertWhenBelowValue" = "Solo Por Debajo De";
+"alertWhenAboveValue" = "Solo Por Encima De";
