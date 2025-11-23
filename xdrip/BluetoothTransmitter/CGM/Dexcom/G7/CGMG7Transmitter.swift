@@ -135,7 +135,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         
         // assign addressname and name or expected devicename
         // For G7/ONE+/Stelo we don't listen for a specific device name. Dexcom uses an advertising id, which already filters out all other devices (like tv's etc. We will verify in another way that we have the current active G7/ONE+/Stelo, and not an old one, which is still near
-        // if the user requests us to connect to a specific transmitter ID, then let's use it        
+        // if the user requests us to connect to a specific transmitter ID, then let's use it
         var newAddressAndName: BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: (transmitterID == nil || transmitterID == ConstantsBluetoothPairing.dummyDexcomG7TypeTransmitterId) ? "DX" : transmitterID)
         
         if let name = name {
@@ -333,52 +333,25 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
                 let newGlucoseData = GlucoseData(timeStamp: g7GlucoseMessage.timeStamp, glucoseLevelRaw: g7GlucoseMessage.calculatedValue)
 
-                // add glucoseData to backfill
-                // possibly we will send it still later, if we receive also backfill data.
-                backfill.append(newGlucoseData)
+                // Always deliver real-time readings immediately
+                let newGlucoseDataArray = [newGlucoseData]
 
-                // if it's been more than 5 min + 30 seconds since previous reading, then it means there's a gap, and most likely the official Dexcom app will request for backfill data. So in that case we'll not immediately send the reading to the  delegate, but wait for the backfill to arrive
-                if let timeStampLastReading = timeStampLastReading {
-                    if abs(timeStampLastReading.timeIntervalSinceNow) < 330.0 {
-                        let newGlucoseDataArray = [newGlucoseData]
-                        
-                        // Per-cycle summary log before delegate dispatch
-                        let glucoseLevelRawString = String(format: "%.1f", newGlucoseData.glucoseLevelRaw)
-                        let timeStampString = DateFormatter.localizedString(from: newGlucoseData.timeStamp, dateStyle: .none, timeStyle: .medium)
-                        let writeControlCharacteristicIsNotifying = self.writeControlCharacteristic?.isNotifying ?? false
-                        let backfillCharacteristicIsNotifying = self.backfillCharacteristic?.isNotifying ?? false
-                        
-                        trace("    G7 connection cycle summary: value = %{public}@ mg/dL at %{public}@ (cid=%{public}d, extra flow: wc_notify_on = %{public}@, bf_notify_on = %{public}@)", log: log, category: ConstantsLog.categoryCGMG7, type: .info, glucoseLevelRawString, timeStampString, self.cycleId, String(writeControlCharacteristicIsNotifying), String(backfillCharacteristicIsNotifying))
-                        
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self = self else { return }
-                            var copy = newGlucoseDataArray
-                            self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
-                        }
-                        // stability: keep gap logic accurate by advancing last delivered timestamp on immediate delivery
-                        self.timeStampLastReading = g7GlucoseMessage.timeStamp
-                    } else {
-                        // stability: we expect backfill soon, debounce a short flush so UI doesn't look stuck if Dexcom keeps link open
-                    }
-                } else {
-                    // no previous reading, deliver immediately and advance last timestamp
-                    let newGlucoseDataArray = [newGlucoseData]
-                    
-                    // Per-cycle summary log before delegate dispatch
-                    let glucoseLevelRawString = String(format: "%.1f", newGlucoseData.glucoseLevelRaw)
-                    let timeStampString = DateFormatter.localizedString(from: newGlucoseData.timeStamp, dateStyle: .none, timeStyle: .medium)
-                    let writeControlCharacteristicIsNotifying = self.writeControlCharacteristic?.isNotifying ?? false
-                    let backfillCharacteristicIsNotifying = self.backfillCharacteristic?.isNotifying ?? false
-                    
-                    trace("    G7 connection cycle summary: value = %{public}@ mg/dL at %{public}@ (cid=%{public}d, extra flow: wc_notify_on = %{public}@, bf_notify_on = %{public}@)", log: log, category: ConstantsLog.categoryCGMG7, type: .info, glucoseLevelRawString, timeStampString, self.cycleId, String(writeControlCharacteristicIsNotifying), String(backfillCharacteristicIsNotifying))
-                    
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self = self else { return }
-                        var copy = newGlucoseDataArray
-                        self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
-                    }
-                    self.timeStampLastReading = g7GlucoseMessage.timeStamp // stability
+                // Per-cycle summary log before delegate dispatch
+                let glucoseLevelRawString = String(format: "%.1f", newGlucoseData.glucoseLevelRaw)
+                let timeStampString = DateFormatter.localizedString(from: newGlucoseData.timeStamp, dateStyle: .none, timeStyle: .medium)
+                let writeControlCharacteristicIsNotifying = self.writeControlCharacteristic?.isNotifying ?? false
+                let backfillCharacteristicIsNotifying = self.backfillCharacteristic?.isNotifying ?? false
+
+                trace("    G7 connection cycle summary: value = %{public}@ mg/dL at %{public}@ (cid=%{public}d, extra flow: wc_notify_on = %{public}@, bf_notify_on = %{public}@)", log: log, category: ConstantsLog.categoryCGMG7, type: .info, glucoseLevelRawString, timeStampString, self.cycleId, String(writeControlCharacteristicIsNotifying), String(backfillCharacteristicIsNotifying))
+
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    var copy = newGlucoseDataArray
+                    self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
                 }
+
+                // Update last delivered timestamp
+                self.timeStampLastReading = g7GlucoseMessage.timeStamp
 
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
