@@ -366,7 +366,7 @@ class Texts_SettingsView {
     }()
     
     static let dexcomG7Message:String = {
-        return NSLocalizedString("settingsviews_dexcomG7Message", tableName: filename, bundle: Bundle.main, value: "Press OK to automatically try and find your sensor.\n\nIf you have trouble connecting then you can manually enter the bluetooth name shown in the iPhone Settings -> Bluetooth devices list.", comment: "transmitter settings, instructions for adding a G7 type transmitter")
+        return NSLocalizedString("settingsviews_dexcomG7Message", tableName: filename, bundle: Bundle.main, value: "Press OK to automatically try to find your sensor.\n\nIf you have trouble connecting then you can manually enter the bluetooth name shown in the iPhone Settings -> Bluetooth devices list.", comment: "transmitter settings, instructions for adding a G7 type transmitter")
     }()
     
     static let labelTransmitterIdTextForButton:String = {

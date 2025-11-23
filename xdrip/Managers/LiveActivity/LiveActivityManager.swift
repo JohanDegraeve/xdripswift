@@ -105,7 +105,7 @@ extension LiveActivityManager {
         if eventActivity == nil {
             let residualCount = Activity<XDripWidgetAttributes>.activities.count
             if residualCount > 0 {
-                trace("in ensureActivity, found %{public} residual live activities, ending them before starting a new one", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info, residualCount.description)
+                trace("in ensureActivity, found %{public}@ residual live activities, ending them before starting a new one", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info, residualCount.description)
                 await endAll()
             }
             await startActivity(contentState: contentState)

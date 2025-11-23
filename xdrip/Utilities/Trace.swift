@@ -730,7 +730,7 @@ class Trace {
                         case .fastdrop:
                             traceInfo.appendStringAndNewLine("        -> start: " + alertEntry.start.convertMinutesToTimeAsString() + " / value: " +  alertEntry.value.description + " / when < " +  alertEntry.triggerValue.description + " / alarm type: " + alertEntry.alertType.description)
                         case .fastrise:
-                            traceInfo.appendStringAndNewLine("        -> start: " + alertEntry.start.convertMinutesToTimeAsString() + " / value: " +  alertEntry.value.description + " when > " +  alertEntry.triggerValue.description + " / alarm type: " + alertEntry.alertType.description)
+                            traceInfo.appendStringAndNewLine("        -> start: " + alertEntry.start.convertMinutesToTimeAsString() + " / value: " +  alertEntry.value.description + " / when > " +  alertEntry.triggerValue.description + " / alarm type: " + alertEntry.alertType.description)
                         default:
                             traceInfo.appendStringAndNewLine("        -> start: " + alertEntry.start.convertMinutesToTimeAsString() + " / value: " +  alertEntry.value.description + " / alarm type: " + alertEntry.alertType.description)
                         }

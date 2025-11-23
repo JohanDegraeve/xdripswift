@@ -9,7 +9,7 @@ enum Texts_ErrorMessages {
     }()
     
     static let DexcomG7TypeTransmitterIDWrongPattern:String = {
-        return NSLocalizedString("DexcomG7TypeTransmitterIDWrongPattern", tableName: errorMessagesFileName, bundle: Bundle.main, value: "The Transmitter ID should start with DX", comment: "transmitter id given by user doesn't start with DX")
+        return NSLocalizedString("error_message_DexcomG7TypeTransmitterIDWrongPattern", tableName: errorMessagesFileName, bundle: Bundle.main, value: "The Transmitter ID should start with DX", comment: "transmitter id given by user doesn't start with DX")
     }()
     
     static let TransmitterIDShouldHaveLength6:String = {

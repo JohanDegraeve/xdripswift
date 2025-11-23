@@ -60,7 +60,7 @@ extension NightscoutProfile {
         if let profile = response.store[response.defaultProfile] ?? response.store.first?.value {
             self.timezone = profile.timezone
             self.dia = profile.dia
-            self.isMgDl = profile.units.lowercased() == "mg/dl" || profile.units.lowercased() == "mg/dl"
+            self.isMgDl = profile.units.lowercased() == "mg/dl"
             self.basal = profile.basal.map { TimeValue(timeAsSecondsFromMidnight: $0.timeAsSeconds, value: $0.value) }
             self.carbratio = profile.carbratio.map { TimeValue(timeAsSecondsFromMidnight: $0.timeAsSeconds, value: $0.value) }
             self.sensitivity = profile.sens.map { TimeValue(timeAsSecondsFromMidnight: $0.timeAsSeconds, value: $0.value) }
