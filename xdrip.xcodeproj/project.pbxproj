@@ -3334,7 +3334,6 @@
 		F8EA6C7D21B70DEA0082976B /* Constants */ = {
 			isa = PBXGroup;
 			children = (
-				47F2E5C22D7CD45500EDA930 /* ConstantsPickerView.swift */,
 				F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */,
 				F8A1585022EDB597007F5B5D /* ConstantsBGGraphBuilder.swift */,
 				F8A1585222EDB602007F5B5D /* ConstantsBloodGlucose.swift */,
@@ -3364,6 +3363,8 @@
 				F8A1586A22EDB967007F5B5D /* ConstantsMaster.swift */,
 				F8A389EC23342EB10010F405 /* ConstantsNightscout.swift */,
 				F8A1586022EDB844007F5B5D /* ConstantsNotifications.swift */,
+				47F2E5C22D7CD45500EDA930 /* ConstantsPickerView.swift */,
+				476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */,
 				F8E51D5E2448E2E8001C9E5A /* ConstantsShareWithLoop.swift */,
 				F8A1586222EDB86E007F5B5D /* ConstantsSounds.swift */,
 				F8B955B0258BEE9D00C06016 /* ConstantsSpeakReading.swift */,
@@ -3373,7 +3374,6 @@
 				F8AF36142455C6F700B5977B /* ConstantsTrace.swift */,
 				F8FDFEAC260DE1B90047597D /* ConstantsUI.swift */,
 				47930E812BC5A001000BD8A1 /* ConstantsWidget.swift */,
-				476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */,
 			);
 			name = Constants;
 			path = xdrip/Constants;
@@ -3980,7 +3980,7 @@
 				BuildIndependentTargetsInParallel = YES;
 				DefaultBuildSystemTypeForWorkspace = Latest;
 				LastSwiftUpdateCheck = 1530;
-				LastUpgradeCheck = 2600;
+				LastUpgradeCheck = 2610;
 				ORGANIZATIONNAME = "Johan Degraeve";
 				TargetAttributes = {
 					4716A4EC2B406C3D00419052 = {

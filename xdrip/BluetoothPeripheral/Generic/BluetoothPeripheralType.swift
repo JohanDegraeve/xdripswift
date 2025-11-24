@@ -204,7 +204,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .DexcomType, .BluconType, .DexcomG4Type, .Libre3HeartBeatType, .DexcomG7HeartBeatType:
+        case .DexcomType, .BluconType, .DexcomG4Type, .Libre3HeartBeatType, .DexcomG7Type, .DexcomG7HeartBeatType:
             return true
             
         default:
@@ -242,6 +242,26 @@ enum BluetoothPeripheralType: String, CaseIterable {
             if transmitterId.count != 5 {
                 return Texts_ErrorMessages.TransmitterIDShouldHaveLength5
             }
+            return nil
+            
+        case .DexcomG7Type:
+            // if nothing entered, then that's fine, we'll scan as normal
+            if transmitterId.isEmpty { return nil }
+            
+            if !transmitterId.uppercased().hasPrefix("DX") {
+                return Texts_ErrorMessages.DexcomG7TypeTransmitterIDWrongPattern
+            }
+            
+            // max length for G7 type is 6, but we will allow partial matches to be used
+            if transmitterId.count > 6 {
+                return Texts_ErrorMessages.TransmitterIDShouldHaveMaximumLength6
+            }
+            
+            let regex = try! NSRegularExpression(pattern: "[a-zA-Z0-9]", options: .caseInsensitive)
+            if !transmitterId.validate(withRegex: regex) {
+                return Texts_ErrorMessages.DexcomTransmitterIDInvalidCharacters
+            }
+            
             return nil
             
         case .BluconType:

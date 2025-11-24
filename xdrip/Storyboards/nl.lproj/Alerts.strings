@@ -16,3 +16,5 @@
 "confirmdeletionalert" = "Alarm Verwijderen?";
 "alerts_fastdrop" = "Snelle Daling Alarm";
 "alerts_fastrise" = "Snelle Stijging Alarm";
+"alertWhenBelowValue" = "Alleen als onder";
+"alertWhenAboveValue" = "Alleen als boven";

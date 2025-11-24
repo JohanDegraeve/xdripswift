@@ -38,11 +38,11 @@ final class SettingsViewController: UIViewController {
         ///Home Screen settings - urgent high, high, target, low and urgent low values for guidelines
         case homescreen
         
-        /// statistics settings
-        case statistics
-        
         /// alarms
         case alarms
+        
+        /// statistics settings
+        case statistics
         
         ///nightscout settings
         case nightscout
@@ -91,10 +91,10 @@ final class SettingsViewController: UIViewController {
                 return SettingsViewNotificationsSettingsViewModel()
             case .homescreen:
                 return SettingsViewHomeScreenSettingsViewModel()
-            case .statistics:
-                return SettingsViewStatisticsSettingsViewModel()
             case .alarms:
                 return SettingsViewAlertSettingsViewModel()
+            case .statistics:
+                return SettingsViewStatisticsSettingsViewModel()
             case .nightscout:
                 return SettingsViewNightscoutSettingsViewModel()
             case .dexcom:

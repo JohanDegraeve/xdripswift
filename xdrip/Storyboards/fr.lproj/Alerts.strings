@@ -7,7 +7,7 @@
 "alerts_snooze" = "Snooze";
 "alerts_select_snooze_time" = "Choix de l'heure Snooze";
 "alerts_missedreadingalerttitle" = "Lecture manquante";
-"alerts_calibrationneeded" = "Calibration nécessaire ";
+"alerts_calibrationneeded" = "Rappel de calibration";
 "alerts_batterylow" = "Batterie faible du transmetteur";
 "alertstart" = "Appliquer à ";
 "alertvalue" = "Valeur";
@@ -16,4 +16,6 @@
 "confirmdeletionalert" = "Supprimer Alerte?";
 "alerts_fastdrop" = "Chute rapide";
 "alerts_fastrise" = "Augmentation rapide";
+"alertWhenBelowValue" = "Que si inf à";
+"alertWhenAboveValue" = "Que si sup à";
 

@@ -76,7 +76,7 @@ public class LoopManager: NSObject {
         // if the user doesn't want to limit Loop Share OR (if they do AND more than 4.5 minutes has passed since the last time we shared data) then let's process the readings and share them
         if !shareToLoopOnceEvery5Minutes || (shareToLoopOnceEvery5Minutes && Date().timeIntervalSince(timeStampLatestLoopSharedBgReading) > TimeInterval(minutes: 4.5)) {
             
-            trace("    loopShare = Sharing data with Loop",log: log, category: ConstantsLog.categoryLoopManager, type: .info)
+            trace("    in share, sharing data with Loop",log: log, category: ConstantsLog.categoryLoopManager, type: .debug)
             
             // get last readings with calculated value
             // reduce timeStampLatestLoopSharedBgReading with 30 minutes. Because maybe Loop wasn't running for a while and so missed one or more readings. By adding 30 minutes of readings, we fill up a gap of maximum 30 minutes in Loop
@@ -88,7 +88,7 @@ public class LoopManager: NSObject {
             // if needed, remove readings less than loopDelay minutes old from glucoseData
             if loopDelay > 0 {
                 
-                trace("    loopDelay = %{public}@. Deleting %{public}@ minutes of readings from glucoseData.",log: log, category: ConstantsLog.categoryLoopManager, type: .debug, loopDelay.description)
+                trace("    in share, loopDelay = %{public}@. Deleting %{public}@ minutes of readings from glucoseData.",log: log, category: ConstantsLog.categoryLoopManager, type: .debug, loopDelay.description)
                 
                 while glucoseData.count > 0 &&  glucoseData[0].timeStamp.addingTimeInterval(loopDelay) > Date() {
                     
@@ -202,9 +202,9 @@ public class LoopManager: NSObject {
             
             // add a trace at debug level to record the data we're going to write to the shared container
             if let debugJSON = String(data: data, encoding: .utf8) {
-                trace("in share: latestReadings JSON = %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .debug, debugJSON)
+                trace("    in share, latestReadings JSON = %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .debug, debugJSON)
             } else {
-                trace("in share: latestReadings JSON = (unavailable UTF8). count = %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .debug, dictionary.count.description)
+                trace("    in share, latestReadings JSON = (unavailable UTF8). count = %{public}@", log: log, category: ConstantsLog.categoryLoopManager, type: .debug, dictionary.count.description)
             }
             
             // write readings to shared user defaults
@@ -238,7 +238,7 @@ public class LoopManager: NSObject {
             
         } else {
                 
-            trace("    loopDelay = Skipping Loop Share as user requests to limit sharing to 5 minutes and the last reading was <4.5 minutes ago at ",log: log, category: ConstantsLog.categoryLoopManager, type: .info, timeStampLatestLoopSharedBgReading.toStringInUserLocale(timeStyle: .short, dateStyle: .none, showTimeZone: false))
+            trace("    in share, skipping Loop Share as user requests to limit sharing to 5 minutes and the last reading was <4.5 minutes ago at ",log: log, category: ConstantsLog.categoryLoopManager, type: .debug, timeStampLatestLoopSharedBgReading.toStringInUserLocale(timeStyle: .short, dateStyle: .none, showTimeZone: false))
             
         }
         

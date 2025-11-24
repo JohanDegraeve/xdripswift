@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23605" systemVersion="24C101" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="24411" systemVersion="25B78" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="AlertEntry" representedClassName=".AlertEntry" syncable="YES">
         <attribute name="alertkind" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="isDisabled" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="start" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="triggerValue" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="value" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="alertType" maxCount="1" deletionRule="Nullify" destinationEntity="AlertType" inverseName="alertEntries" inverseEntity="AlertType"/>
     </entity>

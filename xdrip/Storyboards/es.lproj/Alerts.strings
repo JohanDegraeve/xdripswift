@@ -7,7 +7,7 @@
 "alerts_snooze" = "Silenciar";
 "alerts_select_snooze_time" = "Seleccionar Tiempo de Silencio";
 "alerts_missedreadingalerttitle" = "Lecturas Perdidas";
-"alerts_calibrationneeded" = "Se Requiere Calibración";
+"alerts_calibrationneeded" = "Recordatorio de Calibración";
 "alerts_batterylow" = "Batería Transmisor Baja";
 "alertstart" = "Aplicar desde";
 "alertvalue" = "Valor";
@@ -16,3 +16,5 @@
 "confirmdeletionalert" = "Borrar la Alarma?";
 "alerts_fastrise" = "Alarma Subida Rápida";
 "alerts_fastdrop" = "Alarma Bajada Rápida";
+"alertWhenBelowValue" = "Solo Por Debajo De";
+"alertWhenAboveValue" = "Solo Por Encima De";

@@ -1,14 +1,17 @@
+
 import UIKit
+import CoreData
+
+// MARK: - AlertSettingsViewController
 
 /// to update an existing alertentry
 final class AlertSettingsViewController: UIViewController {
-
     // MARK: - Properties
     
-    var alertSettingsViewControllerData:AlertSettingsViewControllerData!
+    var alertSettingsViewControllerData: AlertSettingsViewControllerData!
     
     /// the alertentry being edited - will only be used , and in the end to update the alertentry
-    private var alertEntryAsNSObject:AlertEntry!
+    private var alertEntryAsNSObject: AlertEntry!
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -16,26 +19,37 @@ final class AlertSettingsViewController: UIViewController {
     
     /// done button, to confirm changes
     @IBAction func doneButtonAction(_ sender: UIBarButtonItem) {
-        
+        // Update isDisabled for all AlertEntries with the same alertKind
+        let context = alertSettingsViewControllerData.coreDataManager.mainManagedObjectContext
+        let fetchRequest: NSFetchRequest<AlertEntry> = AlertEntry.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "alertkind = %i", alertSettingsViewControllerData.alertKind)
+        do {
+            let entries = try context.fetch(fetchRequest)
+            for entry in entries {
+                entry.isDisabled = alertSettingsViewControllerData.isDisabled
+            }
+        } catch {
+            print("Failed to fetch AlertEntries for bulk isDisabled update: \(error)")
+        }
+
+        // Update other properties for the current entry
         alertEntryAsNSObject.alertkind = alertSettingsViewControllerData.alertKind
         alertEntryAsNSObject.alertType = alertSettingsViewControllerData.alertType
         alertEntryAsNSObject.start = alertSettingsViewControllerData.start
         alertEntryAsNSObject.value = alertSettingsViewControllerData.value
-        
-        // save the alertentry
+        alertEntryAsNSObject.triggerValue = alertSettingsViewControllerData.triggerValue
+
+        // save the alertentries
         alertSettingsViewControllerData.coreDataManager.saveChanges()
-        
+
         // if it's a missed reading alert, then set UserDefaults.standard.missedReadingAlertChanged
         // this will trigger the AlertManager to check if missed reading alert needs to be replanned
         if alertEntryAsNSObject.alertkind == AlertKind.missedreading.rawValue {
-            
             UserDefaults.standard.missedReadingAlertChanged = true
-            
         }
-        
+
         // go back to the alerts settings screen
         performSegue(withIdentifier: SegueIdentifiers.unwindToAlertsSettingsViewController.rawValue, sender: self)
-        
     }
     
     @IBOutlet weak var doneButtonOutlet: UIBarButtonItem!
@@ -44,7 +58,6 @@ final class AlertSettingsViewController: UIViewController {
     @IBAction func trashButtonAction(_ sender: UIBarButtonItem) {
         // delete the alertentry
         if let alertEntry = alertEntryAsNSObject {
-            
             // first ask user if ok to delete and if yes delete
             let alert = UIAlertController(title: Texts_Alerts.confirmDeletionAlert, message: nil, actionHandler: {
                 self.alertSettingsViewControllerData.coreDataManager.mainManagedObjectContext.delete(alertEntry)
@@ -55,7 +68,7 @@ final class AlertSettingsViewController: UIViewController {
                 self.performSegue(withIdentifier: SegueIdentifiers.unwindToAlertsSettingsViewController.rawValue, sender: self)
             }, cancelHandler: nil)
             
-            self.present(alert, animated: true, completion: nil)
+            present(alert, animated: true, completion: nil)
             
         } else {
             // go back to alerts settings screen
@@ -68,13 +81,12 @@ final class AlertSettingsViewController: UIViewController {
     @IBAction func addButtonAction(_ sender: UIBarButtonItem) {
         // user clicks add button, need to perform segue to open new alertsettingsviewcontroller
         // sender = alertKind, minimumStart value for new alert = current alert + 1, maximumstart for new alert which is equal to maximumstart of current alertentry
-        self.performSegue(withIdentifier:NewAlertSettingsViewController.SegueIdentifiers.alertToNewAlertSettings.rawValue, sender: (alertSettingsViewControllerData.alertKind, alertSettingsViewControllerData.start + 1, alertSettingsViewControllerData.maximumStart))
+        performSegue(withIdentifier: NewAlertSettingsViewController.SegueIdentifiers.alertToNewAlertSettings.rawValue, sender: (alertSettingsViewControllerData.alertKind, alertSettingsViewControllerData.start + 1, alertSettingsViewControllerData.maximumStart))
     }
-    
     
     @IBOutlet weak var addButtonOutlet: UIBarButtonItem!
     
-    // MARK:- public functions
+    // MARK: - public functions
     
     /// to be called by viewcontroller that opens this viewcontroller
     /// - parameters:
@@ -82,13 +94,12 @@ final class AlertSettingsViewController: UIViewController {
     ///     - minimumStart : what's the minimum allowed value for the start
     ///     - maximumStart : what's the maximum allowed value for the start
     ///     - coreDataManager : reference to the coredatamanager
-    public func configure(alertEntry:AlertEntry, minimumStart:Int16, maximumStart:Int16, coreDataManager:CoreDataManager) {
-        
+    public func configure(alertEntry: AlertEntry, minimumStart: Int16, maximumStart: Int16, coreDataManager: CoreDataManager) {
         // alertEntryAsNSObject will be used in the end when user clicks Trash or Done button
-        self.alertEntryAsNSObject = alertEntry
+        alertEntryAsNSObject = alertEntry
         
         // initialize alertSettingsViewControllerData
-        alertSettingsViewControllerData = AlertSettingsViewControllerData(start: alertEntry.start, value: alertEntry.value, alertKind: alertEntry.alertkind, alertType: alertEntry.alertType, minimumStart: minimumStart, maximumStart: maximumStart, uIViewController: self, toCallWhenUserResetsProperties: {
+        alertSettingsViewControllerData = AlertSettingsViewControllerData(isDisabled: alertEntry.isDisabled, start: alertEntry.start, value: alertEntry.value, triggerValue: alertEntry.triggerValue, alertKind: alertEntry.alertkind, alertType: alertEntry.alertType, minimumStart: minimumStart, maximumStart: maximumStart, uIViewController: self, toCallWhenUserResetsProperties: {
             self.addButtonOutlet.enable()
             self.doneButtonOutlet.disable()
             self.trashButtonOutlet.isEnabled = self.alertSettingsViewControllerData.start != 0
@@ -111,7 +122,6 @@ final class AlertSettingsViewController: UIViewController {
     // MARK: - View Methods
     
     private func setupView() {
-        
         // set title of the screen to empty string
         title = ""
 
@@ -131,7 +141,6 @@ final class AlertSettingsViewController: UIViewController {
             tableView.dataSource = alertSettingsViewControllerData
             tableView.delegate = alertSettingsViewControllerData
         }
-
     }
     
     // MARK: - other overriden functions
@@ -146,16 +155,15 @@ final class AlertSettingsViewController: UIViewController {
         }
         
         switch segueIdentifierAsCase {
-            
         case NewAlertSettingsViewController.SegueIdentifiers.alertToNewAlertSettings:
             guard let vc = segue.destination as? NewAlertSettingsViewController, let (alertKind, minimumStart, maximumStart) = sender as? (Int16, Int16, Int16) else {
-                fatalError("In AlertSettingsViewController, prepare for segue, viewcontroller is not AlertSettingsViewController or sender is not (Int16, Int16, Int16)" )
+                fatalError("In AlertSettingsViewController, prepare for segue, viewcontroller is not AlertSettingsViewController or sender is not (Int16, Int16, Int16)")
             }
             
-            guard let alertKindAsAlertKind = AlertKind(rawValue: Int(alertKind)) else {fatalError("in AlertSettingsViewController, prepare for segue, failed to cretae AlertKind")}
+            guard let alertKindAsAlertKind = AlertKind(rawValue: Int(alertKind)) else { fatalError("in AlertSettingsViewController, prepare for segue, failed to cretae AlertKind") }
             
             // configure view controller
-            vc.configure(alertKind: alertKindAsAlertKind, minimumStart: minimumStart, maximumStart: maximumStart, coreDataManager: alertSettingsViewControllerData.coreDataManager )
+            vc.configure(alertKind: alertKindAsAlertKind, minimumStart: minimumStart, maximumStart: maximumStart, coreDataManager: alertSettingsViewControllerData.coreDataManager)
             
         default:
             break
@@ -163,20 +171,17 @@ final class AlertSettingsViewController: UIViewController {
     }
 
     // MARK: - private helper functions
-    
 }
 
+// MARK: AlertSettingsViewController.SegueIdentifiers
 
 /// defines perform segue identifiers used within AlertSettingsViewController
 extension AlertSettingsViewController {
-    
     public enum SegueIdentifiers: String {
-        
         /// to go from alerts settings screen to alert  settings screen
-        case alertsToAlertSettings = "alertsToAlertSettings"
+        case alertsToAlertSettings
         
         /// to go back from alert settings screen to alerts settings screen
-        case unwindToAlertsSettingsViewController = "unwindToAlertsSettingsViewController"
-        
+        case unwindToAlertsSettingsViewController
     }
 }

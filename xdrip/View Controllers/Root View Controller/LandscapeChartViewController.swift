@@ -59,6 +59,19 @@ final class LandscapeChartViewController: UIViewController {
         updateView()
     }
     
+    @IBOutlet weak var showStatisticsOnChartLabelOutlet: UILabel!
+    @IBOutlet weak var showStatisticsOnChartSwitch: UISwitch!
+    @IBAction func showStatisticsOnChartValueChanged(_ sender: UISwitch) {
+        UserDefaults.standard.showStatisticsOnLandscapeChart = sender.isOn
+        updateView()
+        // the TIR chart doesn't redraw correctly the first time after it's container view has
+        // been unhidden. Just force a second redraw immediately after. It's annoying but works for now.
+        // This should be removed and fixed properly in the future
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+            self.updateView()
+        }
+    }
+    
     /// when the back button is pressed we'll subtract a day from the currently selected date and refresh the view
     @IBOutlet weak var backButtonOutlet: UIButton!
     @IBAction func backButtonPressed(_ sender: Any) {
@@ -91,6 +104,8 @@ final class LandscapeChartViewController: UIViewController {
     }
     
     // left section with statistics data
+    @IBOutlet weak var statisticsSidebarViewOutlet: UIView!
+    
     @IBOutlet weak var highTitleLabelOutlet: UILabel!
     @IBOutlet weak var highLabelOutlet: UILabel!
     @IBOutlet weak var highStatisticLabelOutlet: UILabel!
@@ -288,18 +303,25 @@ final class LandscapeChartViewController: UIViewController {
         averageTitleLabelOutlet.text = Texts_Common.averageStatistics
         a1CTitleLabelOutlet.text = Texts_Common.a1cStatistics
         cVTitleLabelOutlet.text = Texts_Common.cvStatistics
-        showTreatmentsOnChartLabelOutlet.text = Texts_SettingsView.settingsviews_showTreatments
+        showTreatmentsOnChartLabelOutlet.text = Texts_SettingsView.sectionTitleTreatments
+        showStatisticsOnChartLabelOutlet.text = Texts_SettingsView.sectionTitleStatistics
         
         // show a smaller outer radius for the pie chart view if an iPhone mini screen
         pieChartOutlet.outerRadius = UIScreen.main.nativeBounds.height == 2340 ? 30 : 40
                 
         showTreatmentsOnChartSwitch.isOn = UserDefaults.standard.showTreatmentsOnLandscapeChart
+        showStatisticsOnChartSwitch.isOn = UserDefaults.standard.showStatisticsOnLandscapeChart
     }
         
     // MARK: - private functions
     
     /// Updates the view with latest data
     private func updateView() {
+        let showStatistics = UserDefaults.standard.showStatisticsOnLandscapeChart
+        
+        statisticsSidebarViewOutlet.isHidden = !showStatistics
+        tirChartContainerOutlet.isHidden = !showStatistics
+        
         // update the date outlet
         dateLabelOutlet.text = dateFormatter.string(from: selectedDate)
         
