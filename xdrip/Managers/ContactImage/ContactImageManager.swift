@@ -161,7 +161,7 @@ class ContactImageManager: NSObject {
                let contact = (try? self.contactStore.unifiedContacts(matching: CNContact.predicateForContacts(withIdentifiers: [identifier]), keysToFetch: keyToFetch))?.first,
                contact.givenName == ConstantsHomeView.applicationName {
                 if lastReading.count > 0 {
-                    trace("in updateContact, contact found by identifier. Updating the contact image to %{public}@ %{public}@.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+                    trace("in updateContact, contact found by identifier. Updating the contact image to %{public}@ %{public}@.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
                 }
                 guard let mutableContact = contact.mutableCopy() as? CNMutableContact else { return }
                 mutableContact.imageData = contactImageView.getImage().pngData()

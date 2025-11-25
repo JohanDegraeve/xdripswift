@@ -536,7 +536,7 @@ public class AlertManager: NSObject {
         
         // first we'll check if the user has intentionally disabled the alert kind. If so, then just return without doing any more
         if currentAlertEntry.isDisabled {
-            trace("in checkAlertAndFire, alert '%{public}@' is disabled, returning without checking any further", log: log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
+            trace("in checkAlertAndFire, alert '%{public}@' is disabled", log: log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
             return false
         }
         

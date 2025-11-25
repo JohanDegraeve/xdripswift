@@ -47,6 +47,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     /// central queue for all CoreBluetooth work (dedicated serial queue)
     private let centralQueue = DispatchQueue(label: "bt.central", qos: .userInitiated)
+
+    /// queue-specific flag so we can detect whether we're already running on centralQueue
+    private let centralQueueSpecificKey = DispatchSpecificKey<Void>()
     
     /// assert helper to ensure code is running on centralQueue (debug-only)
     private func assertOnCentral(function: String = #function) {
@@ -60,6 +63,15 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             block()
         } else {
             DispatchQueue.main.async(execute: block)
+        }
+    }
+
+    /// helper to synchronously execute work on centralQueue (re-entrant safe)
+    private func runOnCentralQueueSync<T>(_ block: () -> T) -> T {
+        if DispatchQueue.getSpecific(key: centralQueueSpecificKey) != nil {
+            return block()
+        } else {
+            return centralQueue.sync(execute: block)
         }
     }
     
@@ -162,7 +174,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         self.bluetoothTransmitterDelegate = bluetoothTransmitterDelegate
         
         super.init()
-        
+
+        centralQueue.setSpecific(key: centralQueueSpecificKey, value: ())
+
         initialize()
         
     }
@@ -259,77 +273,78 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     /// start bluetooth scanning for device
     func startScanning() -> BluetoothTransmitter.startScanningResult {
-        // NOTE: This method is expected to run on bt.central. It is invoked from centralQueue in connect().
-        
-        trace("in startScanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
-        
-        //assign default returnvalue
-        var returnValue = BluetoothTransmitter.startScanningResult.unknown
-        
-        // first check if already connected or connecting and if so stop processing
-        if let peripheral = peripheral {
-            switch peripheral.state {
-            case .connected:
-                trace("    peripheral is already connected, will not start scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
-                return .alreadyConnected
-            case .connecting:
-                if Date() > Date(timeInterval: maxTimeToWaitForPeripheralResponse, since: timeStampLastStatusUpdate) {
-                    trace("    status connecting, but waiting more than %{public}d seconds, will disconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, maxTimeToWaitForPeripheralResponse)
-                    disconnect()
-                } else {
-                    trace("    peripheral is currently connecting, will not start scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+        return runOnCentralQueueSync {
+            // NOTE: This method expects to run on bt.central. connect() already dispatches there.
+            trace("in startScanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+            
+            //assign default returnvalue
+            var returnValue = BluetoothTransmitter.startScanningResult.unknown
+            
+            // first check if already connected or connecting and if so stop processing
+            if let peripheral = peripheral {
+                switch peripheral.state {
+                case .connected:
+                    trace("    peripheral is already connected, will not start scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+                    return .alreadyConnected
+                case .connecting:
+                    if Date() > Date(timeInterval: maxTimeToWaitForPeripheralResponse, since: timeStampLastStatusUpdate) {
+                        trace("    status connecting, but waiting more than %{public}d seconds, will disconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, maxTimeToWaitForPeripheralResponse)
+                        disconnect()
+                    } else {
+                        trace("    peripheral is currently connecting, will not start scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+                    }
+                    return .connecting
+                default:()
                 }
-                return .connecting
-            default:()
             }
-        }
-        
-        /// list of uuid's to scan for, possibily nil, in which case scanning only if app is in foreground and scan for all devices
-        var services:[CBUUID]?
-        if let CBUUID_Advertisement = CBUUID_Advertisement {
-            services = [CBUUID(string: CBUUID_Advertisement)]
-        }
-        
-        // try to start the scanning
-        if let centralManager = centralManager {
-            if centralManager.isScanning {
-                trace("    already scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
-                return .alreadyScanning
+            
+            /// list of uuid's to scan for, possibly nil, in which case scanning only if app is in foreground and scan for all devices
+            var services:[CBUUID]?
+            if let CBUUID_Advertisement = CBUUID_Advertisement {
+                services = [CBUUID(string: CBUUID_Advertisement)]
             }
-            switch centralManager.state {
-            case .poweredOn:
+            
+            // try to start the scanning
+            if let centralManager = centralManager {
+                if centralManager.isScanning {
+                    trace("    already scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+                    return .alreadyScanning
+                }
+                switch centralManager.state {
+                case .poweredOn:
+                    
+                    trace("    state is poweredOn", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+                    centralManager.scanForPeripherals(withServices: services, options: nil)
+                    returnValue = .success
+                    
+                case .poweredOff:
+                    
+                    trace("    state is poweredOff", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
+                    return .poweredOff
                 
-                trace("    state is poweredOn", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
-                centralManager.scanForPeripherals(withServices: services, options: nil)
-                returnValue = .success
-                
-            case .poweredOff:
-                
-                trace("    state is poweredOff", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
-                return .poweredOff
-                
-            case .unknown:
-                
-                trace("    state is unknown", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
-                return .unknown
-                
-            case .unauthorized:
-                
-                trace("    state is unauthorized", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
-                return .unauthorized
-                
-            default:
-                
-                trace("    state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, centralManager.state.toString())
-                return returnValue
-                
+                case .unknown:
+                    
+                    trace("    state is unknown", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
+                    return .unknown
+                    
+                case .unauthorized:
+                    
+                    trace("    state is unauthorized", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
+                    return .unauthorized
+                    
+                default:
+                    
+                    trace("    state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, centralManager.state.toString())
+                    return returnValue
+               
+                }
+            } else {
+                trace("    centralManager is nil, can not starting scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
+                returnValue = .other(reason:"centralManager is nil, can not start scanning")
             }
-        } else {
-            trace("    centralManager is nil, can not starting scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error)
-            returnValue = .other(reason:"centralManager is nil, can not start scanning")
+            
+            return returnValue
         }
-        
-        return returnValue
     }
     
     /// will write to writeCharacteristic with UUID CBUUID_WriteCharacteristic

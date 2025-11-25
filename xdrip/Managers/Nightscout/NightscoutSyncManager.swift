@@ -69,6 +69,13 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     private var relaunchScheduled: Bool = false
     private var lastRelaunchAt: Date = .distantPast
     private let relaunchDebounceInterval: TimeInterval = 1.0
+    private let idleNightscoutSyncInterval: TimeInterval = 300 // 5 minutes cooldown when the last sync found no changes
+    private var lastSyncHadChanges: Bool = true
+    private var didUpdateProfileDuringLastSync: Bool = false
+    private var didUpdateDeviceStatusDuringLastSync: Bool = false
+    private var pendingForegroundSync: Bool = false
+    private var lastBackgroundFollowerRefreshAt: Date = .distantPast
+    private let backgroundFollowerRefreshCooldown: TimeInterval = 60
     
     /// - when was the sync of treatments with Nightscout started.
     /// - if nil then there's no sync running
@@ -117,6 +124,8 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         self.treatmentEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
         
         super.init()
+
+        NotificationCenter.default.addObserver(self, selector: #selector(handleAppDidBecomeActive), name: UIApplication.didBecomeActiveNotification, object: nil)
         
         // let's try and import the nightscout profile data if stored in userdefaults
         // we can do this as the profile isn't expected to change very often
@@ -152,6 +161,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutSyncRequired.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerUploadDataToNightscout.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue)
+        NotificationCenter.default.removeObserver(self)
     }
     
     // MARK: - public functions
@@ -186,8 +196,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             }
         }
         
-        if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
-            trace("    setting nightscoutSyncRequired to true, this will also initiate a treatments/devicestatus sync", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+        let minimumInterval = lastSyncHadChanges ? ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds : idleNightscoutSyncInterval
+        if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -minimumInterval {
+            trace("    setting nightscoutSyncRequired to true (minInterval=%{public}@ seconds, lastSyncHadChanges=%{public}@)", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, String(format: "%.0f", minimumInterval), String(lastSyncHadChanges))
             
             UserDefaults.standard.timeStampLatestNightscoutSyncRequest = .now
             UserDefaults.standard.nightscoutSyncRequired = true
@@ -318,6 +329,14 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     /// synchronize all treatments and other information with Nightscout
     private func syncWithNightscout() {
+        if UIApplication.shared.applicationState == .background {
+            trace("syncWithNightscout aborted because app is backgrounded", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug)
+            performBackgroundFollowerRefreshIfNeeded()
+            pendingForegroundSync = true
+            nightscoutSyncRequired = true
+            return
+        }
+        pendingForegroundSync = false
         // Global throttle: do not allow sync more often than the minimum interval
         if let last = lastActualSyncTime, Date().timeIntervalSince(last) < ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
             return
@@ -462,6 +481,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                                         
                                         // this sync session has finished, set nightscoutSyncStartTimeStamp to nil
                                         self.nightscoutSyncStartTimeStamp = nil
+                                        self.lastSyncHadChanges = treatmentsLocallyCreatedOrUpdated || self.didUpdateProfileDuringLastSync || self.didUpdateDeviceStatusDuringLastSync
+                                        self.didUpdateProfileDuringLastSync = false
+                                        self.didUpdateDeviceStatusDuringLastSync = false
                                         
                                         // ********************************************************************************************
                                         // next step in the sync process
@@ -499,9 +521,22 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     /// Schedules a Nightscout sync relaunch respecting debounce interval.
     private func scheduleNightscoutSyncRelaunch() {
+        if Thread.isMainThread == false {
+            DispatchQueue.main.async { [weak self] in
+                self?.scheduleNightscoutSyncRelaunch()
+            }
+            return
+        }
+        if UIApplication.shared.applicationState == .background {
+            trace("in scheduleNightscoutSyncRelaunch: app backgrounded, deferring until active", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug)
+            performBackgroundFollowerRefreshIfNeeded()
+            pendingForegroundSync = true
+            nightscoutSyncRequired = true
+            return
+        }
         // If a relaunch is already scheduled or we've relaunched very recently, skip.
         if relaunchScheduled || Date().timeIntervalSince(lastRelaunchAt) < relaunchDebounceInterval {
-            trace("scheduleNightscoutSyncRelaunch: skipping (scheduled=%{public}@, sinceLast=%{public}@s)", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, relaunchScheduled.description, String(format: "%.2f", Date().timeIntervalSince(lastRelaunchAt)))
+            trace("in scheduleNightscoutSyncRelaunch: skipping (scheduled=%{public}@, sinceLast=%{public}@s)", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, relaunchScheduled.description, String(format: "%.2f", Date().timeIntervalSince(lastRelaunchAt)))
             return
         }
         relaunchScheduled = true
@@ -509,10 +544,33 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             guard let self = self else { return }
             self.relaunchScheduled = false
             self.lastRelaunchAt = Date()
-            trace("scheduleNightscoutSyncRelaunch: performing relaunch", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug)
+            trace("in scheduleNightscoutSyncRelaunch: performing relaunch", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug)
             self.syncWithNightscout()
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3, execute: workItem)
+    }
+
+    @objc private func handleAppDidBecomeActive() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            if self.pendingForegroundSync {
+                self.pendingForegroundSync = false
+                self.scheduleNightscoutSyncRelaunch()
+            }
+        }
+    }
+
+    /// Allows follower-mode downloads while backgrounded so Loop data stays fresh when BLE wakes the app.
+    private func performBackgroundFollowerRefreshIfNeeded() {
+        guard UserDefaults.standard.nightscoutFollowType != .none else { return }
+        let now = Date()
+        if now.timeIntervalSince(lastBackgroundFollowerRefreshAt) < backgroundFollowerRefreshCooldown {
+            return
+        }
+        lastBackgroundFollowerRefreshAt = now
+        trace("performBackgroundFollowerRefreshIfNeeded: refreshing Nightscout follow data while backgrounded", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug)
+        updateProfile()
+        updateDeviceStatus()
     }
     
     /// check if a new profile update is required, see if the downloaded response is newer than the stored one and then import it if necessary
@@ -556,6 +614,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         if let profileData = try? JSONEncoder().encode(newProfile) {
                             UserDefaults.standard.nightscoutProfile = profileData
                         }
+                        await MainActor.run {
+                            self.didUpdateProfileDuringLastSync = true
+                        }
                     }
                 }
             } catch {
@@ -578,6 +639,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             deviceStatus.updatedDate = .distantPast
             deviceStatus.lastLoopDate = .distantPast
         }
+        let previousDeviceStatusSignature = (createdAt: deviceStatus.createdAt, lastLoopDate: deviceStatus.lastLoopDate, id: deviceStatus.id)
         Task {
             do {
                 let unifiedResponses: [NightscoutDeviceStatusResponse]? = try await nightscoutRequest(path: nightscoutDeviceStatusPath, responseType: [NightscoutDeviceStatusResponse].self)
@@ -649,11 +711,15 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 if let mostRecent = pumpBatteryCandidates.sorted(by: { $0.date > $1.date }).first {
                     deviceStatus.pumpBatteryPercent = mostRecent.percent
                 }
+                let signatureChanged = deviceStatus.createdAt != previousDeviceStatusSignature.createdAt || deviceStatus.lastLoopDate != previousDeviceStatusSignature.lastLoopDate || deviceStatus.id != previousDeviceStatusSignature.id
                 self.deviceStatus = deviceStatus
                 self.deviceStatus.lastCheckedDate = .now
                 self.deviceStatus.updatedDate = .now
                 trace("in updateDeviceStatus, updated device status with createdAt = %{public}@. Last looping date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, self.deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened), self.deviceStatus.lastLoopDate.formatted(date: .abbreviated, time: .shortened))
                 trace("in updateDeviceStatus, deviceStatus data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, String(describing: self.deviceStatus))
+                await MainActor.run {
+                    self.didUpdateDeviceStatusDuringLastSync = signatureChanged
+                }
             } catch {
                 self.deviceStatus.lastCheckedDate = .now
                 trace("    in updateDeviceStatus, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
