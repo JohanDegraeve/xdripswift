@@ -13,6 +13,7 @@ enum ConstantsDefaultAlertLevels {
     static let defaultBatteryAlertLevelLibre2 = 20
     static let defaultBatteryAlertLevelAtom = 20
     static let defaultBatteryAlertLevelPhone = 10
+    
     // blood glucose level alert values in mgdl
     static let veryHigh = 250
     static let veryLow = 50
@@ -21,9 +22,11 @@ enum ConstantsDefaultAlertLevels {
     
     // blood glucose fast drop delta alert in mgdl
     static let fastdrop = 10
+    static let fastdropTriggerValue = 120
 
     // blood glucose fast rise delta alert in mgdl
     static let fastrise = 10
+    static let fastriseTriggerValue = 160
     
     // in minutes, after how many minutes of now reading should alert be raised
     static let missedReading = 30

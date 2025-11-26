@@ -32,7 +32,7 @@
 "changealertvalue" = "Change Alarm Value";
 
 /// when calibration is needed, this is the title of the alert notification, also in alert settings list, for the name of the alert
-"alerts_calibrationneeded" = "Calibration Needed";
+"alerts_calibrationneeded" = "Calibration Reminder";
 
 /// transmitter battery low, this is the title of the alert notification, also in alert settings list, for the name of the alert
 "alerts_batterylow" = "Transmitter Battery Low";

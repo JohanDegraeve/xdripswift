@@ -8,9 +8,10 @@
 
 import Foundation
 
-// MARK: Internal Profile
+// MARK: Internal NightscoutProfile
 
 /// Struct to hold internal Nightscout profile
+/// Initialize from a NightscoutProfileResponse
 struct NightscoutProfile: Codable {
     struct TimeValue: Codable, Hashable {
         var timeAsSecondsFromMidnight: Int
@@ -41,9 +42,35 @@ struct NightscoutProfile: Codable {
     }
 }
 
-// MARK: External downloaded Nightscout Profile
+// MARK: Internal NightscoutProfile Initializer
 
-/// Struct to decode Nightscout profile response
+extension NightscoutProfile {
+    /// Initialize from a NightscoutProfileResponse
+    init(from response: NightscoutProfileResponse) {
+        self.init()
+        
+        // Parse startDate
+        let startDateString = response.startDate
+        self.startDate = ISO8601DateFormatter.withFractionalSeconds.date(from: startDateString) ?? ISO8601DateFormatter().date(from: startDateString) ?? .distantPast
+        self.profileName = response.defaultProfile
+        self.enteredBy = response.enteredBy
+        self.updatedDate = .now
+        
+        // Use the first profile in the store (usually "Default")
+        if let profile = response.store[response.defaultProfile] ?? response.store.first?.value {
+            self.timezone = profile.timezone
+            self.dia = profile.dia
+            self.isMgDl = profile.units.lowercased() == "mg/dl"
+            self.basal = profile.basal.map { TimeValue(timeAsSecondsFromMidnight: $0.timeAsSeconds, value: $0.value) }
+            self.carbratio = profile.carbratio.map { TimeValue(timeAsSecondsFromMidnight: $0.timeAsSeconds, value: $0.value) }
+            self.sensitivity = profile.sens.map { TimeValue(timeAsSecondsFromMidnight: $0.timeAsSeconds, value: $0.value) }
+        }
+    }
+}
+
+// MARK: - External downloaded NightscoutProfileResponse
+
+/// Robust, tolerant unified model for decoding Nightscout profile endpoint
 struct NightscoutProfileResponse: Codable {
     struct Profile: Codable {
         struct ProfileEntry: Codable {

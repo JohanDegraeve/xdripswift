@@ -241,8 +241,8 @@ class BluetoothPeripheralManager: NSObject {
                 case .DexcomG7Type:
                     
                     if let dexcomG7 = bluetoothPeripheral as? DexcomG7, let cgmTransmitterDelegate = cgmTransmitterDelegate {
-                        
-                        newTransmitter = CGMG7Transmitter(address: dexcomG7.blePeripheral.address, name: dexcomG7.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+                            
+                        newTransmitter = CGMG7Transmitter(address: dexcomG7.blePeripheral.address, name: dexcomG7.blePeripheral.name, transmitterID: dexcomG7.blePeripheral.transmitterId, bluetoothTransmitterDelegate: self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
                         
                     } else {
                         
@@ -677,7 +677,7 @@ class BluetoothPeripheralManager: NSObject {
                 fatalError("in createNewTransmitter, DexcomG7Type, cgmTransmitterDelegate is nil")
             }
             
-            return CGMG7Transmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+            return CGMG7Transmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
             
         }
         
@@ -1311,7 +1311,7 @@ class BluetoothPeripheralManager: NSObject {
 
                             // create an instance of CGMG7Transmitter, CGMG7Transmitter will automatically try to connect to the dexcomg7 with the address that is stored in bubble
                             // add it to the array of bluetoothTransmitters
-                            bluetoothTransmitters.insert(CGMG7Transmitter(address: dexcomG7.blePeripheral.address, name: dexcomG7.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
+                            bluetoothTransmitters.insert(CGMG7Transmitter(address: dexcomG7.blePeripheral.address, name: dexcomG7.blePeripheral.name, transmitterID: dexcomG7.blePeripheral.transmitterId, bluetoothTransmitterDelegate: self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
                             
                             // if CGMG7Transmitter is of type CGM, then assign the address to currentCgmTransmitterAddress, there shouldn't be any other bluetoothPeripherals of type .CGM with shouldconnect = true
                             if bluetoothPeripheralType.category() == .CGM {

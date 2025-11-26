@@ -468,6 +468,9 @@ extension UserDefaults {
         
         /// force StandBy mode to show a big number version of the widget
         case forceStandByBigNumbers = "forceStandByBigNumbers"
+        
+        /// should the landscape chart view show statistics info or just a large chart
+        case showStatisticsOnLandscapeChart = "showStatisticsOnLandscapeChart"
     }
     
     
@@ -2317,6 +2320,17 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.forceStandByBigNumbers.rawValue)
+        }
+    }
+    
+    /// should the landscape chart view show statistics info or just a large chart
+    var showStatisticsOnLandscapeChart: Bool {
+        // default value for bool in userdefaults is false, as default we want the landscape chart view to show the statistics
+        get {
+            return !bool(forKey: Key.showStatisticsOnLandscapeChart.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showStatisticsOnLandscapeChart.rawValue)
         }
     }
     

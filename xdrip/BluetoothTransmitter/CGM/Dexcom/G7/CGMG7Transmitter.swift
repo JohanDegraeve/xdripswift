@@ -85,9 +85,15 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     
     /// Rolling connection id for log correlation (increments on each didConnect)
     private var cycleId: Int = 0
+    
+    /// transmitterId (used to discover and connect to a specific transmitter id
+    private let transmitterId: String?
 
     /// Tracks the name of the authenticated transmitter while a valid coexistence session is active
     private var currentlyAuthenticatedDeviceName: String?
+    
+    /// During new-device discovery, skip the active transmitter id once to give a potential new sensor a chance
+    private var avoidActiveTransmitterIdDuringDiscovery: Bool = true
     
     /// will be used to pass back bluetooth and cgm related events
     private(set) weak var cgmTransmitterDelegate:CGMTransmitterDelegate?
@@ -121,14 +127,16 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     /// - parameters:
     ///     - address: if already connected before, then give here the address that was received during previous connect, if not give nil
     ///     - name : if already connected before, then give here the name that was received during previous connect, if not give nil
+    ///     - transmitterID (optional): should be the name of the dexcom G7/ONE+/Stelo transmitter as seen in the iOS settings, if it doesn't exist, then just search for all and connect as normal
     ///     - bluetoothTransmitterDelegate : a BluetoothTransmitterDelegate
     ///     - cGMTransmitterDelegate : a CGMTransmitterDelegate
     ///     - cGMG7TransmitterDelegate : a CGMG7TransmitterDelegate
-    init(address:String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG7TransmitterDelegate: CGMG7TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate) {
+    init(address:String?, name: String?, transmitterID: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMG7TransmitterDelegate: CGMG7TransmitterDelegate, cGMTransmitterDelegate:CGMTransmitterDelegate) {
         
         // assign addressname and name or expected devicename
         // For G7/ONE+/Stelo we don't listen for a specific device name. Dexcom uses an advertising id, which already filters out all other devices (like tv's etc. We will verify in another way that we have the current active G7/ONE+/Stelo, and not an old one, which is still near
-        var newAddressAndName: BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: "DX")
+        // if the user requests us to connect to a specific transmitter ID, then let's use it
+        var newAddressAndName: BluetoothTransmitter.DeviceAddressAndName = BluetoothTransmitter.DeviceAddressAndName.notYetConnected(expectedName: (transmitterID == nil || transmitterID == ConstantsBluetoothPairing.dummyDexcomG7TypeTransmitterId) ? "DX" : transmitterID)
         
         if let name = name {
             UserDefaults.standard.activeSensorTransmitterId = name
@@ -137,6 +145,9 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         if let address = address {
             newAddressAndName = BluetoothTransmitter.DeviceAddressAndName.alreadyConnectedBefore(address: address, name: name)
         }
+        
+        //assign transmitterId
+        self.transmitterId = transmitterID
         
         // set this to true to make sure that only the raw G7 data is *always* used, even if upgrading from a previous version with a sensor already calibrated in xDrip algorithm
         self.webOOPEnabled = true
@@ -175,16 +186,27 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
     // MARK: - BluetoothTransmitter overriden functions
 
-    // Intercept BluetoothTransmitter's discovery logic to avoid auto-connecting the previous transmitter in new-device discovery mode.
+    // Intercept BluetoothTransmitter's discovery logic to softly avoid auto-connecting the previous transmitter in new-device discovery mode,
+    // while still allowing fallback to the active transmitter after a discovery window.
     override func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        trace("Did discover peripheral with name: %{public}@", log: self.log, category: ConstantsLog.categoryCGMG7, type: .info, peripheral.name ?? "nil")
-        // New-device flow: never connect to the *previously active* transmitter.
-        // This prevents immediately latching onto DXCMx5 and allows the scan to find the *new* DXCMxx.
-        if self.isNewDeviceDiscovery, let activeId = UserDefaults.standard.activeSensorTransmitterId, let discoveredName = peripheral.name, discoveredName == activeId {
-            trace("    skipping previous active transmitter (%{public}@) during new device discovery, keep scanning for the new sensor.", log: self.log, category: ConstantsLog.categoryCGMG7, type: .info, activeId)
+        let discoveredName = peripheral.name ?? "nil"
+        trace("Did discover peripheral with name: %{public}@", log: self.log, category: ConstantsLog.categoryCGMG7, type: .info, discoveredName)
+
+        // If we are not in new-device discovery anymore, use the base behaviour directly.
+        guard isNewDeviceDiscovery else {
+            super.centralManager(central, didDiscover: peripheral, advertisementData: advertisementData, rssi: RSSI)
             return
         }
-        // Call super to retain normal discovery/connect behavior for all other cases
+
+        // In new-device discovery, perform a one-shot soft skip of the active transmitter id if found.
+        // This will only happen if we're not looking for a specific transmitter ID passed in by the user from the view controller
+        if transmitterId == nil, let name = peripheral.name, name.hasPrefix("DX"), let activeId = UserDefaults.standard.activeSensorTransmitterId, avoidActiveTransmitterIdDuringDiscovery, name == activeId {
+            trace("    one-shot skip of active transmitter id (%{public}@) during new sensor discovery", log: self.log, category: ConstantsLog.categoryCGMG7, type: .info, activeId)
+            avoidActiveTransmitterIdDuringDiscovery = false
+            return
+        }
+
+        // Default behaviour: allow BluetoothTransmitter to apply its normal selection logic.
         super.centralManager(central, didDiscover: peripheral, advertisementData: advertisementData, rssi: RSSI)
     }
 
@@ -311,52 +333,25 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
                 let newGlucoseData = GlucoseData(timeStamp: g7GlucoseMessage.timeStamp, glucoseLevelRaw: g7GlucoseMessage.calculatedValue)
 
-                // add glucoseData to backfill
-                // possibly we will send it still later, if we receive also backfill data.
-                backfill.append(newGlucoseData)
+                // Always deliver real-time readings immediately
+                let newGlucoseDataArray = [newGlucoseData]
 
-                // if it's been more than 5 min + 30 seconds since previous reading, then it means there's a gap, and most likely the official Dexcom app will request for backfill data. So in that case we'll not immediately send the reading to the  delegate, but wait for the backfill to arrive
-                if let timeStampLastReading = timeStampLastReading {
-                    if abs(timeStampLastReading.timeIntervalSinceNow) < 330.0 {
-                        let newGlucoseDataArray = [newGlucoseData]
-                        
-                        // Per-cycle summary log before delegate dispatch
-                        let glucoseLevelRawString = String(format: "%.1f", newGlucoseData.glucoseLevelRaw)
-                        let timeStampString = DateFormatter.localizedString(from: newGlucoseData.timeStamp, dateStyle: .none, timeStyle: .medium)
-                        let writeControlCharacteristicIsNotifying = self.writeControlCharacteristic?.isNotifying ?? false
-                        let backfillCharacteristicIsNotifying = self.backfillCharacteristic?.isNotifying ?? false
-                        
-                        trace("    G7 connection cycle summary: value = %{public}@ mg/dL at %{public}@ (cid=%{public}d, extra flow: wc_notify_on = %{public}@, bf_notify_on = %{public}@)", log: log, category: ConstantsLog.categoryCGMG7, type: .info, glucoseLevelRawString, timeStampString, self.cycleId, String(writeControlCharacteristicIsNotifying), String(backfillCharacteristicIsNotifying))
-                        
-                        DispatchQueue.main.async { [weak self] in
-                            guard let self = self else { return }
-                            var copy = newGlucoseDataArray
-                            self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
-                        }
-                        // stability: keep gap logic accurate by advancing last delivered timestamp on immediate delivery
-                        self.timeStampLastReading = g7GlucoseMessage.timeStamp
-                    } else {
-                        // stability: we expect backfill soon, debounce a short flush so UI doesn't look stuck if Dexcom keeps link open
-                    }
-                } else {
-                    // no previous reading, deliver immediately and advance last timestamp
-                    let newGlucoseDataArray = [newGlucoseData]
-                    
-                    // Per-cycle summary log before delegate dispatch
-                    let glucoseLevelRawString = String(format: "%.1f", newGlucoseData.glucoseLevelRaw)
-                    let timeStampString = DateFormatter.localizedString(from: newGlucoseData.timeStamp, dateStyle: .none, timeStyle: .medium)
-                    let writeControlCharacteristicIsNotifying = self.writeControlCharacteristic?.isNotifying ?? false
-                    let backfillCharacteristicIsNotifying = self.backfillCharacteristic?.isNotifying ?? false
-                    
-                    trace("    G7 connection cycle summary: value = %{public}@ mg/dL at %{public}@ (cid=%{public}d, extra flow: wc_notify_on = %{public}@, bf_notify_on = %{public}@)", log: log, category: ConstantsLog.categoryCGMG7, type: .info, glucoseLevelRawString, timeStampString, self.cycleId, String(writeControlCharacteristicIsNotifying), String(backfillCharacteristicIsNotifying))
-                    
-                    DispatchQueue.main.async { [weak self] in
-                        guard let self = self else { return }
-                        var copy = newGlucoseDataArray
-                        self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
-                    }
-                    self.timeStampLastReading = g7GlucoseMessage.timeStamp // stability
+                // Per-cycle summary log before delegate dispatch
+                let glucoseLevelRawString = String(format: "%.1f", newGlucoseData.glucoseLevelRaw)
+                let timeStampString = DateFormatter.localizedString(from: newGlucoseData.timeStamp, dateStyle: .none, timeStyle: .medium)
+                let writeControlCharacteristicIsNotifying = self.writeControlCharacteristic?.isNotifying ?? false
+                let backfillCharacteristicIsNotifying = self.backfillCharacteristic?.isNotifying ?? false
+
+                trace("    G7 connection cycle summary: value = %{public}@ mg/dL at %{public}@ (cid=%{public}d, extra flow: wc_notify_on = %{public}@, bf_notify_on = %{public}@)", log: log, category: ConstantsLog.categoryCGMG7, type: .info, glucoseLevelRawString, timeStampString, self.cycleId, String(writeControlCharacteristicIsNotifying), String(backfillCharacteristicIsNotifying))
+
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    var copy = newGlucoseDataArray
+                    self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: self.sensorAge)
                 }
+
+                // Update last delivered timestamp
+                self.timeStampLastReading = g7GlucoseMessage.timeStamp
 
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
@@ -433,7 +428,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                     self.currentlyAuthenticatedDeviceName = self.deviceName
                     
                     // when paired && authenticated:
-                    if let authenticatedDeviceName = self.deviceName, authenticatedDeviceName.hasPrefix("DX"), UserDefaults.standard.activeSensorTransmitterId != authenticatedDeviceName {
+                    if let authenticatedDeviceName = self.deviceName, authenticatedDeviceName.hasPrefix(transmitterId ?? "DX"), UserDefaults.standard.activeSensorTransmitterId != authenticatedDeviceName {
                         UserDefaults.standard.activeSensorTransmitterId = authenticatedDeviceName
                         trace("    active transmitter id set after authentication: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, authenticatedDeviceName)
                     }
@@ -471,7 +466,6 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
         cycleId += 1
 
         trace("connected to peripheral with name %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, deviceName ?? "'unknown'")
-
 
         // Use descriptive name for deviceName
         if let detectedDeviceName = deviceName, detectedDeviceName.hasPrefix("DX02") {

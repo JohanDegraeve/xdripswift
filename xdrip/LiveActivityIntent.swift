@@ -22,7 +22,7 @@ struct RestartLiveActivityIntent: LiveActivityIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         // restart the live activity via the LiveActivityManager singleton
-        LiveActivityManager.shared.restartActivityFromLiveActivityIntent()
+        LiveActivityManager.shared.restartFromIntent()
         return .result()
     }
 }

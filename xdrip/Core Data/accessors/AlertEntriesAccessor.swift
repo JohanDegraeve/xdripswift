@@ -1,20 +1,19 @@
+import CoreData
 import Foundation
 import os
-import CoreData
 
 class AlertEntriesAccessor {
-    
     // MARK: - Properties
     
     /// for logging
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataAlertEntries)
     
     /// CoreDataManager to use
-    private let coreDataManager:CoreDataManager
+    private let coreDataManager: CoreDataManager
     
     // MARK: - initializer
     
-    init(coreDataManager:CoreDataManager) {
+    init(coreDataManager: CoreDataManager) {
         self.coreDataManager = coreDataManager
     }
 
@@ -23,8 +22,7 @@ class AlertEntriesAccessor {
     /// will check for the specified date (only the time of the day will be used) which AlertEntry is applicable, then for that Alertentry, get the AlertType. Should not be nil. In case it is, a default value will be returned
     ///
     /// if the currentAlertEntry is the last of the day, then the nextAlertEntry in the return value will be the alertentry with start 0
-    func getCurrentAndNextAlertEntry(forAlertKind alertKind:AlertKind, forWhen when:Date, alertTypesAccessor:AlertTypesAccessor) -> (currentAlertEntry:AlertEntry, nextAlertEntry: AlertEntry?) {
-        
+    func getCurrentAndNextAlertEntry(forAlertKind alertKind: AlertKind, forWhen when: Date, alertTypesAccessor: AlertTypesAccessor) -> (currentAlertEntry: AlertEntry, nextAlertEntry: AlertEntry?) {
         // fetch the alert entries
         let alertEntries = getAllEntries(forAlertKind: alertKind, alertTypesAccessor: alertTypesAccessor)
         
@@ -32,16 +30,16 @@ class AlertEntriesAccessor {
         let minutes = Int16(when.minutesSinceMidNightLocalTime())
 
         // initialize currentEntry and nextAlertEntry with nil
-        var currentEntry:AlertEntry?
-        var nextAlertEntry:AlertEntry?
+        var currentEntry: AlertEntry?
+        var nextAlertEntry: AlertEntry?
 
         // search through the alert entries for the current and next alertentry
-        loop: for alertEntry in alertEntries {
+        for alertEntry in alertEntries {
             if alertEntry.start <= minutes {
                 currentEntry = alertEntry
             } else {
                 nextAlertEntry = alertEntry
-                break loop
+                break
             }
         }
         
@@ -51,7 +49,7 @@ class AlertEntriesAccessor {
         }
         
         // if there's no nextalertentry, but there is a currententry with start > 0 then pick as nextalertentry the first of the day, this one is applicable the day after at 00:00
-        if nextAlertEntry == nil && current.start > 0 {
+        if nextAlertEntry == nil, current.start > 0 {
             nextAlertEntry = alertEntries.first
         }
         
@@ -63,8 +61,7 @@ class AlertEntriesAccessor {
     /// - parameters:
     ///     - alertKind the alertKind for which AlertEntries should be fetched, if nil then all AlertEntries are fetched, still sorted by start
     ///     - alertTypesAccessor needed for in case there's no alertEntries for a specific alertKind, then a default alertentry will be created. If alertKind = nil, then this check will be done for every alertkind
-    func getAllEntries(forAlertKind alertKind:AlertKind?, alertTypesAccessor:AlertTypesAccessor) -> [AlertEntry] {
-        
+    func getAllEntries(forAlertKind alertKind: AlertKind?, alertTypesAccessor: AlertTypesAccessor) -> [AlertEntry] {
         // create fetchrequest
         let fetchRequest: NSFetchRequest<AlertEntry> = AlertEntry.fetchRequest()
         
@@ -93,20 +90,28 @@ class AlertEntriesAccessor {
             
             // check for each alertKind if there's at least one alertentry and if not create a default one - if the parameter alertKind is not nil then do this only for this alertKind
             for alertKindInCases in AlertKind.allCases {
-                if alertKind != nil && alertKind != alertKindInCases {
+                if alertKind != nil, alertKind != alertKindInCases {
                     // input parameter is not nil, but the alertKindInCases != alertKind, skip this one
                 } else {
                     // check if there's at least one alertentry for alertKindInCases
                     var entryFound = false
-                    alertentryloop: for alertEntry in alertEntries {
+                    for alertEntry in alertEntries {
                         if alertEntry.alertkind == alertKindInCases.rawValue {
                             entryFound = true
-                            break alertentryloop
+                            
+                            // Check and update the alert entry if needed as an Int16 default is 0 in coredata
+                            // This is a needed migration due to adding these new attributes to the existing coredata AlertKind entity
+                            // triggerValue, if needed and currently zero (i.e. unset), should be set to the default value for each type
+                            if alertKindInCases.needsAlertTriggerValue() && alertEntry.triggerValue == 0 {
+                                alertEntry.triggerValue = Int16(alertKindInCases.defaultAlertTriggerValue())
+                                coreDataManager.saveChanges()
+                            }
+                            break
                         }
                     }
-                    if (!entryFound) {
+                    if !entryFound {
                         // there's no entry found for alertKindInCases, create one and save it in coredata
-                        let  newAlertEntry = AlertEntry(value: alertKindInCases.defaultAlertValue(), alertKind: alertKindInCases, start: 0, alertType: alertTypesAccessor.getDefaultAlertType(), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                        let newAlertEntry = AlertEntry(isDisabled: false, value: alertKindInCases.defaultAlertValue(), triggerValue: alertKindInCases.defaultAlertTriggerValue(), alertKind: alertKindInCases, start: 0, alertType: alertTypesAccessor.getDefaultAlertType(), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                         
                         // insert it at location 0, because it has a start 0, to keep it sorted correctly, at least per alertkind
                         alertEntries.insert(newAlertEntry, at: 0)
@@ -126,8 +131,7 @@ class AlertEntriesAccessor {
     /// - each AlertEntry array has a list of AlertEntries for a specific alertKind, sorted by start
     /// - parameters:
     ///     - alertTypesAccessor needed for in case there's no alertEntries for a specific alertKind, then a default alertentry will be created. If alertKind = nil, then this check will be done for every alertkind
-    func getAllEntriesPerAlertKind(alertTypesAccessor:AlertTypesAccessor) -> [[AlertEntry]] {
-        
+    func getAllEntriesPerAlertKind(alertTypesAccessor: AlertTypesAccessor) -> [[AlertEntry]] {
         // initialize returnvalue
         var returnValue = [[AlertEntry]]()
         

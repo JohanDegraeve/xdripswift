@@ -26,7 +26,7 @@ class Texts_Alerts {
     }()
     
     static let calibrationNeededAlertTitle: String = {
-        return NSLocalizedString("alerts_calibrationneeded", tableName: filename, bundle: Bundle.main, value: "Calibration Needed", comment: "when calibration is needed, this is the title of the alert notification, also in alert settings list, for the name of the alert")
+        return NSLocalizedString("alerts_calibrationneeded", tableName: filename, bundle: Bundle.main, value: "Calibration Reminder", comment: "when calibration is needed, this is the title of the alert notification, also in alert settings list, for the name of the alert")
     }()
     
     static let batteryLowAlertTitle: String = {
@@ -69,12 +69,24 @@ class Texts_Alerts {
         return NSLocalizedString("alertvalue", tableName: filename, bundle: Bundle.main, value: "Value", comment: "an alert is applicable as of a certain value (eg low alert as of 70 mg/dl), this is the name of the field in the settings screen that allows to modify this valule")
     }()
     
+    static let alertWhenBelowValue: String = {
+        return NSLocalizedString("alertWhenBelowValue", tableName: filename, bundle: Bundle.main, value: "Only When Below", comment: "an alert is only triggered when below a certain value")
+    }()
+    
+    static let alertWhenAboveValue: String = {
+        return NSLocalizedString("alertWhenAboveValue", tableName: filename, bundle: Bundle.main, value: "Only When Above", comment: "an alert is only triggered when above a certain value")
+    }()
+    
     static let alerttype: String = {
         return NSLocalizedString("alerttype", tableName: filename, bundle: Bundle.main, value: "Alarm Type", comment: "an alert is applicable as of a certain value (eg low alert as of 70 mg/dl), this is the name of the field in the settings screen that allows to modify this valule")
     }()
     
     static let changeAlertValue: String = {
         return NSLocalizedString("changealertvalue", tableName: filename, bundle: Bundle.main, value: "Change Alarm Value", comment: "when editing an alert value, a pop is shown, this is the explanation message in the pop up")
+    }()
+    
+    static let changeAlertTriggerValue: String = {
+        return NSLocalizedString("changeAlertTriggerValue", tableName: filename, bundle: Bundle.main, value: "Change Alarm Trigger Value", comment: "when editing an alert trigger value, a pop is shown, this is the explanation message in the pop up")
     }()
     
     static let confirmDeletionAlert: String = {

@@ -350,6 +350,7 @@ class Trace {
         traceInfo.appendStringAndNewLine("    Measurement unit: " + (UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
         
         if UserDefaults.standard.isMaster {
+            traceInfo.appendStringAndNewLine("    Upload master values to Nightscout: " + UserDefaults.standard.masterUploadDataToNightscout.description)
             
             if let cgmTransmitterTypeAsString = UserDefaults.standard.cgmTransmitterTypeAsString {
                 traceInfo.appendStringAndNewLine("    Transmitter type: " + cgmTransmitterTypeAsString)
@@ -360,11 +361,25 @@ class Trace {
             traceInfo.appendStringAndNewLine("    Keep-alive type: " + UserDefaults.standard.followerBackgroundKeepAliveType.description)
             traceInfo.appendStringAndNewLine("    Patient name: " + (UserDefaults.standard.followerPatientName?.description ?? "nil"))
             
-            // if follower mode, what is the data source selected
-            if UserDefaults.standard.followerDataSourceType == .libreLinkUp {
+            if UserDefaults.standard.followerDataSourceType == .nightscout {
+                traceInfo.appendStringAndNewLine("    URL: " + ((UserDefaults.standard.nightscoutUrl?.description ?? "") != "" ? "present" : "missing"))
+                traceInfo.appendStringAndNewLine("    Upload follower values to Nightscout: " + UserDefaults.standard.followerUploadDataToNightscout.description)
+            }
+            
+            if UserDefaults.standard.followerDataSourceType == .libreLinkUp || UserDefaults.standard.followerDataSourceType == .libreLinkUpRussia {
                 traceInfo.appendStringAndNewLine("    Username: " + ((UserDefaults.standard.libreLinkUpEmail?.description ?? "") != "" ? "present" : "missing"))
                 traceInfo.appendStringAndNewLine("    Password: " + ((UserDefaults.standard.libreLinkUpPassword?.description ?? "") != "" ? "present" : "missing"))
-                traceInfo.appendStringAndNewLine("    Upload to Nightscout: " + UserDefaults.standard.followerUploadDataToNightscout.description)
+                traceInfo.appendStringAndNewLine("    Region: " + (UserDefaults.standard.libreLinkUpRegion?.description ?? "nil"))
+                traceInfo.appendStringAndNewLine("    Country: " + (UserDefaults.standard.libreLinkUpCountry?.description ?? "nil"))
+                traceInfo.appendStringAndNewLine("    Is 15 day sensor: " + UserDefaults.standard.libreLinkUpIs15DaySensor.description)
+                traceInfo.appendStringAndNewLine("    Upload LLU follower values to Nightscout: " + UserDefaults.standard.followerUploadDataToNightscout.description)
+            }
+            
+            if UserDefaults.standard.followerDataSourceType == .dexcomShare {
+                traceInfo.appendStringAndNewLine("    Username: " + ((UserDefaults.standard.dexcomShareAccountName?.description ?? "") != "" ? "present" : "missing"))
+                traceInfo.appendStringAndNewLine("    Password: " + ((UserDefaults.standard.dexcomSharePassword?.description ?? "") != "" ? "present" : "missing"))
+                traceInfo.appendStringAndNewLine("    Region: " + UserDefaults.standard.dexcomShareRegion.description)
+                traceInfo.appendStringAndNewLine("    Upload Share follower values to Nightscout: " + UserDefaults.standard.followerUploadDataToNightscout.description)
             }
         }
         
@@ -708,10 +723,19 @@ class Trace {
                 let alertEntries = alertEntriesAccessor.getAllEntries(forAlertKind: alertKind, alertTypesAccessor: alertTypesAccessor)
                 
                 for alertEntry in alertEntries {
-                    traceInfo.appendStringAndNewLine("        -> start: " + alertEntry.start.convertMinutesToTimeAsString() + " / value: " +  alertEntry.value.description + " / alarm type: " + alertEntry.alertType.description)
-                    
+                    if alertEntry.isDisabled {
+                        traceInfo.appendStringAndNewLine("        -> disabled")
+                    } else {
+                        switch alertKind {
+                        case .fastdrop:
+                            traceInfo.appendStringAndNewLine("        -> start: " + alertEntry.start.convertMinutesToTimeAsString() + " / value: " +  alertEntry.value.description + " / when < " +  alertEntry.triggerValue.description + " / alarm type: " + alertEntry.alertType.description)
+                        case .fastrise:
+                            traceInfo.appendStringAndNewLine("        -> start: " + alertEntry.start.convertMinutesToTimeAsString() + " / value: " +  alertEntry.value.description + " / when > " +  alertEntry.triggerValue.description + " / alarm type: " + alertEntry.alertType.description)
+                        default:
+                            traceInfo.appendStringAndNewLine("        -> start: " + alertEntry.start.convertMinutesToTimeAsString() + " / value: " +  alertEntry.value.description + " / alarm type: " + alertEntry.alertType.description)
+                        }
+                    }
                 }
-                
             }
             
             traceInfo.appendStringAndNewLine(paragraphSeperator)

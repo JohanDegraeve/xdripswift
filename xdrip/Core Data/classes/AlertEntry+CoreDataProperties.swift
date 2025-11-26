@@ -7,19 +7,18 @@
 //
 //
 
-import Foundation
 import CoreData
+import Foundation
 
-
-extension AlertEntry {
-
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<AlertEntry> {
+public extension AlertEntry {
+    @nonobjc class func fetchRequest() -> NSFetchRequest<AlertEntry> {
         return NSFetchRequest<AlertEntry>(entityName: "AlertEntry")
     }
 
-    @NSManaged public var start: Int16
-    @NSManaged public var value: Int16
-    @NSManaged public var alertkind: Int16
-    @NSManaged public var alertType: AlertType
-
+    @NSManaged var isDisabled: Bool
+    @NSManaged var start: Int16
+    @NSManaged var value: Int16
+    @NSManaged var triggerValue: Int16
+    @NSManaged var alertkind: Int16
+    @NSManaged var alertType: AlertType
 }

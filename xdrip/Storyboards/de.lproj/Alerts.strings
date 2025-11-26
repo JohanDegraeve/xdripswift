@@ -8,7 +8,7 @@
 "alerts_batterylow" = "Transmitter Batterie schwach";
 
 /// when calibration is needed, this is the title of the alert notification, also in alert settings list, for the name of the alert
-"alerts_calibrationneeded" = "Kalibrierung notwendig";
+"alerts_calibrationneeded" = "Erinnerung Kalibrierung";
 
 /// an alentry is applicable as of a certain value (eg low alert as of 70 mg/dl), this is the name of the field in the settings screen that allows to modify this valule
 "alertvalue" = "Wert";
@@ -51,3 +51,6 @@
 
 /// an alentry is applicable as of a certain value (eg low alert as of 70 mg/dl), this is the name of the field in the settings screen that allows to modify this valule
 "alerttype" = "Alarm Typ";
+
+"alertWhenBelowValue" = "Nur unter";
+"alertWhenAboveValue" = "Nur über";

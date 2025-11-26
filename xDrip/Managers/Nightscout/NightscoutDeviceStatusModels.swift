@@ -8,9 +8,10 @@
 import Foundation
 import SwiftUI
 
-// MARK: Internal DeviceStatus model
+// MARK: - Internal NightscoutDeviceStatus
 
 /// Struct to hold internal DeviceStatus
+/// Initialize from a NightscoutDeviceStatusResponse
 struct NightscoutDeviceStatus: Codable {
     var updatedDate: Date = .distantPast
     var lastCheckedDate: Date = .distantPast
@@ -82,7 +83,6 @@ struct NightscoutDeviceStatus: Codable {
                 return nil
             }
         }
-        
         return nil
     }
     
@@ -102,7 +102,6 @@ struct NightscoutDeviceStatus: Codable {
                 return nil
             }
         }
-        
         return nil
     }
     
@@ -112,7 +111,6 @@ struct NightscoutDeviceStatus: Codable {
             let deviceName = device.components(separatedBy: "://")
             return deviceName.count > 1 ? deviceName[1].capitalizedSentence : nil
         }
-        
         return nil
     }
     
@@ -133,9 +131,7 @@ struct NightscoutDeviceStatus: Codable {
             reason = reason.replacingOccurrences(of: "&gt;", with: ">")
             reason = reason.replacingOccurrences(of: "&le;", with: "<=")
             reason = reason.replacingOccurrences(of: "&ge;", with: ">=")
-            
             return reason.components(separatedBy: ", ")
-            
         } else {
             return nil
         }
@@ -178,7 +174,6 @@ struct NightscoutDeviceStatus: Codable {
                 }
             }
         }
-        
         return nil
     }
     
@@ -193,7 +188,6 @@ struct NightscoutDeviceStatus: Codable {
                 return nil
             }
         }
-        
         return nil
     }
     
@@ -205,7 +199,6 @@ struct NightscoutDeviceStatus: Codable {
                 return nil
             }
         }
-        
         return nil
     }
     
@@ -289,7 +282,6 @@ struct NightscoutDeviceStatus: Codable {
                 return .yellow
             }
         }
-        
         return nil
     }
     
@@ -301,7 +293,6 @@ struct NightscoutDeviceStatus: Codable {
                 return UIColor.systemYellow
             }
         }
-        
         return nil
     }
     
@@ -313,7 +304,6 @@ struct NightscoutDeviceStatus: Codable {
                 return .yellow
             }
         }
-        
         return nil
     }
     
@@ -325,17 +315,256 @@ struct NightscoutDeviceStatus: Codable {
                 return UIColor.systemYellow
             }
         }
-        
         return nil
     }
 }
 
-// MARK: OpenAPS DeviceStatus model
+// MARK: Internal NightscoutDeviceStatus initializer
 
-/// Struct to parse OpenAPS DeviceStatus downloaded from Nightscout
-struct NightscoutDeviceStatusOpenAPSResponse: Codable {
+extension NightscoutDeviceStatus {
+    /// Initialize from a unified NightscoutDeviceStatusResponse
+    init(from unified: NightscoutDeviceStatusResponse) {
+        self.init()
+        
+        // Parse createdAt
+        if let createdAtStr = unified.createdAt {
+            self.createdAt = ISO8601DateFormatter.withFractionalSeconds.date(from: createdAtStr)
+                ?? ISO8601DateFormatter().date(from: createdAtStr)
+                ?? .distantPast
+        }
+        
+        self.device = unified.device
+        self.id = unified.id ?? ""
+        self.mills = unified.mills ?? 0
+        self.utcOffset = unified.utcOffset ?? 0
+        
+        // Uploader battery: always from uploader.battery (int, percent)
+        self.uploaderBatteryPercent = unified.uploader?.battery ?? unified.uploaderBattery
+        self.uploaderIsCharging = unified.isCharging ?? unified.uploader?.isCharging
+
+        // OpenAPS fields
+        var lastLoopDates: [Date] = []
+        var cobCandidates: [(value: Double, timestamp: Date?)] = []
+        var iobCandidates: [(value: Double, timestamp: Date?)] = []
+
+        if let openAPS = unified.openAPS {
+            self.appVersion = openAPS.version
+            let enacted = openAPS.enacted
+            let suggested = openAPS.suggested
+            let useSuggested = suggested != nil && (enacted == nil || (suggested?.timestamp ?? "") > (enacted?.timestamp ?? ""))
+            let selectedAPS = useSuggested ? suggested : enacted
+            if let aps = selectedAPS {
+                self.currentTarget = aps.currentTarget
+                self.duration = aps.duration
+                self.eventualBG = aps.eventualBG
+                self.isf = aps.isf ?? aps.variableSens
+                self.insulinReq = aps.insulinReq
+                self.rate = aps.rate
+                self.reason = aps.reason
+                self.sensitivityRatio = aps.sensitivityRatio
+                self.tdd = aps.tdd
+                let apsTimestampDate: Date? = aps.timestamp.flatMap { ISO8601DateFormatter.withFractionalSeconds.date(from: $0) ?? ISO8601DateFormatter().date(from: $0) }
+                self.timestamp = apsTimestampDate
+                if let apsTimestampDate = apsTimestampDate { lastLoopDates.append(apsTimestampDate) }
+                if let cobValue = aps.cob { cobCandidates.append((cobValue, apsTimestampDate)) }
+                if let iobValue = aps.iob { iobCandidates.append((iobValue, apsTimestampDate)) }
+            }
+            // Also consider enacted/suggested timestamps for lastLoopDate
+            if let enactedTimestampString = enacted?.timestamp {
+                let enactedTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: enactedTimestampString) ?? ISO8601DateFormatter().date(from: enactedTimestampString)
+                if let enactedTimestampDate = enactedTimestampDate { lastLoopDates.append(enactedTimestampDate) }
+                if let cobValue = enacted?.cob { cobCandidates.append((cobValue, enactedTimestampDate)) }
+                if let iobValue = enacted?.iob { iobCandidates.append((iobValue, enactedTimestampDate)) }
+            }
+            if let suggestedTimestampString = suggested?.timestamp {
+                let suggestedTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: suggestedTimestampString) ?? ISO8601DateFormatter().date(from: suggestedTimestampString)
+                if let suggestedTimestampDate = suggestedTimestampDate { lastLoopDates.append(suggestedTimestampDate) }
+                if let cobValue = suggested?.cob { cobCandidates.append((cobValue, suggestedTimestampDate)) }
+                if let iobValue = suggested?.iob { iobCandidates.append((iobValue, suggestedTimestampDate)) }
+            }
+        }
+
+        if let loop = unified.loop {
+            self.appVersion = loop.version ?? appVersion
+            self.error = loop.failureReason
+            self.insulinReq = loop.recommendedBolus ?? insulinReq
+            self.eventualBG = loop.predicted?.values?.last ?? eventualBG
+            if let cobValue = loop.cob?.cob {
+                let cobTimestampDate = loop.cob?.timestamp.flatMap { ISO8601DateFormatter.withFractionalSeconds.date(from: $0) ?? ISO8601DateFormatter().date(from: $0) }
+                cobCandidates.append((cobValue, cobTimestampDate))
+            }
+            if let iobValue = loop.iob?.iob {
+                let iobTimestampDate = loop.iob?.timestamp.flatMap { ISO8601DateFormatter.withFractionalSeconds.date(from: $0) ?? ISO8601DateFormatter().date(from: $0) }
+                iobCandidates.append((iobValue, iobTimestampDate))
+            }
+            if let enacted = loop.enacted {
+                self.bolusVolume = enacted.bolusVolume
+                self.duration = enacted.duration ?? duration
+                self.rate = enacted.rate ?? rate
+                if let enactedTimestampString = enacted.timestamp {
+                    let enactedTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: enactedTimestampString) ?? ISO8601DateFormatter().date(from: enactedTimestampString)
+                    if let enactedTimestampDate = enactedTimestampDate { lastLoopDates.append(enactedTimestampDate) }
+                }
+            }
+            if let loopTimestampString = loop.timestamp {
+                let loopTimestampDate = ISO8601DateFormatter.withFractionalSeconds.date(from: loopTimestampString) ?? ISO8601DateFormatter().date(from: loopTimestampString)
+                if let loopTimestampDate = loopTimestampDate { lastLoopDates.append(loopTimestampDate) }
+            }
+        }
+        
+        struct AutomaticDoseRecommendation: Codable {
+            struct TempBasalAdjustment: Codable {
+                let duration: Int?
+                let rate: Double?
+            }
+
+            let bolusVolume: Double?
+            let timestamp: String?
+            let tempBasalAdjustment: TempBasalAdjustment?
+        }
+
+        // --- Robust, endpoint-accurate COB/IOB parsing for all system types ---
+        // OpenAPS/AAPS/iAPS/Trio: use openAPS.suggested.cob/iob, then openAPS.enacted.cob/iob
+        // Loop: use loop.cob.cob, loop.iob.iob
+        // Fallback: most recent candidate
+
+        var cobValue: Double?
+        var iobValue: Double?
+
+        // OpenAPS/AAPS/iAPS/Trio: use .cob/.iob properties (mapped from COB/IOB in JSON)
+        if let openAPS = unified.openAPS {
+            if let cob = openAPS.suggested?.cob { cobValue = cob }
+            else if let cob = openAPS.enacted?.cob { cobValue = cob }
+            if let iob = openAPS.suggested?.iob { iobValue = iob }
+            else if let iob = openAPS.enacted?.iob { iobValue = iob }
+        }
+
+        // Loop
+        if let loop = unified.loop {
+            if let cob = loop.cob?.cob { cobValue = cob }
+            if let iob = loop.iob?.iob { iobValue = iob }
+        }
+
+        // Fallback: most recent candidate (for future-proofing, e.g. Trio/iAPS variants)
+        func mostRecentValue<T>(_ candidates: [(value: T, timestamp: Date?)]) -> T? {
+            return candidates.sorted(by: { ($0.timestamp ?? .distantPast) > ($1.timestamp ?? .distantPast) }).first?.value
+        }
+        
+        if cobValue == nil { cobValue = mostRecentValue(cobCandidates) }
+        if iobValue == nil { iobValue = mostRecentValue(iobCandidates) }
+
+        self.cob = cobValue
+        self.iob = iobValue
+
+        // Set lastLoopDate to the most recent valid date found
+        if let mostRecent = lastLoopDates.max(), mostRecent > .distantPast {
+            self.lastLoopDate = mostRecent
+        }
+
+        // Override fields
+        if let override = unified.override {
+            self.overrideActive = override.active
+            self.overrideName = override.name
+            self.overrideMaxValue = override.currentCorrectionRange?.maxValue
+            self.overrideMinValue = override.currentCorrectionRange?.minValue
+            self.overrideMultiplier = override.multiplier
+        }
+
+        // Pump fields
+        if let pump = unified.pump {
+            self.pumpManufacturer = pump.manufacturer ?? pumpManufacturer
+            self.pumpModel = pump.model ?? pumpModel
+            // Pump battery: always from pump.battery.percent (never from uploader.battery)
+            self.pumpBatteryPercent = pump.battery?.percent ?? pumpBatteryPercent
+            if let clock = pump.clock {
+                self.pumpClock = ISO8601DateFormatter.withFractionalSeconds.date(from: clock) ?? ISO8601DateFormatter().date(from: clock)
+            }
+            self.pumpID = pump.pumpID ?? pumpID
+            self.pumpIsBolusing = pump.bolusing ?? pump.status?.bolusing ?? pumpIsBolusing
+            self.pumpIsSuspended = pump.suspended ?? pump.status?.suspended ?? pumpIsSuspended
+            self.pumpStatus = pump.reservoir_display_override ?? pump.status?.status ?? pumpStatus
+            if let ts = pump.status?.timestamp {
+                self.pumpStatusTimestamp = ISO8601DateFormatter.withFractionalSeconds.date(from: ts) ?? ISO8601DateFormatter().date(from: ts)
+            }
+            // For Omnipod/Dash, if reservoir value being returned is nil,
+            // set to omniPodReservoirFlagNumber so that the UI will display "50+"
+            if pumpManufacturer?.lowercased() == "insulet" || pumpModel?.lowercased() == "dash" {
+                self.pumpReservoir = pump.reservoir ?? ConstantsNightscout.omniPodReservoirFlagNumber
+            } else {
+                self.pumpReservoir = pump.reservoir ?? pumpReservoir
+            }
+            self.activeProfile = pump.extended?.activeProfile ?? activeProfile
+            self.baseBasalRate = pump.extended?.baseBasalRate ?? baseBasalRate
+            self.appVersion = pump.extended?.version ?? appVersion
+        }
+    }
+}
+
+// MARK: - External downloaded NightscoutDeviceStatusResponse
+
+/// Robust, tolerant unified model for decoding Nightscout devicestatus endpoint (AAPS, Trio, Loop, iAPS, OpenAPS etc)
+struct NightscoutDeviceStatusResponse: Codable {
+    struct Suggested: Codable {
+        let carbohydratesOnBoard: Double?
+        let carbohydrateRatio: Double?
+        let currentTarget: Double?
+        let duration: Int?
+        let eventualBloodGlucose: Double?
+        let insulinOnBoard: Double?
+        let insulinSensitivityFactor: Double?
+        let insulinRequired: Double?
+        let rate: Double?
+        let reason: String?
+        let received: Bool?
+        let recieved: Bool? // Was the action received (iAPS typo)
+        let reservoir: Double?
+        let sensitivityRatio: Double?
+        let totalDailyDose: Double?
+        let timestamp: String?
+        let units: Double?
+        let variableSensitivity: Double?
+
+        private enum CodingKeys: String, CodingKey {
+            case carbohydratesOnBoard = "COB"
+            case carbohydrateRatio
+            case currentTarget
+            case duration
+            case eventualBloodGlucose = "eventualBG"
+            case insulinOnBoard = "IOB"
+            case insulinSensitivityFactor
+            case insulinRequired = "insulinReq"
+            case rate
+            case reason
+            case received
+            case recieved // iAPS typo
+            case reservoir
+            case sensitivityRatio
+            case totalDailyDose = "TDD"
+            case timestamp
+            case units
+            case variableSensitivity
+        }
+    }
+    
+    let createdAt: String?
+    let device: String?
+    let id: String?
+    let isCharging: Bool?
+    let mills: Int?
+    let openAPS: OpenAPS?
+    let loop: Loop?
+    let override: Override?
+    let pump: Pump?
+    let uploader: Uploader?
+    let uploaderBattery: Int?
+    let utcOffset: Int?
+
     struct OpenAPS: Codable {
-        struct Suggested: Codable {
+        let enacted: APSuggestion?
+        let suggested: APSuggestion?
+        let version: String?
+
+        struct APSuggestion: Codable {
             let cob: Double?
             let cr: Double?
             let currentTarget: Double?
@@ -347,14 +576,14 @@ struct NightscoutDeviceStatusOpenAPSResponse: Codable {
             let rate: Double?
             let reason: String?
             let received: Bool?
-            let recieved: Bool? // spelt incorrectly in iAPS
+            let recieved: Bool? // iAPS typo
             let reservoir: Double?
             let sensitivityRatio: Double?
             let tdd: Double?
             let timestamp: String?
             let units: Double?
             let variableSens: Double?
-            
+
             private enum CodingKeys: String, CodingKey {
                 case cob = "COB"
                 case cr = "CR"
@@ -367,7 +596,7 @@ struct NightscoutDeviceStatusOpenAPSResponse: Codable {
                 case rate
                 case reason
                 case received
-                case recieved // spelt incorrectly in iAPS
+                case recieved
                 case reservoir
                 case sensitivityRatio
                 case tdd = "TDD"
@@ -376,106 +605,9 @@ struct NightscoutDeviceStatusOpenAPSResponse: Codable {
                 case variableSens = "variable_sens"
             }
         }
-        
-        let enacted: Suggested?
-        let suggested: Suggested?
-        let version: String?
     }
-    
-    struct Pump: Codable {
-        struct Battery: Codable {
-            let percent: Int?
-        }
-        
-        struct Status: Codable {
-            let bolusing: Bool?
-            let status: String?
-            let suspended: Bool?
-            let timestamp: String?
-        }
-        
-        struct Extended: Codable {
-            let version: String?
-            let activeProfile: String?
-            let baseBasalRate: Double?
-            
-            private enum CodingKeys: String, CodingKey {
-                case version = "Version"
-                case activeProfile = "ActiveProfile"
-                case baseBasalRate = "BaseBasalRate"
-            }
-        }
-        
-        let battery: Battery?
-        let reservoir: Double?
-        let clock: String?
-        let status: Status?
-        let extended: Extended?
-    }
-    
-    struct Uploader: Codable {
-        let battery: Int?
-        let isCharging: Bool?
-    }
-    
-    let createdAt: String?
-    let device: String?
-    let id: String?
-    let isCharging: Bool?
-    let mills: Int?
-    let openAPS: OpenAPS?
-    let pump: Pump?
-    let uploader: Uploader?
-    let uploaderBattery: Int?
-    let utcOffset: Int?
-    
-    private enum CodingKeys: String, CodingKey {
-        case createdAt = "created_at"
-        case device
-        case id = "_id"
-        case isCharging
-        case mills
-        case openAPS = "openaps"
-        case pump
-        case uploader
-        case uploaderBattery
-        case utcOffset
-    }
-}
 
-// MARK: Loop DeviceStatus model
-
-/// Struct to parse OpenAPS DeviceStatus downloaded from Nightscout
-struct NightscoutDeviceStatusLoopResponse: Codable {
     struct Loop: Codable {
-        struct AutomaticDoseRecommendation: Codable {
-            let bolusVolume: Double?
-            let timestamp: String?
-        }
-        
-        struct COB: Codable {
-            let cob: Double?
-            let timestamp: String?
-        }
-        
-        struct Enacted: Codable {
-            let bolusVolume: Double?
-            let duration: Int?
-            let rate: Double?
-            let received: Bool?
-            let timestamp: String?
-        }
-        
-        struct IOB: Codable {
-            let iob: Double?
-            let timestamp: String?
-        }
-        
-        struct Predicted: Codable {
-            let startDate: String?
-            let values: [Double]?
-        }
-        
         let automaticDoseRecommendation: AutomaticDoseRecommendation?
         let cob: COB?
         let enacted: Enacted?
@@ -486,25 +618,54 @@ struct NightscoutDeviceStatusLoopResponse: Codable {
         let recommendedBolus: Double?
         let timestamp: String?
         let version: String?
-    }
-    
-    struct Override: Codable {
-        struct CurrentCorrectionRange: Codable {
-            let maxValue: Double?
-            let minValue: Double?
+
+        struct AutomaticDoseRecommendation: Codable {
+            struct TempBasalAdjustment: Codable {
+                let duration: Int?
+                let rate: Double?
+            }
+
+            let bolusVolume: Double?
+            let timestamp: String?
+            let tempBasalAdjustment: TempBasalAdjustment?
         }
-        
+
+        struct COB: Codable {
+            let cob: Double?
+            let timestamp: String?
+        }
+
+        struct Enacted: Codable {
+            let bolusVolume: Double?
+            let duration: Int?
+            let rate: Double?
+            let received: Bool?
+            let timestamp: String?
+        }
+
+        struct IOB: Codable {
+            let iob: Double?
+            let timestamp: String?
+        }
+
+        struct Predicted: Codable {
+            let startDate: String?
+            let values: [Double]?
+        }
+    }
+
+    struct Override: Codable {
         let active: Bool?
         let currentCorrectionRange: CurrentCorrectionRange?
         let name: String?
         let multiplier: Double?
-    }
-    
-    struct Pump: Codable {
-        struct Battery: Codable {
-            let percent: Int?
+        struct CurrentCorrectionRange: Codable {
+            let maxValue: Double?
+            let minValue: Double?
         }
-        
+    }
+
+    struct Pump: Codable {
         let battery: Battery?
         let bolusing: Bool?
         let clock: String?
@@ -514,34 +675,53 @@ struct NightscoutDeviceStatusLoopResponse: Codable {
         let reservoir: Double?
         let reservoir_display_override: String?
         let secondsFromGMT: Int?
+        let status: Status?
         let suspended: Bool?
+        let extended: Extended?
+        struct Battery: Codable { let percent: Int? }
+        struct Status: Codable {
+            let bolusing: Bool?
+            let status: String?
+            let suspended: Bool?
+            let timestamp: String?
+        }
+
+        struct Extended: Codable {
+            let version: String?
+            let activeProfile: String?
+            let baseBasalRate: Double?
+        }
     }
-    
+
     struct Uploader: Codable {
         let battery: Int?
+        let isCharging: Bool?
         let name: String?
         let timestamp: String?
     }
-    
-    let createdAt: String?
-    let device: String?
-    let id: String?
-    let loop: Loop?
-    let mills: Int?
-    let override: Override?
-    let pump: Pump?
-    let uploader: Uploader?
-    let utcOffset: Int?
-    
+
     private enum CodingKeys: String, CodingKey {
         case createdAt = "created_at"
         case device
         case id = "_id"
-        case loop
+        case isCharging
         case mills
+        case openAPS = "openaps"
+        case loop
         case override
         case pump
         case uploader
+        case uploaderBattery
         case utcOffset
     }
+}
+
+// MARK: - ISO8601DateFormatter with fractional seconds
+
+extension ISO8601DateFormatter {
+    static let withFractionalSeconds: ISO8601DateFormatter = {
+        let dateFormatter = ISO8601DateFormatter()
+        dateFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        return dateFormatter
+    }()
 }

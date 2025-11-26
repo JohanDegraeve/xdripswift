@@ -7,7 +7,7 @@
 "alerts_snooze" = "Silenciar";
 "alerts_select_snooze_time" = "Escolha Tempo Silenciar";
 "alerts_missedreadingalerttitle" = "Leituras Perdidas";
-"alerts_calibrationneeded" = "Necessidade de Calibrar";
+"alerts_calibrationneeded" = "Recordatorio de Calibración";
 "alerts_batterylow" = "Bateria fraca do Transmissor";
 "alertstart" = "Aplicar desde";
 "alertvalue" = "Valor";
