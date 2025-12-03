@@ -153,7 +153,9 @@ class ContactImageManager: NSObject {
                let contact = (try? self.contactStore.unifiedContacts(matching: CNContact.predicateForContacts(withIdentifiers: [identifier]), keysToFetch: keyToFetch))?.first,
                contact.givenName == ConstantsHomeView.applicationName {
                 if lastReading.count > 0 {
-                    trace("in updateContact, contact found by identifier. Updating the contact image to %{public}@ %{public}@.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+                    trace("in updateContact, contact found using stored identifier. Updating the contact image to %{public}@%{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+                } else {
+                    trace("in updateContact, contact wasn't found using stored identifier. Trying to match by app name", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
                 }
                 guard let mutableContact = contact.mutableCopy() as? CNMutableContact else { return }
                 mutableContact.imageData = contactImageView.getImage().pngData()
@@ -170,7 +172,7 @@ class ContactImageManager: NSObject {
             if let contact = contacts.first {
                 // Fallback: update the first contact with the app name if none have the note (legacy or bug)
                 if lastReading.count > 0 {
-                    trace("in updateContact, '%{public}@' contact found (by name only). Updating the contact image to %{public}@ %{public}@.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+                    trace("in updateContact, '%{public}@' contact found using application name. Updating the contact image to %{public}@%{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
                 }
                 guard let mutableContact = contact.mutableCopy() as? CNMutableContact else { return }
                 mutableContact.imageData = contactImageView.getImage().pngData()
@@ -180,9 +182,9 @@ class ContactImageManager: NSObject {
                 UserDefaults.standard.set(contact.identifier, forKey: self.contactIdentifierKey)
             } else {
                 if lastReading.count > 0 {
-                    trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' and adding a contact image with %{public}@ %{public}@.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+                    trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' and adding a contact image with %{public}@ %{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
                 } else {
-                    trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' with empty contact image (no BG data).", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName)
+                    trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' with empty contact image (no BG data)", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName)
                 }
                 let contact = CNMutableContact()
                 var appVersion: String = " "

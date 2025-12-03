@@ -115,7 +115,7 @@ public class AlertManager: NSObject {
         
         // check if "Snooze All" is activated. If so, then just return with nothing.
         if let snoozeAllAlertsUntilDate = UserDefaults.standard.snoozeAllAlertsUntilDate, snoozeAllAlertsUntilDate > Date() {
-            trace("in alertNcheckAlertseeded, skipping all alert checks as Snooze All is enabled until %{public}@.", log: log, category: ConstantsLog.categoryAlertManager, type: .info, snoozeAllAlertsUntilDate.formatted(date: .abbreviated, time: .standard))
+            trace("in checkAlerts, skipping as Snooze All is enabled for the next %{public}@", log: log, category: ConstantsLog.categoryAlertManager, type: .info, snoozeAllAlertsUntilDate.daysAndHoursRemaining())
             return false
         }
         

@@ -559,30 +559,26 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         switch setting {
         case .followerExtraRow2:
             if UserDefaults.standard.isMaster {
-                return UserDefaults.standard.nightscoutEnabled ? UISwitch(isOn: UserDefaults.standard.masterUploadDataToNightscout, action: { (isOn: Bool) in UserDefaults.standard.masterUploadDataToNightscout = isOn } ) : nil
+                return UserDefaults.standard.nightscoutEnabled ? UISwitch(isOn: UserDefaults.standard.masterUploadDataToNightscout, action: { (isOn: Bool) in
+                    trace("isMaster changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.masterUploadDataToNightscout = isOn } ) : nil
             } else {
                 return nil
             }
             
         case .followerExtraRow5:
-            return UserDefaults.standard.nightscoutEnabled ? UISwitch(isOn: UserDefaults.standard.followerUploadDataToNightscout, action: { (isOn: Bool) in UserDefaults.standard.followerUploadDataToNightscout = isOn } ) : nil
-            
-        case .followerExtraRow8:
-            switch UserDefaults.standard.followerDataSourceType {
-//            case .dexcomShare:
-//                return UISwitch(isOn: UserDefaults.standard.useUSDexcomShareurl, action: { (isOn: Bool) in
-//                    UserDefaults.standard.useUSDexcomShareurl = isOn } )
-            default:
-                return nil
-            }
+            return UserDefaults.standard.nightscoutEnabled ? UISwitch(isOn: UserDefaults.standard.followerUploadDataToNightscout, action: { (isOn: Bool) in
+                trace("followerUploadDataToNightscout changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, isOn.description)
+                UserDefaults.standard.followerUploadDataToNightscout = isOn } ) : nil
             
         case .followerExtraRow11:
             return UISwitch(isOn: UserDefaults.standard.libreLinkUpIs15DaySensor, action: { (isOn: Bool) in
+                trace("libreLinkUpIs15DaySensor changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, isOn.description)
                 UserDefaults.standard.libreLinkUpIs15DaySensor = isOn
                 UserDefaults.standard.activeSensorMaxSensorAgeInDays = UserDefaults.standard.libreLinkUpIs15DaySensor ? ConstantsLibreLinkUp.libreLinkUpMaxSensorAgeInDaysLibrePlus : ConstantsLibreLinkUp.libreLinkUpMaxSensorAgeInDays
             })
 
-        case .bloodGlucoseUnit, .masterFollower, .followerExtraRow3, .followerExtraRow4, .followerExtraRow6, .followerExtraRow7, .followerExtraRow9, .followerExtraRow10:
+        case .bloodGlucoseUnit, .masterFollower, .followerExtraRow3, .followerExtraRow4, .followerExtraRow6, .followerExtraRow7, .followerExtraRow8, .followerExtraRow9, .followerExtraRow10:
             return nil
         }
     }

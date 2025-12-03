@@ -1,3 +1,4 @@
+import os
 import UIKit
 
 fileprivate enum Setting:Int, CaseIterable {
@@ -21,6 +22,9 @@ fileprivate enum Setting:Int, CaseIterable {
 
 /// conforms to SettingsViewModelProtocol for all speak settings in the first sections screen
 class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
+    
+    /// for trace
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categorySettingsViewSpeakSettingsViewModel)
     
     override init() {
         super.init()
@@ -150,14 +154,20 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         switch setting {
             
         case .speakBgReadings:
-            return UISwitch(isOn: UserDefaults.standard.speakReadings, action: {(isOn:Bool) in UserDefaults.standard.speakReadings = isOn
+            return UISwitch(isOn: UserDefaults.standard.speakReadings, action: {(isOn:Bool) in
+                trace("speakBgReadings changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewSpeakSettingsViewModel, type: .info, isOn.description)
+                UserDefaults.standard.speakReadings = isOn
             })
 
         case .speakTrend:
-            return UISwitch(isOn: UserDefaults.standard.speakTrend, action: {(isOn:Bool) in UserDefaults.standard.speakTrend = isOn})
+            return UISwitch(isOn: UserDefaults.standard.speakTrend, action: {(isOn:Bool) in
+                trace("speakTrend changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewSpeakSettingsViewModel, type: .info, isOn.description)
+                UserDefaults.standard.speakTrend = isOn})
 
         case .speakDelta:
-            return UISwitch(isOn: UserDefaults.standard.speakDelta, action: {(isOn:Bool) in UserDefaults.standard.speakDelta = isOn})
+            return UISwitch(isOn: UserDefaults.standard.speakDelta, action: {(isOn:Bool) in
+                trace("speakDelta changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewSpeakSettingsViewModel, type: .info, isOn.description)
+                UserDefaults.standard.speakDelta = isOn})
 
         case .speakInterval:
             return nil
