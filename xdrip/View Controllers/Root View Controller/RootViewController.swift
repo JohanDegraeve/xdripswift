@@ -1562,6 +1562,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
+                nightscoutSyncManager?.syncAllWithNightscout()
+                
                 healthKitManager?.storeBgReadings()
                 
                 bgReadingSpeaker?.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())

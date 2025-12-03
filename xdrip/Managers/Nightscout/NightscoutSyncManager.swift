@@ -166,6 +166,11 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     
     // MARK: - public functions
     
+    /// Public wrapper to allow external sync requests (e.g. after new BG reading)
+    public func syncAllWithNightscout() {
+        self.syncWithNightscout()
+    }
+    
     /// uploads latest BgReadings, calibrations, active sensor and battery status to Nightscout, only if nightscout enabled, not master, url and key defined, if schedule enabled then check also schedule
     /// - parameters:
     ///     - lastConnectionStatusChangeTimeStamp : when was the last transmitter dis/reconnect
