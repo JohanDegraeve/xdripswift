@@ -67,14 +67,6 @@ class ContactImageManager: NSObject {
         
         guard let keyPath = keyPath else {return}
         if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
-            // If enableContactImage is being set to false, delete all app contacts
-            if keyPathEnum == .enableContactImage {
-                let newValue = UserDefaults.standard.enableContactImage
-                if newValue == false {
-                    deleteAppContacts()
-                    return
-                }
-            }
             evaluateUserDefaultsChange(keyPathEnum: keyPathEnum)
         }
         
@@ -168,8 +160,6 @@ class ContactImageManager: NSObject {
                 mutableContact.organizationName = updatedString
                 saveRequest.update(mutableContact)
                 self.executeSaveRequest(saveRequest: saveRequest)
-                // After update, delete all other app contacts except this one
-                self.deleteAppContacts(exceptFor: contact.identifier)
                 return
             }
             
@@ -188,8 +178,6 @@ class ContactImageManager: NSObject {
                 saveRequest.update(mutableContact)
                 // Store identifier for future updates
                 UserDefaults.standard.set(contact.identifier, forKey: self.contactIdentifierKey)
-                // After update, delete all other app contacts except this one
-                self.deleteAppContacts(exceptFor: contact.identifier)
             } else {
                 if lastReading.count > 0 {
                     trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' and adding a contact image with %{public}@ %{public}@.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
@@ -207,32 +195,11 @@ class ContactImageManager: NSObject {
                 saveRequest.add(contact, toContainerWithIdentifier: nil)
                 // Store identifier for future updates
                 UserDefaults.standard.set(contact.identifier, forKey: self.contactIdentifierKey)
-                // After creation, delete all other app contacts except this one
-                self.deleteAppContacts(exceptFor: contact.identifier)
             }
             self.executeSaveRequest(saveRequest: saveRequest)
         }
     }
     
-    /// Delete all contacts with the app name as givenName except optionally the one with the given identifier
-    private func deleteAppContacts(exceptFor identifierToKeep: String? = nil) {
-        let keyToFetch = [CNContactGivenNameKey, CNContactIdentifierKey] as [CNKeyDescriptor]
-        let predicate = CNContact.predicateForContacts(matchingName: ConstantsHomeView.applicationName)
-        let saveRequest = CNSaveRequest()
-        if let contacts = try? self.contactStore.unifiedContacts(matching: predicate, keysToFetch: keyToFetch) {
-            var didDelete = false
-            for contact in contacts {
-                if identifierToKeep == nil || contact.identifier != identifierToKeep,
-                   let mutableContact = contact.mutableCopy() as? CNMutableContact {
-                    saveRequest.delete(mutableContact)
-                    didDelete = true
-                }
-            }
-            if didDelete {
-                self.executeSaveRequest(saveRequest: saveRequest)
-            }
-        }
-    }
     
     private func executeSaveRequest(saveRequest: CNSaveRequest) {
         // now execute the saveRequest - to delete the existing contact
