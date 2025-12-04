@@ -51,6 +51,9 @@ class MedtrumEasyViewFollowManager: NSObject {
     /// User ID from login response (cached in memory)
     private var medtrumUserId: Int?
 
+    /// Patient UID when following as caregiver (nil if patient account)
+    private var caregiverPatientUserId: Int?
+
     /// Last successfully fetched timestamp to avoid re-downloading old data
     private var lastFetchedTimestamp: Date?
 
@@ -88,6 +91,8 @@ class MedtrumEasyViewFollowManager: NSObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.medtrumEasyViewEmail.rawValue, options: .new, context: nil)
         // Setting Medtrum EasyView password
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.medtrumEasyViewPassword.rawValue, options: .new, context: nil)
+        // Setting follower patient name (used for caregiver mode)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerPatientName.rawValue, options: .new, context: nil)
 
         self.verifyUserDefaultsAndStartOrStopFollowMode()
     }
@@ -157,10 +162,31 @@ class MedtrumEasyViewFollowManager: NSObject {
                     let loginResponse = try await self.requestLogin()
                     self.medtrumUserId = loginResponse.uid
                     trace("    login successful, userId = %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, loginResponse.uid.description)
+
+                    // Check if caregiver mode (patient name configured)
+                    if let patientName = UserDefaults.standard.followerPatientName, !patientName.isEmpty {
+                        trace("    caregiver mode detected, patient name = %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, patientName)
+
+                        let connections = try await self.requestCaregiverConnections()
+
+                        if let patientUid = self.findPatientUid(in: connections) {
+                            self.caregiverPatientUserId = patientUid
+                            trace("    using patient UID = %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, patientUid.description)
+                        } else {
+                            trace("    ERROR: could not find patient with name '%{public}@'", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .error, patientName)
+                            throw MedtrumEasyViewFollowError.invalidResponse
+                        }
+                    } else {
+                        // Patient account mode - use logged-in user's ID
+                        self.caregiverPatientUserId = nil
+                        trace("    patient mode (no patient name configured)", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
+                    }
                 }
 
                 // Step 2: Fetch monitor data
-                if let userId = self.medtrumUserId {
+                // Use caregiverPatientUserId if set, otherwise use medtrumUserId
+                let userIdToFetch = self.caregiverPatientUserId ?? self.medtrumUserId
+                if let userId = userIdToFetch {
                     let monitorResponse = try await self.requestMonitorStatus(userId: userId)
 
                     if let monitorData = monitorResponse.data {
@@ -196,11 +222,13 @@ class MedtrumEasyViewFollowManager: NSObject {
             } catch MedtrumEasyViewFollowError.sessionExpired {
                 trace("    session expired, will re-login on next download", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
                 self.medtrumUserId = nil
+                self.caregiverPatientUserId = nil
                 self.lastFetchedTimestamp = nil  // Reset to fetch fresh data after re-login
             } catch MedtrumEasyViewFollowError.invalidCredentials {
                 trace("    invalid credentials, preventing further login attempts", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .error)
                 UserDefaults.standard.medtrumEasyViewPreventLogin = true
                 self.medtrumUserId = nil
+                self.caregiverPatientUserId = nil
                 self.lastFetchedTimestamp = nil  // Reset timestamp
             } catch MedtrumEasyViewFollowError.loginPreventedByUser {
                 trace("    login prevented by user (invalid credentials previously detected)", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
@@ -374,6 +402,73 @@ class MedtrumEasyViewFollowManager: NSObject {
         }
 
         throw MedtrumEasyViewFollowError.networkError
+    }
+
+    /// Fetch list of connected patients for caregiver account
+    /// - returns: Array of patient connections
+    /// - throws: MedtrumEasyViewFollowError on failure
+    private func requestCaregiverConnections() async throws -> [MedtrumEasyViewPatientConnection] {
+        trace("in requestCaregiverConnections", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
+
+        let urlString = "\(ConstantsMedtrumEasyView.baseUrl)/v3/api/v2.1/monitor/connections?per_page=9999"
+        guard let url = URL(string: urlString) else {
+            throw MedtrumEasyViewFollowError.networkError
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+
+        // Add headers
+        for (header, value) in ConstantsMedtrumEasyView.requestHeaders {
+            request.setValue(value, forHTTPHeaderField: header)
+        }
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        let statusCode = (response as? HTTPURLResponse)?.statusCode ?? 0
+
+        trace("    in requestCaregiverConnections, status code: %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, statusCode.description)
+
+        // Check for session expiry
+        if statusCode == 401 || statusCode == 403 {
+            throw MedtrumEasyViewFollowError.sessionExpired
+        }
+
+        if statusCode == 200 {
+            let connectionsResponse = try JSONDecoder().decode(
+                MedtrumEasyViewResponse<MedtrumEasyViewConnectionsData>.self,
+                from: data
+            )
+
+            if connectionsResponse.error == 0, let connectionsData = connectionsResponse.data {
+                trace("    found %{public}@ connected patients", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, connectionsData.items.count.description)
+                return connectionsData.items
+            }
+        }
+
+        throw MedtrumEasyViewFollowError.networkError
+    }
+
+    /// Find patient UID by matching configured patient name
+    /// - parameter connections: Array of patient connections
+    /// - returns: Patient UID if found, nil otherwise
+    private func findPatientUid(in connections: [MedtrumEasyViewPatientConnection]) -> Int? {
+        guard let patientName = UserDefaults.standard.followerPatientName,
+              !patientName.isEmpty else {
+            return nil
+        }
+
+        // Case-insensitive match on real_name
+        let patient = connections.first { connection in
+            connection.real_name.lowercased() == patientName.lowercased()
+        }
+
+        if let patient = patient {
+            trace("    matched patient '%{public}@' with UID %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, patient.real_name, patient.uid.description)
+        } else {
+            trace("    could not find patient with name '%{public}@'", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .error, patientName)
+        }
+
+        return patient?.uid
     }
 
     /// Process glucose data from monitor status response
@@ -557,11 +652,12 @@ class MedtrumEasyViewFollowManager: NSObject {
                 verifyUserDefaultsAndStartOrStopFollowMode()
             }
 
-        case .medtrumEasyViewEmail, .medtrumEasyViewPassword:
-            // Credentials changed, reset state
+        case .medtrumEasyViewEmail, .medtrumEasyViewPassword, .followerPatientName:
+            // Credentials or patient name changed, reset state
             if keyValueObserverTimeKeeper.verifyKey(forKey: keyPath, withMinimumDelayMilliSeconds: 200) {
-                trace("    credentials changed, resetting state", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
+                trace("    credentials or patient name changed, resetting state", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
                 self.medtrumUserId = nil
+                self.caregiverPatientUserId = nil
                 self.lastFetchedTimestamp = nil  // Reset to fetch full 24 hours on next download
                 UserDefaults.standard.medtrumEasyViewPreventLogin = false
                 verifyUserDefaultsAndStartOrStopFollowMode()
@@ -580,6 +676,7 @@ class MedtrumEasyViewFollowManager: NSObject {
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.medtrumEasyViewEmail.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.medtrumEasyViewPassword.rawValue)
+        UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerPatientName.rawValue)
 
         // Clean up timers
         invalidateDownLoadTimerClosure?()

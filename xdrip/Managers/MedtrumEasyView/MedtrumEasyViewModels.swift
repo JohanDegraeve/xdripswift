@@ -109,6 +109,29 @@ struct MedtrumEasyViewGlucoseMeasurement {
     }
 }
 
+/// Connections response data for caregiver accounts
+struct MedtrumEasyViewConnectionsData: Decodable {
+    let has_next: Bool
+    let has_prev: Bool
+    let itemnum: Int
+    let items: [MedtrumEasyViewPatientConnection]
+    let next_num: Int
+    let page: Int
+    let pages: Int
+    let prev_num: Int
+}
+
+/// Individual patient connection from caregiver connections list
+struct MedtrumEasyViewPatientConnection: Decodable {
+    let uid: Int                // Patient's user ID
+    let real_name: String       // Patient's name to match against configured name
+    let username: String        // Patient's email
+    let alias: String?          // Optional alias
+    let birth_date: String?     // Birth date
+    let gender: String?         // Gender code
+    // sensor_status and pump_status fields exist but are not needed for now
+}
+
 // MARK: - Error Type
 
 enum MedtrumEasyViewFollowError: Error {
