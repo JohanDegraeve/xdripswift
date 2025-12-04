@@ -18,5 +18,8 @@ enum ConstantsFollower {
     
     /// number of seconds without a successful follower connection before a warning is shown when in Dexcom Share follower mode
     static let secondsUntilFollowerDisconnectWarningDexcomShare: Int = 310
-    
+
+    /// number of seconds without a successful follower connection before a warning is shown when in Medtrum EasyView follower mode
+    static let secondsUntilFollowerDisconnectWarningMedtrumEasyView: Int = 70
+
 }

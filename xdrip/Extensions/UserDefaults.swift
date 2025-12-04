@@ -60,7 +60,15 @@ extension UserDefaults {
         case libreLinkUpReAcceptNeeded = "libreLinkUpReAcceptNeeded"
         ///LibreLinkUp is a 15 day "Plus" sensor being used?
         case libreLinkUpIs15DaySensor = "libreLinkUpIs15DaySensor"
-        
+
+        // Medtrum EasyView account info
+        /// Medtrum EasyView username/email
+        case medtrumEasyViewEmail = "medtrumEasyViewEmail"
+        /// Medtrum EasyView password
+        case medtrumEasyViewPassword = "medtrumEasyViewPassword"
+        /// Medtrum EasyView login is allowed, or prevented?
+        case medtrumEasyViewPreventLogin = "medtrumEasyViewPreventLogin"
+
         // General
         
         /// bloodglucose unit
@@ -651,8 +659,41 @@ extension UserDefaults {
             set(newValue, forKey: Key.libreLinkUpPreventLogin.rawValue)
         }
     }
-    
-    
+
+    // MARK: - Medtrum EasyView Follower Settings
+
+    /// Medtrum EasyView account username/email
+    @objc dynamic var medtrumEasyViewEmail: String? {
+        get {
+            return string(forKey: Key.medtrumEasyViewEmail.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.medtrumEasyViewEmail.rawValue)
+        }
+    }
+
+    /// Medtrum EasyView account password
+    @objc dynamic var medtrumEasyViewPassword: String? {
+        get {
+            return string(forKey: Key.medtrumEasyViewPassword.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.medtrumEasyViewPassword.rawValue)
+        }
+    }
+
+    /// Used to prevent further login attempts once a failed authentication due to bad credentials has already taken place
+    /// This should be reset to false once the user has updated their account information
+    @objc dynamic var medtrumEasyViewPreventLogin: Bool {
+        get {
+            return bool(forKey: Key.medtrumEasyViewPreventLogin.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.medtrumEasyViewPreventLogin.rawValue)
+        }
+    }
+
+
     // MARK: General
     
     /// true if unit is mgdl, false if mmol is used

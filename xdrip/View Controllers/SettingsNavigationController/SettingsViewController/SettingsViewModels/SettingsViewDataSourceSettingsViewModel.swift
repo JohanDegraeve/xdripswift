@@ -271,14 +271,27 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 
             case .dexcomShare:
                 return SettingsSelectedRowAction.askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterUsername, keyboardType: .default, text: UserDefaults.standard.dexcomShareAccountName, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (dexcomShareAccountName: String) in
-                        
+
                     UserDefaults.standard.dexcomShareAccountName = dexcomShareAccountName.trimmingCharacters(in: .whitespaces).toNilIfLength0()
-                        
+
                     // if the user has changed their account name, then let's also nillify the password for them so that we don't try and login with bad credentials
                     UserDefaults.standard.dexcomSharePassword = nil
-                        
+
                 }, cancelHandler: nil, inputValidator: nil)
-                    
+
+            case .medtrumEasyView:
+                return SettingsSelectedRowAction.askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterUsername, keyboardType: .default, text: UserDefaults.standard.medtrumEasyViewEmail, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (medtrumEasyViewEmail: String) in
+
+                    UserDefaults.standard.medtrumEasyViewEmail = medtrumEasyViewEmail.trimmingCharacters(in: .whitespaces).toNilIfLength0()
+
+                    // if the user has changed their account name, then let's also nillify the password for them so that we don't try and login with bad credentials
+                    UserDefaults.standard.medtrumEasyViewPassword = nil
+
+                    // reset all data used in the UI
+                    self.resetMedtrumEasyViewData()
+
+                }, cancelHandler: nil, inputValidator: nil)
+
             default:
                 return .nothing
             }
@@ -297,14 +310,24 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 
             case .dexcomShare:
                 return SettingsSelectedRowAction.askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterPassword, keyboardType: .default, text: UserDefaults.standard.dexcomSharePassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (dexcomSharePassword: String) in
-    
+
                     UserDefaults.standard.dexcomSharePassword = dexcomSharePassword.trimmingCharacters(in: .whitespaces).toNilIfLength0()
-                        
+
                     // reset all data used in the UI
                     //self.resetLibreLinkUpData()
-                        
+
                 }, cancelHandler: nil, inputValidator: nil)
-                    
+
+            case .medtrumEasyView:
+                return SettingsSelectedRowAction.askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterPassword, keyboardType: .default, text: UserDefaults.standard.medtrumEasyViewPassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (medtrumEasyViewPassword: String) in
+
+                    UserDefaults.standard.medtrumEasyViewPassword = medtrumEasyViewPassword.trimmingCharacters(in: .whitespaces).toNilIfLength0()
+
+                    // reset all data used in the UI
+                    self.resetMedtrumEasyViewData()
+
+                }, cancelHandler: nil, inputValidator: nil)
+
             default:
                 return .nothing
             }
@@ -350,6 +373,10 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             case .dexcomShare:
                 // show patient name, upload to nightscout and also account username/password, together with "use US servers"
                 return 9
+
+            case .medtrumEasyView:
+                // show patient name, upload to nightscout, keep-alive, username, and password
+                return 8
             }
         }
     }
@@ -451,6 +478,8 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 return UserDefaults.standard.libreLinkUpEmail?.obscured() ?? Texts_SettingsView.valueIsRequired
             case .dexcomShare:
                 return UserDefaults.standard.dexcomShareAccountName?.obscured() ?? Texts_SettingsView.valueIsRequired
+            case .medtrumEasyView:
+                return UserDefaults.standard.medtrumEasyViewEmail?.obscured() ?? Texts_SettingsView.valueIsRequired
             default:
                 return nil
             }
@@ -461,6 +490,8 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 return UserDefaults.standard.libreLinkUpPassword?.obscured() ?? Texts_SettingsView.valueIsRequired
             case .dexcomShare:
                 return UserDefaults.standard.dexcomSharePassword?.obscured() ?? Texts_SettingsView.valueIsRequired
+            case .medtrumEasyView:
+                return UserDefaults.standard.medtrumEasyViewPassword?.obscured() ?? Texts_SettingsView.valueIsRequired
             default:
                 return nil
             }
@@ -594,7 +625,11 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         UserDefaults.standard.libreLinkUpCountry = nil
         UserDefaults.standard.libreLinkUpPreventLogin = false
     }
-    
+
+    func resetMedtrumEasyViewData() {
+        UserDefaults.standard.medtrumEasyViewPreventLogin = false
+    }
+
     func processLibreLinkUpSensorInfo(sn: String?) -> String {
         var returnString = "Not recognised"
         

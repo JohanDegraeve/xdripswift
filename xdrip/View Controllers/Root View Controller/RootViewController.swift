@@ -509,7 +509,10 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// DexcomShareFollowManager instance
     private var dexcomShareFollowManager: DexcomShareFollowManager?
-    
+
+    /// MedtrumEasyViewFollowManager instance
+    private var medtrumEasyViewFollowManager: MedtrumEasyViewFollowManager?
+
     /// LoopFollowManager instance
     private var loopFollowManager: LoopFollowManager?
     
@@ -1177,7 +1180,10 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // setup dexcomShareFollowManager
         dexcomShareFollowManager = DexcomShareFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
-        
+
+        // setup medtrumEasyViewFollowManager
+        medtrumEasyViewFollowManager = MedtrumEasyViewFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
+
         // setup loop follow manager
         loopFollowManager = LoopFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
         
@@ -1262,15 +1268,17 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // setup bluetoothPeripheralManager
         bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self, uIViewController: self, heartBeatFunction: {
-            
+
             self.loopFollowManager?.getReading()
-            
+
             self.nightscoutFollowManager?.download()
-            
+
             self.libreLinkUpFollowManager?.download()
-            
+
             self.dexcomShareFollowManager?.download()
-            
+
+            self.medtrumEasyViewFollowManager?.download()
+
         }, cgmTransmitterInfoChanged: cgmTransmitterInfoChanged)
         
         // to initialize UserDefaults.standard.transmitterTypeAsString
@@ -3343,6 +3351,17 @@ final class RootViewController: UIViewController, ObservableObject {
                 } else if let followerPatientName = UserDefaults.standard.followerPatientName {
                     dataSourceSensorMaxAgeOutlet.text = followerPatientName
                 }
+            
+            case .medtrumEasyView:
+                if UserDefaults.standard.medtrumEasyViewEmail == nil || UserDefaults.standard.medtrumEasyViewPassword == nil {
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.followerAccountCredentialsMissing
+                } else if UserDefaults.standard.libreLinkUpPreventLogin {
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.followerAccountCredentialsInvalid
+                } else if let followerPatientName = UserDefaults.standard.followerPatientName {
+                    dataSourceSensorMaxAgeOutlet.text = followerPatientName
+                }
                 
             case .dexcomShare:
                 if UserDefaults.standard.dexcomShareAccountName == nil || UserDefaults.standard.dexcomSharePassword == nil {
@@ -4132,11 +4151,11 @@ extension RootViewController: UNUserNotificationCenterDelegate {
 extension RootViewController: FollowerDelegate {
     
     func followerInfoReceived(followGlucoseDataArray: inout [FollowerBgReading]) {
-        
+
         if let coreDataManager = coreDataManager, let bgReadingsAccessor = bgReadingsAccessor { //}, let followManager = (UserDefaults.standard.followerDataSourceType == .nightscout ? self.nightscoutFollowManager : self.libreLinkUpFollowManager) {
-            
+
             let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-            
+
             trace("followerInfoReceived", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
             // assign value of timeStampLastBgReading
@@ -4144,11 +4163,11 @@ extension RootViewController: FollowerDelegate {
             
             // get lastReading, ignore sensor as this should be nil because this is follower mode
             if let lastReading = bgReadingsAccessor.last(forSensor: nil) {
-                
+
                 timeStampLastBgReading = lastReading.timeStamp
-                
+
                 trace("    timeStampLastBgReading = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, timeStampLastBgReading.toString(timeStyle: .long, dateStyle: .long))
-                
+
             }
             
             // was a new reading created or not
@@ -4158,32 +4177,39 @@ extension RootViewController: FollowerDelegate {
             for (_, followGlucoseData) in followGlucoseDataArray.enumerated().reversed() {
                 
                 if followGlucoseData.timeStamp > timeStampLastBgReading {
-                    
+
                     trace("    creating new bgreading: value = %{public}@ %{public}@, timestamp =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info,  followGlucoseData.sgv.mgDlToMmol(mgDl: isMgDl).bgValueToString(mgDl: isMgDl), isMgDl ? Texts_Common.mgdl : Texts_Common.mmol, followGlucoseData.timeStamp.toString(timeStyle: .long, dateStyle: .long))
-                    
+
                     // create a new reading
                     // we'll need to check which should be the active followerManager to know where to call the function
                     switch UserDefaults.standard.followerDataSourceType {
                     case .nightscout:
-                        
+
                         if let followManager = nightscoutFollowManager {
                             _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
                         }
-                        
+
                     case .libreLinkUp, .libreLinkUpRussia:
-                        
+
                         if let followManager = libreLinkUpFollowManager {
                             _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
                         }
-                        
+
                     case .dexcomShare:
-                        
+
                         if let followManager = dexcomShareFollowManager {
                             _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
                         }
-                        
+
+                    case .medtrumEasyView:
+                        if let followerManager = medtrumEasyViewFollowManager {
+                            _ = followerManager.createBgReading(followGlucoseData: followGlucoseData)
+                        }
+
                     }
-                    
+
+
+
                     // a new reading was created
                     newReadingCreated = true
                     
@@ -4194,21 +4220,21 @@ extension RootViewController: FollowerDelegate {
             }
             
             if newReadingCreated {
-                
+
                 trace("    new reading(s) successfully created", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-                
+
                 // save in core data
                 coreDataManager.saveChanges()
-                
+
                 // update all text in  first screen
                 updateLabelsAndChart(overrideApplicationState: false)
-                
+
                 // update the mini-chart
                 updateMiniChart()
-                
+
                 // update statistics related outlets
                 updateStatistics(animate: false)
-                
+
                 // update data source info
                 updateDataSourceInfo()
                 
@@ -4242,7 +4268,7 @@ extension RootViewController: FollowerDelegate {
                 watchManager?.updateWatchApp(forceComplicationUpdate: false)
                 
                 updateLiveActivityAndWidgets(forceRestart: false)
-                
+
             }
         }
     }
