@@ -78,8 +78,8 @@ struct MedtrumEasyViewSensorStatus: Decodable {
 struct MedtrumEasyViewGlucoseEntry: Decodable {
     let timestamp: Double    // Unix timestamp
     let glucose1: Double     // Actual glucose value in mmol/L
-    let glucose2: Double     // Unknown (often 8.0)
-    let glucose3: Double     // Unknown (often high value ~29)
+    let glucose2: Double
+    let glucose3: Double
     let status: String       // Status string ("C", "H", "IC", "NC", "CE0", "CE1")
 
     init(from decoder: Decoder) throws {

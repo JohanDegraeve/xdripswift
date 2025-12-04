@@ -23,7 +23,6 @@ enum ConstantsMedtrumEasyView {
         "Content-Type": "application/json",
         "Accept": "application/json, text/plain, */*",
         "AppTag": "v=3.0.2(15);n=eyvw",
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15"
     ]
 
     /// Maximum time range to fetch (in seconds) - 24 hours
