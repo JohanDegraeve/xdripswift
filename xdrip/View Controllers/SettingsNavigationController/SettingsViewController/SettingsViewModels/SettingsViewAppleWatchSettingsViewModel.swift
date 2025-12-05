@@ -77,9 +77,11 @@ class SettingsViewAppleWatchSettingsViewModel: NSObject, SettingsViewModelProtoc
         switch setting {
         case .showDataInWatchComplications:
                 return .askConfirmation(title: Texts_SettingsView.appleWatchShowDataInComplications, message: Texts_SettingsView.appleWatchShowDataInComplicationsMessage, actionHandler: {
+                    trace("showDataInWatchComplications agreed OK by user", log: self.log, category: ConstantsLog.categorySettingsViewAppleWatchSettingsViewModel, type: .info)
                     UserDefaults.standard.showDataInWatchComplications = true
                     UserDefaults.standard.watchComplicationUserAgreementDate = .now
                 }, cancelHandler: {
+                    trace("showDataInWatchComplications cancelled by user", log: self.log, category: ConstantsLog.categorySettingsViewAppleWatchSettingsViewModel, type: .info)
                     UserDefaults.standard.showDataInWatchComplications = false
                     UserDefaults.standard.watchComplicationUserAgreementDate = nil
                     // we have to run this in the main thread to avoid access errors

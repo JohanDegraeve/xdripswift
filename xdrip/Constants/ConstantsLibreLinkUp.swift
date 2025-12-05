@@ -12,7 +12,8 @@ enum ConstantsLibreLinkUp {
     
     /// string to hold the default LibreLinkUp version number. This will replace the user's current version if necessary when the app is run after a change.
     /// updated on 2 October 2025 to "4.16.0"
-    static let libreLinkUpVersionDefault: String = "4.16.0"
+    /// updated on 4 December 2025 to "4.17.0"
+    static let libreLinkUpVersionDefault: String = "4.17.0"
     
     /// double to hold maximum sensor days for Libre sensors that upload to LibreLinkUp
     /// this is needed because we don't have a CGM transmitter class to pull the data from when in follower mode

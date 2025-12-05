@@ -63,13 +63,13 @@ class DexcomShareUploadManager:NSObject {
         
         // check if dexcomShare is enabled
         guard UserDefaults.standard.uploadReadingstoDexcomShare else {
-            trace("in upload, uploadReadingstoDexcomShare not enabled", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+            trace("in upload, uploadReadingstoDexcomShare not enabled", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .debug)
             return
         }
         
         // check if master is enabled
         guard UserDefaults.standard.isMaster else {
-            trace("in upload, not master, no upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+            trace("in upload, not master so nothing to upload", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .debug)
             return
         }
         
@@ -83,9 +83,7 @@ class DexcomShareUploadManager:NSObject {
         if UserDefaults.standard.dexcomShareUploadUseSchedule {
             if let schedule = UserDefaults.standard.dexcomShareUploadSchedule {
                 if !schedule.indicatesOn(forWhen: Date()) {
-                    
-                    trace("in upload, schedule indicates not on", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-                    
+                    trace("in upload, schedule indicates 'not on' so will not upload yet", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                     return
                 }
             }
@@ -93,7 +91,6 @@ class DexcomShareUploadManager:NSObject {
         
         // upload
         uploadBgReadingsToDexcomShare(firstAttempt: true, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
-        
     }
 
     // MARK: - overriden functions
