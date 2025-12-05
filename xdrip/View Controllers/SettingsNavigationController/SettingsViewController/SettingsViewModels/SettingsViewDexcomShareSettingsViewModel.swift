@@ -1,3 +1,4 @@
+import os
 import UIKit
 
 fileprivate enum Setting: Int, CaseIterable {
@@ -20,6 +21,9 @@ fileprivate enum Setting: Int, CaseIterable {
 
 /// conforms to SettingsViewModelProtocol for all Dexcom Share Upload settings in the first sections screen
 class SettingsViewDexcomShareUploadSettingsViewModel: SettingsViewModelProtocol {
+    
+    /// for trace
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categorySettingsViewDexcomShareUploadSettingsViewModel)
     
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
@@ -173,9 +177,13 @@ class SettingsViewDexcomShareUploadSettingsViewModel: SettingsViewModelProtocol 
         switch setting {
         case .uploadReadingstoDexcomShare:
             // hide the UISwitch if we're in dexcom share follower mode
-            return (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .dexcomShare) ? nil : UISwitch(isOn: UserDefaults.standard.uploadReadingstoDexcomShare, action: {(isOn:Bool) in UserDefaults.standard.uploadReadingstoDexcomShare = isOn})
+            return (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .dexcomShare) ? nil : UISwitch(isOn: UserDefaults.standard.uploadReadingstoDexcomShare, action: {(isOn:Bool) in
+                trace("uploadReadingstoDexcomShare changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewDexcomShareUploadSettingsViewModel, type: .info, isOn.description)
+                UserDefaults.standard.uploadReadingstoDexcomShare = isOn})
         case .useUSDexcomShareurl:
-            return UISwitch(isOn: UserDefaults.standard.useUSDexcomShareurl, action: {(isOn:Bool) in UserDefaults.standard.useUSDexcomShareurl = isOn})
+            return UISwitch(isOn: UserDefaults.standard.useUSDexcomShareurl, action: {(isOn:Bool) in
+                trace("useUSDexcomShareurl changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewDexcomShareUploadSettingsViewModel, type: .info, isOn.description)
+                UserDefaults.standard.useUSDexcomShareurl = isOn})
         case .dexcomShareAccountName,.dexcomSharePassword,.dexcomShareUploadSerialNumber:
             return nil
         case .useSchedule:

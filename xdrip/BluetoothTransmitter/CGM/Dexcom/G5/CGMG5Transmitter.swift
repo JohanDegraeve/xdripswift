@@ -1497,21 +1497,77 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     }
     
     /// process glucoseG6RxMessage
+    ///
+    /// In coexistence (useOtherApp == true), behave like a "dumb" CGM client similar to LoopKit's passive mode:
+    /// - Parse the Dexcom G6 glucose frame.
+    /// - Immediately publish a single GlucoseData to the delegate.
+    /// - Do not wait for disconnect or backfill.
+    ///
+    /// In primary mode (useOtherApp == false), keep the existing G5/G6 Firefly flow behaviour and let
+    /// processGlucoseG6DataRxMessageOrGlucoseDataRxMessage + sendGlucoseDataToDelegate() handle batching/backfill.
     private func processGlucoseG6DataRxMessage(value: Data) {
-        
-        if let transmitterStartDate = transmitterStartDate, let glucoseDataRxMessage = DexcomG6GlucoseDataRxMessage(data: value, transmitterStartDate: transmitterStartDate) {
-            
-            trace("in processGlucoseG6DataRxMessage, received glucoseDataRxMessage, value = %{public}@, timeStamp = %{public}@, algorithmState = %{public}@, transmitterStatus = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, glucoseDataRxMessage.calculatedValue.description, glucoseDataRxMessage.timeStamp.toString(timeStyle: .long, dateStyle: .none), glucoseDataRxMessage.algorithmStatus.description,
-                glucoseDataRxMessage.transmitterStatus.description)
-            
-            processGlucoseG6DataRxMessageOrGlucoseDataRxMessage(calculatedValue: glucoseDataRxMessage.calculatedValue, algorithmStatus: glucoseDataRxMessage.algorithmStatus, timeStamp: glucoseDataRxMessage.timeStamp)
-            
-        } else {
-            
+        guard let transmitterStartDate = transmitterStartDate,
+              let glucoseDataRxMessage = DexcomG6GlucoseDataRxMessage(data: value, transmitterStartDate: transmitterStartDate) else {
             trace("processGlucoseG6DataRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
-            
+            return
         }
-        
+
+        trace("in processGlucoseG6DataRxMessage, received glucoseDataRxMessage, value = %{public}@, timeStamp = %{public}@, algorithmState = %{public}@, transmitterStatus = %{public}@",
+              log: log,
+              category: ConstantsLog.categoryCGMG5,
+              type: .debug,
+              glucoseDataRxMessage.calculatedValue.description,
+              glucoseDataRxMessage.timeStamp.toString(timeStyle: .long, dateStyle: .none),
+              glucoseDataRxMessage.algorithmStatus.description,
+              glucoseDataRxMessage.transmitterStatus.description)
+
+        // Always update internal state via the shared helper so sensor status / sensor start
+        // bookkeeping stays consistent across modes.
+        processGlucoseG6DataRxMessageOrGlucoseDataRxMessage(
+            calculatedValue: glucoseDataRxMessage.calculatedValue,
+            algorithmStatus: glucoseDataRxMessage.algorithmStatus,
+            timeStamp: glucoseDataRxMessage.timeStamp
+        )
+
+        // In coexistence with the official Dexcom app, act as a simple, passive listener:
+        // as soon as we get a valid G6 glucose frame, publish it directly to the delegate.
+        if useOtherApp {
+            // Use the lastGlucoseInSensorDataRxReading that was just set by the shared helper
+            // so we honour any scaling/validation that happened there.
+            guard let latestReading = lastGlucoseInSensorDataRxReading else {
+                // Should not normally happen, but if it does, fall back to a direct GlucoseData.
+                let fallback = GlucoseData(timeStamp: glucoseDataRxMessage.timeStamp,
+                                           glucoseLevelRaw: glucoseDataRxMessage.calculatedValue)
+                timeStampOfLastG5Reading = fallback.timeStamp
+
+                DispatchQueue.main.async { [weak self] in
+                    guard let self = self else { return }
+                    var copy = [fallback]
+                    self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy,
+                                                                            transmitterBatteryInfo: nil,
+                                                                            sensorAge: nil)
+                }
+                return
+            }
+
+            // Update the last-reading timestamp so higher-level logic (read-success metrics, UI) sees this cycle.
+            timeStampOfLastG5Reading = latestReading.timeStamp
+
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                var copy = [latestReading]
+                self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy,
+                                                                        transmitterBatteryInfo: nil,
+                                                                        sensorAge: nil)
+            }
+
+            // In coexistence mode we do not rely on sendGlucoseDataToDelegate() or backfill
+            // to deliver readings; we are intentionally "dumb" and fire once per G6 frame.
+            return
+        }
+
+        // Primary / non-coexistence mode: keep the existing behaviour.
+        // The reading will be delivered later as part of sendGlucoseDataToDelegate().
     }
     
     /// process transmitterTimeRxMessage

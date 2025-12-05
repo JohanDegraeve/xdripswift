@@ -493,11 +493,17 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
         
         switch setting {
         case .nightscoutEnabled:
-            return UISwitch(isOn: UserDefaults.standard.nightscoutEnabled, action: {(isOn: Bool) in UserDefaults.standard.nightscoutEnabled = isOn})
+            return UISwitch(isOn: UserDefaults.standard.nightscoutEnabled, action: {(isOn: Bool) in
+                trace("nightscoutEnabled changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNightscoutSettingsViewModel, type: .info, isOn.description)
+                UserDefaults.standard.nightscoutEnabled = isOn})
         case .useSchedule:
-            return UISwitch(isOn: UserDefaults.standard.nightscoutUseSchedule, action: {(isOn: Bool) in UserDefaults.standard.nightscoutUseSchedule = isOn})
+            return UISwitch(isOn: UserDefaults.standard.nightscoutUseSchedule, action: {(isOn: Bool) in
+                trace("useSchedule changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNightscoutSettingsViewModel, type: .info, isOn.description)
+                UserDefaults.standard.nightscoutUseSchedule = isOn})
         case .uploadSensorStartTime:
-            return UISwitch(isOn: UserDefaults.standard.uploadSensorStartTimeToNS, action: {(isOn: Bool) in UserDefaults.standard.uploadSensorStartTimeToNS = isOn})
+            return UISwitch(isOn: UserDefaults.standard.uploadSensorStartTimeToNS, action: {(isOn: Bool) in
+                trace("uploadSensorStartTime changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNightscoutSettingsViewModel, type: .info, isOn.description)
+                UserDefaults.standard.uploadSensorStartTimeToNS = isOn})
         default:
             return nil
         }

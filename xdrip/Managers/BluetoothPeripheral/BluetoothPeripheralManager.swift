@@ -48,7 +48,7 @@ class BluetoothPeripheralManager: NSObject {
             
             if newValue != currentCgmTransmitterAddress {
                 
-                trace("    in didset currentCgmTransmitterAddress", log: self.log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
+                trace("in didSet currentCgmTransmitterAddress", log: self.log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .info)
                 
                 cgmTransmitterInfoChanged()
 

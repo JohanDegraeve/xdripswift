@@ -86,7 +86,7 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
                 return .none
                 
             default:
-                trace("in SettingsViewContactImageSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                trace("unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
                 return .none
                 
             }
@@ -123,7 +123,8 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
             if authorizationStatus == .denied || authorizationStatus == .restricted {return nil}
             
             return UISwitch(isOn: UserDefaults.standard.enableContactImage, action: {
-                (isOn:Bool) in
+                (isOn: Bool) in
+                trace("enableContactImage changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .info, isOn.description)
                 
                 // if setting to false, then no need to check authorization status
                 if !isOn {
@@ -140,39 +141,43 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
                     self.contactStore.requestAccess(for: .contacts) { (granted, error) in
                         DispatchQueue.main.async {
                             if !granted {
-                                trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access not granted", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                                trace("CNContactStore access not granted", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel , type: .error)
                                 UserDefaults.standard.enableContactImage = false
                             } else {
-                                trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access granted", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+                                trace("CNContactStore access granted", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .info)
                                 UserDefaults.standard.enableContactImage = true
                             }
                         }
                     }
                     
                 case .restricted:
-                    trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access restricted, according to apple doc 'possibly due to active restrictions such as parental controls being in place'", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                    trace("CNContactStore access restricted, according to apple doc 'possibly due to active restrictions such as parental controls being in place'", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
                     UserDefaults.standard.enableContactImage = false
                     
                 case .denied:
-                    trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access denied by user", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                    trace("CNContactStore access denied by user", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
                     UserDefaults.standard.enableContactImage = false
                     
                 case .authorized:
-                    trace("in SettingsViewContactImageSettingsViewModel, CNContactStore access authorized", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                    trace("CNContactStore access authorized", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
                     UserDefaults.standard.enableContactImage = true
                     
                 default:
-                    trace("in SettingsViewContactImageSettingsViewModel, unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                    trace("unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
                     
                 }
                 
             })
             
         case .displayTrend:
-            return UISwitch(isOn: UserDefaults.standard.displayTrendInContactImage, action: {(isOn:Bool) in UserDefaults.standard.displayTrendInContactImage = isOn})
+            return UISwitch(isOn: UserDefaults.standard.displayTrendInContactImage, action: {(isOn:Bool) in
+                trace("displayTrend changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .info, isOn.description)
+                UserDefaults.standard.displayTrendInContactImage = isOn})
             
         case .useHighContrastContactImage:
-            return UISwitch(isOn: UserDefaults.standard.useHighContrastContactImage, action: {(isOn:Bool) in UserDefaults.standard.useHighContrastContactImage = isOn})
+            return UISwitch(isOn: UserDefaults.standard.useHighContrastContactImage, action: {(isOn:Bool) in
+                trace("useHighContrastContactImage changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .info, isOn.description)
+                UserDefaults.standard.useHighContrastContactImage = isOn})
             
         }
         
@@ -226,7 +231,7 @@ class SettingsViewContactImageSettingsViewModel: SettingsViewModelProtocol {
                 return SettingsSelectedRowAction.showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.infoContactsAccessRestricted)
                 
             default:
-                trace("in SettingsViewContactImageSettingsViewModel, unknown case returned when authorizing CNContactStore ", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
+                trace("unknown case returned when authorizing CNContactStore ", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
                 
             }
             
