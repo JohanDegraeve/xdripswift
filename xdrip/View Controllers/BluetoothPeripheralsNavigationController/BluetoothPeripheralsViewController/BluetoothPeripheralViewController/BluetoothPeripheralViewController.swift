@@ -1030,8 +1030,8 @@ class BluetoothPeripheralViewController: UIViewController {
         // we'll reduce these thresholds for the 60-second Libre 2 as it
         // is much more prone to drop readings or not send them so it's fine
         // to get lower values and still consider that it's working well
-        let okSuccessPercentage = display.nominalGapInSeconds > 180 ? 95.0 : 90.0
-        let warningSuccessPercentage = display.nominalGapInSeconds > 180 ? 90.0 : 80.0
+        let okSuccessPercentage = display.nominalGapInSeconds > 180 ? 95.0 : 80.0
+        let warningSuccessPercentage = display.nominalGapInSeconds > 180 ? 90.0 : 70.0
             
         var visualIndicator6h = "🔴"
         var visualIndicator12h = "🔴"

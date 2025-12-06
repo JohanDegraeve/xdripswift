@@ -115,7 +115,7 @@ public class AlertManager: NSObject {
         
         // check if "Snooze All" is activated. If so, then just return with nothing.
         if let snoozeAllAlertsUntilDate = UserDefaults.standard.snoozeAllAlertsUntilDate, snoozeAllAlertsUntilDate > Date() {
-            trace("in alertNcheckAlertseeded, skipping all alert checks as Snooze All is enabled until %{public}@.", log: log, category: ConstantsLog.categoryAlertManager, type: .info, snoozeAllAlertsUntilDate.formatted(date: .abbreviated, time: .standard))
+            trace("in checkAlerts, skipping as Snooze All is enabled for the next %{public}@", log: log, category: ConstantsLog.categoryAlertManager, type: .info, snoozeAllAlertsUntilDate.daysAndHoursRemaining())
             return false
         }
         
@@ -536,7 +536,7 @@ public class AlertManager: NSObject {
         
         // first we'll check if the user has intentionally disabled the alert kind. If so, then just return without doing any more
         if currentAlertEntry.isDisabled {
-            trace("in checkAlertAndFire, alert '%{public}@' is disabled, returning without checking any further", log: log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
+            trace("in checkAlertAndFire, alert '%{public}@' is disabled", log: log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging())
             return false
         }
         
