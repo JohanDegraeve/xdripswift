@@ -500,7 +500,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                 
                 // DEBUG
                 let have = [receiveAuthenticationCharacteristic != nil, writeControlCharacteristic != nil, backfillCharacteristic != nil, communicationCharacteristic != nil]
-                trace("G7 notify: discovered refs - auth: %{public}@ write: %{public}@ backfill: %{public}@ comm: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, String(have[0]), String(have[1]), String(have[2]), String(have[3]))
+                trace("G7 notify: discovered refs - auth: %{public}@, write: %{public}@, backfill: %{public}@, comm: %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, String(have[0]), String(have[1]), String(have[2]), String(have[3]))
                 
                 // Subscribe to all relevant characteristics immediately (coexistence: read-only notifies)
                 if characteristic.uuid == CBUUID(string: CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue) {

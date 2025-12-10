@@ -197,13 +197,19 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
         
         switch setting {
         case .showReadingInNotification:
-            return UISwitch(isOn: UserDefaults.standard.showReadingInNotification, action: {(isOn:Bool) in UserDefaults.standard.showReadingInNotification = isOn})
+            return UISwitch(isOn: UserDefaults.standard.showReadingInNotification, action: {(isOn:Bool) in
+                trace("showReadingInNotification changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
+                UserDefaults.standard.showReadingInNotification = isOn})
             
         case .showReadingInAppBadge:
-            return UISwitch(isOn: UserDefaults.standard.showReadingInAppBadge, action: {(isOn:Bool) in UserDefaults.standard.showReadingInAppBadge = isOn})
+            return UISwitch(isOn: UserDefaults.standard.showReadingInAppBadge, action: {(isOn:Bool) in
+                trace("showReadingInAppBadge changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
+                UserDefaults.standard.showReadingInAppBadge = isOn})
 
         case .multipleAppBadgeValueWith10:
-            return UISwitch(isOn: UserDefaults.standard.multipleAppBadgeValueWith10, action: {(isOn:Bool) in UserDefaults.standard.multipleAppBadgeValueWith10 = isOn})
+            return UISwitch(isOn: UserDefaults.standard.multipleAppBadgeValueWith10, action: {(isOn:Bool) in
+                trace("multipleAppBadgeValueWith10 changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
+                UserDefaults.standard.multipleAppBadgeValueWith10 = isOn})
 
         case .notificationInterval, .liveActivityType:
             return nil

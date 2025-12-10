@@ -301,8 +301,8 @@ extension AlertSettingsViewControllerData {
                     if AlertSettingsViewControllerData.getAlertKind(alertKind: self.alertKind).valueIsABgValue() {
                         // now we've validated the BG value, convert it to mmol if required
                         newValue = newValue.mmolToMgdl(mgDl: isMgDl)
-                        // first check that the value, as it is a BG value and now in mg/dL, is within BG value limits
-                        newValueIsValid = newValue > ConstantsCalibrationAlgorithms.minimumBgReadingCalculatedValue && newValue < ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValue
+                        // first check that the value, as it is a BG value and now in mg/dL, is above 0 and below the maximum BG value limits (this value could be a small amount for fast rise/drop
+                        newValueIsValid = newValue > 0.0 && newValue < ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValue
                     }
                     
                     if newValue < 32767.0, newValueIsValid {
