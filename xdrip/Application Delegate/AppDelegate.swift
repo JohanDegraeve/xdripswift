@@ -8,7 +8,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Properties
     
     var window: UIWindow?
-
+    
+    /// the quickActionsManager instance needed to process the shortcut items received
     private let quickActionsManager = QuickActionsManager()
     
     /// allow the orientation to be changed as per the settings for each individual view controller
@@ -19,13 +20,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     // MARK: - Application Life Cycle
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        
         trace("****************************************", log: log, category: ConstantsLog.categoryAppDelegate, type: .info)
         trace("*** in didFinishLaunchingWithOptions ***", log: log, category: ConstantsLog.categoryAppDelegate, type: .info)
         trace("****************************************", log: log, category: ConstantsLog.categoryAppDelegate, type: .info)
-        
         return true
-        
     }
 
     /// used to allow/prevent the specific views from changing orientation when rotating the device
@@ -65,6 +63,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         completionHandler(true)
+    }
+    
+    // Configure a new scene and process any quick action used during scene creation
+    func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+        // Handle quick action invoked while creating this new scene
+        if let type = options.shortcutItem?.type, let quickActionType = QuickActionType(rawValue: type) {
+            quickActionsManager.handleQuickAction(quickActionType)
+        }
+        
+        // Handle quick action invoked while creating this new scene
+        let sceneConfiguration = UISceneConfiguration(name: "Default",sessionRole: connectingSceneSession.role)
+        sceneConfiguration.delegateClass = SceneDelegate.self
+        
+        return sceneConfiguration
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
