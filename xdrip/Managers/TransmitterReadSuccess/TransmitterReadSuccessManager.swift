@@ -64,14 +64,10 @@ final class TransmitterReadSuccessManager {
 
         // Pull window counts and 24h boundaries in a single roundtrip
         var windowCounts = bgReadingsAccessor.getTransmitterReadSuccessWindowCounts(endingAt: now, forSensor: sensor)
-        
-        let allTimestamps = bgReadingsAccessor.getReadingTimestampsForLast24h(forSensor: sensor, endingAt: now)
-        let slotOccupancy = countPhaseAlignedDistinctSlots(timestamps: allTimestamps, now: now, periodSeconds: 300)
-        windowCounts.distinctCountLast6h = slotOccupancy.distinct6h
-        windowCounts.distinctCountLast12h = slotOccupancy.distinct12h
-        windowCounts.distinctCountLast24h = slotOccupancy.distinct24h
-        
+
+        let rawDistinctCountLast24h = windowCounts.distinctCountLast24h
         let rawEarliest24h = windowCounts.earliestTimestampInLast24h
+
         let latest24h = windowCounts.latestTimestampInLast24h
         let earliest24h: Date? = {
             guard let rawEarliest24h = rawEarliest24h else { return nil }
@@ -82,7 +78,13 @@ final class TransmitterReadSuccessManager {
         }()
 
         // Infer nominal gap from 24h
-        let nominalGapInSeconds = TransmitterReadSuccessManager.inferNominalGapSeconds(earliest: earliest24h, latest: latest24h, distinctCount: windowCounts.distinctCountLast24h)
+        let nominalGapInSeconds = TransmitterReadSuccessManager.inferNominalGapSeconds(earliest: earliest24h, latest: latest24h, distinctCount: rawDistinctCountLast24h)
+
+        let allTimestamps = bgReadingsAccessor.getReadingTimestampsForLast24h(forSensor: sensor, endingAt: now)
+        let slotOccupancy = countPhaseAlignedDistinctSlots(timestamps: allTimestamps, now: now, periodSeconds: nominalGapInSeconds)
+        windowCounts.distinctCountLast6h = slotOccupancy.distinct6h
+        windowCounts.distinctCountLast12h = slotOccupancy.distinct12h
+        windowCounts.distinctCountLast24h = slotOccupancy.distinct24h
 
         // Helper to compute expected slots using the actual span between
         // the effective window start and the timestamp of the latest reading.

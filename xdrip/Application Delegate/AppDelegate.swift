@@ -20,7 +20,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        trace("in didFinishLaunchingWithOptions", log: log, category: ConstantsLog.categoryAppDelegate, type: .info)
+        trace("****************************************", log: log, category: ConstantsLog.categoryAppDelegate, type: .info)
+        trace("*** in didFinishLaunchingWithOptions ***", log: log, category: ConstantsLog.categoryAppDelegate, type: .info)
+        trace("****************************************", log: log, category: ConstantsLog.categoryAppDelegate, type: .info)
         
         return true
         
