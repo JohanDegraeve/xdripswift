@@ -3498,7 +3498,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 infoStatusActivityIndicatorOutlet.isHidden = false
                 infoStatusIconOutlet.isHidden = true
-                infoStatusButtonOutlet.setTitle("Checking...", for: .normal)
+                infoStatusButtonOutlet.setTitle(Texts_Common.checking, for: .normal)
                 infoStatusButtonOutlet.setTitleColor(UIColor(resource: .colorSecondary), for: .normal)
                 infoStatusTimeAgoOutlet.isHidden = true
                 
