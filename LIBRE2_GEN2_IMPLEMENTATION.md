@@ -1,8 +1,11 @@
-# Libre 2 Gen2 (US/CA/AU) Implementation Guide
+# Libre 2 Gen2 (US/CA/AU/RU) Implementation Guide
 
 ## Overview
 
-This document describes the implementation of support for FreeStyle Libre 2 Gen2 sensors (US/CA/AU models E5, E6) in xDripSwift.
+This document describes the implementation of support for FreeStyle Libre 2 Gen2 sensors in xDripSwift:
+- **US/CA/AU**: Models E5, E6
+- **Russia**: Model 2B (14-day, Gen2 variant)
+- **Latin America**: Model 2B (14-day Plus, Gen1 variant)
 
 **Status:** 🟡 Structure Complete - Awaiting Cryptographic Implementation
 
@@ -28,6 +31,10 @@ This document describes the implementation of support for FreeStyle Libre 2 Gen2
 ### 3. Detection (`LibreSensorType`)
 - ✅ Utility functions to identify Gen2 sensors
 - ✅ Support for `.libreUS` (E5) and `.libreUSE6` (E6) types
+- ✅ Support for `.libre22B` (2B) type with regional detection:
+  - LATAM Libre 2 Plus: `2B 0A 3A 08` (Gen1 - uses PreLibre2 decryption)
+  - RU Libre 2: `2B 0A 39 08` (Gen2 - requires whiteCryption)
+- ✅ Helper functions: `isRussianGen2()` and `isLatinAmericanPlus()`
 
 ## What's Missing ⚠️
 
@@ -190,6 +197,28 @@ Libre2Gen2.isGen2Sensor(patchInfo: String) -> Bool
   - Reverse engineering notes
   - Key derivation details
 
+## Patch Info Reference
+
+The patch info is a 4-byte identifier read from the sensor via NFC. Format: `[Type][Variant][Generation][Region]`
+
+### Known Patch Info Values:
+
+| Sensor Type | Patch Info | Generation | Notes |
+|-------------|------------|------------|-------|
+| **Libre 2+ EU** | `C6 09 31 01` | Gen1 | 15-day |
+| **Libre 2+ EU** | `7F 0E 31 01` | Gen1 | 15-day (newer) |
+| **Libre 2 EU** | `7F 0E 30 01` | Gen1 | 14-day |
+| **Libre 2+ US** | `2C 0A 3A 02` | Gen2 | Uses whiteCryption |
+| **Libre 2+ LA** | `2B 0A 3A 08` | Gen1 | LATAM Plus, 14-day |
+| **Libre 2 RU** | `2B 0A 39 08` | Gen2 | Russian, 14-day, uses whiteCryption |
+
+### Detection Logic:
+- **First byte (2B)**: Both LATAM and RU sensors
+- **Third byte**: Distinguishes variants
+  - `3A` = LATAM (Gen1 encryption)
+  - `39` = Russian (Gen2 encryption)
+- **Last byte (08)**: Common region code for both
+
 ## Security Considerations
 
 - Gen2 uses **whiteCryption Secure Key Box** (proprietary)
@@ -197,6 +226,8 @@ Libre2Gen2.isGen2Sensor(patchInfo: String) -> Bool
 - Requires proper key management
 - Challenge-response authentication
 - Session-based encryption
+- **LATAM sensors use Gen1 encryption** (PreLibre2 algorithm)
+- **Russian sensors require Gen2 encryption** (whiteCryption, not yet implemented)
 
 ## License & Legal
 

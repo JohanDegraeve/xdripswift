@@ -416,25 +416,43 @@ class Libre2Gen2 {
     /// Determines if a LibreSensorType requires Gen2 encryption.
     ///
     /// - Parameter sensorType: The sensor type to check
-    /// - Returns: true if Gen2 (US/CA/AU), false if Gen1 (EU)
+    /// - Returns: true if Gen2 (US/CA/AU/RU), false if Gen1 (EU/LATAM)
     static func isGen2Sensor(_ sensorType: LibreSensorType) -> Bool {
         switch sensorType {
         case .libreUS, .libreUSE6:
-            return true  // Gen2 sensors
+            return true  // Gen2 sensors (US/CA/AU)
+        case .libre22B:
+            // 2B could be either LATAM (Gen1) or RU (Gen2)
+            // Need full patch info to determine - see isGen2Sensor(patchInfo:)
+            return false  // Default to Gen1 when type alone is insufficient
         default:
             return false  // Gen1 or other sensors
         }
     }
 
-    /// Check if sensor UID indicates Gen2
+    /// Check if sensor patch info indicates Gen2
     ///
-    /// Uses the sensor's patch info byte to determine Gen2 status.
+    /// Uses the full patch info to determine Gen2 status, including:
+    /// - E5/E6: US/CA/AU Gen2 sensors
+    /// - 2B 0A 39 08: Russian Libre 2 Gen2
+    /// - 2B 0A 3A 08: LATAM Libre 2 Plus (Gen1, not Gen2)
     ///
-    /// - Parameter patchInfo: First byte of patch info from NFC
+    /// - Parameter patchInfo: Full patch info string from NFC (at least first 8 hex chars)
     /// - Returns: true if Gen2 sensor
     static func isGen2Sensor(patchInfo: String) -> Bool {
-        // E5 and E6 are Gen2 US sensors
-        return patchInfo.uppercased() == "E5" || patchInfo.uppercased() == "E6"
+        let normalized = patchInfo.uppercased().replacingOccurrences(of: " ", with: "")
+
+        // E5 and E6 are Gen2 US/CA/AU sensors
+        if normalized.hasPrefix("E5") || normalized.hasPrefix("E6") {
+            return true
+        }
+
+        // Check for Russian Gen2: 2B 0A 39 08
+        if LibreSensorType.isRussianGen2(patchInfo: patchInfo) {
+            return true
+        }
+
+        return false
     }
 
 

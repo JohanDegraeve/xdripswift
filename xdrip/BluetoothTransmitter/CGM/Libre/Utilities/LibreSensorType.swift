@@ -17,7 +17,9 @@ public enum LibreSensorType: String {
     case libre2C6 = "C6" // EU Libre 2 Plus (May 2024)
     
     case libre27F = "7F" // EU Libre 2 Plus (May 2025)
-    
+
+    case libre22B = "2B" // LATAM Libre 2 Plus (2B 0A 3A 08) / RU Libre 2 (2B 0A 39 08)
+
     case libreUS = "E5"
     
     case libreUSE6 = "E6"
@@ -45,7 +47,10 @@ public enum LibreSensorType: String {
             
         case .libre27F:
             return "Libre 2 Plus EU 7F"
-            
+
+        case .libre22B:
+            return "Libre 2 Plus LATAM/RU 2B"
+
         case .libreUS:
             return "Libre US"
             
@@ -71,7 +76,7 @@ public enum LibreSensorType: String {
         }
         
         // decrypt if libre2 or libreUS
-        if self == .libre2 || self == .libre2C5 || self == .libre2C6 || self == .libre27F || self == .libreUS || self == .libreUSE6 {
+        if self == .libre2 || self == .libre2C5 || self == .libre2C6 || self == .libre27F || self == .libre22B || self == .libreUS || self == .libreUSE6 {
             
             var libreData = rxBuffer.subdata(in: headerLength..<(rxBufferEnd + 1))
 
@@ -119,12 +124,15 @@ public enum LibreSensorType: String {
     /// - reads the first byte in patchInfo and dependent on that value, returns type of sensor
     /// - if patchInfo = nil, then returnvalue is Libre1
     /// - if first byte is unknown, then returns nil
+    /// - Full patch info format (4 bytes): [Type][Variant][Generation][Region]
+    ///   Example: 2B 0A 3A 08 = LATAM Libre 2 Plus
+    ///            2B 0A 39 08 = RU Libre 2 (Gen2)
     static func type(patchInfo: String?) -> LibreSensorType? {
-        
+
         guard let patchInfo = patchInfo else {return .libre1}
-        
+
         guard patchInfo.count > 1 else {return nil}
-        
+
         let firstTwoChars = patchInfo[0..<2].uppercased()
         
         switch firstTwoChars {
@@ -146,7 +154,10 @@ public enum LibreSensorType: String {
             
         case "7F":
             return .libre27F // new Libre 2 Plus EU type (May 2025)
-            
+
+        case "2B":
+            return .libre22B // LATAM Libre 2 Plus / RU Libre 2 (14-day)
+
         case "E5":
             return .libreUS
             
@@ -176,7 +187,10 @@ public enum LibreSensorType: String {
 
         case .libre2, .libre2C5:
             return 14.5
-            
+
+        case .libre22B:
+            return 14.5  // LATAM Plus and RU Libre 2 are 14-day sensors
+
         case .libre2C6, .libre27F:
             return 15.5
 
@@ -189,9 +203,50 @@ public enum LibreSensorType: String {
         }
         
     }
-    
 
-    
+    /// Determine if a 2B sensor is the Russian Gen2 variant
+    ///
+    /// Uses full patch info to distinguish between:
+    /// - LATAM Libre 2 Plus: 2B 0A 3A 08 (Gen1)
+    /// - RU Libre 2: 2B 0A 39 08 (Gen2)
+    ///
+    /// - Parameter patchInfo: Full patch info string (12 hex chars for 6 bytes)
+    /// - Returns: true if Russian Gen2 sensor, false otherwise
+    static func isRussianGen2(patchInfo: String?) -> Bool {
+        guard let patchInfo = patchInfo?.uppercased() else { return false }
+
+        // Check for Russian Libre 2 Gen2 pattern: 2B 0A 39 08
+        // patchInfo format: "2B0A3908" (no spaces) or "2B 0A 39 08" (with spaces)
+        let normalized = patchInfo.replacingOccurrences(of: " ", with: "")
+
+        // Must start with 2B and have byte[2] = 39 (byte 4-5 in hex string)
+        if normalized.hasPrefix("2B") && normalized.count >= 8 {
+            let thirdByte = normalized[4..<6]  // Characters 4-5 = third byte
+            return thirdByte == "39"
+        }
+
+        return false
+    }
+
+    /// Determine if a 2B sensor is the Latin American Plus variant
+    ///
+    /// - Parameter patchInfo: Full patch info string
+    /// - Returns: true if LATAM Libre 2 Plus sensor
+    static func isLatinAmericanPlus(patchInfo: String?) -> Bool {
+        guard let patchInfo = patchInfo?.uppercased() else { return false }
+
+        let normalized = patchInfo.replacingOccurrences(of: " ", with: "")
+
+        // LATAM pattern: 2B 0A 3A 08
+        if normalized.hasPrefix("2B") && normalized.count >= 8 {
+            let thirdByte = normalized[4..<6]
+            return thirdByte == "3A"  // 3A = LATAM, 39 = RU
+        }
+
+        return false
+    }
+
+
 }
 
 
