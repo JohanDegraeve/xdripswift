@@ -10,7 +10,7 @@
 "settingsviews_master" = "Master";
 "settingsviews_follower" = "Follower";
 "settingsviews_sectionTitleDataSource" = "CGM Data Source";
-"settingsviews_labelFollowerDataSourceType" = "Follower Data Source";
+"settingsviews_labelFollowerDataSourceType" = "Data Source";
 "settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
 "settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
 "settingsviews_followerKeepAliveTypeDisabled" = "Disabled";

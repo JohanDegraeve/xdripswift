@@ -1317,7 +1317,7 @@ final class RootViewController: UIViewController, ObservableObject {
             // this value is also used to verify that glucoseData Array has enough readings
             var timeStampToDelete = Date(timeIntervalSinceNow: -60.0 * (Double)(ConstantsLibreSmoothing.readingsToDeleteInMinutes))
             
-            trace("in processNewGlucoseData, timeStampToDelete =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .debug, timeStampToDelete.toString(timeStyle: .long, dateStyle: .none))
+            trace("in processNewGlucoseData, timeStampToDelete =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .debug, timeStampToDelete.toStringForTrace(timeStyle: .long, dateStyle: .none))
             
             // now check if we'll delete readings
             // there must be a glucoseData.last, here assigning oldestGlucoseData just to unwrap it
@@ -1326,7 +1326,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 // older than the timestamp of the latest calibration (would only be applicable if recalibration is used)
                 if let lastCalibrationForActiveSensor = lastCalibrationForActiveSensor {
                     timeStampToDelete = max(timeStampToDelete, lastCalibrationForActiveSensor.timeStamp)
-                    trace("in processNewGlucoseData, after lastcalibrationcheck timeStampToDelete =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .debug, timeStampToDelete.toString(timeStyle: .long, dateStyle: .none))
+                    trace("in processNewGlucoseData, after lastcalibrationcheck timeStampToDelete =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .debug, timeStampToDelete.toStringForTrace(timeStyle: .long, dateStyle: .none))
                 }
                 
                 // there should be one reading per minute for the period that we want to delete readings, otherwise we may not be able to fill up a gap that is created by deleting readings, because the next readings are per 15 minutes. This will typically happen the first time the app runs (or reruns), the first range of readings is only 16 readings not enough to fill up a gap of more than 20 minutes
@@ -1362,7 +1362,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 // delete them
                 for reading in lastBgReadings {
-                    trace("in processNewGlucoseData, reading being deleted with timestamp =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .debug, reading.timeStamp.toString(timeStyle: .long, dateStyle: .none))
+                    trace("in processNewGlucoseData, reading being deleted with timestamp =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .debug, reading.timeStamp.toStringForTrace(timeStyle: .long, dateStyle: .none))
                     coreDataManager.mainManagedObjectContext.delete(reading)
                     coreDataManager.saveChanges()
                 }
@@ -3498,7 +3498,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 infoStatusActivityIndicatorOutlet.isHidden = false
                 infoStatusIconOutlet.isHidden = true
-                infoStatusButtonOutlet.setTitle("Checking...", for: .normal)
+                infoStatusButtonOutlet.setTitle(Texts_Common.checking, for: .normal)
                 infoStatusButtonOutlet.setTitleColor(UIColor(resource: .colorSecondary), for: .normal)
                 infoStatusTimeAgoOutlet.isHidden = true
                 
@@ -3615,7 +3615,7 @@ extension RootViewController: CGMTransmitterDelegate {
         
         // list readings
         for (index, glucose) in glucoseData.enumerated() {
-            trace("in cgmTransmitterInfoReceived, glucoseData %{public}@, value = %{public}@, timestamp = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, String(format: "%02d", index), glucose.glucoseLevelRaw.round(toDecimalPlaces: 3).description, glucose.timeStamp.toString(timeStyle: .long, dateStyle: .none))
+            trace("in cgmTransmitterInfoReceived, glucoseData %{public}@, value = %{public}@, timestamp = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .debug, String(format: "%02d", index), glucose.glucoseLevelRaw.round(toDecimalPlaces: 3).description, glucose.timeStamp.toStringForTrace(timeStyle: .long, dateStyle: .none))
         }
         
         // let's check to ensure that the sensor is not within the minimum warm-up time as defined in ConstantsMaster
@@ -3770,7 +3770,7 @@ extension RootViewController: FollowerDelegate {
             if let lastReading = bgReadingsAccessor.last(forSensor: nil) {
                 timeStampLastBgReading = lastReading.timeStamp
                 
-                trace("in followerInfoReceived, timeStampLastBgReading = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, timeStampLastBgReading.toString(timeStyle: .long, dateStyle: .long))
+                trace("in followerInfoReceived, timeStampLastBgReading = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, timeStampLastBgReading.toStringForTrace(timeStyle: .long, dateStyle: .long))
             }
             
             // was a new reading created or not
@@ -3779,7 +3779,7 @@ extension RootViewController: FollowerDelegate {
             // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
             for (_, followGlucoseData) in followGlucoseDataArray.enumerated().reversed() {
                 if followGlucoseData.timeStamp > timeStampLastBgReading {
-                    trace("in followerInfoReceived, creating new bgreading: value = %{public}@ %{public}@, timestamp =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info,  followGlucoseData.sgv.mgDlToMmol(mgDl: isMgDl).bgValueToString(mgDl: isMgDl), isMgDl ? Texts_Common.mgdl : Texts_Common.mmol, followGlucoseData.timeStamp.toString(timeStyle: .long, dateStyle: .long))
+                    trace("in followerInfoReceived, creating new bgreading: value = %{public}@ %{public}@, timestamp =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info,  followGlucoseData.sgv.mgDlToMmol(mgDl: isMgDl).bgValueToString(mgDl: isMgDl), isMgDl ? Texts_Common.mgdl : Texts_Common.mmol, followGlucoseData.timeStamp.toStringForTrace(timeStyle: .long, dateStyle: .long))
                     
                     // create a new reading
                     // we'll need to check which should be the active followerManager to know where to call the function
