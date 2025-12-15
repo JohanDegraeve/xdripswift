@@ -68,6 +68,14 @@ extension UserDefaults {
         case medtrumEasyViewPassword = "medtrumEasyViewPassword"
         /// Medtrum EasyView login is allowed, or prevented?
         case medtrumEasyViewPreventLogin = "medtrumEasyViewPreventLogin"
+        /// Medtrum EasyView user type from login response ("P" = patient, "M" = caregiver/monitor)
+        case medtrumEasyViewUserType = "medtrumEasyViewUserType"
+        /// Cached JSON data of caregiver's patient connections (serialized [MedtrumEasyViewPatientConnection])
+        case medtrumEasyViewCachedConnections = "medtrumEasyViewCachedConnections"
+        /// Selected patient UID for caregiver accounts (nil = "My Account" / patient mode)
+        case medtrumEasyViewSelectedPatientUid = "medtrumEasyViewSelectedPatientUid"
+        /// Flag indicating if the last connections fetch failed (to show error in UI)
+        case medtrumEasyViewConnectionsFetchFailed = "medtrumEasyViewConnectionsFetchFailed"
 
         // General
         
@@ -690,6 +698,46 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.medtrumEasyViewPreventLogin.rawValue)
+        }
+    }
+
+    /// Medtrum EasyView user type ("P" for patient, "M" for caregiver/monitor)
+    @objc dynamic var medtrumEasyViewUserType: String? {
+        get {
+            return string(forKey: Key.medtrumEasyViewUserType.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.medtrumEasyViewUserType.rawValue)
+        }
+    }
+
+    /// Cached patient connections for caregiver accounts (stored as JSON Data)
+    var medtrumEasyViewCachedConnections: Data? {
+        get {
+            return data(forKey: Key.medtrumEasyViewCachedConnections.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.medtrumEasyViewCachedConnections.rawValue)
+        }
+    }
+
+    /// Selected patient UID for caregiver mode (nil means "My Account")
+    @objc dynamic var medtrumEasyViewSelectedPatientUid: Int {
+        get {
+            return integer(forKey: Key.medtrumEasyViewSelectedPatientUid.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.medtrumEasyViewSelectedPatientUid.rawValue)
+        }
+    }
+
+    /// Flag indicating if connections fetch failed (to show error in settings)
+    var medtrumEasyViewConnectionsFetchFailed: Bool {
+        get {
+            return bool(forKey: Key.medtrumEasyViewConnectionsFetchFailed.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.medtrumEasyViewConnectionsFetchFailed.rawValue)
         }
     }
 

@@ -344,7 +344,63 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 return .nothing
             }
             
-        case .followerExtraRow8, .followerExtraRow10, .followerExtraRow11:
+        case .followerExtraRow8:
+            switch UserDefaults.standard.followerDataSourceType {
+            case .medtrumEasyView:
+                // Only show dropdown if caregiver account
+                guard UserDefaults.standard.medtrumEasyViewUserType == "M" else {
+                    return .nothing
+                }
+
+                // Try to decode cached connections
+                var connections: [MedtrumEasyViewPatientConnection] = []
+                if let cachedData = UserDefaults.standard.medtrumEasyViewCachedConnections {
+                    connections = (try? JSONDecoder().decode([MedtrumEasyViewPatientConnection].self, from: cachedData)) ?? []
+                }
+
+                // Build dropdown data: "My Account" + patient list
+                var data = ["My Account (Patient Mode)"]
+                data.append(contentsOf: connections.map { $0.displayName })
+
+                // Determine selected row
+                let selectedPatientUid = UserDefaults.standard.medtrumEasyViewSelectedPatientUid
+                var selectedRow = 0  // Default to "My Account"
+                if selectedPatientUid != 0 {
+                    // Find index of selected patient (add 1 for "My Account" offset)
+                    if let index = connections.firstIndex(where: { $0.uid == selectedPatientUid }) {
+                        selectedRow = index + 1
+                    }
+                }
+
+                return SettingsSelectedRowAction.selectFromList(
+                    title: "Select Patient",
+                    data: data,
+                    selectedRow: selectedRow,
+                    actionTitle: nil,
+                    cancelTitle: nil,
+                    actionHandler: { (index: Int) in
+                        if index == 0 {
+                            // "My Account" selected
+                            UserDefaults.standard.medtrumEasyViewSelectedPatientUid = 0
+                            trace("Medtrum EasyView: Selected 'My Account' (patient mode)", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info)
+                        } else if index > 0 && index <= connections.count {
+                            // Patient selected
+                            let patient = connections[index - 1]
+                            UserDefaults.standard.medtrumEasyViewSelectedPatientUid = patient.uid
+                            trace("Medtrum EasyView: Selected patient '%{public}@' (UID: %{public}@)", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, patient.displayName, patient.uid.description)
+                        }
+
+                        // Reset Medtrum data to trigger refetch with new patient
+                        self.resetMedtrumEasyViewData()
+                    },
+                    cancelHandler: nil,
+                    didSelectRowHandler: nil
+                )
+            default:
+                return .nothing
+            }
+
+        case .followerExtraRow10, .followerExtraRow11:
             return .nothing
         }
     }
@@ -375,8 +431,10 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 return 9
 
             case .medtrumEasyView:
-                // show patient name, upload to nightscout, keep-alive, username, and password
-                return 8
+                // Show patient selector dropdown if caregiver account, otherwise 8 rows
+                // Rows: patient name (display), data source, upload toggle, keep-alive, username, password, region, [patient selector if caregiver]
+                let isCaregiverAccount = UserDefaults.standard.medtrumEasyViewUserType == "M"
+                return isCaregiverAccount ? 9 : 8
             }
         }
     }
@@ -413,6 +471,8 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             switch UserDefaults.standard.followerDataSourceType {
             case .dexcomShare:
                 return Texts_SettingsView.labelFollowerDataSourceRegion
+            case .medtrumEasyView:
+                return "Patient Selection"
             default:
                 return Texts_HomeView.sensor
             }
@@ -436,9 +496,14 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
-        case .bloodGlucoseUnit, .masterFollower, .followerExtraRow5, .followerExtraRow8, .followerExtraRow10, .followerExtraRow11:
+        case .bloodGlucoseUnit, .masterFollower, .followerExtraRow5, .followerExtraRow10, .followerExtraRow11:
             return .none
-            
+
+        case .followerExtraRow8:
+            // Show disclosure indicator for Medtrum caregiver accounts only
+            return (UserDefaults.standard.followerDataSourceType == .medtrumEasyView &&
+                    UserDefaults.standard.medtrumEasyViewUserType == "M") ? .disclosureIndicator : .none
+
         case .followerExtraRow2:
             return UserDefaults.standard.isMaster ? .none : .disclosureIndicator
             
@@ -522,7 +587,32 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 } else {
                     return UserDefaults.standard.dexcomShareRegion.description + " ✅"
                 }
-                
+
+            case .medtrumEasyView:
+                // Only show for caregiver accounts
+                guard UserDefaults.standard.medtrumEasyViewUserType == "M" else {
+                    return nil
+                }
+
+                // Show error if connections fetch failed
+                if UserDefaults.standard.medtrumEasyViewConnectionsFetchFailed {
+                    return "⚠️ Failed to fetch patients (using cached list)"
+                }
+
+                // Show selected patient or "My Account"
+                let selectedPatientUid = UserDefaults.standard.medtrumEasyViewSelectedPatientUid
+                if selectedPatientUid == 0 {
+                    return "My Account (Patient Mode)"
+                } else {
+                    // Try to find patient name from cached connections
+                    if let cachedData = UserDefaults.standard.medtrumEasyViewCachedConnections,
+                       let connections = try? JSONDecoder().decode([MedtrumEasyViewPatientConnection].self, from: cachedData),
+                       let patient = connections.first(where: { $0.uid == selectedPatientUid }) {
+                        return patient.displayName
+                    }
+                    return "Patient ID: \(selectedPatientUid)"
+                }
+
             default:
                 return nil
             }
@@ -653,12 +743,18 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
     private func addObservers() {
         // Listen for changes in the active sensor value to trigger the UI to be updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.activeSensorSerialNumber.rawValue, options: .new, context: nil)
-        
+
         // Listen for changes in the detected dexcom server region to trigger the UI to be updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomShareRegion.rawValue, options: .new, context: nil)
-        
+
         // Listen for changes in the login status to trigger the UI to be updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomShareLoginFailedTimestamp.rawValue, options: .new, context: nil)
+
+        // Listen for changes in Medtrum EasyView user type (patient vs caregiver)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.medtrumEasyViewUserType.rawValue, options: .new, context: nil)
+
+        // Listen for changes in Medtrum EasyView selected patient
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.medtrumEasyViewSelectedPatientUid.rawValue, options: .new, context: nil)
     }
     
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
@@ -667,12 +763,12 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         else { return }
         
         switch keyPathEnum {
-        case UserDefaults.Key.activeSensorSerialNumber, UserDefaults.Key.dexcomShareRegion, UserDefaults.Key.dexcomShareLoginFailedTimestamp:
+        case UserDefaults.Key.activeSensorSerialNumber, UserDefaults.Key.dexcomShareRegion, UserDefaults.Key.dexcomShareLoginFailedTimestamp, UserDefaults.Key.medtrumEasyViewUserType, UserDefaults.Key.medtrumEasyViewSelectedPatientUid:
             // we have to run this in the main thread to avoid access errors
             DispatchQueue.main.async {
                 self.sectionReloadClosure?()
             }
-            
+
         default:
             break
         }
