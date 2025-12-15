@@ -839,7 +839,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         if calibrationIsValid(calibration: calibration) {
             calibrationToSendToTransmitter = calibration
             
-            trace("in calibrate., new calibration stored, value = %{public}@, timestamp = %{public}@ ", log: log, category: ConstantsLog.categoryCGMG5, type: .info, calibration.bg.description, calibration.timeStamp.toString(timeStyle: .long, dateStyle: .none))
+            trace("in calibrate., new calibration stored, value = %{public}@, timestamp = %{public}@ ", log: log, category: ConstantsLog.categoryCGMG5, type: .info, calibration.bg.description, calibration.timeStamp.toStringForTrace(timeStyle: .long, dateStyle: .none))
         }
     }
     
@@ -936,7 +936,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let writeControlCharacteristic = writeControlCharacteristic {
             
-            trace("in sendCalibrationTxMessage, sending calibrationTxMessage with timestamp %{public}@, value %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, calibration.timeStamp.toString(timeStyle: .long, dateStyle: .long), calibration.bg.description)
+            trace("in sendCalibrationTxMessage, sending calibrationTxMessage with timestamp %{public}@, value %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, calibration.timeStamp.toStringForTrace(timeStyle: .long, dateStyle: .long), calibration.bg.description)
             
             _ = super.writeDataToPeripheral(data: calibrationTxMessage.data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
             
@@ -955,7 +955,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let writeControlCharacteristic = writeControlCharacteristic {
             
-            trace("in sendSessionStopTxMessage, sending sendSessionStopTxMessage with stopDate %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, dexcomSessionStopTxMessage.stopDate.toString(timeStyle: .long, dateStyle: .long))
+            trace("in sendSessionStopTxMessage, sending sendSessionStopTxMessage with stopDate %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, dexcomSessionStopTxMessage.stopDate.toStringForTrace(timeStyle: .long, dateStyle: .long))
             
             _ = super.writeDataToPeripheral(data: dexcomSessionStopTxMessage.data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
             
@@ -974,7 +974,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let writeControlCharacteristic = writeControlCharacteristic {
             
-            trace("in sendSessionStartTxMessage, sending sessionStartTxMessage with startDate %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, sensorStartToSendToTransmitter.startDate.toString(timeStyle: .long, dateStyle: .long))
+            trace("in sendSessionStartTxMessage, sending sessionStartTxMessage with startDate %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, sensorStartToSendToTransmitter.startDate.toStringForTrace(timeStyle: .long, dateStyle: .long))
             
             _ = super.writeDataToPeripheral(data: sessionStartTxMessage.data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
             
@@ -998,7 +998,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let writeControlCharacteristic = writeControlCharacteristic {
             
-            trace("in sendBackfillTxMessage, sending backfillTxMessage with startTime %{public}@, endTime %{public}@, data %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, startTime.toString(timeStyle: .long, dateStyle: .none), endTime.toString(timeStyle: .long, dateStyle: .none), backfillTxMessage.data.hexEncodedString())
+            trace("in sendBackfillTxMessage, sending backfillTxMessage with startTime %{public}@, endTime %{public}@, data %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, startTime.toStringForTrace(timeStyle: .long, dateStyle: .none), endTime.toStringForTrace(timeStyle: .long, dateStyle: .none), backfillTxMessage.data.hexEncodedString())
             
             _ = super.writeDataToPeripheral(data: backfillTxMessage.data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
             
@@ -1107,7 +1107,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
         if let transmitterStartDate = transmitterStartDate, let glucoseBackFillRxMessage = GlucoseBackfillRxMessage(data: value, transmitterStartDate: transmitterStartDate) {
             
-            trace("in processGlucoseBackfillRxMessage, backFillStartTimeStamp = %{public}@, backFillEndTimeStamp = %{public}@, backFillIdentifier = %{public}@, backFillStatus = %{public}@, transmitterStatus = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, glucoseBackFillRxMessage.backFillStartTimeStamp.toString(timeStyle: .short, dateStyle: .short), glucoseBackFillRxMessage.backFillEndTimeStamp.toString(timeStyle: .short, dateStyle: .short), glucoseBackFillRxMessage.backFillIdentifier.description, glucoseBackFillRxMessage.backFillStatus.description, glucoseBackFillRxMessage.transmitterStatus.description)
+            trace("in processGlucoseBackfillRxMessage, backFillStartTimeStamp = %{public}@, backFillEndTimeStamp = %{public}@, backFillIdentifier = %{public}@, backFillStatus = %{public}@, transmitterStatus = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, glucoseBackFillRxMessage.backFillStartTimeStamp.toStringForTrace(timeStyle: .short, dateStyle: .short), glucoseBackFillRxMessage.backFillEndTimeStamp.toStringForTrace(timeStyle: .short, dateStyle: .short), glucoseBackFillRxMessage.backFillIdentifier.description, glucoseBackFillRxMessage.backFillStatus.description, glucoseBackFillRxMessage.transmitterStatus.description)
                         
         } else {
             
@@ -1122,7 +1122,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         if let dexcomSessionStopRxMessage = DexcomSessionStopRxMessage(data: value) {
             
-            trace("in processSessionStopRxMessage, received dexcomSessionStopRxMessage, isOkay = %{public}@, sessionStopResponse = %{public}@, sessionStopDate = %{public}@, status = %{public}@, transmitterStartDate = %{public}@,", log: log, category: ConstantsLog.categoryCGMG5, type: .info, dexcomSessionStopRxMessage.isOkay.description, dexcomSessionStopRxMessage.sessionStopResponse.description, dexcomSessionStopRxMessage.sessionStopDate.toString(timeStyle: .long, dateStyle: .long), dexcomSessionStopRxMessage.status.description, dexcomSessionStopRxMessage.transmitterStartDate.toString(timeStyle: .long, dateStyle: .long))
+            trace("in processSessionStopRxMessage, received dexcomSessionStopRxMessage, isOkay = %{public}@, sessionStopResponse = %{public}@, sessionStopDate = %{public}@, status = %{public}@, transmitterStartDate = %{public}@,", log: log, category: ConstantsLog.categoryCGMG5, type: .info, dexcomSessionStopRxMessage.isOkay.description, dexcomSessionStopRxMessage.sessionStopResponse.description, dexcomSessionStopRxMessage.sessionStopDate.toStringForTrace(timeStyle: .long, dateStyle: .long), dexcomSessionStopRxMessage.status.description, dexcomSessionStopRxMessage.transmitterStartDate.toStringForTrace(timeStyle: .long, dateStyle: .long))
             
         } else {
             
@@ -1228,11 +1228,11 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             if let receivedSensorStartDate = receivedSensorStartDate {
                 if forceNewSensor || sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate.addingTimeInterval(-15.0)) {
                     if let sensorStartDate = sensorStartDate {
-                        trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, currently known sensorStartDate = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, sensorStartDate.toString(timeStyle: .long, dateStyle: .long))
+                        trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, currently known sensorStartDate = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, sensorStartDate.toStringForTrace(timeStyle: .long, dateStyle: .long))
                     } else {
                         trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, current sensorStartDate is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
                     }
-                    trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, received sensorStartDate minus 15 seconds = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, receivedSensorStartDate.addingTimeInterval(-15.0).toString(timeStyle: .long, dateStyle: .long))
+                    trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, received sensorStartDate minus 15 seconds = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, receivedSensorStartDate.addingTimeInterval(-15.0).toStringForTrace(timeStyle: .long, dateStyle: .long))
                     trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, seems that a new sensor is detected.", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
                     self.receivedSensorStartDate = receivedSensorStartDate
                     DispatchQueue.main.async { [weak self] in
@@ -1256,11 +1256,11 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 }
                 if forceNewSensor || sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate.addingTimeInterval(-15.0)) {
                     if let sensorStartDate = sensorStartDate {
-                        trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, currently known sensorStartDate = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, sensorStartDate.toString(timeStyle: .long, dateStyle: .long))
+                        trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, currently known sensorStartDate = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, sensorStartDate.toStringForTrace(timeStyle: .long, dateStyle: .long))
                     } else {
                         trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, current sensorStartDate is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
                     }
-                    trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, received sensorStartDate minus 15 seconds = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, receivedSensorStartDate.addingTimeInterval(-15.0).toString(timeStyle: .long, dateStyle: .long))
+                    trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, received sensorStartDate minus 15 seconds = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, receivedSensorStartDate.addingTimeInterval(-15.0).toStringForTrace(timeStyle: .long, dateStyle: .long))
                     trace("in processGlucoseG6DataRxMessageOrGlucoseDataRxMessage, seems a new sensor is detected.", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
                     self.receivedSensorStartDate = receivedSensorStartDate
                     DispatchQueue.main.async { [weak self] in
@@ -1318,7 +1318,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
               category: ConstantsLog.categoryCGMG5,
               type: .debug,
               glucoseDataRxMessage.calculatedValue.description,
-              glucoseDataRxMessage.timeStamp.toString(timeStyle: .long, dateStyle: .none),
+              glucoseDataRxMessage.timeStamp.toStringForTrace(timeStyle: .long, dateStyle: .none),
               glucoseDataRxMessage.algorithmStatus.description,
               glucoseDataRxMessage.transmitterStatus.description)
 
@@ -1368,7 +1368,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     private func processTransmitterTimeRxMessage(value:Data) {
         if let transmitterTimeRxMessage = DexcomTransmitterTimeRxMessage(data: value) {
             if let receivedSensorStartDate = transmitterTimeRxMessage.sensorStartDate {
-                trace("in processTransmitterTimeRxMessage, receivedSensorStartDate = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, receivedSensorStartDate.toString(timeStyle: .long, dateStyle: .long))
+                trace("in processTransmitterTimeRxMessage, receivedSensorStartDate = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, receivedSensorStartDate.toStringForTrace(timeStyle: .long, dateStyle: .long))
                 
                 // send to delegate (UI/Core Data) on main thread
                 DispatchQueue.main.async { [weak self] in
@@ -1382,11 +1382,11 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 // if current sensorStartDate is < from receivedSensorStartDate then it seems a new sensor
                 if self.receivedSensorStartDate == nil || sensorStartDate == nil || (sensorStartDate! < receivedSensorStartDate.addingTimeInterval(-15.0)) {
                     if let sensorStartDate = sensorStartDate {
-                        trace("in processTransmitterTimeRxMessage, currently known sensorStartDate = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, sensorStartDate.toString(timeStyle: .long, dateStyle: .long))
+                        trace("in processTransmitterTimeRxMessage, currently known sensorStartDate = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, sensorStartDate.toStringForTrace(timeStyle: .long, dateStyle: .long))
                     } else {
                         trace("in processTransmitterTimeRxMessage, current sensorStartDate is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
                     }
-                    trace("in processTransmitterTimeRxMessage, received sensorStartDate minus 15 seconds = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, receivedSensorStartDate.addingTimeInterval(-15.0).toString(timeStyle: .long, dateStyle: .long))
+                    trace("in processTransmitterTimeRxMessage, received sensorStartDate minus 15 seconds = %{public}@.", log: log, category: ConstantsLog.categoryCGMG5, type: .info, receivedSensorStartDate.addingTimeInterval(-15.0).toStringForTrace(timeStyle: .long, dateStyle: .long))
 
                     trace("in processTransmitterTimeRxMessage, temporarily storing the received SensorStartDate till a glucoseRx message is received with valid sensor status", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
                     
@@ -1406,7 +1406,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                     self.cGMG5TransmitterDelegate?.received(transmitterStartDate: transmitterStartDate, cGMG5Transmitter: self)
                 }
 
-                trace("in processTransmitterTimeRxMessage, transmitterStartDate = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, transmitterStartDate.toString(timeStyle: .long, dateStyle: .long))
+                trace("in processTransmitterTimeRxMessage, transmitterStartDate = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, transmitterStartDate.toStringForTrace(timeStyle: .long, dateStyle: .long))
             } else {
                 trace("in processTransmitterTimeRxMessage, transmitterStartDate is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
             }
@@ -1672,14 +1672,14 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 
                 glucoseDataArray.insert(GlucoseData(timeStamp: backfillDate, glucoseLevelRaw: Double(backFill.glucose)), at: 0)
                 
-                trace("in sendGlucoseDataToDelegate, new backfill, value = %{public}@, date = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, backFill.glucose.description, backfillDate.toString(timeStyle: .long, dateStyle: .long))
+                trace("in sendGlucoseDataToDelegate, new backfill, value = %{public}@, date = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, backFill.glucose.description, backfillDate.toStringForTrace(timeStyle: .long, dateStyle: .long))
             }
         }
         
         // only add lastGlucoseInSensorDataRxReading if the last algorithm status was .okay or .needsCalibration
         // this prevents us sending rogue values when under temporary sensor error or warm-up
         if let lastGlucoseInSensorDataRxReading = lastGlucoseInSensorDataRxReading, let status = lastAlgorithmStatus, status == .okay || status == .needsCalibration {
-            trace("in sendGlucoseDataToDelegate, adding glucose value that was received in GlucoseDataRxMessage/DexcomG6GlucoseDataRxMessage, value = %{public}@, date = %{public}@, status = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, lastGlucoseInSensorDataRxReading.glucoseLevelRaw.description, lastGlucoseInSensorDataRxReading.timeStamp.toString(timeStyle: .long, dateStyle: .none), String(describing: lastAlgorithmStatus))
+            trace("in sendGlucoseDataToDelegate, adding glucose value that was received in GlucoseDataRxMessage/DexcomG6GlucoseDataRxMessage, value = %{public}@, date = %{public}@, status = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, lastGlucoseInSensorDataRxReading.glucoseLevelRaw.description, lastGlucoseInSensorDataRxReading.timeStamp.toStringForTrace(timeStyle: .long, dateStyle: .none), String(describing: lastAlgorithmStatus))
             glucoseDataArray.insert(lastGlucoseInSensorDataRxReading, at: 0)
         } else if lastGlucoseInSensorDataRxReading != nil {
             trace("in sendGlucoseDataToDelegate, NOT adding glucose value = %{public}@, due to algorithm status = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .error, lastGlucoseInSensorDataRxReading?.glucoseLevelRaw.description ?? "nil", String(describing: lastAlgorithmStatus))
