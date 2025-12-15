@@ -33,7 +33,7 @@ public final class LiveActivityManager {
 
     // minimum age an activity must reach before respecting forceRestart requests
     // this is done to prevent unnecessary restarts being performed one after the other
-    private let minimumForceRestartAge: TimeInterval = 2 * 60 * 60
+    private let minimumForceRestartAge: TimeInterval = 10
     
     // static shared singleton of LiveActivityManager
     static let shared = LiveActivityManager()
@@ -74,11 +74,19 @@ extension LiveActivityManager {
     /// Public API: Restart from intent/shortcut
     @MainActor
     func restartFromIntent() {
-        Task { [weak self] in
-            guard let self = self else { return }
-            await self.endAll()
-            await self.ensureActivity(contentState: self.persistentContentState)
-        }
+        if (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)) && UserDefaults.standard.liveActivityType != .disabled {
+            if persistentContentState.urgentLowLimitInMgDl > 0 {
+                trace("in restartFromIntent, will try and end/restart current Live Activity", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+                Task { [weak self] in
+                    guard let self = self else { return }
+                    await self.endAll()
+                    await self.ensureActivity(contentState: self.persistentContentState, forceRestart: true)
+                }
+            } else {
+                trace("in restartFromIntent, cannot restart live activity from Intent because there is no persistentContentState available", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
+            }
+        } else {
+            trace("in restartFromIntent, will NOT try and restart Live Activity as not in master or not follower+heartbeat or LAs are not enabled", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)}
     }
 
     /// Recover orphaned activities if needed. This likely won't usually be needed often but if we can do it, then we will avoid
@@ -110,7 +118,7 @@ extension LiveActivityManager {
         
         // If no activity, start one and return
         if eventActivity == nil {
-            if shouldDeferNewStart(contentState: contentState, context: "initial start") {
+            if !forceRestart && shouldDeferNewStart(contentState: contentState, context: "initial start") {
                 return
             }
             let residualCount = Activity<XDripWidgetAttributes>.activities.count
@@ -127,9 +135,6 @@ extension LiveActivityManager {
         if forceRestart {
             let activityAge = Date().timeIntervalSince(eventStartDate)
             if activityAge >= minimumForceRestartAge {
-                if shouldDeferNewStart(contentState: contentState, context: "force restart request") {
-                    return
-                }
                 await endAll()
                 await startActivity(contentState: contentState)
                 let activityAgeString = activityAge < 3600 ? activityAge.minutes.round(toDecimalPlaces: 1).description + " minutes" : activityAge.hours.round(toDecimalPlaces: 1).description + " hours"
@@ -143,7 +148,7 @@ extension LiveActivityManager {
         
         // If activity is dismissed or ended, end them, start a new one and return
         if eventActivity?.activityState == .dismissed || eventActivity?.activityState == .ended {
-            if shouldDeferNewStart(contentState: contentState, context: "restart after dismissal/end") {
+            if !forceRestart && shouldDeferNewStart(contentState: contentState, context: "restart after dismissal/end") {
                 return
             }
             await endAll()
@@ -203,8 +208,6 @@ extension LiveActivityManager {
     /// - Parameter contentState: the updated context state of the activity
     @MainActor
     private func updateActivity(to contentState: XDripWidgetAttributes.ContentState) async {
-        // ...existing code...
-        
         if eventActivity?.activityState == .ended {
             trace("in updateActivity, detected .ended state. Starting a new live activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
             if shouldDeferNewStart(contentState: contentState, context: "restart after .ended state") {

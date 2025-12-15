@@ -157,6 +157,9 @@ extension AlertsSettingsViewController: UITableViewDataSource, UITableViewDelega
             fatalError("AlertsSettingsViewController, in cellForRowAt, failed to create alertKind")
         }
         
+        // define the separator character string (could be spaces or a dash or anything)
+        let separatorString = " \u{00B7} " // use a 'mid-dot' as a separator with a space before and after
+        
         // get the alertEntry
         let alertEntry = alertEntriesPerAlertKind[alertKind.rawValue][indexPath.row]
                 
@@ -167,38 +170,41 @@ extension AlertsSettingsViewController: UITableViewDataSource, UITableViewDelega
             // start creating the textLabel, start with start time in user's locale and region format
             var textLabelToUse = Int(alertEntry.start).convertMinutesToTimeAsString()
             
-            // add a space
-            textLabelToUse += " \u{00B7} " // use a 'mid-dot' as a separator
+            // add the separator
+            textLabelToUse += separatorString
             
             // do we add the alert value or not ?
             //   - is the alerttype enabled ? If it's not no need to show the value (it was like that in iosxdrip, seems a good approach)
             //   - does the alert type need a value ? at the moment al do, iphone muted alert (not present) yet would need it
-            if alertKind.needsAlertValue() && alertEntry.alertType.enabled {
+            if alertEntry.alertType.enabled && alertKind.needsAlertValue() {
                 // only bg level alerts would need conversion
                 textLabelToUse += alertKind.valueIsABgValue() ? Double(alertValue).mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) : alertValue.description
-            }
-            
-            if alertKind.needsAlertTriggerValue() {
-                switch alertKind {
-                case .fastdrop:
-                    textLabelToUse += " (<"
-                case .fastrise:
-                    textLabelToUse += " (>"
-                default:
-                    break
+                
+                if alertKind.needsAlertTriggerValue() {
+                    switch alertKind {
+                    case .fastdrop:
+                        textLabelToUse += " (<"
+                    case .fastrise:
+                        textLabelToUse += " (>"
+                    default:
+                        break
+                    }
+                    
+                    textLabelToUse += alertKind.valueIsABgValue() ? Double(alertTriggerValue).mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) : alertTriggerValue.description
+                    textLabelToUse += ")"
                 }
-                textLabelToUse += alertKind.valueIsABgValue() ? Double(alertTriggerValue).mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) : alertTriggerValue.description
-                textLabelToUse += ")"
+                
+                // add the separator
+                textLabelToUse += separatorString
             }
             
-            textLabelToUse += " \u{00B7} "
+            // and now the name of the alerttype adding the disabled alert type indicator if needed
+            textLabelToUse += alertEntry.alertType.name + (alertEntry.alertType.enabled ? "" : ConstantsAlerts.disabledAlertSymbolStringToAppend)
             
-            // and now the name of the alerttype
-            textLabelToUse += alertEntry.alertType.name
             cell.textLabel?.text = textLabelToUse
             cell.textLabel?.textColor = UIColor(resource: .colorPrimary)
         } else {
-            cell.textLabel?.text = "\u{26A0} " + Texts_Common.disabled
+            cell.textLabel?.text = ConstantsAlerts.disabledAlertSymbol + " " + Texts_Common.disabled
             cell.textLabel?.textColor = UIColor(resource: .colorTertiary)
         }
         
