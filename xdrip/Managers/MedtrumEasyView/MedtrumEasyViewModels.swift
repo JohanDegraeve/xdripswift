@@ -12,7 +12,7 @@ import Foundation
 /// Login request payload
 struct MedtrumEasyViewLoginRequest: Codable {
     let user_name: String
-    let user_type: String  // Always "P" for patient
+    let user_type: String  // Always "P" for login request (response will contain actual type)
     let password: String
 }
 
@@ -122,7 +122,7 @@ struct MedtrumEasyViewConnectionsData: Decodable {
 }
 
 /// Individual patient connection from caregiver connections list
-struct MedtrumEasyViewPatientConnection: Decodable {
+struct MedtrumEasyViewPatientConnection: Codable {
     let uid: Int                // Patient's user ID
     let real_name: String       // Patient's name to match against configured name
     let username: String        // Patient's email
@@ -130,6 +130,14 @@ struct MedtrumEasyViewPatientConnection: Decodable {
     let birth_date: String?     // Birth date
     let gender: String?         // Gender code
     // sensor_status and pump_status fields exist but are not needed for now
+
+    /// Helper to create display name for dropdown
+    var displayName: String {
+        if let alias = alias, !alias.isEmpty {
+            return "\(real_name) (\(alias))"
+        }
+        return real_name
+    }
 }
 
 // MARK: - Error Type

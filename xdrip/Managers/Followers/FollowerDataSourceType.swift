@@ -149,6 +149,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
         switch self {
         case .nightscout, .libreLinkUp, .libreLinkUpRussia, .dexcomShare:
             return true
+        case .medtrumEasyView:
+            return false
         }
     }
     
@@ -162,6 +164,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return ConstantsFollower.followerStatusDexcomBaseUrl
         case .libreLinkUp, .libreLinkUpRussia:
             return ConstantsFollower.followerStatusAbbottBaseUrl
+        case .medtrumEasyView:
+            return ""
         }
     }
     
@@ -174,6 +178,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             // both Dexcom and Abbott use Atlassian Statuspage to show
             // their service status so the API path is common and public
             return ConstantsFollower.followerStatusAtlassianApiPath
+        case .medtrumEasyView:
+            return ""
         }
     }
 }

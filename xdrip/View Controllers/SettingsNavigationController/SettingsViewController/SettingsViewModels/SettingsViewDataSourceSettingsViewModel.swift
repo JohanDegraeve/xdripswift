@@ -141,7 +141,11 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         UserDefaults.standard.libreLinkUpCountry = nil
         UserDefaults.standard.libreLinkUpPreventLogin = false
     }
-    
+
+    private func resetMedtrumEasyViewData() {
+        UserDefaults.standard.medtrumEasyViewPreventLogin = false
+    }
+
     private func processLibreLinkUpSensorInfo(sn: String?) -> String {
         var returnString = "Not recognised"
         
@@ -414,11 +418,31 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 
             case .dexcomShare:
                 return .askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterPassword, keyboardType: .default, text: UserDefaults.standard.dexcomSharePassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (dexcomSharePassword: String) in
-    
+
                     UserDefaults.standard.dexcomSharePassword = dexcomSharePassword.trimmingCharacters(in: .whitespaces).toNilIfLength0()
                 }, cancelHandler: nil, inputValidator: nil)
 
             case .medtrumEasyView:
+                return .askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterPassword, keyboardType: .default, text: UserDefaults.standard.medtrumEasyViewPassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (medtrumEasyViewPassword: String) in
+
+                    UserDefaults.standard.medtrumEasyViewPassword = medtrumEasyViewPassword.trimmingCharacters(in: .whitespaces).toNilIfLength0()
+                }, cancelHandler: nil, inputValidator: nil)
+
+            default:
+                return .nothing
+            }
+            
+        case .followerExtraRow9:
+            switch UserDefaults.standard.followerDataSourceType {
+            case .dexcomShare:
+                if UserDefaults.standard.dexcomShareRegion != .none {
+                    return .showInfoText(title: "Dexcom Server " + UserDefaults.standard.dexcomShareRegion.regionServerNumber, message: "\n" + UserDefaults.standard.dexcomShareRegion.regionCountriesDescription)
+                }
+
+                return .nothing
+
+            case .medtrumEasyView:
+                // Only show dropdown if caregiver account
                 guard UserDefaults.standard.medtrumEasyViewUserType == "M" else {
                     return .nothing
                 }
@@ -472,19 +496,6 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 return .nothing
             }
             
-        case .followerExtraRow9:
-            switch UserDefaults.standard.followerDataSourceType {
-            case .dexcomShare:
-                if UserDefaults.standard.dexcomShareRegion != .none {
-                    return .showInfoText(title: "Dexcom Server " + UserDefaults.standard.dexcomShareRegion.regionServerNumber, message: "\n" + UserDefaults.standard.dexcomShareRegion.regionCountriesDescription)
-                }
-                
-                return .nothing
-                
-            default:
-                return .nothing
-            }
-            
         case .followerExtraRow10:
             if let startDate = UserDefaults.standard.activeSensorStartDate {
                 var startDateString = startDate.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
@@ -525,10 +536,11 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 return 10
 
             case .medtrumEasyView:
-                // Show patient selector dropdown if caregiver account, otherwise 8 rows
-                // Rows: patient name (display), data source, upload toggle, keep-alive, username, password, region, [patient selector if caregiver]
+                // Show patient selector dropdown if caregiver account
+                // Patient account rows (0-8): BG unit, master/follower, patient name, keep-alive, data source, service status, upload to NS, username, password
+                // Caregiver account adds row 9: patient selection
                 let isCaregiverAccount = UserDefaults.standard.medtrumEasyViewUserType == "M"
-                return isCaregiverAccount ? 9 : 8
+                return isCaregiverAccount ? 10 : 9
             }
         }
     }
@@ -590,26 +602,27 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
     
     func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-        
+
         switch setting {
         case .bloodGlucoseUnit, .masterFollower, .followerExtraRow6, .followerExtraRow11, .followerExtraRow12:
             return .none
 
-        case .followerExtraRow8:
-            // Show disclosure indicator for Medtrum caregiver accounts only
-            return (UserDefaults.standard.followerDataSourceType == .medtrumEasyView &&
-                    UserDefaults.standard.medtrumEasyViewUserType == "M") ? .disclosureIndicator : .none
-
         case .followerExtraRow2:
             return UserDefaults.standard.isMaster ? .none : .disclosureIndicator
-            
+
         case .followerExtraRow3, .followerExtraRow4, .followerExtraRow5, .followerExtraRow7, .followerExtraRow8:
             return .disclosureIndicator
-            
+
         case .followerExtraRow9:
-            // if we're using Dexcom and there is a valid region, then show the disclosure indicator
-            return (UserDefaults.standard.followerDataSourceType == .dexcomShare && UserDefaults.standard.dexcomShareRegion != .none) ? .disclosureIndicator : .none
-            
+            // Show disclosure indicator for Dexcom region selection or Medtrum patient selection
+            if UserDefaults.standard.followerDataSourceType == .dexcomShare && UserDefaults.standard.dexcomShareRegion != .none {
+                return .disclosureIndicator
+            } else if UserDefaults.standard.followerDataSourceType == .medtrumEasyView && UserDefaults.standard.medtrumEasyViewUserType == "M" {
+                return .disclosureIndicator
+            } else {
+                return .none
+            }
+
         case .followerExtraRow10:
             return UserDefaults.standard.activeSensorStartDate != nil ? .disclosureIndicator : .none
         }
@@ -988,6 +1001,9 @@ extension SettingsViewDataSourceSettingsViewModel {
                 let summary = try JSONDecoder().decode(StatusPageSummaryModel.self, from: data)
                 status = FollowerServiceStatus(indicator: summary.status.indicator)
                 description = summary.status.description
+            case .medtrumEasyView:
+                // Medtrum doesn't have a service status, this case should never be reached
+                break
             }
             if status != .ok && status != .unknown {
                 trace("in fetchFollowerServiceStatus, %{public}@ service status issue = '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, followerDataSourceType.description, description)
