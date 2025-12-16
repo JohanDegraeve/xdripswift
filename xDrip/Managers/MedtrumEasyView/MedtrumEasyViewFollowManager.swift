@@ -177,6 +177,27 @@ class MedtrumEasyViewFollowManager: NSObject {
                                     UserDefaults.standard.medtrumEasyViewCachedConnections = jsonData
                                     UserDefaults.standard.medtrumEasyViewConnectionsFetchFailed = false
                                     trace("    cached %{public}@ patient connections", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, connections.count.description)
+
+                                    // Handle patient selection with priority order
+                                    let currentSelection = UserDefaults.standard.medtrumEasyViewSelectedPatientUid
+
+                                    // Priority 1: Validate existing selection
+                                    if currentSelection != 0 {
+                                        // Check if currently selected patient still exists in the connections
+                                        if !connections.contains(where: { $0.uid == currentSelection }) {
+                                            // Previously selected patient no longer exists, reset to placeholder
+                                            UserDefaults.standard.medtrumEasyViewSelectedPatientUid = 0
+                                            trace("    previously selected patient (UID: %{public}@) no longer exists, reset to placeholder", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, currentSelection.description)
+                                        } else {
+                                            trace("    keeping existing patient selection (UID: %{public}@)", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, currentSelection.description)
+                                        }
+                                    }
+                                    // Priority 2: Auto-select single patient only if no selection
+                                    else if connections.count == 1 {
+                                        let singlePatient = connections[0]
+                                        UserDefaults.standard.medtrumEasyViewSelectedPatientUid = singlePatient.uid
+                                        trace("    auto-selected single patient: %{public}@ (UID: %{public}@)", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, singlePatient.displayName, singlePatient.uid.description)
+                                    }
                                 }
 
                             } catch {
@@ -190,8 +211,15 @@ class MedtrumEasyViewFollowManager: NSObject {
                 }
 
                 // Step 2: Fetch monitor data
-                // Use selected patient UID if caregiver mode and patient selected, otherwise use logged-in user
                 let selectedPatientUid = UserDefaults.standard.medtrumEasyViewSelectedPatientUid
+
+                // For caregivers, require a patient to be selected before fetching data
+                if UserDefaults.standard.medtrumEasyViewUserType == "M" && selectedPatientUid == 0 {
+                    trace("    caregiver account with no patient selected, skipping data fetch", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info)
+                    return
+                }
+
+                // Use selected patient UID if caregiver mode and patient selected, otherwise use logged-in user
                 let userIdToFetch = (UserDefaults.standard.medtrumEasyViewUserType == "M" && selectedPatientUid != 0) ?
                     selectedPatientUid : self.medtrumUserId
                 if let userId = userIdToFetch {

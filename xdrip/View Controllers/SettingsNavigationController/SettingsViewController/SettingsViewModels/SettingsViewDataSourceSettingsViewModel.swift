@@ -452,15 +452,15 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                     connections = (try? JSONDecoder().decode([MedtrumEasyViewPatientConnection].self, from: cachedData)) ?? []
                 }
 
-                // Build dropdown data: "My Account" + patient list
-                var data = ["My Account (Patient Mode)"]
+                // Build dropdown data: placeholder + patient list
+                var data = ["Select patient..."]
                 data.append(contentsOf: connections.map { $0.displayName })
 
                 // Determine selected row
                 let selectedPatientUid = UserDefaults.standard.medtrumEasyViewSelectedPatientUid
-                var selectedRow = 0  // Default to "My Account"
+                var selectedRow = 0  // Default to placeholder
                 if selectedPatientUid != 0 {
-                    // Find index of selected patient (add 1 for "My Account" offset)
+                    // Find index of selected patient (add 1 for placeholder offset)
                     if let index = connections.firstIndex(where: { $0.uid == selectedPatientUid }) {
                         selectedRow = index + 1
                     }
@@ -474,9 +474,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                     cancelTitle: nil,
                     actionHandler: { (index: Int) in
                         if index == 0 {
-                            // "My Account" selected
+                            // Placeholder selected - no patient
                             UserDefaults.standard.medtrumEasyViewSelectedPatientUid = 0
-                            trace("Medtrum EasyView: Selected 'My Account' (patient mode)", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info)
+                            trace("Medtrum EasyView: No patient selected (placeholder)", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info)
                         } else if index > 0 && index <= connections.count {
                             // Patient selected
                             let patient = connections[index - 1]
@@ -721,10 +721,10 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                     return "⚠️ Failed to fetch patients (using cached list)"
                 }
 
-                // Show selected patient or "My Account"
+                // Show selected patient or placeholder
                 let selectedPatientUid = UserDefaults.standard.medtrumEasyViewSelectedPatientUid
                 if selectedPatientUid == 0 {
-                    return "My Account (Patient Mode)"
+                    return "Select patient..."
                 } else {
                     // Try to find patient name from cached connections
                     if let cachedData = UserDefaults.standard.medtrumEasyViewCachedConnections,
