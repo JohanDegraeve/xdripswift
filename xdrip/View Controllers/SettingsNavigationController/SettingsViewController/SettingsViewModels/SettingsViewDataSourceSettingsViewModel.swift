@@ -48,7 +48,6 @@ fileprivate enum Setting: Int, CaseIterable {
     
     /// - Follower
     ///  - LibreLinkUp:  followerSensorStartDate (web follower sensor start date - will not always be available)
-    ///  - Dexcom Share: Dexcom service status
     case followerExtraRow10 = 10
     
     /// - Follower
@@ -357,7 +356,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             }, cancelHandler: nil, didSelectRowHandler: nil)
             
         case .followerExtraRow5:
-            if let url = URL(string: UserDefaults.standard.followerDataSourceType.serviceStatusBaseUrlString(nightscoutUrl: UserDefaults.standard.nightscoutUrl)) {
+            if let url = URL(string: UserDefaults.standard.followerDataSourceType.serviceStatusBaseUrlString(nightscoutUrl: UserDefaults.standard.nightscoutUrl)), (UserDefaults.standard.followerDataSourceType.hasServiceStatus() && followerServiceStatusResult.status != .notAvailable) {
                 openWeb(url)
             }
             return .nothing
@@ -609,9 +608,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
 
         case .followerExtraRow2:
             return UserDefaults.standard.isMaster ? .none : .disclosureIndicator
-
-        case .followerExtraRow3, .followerExtraRow4, .followerExtraRow5, .followerExtraRow7, .followerExtraRow8:
-            return .disclosureIndicator
+            
+        case .followerExtraRow5:
+            return (UserDefaults.standard.followerDataSourceType.hasServiceStatus() && followerServiceStatusResult.status != .notAvailable) ? .disclosureIndicator : .none
 
         case .followerExtraRow9:
             // Show disclosure indicator for Dexcom region selection or Medtrum patient selection
@@ -625,6 +624,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
 
         case .followerExtraRow10:
             return UserDefaults.standard.activeSensorStartDate != nil ? .disclosureIndicator : .none
+            
+        case .followerExtraRow3, .followerExtraRow4, .followerExtraRow7, .followerExtraRow8:
+            return .disclosureIndicator
         }
     }
     
@@ -883,10 +885,12 @@ extension SettingsViewDataSourceSettingsViewModel {
     /// https://status.atlassian.com/api#summary
     ///
     enum FollowerServiceStatus {
-        case ok, degraded, outage, unknown, error
+        case notAvailable, ok, degraded, outage, unknown, error
 
         init(indicator: String = "") {
             switch indicator { // need to add more Nightscout status cases here
+            case "":
+                self = .notAvailable
             case "none", "ok":
                 self = .ok
             case "minor":
@@ -915,6 +919,8 @@ extension SettingsViewDataSourceSettingsViewModel {
         
         var description: String {
             switch self {
+            case .notAvailable:
+                return Texts_Common.notAvailable
             case .ok:
                 return "Operational"
             case .degraded:
@@ -923,8 +929,8 @@ extension SettingsViewDataSourceSettingsViewModel {
                 return "Outage"
             case .error:
                 return "Error"
-            default:
-                return ""
+            case .unknown:
+                return Texts_Common.checking
             }
         }
     }
@@ -934,9 +940,15 @@ extension SettingsViewDataSourceSettingsViewModel {
         let description: String
         
         // set the default initialization values to unknown and "checking...", this is useful for the UI
-        init(status: FollowerServiceStatus = .unknown, description: String = Texts_Common.checking) {
-            self.status = status
-            self.description = description
+        init(status: FollowerServiceStatus = .unknown, description: String? = nil) {
+            // make a quick check to set Nightscout follower service status to not available if Nightscout isn't enabled or if a valid URL doesn't exist
+            if UserDefaults.standard.followerDataSourceType == .nightscout && (!UserDefaults.standard.nightscoutEnabled || UserDefaults.standard.nightscoutUrl == "") {
+                self.status = .notAvailable
+            } else {
+                self.status = status
+            }
+                
+            self.description = description ?? self.status.description
         }
     }
 
@@ -958,7 +970,7 @@ extension SettingsViewDataSourceSettingsViewModel {
     /// checks if we should fetch the service status and then calls  the fetch whilst handling the UI updates
     /// this is the only function called by the main class - it uses the below helper functions to work.
     private func checkFollowerServiceStatus() {
-        guard !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType.hasServiceStatus() else { return }
+        guard !UserDefaults.standard.isMaster else { return }
         
         followerServiceStatusResult = FollowerServiceStatusResult()
         
@@ -983,6 +995,14 @@ extension SettingsViewDataSourceSettingsViewModel {
     /// - Parameter followerDataSourceType: The data source type to check
     /// - Returns: FollowerServiceStatusResult with status and description, or nil if URL is invalid
     private func fetchFollowerServiceStatus(followerDataSourceType: FollowerDataSourceType) async -> FollowerServiceStatusResult? {
+        guard UserDefaults.standard.followerDataSourceType.hasServiceStatus() else {
+            return FollowerServiceStatusResult(status: .notAvailable)
+        }
+        
+        guard !(UserDefaults.standard.followerDataSourceType == .nightscout && (!UserDefaults.standard.nightscoutEnabled || UserDefaults.standard.nightscoutUrl == "")) else {
+            return FollowerServiceStatusResult(status: .notAvailable)
+        }
+        
         guard let url = URL(string: followerDataSourceType.serviceStatusBaseUrlString(nightscoutUrl: UserDefaults.standard.nightscoutUrl).appending(followerDataSourceType.serviceStatusApiPathString())) else {
             return nil
         }
@@ -1019,7 +1039,11 @@ extension SettingsViewDataSourceSettingsViewModel {
     // run the UI update on the main thread after a small delay so that the user actually notices that we are checking the service status
     // if we don't do this, it will likely change so fast that it will just look like we haven't checked
     private func delayedUIUpdate(_ result: FollowerServiceStatusResult) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+        // we won't apply any delay if the follower mode doesn't have a service status as it makes no sense and will
+        // confuse even further - in this case, we'll immediately show that it's not available
+        let delayToUse = (result.status == .notAvailable ? 0.0 : 0.5)
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + delayToUse) { [weak self] in
             guard let self = self else { return }
             self.followerServiceStatusResult = result
             self.sectionReloadClosure?()
