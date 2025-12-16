@@ -57,7 +57,10 @@ enum BluetoothPeripheralType: String, CaseIterable {
     
     /// omnipod heartbeat
     case OmniPodHeartBeatType = "OmniPod HeartBeat"
-    
+
+    /// Medtrum TouchCare Nano heartbeat
+    case MedtrumTouchCareNanoHeartBeatType = "Medtrum TouchCare Nano HeartBeat"
+
     /// - returns: the BluetoothPeripheralViewModel. If nil then there's no specific settings for the tpe of bluetoothPeripheral
     func viewModel() -> BluetoothPeripheralViewModel? {
         
@@ -110,11 +113,14 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .OmniPodHeartBeatType:
             return OmniPodHeartBeatBluetoothPeripheralViewModel()
-            
+
+        case .MedtrumTouchCareNanoHeartBeatType:
+            return MedtrumTouchCareNanoHeartBeatBluetoothPeripheralViewModel()
+
         case .DexcomG7Type:
             return DexcomG7BluetoothPeripheralViewModel()
         }
-        
+
     }
     
     func createNewBluetoothPeripheral(withAddress address: String, withName name: String, nsManagedObjectContext: NSManagedObjectContext) -> BluetoothPeripheral {
@@ -173,12 +179,15 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .OmniPodHeartBeatType:
             return OmniPodHeartBeat(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
-            
+
+        case .MedtrumTouchCareNanoHeartBeatType:
+            return MedtrumTouchCareNanoHeartBeat(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+
         case .DexcomG7Type:
             return DexcomG7(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
-            
+
         }
-        
+
     }
     
     /// to which category of bluetoothperipherals does this type belong (M5Stack, CGM, ...)
@@ -191,8 +200,8 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .DexcomType, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .WatlaaType, .Libre2Type, .AtomType, .DexcomG7Type:
             return .CGM
-            
-        case .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType:
+
+        case .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType, .MedtrumTouchCareNanoHeartBeatType:
             return .HeartBeat
             
         }
@@ -204,9 +213,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .DexcomType, .BluconType, .DexcomG4Type, .Libre3HeartBeatType, .DexcomG7Type, .DexcomG7HeartBeatType:
+        case .DexcomType, .BluconType, .DexcomG4Type, .Libre3HeartBeatType, .DexcomG7Type, .DexcomG7HeartBeatType, .MedtrumTouchCareNanoHeartBeatType:
             return true
-            
+
         default:
             return false
         }

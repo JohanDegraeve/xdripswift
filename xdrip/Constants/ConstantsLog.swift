@@ -102,7 +102,10 @@ enum ConstantsLog {
     
     /// nightscout follow
     static let categoryDexcomShareFollowManager =           "DexcomShareFollowManager      "
-    
+
+    /// medtrum easyview follow
+    static let categoryMedtrumEasyViewFollowManager =   "MedtrumEasyViewFollowManager  "
+
     /// alertmanager
     static let categoryAlertManager =                       "AlertManager                  "
     
@@ -220,6 +223,10 @@ enum ConstantsLog {
     
     /// for use in Libre3HeartBeatTransmitter
     static let categoryHeartBeatLibre3 =                    "HeartBeatLibre3               "
+    
+    /// for use in MedtrumTouchCareNanoHeartBeatTransmitter
+    static let categoryHeartBeatMedtrumTouchCareNano =                       "HeartBeatMedtrumTouchCareNano         "
+
     
     /// for use in DexcomG7HeartBeatTransmitter
     static let categoryHeartBeatG7 =                        "HeartBeatG7                   "

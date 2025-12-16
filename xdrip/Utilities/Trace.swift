@@ -692,11 +692,18 @@ class Trace {
                         
                     case .OmniPodHeartBeatType:
                         if blePeripheral.omniPodHeartBeat != nil {
-                            
+
                             traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
-                            
+
                         }
-                        
+
+                    case .MedtrumTouchCareNanoHeartBeatType:
+                        if blePeripheral.medtrumtouchcarenanoheartbeat != nil {
+
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+
+                        }
+
                     case .DexcomG7Type:
                         if blePeripheral.dexcomG7 != nil {
                             
