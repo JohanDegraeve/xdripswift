@@ -42,6 +42,32 @@ enum DexcomShareRegion: Int, CaseIterable, Codable {
             return "Japan"
         }
     }
+    
+    var regionServerNumber: String {
+        switch self {
+        case .none:
+            return ""
+        case .us:
+            return "1"
+        case .global:
+            return "2"
+        case .jp:
+            return "3"
+        }
+    }
+    
+    var regionCountriesDescription: String {
+        switch self {
+        case .none:
+            return ""
+        case .us:
+            return "United States"
+        case .global:
+            return "Australia, Canada, Europe, Hong Kong, Korea, Malaysia, Middle East, New Zealand, South Africa, South America, United Kingdom"
+        case .jp:
+            return "Japan, Singapore"
+        }
+    }
 
     // https://github.com/LoopKit/dexcom-share-client-swift/blob/82a9179d444b3e79d5e9cfe99bbe7f298c4e8b40/ShareClient/ShareClient.swift#L30
     var baseURL: URL {

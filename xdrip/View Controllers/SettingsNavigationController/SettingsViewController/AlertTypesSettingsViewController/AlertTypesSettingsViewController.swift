@@ -121,7 +121,7 @@ extension AlertTypesSettingsViewController: UITableViewDataSource, UITableViewDe
         cell.textLabel?.text = alertTypesAccessor.getAllAlertTypes()[indexPath.row].name
         
         // no detail text to be shown
-        cell.detailTextLabel?.text = nil
+        cell.detailTextLabel?.text = alertTypesAccessor.getAllAlertTypes()[indexPath.row].enabled ? nil : ConstantsAlerts.disabledAlertSymbol
         
         // clicking the cell will always open a new screen which allows the user to edit the alert type
         cell.accessoryType = .disclosureIndicator

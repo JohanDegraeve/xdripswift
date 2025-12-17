@@ -134,4 +134,35 @@ public enum FollowerDataSourceType: Int, CaseIterable {
         }
     }
     
+    func hasServiceStatus() -> Bool {
+        switch self {
+        case .nightscout, .libreLinkUp, .libreLinkUpRussia, .dexcomShare:
+            return true
+        }
+    }
+    
+    // as an enum should be a simple value type without access to UserDefaults or app data,
+    // we use a workaround to pass the Nightscout URL to the function and then return it
+    func serviceStatusBaseUrlString(nightscoutUrl: String? = "") -> String {
+        switch self {
+        case .nightscout:
+            return nightscoutUrl ?? ""
+        case .dexcomShare:
+            return ConstantsFollower.followerStatusDexcomBaseUrl
+        case .libreLinkUp, .libreLinkUpRussia:
+            return ConstantsFollower.followerStatusAbbottBaseUrl
+        }
+    }
+    
+    func serviceStatusApiPathString() -> String {
+        switch self {
+        case .nightscout:
+            // for Nightscout, just use the basic status response from v1
+            return ConstantsFollower.followerStatusNightscoutApiPath
+        case .dexcomShare, .libreLinkUp, .libreLinkUpRussia:
+            // both Dexcom and Abbott use Atlassian Statuspage to show
+            // their service status so the API path is common and public
+            return ConstantsFollower.followerStatusAtlassianApiPath
+        }
+    }
 }

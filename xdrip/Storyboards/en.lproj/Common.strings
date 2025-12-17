@@ -52,3 +52,4 @@
 "common_disabled" = "Disabled";
 "common_notRequired" = "Not required";
 "next" = "Next";
+"common_checking" = "Checking...";

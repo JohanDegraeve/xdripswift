@@ -19,4 +19,16 @@ enum ConstantsFollower {
     /// number of seconds without a successful follower connection before a warning is shown when in Dexcom Share follower mode
     static let secondsUntilFollowerDisconnectWarningDexcomShare: Int = 310
     
+    
+    // Server URLs for different services
+    /// base url for Abbott server statuspage
+    static let followerStatusAbbottBaseUrl = "https://status.freestyle.abbott"
+    /// base url for Dexcom server statuspage
+    static let followerStatusDexcomBaseUrl = "https://status.dexcom.com"
+    
+    // Server paths for status API
+    /// status endpoint for Abbott, Dexcom
+    static let followerStatusAtlassianApiPath = "/api/v2/summary.json"
+    /// status endpoint for Nightscout
+    static let followerStatusNightscoutApiPath = "/api/v1/status.json"    
 }

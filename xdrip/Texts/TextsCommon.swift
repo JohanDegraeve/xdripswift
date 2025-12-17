@@ -233,4 +233,8 @@ class Texts_Common {
     static let next = {
         return NSLocalizedString("common_next", tableName: filename, bundle: Bundle.main, value: "Next", comment: "next")
     }()
+    
+    static let checking = {
+        return NSLocalizedString("common_checking", tableName: filename, bundle: Bundle.main, value: "Checking...", comment: "checking")
+    }()
 }

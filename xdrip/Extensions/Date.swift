@@ -173,31 +173,37 @@ extension Date {
     /// Example return: "6d11h" if optional appendAgo is false or not used
     /// Example return: "6d11h ago" if optional appendAgo is true
     /// if less than 12 hours, return also minutes, e.g: "7h43m" or "58m" to give extra granularity
-    func daysAndHoursAgo(appendAgo: Bool? = false, showOnlyDays: Bool? = false, showOnlyHours: Bool? = false) -> String {
+    /// can use the forTrace attribute to force the returned string to English for use in the trace file
+    func daysAndHoursAgo(appendAgo: Bool? = false, showOnlyDays: Bool? = false, showOnlyHours: Bool? = false, forTrace: Bool = false) -> String {
+        let dayShortString = forTrace ? "d" : Texts_Common.dayshort
+        let hourShortString = forTrace ? "h" : Texts_Common.hourshort
+        let minuteShortString = forTrace ? "m" : Texts_Common.minuteshort
+        let agoString = forTrace ? "ago" : Texts_HomeView.ago
+        
         // set a default value assuming that we're unable to calculate the hours + days
         var daysAndHoursAgoString: String = "n/a"
-
+        
         let diffComponents = Calendar.current.dateComponents([.day, .hour, .minute], from: self, to: Date())
 
         if let days = diffComponents.day, let hours = diffComponents.hour, let minutes = diffComponents.minute {
             if let showOnlyHours = showOnlyHours, showOnlyHours {
                 // show just the total hours
-                daysAndHoursAgoString = abs((days * 24) + hours).description + Texts_Common.hourshort
+                daysAndHoursAgoString = abs((days * 24) + hours).description + hourShortString
             } else if days == 0 && hours < 1 {
                 // show just minutes for less than one hour
-                daysAndHoursAgoString = abs(minutes).description + Texts_Common.minuteshort
+                daysAndHoursAgoString = abs(minutes).description + minuteShortString
             } else if days == 0 {
                 // show just hours if less than a day
                 // also show only hours if requested (i.e. 24h instead of 1d0h)
-                daysAndHoursAgoString = abs(hours).description + Texts_Common.hourshort
+                daysAndHoursAgoString = abs(hours).description + hourShortString
             } else {
                 // default show days and hours
-                daysAndHoursAgoString = abs(days).description + Texts_Common.dayshort + (!(showOnlyDays ?? false) ? abs(hours).description + Texts_Common.hourshort : "")
+                daysAndHoursAgoString = abs(days).description + dayShortString + (!(showOnlyDays ?? false) ? abs(hours).description + hourShortString : "")
             }
             
             // if the function was called using appendAgo == true, then add the "ago" string
             if appendAgo ?? false {
-                daysAndHoursAgoString += " " + Texts_HomeView.ago
+                daysAndHoursAgoString += " " + agoString
             }
         }
 
