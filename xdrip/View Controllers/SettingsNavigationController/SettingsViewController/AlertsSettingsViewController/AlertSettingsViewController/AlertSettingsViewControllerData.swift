@@ -119,6 +119,11 @@ class AlertSettingsViewControllerData: NSObject, UITableViewDataSource, UITableV
             }
         }
     }
+    
+    /// helper function to format the alert type name to include an identifier if the alert type is disabled
+    private func formatAlertTypeName(alertType: AlertType) -> String {
+        return alertType.name + (alertType.enabled ? "" : ConstantsAlerts.disabledAlertSymbolStringToAppend)
+    }
 }
 
 // UITableViewDataSource and UITableViewDelegate protocol Methods
@@ -165,7 +170,7 @@ extension AlertSettingsViewControllerData {
         switch setting {
         case .isDisabled:
             cell.textLabel?.text = Texts_Common.enabled
-            cell.detailTextLabel?.text = isDisabled ? "\u{26A0}" : nil
+            cell.detailTextLabel?.text = isDisabled ? ConstantsAlerts.disabledAlertSymbol : nil
             cell.accessoryType = .none
             cell.accessoryView = UISwitch(isOn: !isDisabled, action: { (isOn: Bool) in
                 self.isDisabled = !isOn
@@ -231,7 +236,7 @@ extension AlertSettingsViewControllerData {
             
         case .alertType:
             cell.textLabel?.text = Texts_Alerts.alerttype
-            cell.detailTextLabel?.text = AlertSettingsViewControllerData.getAlertType(alertType: alertType).name
+            cell.detailTextLabel?.text = formatAlertTypeName(alertType: alertType)
             cell.accessoryType = .disclosureIndicator
             // set color of disclosureIndicator to ConstantsUI.disclosureIndicatorColor
             cell.accessoryView = DTCustomColoredAccessory(color: ConstantsUI.disclosureIndicatorColor)
@@ -368,13 +373,13 @@ extension AlertSettingsViewControllerData {
             let allAlertTypes = AlertTypesAccessor(coreDataManager: coreDataManager).getAllAlertTypes()
             var allAlertTypeNames = [String]()
             for alertType in allAlertTypes {
-                allAlertTypeNames.append(alertType.name)
+                allAlertTypeNames.append(formatAlertTypeName(alertType: alertType))
             }
             
             // select index of current alerttype
             var selectedRow = 0
             for (index, alertTypeName) in allAlertTypeNames.enumerated() {
-                if alertTypeName == alertType.name {
+                if alertTypeName == formatAlertTypeName(alertType: alertType) {
                     selectedRow = index
                 }
             }
