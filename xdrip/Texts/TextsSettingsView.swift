@@ -89,7 +89,7 @@ class Texts_SettingsView {
     }()
     
     static let labelFollowerDataSourceType: String = {
-        return NSLocalizedString("settingsviews_labelFollowerDataSourceType", tableName: filename, bundle: Bundle.main, value: "Follower Data Source", comment: "data source settings, data source")
+        return NSLocalizedString("settingsviews_labelFollowerDataSourceType", tableName: filename, bundle: Bundle.main, value: "Data Source", comment: "data source settings, data source")
     }()
     
     static let labelUploadDataToNightscout: String = {
@@ -138,6 +138,10 @@ class Texts_SettingsView {
     
     static let followerPatientNameMessage: String = {
         return NSLocalizedString("settingsviews_followerPatientNameMessage", tableName: filename, bundle: Bundle.main, value: "Here you can optionally write the name of the person you are following.", comment: "data source settings, ask the user to enter the name of the person we are following if they want to")
+    }()
+    
+    static let followerServiceStatus: String = {
+        return NSLocalizedString("settingsviews_followerServiceStatus", tableName: filename, bundle: Bundle.main, value: "Status", comment: "data source settings, the status of the web follower service")
     }()
     
     static let nightscoutNotEnabled: String = {

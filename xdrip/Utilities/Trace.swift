@@ -324,7 +324,7 @@ class Trace {
         
         var traceInfo = ""
         
-        traceInfo.appendStringAndNewLine("\nDate & timezone: " + Date().toStringForTrace(timeStyle: .full, dateStyle: .medium))
+        traceInfo.appendStringAndNewLine("\nDate & Timezone: " + Date().toStringForTrace(timeStyle: .full, dateStyle: .medium))
         
         traceInfo.appendStringAndNewLine(paragraphSeperator)
         
@@ -334,10 +334,10 @@ class Trace {
         traceInfo.appendStringAndNewLine("Build number: " + buildNumber + " (" + timeStampAppBuild.toStringForTrace(timeStyle: .none, dateStyle: .medium) + ")\n")
         
         // app install and open timestamps
-        traceInfo.appendStringAndNewLine("Installed on: " + timeStampAppInstall.toStringForTrace(timeStyle: .short, dateStyle: .medium) + " (" + timeStampAppInstall.daysAndHoursAgo(appendAgo: true) + ")")
+        traceInfo.appendStringAndNewLine("Installed on: " + timeStampAppInstall.toStringForTrace(timeStyle: .short, dateStyle: .medium) + " (" + timeStampAppInstall.daysAndHoursAgo(appendAgo: true, forTrace: true) + ")")
                 
         if let timeStampAppLaunch = UserDefaults.standard.timeStampAppLaunch {
-            traceInfo.appendStringAndNewLine("Last opened on: " + timeStampAppLaunch.toStringForTrace(timeStyle: .short, dateStyle: .medium) + " (" + timeStampAppLaunch.daysAndHoursAgo(appendAgo: true) + ")")
+            traceInfo.appendStringAndNewLine("Last opened on: " + timeStampAppLaunch.toStringForTrace(timeStyle: .short, dateStyle: .medium) + " (" + timeStampAppLaunch.daysAndHoursAgo(appendAgo: true, forTrace: true) + ")")
         }
         
         traceInfo.appendStringAndNewLine(paragraphSeperator)
@@ -448,7 +448,7 @@ class Trace {
         traceInfo.appendStringAndNewLine("\nApple Watch settings:")
         traceInfo.appendStringAndNewLine("    Show values in complications: " + UserDefaults.standard.showDataInWatchComplications.description)
         if let agreementDate = UserDefaults.standard.watchComplicationUserAgreementDate {
-            traceInfo.appendStringAndNewLine("    User agreement date: " + agreementDate.toStringForTrace(timeStyle: .short, dateStyle: .medium) + " (" + agreementDate.daysAndHoursAgo(appendAgo: true) + ")")
+            traceInfo.appendStringAndNewLine("    User agreement date: " + agreementDate.toStringForTrace(timeStyle: .short, dateStyle: .medium) + " (" + agreementDate.daysAndHoursAgo(appendAgo: true, forTrace: true) + ")")
             if let remainingComplicationUserInfoTransfers = UserDefaults.standard.remainingComplicationUserInfoTransfers {
                 traceInfo.appendStringAndNewLine("    Remaining complication updates: " + remainingComplicationUserInfoTransfers.description + " / 50")
             }
@@ -509,7 +509,7 @@ class Trace {
         if !(!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .nightscout) {
             traceInfo.appendStringAndNewLine("    Description: " + (UserDefaults.standard.activeSensorDescription?.description ?? "nil"))
             if let startDate = UserDefaults.standard.activeSensorStartDate {
-                traceInfo.appendStringAndNewLine("    Sensor start date: " + startDate.toStringForTrace(timeStyle: .short, dateStyle: .medium) + " (" + startDate.daysAndHoursAgo(appendAgo: true) + ")")
+                traceInfo.appendStringAndNewLine("    Sensor start date: " + startDate.toStringForTrace(timeStyle: .short, dateStyle: .medium) + " (" + startDate.daysAndHoursAgo(appendAgo: true, forTrace: true) + ")")
             } else {
                 traceInfo.appendStringAndNewLine("    Sensor start date: nil")
             }
@@ -583,9 +583,9 @@ class Trace {
                             
                             traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
                             
-                            traceInfo.appendStringAndNewLine("        Transmitter start date: " + (dexcomG5.transmitterStartDate?.toStringForTrace(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (dexcomG5.transmitterStartDate?.daysAndHoursAgo(appendAgo: true) ?? "nil") + ")")
+                            traceInfo.appendStringAndNewLine("        Transmitter start date: " + (dexcomG5.transmitterStartDate?.toStringForTrace(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (dexcomG5.transmitterStartDate?.daysAndHoursAgo(appendAgo: true, forTrace: true) ?? "nil") + ")")
                             
-                            traceInfo.appendStringAndNewLine("        Sensor start date: " + (dexcomG5.sensorStartDate?.toStringForTrace(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (dexcomG5.sensorStartDate?.daysAndHoursAgo(appendAgo: true) ?? "nil") + ")")
+                            traceInfo.appendStringAndNewLine("        Sensor start date: " + (dexcomG5.sensorStartDate?.toStringForTrace(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (dexcomG5.sensorStartDate?.daysAndHoursAgo(appendAgo: true, forTrace: true) ?? "nil") + ")")
                             
                             traceInfo.appendStringAndNewLine("        Sensor status: " + (dexcomG5.sensorStatus?.description ?? "nil"))
                             
@@ -595,7 +595,7 @@ class Trace {
                             
                             traceInfo.appendStringAndNewLine("        Is Anubis?: " + dexcomG5.isAnubis.description)
                             
-                            traceInfo.appendStringAndNewLine("        Last reset: " + (dexcomG5.lastResetTimeStamp?.toStringForTrace(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (dexcomG5.lastResetTimeStamp?.daysAndHoursAgo(appendAgo: true) ?? "nil") + ")")
+                            traceInfo.appendStringAndNewLine("        Last reset: " + (dexcomG5.lastResetTimeStamp?.toStringForTrace(timeStyle: .short, dateStyle: .medium) ?? "nil") + " (" + (dexcomG5.lastResetTimeStamp?.daysAndHoursAgo(appendAgo: true, forTrace: true) ?? "nil") + ")")
                             
                             // if needed additional specific info can be added
                             traceInfo.appendStringAndNewLine("        Voltage A: " + dexcomG5.voltageA.description + "0mV")

@@ -1516,7 +1516,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         
                         if treatmentUpdated {
                             amountOfUpdatedTreatmentEntries = amountOfUpdatedTreatmentEntries + 1
-                            trace("in checkIfChangedAtNightscout, localupdate done for treatment with date %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, treatmentNSResponse.createdAt.toString(timeStyle: .long, dateStyle: .long))
+                            trace("in checkIfChangedAtNightscout, localupdate done for treatment with date %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, treatmentNSResponse.createdAt.toStringForTrace(timeStyle: .long, dateStyle: .long))
                         }
                         
                         break
@@ -1551,7 +1551,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         
                         amountOfNewTreatmentEntries = amountOfNewTreatmentEntries + 1
                         
-                        trace("in checkIfUploaded, set uploaded to true for TreatmentEntry with date %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, treatmentNSResponse.createdAt.toString(timeStyle: .full, dateStyle: .long))
+                        trace("in checkIfUploaded, set uploaded to true for TreatmentEntry with date %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, treatmentNSResponse.createdAt.toStringForTrace(timeStyle: .full, dateStyle: .long))
                         
                         break
                     }
@@ -1577,7 +1577,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 if treatmentNSResponse.asNewTreatmentEntry(nsManagedObjectContext: coreDataManager.mainManagedObjectContext) != nil {
                     numberOfNewTreatments = numberOfNewTreatments + 1
                     
-                    trace("in newTreatmentsIfRequired, new treatmentEntry created with id %{public}@ and date %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, treatmentNSResponse.id, treatmentNSResponse.createdAt.toString(timeStyle: .long, dateStyle: .long))
+                    trace("in newTreatmentsIfRequired, new treatmentEntry created with id %{public}@ and date %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, treatmentNSResponse.id, treatmentNSResponse.createdAt.toStringForTrace(timeStyle: .long, dateStyle: .long))
                 }
             }
         }

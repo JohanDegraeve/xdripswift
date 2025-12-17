@@ -500,7 +500,7 @@
 "settingsviews_labelFollowerDataSourceRegion" = "Region";
 
 /// data source settings, data source
-"settingsviews_labelFollowerDataSourceType" = "Follower Data Source";
+"settingsviews_labelFollowerDataSourceType" = "Data Source";
 
 /// data source settings, enable Nightscout upload
 "settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
