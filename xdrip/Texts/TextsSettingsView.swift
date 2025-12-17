@@ -178,6 +178,18 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_libreLinkUpNoActiveSensor", tableName: filename, bundle: Bundle.main, value: "No active sensor data", comment: "libre link up follower settings, no active sensor")
     }()
     
+    static let medtrumSelectedPatient = {
+        return NSLocalizedString("settingsviews_medtrumSelectedPatient", tableName: filename, bundle: Bundle.main, value: "Selected Patient", comment: "medtrum follower settings, select a patient from the list")
+    }()
+    
+    static let medtrumSelectPatient = {
+        return NSLocalizedString("settingsviews_medtrumSelectPatient", tableName: filename, bundle: Bundle.main, value: "Select Patient", comment: "medtrum follower settings, select a patient")
+    }()
+    
+    static let medtrumSelectPatientFromList = {
+        return NSLocalizedString("settingsviews_medtrumSelectPatientFromList", tableName: filename, bundle: Bundle.main, value: "Select Patient From List", comment: "medtrum follower settings, choose a patient from the list")
+    }()
+    
     // MARK: - Section Notifications
     
     static let sectionTitleNotifications: String = {

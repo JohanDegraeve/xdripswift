@@ -3047,7 +3047,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 if UserDefaults.standard.medtrumEasyViewEmail == nil || UserDefaults.standard.medtrumEasyViewPassword == nil {
                     dataSourceSensorMaxAgeOutlet.textColor = .systemRed
                     dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.followerAccountCredentialsMissing
-                } else if UserDefaults.standard.libreLinkUpPreventLogin {
+                } else if UserDefaults.standard.medtrumEasyViewPreventLogin {
                     dataSourceSensorMaxAgeOutlet.textColor = .systemRed
                     dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.followerAccountCredentialsInvalid
                 } else if let followerPatientName = UserDefaults.standard.followerPatientName {
