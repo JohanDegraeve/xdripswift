@@ -733,15 +733,11 @@ class Texts_SettingsView {
     }()
     
     static let infoCalendarAccessDeniedByUser: String = {
-        return String(format: NSLocalizedString("infoCalendarAccessDeniedByUser", tableName: filename, bundle: Bundle.main, value: "You previously denied access to your calendars.\n\nGo to iPhone Settings > %@ > Calendars and enable full access.", comment: "If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown"), ConstantsHomeView.applicationName)
-    }()
-
-    static let infoContactsAccessDeniedByUser: String = {
-        return String(format: NSLocalizedString("infoContactsAccessDeniedByUser", tableName: filename, bundle: Bundle.main, value: "You previously denied access to your contacts.\n\nGo to iPhone Settings > %@ > Contacts and enable full access.", comment: "If user has earlier denied access to contacts, and then tries to activate the contact image, this message will be shown"), ConstantsHomeView.applicationName)
+        return String(format: NSLocalizedString("infoCalendarAccessDeniedByUser", tableName: filename, bundle: Bundle.main, value: "Full Access is required to your contacts.\n\nGo to iPhone Settings > Apps > %@ > Contacts and enable Full Access.", comment: "If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown"), ConstantsHomeView.applicationName)
     }()
     
     static let infoCalendarAccessWriteOnly: String = {
-        return String(format: NSLocalizedString("infoCalendarAccessWriteOnly", tableName: filename, bundle: Bundle.main, value: "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > %@ > Calendars and select 'Full Access'.", comment: "The user needs to update their calendar permissions"), ConstantsHomeView.applicationName)
+        return String(format: NSLocalizedString("infoCalendarAccessWriteOnly", tableName: filename, bundle: Bundle.main, value: "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.", comment: "The user needs to update their calendar permissions"), ConstantsHomeView.applicationName)
     }()
     
     static let infoCalendarAccessRestricted: String = {
@@ -762,12 +758,20 @@ class Texts_SettingsView {
         
     // MARK: - Contact image
     
+    static let infoContactsKeepAliveDisabled: String = {
+        return String(format: NSLocalizedString("settingsviews_infoContactsKeepAliveDisabled", tableName: filename, bundle: Bundle.main, value: "You are using Follower mode with background keep-alive disabled.\n\nContact Image function cannot work without a background keep-alive.", comment: "If user is in follower mode with background keep-alive disabled, show this message when they tap the row"), ConstantsHomeView.applicationName)
+    }()
+    
+    static let infoContactsAccessDeniedByUser: String = {
+        return String(format: NSLocalizedString("infoContactsAccessDeniedByUser", tableName: filename, bundle: Bundle.main, value: "Full Access is required to your contacts.\n\nGo to iPhone Settings > Apps > %@ > Contacts and enable Full Access.", comment: "If user has earlier denied full access to contacts, and then tries to activate the contact image, this message will be shown"), ConstantsHomeView.applicationName)
+    }()
+    
     static let infoContactsAccessRestricted: String = {
         return String(format: NSLocalizedString("settingsviews_infoContactsAccessRestricted", tableName: filename, bundle: Bundle.main, value: "You cannot give authorization to %@ to access your contacts. This is possibly due to active restrictions such as parental controls being in place.", comment: "If user is not allowed to give any app access to the Contacts, due to restrictions. And then tries to activate the contact image, this message will be shown"), ConstantsHomeView.applicationName)
     }()
     
     static let infoContactsAccessLimited: String = {
-        return String(format: NSLocalizedString("settingsviews_infoContactsAccessLimited", tableName: filename, bundle: Bundle.main, value: "Only limited access has been given to %@ to access your contacts. Please change the permission to Full Access in the iPhone Settings", comment: "If user has only given limited access to the Contacts and then tries to activate the contact image, this message will be shown"), ConstantsHomeView.applicationName)
+        return String(format: NSLocalizedString("settingsviews_infoContactsAccessLimited", tableName: filename, bundle: Bundle.main, value: "Only limited access has been given to access your contacts.\n\nGo to iPhone Settings > Apps > %@ > Contacts and enable Full Access.", comment: "If user has only given limited access to the Contacts and then tries to activate the contact image, this message will be shown"), ConstantsHomeView.applicationName)
     }()
     
     static let contactImageSectionTitle: String = {

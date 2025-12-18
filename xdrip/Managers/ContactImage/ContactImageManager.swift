@@ -40,8 +40,6 @@ class ContactImageManager: NSObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
-        
-        
     }
     
     deinit {
@@ -64,12 +62,10 @@ class ContactImageManager: NSObject {
     // MARK: - overriden functions
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        
-        guard let keyPath = keyPath else {return}
+        guard let keyPath = keyPath else { return }
         if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
             evaluateUserDefaultsChange(keyPathEnum: keyPathEnum)
         }
-        
     }
     
     // MARK: - private functions
@@ -87,6 +83,9 @@ class ContactImageManager: NSObject {
     /// - schedule a 5-6 minute timer to repeat the above (just in case the function isn't updated again by the root view controller)
     private func updateContact() {
         guard UserDefaults.standard.enableContactImage else { return }
+        // make sure we're in master mode OR in (follower mode WITHOUT keep-alive disabled)
+        guard UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled) else { return }
+        
         debouncer.debounce {
             self.workItem?.cancel()
             self.workItem = nil
@@ -107,6 +106,7 @@ class ContactImageManager: NSObject {
                 }
                 return
             }
+            
             guard status == .authorized else {
                 // if it isn't, and the user has enabled the feature, then disable it
                 if UserDefaults.standard.enableContactImage {
@@ -145,60 +145,98 @@ class ContactImageManager: NSObject {
             
             // we're going to use the app name as the given name of the contact we want to use/create/update
             let keyToFetch = [CNContactGivenNameKey, CNContactFamilyNameKey, CNContactOrganizationNameKey, CNContactImageDataKey] as [CNKeyDescriptor]
-            let saveRequest = CNSaveRequest()
             let updatedString = (UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "Updated" : UserDefaults.standard.followerDataSourceType.fullDescription) + ": \(Date().formatted(date: .omitted, time: .shortened))"
-            
-            // Try to fetch by identifier first (if stored)
-            if let identifier = UserDefaults.standard.string(forKey: self.contactIdentifierKey),
-               let contact = (try? self.contactStore.unifiedContacts(matching: CNContact.predicateForContacts(withIdentifiers: [identifier]), keysToFetch: keyToFetch))?.first,
-               contact.givenName == ConstantsHomeView.applicationName {
-                if lastReading.count > 0 {
-                    trace("in updateContact, contact found using stored identifier. Updating the contact image to %{public}@%{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+
+            // 1) Try identifier match first
+            let storedIdentifier = UserDefaults.standard.string(forKey: self.contactIdentifierKey)
+
+            if let storedIdentifier = storedIdentifier, !storedIdentifier.isEmpty {
+                let identifierPredicate = CNContact.predicateForContacts(withIdentifiers: [storedIdentifier])
+                let identifierMatches = (try? self.contactStore.unifiedContacts(matching: identifierPredicate, keysToFetch: keyToFetch)) ?? []
+
+                if let identifierMatchedContact = identifierMatches.first {
+                    if identifierMatchedContact.givenName != ConstantsHomeView.applicationName {
+                        trace("in updateContact, stored identifier matched a contact but givenName '%{public}@' did not match '%{public}@'. Updating anyway to preserve contact complication sync.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, identifierMatchedContact.givenName, ConstantsHomeView.applicationName)
+                    }
+
+                    if lastReading.count > 0 {
+                        trace("in updateContact, contact found using stored identifier. Updating the contact image to %{public}@%{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+                    } else {
+                        trace("in updateContact, contact found using stored identifier. Updating the contact image (no BG data)", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
+                    }
+
+                    let saveRequest = CNSaveRequest()
+                    guard let mutableContact = identifierMatchedContact.mutableCopy() as? CNMutableContact else { return }
+                    mutableContact.imageData = contactImageView.getImage().pngData()
+                    mutableContact.organizationName = updatedString
+                    saveRequest.update(mutableContact)
+                    self.executeSaveRequest(saveRequest: saveRequest)
+
+                    // Re-store identifier to keep the fast path stable
+                    UserDefaults.standard.set(identifierMatchedContact.identifier, forKey: self.contactIdentifierKey)
+
+                    return
                 } else {
-                    trace("in updateContact, contact wasn't found using stored identifier. Trying to match by app name", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
+                    trace("in updateContact, no contact found for stored identifier '%{public}@'. Falling back to name search.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, storedIdentifier)
                 }
-                guard let mutableContact = contact.mutableCopy() as? CNMutableContact else { return }
+            } else {
+                trace("in updateContact, no stored contact identifier (or empty). Falling back to name search.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
+            }
+
+            // 2) Fallback: match by application name
+            let namePredicate = CNContact.predicateForContacts(matchingName: ConstantsHomeView.applicationName)
+            let nameMatches = (try? self.contactStore.unifiedContacts(matching: namePredicate, keysToFetch: keyToFetch)) ?? []
+
+            if let nameMatchedContact = nameMatches.first {
+                if nameMatches.count > 1 {
+                    trace("in updateContact, found %{public}d contacts matching '%{public}@'. Updating the first and leaving duplicates untouched.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, nameMatches.count, ConstantsHomeView.applicationName)
+                } else {
+                    trace("in updateContact, '%{public}@' contact found using application name. Updating.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName)
+                }
+
+                let saveRequest = CNSaveRequest()
+
+                guard let mutableContact = nameMatchedContact.mutableCopy() as? CNMutableContact else { return }
                 mutableContact.imageData = contactImageView.getImage().pngData()
                 mutableContact.organizationName = updatedString
                 saveRequest.update(mutableContact)
+
                 self.executeSaveRequest(saveRequest: saveRequest)
+
+                // Store identifier for future updates (this is a real identifier from an existing unified contact)
+                UserDefaults.standard.set(nameMatchedContact.identifier, forKey: self.contactIdentifierKey)
+
                 return
             }
-            
-            // Fallback: Find all contacts with the app name
-            let predicate = CNContact.predicateForContacts(matchingName: ConstantsHomeView.applicationName)
-            let contacts = (try? self.contactStore.unifiedContacts(matching: predicate, keysToFetch: keyToFetch)) ?? []
-            
-            if let contact = contacts.first {
-                // Fallback: update the first contact with the app name if none have the note (legacy or bug)
-                if lastReading.count > 0 {
-                    trace("in updateContact, '%{public}@' contact found using application name. Updating the contact image to %{public}@%{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
-                }
-                guard let mutableContact = contact.mutableCopy() as? CNMutableContact else { return }
-                mutableContact.imageData = contactImageView.getImage().pngData()
-                mutableContact.organizationName = updatedString
-                saveRequest.update(mutableContact)
-                // Store identifier for future updates
-                UserDefaults.standard.set(contact.identifier, forKey: self.contactIdentifierKey)
+
+            // 3) No match by identifier or name: create a new contact
+            if lastReading.count > 0 {
+                trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' and adding a contact image with %{public}@ %{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
             } else {
-                if lastReading.count > 0 {
-                    trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' and adding a contact image with %{public}@ %{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
-                } else {
-                    trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' with empty contact image (no BG data)", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName)
-                }
-                let contact = CNMutableContact()
-                var appVersion: String = " "
-                if let dictionary = Bundle.main.infoDictionary, let version = dictionary["CFBundleShortVersionString"] as? String {
-                    appVersion += "v" + version
-                }
-                contact.givenName = ConstantsHomeView.applicationName
-                contact.imageData = contactImageView.getImage().pngData()
-                contact.organizationName = updatedString
-                saveRequest.add(contact, toContainerWithIdentifier: nil)
-                // Store identifier for future updates
-                UserDefaults.standard.set(contact.identifier, forKey: self.contactIdentifierKey)
+                trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' with empty contact image (no BG data)", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName)
             }
+
+            let contactToCreate = CNMutableContact()
+            contactToCreate.givenName = ConstantsHomeView.applicationName
+            contactToCreate.imageData = contactImageView.getImage().pngData()
+            contactToCreate.organizationName = updatedString
+
+            let saveRequest = CNSaveRequest()
+            saveRequest.add(contactToCreate, toContainerWithIdentifier: nil)
             self.executeSaveRequest(saveRequest: saveRequest)
+
+            // After creating, fetch by name once and store the resulting identifier (avoid storing empty identifier before save)
+            let postCreateMatches = (try? self.contactStore.unifiedContacts(matching: namePredicate, keysToFetch: keyToFetch)) ?? []
+            if let postCreateContact = postCreateMatches.first {
+                UserDefaults.standard.set(postCreateContact.identifier, forKey: self.contactIdentifierKey)
+
+                if postCreateMatches.count > 1 {
+                    // If duplicates exist even after create, clean them up on the next cycle
+                    trace("in updateContact, after creating contact found %{public}d matches for '%{public}@'. Duplicates may exist.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, postCreateMatches.count, ConstantsHomeView.applicationName)
+                }
+            } else {
+                trace("in updateContact, after creating contact could not re-fetch '%{public}@' by name to store identifier.", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error, ConstantsHomeView.applicationName)
+            }
         }
     }
     
