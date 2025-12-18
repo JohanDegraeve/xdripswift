@@ -44,6 +44,7 @@ fileprivate enum Setting: Int, CaseIterable {
     /// - Follower
     ///  - LibreLinkUp: followerSensorSerialNumber (web follower sensor serial number - will not always be available)
     ///  - Dexcom Share: Dexcom Share Region as detected (or error message)
+    ///  - Medtrum EasyView: Picker list for patient selection or just patient name if already selected (or if no selection was needed)
     case followerExtraRow9 = 9
     
     /// - Follower
@@ -77,6 +78,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
     
     /// timer instance for the timer that will run and periodically update the follower service status if required
     private var serviceStatusTimer: Timer?
+    
+    /// warning symbol to be prefixed to a user-facing string where there is an error or further action needed
+    private let warningPrefix = "⚠️ "
     
     // MARK: - Initialization / Deinitialization
 
@@ -425,6 +429,10 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 return .askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterPassword, keyboardType: .default, text: UserDefaults.standard.medtrumEasyViewPassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (medtrumEasyViewPassword: String) in
 
                     UserDefaults.standard.medtrumEasyViewPassword = medtrumEasyViewPassword.trimmingCharacters(in: .whitespaces).toNilIfLength0()
+                    
+                    // reset all data used in the UI
+                    self.resetMedtrumEasyViewData()
+                    
                 }, cancelHandler: nil, inputValidator: nil)
 
             default:
@@ -445,6 +453,11 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 guard UserDefaults.standard.medtrumEasyViewUserType == "M" else {
                     return .nothing
                 }
+                
+                // if caregiver account, but patient was previously selected then do nothing
+                guard UserDefaults.standard.medtrumEasyViewSelectedPatientUid == 0 else {
+                    return .nothing
+                }
 
                 // Try to decode cached connections
                 var connections: [MedtrumEasyViewPatientConnection] = []
@@ -453,7 +466,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 }
 
                 // Build dropdown data: placeholder + patient list
-                var data = ["Select patient..."]
+                // add 👇 before the text - it's ugly but clearly indicates that it isn't
+                // a valid patient name and they should chose from the options below
+                var data = ["👇 " + Texts_SettingsView.medtrumSelectPatient + "..."]
                 data.append(contentsOf: connections.map { $0.displayName })
 
                 // Determine selected row
@@ -467,7 +482,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 }
 
                 return SettingsSelectedRowAction.selectFromList(
-                    title: "Select Patient",
+                    title: Texts_SettingsView.medtrumSelectPatientFromList,
                     data: data,
                     selectedRow: selectedRow,
                     actionTitle: nil,
@@ -482,6 +497,8 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                             let patient = connections[index - 1]
                             UserDefaults.standard.medtrumEasyViewSelectedPatientUid = patient.uid
                             trace("Medtrum EasyView: Selected patient '%{public}@' (UID: %{public}@)", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, patient.displayName, patient.uid.description)
+                            // set the Follower Patient Name in the app
+                            UserDefaults.standard.followerPatientName = patient.displayName
                         }
 
                         // Reset Medtrum data to trigger refetch with new patient
@@ -580,7 +597,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             case .dexcomShare:
                 return Texts_SettingsView.labelFollowerDataSourceRegion
             case .medtrumEasyView:
-                return "Patient Selection"
+                return Texts_SettingsView.medtrumSelectedPatient
             default:
                 return Texts_HomeView.sensor
             }
@@ -619,7 +636,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             // Show disclosure indicator for Dexcom region selection or Medtrum patient selection
             if UserDefaults.standard.followerDataSourceType == .dexcomShare && UserDefaults.standard.dexcomShareRegion != .none {
                 return .disclosureIndicator
-            } else if UserDefaults.standard.followerDataSourceType == .medtrumEasyView && UserDefaults.standard.medtrumEasyViewUserType == "M" {
+            } else if UserDefaults.standard.followerDataSourceType == .medtrumEasyView && UserDefaults.standard.medtrumEasyViewUserType == "M" && UserDefaults.standard.medtrumEasyViewSelectedPatientUid == 0 {
                 return .disclosureIndicator
             } else {
                 return .none
@@ -661,11 +678,19 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .followerExtraRow7:
             switch UserDefaults.standard.followerDataSourceType {
             case .libreLinkUp, .libreLinkUpRussia:
-                return UserDefaults.standard.libreLinkUpEmail?.obscured() ?? Texts_SettingsView.valueIsRequired
+                if let libreLinkUpEmail = UserDefaults.standard.libreLinkUpEmail {
+                    return ((UserDefaults.standard.libreLinkUpPreventLogin && UserDefaults.standard.libreLinkUpPassword != nil) ? warningPrefix : "") + libreLinkUpEmail.obscured()
+                } else {
+                    return Texts_SettingsView.valueIsRequired
+                }
             case .dexcomShare:
                 return UserDefaults.standard.dexcomShareAccountName?.obscured() ?? Texts_SettingsView.valueIsRequired
             case .medtrumEasyView:
-                return UserDefaults.standard.medtrumEasyViewEmail?.obscured() ?? Texts_SettingsView.valueIsRequired
+                if let medtrumEasyViewEmail = UserDefaults.standard.medtrumEasyViewEmail {
+                    return ((UserDefaults.standard.medtrumEasyViewPreventLogin && UserDefaults.standard.medtrumEasyViewPassword != nil) ? warningPrefix : "") + medtrumEasyViewEmail.obscured()
+                } else {
+                    return Texts_SettingsView.valueIsRequired
+                }
             default:
                 return nil
             }
@@ -673,11 +698,19 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .followerExtraRow8:
             switch UserDefaults.standard.followerDataSourceType {
             case .libreLinkUp, .libreLinkUpRussia:
-                return UserDefaults.standard.libreLinkUpPassword?.obscured() ?? Texts_SettingsView.valueIsRequired
+                if let libreLinkUpPassword = UserDefaults.standard.libreLinkUpPassword {
+                    return (UserDefaults.standard.libreLinkUpPreventLogin ? warningPrefix : "") + libreLinkUpPassword.obscured()
+                } else {
+                    return Texts_SettingsView.valueIsRequired
+                }
             case .dexcomShare:
                 return UserDefaults.standard.dexcomSharePassword?.obscured() ?? Texts_SettingsView.valueIsRequired
             case .medtrumEasyView:
-                return UserDefaults.standard.medtrumEasyViewPassword?.obscured() ?? Texts_SettingsView.valueIsRequired
+                if let medtrumEasyViewPassword = UserDefaults.standard.medtrumEasyViewPassword {
+                    return (UserDefaults.standard.medtrumEasyViewPreventLogin ? warningPrefix : "") + medtrumEasyViewPassword.obscured()
+                } else {
+                    return Texts_SettingsView.valueIsRequired
+                }
             default:
                 return nil
             }
@@ -693,9 +726,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                         // nicely format the (incomplete) serial numbers from LibreLinkUp
                         return processLibreLinkUpSensorInfo(sn: UserDefaults.standard.activeSensorSerialNumber)
                     } else if UserDefaults.standard.libreLinkUpPreventLogin {
-                        return "⚠️ " + Texts_HomeView.followerAccountCredentialsInvalid
+                        return warningPrefix + Texts_HomeView.followerAccountCredentialsInvalid
                     } else {
-                        return "⚠️ " + Texts_SettingsView.libreLinkUpNoActiveSensor
+                        return warningPrefix + Texts_SettingsView.libreLinkUpNoActiveSensor
                     }
                 }
                 
@@ -703,7 +736,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 if UserDefaults.standard.dexcomShareAccountName == nil || UserDefaults.standard.dexcomSharePassword == nil {
                     return "-"
                 } else if UserDefaults.standard.dexcomShareRegion == .none && UserDefaults.standard.dexcomShareLoginFailedTimestamp != nil {
-                    return "⚠️ " + Texts_HomeView.followerAccountCredentialsInvalid
+                    return warningPrefix + Texts_HomeView.followerAccountCredentialsInvalid
                 } else if UserDefaults.standard.dexcomShareRegion == .none {
                     return Texts_Common.checking
                 } else {
@@ -718,13 +751,13 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
 
                 // Show error if connections fetch failed
                 if UserDefaults.standard.medtrumEasyViewConnectionsFetchFailed {
-                    return "⚠️ Failed to fetch patients (using cached list)"
+                    return warningPrefix + "Failed to fetch patients (using cached list)"
                 }
 
                 // Show selected patient or placeholder
                 let selectedPatientUid = UserDefaults.standard.medtrumEasyViewSelectedPatientUid
                 if selectedPatientUid == 0 {
-                    return "Select patient..."
+                    return warningPrefix + Texts_SettingsView.medtrumSelectPatient
                 } else {
                     // Try to find patient name from cached connections
                     if let cachedData = UserDefaults.standard.medtrumEasyViewCachedConnections,
@@ -830,6 +863,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
     // MARK: - observe functions
     
     private func addObservers() {
+        // Listen for changes in the follower patient name to trigger the UI to be updated
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerPatientName.rawValue, options: .new, context: nil)
+        
         // Listen for changes in the active sensor value to trigger the UI to be updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.activeSensorSerialNumber.rawValue, options: .new, context: nil)
 
@@ -844,6 +880,10 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
 
         // Listen for changes in Medtrum EasyView selected patient
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.medtrumEasyViewSelectedPatientUid.rawValue, options: .new, context: nil)
+        
+        // Listen for changes in follower login status (i.e. if prevented due to wrong credentials)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.libreLinkUpPreventLogin.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.medtrumEasyViewPreventLogin.rawValue, options: .new, context: nil)
         
         // Listen for changes in the Nightscout status to trigger the UI to be updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutUrl.rawValue, options: .new, context: nil)
@@ -860,10 +900,25 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         
         switch keyPathEnum {
 
-        case UserDefaults.Key.activeSensorSerialNumber, UserDefaults.Key.dexcomShareRegion, UserDefaults.Key.dexcomShareLoginFailedTimestamp, UserDefaults.Key.medtrumEasyViewUserType, UserDefaults.Key.medtrumEasyViewSelectedPatientUid:
+        case UserDefaults.Key.followerPatientName, UserDefaults.Key.activeSensorSerialNumber, UserDefaults.Key.dexcomShareRegion, UserDefaults.Key.dexcomShareLoginFailedTimestamp, UserDefaults.Key.medtrumEasyViewUserType, UserDefaults.Key.medtrumEasyViewSelectedPatientUid:
             // run this in the main thread to avoid access errors
             DispatchQueue.main.async {
                 self.sectionReloadClosure?()
+            }
+        case UserDefaults.Key.medtrumEasyViewPreventLogin:
+            // if there is a problem with the medtrum login, then clear the last connection date and follower patient name
+            if UserDefaults.standard.medtrumEasyViewPreventLogin {
+                UserDefaults.standard.timeStampOfLastFollowerConnection = .distantPast
+                UserDefaults.standard.followerPatientName = nil
+            }
+            // run this in the main thread to avoid access errors
+            DispatchQueue.main.async {
+                self.sectionReloadClosure?()
+            }
+        case UserDefaults.Key.libreLinkUpPreventLogin:
+            // if there is a problem with the LLU login, then clear the last connection date
+            if UserDefaults.standard.libreLinkUpPreventLogin {
+                UserDefaults.standard.timeStampOfLastFollowerConnection = .distantPast
             }
         case UserDefaults.Key.nightscoutUrl, UserDefaults.Key.nightscoutAPIKey, UserDefaults.Key.nightscoutToken, UserDefaults.Key.nightscoutPort, UserDefaults.Key.nightscoutEnabled:
             checkFollowerServiceStatus()

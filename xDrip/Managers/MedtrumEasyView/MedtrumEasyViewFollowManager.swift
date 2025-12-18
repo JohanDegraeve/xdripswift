@@ -158,7 +158,10 @@ class MedtrumEasyViewFollowManager: NSObject {
                 if self.medtrumUserId == nil {
                     let loginResponse = try await self.requestLogin()
                     self.medtrumUserId = loginResponse.uid
-                    trace("    login successful, userId = %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, loginResponse.uid.description)
+                    // need to cleanly unwrap because uid can technically be nil in a failed login response
+                    if let uid = loginResponse.uid {
+                        trace("    login successful, userId = %{public}@", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, uid.description)
+                    }
 
                     // Cache user type
                     if let userType = loginResponse.user_type {
@@ -197,6 +200,10 @@ class MedtrumEasyViewFollowManager: NSObject {
                                         let singlePatient = connections[0]
                                         UserDefaults.standard.medtrumEasyViewSelectedPatientUid = singlePatient.uid
                                         trace("    auto-selected single patient: %{public}@ (UID: %{public}@)", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .info, singlePatient.displayName, singlePatient.uid.description)
+                                        
+                                        // Set the Follower Patient Name in the app. In case that there are several connections
+                                        // we'll set this in the View Controller once a patient has been chosen
+                                        UserDefaults.standard.followerPatientName = singlePatient.displayName
                                     }
                                 }
 
@@ -267,6 +274,7 @@ class MedtrumEasyViewFollowManager: NSObject {
             } catch MedtrumEasyViewFollowError.invalidCredentials {
                 trace("    invalid credentials, preventing further login attempts", log: self.log, category: ConstantsLog.categoryMedtrumEasyViewFollowManager, type: .error)
                 UserDefaults.standard.medtrumEasyViewPreventLogin = true
+                UserDefaults.standard.timeStampOfLastFollowerConnection = .distantPast
                 self.medtrumUserId = nil
                 // Clear cached user type and connections
                 UserDefaults.standard.medtrumEasyViewUserType = nil
@@ -358,15 +366,14 @@ class MedtrumEasyViewFollowManager: NSObject {
 
         if statusCode == 200 {
             let loginResponse = try JSONDecoder().decode(MedtrumEasyViewLoginResponse.self, from: data)
-
-            if loginResponse.error == 0, loginResponse.uid > 0 {
-                // Login successful, reset prevent login flag
-                UserDefaults.standard.medtrumEasyViewPreventLogin = false
-                return loginResponse
-            } else {
-                // Login failed due to invalid credentials
+            
+            guard loginResponse.error == 0, let uid = loginResponse.uid, uid > 0 else {
                 throw MedtrumEasyViewFollowError.invalidCredentials
             }
+            
+            // Login successful, reset prevent login flag
+            UserDefaults.standard.medtrumEasyViewPreventLogin = false
+            return loginResponse
         }
 
         throw MedtrumEasyViewFollowError.networkError

@@ -25,6 +25,10 @@
 "settingsviews_enterPassword" = "Entrar tu contraseña";
 "settingsviews_libreLinkUpReAcceptNeeded" = "Aceptar terminos";
 "settingsviews_libreLinkUpNoActiveSensor" = "Sin datos de sensor activo";
+"settingsviews_medtrumSelectedPatient" = "Paciente Seleccionado";
+"settingsviews_medtrumSelectPatient" = "Elige Paciente";
+"settingsviews_medtrumSelectPatientFromList" = "Elige paciente de la lista";
+
 "settingsviews_translateOnlineHelp" = "Traducir Documentación";
 "settingsviews_restartNeeded" = "(Pendiente reiniciar)";
 "settingsviews_showReadingInNotification" = "Mostrar en Notificaciones";

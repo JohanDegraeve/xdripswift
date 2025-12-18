@@ -38,7 +38,7 @@ struct MedtrumEasyViewResponse<T: Decodable>: Decodable {
 /// Login response (note: login endpoint doesn't use the generic wrapper structure)
 struct MedtrumEasyViewLoginResponse: Decodable {
     let error: Int
-    let uid: Int
+    let uid: Int? // uid must be optional as it isn't returned when there is an error
     let username: String?
     let user_type: String?
     let realname: String?
