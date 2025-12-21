@@ -81,8 +81,8 @@
 "settingsviews_displayTrendInCalendarEvent" = "Toon Trend";
 "displayUnitInCalendarEvent" = "Toon Eenheid";
 "displayDeltaInCalendarEvent" = "Toon Delta";
-"infoCalendarAccessDeniedByUser" = "In het verleden heb je toegang geweigerd tot je Agenda.\n\nGa naar iPhone-instellingen > %@ > Agenda's en kies 'Volledige toegang'.";
-"infoCalendarAccessWriteOnly" = "Je kunt Agenda Activiteiten niet gebruiken totdat je de Agenda-toegang hebt gewijzigd van 'Voeg alleen activiteiten toe' naar 'Volledige toegang'.\n\nGa naar iPhone-instellingen > %@ > Agenda's en kies 'Volledige toegang'.";
+"infoCalendarAccessDeniedByUser" = "In het verleden heb je toegang geweigerd tot je Agenda.\n\nGa naar iPhone-instellingen > Apps > %@ > Agenda's en kies 'Volledige toegang'.";
+"infoCalendarAccessWriteOnly" = "Je kunt Agenda Activiteiten niet gebruiken totdat je de Agenda-toegang hebt gewijzigd van 'Voeg alleen activiteiten toe' naar 'Volledige toegang'.\n\nGa naar iPhone-instellingen > Apps > %@ > Agenda's en kies 'Volledige toegang'.";
 "infoCalendarAccessRestricted" = "Geen toegang voor %@ tot je agenda. Dit komt waarschijnlijk door actieve beperkingen zoals Ouderlijk Toezicht.";
 "sectionTitleTrace" = "Probleemrapportage";
 "sendTraceFile" = "Verstuur Probleemrapportage";

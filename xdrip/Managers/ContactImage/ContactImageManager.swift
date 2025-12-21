@@ -40,8 +40,6 @@ class ContactImageManager: NSObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.bloodGlucoseUnitIsMgDl.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.isMaster.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
-        
-        
     }
     
     deinit {
@@ -64,12 +62,10 @@ class ContactImageManager: NSObject {
     // MARK: - overriden functions
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        
-        guard let keyPath = keyPath else {return}
+        guard let keyPath = keyPath else { return }
         if let keyPathEnum = UserDefaults.Key(rawValue: keyPath) {
             evaluateUserDefaultsChange(keyPathEnum: keyPathEnum)
         }
-        
     }
     
     // MARK: - private functions
@@ -87,6 +83,9 @@ class ContactImageManager: NSObject {
     /// - schedule a 5-6 minute timer to repeat the above (just in case the function isn't updated again by the root view controller)
     private func updateContact() {
         guard UserDefaults.standard.enableContactImage else { return }
+        // make sure we're in master mode OR in (follower mode WITHOUT keep-alive disabled)
+        guard UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType != .disabled) else { return }
+        
         debouncer.debounce {
             self.workItem?.cancel()
             self.workItem = nil
@@ -107,6 +106,7 @@ class ContactImageManager: NSObject {
                 }
                 return
             }
+            
             guard status == .authorized else {
                 // if it isn't, and the user has enabled the feature, then disable it
                 if UserDefaults.standard.enableContactImage {
