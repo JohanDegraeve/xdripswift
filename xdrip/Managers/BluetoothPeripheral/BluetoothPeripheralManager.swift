@@ -171,7 +171,7 @@ class BluetoothPeripheralManager: NSObject {
                     // cgm's don't receive reading, they send it
                     break
                     
-                case .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType, .MedtrumTouchCareNanoHeartBeatType:
+                case .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType:
                     // heartbeat transmitters are just there to wake up the app
                     break
                     
@@ -442,22 +442,6 @@ class BluetoothPeripheralManager: NSObject {
 
                     }
 
-                case .MedtrumTouchCareNanoHeartBeatType:
-
-                    if let medtrumTouchCareNanoHeartBeat = bluetoothPeripheral as? MedtrumTouchCareNanoHeartBeat {
-
-                        if let transmitterId = medtrumTouchCareNanoHeartBeat.blePeripheral.transmitterId {
-
-                            newTransmitter = MedtrumTouchCareNanoHeartBeatBluetoothTransmitter(address: medtrumTouchCareNanoHeartBeat.blePeripheral.address, name: medtrumTouchCareNanoHeartBeat.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self)
-
-                        } else {
-
-                            trace("in getBluetoothTransmitter, case MedtrumTouchCareNanoHeartBeatType but transmitterId is nil , looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
-
-                        }
-
-                    }
-
                 }
                 
                 
@@ -555,11 +539,6 @@ class BluetoothPeripheralManager: NSObject {
             case .OmniPodHeartBeatType:
                 if bluetoothTransmitter is OmniPodHeartBeatTransmitter {
                     return .OmniPodHeartBeatType
-                }
-
-            case .MedtrumTouchCareNanoHeartBeatType:
-                if bluetoothTransmitter is MedtrumTouchCareNanoHeartBeatBluetoothTransmitter {
-                    return .MedtrumTouchCareNanoHeartBeatType
                 }
 
             case .DexcomG7Type:
@@ -691,14 +670,6 @@ class BluetoothPeripheralManager: NSObject {
         case .OmniPodHeartBeatType:
 
             return OmniPodHeartBeatTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self)
-
-        case .MedtrumTouchCareNanoHeartBeatType:
-
-            guard let transmitterId = transmitterId else {
-                fatalError("in createNewTransmitter, type MedtrumTouchCareNanoHeartBeatType, transmitterId is nil")
-            }
-
-            return MedtrumTouchCareNanoHeartBeatBluetoothTransmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self)
 
         case .DexcomG7Type:
             
@@ -1327,33 +1298,6 @@ class BluetoothPeripheralManager: NSObject {
 
                     }
 
-                case .MedtrumTouchCareNanoHeartBeatType:
-                    if let medtrumTouchCareNanoHeartBeat = blePeripheral.medtrumtouchcarenanoheartbeat {
-
-                        blePeripheralFound = true
-
-                        // add it to the list of bluetoothPeripherals
-                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: medtrumTouchCareNanoHeartBeat)
-
-                        if medtrumTouchCareNanoHeartBeat.blePeripheral.shouldconnect {
-
-                            if let transmitterId = medtrumTouchCareNanoHeartBeat.blePeripheral.transmitterId {
-
-                                // create an instance of MedtrumTouchCareNanoHeartBeatBluetoothTransmitter, will automatically try to connect
-                                // add it to the array of bluetoothTransmitters
-                                bluetoothTransmitters.insert(MedtrumTouchCareNanoHeartBeatBluetoothTransmitter(address: medtrumTouchCareNanoHeartBeat.blePeripheral.address, name: medtrumTouchCareNanoHeartBeat.blePeripheral.name, transmitterID: transmitterId, bluetoothTransmitterDelegate: self), at: index)
-
-                            }
-
-                        } else {
-
-                            // bluetoothTransmitters array (which should have the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
-                            bluetoothTransmitters.insert(nil, at: index)
-
-                        }
-
-                    }
-
                 case .DexcomG7Type:
                     
                     if let dexcomG7 = blePeripheral.dexcomG7 {
@@ -1526,8 +1470,8 @@ class BluetoothPeripheralManager: NSObject {
                     bluetoothPeripheral.blePeripheral.parameterUpdateNeededAtNextConnect = true
                 }
              
-            case .WatlaaType, .DexcomType, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .Libre2Type, .AtomType, .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType, .MedtrumTouchCareNanoHeartBeatType, .DexcomG7Type:
-                
+            case .WatlaaType, .DexcomType, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .Libre2Type, .AtomType, .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType, .DexcomG7Type:
+
                 // nothing to check
                 break
 

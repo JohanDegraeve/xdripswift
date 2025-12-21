@@ -223,11 +223,8 @@ enum ConstantsLog {
     
     /// for use in Libre3HeartBeatTransmitter
     static let categoryHeartBeatLibre3 =                    "HeartBeatLibre3               "
-    
-    /// for use in MedtrumTouchCareNanoHeartBeatTransmitter
-    static let categoryHeartBeatMedtrumTouchCareNano =                       "HeartBeatMedtrumTouchCareNano         "
 
-    
+
     /// for use in DexcomG7HeartBeatTransmitter
     static let categoryHeartBeatG7 =                        "HeartBeatG7                   "
     
