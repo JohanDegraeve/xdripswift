@@ -58,9 +58,6 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// omnipod heartbeat
     case OmniPodHeartBeatType = "OmniPod HeartBeat"
 
-    /// Medtrum TouchCare Nano heartbeat
-    case MedtrumTouchCareNanoHeartBeatType = "Medtrum TouchCare Nano HeartBeat"
-
     /// - returns: the BluetoothPeripheralViewModel. If nil then there's no specific settings for the tpe of bluetoothPeripheral
     func viewModel() -> BluetoothPeripheralViewModel? {
         
@@ -113,9 +110,6 @@ enum BluetoothPeripheralType: String, CaseIterable {
             
         case .OmniPodHeartBeatType:
             return OmniPodHeartBeatBluetoothPeripheralViewModel()
-
-        case .MedtrumTouchCareNanoHeartBeatType:
-            return MedtrumTouchCareNanoHeartBeatBluetoothPeripheralViewModel()
 
         case .DexcomG7Type:
             return DexcomG7BluetoothPeripheralViewModel()
@@ -180,9 +174,6 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .OmniPodHeartBeatType:
             return OmniPodHeartBeat(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
 
-        case .MedtrumTouchCareNanoHeartBeatType:
-            return MedtrumTouchCareNanoHeartBeat(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
-
         case .DexcomG7Type:
             return DexcomG7(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
 
@@ -201,7 +192,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .DexcomType, .BubbleType, .MiaoMiaoType, .BluconType, .GNSentryType, .BlueReaderType, .DropletType, .DexcomG4Type, .WatlaaType, .Libre2Type, .AtomType, .DexcomG7Type:
             return .CGM
 
-        case .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType, .MedtrumTouchCareNanoHeartBeatType:
+        case .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType:
             return .HeartBeat
             
         }
@@ -213,7 +204,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         
         switch self {
             
-        case .DexcomType, .BluconType, .DexcomG4Type, .Libre3HeartBeatType, .DexcomG7Type, .DexcomG7HeartBeatType, .MedtrumTouchCareNanoHeartBeatType:
+        case .DexcomType, .BluconType, .DexcomG4Type, .Libre3HeartBeatType, .DexcomG7Type, .DexcomG7HeartBeatType:
             return true
 
         default:
