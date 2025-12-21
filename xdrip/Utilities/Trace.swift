@@ -697,13 +697,6 @@ class Trace {
 
                         }
 
-                    case .MedtrumTouchCareNanoHeartBeatType:
-                        if blePeripheral.medtrumtouchcarenanoheartbeat != nil {
-
-                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
-
-                        }
-
                     case .DexcomG7Type:
                         if blePeripheral.dexcomG7 != nil {
                             

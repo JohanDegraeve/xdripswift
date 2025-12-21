@@ -625,6 +625,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
 
         case .followerExtraRow2:
             return UserDefaults.standard.isMaster ? .none : .disclosureIndicator
+
+        case .followerExtraRow3, .followerExtraRow4, .followerExtraRow7, .followerExtraRow8:
+            return .disclosureIndicator
             
         case .followerExtraRow5:
             return (UserDefaults.standard.followerDataSourceType.hasServiceStatus() && followerServiceStatusResult.status != .notAvailable) ? .disclosureIndicator : .none

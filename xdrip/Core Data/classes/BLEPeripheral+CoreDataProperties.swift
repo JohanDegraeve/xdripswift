@@ -75,9 +75,6 @@ extension BLEPeripheral {
     @NSManaged public var dexcomG7HeartBeat: DexcomG7HeartBeat?
 
     // a BLEPeripheral should only have one of dexcomG5, watlaa, m5Stack, ...
-    @NSManaged public var medtrumtouchcarenanoheartbeat: MedtrumTouchCareNanoHeartBeat?
-
-    // a BLEPeripheral should only have one of dexcomG5, watlaa, m5Stack, ...
     @NSManaged public var omniPodHeartBeat: OmniPodHeartBeat?
     
     // a BLEPeripheral should only have one of dexcomG5, watlaa, m5Stack, ...

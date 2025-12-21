@@ -135,14 +135,9 @@
 		4796C6072B9516FD00DE2210 /* Bundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D602448E695001C9E5A /* Bundle.swift */; };
 		47976E362BF536BA005E86EC /* AlertSnoozeStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47976E352BF536BA005E86EC /* AlertSnoozeStatus.swift */; };
 		47976E372BFBB870005E86EC /* TextsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8B3A7B1226A0878004BA588 /* TextsAlerts.swift */; };
-		47A05CB62EF15FCD004DABE7 /* MedtrumTouchCareNanoHeartBeat+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A05CB52EF15FCD004DABE7 /* MedtrumTouchCareNanoHeartBeat+CoreDataProperties.swift */; };
-		47A05CB72EF15FCD004DABE7 /* MedtrumTouchCareNanoHeartBeat+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A05CB42EF15FCD004DABE7 /* MedtrumTouchCareNanoHeartBeat+CoreDataClass.swift */; };
 		47A05CC52EF160A9004DABE7 /* MedtrumEasyViewFollowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A05CC22EF160A9004DABE7 /* MedtrumEasyViewFollowManager.swift */; };
 		47A05CC62EF160A9004DABE7 /* MedtrumEasyViewModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A05CC32EF160A9004DABE7 /* MedtrumEasyViewModels.swift */; };
-		47A05CC82EF160CC004DABE7 /* MedtrumTouchCareNanoBluetoothTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A05CC72EF160CC004DABE7 /* MedtrumTouchCareNanoBluetoothTransmitter.swift */; };
-		47A05CCA2EF160F5004DABE7 /* MedtrumTouchCareNanoHeartBeat+BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A05CC92EF160F5004DABE7 /* MedtrumTouchCareNanoHeartBeat+BluetoothPeripheral.swift */; };
 		47A05CCC2EF16110004DABE7 /* ConstantsMedtrumEasyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A05CCB2EF16110004DABE7 /* ConstantsMedtrumEasyView.swift */; };
-		47A05CCE2EF1617D004DABE7 /* MedtrumTouchCareNanoHeartBeatBluetoothPeripheralViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A05CCD2EF1617D004DABE7 /* MedtrumTouchCareNanoHeartBeatBluetoothPeripheralViewModel.swift */; };
 		47A0E6442D4E263800B31C21 /* LiveActivityIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A0E6432D4E262A00B31C21 /* LiveActivityIntent.swift */; };
 		47A6ABE22B790CC60047A4BA /* xDripWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6ABE12B790CC60047A4BA /* xDripWatchApp.swift */; };
 		47A6ABE42B790CC60047A4BA /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A6ABE32B790CC60047A4BA /* MainView.swift */; };
@@ -1010,14 +1005,9 @@
 		4798BADC27BA7965002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/LibreNFC.strings; sourceTree = "<group>"; };
 		4798BADD27BA7996002583BC /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/M5StackView.strings; sourceTree = "<group>"; };
 		4798BADE27BA79B8002583BC /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
-		47A05CB42EF15FCD004DABE7 /* MedtrumTouchCareNanoHeartBeat+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "MedtrumTouchCareNanoHeartBeat+CoreDataClass.swift"; path = "xDrip/Core Data/classes/MedtrumTouchCareNanoHeartBeat+CoreDataClass.swift"; sourceTree = SOURCE_ROOT; };
-		47A05CB52EF15FCD004DABE7 /* MedtrumTouchCareNanoHeartBeat+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "MedtrumTouchCareNanoHeartBeat+CoreDataProperties.swift"; path = "xDrip/Core Data/classes/MedtrumTouchCareNanoHeartBeat+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
 		47A05CC22EF160A9004DABE7 /* MedtrumEasyViewFollowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedtrumEasyViewFollowManager.swift; sourceTree = "<group>"; };
 		47A05CC32EF160A9004DABE7 /* MedtrumEasyViewModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedtrumEasyViewModels.swift; sourceTree = "<group>"; };
-		47A05CC72EF160CC004DABE7 /* MedtrumTouchCareNanoBluetoothTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MedtrumTouchCareNanoBluetoothTransmitter.swift; path = xDrip/BluetoothTransmitter/HeartBeat/MedtrumTouchCareNanoBluetoothTransmitter.swift; sourceTree = SOURCE_ROOT; };
-		47A05CC92EF160F5004DABE7 /* MedtrumTouchCareNanoHeartBeat+BluetoothPeripheral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "MedtrumTouchCareNanoHeartBeat+BluetoothPeripheral.swift"; path = "xDrip/BluetoothPeripheral/HeartBeat/MedtrumTouchCareNanoHeartBeat+BluetoothPeripheral.swift"; sourceTree = SOURCE_ROOT; };
 		47A05CCB2EF16110004DABE7 /* ConstantsMedtrumEasyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = ConstantsMedtrumEasyView.swift; path = xDrip/Constants/ConstantsMedtrumEasyView.swift; sourceTree = SOURCE_ROOT; };
-		47A05CCD2EF1617D004DABE7 /* MedtrumTouchCareNanoHeartBeatBluetoothPeripheralViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MedtrumTouchCareNanoHeartBeatBluetoothPeripheralViewModel.swift; path = "xDrip/View Controllers/BluetoothPeripheralsNavigationController/BluetoothPeripheralsViewController/BluetoothPeripheralViewController/Models/HeartBeat/MedtrumTouchCareNanoHeartBeatBluetoothPeripheralViewModel.swift"; sourceTree = SOURCE_ROOT; };
 		47A0E6432D4E262A00B31C21 /* LiveActivityIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityIntent.swift; sourceTree = "<group>"; };
 		47A6ABDF2B790CC60047A4BA /* xDrip Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "xDrip Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		47A6ABE12B790CC60047A4BA /* xDripWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = xDripWatchApp.swift; sourceTree = "<group>"; };
@@ -3464,8 +3454,6 @@
 				F8EE3EAB2B6834FD00B27B96 /* Libre2HeartBeat+CoreDataProperties.swift */,
 				F804870A2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift */,
 				F804870B2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift */,
-				47A05CB42EF15FCD004DABE7 /* MedtrumTouchCareNanoHeartBeat+CoreDataClass.swift */,
-				47A05CB52EF15FCD004DABE7 /* MedtrumTouchCareNanoHeartBeat+CoreDataProperties.swift */,
 				F8C97851242AA70C00A09483 /* MiaoMiao+CoreDataClass.swift */,
 				F8C97852242AA70C00A09483 /* MiaoMiao+CoreDataProperties.swift */,
 				F85542312B7573D20058CE09 /* OmniPodHeartBeat+CoreDataClass.swift */,
@@ -3500,7 +3488,6 @@
 			children = (
 				F8EE3E9C2B6831A200B27B96 /* DexcomG7HeartBeat+BluetoothPeripheral.swift */,
 				F8EE3E9D2B6831A200B27B96 /* Libre2HeartBeat+BluetoothPeripheral.swift */,
-				47A05CC92EF160F5004DABE7 /* MedtrumTouchCareNanoHeartBeat+BluetoothPeripheral.swift */,
 				F855422F2B7573930058CE09 /* OmniPodHeartBeat+BluetoothPeripheral.swift */,
 			);
 			path = HeartBeat;
@@ -3511,7 +3498,6 @@
 			children = (
 				F8EE3EB12B683B2100B27B96 /* DexcomG7HeartbeatBluetoothTransmitter.swift */,
 				F8EE3EB02B683B2100B27B96 /* Libre3HeartbeatBluetoothTransmitter.swift */,
-				47A05CC72EF160CC004DABE7 /* MedtrumTouchCareNanoBluetoothTransmitter.swift */,
 				F855422D2B756DF40058CE09 /* OmniPodHeartbeatBluetoothTransmitter.swift */,
 			);
 			path = HeartBeat;
@@ -3522,7 +3508,6 @@
 			children = (
 				F8EE3EA42B6833FA00B27B96 /* DexcomG7HeartBeatBluetoothPeripheralViewModel.swift */,
 				F8EE3EA52B6833FA00B27B96 /* Libre3HeartBeatBluetoothPeripheralViewModel.swift */,
-				47A05CCD2EF1617D004DABE7 /* MedtrumTouchCareNanoHeartBeatBluetoothPeripheralViewModel.swift */,
 				F85542352B7575B40058CE09 /* OmniPodHeartBeatBluetoothPeripheralViewModel.swift */,
 			);
 			path = HeartBeat;
@@ -4464,7 +4449,6 @@
 				F816E0F724367137009EE65B /* GNSEntry+CoreDataClass.swift in Sources */,
 				F8F9721923A5915900C3F17D /* CGMGNSEntryTransmitter.swift in Sources */,
 				F8B3A84A227F090E004BA588 /* SettingsViewNotificationsSettingsViewModel.swift in Sources */,
-				47A05CCA2EF160F5004DABE7 /* MedtrumTouchCareNanoHeartBeat+BluetoothPeripheral.swift in Sources */,
 				F83098FE23AD3F84005741DF /* UITabBarController.swift in Sources */,
 				F816E11A243923B2009EE65B /* Droplet+CoreDataClass.swift in Sources */,
 				F80D916D24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift in Sources */,
@@ -4690,7 +4674,6 @@
 				47DB06E92A715FD900267BE3 /* LibreLinkUpModels.swift in Sources */,
 				F8A1585322EDB602007F5B5D /* ConstantsBloodGlucose.swift in Sources */,
 				4733B93E2AD17C99001D609D /* FollowerBgReading.swift in Sources */,
-				47A05CC82EF160CC004DABE7 /* MedtrumTouchCareNanoBluetoothTransmitter.swift in Sources */,
 				F85FB769255DE14600D1C39E /* ConstantsLibreSmoothing.swift in Sources */,
 				F8F1671B272B3E4F001AA3D8 /* DexcomBackfillStream.swift in Sources */,
 				F85542302B7573930058CE09 /* OmniPodHeartBeat+BluetoothPeripheral.swift in Sources */,
@@ -4711,7 +4694,6 @@
 				F8A2BC2F25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMBlueReaderTransmitterDelegate.swift in Sources */,
 				F8F9722123A5915900C3F17D /* LibreSensorSerialNumber.swift in Sources */,
 				F8A1586722EDB8BF007F5B5D /* ConstantsHomeView.swift in Sources */,
-				47A05CCE2EF1617D004DABE7 /* MedtrumTouchCareNanoHeartBeatBluetoothPeripheralViewModel.swift in Sources */,
 				F8A1585922EDB7C6007F5B5D /* ConstantsDefaultAlertLevels.swift in Sources */,
 				F8A54AAD22D6859200934E7A /* SlopeParameters.swift in Sources */,
 				472596052B76301F00459D12 /* WatchManager.swift in Sources */,
@@ -4764,8 +4746,6 @@
 				F80D916524F5B3DE006840B5 /* Libre2+CoreDataClass.swift in Sources */,
 				D4028CC02774A50600341476 /* TreatmentsViewController.swift in Sources */,
 				F898EDF2234A8A0500BFB79B /* UInt8.swift in Sources */,
-				47A05CB62EF15FCD004DABE7 /* MedtrumTouchCareNanoHeartBeat+CoreDataProperties.swift in Sources */,
-				47A05CB72EF15FCD004DABE7 /* MedtrumTouchCareNanoHeartBeat+CoreDataClass.swift in Sources */,
 				F8DF766423E781C100063910 /* BLEPeripheralAccessor.swift in Sources */,
 				F8F1671727288B24001AA3D8 /* DexcomSessionStopRxMessage.swift in Sources */,
 				F816E12124392D40009EE65B /* DropletBluetoothPeripheralViewModel.swift in Sources */,
@@ -5772,7 +5752,6 @@
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = "xDrip Notification Context Extension/xDrip Notification Context Extension.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
 				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
@@ -5807,7 +5786,6 @@
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
 				CODE_SIGN_ENTITLEMENTS = "xDrip Notification Context Extension/xDrip Notification Context Extension.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
 				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
@@ -5972,7 +5950,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "$(XDRIP_ENTITLEMENTS_DEBUG)";
-				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = "$(XDRIP_CODE_SIGN_STYLE)";
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
 				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
@@ -5985,7 +5962,6 @@
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -6001,7 +5977,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "$(XDRIP_ENTITLEMENTS_RELEASE)";
-				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = "$(XDRIP_CODE_SIGN_STYLE)";
 				CURRENT_PROJECT_VERSION = "$(CURRENT_PROJECT_VERSION)";
 				DEVELOPMENT_TEAM = "$(XDRIP_DEVELOPMENT_TEAM)";
@@ -6014,7 +5989,6 @@
 				MARKETING_VERSION = "$(XDRIP_MARKETING_VERSION)";
 				PRODUCT_BUNDLE_IDENTIFIER = "$(MAIN_APP_BUNDLE_IDENTIFIER)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "xdrip/xdrip-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
