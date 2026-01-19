@@ -73,6 +73,10 @@ public final class StatisticsManager {
                 // let's calculate the actual first day of readings in bgReadings. Although the user wants to use 60 days to calculate, maybe we only have 4 days of data. This will be returned from the method and used in the UI. To ensure we calculate the whole days used, we should subtract 5 minutes from the fromDate
                 numberOfDaysUsed = Calendar.current.dateComponents([.day], from: readings.first!.timeStamp - 5 * 60, to: Date()).day!
                 
+                // when requesting the full 90 days and to avoid a date calculation bug caused by the last retrieved date not quite adding to a full 90 days, we'll just add 1 to the total
+                // it's a bit of a rough fix, but effective
+                numberOfDaysUsed += (numberOfDaysUsed == 89 ? 1 : 0)
+                
                 // get the minimum time between readings (convert to seconds). This is to avoid getting too many extra 60-second readings from the Libre 2 Direct - they will take up a lot more processing time and don't add anything to the accuracy of the results so we'll just filter them out if they exist.
                 let minimumSecondsBetweenReadings: Double = ConstantsStatistics.minimumFilterTimeBetweenReadings * 60
                 
