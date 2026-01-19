@@ -1935,10 +1935,7 @@ final class RootViewController: UIViewController, ObservableObject {
         // initialize return value
         var calibrator: Calibrator = NoCalibrator()
         
-        switch cgmTransmitterType {
-        case .dexcomG4:
-            calibrator = DexcomCalibrator()
-            
+        switch cgmTransmitterType {            
         case .dexcom:
             if cgmTransmitter.isWebOOPEnabled() {
                 // received values are already calibrated
@@ -1957,7 +1954,7 @@ final class RootViewController: UIViewController, ObservableObject {
             // received values are already calibrated
             calibrator = NoCalibrator()
             
-        case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa, .Libre2, .Atom:
+        case .miaomiao, .Bubble, .Libre2:
             if cgmTransmitter.isWebOOPEnabled() {
                 // received values are already calibrated
                 calibrator = NoCalibrator()

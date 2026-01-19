@@ -8,21 +8,15 @@ enum TransmitterBatteryInfo: Equatable {
     /// Dexcom G5 (and also G6 ?) voltageA, voltageB and resist
     case DexcomG5 (voltageA:Int, voltageB:Int, resist:Int, runtime:Int, temperature:Int)
     
-    /// Dexcom G4, batteryinfo (215 or something like that)
-    case DexcomG4 (level:Int)
-    
     /// gives textual description of the battery level, example for percentage based, this is just the value followed by % sign
     var description: String {
         switch (self) {
-        case .DexcomG4(let level):
-            return level.description
         case .DexcomG5(let voltA, let voltB, _, _, _):
             if (voltA == 0 || voltB == 0) {
                 return Texts_HomeView.waitingForDataSource // "waiting for data..."
             } else {
                 return "Voltage A: " + voltA.description + "0mV\nVoltage B: " + voltB.description + "0mV"
             }
-//            return "Voltage A: " + (voltA > 0 ? voltA.description + "0" : "-") + "mV\nVoltage B: " + (voltB > 0 ? voltB.description + "0" : "-") + "mV" //+ "\nResistance: " + resist.description + "\nRuntime: " + (runt != -1 ? runtime.description : "n/a") + "\nTemperature: " + temperature.description
         case .percentage(let perc):
             return  perc.description + "%"
         }
@@ -42,11 +36,6 @@ enum TransmitterBatteryInfo: Equatable {
             
             return ("batteryVoltage" , voltageB)
 
-            
-        case .DexcomG4(level: let level):
-            
-            return ("battery" , level)
-
         }
     }
 
@@ -62,7 +51,7 @@ enum TransmitterBatteryInfo: Equatable {
         let type = data.uint8(position: 0)
         
         switch type {
-        case 0,2:// percentage or DexcomG4
+        case 0,2: // percentage
             
             // get value,
             var percentageOrLevel:Int?
@@ -75,13 +64,9 @@ enum TransmitterBatteryInfo: Equatable {
                 break
             }
             
-            // if percentageOrLevel found, return it as percentage or DexcomG4 batterylevel
+            // if percentageOrLevel found, return it as percentage
             if let percentageOrLevel = percentageOrLevel {
-                if type == 0 {//percentage
-                    self = .percentage(percentage: percentageOrLevel)
-                } else {//dexcomG4
-                    self = .DexcomG4(level: percentageOrLevel)
-                }
+                self = .percentage(percentage: percentageOrLevel)
             } else {
                 return nil
             }
@@ -152,7 +137,7 @@ enum TransmitterBatteryInfo: Equatable {
     /// would need to be extended if new cases are added to TransmitterBatteryInfo
     func toData() -> Data {
         
-        /// first bit will indicate enum with 0 = percentage, 1 = DexcomG5, 2 = DexcomG4
+        /// first bit will indicate enum with 0 = percentage, 1 = DexcomG5
         
         // start with empty array, actual result should never be empty
         var returnValueAsArray:[UInt8] = []
@@ -170,11 +155,6 @@ enum TransmitterBatteryInfo: Equatable {
             returnValueAsArray.append(contentsOf: resist.toByteArray())
             returnValueAsArray.append(contentsOf: runtime.toByteArray())
             returnValueAsArray.append(contentsOf: temperature.toByteArray())
-
-        case .DexcomG4(let level):
-            returnValueAsArray = [2]
-            returnValueAsArray.append(contentsOf: level.toByteArray())
-
         }
         
         return Data(returnValueAsArray)
