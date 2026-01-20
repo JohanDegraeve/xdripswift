@@ -63,32 +63,9 @@ class SettingsViewContactImageSettingsViewModel: NSObject, SettingsViewModelProt
     }
     
     func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+        guard let _ = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
-            return .none
-        switch setting {
-        case .enableContactImage:
-            // if access to Contacts was previously denied by user, then show disclosure indicator, clicking the row will give info how user should authorize access
-            // also if access is restricted
-            switch CNContactStore.authorizationStatus(for: .contacts) {
-//            case .denied, .restricted:
-//                // by clicking row, show info how to authorized
-//                return .disclosureIndicator
-                
-            case .notDetermined, .authorized:
-                return .none
-                
-//            case .limited:
-                return .disclosureIndicator
-                
-            default:
-                trace("unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
-                return .none
-            }
-            
-        case .displayTrend, .useHighContrastContactImage:
-            return .none
-        }
+        return .none
     }
     
     func detailedText(index: Int) -> String? {
