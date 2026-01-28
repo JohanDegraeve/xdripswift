@@ -25,6 +25,10 @@
 "settingsviews_enterPassword" = "Entrar tu contraseña";
 "settingsviews_libreLinkUpReAcceptNeeded" = "Aceptar terminos";
 "settingsviews_libreLinkUpNoActiveSensor" = "Sin datos de sensor activo";
+"settingsviews_medtrumSelectedPatient" = "Paciente Seleccionado";
+"settingsviews_medtrumSelectPatient" = "Elige Paciente";
+"settingsviews_medtrumSelectPatientFromList" = "Elige paciente de la lista";
+
 "settingsviews_translateOnlineHelp" = "Traducir Documentación";
 "settingsviews_restartNeeded" = "(Pendiente reiniciar)";
 "settingsviews_showReadingInNotification" = "Mostrar en Notificaciones";
@@ -117,8 +121,8 @@
 "settingsviews_displayTrendInCalendarEvent" = "Mostrar Tendencia";
 "displayUnitInCalendarEvent" = "Mostrar Unidad";
 "displayDeltaInCalendarEvent" = "Mostrar Delta";
-"infoCalendarAccessDeniedByUser" = "Has denegado previamente permiso para acceder al calendario.\n\nIr a Configuración iPhone > %@ > Calendarios y habilitarlo.";
-"infoCalendarAccessWriteOnly" = "No puedes usar Eventos de Calendario hasta que actualices los permisos de 'Sólo agregar eventos' a 'Acceso completo'.\n\nIr a Configuración iPhone > %@ > Calendarios y seleccionar 'Acceso completo'.";
+"infoCalendarAccessDeniedByUser" = "Has denegado previamente permiso para acceder al calendario.\n\nIr a Configuración iPhone > Apps > %@ > Calendarios y habilitarlo.";
+"infoCalendarAccessWriteOnly" = "No puedes usar Eventos de Calendario hasta que actualices los permisos de 'Sólo agregar eventos' a 'Acceso completo'.\n\nIr a Configuración iPhone > > Apps %@ > Calendarios y seleccionar 'Acceso completo'.";
 "infoCalendarAccessRestricted" = "No se puede autorizar a que %@ tenga acceso a tu calendario. Podría ser debido a que restricciones tipo Controles Parentales o similares lo están impidiendo.";
 "sectionTitleTrace" = "Rastrear/Issue Reporting";
 "sendTraceFile" = "Enviar Archivo de Rastreo";

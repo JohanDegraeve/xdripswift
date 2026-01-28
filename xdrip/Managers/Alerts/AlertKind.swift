@@ -376,8 +376,6 @@ public enum AlertKind: Int, CaseIterable {
                 batteryLevelToCheck = percentage
             case .DexcomG5(_, let voltageB, _, _, _):
                 batteryLevelToCheck = voltageB
-            case .DexcomG4(let level):
-                batteryLevelToCheck = level
             }
 
             if let batteryLevelToCheck = batteryLevelToCheck, currentAlertEntry.value > batteryLevelToCheck {
