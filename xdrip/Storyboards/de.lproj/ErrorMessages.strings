@@ -6,6 +6,3 @@
 
 /// error message for the case where Dexcom G5 transmitter id given by user doesn't have 5 characters
 "error_message_transmitter_id_should_have_length_5" = "Die Transmitter ID darf nur 5 Zeichen haben";
-
-/// error message for the case where Blucon transmitter id is given by user, but expected format is not correct
-"TransmitterIdBluCon" = "Die Transmitter ID sollte aus den letzten 5 Zeichen der BluCon ID (auf der Seite des Gerätes) bestehen.\n\nBeispiel: Die BluCon ID lautet: BLU1742B01007, die Transmitter ID wäre dann 01007.";

@@ -568,16 +568,6 @@ class Trace {
                             
                         }
                         
-                    case .DexcomG4Type:
-                        if let dexcomG4 = blePeripheral.dexcomG4 {
-                            
-                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
-                            
-                            // if needed additional specific info can be added
-                            traceInfo.appendStringAndNewLine("        Battery level: " + dexcomG4.batteryLevel.description)
-                            
-                        }
-                        
                     case .DexcomType:
                         if let dexcomG5 = blePeripheral.dexcomG5 {
                             
@@ -603,44 +593,11 @@ class Trace {
                             
                         }
                         
-                    case .BluconType:
-                        if let blucon = blePeripheral.blucon {
-                            
-                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
-                            
-                            // if needed additional specific info can be added
-                            traceInfo.appendStringAndNewLine("        Battery level: " + blucon.batteryLevel.description)
-                            
-                        }
-                        
-                    case .BlueReaderType:
-                        if blePeripheral.blueReader != nil {
-                            
-                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
-                            
-                        }
-                        
                     case .BubbleType:
                         if let bubble = blePeripheral.bubble {
                             
                             traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
                             traceInfo.appendStringAndNewLine("        Battery level: " + bubble.batteryLevel.description)
-                            
-                        }
-                        
-                    case .DropletType:
-                        if let droplet = blePeripheral.droplet {
-                            
-                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
-                            traceInfo.appendStringAndNewLine("        Battery level: " + droplet.batteryLevel.description)
-                            
-                        }
-
-                    case .GNSentryType:
-                        if let gNSEntry = blePeripheral.gNSEntry {
-                            
-                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
-                            traceInfo.appendStringAndNewLine("        Battery level: " + gNSEntry.batteryLevel.description)
                             
                         }
 
@@ -649,22 +606,6 @@ class Trace {
                             
                             traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
                             traceInfo.appendStringAndNewLine("        Battery level: " + miaoMiao.batteryLevel.description)
-                            
-                        }
-                        
-                    case .AtomType:
-                        if let miaoMiao = blePeripheral.atom {
-                            
-                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
-                            traceInfo.appendStringAndNewLine("        Battery level: " + miaoMiao.batteryLevel.description)
-                            
-                        }
-                        
-                    case .WatlaaType:
-                        if let watlaa = blePeripheral.watlaa {
-                            
-                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
-                            traceInfo.appendStringAndNewLine("        Battery level: " + watlaa.watlaaBatteryLevel.description)
                             
                         }
                         
@@ -692,11 +633,11 @@ class Trace {
                         
                     case .OmniPodHeartBeatType:
                         if blePeripheral.omniPodHeartBeat != nil {
-                            
+
                             traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
-                            
+
                         }
-                        
+
                     case .DexcomG7Type:
                         if blePeripheral.dexcomG7 != nil {
                             

@@ -39,15 +39,6 @@ enum ConstantsLog {
     /// G7
     static let categoryCGMG7 =                              "CGMG7                         "
     
-    /// watlaa
-    static let categoryWatlaa =                             "Watlaa                        "
-    
-    /// GNSEntry
-    static let categoryCGMGNSEntry =                        "CGMGNSEntry                   "
-    
-    /// Blucon
-    static let categoryBlucon =                             "Blucon                        "
-    
     /// Libre2
     static let categoryCGMLibre2 =                          "Libre2                        "
     
@@ -73,10 +64,7 @@ enum ConstantsLog {
     static let categoryApplicationDataAlertEntries =        "ApplicationDataAlertEntries   "
     
     /// application data for M5Stack
-    static let categoryApplicationDataM5Stacks =            "ApplicationDataM5Stacks       "
-    
-    /// application data for M5Stack
-    static let categoryApplicationDataWatlaa =              "ApplicationDataWatlaa         "
+    static let categoryApplicationDataM5Stacks =            "ApplicationDataM5Stacks         "
     
     /// application data for BLEPeripheral
     static let categoryApplicationDataBLEPeripheral =       "ApplicationDataBLEPeripheral  "
@@ -102,7 +90,10 @@ enum ConstantsLog {
     
     /// nightscout follow
     static let categoryDexcomShareFollowManager =           "DexcomShareFollowManager      "
-    
+
+    /// medtrum easyview follow
+    static let categoryMedtrumEasyViewFollowManager =       "MedtrumEasyViewFollowManager  "
+
     /// alertmanager
     static let categoryAlertManager =                       "AlertManager                  "
     
@@ -125,15 +116,6 @@ enum ConstantsLog {
     
     /// SettingsViewSpeakSettingsViewModel
     static let categorySettingsViewSpeakSettingsViewModel = "SpeakSettingsViewModel        "
-    
-    /// droplet 1
-    static let categoryCGMDroplet1 =                        "CGMDroplet1                   "
-    
-    /// bluereader
-    static let categoryCGMBlueReader =                      "CGMBlueReader                 "
-    
-    /// atom
-    static let categoryCGMAtom =                            "categoryCGMAtom               "
     
     /// LibreOOPClient
     static let categoryLibreOOPClient =                     "LibreOOPClient                "
@@ -220,7 +202,8 @@ enum ConstantsLog {
     
     /// for use in Libre3HeartBeatTransmitter
     static let categoryHeartBeatLibre3 =                    "HeartBeatLibre3               "
-    
+
+
     /// for use in DexcomG7HeartBeatTransmitter
     static let categoryHeartBeatG7 =                        "HeartBeatG7                   "
     

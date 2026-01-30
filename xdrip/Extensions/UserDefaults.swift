@@ -60,7 +60,23 @@ extension UserDefaults {
         case libreLinkUpReAcceptNeeded = "libreLinkUpReAcceptNeeded"
         ///LibreLinkUp is a 15 day "Plus" sensor being used?
         case libreLinkUpIs15DaySensor = "libreLinkUpIs15DaySensor"
-        
+
+        // Medtrum EasyView account info
+        /// Medtrum EasyView username/email
+        case medtrumEasyViewEmail = "medtrumEasyViewEmail"
+        /// Medtrum EasyView password
+        case medtrumEasyViewPassword = "medtrumEasyViewPassword"
+        /// Medtrum EasyView login is allowed, or prevented?
+        case medtrumEasyViewPreventLogin = "medtrumEasyViewPreventLogin"
+        /// Medtrum EasyView user type from login response ("P" = patient, "M" = caregiver/monitor)
+        case medtrumEasyViewUserType = "medtrumEasyViewUserType"
+        /// Cached JSON data of caregiver's patient connections (serialized [MedtrumEasyViewPatientConnection])
+        case medtrumEasyViewCachedConnections = "medtrumEasyViewCachedConnections"
+        /// Selected patient UID for caregiver accounts (nil = "My Account" / patient mode)
+        case medtrumEasyViewSelectedPatientUid = "medtrumEasyViewSelectedPatientUid"
+        /// Flag indicating if the last connections fetch failed (to show error in UI)
+        case medtrumEasyViewConnectionsFetchFailed = "medtrumEasyViewConnectionsFetchFailed"
+
         // General
         
         /// bloodglucose unit
@@ -651,8 +667,81 @@ extension UserDefaults {
             set(newValue, forKey: Key.libreLinkUpPreventLogin.rawValue)
         }
     }
-    
-    
+
+    // MARK: - Medtrum EasyView Follower Settings
+
+    /// Medtrum EasyView account username/email
+    @objc dynamic var medtrumEasyViewEmail: String? {
+        get {
+            return string(forKey: Key.medtrumEasyViewEmail.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.medtrumEasyViewEmail.rawValue)
+        }
+    }
+
+    /// Medtrum EasyView account password
+    @objc dynamic var medtrumEasyViewPassword: String? {
+        get {
+            return string(forKey: Key.medtrumEasyViewPassword.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.medtrumEasyViewPassword.rawValue)
+        }
+    }
+
+    /// Used to prevent further login attempts once a failed authentication due to bad credentials has already taken place
+    /// This should be reset to false once the user has updated their account information
+    @objc dynamic var medtrumEasyViewPreventLogin: Bool {
+        get {
+            return bool(forKey: Key.medtrumEasyViewPreventLogin.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.medtrumEasyViewPreventLogin.rawValue)
+        }
+    }
+
+    /// Medtrum EasyView user type ("P" for patient, "M" for caregiver/monitor)
+    @objc dynamic var medtrumEasyViewUserType: String? {
+        get {
+            return string(forKey: Key.medtrumEasyViewUserType.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.medtrumEasyViewUserType.rawValue)
+        }
+    }
+
+    /// Cached patient connections for caregiver accounts (stored as JSON Data)
+    var medtrumEasyViewCachedConnections: Data? {
+        get {
+            return data(forKey: Key.medtrumEasyViewCachedConnections.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.medtrumEasyViewCachedConnections.rawValue)
+        }
+    }
+
+    /// Selected patient UID for caregiver mode (nil means "My Account")
+    @objc dynamic var medtrumEasyViewSelectedPatientUid: Int {
+        get {
+            return integer(forKey: Key.medtrumEasyViewSelectedPatientUid.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.medtrumEasyViewSelectedPatientUid.rawValue)
+        }
+    }
+
+    /// Flag indicating if connections fetch failed (to show error in settings)
+    var medtrumEasyViewConnectionsFetchFailed: Bool {
+        get {
+            return bool(forKey: Key.medtrumEasyViewConnectionsFetchFailed.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.medtrumEasyViewConnectionsFetchFailed.rawValue)
+        }
+    }
+
+
     // MARK: General
     
     /// true if unit is mgdl, false if mmol is used
