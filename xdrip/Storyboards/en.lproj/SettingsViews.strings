@@ -29,6 +29,10 @@
 "settingsviews_enterPassword" = "Enter your password";
 "settingsviews_libreLinkUpReAcceptNeeded" = "Need to accept terms";
 "settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
+"settingsviews_medtrumSelectedPatient" = "Selected Patient";
+"settingsviews_medtrumSelectPatient" = "Select Patient";
+"settingsviews_medtrumSelectPatientFromList" = "Select Patient From List";
+
 "settingsviews_showReadingInNotification" = "Show BG in Notifications";
 "settingsviews_labelShowReadingInAppBadge" = "Show BG in the App Badge";
 "settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10";
@@ -125,8 +129,8 @@
 "settingsviews_displayTrendInCalendarEvent" = "Display Trend";
 "displayUnitInCalendarEvent" = "Display Unit";
 "displayDeltaInCalendarEvent" = "Display Delta";
-"infoCalendarAccessDeniedByUser" = "You previously denied access to your calendars.\n\nGo to iPhone Settings > %@ > Calendars and enable full access.";
-"infoCalendarAccessWriteOnly" = "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > %@ > Calendars and select 'Full Access'.";
+"infoCalendarAccessDeniedByUser" = "Full Access is required to your contacts.\n\nGo to iPhone Settings > Apps > %@ > Contacts and enable Full Access.";
+"infoCalendarAccessWriteOnly" = "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.";
 "infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
 "settingsviews_CalenderIntervalTitle" = "Event Interval";
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";

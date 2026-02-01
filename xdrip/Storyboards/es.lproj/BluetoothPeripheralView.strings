@@ -30,7 +30,7 @@
 "confirmDisconnectTitle" = "Confirmar Desconexión";
 "confirmDisconnectMessage" = "Haz click en 'Desconectar' para confirmar que deseas desconectar el transmisor.";
 "warmingUpUntil" = "Calentando hasta";
-"useOtherDexcomApp" = "Usar a la vez la app de Dexcom";
+"useOtherDexcomApp" = "Usar con otras apps";
 "sensorStartDate" = "Sensor iniciado";
 "transmittterStartDate" = "Transmisor iniciado";
 

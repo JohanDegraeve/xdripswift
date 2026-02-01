@@ -415,6 +415,8 @@ class LibreLinkUpFollowManager: NSObject {
                 // make sure we don't try and login again until the user updates their account info
                 UserDefaults.standard.libreLinkUpPreventLogin = true
                 
+                UserDefaults.standard.timeStampOfLastFollowerConnection = .distantPast
+                
                 self.resetActiveSensorData()
                 
             } catch {

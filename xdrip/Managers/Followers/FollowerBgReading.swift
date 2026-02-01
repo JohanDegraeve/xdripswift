@@ -34,10 +34,10 @@ struct FollowerBgReading {
     
     /// creates an instance with parameter a json array as received from LibreLinkUpFollowerManager
     init?(entry: RequestGraphResponseGlucoseMeasurement) {
-        
+
         self.sgv = entry.ValueInMgPerDl.value
         self.timeStamp =  entry.FactoryTimestamp // Date(timeIntervalSince1970: date/1000)
-        
+
     }
 
 }

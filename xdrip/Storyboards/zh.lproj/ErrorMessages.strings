@@ -4,6 +4,3 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
-
-/// error message for the case where Blucon transmitter id is given by user, but expected format is not correct
-"TransmitterIdBluCon" = "The Transmitter ID should be the last 5 numbers of the BluCon ID written on side of the device.\n\nExample: If the BluCon ID is BLU1742B01007, the Transmitter ID you should use is 01007.";

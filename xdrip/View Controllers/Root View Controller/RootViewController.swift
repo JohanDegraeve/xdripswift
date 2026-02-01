@@ -509,7 +509,10 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// DexcomShareFollowManager instance
     private var dexcomShareFollowManager: DexcomShareFollowManager?
-    
+
+    /// MedtrumEasyViewFollowManager instance
+    private var medtrumEasyViewFollowManager: MedtrumEasyViewFollowManager?
+
     /// LoopFollowManager instance
     private var loopFollowManager: LoopFollowManager?
     
@@ -1156,7 +1159,10 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // setup dexcomShareFollowManager
         dexcomShareFollowManager = DexcomShareFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
-        
+
+        // setup medtrumEasyViewFollowManager
+        medtrumEasyViewFollowManager = MedtrumEasyViewFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
+
         // setup loop follow manager
         loopFollowManager = LoopFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
         
@@ -1227,6 +1233,7 @@ final class RootViewController: UIViewController, ObservableObject {
             self.nightscoutFollowManager?.download()
             self.libreLinkUpFollowManager?.download()
             self.dexcomShareFollowManager?.download()
+            self.medtrumEasyViewFollowManager?.download()
         }, cgmTransmitterInfoChanged: cgmTransmitterInfoChanged)
         
         // to initialize UserDefaults.standard.transmitterTypeAsString
@@ -1928,10 +1935,7 @@ final class RootViewController: UIViewController, ObservableObject {
         // initialize return value
         var calibrator: Calibrator = NoCalibrator()
         
-        switch cgmTransmitterType {
-        case .dexcomG4:
-            calibrator = DexcomCalibrator()
-            
+        switch cgmTransmitterType {            
         case .dexcom:
             if cgmTransmitter.isWebOOPEnabled() {
                 // received values are already calibrated
@@ -1950,7 +1954,7 @@ final class RootViewController: UIViewController, ObservableObject {
             // received values are already calibrated
             calibrator = NoCalibrator()
             
-        case .miaomiao, .GNSentry, .Blucon, .Bubble, .Droplet1, .blueReader, .watlaa, .Libre2, .Atom:
+        case .miaomiao, .Bubble, .Libre2:
             if cgmTransmitter.isWebOOPEnabled() {
                 // received values are already calibrated
                 calibrator = NoCalibrator()
@@ -3035,6 +3039,17 @@ final class RootViewController: UIViewController, ObservableObject {
                 } else if let followerPatientName = UserDefaults.standard.followerPatientName {
                     dataSourceSensorMaxAgeOutlet.text = followerPatientName
                 }
+            
+            case .medtrumEasyView:
+                if UserDefaults.standard.medtrumEasyViewEmail == nil || UserDefaults.standard.medtrumEasyViewPassword == nil {
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.followerAccountCredentialsMissing
+                } else if UserDefaults.standard.medtrumEasyViewPreventLogin {
+                    dataSourceSensorMaxAgeOutlet.textColor = .systemRed
+                    dataSourceSensorMaxAgeOutlet.text = Texts_HomeView.followerAccountCredentialsInvalid
+                } else if let followerPatientName = UserDefaults.standard.followerPatientName {
+                    dataSourceSensorMaxAgeOutlet.text = followerPatientName
+                }
                 
             case .dexcomShare:
                 if UserDefaults.standard.dexcomShareAccountName == nil || UserDefaults.standard.dexcomSharePassword == nil {
@@ -3760,7 +3775,7 @@ extension RootViewController: UNUserNotificationCenterDelegate {
 extension RootViewController: FollowerDelegate {
     func followerInfoReceived(followGlucoseDataArray: inout [FollowerBgReading]) {
         if let coreDataManager = coreDataManager, let bgReadingsAccessor = bgReadingsAccessor { //}, let followManager = (UserDefaults.standard.followerDataSourceType == .nightscout ? self.nightscoutFollowManager : self.libreLinkUpFollowManager) {
-            
+
             let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
             
             // assign value of timeStampLastBgReading
@@ -3788,18 +3803,26 @@ extension RootViewController: FollowerDelegate {
                         if let followManager = nightscoutFollowManager {
                             _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
                         }
-                        
+
                     case .libreLinkUp, .libreLinkUpRussia:
                         if let followManager = libreLinkUpFollowManager {
                             _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
                         }
-                        
+
                     case .dexcomShare:
                         if let followManager = dexcomShareFollowManager {
                             _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
                         }
+
+                    case .medtrumEasyView:
+                        if let followerManager = medtrumEasyViewFollowManager {
+                            _ = followerManager.createBgReading(followGlucoseData: followGlucoseData)
+                        }
+
                     }
-                    
+
+
+
                     // a new reading was created
                     newReadingCreated = true
                     
@@ -3813,16 +3836,16 @@ extension RootViewController: FollowerDelegate {
                 
                 // save in core data
                 coreDataManager.saveChanges()
-                
+
                 // update all text in  first screen
                 updateLabelsAndChart(overrideApplicationState: false)
-                
+
                 // update the mini-chart
                 updateMiniChart()
-                
+
                 // update statistics related outlets
                 updateStatistics(animate: false)
-                
+
                 // update data source info
                 updateDataSourceInfo()
                 
