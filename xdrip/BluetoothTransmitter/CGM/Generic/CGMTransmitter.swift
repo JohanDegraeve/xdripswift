@@ -82,9 +82,6 @@ protocol CGMTransmitter: AnyObject {
 /// cgm transmitter types
 enum CGMTransmitterType:String, CaseIterable {
     
-    /// dexcom G4 using xdrip, xbridge, ...
-    case dexcomG4 = "Dexcom G4"
-    
     /// dexcom G5, G6
     case dexcom = "Dexcom G5/G6/ONE"
     
@@ -94,26 +91,8 @@ enum CGMTransmitterType:String, CaseIterable {
     /// miaomiao
     case miaomiao = "MiaoMiao"
     
-    /// GNSentry
-    case GNSentry = "GNSentry"
-    
-    /// Blucon
-    case Blucon = "Blucon"
-    
     /// Bubble
     case Bubble = "Bubble"
-    
-    /// Droplet
-    case Droplet1 = "Droplet-1"
-    
-    /// BlueReader
-    case blueReader = "BlueReader"
-    
-    /// Atom
-    case Atom = "Atom"
-    
-    /// watlaa
-    case watlaa = "Watlaa"
     
     /// Libre2
     case Libre2 = "Libre2"
@@ -123,10 +102,10 @@ enum CGMTransmitterType:String, CaseIterable {
         
         switch self {
             
-        case .dexcomG4, .dexcom, .dexcomG7:
+        case .dexcom, .dexcomG7:
             return .Dexcom
             
-        case .miaomiao, .Bubble, .GNSentry, .Droplet1, .blueReader, .watlaa, .Blucon, .Libre2, .Atom:
+        case .miaomiao, .Bubble, .Libre2:
             return .Libre
             
         }
@@ -142,9 +121,6 @@ enum CGMTransmitterType:String, CaseIterable {
         
         switch self {
             
-        case .dexcomG4:
-            return false
-            
         case .dexcom:
             // for dexcom in native algorithm mode, we receive the sensorStart time from the transmitter, this will be used to determine if a new sensor is received
             // the others will not send sensorStart and will also not send sensorAge
@@ -153,25 +129,7 @@ enum CGMTransmitterType:String, CaseIterable {
         case .miaomiao, .Bubble:
             return true
             
-        case .GNSentry:
-            return false
-            
-        case .Blucon:
-            return true
-            
-        case .Droplet1:
-            return false
-            
-        case .blueReader:
-            return false
-            
-        case .watlaa:
-            return false
-            
         case .Libre2:
-            return true
-            
-        case .Atom:
             return true
             
         case .dexcomG7:
@@ -182,15 +140,15 @@ enum CGMTransmitterType:String, CaseIterable {
     
     /// this function says if the user should be able to manually start the sensor.
     ///
-    /// Would normally not be required, because if canDetectNewSensor returns true, then manual start shouldn't e necessary. However blucon automatic sensor start does not always work. So for this reason, this function is used.
+    /// Would normally not be required, because if canDetectNewSensor returns true, then manual start shouldn't e necessary.
     func allowManualSensorStart() -> Bool {
         
         switch self {
             
-        case .dexcomG4, .dexcom, .GNSentry, .Droplet1, .blueReader, .watlaa:
+        case .dexcom:
             return true
             
-        case .miaomiao, .Bubble, .Blucon, .Libre2, .Atom:
+        case .miaomiao, .Bubble, .Libre2:
             return true
             
         case .dexcomG7:
@@ -203,9 +161,6 @@ enum CGMTransmitterType:String, CaseIterable {
     func defaultBatteryAlertLevel() -> Int {
         switch self {
             
-        case .dexcomG4:
-            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDexcomG4
-            
         case .dexcom:
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDexcomG5
             
@@ -215,26 +170,8 @@ enum CGMTransmitterType:String, CaseIterable {
         case .Bubble:
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelBubble
             
-        case .GNSentry:
-            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelGNSEntry
-            
-        case .Blucon:
-            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelBlucon
-            
-        case .Droplet1:
-            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDroplet
-            
-        case .blueReader:
-            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelBlueReader
-            
-        case .watlaa:
-            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelWatlaa
-            
         case .Libre2:
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelLibre2
-            
-        case .Atom:
-            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelAtom
             
         case .dexcomG7:
             // we don't use this
@@ -250,31 +187,13 @@ enum CGMTransmitterType:String, CaseIterable {
         
         switch self {
             
-        case .dexcomG4:
-            return ""
-            
         case .dexcom:
             return "voltB"
             
-        case .miaomiao, .Bubble, .Droplet1:
-            return "%"
-            
-        case .GNSentry:
-            return ""
-            
-        case .Blucon:
-            return "%"
-            
-        case .blueReader:
-            return "%"
-            
-        case .watlaa:
+        case .miaomiao, .Bubble:
             return "%"
             
         case .Libre2:
-            return "%"
-            
-        case .Atom:
             return "%"
             
         case .dexcomG7:

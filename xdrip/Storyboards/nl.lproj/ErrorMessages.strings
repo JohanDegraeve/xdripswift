@@ -1,4 +1,3 @@
 "error_message_Dexcom_transmitter_id_invalid_characters" = "De Transmitter ID kan enkel de volgende karakters bevatten: a-z, A-Z or 0-9";
 "error_message_transmitter_id_should_have_length_6" = "De Transmitter ID moet 6 karakters lang zijn";
 "error_message_transmitter_id_should_have_length_5" = "De Transmitter ID moet 5 karakters lang zijn";
-"TransmitterIdBluCon" = "De Transmitter ID zijn de laatste 5 nummers van het BlueCon ID geschreven op de zijkant van het apparaat.\n\nVoorbeeld: Als de BluCon ID BLU1742B01007 is, gebruik dan Transmitter ID 01007.";

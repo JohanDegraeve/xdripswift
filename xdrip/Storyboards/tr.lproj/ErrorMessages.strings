@@ -1,4 +1,3 @@
 "error_message_Dexcom_transmitter_id_invalid_characters" = "Verici Kimliği yalnızca a-z, A-Z veya 0-9 karakterlerini içermelidir";
 "error_message_transmitter_id_should_have_length_6" = "Verici Kimliği 6 karakter uzunluğunda olmalıdır";
 "error_message_transmitter_id_should_have_length_5" = "Verici Kimliği 5 karakter uzunluğunda olmalıdır";
-"TransmitterIdBluCon" = "Verici Kimliği, cihazın yan tarafında yazılı olan BluCon Kimliğinin son 5 rakamı olmalıdır.\n\nÖrnek: BluCon Kimliği BLU1742B01007 ise, kullanmanız gereken Verici Kimliği 01007'dir.";

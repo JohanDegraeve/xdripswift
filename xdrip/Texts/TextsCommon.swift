@@ -237,4 +237,8 @@ class Texts_Common {
     static let checking = {
         return NSLocalizedString("common_checking", tableName: filename, bundle: Bundle.main, value: "Checking...", comment: "checking")
     }()
+    
+    static let notAvailable = {
+        return NSLocalizedString("common_notAvailable", tableName: filename, bundle: Bundle.main, value: "Not Available", comment: "not available")
+    }()
 }
