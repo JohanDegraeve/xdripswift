@@ -60,7 +60,11 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
     
     /// sensor type
     private var libreSensorType: LibreSensorType?
-    
+
+    /// Gen2 helper instance for US/CA sensors
+    /// Only initialized when a Gen2 sensor is detected
+    private var libre2Gen2: Libre2Gen2?
+
     // MARK: - Initialization
 
     /// - parameters:
@@ -284,9 +288,38 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
                     }
                 }
                 
-                // decrypt buffer and parse
+                // decrypt buffer based on sensor generation
+                let decryptedData: [UInt8]
+
+                // Check if this is a Gen2 sensor (US/CA/AU)
+                if let gen2 = libre2Gen2, gen2.streamingContext > 0 {
+                    // Gen2 decryption path
+                    trace("Using Gen2 decryption for US/CA/AU sensor", log: log, category: ConstantsLog.categoryCGMLibre2, type: .debug)
+
+                    let result = Libre2Gen2.decryptStreamingData(context: gen2.streamingContext, data: rxBuffer)
+
+                    if let decryptedGen2Data = result.data {
+                        decryptedData = Array(decryptedGen2Data)
+                    } else {
+                        // Gen2 decryption failed - likely because p1/p2 functions are not implemented
+                        let errorMsg = result.error?.rawValue ?? -1
+                        trace("⚠️ Gen2 decryption failed with error code: %{public}@. Gen2 cryptographic functions (p1/p2) need implementation.", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error, String(errorMsg))
+
+                        // Show user-friendly message
+                        DispatchQueue.main.async { [weak self] in
+                            self?.bluetoothTransmitterDelegate?.error(message: "Gen2 sensor detected but decryption not available. This sensor requires additional cryptographic library support.")
+                        }
+                        return
+                    }
+                } else {
+                    // Gen1 decryption path (EU sensors) - existing implementation
+                    trace("Using Gen1 decryption for EU sensor", log: log, category: ConstantsLog.categoryCGMLibre2, type: .debug)
+                    decryptedData = try Libre2BLEUtilities.decryptBLE(sensorUID: sensorUID, data: rxBuffer)
+                }
+
+                // Parse decrypted data
                 // if oop web not enabled, then don't pass libre1DerivedAlgorithmParameters
-                let parsedBLEData = try Libre2BLEUtilities.parseBLEData(Data(Libre2BLEUtilities.decryptBLE(sensorUID: sensorUID, data: rxBuffer)), libre1DerivedAlgorithmParameters: isWebOOPEnabled() ? UserDefaults.standard.libre1DerivedAlgorithmParameters : nil)
+                let parsedBLEData = Libre2BLEUtilities.parseBLEData(Data(decryptedData), libre1DerivedAlgorithmParameters: isWebOOPEnabled() ? UserDefaults.standard.libre1DerivedAlgorithmParameters : nil)
                 
                 // deliver glucose data and sensor age to delegates on main; use local copy for inout
                 DispatchQueue.main.async { [weak self] in
@@ -376,23 +409,41 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
     func received(sensorUID: Data, patchInfo: Data) {
         // store sensorUID as data in UserDefaults
         UserDefaults.standard.libreSensorUID = sensorUID
-        
+
+        // Detect sensor type and initialize Gen2 if needed
+        let detectedSensorType = LibreSensorType.type(patchInfo: patchInfo.toHexString())
+        libreSensorType = detectedSensorType
+
+        // Initialize Gen2 helper for US/CA sensors
+        if let sensorType = detectedSensorType, Libre2Gen2.isGen2Sensor(sensorType) {
+            trace("Gen2 sensor detected (US/CA/AU): %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, patchInfo.toHexString())
+
+            if libre2Gen2 == nil {
+                libre2Gen2 = Libre2Gen2()
+                libre2Gen2?.sensorUID = sensorUID
+            }
+        } else {
+            // Gen1 EU sensor
+            trace("Gen1 sensor detected (EU): %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, patchInfo.toHexString())
+            libre2Gen2 = nil
+        }
+
         // store the sensorUID as tempSensorSerialNumber (as LibreSensorSerialNumber)
-        let receivedSensorSerialNumber = LibreSensorSerialNumber(withUID: sensorUID, with: LibreSensorType.type(patchInfo: patchInfo.toHexString()))
+        let receivedSensorSerialNumber = LibreSensorSerialNumber(withUID: sensorUID, with: detectedSensorType)
         if let receivedSensorSerialNumber = receivedSensorSerialNumber {
             tempSensorSerialNumber = receivedSensorSerialNumber
         }
-        
+
         // sensor serial number as String
         let receivedSensorSerialNumberAsString = receivedSensorSerialNumber?.serialNumber
-        
+
         if let receivedSensorSerialNumberAsString = receivedSensorSerialNumberAsString {
             // is it a new value ?
             if sensorSerialNumber != receivedSensorSerialNumberAsString {
                 trace("new sensor detected :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, receivedSensorSerialNumberAsString)
-                
+
                 sensorSerialNumber = receivedSensorSerialNumberAsString
-                
+
                 // assign sensorStartDate, for this type of transmitter the sensorAge is passed in another call to cgmTransmitterDelegate
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
@@ -400,13 +451,13 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
                     self.cGMLibre2TransmitterDelegate?.received(serialNumber: receivedSensorSerialNumberAsString, from: self)
                 }
             }
-            
+
         } else {
             trace("could not created sensor serial number from received sensorUID, sensorUID = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, sensorUID.toHexString())
         }
-        
+
         trace("patchInfo received :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, patchInfo.toHexString())
-        
+
         UserDefaults.standard.librePatchInfo = patchInfo
     }
     
