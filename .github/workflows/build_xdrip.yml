@@ -158,7 +158,7 @@ jobs:
   build:
     name: Build
     needs: [validate, check_alive_and_permissions, check_latest_from_upstream]
-    runs-on: macos-15
+    runs-on: macos-26
     permissions:
       contents: write
     if: | # runs if started manually, or if sync schedule is set and enabled and scheduled on the first Saturday each month, or if sync schedule is set and enabled and new commits were found
@@ -169,7 +169,7 @@ jobs:
         )
     steps:
       - name: Select Xcode version
-        run: "sudo xcode-select --switch /Applications/Xcode_16.4.app/Contents/Developer"
+        run: "sudo xcode-select --switch /Applications/Xcode_26.2.app/Contents/Developer"
       
       - name: Checkout Repo for syncing
         if: |
