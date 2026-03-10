@@ -53,6 +53,7 @@ GEM
       base64
       nkf
       rexml
+    abbrev (0.1.2)
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
     artifactory (3.0.17)
@@ -229,11 +230,13 @@ PLATFORMS
   arm64-darwin-22
   arm64-darwin-23
   arm64-darwin-24
+  arm64-darwin-25
   x86_64-darwin-19
   x86_64-darwin-24
   x86_64-linux
 
 DEPENDENCIES
+  abbrev
   fastlane!
 
 BUNDLED WITH
