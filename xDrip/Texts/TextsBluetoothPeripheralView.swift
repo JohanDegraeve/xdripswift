@@ -148,6 +148,10 @@ class Texts_BluetoothPeripheralView {
         return String(format: NSLocalizedString("useOtherDexcomAppMessageDisabled", tableName: filename, bundle: Bundle.main, value: "Disabling this option means that %@ must be the only app connecting and authenticating with the G6 transmitter.\r\n\nIf any other app is also left open and connected, then it is likely that either %@ or the other app will not get readings.", comment: "Dexcom bluetooth screen. Message to explain that this app is the only one running to handle the authentication with the transmitter"), ConstantsHomeView.applicationName, ConstantsHomeView.applicationName)
     }()
     
+    static let is15DayDexcomG7: String = {
+        return NSLocalizedString("is15DayDexcomG7", tableName: filename, bundle: Bundle.main, value: "15 Day Sensor", comment: "Dexcom bluetooth screen. Is this a 15-day G7 sensor?")
+    }()
+    
     static let nfcScanNeeded: String = {
         return NSLocalizedString("nfcScanNeeded", tableName: filename, bundle: Bundle.main, value: "NFC scan needed", comment: "text in status row, when waiting for a successful NFC scan before starting bluetooth scanning")
     }()

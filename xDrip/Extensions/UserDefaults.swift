@@ -187,6 +187,8 @@ extension UserDefaults {
         case activeSensorMaxSensorAgeInDays = "activeSensorMaxSensorAgeInDays"
         /// overriden active sensor max days (lifetime) - only used for G6 Anubis transmitters
         case activeSensorMaxSensorAgeInDaysOverridenAnubis = "activeSensorMaxSensorAgeInDaysOverridenAnubis"
+        /// should we force a 15 day sensor max days for G7 sensors?
+        case is15DayDexcomG7 = "is15DayDexcomG7"
         
         
         // Transmitter
@@ -1444,6 +1446,17 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.activeSensorMaxSensorAgeInDaysOverridenAnubis.rawValue)
+        }
+    }
+    
+    /// should we force a 15 day sensor max days for G7 sensors?
+    var is15DayDexcomG7: Bool {
+        // default value for bool in userdefaults is false, by default we want to assume a standard (usually 10-day) sensor life (false)
+        get {
+            return bool(forKey: Key.is15DayDexcomG7.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.is15DayDexcomG7.rawValue)
         }
     }
     

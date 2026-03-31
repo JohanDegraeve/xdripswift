@@ -19,6 +19,9 @@ class DexcomG7BluetoothPeripheralViewModel {
         /// case sensorStatus
         case sensorStatus = 1
         
+        /// is it a 15-day G7 sensor?
+        case is15DayDexcomG7 = 2
+        
     }
      
 
@@ -103,27 +106,32 @@ extension DexcomG7BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
         guard let setting = Settings(rawValue: rawValue) else { fatalError("DexcomG7BluetoothPeripheralViewModel update, unexpected setting") }
     
         switch setting {
-        
-            case .sensorStatus:
             
-                cell.textLabel?.text = Texts_Common.sensorStatus
-                cell.detailTextLabel?.text = dexcomG7.sensorStatus
-                cell.accessoryType = .none
+        case .sensorStatus:
             
-            case .sensorStartDate:
+            cell.textLabel?.text = Texts_Common.sensorStatus
+            cell.detailTextLabel?.text = dexcomG7.sensorStatus
+            cell.accessoryType = .none
             
-                var startDateString = ""
-                
-                if let startDate = dexcomG7.sensorStartDate {
-                    startDateString = startDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short)
-                    startDateString += " (" + startDate.daysAndHoursAgo() + ")"
-                }
-                cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorStartDate
-                cell.detailTextLabel?.text = startDateString
-                cell.accessoryType = .none
-
+        case .sensorStartDate:
+            
+            var startDateString = ""
+            
+            if let startDate = dexcomG7.sensorStartDate {
+                startDateString = startDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short)
+                startDateString += " (" + startDate.daysAndHoursAgo() + ")"
+            }
+            cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorStartDate
+            cell.detailTextLabel?.text = startDateString
+            cell.accessoryType = .none
+            
+        case .is15DayDexcomG7:
+            cell.textLabel?.text = Texts_BluetoothPeripheralView.is15DayDexcomG7
+            cell.detailTextLabel?.text = nil // it's a UISwitch,  no detailed text
+            cell.accessoryView = UISwitch(isOn: UserDefaults.standard.is15DayDexcomG7, action: { (isOn: Bool) in
+                UserDefaults.standard.is15DayDexcomG7 = isOn
+            })
         }
-
     }
 
     
@@ -135,9 +143,12 @@ extension DexcomG7BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
     }
     
     func numberOfSettings(inSection section: Int) -> Int {
+        // if it's a G7 sensor (not Stelo or ONE+), then show the option to enable it as a 15-day sensor
+        if let transmitterIdString = UserDefaults.standard.activeSensorTransmitterId, transmitterIdString.startsWith("DXCM"){
+            return 3
+        }
         
         return 2
-        
     }
     
     func numberOfSections() -> Int {

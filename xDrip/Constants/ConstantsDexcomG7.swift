@@ -15,6 +15,7 @@ enum ConstantsDexcomG7 {
     static let maxSensorAgeInDays: Double = 10.5
     
     /// how many days the sensor session lasts. In the case of Stelo it is 15 days + a 12 hour grace period = 15.5 days
+    /// now also true for the 15-day version of the G7 so we will re-use
     static let maxSensorAgeInDaysStelo: Double = 15.5
     
 }

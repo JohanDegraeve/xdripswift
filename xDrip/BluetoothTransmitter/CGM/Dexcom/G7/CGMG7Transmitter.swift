@@ -306,7 +306,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
                 // check if we already have the transmitterId (or device name). If so, set the maxSensorAge and then perform a quick check to see if the sensor hasn't expired.
                 if let transmitterIdString = UserDefaults.standard.activeSensorTransmitterId {
-                    if transmitterIdString.startsWith("DX01") {
+                    if transmitterIdString.startsWith("DX01") || UserDefaults.standard.is15DayDexcomG7 {
                         maxSensorAgeInDays = ConstantsDexcomG7.maxSensorAgeInDaysStelo
                     } else {
                         maxSensorAgeInDays = ConstantsDexcomG7.maxSensorAgeInDays
@@ -382,8 +382,15 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
             trace("in peripheralDidUpdateValueFor, characteristic uuid = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, characteristic_UUID.description)
 
             trace("in peripheralDidUpdateValueFor, data = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .debug, value.hexEncodedString())
-
-            if let sensorAge = sensorAge, sensorAge < (ConstantsDexcomG7.maxSensorAgeInDays * 24 * 3600) {
+            
+            // calculate the actual maxSensorAgeInDays - it should be 15 days for a Stelo or for the 15-day G7
+            var maxSensorAgeInDays = ConstantsDexcomG7.maxSensorAgeInDays
+            
+            if let transmitterIdString = UserDefaults.standard.activeSensorTransmitterId, transmitterIdString.startsWith("DX01") || UserDefaults.standard.is15DayDexcomG7 {
+                maxSensorAgeInDays = ConstantsDexcomG7.maxSensorAgeInDaysStelo
+            }
+                
+            if let sensorAge = sensorAge, sensorAge < (maxSensorAgeInDays * 24 * 3600) {
                 if let dexcomG7BackfillMessage = DexcomG7BackfillMessage(data: value, sensorAge: sensorAge) {
                     trace("    received backfill mesage, calculatedValue = %{public}@, timeStamp = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, dexcomG7BackfillMessage.calculatedValue.description, dexcomG7BackfillMessage.timeStamp.description(with: .current))
 
@@ -560,7 +567,8 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     
     func maxSensorAgeInDays() -> Double? {
         if let transmitterIdString = UserDefaults.standard.activeSensorTransmitterId {
-            if transmitterIdString.startsWith("DX01") {
+            // use 15 days maximum if a Stelo or 15-day G7
+            if transmitterIdString.startsWith("DX01") || UserDefaults.standard.is15DayDexcomG7 {
                 return ConstantsDexcomG7.maxSensorAgeInDaysStelo
             } else {
                 return ConstantsDexcomG7.maxSensorAgeInDays
@@ -620,7 +628,15 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
     /// Attempt to parse and deliver any queued raw backfill frames now that sensorAge is available
     private func processPendingBackfillFramesIfPossible() {
-        guard let sensorAge = sensorAge, sensorAge < (ConstantsDexcomG7.maxSensorAgeInDays * 24 * 3600) else { return }
+        
+        // calculate the actual maxSensorAgeInDays - it should be 15 days for a Stelo or for the 15-day G7
+        var maxSensorAgeInDays = ConstantsDexcomG7.maxSensorAgeInDays
+        
+        if let transmitterIdString = UserDefaults.standard.activeSensorTransmitterId, transmitterIdString.startsWith("DX01") || UserDefaults.standard.is15DayDexcomG7 {
+            maxSensorAgeInDays = ConstantsDexcomG7.maxSensorAgeInDaysStelo
+        }
+        
+        guard let sensorAge = sensorAge, sensorAge < (maxSensorAgeInDays * 24 * 3600) else { return }
         guard pendingBackfillRawFrames.isEmpty == false else { return }
 
         var delivered: [GlucoseData] = []

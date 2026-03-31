@@ -643,6 +643,7 @@ class Trace {
                             
                             traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
                             
+                            traceInfo.appendStringAndNewLine("        15-day G7: " + (blePeripheral.name.startsWith("DXCM") ? UserDefaults.standard.is15DayDexcomG7.description : "n/a (not a G7)"))
                         }
                         
                     }
