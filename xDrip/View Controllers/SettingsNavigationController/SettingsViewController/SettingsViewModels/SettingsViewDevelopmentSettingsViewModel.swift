@@ -127,8 +127,11 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit:
             return .none
             
-        case .loopShareType, .loopDelay, .libreLinkUpVersion, .remainingComplicationUserInfoTransfers, .CAGEMaxHours:
+        case .loopDelay, .libreLinkUpVersion, .remainingComplicationUserInfoTransfers, .CAGEMaxHours:
             return .disclosureIndicator
+            
+        case .loopShareType:
+            return (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .medtrumEasyView) ? .none : .disclosureIndicator
             
         }
     }
@@ -143,7 +146,10 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             return nil
             
         case .loopShareType:
-            return UserDefaults.standard.loopShareType.description
+            // if using Medtrum Follower mode, then show disabled text as we have disabled loop share feature due to
+            // concerns over Medtrum CGM values producing incorrect insulin dosing
+            // if not, then all good, just show the share type description
+            return (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .medtrumEasyView) ? "⚠️ " + Texts_Common.notAvailable : UserDefaults.standard.loopShareType.description
             
         case .libreLinkUpVersion:
             return UserDefaults.standard.libreLinkUpVersion
@@ -259,6 +265,12 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             return .nothing
             
         case .loopShareType:
+            // if using Medtrum Follower mode, then disable loop share feature due to concerns over Medtrum CGM values
+            // producing incorrect insulin dosing
+            // SPANISH: https://www.aemps.gob.es/informa/la-aemps-informa-del-cese-de-comercializacion-y-retirada-del-mercado-del-sensor-y-transmisor-del-sistema-de-monitorizacion-continua-de-glucosa-a8-touchcare/
+            if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .medtrumEasyView {
+                return .showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.loopShareMedtrumFollowerDisabled)
+            }
             
             // data to be displayed in list from which user needs to pick a loop share type
             var data = [String]()

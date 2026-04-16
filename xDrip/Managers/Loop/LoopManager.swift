@@ -51,6 +51,16 @@ public class LoopManager: NSObject {
         // will return if loop share is disabled
         guard UserDefaults.standard.loopShareType != .disabled else { return }
         
+        // will return if loop share is enabled but the user is receiving BG values from Medtrum Follower Mode
+        // this is due to this sensor being pulled by European Health Agencies (March/April 2026) due to inaccurate results
+        // and fears over inaccurate dosing by AID systems.
+        // SPANISH: https://www.aemps.gob.es/informa/la-aemps-informa-del-cese-de-comercializacion-y-retirada-del-mercado-del-sensor-y-transmisor-del-sistema-de-monitorizacion-continua-de-glucosa-a8-touchcare/
+        // basically guard to ensure "master" or "follower mode except Medtrum" to allow to proceed
+        guard UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType != .medtrumEasyView) else {
+            clearSharedLoopReadings()
+            return
+        }
+        
         // shared app group suite name to publish data
         let suiteName = UserDefaults.standard.loopShareType.sharedUserDefaultsSuiteName
         

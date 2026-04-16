@@ -866,6 +866,10 @@ class Texts_SettingsView {
         return NSLocalizedString("loopShareToTrio", tableName: filename, bundle: Bundle.main, value: "Trio", comment: "text for Trio")
     }()
     
+    static let loopShareMedtrumFollowerDisabled: String = {
+        return NSLocalizedString("settingsviews_loopShareMedtrumFollowerDisabled", tableName: filename, bundle: Bundle.main, value: "OS-AID Share is disabled in Medtrum Follower Mode due to safety concerns over sensor accuracy.", comment: "developer settings, Medtrum follower is disabled to share values to shared app group")
+    }()
+    
     static let selectTime: String = {
         return NSLocalizedString("Select Time", tableName: filename, bundle: Bundle.main, value: "Select Time", comment: "Settings screen for loop delay")
     }()
