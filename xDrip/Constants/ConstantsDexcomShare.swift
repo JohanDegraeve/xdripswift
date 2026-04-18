@@ -15,8 +15,6 @@ enum ConstantsDexcomShare {
     static let japanBaseShareUrl = "https://share.dexcom.jp/ShareWebServices/Services"
     
     // Server paths for dexcom share upload services
-    /// endpoint for authorization to login with account name
-    static let dexcomShareUploadLoginPath = "/General/LoginPublisherAccountByName"
     /// endpoint to upload EGV records
     static let dexcomShareUploadPostReceiverEgvRecordsPath = "Publisher/PostReceiverEgvRecords"
     /// endpoint to start remote monitoring session
