@@ -163,10 +163,10 @@ class BluetoothPeripheralManager: NSObject {
                         _ = m5StackBluetoothTransmitter.writeBgReadingInfo(bgReading: bgReadingToSend[0])
                     }
                     
-                case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .DexcomG7Type:
+                case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .DexcomG7Type, .MedtrumTouchCareNanoType:
                     // cgm's don't receive reading, they send it
                     break
-                    
+
                 case .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType:
                     // heartbeat transmitters are just there to wake up the app
                     break
@@ -340,11 +340,26 @@ class BluetoothPeripheralManager: NSObject {
 
                     }
 
+                case .MedtrumTouchCareNanoType:
+
+                    if let medtrumNano = bluetoothPeripheral as? MedtrumTouchCareNano {
+
+                        if let cgmTransmitterDelegate = cgmTransmitterDelegate {
+
+                            newTransmitter = CGMMedtrumTouchCareNanoTransmitter(address: medtrumNano.blePeripheral.address, name: medtrumNano.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMMedtrumTouchCareNanoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+
+                        } else {
+
+                            trace("in getBluetoothTransmitter, case MedtrumTouchCareNanoType but cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+
+                        }
+                    }
+
                 }
-                
-                
+
+
                 bluetoothTransmitters[index] = newTransmitter
-                
+
                 return newTransmitter
                 
             }
@@ -407,9 +422,14 @@ class BluetoothPeripheralManager: NSObject {
                 if bluetoothTransmitter is CGMG7Transmitter {
                     return .DexcomG7Type
                 }
-                
+
+            case .MedtrumTouchCareNanoType:
+                if bluetoothTransmitter is CGMMedtrumTouchCareNanoTransmitter {
+                    return .MedtrumTouchCareNanoType
+                }
+
             }
-            
+
         }
         
         // normally we shouldn't get here, but we need to return a value
@@ -481,15 +501,23 @@ class BluetoothPeripheralManager: NSObject {
             return OmniPodHeartBeatTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self)
 
         case .DexcomG7Type:
-            
+
             guard let cgmTransmitterDelegate = cgmTransmitterDelegate else {
                 fatalError("in createNewTransmitter, DexcomG7Type, cgmTransmitterDelegate is nil")
             }
-            
+
             return CGMG7Transmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
-            
+
+        case .MedtrumTouchCareNanoType:
+
+            guard let cgmTransmitterDelegate = cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, MedtrumTouchCareNanoType, cgmTransmitterDelegate is nil")
+            }
+
+            return CGMMedtrumTouchCareNanoTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMMedtrumTouchCareNanoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+
         }
-        
+
     }
 
     public func firstIndexInBluetoothPeripherals(bluetoothPeripheral: BluetoothPeripheral) -> Int? {
@@ -916,18 +944,42 @@ class BluetoothPeripheralManager: NSObject {
                             }
 
                         } else {
-                            
+
                             // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
                             bluetoothTransmitters.insert(nil, at: index)
-                            
+
                         }
-                        
+
                     }
-                    
+
+                case .MedtrumTouchCareNanoType:
+
+                    if let medtrumNano = blePeripheral.medtrumTouchCareNano {
+
+                        blePeripheralFound = true
+
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: medtrumNano)
+
+                        if medtrumNano.blePeripheral.shouldconnect {
+
+                            bluetoothTransmitters.insert(CGMMedtrumTouchCareNanoTransmitter(address: medtrumNano.blePeripheral.address, name: medtrumNano.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMMedtrumTouchCareNanoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
+
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+
+                        } else {
+
+                            bluetoothTransmitters.insert(nil, at: index)
+
+                        }
+
+                    }
+
                 }
 
             }
-            
+
             if !blePeripheralFound {
                 
                 // this is a corruption in the database. blePeripheral was stored witout one of the types being assigned
@@ -1067,7 +1119,7 @@ class BluetoothPeripheralManager: NSObject {
                     bluetoothPeripheral.blePeripheral.parameterUpdateNeededAtNextConnect = true
                 }
              
-            case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType, .DexcomG7Type:
+            case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType, .DexcomG7Type, .MedtrumTouchCareNanoType:
 
                 // nothing to check
                 break

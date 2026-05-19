@@ -37,6 +37,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// omnipod heartbeat
     case OmniPodHeartBeatType = "OmniPod HeartBeat"
 
+    /// Medtrum TouchCare Nano CGM (data relayed by the paired Medtrum patch pump)
+    case MedtrumTouchCareNanoType = "Medtrum TouchCare Nano"
+
     /// - returns: the BluetoothPeripheralViewModel. If nil then there's no specific settings for the tpe of bluetoothPeripheral
     func viewModel() -> BluetoothPeripheralViewModel? {
         
@@ -71,6 +74,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
 
         case .DexcomG7Type:
             return DexcomG7BluetoothPeripheralViewModel()
+
+        case .MedtrumTouchCareNanoType:
+            return MedtrumTouchCareNanoBluetoothPeripheralViewModel()
         }
 
     }
@@ -114,26 +120,29 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .DexcomG7Type:
             return DexcomG7(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
 
+        case .MedtrumTouchCareNanoType:
+            return MedtrumTouchCareNano(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+
         }
 
     }
-    
+
     /// to which category of bluetoothperipherals does this type belong (M5Stack, CGM, ...)
     func category() -> BluetoothPeripheralCategory {
-        
+
         switch self {
-            
+
         case .M5StackType, .M5StickCType:
             return .M5Stack
-            
-        case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .DexcomG7Type:
+
+        case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .DexcomG7Type, .MedtrumTouchCareNanoType:
             return .CGM
 
         case .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType:
             return .HeartBeat
-            
+
         }
-        
+
     }
     
     /// does the device need a transmitterID (currently only Dexcom)
