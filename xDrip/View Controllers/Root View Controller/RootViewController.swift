@@ -1965,6 +1965,10 @@ final class RootViewController: UIViewController, ObservableObject {
                 // no oop web, fixed slope
                 calibrator = Libre1Calibrator()
             }
+
+        case .medtrumTouchCareNano:
+            // values are already in mg/dL after raw/9+1 conversion in the transmitter
+            calibrator = NoCalibrator()
         }
         
         trace("in getCalibrator, calibrator = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .info, calibrator.description())
