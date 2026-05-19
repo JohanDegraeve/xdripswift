@@ -1967,7 +1967,8 @@ final class RootViewController: UIViewController, ObservableObject {
             }
 
         case .medtrumTouchCareNano:
-            // values are already in mg/dL after raw/9+1 conversion in the transmitter
+            // Values arrive already calibrated to mg/dL — the transmitter applies the Medtrum per-sensor
+            // calibration factor decoded from each packet, so xDrip should not run its own calibrator.
             calibrator = NoCalibrator()
         }
         
