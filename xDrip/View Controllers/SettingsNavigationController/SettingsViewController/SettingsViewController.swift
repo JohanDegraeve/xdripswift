@@ -180,13 +180,17 @@ final class SettingsViewController: UIViewController {
             viewModel.storeUIViewController(uIViewController: self)
             
             // store row reload closure in the viewModel
-            viewModel.storeRowReloadClosure(rowReloadClosure: {row in
+            viewModel.storeRowReloadClosure(rowReloadClosure: { [weak self] row in
+                // Avoid forcing table layout before SettingsViewController has entered the window hierarchy.
+                guard let self = self, self.isViewLoaded, self.view.window != nil else { return }
                 self.tableView.reloadRows(at: [IndexPath(row: row, section: section.rawValue)], with: .none)
             })
           
             // store section reload closure in the viewModel
             viewModel.storeSectionReloadClosure(sectionReloadClosure: { [weak self] in
-                self?.tableView.reloadSections([section.rawValue], with: .none)
+                // Avoid forcing table layout before SettingsViewController has entered the window hierarchy.
+                guard let self = self, self.isViewLoaded, self.view.window != nil else { return }
+                self.tableView.reloadSections([section.rawValue], with: .none)
             })
 
             // store the viewModel
