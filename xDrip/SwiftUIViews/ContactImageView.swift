@@ -1,5 +1,6 @@
 import Foundation
 import SwiftUI
+import UIKit
 
 struct ContactImageView: View {
     
@@ -75,6 +76,10 @@ struct ContactImageView: View {
         
         return UIFont.systemFont(ofSize: fontSize, weight: .bold)
     }
+
+    var imageBackgroundColor: UIColor {
+        .black
+    }
     
     func getImage() -> UIImage {
         let width = 256.0
@@ -91,8 +96,6 @@ struct ContactImageView: View {
             bgValueString = "OFF"
             showSlopeArrow = false
         }
-                
-        UIGraphicsBeginImageContext(rect.size)
         
         let bgValueAttributes: [NSAttributedString.Key : Any] = [
             .font : bgValueFont,
@@ -104,39 +107,45 @@ struct ContactImageView: View {
             .font: UIFont.systemFont(ofSize: 80, weight: .bold),
             .foregroundColor: bgColor,
         ]
-        
-        if bgValueString != "" {
-            var size = bgValueString.size(withAttributes: bgValueAttributes)
-            
-            bgValueString.draw(
-                in: CGRectMake(
-                    (width - size.width) / 2,
-                    (height - size.height) / (showSlopeArrow ? 2 + ConstantsContactImage.bgValueVerticalOffsetIfSlopeArrow : 2),
-                    size.width,
-                    size.height
-                ),
-                withAttributes: bgValueAttributes
-            )
-            
-            if showSlopeArrow {
-                size = slopeArrow.size(withAttributes: slopeArrowAttributes)
-                
-                slopeArrow.draw(
+
+        let format = UIGraphicsImageRendererFormat.default()
+        format.opaque = true
+        format.scale = 1
+
+        let renderer = UIGraphicsImageRenderer(size: rect.size, format: format)
+
+        return renderer.image { _ in
+            imageBackgroundColor.setFill()
+            UIRectFill(rect)
+
+            if bgValueString != "" {
+                var size = bgValueString.size(withAttributes: bgValueAttributes)
+
+                bgValueString.draw(
                     in: CGRectMake(
                         (width - size.width) / 2,
-                        (height - size.height) / (2 + ConstantsContactImage.slopeArrowVerticalOffset),
+                        (height - size.height) / (showSlopeArrow ? 2 + ConstantsContactImage.bgValueVerticalOffsetIfSlopeArrow : 2),
                         size.width,
                         size.height
                     ),
-                    withAttributes: slopeArrowAttributes
+                    withAttributes: bgValueAttributes
                 )
+
+                if showSlopeArrow {
+                    size = slopeArrow.size(withAttributes: slopeArrowAttributes)
+
+                    slopeArrow.draw(
+                        in: CGRectMake(
+                            (width - size.width) / 2,
+                            (height - size.height) / (2 + ConstantsContactImage.slopeArrowVerticalOffset),
+                            size.width,
+                            size.height
+                        ),
+                        withAttributes: slopeArrowAttributes
+                    )
+                }
             }
         }
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        
-        UIGraphicsEndImageContext()
-        
-        return image ?? UIImage()
     }
 }
 
@@ -188,4 +197,3 @@ struct ContactImageView_Previews: PreviewProvider {
         Preview()
     }
 }
-
