@@ -20,25 +20,25 @@ final class RootViewController: UIViewController, ObservableObject {
     // *******************
     // ***** Toolbar *****
     // *******************
-    @IBOutlet weak var toolbarOutlet: UIToolbar!
+    @IBOutlet weak var toolbarOutlet: UIStackView!
     
-    @IBOutlet weak var preSnoozeToolbarButtonOutlet: UIBarButtonItem!
-    @IBAction func preSnoozeToolbarButtonAction(_ sender: UIBarButtonItem) {
-        // opens the SnoozeViewController, see storyboard
+    private var preSnoozeToolbarButtonOutlet: UIButton!
+    @IBAction func preSnoozeToolbarButtonAction(_ sender: UIButton) {
+        performSegue(withIdentifier: "RootViewToSnoozeView", sender: self)
     }
     
-    @IBOutlet weak var bgReadingsToolbarButtonOutlet: UIBarButtonItem!
-    @IBAction func bgReadingsToolbarButtonAction(_ sender: UIBarButtonItem) {
-        showBgReadingsView()
+    private var bgReadingsToolbarButtonOutlet: UIButton!
+    @IBAction func bgReadingsToolbarButtonAction(_ sender: UIButton) {
+        performSegue(withIdentifier: "RootViewToBgReadingsView", sender: self)
     }
     
-    @IBOutlet weak var sensorToolbarButtonOutlet: UIBarButtonItem!
-    @IBAction func sensorToolbarButtonAction(_ sender: UIBarButtonItem) {
+    private var sensorToolbarButtonOutlet: UIButton!
+    @IBAction func sensorToolbarButtonAction(_ sender: UIButton) {
         createAndPresentSensorButtonActionSheet()
     }
     
-    @IBOutlet weak var calibrateToolbarButtonOutlet: UIBarButtonItem!
-    @IBAction func calibrateToolbarButtonAction(_ sender: UIBarButtonItem) {
+    private var calibrateToolbarButtonOutlet: UIButton!
+    @IBAction func calibrateToolbarButtonAction(_ sender: UIButton) {
         // if this is a transmitter that does not require and is not allowed to be calibrated, then give warning message
         if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), (cgmTransmitter.isWebOOPEnabled() && !cgmTransmitter.overruleIsWebOOPEnabled()) {
             let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.calibrationNotNecessary, actionHandler: nil)
@@ -49,14 +49,15 @@ final class RootViewController: UIViewController, ObservableObject {
         }
     }
     
-    @IBOutlet weak var showHideItemsToolbarButtonOutlet: UIBarButtonItem!
-    @IBAction func showHideItemsToolbarButtonAction(_ sender: UIBarButtonItem) {
+    private var showHideItemsToolbarButtonOutlet: UIButton!
+    @IBAction func showHideItemsToolbarButtonAction(_ sender: UIButton) {
+        performSegue(withIdentifier: "RootViewToShowHideItemsView", sender: self)
     }
     
     /// outlet for the lock button - it will change text based upon whether they screen is locked or not
-    @IBOutlet weak var screenLockToolbarButtonOutlet: UIBarButtonItem!
+    private var screenLockToolbarButtonOutlet: UIButton!
     /// call the screen lock alert when the button is pressed
-    @IBAction func screenLockToolbarButtonAction(_ sender: UIBarButtonItem) {
+    @IBAction func screenLockToolbarButtonAction(_ sender: UIButton) {
         screenLockAlert(nightMode: true)
     }
     
@@ -715,7 +716,8 @@ final class RootViewController: UIViewController, ObservableObject {
         clockDateFormatter.timeStyle = .short
         clockLabelOutlet.font = ConstantsUI.clockLabelFontSize
         clockLabelOutlet.textColor = ConstantsUI.clockLabelColor
-                
+        configureToolbarButtons()
+
         // ensure the screen layout
         screenLockUpdate(enabled: false)
         
@@ -1695,17 +1697,11 @@ final class RootViewController: UIViewController, ObservableObject {
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
         
-        // set texts for buttons on top
-        preSnoozeToolbarButtonOutlet.title = Texts_HomeView.snoozeButton
-        sensorToolbarButtonOutlet.title = Texts_HomeView.sensor
-        calibrateToolbarButtonOutlet.title = Texts_HomeView.calibrationButton
-        screenLockToolbarButtonOutlet.title = screenIsLocked ? Texts_HomeView.unlockButton : Texts_HomeView.lockButton
-        
         // provide the older SF Symbol for the calibrate button for users below iOS17
         if #available(iOS 17.0, *) {
-            calibrateToolbarButtonOutlet.image = UIImage(systemName: "dot.scope")
+            calibrateToolbarButtonOutlet.setImage(UIImage(systemName: "dot.scope"), for: .normal)
         } else {
-            calibrateToolbarButtonOutlet.image = UIImage(systemName: "scope")
+            calibrateToolbarButtonOutlet.setImage(UIImage(systemName: "scope"), for: .normal)
         }
         
         chartLongPressGestureRecognizerOutlet.delegate = self
@@ -1715,6 +1711,35 @@ final class RootViewController: UIViewController, ObservableObject {
         self.chartOutlet.reloadChart()
         
         self.miniChartOutlet.reloadChart()
+    }
+
+    private func configureToolbarButtons() {
+        let makeToolbarButton: (String, String, Selector) -> UIButton = { title, imageSystemName, action in
+            let button = UIButton(type: .system)
+            button.tintColor = .white
+            button.setImage(UIImage(systemName: imageSystemName), for: .normal)
+            button.accessibilityLabel = title
+            button.imageView?.contentMode = .scaleAspectFit
+            button.setTitle(nil, for: .normal)
+            button.addTarget(self, action: action, for: .touchUpInside)
+            return button
+        }
+
+        preSnoozeToolbarButtonOutlet = makeToolbarButton(Texts_HomeView.snoozeButton, "speaker.wave.2", #selector(preSnoozeToolbarButtonAction(_:)))
+        bgReadingsToolbarButtonOutlet = makeToolbarButton("BgReadings", "drop", #selector(bgReadingsToolbarButtonAction(_:)))
+        sensorToolbarButtonOutlet = makeToolbarButton(Texts_HomeView.sensor, "sensor.tag.radiowaves.forward", #selector(sensorToolbarButtonAction(_:)))
+        calibrateToolbarButtonOutlet = makeToolbarButton(Texts_HomeView.calibrationButton, "dot.scope", #selector(calibrateToolbarButtonAction(_:)))
+        showHideItemsToolbarButtonOutlet = makeToolbarButton("Show/Hide", "rectangle.3.group", #selector(showHideItemsToolbarButtonAction(_:)))
+        screenLockToolbarButtonOutlet = makeToolbarButton(Texts_HomeView.lockButton, "lock", #selector(screenLockToolbarButtonAction(_:)))
+
+        [
+            preSnoozeToolbarButtonOutlet,
+            bgReadingsToolbarButtonOutlet,
+            sensorToolbarButtonOutlet,
+            calibrateToolbarButtonOutlet,
+            showHideItemsToolbarButtonOutlet,
+            screenLockToolbarButtonOutlet
+        ].forEach(toolbarOutlet.addArrangedSubview(_:))
     }
     
     // MARK: - private helper functions
@@ -2466,12 +2491,12 @@ final class RootViewController: UIViewController, ObservableObject {
     /// enables or disables the buttons on top of the screen
     private func changeButtonsStatusTo(enabled: Bool) {
         if enabled {
-            sensorToolbarButtonOutlet.enable()
-            calibrateToolbarButtonOutlet.enable()
+            sensorToolbarButtonOutlet.isEnabled = true
+            calibrateToolbarButtonOutlet.isEnabled = true
             
         } else {
-            sensorToolbarButtonOutlet.disable()
-            calibrateToolbarButtonOutlet.disable()
+            sensorToolbarButtonOutlet.isEnabled = false
+            calibrateToolbarButtonOutlet.isEnabled = false
         }
     }
     
@@ -2740,8 +2765,7 @@ final class RootViewController: UIViewController, ObservableObject {
     ///     - nightMode : when false, this will enable a simple screen lock without changing the UI - useful for keeping the screen open on your desk. True will bring the full screen lock changes to the UI
     private func screenLockUpdate(enabled: Bool = true, nightMode: Bool = true) {
         if enabled {
-            // set the toolbar button text to "Unlock"
-            screenLockToolbarButtonOutlet.title = Texts_HomeView.unlockButton
+            screenLockToolbarButtonOutlet.accessibilityLabel = Texts_HomeView.unlockButton
             
             screenLockToolbarButtonOutlet.tintColor = UIColor.red
             
@@ -2750,7 +2774,7 @@ final class RootViewController: UIViewController, ObservableObject {
             AudioServicesPlaySystemSound(1519)
             
             if nightMode {
-                screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock.fill")
+                screenLockToolbarButtonOutlet.setImage(UIImage(systemName: "lock.fill"), for: .normal)
                 
                 // set the value label font size to big
                 valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeScreenLock
@@ -2805,13 +2829,12 @@ final class RootViewController: UIViewController, ObservableObject {
             
             trace("screen lock : screen lock / keep-awake enabled. Night mode set to '%{public}@'. Dimming type set to '%{public}@'", log: self.log, category: ConstantsLog.categoryRootView, type: .info, nightMode.description, UserDefaults.standard.screenLockDimmingType.description)
         } else {
-            // set the toolbar button text to "Lock"
-            screenLockToolbarButtonOutlet.title = Texts_HomeView.lockButton
+            screenLockToolbarButtonOutlet.accessibilityLabel = Texts_HomeView.lockButton
             
             screenLockToolbarButtonOutlet.tintColor = nil
             
             // set the lock icon back to the standard SF Symbol
-            screenLockToolbarButtonOutlet.image = UIImage(systemName: "lock")
+            screenLockToolbarButtonOutlet.setImage(UIImage(systemName: "lock"), for: .normal)
             
             valueLabelOutlet.font = ConstantsUI.valueLabelFontSizeNormal
             
@@ -3279,20 +3302,6 @@ final class RootViewController: UIViewController, ObservableObject {
         updateDataSourceInfo()
     }
     
-    /// show the SwiftUI BgReadingsView view via UIHostingController
-    private func showBgReadingsView() {
-        let bgReadingsViewController = UIHostingController(rootView: BgReadingsView().environmentObject(self.bgReadingsAccessor!).environmentObject(nightscoutSyncManager!))
-        
-        navigationController?.pushViewController(bgReadingsViewController, animated: true)
-    }
-    
-    /// show the SwiftUI showHideItemsView view via UIHostingController
-    private func showShowHideItemsView() {
-        let showHideItemsViewController = UIHostingController(rootView: ShowHideItemsView())
-        
-        navigationController?.pushViewController(showHideItemsViewController, animated: true)
-    }
-    
     /// show the SwiftUI Automated Insulin Devliery system info view via UIHostingController
     private func showAIDStatusView() {
         let aidStatusViewController = UIHostingController(rootView: AIDStatusView().environmentObject(nightscoutSyncManager!))
@@ -3432,19 +3441,19 @@ final class RootViewController: UIViewController, ObservableObject {
             case .allSnoozed:
                 // all alerts are snoozed so let's make it clear - change to red filled icon
                 preSnoozeToolbarButtonOutlet.tintColor = .red
-                preSnoozeToolbarButtonOutlet.image = UIImage(systemName: "speaker.slash.fill")
+                preSnoozeToolbarButtonOutlet.setImage(UIImage(systemName: "speaker.slash.fill"), for: .normal)
             case .urgent:
                 // urgent low, low or fast drop alerts are snoozed - change to red outline icon
                 preSnoozeToolbarButtonOutlet.tintColor = .red
-                preSnoozeToolbarButtonOutlet.image = UIImage(systemName: "speaker.slash")
+                preSnoozeToolbarButtonOutlet.setImage(UIImage(systemName: "speaker.slash"), for: .normal)
             case .notUrgent:
                 // some other alert except urgent low, low or fast drop is snoozed so let's just change the icon
                 preSnoozeToolbarButtonOutlet.tintColor = nil
-                preSnoozeToolbarButtonOutlet.image = UIImage(systemName: "speaker.slash")
+                preSnoozeToolbarButtonOutlet.setImage(UIImage(systemName: "speaker.slash"), for: .normal)
             default:
                 // no alerts are snoozed so show default icon/colour
                 preSnoozeToolbarButtonOutlet.tintColor = nil
-                preSnoozeToolbarButtonOutlet.image = UIImage(systemName: "speaker.wave.2")
+                preSnoozeToolbarButtonOutlet.setImage(UIImage(systemName: "speaker.wave.2"), for: .normal)
             }
         }
     }
