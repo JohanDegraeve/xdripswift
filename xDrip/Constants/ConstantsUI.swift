@@ -16,6 +16,9 @@ enum ConstantsUI {
     
     /// List background color
     static let listBackGroundColor = Color(listBackGroundUIColor)
+
+    /// dark red tint used for warning-style SwiftUI sections
+    static let warningSectionBackgroundColor = Color(red: 0.20, green: 0.12, blue: 0.12)
     
     /// color for cancel or dismiss button
     static let dismissOrCancelColor = Color(UIColor.red)

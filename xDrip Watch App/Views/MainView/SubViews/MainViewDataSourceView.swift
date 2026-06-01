@@ -9,10 +9,24 @@
 import Foundation
 import SwiftUI
 
+#if canImport(WatchKit)
+import WatchKit
+#elseif canImport(UIKit)
+import UIKit
+#endif
+
 struct MainViewDataSourceView: View {
     @EnvironmentObject var watchState: WatchStateModel
     
-    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
+    let isSmallScreen = {
+        #if canImport(WatchKit)
+        return WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen
+        #elseif canImport(UIKit)
+        return UIScreen.main.bounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen
+        #else
+        return false
+        #endif
+    }()
     
     var body: some View {
         VStack(spacing: 2) {

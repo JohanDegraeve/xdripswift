@@ -24,26 +24,39 @@ fileprivate enum Setting:Int, CaseIterable {
     
     // allow the main chart y-axis to auto rescale to the current chart values?
     case allowMainChartAutoReset = 4
+
+    // show the original glucose readings on the main chart when post processing is enabled?
+    case showOriginalBGReadings = 5
     
     //urgent high value
-    case urgentHighMarkValue = 5
+    case urgentHighMarkValue = 6
     
     //high value
-    case highMarkValue = 6
+    case highMarkValue = 7
     
     //target value
-    case targetMarkValue = 7
+    case targetMarkValue = 8
     
     //low value
-    case lowMarkValue = 8
+    case lowMarkValue = 9
     
     //urgent low value
-    case urgentLowMarkValue = 9
+    case urgentLowMarkValue = 10
     
 }
 
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
-struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
+class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtocol {
+
+    override init() {
+
+        super.init()
+
+        addObservers()
+
+    }
+
+    var sectionReloadClosure: (() -> Void)?
     
     func uiView(index: Int) -> UIView? {
         
@@ -62,6 +75,9 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
             
         case .allowMainChartAutoReset:
             return UISwitch(isOn: UserDefaults.standard.allowMainChartAutoReset, action: {(isOn:Bool) in UserDefaults.standard.allowMainChartAutoReset = isOn})
+
+        case .showOriginalBGReadings:
+            return UISwitch(isOn: UserDefaults.standard.showOriginalBGReadings, action: {(isOn:Bool) in UserDefaults.standard.showOriginalBGReadings = isOn})
             
         case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .targetMarkValue, .lowMarkValue, .urgentLowMarkValue:
             return nil
@@ -75,6 +91,10 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
     
     
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
+
+    func storeSectionReloadClosure(sectionReloadClosure: @escaping (() -> Void)) {
+        self.sectionReloadClosure = sectionReloadClosure
+    }
     
     func storeUIViewController(uIViewController: UIViewController) {}
     
@@ -175,6 +195,15 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
                     UserDefaults.standard.allowMainChartAutoReset = true
                 }
             })
+            
+        case .showOriginalBGReadings:
+            return SettingsSelectedRowAction.callFunction(function: {
+                if UserDefaults.standard.showOriginalBGReadings {
+                    UserDefaults.standard.showOriginalBGReadings = false
+                } else {
+                    UserDefaults.standard.showOriginalBGReadings = true
+                }
+            })
         }
     }
     
@@ -205,6 +234,9 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
             
         case .allowMainChartAutoReset:
             return Texts_SettingsView.allowMainChartAutoReset
+
+        case .showOriginalBGReadings:
+            return Texts_SettingsView.showOriginalBGReadings
             
         case .urgentHighMarkValue:
             return "🔴 " + Texts_SettingsView.labelUrgentHighValue
@@ -231,7 +263,7 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .lowMarkValue, .urgentLowMarkValue, .targetMarkValue:
             return UITableViewCell.AccessoryType.disclosureIndicator
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings:
             return UITableViewCell.AccessoryType.none
             
         }
@@ -260,10 +292,42 @@ struct SettingsViewHomeScreenSettingsViewModel:SettingsViewModelProtocol {
         case .screenLockDimmingType:
             return UserDefaults.standard.screenLockDimmingType.description
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings:
             return nil
             
         }
     }
-    
+
+    // MARK: - observe functions
+
+    private func addObservers() {
+
+        // Listen for changes in the showMiniChart to trigger the UI to be updated
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showMiniChart.rawValue, options: .new, context: nil)
+
+        // Listen for changes in the showOriginalBGReadings to trigger the UI to be updated
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showOriginalBGReadings.rawValue, options: .new, context: nil)
+
+    }
+
+    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+
+        guard let keyPath = keyPath,
+              let keyPathEnum = UserDefaults.Key(rawValue: keyPath)
+        else { return }
+
+        switch keyPathEnum {
+        case UserDefaults.Key.showMiniChart, UserDefaults.Key.showOriginalBGReadings:
+
+            // we have to run this in the main thread to avoid access errors
+            DispatchQueue.main.async {
+                self.sectionReloadClosure?()
+            }
+
+        default:
+            break
+
+        }
+    }
+
 }

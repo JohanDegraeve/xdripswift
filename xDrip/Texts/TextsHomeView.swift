@@ -246,6 +246,158 @@ enum Texts_HomeView {
     static let showHideItemsTitle: String = {
         return NSLocalizedString("showHideItemsTitle", tableName: filename, bundle: Bundle.main, value: "Quick Show/Hide", comment: "show or hide various interface items")
     }()
+
+    static let showHideHomeScreenTitle: String = {
+        return NSLocalizedString("showHideHomeScreenTitle", tableName: filename, bundle: Bundle.main, value: "Home Screen", comment: "quick show hide section title for home screen items")
+    }()
+
+    static let showHideHomeScreenFooter: String = {
+        return NSLocalizedString("showHideHomeScreenFooter", tableName: filename, bundle: Bundle.main, value: "Show or hide main home screen elements, useful when using smaller iPhone screen sizes", comment: "quick show hide footer for home screen items")
+    }()
+
+    static let showHideGlucoseChartTitle: String = {
+        return NSLocalizedString("showHideGlucoseChartTitle", tableName: filename, bundle: Bundle.main, value: "Glucose Chart", comment: "quick show hide section title for chart items")
+    }()
+
+    static let showHideStandByModeTitle: String = {
+        return NSLocalizedString("showHideStandByModeTitle", tableName: filename, bundle: Bundle.main, value: "StandBy Mode", comment: "quick show hide section title for standby settings")
+    }()
+
+    static let showHideStandByModeFooter: String = {
+        return NSLocalizedString("showHideStandByModeFooter", tableName: filename, bundle: Bundle.main, value: "Changes how the StandBy mode will be displayed if activated in the iPhone settings", comment: "quick show hide footer for standby settings")
+    }()
+
+    static let showHideAdditionalItemsTitle: String = {
+        return NSLocalizedString("showHideAdditionalItemsTitle", tableName: filename, bundle: Bundle.main, value: "Additional Items", comment: "quick show hide section title for additional items")
+    }()
+    
+    static let postProcessingTitle: String = {
+        return NSLocalizedString("postProcessingTitle", tableName: filename, bundle: Bundle.main, value: "Glucose Adjustments", comment: "title for the blood glucose post processing view")
+    }()
+
+    static let postProcessingPreviewHours: String = {
+        return NSLocalizedString("postProcessingPreviewHours", tableName: filename, bundle: Bundle.main, value: "Preview Hours", comment: "post processing preview chart hours selector label")
+    }()
+
+    static let postProcessingAdjustment: String = {
+        return NSLocalizedString("postProcessingAdjustment", tableName: filename, bundle: Bundle.main, value: "Adjustment", comment: "post processing section title for adjustment")
+    }()
+
+    static let postProcessingEnable: String = {
+        return NSLocalizedString("postProcessingEnable", tableName: filename, bundle: Bundle.main, value: "Enable", comment: "post processing enable toggle title")
+    }()
+
+    static let postProcessingOffset: String = {
+        return NSLocalizedString("postProcessingOffset", tableName: filename, bundle: Bundle.main, value: "Offset", comment: "post processing offset label")
+    }()
+
+    static let postProcessingScale: String = {
+        return NSLocalizedString("postProcessingScale", tableName: filename, bundle: Bundle.main, value: "Scale", comment: "post processing scale label")
+    }()
+
+    static let postProcessingShape: String = {
+        return NSLocalizedString("postProcessingShape", tableName: filename, bundle: Bundle.main, value: "Emphasis", comment: "post processing emphasis picker title")
+    }()
+
+    static let postProcessingShapeExplanation: String = {
+        return NSLocalizedString("postProcessingShapeExplanation", tableName: filename, bundle: Bundle.main, value: "Emphasis changes where Scale has the most effect on the curve. This can help if a sensor seems to exaggerate higher or lower glucose values more than the rest of the range.", comment: "post processing explanation for emphasis selection")
+    }()
+
+    static let postProcessingSofterHighs: String = {
+        return NSLocalizedString("postProcessingSofterHighs", tableName: filename, bundle: Bundle.main, value: "Highs", comment: "post processing emphasis option for highs")
+    }()
+
+    static let postProcessingSofterHighsDescription: String = {
+        return NSLocalizedString("postProcessingSofterHighsDescription", tableName: filename, bundle: Bundle.main, value: "Applies more of the scale effect at higher glucose values and less at lower values.", comment: "post processing explanation for highs emphasis option")
+    }()
+
+    static let postProcessingNeutral: String = {
+        return NSLocalizedString("postProcessingNeutral", tableName: filename, bundle: Bundle.main, value: "Normal", comment: "post processing shape option normal")
+    }()
+
+    static let postProcessingNeutralDescription: String = {
+        return NSLocalizedString("postProcessingNeutralDescription", tableName: filename, bundle: Bundle.main, value: "Applies the scale effect evenly through the glucose range.", comment: "post processing explanation for neutral emphasis option")
+    }()
+
+    static let postProcessingSofterLows: String = {
+        return NSLocalizedString("postProcessingSofterLows", tableName: filename, bundle: Bundle.main, value: "Lows", comment: "post processing emphasis option for lows")
+    }()
+
+    static let postProcessingSofterLowsDescription: String = {
+        return NSLocalizedString("postProcessingSofterLowsDescription", tableName: filename, bundle: Bundle.main, value: "Applies more of the scale effect at lower glucose values and less at higher values.", comment: "post processing explanation for lows emphasis option")
+    }()
+
+    static let postProcessingSmoothing: String = {
+        return NSLocalizedString("postProcessingSmoothing", tableName: filename, bundle: Bundle.main, value: "Smoothing", comment: "post processing section title for smoothing")
+    }()
+
+    static let postProcessingStrength: String = {
+        return NSLocalizedString("postProcessingStrength", tableName: filename, bundle: Bundle.main, value: "Strength", comment: "post processing smoothing strength picker title")
+    }()
+
+    static let postProcessingLight: String = {
+        return NSLocalizedString("postProcessingLight", tableName: filename, bundle: Bundle.main, value: "Light", comment: "post processing smoothing light option")
+    }()
+
+    static let postProcessingMedium: String = {
+        return NSLocalizedString("postProcessingMedium", tableName: filename, bundle: Bundle.main, value: "Medium", comment: "post processing smoothing medium option")
+    }()
+
+    static let postProcessingStrong: String = {
+        return NSLocalizedString("postProcessingStrong", tableName: filename, bundle: Bundle.main, value: "Strong", comment: "post processing smoothing strong option")
+    }()
+
+    static let postProcessingApplyFrom: String = {
+        return NSLocalizedString("postProcessingApplyFrom", tableName: filename, bundle: Bundle.main, value: "Apply From", comment: "post processing section title and picker title for apply from")
+    }()
+
+    static let postProcessingNow: String = {
+        return NSLocalizedString("postProcessingNow", tableName: filename, bundle: Bundle.main, value: "Now", comment: "post processing apply from now option")
+    }()
+
+    static let postProcessingApply: String = {
+        return NSLocalizedString("postProcessingApply", tableName: filename, bundle: Bundle.main, value: "Apply", comment: "post processing apply button")
+    }()
+
+    static let postProcessingDexcomShareDataNotUpdated: String = {
+        return NSLocalizedString("postProcessingDexcomShareDataNotUpdated", tableName: filename, bundle: Bundle.main, value: "Dexcom Share data will not be updated", comment: "post processing helper text when following Dexcom Share and Dexcom Share writes are disabled")
+    }()
+
+    static let postProcessingOriginal: String = {
+        return NSLocalizedString("postProcessingOriginal", tableName: filename, bundle: Bundle.main, value: "Original", comment: "post processing chart context original value title")
+    }()
+
+    static let postProcessingAdjusted: String = {
+        return NSLocalizedString("postProcessingAdjusted", tableName: filename, bundle: Bundle.main, value: "Adjusted", comment: "post processing chart context adjusted value title")
+    }()
+
+    static let postProcessingSmoothed: String = {
+        return NSLocalizedString("postProcessingSmoothed", tableName: filename, bundle: Bundle.main, value: "Smoothed", comment: "post processing chart context smoothed value title")
+    }()
+
+    static let postProcessingUpdateAllReadingsLastHours: String = {
+        return NSLocalizedString("postProcessingUpdateAllReadingsLastHours", tableName: filename, bundle: Bundle.main, value: "Overwrite all values in the last %d hours", comment: "post processing helper text for historical apply window")
+    }()
+
+    static let postProcessingNightscoutDataNotUpdated: String = {
+        return NSLocalizedString("postProcessingNightscoutDataNotUpdated", tableName: filename, bundle: Bundle.main, value: "Nightscout data will not be updated", comment: "post processing helper text when following Nightscout and Nightscout writes are disabled")
+    }()
+
+    static let postProcessingOriginalGlucose: String = {
+        return NSLocalizedString("postProcessingOriginalGlucose", tableName: filename, bundle: Bundle.main, value: "Original Glucose", comment: "post processing input row title for original glucose")
+    }()
+
+    static let postProcessingAdjustedGlucose: String = {
+        return NSLocalizedString("postProcessingAdjustedGlucose", tableName: filename, bundle: Bundle.main, value: "Adjusted glucose", comment: "post processing input row title for adjusted glucose")
+    }()
+
+    static let postProcessingEnterValue: String = {
+        return NSLocalizedString("postProcessingEnterValue", tableName: filename, bundle: Bundle.main, value: "Enter value", comment: "post processing placeholder to enter a glucose value")
+    }()
+
+    static let postProcessingEnterGlucose: String = {
+        return NSLocalizedString("postProcessingEnterGlucose", tableName: filename, bundle: Bundle.main, value: "Enter Glucose", comment: "post processing input screen title")
+    }()
     
     static let showTreatments: String = {
         return NSLocalizedString("showTreatments", tableName: filename, bundle: Bundle.main, value: "Show Treatments", comment: "show the treatments on the chart")

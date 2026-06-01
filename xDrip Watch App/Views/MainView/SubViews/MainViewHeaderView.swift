@@ -12,7 +12,7 @@ import SwiftUI
 struct MainViewHeaderView: View {
     @EnvironmentObject var watchState: WatchStateModel
     
-    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
+    let isSmallScreen = ConstantsAppleWatch.isSmallScreen()
     
     let originalTextScaleValue = 1.0
     let animatedTextScaleValue = 1.1

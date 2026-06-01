@@ -23,10 +23,10 @@ struct BgReadingsView: View {
     // MARK: - private @State properties
     
     /// the BgReadings pulled from coredata via BgReadingsAccessor
-    @State private var bgReadings: [(BgReading)] = [(BgReading)]()
+    @State private var bgReadings: [BgReadingSnapshot] = []
     
     /// a filtered version of bgReadings to show only the values only on the selected date
-    @State private var filteredBgReadings: [(BgReading)] = [(BgReading)]()
+    @State private var filteredBgReadings: [BgReadingSnapshot] = []
     
     /// date selected at which we should display BgReadings
     @State private var dateSelected: Date = Date()
@@ -39,7 +39,7 @@ struct BgReadingsView: View {
     @State private var datePickerReset = UUID()
     
     /// selection set for multi-select delete in the List
-    @State private var selectedBgReadings: Set<BgReading> = []
+    @State private var selectedBgReadings: Set<BgReadingSnapshot> = []
 
     /// edit mode binding to enable multi-select in the List
     @Environment(\.editMode) private var editMode
@@ -86,7 +86,7 @@ struct BgReadingsView: View {
                                     visualIndicator(bgRangeDescription: bgReading.bgRangeDescription())
                                         .font(.system(size: 10))
                                     
-                                    Text(bgReading.calculatedValue.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).bgValueToString(mgDl: isMgDl))
+                                    Text(bgReading.finalValue.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).bgValueToString(mgDl: isMgDl))
                                         .foregroundColor(.primary)
                                     
                                     Text(String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
@@ -156,7 +156,7 @@ struct BgReadingsView: View {
         if let fromDate: Date = Calendar.current.date(byAdding: .day, value: -numberOfDaysOfBgReadingsToShow, to: dateSelected)?.toMidnight() {
             
             // get 'numberOfDaysOfBgReadingsToShow' days worth of BG Readings from coredata
-            bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: fromDate, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
+            bgReadings = bgReadingsAccessor.getLatestBgReadingSnapshots(limit: nil, fromDate: fromDate, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: false)
             
             // create a filtered array to only show bg readings for the date selected
             filteredBgReadings = bgReadings.filter { Calendar.current.compare($0.timeStamp, to: dateSelected, toGranularity: .day) == .orderedSame}
@@ -176,7 +176,7 @@ struct BgReadingsView: View {
         // get the index to be deleted from filteredBgReadings
         let index = offsets[offsets.startIndex]
         
-        // get the actual BgReading from filteredBgReadings
+        // get the actual BgReading snapshot from filteredBgReadings
         let bgReadingToDelete =  filteredBgReadings[index]
         
         // get the timestamp so that we can match it to the main (unfiltered) array
@@ -191,7 +191,7 @@ struct BgReadingsView: View {
         bgReadings.removeAll(where: { $0.timeStamp == timestampOfBgReadingToDelete })
         
         // delete the BgReading from coredata
-        bgReadingsAccessor.delete(bgReading: bgReadingToDelete)
+        bgReadingsAccessor.delete(bgReadingObjectID: bgReadingToDelete.objectID)
         
         // delete the BgReading from Nightscout (if it exists)
         nightscoutSyncManager.deleteBgReadingFromNightscout(timeStampOfBgReadingToDelete: timestampOfBgReadingToDelete)
@@ -222,7 +222,7 @@ struct BgReadingsView: View {
             bgReadings.removeAll(where: { $0.timeStamp == timestampOfBgReadingToDelete })
 
             // delete from Core Data
-            bgReadingsAccessor.delete(bgReading: bgReadingToDelete)
+            bgReadingsAccessor.delete(bgReadingObjectID: bgReadingToDelete.objectID)
 
             // delete from Nightscout
             nightscoutSyncManager.deleteBgReadingFromNightscout(timeStampOfBgReadingToDelete: timestampOfBgReadingToDelete)

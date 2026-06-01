@@ -229,6 +229,13 @@
 		47F7B1C62C68BBE100609DA7 /* ConstantsCalibrationAlgorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585422EDB706007F5B5D /* ConstantsCalibrationAlgorithms.swift */; };
 		47F7B1CD2C68CC3000609DA7 /* ConstantsCalibrationAlgorithms.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1585422EDB706007F5B5D /* ConstantsCalibrationAlgorithms.swift */; };
 		47FB28082636B04200042FFB /* StatisticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47FB28072636B04200042FFB /* StatisticsManager.swift */; };
+		4A9B10012F0A000100000001 /* BgAdjustment+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10112F0A000100000001 /* BgAdjustment+CoreDataClass.swift */; };
+		4A9B10022F0A000100000001 /* BgAdjustment+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10122F0A000100000001 /* BgAdjustment+CoreDataProperties.swift */; };
+		4A9B10032F0A000100000001 /* BgAdjustmentsAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10132F0A000100000001 /* BgAdjustmentsAccessor.swift */; };
+		4A9B10042F0A000100000001 /* ConstantsBgSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10142F0A000100000001 /* ConstantsBgSmoothing.swift */; };
+		4A9B10052F0A000100000001 /* BgPostProcessingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10152F0A000100000001 /* BgPostProcessingManager.swift */; };
+		4A9B10062F0A000100000001 /* BgAdjustmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10162F0A000100000001 /* BgAdjustmentsView.swift */; };
+		4A9B10072F0A000100000001 /* ConstantsBgAdjustment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10172F0A000100000001 /* ConstantsBgAdjustment.swift */; };
 		CE1B2FE025D0264B00F642F5 /* LaunchScreen.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */; };
 		CE1B2FE125D0264B00F642F5 /* Main.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD425D0264900F642F5 /* Main.strings */; };
 		D400F8032778BD8000B57648 /* TextsTreatmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D400F8022778BD8000B57648 /* TextsTreatmentsView.swift */; };
@@ -961,11 +968,13 @@
 		47A7DFB52BE4BE4900F1DA5F /* UIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIView.swift; sourceTree = "<group>"; };
 		47A8B8862E392BF700081CBD /* LiveActivityViewContentActivityFamilies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityViewContentActivityFamilies.swift; sourceTree = "<group>"; };
 		47AB72F227105EF4005E7CAB /* SettingsViewHelpSettingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewHelpSettingModel.swift; sourceTree = "<group>"; };
+		47AC0EE42FCE1FAF0098B607 /* xdrip v17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v17.xcdatamodel"; sourceTree = "<group>"; };
 		47ACB9282D835838001EC891 /* DatePickerViewControllerModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerViewControllerModal.swift; sourceTree = "<group>"; };
 		47ADD2DE27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartPointsScatterDownTrianglesLayer.swift; sourceTree = "<group>"; };
 		47AECB9D2CD2B618005F1814 /* NightscoutDeviceStatusModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutDeviceStatusModels.swift; sourceTree = "<group>"; };
 		47B136DA2BC9BB55001E7ED3 /* ContactImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactImageView.swift; sourceTree = "<group>"; };
 		47B136DC2BCA9151001E7ED3 /* ConstantsContactImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsContactImage.swift; sourceTree = "<group>"; };
+		47B4A7B42FD0AAC600B4712A /* xdrip v18.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v18.xcdatamodel"; sourceTree = "<group>"; };
 		47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandscapeChartViewController.swift; sourceTree = "<group>"; };
 		47B65D402E3A319D00C3140B /* LiveActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityView.swift; sourceTree = "<group>"; };
 		47B65D442E3A755900C3140B /* LiveActivityViewContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityViewContent.swift; sourceTree = "<group>"; };
@@ -1017,6 +1026,13 @@
 		47F4E09B2E699D6500087889 /* DexcomShareFollowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomShareFollowManager.swift; sourceTree = "<group>"; };
 		47F4E09D2E69C59A00087889 /* DexcomShareModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomShareModels.swift; sourceTree = "<group>"; };
 		47FB28072636B04200042FFB /* StatisticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsManager.swift; sourceTree = "<group>"; };
+		4A9B10112F0A000100000001 /* BgAdjustment+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BgAdjustment+CoreDataClass.swift"; sourceTree = "<group>"; };
+		4A9B10122F0A000100000001 /* BgAdjustment+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BgAdjustment+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		4A9B10132F0A000100000001 /* BgAdjustmentsAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgAdjustmentsAccessor.swift; sourceTree = "<group>"; };
+		4A9B10142F0A000100000001 /* ConstantsBgSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBgSmoothing.swift; sourceTree = "<group>"; };
+		4A9B10152F0A000100000001 /* BgPostProcessingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgPostProcessingManager.swift; sourceTree = "<group>"; };
+		4A9B10162F0A000100000001 /* BgAdjustmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgAdjustmentsView.swift; sourceTree = "<group>"; };
+		4A9B10172F0A000100000001 /* ConstantsBgAdjustment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBgAdjustment.swift; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xDrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xDrip/Version.xcconfig; sourceTree = "<group>"; };
 		CE1B2FC825D0261500F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Alerts.strings; sourceTree = "<group>"; };
@@ -2141,6 +2157,14 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		4A9B10212F0A000100000001 /* PostProcessing */ = {
+			isa = PBXGroup;
+			children = (
+				4A9B10152F0A000100000001 /* BgPostProcessingManager.swift */,
+			);
+			path = PostProcessing;
+			sourceTree = "<group>";
+		};
 		D4028CBE2774A4B900341476 /* Treatments */ = {
 			isa = PBXGroup;
 			children = (
@@ -2493,6 +2517,7 @@
 				47244D642E8318B9007357C3 /* TransmitterReadSuccess */,
 				472596032B76300800459D12 /* Watch */,
 				474606812B96357200AC9214 /* Widgets */,
+				4A9B10212F0A000100000001 /* PostProcessing */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -2562,6 +2587,7 @@
 			isa = PBXGroup;
 			children = (
 				47E3BEC62CD780D900B794A0 /* AIDStatusView.swift */,
+				4A9B10162F0A000100000001 /* BgAdjustmentsView.swift */,
 				47D9BC942A78498500AB85B2 /* BgReadingsDetailView.swift */,
 				47228B142996BDD2008725DB /* BgReadingsView.swift */,
 				47B136DA2BC9BB55001E7ED3 /* ContactImageView.swift */,
@@ -2841,6 +2867,7 @@
 				F8B3A819227DEC92004BA588 /* README.md */,
 				F8B3A816227DEC91004BA588 /* AlertEntriesAccessor.swift */,
 				F8B3A81A227DEC92004BA588 /* AlertTypesAccessor.swift */,
+				4A9B10132F0A000100000001 /* BgAdjustmentsAccessor.swift */,
 				F8B3A818227DEC92004BA588 /* BgReadingsAccessor.swift */,
 				F8DF766323E781C100063910 /* BLEPeripheralAccessor.swift */,
 				F8B3A817227DEC91004BA588 /* CalibrationsAccessor.swift */,
@@ -3105,6 +3132,8 @@
 				F8E5404B2522624800052CE5 /* ConstantsHousekeeping.swift */,
 				F8252866243E50FE0067AF77 /* ConstantsLibre.swift */,
 				47DB06E62A715EC500267BE3 /* ConstantsLibreLinkUp.swift */,
+				4A9B10172F0A000100000001 /* ConstantsBgAdjustment.swift */,
+				4A9B10142F0A000100000001 /* ConstantsBgSmoothing.swift */,
 				F85FB768255DE14600D1C39E /* ConstantsLibreSmoothing.swift */,
 				47B7313F2B83DC0200B0A450 /* ConstantsLiveActivity.swift */,
 				F8A1585E22EDB81E007F5B5D /* ConstantsLog.swift */,
@@ -3153,6 +3182,8 @@
 				F8B3A79222635A25004BA588 /* AlertEntry+CoreDataProperties.swift */,
 				F8B3A78C22622953004BA588 /* AlertType+CoreDataClass.swift */,
 				F8B3A79022635A25004BA588 /* AlertType+CoreDataProperties.swift */,
+				4A9B10112F0A000100000001 /* BgAdjustment+CoreDataClass.swift */,
+				4A9B10122F0A000100000001 /* BgAdjustment+CoreDataProperties.swift */,
 				F85DC2F221CFE3D400B9F74A /* BgReading+CoreDataClass.swift */,
 				F85DC2E721CFE2F500B9F74A /* BgReading+CoreDataProperties.swift */,
 				F8DF765F23E38FC100063910 /* BLEPeripheral+CoreDataClass.swift */,
@@ -4151,6 +4182,9 @@
 				F8BDD43F221B5BAF006EAB84 /* TextsErrorMessages.swift in Sources */,
 				F8B3A7FA2278E0E8004BA588 /* SettingsViewModelProtocol.swift in Sources */,
 				F8A2BC3225DB0D6D001D1E78 /* BluetoothPeripheralManaging.swift in Sources */,
+				4A9B10012F0A000100000001 /* BgAdjustment+CoreDataClass.swift in Sources */,
+				4A9B10022F0A000100000001 /* BgAdjustment+CoreDataProperties.swift in Sources */,
+				4A9B10062F0A000100000001 /* BgAdjustmentsView.swift in Sources */,
 				F85DC2F521CFE3D400B9F74A /* BgReading+CoreDataClass.swift in Sources */,
 				47B7FC722B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift in Sources */,
 				F821CF56229BF43A005C1E43 /* AlertKind.swift in Sources */,
@@ -4210,6 +4244,7 @@
 				F51B9F7D24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift in Sources */,
 				F8E51D612448E695001C9E5A /* Bundle.swift in Sources */,
 				F821CF61229BF4A2005C1E43 /* NightscoutSyncManager.swift in Sources */,
+				4A9B10052F0A000100000001 /* BgPostProcessingManager.swift in Sources */,
 				F8F9721023A5915900C3F17D /* TransmitterVersionRxMessage.swift in Sources */,
 				F8A1587122EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift in Sources */,
 				F8A1585522EDB706007F5B5D /* ConstantsCalibrationAlgorithms.swift in Sources */,
@@ -4428,6 +4463,7 @@
 				F8F9721123A5915900C3F17D /* KeepAliveTxMessage.swift in Sources */,
 				F64039B0281C3F9D0051EFFE /* QuickActionsManager.swift in Sources */,
 				F8B3A81E227DEC92004BA588 /* BgReadingsAccessor.swift in Sources */,
+				4A9B10032F0A000100000001 /* BgAdjustmentsAccessor.swift in Sources */,
 				4746068E2B963EA100AC9214 /* View.swift in Sources */,
 				D41F32942827332000861B3D /* DataExporter.swift in Sources */,
 				4733B9402AD17D15001D609D /* FollowerDelegate.swift in Sources */,
@@ -4470,6 +4506,8 @@
 				F8F9722923A5915900C3F17D /* CGMTransmitter.swift in Sources */,
 				474606822B96358E00AC9214 /* WidgetSharedUserDefaultsModel.swift in Sources */,
 				F8A389ED23342EB10010F405 /* ConstantsNightscout.swift in Sources */,
+				4A9B10042F0A000100000001 /* ConstantsBgSmoothing.swift in Sources */,
+				4A9B10072F0A000100000001 /* ConstantsBgAdjustment.swift in Sources */,
 				F85FF3D1252F9FF9004E6FF1 /* SnoozeParameters+CoreDataClass.swift in Sources */,
 				F857A32A253E2D9E00951BB2 /* LibreAlgorithmThresholds.swift in Sources */,
 				F8A1850C25643B16000EF8A0 /* Double+Smoothable.swift in Sources */,
@@ -5704,13 +5742,15 @@
 		F85FF3C2252D0C32004E6FF1 /* xdrip.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				47B4A7B42FD0AAC600B4712A /* xdrip v18.xcdatamodel */,
+				47AC0EE42FCE1FAF0098B607 /* xdrip v17.xcdatamodel */,
 				F8A2BC0225D9D471001D1E78 /* xdrip v16.xcdatamodel */,
 				F87F5EFD2560686C00FFA395 /* xdrip v15.xcdatamodel */,
 				F83275882546225400D305E6 /* xdrip v14.xcdatamodel */,
 				F85FF3CB252F9C9A004E6FF1 /* xdrip v13.xcdatamodel */,
 				F85FF3C3252D0C32004E6FF1 /* xdrip v12.xcdatamodel */,
 			);
-			currentVersion = F8A2BC0225D9D471001D1E78 /* xdrip v16.xcdatamodel */;
+			currentVersion = 47B4A7B42FD0AAC600B4712A /* xdrip v18.xcdatamodel */;
 			path = xdrip.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

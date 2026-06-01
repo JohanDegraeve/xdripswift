@@ -9,13 +9,13 @@ import SwiftUI
 
 struct BgReadingsDetailView: View {
     /// this must be passed in by the parent view
-    let bgReading: BgReading
+    let bgReading: BgReadingSnapshot
     
     // MARK: - private properties
     
     /// a common string to show in case a BgReading property is nil
     private let nilString = "-"
-    
+
     /// is true if the user is using mg/dL units (pulled from UserDefaults)
     private let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
     
@@ -24,8 +24,9 @@ struct BgReadingsDetailView: View {
     var body: some View {
         List {
             Section(header: Text(Texts_BgReadings.generalSectionHeader)) {
+                row(title: Texts_BgReadings.deviceName, data: bgReading.deviceName ?? nilString)
+                row(title: Texts_BgReadings.finalGlucose, data: displayBgValue(bgReading.finalValue))
                 row(title: Texts_BgReadings.timestamp, data: bgReading.timeStamp.formatted(date: .abbreviated, time: .shortened))
-                row(title: Texts_BgReadings.calculatedValue, data: bgReading.calculatedValue.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).bgValueToString(mgDl: isMgDl) + " " + String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
             }
             
             Section(header: Text(Texts_BgReadings.slopeSectionHeader)) {
@@ -34,7 +35,7 @@ struct BgReadingsDetailView: View {
                 row(title: Texts_BgReadings.slopePer5Minutes, data: (bgReading.calculatedValueSlope.mgDlToMmol(mgDl: isMgDl) * 60000 * 5).formatted(.number.rounded(increment: isMgDl ? 0.01 : 0.001)) + " " + String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
             }
             
-            if let calibration = bgReading.calibration {
+            if let calibration = bgReading.calibrationSnapshot {
                 Section(header: Text(Texts_BgReadings.calibrationTitle)) {
                     row(title: Texts_BgReadings.id, data: calibration.id)
                     row(title: Texts_BgReadings.date, data: calibration.timeStamp.formatted(date: .abbreviated, time: .shortened))
@@ -45,10 +46,16 @@ struct BgReadingsDetailView: View {
                 }
             }
             
+            Section(header: Text(Texts_BgReadings.glucoseValueSectionHeader)) {
+                row(title: Texts_BgReadings.rawValue, data: displayBgValue(bgReading.rawData))
+                row(title: Texts_BgReadings.calibratedValue, data: displayBgValue(bgReading.calculatedValue))
+                row(title: Texts_BgReadings.adjustedValue, data: displayOptionalBgValue(bgReading.adjustedValue))
+                row(title: Texts_BgReadings.smoothedValue, data: displayOptionalBgValue(bgReading.smoothedValue))
+            }
+
             Section(header: Text(Texts_BgReadings.internalDataSectionHeader)) {
-                row(title: Texts_BgReadings.deviceName, data: bgReading.deviceName?.description ?? nilString)
                 row(title: Texts_BgReadings.rawData, data: bgReading.rawData.bgValueToString(mgDl: true))
-                row(title: Texts_BgReadings.id, data: bgReading.id.description)
+                row(title: Texts_BgReadings.id, data: bgReading.id)
             }
         }
         .navigationTitle(Texts_BgReadings.glucoseReadingTitle)
@@ -74,5 +81,15 @@ struct BgReadingsDetailView: View {
         })
         
         return rowView
+    }
+
+    private func displayBgValue(_ valueInMgDl: Double) -> String {
+        return valueInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).bgValueToString(mgDl: isMgDl) + " " + String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+    }
+
+    private func displayOptionalBgValue(_ valueInMgDl: Double?) -> String {
+        guard let valueInMgDl = valueInMgDl else { return nilString }
+        
+        return displayBgValue(valueInMgDl)
     }
 }

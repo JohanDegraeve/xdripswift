@@ -29,7 +29,7 @@ struct GlucoseIntent: AppIntent {
         
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
-        let value = latestBgReading.calculatedValue.mgDlToMmol(mgDl: isMgDl)
+        let value = latestBgReading.finalValue.mgDlToMmol(mgDl: isMgDl)
         let valueString = value.bgValueToString(mgDl: isMgDl)
         
         let trendDescription: LocalizedStringResource = switch latestBgReading.slopeTrend() {
@@ -46,7 +46,7 @@ struct GlucoseIntent: AppIntent {
         var bgReadingDates: [Date] = []
         
         for bgReading in bgReadings {
-            bgReadingValues.append(bgReading.calculatedValue)
+            bgReadingValues.append(bgReading.finalValue)
             bgReadingDates.append(bgReading.timeStamp)
         }
         

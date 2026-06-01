@@ -46,6 +46,7 @@
 "settingsviews_screenLockDimmingTypeDark" = "Dark";
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
 "settingsviews_allowMainChartAutoReset" = "Auto Reset Main Chart";
+"settingsviews_showOriginalBGReadings" = "Show Original Values";
 "settingsviews_urgentHighValue" = "Urgent High Value";
 "settingsviews_highValue" = "High Value";
 "settingsviews_targetValue" = "Target Value";

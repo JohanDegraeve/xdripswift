@@ -1551,6 +1551,7 @@
                         <outlet property="valueLabelOutlet" destination="We3-bN-ffR" id="wtY-sZ-mev"/>
                         <segue destination="NvR-Zh-2Zn" kind="show" identifier="RootViewToSnoozeView" id="Dxa-Oc-1V2"/>
                         <segue destination="X4x-SF-9tU" kind="show" identifier="RootViewToBgReadingsView" destinationCreationSelector="segueToBgReadingsView:" id="MY4-tb-cb4"/>
+                        <segue destination="f4M-VL-jQw" kind="show" identifier="RootViewToBgAdjustmentsView" destinationCreationSelector="segueToBgAdjustmentsView:" id="mQ8-Kr-oD1"/>
                         <segue destination="J8I-o4-LCb" kind="show" identifier="RootViewToShowHideItemsView" destinationCreationSelector="segueToShowHideItemsView:" id="H9i-JN-TjS"/>
                     </connections>
                 </viewController>
@@ -1752,6 +1753,16 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SrA-mt-Lv6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="4068" y="-837"/>
+        </scene>
+        <!--Hosting Controller-->
+        <scene sceneID="QnK-Xk-W7k">
+            <objects>
+                <hostingController id="f4M-VL-jQw" sceneMemberID="viewController">
+                    <navigationItem key="navigationItem" id="Npp-Uq-a2g"/>
+                </hostingController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="z9k-Na-o2w" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3328" y="-569"/>
         </scene>
         <!--Picker View Controller-->
         <scene sceneID="6RW-Ef-2Hm">

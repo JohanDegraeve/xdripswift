@@ -49,6 +49,11 @@ final class RootViewController: UIViewController, ObservableObject {
         }
     }
     
+    private var bgAdjustmentsToolbarButtonOutlet: UIButton!
+    @IBAction func bgAdjustmentsToolbarButtonAction(_ sender: UIButton) {
+        performSegue(withIdentifier: "RootViewToBgAdjustmentsView", sender: self)
+    }
+    
     private var showHideItemsToolbarButtonOutlet: UIButton!
     @IBAction func showHideItemsToolbarButtonAction(_ sender: UIButton) {
         performSegue(withIdentifier: "RootViewToShowHideItemsView", sender: self)
@@ -426,6 +431,10 @@ final class RootViewController: UIViewController, ObservableObject {
         return UIHostingController(coder: coder, rootView: ShowHideItemsView())
     }
     
+    @IBSegueAction func segueToBgAdjustmentsView(_ coder: NSCoder) -> UIViewController? {
+        return UIHostingController(coder: coder, rootView: BgAdjustmentsView(bgReadingsAccessor: bgReadingsAccessor!, treatmentEntryAccessor: treatmentEntryAccessor!, bgPostProcessingManager: bgPostProcessingManager!))
+    }
+    
     @IBSegueAction func segueToAIDStatusView(_ coder: NSCoder) -> UIViewController? {
         return UIHostingController(coder: coder, rootView: AIDStatusView().environmentObject(nightscoutSyncManager!))
     }
@@ -528,6 +537,9 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// HealthKit manager instance
     private var healthKitManager:HealthKitManager?
+    
+    /// BG post processing manager instance
+    private var bgPostProcessingManager: BgPostProcessingManager?
     
     /// reference to activeSensor
     private(set) var activeSensor:Sensor?
@@ -689,6 +701,7 @@ final class RootViewController: UIViewController, ObservableObject {
         }
         
         self.updateSnoozeStatus()
+        self.updatePostProcessingStatus()
         
         IntentDonationManager.shared.donate(intent: GlucoseIntent())
     }
@@ -888,6 +901,9 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // showing or hiding the treatments on the chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showTreatmentsOnChart.rawValue, options: .new, context: nil)
+
+        // showing or hiding the original BG readings on the chart
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showOriginalBGReadings.rawValue, options: .new, context: nil)
         
         // see if the user has changed the statistic days to use
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.daysToUseStatistics.rawValue, options: .new, context: nil)
@@ -933,6 +949,10 @@ final class RootViewController: UIViewController, ObservableObject {
         // if the snooze all until data changes, update the UI
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.snoozeAllAlertsUntilDate.rawValue, options: .new, context: nil)
         
+        // if bg post processing settings change, update the toolbar status
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.enableAdjustment.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.enableSmoothing.rawValue, options: .new, context: nil)
+        
         // if the Nightscout Follower type changes, update the UI
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue, options: .new, context: nil)
         
@@ -945,6 +965,9 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // if the snooze all until data changes, update the UI
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.snoozeAllAlertsUntilDate.rawValue, options: .new, context: nil)
+        
+        // if bg post processing changes, update the chart
+        NotificationCenter.default.addObserver(self, selector: #selector(handleBgPostProcessingDidUpdate), name: Notification.Name(ConstantsNotifications.NotificationIdentifierForBgPostProcessing.bgPostProcessingDidUpdate), object: nil)
         
         // setup delegate for UNUserNotificationCenter
         UNUserNotificationCenter.current().delegate = self
@@ -1170,6 +1193,9 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // setup healthkitmanager
         healthKitManager = HealthKitManager(coreDataManager: coreDataManager)
+        
+        // setup bgPostProcessingManager
+        bgPostProcessingManager = BgPostProcessingManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager, healthKitManager: healthKitManager)
         
         // setup bgReadingSpeaker
         bgReadingSpeaker = BGReadingSpeaker(sharedSoundPlayer: soundPlayer, coreDataManager: coreDataManager)
@@ -1428,7 +1454,7 @@ final class RootViewController: UIViewController, ObservableObject {
                         latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
                         
                         if LoopManager.loopDelay() > 0 && abs(Date().timeIntervalSince(timeStampLastCalibrationForActiveSensor)) > LoopManager.loopDelay() + TimeInterval(minutes: 5.5) {
-                            loopManager?.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.calculatedValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
+                            loopManager?.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.finalValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
                         }
                     } else {
                         trace("in processNewGlucoseData, reading skipped, rawValue <= 0, looks like a faulty sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
@@ -1439,7 +1465,7 @@ final class RootViewController: UIViewController, ObservableObject {
                     
                     let newReading = calibrator.createNewBgReading(rawData: glucose.glucoseLevelRaw, timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                     
-                    loopManager?.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.calculatedValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
+                    loopManager?.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.finalValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
                     
                     // delete the newReading, otherwise it stays in coredata and we would end up with per minute readings
                     coreDataManager.mainManagedObjectContext.delete(newReading)
@@ -1448,6 +1474,8 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // if a new reading is created, create either initial calibration request or bgreading notification - upload to nightscout and check alerts
             if newReadingCreated {
+                bgPostProcessingManager?.processLatestReadings()
+                
                 // only if no webOOPEnabled and overruleIsWebOOPEnabled false : if no two calibration exist yet then create calibration request notification, otherwise a bgreading notification and update labels
                 if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil && (!cgmTransmitter.isWebOOPEnabled() && !cgmTransmitter.overruleIsWebOOPEnabled()) {
                     // there must be at least 2 readings
@@ -1477,11 +1505,15 @@ final class RootViewController: UIViewController, ObservableObject {
                     updateDataSourceInfo()
                 }
                 
-                nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                if !(UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing) {
+                    nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                }
                 
                 nightscoutSyncManager?.syncAllWithNightscout()
                 
-                healthKitManager?.storeBgReadings()
+                if !(UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing) {
+                    healthKitManager?.storeBgReadings()
+                }
                 
                 bgReadingSpeaker?.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
@@ -1618,6 +1650,13 @@ final class RootViewController: UIViewController, ObservableObject {
             
         case UserDefaults.Key.showTreatmentsOnChart:
             updateChartWithResetEndDate()
+
+        case UserDefaults.Key.showOriginalBGReadings:
+            // redraw chart is necessary
+            if let glucoseChartManager = glucoseChartManager {
+                glucoseChartManager.cleanUpMemory()
+                glucoseChartManager.updateChartPoints(endDate: glucoseChartManager.endDate, startDate: glucoseChartManager.endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, forceReset: false, showTreaments: UserDefaults.standard.showTreatmentsOnChart, completionHandler: nil)
+            }
             
         case UserDefaults.Key.showClockWhenScreenIsLocked:
             // refresh screenLock function if it is currently activated in order to show/hide the clock as requested
@@ -1648,6 +1687,9 @@ final class RootViewController: UIViewController, ObservableObject {
             
         case UserDefaults.Key.updateSnoozeStatus:
             updateSnoozeStatus()
+            
+        case UserDefaults.Key.enableAdjustment, UserDefaults.Key.enableSmoothing:
+            updatePostProcessingStatus()
             
         default:
             break
@@ -1729,6 +1771,7 @@ final class RootViewController: UIViewController, ObservableObject {
         bgReadingsToolbarButtonOutlet = makeToolbarButton("BgReadings", "drop", #selector(bgReadingsToolbarButtonAction(_:)))
         sensorToolbarButtonOutlet = makeToolbarButton(Texts_HomeView.sensor, "sensor.tag.radiowaves.forward", #selector(sensorToolbarButtonAction(_:)))
         calibrateToolbarButtonOutlet = makeToolbarButton(Texts_HomeView.calibrationButton, "dot.scope", #selector(calibrateToolbarButtonAction(_:)))
+        bgAdjustmentsToolbarButtonOutlet = makeToolbarButton(Texts_HomeView.postProcessingTitle, "dial.low", #selector(bgAdjustmentsToolbarButtonAction(_:)))
         showHideItemsToolbarButtonOutlet = makeToolbarButton("Show/Hide", "rectangle.3.group", #selector(showHideItemsToolbarButtonAction(_:)))
         screenLockToolbarButtonOutlet = makeToolbarButton(Texts_HomeView.lockButton, "lock", #selector(screenLockToolbarButtonAction(_:)))
 
@@ -1737,9 +1780,12 @@ final class RootViewController: UIViewController, ObservableObject {
             bgReadingsToolbarButtonOutlet,
             sensorToolbarButtonOutlet,
             calibrateToolbarButtonOutlet,
+            bgAdjustmentsToolbarButtonOutlet,
             showHideItemsToolbarButtonOutlet,
             screenLockToolbarButtonOutlet
         ].forEach(toolbarOutlet.addArrangedSubview(_:))
+        
+        updatePostProcessingStatus()
     }
     
     // MARK: - private helper functions
@@ -2069,7 +2115,7 @@ final class RootViewController: UIViewController, ObservableObject {
         UNUserNotificationCenter.current().removeDeliveredNotifications(withIdentifiers: [ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected])
         
         // prepare value for badge
-        var readingValueForBadge = lastReading[0].calculatedValue
+        var readingValueForBadge = lastReading[0].finalValue
         // values lower dan 12 are special values, don't show anything
         guard readingValueForBadge > 12 else { return }
         // high limit to 400
@@ -2149,6 +2195,14 @@ final class RootViewController: UIViewController, ObservableObject {
     // MAYBE DELETE
     @objc private func updateLabelsAndChartWithReset() {
         updateLabelsAndChart(forceReset: UserDefaults.standard.allowMainChartAutoReset)
+    }
+    
+    @objc private func handleBgPostProcessingDidUpdate() {
+        glucoseChartManager?.cleanUpMemory()
+        updateLabelsAndChart(overrideApplicationState: true, forceReset: true)
+        updatePostProcessingStatus()
+        watchManager?.updateWatchApp(forceComplicationUpdate: true)
+        updateLiveActivityAndWidgets(forceRestart: false)
     }
     
     /// - updates the labels and the chart,
@@ -2248,11 +2302,11 @@ final class RootViewController: UIViewController, ObservableObject {
         // set both HIGH and LOW BG values to red as previous yellow for hig is now not so obvious due to in-range colour of green.
         if lastReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11) {
             valueLabelOutlet.textColor = UIColor.lightGray
-        } else if lastReading.calculatedValue.bgValueRounded(mgDl: mgdl) >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgDl: mgdl).bgValueRounded(mgDl: mgdl) || lastReading.calculatedValue.bgValueRounded(mgDl: mgdl) <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgDl: mgdl).bgValueRounded(mgDl: mgdl) {
+        } else if lastReading.finalValue.bgValueRounded(mgDl: mgdl) >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgDl: mgdl).bgValueRounded(mgDl: mgdl) || lastReading.finalValue.bgValueRounded(mgDl: mgdl) <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgDl: mgdl).bgValueRounded(mgDl: mgdl) {
             
             // BG is higher than urgentHigh or lower than urgentLow objectives
             valueLabelOutlet.textColor = UIColor.red
-        } else if lastReading.calculatedValue.bgValueRounded(mgDl: mgdl) >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgDl: mgdl).bgValueRounded(mgDl: mgdl) || lastReading.calculatedValue.bgValueRounded(mgDl: mgdl) <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgDl: mgdl).bgValueRounded(mgDl: mgdl) {
+        } else if lastReading.finalValue.bgValueRounded(mgDl: mgdl) >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgDl: mgdl).bgValueRounded(mgDl: mgdl) || lastReading.finalValue.bgValueRounded(mgDl: mgdl) <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgDl: mgdl).bgValueRounded(mgDl: mgdl) {
             
             // BG is between urgentHigh/high and low/urgentLow objectives
             valueLabelOutlet.textColor = UIColor.yellow
@@ -2831,7 +2885,7 @@ final class RootViewController: UIViewController, ObservableObject {
         } else {
             screenLockToolbarButtonOutlet.accessibilityLabel = Texts_HomeView.lockButton
             
-            screenLockToolbarButtonOutlet.tintColor = nil
+            screenLockToolbarButtonOutlet.tintColor = .white
             
             // set the lock icon back to the standard SF Symbol
             screenLockToolbarButtonOutlet.setImage(UIImage(systemName: "lock"), for: .normal)
@@ -3255,6 +3309,8 @@ final class RootViewController: UIViewController, ObservableObject {
         // create active sensor
         let newSensor = Sensor(startDate: sensorStarDate, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
         
+        bgPostProcessingManager?.handleSourceContextChanged()
+        
         // save the newly created Sensor permenantly in coredata
         coreDataManager.saveChanges()
         
@@ -3339,8 +3395,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 // add delta if available
                 if bgReadings.count > 1 {
-                    var previousValueInUserUnit: Double = bgReadings[1].calculatedValue.mgDlToMmol(mgDl: isMgDl)
-                    var actualValueInUserUnit: Double = bgReadings[0].calculatedValue.mgDlToMmol(mgDl: isMgDl)
+                    var previousValueInUserUnit: Double = bgReadings[1].finalValue.mgDlToMmol(mgDl: isMgDl)
+                    var actualValueInUserUnit: Double = bgReadings[0].finalValue.mgDlToMmol(mgDl: isMgDl)
                     
                     // if the values are in mmol/L, then round them to the nearest decimal point in order to get the same precision out of the next operation
                     if !isMgDl {
@@ -3353,7 +3409,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 }
                 
                 for bgReading in bgReadings {
-                    bgReadingValues.append(bgReading.calculatedValue)
+                    bgReadingValues.append(bgReading.finalValue)
                     bgReadingDates.append(bgReading.timeStamp)
                 }
                 
@@ -3414,7 +3470,7 @@ final class RootViewController: UIViewController, ObservableObject {
                     var bgReadingDates: [Date] = []
                     
                     for bgReading in bgReadings {
-                        bgReadingValues.append(bgReading.calculatedValue)
+                        bgReadingValues.append(bgReading.finalValue)
                         bgReadingDates.append(bgReading.timeStamp)
                     }
                     
@@ -3448,14 +3504,38 @@ final class RootViewController: UIViewController, ObservableObject {
                 preSnoozeToolbarButtonOutlet.setImage(UIImage(systemName: "speaker.slash"), for: .normal)
             case .notUrgent:
                 // some other alert except urgent low, low or fast drop is snoozed so let's just change the icon
-                preSnoozeToolbarButtonOutlet.tintColor = nil
+                preSnoozeToolbarButtonOutlet.tintColor = .white
                 preSnoozeToolbarButtonOutlet.setImage(UIImage(systemName: "speaker.slash"), for: .normal)
             default:
                 // no alerts are snoozed so show default icon/colour
-                preSnoozeToolbarButtonOutlet.tintColor = nil
+                preSnoozeToolbarButtonOutlet.tintColor = .white
                 preSnoozeToolbarButtonOutlet.setImage(UIImage(systemName: "speaker.wave.2"), for: .normal)
             }
         }
+    }
+    
+    private func updatePostProcessingStatus() {
+        bgAdjustmentsToolbarButtonOutlet.tintColor = .white
+        bgAdjustmentsToolbarButtonOutlet.setImage(UIImage(systemName: postProcessingToolbarButtonImageSystemName()), for: .normal)
+    }
+    
+    private func postProcessingToolbarButtonImageSystemName() -> String {
+        let symbolBaseName: String
+        
+        guard UserDefaults.standard.enableAdjustment else {
+            symbolBaseName = "dial.low"
+            return UserDefaults.standard.enableSmoothing ? symbolBaseName + ".fill" : symbolBaseName
+        }
+        
+        // if the latest active adjustment changes the scale, then show the strongest dial state
+        if let latestActiveBgAdjustment = bgPostProcessingManager?.latestActiveBgAdjustment(),
+           latestActiveBgAdjustment.slope.round(toDecimalPlaces: 2) != 1.0 {
+            symbolBaseName = "dial.high"
+        } else {
+            symbolBaseName = "dial.medium"
+        }
+        
+        return UserDefaults.standard.enableSmoothing ? symbolBaseName + ".fill" : symbolBaseName
     }
     
     private func setNightscoutSyncRequiredToTrue(forceNow: Bool) {
@@ -3600,6 +3680,8 @@ extension RootViewController: CGMTransmitterDelegate {
     func sensorStopDetected() {
         trace("sensor stop detected", log: log, category: ConstantsLog.categoryRootView, type: .info)
         
+        bgPostProcessingManager?.handleSourceContextChanged()
+        
         stopSensor(cGMTransmitter: self.bluetoothPeripheralManager?.getCGMTransmitter(), sendToTransmitter: false)
         
         UserDefaults.standard.activeSensorStartDate = nil
@@ -3608,6 +3690,8 @@ extension RootViewController: CGMTransmitterDelegate {
     
     func newSensorDetected(sensorStartDate: Date?) {
         trace("new sensor detected", log: log, category: ConstantsLog.categoryRootView, type: .info)
+        
+        bgPostProcessingManager?.handleSourceContextChanged()
         
         // stop sensor, self.bluetoothPeripheralManager?.getCGMTransmitter() can be nil in case of Libre2, because new sensor is detected via NFC call which usually happens before the transmitter connection is made (and so before cGMTransmitter is assigned a new value)
         stopSensor(cGMTransmitter: self.bluetoothPeripheralManager?.getCGMTransmitter(), sendToTransmitter: false)
@@ -3797,8 +3881,9 @@ extension RootViewController: FollowerDelegate {
                 trace("in followerInfoReceived, timeStampLastBgReading = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, timeStampLastBgReading.toStringForTrace(timeStyle: .long, dateStyle: .long))
             }
             
-            // was a new reading created or not
-            var newReadingCreated = false
+            let previousTimeStampLastBgReading = timeStampLastBgReading
+            
+            var firstCreatedBgReadingTimeStamp: Date?
             
             // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
             for (_, followGlucoseData) in followGlucoseDataArray.enumerated().reversed() {
@@ -3829,22 +3914,27 @@ extension RootViewController: FollowerDelegate {
                         }
 
                     }
-
-
-
-                    // a new reading was created
-                    newReadingCreated = true
+                    if firstCreatedBgReadingTimeStamp == nil {
+                        firstCreatedBgReadingTimeStamp = followGlucoseData.timeStamp
+                    }
                     
                     // set timeStampLastBgReading to new timestamp
                     timeStampLastBgReading = followGlucoseData.timeStamp
                 }
             }
             
-            if newReadingCreated {
+            if firstCreatedBgReadingTimeStamp != nil {
                 trace("in followerInfoReceived, new reading(s) successfully created", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                 
                 // save in core data
                 coreDataManager.saveChanges()
+                
+                if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled, let firstCreatedBgReadingTimeStamp = firstCreatedBgReadingTimeStamp {
+                    let processingStartDateOverride = previousTimeStampLastBgReading.timeIntervalSince1970 > 0 ? previousTimeStampLastBgReading.addingTimeInterval(-1.0) : firstCreatedBgReadingTimeStamp
+                    bgPostProcessingManager?.processBgReadings(processingStartDateOverride: processingStartDateOverride, smoothingWindowStartDateOverride: processingStartDateOverride)
+                } else {
+                    bgPostProcessingManager?.processLatestReadings()
+                }
 
                 // update all text in  first screen
                 updateLabelsAndChart(overrideApplicationState: false)
@@ -3863,12 +3953,14 @@ extension RootViewController: FollowerDelegate {
                 // (this will only happen if we're not following Nightscout
                 // and if the user has requested to upload follower BG values
                 // to Nightscout
-                nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                if !(UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing) {
+                    nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
+                }
                 
                 // check alerts, create notification, set app badge
                 checkAlertsCreateNotificationAndSetAppBadge()
                 
-                if let healthKitManager = healthKitManager {
+                if !(UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing), let healthKitManager = healthKitManager {
                     healthKitManager.storeBgReadings()
                 }
                 

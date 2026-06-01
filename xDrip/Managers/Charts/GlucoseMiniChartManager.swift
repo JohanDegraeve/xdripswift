@@ -324,15 +324,15 @@ public class GlucoseMiniChartManager {
             
             for reading in bgReadings {
                 
-                if reading.calculatedValue > 0.0 {
+                if reading.finalValue > 0.0 {
                     
                     let newGlucoseChartPoint = ChartPoint(bgReading: reading, formatter: data().chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
                     
-                    if (reading.calculatedValue < UserDefaults.standard.lowMarkValue && reading.calculatedValue > UserDefaults.standard.urgentLowMarkValue) || (reading.calculatedValue > UserDefaults.standard.highMarkValue && reading.calculatedValue < UserDefaults.standard.urgentHighMarkValue) {
+                    if (reading.finalValue < UserDefaults.standard.lowMarkValue && reading.finalValue > UserDefaults.standard.urgentLowMarkValue) || (reading.finalValue > UserDefaults.standard.highMarkValue && reading.finalValue < UserDefaults.standard.urgentHighMarkValue) {
                         
                         notUrgentRangeChartPoints.append(newGlucoseChartPoint)
                         
-                    } else if reading.calculatedValue >= UserDefaults.standard.urgentHighMarkValue || reading.calculatedValue <= UserDefaults.standard.urgentLowMarkValue {
+                    } else if reading.finalValue >= UserDefaults.standard.urgentHighMarkValue || reading.finalValue <= UserDefaults.standard.urgentLowMarkValue {
                         
                         urgentRangeChartPoints.append(newGlucoseChartPoint)
                         
@@ -342,7 +342,7 @@ public class GlucoseMiniChartManager {
                         
                     }
                     
-                    maximumValueInGlucoseChartPoints = (maximumValueInGlucoseChartPoints != nil ? max(maximumValueInGlucoseChartPoints!, reading.calculatedValue) : reading.calculatedValue)
+                    maximumValueInGlucoseChartPoints = (maximumValueInGlucoseChartPoints != nil ? max(maximumValueInGlucoseChartPoints!, reading.finalValue) : reading.finalValue)
                     
                 }
                 
@@ -500,4 +500,3 @@ public class GlucoseMiniChartManager {
     }
     
 }
-

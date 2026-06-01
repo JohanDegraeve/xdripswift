@@ -91,7 +91,7 @@ public final class StatisticsManager {
                 // step though all values, check them for validity, convert if necessary and append them to the glucoseValues array
                 for reading in readings {
                     // declare and initialise the date variables needed
-                    var calculatedValue = reading.calculatedValue
+                    var calculatedValue = reading.finalValue
                     let currentTimeStamp = reading.timeStamp
                     
                     if calculatedValue != 0.0, calculatedValue >= minValidReading, calculatedValue <= maxValidReading {
@@ -212,7 +212,7 @@ public final class StatisticsManager {
                 var previousTimeStampByDay: [Date: Date] = [:]
 
                 for reading in readings {
-                    var calculatedValue = reading.calculatedValue
+                    var calculatedValue = reading.finalValue
                     let currentTimeStamp = reading.timeStamp
 
                     // Basic validity filter first

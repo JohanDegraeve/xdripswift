@@ -526,7 +526,7 @@ final class WatchStateModel: NSObject, ObservableObject {
         }
 
         
-        debugString += "\nScreen width: \(Int(WKInterfaceDevice.current().screenBounds.size.width))"
+        debugString += "\nScreen width: \(Int(ConstantsAppleWatch.screenWidth()))"
         debugString += "\niOS app: Idle"
         
         return debugString
@@ -567,4 +567,12 @@ extension WatchStateModel: WCSessionDelegate {
             self.processWatchStateFromDictionary(dictionary: watchStateAsDictionary)
         }
     }
+    
+    #if os(iOS)
+    func sessionDidBecomeInactive(_: WCSession) {}
+    
+    func sessionDidDeactivate(_ session: WCSession) {
+        session.activate()
+    }
+    #endif
 }

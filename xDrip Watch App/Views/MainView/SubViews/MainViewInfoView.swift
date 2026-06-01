@@ -12,7 +12,7 @@ import SwiftUI
 struct MainViewInfoView: View {
     @EnvironmentObject var watchState: WatchStateModel
     
-    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
+    let isSmallScreen = ConstantsAppleWatch.isSmallScreen()
     
     let originalMinsAgoTextColor = Color.colorSecondary
     let animatedMinsAgoTextColor = Color.white

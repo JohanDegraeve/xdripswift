@@ -166,6 +166,32 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     private var backfillNotifyConfigured = false
     private var authChallengeTxSent = false
 
+    // Coexistence debugging. All logs emitted through this path share one removable prefix.
+    private let coexistenceDebugPrefix = "[COEXDBG]"
+    private var coexistenceDebugSessionSequence = 0
+    private var coexistenceDebugSession: CoexistenceDebugSession?
+
+    private struct CoexistenceDebugSession {
+        let id: Int
+        let connectedAt: Date
+        let peripheralName: String
+        var serviceDiscoveryCount = 0
+        var receiveAuthNotifyEnabled = false
+        var writeControlNotifyEnabled = false
+        var backfillNotifyEnabled = false
+        var authRequestRxSeen = false
+        var authChallengeRxSeen = false
+        var transmitterTimeRxSeen = false
+        var glucoseOpcodeSeen = false
+        var glucosePublished = false
+        var glucoseRejectedStatus: String?
+        var lastKnownAlgorithmStatus: String?
+        var lastKnownGlucoseTimestamp: String?
+        var lastKnownGlucoseValue: Double?
+        var sendGlucoseNoValuesCount = 0
+        var lastDisconnectError: String?
+    }
+
     // MARK: - public functions
     
     /// - parameters:
@@ -315,8 +341,14 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     }
 
     override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        if useOtherApp, var session = coexistenceDebugSession {
+            session.lastDisconnectError = error?.localizedDescription
+            coexistenceDebugSession = session
+        }
+
         // Coexistence: tiny debounce; Primary: forward immediately.
         if useOtherApp {
+            coexistenceTrace("session=%d scheduling delayed super.didDisconnect in 2.0s error=%@", coexistenceDebugSession?.id ?? -1, error?.localizedDescription ?? "none")
             DispatchQueue.global(qos: .utility).asyncAfter(deadline: .now() + 2.0) { [weak self] in
                 self?.delayedSuperDidDisconnect(central: central, peripheral: peripheral, error: error)
             }
@@ -335,6 +367,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         }
 
         sendGlucoseDataToDelegate()
+        coexistenceDebugFinishSession(error: error)
 
         // setting characteristics to nil, they will be reinitialized at next connect
         writeControlCharacteristic = nil
@@ -355,6 +388,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         if let error = error {
             trace("in didUpdateNotificationStateFor characteristic, error: %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .error , error.localizedDescription)
         }
+
+        coexistenceDebugMarkNotifyState(characteristic: characteristic)
         
         if let characteristicValue = CBUUID_Characteristic_UUID(rawValue: characteristic.uuid.uuidString) {
             trace("in didUpdateNotificationStateFor characteristic, characteristic : %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, characteristicValue.description)
@@ -435,6 +470,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                         switch opCode {
                         case .authChallengeRx:
                             if let authChallengeRxMessage = AuthChallengeRxMessage(data: value) {
+                                coexistenceDebugMarkAuthChallenge(paired: authChallengeRxMessage.paired, authenticated: nil)
                                 // if not paired, then send message to delegate
                                 if !authChallengeRxMessage.paired {
                                     trace("in didUpdateValueFor characteristic, authChallengeRx, transmitter needs pairing, calling sendKeepAliveMessage", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
@@ -473,6 +509,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                         case .authRequestRx:
                             // In coexistence, do not participate in the authentication handshake; remain passive so the transmitter drops us quickly.
                             if useOtherApp {
+                                coexistenceDebugMarkAuthRequest()
                                 trace("in didUpdateValueFor characteristic, authRequestRx, coexistence mode, remaining passive (no AuthChallengeTx).", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
                                 return
                             }
@@ -660,6 +697,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         super.centralManager(central, didConnect: peripheral)
         
         timeStampLastConnection = Date()
+        coexistenceDebugStartSession(peripheral: peripheral)
 
         // to be sure waitingPairingConfirmation is reset to false
         waitingPairingConfirmation = false
@@ -675,6 +713,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         if let error = error {
             trace("in didDiscoverCharacteristicsFor, error: %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .error , error.localizedDescription)
         }
+
+        coexistenceDebugMarkCharacteristicDiscovery(service: service)
         
         if let characteristics = service.characteristics {
             
@@ -716,6 +756,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         // if our Dexcom service was invalidated, clear cached characteristics and rediscover
         let serviceUUID = CBUUID(string: CBUUID_Service_G5)
         if invalidatedServices.contains(where: { $0.uuid == serviceUUID }) {
+            coexistenceTrace("session=%d service invalidated rediscovering", coexistenceDebugSession?.id ?? -1)
             trace("in didModifyServices, Dexcom service invalidated, clearing characteristic handles and rediscovering", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
             writeControlCharacteristic = nil
             receiveAuthenticationCharacteristic = nil
@@ -730,6 +771,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         if !useOtherApp {
             return super.writeDataToPeripheral(data: data, characteristicToWriteTo: characteristicToWriteTo, type: type)
         } else {
+            coexistenceTrace("session=%d suppressed write characteristic=%@ bytes=%d", coexistenceDebugSession?.id ?? -1, characteristicToWriteTo.uuid.uuidString, data.count)
             trace("in writeDataToPeripheral, useOtherApp - data not written to characteristic", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
             return true
         }
@@ -990,6 +1032,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     private func sendBackfillTxMessage(startTime: Date, endTime: Date, transmitterStartDate: Date) {
         
         if useOtherApp {
+            coexistenceTrace("session=%d suppressed backfill request start=%@ end=%@", coexistenceDebugSession?.id ?? -1, startTime.toStringForTrace(timeStyle: .long, dateStyle: .none), endTime.toStringForTrace(timeStyle: .long, dateStyle: .none))
             trace("in sendBackfillTxMessage, use other app/coexistence: suppress backfillTx", log:log, category:ConstantsLog.categoryCGMG5, type:.debug)
             return
         }
@@ -1013,6 +1056,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// sends AuthRequestTxMessage to transmitter
     private func sendAuthRequestTxMessage() {
         if useOtherApp {
+            coexistenceTrace("session=%d suppressed authRequestTx", coexistenceDebugSession?.id ?? -1)
             trace("in sendAuthRequestTxMessage, use other app/coexistence: suppress authRequestTx", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
             return
         }
@@ -1052,7 +1096,159 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     /// Helper to allow calling super.didDisconnectPeripheral from a delayed closure
     private func delayedSuperDidDisconnect(central: CBCentralManager, peripheral: CBPeripheral, error: Error?) {
+        coexistenceTrace("session=%d executing delayed super.didDisconnect peripheral=%@ error=%@", coexistenceDebugSession?.id ?? -1, peripheral.name ?? "unknown", error?.localizedDescription ?? "none")
         super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
+    }
+
+    private func coexistenceTrace(_ message: StaticString, _ args: CVarArg...) {
+        guard useOtherApp else { return }
+        if args.isEmpty {
+            trace("%{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, coexistenceDebugPrefix + " " + String(describing: message))
+        } else {
+            let formatted = String(format: String(describing: message), arguments: args)
+            trace("%{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, coexistenceDebugPrefix + " " + formatted)
+        }
+    }
+
+    private func coexistenceDebugStartSession(peripheral: CBPeripheral) {
+        guard useOtherApp else { return }
+        coexistenceDebugSessionSequence += 1
+        coexistenceDebugSession = CoexistenceDebugSession(
+            id: coexistenceDebugSessionSequence,
+            connectedAt: Date(),
+            peripheralName: peripheral.name ?? "unknown"
+        )
+        coexistenceTrace("session=%d start connect peripheral=%@", coexistenceDebugSessionSequence, peripheral.name ?? "unknown")
+    }
+
+    private func coexistenceDebugMarkCharacteristicDiscovery(service: CBService) {
+        guard useOtherApp, var session = coexistenceDebugSession else { return }
+        session.serviceDiscoveryCount += 1
+        coexistenceDebugSession = session
+        coexistenceTrace("session=%d discover service=%@ count=%d", session.id, service.uuid.uuidString, session.serviceDiscoveryCount)
+    }
+
+    private func coexistenceDebugMarkNotifyState(characteristic: CBCharacteristic) {
+        guard useOtherApp, var session = coexistenceDebugSession else { return }
+        switch characteristic.uuid.uuidString {
+        case CBUUID_Characteristic_UUID.CBUUID_Receive_Authentication.rawValue:
+            session.receiveAuthNotifyEnabled = characteristic.isNotifying
+        case CBUUID_Characteristic_UUID.CBUUID_Write_Control.rawValue:
+            session.writeControlNotifyEnabled = characteristic.isNotifying
+        case CBUUID_Characteristic_UUID.CBUUID_Backfill.rawValue:
+            session.backfillNotifyEnabled = characteristic.isNotifying
+        default:
+            break
+        }
+        coexistenceDebugSession = session
+        coexistenceTrace(
+            "session=%d notify characteristic=%@ enabled=%@ auth=%@ write=%@ backfill=%@",
+            session.id,
+            characteristic.uuid.uuidString,
+            characteristic.isNotifying.description,
+            session.receiveAuthNotifyEnabled.description,
+            session.writeControlNotifyEnabled.description,
+            session.backfillNotifyEnabled.description
+        )
+    }
+
+    private func coexistenceDebugMarkAuthRequest() {
+        guard useOtherApp, var session = coexistenceDebugSession else { return }
+        session.authRequestRxSeen = true
+        coexistenceDebugSession = session
+        coexistenceTrace("session=%d received authRequestRx; staying passive", session.id)
+    }
+
+    private func coexistenceDebugMarkAuthChallenge(paired: Bool, authenticated: Bool?) {
+        guard useOtherApp, var session = coexistenceDebugSession else { return }
+        session.authChallengeRxSeen = true
+        coexistenceDebugSession = session
+        if let authenticated {
+            coexistenceTrace("session=%d received authChallengeRx paired=%@ authenticated=%@", session.id, paired.description, authenticated.description)
+        } else {
+            coexistenceTrace("session=%d received authChallengeRx paired=%@", session.id, paired.description)
+        }
+    }
+
+    private func coexistenceDebugMarkTransmitterTime(sensorStartDate: Date?, transmitterStartDate: Date?) {
+        guard useOtherApp, var session = coexistenceDebugSession else { return }
+        session.transmitterTimeRxSeen = true
+        coexistenceDebugSession = session
+        coexistenceTrace(
+            "session=%d received transmitterTimeRx sensorStart=%@ transmitterStart=%@",
+            session.id,
+            sensorStartDate?.toStringForTrace(timeStyle: .long, dateStyle: .long) ?? "nil",
+            transmitterStartDate?.toStringForTrace(timeStyle: .long, dateStyle: .long) ?? "nil"
+        )
+    }
+
+    private func coexistenceDebugMarkGlucoseFrame(value: Double, timestamp: Date, algorithmStatus: DexcomAlgorithmState, published: Bool) {
+        guard useOtherApp, var session = coexistenceDebugSession else { return }
+        session.glucoseOpcodeSeen = true
+        session.lastKnownAlgorithmStatus = algorithmStatus.description
+        session.lastKnownGlucoseTimestamp = timestamp.toStringForTrace(timeStyle: .long, dateStyle: .none)
+        session.lastKnownGlucoseValue = value
+        if published {
+            session.glucosePublished = true
+            session.glucoseRejectedStatus = nil
+        } else {
+            session.glucoseRejectedStatus = algorithmStatus.description
+        }
+        coexistenceDebugSession = session
+        coexistenceTrace(
+            "session=%d glucose frame value=%.1f timestamp=%@ algorithm=%@ published=%@",
+            session.id,
+            value,
+            session.lastKnownGlucoseTimestamp ?? "nil",
+            algorithmStatus.description,
+            published.description
+        )
+    }
+
+    private func coexistenceDebugMarkNoValuesEmission() {
+        guard useOtherApp, var session = coexistenceDebugSession else { return }
+        session.sendGlucoseNoValuesCount += 1
+        coexistenceDebugSession = session
+        coexistenceTrace("session=%d sendGlucoseDataToDelegate emitted no values count=%d", session.id, session.sendGlucoseNoValuesCount)
+    }
+
+    private func coexistenceDebugFinishSession(error: Error?) {
+        guard useOtherApp, let session = coexistenceDebugSession else { return }
+        let duration = Date().timeIntervalSince(session.connectedAt)
+        let classification: String
+        if session.glucosePublished {
+            classification = "published_glucose"
+        } else if let rejected = session.glucoseRejectedStatus {
+            classification = "glucose_rejected_\(rejected)"
+        } else if session.glucoseOpcodeSeen {
+            classification = "glucose_frame_not_published"
+        } else if session.transmitterTimeRxSeen {
+            classification = "time_rx_but_no_glucose"
+        } else if session.authChallengeRxSeen {
+            classification = "auth_challenge_but_no_time"
+        } else if session.authRequestRxSeen {
+            classification = "auth_request_only"
+        } else if session.receiveAuthNotifyEnabled || session.writeControlNotifyEnabled || session.backfillNotifyEnabled {
+            classification = "notify_enabled_no_payload"
+        } else {
+            classification = "connected_no_notify_or_payload"
+        }
+        coexistenceTrace(
+            "session=%d end duration=%.2fs class=%@ authReq=%@ challenge=%@ time=%@ glucose=%@ published=%@ noValues=%d lastValue=%@ lastTimestamp=%@ error=%@",
+            session.id,
+            duration,
+            classification,
+            session.authRequestRxSeen.description,
+            session.authChallengeRxSeen.description,
+            session.transmitterTimeRxSeen.description,
+            session.glucoseOpcodeSeen.description,
+            session.glucosePublished.description,
+            session.sendGlucoseNoValuesCount,
+            session.lastKnownGlucoseValue.map { String(format: "%.1f", $0) } ?? "nil",
+            session.lastKnownGlucoseTimestamp ?? "nil",
+            error?.localizedDescription ?? session.lastDisconnectError ?? "nil"
+        )
+        coexistenceDebugSession = nil
     }
 
     private func processResetRxMessage(value:Data) {
@@ -1309,6 +1505,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     private func processGlucoseG6DataRxMessage(value: Data) {
         guard let transmitterStartDate = transmitterStartDate,
               let glucoseDataRxMessage = DexcomG6GlucoseDataRxMessage(data: value, transmitterStartDate: transmitterStartDate) else {
+            coexistenceTrace("glucoseG6Rx decode failed transmitterStartDateKnown=%@", (self.transmitterStartDate != nil).description)
             trace("processGlucoseG6DataRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
             return
         }
@@ -1335,6 +1532,12 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         if useOtherApp {
             // Only send if status is .okay or .needsCalibration
             if glucoseDataRxMessage.algorithmStatus == .okay || glucoseDataRxMessage.algorithmStatus == .needsCalibration {
+                coexistenceDebugMarkGlucoseFrame(
+                    value: glucoseDataRxMessage.calculatedValue,
+                    timestamp: glucoseDataRxMessage.timeStamp,
+                    algorithmStatus: glucoseDataRxMessage.algorithmStatus,
+                    published: true
+                )
                 guard let latestReading = lastGlucoseInSensorDataRxReading else {
                     // Should not normally happen, but if it does, fall back to a direct GlucoseData.
                     let fallback = GlucoseData(timeStamp: glucoseDataRxMessage.timeStamp, glucoseLevelRaw: glucoseDataRxMessage.calculatedValue)
@@ -1344,6 +1547,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                         var copy = [fallback]
                         self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: nil)
                     }
+                    coexistenceTrace("session=%d published fallback glucose because cached latestReading was nil", coexistenceDebugSession?.id ?? -1)
                     return
                 }
                 timeStampOfLastG5Reading = latestReading.timeStamp
@@ -1353,6 +1557,12 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                     self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: nil)
                 }
             } else {
+                coexistenceDebugMarkGlucoseFrame(
+                    value: glucoseDataRxMessage.calculatedValue,
+                    timestamp: glucoseDataRxMessage.timeStamp,
+                    algorithmStatus: glucoseDataRxMessage.algorithmStatus,
+                    published: false
+                )
                 trace("in processGlucoseG6DataRxMessage, not sending glucose value due to algorithm status: %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, glucoseDataRxMessage.algorithmStatus.description)
             }
             // In coexistence mode we do not rely on sendGlucoseDataToDelegate() or backfill
@@ -1367,6 +1577,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// process transmitterTimeRxMessage
     private func processTransmitterTimeRxMessage(value:Data) {
         if let transmitterTimeRxMessage = DexcomTransmitterTimeRxMessage(data: value) {
+            coexistenceDebugMarkTransmitterTime(
+                sensorStartDate: transmitterTimeRxMessage.sensorStartDate,
+                transmitterStartDate: transmitterTimeRxMessage.transmitterStartDate
+            )
             if let receivedSensorStartDate = transmitterTimeRxMessage.sensorStartDate {
                 trace("in processTransmitterTimeRxMessage, receivedSensorStartDate = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, receivedSensorStartDate.toStringForTrace(timeStyle: .long, dateStyle: .long))
                 
@@ -1411,6 +1625,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 trace("in processTransmitterTimeRxMessage, transmitterStartDate is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
             }
         } else {
+            coexistenceTrace("transmitterTimeRx decode failed")
             trace("in processTransmitterTimeRxMessage, transmitterTimeRxMessage is nil", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
         }
     }
@@ -1540,6 +1755,15 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     /// - and sends that message
     private func fireflyMessageFlow() {
         if useOtherApp {
+            coexistenceTrace(
+                "session=%d firefly suppressed authReq=%@ challenge=%@ time=%@ glucose=%@ published=%@",
+                coexistenceDebugSession?.id ?? -1,
+                coexistenceDebugSession.map { $0.authRequestRxSeen.description } ?? "false",
+                coexistenceDebugSession.map { $0.authChallengeRxSeen.description } ?? "false",
+                coexistenceDebugSession.map { $0.transmitterTimeRxSeen.description } ?? "false",
+                coexistenceDebugSession.map { $0.glucoseOpcodeSeen.description } ?? "false",
+                coexistenceDebugSession.map { $0.glucosePublished.description } ?? "false"
+            )
             trace("in fireflyMessageFlow, firefly flow suppressed (use other app/coexistence)", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
             return
         }
@@ -1703,6 +1927,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 self.cgmTransmitterDelegate?.cgmTransmitterInfoReceived(glucoseData: &copy, transmitterBatteryInfo: nil, sensorAge: nil)
             }
         } else {
+            coexistenceDebugMarkNoValuesEmission()
             trace("in sendGlucoseDataToDelegate, glucoseDataArray has no values", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
         }
         

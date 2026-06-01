@@ -137,7 +137,15 @@ public class LoopManager: NSObject {
                 
                 for reading in lastReadings {
                     
-                    var representation = reading.dictionaryRepresentationForDexcomShareUpload
+                    // Loop should always receive the final post processed value shown in the app
+                    let date = "/Date(" + Int64(floor(reading.timeStamp.toMillisecondsAsDouble() / 1000) * 1000).description + ")/"
+                    var representation: [String : Any] = [
+                        "Trend" : reading.slopeOrdinal(),
+                        "ST" : date,
+                        "DT" : date,
+                        "Value" : round(reading.finalValue),
+                        "direction" : reading.slopeName
+                    ]
                     
                     // Adding "from" field to be able to use multiple BG sources with the same shared group in FreeAPS X
                     representation["from"] = "xDrip"

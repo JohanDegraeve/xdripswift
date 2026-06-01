@@ -11,10 +11,11 @@ public class GlucoseChartManager {
     /// - urgentRange = above urgentHighMarkValue or below urgentLowMarkValue
     /// - in range = between lowMarkValue and highMarkValue
     /// - notUrgentRange = between highMarkValue and urgentHighMarkValue or between urgentLowMarkValue and lowMarkValue
+    /// - original = original calculatedValue points to be shown behind post processed values when needed
     /// - firstGlucoseChartPoint is the first ChartPoint considering the three arrays together
     /// - lastGlucoseChartPoint is the last ChartPoint considering the three arrays together
     /// - maximumValueInGlucoseChartPoints = the largest x value (ie the highest Glucose value) considering the three arrays together
-    typealias GlucoseChartPointsType = (urgentRange: [ChartPoint], inRange: [ChartPoint], notUrgentRange: [ChartPoint], firstGlucoseChartPoint: ChartPoint?, lastGlucoseChartPoint: ChartPoint?, maximumValueInGlucoseChartPoints: Double?)
+    typealias GlucoseChartPointsType = (urgentRange: [ChartPoint], inRange: [ChartPoint], notUrgentRange: [ChartPoint], original: [ChartPoint], firstGlucoseChartPoint: ChartPoint?, lastGlucoseChartPoint: ChartPoint?, maximumValueInGlucoseChartPoints: Double?)
     
     /// to hold the treatment chartpoints
     /// - smallBolus = bolus values below the micro-bolus threshold (usually around 1.0U or less)
@@ -30,7 +31,7 @@ public class GlucoseChartManager {
     /// glucoseChartPoints to reuse for each iteration, or for each redrawing of glucose chart
     ///
     /// Whenever glucoseChartPoints is assigned a new value, glucoseChart is set to nil
-    private var glucoseChartPoints: GlucoseChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), nil, nil, nil) {
+    private var glucoseChartPoints: GlucoseChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), nil, nil, nil) {
         didSet {
             glucoseChart = nil
         }
@@ -86,6 +87,9 @@ public class GlucoseChartManager {
     
     /// ChartPoints to be shown on chart, processed only in main thread - not Urgent Range
     private var notUrgentRangeGlucoseChartPoints = [ChartPoint]()
+    
+    /// ChartPoints to be shown on chart, processed only in main thread - original values
+    private var originalGlucoseChartPoints = [ChartPoint]()
     
     /// for logging
     private var oslog = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryGlucoseChartManager)
@@ -258,15 +262,15 @@ public class GlucoseChartManager {
             // we're going to check if we have already all chartpoints in the arrays self.glucoseChartPoints for the new start and date time. If not we're going to prepand a arrays and/or append a arrays
             
             // initialize new list of chartPoints to prepend with empty arrays
-            var newGlucoseChartPointsToPrepend: GlucoseChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), nil, nil, nil)
+            var newGlucoseChartPointsToPrepend: GlucoseChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), nil, nil, nil)
             
             // initialize new list of chartPoints to append with empty arrays
-            var newGlucoseChartPointsToAppend: GlucoseChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), nil, nil, nil)
+            var newGlucoseChartPointsToAppend: GlucoseChartPointsType = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), nil, nil, nil)
             
             // do we reuse the existing list ? for instance if new startDate > date of currently stored last chartpoint, then we don't reuse the existing list, probably better to reinitialize from scratch to avoid ending up with too long lists
             // and if there's more than a predefined amount of elements already in the array then we restart from scratch because (on an iPhone SE with iOS 13), the panning is getting slowed down when there's more than 1000 elements in the array
             var reUseExistingChartPointList = self.glucoseChartPoints.urgentRange
-                .count + self.glucoseChartPoints.inRange.count + self.glucoseChartPoints.notUrgentRange.count <= ConstantsGlucoseChart.maximumElementsInGlucoseChartPointsArray ? true : false
+                .count + self.glucoseChartPoints.inRange.count + self.glucoseChartPoints.notUrgentRange.count + self.glucoseChartPoints.original.count <= ConstantsGlucoseChart.maximumElementsInGlucoseChartPointsArray ? true : false
             
             if let lastGlucoseChartPoint = self.glucoseChartPoints.lastGlucoseChartPoint, let lastGlucoseChartPointX = lastGlucoseChartPoint.x as? ChartAxisValueDate {
                 
@@ -347,6 +351,7 @@ public class GlucoseChartManager {
             self.glucoseChartPoints.urgentRange = newGlucoseChartPointsToPrepend.urgentRange + (reUseExistingChartPointList ? self.glucoseChartPoints.urgentRange : [ChartPoint]()) + newGlucoseChartPointsToAppend.urgentRange
             self.glucoseChartPoints.inRange = newGlucoseChartPointsToPrepend.inRange + (reUseExistingChartPointList ? self.glucoseChartPoints.inRange : [ChartPoint]()) + newGlucoseChartPointsToAppend.inRange
             self.glucoseChartPoints.notUrgentRange = newGlucoseChartPointsToPrepend.notUrgentRange + (reUseExistingChartPointList ? self.glucoseChartPoints.notUrgentRange : [ChartPoint]()) + newGlucoseChartPointsToAppend.notUrgentRange
+            self.glucoseChartPoints.original = newGlucoseChartPointsToPrepend.original + (reUseExistingChartPointList ? self.glucoseChartPoints.original : [ChartPoint]()) + newGlucoseChartPointsToAppend.original
             
             
             // get calibrations from coredata
@@ -389,6 +394,7 @@ public class GlucoseChartManager {
                 self.urgentRangeGlucoseChartPoints = self.glucoseChartPoints.urgentRange
                 self.inRangeGlucoseChartPoints = self.glucoseChartPoints.inRange
                 self.notUrgentRangeGlucoseChartPoints = self.glucoseChartPoints.notUrgentRange
+                self.originalGlucoseChartPoints = self.glucoseChartPoints.original
                 
                 // assign calibrationChartPoints to newCalibrationChartPoints
                 self.calibrationChartPoints = calibrationChartPoints
@@ -868,6 +874,10 @@ public class GlucoseChartManager {
         let basalRateFillLayer = ChartPointsFillsLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, fills: [ChartPointsFill( chartPoints: basalRateFillTreatmentChartPoints, fillColor: ConstantsGlucoseChart.basalRateFillTreatmentColor, createContainerPoints: false)])
         
         
+        // original circle layers
+        let originalGlucoseCirclesLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: originalGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter, height: glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseOriginalColor, optimized: true)
+        
+        
         // in Range circle layers
         let inRangeGlucoseCirclesLayer = ChartPointsScatterCirclesLayer(xAxis: xAxisLayer.axis, yAxis: yAxisLayer.axis, chartPoints: inRangeGlucoseChartPoints, displayDelay: 0, itemSize: CGSize(width: glucoseCircleDiameter, height: glucoseCircleDiameter), itemFillColor: ConstantsGlucoseChart.glucoseInRangeColor, optimized: true)
         
@@ -943,6 +953,8 @@ public class GlucoseChartManager {
         }
         
         let layersGlucoseCircles: [ChartLayer?] = [
+            // original glucosePoint layers
+            originalGlucoseCirclesLayer,
             // glucosePoint layers
             inRangeGlucoseCirclesLayer,
             notUrgentRangeGlucoseCirclesLayer,
@@ -1050,6 +1062,7 @@ public class GlucoseChartManager {
         var urgentRangeChartPoints = [ChartPoint]()
         var inRangeChartPoints = [ChartPoint]()
         var notUrgentRangeChartPoints = [ChartPoint]()
+        var originalChartPoints = [ChartPoint]()
         
         // initialize last chartpoint
         var lastGlucoseChartPoint: ChartPoint?
@@ -1060,21 +1073,23 @@ public class GlucoseChartManager {
         // initiliaze maximumValueInGlucoseChartPoints
         var maximumValueInGlucoseChartPoints: Double?
         
+        let shouldShowOriginalChartPoints = UserDefaults.standard.showOriginalBGReadings && (UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing)
+        
         // bgReadings array has been fetched from coredata using a private mangedObjectContext
         // we need to use the same context to perform next piece of code which will use those bgReadings, in order to stay thread-safe
         managedObjectContext.performAndWait {
             
             for reading in bgReadings {
                 
-                if reading.calculatedValue > 0.0 {
+                if reading.finalValue > 0.0 {
                     
                     let newGlucoseChartPoint = ChartPoint(bgReading: reading, formatter: data().chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
                     
-                    if (reading.calculatedValue < UserDefaults.standard.lowMarkValue && reading.calculatedValue > UserDefaults.standard.urgentLowMarkValue) || (reading.calculatedValue > UserDefaults.standard.highMarkValue && reading.calculatedValue < UserDefaults.standard.urgentHighMarkValue) {
+                    if (reading.finalValue < UserDefaults.standard.lowMarkValue && reading.finalValue > UserDefaults.standard.urgentLowMarkValue) || (reading.finalValue > UserDefaults.standard.highMarkValue && reading.finalValue < UserDefaults.standard.urgentHighMarkValue) {
                         
                         notUrgentRangeChartPoints.append(newGlucoseChartPoint)
                         
-                    } else if reading.calculatedValue >= UserDefaults.standard.urgentHighMarkValue || reading.calculatedValue <= UserDefaults.standard.urgentLowMarkValue {
+                    } else if reading.finalValue >= UserDefaults.standard.urgentHighMarkValue || reading.finalValue <= UserDefaults.standard.urgentLowMarkValue {
                         
                         urgentRangeChartPoints.append(newGlucoseChartPoint)
                         
@@ -1088,6 +1103,15 @@ public class GlucoseChartManager {
                     
                     firstGlucoseChartPoint = (firstGlucoseChartPoint != nil ? min(firstGlucoseChartPoint!, newGlucoseChartPoint) : newGlucoseChartPoint)
                     
+                    maximumValueInGlucoseChartPoints = (maximumValueInGlucoseChartPoints != nil ? max(maximumValueInGlucoseChartPoints!, reading.finalValue) : reading.finalValue)
+                    
+                }
+                
+                if shouldShowOriginalChartPoints, reading.calculatedValue > 0.0 {
+                    
+                    let newOriginalChartPoint = ChartPoint(originalBgReading: reading, formatter: data().chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+                    originalChartPoints.append(newOriginalChartPoint)
+                    
                     maximumValueInGlucoseChartPoints = (maximumValueInGlucoseChartPoints != nil ? max(maximumValueInGlucoseChartPoints!, reading.calculatedValue) : reading.calculatedValue)
                     
                 }
@@ -1096,7 +1120,7 @@ public class GlucoseChartManager {
             
         }
         
-        return (urgentRangeChartPoints, inRangeChartPoints, notUrgentRangeChartPoints, firstGlucoseChartPoint, lastGlucoseChartPoint, maximumValueInGlucoseChartPoints)
+        return (urgentRangeChartPoints, inRangeChartPoints, notUrgentRangeChartPoints, originalChartPoints, firstGlucoseChartPoint, lastGlucoseChartPoint, maximumValueInGlucoseChartPoints)
         
     }
     
@@ -1596,7 +1620,7 @@ public class GlucoseChartManager {
         
         // If there is no second closest, return the closestBgReading calculatedValue.
         guard let secondClosestBgReading = secondClosestBgReading else {
-            return closestBgReading.calculatedValue
+            return closestBgReading.finalValue
         }
         
         // If there is a second closest, interpolate the Y value using a linear aproach.
@@ -1605,14 +1629,14 @@ public class GlucoseChartManager {
         // It is safe to unwrap the first and last elements.
         let sortedReadings = [closestBgReading, secondClosestBgReading].sorted(by: { $0.timeStamp < $1.timeStamp })
         guard let olderBgReading = sortedReadings.first, let newerBgReading = sortedReadings.last else {
-            return closestBgReading.calculatedValue
+            return closestBgReading.finalValue
         }
 
         // Calculate the interpolation based on the time difference
         // Time difference from newerBgReading to olderBgReading
         let timeDifference: Double = newerBgReading.timeStamp.timeIntervalSince1970 - olderBgReading.timeStamp.timeIntervalSince1970
         guard timeDifference != 0 else {
-            return olderBgReading.calculatedValue
+            return olderBgReading.finalValue
         }
         // Time difference from treatmentDate to olderBgReading
         let timeOffset: Double = treatmentDate.timeIntervalSince1970 - olderBgReading.timeStamp.timeIntervalSince1970
@@ -1621,9 +1645,9 @@ public class GlucoseChartManager {
         let timeOffsetFactor: Double = timeOffset / timeDifference
         
         // Calculate the SGV difference between the readings.
-        let yDifference: Double = newerBgReading.calculatedValue - olderBgReading.calculatedValue
+        let yDifference: Double = newerBgReading.finalValue - olderBgReading.finalValue
         // Linear interpolation for Y
-        let yValue = olderBgReading.calculatedValue + (yDifference * timeOffsetFactor)
+        let yValue = olderBgReading.finalValue + (yDifference * timeOffsetFactor)
         
         return yValue
     }
@@ -1785,7 +1809,7 @@ public class GlucoseChartManager {
         
         stopDeceleration()
         
-        glucoseChartPoints = ([ChartPoint](), [ChartPoint](), [ChartPoint](), nil, nil, nil)
+        glucoseChartPoints = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), nil, nil, nil)
         treatmentChartPoints = ([ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint](), [ChartPoint]())
         
         calibrationChartPoints = [ChartPoint]()
@@ -1830,6 +1854,8 @@ public class GlucoseChartManager {
         inRangeGlucoseChartPoints = []
         
         notUrgentRangeGlucoseChartPoints = []
+        
+        originalGlucoseChartPoints = []
         
         chartLabelSettingsObjectives = nil
         

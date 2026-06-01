@@ -1,0 +1,835 @@
+//
+//  BgAdjustmentsView.swift
+//  xdrip
+//
+//  Created by Paul Plant on 2/6/26.
+//  Copyright © 2026 Johan Degraeve. All rights reserved.
+//
+
+import SwiftUI
+
+struct BgAdjustmentsView: View {
+    // Track whether the user last changed the offset by nudging the delta
+    // or by directly entering an adjusted glucose value.
+    private enum OffsetAdjustmentInputType {
+        case adjustedGlucoseValue
+        case offsetValue
+    }
+    
+    /// available manual historical apply windows in hours
+    private let applyFromPeriodsInHours = [0, 3, 6, 12]
+    
+    private let bgReadingsAccessor: BgReadingsAccessor
+    private let treatmentEntryAccessor: TreatmentEntryAccessor
+    private let bgPostProcessingManager: BgPostProcessingManager
+    
+    @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
+    
+    @State private var bgReadings: [BgReading] = []
+    
+    @State private var calculatedBgReadingValues: [Double] = []
+    @State private var calculatedBgReadingDates: [Date] = []
+    @State private var bgCheckTreatmentChartPointsValues: [Double] = []
+    @State private var bgCheckTreatmentChartPointsDates: [Date] = []
+    @State private var previewFinalBgReadingValues: [Double] = []
+    @State private var previewFinalBgReadingDates: [Date] = []
+    
+    @State private var currentBgAdjustment: BgAdjustment?
+    
+    @State private var enableAdjustment = UserDefaults.standard.enableAdjustment
+    @State private var enableSmoothing = UserDefaults.standard.enableSmoothing
+    @State private var draftAdjustedGlucoseValue = ""
+    @State private var slope = "1.00"
+    @State private var intercept = "0.0"
+    @State private var adjustmentShapeTypeRawValue = ConstantsBgAdjustment.defaultShapeType.rawValue
+    @State private var openedSlopeValue = 1.00
+    @State private var openedInterceptValue = 0.0
+    @State private var smoothingStrength = UserDefaults.standard.bgSmoothingStrength
+    @State private var selectedApplyFromPeriodIndex = 0
+    @State private var chartHoursToShow = Double(UserDefaults.standard.postProcessingPreviewChartHoursToShow)
+    @State private var showingBasicAdjustmentInputSheet = false
+    @State private var viewStateWasLoaded = false
+    @State private var offsetAdjustmentInputType: OffsetAdjustmentInputType = .offsetValue
+    private let chartContextSeparator = ", "
+    /// refresh the chart while the view stays open so the time axis and points
+    /// continue to reflect newly arrived readings
+    private let chartRefreshTimer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
+    
+    init(bgReadingsAccessor: BgReadingsAccessor, treatmentEntryAccessor: TreatmentEntryAccessor, bgPostProcessingManager: BgPostProcessingManager) {
+        self.bgReadingsAccessor = bgReadingsAccessor
+        self.treatmentEntryAccessor = treatmentEntryAccessor
+        self.bgPostProcessingManager = bgPostProcessingManager
+    }
+    
+    var body: some View {
+        NavigationView {
+            VStack(spacing: 0) {
+                chartView()
+                    .padding(.top, 8)
+                
+                List {
+                    adjustmentSection()
+                    smoothingSection()
+                    applyFromSection()
+                }
+            }
+            .navigationTitle(Texts_HomeView.postProcessingTitle)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(Texts_Common.Cancel, action: {
+                        self.presentationMode.wrappedValue.dismiss()
+                    })
+                }
+                
+            }
+            .sheet(isPresented: $showingBasicAdjustmentInputSheet) {
+                BasicAdjustmentInputView(currentGlucoseValueString: displayBgString(for: bgReadings.last?.calculatedValue), glucoseAdjustmentValueString: inputGlucoseAdjustmentValueString(for: draftAdjustedGlucoseValue), unitString: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol, enteredGlucoseValue: $draftAdjustedGlucoseValue, onCancel: {
+                    draftAdjustedGlucoseValue = adjustedGlucoseInputValueString()
+                    showingBasicAdjustmentInputSheet = false
+                }, onConfirm: {
+                    confirmDraftAdjustedGlucoseValue()
+                    showingBasicAdjustmentInputSheet = false
+                })
+            }
+            .onAppear {
+                if !viewStateWasLoaded {
+                    loadViewState()
+                    viewStateWasLoaded = true
+                }
+            }
+            .onChange(of: enableAdjustment) { _ in
+                updatePreviewData()
+            }
+            .onChange(of: enableSmoothing) { _ in
+                updatePreviewData()
+            }
+            .onChange(of: adjustmentShapeTypeRawValue) { _ in
+                updatePreviewData()
+            }
+            .onChange(of: slope) { _ in
+                updatePreviewData()
+            }
+            .onChange(of: intercept) { _ in
+                updatePreviewData()
+            }
+            .onChange(of: smoothingStrength) { _ in
+                updatePreviewData()
+            }
+            .onChange(of: chartHoursToShow) { newValue in
+                UserDefaults.standard.postProcessingPreviewChartHoursToShow = Int(newValue)
+                loadBgReadings()
+                updatePreviewData()
+            }
+            .onReceive(chartRefreshTimer) { _ in
+                loadBgReadings()
+                updatePreviewData()
+            }
+        }
+        .colorScheme(.dark)
+    }
+    
+    private var adjustmentShapeType: BgAdjustmentShapeType {
+        return BgAdjustmentShapeType(rawValue: adjustmentShapeTypeRawValue) ?? ConstantsBgAdjustment.defaultShapeType
+    }
+    
+    @ViewBuilder private func chartView() -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            chartContextView()
+                .padding(.horizontal)
+                .font(.subheadline)
+            
+            GlucoseChartView(glucoseChartType: .siriGlucoseIntent, bgReadingValues: previewBgReadingValues(), bgReadingDates: previewBgReadingDates(), additionalBgReadingDataSets: chartDataSets(), isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: nil, hoursToShowScalingHours: chartHoursToShow, glucoseCircleDiameterScalingHours: chartHoursToShow, overrideChartHeight: 150, overrideChartWidth: nil, highContrast: nil)
+                .padding(.horizontal)
+            
+            HStack {
+                Text(Texts_HomeView.postProcessingPreviewHours)
+                    .foregroundStyle(Color(.colorSecondary))
+                Spacer()
+                Picker(Texts_HomeView.postProcessingPreviewHours, selection: Binding<Int>(
+                    get: { Int(chartHoursToShow) },
+                    set: { selectedChartHoursToShow in
+                        chartHoursToShow = Double(selectedChartHoursToShow)
+                    }
+                )) {
+                    ForEach(ConstantsBgAdjustment.previewChartHoursToShowOptions, id: \.self) { previewChartHoursToShow in
+                        Text("\(previewChartHoursToShow)h")
+                            .tag(previewChartHoursToShow)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .frame(maxWidth: 240)
+            }
+            .padding(.horizontal)
+            .padding(.bottom, 8)
+        }
+    }
+    
+    private func adjustmentSection() -> some View {
+        Section(header: Text(Texts_HomeView.postProcessingAdjustment)) {
+            Toggle(Texts_HomeView.postProcessingEnable, isOn: $enableAdjustment)
+            
+            if enableAdjustment {
+                offsetAdjustmentValueRow()
+                
+                scaleAdjustmentControl()
+            }
+        }
+    }
+    
+    private func advancedAdjustmentValueRow(title: String, value: String, valueColor: Color, onMinus: @escaping () -> Void, onPlus: @escaping () -> Void) -> some View {
+        HStack {
+            Text(title)
+            Spacer()
+            Button("-") {
+                onMinus()
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+            
+            Text(value)
+                .foregroundStyle(valueColor)
+                .frame(minWidth: 44, alignment: .center)
+            
+            Button("+") {
+                onPlus()
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+        }
+    }
+
+    @ViewBuilder private func offsetAdjustmentValueRow() -> some View {
+        HStack {
+            Text(Texts_HomeView.postProcessingOffset)
+            Spacer()
+            Button {
+                draftAdjustedGlucoseValue = adjustedGlucoseInputValueString()
+                showingBasicAdjustmentInputSheet = true
+            } label: {
+                Text(displayBgString(for: currentAdjustedGlucoseValueInMgDl()))
+                    .foregroundStyle(offsetAdjustmentInputType == .adjustedGlucoseValue ? Color(.colorPrimary) : Color(.colorSecondary))
+            }
+            .buttonStyle(.plain)
+            .padding(.trailing, 8)
+            
+            Button("-") {
+                updateIntercept(by: -interceptNudgeValueInMgDl())
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+            
+            Text(displayAdjustmentValueString(for: intercept.toDouble() ?? 0.0, includeUnit: false))
+                .foregroundStyle(offsetAdjustmentInputType == .offsetValue ? adjustmentValueColor(isChanged: offsetValueChanged()) : Color(.colorSecondary))
+                .frame(minWidth: 44, alignment: .center)
+            
+            Button("+") {
+                updateIntercept(by: interceptNudgeValueInMgDl())
+            }
+            .buttonStyle(.bordered)
+            .controlSize(.small)
+        }
+    }
+
+    @ViewBuilder private func scaleAdjustmentControl() -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            advancedAdjustmentValueRow(title: Texts_HomeView.postProcessingScale, value: displaySlopeString(for: slope.toDouble()), valueColor: adjustmentValueColor(isChanged: scaleValueChanged()), onMinus: {
+                updateSlope(by: -ConstantsBgAdjustment.slopeNudgeValue)
+            }, onPlus: {
+                updateSlope(by: ConstantsBgAdjustment.slopeNudgeValue)
+            })
+            
+            Rectangle()
+                .fill(Color(.separator))
+                .frame(height: 0.5)
+            
+            HStack {
+                Text(Texts_HomeView.postProcessingShape)
+                Spacer()
+                compactAdjustmentShapeControl()
+            }
+            
+            if shouldShowSelectedAdjustmentShapeDescription() {
+                Text(selectedAdjustmentShapeDescription())
+                    .font(.footnote)
+                    .foregroundStyle(Color(.colorSecondary))
+            }
+        }
+        .padding(.vertical, 2)
+    }
+    
+    private func smoothingSection() -> some View {
+        Section(header: Text(Texts_HomeView.postProcessingSmoothing)) {
+            Toggle(Texts_HomeView.postProcessingEnable, isOn: $enableSmoothing)
+            
+            if enableSmoothing {
+                Picker(Texts_HomeView.postProcessingStrength, selection: $smoothingStrength) {
+                    smoothingStrengthPickerItem(title: Texts_HomeView.postProcessingLight, strength: 0)
+                    smoothingStrengthPickerItem(title: Texts_HomeView.postProcessingMedium, strength: 1)
+                    smoothingStrengthPickerItem(title: Texts_HomeView.postProcessingStrong, strength: 2)
+                }
+                .pickerStyle(.segmented)
+            }
+        }
+    }
+
+    private func applyFromSection() -> some View {
+        Section(header: Text(Texts_HomeView.postProcessingApplyFrom)) {
+            VStack(alignment: .leading, spacing: 10) {
+                Picker(Texts_HomeView.postProcessingApplyFrom, selection: $selectedApplyFromPeriodIndex) {
+                    ForEach(Array(applyFromPeriodsInHours.enumerated()), id: \.offset) { _, applyFromPeriodInHours in
+                        if applyFromPeriodInHours == 0 {
+                            Text(Texts_HomeView.postProcessingNow)
+                        } else {
+                            Text("-\(applyFromPeriodInHours)h")
+                        }
+                    }
+                }
+                .pickerStyle(.segmented)
+
+                if let sourceDataNotUpdatedWarningText = sourceDataNotUpdatedWarningText() {
+                    Text(sourceDataNotUpdatedWarningText)
+                        .font(.footnote)
+                        .foregroundStyle(Color(.colorSecondary))
+                }
+
+                if selectedApplyFromPeriodIndex > 0 {
+                    Text("⚠️ " + String(format: Texts_HomeView.postProcessingUpdateAllReadingsLastHours, applyFromPeriodsInHours[selectedApplyFromPeriodIndex]))
+                        .font(.footnote)
+                        .foregroundStyle(Color(.colorSecondary))
+                }
+            }
+            .listRowBackground(applyFromSectionBackgroundColor())
+
+            Button(Texts_HomeView.postProcessingApply) {
+                applySelectedChanges()
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+            .disabled(!canApplySelectedChanges())
+            .listRowBackground(applyFromSectionBackgroundColor())
+        }
+    }
+    
+    private func smoothingStrengthPickerItem(title: String, strength: Int) -> some View {
+        Text(title)
+            .tag(strength)
+    }
+    
+    private func chartContextView() -> Text {
+        var chartContextParts = [(title: String, value: Double, isFinalValue: Bool)]()
+        
+        if let originalValue = bgReadings.last?.calculatedValue {
+            let finalValueIsOriginal = !enableAdjustment && !enableSmoothing
+            chartContextParts.append((title: Texts_HomeView.postProcessingOriginal, value: originalValue, isFinalValue: finalValueIsOriginal))
+        }
+        
+        if enableAdjustment, let adjustedValue = latestAdjustedPreviewValue() {
+            let finalValueIsAdjusted = !enableSmoothing
+            chartContextParts.append((title: Texts_HomeView.postProcessingAdjusted, value: adjustedValue, isFinalValue: finalValueIsAdjusted))
+        }
+        
+        if enableSmoothing, let smoothedValue = latestSmoothedPreviewValue() {
+            chartContextParts.append((title: Texts_HomeView.postProcessingSmoothed, value: smoothedValue, isFinalValue: true))
+        }
+        
+        guard chartContextParts.count > 0 else {
+            return Text("")
+        }
+        
+        var returnText = Text("")
+        
+        for (index, chartContextPart) in chartContextParts.enumerated() {
+            if index > 0 {
+                returnText = returnText + Text(chartContextSeparator).foregroundColor(.secondary)
+            }
+            
+            returnText = returnText + chartContextPartText(for: chartContextPart.title, value: chartContextPart.value, isFinalValue: chartContextPart.isFinalValue)
+        }
+        
+        return returnText
+    }
+    
+    private func chartContextPartText(for title: String, value: Double, isFinalValue: Bool) -> Text {
+        let titleColor: Color = isFinalValue ? .white : .secondary
+        let valueColor: Color = isFinalValue ? glucoseTextColor(for: value) : .secondary
+        let titleText = Text(title + ": ").foregroundColor(titleColor)
+        let valueText = Text(displayBgValueString(for: value)).foregroundColor(valueColor)
+        let partText = titleText + valueText
+        
+        if isFinalValue {
+            return partText.bold()
+        }
+        
+        return partText
+    }
+    
+    private func confirmDraftAdjustedGlucoseValue() {
+        guard let adjustedGlucoseValueInMgDl = enteredGlucoseValueInMgDl(draftAdjustedGlucoseValue), let latestBgReading = bgReadings.last else { return }
+        
+        intercept = (adjustedGlucoseValueInMgDl - latestBgReading.calculatedValue).round(toDecimalPlaces: 1).stringWithoutTrailingZeroes
+        offsetAdjustmentInputType = .adjustedGlucoseValue
+    }
+    
+    private func chartDataSets() -> [GlucoseChartDataSet] {
+        var dataSets = [GlucoseChartDataSet]()
+        
+        // Show the original calculated values behind the previewed final values
+        // so the user can compare the effect of adjustment and smoothing.
+        if enableAdjustment || enableSmoothing {
+            dataSets.append(GlucoseChartDataSet(bgReadingValues: calculatedBgReadingValues, bgReadingDates: calculatedBgReadingDates, seriesIdentifier: "original", lineColor: nil, pointColor: Color(ConstantsGlucoseChart.glucoseOriginalColor), lineWidth: 0, dash: [], showLine: false, showPoints: true, pointSizeMultiplier: 1.0, pointBorderColor: nil, pointBorderSizeMultiplier: nil))
+        }
+        
+        if bgCheckTreatmentChartPointsValues.count > 0 {
+            dataSets.append(GlucoseChartDataSet(bgReadingValues: bgCheckTreatmentChartPointsValues, bgReadingDates: bgCheckTreatmentChartPointsDates, seriesIdentifier: "bgCheckTreatments", lineColor: nil, pointColor: Color(ConstantsGlucoseChart.bgCheckTreatmentColorInner), lineWidth: 0, dash: [], showLine: false, showPoints: true, pointSizeMultiplier: Double(ConstantsGlucoseChart.bgCheckTreatmentScaleInner) * 1.15, pointBorderColor: Color(ConstantsGlucoseChart.bgCheckTreatmentColorOuter), pointBorderSizeMultiplier: Double(ConstantsGlucoseChart.bgCheckTreatmentScaleOuter) * 1.25))
+        }
+        
+        return dataSets
+    }
+    
+    private func loadViewState() {
+        enableAdjustment = UserDefaults.standard.enableAdjustment
+        enableSmoothing = UserDefaults.standard.enableSmoothing
+        smoothingStrength = UserDefaults.standard.bgSmoothingStrength
+        chartHoursToShow = Double(UserDefaults.standard.postProcessingPreviewChartHoursToShow)
+        currentBgAdjustment = bgPostProcessingManager.latestActiveBgAdjustment()
+        
+        loadBgReadings()
+        
+        if let currentBgAdjustment = currentBgAdjustment {
+            slope = currentBgAdjustment.slope.round(toDecimalPlaces: 2).description
+            intercept = currentBgAdjustment.intercept.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes
+            adjustmentShapeTypeRawValue = currentBgAdjustment.adjustmentShapeType
+            openedSlopeValue = currentBgAdjustment.slope.round(toDecimalPlaces: 2)
+            openedInterceptValue = currentBgAdjustment.intercept.round(toDecimalPlaces: 1)
+        } else {
+            slope = "1.00"
+            intercept = "0.0"
+            adjustmentShapeTypeRawValue = ConstantsBgAdjustment.defaultShapeType.rawValue
+            openedSlopeValue = 1.0
+            openedInterceptValue = 0.0
+        }
+        
+        offsetAdjustmentInputType = .offsetValue
+        
+        draftAdjustedGlucoseValue = adjustedGlucoseInputValueString()
+        updatePreviewData()
+    }
+    
+    private func loadBgReadings() {
+        let fromDate = Date(timeIntervalSinceNow: -(chartHoursToShow * 3600))
+        let currentSensor = bgPostProcessingManager.currentSensorForPostProcessing()
+        
+        bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: fromDate, forSensor: currentSensor, ignoreRawData: true, ignoreCalculatedValue: false).sorted { $0.timeStamp < $1.timeStamp }
+        
+        calculatedBgReadingValues = bgReadings.map { $0.calculatedValue }
+        calculatedBgReadingDates = bgReadings.map { $0.timeStamp }
+        loadBgCheckTreatmentChartPoints(fromDate: fromDate)
+        
+        previewFinalBgReadingValues = []
+        previewFinalBgReadingDates = []
+    }
+
+    private func loadBgCheckTreatmentChartPoints(fromDate: Date) {
+        let bgCheckTreatments = treatmentEntryAccessor.getLatestTreatments(limit: nil, fromDate: fromDate)
+            .filter { !$0.treatmentdeleted && $0.treatmentType == .BgCheck }
+            .sorted { $0.date < $1.date }
+        
+        bgCheckTreatmentChartPointsValues = bgCheckTreatments.map { $0.value }
+        bgCheckTreatmentChartPointsDates = bgCheckTreatments.map { $0.date }
+    }
+    
+    private func updatePreviewData() {
+        guard bgReadings.count > 0 else {
+            previewFinalBgReadingValues = []
+            previewFinalBgReadingDates = []
+            return
+        }
+        
+        guard enableAdjustment || enableSmoothing else {
+            previewFinalBgReadingValues = []
+            previewFinalBgReadingDates = []
+            return
+        }
+        
+        // Start from the calculated values, then layer in adjustment and smoothing
+        // in the same order used by the stored post processing path.
+        let sourceValues = bgReadings.map { $0.calculatedValue }
+        var finalValues = sourceValues
+        
+        if enableAdjustment, let adjustmentPreview = currentAdjustmentPreview() {
+            finalValues = sourceValues.map {
+                adjustmentPreview.scaleCenterInMgDl + adjustmentPreview.slope * ($0 - adjustmentPreview.scaleCenterInMgDl) + adjustmentPreview.intercept
+            }
+        }
+        
+        if enableSmoothing {
+            finalValues = smoothPreviewValues(previewValues: finalValues)
+        }
+        
+        previewFinalBgReadingValues = finalValues
+        previewFinalBgReadingDates = bgReadings.map { $0.timeStamp }
+    }
+    
+    private func currentAdjustmentPreview() -> (slope: Double, intercept: Double, scaleCenterInMgDl: Double)? {
+        guard let slopeAsDouble = slope.toDouble(), let interceptAsDouble = intercept.toDouble() else { return nil }
+        
+        return (slopeAsDouble, interceptAsDouble, adjustmentShapeType.scaleCenterInMgDl)
+    }
+
+    private func latestAdjustedPreviewValue() -> Double? {
+        guard let latestCalculatedValue = bgReadings.last?.calculatedValue else { return nil }
+        
+        if let currentAdjustmentPreview = currentAdjustmentPreview() {
+            return currentAdjustmentPreview.scaleCenterInMgDl + currentAdjustmentPreview.slope * (latestCalculatedValue - currentAdjustmentPreview.scaleCenterInMgDl) + currentAdjustmentPreview.intercept
+        }
+        
+        return latestCalculatedValue
+    }
+
+    private func latestSmoothedPreviewValue() -> Double? {
+        if let latestPreviewFinalValue = previewFinalBgReadingValues.last {
+            return latestPreviewFinalValue
+        }
+        
+        if let latestAdjustedPreviewValue = latestAdjustedPreviewValue() {
+            return latestAdjustedPreviewValue
+        }
+        
+        return bgReadings.last?.calculatedValue
+    }
+    
+    private func selectedApplyFromTimeStamp() -> Date {
+        let latestBgReadingTimeStamp = bgReadings.last?.timeStamp ?? Date()
+        
+        if let postProcessingStartTimeStamp = UserDefaults.standard.postProcessingStartTimeStamp {
+            return max(latestBgReadingTimeStamp, postProcessingStartTimeStamp)
+        }
+        
+        return latestBgReadingTimeStamp
+    }
+
+    /// historical apply is anchored to the latest available reading, not to now,
+    /// so gaps in incoming data do not shrink the user-selected rewrite window
+    private func selectedHistoricalApplyFromTimeStamp() -> Date {
+        let latestBgReadingTimeStamp = bgReadings.last?.timeStamp ?? Date()
+        let selectedApplyFromPeriodInHours = applyFromPeriodsInHours[selectedApplyFromPeriodIndex]
+        
+        return latestBgReadingTimeStamp.addingTimeInterval(-Double(selectedApplyFromPeriodInHours) * 3600.0)
+    }
+    
+    private func smoothPreviewValues(previewValues: [Double]) -> [Double] {
+        return bgPostProcessingManager.smoothedValuesSeparatedByReadingGap(values: previewValues, readingDates: bgReadings.map { $0.timeStamp }, smoothingStrength: smoothingStrength)
+    }
+    
+    private func applyNowChanges() {
+        let adjustmentPreview = currentAdjustmentPreview()
+        
+        bgPostProcessingManager.applyPostProcessing(enableAdjustment: enableAdjustment, slope: adjustmentPreview?.slope, intercept: adjustmentPreview?.intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: selectedApplyFromTimeStamp(), isBasicAdjustment: false, enteredBgValue: currentAdjustedGlucoseValueInMgDl(), sourceCalculatedValue: bgReadings.last?.calculatedValue, enableSmoothing: enableSmoothing, smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes, smoothingStrength: smoothingStrength)
+        presentationMode.wrappedValue.dismiss()
+    }
+
+    private func applyHistoricalChanges() {
+        let adjustmentPreview = currentAdjustmentPreview()
+        let historicalApplyFromTimeStamp = selectedHistoricalApplyFromTimeStamp()
+
+        bgPostProcessingManager.applyPostProcessing(enableAdjustment: enableAdjustment, slope: adjustmentPreview?.slope, intercept: adjustmentPreview?.intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: historicalApplyFromTimeStamp, isBasicAdjustment: false, enteredBgValue: currentAdjustedGlucoseValueInMgDl(), sourceCalculatedValue: bgReadings.last?.calculatedValue, enableSmoothing: enableSmoothing, smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes, smoothingStrength: smoothingStrength, processingStartDateOverride: historicalApplyFromTimeStamp, smoothingWindowStartDateOverride: historicalApplyFromTimeStamp)
+        presentationMode.wrappedValue.dismiss()
+    }
+
+    private func applySelectedChanges() {
+        if selectedApplyFromPeriodIndex == 0 {
+            applyNowChanges()
+        } else {
+            applyHistoricalChanges()
+        }
+    }
+    
+    private func updateSlope(by valueToAdd: Double) {
+        let currentSlope = slope.toDouble() ?? 1.0
+        slope = (currentSlope + valueToAdd).round(toDecimalPlaces: 2).description
+    }
+    
+    private func updateIntercept(by valueToAdd: Double) {
+        let currentIntercept = intercept.toDouble() ?? 0.0
+        intercept = (currentIntercept + valueToAdd).round(toDecimalPlaces: 1).stringWithoutTrailingZeroes
+        draftAdjustedGlucoseValue = adjustedGlucoseInputValueString()
+        offsetAdjustmentInputType = .offsetValue
+    }
+    
+    private func canApplyChanges() -> Bool {
+        if enableAdjustment {
+            return currentAdjustmentPreview() != nil
+        }
+        
+        return enableSmoothing != UserDefaults.standard.enableSmoothing || smoothingStrength != UserDefaults.standard.bgSmoothingStrength || currentBgAdjustment != nil
+    }
+
+    private func canApplySelectedChanges() -> Bool {
+        return bgReadings.count > 0 && canApplyChanges()
+    }
+
+    private func applyFromSectionBackgroundColor() -> Color {
+        if selectedApplyFromPeriodIndex > 0 {
+            return ConstantsUI.warningSectionBackgroundColor
+        }
+        
+        return Color(.clear)
+    }
+
+    private func shouldAllowNightscoutBgWrites() -> Bool {
+        return bgPostProcessingManager.shouldAllowNightscoutBgPostProcessingWrites()
+    }
+
+    private func sourceDataNotUpdatedWarningText() -> String? {
+        guard !UserDefaults.standard.isMaster else { return nil }
+        
+        switch UserDefaults.standard.followerDataSourceType {
+        case .nightscout:
+            return Texts_HomeView.postProcessingNightscoutDataNotUpdated
+        case .dexcomShare:
+            return Texts_HomeView.postProcessingDexcomShareDataNotUpdated
+        default:
+            return nil
+        }
+    }
+    
+    private func displayString(for value: Double?, decimalPlaces: Int = 1) -> String {
+        guard let value = value else { return Texts_Common.unknown }
+        
+        return value.round(toDecimalPlaces: decimalPlaces).stringWithoutTrailingZeroes
+    }
+    
+    private func displayBgString(for value: Double?) -> String {
+        guard let value = value else { return Texts_Common.unknown }
+        
+        let unitString = UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol
+        let valueString = displayBgValueString(for: value)
+        
+        return valueString + " " + unitString
+    }
+    
+    private func displayBgValueString(for value: Double?) -> String {
+        guard let value = value else { return Texts_Common.unknown }
+        
+        return value.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueRounded(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+    }
+
+    private func displaySlopeString(for value: Double?) -> String {
+        guard let value = value else { return Texts_Common.unknown }
+        
+        return String(format: "%.2f", value)
+    }
+
+    private func adjustmentValueColor(isChanged: Bool) -> Color {
+        return isChanged ? Color(.colorPrimary) : Color(.colorSecondary)
+    }
+
+    private func inputGlucoseString(for valueInMgDl: Double?) -> String {
+        guard let valueInMgDl = valueInMgDl else { return "" }
+        
+        return valueInMgDl.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueRounded(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+    }
+    
+    private func enteredGlucoseValueInMgDl(_ glucoseValueString: String) -> Double? {
+        guard let glucoseValue = glucoseValueString.toDouble() else { return nil }
+        
+        return glucoseValue.mmolToMgdl(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+    }
+    
+    private func adjustedGlucoseInputValueString() -> String {
+        return inputGlucoseString(for: currentAdjustedGlucoseValueInMgDl())
+    }
+
+    private func interceptNudgeValueInMgDl() -> Double {
+        let interceptNudgeValueInUserUnit = UserDefaults.standard.bloodGlucoseUnitIsMgDl ? ConstantsBgAdjustment.interceptNudgeValueInMgDl : ConstantsBgAdjustment.interceptNudgeValueInMmol
+        
+        return interceptNudgeValueInUserUnit.mmolToMgdl(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+    }
+
+    private func offsetValueChanged() -> Bool {
+        guard let currentIntercept = intercept.toDouble() else { return false }
+        
+        return abs(currentIntercept - openedInterceptValue) > 0.0001
+    }
+
+    private func scaleValueChanged() -> Bool {
+        guard let currentSlope = slope.toDouble() else { return false }
+        
+        return abs(currentSlope - openedSlopeValue) > 0.0001
+    }
+
+    private func shapeControlDisabled() -> Bool {
+        guard let currentSlope = slope.toDouble() else { return true }
+        
+        return abs(currentSlope - 1.0) < 0.0001
+    }
+
+    @ViewBuilder private func compactAdjustmentShapeControl() -> some View {
+        let bgAdjustmentShapeTypes: [BgAdjustmentShapeType] = [.softerHighs, .neutral, .softerLows]
+        
+        HStack(spacing: 4) {
+            ForEach(bgAdjustmentShapeTypes, id: \.rawValue) { bgAdjustmentShapeType in
+                Button {
+                    if !shapeControlDisabled() {
+                        adjustmentShapeTypeRawValue = bgAdjustmentShapeType.rawValue
+                    }
+                } label: {
+                    Text(bgAdjustmentShapeType.description)
+                        .font(.footnote)
+                        .lineLimit(1)
+                        .foregroundStyle(compactAdjustmentShapeControlTextColor(for: bgAdjustmentShapeType))
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 6)
+                        .background(compactAdjustmentShapeControlBackgroundColor(for: bgAdjustmentShapeType))
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                }
+                .buttonStyle(.plain)
+                .disabled(shapeControlDisabled())
+            }
+        }
+    }
+
+    private func compactAdjustmentShapeControlBackgroundColor(for bgAdjustmentShapeType: BgAdjustmentShapeType) -> Color {
+        if adjustmentShapeTypeRawValue == bgAdjustmentShapeType.rawValue {
+            return shapeControlDisabled() ? Color(.systemGray3) : Color(.colorPrimary)
+        }
+        
+        return shapeControlDisabled() ? Color(.systemGray6) : Color(.systemGray5)
+    }
+
+    private func compactAdjustmentShapeControlTextColor(for bgAdjustmentShapeType: BgAdjustmentShapeType) -> Color {
+        if adjustmentShapeTypeRawValue == bgAdjustmentShapeType.rawValue {
+            return shapeControlDisabled() ? Color(.colorPrimary) : Color(.systemBackground)
+        }
+        
+        return shapeControlDisabled() ? Color(.colorSecondary) : Color(.colorPrimary)
+    }
+
+    private func shouldShowSelectedAdjustmentShapeDescription() -> Bool {
+        return !shapeControlDisabled() && adjustmentShapeType != .neutral
+    }
+
+    private func selectedAdjustmentShapeDescription() -> String {
+        switch adjustmentShapeType {
+        case .softerLows:
+            return Texts_HomeView.postProcessingSofterHighsDescription
+        case .neutral:
+            return Texts_HomeView.postProcessingNeutralDescription
+        case .softerHighs:
+            return Texts_HomeView.postProcessingSofterLowsDescription
+        }
+    }
+    
+    private func inputGlucoseAdjustmentValueString(for adjustedGlucoseValueString: String) -> String {
+        guard let adjustedGlucoseValueInMgDl = enteredGlucoseValueInMgDl(adjustedGlucoseValueString), let latestBgReading = bgReadings.last else {
+            return displayAdjustmentValueString(for: intercept.toDouble() ?? 0.0)
+        }
+        
+        return displayAdjustmentValueString(for: adjustedGlucoseValueInMgDl - latestBgReading.calculatedValue)
+    }
+    
+    private func previewBgReadingValues() -> [Double] {
+        if !previewFinalBgReadingValues.isEmpty {
+            return previewFinalBgReadingValues
+        }
+        
+        return calculatedBgReadingValues
+    }
+    
+    private func previewBgReadingDates() -> [Date] {
+        if !previewFinalBgReadingDates.isEmpty {
+            return previewFinalBgReadingDates
+        }
+        
+        return calculatedBgReadingDates
+    }
+    
+    private func displayAdjustmentValueString(for adjustmentValueInMgDl: Double, includeUnit: Bool = true) -> String {
+        let adjustmentValueInUserUnit = adjustmentValueInMgDl.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl).bgValueRounded(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        let unitString = UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol
+        let prefix = adjustmentValueInUserUnit > 0 ? "+" : adjustmentValueInUserUnit < 0 ? "-" : ""
+        let absoluteValueString = abs(adjustmentValueInUserUnit).bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+        
+        if includeUnit {
+            return prefix + absoluteValueString + " " + unitString
+        }
+        
+        return prefix + absoluteValueString
+    }
+
+    private func glucoseTextColor(for valueInMgDl: Double) -> Color {
+        if valueInMgDl >= UserDefaults.standard.urgentHighMarkValue || valueInMgDl <= UserDefaults.standard.urgentLowMarkValue {
+            return Color(ConstantsGlucoseChart.glucoseUrgentRangeColor)
+        }
+        
+        if valueInMgDl >= UserDefaults.standard.highMarkValue || valueInMgDl <= UserDefaults.standard.lowMarkValue {
+            return Color(ConstantsGlucoseChart.glucoseNotUrgentRangeColor)
+        }
+        
+        return Color(ConstantsGlucoseChart.glucoseInRangeColor)
+    }
+    
+    private func currentAdjustedGlucoseValueInMgDl() -> Double? {
+        guard let latestBgReading = bgReadings.last else { return nil }
+        
+        return latestBgReading.calculatedValue + (intercept.toDouble() ?? 0.0)
+    }
+    
+}
+
+private struct BasicAdjustmentInputView: View {
+    let currentGlucoseValueString: String
+    let glucoseAdjustmentValueString: String
+    let unitString: String
+    @Binding var enteredGlucoseValue: String
+    let onCancel: () -> Void
+    let onConfirm: () -> Void
+    
+    var body: some View {
+        NavigationView {
+            List {
+                Section {
+                    HStack {
+                        Text(Texts_HomeView.postProcessingOriginalGlucose)
+                        Spacer()
+                        Text(currentGlucoseValueString)
+                            .foregroundStyle(Color(.colorSecondary))
+                    }
+                    
+                    HStack {
+                        Text(Texts_HomeView.postProcessingAdjustedGlucose)
+                        Spacer()
+                        TextField(Texts_HomeView.postProcessingEnterValue, text: $enteredGlucoseValue)
+                            .keyboardType(.numbersAndPunctuation)
+                            .multilineTextAlignment(.trailing)
+                        Text(unitString)
+                            .foregroundStyle(Color(.colorSecondary))
+                    }
+                }
+                
+                Section {
+                    HStack {
+                        Text(Texts_HomeView.postProcessingOffset)
+                        Spacer()
+                        Text(glucoseAdjustmentValueString)
+                            .lineLimit(1)
+                            .fixedSize(horizontal: true, vertical: false)
+                            .foregroundStyle(Color(.colorSecondary))
+                    }
+                }
+            }
+            .listStyle(.insetGrouped)
+            .navigationTitle(Texts_HomeView.postProcessingEnterGlucose)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(Texts_Common.Cancel, action: onCancel)
+                }
+                
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(Texts_Common.Ok, action: onConfirm)
+                        .disabled(enteredGlucoseValue.toDouble() == nil)
+                }
+            }
+        }
+        .colorScheme(.dark)
+    }
+}

@@ -18,6 +18,7 @@ struct ShowHideItemsView: View {
     
     @State private var showMiniChart = UserDefaults.standard.showMiniChart
     @State private var showStatistics = UserDefaults.standard.showStatistics
+    @State private var showOriginalBGReadings = UserDefaults.standard.showOriginalBGReadings
     @State private var showTreatmentsOnChart = UserDefaults.standard.showTreatmentsOnChart
     @State private var speakReadings = UserDefaults.standard.speakReadings
     @State private var allowStandByHighContrast = UserDefaults.standard.allowStandByHighContrast
@@ -34,7 +35,7 @@ struct ShowHideItemsView: View {
         NavigationView {
             VStack {
                 List {
-                    Section(header: Text("Home Screen"), footer: Text("Show or hide main home screen elements, useful when using smaller iPhone screen sizes")) {
+                    Section(header: Text(Texts_HomeView.showHideHomeScreenTitle), footer: Text(Texts_HomeView.showHideHomeScreenFooter)) {
                         Toggle(Texts_SettingsView.showMiniChart, isOn: $showMiniChart)
                             .onChange(of: showMiniChart) { newValue in
                                 UserDefaults.standard.showMiniChart = newValue
@@ -46,14 +47,19 @@ struct ShowHideItemsView: View {
                             }
                     }
                     
-                    Section(header: Text("Glucose Chart")) {
+                    Section(header: Text(Texts_HomeView.showHideGlucoseChartTitle)) {
+                        Toggle(Texts_SettingsView.showOriginalBGReadings, isOn: $showOriginalBGReadings)
+                            .onChange(of: showOriginalBGReadings) { newValue in
+                                UserDefaults.standard.showOriginalBGReadings = newValue
+                            }
+                        
                         Toggle(Texts_SettingsView.settingsviews_showTreatments, isOn: $showTreatmentsOnChart)
                             .onChange(of: showTreatmentsOnChart) { newValue in
                                 UserDefaults.standard.showTreatmentsOnChart = newValue
                             }
                     }
                     
-                    Section(header: Text("StandBy Mode"), footer: Text("Changes how the StandBy mode will be displayed if activated in the iPhone settings")) {
+                    Section(header: Text(Texts_HomeView.showHideStandByModeTitle), footer: Text(Texts_HomeView.showHideStandByModeFooter)) {
                         Toggle(Texts_SettingsView.allowStandByHighContrast, isOn: $allowStandByHighContrast)
                             .onChange(of: allowStandByHighContrast) { newValue in
                                 UserDefaults.standard.allowStandByHighContrast = newValue
@@ -65,7 +71,7 @@ struct ShowHideItemsView: View {
                             }
                     }
                     
-                    Section(header: Text("Additional Items")) {
+                    Section(header: Text(Texts_HomeView.showHideAdditionalItemsTitle)) {
                         Toggle(Texts_SettingsView.labelSpeakBgReadings, isOn: $speakReadings)
                             .onChange(of: speakReadings) { newValue in
                                 UserDefaults.standard.speakReadings = newValue

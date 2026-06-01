@@ -90,7 +90,7 @@ final class WatchManager: NSObject, ObservableObject {
         
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
-        let bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: .now.addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let bgReadings = bgReadingsAccessor.getLatestBgReadingSnapshots(limit: nil, fromDate: .now.addingTimeInterval(-3600 * hoursOfBgReadingsToSend), forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
         
         let slopeOrdinal: Int = !bgReadings.isEmpty ? bgReadings[0].slopeOrdinal() : 1
         
@@ -100,8 +100,8 @@ final class WatchManager: NSObject, ObservableObject {
         
         // add delta if available
         if bgReadings.count > 1 {
-            previousValueInUserUnit = bgReadings[1].calculatedValue.mgDlToMmol(mgDl: isMgDl)
-            actualValueInUserUnit = bgReadings[0].calculatedValue.mgDlToMmol(mgDl: isMgDl)
+            previousValueInUserUnit = bgReadings[1].finalValue.mgDlToMmol(mgDl: isMgDl)
+            actualValueInUserUnit = bgReadings[0].finalValue.mgDlToMmol(mgDl: isMgDl)
             
             // if the values are in mmol/L, then round them to the nearest decimal point in order to get the same precision out of the next operation
             if !isMgDl {
@@ -116,7 +116,7 @@ final class WatchManager: NSObject, ObservableObject {
         var bgReadingDatesAsDouble: [Double] = []
         
         for bgReading in bgReadings {
-            bgReadingValues.append(bgReading.calculatedValue)
+            bgReadingValues.append(bgReading.finalValue)
             bgReadingDatesAsDouble.append(bgReading.timeStamp.timeIntervalSince1970)
         }
         

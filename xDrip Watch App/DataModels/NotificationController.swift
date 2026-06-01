@@ -6,9 +6,11 @@
 //  Copyright © 2024 Johan Degraeve. All rights reserved.
 //
 
-import WatchKit
 import SwiftUI
 import UserNotifications
+
+#if canImport(WatchKit)
+import WatchKit
 
 class NotificationController: WKUserNotificationHostingController<NotificationView> {
     var alertTitle: String?
@@ -80,3 +82,4 @@ class NotificationController: WKUserNotificationHostingController<NotificationVi
         
     }
 }
+#endif

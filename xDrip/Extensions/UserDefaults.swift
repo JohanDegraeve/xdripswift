@@ -91,6 +91,20 @@ extension UserDefaults {
         case notificationInterval = "notificationInterval"
         /// which type of live activities should be shown, if any?
         case liveActivityType = "liveActivityType"
+        /// should BG adjustment be enabled?
+        case enableAdjustment = "enableAdjustment"
+        /// should BG smoothing be enabled?
+        case enableSmoothing = "enableSmoothing"
+        /// BG smoothing period in minutes
+        case bgSmoothingPeriodInMinutes = "bgSmoothingPeriodInMinutes"
+        /// BG smoothing strength
+        case bgSmoothingStrength = "bgSmoothingStrength"
+        /// timestamp from which BG post processing should be allowed for the current source
+        case postProcessingStartTimeStamp = "postProcessingStartTimeStamp"
+        /// current source context identifier used by BG post processing
+        case postProcessingSourceContextIdentifier = "postProcessingSourceContextIdentifier"
+        /// hours to show in the BG post processing preview chart
+        case postProcessingPreviewChartHoursToShow = "postProcessingPreviewChartHoursToShow"
         
         // Home Screen and main chart settings
         
@@ -106,6 +120,8 @@ extension UserDefaults {
         case screenLockDimmingType = "screenLockDimmingType"
         /// should the main chart y-axis be automatically rescaled back down to current chart values and the end date reset when necessary?
         case allowMainChartAutoReset = "allowMainChartAutoReset"
+        /// should the original glucose values be shown on the main chart when post processing is enabled?
+        case showOriginalBGReadings = "showOriginalBGReadings"
         /// show the objective lines in color or grey?
         case urgentHighMarkValue = "urgentHighMarkValue"
         /// high value
@@ -816,6 +832,82 @@ extension UserDefaults {
         }
     }
     
+    /// should adjustment be enabled?
+    @objc dynamic var enableAdjustment: Bool {
+        get {
+            return bool(forKey: Key.enableAdjustment.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.enableAdjustment.rawValue)
+        }
+    }
+    
+    /// should smoothing be enabled?
+    @objc dynamic var enableSmoothing: Bool {
+        get {
+            return bool(forKey: Key.enableSmoothing.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.enableSmoothing.rawValue)
+        }
+    }
+    
+    /// smoothing period in minutes
+    @objc dynamic var bgSmoothingPeriodInMinutes: Int {
+        get {
+            let smoothingPeriodInMinutes = integer(forKey: Key.bgSmoothingPeriodInMinutes.rawValue)
+            return smoothingPeriodInMinutes > 0 ? smoothingPeriodInMinutes : ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes
+        }
+        set {
+            set(newValue, forKey: Key.bgSmoothingPeriodInMinutes.rawValue)
+        }
+    }
+    
+    /// smoothing strength
+    @objc dynamic var bgSmoothingStrength: Int {
+        get {
+            if object(forKey: Key.bgSmoothingStrength.rawValue) == nil {
+                return ConstantsBgSmoothing.defaultSmoothingStrength
+            }
+            
+            return integer(forKey: Key.bgSmoothingStrength.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.bgSmoothingStrength.rawValue)
+        }
+    }
+    
+    /// timestamp from which post processing can be applied for the current source context
+    @objc dynamic var postProcessingStartTimeStamp: Date? {
+        get {
+            return object(forKey: Key.postProcessingStartTimeStamp.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.postProcessingStartTimeStamp.rawValue)
+        }
+    }
+    
+    /// current source context identifier used by BG post processing
+    @objc dynamic var postProcessingSourceContextIdentifier: String? {
+        get {
+            return string(forKey: Key.postProcessingSourceContextIdentifier.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.postProcessingSourceContextIdentifier.rawValue)
+        }
+    }
+
+    /// hours to show in the BG post processing preview chart
+    @objc dynamic var postProcessingPreviewChartHoursToShow: Int {
+        get {
+            let hoursToShow = integer(forKey: Key.postProcessingPreviewChartHoursToShow.rawValue)
+            return hoursToShow > 0 ? hoursToShow : ConstantsBgAdjustment.defaultPreviewChartHoursToShow
+        }
+        set {
+            set(newValue, forKey: Key.postProcessingPreviewChartHoursToShow.rawValue)
+        }
+    }
+    
     // MARK: Home Screen Settings
     
     /// the amount of hours to show in the mini-chart. Usually 24 hours but can be set to 48 hours by the user
@@ -1173,6 +1265,17 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.allowMainChartAutoReset.rawValue)
+        }
+    }
+
+    /// should the app show the original glucose values on the main chart when post processing is enabled?
+    @objc dynamic var showOriginalBGReadings: Bool {
+        // default value for bool in userdefaults is false, as default we want the app to show the original BG readings
+        get {
+            return !bool(forKey: Key.showOriginalBGReadings.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showOriginalBGReadings.rawValue)
         }
     }
     
@@ -2715,5 +2818,3 @@ extension UserDefaults {
         }
     }
 }
-
-

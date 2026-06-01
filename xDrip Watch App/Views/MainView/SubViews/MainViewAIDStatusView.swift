@@ -12,7 +12,7 @@ import SwiftUI
 struct MainViewAIDStatusView: View {
     @EnvironmentObject var watchState: WatchStateModel
     
-    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
+    let isSmallScreen = ConstantsAppleWatch.isSmallScreen()
     
     var body: some View {
         let textSize: CGFloat = isSmallScreen ? 14 : 16

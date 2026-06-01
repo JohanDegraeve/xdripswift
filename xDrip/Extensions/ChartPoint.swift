@@ -7,7 +7,16 @@ extension ChartPoint {
         
             self.init(
                 x: ChartAxisValueDate(date: bgReading.timeStamp, formatter: formatter),
-                y: ChartAxisValueDouble(bgReading.calculatedValue.mgDlToMmol(mgDl: unitIsMgDl))
+                y: ChartAxisValueDouble(bgReading.finalValue.mgDlToMmol(mgDl: unitIsMgDl))
+            )
+
+    }
+    
+    convenience init(originalBgReading: BgReading, formatter: DateFormatter, unitIsMgDl: Bool) {
+        
+            self.init(
+                x: ChartAxisValueDate(date: originalBgReading.timeStamp, formatter: formatter),
+                y: ChartAxisValueDouble(originalBgReading.calculatedValue.mgDlToMmol(mgDl: unitIsMgDl))
             )
 
     }

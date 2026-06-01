@@ -44,6 +44,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     // for trace,
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryBlueToothTransmitter)
+    private let bluetoothDebugPrefix = "[COEXDBG][BLE]"
     
     /// central queue for all CoreBluetooth work (dedicated serial queue)
     private let centralQueue = DispatchQueue(label: "bt.central", qos: .userInitiated)
@@ -105,6 +106,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     private var lastConnectLogName: String? = nil
     
     private var hasLoggedPersistThisRun = false
+    private var bluetoothDebugSessionSequence = 0
+    private var bluetoothDebugSession: BluetoothDebugSession?
+    private var bluetoothDebugPendingConnectSourceByPeripheralID: [UUID: String] = [:]
 
     /// If set by a subclass, we will treat the *next* disconnect as a temporary rejection for this specific device name.
     /// This is intended for transient pre-auth cases (e.g. G7/ONE+ "Encryption is insufficient").
@@ -113,6 +117,25 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// Names of devices we should avoid reconnecting to for a short period after a recent disconnect
     private var temporarilyRejectedDeviceNames: [String: Date] = [:]
     private let temporaryRejectionCooldownSeconds: TimeInterval = 180
+
+    private struct BluetoothDebugSession {
+        let id: Int
+        let peripheralID: String
+        let peripheralName: String
+        let source: String
+        let startedAt: Date
+        var didConnectCount: Int = 0
+        var discoverServicesRequested = false
+        var didDiscoverServicesCount: Int = 0
+        var didDiscoverCharacteristicsCount: Int = 0
+        var didUpdateNotificationStateCount: Int = 0
+        var didFailToConnectCount: Int = 0
+        var didDisconnectCount: Int = 0
+        var restoredStateCount: Int = 0
+        var lastCentralState: String?
+        var lastPeripheralState: String?
+        var lastError: String?
+    }
     
     /// set the connection options
     private var connectOptions: [String: Any] {
@@ -130,6 +153,268 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// Records a device name as temporarily rejected from immediate reconnection attempts
     private func markDeviceNameAsTemporarilyRejected(_ discoveredDeviceName: String) {
         temporarilyRejectedDeviceNames[discoveredDeviceName] = Date()
+    }
+
+    private func bluetoothDebugTrace(_ message: StaticString, _ args: CVarArg...) {
+        if args.isEmpty {
+            trace("%{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug, bluetoothDebugPrefix + " " + String(describing: message))
+        } else {
+            let formatted = String(format: String(describing: message), arguments: args)
+            trace("%{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug, bluetoothDebugPrefix + " " + formatted)
+        }
+    }
+
+    private func bluetoothDebugRecordPendingConnectSource(peripheral: CBPeripheral, source: String) {
+        bluetoothDebugPendingConnectSourceByPeripheralID[peripheral.identifier] = source
+        bluetoothDebugTrace(
+            "pending connect source=%@ peripheral=%@ id=%@ state=%@",
+            source,
+            peripheral.name ?? "unknown",
+            peripheral.identifier.uuidString,
+            peripheral.state.description()
+        )
+    }
+
+    private func bluetoothDebugConsumePendingConnectSource(peripheral: CBPeripheral) -> String {
+        let source = bluetoothDebugPendingConnectSourceByPeripheralID.removeValue(forKey: peripheral.identifier) ?? "callback_unknown"
+        bluetoothDebugTrace(
+            "consume connect source=%@ peripheral=%@ id=%@ state=%@",
+            source,
+            peripheral.name ?? "unknown",
+            peripheral.identifier.uuidString,
+            peripheral.state.description()
+        )
+        return source
+    }
+
+    private func bluetoothDebugStartOrUpdateSession(peripheral: CBPeripheral, source: String) {
+        if var session = bluetoothDebugSession, session.peripheralID == peripheral.identifier.uuidString {
+            session.didConnectCount += 1
+            session.lastPeripheralState = peripheral.state.description()
+            bluetoothDebugSession = session
+            bluetoothDebugTrace(
+                "session=%d didConnect source=%@ peripheral=%@ state=%@ count=%d",
+                session.id,
+                source,
+                peripheral.name ?? "unknown",
+                peripheral.state.description(),
+                session.didConnectCount
+            )
+            return
+        }
+
+        bluetoothDebugSessionSequence += 1
+        bluetoothDebugSession = BluetoothDebugSession(
+            id: bluetoothDebugSessionSequence,
+            peripheralID: peripheral.identifier.uuidString,
+            peripheralName: peripheral.name ?? "unknown",
+            source: source,
+            startedAt: Date(),
+            didConnectCount: 1,
+            lastPeripheralState: peripheral.state.description()
+        )
+        bluetoothDebugTrace(
+            "session=%d start source=%@ peripheral=%@ id=%@ state=%@",
+            bluetoothDebugSessionSequence,
+            source,
+            peripheral.name ?? "unknown",
+            peripheral.identifier.uuidString,
+            peripheral.state.description()
+        )
+    }
+
+    private func bluetoothDebugMarkDiscoverServicesRequested(peripheral: CBPeripheral) {
+        guard var session = bluetoothDebugSession, session.peripheralID == peripheral.identifier.uuidString else {
+            bluetoothDebugTrace(
+                "discoverServices requested with no session peripheral=%@ id=%@ state=%@",
+                peripheral.name ?? "unknown",
+                peripheral.identifier.uuidString,
+                peripheral.state.description()
+            )
+            return
+        }
+        session.discoverServicesRequested = true
+        session.lastPeripheralState = peripheral.state.description()
+        bluetoothDebugSession = session
+        bluetoothDebugTrace(
+            "session=%d discoverServices requested peripheral=%@ state=%@ knownServices=%d",
+            session.id,
+            peripheral.name ?? "unknown",
+            peripheral.state.description(),
+            peripheral.services?.count ?? 0
+        )
+    }
+
+    private func bluetoothDebugMarkDidDiscoverServices(peripheral: CBPeripheral, error: Error?) {
+        guard var session = bluetoothDebugSession, session.peripheralID == peripheral.identifier.uuidString else {
+            bluetoothDebugTrace(
+                "didDiscoverServices with no session peripheral=%@ id=%@ error=%@",
+                peripheral.name ?? "unknown",
+                peripheral.identifier.uuidString,
+                error?.localizedDescription ?? "none"
+            )
+            return
+        }
+        session.didDiscoverServicesCount += 1
+        session.lastPeripheralState = peripheral.state.description()
+        session.lastError = error?.localizedDescription
+        bluetoothDebugSession = session
+        bluetoothDebugTrace(
+            "session=%d didDiscoverServices count=%d serviceCount=%d error=%@",
+            session.id,
+            session.didDiscoverServicesCount,
+            peripheral.services?.count ?? 0,
+            error?.localizedDescription ?? "none"
+        )
+    }
+
+    private func bluetoothDebugMarkDidDiscoverCharacteristics(peripheral: CBPeripheral, service: CBService, error: Error?) {
+        guard var session = bluetoothDebugSession, session.peripheralID == peripheral.identifier.uuidString else {
+            bluetoothDebugTrace(
+                "didDiscoverCharacteristics with no session peripheral=%@ service=%@ error=%@",
+                peripheral.name ?? "unknown",
+                service.uuid.uuidString,
+                error?.localizedDescription ?? "none"
+            )
+            return
+        }
+        session.didDiscoverCharacteristicsCount += 1
+        session.lastPeripheralState = peripheral.state.description()
+        session.lastError = error?.localizedDescription
+        bluetoothDebugSession = session
+        bluetoothDebugTrace(
+            "session=%d didDiscoverCharacteristics service=%@ count=%d characteristicCount=%d error=%@",
+            session.id,
+            service.uuid.uuidString,
+            session.didDiscoverCharacteristicsCount,
+            service.characteristics?.count ?? 0,
+            error?.localizedDescription ?? "none"
+        )
+    }
+
+    private func bluetoothDebugMarkDidUpdateNotificationState(peripheral: CBPeripheral, characteristic: CBCharacteristic, error: Error?) {
+        guard var session = bluetoothDebugSession, session.peripheralID == peripheral.identifier.uuidString else {
+            bluetoothDebugTrace(
+                "didUpdateNotificationState with no session peripheral=%@ characteristic=%@ notifying=%@ error=%@",
+                peripheral.name ?? "unknown",
+                characteristic.uuid.uuidString,
+                characteristic.isNotifying.description,
+                error?.localizedDescription ?? "none"
+            )
+            return
+        }
+        session.didUpdateNotificationStateCount += 1
+        session.lastPeripheralState = peripheral.state.description()
+        session.lastError = error?.localizedDescription
+        bluetoothDebugSession = session
+        bluetoothDebugTrace(
+            "session=%d didUpdateNotificationState characteristic=%@ notifying=%@ count=%d error=%@",
+            session.id,
+            characteristic.uuid.uuidString,
+            characteristic.isNotifying.description,
+            session.didUpdateNotificationStateCount,
+            error?.localizedDescription ?? "none"
+        )
+    }
+
+    private func bluetoothDebugMarkDidFailToConnect(peripheral: CBPeripheral, error: Error?) {
+        guard var session = bluetoothDebugSession, session.peripheralID == peripheral.identifier.uuidString else {
+            bluetoothDebugTrace(
+                "didFailToConnect with no session peripheral=%@ id=%@ state=%@ error=%@",
+                peripheral.name ?? "unknown",
+                peripheral.identifier.uuidString,
+                peripheral.state.description(),
+                error?.localizedDescription ?? "none"
+            )
+            return
+        }
+        session.didFailToConnectCount += 1
+        session.lastPeripheralState = peripheral.state.description()
+        session.lastError = error?.localizedDescription
+        bluetoothDebugSession = session
+        bluetoothDebugTrace(
+            "session=%d didFailToConnect count=%d state=%@ error=%@",
+            session.id,
+            session.didFailToConnectCount,
+            peripheral.state.description(),
+            error?.localizedDescription ?? "none"
+        )
+    }
+
+    private func bluetoothDebugMarkCentralState(_ central: CBCentralManager) {
+        if var session = bluetoothDebugSession {
+            session.lastCentralState = central.state.toString()
+            bluetoothDebugSession = session
+            bluetoothDebugTrace("session=%d central state=%@", session.id, central.state.toString())
+        } else {
+            bluetoothDebugTrace("central state=%@ with no active session", central.state.toString())
+        }
+    }
+
+    private func bluetoothDebugMarkWillRestoreState(_ restoredPeripheral: CBPeripheral?) {
+        if let restoredPeripheral = restoredPeripheral {
+            bluetoothDebugTrace(
+                "willRestoreState peripheral=%@ id=%@ state=%@",
+                restoredPeripheral.name ?? "unknown",
+                restoredPeripheral.identifier.uuidString,
+                restoredPeripheral.state.description()
+            )
+            if var session = bluetoothDebugSession, session.peripheralID == restoredPeripheral.identifier.uuidString {
+                session.restoredStateCount += 1
+                session.lastPeripheralState = restoredPeripheral.state.description()
+                bluetoothDebugSession = session
+            }
+        } else {
+            bluetoothDebugTrace("willRestoreState with no restored peripherals")
+        }
+    }
+
+    private func bluetoothDebugMarkDisconnect(peripheral: CBPeripheral, error: Error?) {
+        guard var session = bluetoothDebugSession, session.peripheralID == peripheral.identifier.uuidString else {
+            bluetoothDebugTrace(
+                "didDisconnect with no session peripheral=%@ id=%@ state=%@ error=%@",
+                peripheral.name ?? "unknown",
+                peripheral.identifier.uuidString,
+                peripheral.state.description(),
+                error?.localizedDescription ?? "none"
+            )
+            return
+        }
+        session.didDisconnectCount += 1
+        session.lastPeripheralState = peripheral.state.description()
+        session.lastError = error?.localizedDescription
+        bluetoothDebugSession = session
+        bluetoothDebugTrace(
+            "session=%d didDisconnect count=%d state=%@ error=%@",
+            session.id,
+            session.didDisconnectCount,
+            peripheral.state.description(),
+            error?.localizedDescription ?? "none"
+        )
+    }
+
+    private func bluetoothDebugFinishSession(peripheral: CBPeripheral, reason: String) {
+        guard let session = bluetoothDebugSession, session.peripheralID == peripheral.identifier.uuidString else { return }
+        let duration = Date().timeIntervalSince(session.startedAt)
+        bluetoothDebugTrace(
+            "session=%d finish reason=%@ source=%@ peripheral=%@ duration=%.3f didConnect=%d discoverRequested=%@ didDiscoverServices=%d didDiscoverCharacteristics=%d notifyUpdates=%d didFailToConnect=%d didDisconnect=%d lastCentral=%@ lastPeripheral=%@ lastError=%@",
+            session.id,
+            reason,
+            session.source,
+            session.peripheralName,
+            duration,
+            session.didConnectCount,
+            session.discoverServicesRequested.description,
+            session.didDiscoverServicesCount,
+            session.didDiscoverCharacteristicsCount,
+            session.didUpdateNotificationStateCount,
+            session.didFailToConnectCount,
+            session.didDisconnectCount,
+            session.lastCentralState ?? "unknown",
+            session.lastPeripheralState ?? "unknown",
+            session.lastError ?? "none"
+        )
+        bluetoothDebugSession = nil
     }
     
     /// Returns true if the device name looks like a Dexcom G7/ONE+ (DX**)
@@ -430,6 +715,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         //in Spike a check is done to see if state is disconnected, this is code from the MiaoMiao developers, not sure if this is needed or not because normally the device should be disconnected
         if peripheral.state == .disconnected {
             trace("in stopScanAndconnect, trying to connect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+            bluetoothDebugRecordPendingConnectSource(peripheral: peripheral, source: "scan_stop_and_connect")
             
             // set timer to avoid that connection attempt takes forever
             // schedule timer on main thread because background queues do not have a run loop
@@ -442,6 +728,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         } else {
             if let newCentralManager = centralManager {
                 trace("in stopScanAndconnect, calling centralManager(newCentralManager, didConnect: peripheral", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+                bluetoothDebugRecordPendingConnectSource(peripheral: peripheral, source: "synthetic_didConnect_existing_state_\(peripheral.state.description())")
                 centralManager(newCentralManager, didConnect: peripheral)
             }
         }
@@ -481,6 +768,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                     peripheral = peripheralArr[0]
                     if let peripheral = peripheral {
                         trace("in retrievePeripherals, trying to connect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+                        bluetoothDebugRecordPendingConnectSource(peripheral: peripheral, source: "retrieve_peripherals")
                         peripheral.delegate = self
                         central.connect(peripheral, options: connectOptions)
                         return true
@@ -562,6 +850,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         let now = Date()
         let name = deviceName ?? "'unknown'"
+        let connectSource = bluetoothDebugConsumePendingConnectSource(peripheral: peripheral)
+        bluetoothDebugStartOrUpdateSession(peripheral: peripheral, source: connectSource)
         if now.timeIntervalSince(lastConnectLogAt) > 2.0 || lastConnectLogName != name {
             trace("in didConnect, connected to peripheral with name %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, name)
             lastConnectLogAt = now
@@ -598,6 +888,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             }
         }
         
+        bluetoothDebugMarkDiscoverServicesRequested(peripheral: peripheral)
         peripheral.discoverServices(servicesCBUUIDs)
         
     }
@@ -605,6 +896,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
         
         timeStampLastStatusUpdate = Date()
+        bluetoothDebugMarkDidFailToConnect(peripheral: peripheral, error: error)
         
         if let error = error {
             trace("in didFailToConnect, failed to connect for peripheral with name %{public}@, with error: %{public}@, will try again", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error , deviceName ?? "'unknown'", error.localizedDescription)
@@ -619,6 +911,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         
         timeStampLastStatusUpdate = Date()
+        bluetoothDebugMarkCentralState(central)
         
         trace("in centralManagerDidUpdateState, for peripheral with name %{public}@, new state is %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'", "\(central.state.toString())")
         
@@ -643,6 +936,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         
         timeStampLastStatusUpdate = Date()
+        bluetoothDebugMarkDisconnect(peripheral: peripheral, error: error)
         
         // delegate can update UI / Core Data. Ensure main thread
         dispatchToMain { [weak self] in
@@ -687,6 +981,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         // otherwise disconnect occurred because of other (like out of range), so let's try to reconnect
         if shouldReconnectOnNextDisconnect, let ownPeripheral = self.peripheral {
             trace("in didDisconnectPeripheral, will try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug)
+            bluetoothDebugRecordPendingConnectSource(peripheral: ownPeripheral, source: "auto_reconnect_after_disconnect")
             centralManager?.connect(ownPeripheral, options: connectOptions)
         } else {
             trace("in didDisconnectPeripheral, reconnect disabled for this disconnect or peripheral is nil, will not try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
@@ -694,11 +989,13 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
         // Reset policy back to default (reconnect) after handling one disconnect
         shouldReconnectOnNextDisconnect = true
+        bluetoothDebugFinishSession(peripheral: peripheral, reason: "didDisconnectPeripheral")
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         
         timeStampLastStatusUpdate = Date()
+        bluetoothDebugMarkDidDiscoverServices(peripheral: peripheral, error: error)
         
         trace("in didDiscoverServices, for peripheral with name %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug, deviceName ?? "'unknown'")
         
@@ -719,6 +1016,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         
         timeStampLastStatusUpdate = Date()
+        bluetoothDebugMarkDidDiscoverCharacteristics(peripheral: peripheral, service: service, error: error)
         
         trace("in didDiscoverCharacteristicsFor, for peripheral with name %{public}@, for service with uuid %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug, deviceName ?? "'unknown'", String(describing:service.uuid))
         
@@ -758,6 +1056,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func peripheral(_ peripheral: CBPeripheral, didUpdateNotificationStateFor characteristic: CBCharacteristic, error: Error?) {
         
         timeStampLastStatusUpdate = Date()
+        bluetoothDebugMarkDidUpdateNotificationState(peripheral: peripheral, characteristic: characteristic, error: error)
         
         if let error = error {
             trace("in didUpdateNotificationStateFor, for peripheral with name %{public}@, characteristic %{public}@, error =  %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error, deviceName ?? "'unkonwn'", String(describing: characteristic.uuid), error.localizedDescription)
@@ -785,6 +1084,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         
         // Attempt to reuse the restored peripheral (if any) without forcing a rescan.
         if let restoredPeripherals = dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral], let restoredPeripheral = restoredPeripherals.first {
+            bluetoothDebugMarkWillRestoreState(restoredPeripheral)
             
             // Re-attach references and delegates
             self.peripheral = restoredPeripheral
@@ -798,14 +1098,20 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             case .connected:
                 // On restore while connected, always rediscover services so subclasses can resubscribe ALL required characteristics (not just the cached receive one).
                 trace("didUpdateValueFor, connected, rediscovering services for full resubscribe", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+                bluetoothDebugRecordPendingConnectSource(peripheral: restoredPeripheral, source: "restore_connected_rediscover")
+                bluetoothDebugStartOrUpdateSession(peripheral: restoredPeripheral, source: "restore_connected_rediscover")
+                bluetoothDebugMarkDiscoverServicesRequested(peripheral: restoredPeripheral)
                 restoredPeripheral.discoverServices(self.servicesCBUUIDs)
             case .connecting:
                 // Nothing to do. CoreBluetooth will finish the connection
                 break
             default:
                 // Reconnect restored peripheral to resume subscriptions after OS restore
+                bluetoothDebugRecordPendingConnectSource(peripheral: restoredPeripheral, source: "restore_reconnect")
                 central.connect(restoredPeripheral, options: connectOptions)
             }
+        } else {
+            bluetoothDebugMarkWillRestoreState(nil)
         }
     }
     

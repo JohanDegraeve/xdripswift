@@ -9,6 +9,7 @@ extension BgReading {
     }
 
     @NSManaged public var a: Double
+    @NSManaged public var adjustedValue: NSNumber?
     @NSManaged public var ageAdjustedRawValue: Double
     @NSManaged public var b: Double
     @NSManaged public var c: Double
@@ -21,6 +22,7 @@ extension BgReading {
     @NSManaged public var rawData: Double
     @NSManaged public var rb: Double
     @NSManaged public var rc: Double
+    @NSManaged public var smoothedValue: NSNumber?
     @NSManaged public var timeStamp: Date
     @NSManaged public var deviceName: String?
     @NSManaged public var calibration: Calibration?

@@ -200,7 +200,14 @@ class BgReadingsAccessor: ObservableObject {
                     // this is the big difference here.
                     // Use snapshots instead of BgReading objects to avoid Core Data crashes.
                     // They’re plain value types, detached from the context, and safe to use on any thread.
-                    returnValue.append(BgReadingSnapshot(timeStamp: bgReading.timeStamp, calculatedValue: bgReading.calculatedValue, rawData: bgReading.rawData, sensorID: bgReading.sensor?.id, objectID: bgReading.objectID))
+                    let calibrationSnapshot: CalibrationSnapshot?
+                    if let calibration = bgReading.calibration {
+                        calibrationSnapshot = CalibrationSnapshot(id: calibration.id, timeStamp: calibration.timeStamp, slope: calibration.slope, intercept: calibration.intercept, bg: calibration.bg, rawValue: calibration.rawValue)
+                    } else {
+                        calibrationSnapshot = nil
+                    }
+                    
+                    returnValue.append(BgReadingSnapshot(timeStamp: bgReading.timeStamp, calculatedValue: bgReading.calculatedValue, rawData: bgReading.rawData, finalValue: bgReading.finalValue, adjustedValue: bgReading.adjustedValue?.doubleValue, smoothedValue: bgReading.smoothedValue?.doubleValue, calculatedValueSlope: bgReading.calculatedValueSlope, hideSlope: bgReading.hideSlope, id: bgReading.id, deviceName: bgReading.deviceName, calibrationSnapshot: calibrationSnapshot, sensorID: bgReading.sensor?.id, objectID: bgReading.objectID))
 
                     if let limit = limit, returnValue.count == limit { break }
                 }
@@ -558,6 +565,20 @@ class BgReadingsAccessor: ObservableObject {
 
         }
         
+    }
+
+    /// deletes a bgReading using its objectID
+    func delete(bgReadingObjectID: NSManagedObjectID) {
+        coreDataManager.mainManagedObjectContext.performAndWait {
+            do {
+                if let bgReading = try coreDataManager.mainManagedObjectContext.existingObject(with: bgReadingObjectID) as? BgReading {
+                    coreDataManager.mainManagedObjectContext.delete(bgReading)
+                    try coreDataManager.mainManagedObjectContext.save()
+                }
+            } catch {
+                trace("in delete bgReadingObjectID, Unable to Save Changes, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, error.localizedDescription)
+            }
+        }
     }
     
     

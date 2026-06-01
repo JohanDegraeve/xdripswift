@@ -22,7 +22,7 @@ struct MainView: View {
     // store a boolean flag. We'll toggle this to refresh as needed
     @State private var refreshView = false
     
-    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
+    let isSmallScreen = ConstantsAppleWatch.isSmallScreen()
     
     // MARK: -  Body
     var body: some View {
