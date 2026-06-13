@@ -24,7 +24,7 @@ final class RootViewController: UIViewController, ObservableObject {
     
     private var preSnoozeToolbarButtonOutlet: UIButton!
     @IBAction func preSnoozeToolbarButtonAction(_ sender: UIButton) {
-        performSegue(withIdentifier: "RootViewToSnoozeView", sender: self)
+        showSnoozeView()
     }
     
     private var bgReadingsToolbarButtonOutlet: UIButton!
@@ -427,7 +427,7 @@ final class RootViewController: UIViewController, ObservableObject {
     private let applicationManagerKeyCreateupdateLabelsAndChartTimer = "RootViewController-CreateupdateLabelsAndChartTimer"
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground
-    private let applicationManagerKeyInvalidateupdateLabelsAndChartTimerAndCloseSnoozeViewController = "RootViewController-InvalidateupdateLabelsAndChartTimerAndCloseSnoozeViewController"
+    private let applicationManagerKeyInvalidateupdateLabelsAndChartTimerAndCloseSnoozeScreen = "RootViewController-InvalidateupdateLabelsAndChartTimerAndCloseSnoozeScreen"
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - initial calibration
     private let applicationManagerKeyInitialCalibration = "RootViewController-InitialCalibration"
@@ -1085,26 +1085,6 @@ final class RootViewController: UIViewController, ObservableObject {
         
     }
     
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
-        guard let segueIdentifier = segue.identifier else {
-            fatalError("In RootViewController, prepare for segue, Segue had no identifier")
-        }
-        
-        switch segueIdentifier {
-            
-        case "RootViewToSnoozeView":
-            guard let vc = segue.destination as? SnoozeViewController else {
-                fatalError("In RootViewController, prepare for segue, viewcontroller is not SnoozeViewController" )
-            }
-            
-            // configure view controller
-            vc.configure(alertManager: alertManager)
-        default:
-            break
-        }
-    }
-    
     /// sets AVAudioSession category to AVAudioSession.Category.playback with option mixWithOthers and
     /// AVAudioSession.sharedInstance().setActive(true)
     private func setupAVAudioSession() {
@@ -1515,12 +1495,19 @@ final class RootViewController: UIViewController, ObservableObject {
         }
     }
     
-    /// closes the SnoozeViewController if it is being presented now
-    private func closeSnoozeViewController() {
+    /// closes the SwiftUI snooze screen if it is currently visible
+    private func closeSnoozeScreen() {
         if let presentedViewController = self.presentedViewController {
-            if let snoozeViewController = presentedViewController as? SnoozeViewController {
-                snoozeViewController.dismiss(animated: true, completion: nil)
+            if presentedViewController is SnoozeHostingController {
+                presentedViewController.dismiss(animated: true, completion: nil)
+                return
             }
+        }
+
+        if let navigationController = navigationController,
+           let topViewController = navigationController.topViewController,
+           topViewController is SnoozeHostingController {
+            navigationController.popViewController(animated: false)
         }
     }
     
@@ -1849,10 +1836,10 @@ final class RootViewController: UIViewController, ObservableObject {
         })
         
         // when app goes to background
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInvalidateupdateLabelsAndChartTimerAndCloseSnoozeViewController, closure: {
-            // this is for the case that the snoozeViewController is shown. If not removed, then if user opens alert notification, the alert snooze wouldn't be shown
-            // that's why, close the snoozeViewController
-            self.closeSnoozeViewController()
+        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyInvalidateupdateLabelsAndChartTimerAndCloseSnoozeScreen, closure: {
+            // If the snooze screen is visible when the app backgrounds, close it so
+            // the alert snooze picker can still be shown when the app reopens.
+            self.closeSnoozeScreen()
             
             // updateLabelsAndChartTimer needs to be invalidated when app goes to background
             invalidateUpdateLabelsAndChartTimer()
@@ -2545,9 +2532,9 @@ final class RootViewController: UIViewController, ObservableObject {
             if alertManager.checkAlerts(maxAgeOfLastBgReadingInSeconds: ConstantsFollower.maximumBgReadingAgeForAlertsInSeconds) {
                 // an immediate alert went off that shows the current reading
                 
-                // possibily the app is in the foreground now
-                // if user would have opened SnoozeViewController now, then close it, otherwise the alarm picker view will not be shown
-                closeSnoozeViewController()
+                // possibly the app is in the foreground now
+                // if user has the snooze screen open now, then close it, otherwise the alarm picker view will not be shown
+                closeSnoozeScreen()
                 
                 // only update badge is required, (if enabled offcourse)
                 createBgReadingNotificationAndSetAppBadge(overrideShowReadingInNotification: true)
@@ -3343,16 +3330,26 @@ final class RootViewController: UIViewController, ObservableObject {
     private func showAIDStatusView() {
         showSwiftUIView(AIDStatusView().environmentObject(nightscoutSyncManager!))
     }
-    
+
+    private func showSnoozeView() {
+        guard let alertManager = alertManager else { return }
+
+        showViewController(SnoozeHostingController(alertManager: alertManager))
+    }
+
     /// Show a SwiftUI view from the UIKit root view controller.
     /// This keeps the SwiftUI bridge in code so we do not need storyboard segues
     /// or destination creation selectors for every hosted SwiftUI screen.
     private func showSwiftUIView<Content: View>(_ rootView: Content) {
-        let hostingController = UIHostingController(rootView: rootView)
-        
+        showViewController(UIHostingController(rootView: rootView))
+    }
+
+    /// Use the same code-based UIKit presentation path for both plain SwiftUI
+    /// hosting controllers and custom container view controllers.
+    private func showViewController(_ viewController: UIViewController) {
         // Use show so UIKit can choose the same navigation behavior that the
         // previous storyboard-based show segues were using in this controller.
-        show(hostingController, sender: self)
+        show(viewController, sender: self)
     }
     
     /// check if the conditions are correct to start a live activity, update it, or end it

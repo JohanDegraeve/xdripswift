@@ -91,6 +91,7 @@
 		4752B400263570DA0081D551 /* ConstantsStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */; };
 		4752B4062635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */; };
 		475F2A872D0DA81400DE6019 /* ShowHideItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */; };
+		4AC0D0012F1D000100000001 /* SnoozeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AC0D0022F1D000100000001 /* SnoozeView.swift */; };
 		475FBA082D7312DE004D068E /* PickerViewControllerModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475FBA072D7312D5004D068E /* PickerViewControllerModal.swift */; };
 		476404892EA29034006CBE03 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476404882EA29034006CBE03 /* SceneDelegate.swift */; };
 		476698662BE2572C008EB2A9 /* ConstantsSettingsIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */; };
@@ -632,7 +633,6 @@
 		F8E51D63244B3386001C9E5A /* MiaoMiaoResponseType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D62244B3386001C9E5A /* MiaoMiaoResponseType.swift */; };
 		F8E51D6924549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */; };
 		F8E5404C2522624800052CE5 /* ConstantsHousekeeping.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E5404B2522624800052CE5 /* ConstantsHousekeeping.swift */; };
-		F8E6C78C24CDDB83007C1199 /* SnoozeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E6C78B24CDDB83007C1199 /* SnoozeViewController.swift */; };
 		F8E6C79024CEC22A007C1199 /* TextsSnooze.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E6C78F24CEC22A007C1199 /* TextsSnooze.swift */; };
 		F8E6C79124CEC2E3007C1199 /* Snooze.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8E6C79324CEC2E3007C1199 /* Snooze.strings */; };
 		F8EA6C8221B723BC0082976B /* Date.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8EA6C8121B723BC0082976B /* Date.swift */; };
@@ -910,6 +910,7 @@
 		4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewStatisticsSettingsViewModel.swift; sourceTree = "<group>"; };
 		475DED96244AF92A00F78473 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Alerts.strings; sourceTree = "<group>"; };
 		475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowHideItemsView.swift; sourceTree = "<group>"; };
+		4AC0D0022F1D000100000001 /* SnoozeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeView.swift; sourceTree = "<group>"; };
 		475FBA072D7312D5004D068E /* PickerViewControllerModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerViewControllerModal.swift; sourceTree = "<group>"; };
 		476404882EA29034006CBE03 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = "xDrip/Supporting Files/SceneDelegate.swift"; sourceTree = SOURCE_ROOT; };
 		476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSettingsIcons.swift; sourceTree = "<group>"; };
@@ -1713,7 +1714,6 @@
 		F8E51D62244B3386001C9E5A /* MiaoMiaoResponseType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiaoMiaoResponseType.swift; sourceTree = "<group>"; };
 		F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewTraceSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8E5404B2522624800052CE5 /* ConstantsHousekeeping.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsHousekeeping.swift; sourceTree = "<group>"; };
-		F8E6C78B24CDDB83007C1199 /* SnoozeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeViewController.swift; sourceTree = "<group>"; };
 		F8E6C78F24CEC22A007C1199 /* TextsSnooze.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsSnooze.swift; sourceTree = "<group>"; };
 		F8E6C79224CEC2E3007C1199 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Snooze.strings; sourceTree = "<group>"; };
 		F8EA6C8121B723BC0082976B /* Date.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Date.swift; sourceTree = "<group>"; };
@@ -2263,7 +2263,6 @@
 				47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */,
 				F8CCBB4E2D1B6DF900F14867 /* LandscapeValueViewController.swift */,
 				F8AC425F21ADEBD60078C348 /* RootViewController.swift */,
-				F8E6C78B24CDDB83007C1199 /* SnoozeViewController.swift */,
 			);
 			path = "Root View Controller";
 			sourceTree = "<group>";
@@ -2593,6 +2592,7 @@
 				47B136DA2BC9BB55001E7ED3 /* ContactImageView.swift */,
 				47C210EF2B52A05B00005711 /* GlucoseChartView.swift */,
 				475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */,
+				4AC0D0022F1D000100000001 /* SnoozeView.swift */,
 				F866974E2867A97000025441 /* Settings */,
 			);
 			path = SwiftUIViews;
@@ -4277,6 +4277,7 @@
 				F8B3A844227F090E004BA588 /* SettingsViewAlertSettingsViewModel.swift in Sources */,
 				47244D662E8318DB007357C3 /* TransmitterReadSuccessManager.swift in Sources */,
 				475F2A872D0DA81400DE6019 /* ShowHideItemsView.swift in Sources */,
+				4AC0D0012F1D000100000001 /* SnoozeView.swift in Sources */,
 				F8D0587C24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift in Sources */,
 				F8A1586322EDB86E007F5B5D /* ConstantsSounds.swift in Sources */,
 				F8A1587322EDC893007F5B5D /* ConstantsDexcomShare.swift in Sources */,
@@ -4358,7 +4359,6 @@
 				F898EDEA233F53BF00BFB79B /* UIButton.swift in Sources */,
 				F81F9FF822861E6D0028C70F /* KeyValueObserverTimeKeeper.swift in Sources */,
 				F8B3A858227F6971004BA588 /* UISwitch.swift in Sources */,
-				F8E6C78C24CDDB83007C1199 /* SnoozeViewController.swift in Sources */,
 				F8AF11F824B1E6EE00AE5BA2 /* XdripError.swift in Sources */,
 				F830990523B94ED7005741DF /* TimeScheduleViewController.swift in Sources */,
 				F855422C2B7182C60058CE09 /* LoopFollowManager.swift in Sources */,
