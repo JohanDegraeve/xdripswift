@@ -29,7 +29,7 @@ final class RootViewController: UIViewController, ObservableObject {
     
     private var bgReadingsToolbarButtonOutlet: UIButton!
     @IBAction func bgReadingsToolbarButtonAction(_ sender: UIButton) {
-        performSegue(withIdentifier: "RootViewToBgReadingsView", sender: self)
+        showSwiftUIView(BgReadingsView().environmentObject(bgReadingsAccessor!).environmentObject(nightscoutSyncManager!))
     }
     
     private var sensorToolbarButtonOutlet: UIButton!
@@ -51,12 +51,12 @@ final class RootViewController: UIViewController, ObservableObject {
     
     private var bgAdjustmentsToolbarButtonOutlet: UIButton!
     @IBAction func bgAdjustmentsToolbarButtonAction(_ sender: UIButton) {
-        performSegue(withIdentifier: "RootViewToBgAdjustmentsView", sender: self)
+        showSwiftUIView(BgAdjustmentsView(bgReadingsAccessor: bgReadingsAccessor!, treatmentEntryAccessor: treatmentEntryAccessor!, bgPostProcessingManager: bgPostProcessingManager!))
     }
     
     private var showHideItemsToolbarButtonOutlet: UIButton!
     @IBAction func showHideItemsToolbarButtonAction(_ sender: UIButton) {
-        performSegue(withIdentifier: "RootViewToShowHideItemsView", sender: self)
+        showSwiftUIView(ShowHideItemsView())
     }
     
     /// outlet for the lock button - it will change text based upon whether they screen is locked or not
@@ -418,25 +418,6 @@ final class RootViewController: UIViewController, ObservableObject {
     /// function which is triggered when hideCoverView is called
     @objc func handleTapCoverView(_ sender: UITapGestureRecognizer) {
         screenLockUpdate(enabled: false)
-    }
-    
-    
-    // MARK: - Actions for SwiftUI Hosting Controller integration
-    
-    @IBSegueAction func segueToBgReadingsView(_ coder: NSCoder) -> UIViewController? {
-        return UIHostingController(coder: coder, rootView: BgReadingsView().environmentObject(bgReadingsAccessor!).environmentObject(nightscoutSyncManager!))
-    }
-    
-    @IBSegueAction func segueToShowHideItemsView(_ coder: NSCoder) -> UIViewController? {
-        return UIHostingController(coder: coder, rootView: ShowHideItemsView())
-    }
-    
-    @IBSegueAction func segueToBgAdjustmentsView(_ coder: NSCoder) -> UIViewController? {
-        return UIHostingController(coder: coder, rootView: BgAdjustmentsView(bgReadingsAccessor: bgReadingsAccessor!, treatmentEntryAccessor: treatmentEntryAccessor!, bgPostProcessingManager: bgPostProcessingManager!))
-    }
-    
-    @IBSegueAction func segueToAIDStatusView(_ coder: NSCoder) -> UIViewController? {
-        return UIHostingController(coder: coder, rootView: AIDStatusView().environmentObject(nightscoutSyncManager!))
     }
     
     
@@ -3360,9 +3341,18 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// show the SwiftUI Automated Insulin Devliery system info view via UIHostingController
     private func showAIDStatusView() {
-        let aidStatusViewController = UIHostingController(rootView: AIDStatusView().environmentObject(nightscoutSyncManager!))
+        showSwiftUIView(AIDStatusView().environmentObject(nightscoutSyncManager!))
+    }
+    
+    /// Show a SwiftUI view from the UIKit root view controller.
+    /// This keeps the SwiftUI bridge in code so we do not need storyboard segues
+    /// or destination creation selectors for every hosted SwiftUI screen.
+    private func showSwiftUIView<Content: View>(_ rootView: Content) {
+        let hostingController = UIHostingController(rootView: rootView)
         
-        navigationController?.pushViewController(aidStatusViewController, animated: true)
+        // Use show so UIKit can choose the same navigation behavior that the
+        // previous storyboard-based show segues were using in this controller.
+        show(hostingController, sender: self)
     }
     
     /// check if the conditions are correct to start a live activity, update it, or end it

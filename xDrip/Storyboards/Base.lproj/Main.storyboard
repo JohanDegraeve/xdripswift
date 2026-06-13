@@ -978,7 +978,6 @@
                                                                                         </state>
                                                                                         <connections>
                                                                                             <action selector="infoStatusButtonAction:" destination="9pv-A4-QxB" eventType="touchUpInside" id="jWC-DW-EKP"/>
-                                                                                            <segue destination="yPB-Ev-B9g" kind="show" identifier="RootViewToAIDStatusView" destinationCreationSelector="segueToAIDStatusView:" id="r4Y-tY-lZT"/>
                                                                                         </connections>
                                                                                     </button>
                                                                                     <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="-m" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8RJ-QC-aTl">
@@ -1550,9 +1549,6 @@
                         <outlet property="toolbarOutlet" destination="tVG-ML-9xd" id="p1N-b3-pnD"/>
                         <outlet property="valueLabelOutlet" destination="We3-bN-ffR" id="wtY-sZ-mev"/>
                         <segue destination="NvR-Zh-2Zn" kind="show" identifier="RootViewToSnoozeView" id="Dxa-Oc-1V2"/>
-                        <segue destination="X4x-SF-9tU" kind="show" identifier="RootViewToBgReadingsView" destinationCreationSelector="segueToBgReadingsView:" id="MY4-tb-cb4"/>
-                        <segue destination="f4M-VL-jQw" kind="show" identifier="RootViewToBgAdjustmentsView" destinationCreationSelector="segueToBgAdjustmentsView:" id="mQ8-Kr-oD1"/>
-                        <segue destination="J8I-o4-LCb" kind="show" identifier="RootViewToShowHideItemsView" destinationCreationSelector="segueToShowHideItemsView:" id="H9i-JN-TjS"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="W5J-7L-Pyd" sceneMemberID="firstResponder"/>
@@ -1723,46 +1719,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lDU-f7-mwF" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1753.8461538461538" y="-887.20379146919424"/>
-        </scene>
-        <!--Hosting Controller-->
-        <scene sceneID="e0R-zW-G7U">
-            <objects>
-                <hostingController id="X4x-SF-9tU" sceneMemberID="viewController">
-                    <navigationItem key="navigationItem" id="yoW-zq-72E"/>
-                </hostingController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="ZEF-Eh-TAw" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2595" y="-837"/>
-        </scene>
-        <!--Hosting Controller-->
-        <scene sceneID="acC-PD-e5f">
-            <objects>
-                <hostingController id="yPB-Ev-B9g" sceneMemberID="viewController">
-                    <navigationItem key="navigationItem" id="JTp-ZT-QZO"/>
-                </hostingController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="bae-g3-3wD" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3335" y="-837"/>
-        </scene>
-        <!--Hosting Controller-->
-        <scene sceneID="ixu-3S-Cyy">
-            <objects>
-                <hostingController id="J8I-o4-LCb" sceneMemberID="viewController">
-                    <navigationItem key="navigationItem" id="geY-Le-WCa"/>
-                </hostingController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="SrA-mt-Lv6" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="4068" y="-837"/>
-        </scene>
-        <!--Hosting Controller-->
-        <scene sceneID="QnK-Xk-W7k">
-            <objects>
-                <hostingController id="f4M-VL-jQw" sceneMemberID="viewController">
-                    <navigationItem key="navigationItem" id="Npp-Uq-a2g"/>
-                </hostingController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="z9k-Na-o2w" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="3328" y="-569"/>
         </scene>
         <!--Picker View Controller-->
         <scene sceneID="6RW-Ef-2Hm">
