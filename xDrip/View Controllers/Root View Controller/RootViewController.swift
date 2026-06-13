@@ -50,8 +50,43 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     private var bgAdjustmentsToolbarButtonOutlet: UIButton!
+    /// keep track of the temporary peek state so the chart only redraws when needed
+    private var bgAdjustmentsToolbarButtonLongPressIsActive = false
+    
+    /// after a successful hold gesture, ignore the next touchUpInside event so
+    /// releasing the button does not also open the adjustments screen
+    private var shouldIgnoreNextBgAdjustmentsToolbarButtonTap = false
+    
     @IBAction func bgAdjustmentsToolbarButtonAction(_ sender: UIButton) {
+        if shouldIgnoreNextBgAdjustmentsToolbarButtonTap {
+            shouldIgnoreNextBgAdjustmentsToolbarButtonTap = false
+            return
+        }
+        
         showSwiftUIView(BgAdjustmentsView(bgReadingsAccessor: bgReadingsAccessor!, treatmentEntryAccessor: treatmentEntryAccessor!, bgPostProcessingManager: bgPostProcessingManager!))
+    }
+    
+    @objc private func bgAdjustmentsToolbarButtonLongPressAction(_ sender: UILongPressGestureRecognizer) {
+        switch sender.state {
+        case .began:
+            guard UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing else { return }
+            guard !bgAdjustmentsToolbarButtonLongPressIsActive else { return }
+            
+            bgAdjustmentsToolbarButtonLongPressIsActive = true
+            UISelectionFeedbackGenerator().selectionChanged()
+            setShowOriginalGlucoseChartPointsOnly(true)
+        case .ended, .cancelled, .failed:
+            guard bgAdjustmentsToolbarButtonLongPressIsActive else { return }
+            
+            bgAdjustmentsToolbarButtonLongPressIsActive = false
+            UISelectionFeedbackGenerator().selectionChanged()
+            if sender.state == .ended {
+                shouldIgnoreNextBgAdjustmentsToolbarButtonTap = true
+            }
+            setShowOriginalGlucoseChartPointsOnly(false)
+        default:
+            break
+        }
     }
     
     private var showHideItemsToolbarButtonOutlet: UIButton!
@@ -1742,6 +1777,13 @@ final class RootViewController: UIViewController, ObservableObject {
         bgAdjustmentsToolbarButtonOutlet = makeToolbarButton(Texts_HomeView.postProcessingTitle, "dial.low", #selector(bgAdjustmentsToolbarButtonAction(_:)))
         showHideItemsToolbarButtonOutlet = makeToolbarButton("Show/Hide", "rectangle.3.group", #selector(showHideItemsToolbarButtonAction(_:)))
         screenLockToolbarButtonOutlet = makeToolbarButton(Texts_HomeView.lockButton, "lock", #selector(screenLockToolbarButtonAction(_:)))
+        
+        // Allow a temporary "peek underneath" action on the main chart without
+        // changing the persisted show/hide setting for original glucose values.
+        let bgAdjustmentsToolbarButtonLongPressGestureRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(bgAdjustmentsToolbarButtonLongPressAction(_:)))
+        bgAdjustmentsToolbarButtonLongPressGestureRecognizer.minimumPressDuration = 0.35
+        bgAdjustmentsToolbarButtonLongPressGestureRecognizer.cancelsTouchesInView = false
+        bgAdjustmentsToolbarButtonOutlet.addGestureRecognizer(bgAdjustmentsToolbarButtonLongPressGestureRecognizer)
 
         [
             preSnoozeToolbarButtonOutlet,
@@ -1794,6 +1836,24 @@ final class RootViewController: UIViewController, ObservableObject {
     ///     - forceReset : if true, then we'll force a rescale of the chart y-axis
     private func updateChartWithResetEndDate(forceReset: Bool = false) {
         glucoseChartManager?.updateChartPoints(endDate: Date(), startDate: nil, chartOutlet: chartOutlet, forceReset: forceReset, showTreaments: UserDefaults.standard.showTreatmentsOnChart, completionHandler: nil)
+    }
+    
+    /// redraw the main chart using the current visible time window so a temporary
+    /// peek mode can switch between post processed and original values instantly
+    private func updateMainChartKeepingCurrentTimeWindow(forceReset: Bool = false) {
+        if let glucoseChartManager = glucoseChartManager {
+            glucoseChartManager.cleanUpMemory()
+            glucoseChartManager.updateChartPoints(endDate: glucoseChartManager.endDate, startDate: glucoseChartManager.endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, forceReset: forceReset, showTreaments: UserDefaults.standard.showTreatmentsOnChart, completionHandler: nil)
+        }
+    }
+    
+    /// switch the main chart between the normal post processed view and a
+    /// temporary original-only view while the adjustments button is held down
+    private func setShowOriginalGlucoseChartPointsOnly(_ showOriginalGlucoseChartPointsOnly: Bool) {
+        let shouldShowOriginalOnly = showOriginalGlucoseChartPointsOnly && (UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing)
+        
+        glucoseChartManager?.setShowOriginalGlucoseChartPointsOnly(shouldShowOriginalOnly)
+        updateMainChartKeepingCurrentTimeWindow()
     }
     
     /// launches timer that will do regular screen updates - and adds closure to ApplicationManager : when going to background, stop the timer, when coming to foreground, restart the timer

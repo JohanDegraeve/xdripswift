@@ -190,6 +190,10 @@ public class GlucoseChartManager {
     /// persisted value to indicate if we should show the treatments on the chart being managed by this instance
     private var showTreatmentsOnChart: Bool = false
     
+    /// temporary chart state used while the user is holding the glucose adjustments
+    /// toolbar button to peek underneath the post processed values
+    private var showOriginalGlucoseChartPointsOnly = false
+    
     // MARK: - intializer
     
     /// - parameters:
@@ -436,6 +440,12 @@ public class GlucoseChartManager {
             operation.start()
         }
         
+    }
+    
+    /// temporarily switch the main chart to show only original glucose values
+    /// so the user can inspect the underlying sensor shape while holding the toolbar icon
+    func setShowOriginalGlucoseChartPointsOnly(_ showOriginalGlucoseChartPointsOnly: Bool) {
+        self.showOriginalGlucoseChartPointsOnly = showOriginalGlucoseChartPointsOnly
     }
     
     public func cleanUpMemory() {
@@ -1073,7 +1083,7 @@ public class GlucoseChartManager {
         // initiliaze maximumValueInGlucoseChartPoints
         var maximumValueInGlucoseChartPoints: Double?
         
-        let shouldShowOriginalChartPoints = UserDefaults.standard.showOriginalBGReadings && (UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing)
+        let shouldShowOriginalChartPoints = showOriginalGlucoseChartPointsOnly || (UserDefaults.standard.showOriginalBGReadings && (UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing))
         
         // bgReadings array has been fetched from coredata using a private mangedObjectContext
         // we need to use the same context to perform next piece of code which will use those bgReadings, in order to stay thread-safe
@@ -1081,7 +1091,7 @@ public class GlucoseChartManager {
             
             for reading in bgReadings {
                 
-                if reading.finalValue > 0.0 {
+                if !showOriginalGlucoseChartPointsOnly, reading.finalValue > 0.0 {
                     
                     let newGlucoseChartPoint = ChartPoint(bgReading: reading, formatter: data().chartPointDateFormatter, unitIsMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
                     
