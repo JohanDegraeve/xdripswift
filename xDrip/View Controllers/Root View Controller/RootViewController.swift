@@ -73,13 +73,13 @@ final class RootViewController: UIViewController, ObservableObject {
             guard !bgAdjustmentsToolbarButtonLongPressIsActive else { return }
             
             bgAdjustmentsToolbarButtonLongPressIsActive = true
-            UISelectionFeedbackGenerator().selectionChanged()
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             setShowOriginalGlucoseChartPointsOnly(true)
         case .ended, .cancelled, .failed:
             guard bgAdjustmentsToolbarButtonLongPressIsActive else { return }
             
             bgAdjustmentsToolbarButtonLongPressIsActive = false
-            UISelectionFeedbackGenerator().selectionChanged()
+            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             if sender.state == .ended {
                 shouldIgnoreNextBgAdjustmentsToolbarButtonTap = true
             }
@@ -1355,7 +1355,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // assign value of timeStampLastBgReading
             var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
-            if let lastReading = bgReadingsAccessor.last(forSensor: nil) {
+            if let lastReading = bgReadingsAccessor.last(forSensor: nil, includingSuppressed: true) {
                 timeStampLastBgReading = lastReading.timeStamp
             }
             
@@ -1365,7 +1365,7 @@ final class RootViewController: UIViewController, ObservableObject {
             loopManager?.glucoseData = [GlucoseData]()
             
             // initialize latest3BgReadings
-            var latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
+            var latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false, includingSuppressed: true)
             
             // iterate through array, elements are ordered by timestamp, first is the youngest, we need to start with the oldest
             for (index, glucose) in glucoseData.enumerated().reversed() {
@@ -1393,7 +1393,7 @@ final class RootViewController: UIViewController, ObservableObject {
                         timeStampLastBgReading = glucose.timeStamp
                         
                         // reset latest3BgReadings
-                        latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false)
+                        latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false, includingSuppressed: true)
                         
                         if LoopManager.loopDelay() > 0 && abs(Date().timeIntervalSince(timeStampLastCalibrationForActiveSensor)) > LoopManager.loopDelay() + TimeInterval(minutes: 5.5) {
                             loopManager?.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.finalValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
@@ -1421,7 +1421,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 // only if no webOOPEnabled and overruleIsWebOOPEnabled false : if no two calibration exist yet then create calibration request notification, otherwise a bgreading notification and update labels
                 if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil && (!cgmTransmitter.isWebOOPEnabled() && !cgmTransmitter.overruleIsWebOOPEnabled()) {
                     // there must be at least 2 readings
-                    let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
+                    let latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true, includingSuppressed: true)
                     
                     if latestReadings.count > 1 {
                         trace("in processNewGlucoseData, calibration : two readings received, no calibrations exist yet and not web oopenabled, request calibation to user", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
@@ -1431,6 +1431,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 } else {
                     // check alerts, create notification, set app badge
                     checkAlertsCreateNotificationAndSetAppBadge()
+                    cleanUpChartMemoryForLivePostProcessingIfNeeded()
                     
                     // update all text in  first screen
                     updateLabelsAndChart(overrideApplicationState: false)
@@ -1798,6 +1799,16 @@ final class RootViewController: UIViewController, ObservableObject {
     private func updateChartWithResetEndDate(forceReset: Bool = false) {
         glucoseChartManager?.updateChartPoints(endDate: Date(), startDate: nil, chartOutlet: chartOutlet, forceReset: forceReset, showTreaments: UserDefaults.standard.showTreatmentsOnChart, completionHandler: nil)
     }
+
+    /// live post processing can update several recent readings, not just the
+    /// newest point. Clear both chart caches before the next redraw so the
+    /// visible curve is rebuilt from the latest stored values.
+    private func cleanUpChartMemoryForLivePostProcessingIfNeeded() {
+        guard UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing else { return }
+
+        glucoseChartManager?.cleanUpMemory()
+        glucoseMiniChartManager?.cleanUpMemory()
+    }
     
     /// redraw the main chart using the current visible time window so a temporary
     /// peek mode can switch between post processed and original values instantly
@@ -1918,7 +1929,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             let valueAsDoubleConvertedToMgDl = valueAsDouble.mmolToMgdl(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
             
-            var latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
+            var latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true, includingSuppressed: true)
             
             var latestCalibrations = calibrationsAccessor.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
             
@@ -2035,7 +2046,7 @@ final class RootViewController: UIViewController, ObservableObject {
     /// for debug purposes
     private func logAllBgReadings() {
         if let bgReadingsAccessor = bgReadingsAccessor {
-            let readings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: nil, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: true)
+            let readings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: nil, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: true, includingSuppressed: true)
             for (index,reading) in readings.enumerated() {
                 if reading.sensor?.id == activeSensor?.id {
                     trace("readings %{public}d timestamp = %{public}@, calculatedValue = %{public}f", log: log, category: ConstantsLog.categoryRootView, type: .info, index, reading.timeStamp.description, reading.calculatedValue)
@@ -3888,7 +3899,11 @@ extension RootViewController: FollowerDelegate {
             var timeStampLastBgReading = Date(timeIntervalSince1970: 0)
             
             // get lastReading, ignore sensor as this should be nil because this is follower mode
-            if let lastReading = bgReadingsAccessor.last(forSensor: nil) {
+            // When follower post processing is reducing faster source data down to
+            // 5 minute output, new follower readings must still be compared against
+            // the latest stored source reading here. Otherwise a suppressed source
+            // reading could look "missing" and get recreated on the next download.
+            if let lastReading = bgReadingsAccessor.last(forSensor: nil, includingSuppressed: true) {
                 timeStampLastBgReading = lastReading.timeStamp
                 
                 trace("in followerInfoReceived, timeStampLastBgReading = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, timeStampLastBgReading.toStringForTrace(timeStyle: .long, dateStyle: .long))
@@ -3944,10 +3959,12 @@ extension RootViewController: FollowerDelegate {
                 
                 if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled, let firstCreatedBgReadingTimeStamp = firstCreatedBgReadingTimeStamp {
                     let processingStartDateOverride = previousTimeStampLastBgReading.timeIntervalSince1970 > 0 ? previousTimeStampLastBgReading.addingTimeInterval(-1.0) : firstCreatedBgReadingTimeStamp
-                    bgPostProcessingManager?.processBgReadings(processingStartDateOverride: processingStartDateOverride, smoothingWindowStartDateOverride: processingStartDateOverride)
+                    bgPostProcessingManager?.processBgReadings(processingStartDateOverride: processingStartDateOverride)
                 } else {
                     bgPostProcessingManager?.processLatestReadings()
                 }
+
+                cleanUpChartMemoryForLivePostProcessingIfNeeded()
 
                 // update all text in  first screen
                 updateLabelsAndChart(overrideApplicationState: false)

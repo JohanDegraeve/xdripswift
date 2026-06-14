@@ -84,7 +84,7 @@ class HouseKeeper {
     private func deleteOldReadings(on managedObjectContext: NSManagedObjectContext) {
         
         // get old readings to delete
-        let oldReadings = self.bgReadingsAccessor.getBgReadings(from: nil, to: self.toDate, on: managedObjectContext)
+        let oldReadings = self.bgReadingsAccessor.getBgReadings(from: nil, to: self.toDate, on: managedObjectContext, includingSuppressed: true)
         
         if oldReadings.count > 0 {
             

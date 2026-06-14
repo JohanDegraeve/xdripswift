@@ -152,7 +152,7 @@ public class DataExporter {
 	/// - returns:
 	///     - [[String: Any]] : an array of dicts, each element is a reading.
 	private func readingsAsDicts() -> [[String: Any]] {
-        let readings = self.bgReadingsAccessor.getBgReadings(from: self.onlyFromDate, to: self.endDate, on: privateManagedObjectContext)
+        let readings = self.bgReadingsAccessor.getBgReadings(from: self.onlyFromDate, to: self.endDate, on: privateManagedObjectContext, includingSuppressed: true)
 	
 		// Figure out how frequent we must update the progress, 50 updates at total
 		let amountOfUpdates: Float = 50

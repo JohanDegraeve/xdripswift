@@ -968,6 +968,7 @@
 		47A8B8862E392BF700081CBD /* LiveActivityViewContentActivityFamilies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityViewContentActivityFamilies.swift; sourceTree = "<group>"; };
 		47AB72F227105EF4005E7CAB /* SettingsViewHelpSettingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewHelpSettingModel.swift; sourceTree = "<group>"; };
 		47AC0EE42FCE1FAF0098B607 /* xdrip v17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v17.xcdatamodel"; sourceTree = "<group>"; };
+		47BFA1232FD6A00100B4712A /* xdrip v19.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v19.xcdatamodel"; sourceTree = "<group>"; };
 		47ACB9282D835838001EC891 /* DatePickerViewControllerModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerViewControllerModal.swift; sourceTree = "<group>"; };
 		47ADD2DE27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartPointsScatterDownTrianglesLayer.swift; sourceTree = "<group>"; };
 		47AECB9D2CD2B618005F1814 /* NightscoutDeviceStatusModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutDeviceStatusModels.swift; sourceTree = "<group>"; };
@@ -5734,6 +5735,7 @@
 		F85FF3C2252D0C32004E6FF1 /* xdrip.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				47BFA1232FD6A00100B4712A /* xdrip v19.xcdatamodel */,
 				47B4A7B42FD0AAC600B4712A /* xdrip v18.xcdatamodel */,
 				47AC0EE42FCE1FAF0098B607 /* xdrip v17.xcdatamodel */,
 				F8A2BC0225D9D471001D1E78 /* xdrip v16.xcdatamodel */,
@@ -5742,7 +5744,7 @@
 				F85FF3CB252F9C9A004E6FF1 /* xdrip v13.xcdatamodel */,
 				F85FF3C3252D0C32004E6FF1 /* xdrip v12.xcdatamodel */,
 			);
-			currentVersion = 47B4A7B42FD0AAC600B4712A /* xdrip v18.xcdatamodel */;
+			currentVersion = 47BFA1232FD6A00100B4712A /* xdrip v19.xcdatamodel */;
 			path = xdrip.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

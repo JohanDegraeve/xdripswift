@@ -18,6 +18,7 @@ extension BgReading {
     @NSManaged public var calibrationFlag: Bool
     @NSManaged public var hideSlope: Bool
     @NSManaged public var id: String
+    @NSManaged public var isSuppressedByFiveMinuteCadence: Bool
     @NSManaged public var ra: Double
     @NSManaged public var rawData: Double
     @NSManaged public var rb: Double

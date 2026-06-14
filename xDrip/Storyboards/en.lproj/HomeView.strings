@@ -103,3 +103,5 @@
 "snoozeAllDisabled" = "Snooze All Disabled";
 "snoozeAllSnoozedUntil" = "Snoozed Until %@";
 "snoozeUrgentAlarms" = "Urgent Alarms Only";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";

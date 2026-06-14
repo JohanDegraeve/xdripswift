@@ -79,7 +79,10 @@ enum ConstantsGlucoseChart {
     static let glucoseNotUrgentRangeColor = UIColor.yellow
     
     /// glucose colors - for original values when post processing is enabled
-    static let glucoseOriginalColor = UIColor.darkGray.withAlphaComponent(0.7)
+    static let glucoseOriginalColor = UIColor.darkGray.withAlphaComponent(0.4)
+
+    /// glucose colors - for original values when peek mode is active
+    static let glucoseOriginalPeekColor = UIColor.lightGray
     
     /// diameter of the circle for blood glucose readings with a 3h chart width. The more hours on the chart, the smaller the circles should be
     static let glucoseCircleDiameter3h: CGFloat = 7

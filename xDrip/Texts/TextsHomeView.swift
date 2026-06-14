@@ -347,6 +347,10 @@ enum Texts_HomeView {
         return NSLocalizedString("postProcessingStrong", tableName: filename, bundle: Bundle.main, value: "Strong", comment: "post processing smoothing strong option")
     }()
 
+    static let postProcessingFiveMinuteReadings: String = {
+        return NSLocalizedString("postProcessingFiveMinuteReadings", tableName: filename, bundle: Bundle.main, value: "5-minute readings", comment: "post processing option to reduce faster CGM streams to visible 5 minute readings")
+    }()
+
     static let postProcessingApplyFrom: String = {
         return NSLocalizedString("postProcessingApplyFrom", tableName: filename, bundle: Bundle.main, value: "Apply From", comment: "post processing section title and picker title for apply from")
     }()
