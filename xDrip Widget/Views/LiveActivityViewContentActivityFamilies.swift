@@ -18,6 +18,12 @@ struct LiveActivityViewContentActivityFamilies: View {
     
     var body: some View {
         ZStack {
+            AccessoryWidgetBackground()
+                .cornerRadius(8)
+            
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Color.black.opacity(0.4))
+            
             GeometryReader { geo in
                 VStack(spacing: 3) {
                     HStack(alignment: .center) {
@@ -63,7 +69,7 @@ struct LiveActivityViewContentActivityFamilies: View {
                 }
             }
         }
-        
+        .activityBackgroundTint(.clear)
     }
 }
 
