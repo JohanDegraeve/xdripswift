@@ -375,8 +375,8 @@ enum Texts_HomeView {
         return NSLocalizedString("postProcessingSmoothed", tableName: filename, bundle: Bundle.main, value: "Smoothed", comment: "post processing chart context smoothed value title")
     }()
 
-    static let postProcessingUpdateAllReadingsLastHours: String = {
-        return NSLocalizedString("postProcessingUpdateAllReadingsLastHours", tableName: filename, bundle: Bundle.main, value: "Overwrite all values in the last %d hours", comment: "post processing helper text for historical apply window")
+    static let postProcessingUpdateAllReadingsLastPeriod: String = {
+        return NSLocalizedString("postProcessingUpdateAllReadingsLastPeriod", tableName: filename, bundle: Bundle.main, value: "Overwrite all values in the last %@", comment: "post processing helper text for historical apply window using a dynamic time period such as 1h36m")
     }()
 
     static let postProcessingNightscoutDataNotUpdated: String = {
@@ -397,6 +397,30 @@ enum Texts_HomeView {
 
     static let postProcessingEnterGlucose: String = {
         return NSLocalizedString("postProcessingEnterGlucose", tableName: filename, bundle: Bundle.main, value: "Enter Glucose", comment: "post processing input screen title")
+    }()
+
+    static let postProcessingNoCurrentValues: String = {
+        return NSLocalizedString("postProcessingNoCurrentValues", tableName: filename, bundle: Bundle.main, value: "No current values", comment: "post processing placeholder shown above the preview chart when there are no glucose values to display")
+    }()
+    
+    static let postProcessingValidGlucoseRange: String = {
+        return NSLocalizedString("postProcessingValidGlucoseRange", tableName: filename, bundle: Bundle.main, value: "Enter a value between %@ and %@", comment: "post processing helper text describing the valid glucose input range")
+    }()
+    
+    static let postProcessingOffsetBgCheckHint: String = {
+        return NSLocalizedString("postProcessingOffsetBgCheckHint", tableName: filename, bundle: Bundle.main, value: "At least one recent BG check recommended", comment: "post processing hint shown when no BG check is visible in the preview while adjusting offset")
+    }()
+    
+    static let postProcessingScaleBgCheckHint: String = {
+        return NSLocalizedString("postProcessingScaleBgCheckHint", tableName: filename, bundle: Bundle.main, value: "At least two recent BG checks recommended", comment: "post processing hint shown when fewer than two BG checks are visible in the preview while adjusting scale or emphasis")
+    }()
+    
+    static let postProcessingAdjustmentDisabledBecauseSensorIsCalibrated: String = {
+        return NSLocalizedString("postProcessingAdjustmentDisabledBecauseSensorIsCalibrated", tableName: filename, bundle: Bundle.main, value: "Adjustment is disabled because this sensor already uses its own calibration.", comment: "post processing footer text when glucose adjustment is disabled because the active sensor already uses calibration")
+    }()
+    
+    static let postProcessingAdjustmentDisabledUseNativeAlgorithm: String = {
+        return NSLocalizedString("postProcessingAdjustmentDisabledUseNativeAlgorithm", tableName: filename, bundle: Bundle.main, value: "Adjustment is disabled because this sensor already uses its own calibration. Change to the native algorithm to allow glucose adjustments.", comment: "post processing footer text when glucose adjustment is disabled for a Libre sensor using xDrip calibration")
     }()
     
     static let showTreatments: String = {

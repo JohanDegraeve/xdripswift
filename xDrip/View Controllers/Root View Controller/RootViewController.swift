@@ -63,7 +63,7 @@ final class RootViewController: UIViewController, ObservableObject {
             return
         }
         
-        showSwiftUIView(BgAdjustmentsView(bgReadingsAccessor: bgReadingsAccessor!, treatmentEntryAccessor: treatmentEntryAccessor!, bgPostProcessingManager: bgPostProcessingManager!))
+        showBgAdjustmentsView()
     }
     
     @objc private func bgAdjustmentsToolbarButtonLongPressAction(_ sender: UILongPressGestureRecognizer) {
@@ -969,6 +969,21 @@ final class RootViewController: UIViewController, ObservableObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.enableAdjustment.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.enableSmoothing.rawValue, options: .new, context: nil)
         
+        // if the user changes master or follower source identity details, clear
+        // any post processing state so it does not carry over to a different source
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutUrl.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutToken.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutAPIKey.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.libreLinkUpEmail.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.libreLinkUpPassword.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerPatientName.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomShareAccountName.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.dexcomSharePassword.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.medtrumEasyViewEmail.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.medtrumEasyViewPassword.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.medtrumEasyViewSelectedPatientUid.rawValue, options: .new, context: nil)
+        
         // if the Nightscout Follower type changes, update the UI
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutFollowType.rawValue, options: .new, context: nil)
         
@@ -1247,6 +1262,10 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 // change value of UserDefaults.standard.transmitterTypeAsString
                 UserDefaults.standard.cgmTransmitterTypeAsString = cgmTransmitter.cgmTransmitterType().rawValue
+                
+                // Algorithm and transmitter identity changes can alter whether
+                // BG adjustment is still allowed for the active master source.
+                self.bgPostProcessingManager?.refreshSourceContext()
             }
             
         }
@@ -1582,6 +1601,7 @@ final class RootViewController: UIViewController, ObservableObject {
         switch keyPathEnum {
         case UserDefaults.Key.isMaster:
             changeButtonsStatusTo(enabled: UserDefaults.standard.isMaster)
+            bgPostProcessingManager?.refreshSourceContext()
             
             guard let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() else {break}
             
@@ -1693,6 +1713,20 @@ final class RootViewController: UIViewController, ObservableObject {
             
         case UserDefaults.Key.enableAdjustment, UserDefaults.Key.enableSmoothing:
             updatePostProcessingStatus()
+            
+        case UserDefaults.Key.followerDataSourceType,
+             UserDefaults.Key.nightscoutUrl,
+             UserDefaults.Key.nightscoutToken,
+             UserDefaults.Key.nightscoutAPIKey,
+             UserDefaults.Key.libreLinkUpEmail,
+             UserDefaults.Key.libreLinkUpPassword,
+             UserDefaults.Key.followerPatientName,
+             UserDefaults.Key.dexcomShareAccountName,
+             UserDefaults.Key.dexcomSharePassword,
+             UserDefaults.Key.medtrumEasyViewEmail,
+             UserDefaults.Key.medtrumEasyViewPassword,
+             UserDefaults.Key.medtrumEasyViewSelectedPatientUid:
+            bgPostProcessingManager?.refreshSourceContext()
             
         default:
             break
@@ -3395,6 +3429,12 @@ final class RootViewController: UIViewController, ObservableObject {
         guard let alertManager = alertManager else { return }
 
         showViewController(SnoozeHostingController(alertManager: alertManager))
+    }
+
+    private func showBgAdjustmentsView() {
+        guard let bgReadingsAccessor = bgReadingsAccessor, let treatmentEntryAccessor = treatmentEntryAccessor, let bgPostProcessingManager = bgPostProcessingManager else { return }
+        
+        showViewController(BgAdjustmentsHostingController(bgReadingsAccessor: bgReadingsAccessor, treatmentEntryAccessor: treatmentEntryAccessor, bgPostProcessingManager: bgPostProcessingManager))
     }
 
     /// Show a SwiftUI view from the UIKit root view controller.

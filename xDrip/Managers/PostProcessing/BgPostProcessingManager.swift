@@ -27,6 +27,7 @@ class BgPostProcessingManager {
     private let coreDataManager: CoreDataManager
     private let bgReadingsAccessor: BgReadingsAccessor
     private let bgAdjustmentsAccessor: BgAdjustmentsAccessor
+    private let bLEPeripheralAccessor: BLEPeripheralAccessor
     private let sensorsAccessor: SensorsAccessor
     
     private weak var nightscoutSyncManager: NightscoutSyncManager?
@@ -39,6 +40,7 @@ class BgPostProcessingManager {
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.bgAdjustmentsAccessor = BgAdjustmentsAccessor(coreDataManager: coreDataManager)
+        self.bLEPeripheralAccessor = BLEPeripheralAccessor(coreDataManager: coreDataManager)
         self.sensorsAccessor = SensorsAccessor(coreDataManager: coreDataManager)
         self.nightscoutSyncManager = nightscoutSyncManager
         self.healthKitManager = healthKitManager
@@ -51,18 +53,34 @@ class BgPostProcessingManager {
     func processLatestReadings() {
         processBgReadings(processingStartDateOverride: nil, smoothingWindowStartDateOverride: nil)
     }
+    
+    /// compare the resolved source context against the stored one and reset the
+    /// current post processing state if the user has switched to a different source
+    /// or changed the credentials and identity details behind that source
+    func refreshSourceContext() {
+        let sourceContextIdentifier = currentSourceContextIdentifier()
+        let previousSourceContextIdentifier = UserDefaults.standard.postProcessingSourceContextIdentifier
+        
+        if previousSourceContextIdentifier != sourceContextIdentifier {
+            if UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing {
+                trace("in refreshSourceContext, resetting BG post processing because the source context changed from %{public}@ to %{public}@. BG adjustment enabled = %{public}@. Smoothing enabled = %{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, previousSourceContextIdentifier ?? "nil", sourceContextIdentifier ?? "nil", UserDefaults.standard.enableAdjustment.description, UserDefaults.standard.enableSmoothing.description)
+            }
+            
+            handleSourceContextChanged()
+            UserDefaults.standard.postProcessingSourceContextIdentifier = sourceContextIdentifier
+        }
+        
+        syncAdjustmentAvailabilityForCurrentSource()
+    }
 
     /// applies adjustment and smoothing to the requested readings, then updates
     /// any downstream consumers that should reflect the new final values
     func processBgReadings(processingStartDateOverride: Date?, smoothingWindowStartDateOverride: Date?) {
+        refreshSourceContext()
+        
         guard let sourceContextIdentifier = currentSourceContextIdentifier() else {
             trace("in processLatestReadings, sourceContextIdentifier is nil", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info)
             return
-        }
-        
-        if UserDefaults.standard.postProcessingSourceContextIdentifier != sourceContextIdentifier {
-            handleSourceContextChanged()
-            UserDefaults.standard.postProcessingSourceContextIdentifier = sourceContextIdentifier
         }
         
         let currentSensor = UserDefaults.standard.isMaster ? sensorsAccessor.fetchActiveSensor() : nil
@@ -120,8 +138,13 @@ class BgPostProcessingManager {
     /// reset source-specific post processing whenever the active master sensor
     /// or follower source changes
     func handleSourceContextChanged() {
+        // Source-specific processing must not leak into a new master sensor session
+        // or a different follower stream. Reset the entire editing state so any
+        // new source starts from neutral values and disabled post processing.
         UserDefaults.standard.enableAdjustment = false
+        updateSmoothingSettings(enableSmoothing: false, smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes, smoothingStrength: ConstantsBgSmoothing.defaultSmoothingStrength)
         UserDefaults.standard.postProcessingStartTimeStamp = Date()
+        UserDefaults.standard.postProcessingSourceContextIdentifier = nil
     }
     
     func latestActiveBgAdjustment() -> BgAdjustment? {
@@ -162,6 +185,25 @@ class BgPostProcessingManager {
     
     func currentSensorForPostProcessing() -> Sensor? {
         return UserDefaults.standard.isMaster ? sensorsAccessor.fetchActiveSensor() : nil
+    }
+    
+    /// smoothing can be enabled for every source, but BG adjustment should stay
+    /// disabled when the current master source already has its own calibration flow
+    func shouldAllowBgAdjustmentForCurrentSource() -> Bool {
+        return adjustmentDisabledReasonForCurrentSource() == nil
+    }
+    
+    /// return a footer message for the adjustment section when the current source
+    /// should not allow offset and scale editing
+    func bgAdjustmentDisabledMessageForCurrentSource() -> String? {
+        guard let adjustmentDisabledReason = adjustmentDisabledReasonForCurrentSource() else { return nil }
+        
+        switch adjustmentDisabledReason {
+        case .masterLibreUsesCalibration:
+            return Texts_HomeView.postProcessingAdjustmentDisabledUseNativeAlgorithm
+        case .masterDexcomG6UsesCalibration:
+            return Texts_HomeView.postProcessingAdjustmentDisabledBecauseSensorIsCalibrated
+        }
     }
 
     func shouldAllowNightscoutBgPostProcessingWrites() -> Bool {
@@ -247,7 +289,7 @@ class BgPostProcessingManager {
     }
     
     private func recomputeAdjustedValues(bgReadings: [BgReading], sourceContextIdentifier: String) {
-        if !UserDefaults.standard.enableAdjustment {
+        if !UserDefaults.standard.enableAdjustment || !shouldAllowBgAdjustmentForCurrentSource() {
             for bgReading in bgReadings {
                 bgReading.adjustedValue = nil
             }
@@ -289,6 +331,11 @@ class BgPostProcessingManager {
     }
     
     private func createAdjustment(slope: Double, intercept: Double, adjustmentShapeType: BgAdjustmentShapeType, applyFromTimeStamp: Date, isBasicAdjustment: Bool, enteredBgValue: Double?, sourceCalculatedValue: Double?) {
+        guard shouldAllowBgAdjustmentForCurrentSource() else {
+            disableCurrentAdjustment()
+            return
+        }
+        
         guard let sourceContextIdentifier = currentSourceContextIdentifier() else { return }
 
         bgAdjustmentsAccessor.disableBgAdjustments(forSourceContextIdentifier: sourceContextIdentifier, fromApplyFromTimeStamp: applyFromTimeStamp, on: coreDataManager.mainManagedObjectContext)
@@ -462,7 +509,7 @@ class BgPostProcessingManager {
     private func currentSourceContextIdentifier() -> String? {
         if UserDefaults.standard.isMaster {
             guard let activeSensor = sensorsAccessor.fetchActiveSensor() else { return nil }
-            return "master|\(activeSensor.id)"
+            return "master|\(activeSensor.id)|\(activeSensor.startDate.toMillisecondsAsDouble())"
         }
         
         switch UserDefaults.standard.followerDataSourceType {
@@ -483,5 +530,74 @@ class BgPostProcessingManager {
         }
         
         return UserDefaults.standard.followerDataSourceType.fullDescription
+    }
+    
+    private enum AdjustmentDisabledReason {
+        case masterLibreUsesCalibration
+        case masterDexcomG6UsesCalibration
+    }
+    
+    private func adjustmentDisabledReasonForCurrentSource() -> AdjustmentDisabledReason? {
+        guard UserDefaults.standard.isMaster else { return nil }
+        guard let cgmTransmitterType = UserDefaults.standard.cgmTransmitterType else { return nil }
+        
+        switch cgmTransmitterType {
+        case .Bubble, .miaomiao, .Libre2:
+            return currentMasterLibreUsesNativeAlgorithm() ? nil : .masterLibreUsesCalibration
+        case .dexcom:
+            return currentMasterSourceIsDexcomG6() ? .masterDexcomG6UsesCalibration : nil
+        case .dexcomG7:
+            return nil
+        }
+    }
+    
+    /// Adjustment must stay separate from transmitter-side calibration.
+    /// Libre native algorithm can still use a simple post processing offset or scale,
+    /// but once the user switches to the xDrip calibration path the adjustment row
+    /// should be disabled so two calibration systems are not stacked together.
+    private func currentMasterLibreUsesNativeAlgorithm() -> Bool {
+        guard let currentCGMBLEPeripheral = currentCGMBLEPeripheral() else { return false }
+        
+        return currentCGMBLEPeripheral.webOOPEnabled
+    }
+    
+    private func currentMasterSourceIsDexcomG6() -> Bool {
+        if let activeSensorTransmitterId = UserDefaults.standard.activeSensorTransmitterId, activeSensorTransmitterId.starts(with: "8") {
+            return true
+        }
+        
+        return UserDefaults.standard.activeSensorDescription?.contains("G6") ?? false
+    }
+    
+    private func currentCGMBLEPeripheral() -> BLEPeripheral? {
+        let connectedCGMPeripherals = bLEPeripheralAccessor.getBLEPeripherals().filter { $0.shouldconnect }
+        
+        switch UserDefaults.standard.cgmTransmitterType {
+        case .dexcom:
+            return connectedCGMPeripherals.first { $0.dexcomG5 != nil }
+        case .Bubble:
+            return connectedCGMPeripherals.first { $0.bubble != nil }
+        case .miaomiao:
+            return connectedCGMPeripherals.first { $0.miaoMiao != nil }
+        case .Libre2:
+            return connectedCGMPeripherals.first { $0.libre2 != nil }
+        case .dexcomG7:
+            return connectedCGMPeripherals.first { $0.dexcomG7 != nil }
+        case nil:
+            return nil
+        }
+    }
+    
+    /// If the source changes from an adjustment-compatible path to one that already
+    /// calibrates internally, disable the existing BG adjustment immediately so the
+    /// next processing pass cannot keep applying an invalid offset or scale.
+    private func syncAdjustmentAvailabilityForCurrentSource() {
+        guard let adjustmentDisabledReason = adjustmentDisabledReasonForCurrentSource() else { return }
+        guard UserDefaults.standard.enableAdjustment || latestActiveBgAdjustment() != nil else { return }
+        
+        trace("in syncAdjustmentAvailabilityForCurrentSource, disabling BG adjustment because the current source no longer allows it. reason = %{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, String(describing: adjustmentDisabledReason))
+        
+        disableCurrentAdjustment()
+        notifyBgPostProcessingDidUpdate()
     }
 }

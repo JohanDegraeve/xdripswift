@@ -39,6 +39,8 @@ enum BgAdjustmentShapeType: Int16, CaseIterable {
 }
 
 enum ConstantsBgAdjustment {
+    static let minimumSlopeValue: Double = 0.25
+    static let maximumSlopeValue: Double = 1.75
     static let slopeNudgeValue: Double = 0.05
     static let interceptNudgeValueInMgDl: Double = 1.0
     static let interceptNudgeValueInMmol: Double = 0.1
