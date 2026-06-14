@@ -100,7 +100,6 @@
 "warningChangeFromMasterToFollower" = "Sahip'ten Takipciye geçmek mevcut sensörünüzü durduracaktır. Devam etmek istiyor musun?";
 "nightscoutPort" = "Port";
 "developerSettings" = "Geliştirici Ayarları";
-"smoothLibreValues" = "Pürüzsüz Libre değerleri";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Ana Ekran";

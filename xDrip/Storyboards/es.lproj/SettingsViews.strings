@@ -142,7 +142,6 @@
 "settingsviews_nightscoutUrl" = "URL";
 "settingsviews_sectiontitleAbout" = "Sobre %@";
 "volumeTestiOSSoundExplanation" = "Se está reproduciendo una alamra con el mismo volumen que usar un Tipo de Alarma con la opción de 'Ignorar Mode Silencio?' deshabilitado\n\nCambiar el volume con los botones del iPhone y apretar OK para confirmar";
-"smoothLibreValues" = "Suavizar valores Libre";
 "oslog" = "OSLog";
 "nslog" = "NSLog";
 "developerSettings" = "Opciones de Desarrollo";

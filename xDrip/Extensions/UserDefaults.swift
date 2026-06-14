@@ -443,10 +443,6 @@ extension UserDefaults {
         case NSLogEnabled = "NSLogEnabled"
         /// OSLogEnabled enabled or not
         case OSLogEnabled = "OSLogEnabled"
-        /// case smooth libre values
-        case smoothLibreValues = "smoothLibreValues"
-        /// timestamp of when smoothLibreValues was enabled or disabled by the user
-        case smoothLibreValuesChangedAtTimeStamp = "smoothLibreValuesChangedAtTimeStamp"
         /// for Libre 2 : suppress sending unlockPayLoad, this will allow to run xDrip4iOS/Libre 2 in parallel with other app(s)
         case suppressUnLockPayLoad = "suppressUnLockPayLoad"
         /// should the BG values be written to a shared app group?
@@ -2406,27 +2402,6 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.NSLogEnabled.rawValue)
-        }
-    }
-    
-    /// smoothLibreValues - default false
-    var smoothLibreValues: Bool {
-        get {
-            return bool(forKey: Key.smoothLibreValues.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.smoothLibreValues.rawValue)
-        }
-    }
-    
-    /// timestamp of when smoothLibreValues was enabled or disabled by the user
-    /// used to help calculate/inform about the transmitter Read Success
-    @objc dynamic var smoothLibreValuesChangedAtTimeStamp: Date? {
-        get {
-            return object(forKey: Key.smoothLibreValuesChangedAtTimeStamp.rawValue) as? Date
-        }
-        set {
-            set(newValue, forKey: Key.smoothLibreValuesChangedAtTimeStamp.rawValue)
         }
     }
     

@@ -105,7 +105,6 @@
 "warningChangeFromMasterToFollower" = "Η εναλλαγή από κύριο σε ακόλουθο θα σταματήσει τον τρέχοντα αισθητήρα σας. Θέλετε να συνεχίσετε;";
 "nightscoutPort" = "Θύρα";
 "developerSettings" = "Ρυθμίσεις προγραμματιστή";
-"smoothLibreValues" = "Ομαλοποίηση τιμών Libre;";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Αρχική οθόνη";

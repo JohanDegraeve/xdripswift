@@ -1014,9 +1014,9 @@ class BluetoothPeripheralViewController: UIViewController {
             return
         }
         
-        // let's pull the result from the manager - we're using it as a stateless instance as there is nothing to persist in the manager itself. We'll use the last time that the smooth libre values
-        // was changed to make the cut off for the calculations in order to avoid screwing up the statistics
-        let display = TransmitterReadSuccessManager(bgReadingsAccessor: bgReadingsAccessor).getReadSuccess(forSensor: activeSensor, now: nil, notBefore: UserDefaults.standard.smoothLibreValuesChangedAtTimeStamp)
+        // let's pull the result from the manager - we're using it as a stateless
+        // instance as there is nothing to persist in the manager itself
+        let display = TransmitterReadSuccessManager(bgReadingsAccessor: bgReadingsAccessor).getReadSuccess(forSensor: activeSensor, now: nil, notBefore: nil)
 
         // Compute how many hours of data we actually have within the last 24h
         let now = Date()
@@ -1083,17 +1083,7 @@ class BluetoothPeripheralViewController: UIViewController {
 
         var summaryMessageLines: [String] = []
         
-        // we need to add a small text to explain that if Libre smoothing has been changed in the last 24 hours
-        // then we will calculate read success only since then to avoid mistakes in the calculations
-        if let smoothLibreValuesChangedAtTimeStamp = UserDefaults.standard.smoothLibreValuesChangedAtTimeStamp, Date().timeIntervalSince(smoothLibreValuesChangedAtTimeStamp) < (1 * 60 * 60), expectedType == .Libre2Type {
-            summaryMessageLines.append("Please note that you changed the Libre 2 smoothing option \(smoothLibreValuesChangedAtTimeStamp.daysAndHoursAgoFull(appendAgo: true)). We will only calculate the read success since then.")
-        } else if expectedType == .Libre2Type && UserDefaults.standard.smoothLibreValues {
-            // if using Libre 2 (60 second readings) and also smoothing, then the results are not reliable as we will fill in any gaps!
-            summaryMessageLines.append("You're using Libre 2 smoothing, so you will always get 100% success!")
-        } else {
-            // if not (as should usually be the case), then just show how often we're calculating the expected readings to arrive
-            summaryMessageLines.append("Expecting \(expectedBluetoothPeripheralType?.rawValue ?? "to get") readings every \(display.nominalGapInSeconds) seconds.")
-        }
+        summaryMessageLines.append("Expecting \(expectedBluetoothPeripheralType?.rawValue ?? "to get") readings every \(display.nominalGapInSeconds) seconds.")
         
         // always include the first line (6h window). If we have <6h data, the label already shows X.Xh.
         let line6h = "\(visualIndicator6h) \(String(format: "%0.1f", display.success6h))% (\(label6h): \(display.expected6h - display.actual6h) dropped)"

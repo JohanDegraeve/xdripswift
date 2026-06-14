@@ -156,7 +156,6 @@
 "warningChangeToFollowerDexcomShare" = "Switching to Dexcom Share Follower mode will disable 'Upload to Dexcom Share'.";
 "nightscoutPort" = "Port";
 "developerSettings" = "Developer Settings";
-"smoothLibreValues" = "Smooth Libre Values";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Home Screen";

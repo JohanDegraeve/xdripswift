@@ -850,10 +850,6 @@ class Texts_SettingsView {
         return NSLocalizedString("developerSettings", tableName: filename, bundle: Bundle.main, value: "Developer Settings", comment: "Developer Settings, section title")
     }()
     
-    static let smoothLibreValues: String = {
-        return NSLocalizedString("smoothLibreValues", tableName: filename, bundle: Bundle.main, value: "Smooth Libre Values", comment: "deloper settings, row title for 'Smooth Libre Values?'")
-    }()
-    
     static let suppressUnLockPayLoad: String = {
         return NSLocalizedString("suppressUnLockPayLoad", tableName: filename, bundle: Bundle.main, value: "Suppress Unlock Payload", comment: "When enabled, then it should be possible to run xDrip4iOS/Libre 2 in parallel with other app(s)")
     }()

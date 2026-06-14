@@ -103,7 +103,6 @@
 "warningChangeFromMasterToFollower" = "Switching from Master to Follower will stop your current sensor. Do you want to continue?";
 "nightscoutPort" = "Port";
 "developerSettings" = "Developer Settings";
-"smoothLibreValues" = "Smooth Libre Values";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Home Screen";

@@ -11,10 +11,6 @@ class Libre2BluetoothPeripheralViewModel {
         
         /// sensor start time
         case sensorStartTime = 1
-        
-        /// case smooth libre values
-        case smoothLibreValues = 2
-        
     }
     
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: "Libre2BluetoothPeripheralViewModel")
@@ -155,16 +151,6 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             cell.accessoryType = .disclosureIndicator
             cell.accessoryView = disclosureAccessoryView
                         
-        case .smoothLibreValues:
-            
-            cell.textLabel?.text = Texts_SettingsView.smoothLibreValues
-            cell.detailTextLabel?.text = nil // it's a UISwitch,  no detailed text
-            cell.accessoryView = UISwitch(isOn: UserDefaults.standard.smoothLibreValues, action: { (isOn:Bool) in
-                UserDefaults.standard.smoothLibreValues = isOn
-                // set the time at which this option was changed.
-                // this is later used to make a cut-off in the read success calculations
-                UserDefaults.standard.smoothLibreValuesChangedAtTimeStamp = .now
-            })
         }
     }
     
@@ -198,9 +184,6 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                 
                 return .showInfoText(title: Texts_BluetoothPeripheralView.sensorStartDate, message: "\n" + sensorStartTimeText)
             }
-            
-        case .smoothLibreValues:
-            return .nothing
             
         }
         

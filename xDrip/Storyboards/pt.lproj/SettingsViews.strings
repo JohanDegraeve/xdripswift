@@ -99,7 +99,6 @@
 "debugLevel" = "Incluir Nível de Depuração";
 "warningChangeFromMasterToFollower" = "Aterar de Mestre para Seguidor vai parar o actual sensor. Deseja continuar?";
 "nightscoutPort" = "Porto";
-"smoothLibreValues" = "Suavizar Valores do Libre";
 "oslog" = "OSLog";
 "nslog" = "NSLog";
 "developerSettings" = "Definições de Programador";

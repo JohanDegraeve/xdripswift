@@ -1350,79 +1350,6 @@ final class RootViewController: UIViewController, ObservableObject {
             /// used if loopdelay > 0, to check if there was a recent calibration. If so then no readings are added in glucoseData array for a period of loopdelay + an amount of minutes
             let timeStampLastCalibrationForActiveSensor = lastCalibrationForActiveSensor != nil ? lastCalibrationForActiveSensor!.timeStamp : Date(timeIntervalSince1970: 0)
             
-            // next is only if smoothing is enabled, and if there's at least 11 minutes of readings in the glucoseData array, which will normally only be the case for Libre with MM/Bubble
-            // if that's the case then delete following existing BgReading's
-            //  - younger than 11 minutes : why, because some of the Libre transmitters return readings of the last 15 minutes for every minute, we don't go further than 11 minutes because these readings are not so well smoothed
-            //  - younger than the latest calibration : becuase if recalibration is used, then it might be difficult if there's been a recent calibration, to delete and recreate a reading with an earlier timestamp
-            //  - younger or equal in age than the oldest reading in the GlucoseData array
-            // why :
-            //    - in case of Libre, using transmitters like Bubble, MM, .. the 16 most recent readings in GlucoseData are smoothed (done in LibreDataParser if smoothing is enabled)
-            //    - specifically the reading at position 5, 6, 7....10 are well smoothed (because they are based on per minute readings of the last 15 minutes, inclusive 5 minutes before and 5 minutes after) we'll use
-            //
-            //  we will remove the BgReading's and then re-add them using smoothed values
-            // so we'll define the timestamp as of when readings should be deleted
-            // younger than 11 minutes
-            
-            // start defining timeStampToDelete as of when existing BgReading's will be deleted
-            // this value is also used to verify that glucoseData Array has enough readings
-            var timeStampToDelete = Date(timeIntervalSinceNow: -60.0 * (Double)(ConstantsLibreSmoothing.readingsToDeleteInMinutes))
-            
-            trace("in processNewGlucoseData, timeStampToDelete =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .debug, timeStampToDelete.toStringForTrace(timeStyle: .long, dateStyle: .none))
-            
-            // now check if we'll delete readings
-            // there must be a glucoseData.last, here assigning oldestGlucoseData just to unwrap it
-            // checking oldestGlucoseData.timeStamp < timeStampToDelete guarantees the oldest reading is older than the one we'll delete, so we're sur we have enough readings in glucoseData to refill the BgReadings
-            if let oldestGlucoseData = glucoseData.last, oldestGlucoseData.timeStamp < timeStampToDelete, UserDefaults.standard.smoothLibreValues  {
-                // older than the timestamp of the latest calibration (would only be applicable if recalibration is used)
-                if let lastCalibrationForActiveSensor = lastCalibrationForActiveSensor {
-                    timeStampToDelete = max(timeStampToDelete, lastCalibrationForActiveSensor.timeStamp)
-                    trace("in processNewGlucoseData, after lastcalibrationcheck timeStampToDelete =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .debug, timeStampToDelete.toStringForTrace(timeStyle: .long, dateStyle: .none))
-                }
-                
-                // there should be one reading per minute for the period that we want to delete readings, otherwise we may not be able to fill up a gap that is created by deleting readings, because the next readings are per 15 minutes. This will typically happen the first time the app runs (or reruns), the first range of readings is only 16 readings not enough to fill up a gap of more than 20 minutes
-                // we calculate the number of minutes between timeStampToDelete and now, use the result as index in glucoseData, the timestamp of that element is a number of minutes away from now, that number should be equal to index (as we expect one reading per minute)
-                // if that's not the case add 1 minute to timeStampToDelete
-                // repeat this until reached
-                let checkTimeStampToDelete = { (glucoseData: [GlucoseData]) -> Bool in
-                    // just to avoid infinite loop
-                    if timeStampToDelete > Date() {return true}
-                    
-                    let minutes = Int(abs(timeStampToDelete.timeIntervalSince(Date())/60.0))
-                    
-                    if minutes < glucoseData.count {
-                        if abs(glucoseData[minutes].timeStamp.timeIntervalSince(timeStampToDelete)) > 60.0 {
-                            // increase timeStampToDelete with 1 minute
-                            timeStampToDelete = timeStampToDelete.addingTimeInterval(1.0 * 60)
-                            return false
-                        }
-                        return true
-                    } else {
-                        // should never come here
-                        // increase timeStampToDelete with 5 minutes
-                        timeStampToDelete = timeStampToDelete.addingTimeInterval(1.0 * 60)
-                        return false
-                    }
-                }
-                
-                // repeat the function checkTimeStampToDelete until timeStampToDelete is high enough so that we delete only bgReading's without creating a gap that can't be filled in
-                while !checkTimeStampToDelete(glucoseData) {}
-                
-                // get the readings to be deleted - delete also non-calibrated readings
-                let lastBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStampToDelete, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true)
-                
-                // delete them
-                for reading in lastBgReadings {
-                    trace("in processNewGlucoseData, reading being deleted with timestamp =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .debug, reading.timeStamp.toStringForTrace(timeStyle: .long, dateStyle: .none))
-                    coreDataManager.mainManagedObjectContext.delete(reading)
-                    coreDataManager.saveChanges()
-                }
-                
-                // as we're deleting readings, glucoseChartPoints need to be updated, otherwise we keep seeing old values
-                // this is the easiest way to achieve it
-                glucoseChartManager?.cleanUpMemory()
-                
-            }
-            
             // was a new reading created or not ?
             var newReadingCreated = false
             
@@ -3832,9 +3759,8 @@ extension RootViewController: CGMTransmitterDelegate {
             
             // now try and log a transmitter read success line to the trace files.
             // this will only happen once per hour after launching the app
-            if let activeSensor = activeSensor, let bgReadingsAccessor = bgReadingsAccessor, let transmitterReadSuccessDisplay = TransmitterReadSuccessManager(bgReadingsAccessor: bgReadingsAccessor).getReadSuccessForLogs(forSensor: activeSensor, notBefore: UserDefaults.standard.smoothLibreValuesChangedAtTimeStamp, timeStampOfLastLogCreated: transmitterReadSuccessTimeStampOfLastLogCreated), transmitterReadSuccessDisplay.expected24h > 0 {
-                // Libre 2 + smoothing => success is effectively 100%
-                let success24h: Double = (transmitterReadSuccessDisplay.nominalGapInSeconds == 60 && UserDefaults.standard.smoothLibreValues) ? 100.0 : transmitterReadSuccessDisplay.success24h
+            if let activeSensor = activeSensor, let bgReadingsAccessor = bgReadingsAccessor, let transmitterReadSuccessDisplay = TransmitterReadSuccessManager(bgReadingsAccessor: bgReadingsAccessor).getReadSuccessForLogs(forSensor: activeSensor, notBefore: nil, timeStampOfLastLogCreated: transmitterReadSuccessTimeStampOfLastLogCreated), transmitterReadSuccessDisplay.expected24h > 0 {
+                let success24h: Double = transmitterReadSuccessDisplay.success24h
                 
                 // Compute how much history we actually have (after cutoff, capped to 24h)
                 let now = Date()

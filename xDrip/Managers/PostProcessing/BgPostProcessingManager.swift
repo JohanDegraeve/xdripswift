@@ -14,6 +14,11 @@ import CoreData
 class BgPostProcessingManager {
     
     // MARK: - Properties
+
+    private enum LegacyLibreSmoothingDefaultsKey {
+        static let enabled = "smoothLibreValues"
+        static let changedAt = "smoothLibreValuesChangedAtTimeStamp"
+    }
     
     private struct BgReadingStateBeforeProcessing {
         let finalValue: Double
@@ -44,7 +49,9 @@ class BgPostProcessingManager {
         self.sensorsAccessor = SensorsAccessor(coreDataManager: coreDataManager)
         self.nightscoutSyncManager = nightscoutSyncManager
         self.healthKitManager = healthKitManager
-        
+
+        removeLegacyLibreSmoothingDefaultsIfNeeded()
+
     }
     
     // MARK: - public functions
@@ -243,6 +250,15 @@ class BgPostProcessingManager {
         return description
     }
     
+    /// Libre used to have its own upstream smoothing switch. Remove those old
+    /// defaults now so the deleted feature no longer survives in persisted state.
+    private func removeLegacyLibreSmoothingDefaultsIfNeeded() {
+        if UserDefaults.standard.object(forKey: LegacyLibreSmoothingDefaultsKey.enabled) != nil || UserDefaults.standard.object(forKey: LegacyLibreSmoothingDefaultsKey.changedAt) != nil {
+            UserDefaults.standard.removeObject(forKey: LegacyLibreSmoothingDefaultsKey.enabled)
+            UserDefaults.standard.removeObject(forKey: LegacyLibreSmoothingDefaultsKey.changedAt)
+        }
+    }
+
     private func applyFromDescription(applyFromTimeStamp: Date, processingStartDateOverride: Date?) -> String {
         guard let processingStartDateOverride = processingStartDateOverride else {
             return "now"

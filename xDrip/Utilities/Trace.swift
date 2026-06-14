@@ -613,7 +613,6 @@ class Trace {
                         if blePeripheral.libre2 != nil {
                             
                             traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
-                            traceInfo.appendStringAndNewLine("    Smooth Libre readings: " + UserDefaults.standard.smoothLibreValues.description)
                             
                         }
                         

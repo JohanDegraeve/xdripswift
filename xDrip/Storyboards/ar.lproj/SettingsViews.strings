@@ -91,7 +91,6 @@
 "warningChangeFromMasterToFollower" = "سيؤدي التبديل من رئيسي إلى متابعة، إلى إيقاف الحساس الحالي. هل تريد الاستمرار ?";
 "nightscoutPort" = "المنفذ (اختياري)";
 "developerSettings" = "إعدادات المطور";
-"smoothLibreValues" = "تناسق قيم اليبري ?";
 "nslog" = "NSتقرير";
 "oslog" = "OSتقرير";
 "settingsviews_sectiontitlehomescreen" = "الشاشة الرئيسية";

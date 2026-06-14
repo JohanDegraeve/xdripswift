@@ -101,7 +101,6 @@
 "warningChangeFromMasterToFollower" = "Byte från användare till följare kommer att stoppa nuvarande sensor. Vill du fortsätta?";
 "nightscoutPort" = "Port";
 "developerSettings" = "Inställningar för utvecklare";
-"smoothLibreValues" = "Utjämna Libre-värden";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Hemskärm";
