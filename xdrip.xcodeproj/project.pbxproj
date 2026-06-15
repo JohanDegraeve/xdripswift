@@ -101,6 +101,7 @@
 		476CAF792B9F6A7200743168 /* ComplicationSharedUserDefaultsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474606632B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift */; };
 		476FA90C2BDC1EBA0091866C /* WatchComplication.strings in Resources */ = {isa = PBXBuildFile; fileRef = 476FA90A2BDC1EBA0091866C /* WatchComplication.strings */; };
 		476FA90E2BDC1EF80091866C /* TextsWatchComplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476FA90D2BDC1EF80091866C /* TextsWatchComplication.swift */; };
+		4B0C00022F3B000100000001 /* SensorManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0C00012F3B000100000001 /* SensorManagementView.swift */; };
 		476FE8FF2B2F1D1700537E0A /* ConstantsFollower.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */; };
 		4779BCEE2974306300515714 /* ActionClosurable in Frameworks */ = {isa = PBXBuildFile; productRef = 4779BCED2974306300515714 /* ActionClosurable */; };
 		4779BCF12974307700515714 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4779BCF02974307700515714 /* CryptoSwift */; };
@@ -917,6 +918,7 @@
 		476A897D2CCA7E680073ED83 /* NightscoutFollowType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutFollowType.swift; sourceTree = "<group>"; };
 		476FA90B2BDC1EBA0091866C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/WatchComplication.strings; sourceTree = "<group>"; };
 		476FA90D2BDC1EF80091866C /* TextsWatchComplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsWatchComplication.swift; sourceTree = "<group>"; };
+		4B0C00012F3B000100000001 /* SensorManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorManagementView.swift; sourceTree = "<group>"; };
 		476FA9102BDC1FFF0091866C /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/WatchComplication.strings; sourceTree = "<group>"; };
 		476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsFollower.swift; sourceTree = "<group>"; };
 		477B2C7D2B432775002F64A4 /* LiveActivityType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityType.swift; sourceTree = "<group>"; };
@@ -2588,6 +2590,7 @@
 				47228B142996BDD2008725DB /* BgReadingsView.swift */,
 				47B136DA2BC9BB55001E7ED3 /* ContactImageView.swift */,
 				47C210EF2B52A05B00005711 /* GlucoseChartView.swift */,
+				4B0C00012F3B000100000001 /* SensorManagementView.swift */,
 				475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */,
 				4AC0D0022F1D000100000001 /* SnoozeView.swift */,
 				F866974E2867A97000025441 /* Settings */,
@@ -4369,6 +4372,7 @@
 				F85FF39125288870004E6FF1 /* HouseKeeper.swift in Sources */,
 				F8CB59C42739D1CD00BA199E /* DexcomBackfillTxMessage.swift in Sources */,
 				47E3BEC72CD780E300B794A0 /* AIDStatusView.swift in Sources */,
+				4B0C00022F3B000100000001 /* SensorManagementView.swift in Sources */,
 				F8252867243E50FE0067AF77 /* ConstantsLibre.swift in Sources */,
 				F8F9720923A5915900C3F17D /* AESCrypt.m in Sources */,
 				F8CB59D3274D94AF00BA199E /* DexcomSessionStartTxMessage.swift in Sources */,

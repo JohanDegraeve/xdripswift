@@ -35,6 +35,106 @@ enum Texts_HomeView {
     static let calibrationButton:String = {
         return NSLocalizedString("calibrate", tableName: filename, bundle: Bundle.main, value: "Calibrate", comment: "Text in button on home screen")
     }()
+
+    static let sensorManagementTitle:String = {
+        return NSLocalizedString("sensorManagementTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Management", comment: "navigation title for the sensor management screen")
+    }()
+
+    static let sensorManagementSummaryTitle:String = {
+        return NSLocalizedString("sensorManagementSummaryTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Information", comment: "section title for sensor information")
+    }()
+
+    static let sensorManagementActionsTitle:String = {
+        return NSLocalizedString("sensorManagementActionsTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Actions", comment: "section title for sensor management actions")
+    }()
+
+    static let sensorManagementCalibrationTitle:String = {
+        return NSLocalizedString("sensorManagementCalibrationTitle", tableName: filename, bundle: Bundle.main, value: "Calibration", comment: "section title for sensor calibration information")
+    }()
+
+    static let sensorManagementHistoryTitle:String = {
+        return NSLocalizedString("sensorManagementHistoryTitle", tableName: filename, bundle: Bundle.main, value: "Calibration History", comment: "section title for calibration history")
+    }()
+
+    static let sensorManagementNotAvailableInFollower:String = {
+        return NSLocalizedString("sensorManagementNotAvailableInFollower", tableName: filename, bundle: Bundle.main, value: "Sensor management is unavailable in follower mode.", comment: "message shown when sensor management is not available in follower mode")
+    }()
+
+    static let sensorManagementAutomaticSessionNote:String = {
+        return NSLocalizedString("sensorManagementAutomaticSessionNote", tableName: filename, bundle: Bundle.main, value: "This sensor manages its session automatically, so manual start and stop are unavailable.", comment: "message shown when a sensor manages its own session")
+    }()
+
+    static let sensorManagementNoTransmitterNote:String = {
+        return NSLocalizedString("sensorManagementNoTransmitterNote", tableName: filename, bundle: Bundle.main, value: "Connect a CGM transmitter to manage the sensor session.", comment: "message shown when no transmitter is available for sensor management")
+    }()
+
+    static let sensorManagementCalibrationUnavailable:String = {
+        return NSLocalizedString("sensorManagementCalibrationUnavailable", tableName: filename, bundle: Bundle.main, value: "Calibration is temporarily unavailable.", comment: "generic error shown when calibration cannot be performed")
+    }()
+
+    static let sensorManagementStatusActive:String = {
+        return NSLocalizedString("sensorManagementStatusActive", tableName: filename, bundle: Bundle.main, value: "Active", comment: "sensor management status label")
+    }()
+
+    static let sensorManagementStatusWarmingUp:String = {
+        return NSLocalizedString("sensorManagementStatusWarmingUp", tableName: filename, bundle: Bundle.main, value: "Warming Up", comment: "sensor management status label")
+    }()
+
+    static let sensorManagementStatusExpired:String = {
+        return NSLocalizedString("sensorManagementStatusExpired", tableName: filename, bundle: Bundle.main, value: "Expired", comment: "sensor management status label")
+    }()
+
+    static let sensorManagementStatusNotStarted:String = {
+        return NSLocalizedString("sensorManagementStatusNotStarted", tableName: filename, bundle: Bundle.main, value: "Not Started", comment: "sensor management status label")
+    }()
+
+    static let sensorManagementSensorType:String = {
+        return NSLocalizedString("sensorManagementSensorType", tableName: filename, bundle: Bundle.main, value: "Sensor Type", comment: "sensor management row title")
+    }()
+
+    static let sensorManagementStartedAt:String = {
+        return NSLocalizedString("sensorManagementStartedAt", tableName: filename, bundle: Bundle.main, value: "Session Start", comment: "sensor management row title")
+    }()
+
+    static let sensorManagementElapsed:String = {
+        return NSLocalizedString("sensorManagementElapsed", tableName: filename, bundle: Bundle.main, value: "Elapsed", comment: "sensor management row title")
+    }()
+
+    static let sensorManagementRemaining:String = {
+        return NSLocalizedString("sensorManagementRemaining", tableName: filename, bundle: Bundle.main, value: "Remaining", comment: "sensor management row title")
+    }()
+
+    static let sensorManagementAlgorithm:String = {
+        return NSLocalizedString("sensorManagementAlgorithm", tableName: filename, bundle: Bundle.main, value: "Algorithm", comment: "sensor management row title")
+    }()
+
+    static let sensorManagementCalibrationMode:String = {
+        return NSLocalizedString("sensorManagementCalibrationMode", tableName: filename, bundle: Bundle.main, value: "Calibration Type", comment: "sensor management row title")
+    }()
+
+    static let sensorManagementCurrentCalibrationTitle:String = {
+        return NSLocalizedString("sensorManagementCurrentCalibrationTitle", tableName: filename, bundle: Bundle.main, value: "Current Calibration", comment: "title for the current calibration subsection")
+    }()
+
+    static let sensorManagementNoCalibrationYet:String = {
+        return NSLocalizedString("sensorManagementNoCalibrationYet", tableName: filename, bundle: Bundle.main, value: "No calibration has been applied to this sensor yet.", comment: "message shown when there is no active calibration")
+    }()
+
+    static let sensorManagementNoCalibrationHistory:String = {
+        return NSLocalizedString("sensorManagementNoCalibrationHistory", tableName: filename, bundle: Bundle.main, value: "No calibration history is available for this sensor.", comment: "message shown when no calibration history exists")
+    }()
+
+    static let sensorManagementNativeAlgorithm:String = {
+        return NSLocalizedString("sensorManagementNativeAlgorithm", tableName: filename, bundle: Bundle.main, value: "Native", comment: "algorithm mode label for native sensor algorithms")
+    }()
+
+    static let sensorManagementXdripAlgorithm:String = {
+        return NSLocalizedString("sensorManagementXdripAlgorithm", tableName: filename, bundle: Bundle.main, value: "xDrip", comment: "algorithm mode label for xDrip calibration")
+    }()
+
+    static let sensorManagementHistoricCalibration:String = {
+        return NSLocalizedString("sensorManagementHistoricCalibration", tableName: filename, bundle: Bundle.main, value: "Historic", comment: "label for a historic or unused calibration")
+    }()
     
     static let lockButton:String = {
         return NSLocalizedString("lock", tableName: filename, bundle: Bundle.main, value: "Lock", comment: "Text in button on home screen")

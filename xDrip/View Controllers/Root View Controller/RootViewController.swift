@@ -34,19 +34,7 @@ final class RootViewController: UIViewController, ObservableObject {
     
     private var sensorToolbarButtonOutlet: UIButton!
     @IBAction func sensorToolbarButtonAction(_ sender: UIButton) {
-        createAndPresentSensorButtonActionSheet()
-    }
-    
-    private var calibrateToolbarButtonOutlet: UIButton!
-    @IBAction func calibrateToolbarButtonAction(_ sender: UIButton) {
-        // if this is a transmitter that does not require and is not allowed to be calibrated, then give warning message
-        if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), (cgmTransmitter.isWebOOPEnabled() && !cgmTransmitter.overruleIsWebOOPEnabled()) {
-            let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.calibrationNotNecessary, actionHandler: nil)
-            self.present(alert, animated: true, completion: nil)
-        } else {
-            trace("calibration : user clicked the calibrate button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-            requestCalibration(userRequested: true)
-        }
+        showSensorManagementView()
     }
     
     private var bgAdjustmentsToolbarButtonOutlet: UIButton!
@@ -840,7 +828,7 @@ final class RootViewController: UIViewController, ObservableObject {
         }
         
         
-        // enable or disable the buttons 'sensor' and 'calibrate' on top, depending on master or follower
+        // enable or disable the sensor management button on top, depending on master or follower
         changeButtonsStatusTo(enabled: UserDefaults.standard.isMaster)
         
         // nillify the active sensor start date on start-up
@@ -1704,13 +1692,6 @@ final class RootViewController: UIViewController, ObservableObject {
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
         
-        // provide the older SF Symbol for the calibrate button for users below iOS17
-        if #available(iOS 17.0, *) {
-            calibrateToolbarButtonOutlet.setImage(UIImage(systemName: "dot.scope"), for: .normal)
-        } else {
-            calibrateToolbarButtonOutlet.setImage(UIImage(systemName: "scope"), for: .normal)
-        }
-        
         chartLongPressGestureRecognizerOutlet.delegate = self
         chartPanGestureRecognizerOutlet.delegate = self
         
@@ -1735,7 +1716,6 @@ final class RootViewController: UIViewController, ObservableObject {
         preSnoozeToolbarButtonOutlet = makeToolbarButton(Texts_HomeView.snoozeButton, "speaker.wave.2", #selector(preSnoozeToolbarButtonAction(_:)))
         bgReadingsToolbarButtonOutlet = makeToolbarButton("BgReadings", "drop", #selector(bgReadingsToolbarButtonAction(_:)))
         sensorToolbarButtonOutlet = makeToolbarButton(Texts_HomeView.sensor, "sensor.tag.radiowaves.forward", #selector(sensorToolbarButtonAction(_:)))
-        calibrateToolbarButtonOutlet = makeToolbarButton(Texts_HomeView.calibrationButton, "dot.scope", #selector(calibrateToolbarButtonAction(_:)))
         bgAdjustmentsToolbarButtonOutlet = makeToolbarButton(Texts_HomeView.postProcessingTitle, "dial.low", #selector(bgAdjustmentsToolbarButtonAction(_:)))
         showHideItemsToolbarButtonOutlet = makeToolbarButton("Show/Hide", "rectangle.3.group", #selector(showHideItemsToolbarButtonAction(_:)))
         screenLockToolbarButtonOutlet = makeToolbarButton(Texts_HomeView.lockButton, "lock", #selector(screenLockToolbarButtonAction(_:)))
@@ -1751,7 +1731,6 @@ final class RootViewController: UIViewController, ObservableObject {
             preSnoozeToolbarButtonOutlet,
             bgReadingsToolbarButtonOutlet,
             sensorToolbarButtonOutlet,
-            calibrateToolbarButtonOutlet,
             bgAdjustmentsToolbarButtonOutlet,
             showHideItemsToolbarButtonOutlet,
             screenLockToolbarButtonOutlet
@@ -1923,80 +1902,80 @@ final class RootViewController: UIViewController, ObservableObject {
                 self.present(UIAlertController(title: Texts_Common.warning, message: Texts_Common.invalidValue, actionHandler: nil), animated: true, completion: nil)
                 return
             }
-            
-            // store the calibration value entered by the user into the log
-            trace("calibration : value %{public}@ entered by user", log: self.log, category: ConstantsLog.categoryRootView, type: .info, text.description)
-            
-            let valueAsDoubleConvertedToMgDl = valueAsDouble.mmolToMgdl(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-            
-            var latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true, includingSuppressed: true)
-            
-            var latestCalibrations = calibrationsAccessor.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
-            
-            if let calibrator = self.calibrator {
-                if latestCalibrations.count == 0 {
-                    trace("calibration : initial calibration, creating two calibrations", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-                    
-                    // calling initialCalibration will create two calibrations, they are returned also but we don't need them
-                    let (calibration, _) = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDoubleConvertedToMgDl, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDoubleConvertedToMgDl, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
-                    
-                    // send calibration to transmitter (only used for Dexcom, if firefly flow is used)
-                    if let calibration = calibration {
-                        cgmTransmitter.calibrate(calibration: calibration)
-                        
-                        // presnooze fastrise and fastdrop alert
-                        self.alertManager?.snooze(alertKind: .fastdrop, snoozePeriodInMinutes: 9, response: nil)
-                        
-                        self.alertManager?.snooze(alertKind: .fastrise, snoozePeriodInMinutes: 9, response: nil)
-                    }
-                } else {
-                    // it's not the first calibration
-                    if let firstCalibrationForActiveSensor = calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) {
-                        trace("calibration : creating calibration", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-                        
-                        // create new calibration
-                        if let calibration = calibrator.createNewCalibration(bgValue: valueAsDoubleConvertedToMgDl, lastBgReading: latestReadings.count > 0 ? latestReadings[0] : nil, sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext) {
-                            
-                            // send calibration to transmitter (only used for Dexcom, if firefly flow is used)
-                            cgmTransmitter.calibrate(calibration: calibration)
-                            
-                            // presnooze fastrise and fastdrop alert
-                            self.alertManager?.snooze(alertKind: .fastdrop, snoozePeriodInMinutes: 9, response: nil)
-                            
-                            self.alertManager?.snooze(alertKind: .fastrise, snoozePeriodInMinutes: 9, response: nil)
-                        }
-                    }
-                }
-                
-                // this will store the newly created calibration(s) in coredata
-                coreDataManager.saveChanges()
-                
-                // initiate upload to Nightscout, if needed
-                if let nightscoutSyncManager = self.nightscoutSyncManager {
-                    nightscoutSyncManager.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
-                }
-                
-                // initiate upload to Dexcom Share, if needed
-                if let dexcomShareUploadManager = self.dexcomShareUploadManager {
-                    dexcomShareUploadManager.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
-                }
-                
-                // update labels
-                self.updateLabelsAndChart(overrideApplicationState: false)
-                
-                // bluetoothPeripherals (M5Stack, ..) should receive latest reading with calculated value
-                self.bluetoothPeripheralManager?.sendLatestReading()
-                
-                // calendarManager should process new reading
-                self.calendarManager?.processNewReading(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
-                
-                // send also to loopmanager
-                self.loopManager?.share()
+
+            if let errorMessage = self.submitCalibrationValue(
+                valueAsDouble,
+                calibrationsAccessor: calibrationsAccessor,
+                coreDataManager: coreDataManager,
+                bgReadingsAccessor: bgReadingsAccessor,
+                cgmTransmitter: cgmTransmitter,
+                activeSensor: activeSensor,
+                deviceName: deviceName
+            ) {
+                self.present(UIAlertController(title: Texts_Common.warning, message: errorMessage, actionHandler: nil), animated: true, completion: nil)
             }
         }, cancelHandler: nil)
         
         // present the alert
         self.present(alert, animated: true, completion: nil)
+    }
+
+    private func submitCalibrationValue(
+        _ valueAsDouble: Double,
+        calibrationsAccessor: CalibrationsAccessor,
+        coreDataManager: CoreDataManager,
+        bgReadingsAccessor: BgReadingsAccessor,
+        cgmTransmitter: CGMTransmitter,
+        activeSensor: Sensor,
+        deviceName: String?
+    ) -> String? {
+        trace("calibration : value %{public}@ entered by user", log: self.log, category: ConstantsLog.categoryRootView, type: .info, valueAsDouble.description)
+
+        let valueAsDoubleConvertedToMgDl = valueAsDouble.mmolToMgdl(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+
+        var latestReadings = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true, includingSuppressed: true)
+        var latestCalibrations = calibrationsAccessor.getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
+
+        guard let calibrator = self.calibrator else {
+            return Texts_HomeView.sensorManagementCalibrationUnavailable
+        }
+
+        if latestCalibrations.count == 0 {
+            trace("calibration : initial calibration, creating two calibrations", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+
+            let (calibration, _) = calibrator.initialCalibration(firstCalibrationBgValue: valueAsDoubleConvertedToMgDl, firstCalibrationTimeStamp: Date(timeInterval: -(5*60), since: Date()), secondCalibrationBgValue: valueAsDoubleConvertedToMgDl, sensor: activeSensor, lastBgReadingsWithCalculatedValue0AndForSensor: &latestReadings, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+
+            if let calibration = calibration {
+                cgmTransmitter.calibrate(calibration: calibration)
+                self.alertManager?.snooze(alertKind: .fastdrop, snoozePeriodInMinutes: 9, response: nil)
+                self.alertManager?.snooze(alertKind: .fastrise, snoozePeriodInMinutes: 9, response: nil)
+            }
+        } else if let firstCalibrationForActiveSensor = calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) {
+            trace("calibration : creating calibration", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
+
+            if let calibration = calibrator.createNewCalibration(bgValue: valueAsDoubleConvertedToMgDl, lastBgReading: latestReadings.count > 0 ? latestReadings[0] : nil, sensor: activeSensor, lastCalibrationsForActiveSensorInLastXDays: &latestCalibrations, firstCalibration: firstCalibrationForActiveSensor, deviceName: deviceName, nsManagedObjectContext: coreDataManager.mainManagedObjectContext) {
+                cgmTransmitter.calibrate(calibration: calibration)
+                self.alertManager?.snooze(alertKind: .fastdrop, snoozePeriodInMinutes: 9, response: nil)
+                self.alertManager?.snooze(alertKind: .fastrise, snoozePeriodInMinutes: 9, response: nil)
+            }
+        }
+
+        coreDataManager.saveChanges()
+
+        if let nightscoutSyncManager = self.nightscoutSyncManager {
+            nightscoutSyncManager.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
+        }
+
+        if let dexcomShareUploadManager = self.dexcomShareUploadManager {
+            dexcomShareUploadManager.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
+        }
+
+        self.updateLabelsAndChart(overrideApplicationState: false)
+        self.bluetoothPeripheralManager?.sendLatestReading()
+        self.calendarManager?.processNewReading(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
+        self.loopManager?.share()
+
+        return nil
     }
     
     /// this is just some functionality which is used frequently
@@ -2364,176 +2343,6 @@ final class RootViewController: UIViewController, ObservableObject {
         }
     }
     
-    /// when user clicks transmitter button, this will create and present the actionsheet, contents depend on type of transmitter and sensor status
-    private func createAndPresentSensorButtonActionSheet() {
-        // unwrap coredatamanager
-        guard let coreDataManager = coreDataManager else {return}
-        
-        // initialize list of actions
-        var listOfActions = [UIAlertAction]()
-        
-        // first action is to show the status
-        let sensorStatusAction = UIAlertAction(title: Texts_HomeView.statusActionTitle, style: .default) { (UIAlertAction) in
-            self.showSensorStatus()
-        }
-        
-        listOfActions.append(sensorStatusAction)
-        
-        // next action is to start or stop the sensor, can also be omitted depending on type of device - also not applicable for follower mode
-        if let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() {
-            if cgmTransmitter.cgmTransmitterType().allowManualSensorStart() && UserDefaults.standard.isMaster {
-                // user can (or needs to) start and stop the sensor
-                var startStopAction: UIAlertAction
-                
-                if activeSensor != nil {
-                    startStopAction = UIAlertAction(title: Texts_HomeView.stopSensorActionTitle, style: .default) { (UIAlertAction) in
-                        
-                        // first ask user confirmation
-                        let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.stopSensorConfirmation, actionHandler: {
-                            
-                            trace("in createAndPresentSensorButtonActionSheet, user clicked stop sensor, will stop the sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-                            
-                            self.stopSensor(cGMTransmitter: cgmTransmitter, sendToTransmitter: true)
-                            
-                        }, cancelHandler: nil)
-                        
-                        self.present(alert, animated: true, completion: nil)
-                    }
-                } else {
-                    startStopAction = UIAlertAction(title: Texts_HomeView.startSensorActionTitle, style: .default) { (UIAlertAction) in
-                        // either sensor needs a sensor start time, or a sensor code .. or none
-                        if cgmTransmitter.needsSensorStartTime() {
-                            self.startSensorAskUserForStarttime(cGMTransmitter: cgmTransmitter)
-                        } else if cgmTransmitter.needsSensorStartCode() {
-                            self.startSensorAskUserForSensorCode(cGMTransmitter: cgmTransmitter)
-                        } else {
-                            self.startSensor(cGMTransmitter: cgmTransmitter, sensorStarDate: Date(), sensorCode: nil, coreDataManager: coreDataManager, sendToTransmitter: true)
-                        }
-                    }
-                }
-                
-                listOfActions.append(startStopAction)
-            }
-        }
-        
-        let cancelAction = UIAlertAction(title: Texts_Common.Cancel, style: .cancel, handler: nil)
-        listOfActions.append(cancelAction)
-        
-        // create and present new alertController of type actionsheet
-        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        for action in listOfActions {
-            actionSheet.addAction(action)
-        }
-        
-        // following is required for iPad, as explained here https://stackoverflow.com/questions/28089898/actionsheet-not-working-ipad
-        // otherwise it crashes on iPad when clicking transmitter button
-        if let popoverController = actionSheet.popoverPresentationController {
-            popoverController.sourceView = self.view
-            popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
-            popoverController.permittedArrowDirections = []
-        }
-        
-        self.present(actionSheet, animated: true)
-    }
-    
-    private func appendEndDateInformation(_ activeSensor: Sensor, _ textToShow: String) -> String {
-        var result = "\r\n\r\n" + Texts_HomeView.sensorEnd + ":\n"
-        if activeSensor.endDate != nil {
-            result += (activeSensor.endDate?.toStringInUserLocale(timeStyle: .short, dateStyle: .short, showTimeZone: true))!
-            result += "\r\n\r\n" + Texts_HomeView.sensorRemaining + ":\n"
-            result += (activeSensor.endDate?.daysAndHoursAgo())!
-        }
-        else if UserDefaults.standard.maxSensorAgeInDays > 0 {
-            result += activeSensor.startDate.addingTimeInterval(TimeInterval(hours: Double(UserDefaults.standard.maxSensorAgeInDays * 24))).toStringInUserLocale(timeStyle: .short, dateStyle: .short, showTimeZone: true)
-            result += "\r\n\r\n" + Texts_HomeView.sensorRemaining + ":\n"
-            result += "-" + activeSensor.startDate.addingTimeInterval(TimeInterval(hours: Double(UserDefaults.standard.maxSensorAgeInDays * 24))).daysAndHoursAgo()
-        }
-        else { //No end date information could be retrieved, return nothing
-            return ""
-        }
-        
-        return result
-    }
-    
-    /// will show the sensor status
-    private func showSensorStatus() {
-        // first sensor status
-        var textToShow = "\n" + Texts_HomeView.sensorStart + ":\n"
-        
-        if let activeSensor = activeSensor {
-            textToShow += activeSensor.startDate.toStringInUserLocale(timeStyle: .short, dateStyle: .short, showTimeZone: true)
-            textToShow += "\n\n" + Texts_HomeView.sensorDuration + ":\n"
-            textToShow += activeSensor.startDate.daysAndHoursAgo()
-            textToShow += appendEndDateInformation(activeSensor, textToShow)
-        } else {
-            textToShow += Texts_HomeView.notStarted
-        }
-        
-        // add 2 newlines
-        textToShow += "\r\n\r\n"
-        
-        // add transmitterBatteryInfo if known
-        if let transmitterBatteryInfo = UserDefaults.standard.transmitterBatteryInfo {
-            textToShow += Texts_HomeView.transmitterBatteryLevel + ":\n" + transmitterBatteryInfo.description
-            // add 1 newline with last connection timestamp
-            textToShow += "\r\n\r\n"
-        }
-        
-        // display textoToshow
-        let alert = UIAlertController(title: Texts_HomeView.statusActionTitle, message: textToShow, actionHandler: nil)
-        
-        self.present(alert, animated: true, completion: nil)
-    }
-    
-    /// start a new sensor, ask user for starttime
-    /// - parameters:
-    ///     - cGMTransmitter is required because startSensor command will be sent also to the transmitter
-    private func startSensorAskUserForStarttime(cGMTransmitter: CGMTransmitter) {
-        // craete datePickerViewData
-        let datePickerViewData = DatePickerViewData(withMainTitle: Texts_HomeView.startSensorActionTitle, withSubTitle: nil, datePickerMode: .dateAndTime, date: Date(), minimumDate: nil, maximumDate: Date(), okButtonText: Texts_Common.Ok, cancelButtonText: Texts_Common.Cancel, onOkClick: {(date) in
-            if let coreDataManager = self.coreDataManager, let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() {
-                
-                // start sensor with date chosen by user, sensorCode nil
-                self.startSensor(cGMTransmitter: cgmTransmitter, sensorStarDate: date, sensorCode: nil, coreDataManager: coreDataManager, sendToTransmitter: true)
-                
-            }
-        }, onCancelClick: nil)
-        
-        // if this is the first time user starts a sensor, give warning that time should be correct
-        // if not the first them, then immediately open the timePickAlertController
-        if (!UserDefaults.standard.startSensorTimeInfoGiven) {
-            let alert = UIAlertController(title: Texts_HomeView.startSensorActionTitle, message: Texts_HomeView.startSensorTimeInfo, actionHandler: {
-                // create and present pickerviewcontroller
-                DatePickerViewController.displayDatePickerViewController(datePickerViewData: datePickerViewData, parentController: self)
-                
-                // no need to display sensor start time info next sensor start
-                UserDefaults.standard.startSensorTimeInfoGiven = true
-            })
-            
-            self.present(alert, animated: true, completion: nil)
-            
-        } else {
-            DatePickerViewController.displayDatePickerViewController(datePickerViewData: datePickerViewData, parentController: self)
-        }
-    }
-    
-    /// start a new sensor, ask user for sensor code
-    /// - parameters:
-    ///     - cGMTransmitter is required because startSensor command will be sent also to the transmitter
-    private func startSensorAskUserForSensorCode(cGMTransmitter: CGMTransmitter) {
-        let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.enterSensorCode, keyboardType:.numberPad, text: nil, placeHolder: "0000", actionTitle: nil, cancelTitle: nil, actionHandler: {
-            (text:String) in
-            
-            if let coreDataManager = self.coreDataManager, let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() {
-                // start sensor with date chosen by user, sensorCode nil
-                self.startSensor(cGMTransmitter: cgmTransmitter, sensorStarDate: Date(), sensorCode: text, coreDataManager: coreDataManager, sendToTransmitter: true)
-                
-            }
-        }, cancelHandler: nil)
-        
-        self.present(alert, animated: true, completion: nil)
-    }
-    
     private func getCGMTransmitterDeviceName(for cgmTransmitter: CGMTransmitter) -> String? {
         if let bluetoothTransmitter = cgmTransmitter as? BluetoothTransmitter {
             return bluetoothTransmitter.deviceName
@@ -2542,15 +2351,13 @@ final class RootViewController: UIViewController, ObservableObject {
         return nil
     }
     
-    /// enables or disables the buttons on top of the screen
+    /// enables or disables the sensor management button on top of the screen
     private func changeButtonsStatusTo(enabled: Bool) {
         if enabled {
             sensorToolbarButtonOutlet.isEnabled = true
-            calibrateToolbarButtonOutlet.isEnabled = true
             
         } else {
             sensorToolbarButtonOutlet.isEnabled = false
-            calibrateToolbarButtonOutlet.isEnabled = false
         }
     }
     
@@ -3375,6 +3182,28 @@ final class RootViewController: UIViewController, ObservableObject {
         showViewController(BgAdjustmentsHostingController(bgReadingsAccessor: bgReadingsAccessor, treatmentEntryAccessor: treatmentEntryAccessor, bgPostProcessingManager: bgPostProcessingManager))
     }
 
+    private func showSensorManagementView() {
+        guard let calibrationsAccessor = calibrationsAccessor, let bgReadingsAccessor = bgReadingsAccessor else { return }
+
+        showSwiftUIView(
+            SensorManagementView(
+                activeSensorProvider: { [weak self] in self?.activeSensor },
+                transmitterProvider: { [weak self] in self?.bluetoothPeripheralManager?.getCGMTransmitter() },
+                calibrationsAccessor: calibrationsAccessor,
+                bgReadingsAccessor: bgReadingsAccessor,
+                onStartSensor: { [weak self] startDate, sensorCode in
+                    self?.startSensorFromManagementView(startDate: startDate, sensorCode: sensorCode)
+                },
+                onStopSensor: { [weak self] in
+                    self?.stopSensorFromManagementView()
+                },
+                onSubmitCalibration: { [weak self] value in
+                    self?.submitCalibrationFromManagementView(value)
+                }
+            )
+        )
+    }
+
     /// Show a SwiftUI view from the UIKit root view controller.
     /// This keeps the SwiftUI bridge in code so we do not need storyboard segues
     /// or destination creation selectors for every hosted SwiftUI screen.
@@ -3388,6 +3217,53 @@ final class RootViewController: UIViewController, ObservableObject {
         // Use show so UIKit can choose the same navigation behavior that the
         // previous storyboard-based show segues were using in this controller.
         show(viewController, sender: self)
+    }
+
+    private func startSensorFromManagementView(startDate: Date, sensorCode: String?) {
+        guard let coreDataManager = coreDataManager, let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() else { return }
+
+        startSensor(cGMTransmitter: cgmTransmitter, sensorStarDate: startDate, sensorCode: sensorCode, coreDataManager: coreDataManager, sendToTransmitter: true)
+        updateDataSourceInfo()
+        updateLabelsAndChart(overrideApplicationState: false)
+    }
+
+    private func stopSensorFromManagementView() {
+        guard let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() else { return }
+
+        stopSensor(cGMTransmitter: cgmTransmitter, sendToTransmitter: true)
+        updateLabelsAndChart(overrideApplicationState: false)
+    }
+
+    private func submitCalibrationFromManagementView(_ valueAsDouble: Double) -> String? {
+        guard let calibrationsAccessor = calibrationsAccessor, let coreDataManager = self.coreDataManager, let bgReadingsAccessor = self.bgReadingsAccessor else {
+            return Texts_HomeView.sensorManagementCalibrationUnavailable
+        }
+
+        guard let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let bluetoothTransmitter = cgmTransmitter as? BluetoothTransmitter else {
+            return Texts_HomeView.theresNoCGMTransmitterActive
+        }
+
+        guard let activeSensor = activeSensor else {
+            return Texts_HomeView.startSensorBeforeCalibration
+        }
+
+        if cgmTransmitter.isWebOOPEnabled() && !cgmTransmitter.overruleIsWebOOPEnabled() {
+            return Texts_HomeView.calibrationNotNecessary
+        }
+
+        if calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) == nil && !cgmTransmitter.overruleIsWebOOPEnabled() {
+            return Texts_HomeView.thereMustBeAreadingBeforeCalibration
+        }
+
+        return submitCalibrationValue(
+            valueAsDouble,
+            calibrationsAccessor: calibrationsAccessor,
+            coreDataManager: coreDataManager,
+            bgReadingsAccessor: bgReadingsAccessor,
+            cgmTransmitter: cgmTransmitter,
+            activeSensor: activeSensor,
+            deviceName: bluetoothTransmitter.deviceName
+        )
     }
     
     /// check if the conditions are correct to start a live activity, update it, or end it
