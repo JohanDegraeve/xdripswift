@@ -85,6 +85,7 @@
 "postProcessingSmoothed" = "Smoothed";
 "postProcessingUpdateAllReadingsLastPeriod" = "Overwrite all values in the last %@";
 "postProcessingNightscoutDataNotUpdated" = "Nightscout data will not be updated";
+"postProcessingMasterNightscoutUploadDisabled" = "Upload to Nightscout is disabled";
 "postProcessingOriginalGlucose" = "Original Glucose";
 "postProcessingAdjustedGlucose" = "Adjusted glucose";
 "postProcessingEnterValue" = "Enter value";

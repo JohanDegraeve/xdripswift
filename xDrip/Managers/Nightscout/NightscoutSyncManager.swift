@@ -108,6 +108,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// allowed to overlap, a later delete can remove data that an earlier task
     /// has only just re-uploaded.
     private var bgReadingsReplacementTask: Task<Void, Never>?
+    private var bgReadingsReplacementTaskIdentifier: String?
+    private var pendingDirectBgUploadAfterReplacement = false
+    private var pendingDirectBgUploadLastConnectionStatusChangeTimeStamp: Date?
     
     /// - when was the sync of treatments with Nightscout started.
     /// - if nil then there's no sync running
@@ -226,18 +229,23 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     public func uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: Date?) {
         // check that Nightscout is enabled
         // and nightscoutURL exists
-        guard UserDefaults.standard.nightscoutEnabled, UserDefaults.standard.nightscoutUrl != nil else { return }
+        guard UserDefaults.standard.nightscoutEnabled, UserDefaults.standard.nightscoutUrl != nil else {
+            trace("in uploadLatestBgReadings, returning because Nightscout is disabled or URL is missing", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+            return
+        }
         
         // check and exit without uploading BG values if any of the following conditions are true:
         // - follower mode but the follower source is also Nightscout
         // - follower mode but upload follower data to Nightscout if false
         // - master mode but upload master to Nightscout is false
         if !shouldAllowNightscoutBgWrites() {
+            trace("in uploadLatestBgReadings, returning because BG writes are not allowed. isMaster = %{public}@, masterUploadDataToNightscout = %{public}@, followerDataSourceType = %{public}@, followerUploadDataToNightscout = %{public}@", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, UserDefaults.standard.isMaster.description, UserDefaults.standard.masterUploadDataToNightscout.description, UserDefaults.standard.followerDataSourceType.description, UserDefaults.standard.followerUploadDataToNightscout.description)
             return
         }
         
         // check that either the API_SECRET or Token exists, if both are nil then return
         if UserDefaults.standard.nightscoutAPIKey == nil && UserDefaults.standard.nightscoutToken == nil {
+            trace("in uploadLatestBgReadings, returning because neither API secret nor token is configured", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
             return
         }
         
@@ -245,10 +253,13 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         if UserDefaults.standard.nightscoutUseSchedule {
             if let schedule = UserDefaults.standard.nightscoutSchedule {
                 if !schedule.indicatesOn(forWhen: Date()) {
+                    trace("in uploadLatestBgReadings, returning because the Nightscout upload schedule is currently off", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
                     return
                 }
             }
         }
+
+        trace("in uploadLatestBgReadings, proceeding with direct BG upload evaluation", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
         
         let minimumInterval = lastSyncHadChanges ? ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds : idleNightscoutSyncInterval
         if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -minimumInterval {
@@ -258,8 +269,30 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             UserDefaults.standard.nightscoutSyncRequired = true
         }
         
-        // upload readings
-        uploadBgReadingsToNightscout(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
+        // During testing it was found that disabling smoothing or adjustment
+        // can switch the app back to the normal live upload path while an older
+        // BG replacement task is still finishing its delete and re-upload work.
+        // If the direct upload starts too early, that older replacement task can
+        // still delete the same Nightscout window afterwards and make it look
+        // like live uploads have stopped.
+        //
+        // Do not defer the direct upload into a new Task here. That looked tidy,
+        // but it meant the app could move to the background and be suspended
+        // before the actual BG upload ever started. Queue one pending direct
+        // upload request instead, then let the replacement task trigger it
+        // synchronously as soon as the delete and re-upload cycle is finished.
+        if bgReadingsReplacementTaskIdentifier != nil {
+            trace("in uploadLatestBgReadings, pending BG replacement task detected, queuing direct BG upload until replacement completes", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+
+            pendingDirectBgUploadAfterReplacement = true
+
+            if let lastConnectionStatusChangeTimeStamp = lastConnectionStatusChangeTimeStamp {
+                pendingDirectBgUploadLastConnectionStatusChangeTimeStamp = lastConnectionStatusChangeTimeStamp
+            }
+
+        } else {
+            uploadBgReadingsToNightscout(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp)
+        }
         
         // upload calibrations
         uploadCalibrationsToNightscout()
@@ -286,7 +319,15 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// - parameters:
     ///     - timeStampOfBgReadingToDelete : the timestamp of the BG reading that we want to try and remove
     public func deleteBgReadingFromNightscout(timeStampOfBgReadingToDelete: Date) {
-        guard UserDefaults.standard.nightscoutEnabled, UserDefaults.standard.nightscoutUrl != nil, shouldAllowNightscoutBgPostProcessingWrites() else { return }
+        // During testing it was found that the historical BG replacement path
+        // could still delete and re-upload values even when the normal master
+        // Nightscout BG upload switch had been turned off. Use the same BG
+        // write permission gate here so there is no replacement escape path.
+        guard UserDefaults.standard.nightscoutEnabled,
+              UserDefaults.standard.nightscoutUrl != nil,
+              shouldAllowNightscoutBgWrites(),
+              shouldAllowNightscoutBgPostProcessingWrites()
+        else { return }
 
         Task {
             let defaultHalfWindowInSeconds = ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutes * 60.0 / 2.0
@@ -295,7 +336,14 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     }
     
     public func replaceBgReadingsInNightscout(bgReadings: [BgReading], deleteFromTimeStamp: Date? = nil, deleteToTimeStamp: Date? = nil) {
-        guard UserDefaults.standard.nightscoutEnabled, UserDefaults.standard.nightscoutUrl != nil, shouldAllowNightscoutBgPostProcessingWrites() else { return }
+        // Use the same BG write gate as the direct upload path.
+        // If master BG upload is disabled, no adjusted, smoothed or rewritten
+        // BG values should be sent to Nightscout either.
+        guard UserDefaults.standard.nightscoutEnabled,
+              UserDefaults.standard.nightscoutUrl != nil,
+              shouldAllowNightscoutBgWrites(),
+              shouldAllowNightscoutBgPostProcessingWrites()
+        else { return }
         
         // Build plain payload snapshots before the queued async work starts.
         // During testing it was found that the historical replacement path can
@@ -311,11 +359,19 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
 
         let newestTimeStamp = bgReadingsToReplace.last?.timeStamp
         let previousReplacementTask = bgReadingsReplacementTask
+        let replacementTaskIdentifier = UUID().uuidString
+
+        bgReadingsReplacementTaskIdentifier = replacementTaskIdentifier
 
         bgReadingsReplacementTask = Task { @MainActor [weak self] in
             _ = await previousReplacementTask?.result
 
             guard let self = self else { return }
+            // During testing it was found that the user can turn off master
+            // Nightscout BG upload while a replacement task is still queued.
+            // Re-check the write permission after waiting so the delayed task
+            // does not continue deleting and re-uploading BG values anyway.
+            guard self.shouldAllowNightscoutBgWrites() else { return }
 
             // Historical overwrite uses one explicit time window.
             // Normal live replacement uses per-reading windows so only the affected slots are replaced.
@@ -334,9 +390,39 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
 
             if uploadSucceeded, let newestTimeStamp = newestTimeStamp {
                 let currentTimeStampLatestNightscoutUploadedBgReading = UserDefaults.standard.timeStampLatestNightscoutUploadedBgReading ?? .distantPast
-                if newestTimeStamp > currentTimeStampLatestNightscoutUploadedBgReading {
-                    UserDefaults.standard.timeStampLatestNightscoutUploadedBgReading = newestTimeStamp
+                let minimiumTimeBetweenTwoReadingsInMinutes = UserDefaults.standard.storeFrequentReadingsInNightscout ? ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutesFrequentUploads : ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutes
+                let replacementHandoffTimeStamp = newestTimeStamp.addingTimeInterval(-minimiumTimeBetweenTwoReadingsInMinutes * 60.0)
+
+                // During testing it was found that a historical overwrite can
+                // finish only a few seconds before the next normal live reading.
+                // If the latest uploaded Nightscout timestamp is moved all the
+                // way to the newest overwritten reading, the next live cycle can
+                // think that the new reading is still inside the normal upload
+                // cadence and skip it completely.
+                //
+                // Move the Nightscout handoff back by one upload cadence so the
+                // next truly new reading is still allowed through, while the
+                // overwritten reading itself remains too close to be uploaded
+                // again in the normal direct path.
+                if replacementHandoffTimeStamp > currentTimeStampLatestNightscoutUploadedBgReading {
+                    UserDefaults.standard.timeStampLatestNightscoutUploadedBgReading = replacementHandoffTimeStamp
                 }
+            }
+
+            guard self.bgReadingsReplacementTaskIdentifier == replacementTaskIdentifier else { return }
+
+            self.bgReadingsReplacementTask = nil
+            self.bgReadingsReplacementTaskIdentifier = nil
+
+            if self.pendingDirectBgUploadAfterReplacement {
+                let pendingDirectBgUploadLastConnectionStatusChangeTimeStamp = self.pendingDirectBgUploadLastConnectionStatusChangeTimeStamp
+
+                self.pendingDirectBgUploadAfterReplacement = false
+                self.pendingDirectBgUploadLastConnectionStatusChangeTimeStamp = nil
+
+                trace("in replaceBgReadingsInNightscout, replacement finished, continuing with queued direct BG upload", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+
+                self.uploadBgReadingsToNightscout(lastConnectionStatusChangeTimeStamp: pendingDirectBgUploadLastConnectionStatusChangeTimeStamp)
             }
         }
     }
@@ -1125,6 +1211,11 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// - parameters:
     ///     - lastConnectionStatusChangeTimeStamp : if there's not been a disconnect in the last 5 minutes, then the latest reading will be uploaded only if the time difference with the latest but one reading is at least 5 minutes.
     private func uploadBgReadingsToNightscout(lastConnectionStatusChangeTimeStamp: Date?) {
+        // The queued direct upload handoff can call into this function after the
+        // original public guard already ran. Check again here so turning off the
+        // master Nightscout BG upload switch immediately stops all BG writes.
+        guard shouldAllowNightscoutBgWrites() else { return }
+
         // get readings to upload, limit to x days, x = ConstantsNightscout.maxBgReadingsDaysToUpload
         var timeStamp = Date(timeIntervalSinceNow: TimeInterval(-ConstantsNightscout.maxBgReadingsDaysToUpload))
         
@@ -1133,10 +1224,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 timeStamp = timeStampLatestNightscoutUploadedBgReading
             }
         }
-        
-        // add 10 seconds because if Libre with smoothing is used, sometimes the older values reappear but with a slightly different timestamp
-        // this caused readings being uploaded to NS with just a few seconds difference
-        timeStamp = timeStamp.addingTimeInterval(10.0)
         
         let minimiumTimeBetweenTwoReadingsInMinutes = UserDefaults.standard.storeFrequentReadingsInNightscout ? ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutesFrequentUploads : ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutes
         

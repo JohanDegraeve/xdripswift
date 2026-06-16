@@ -487,6 +487,10 @@ enum Texts_HomeView {
         return NSLocalizedString("postProcessingNightscoutDataNotUpdated", tableName: filename, bundle: Bundle.main, value: "Nightscout data will not be updated", comment: "post processing helper text when following Nightscout and Nightscout writes are disabled")
     }()
 
+    static let postProcessingMasterNightscoutUploadDisabled: String = {
+        return NSLocalizedString("postProcessingMasterNightscoutUploadDisabled", tableName: filename, bundle: Bundle.main, value: "Upload to Nightscout is disabled", comment: "post processing helper text when master Nightscout BG upload is disabled")
+    }()
+
     static let postProcessingOriginalGlucose: String = {
         return NSLocalizedString("postProcessingOriginalGlucose", tableName: filename, bundle: Bundle.main, value: "Original Glucose", comment: "post processing input row title for original glucose")
     }()

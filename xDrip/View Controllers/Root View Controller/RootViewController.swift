@@ -1404,7 +1404,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // if a new reading is created, create either initial calibration request or bgreading notification - upload to nightscout and check alerts
             if newReadingCreated {
-                bgPostProcessingManager?.processLatestReadings()
+                let didReplaceDownstreamBgReadings = bgPostProcessingManager?.processLatestReadings() ?? false
                 
                 // only if no webOOPEnabled and overruleIsWebOOPEnabled false : if no two calibration exist yet then create calibration request notification, otherwise a bgreading notification and update labels
                 if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil && (!cgmTransmitter.isWebOOPEnabled() && !cgmTransmitter.overruleIsWebOOPEnabled()) {
@@ -1436,13 +1436,18 @@ final class RootViewController: UIViewController, ObservableObject {
                     updateDataSourceInfo()
                 }
                 
-                if !(UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing) {
+                // Once live post processing started rewriting a wider recent BG
+                // window, Nightscout could end up with two competing BG writers
+                // in the same cycle, the historical replacement path and the old
+                // direct latest-reading uploader. Let automatic post processing
+                // own the BG upload whenever it has already prepared a rewrite.
+                if !didReplaceDownstreamBgReadings {
                     nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 }
                 
                 nightscoutSyncManager?.syncAllWithNightscout()
                 
-                if !(UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing) {
+                if !didReplaceDownstreamBgReadings {
                     healthKitManager?.storeBgReadings()
                 }
                 
@@ -1783,7 +1788,7 @@ final class RootViewController: UIViewController, ObservableObject {
     /// newest point. Clear both chart caches before the next redraw so the
     /// visible curve is rebuilt from the latest stored values.
     private func cleanUpChartMemoryForLivePostProcessingIfNeeded() {
-        guard UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing else { return }
+        guard bgPostProcessingManager?.hasActiveDownstreamPostProcessing() ?? false else { return }
 
         glucoseChartManager?.cleanUpMemory()
         glucoseMiniChartManager?.cleanUpMemory()
@@ -3833,11 +3838,13 @@ extension RootViewController: FollowerDelegate {
                 // save in core data
                 coreDataManager.saveChanges()
                 
+                let didReplaceDownstreamBgReadings: Bool
+
                 if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled, let firstCreatedBgReadingTimeStamp = firstCreatedBgReadingTimeStamp {
                     let processingStartDateOverride = previousTimeStampLastBgReading.timeIntervalSince1970 > 0 ? previousTimeStampLastBgReading.addingTimeInterval(-1.0) : firstCreatedBgReadingTimeStamp
-                    bgPostProcessingManager?.processBgReadings(processingStartDateOverride: processingStartDateOverride)
+                    didReplaceDownstreamBgReadings = bgPostProcessingManager?.processBgReadings(processingStartDateOverride: processingStartDateOverride) ?? false
                 } else {
-                    bgPostProcessingManager?.processLatestReadings()
+                    didReplaceDownstreamBgReadings = bgPostProcessingManager?.processLatestReadings() ?? false
                 }
 
                 cleanUpChartMemoryForLivePostProcessingIfNeeded()
@@ -3859,14 +3866,18 @@ extension RootViewController: FollowerDelegate {
                 // (this will only happen if we're not following Nightscout
                 // and if the user has requested to upload follower BG values
                 // to Nightscout
-                if !(UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing) {
+                // Use the same Nightscout upload decision path in follower mode.
+                // The manager can safely no-op when nothing new needs uploading,
+                // and it avoids RootView having to predict whether a previous
+                // post processing pass already covered the newest reading.
+                if !didReplaceDownstreamBgReadings {
                     nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 }
                 
                 // check alerts, create notification, set app badge
                 checkAlertsCreateNotificationAndSetAppBadge()
                 
-                if !(UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing), let healthKitManager = healthKitManager {
+                if !didReplaceDownstreamBgReadings, let healthKitManager = healthKitManager {
                     healthKitManager.storeBgReadings()
                 }
                 

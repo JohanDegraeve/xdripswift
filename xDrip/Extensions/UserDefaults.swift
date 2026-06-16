@@ -103,8 +103,10 @@ extension UserDefaults {
         case useFiveMinuteReadings = "useFiveMinuteReadings"
         /// timestamp from which the current 5 minute readings setting should be applied
         case fiveMinuteReadingsStartTimeStamp = "fiveMinuteReadingsStartTimeStamp"
-        /// timestamp from which BG post processing should be allowed for the current source
+        /// timestamp from which BG data exists for the current source context
         case postProcessingStartTimeStamp = "postProcessingStartTimeStamp"
+        /// timestamp from which the current post processing settings should be applied
+        case postProcessingApplyFromTimeStamp = "postProcessingApplyFromTimeStamp"
         /// current source context identifier used by BG post processing
         case postProcessingSourceContextIdentifier = "postProcessingSourceContextIdentifier"
         /// hours to show in the BG post processing preview chart
@@ -901,13 +903,23 @@ extension UserDefaults {
         }
     }
 
-    /// timestamp from which post processing can be applied for the current source context
+    /// timestamp from which BG data exists for the current source context
     @objc dynamic var postProcessingStartTimeStamp: Date? {
         get {
             return object(forKey: Key.postProcessingStartTimeStamp.rawValue) as? Date
         }
         set {
             set(newValue, forKey: Key.postProcessingStartTimeStamp.rawValue)
+        }
+    }
+
+    /// timestamp from which the current post processing settings should be applied
+    @objc dynamic var postProcessingApplyFromTimeStamp: Date? {
+        get {
+            return object(forKey: Key.postProcessingApplyFromTimeStamp.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.postProcessingApplyFromTimeStamp.rawValue)
         }
     }
 

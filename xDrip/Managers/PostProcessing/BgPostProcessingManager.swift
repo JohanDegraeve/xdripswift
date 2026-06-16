@@ -58,8 +58,9 @@ class BgPostProcessingManager {
     // MARK: - public functions
 
     /// reprocess the latest readings for the current source context
-    func processLatestReadings() {
-        processBgReadings(processingStartDateOverride: nil)
+    @discardableResult
+    func processLatestReadings() -> Bool {
+        return processBgReadings(processingStartDateOverride: nil)
     }
 
     /// compare the resolved source context against the stored one and reset the
@@ -83,22 +84,23 @@ class BgPostProcessingManager {
 
     /// applies adjustment and smoothing to the requested readings, then updates
     /// any downstream consumers that should reflect the new final values
-    func processBgReadings(processingStartDateOverride: Date?, fiveMinuteReadingsStartTimeStampOverride: Date? = nil, forceFullDownstreamRewrite: Bool = false) {
+    @discardableResult
+    func processBgReadings(processingStartDateOverride: Date?, fiveMinuteReadingsStartTimeStampOverride: Date? = nil, forceFullDownstreamRewrite: Bool = false) -> Bool {
         refreshSourceContext()
 
         guard let sourceContextIdentifier = currentSourceContextIdentifier() else {
             trace("in processLatestReadings, sourceContextIdentifier is nil", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info)
-            return
+            return false
         }
 
         let currentSensor = UserDefaults.standard.isMaster ? sensorsAccessor.fetchActiveSensor() : nil
-        let fromDate = processingStartDateOverride ?? UserDefaults.standard.postProcessingStartTimeStamp
+        let fromDate = processingStartDateOverride ?? UserDefaults.standard.postProcessingApplyFromTimeStamp ?? UserDefaults.standard.postProcessingStartTimeStamp
 
         // Work in ascending time order so each processing step can move forward
         // through the readings without needing to constantly look backwards.
         let bgReadings = Array(bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: fromDate, forSensor: currentSensor, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: true).reversed())
 
-        guard bgReadings.count > 0 else { return }
+        guard bgReadings.count > 0 else { return false }
 
         var statesBeforeProcessing = [NSManagedObjectID: BgReadingStateBeforeProcessing]()
         for bgReading in bgReadings {
@@ -135,9 +137,31 @@ class BgPostProcessingManager {
         }
 
         // A manual historical apply should always rewrite the full selected window.
-        // Automatic processing only needs to push the readings that actually changed.
+        // Automatic processing only needs downstream rewrites when post processing
+        // is actually active. During testing it was found that letting normal live
+        // readings go through the replace path while adjustment, smoothing and
+        // 5 minute reduction were all disabled could still trigger Nightscout
+        // deletes and re-uploads just because slope metadata changed.
+        // That interfered with the normal direct upload path and could leave
+        // historical Nightscout entries missing after an otherwise ordinary cycle.
         let shouldRewriteFullDownstreamWindow = processingStartDateOverride != nil || forceFullDownstreamRewrite
-        let bgReadingsToReplaceDownstream = (shouldRewriteFullDownstreamWindow ? bgReadings : changedBgReadings).filter { !$0.isSuppressedByFiveMinuteCadence }
+        let hasActiveAutomaticPostProcessing = hasActiveDownstreamPostProcessing()
+        let shouldUpdateDownstream = shouldRewriteFullDownstreamWindow || hasActiveAutomaticPostProcessing
+
+        guard shouldUpdateDownstream else { return false }
+
+        var bgReadingsToReplaceDownstream = (shouldRewriteFullDownstreamWindow ? bgReadings : changedBgReadings).filter { !$0.isSuppressedByFiveMinuteCadence }
+
+        if !shouldRewriteFullDownstreamWindow && hasActiveAutomaticPostProcessing, let latestVisibleBgReading = bgReadings.last(where: { !$0.isSuppressedByFiveMinuteCadence }) {
+            // During testing it was found that widening the live smoothing window
+            // can shift several recent readings while leaving the newest final
+            // value itself almost unchanged. Nightscout still needs that newest
+            // reading in the replacement payload so the live stream and the
+            // rewritten historical window always move forward together.
+            if !bgReadingsToReplaceDownstream.contains(where: { $0.objectID == latestVisibleBgReading.objectID }) {
+                bgReadingsToReplaceDownstream.append(latestVisibleBgReading)
+            }
+        }
 
         if bgReadingsToReplaceDownstream.count > 0 {
             if shouldRewriteFullDownstreamWindow, let earliestBgReading = bgReadings.first, let latestBgReading = bgReadings.last {
@@ -146,7 +170,10 @@ class BgPostProcessingManager {
                 nightscoutSyncManager?.replaceBgReadingsInNightscout(bgReadings: bgReadingsToReplaceDownstream)
             }
             healthKitManager?.replaceBgReadingsInHealthKit(bgReadings: bgReadingsToReplaceDownstream)
+            return true
         }
+
+        return false
     }
 
     /// reset source-specific post processing whenever the active master sensor
@@ -159,6 +186,7 @@ class BgPostProcessingManager {
         updateSmoothingSettings(enableSmoothing: false, useFiveMinuteReadings: ConstantsBgSmoothing.defaultUseFiveMinuteReadings, smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes, smoothingStrength: ConstantsBgSmoothing.defaultSmoothingStrength)
         UserDefaults.standard.fiveMinuteReadingsStartTimeStamp = nil
         UserDefaults.standard.postProcessingStartTimeStamp = Date()
+        UserDefaults.standard.postProcessingApplyFromTimeStamp = UserDefaults.standard.postProcessingStartTimeStamp
         UserDefaults.standard.postProcessingSourceContextIdentifier = nil
     }
 
@@ -179,7 +207,7 @@ class BgPostProcessingManager {
         }
 
         updateSmoothingSettings(enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingPeriodInMinutes: smoothingPeriodInMinutes, smoothingStrength: smoothingStrength)
-        processBgReadings(processingStartDateOverride: nil)
+        _ = processBgReadings(processingStartDateOverride: nil)
         notifyBgPostProcessingDidUpdate()
     }
 
@@ -196,9 +224,17 @@ class BgPostProcessingManager {
             UserDefaults.standard.fiveMinuteReadingsStartTimeStamp = applyFromTimeStamp
         }
 
+        // During testing it was found that "Apply from Now" could look correct
+        // at first, but the next automatic processing pass would still start
+        // from the older source start timestamp and reach back into historical
+        // readings. Keep the source history boundary unchanged, but store the
+        // active apply-from timestamp separately so future live cycles only
+        // reprocess the intended range.
+        UserDefaults.standard.postProcessingApplyFromTimeStamp = applyFromTimeStamp
+
         updateSmoothingSettings(enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingPeriodInMinutes: smoothingPeriodInMinutes, smoothingStrength: smoothingStrength)
 
-        processBgReadings(processingStartDateOverride: processingStartDateOverride, fiveMinuteReadingsStartTimeStampOverride: processingStartDateOverride)
+        _ = processBgReadings(processingStartDateOverride: processingStartDateOverride, fiveMinuteReadingsStartTimeStampOverride: processingStartDateOverride)
         notifyBgPostProcessingDidUpdate()
     }
 
@@ -231,6 +267,29 @@ class BgPostProcessingManager {
 
     func shouldAllowNightscoutBgPostProcessingWrites() -> Bool {
         return nightscoutSyncManager?.shouldAllowNightscoutBgPostProcessingWrites() ?? false
+    }
+
+    /// direct live uploads should only be bypassed when the current source
+    /// really has an active downstream change to apply.
+    /// During testing it was found that raw stored flags could stay true even
+    /// when the current source no longer had any effective offset, smoothing
+    /// or cadence reduction. Using those raw flags alone could suppress the
+    /// normal Nightscout upload path even though nothing was actually being
+    /// changed downstream.
+    func hasActiveDownstreamPostProcessing() -> Bool {
+        if hasEffectiveAdjustmentForCurrentSource() {
+            return true
+        }
+
+        if UserDefaults.standard.enableSmoothing {
+            return true
+        }
+
+        if UserDefaults.standard.useFiveMinuteReadings && currentSourceCanUseFiveMinuteReadings() {
+            return true
+        }
+
+        return false
     }
 
     /// 5 minute reduction only makes sense when the source normally produces
@@ -771,6 +830,21 @@ class BgPostProcessingManager {
         let fromDate = UserDefaults.standard.postProcessingStartTimeStamp
 
         return bgReadingsAccessor.getLatestBgReadings(limit: 1, fromDate: fromDate, forSensor: currentSensor, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: true).first
+    }
+
+    private func hasEffectiveAdjustmentForCurrentSource() -> Bool {
+        guard UserDefaults.standard.enableAdjustment else { return false }
+        guard shouldAllowBgAdjustmentForCurrentSource() else { return false }
+        guard let latestBgAdjustment = latestActiveBgAdjustment() else { return false }
+
+        return abs(latestBgAdjustment.intercept) > 0.0001 || abs(latestBgAdjustment.slope - 1.0) > 0.0001
+    }
+
+    private func currentSourceCanUseFiveMinuteReadings() -> Bool {
+        let currentSensor = UserDefaults.standard.isMaster ? sensorsAccessor.fetchActiveSensor() : nil
+        let currentSourceReadingDates = bgReadingsAccessor.getLatestBgReadings(limit: 288, fromDate: Date(timeIntervalSinceNow: -24 * 60 * 60), forSensor: currentSensor, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: true).map { $0.timeStamp }
+
+        return sourceCanUseFiveMinuteReadings(readingDates: currentSourceReadingDates)
     }
 
     private func currentSourceContextIdentifier() -> String? {

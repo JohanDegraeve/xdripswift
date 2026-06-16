@@ -319,7 +319,7 @@ struct BgAdjustmentsView: View {
                 compactApplyFromControl(applyFromOptions: applyFromOptions)
 
                 if let sourceDataNotUpdatedWarningText = sourceDataNotUpdatedWarningText() {
-                    Text(sourceDataNotUpdatedWarningText)
+                    Text("⚠️ " + sourceDataNotUpdatedWarningText)
                         .font(.footnote)
                         .foregroundStyle(Color(.colorSecondary))
                 }
@@ -619,7 +619,13 @@ struct BgAdjustmentsView: View {
     }
 
     private func canApplySelectedChanges() -> Bool {
-        return bgReadings.count > 0 && canApplyChanges()
+        guard bgReadings.count > 0 else { return false }
+
+        if selectedApplyFromPeriodIndex > 0 {
+            return !effectiveEnableAdjustment() || currentAdjustmentPreview() != nil
+        }
+
+        return canApplyChanges()
     }
 
     private func applyFromSectionBackgroundColor() -> Color {
@@ -651,7 +657,13 @@ struct BgAdjustmentsView: View {
     }
 
     private func sourceDataNotUpdatedWarningText() -> String? {
-        guard !UserDefaults.standard.isMaster else { return nil }
+        if UserDefaults.standard.isMaster {
+            let masterNightscoutBgWritesAvailable = UserDefaults.standard.nightscoutEnabled
+                && UserDefaults.standard.nightscoutUrl != nil
+                && UserDefaults.standard.masterUploadDataToNightscout
+
+            return masterNightscoutBgWritesAvailable ? nil : Texts_HomeView.postProcessingMasterNightscoutUploadDisabled
+        }
 
         switch UserDefaults.standard.followerDataSourceType {
         case .nightscout:
