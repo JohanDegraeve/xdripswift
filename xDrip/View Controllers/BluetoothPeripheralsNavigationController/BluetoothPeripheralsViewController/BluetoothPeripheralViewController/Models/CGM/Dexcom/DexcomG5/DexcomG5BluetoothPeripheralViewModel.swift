@@ -542,12 +542,16 @@ extension DexcomG5BluetoothPeripheralViewModel: CGMG5TransmitterDelegate {
         (bluetoothPeripheralManager as? CGMG5TransmitterDelegate)?.received(isAnubis: isAnubis, cGMG5Transmitter: cGMG5Transmitter)
         
         // force a reload of the whole table. This will incorporate the anubis section as needed
-        tableView?.reloadData()
+        DispatchQueue.main.async { [weak self] in
+            guard let tableView = self?.tableView, tableView.window != nil else { return }
+            tableView.reloadData()
+        }
     }
     
     private func reloadRow(row: Int, section: Int) {
         DispatchQueue.main.async {
             guard let tableView = self.tableView else { return }
+            guard tableView.window != nil else { return }
 
             // Always reload the general section (0) first, because its row count may have changed.
             tableView.reloadSections(IndexSet(integer: 0), with: .none)

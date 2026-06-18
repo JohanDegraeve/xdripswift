@@ -193,6 +193,7 @@ extension DexcomG7BluetoothPeripheralViewModel: CGMG7TransmitterDelegate {
     private func reloadRow(row: Int, section: Int) {
         DispatchQueue.main.async {
             guard let tableView = self.tableView else { return }
+            guard tableView.window != nil else { return }
 
             // Always reload the general section (0) first, because its row count may have changed.
             tableView.reloadSections(IndexSet(integer: 0), with: .none)
