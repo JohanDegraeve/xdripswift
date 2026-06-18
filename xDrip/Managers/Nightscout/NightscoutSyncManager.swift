@@ -964,10 +964,6 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         // query for treatments older than maxHoursTreatmentsToDownload
         let queries = [URLQueryItem(name: "find[created_at][$gte]", value: String(Date(timeIntervalSinceNow: TimeInterval(hours: -ConstantsNightscout.maxHoursTreatmentsToDownload)).ISOStringFromDate()))]
         
-        /// treatments that are locally stored (and not marked as deleted), and that are not in the list of downloaded treatments will be locally deleted
-        /// - only for latest treatments less than maxHoursTreatmentsToDownload old
-        var didFindTreatmentInDownload = [Bool](repeating: false, count: treatmentsToSync.count)
-        
         performHTTPRequest(path: nightscoutTreatmentPath, queries: queries, httpMethod: nil) { (data: Data?, nightscoutResult: NightscoutResult) in
             
             guard nightscoutResult.successFull() else {
@@ -1007,42 +1003,23 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                             trace("in getLatestTreatmentsNSResponses, %{public}@ treatmentEntries found in response which were not yet marked as uploaded", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountMarkedAsUploaded.description)
                         }
                         
-                        let amountOfUpdatedTreatments = self.checkIfChangedAtNightscout(forTreatmentEntries: treatmentsToSync, inTreatmentNSResponses: treatmentNSResponses, didFindTreatmentInDownload: &didFindTreatmentInDownload)
+                        let amountOfUpdatedTreatments = self.checkIfChangedAtNightscout(forTreatmentEntries: treatmentsToSync, inTreatmentNSResponses: treatmentNSResponses)
                         
                         if amountOfUpdatedTreatments > 0 {
                             trace("in getLatestTreatmentsNSResponses, %{public}@ treatmentEntries found that were updated at NS and updated locally", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfUpdatedTreatments.description)
                         }
                         
-                        // now for each treatmentEntry, less than maxHoursTreatmentsToDownload, check if it was found in the NS response
-                        //    if not, it means it's been deleted at NS, also do the local deletion
-                        //    only treatments that were successfully uploaded before
-                        
-                        // to  keep track of amount of locally deleted treatmentEntries
-                        var amountOfLocallyDeletedTreatments = 0
-                        
-                        for (index, entry) in treatmentsToSync.enumerated() {
-                            if abs(entry.date.timeIntervalSinceNow) < ConstantsNightscout.maxHoursTreatmentsToDownload * 3600.0 {
-                                if !didFindTreatmentInDownload[index] && !entry.treatmentdeleted && entry.uploaded {
-                                    entry.treatmentdeleted = true
-                                    amountOfLocallyDeletedTreatments = amountOfLocallyDeletedTreatments + 1
-                                }
-                            }
-                        }
-                        
-                        if amountOfLocallyDeletedTreatments > 0 {
-                            trace("in getLatestTreatmentsNSResponses, %{public}@ treatmentEntries that were not found anymore at NS and deleted locally", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfLocallyDeletedTreatments.description)
-                        }
-                        
-                        // Moved summary log here, after amountOfLocallyDeletedTreatments is computed
-                        let totalActivity = amountOfNewTreatments + amountMarkedAsUploaded + amountOfUpdatedTreatments + amountOfLocallyDeletedTreatments
+                        // A bulk treatment download is not authoritative enough to infer remote deletion.
+                        // Keep explicit local deletes only; otherwise a truncated or delayed Nightscout response can hide valid local treatments.
+                        let totalActivity = amountOfNewTreatments + amountMarkedAsUploaded + amountOfUpdatedTreatments
                         if totalActivity > 0 {
-                            trace("in getLatestTreatmentsNSResponses, Nightscout sync summary: new = %{public}@, markedUploaded = %{public}@, updated = %{public}@, deleted = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfNewTreatments.description, amountMarkedAsUploaded.description, amountOfUpdatedTreatments.description, amountOfLocallyDeletedTreatments.description)
+                            trace("in getLatestTreatmentsNSResponses, Nightscout sync summary: new = %{public}@, markedUploaded = %{public}@, updated = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info, amountOfNewTreatments.description, amountMarkedAsUploaded.description, amountOfUpdatedTreatments.description)
                         }
                         
                         self.coreDataManager.saveChanges()
                         
                         // call completion handler with success, if amount and/or amountOfNewTreatments > 0 then it's success with localchanges
-                        completionHandler(.success(amountOfUpdatedTreatments + amountOfNewTreatments + amountOfLocallyDeletedTreatments))
+                        completionHandler(.success(amountOfUpdatedTreatments + amountOfNewTreatments))
                     }
                     
                 } else {
@@ -1736,24 +1713,25 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// - returns:amount of locally updated treatmentEntries
     ///
     /// - !! does not save to coredata
-    /// - while the function iterates through treatmentEntries, didFindTreatmentInDownload will be updated and corresponding value will be set to true if a treatment is found at NS
-    private func checkIfChangedAtNightscout(forTreatmentEntries treatmentEntries: [TreatmentEntry], inTreatmentNSResponses treatmentNSResponses: [TreatmentNSResponse], didFindTreatmentInDownload: inout [Bool]) -> Int {
+    private func checkIfChangedAtNightscout(forTreatmentEntries treatmentEntries: [TreatmentEntry], inTreatmentNSResponses treatmentNSResponses: [TreatmentNSResponse]) -> Int {
         // used to trace how many new treatmenEntries are locally updated
         var amountOfUpdatedTreatmentEntries = 0
         
         // iterate through treatmentEntries
-        for (index, treatmentEntry) in treatmentEntries.enumerated() {
+        for treatmentEntry in treatmentEntries {
             // only handle treatmentEntries that are already uploaded
             if treatmentEntry.uploaded && treatmentEntry.id != TreatmentEntry.EmptyId {
                 for treatmentNSResponse in treatmentNSResponses {
                     // iterate through treatmentEntries
                     // find matching id
                     if treatmentNSResponse.id == treatmentEntry.id {
-                        // found the treatment in NS response, set didFindTreatmentInDownload to true for that treatment
-                        didFindTreatmentInDownload[index] = true
-                        
                         var treatmentUpdated = false
                         
+                        if treatmentEntry.treatmentdeleted {
+                            treatmentUpdated = true
+                            treatmentEntry.treatmentdeleted = false
+                        }
+
                         // check value, type and date. If NS has any difference, then update locally
                         
                         if treatmentNSResponse.value != treatmentEntry.value {
