@@ -7,6 +7,8 @@
 //
 
 import SwiftUI
+import UIKit
+import os
 
 struct SensorManagementView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -22,8 +24,9 @@ struct SensorManagementView: View {
     @State private var refreshView = false
     @State private var showingStartDateSheet = false
     @State private var showingStartCodeSheet = false
-    @State private var showingCalibrationSheet = false
     @State private var showingStopConfirmation = false
+    @State private var showingCalibrationSheet = false
+    @State private var showingLargeCalibrationDifferenceConfirmation = false
     @State private var transientMessage: SensorManagementMessage?
     @State private var selectedStartDate = Date()
     @State private var sensorCode = "0000"
@@ -32,6 +35,7 @@ struct SensorManagementView: View {
     private let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
     private let timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
     private let nilString = "-"
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataCalibrations)
 
     var body: some View {
         let state = currentState()
@@ -42,7 +46,7 @@ struct SensorManagementView: View {
                     VStack(alignment: .leading, spacing: 12) {
                         HStack(alignment: .center) {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text(state.sensorDescription)
+                                Text(state.bannerTitle)
                                     .font(.title3)
                                     .fontWeight(.semibold)
                                 Text(state.statusTitle)
@@ -53,59 +57,60 @@ struct SensorManagementView: View {
                             Spacer()
 
                             Image(systemName: "sensor.tag.radiowaves.forward")
-                                .font(.title2)
+                                .font(.system(size: 30, weight: .semibold))
                                 .foregroundStyle(state.statusColor)
-                        }
-
-                        if let warmupUntil = state.warmupUntil {
-                            Text(warmupUntil)
-                                .font(.subheadline)
-                                .foregroundStyle(Color(.colorSecondary))
                         }
                     }
                     .padding(.vertical, 4)
                     .id(refreshView)
                 }
 
-                Section(header: Text(Texts_HomeView.sensorManagementSummaryTitle)) {
-                    row(title: Texts_HomeView.sensorManagementSensorType, data: state.sensorDescription)
-                    row(title: Texts_HomeView.sensorManagementStartedAt, data: state.startDateString)
-                    row(title: Texts_HomeView.sensorManagementElapsed, data: state.elapsedString)
-                    row(title: Texts_HomeView.sensorManagementRemaining, data: state.remainingString)
-                    row(title: Texts_HomeView.sensorManagementAlgorithm, data: state.algorithmDescription)
-                    row(title: Texts_HomeView.sensorManagementCalibrationMode, data: state.calibrationModeDescription)
-                    if let transmitterBattery = state.transmitterBattery {
-                        row(title: Texts_HomeView.transmitterBatteryLevel, data: transmitterBattery)
+                Section(header: Text(Texts_HomeView.sensorManagementSummaryTitle), footer: summaryFooter(for: state)) {
+                    row(title: Texts_HomeView.sensorStart, data: state.startDateString)
+                    row(title: state.secondarySessionTitle, data: state.secondarySessionValue, dataColor: state.secondarySessionColor)
+                    if state.showsRemainingRow {
+                        row(title: Texts_HomeView.sensorManagementRemaining, data: state.remainingString, dataColor: state.remainingColor)
                     }
                 }
 
                 Section(header: Text(Texts_HomeView.sensorManagementActionsTitle), footer: actionFooter(for: state)) {
-                    Button(action: handleStartTap) {
-                        Text(Texts_HomeView.startSensorActionTitle)
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    }
-                    .disabled(!state.canStartSensor)
-                    .foregroundStyle(state.canStartSensor ? Color.green : Color(.systemGray))
+                    HStack(spacing: 12) {
+                        Button(action: handleStartTap) {
+                            Text(Texts_HomeView.startSensorActionTitle)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.green)
+                        .disabled(!state.canStartSensor)
 
-                    Button(role: .destructive, action: {
-                        showingStopConfirmation = true
-                    }) {
-                        Text(Texts_HomeView.stopSensorActionTitle)
-                            .frame(maxWidth: .infinity, alignment: .center)
+                        Button(role: .destructive, action: {
+                            showingStopConfirmation = true
+                        }) {
+                            Text(Texts_HomeView.stopSensorActionTitle)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(.red)
+                        .disabled(!state.canStopSensor)
                     }
-                    .disabled(!state.canStopSensor)
-                    .foregroundStyle(state.canStopSensor ? Color.red : Color(.systemGray))
+                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                 }
 
                 Section(header: Text(Texts_HomeView.sensorManagementCalibrationTitle), footer: calibrationFooter(for: state)) {
-                    Button(action: {
-                        calibrationValue = ""
-                        showingCalibrationSheet = true
-                    }) {
-                        Text(Texts_HomeView.calibrationButton)
-                            .frame(maxWidth: .infinity, alignment: .center)
+                    if state.showCalibrationUnavailableRow {
+                        row(title: Texts_HomeView.calibrationButton, data: Texts_Common.notAvailable)
+                    } else {
+                        Button(action: {
+                            calibrationValue = ""
+                            showingCalibrationSheet = true
+                        }) {
+                            Text(Texts_HomeView.calibrationButton)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(Color(.systemBlue))
+                        .disabled(!state.canCalibrate || state.currentBgDisplay == nil)
                     }
-                    .disabled(!state.canCalibrate)
 
                     if let currentCalibration = state.currentCalibration {
                         VStack(alignment: .leading, spacing: 8) {
@@ -114,17 +119,11 @@ struct SensorManagementView: View {
                             calibrationSummaryView(calibration: currentCalibration, isHistoric: false)
                         }
                         .padding(.vertical, 4)
-                    } else {
-                        Text(Texts_HomeView.sensorManagementNoCalibrationYet)
-                            .foregroundStyle(Color(.colorSecondary))
                     }
                 }
 
-                Section(header: Text(Texts_HomeView.sensorManagementHistoryTitle)) {
-                    if state.calibrationHistory.isEmpty {
-                        Text(Texts_HomeView.sensorManagementNoCalibrationHistory)
-                            .foregroundStyle(Color(.colorSecondary))
-                    } else {
+                if !state.calibrationHistory.isEmpty {
+                    Section(header: Text(Texts_HomeView.sensorManagementHistoryTitle)) {
                         ForEach(state.calibrationHistory, id: \.id) { calibration in
                             calibrationSummaryView(calibration: calibration, isHistoric: !calibration.isValid)
                         }
@@ -147,6 +146,14 @@ struct SensorManagementView: View {
         .alert(item: $transientMessage) { message in
             Alert(title: Text(message.title), message: Text(message.message), dismissButton: .default(Text(Texts_Common.Ok)))
         }
+        .alert(Texts_Common.warning, isPresented: $showingLargeCalibrationDifferenceConfirmation) {
+            Button(Texts_Common.Cancel, role: .cancel) {}
+            Button(Texts_HomeView.calibrationButton) {
+                confirmCalibrationAfterWarning()
+            }
+        } message: {
+            Text(largeCalibrationDifferenceWarning(for: currentState()) ?? "")
+        }
         .alert(Texts_Common.warning, isPresented: $showingStopConfirmation) {
             Button(Texts_Common.Cancel, role: .cancel) {}
             Button(Texts_Common.yes, role: .destructive) {
@@ -163,7 +170,7 @@ struct SensorManagementView: View {
             startCodeSheet
         }
         .sheet(isPresented: $showingCalibrationSheet) {
-            calibrationSheet
+            calibrationSheet(state: state)
         }
     }
 
@@ -179,7 +186,7 @@ struct SensorManagementView: View {
 
                 Section(header: Text(Texts_HomeView.startSensorActionTitle)) {
                     DatePicker(
-                        Texts_HomeView.sensorManagementStartedAt,
+                        Texts_HomeView.sensorStart,
                         selection: $selectedStartDate,
                         in: ...Date(),
                         displayedComponents: [.date, .hourAndMinute]
@@ -239,41 +246,6 @@ struct SensorManagementView: View {
         .colorScheme(.dark)
     }
 
-    private var calibrationSheet: some View {
-        NavigationView {
-            Form {
-                Section(header: Text(Texts_Calibrations.enterCalibrationValue)) {
-                    TextField("...", text: $calibrationValue)
-                        .keyboardType(isMgDl ? .numberPad : .decimalPad)
-                }
-            }
-            .navigationTitle(Texts_HomeView.calibrationButton)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(Texts_Common.Cancel) {
-                        showingCalibrationSheet = false
-                    }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(Texts_Common.Ok) {
-                        guard let valueAsDouble = calibrationValue.toDouble() else {
-                            transientMessage = SensorManagementMessage(title: Texts_Common.warning, message: Texts_Common.invalidValue)
-                            return
-                        }
-
-                        if let errorMessage = onSubmitCalibration(valueAsDouble) {
-                            transientMessage = SensorManagementMessage(title: Texts_Common.warning, message: errorMessage)
-                        } else {
-                            showingCalibrationSheet = false
-                            refreshView.toggle()
-                        }
-                    }
-                }
-            }
-        }
-        .colorScheme(.dark)
-    }
-
     private func handleStartTap() {
         let state = currentState()
 
@@ -289,10 +261,80 @@ struct SensorManagementView: View {
         }
     }
 
+    private func submitCalibration() {
+        let state = currentState()
+
+        guard isCalibrationValueInRange() else {
+            return
+        }
+
+        guard calibrationValue.toDouble() != nil else {
+            transientMessage = SensorManagementMessage(title: Texts_Common.warning, message: Texts_Common.invalidValue)
+            return
+        }
+
+        if state.shouldWarnOnLargeCalibrationStep, largeCalibrationDifferenceWarning(for: state) != nil {
+            showingLargeCalibrationDifferenceConfirmation = true
+            return
+        }
+
+        executeCalibration(state: state)
+    }
+
+    private func confirmCalibrationAfterWarning() {
+        guard isCalibrationValueInRange() else { return }
+
+        executeCalibration(state: currentState())
+    }
+
+    private func executeCalibration(state: SensorManagementState) {
+        guard let valueAsDouble = calibrationValue.toDouble() else { return }
+
+        let currentBgValueDescription = state.currentBgDisplay?.displayValueWithUnit(isMgDl: isMgDl) ?? nilString
+        let calibrationValueDescription = displayEnteredCalibrationValueWithUnit(valueAsDouble)
+        let warningMessage = largeCalibrationDifferenceWarning(for: state)
+
+        if let warningMessage {
+            trace(
+                "in submitCalibration, user calibrating. current BG = %{public}@, calibration value = %{public}@, warning = %{public}@",
+                log: log,
+                category: ConstantsLog.categoryApplicationDataCalibrations,
+                type: .info,
+                currentBgValueDescription,
+                calibrationValueDescription,
+                warningMessage
+            )
+        } else {
+            trace(
+                "in submitCalibration, user calibrating. current BG = %{public}@, calibration value = %{public}@",
+                log: log,
+                category: ConstantsLog.categoryApplicationDataCalibrations,
+                type: .info,
+                currentBgValueDescription,
+                calibrationValueDescription
+            )
+        }
+
+        if let errorMessage = onSubmitCalibration(valueAsDouble) {
+            transientMessage = SensorManagementMessage(title: Texts_Common.warning, message: errorMessage)
+        } else {
+            showingCalibrationSheet = false
+            refreshView.toggle()
+        }
+    }
+
     private func actionFooter(for state: SensorManagementState) -> some View {
         Group {
             if let actionNote = state.sensorActionNote {
                 Text(actionNote)
+            }
+        }
+    }
+
+    private func summaryFooter(for state: SensorManagementState) -> some View {
+        Group {
+            if let expiryFooter = state.expiryFooter {
+                Text(expiryFooter)
             }
         }
     }
@@ -305,12 +347,77 @@ struct SensorManagementView: View {
         }
     }
 
+    private func calibrationSheet(state: SensorManagementState) -> some View {
+        NavigationView {
+            Form {
+                Section(footer: calibrationEntryFooter) {
+                    HStack {
+                        Text(Texts_HomeView.postProcessingCurrentValue)
+                        Spacer()
+                        if let currentBgDisplay = state.currentBgDisplay {
+                            Text(currentBgDisplay.rawValue)
+                                .foregroundStyle(Color(.colorSecondary))
+                            Text(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+                                .foregroundStyle(Color(.colorTertiary))
+                        } else {
+                            Text(nilString)
+                                .foregroundStyle(Color(.colorSecondary))
+                        }
+                    }
+
+                    HStack {
+                        Text(Texts_BgReadings.calibrationValue)
+                        Spacer()
+                        TextField(isMgDl ? "---" : "-.-", text: $calibrationValue)
+                            .keyboardType(isMgDl ? .numberPad : .decimalPad)
+                            .multilineTextAlignment(.trailing)
+                            .frame(maxWidth: 96)
+                            .foregroundStyle(calibrationValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? Color(.colorSecondary) : Color(.colorPrimary))
+                        Text(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+                            .foregroundStyle(Color(.colorTertiary))
+                    }
+                }
+            }
+            .navigationTitle(Texts_HomeView.calibrationButton)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(Texts_Common.Cancel) {
+                        calibrationValue = ""
+                        showingCalibrationSheet = false
+                    }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(Texts_HomeView.calibrationButton) {
+                        submitCalibration()
+                    }
+                    .disabled(!state.canCalibrate || !isCalibrationValueValid(for: state))
+                }
+            }
+        }
+        .colorScheme(.dark)
+    }
+
+    private var calibrationEntryFooter: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            validationMessageView()
+            Text(Texts_HomeView.sensorManagementCalibrationSafetyFooter)
+            Spacer()
+                .frame(height: 6)
+            Button(action: {
+                openCalibrationHelp()
+            }) {
+                Label(Texts_HomeView.sensorManagementCalibrationHelp, systemImage: "questionmark.circle")
+            }
+        }
+    }
+
     private func calibrationSummaryView(calibration: SensorManagementCalibrationDisplay, isHistoric: Bool) -> some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text(calibration.timeStamp.formatted(date: .abbreviated, time: .shortened))
                     .font(.subheadline)
                     .fontWeight(.semibold)
+                    .foregroundStyle(Color(.colorPrimary))
                 Spacer()
                 if isHistoric {
                     Text(Texts_HomeView.sensorManagementHistoricCalibration)
@@ -321,6 +428,7 @@ struct SensorManagementView: View {
 
             HStack {
                 Text("BG")
+                    .foregroundStyle(Color(.colorSecondary))
                 Spacer()
                 Text(displayBgValue(calibration.bg))
                     .foregroundStyle(isHistoric ? Color(.systemGray) : Color(.colorSecondary))
@@ -328,6 +436,7 @@ struct SensorManagementView: View {
 
             HStack {
                 Text("Raw")
+                    .foregroundStyle(Color(.colorSecondary))
                 Spacer()
                 Text(calibration.rawValue.bgValueToString(mgDl: true) + " " + Texts_Common.mgdl)
                     .foregroundStyle(isHistoric ? Color(.systemGray) : Color(.colorSecondary))
@@ -335,6 +444,7 @@ struct SensorManagementView: View {
 
             HStack {
                 Text("Slope")
+                    .foregroundStyle(Color(.colorSecondary))
                 Spacer()
                 Text(calibration.slope.formatted(.number.rounded(increment: 0.0001)))
                     .foregroundStyle(isHistoric ? Color(.systemGray) : Color(.colorSecondary))
@@ -342,29 +452,22 @@ struct SensorManagementView: View {
 
             HStack {
                 Text("Intercept")
+                    .foregroundStyle(Color(.colorSecondary))
                 Spacer()
                 Text(calibration.intercept.formatted(.number.rounded(increment: 0.0001)))
                     .foregroundStyle(isHistoric ? Color(.systemGray) : Color(.colorSecondary))
             }
 
-            if let sentToTransmitter = calibration.sentToTransmitter, sentToTransmitter || calibration.acceptedByTransmitter == true {
-                HStack {
-                    Text("Transmitter Sync")
-                    Spacer()
-                    Text(calibration.acceptedByTransmitter == true ? "Accepted" : "Queued")
-                        .foregroundStyle(isHistoric ? Color(.systemGray) : Color(.colorSecondary))
-                }
-            }
         }
         .padding(.vertical, 4)
     }
 
-    private func row(title: String, data: String) -> some View {
+    private func row(title: String, data: String, dataColor: Color = Color(.colorSecondary)) -> some View {
         HStack {
             Text(title)
             Spacer()
             Text(data)
-                .foregroundStyle(Color(.colorSecondary))
+                .foregroundStyle(dataColor)
                 .multilineTextAlignment(.trailing)
         }
     }
@@ -373,10 +476,103 @@ struct SensorManagementView: View {
         valueInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).bgValueToString(mgDl: isMgDl) + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
     }
 
+    private func displayEditableBgValue(_ valueInMgDl: Double) -> String {
+        valueInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).stringWithoutTrailingZeroes
+    }
+
+    private func isCalibrationValueValid(for state: SensorManagementState) -> Bool {
+        guard let currentBgDisplay = state.currentBgDisplay else { return false }
+        guard calibrationValue.toDouble() != nil else { return false }
+
+        return calibrationValue.trimmingCharacters(in: .whitespacesAndNewlines) != currentBgDisplay.rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    @ViewBuilder private func validationMessageView() -> some View {
+        if !calibrationValue.isEmpty, !isCalibrationValueInRange() {
+            Text(String(format: Texts_HomeView.postProcessingValidGlucoseRange, minimumGlucoseValueString(), maximumGlucoseValueString()))
+                .foregroundStyle(Color(.systemRed))
+        }
+    }
+
+    private func isCalibrationValueInRange() -> Bool {
+        guard let enteredCalibrationValueInMgDl = enteredCalibrationValueInMgDl() else { return false }
+
+        return enteredCalibrationValueInMgDl >= ConstantsCalibrationAlgorithms.minimumBgReadingCalculatedValue &&
+            enteredCalibrationValueInMgDl <= ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValue
+    }
+
+    private func enteredCalibrationValueInMgDl() -> Double? {
+        guard let enteredCalibrationValue = calibrationValue.toDouble() else { return nil }
+
+        return enteredCalibrationValue.mmolToMgdl(mgDl: isMgDl)
+    }
+
+    private func largeCalibrationDifferenceWarning(for state: SensorManagementState) -> String? {
+        guard let currentBgDisplay = state.currentBgDisplay else { return nil }
+        guard let enteredValueInMgDl = enteredCalibrationValueInMgDl() else { return nil }
+        let differenceInMgDl = abs(enteredValueInMgDl - currentBgDisplay.valueInMgDl)
+
+        // Only some transmitters want this extra guardrail. When enabled, keep
+        // large recalibrations behind an explicit confirmation.
+        guard differenceInMgDl > ConstantsCalibrationAlgorithms.maximumRecommendedCalibrationDifferenceInMgDl else { return nil }
+
+        return String(
+            format: Texts_HomeView.sensorManagementLargeCalibrationDifferenceWarningFormat,
+            displayCalibrationDifferenceLimit()
+        )
+    }
+
+    private func displayCalibrationDifferenceLimit() -> String {
+        let limitInUserUnit = ConstantsCalibrationAlgorithms.maximumRecommendedCalibrationDifferenceInMgDl
+            .mgDlToMmol(mgDl: isMgDl)
+            .bgValueRounded(mgDl: isMgDl)
+
+        return limitInUserUnit.bgValueToString(mgDl: isMgDl) + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+    }
+
+    private func displayEnteredCalibrationValueWithUnit(_ value: Double) -> String {
+        let valueInUserUnit = value.bgValueRounded(mgDl: isMgDl)
+        return valueInUserUnit.bgValueToString(mgDl: isMgDl) + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+    }
+
+    private func minimumGlucoseValueString() -> String {
+        let minimumValue = ConstantsCalibrationAlgorithms.minimumBgReadingCalculatedValue
+            .mgDlToMmol(mgDl: isMgDl)
+            .bgValueRounded(mgDl: isMgDl)
+        return minimumValue.bgValueToString(mgDl: isMgDl) + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+    }
+
+    private func maximumGlucoseValueString() -> String {
+        let maximumValue = ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValue
+            .mgDlToMmol(mgDl: isMgDl)
+            .bgValueRounded(mgDl: isMgDl)
+        return maximumValue.bgValueToString(mgDl: isMgDl) + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+    }
+
+    private func openCalibrationHelp() {
+        let urlString: String
+
+        if let languageCode = NSLocale.current.language.languageCode?.identifier,
+           languageCode != ConstantsHomeView.onlineHelpBaseLocale,
+           UserDefaults.standard.translateOnlineHelp {
+            urlString = ConstantsHomeView.calibrationHelpURLTranslated1 + languageCode + ConstantsHomeView.calibrationHelpURLTranslated2
+        } else {
+            urlString = ConstantsHomeView.calibrationHelpURL
+        }
+
+        guard let url = URL(string: urlString) else { return }
+        UIApplication.shared.open(url)
+    }
+
     private func currentState() -> SensorManagementState {
         let transmitter = transmitterProvider()
         let activeSensor = activeSensorProvider()
-        let sensorDescription = UserDefaults.standard.activeSensorDescription ?? activeSensor.map { _ in Texts_HomeView.sensor } ?? Texts_HomeView.notStarted
+        let sensorDescription: String
+        if activeSensor != nil {
+            sensorDescription = UserDefaults.standard.activeSensorDescription ?? Texts_HomeView.sensor
+        } else {
+            sensorDescription = Texts_HomeView.sensorManagementNoSensor
+        }
         let startDate = activeSensor?.startDate
         let maxSensorAgeInDays = UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? transmitter?.maxSensorAgeInDays() ?? 0
 
@@ -395,13 +591,14 @@ struct SensorManagementView: View {
 
         let elapsedMinutes = startDate.map { Double(Calendar.current.dateComponents([.minute], from: $0, to: Date()).minute ?? 0) }
         let remainingMinutes = (elapsedMinutes != nil && maxSensorAgeInDays > 0) ? ((maxSensorAgeInDays * 24 * 60) - (elapsedMinutes ?? 0)) : nil
+        let expiryDate = startDate.map { $0.addingTimeInterval(TimeInterval(days: maxSensorAgeInDays)) }
 
-        let warmupUntil: String?
+        let warmupReadyTimeString: String?
         if let startDate = startDate, let warmupMinutes = warmupMinutes, let elapsedMinutes = elapsedMinutes, elapsedMinutes < warmupMinutes {
             let readyDate = startDate.addingTimeInterval(TimeInterval(minutes: warmupMinutes))
-            warmupUntil = Texts_BluetoothPeripheralView.warmingUpUntil + " " + readyDate.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
+            warmupReadyTimeString = readyDate.toStringInUserLocale(timeStyle: .short, dateStyle: .none)
         } else {
-            warmupUntil = nil
+            warmupReadyTimeString = nil
         }
 
         let statusTitle: String
@@ -410,7 +607,7 @@ struct SensorManagementView: View {
         if activeSensor == nil {
             statusTitle = Texts_HomeView.sensorManagementStatusNotStarted
             statusColor = Color(.systemGray)
-        } else if warmupUntil != nil {
+        } else if warmupReadyTimeString != nil {
             statusTitle = Texts_HomeView.sensorManagementStatusWarmingUp
             statusColor = Color.orange
         } else if let remainingMinutes = remainingMinutes, remainingMinutes < 0 {
@@ -419,6 +616,48 @@ struct SensorManagementView: View {
         } else {
             statusTitle = Texts_HomeView.sensorManagementStatusActive
             statusColor = Color.green
+        }
+
+        let expiryFooter: String?
+        if activeSensor != nil, warmupReadyTimeString == nil, maxSensorAgeInDays > 0, let expiryDate {
+            expiryFooter = String(
+                format: Texts_HomeView.sensorManagementExpiryFooterFormat,
+                expiryDate.toStringInUserLocale(timeStyle: .short, dateStyle: .medium)
+            )
+        } else {
+            expiryFooter = nil
+        }
+
+        let secondarySessionTitle: String
+        let secondarySessionValue: String
+        let secondarySessionColor: Color
+        let showsRemainingRow: Bool
+
+        if let warmupReadyTimeString {
+            secondarySessionTitle = Texts_BluetoothPeripheralView.warmingUpUntil
+            secondarySessionValue = warmupReadyTimeString
+            secondarySessionColor = Color(.colorSecondary)
+            showsRemainingRow = false
+        } else {
+            secondarySessionTitle = Texts_HomeView.sensorManagementElapsed
+            secondarySessionValue = startDate?.daysAndHoursAgo() ?? nilString
+            secondarySessionColor = Color(.colorSecondary)
+            showsRemainingRow = true
+        }
+
+        let remainingColor: Color
+        if let remainingMinutes {
+            if remainingMinutes < 0 {
+                remainingColor = ConstantsHomeView.sensorProgressExpiredSwiftUI
+            } else if remainingMinutes <= ConstantsHomeView.sensorProgressViewUrgentInMinutes {
+                remainingColor = ConstantsHomeView.sensorProgressViewProgressColorUrgentSwiftUI
+            } else if remainingMinutes <= ConstantsHomeView.sensorProgressViewWarningInMinutes {
+                remainingColor = ConstantsHomeView.sensorProgressViewProgressColorWarningSwiftUI
+            } else {
+                remainingColor = Color(.colorSecondary)
+            }
+        } else {
+            remainingColor = Color(.colorSecondary)
         }
 
         let canManageSensor = UserDefaults.standard.isMaster && (transmitter?.cgmTransmitterType().allowManualSensorStart() ?? false)
@@ -435,52 +674,69 @@ struct SensorManagementView: View {
 
         let currentCalibration = activeSensor.flatMap { calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: $0) }.map(SensorManagementCalibrationDisplay.init)
         let calibrationHistory = activeSensor.map { sensor in
-            calibrationsAccessor.getLatestCalibrations(howManyDays: 4, forSensor: sensor).map(SensorManagementCalibrationDisplay.init)
+            calibrationsAccessor
+                .getLatestCalibrations(howManyDays: 4, forSensor: sensor)
+                .map(SensorManagementCalibrationDisplay.init)
+                // The latest valid calibration is already shown in its own section.
+                .filter { $0.id != currentCalibration?.id }
         } ?? []
 
         let firstCalibration = activeSensor.flatMap { calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: $0) }
         let calibrationNote: String?
         let canCalibrate: Bool
+        let showCalibrationUnavailableRow: Bool
 
         if !UserDefaults.standard.isMaster {
             canCalibrate = false
+            showCalibrationUnavailableRow = false
             calibrationNote = Texts_HomeView.sensorManagementNotAvailableInFollower
         } else if transmitter == nil {
             canCalibrate = false
+            showCalibrationUnavailableRow = false
             calibrationNote = Texts_HomeView.theresNoCGMTransmitterActive
         } else if activeSensor == nil {
             canCalibrate = false
+            showCalibrationUnavailableRow = false
             calibrationNote = Texts_HomeView.startSensorBeforeCalibration
         } else if transmitter?.isWebOOPEnabled() == true && transmitter?.overruleIsWebOOPEnabled() == false {
             canCalibrate = false
-            calibrationNote = Texts_HomeView.calibrationNotNecessary
+            showCalibrationUnavailableRow = true
+            calibrationNote = nil
         } else if firstCalibration == nil && transmitter?.overruleIsWebOOPEnabled() == false {
             let readingCount = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true, includingSuppressed: true).count
             canCalibrate = false
+            showCalibrationUnavailableRow = false
             calibrationNote = readingCount > 1 ? Texts_Calibrations.calibrationNotificationRequestBody : Texts_HomeView.thereMustBeAreadingBeforeCalibration
         } else {
             canCalibrate = true
+            showCalibrationUnavailableRow = false
             calibrationNote = nil
         }
 
         return SensorManagementState(
-            sensorDescription: sensorDescription,
+            bannerTitle: sensorDescription,
             statusTitle: statusTitle,
             statusColor: statusColor,
-            startDateString: startDate?.toStringInUserLocale(timeStyle: .short, dateStyle: .short, showTimeZone: true) ?? nilString,
-            elapsedString: startDate?.daysAndHoursAgo() ?? nilString,
+            startDateString: startDate?.toStringInUserLocale(timeStyle: .short, dateStyle: .short) ?? nilString,
+            secondarySessionTitle: secondarySessionTitle,
+            secondarySessionValue: secondarySessionValue,
+            secondarySessionColor: secondarySessionColor,
             remainingString: remainingMinutes.map { $0 < 0 ? "-" + abs($0).minutesToDaysAndHours() : $0.minutesToDaysAndHours() } ?? nilString,
-            warmupUntil: warmupUntil,
-            algorithmDescription: transmitter?.isWebOOPEnabled() == true ? Texts_HomeView.sensorManagementNativeAlgorithm : Texts_HomeView.sensorManagementXdripAlgorithm,
-            calibrationModeDescription: transmitter?.isNonFixedSlopeEnabled() == true ? Texts_Calibrations.multiPointCalibration : Texts_Calibrations.singlePointCalibration,
-            transmitterBattery: UserDefaults.standard.transmitterBatteryInfo?.description,
+            remainingColor: remainingColor,
+            expiryFooter: expiryFooter,
+            showsRemainingRow: showsRemainingRow,
             canStartSensor: canManageSensor && activeSensor == nil,
             canStopSensor: canManageSensor && activeSensor != nil,
             needsSensorStartTime: transmitter?.needsSensorStartTime() ?? false,
             needsSensorStartCode: transmitter?.needsSensorStartCode() ?? false,
+            shouldWarnOnLargeCalibrationStep: transmitter?.shouldWarnOnLargeCalibrationStep() ?? false,
             sensorActionNote: sensorActionNote,
             canCalibrate: canCalibrate,
+            showCalibrationUnavailableRow: showCalibrationUnavailableRow,
             calibrationNote: calibrationNote,
+            currentBgDisplay: activeSensor.flatMap { bgReadingsAccessor.lastSnapshot(forSensor: $0) }.map {
+                SensorManagementEnteredBgValue(rawValue: displayEditableBgValue($0.finalValue), valueInMgDl: $0.finalValue)
+            },
             currentCalibration: currentCalibration,
             calibrationHistory: calibrationHistory
         )
@@ -488,25 +744,38 @@ struct SensorManagementView: View {
 }
 
 private struct SensorManagementState {
-    let sensorDescription: String
+    let bannerTitle: String
     let statusTitle: String
     let statusColor: Color
     let startDateString: String
-    let elapsedString: String
+    let secondarySessionTitle: String
+    let secondarySessionValue: String
+    let secondarySessionColor: Color
     let remainingString: String
-    let warmupUntil: String?
-    let algorithmDescription: String
-    let calibrationModeDescription: String
-    let transmitterBattery: String?
+    let remainingColor: Color
+    let expiryFooter: String?
+    let showsRemainingRow: Bool
     let canStartSensor: Bool
     let canStopSensor: Bool
     let needsSensorStartTime: Bool
     let needsSensorStartCode: Bool
+    let shouldWarnOnLargeCalibrationStep: Bool
     let sensorActionNote: String?
     let canCalibrate: Bool
+    let showCalibrationUnavailableRow: Bool
     let calibrationNote: String?
+    let currentBgDisplay: SensorManagementEnteredBgValue?
     let currentCalibration: SensorManagementCalibrationDisplay?
     let calibrationHistory: [SensorManagementCalibrationDisplay]
+}
+
+private struct SensorManagementEnteredBgValue {
+    let rawValue: String
+    let valueInMgDl: Double
+
+    func displayValueWithUnit(isMgDl: Bool) -> String {
+        rawValue + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+    }
 }
 
 private struct SensorManagementCalibrationDisplay {
@@ -517,8 +786,6 @@ private struct SensorManagementCalibrationDisplay {
     let bg: Double
     let rawValue: Double
     let isValid: Bool
-    let sentToTransmitter: Bool?
-    let acceptedByTransmitter: Bool?
 
     init(_ calibration: Calibration) {
         id = calibration.id
@@ -528,8 +795,6 @@ private struct SensorManagementCalibrationDisplay {
         bg = calibration.bg
         rawValue = calibration.rawValue
         isValid = calibration.sensorConfidence != 0 && calibration.slopeConfidence != 0
-        sentToTransmitter = calibration.sentToTransmitter
-        acceptedByTransmitter = calibration.acceptedByTransmitter
     }
 }
 
@@ -537,4 +802,14 @@ private struct SensorManagementMessage: Identifiable {
     let id = UUID()
     let title: String
     let message: String
+}
+
+final class SensorManagementHostingController: PortraitLockedHostingController<SensorManagementView> {
+    init(activeSensorProvider: @escaping () -> Sensor?, transmitterProvider: @escaping () -> CGMTransmitter?, calibrationsAccessor: CalibrationsAccessor, bgReadingsAccessor: BgReadingsAccessor, onStartSensor: @escaping (Date, String?) -> Void, onStopSensor: @escaping () -> Void, onSubmitCalibration: @escaping (Double) -> String?) {
+        super.init(rootView: SensorManagementView(activeSensorProvider: activeSensorProvider, transmitterProvider: transmitterProvider, calibrationsAccessor: calibrationsAccessor, bgReadingsAccessor: bgReadingsAccessor, onStartSensor: onStartSensor, onStopSensor: onStopSensor, onSubmitCalibration: onSubmitCalibration))
+    }
+
+    @objc required dynamic init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 }

@@ -1033,7 +1033,7 @@ private struct BasicAdjustmentInputView: View {
             List {
                 Section(footer: validationMessageView()) {
                     HStack {
-                        Text(Texts_HomeView.postProcessingOriginalGlucose)
+                        Text(Texts_HomeView.postProcessingCurrentValue)
                         Spacer()
                         Text(currentGlucoseValueString)
                             .foregroundStyle(Color(.colorSecondary))
@@ -1163,30 +1163,12 @@ private struct AutoSelectingNumericTextField: UIViewRepresentable {
     }
 }
 
-final class BgAdjustmentsHostingController: UIHostingController<BgAdjustmentsView> {
+final class BgAdjustmentsHostingController: PortraitLockedHostingController<BgAdjustmentsView> {
     init(bgReadingsAccessor: BgReadingsAccessor, treatmentEntryAccessor: TreatmentEntryAccessor, bgPostProcessingManager: BgPostProcessingManager) {
         super.init(rootView: BgAdjustmentsView(bgReadingsAccessor: bgReadingsAccessor, treatmentEntryAccessor: treatmentEntryAccessor, bgPostProcessingManager: bgPostProcessingManager))
     }
 
     @objc required dynamic init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-
-        // Match the Snooze view behavior so this portrait-only workflow stays
-        // stable while the user is comparing values and editing adjustments.
-        (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-
-        if UserDefaults.standard.allowScreenRotation {
-            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .allButUpsideDown
-        } else {
-            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
-        }
     }
 }

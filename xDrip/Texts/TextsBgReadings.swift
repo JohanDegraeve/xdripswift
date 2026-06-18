@@ -27,6 +27,10 @@ enum Texts_BgReadings {
     static let noReadingsToShow: String = {
         return NSLocalizedString("noReadingsToShow", tableName: filename, bundle: Bundle.main, value: "No readings to show", comment: "no readings are found for the selected date")
     }()
+
+    static let selectedDateFooterFormat: String = {
+        return NSLocalizedString("selectedDateFooterFormat", tableName: filename, bundle: Bundle.main, value: "Choose a value in the last %@ days", comment: "footer text below the glucose readings date picker")
+    }()
     
     static let generalSectionHeader: String = {
         return NSLocalizedString("generalSectionHeader", tableName: filename, bundle: Bundle.main, value: "General", comment: "general glucose reading section header")

@@ -12,6 +12,25 @@ import SwiftUI
 import WidgetKit
 import AppIntents
 
+/// Shared hosting controller for SwiftUI flows that should stay in portrait while they are visible.
+class PortraitLockedHostingController<Content: View>: UIHostingController<Content> {
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        if UserDefaults.standard.allowScreenRotation {
+            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .allButUpsideDown
+        } else {
+            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
+        }
+    }
+}
+
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController, ObservableObject {
     
@@ -29,7 +48,9 @@ final class RootViewController: UIViewController, ObservableObject {
     
     private var bgReadingsToolbarButtonOutlet: UIButton!
     @IBAction func bgReadingsToolbarButtonAction(_ sender: UIButton) {
-        showSwiftUIView(BgReadingsView().environmentObject(bgReadingsAccessor!).environmentObject(nightscoutSyncManager!))
+        guard let bgReadingsAccessor = bgReadingsAccessor, let nightscoutSyncManager = nightscoutSyncManager else { return }
+
+        showViewController(BgReadingsHostingController(bgReadingsAccessor: bgReadingsAccessor, nightscoutSyncManager: nightscoutSyncManager))
     }
     
     private var sensorToolbarButtonOutlet: UIButton!
@@ -79,7 +100,7 @@ final class RootViewController: UIViewController, ObservableObject {
     
     private var showHideItemsToolbarButtonOutlet: UIButton!
     @IBAction func showHideItemsToolbarButtonAction(_ sender: UIButton) {
-        showSwiftUIView(ShowHideItemsView())
+        showViewController(ShowHideItemsHostingController())
     }
     
     /// outlet for the lock button - it will change text based upon whether they screen is locked or not
@@ -3190,8 +3211,8 @@ final class RootViewController: UIViewController, ObservableObject {
     private func showSensorManagementView() {
         guard let calibrationsAccessor = calibrationsAccessor, let bgReadingsAccessor = bgReadingsAccessor else { return }
 
-        showSwiftUIView(
-            SensorManagementView(
+        showViewController(
+            SensorManagementHostingController(
                 activeSensorProvider: { [weak self] in self?.activeSensor },
                 transmitterProvider: { [weak self] in self?.bluetoothPeripheralManager?.getCGMTransmitter() },
                 calibrationsAccessor: calibrationsAccessor,

@@ -60,58 +60,50 @@ struct BgReadingsView: View {
     
     var body: some View {
         NavigationView {
-            VStack {
-                DatePicker(selection: $dateSelected, in: Date().addingTimeInterval(-(Double(numberOfDaysOfBgReadingsToShow) * 24 * 3600))...Date(), displayedComponents: .date) {
-                    
-                    HStack {
-                        Text(Texts_BgReadings.date)
-                        
-                        Spacer()
-                        
-                        Text(dateSelectedDayName)
-                            .foregroundColor(.secondary)
-                    }
-                }
-                .padding()
-                .padding(.horizontal)
-                .padding(.bottom, 0)
-                .id(self.datePickerReset)
-                
-                List(selection: $selectedBgReadings) {
-                    // only process the view contents if there is data to show.
-                    if !filteredBgReadings.isEmpty {
-                        ForEach(filteredBgReadings, id: \.self) { bgReading in
-                            NavigationLink(destination: BgReadingsDetailView(bgReading: bgReading)) {
-                                HStack {
-                                    visualIndicator(bgRangeDescription: bgReading.bgRangeDescription())
-                                        .font(.system(size: 10))
-                                    
-                                    Text(bgReading.finalValue.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).bgValueToString(mgDl: isMgDl))
-                                        .foregroundColor(.primary)
-                                    
-                                    Text(String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
-                                        .foregroundColor(.secondary)
-                                    
-                                    Text(bgReading.slopeArrow())
-                                        .fontWeight(.bold)
-                                        .foregroundColor(.primary)
-                                    
-                                    Spacer()
-                                    
-                                    Text(bgReading.timeStamp.toStringInUserLocale(timeStyle: .short, dateStyle: .none))
-                                        .foregroundColor(.secondary)
-                                }
-                                .foregroundColor(.white)
-                            }
+            List(selection: $selectedBgReadings) {
+                Section(footer: Text(selectedDateFooterText())) {
+                    DatePicker(selection: $dateSelected, in: Date().addingTimeInterval(-(Double(numberOfDaysOfBgReadingsToShow) * 24 * 3600))...Date(), displayedComponents: .date) {
+                        HStack {
+                            Text(Texts_BgReadings.date)
+                            Spacer()
+                            Text(dateSelectedDayName)
+                                .foregroundStyle(Color(.colorSecondary))
                         }
-                        .onDelete(perform: deleteBgReading)
                     }
-                    else {
-                        // this is shown when there is no data for the selected date
-                        Text(Texts_BgReadings.noReadingsToShow)
+                    .id(self.datePickerReset)
+                }
+
+                if !filteredBgReadings.isEmpty {
+                    ForEach(filteredBgReadings, id: \.self) { bgReading in
+                        NavigationLink(destination: BgReadingsDetailView(bgReading: bgReading)) {
+                            HStack {
+                                visualIndicator(bgRangeDescription: bgReading.bgRangeDescription())
+                                    .font(.system(size: 10))
+
+                                Text(bgReading.finalValue.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).bgValueToString(mgDl: isMgDl))
+                                    .foregroundColor(.primary)
+
+                                Text(String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
+                                    .foregroundColor(.secondary)
+
+                                Text(bgReading.slopeArrow())
+                                    .fontWeight(.bold)
+                                    .foregroundColor(.primary)
+
+                                Spacer()
+
+                                Text(bgReading.timeStamp.toStringInUserLocale(timeStyle: .short, dateStyle: .none))
+                                    .foregroundColor(.secondary)
+                            }
+                            .foregroundColor(.white)
+                        }
                     }
+                    .onDelete(perform: deleteBgReading)
+                } else {
+                    Text(Texts_BgReadings.noReadingsToShow)
                 }
             }
+            .listStyle(.insetGrouped)
             .navigationTitle(Texts_BgReadings.glucoseReadingsTitle)
             .onChange(of: dateSelected, perform: { value in
                 // update the filtered array with the newly selected date
@@ -268,10 +260,30 @@ struct BgReadingsView: View {
         
         dateSelectedDayName = dateFormatter.string(from: date).capitalized
     }
+
+    private func selectedDateFooterText() -> String {
+        String(format: Texts_BgReadings.selectedDateFooterFormat, numberOfDaysOfBgReadingsToShow.description)
+    }
 }
 
 struct BgReadingsView_Previews: PreviewProvider {
     static var previews: some View {
         BgReadingsView()
+    }
+}
+
+final class BgReadingsHostingController: PortraitLockedHostingController<AnyView> {
+    init(bgReadingsAccessor: BgReadingsAccessor, nightscoutSyncManager: NightscoutSyncManager) {
+        let rootView = AnyView(
+            BgReadingsView()
+                .environmentObject(bgReadingsAccessor)
+                .environmentObject(nightscoutSyncManager)
+        )
+
+        super.init(rootView: rootView)
+    }
+
+    @objc required dynamic init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
 }

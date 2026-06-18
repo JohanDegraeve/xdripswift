@@ -37,11 +37,11 @@ enum Texts_HomeView {
     }()
 
     static let sensorManagementTitle:String = {
-        return NSLocalizedString("sensorManagementTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Management", comment: "navigation title for the sensor management screen")
+        return NSLocalizedString("sensorManagementTitle", tableName: filename, bundle: Bundle.main, value: "Sensor", comment: "navigation title for the sensor management screen")
     }()
 
     static let sensorManagementSummaryTitle:String = {
-        return NSLocalizedString("sensorManagementSummaryTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Information", comment: "section title for sensor information")
+        return NSLocalizedString("sensorManagementSummaryTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Session", comment: "section title for sensor information")
     }()
 
     static let sensorManagementActionsTitle:String = {
@@ -88,12 +88,8 @@ enum Texts_HomeView {
         return NSLocalizedString("sensorManagementStatusNotStarted", tableName: filename, bundle: Bundle.main, value: "Not Started", comment: "sensor management status label")
     }()
 
-    static let sensorManagementSensorType:String = {
-        return NSLocalizedString("sensorManagementSensorType", tableName: filename, bundle: Bundle.main, value: "Sensor Type", comment: "sensor management row title")
-    }()
-
-    static let sensorManagementStartedAt:String = {
-        return NSLocalizedString("sensorManagementStartedAt", tableName: filename, bundle: Bundle.main, value: "Session Start", comment: "sensor management row title")
+    static let sensorManagementNoSensor:String = {
+        return NSLocalizedString("sensorManagementNoSensor", tableName: filename, bundle: Bundle.main, value: "No Sensor", comment: "banner title when no sensor session is active")
     }()
 
     static let sensorManagementElapsed:String = {
@@ -104,36 +100,28 @@ enum Texts_HomeView {
         return NSLocalizedString("sensorManagementRemaining", tableName: filename, bundle: Bundle.main, value: "Remaining", comment: "sensor management row title")
     }()
 
-    static let sensorManagementAlgorithm:String = {
-        return NSLocalizedString("sensorManagementAlgorithm", tableName: filename, bundle: Bundle.main, value: "Algorithm", comment: "sensor management row title")
-    }()
-
-    static let sensorManagementCalibrationMode:String = {
-        return NSLocalizedString("sensorManagementCalibrationMode", tableName: filename, bundle: Bundle.main, value: "Calibration Type", comment: "sensor management row title")
+    static let sensorManagementExpiryFooterFormat:String = {
+        return NSLocalizedString("sensorManagementExpiryFooterFormat", tableName: filename, bundle: Bundle.main, value: "Sensor expires on %@", comment: "footer text shown in sensor session when an expiry date is known")
     }()
 
     static let sensorManagementCurrentCalibrationTitle:String = {
         return NSLocalizedString("sensorManagementCurrentCalibrationTitle", tableName: filename, bundle: Bundle.main, value: "Current Calibration", comment: "title for the current calibration subsection")
     }()
 
-    static let sensorManagementNoCalibrationYet:String = {
-        return NSLocalizedString("sensorManagementNoCalibrationYet", tableName: filename, bundle: Bundle.main, value: "No calibration has been applied to this sensor yet.", comment: "message shown when there is no active calibration")
-    }()
-
-    static let sensorManagementNoCalibrationHistory:String = {
-        return NSLocalizedString("sensorManagementNoCalibrationHistory", tableName: filename, bundle: Bundle.main, value: "No calibration history is available for this sensor.", comment: "message shown when no calibration history exists")
-    }()
-
-    static let sensorManagementNativeAlgorithm:String = {
-        return NSLocalizedString("sensorManagementNativeAlgorithm", tableName: filename, bundle: Bundle.main, value: "Native", comment: "algorithm mode label for native sensor algorithms")
-    }()
-
-    static let sensorManagementXdripAlgorithm:String = {
-        return NSLocalizedString("sensorManagementXdripAlgorithm", tableName: filename, bundle: Bundle.main, value: "xDrip", comment: "algorithm mode label for xDrip calibration")
-    }()
-
     static let sensorManagementHistoricCalibration:String = {
         return NSLocalizedString("sensorManagementHistoricCalibration", tableName: filename, bundle: Bundle.main, value: "Historic", comment: "label for a historic or unused calibration")
+    }()
+
+    static let sensorManagementCalibrationSafetyFooter:String = {
+        return NSLocalizedString("sensorManagementCalibrationSafetyFooter", tableName: filename, bundle: Bundle.main, value: "Only calibrate if you understand how to do it safely.", comment: "safety text shown in the calibration entry screen")
+    }()
+
+    static let sensorManagementCalibrationHelp:String = {
+        return NSLocalizedString("sensorManagementCalibrationHelp", tableName: filename, bundle: Bundle.main, value: "Calibration Help", comment: "button title to open the calibration help documentation")
+    }()
+
+    static let sensorManagementLargeCalibrationDifferenceWarningFormat:String = {
+        return NSLocalizedString("sensorManagementLargeCalibrationDifferenceWarningFormat", tableName: filename, bundle: Bundle.main, value: "The calibration difference is big. It is possible that this will not work. Try to limit each calibration change to maximum %@ at a time.", comment: "warning shown when the entered calibration differs too much from the current glucose value")
     }()
     
     static let lockButton:String = {
@@ -218,10 +206,6 @@ enum Texts_HomeView {
 
     static let lastConnection:String = {
         return NSLocalizedString("lastconnection", tableName: filename, bundle: Bundle.main, value: "Last Connection", comment: "status info : literally 'Last connection', shows when the last connection to a transmitter occured")
-    }()
-    
-    static let transmitterBatteryLevel:String = {
-        return NSLocalizedString("transmitterbatterylevel", tableName: filename, bundle: Bundle.main, value: "Transmitter Battery Level", comment: "status info : literally 'Transmitter Battery Level', shows the battery level")
     }()
     
     static let ago:String = {
@@ -493,6 +477,10 @@ enum Texts_HomeView {
 
     static let postProcessingOriginalGlucose: String = {
         return NSLocalizedString("postProcessingOriginalGlucose", tableName: filename, bundle: Bundle.main, value: "Original Glucose", comment: "post processing input row title for original glucose")
+    }()
+
+    static let postProcessingCurrentValue: String = {
+        return NSLocalizedString("postProcessingCurrentValue", tableName: filename, bundle: Bundle.main, value: "Current Value", comment: "shared row title for the current glucose value")
     }()
 
     static let postProcessingAdjustedGlucose: String = {
