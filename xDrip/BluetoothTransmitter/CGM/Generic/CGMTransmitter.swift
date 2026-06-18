@@ -71,6 +71,10 @@ protocol CGMTransmitter: AnyObject {
     /// - default false
     func needsSensorStartCode() -> Bool
     
+    /// if true, then the UI should ask the user to confirm a large one-step calibration change
+    /// - default false
+    func shouldWarnOnLargeCalibrationStep() -> Bool
+
     /// returns the service CBUUID
     func getCBUUID_Service() -> String
     
@@ -302,6 +306,9 @@ extension CGMTransmitter {
     // default implementation, returns false
     func needsSensorStartCode() -> Bool { return false }
     
+    // default implementation, returns false
+    func shouldWarnOnLargeCalibrationStep() -> Bool { return false }
+
     // default implementation, returns true
     func nonWebOOPAllowed() -> Bool { return true }
     
