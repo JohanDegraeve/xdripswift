@@ -38,6 +38,15 @@ class BgPostProcessingManager {
 
     private weak var nightscoutSyncManager: NightscoutSyncManager?
     private weak var healthKitManager: HealthKitManager?
+    private let automaticProcessingLookbackInterval: TimeInterval = .hours(6)
+
+    // DEBUG START: removable post-processing diagnostics for background load investigation.
+    private enum DebugPostProcessing {
+        static let enabled = false
+        static let tracePrefix = "[DBG_POSTPROC]"
+    }
+    private var debugProcessingRunSequence = 0
+    // DEBUG END: removable post-processing diagnostics for background load investigation.
 
     // MARK: - initializer
 
@@ -86,6 +95,15 @@ class BgPostProcessingManager {
     /// any downstream consumers that should reflect the new final values
     @discardableResult
     func processBgReadings(processingStartDateOverride: Date?, fiveMinuteReadingsStartTimeStampOverride: Date? = nil, forceFullDownstreamRewrite: Bool = false) -> Bool {
+        // DEBUG START: removable post-processing diagnostics for background load investigation.
+        let startedAt = Date()
+        var debugProcessingRunID: Int?
+        if DebugPostProcessing.enabled {
+            debugProcessingRunSequence += 1
+            debugProcessingRunID = debugProcessingRunSequence
+        }
+        // DEBUG END: removable post-processing diagnostics for background load investigation.
+
         refreshSourceContext()
 
         guard let sourceContextIdentifier = currentSourceContextIdentifier() else {
@@ -94,13 +112,22 @@ class BgPostProcessingManager {
         }
 
         let currentSensor = UserDefaults.standard.isMaster ? sensorsAccessor.fetchActiveSensor() : nil
-        let fromDate = processingStartDateOverride ?? UserDefaults.standard.postProcessingApplyFromTimeStamp ?? UserDefaults.standard.postProcessingStartTimeStamp
+        let fromDate = processingStartDate(for: processingStartDateOverride, currentSensor: currentSensor)
 
         // Work in ascending time order so each processing step can move forward
         // through the readings without needing to constantly look backwards.
         let bgReadings = Array(bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: fromDate, forSensor: currentSensor, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: true).reversed())
 
-        guard bgReadings.count > 0 else { return false }
+        guard bgReadings.count > 0 else {
+            // DEBUG START: removable post-processing diagnostics for background load investigation.
+            if DebugPostProcessing.enabled {
+                trace("%{public}@ no readings found, run=%{public}@, fromDate=%{public}@, forceFullDownstreamRewrite=%{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .debug, DebugPostProcessing.tracePrefix, debugProcessingRunID?.description ?? "nil", String(describing: fromDate), forceFullDownstreamRewrite.description)
+            }
+            // DEBUG END: removable post-processing diagnostics for background load investigation.
+            return false
+        }
+
+        let visibleReadingsBeforeProcessingCount = bgReadings.filter { !$0.isSuppressedByFiveMinuteCadence }.count
 
         var statesBeforeProcessing = [NSManagedObjectID: BgReadingStateBeforeProcessing]()
         for bgReading in bgReadings {
@@ -148,7 +175,19 @@ class BgPostProcessingManager {
         let hasActiveAutomaticPostProcessing = hasActiveDownstreamPostProcessing()
         let shouldUpdateDownstream = shouldRewriteFullDownstreamWindow || hasActiveAutomaticPostProcessing
 
-        guard shouldUpdateDownstream else { return false }
+        // DEBUG START: removable post-processing diagnostics for background load investigation.
+        let processingDurationMilliseconds = Int((Date().timeIntervalSince(startedAt) * 1000.0).rounded())
+        let changedVisibleReadingsCount = changedBgReadings.filter { !$0.isSuppressedByFiveMinuteCadence }.count
+        // DEBUG END: removable post-processing diagnostics for background load investigation.
+
+        guard shouldUpdateDownstream else {
+            // DEBUG START: removable post-processing diagnostics for background load investigation.
+            if DebugPostProcessing.enabled {
+                trace("%{public}@ finished without downstream rewrite, run=%{public}@, duration=%{public}@ ms, fetched=%{public}@, visibleBefore=%{public}@, changed=%{public}@, changedVisible=%{public}@, sourceContext=%{public}@, fromDate=%{public}@, effectiveAdjustment=%{public}@, smoothing=%{public}@, fiveMinute=%{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, DebugPostProcessing.tracePrefix, debugProcessingRunID?.description ?? "nil", processingDurationMilliseconds.description, bgReadings.count.description, visibleReadingsBeforeProcessingCount.description, changedBgReadings.count.description, changedVisibleReadingsCount.description, sourceContextIdentifier, String(describing: fromDate), hasEffectiveAdjustmentForCurrentSource().description, UserDefaults.standard.enableSmoothing.description, (UserDefaults.standard.useFiveMinuteReadings && currentSourceCanUseFiveMinuteReadings()).description)
+            }
+            // DEBUG END: removable post-processing diagnostics for background load investigation.
+            return false
+        }
 
         var bgReadingsToReplaceDownstream = (shouldRewriteFullDownstreamWindow ? bgReadings : changedBgReadings).filter { !$0.isSuppressedByFiveMinuteCadence }
 
@@ -164,15 +203,27 @@ class BgPostProcessingManager {
         }
 
         if bgReadingsToReplaceDownstream.count > 0 {
+            let earliestReplacementDate = bgReadingsToReplaceDownstream.map(\.timeStamp).min()
+            let latestReplacementDate = bgReadingsToReplaceDownstream.map(\.timeStamp).max()
             if shouldRewriteFullDownstreamWindow, let earliestBgReading = bgReadings.first, let latestBgReading = bgReadings.last {
                 nightscoutSyncManager?.replaceBgReadingsInNightscout(bgReadings: bgReadingsToReplaceDownstream, deleteFromTimeStamp: earliestBgReading.timeStamp, deleteToTimeStamp: latestBgReading.timeStamp)
             } else {
                 nightscoutSyncManager?.replaceBgReadingsInNightscout(bgReadings: bgReadingsToReplaceDownstream)
             }
             healthKitManager?.replaceBgReadingsInHealthKit(bgReadings: bgReadingsToReplaceDownstream)
+            // DEBUG START: removable post-processing diagnostics for background load investigation.
+            if DebugPostProcessing.enabled {
+                trace("%{public}@ queued downstream rewrite, run=%{public}@, duration=%{public}@ ms, fetched=%{public}@, visibleBefore=%{public}@, changed=%{public}@, changedVisible=%{public}@, rewriteCount=%{public}@, fullWindow=%{public}@, sourceContext=%{public}@, replacementStart=%{public}@, replacementEnd=%{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, DebugPostProcessing.tracePrefix, debugProcessingRunID?.description ?? "nil", processingDurationMilliseconds.description, bgReadings.count.description, visibleReadingsBeforeProcessingCount.description, changedBgReadings.count.description, changedVisibleReadingsCount.description, bgReadingsToReplaceDownstream.count.description, shouldRewriteFullDownstreamWindow.description, sourceContextIdentifier, String(describing: earliestReplacementDate), String(describing: latestReplacementDate))
+            }
+            // DEBUG END: removable post-processing diagnostics for background load investigation.
             return true
         }
 
+        // DEBUG START: removable post-processing diagnostics for background load investigation.
+        if DebugPostProcessing.enabled {
+            trace("%{public}@ downstream rewrite eligible but nothing visible changed, run=%{public}@, duration=%{public}@ ms, fetched=%{public}@, visibleBefore=%{public}@, changed=%{public}@, sourceContext=%{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, DebugPostProcessing.tracePrefix, debugProcessingRunID?.description ?? "nil", processingDurationMilliseconds.description, bgReadings.count.description, visibleReadingsBeforeProcessingCount.description, changedBgReadings.count.description, sourceContextIdentifier)
+        }
+        // DEBUG END: removable post-processing diagnostics for background load investigation.
         return false
     }
 
@@ -421,6 +472,30 @@ class BgPostProcessingManager {
         let absoluteValueString = abs(valueInUserUnit).bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
 
         return prefix + absoluteValueString + " " + unitString
+    }
+
+    private func processingStartDate(for processingStartDateOverride: Date?, currentSensor: Sensor?) -> Date? {
+        if let processingStartDateOverride = processingStartDateOverride {
+            return processingStartDateOverride
+        }
+
+        let configuredStartDate = UserDefaults.standard.postProcessingApplyFromTimeStamp ?? UserDefaults.standard.postProcessingStartTimeStamp
+
+        guard hasActiveDownstreamPostProcessing() else {
+            return configuredStartDate
+        }
+
+        guard let latestBgReading = bgReadingsAccessor.getLatestBgReadings(limit: 1, fromDate: nil, forSensor: currentSensor, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: true).first else {
+            return configuredStartDate
+        }
+
+        let boundedAutomaticStartDate = latestBgReading.timeStamp.addingTimeInterval(-automaticProcessingLookbackInterval)
+
+        if let configuredStartDate = configuredStartDate {
+            return max(configuredStartDate, boundedAutomaticStartDate)
+        }
+
+        return boundedAutomaticStartDate
     }
 
     private func recomputeAdjustedValues(bgReadings: [BgReading], sourceContextIdentifier: String) {

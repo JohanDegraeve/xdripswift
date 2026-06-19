@@ -166,6 +166,16 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     private var backfillNotifyConfigured = false
     private var authChallengeTxSent = false
 
+    // DEBUG START: removable firefly cycle diagnostics for missed-reading investigation.
+    private enum DebugFireflyCycle {
+        static let enabled = false
+        static let tracePrefix = "[DBG_G5_CYCLE]"
+    }
+    private var debugFireflyCycleSequence = 0
+    private var debugCurrentFireflyCycleID: Int?
+    private var debugCurrentFireflyCycleStartedAt: Date?
+    // DEBUG END: removable firefly cycle diagnostics for missed-reading investigation.
+
     // MARK: - public functions
     
     /// - parameters:
@@ -660,6 +670,14 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         super.centralManager(central, didConnect: peripheral)
         
         timeStampLastConnection = Date()
+        // DEBUG START: removable firefly cycle diagnostics for missed-reading investigation.
+        if DebugFireflyCycle.enabled && useFireFlyFlow() {
+            debugFireflyCycleSequence += 1
+            debugCurrentFireflyCycleID = debugFireflyCycleSequence
+            debugCurrentFireflyCycleStartedAt = Date()
+            trace("%{public}@ in didConnect, started firefly cycle %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, DebugFireflyCycle.tracePrefix, debugFireflyCycleSequence.description)
+        }
+        // DEBUG END: removable firefly cycle diagnostics for missed-reading investigation.
 
         // to be sure waitingPairingConfirmation is reset to false
         waitingPairingConfirmation = false
@@ -1608,6 +1626,11 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                     // next time don't ask again for glucoseTx, but ask for backfill if needed
                     glucoseTxSent = true
                 } else if Date().timeIntervalSince(timeStampOfLastG5Reading) > ConstantsDexcomG5.minPeriodOfLatestReadingsToStartBackFill && !backfillTxSent && sensorStartDate != nil && okToRequestBackfill {
+                    // DEBUG START: removable firefly cycle diagnostics for missed-reading investigation.
+                    if DebugFireflyCycle.enabled, let cycleID = debugCurrentFireflyCycleID {
+                        trace("%{public}@ in fireflyMessageFlow, cycle %{public}@ requesting backfill because last reading age is %{public}@ seconds", log: log, category: ConstantsLog.categoryCGMG5, type: .info, DebugFireflyCycle.tracePrefix, cycleID.description, Int(Date().timeIntervalSince(timeStampOfLastG5Reading)).description)
+                    }
+                    // DEBUG END: removable firefly cycle diagnostics for missed-reading investigation.
                     // check if backfill needed, and request backfill if needed
                     // if not needed continue with flow
                     // sensor must be active
@@ -1700,7 +1723,15 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             if let latest = glucoseDataArray.first {
                 let v = String(format: "%.1f", latest.glucoseLevelRaw)
                 let t = DateFormatter.localizedString(from: latest.timeStamp, dateStyle: .none, timeStyle: .medium)
-                trace("in sendGlucoseDataToDelegate, G5/G6 connection cycle summary: value = %{public}@ mg/dL at %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, v, t)}
+                trace("in sendGlucoseDataToDelegate, G5/G6 connection cycle summary: value = %{public}@ mg/dL at %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, v, t)
+
+                // DEBUG START: removable firefly cycle diagnostics for missed-reading investigation.
+                if DebugFireflyCycle.enabled {
+                    let cycleDurationMilliseconds = Int(((debugCurrentFireflyCycleStartedAt.map { Date().timeIntervalSince($0) } ?? 0) * 1000.0).rounded())
+                    trace("%{public}@ delivered firefly cycle=%{public}@ value=%{public}@ mg/dL at %{public}@, count=%{public}@, duration=%{public}@ ms, hadBackfill=%{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, DebugFireflyCycle.tracePrefix, (debugCurrentFireflyCycleID?.description ?? "nil"), v, t, glucoseDataArray.count.description, cycleDurationMilliseconds.description, (!backFills.isEmpty).description)
+                }
+                // DEBUG END: removable firefly cycle diagnostics for missed-reading investigation.
+            }
 
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
@@ -1709,6 +1740,13 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             }
         } else {
             trace("in sendGlucoseDataToDelegate, glucoseDataArray has no values", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
+
+            // DEBUG START: removable firefly cycle diagnostics for missed-reading investigation.
+            if DebugFireflyCycle.enabled {
+                let cycleDurationMilliseconds = Int(((debugCurrentFireflyCycleStartedAt.map { Date().timeIntervalSince($0) } ?? 0) * 1000.0).rounded())
+                trace("%{public}@ no values delivered, cycle=%{public}@, duration=%{public}@ ms, lastAlgorithmStatus=%{public}@, lastGlucosePresent=%{public}@, decodedBackfills=%{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, DebugFireflyCycle.tracePrefix, (debugCurrentFireflyCycleID?.description ?? "nil"), cycleDurationMilliseconds.description, String(describing: lastAlgorithmStatus), (lastGlucoseInSensorDataRxReading != nil).description, backFills.count.description)
+            }
+            // DEBUG END: removable firefly cycle diagnostics for missed-reading investigation.
         }
         
         // reset both backFillStream
@@ -1722,6 +1760,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         // reset glucoseTxSent to false
         glucoseTxSent = false
+        // DEBUG START: removable firefly cycle diagnostics for missed-reading investigation.
+        debugCurrentFireflyCycleID = nil
+        debugCurrentFireflyCycleStartedAt = nil
+        // DEBUG END: removable firefly cycle diagnostics for missed-reading investigation.
     }
     
     /// - check if stored calibration is valid or not, valid in the sense of "is it ok to send it to the transmitter"
