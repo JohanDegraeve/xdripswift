@@ -412,7 +412,9 @@ struct SensorManagementView: View {
     }
 
     private func calibrationSummaryView(calibration: SensorManagementCalibrationDisplay, isHistoric: Bool) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
+        let showsCalculatedCalibrationDetails = calibration.showsCalculatedDetails
+
+        return VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text(calibration.timeStamp.formatted(date: .abbreviated, time: .shortened))
                     .font(.subheadline)
@@ -434,30 +436,31 @@ struct SensorManagementView: View {
                     .foregroundStyle(isHistoric ? Color(.systemGray) : Color(.colorSecondary))
             }
 
-            HStack {
-                Text("Raw")
-                    .foregroundStyle(Color(.colorSecondary))
-                Spacer()
-                Text(calibration.rawValue.bgValueToString(mgDl: true) + " " + Texts_Common.mgdl)
-                    .foregroundStyle(isHistoric ? Color(.systemGray) : Color(.colorSecondary))
-            }
+            if showsCalculatedCalibrationDetails {
+                HStack {
+                    Text("Raw")
+                        .foregroundStyle(Color(.colorSecondary))
+                    Spacer()
+                    Text(calibration.rawValue.bgValueToString(mgDl: true) + " " + Texts_Common.mgdl)
+                        .foregroundStyle(isHistoric ? Color(.systemGray) : Color(.colorSecondary))
+                }
 
-            HStack {
-                Text("Slope")
-                    .foregroundStyle(Color(.colorSecondary))
-                Spacer()
-                Text(calibration.slope.formatted(.number.rounded(increment: 0.0001)))
-                    .foregroundStyle(isHistoric ? Color(.systemGray) : Color(.colorSecondary))
-            }
+                HStack {
+                    Text("Slope")
+                        .foregroundStyle(Color(.colorSecondary))
+                    Spacer()
+                    Text(calibration.slope.formatted(.number.rounded(increment: 0.0001)))
+                        .foregroundStyle(isHistoric ? Color(.systemGray) : Color(.colorSecondary))
+                }
 
-            HStack {
-                Text("Intercept")
-                    .foregroundStyle(Color(.colorSecondary))
-                Spacer()
-                Text(calibration.intercept.formatted(.number.rounded(increment: 0.0001)))
-                    .foregroundStyle(isHistoric ? Color(.systemGray) : Color(.colorSecondary))
+                HStack {
+                    Text("Intercept")
+                        .foregroundStyle(Color(.colorSecondary))
+                    Spacer()
+                    Text(calibration.intercept.formatted(.number.rounded(increment: 0.0001)))
+                        .foregroundStyle(isHistoric ? Color(.systemGray) : Color(.colorSecondary))
+                }
             }
-
         }
         .padding(.vertical, 4)
     }
@@ -795,6 +798,10 @@ private struct SensorManagementCalibrationDisplay {
         bg = calibration.bg
         rawValue = calibration.rawValue
         isValid = calibration.sensorConfidence != 0 && calibration.slopeConfidence != 0
+    }
+
+    var showsCalculatedDetails: Bool {
+        abs(slope) > 0.0001 || abs(intercept) > 0.0001
     }
 }
 
