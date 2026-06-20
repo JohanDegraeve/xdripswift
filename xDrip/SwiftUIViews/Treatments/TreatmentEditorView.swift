@@ -20,17 +20,29 @@ struct TreatmentEditorContainerView: View {
 
     // MARK: - initialization
 
-    init(coreDataManager: CoreDataManager, editorState: TreatmentEditorState, onSave: @escaping () -> Void, onCancel: @escaping () -> Void) {
+    init(
+        coreDataManager: CoreDataManager,
+        editorState: TreatmentEditorState,
+        onSave: @escaping () -> Void,
+        onCancel: @escaping () -> Void
+    ) {
         self.onSave = onSave
         self.onCancel = onCancel
 
         switch editorState {
         case .add:
-            _viewModel = StateObject(wrappedValue: TreatmentEditorViewModel(coreDataManager: coreDataManager, treatmentToEdit: nil))
+            _viewModel = StateObject(
+                wrappedValue: TreatmentEditorViewModel(coreDataManager: coreDataManager, treatmentToEdit: nil)
+            )
         case .edit(let treatment):
             let treatmentEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
             let treatmentEntry = treatmentEntryAccessor.getTreatment(objectID: treatment.objectID)
-            _viewModel = StateObject(wrappedValue: TreatmentEditorViewModel(coreDataManager: coreDataManager, treatmentToEdit: treatmentEntry))
+            _viewModel = StateObject(
+                wrappedValue: TreatmentEditorViewModel(
+                    coreDataManager: coreDataManager,
+                    treatmentToEdit: treatmentEntry
+                )
+            )
         }
     }
 
@@ -143,7 +155,11 @@ struct TreatmentEditorView: View {
         .listStyle(.insetGrouped)
         .colorScheme(.dark)
         .alert(item: $viewModel.alertMessage) { message in
-            Alert(title: Text(message.title), message: Text(message.message), dismissButton: .default(Text(Texts_Common.Ok)))
+            Alert(
+                title: Text(message.title),
+                message: Text(message.message),
+                dismissButton: .default(Text(Texts_Common.Ok))
+            )
         }
         .onChange(of: viewModel.selectedType) { _ in
             viewModel.validateSelectedDateIfNeeded()

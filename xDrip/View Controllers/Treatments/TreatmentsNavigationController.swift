@@ -42,7 +42,7 @@ final class TreatmentsNavigationController: UINavigationController {
         super.viewWillAppear(animated)
 
         // restrict rotation of this Navigation Controller to just portrait
-        (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
+        (UIApplication.shared.delegate as? AppDelegate)?.restrictRotation = .portrait
 
         if let navigationBar = navigationBar as UINavigationBar? {
             navigationBar.barStyle = .black

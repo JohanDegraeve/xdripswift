@@ -82,24 +82,47 @@ struct TreatmentsListView: View {
             Section {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
-                        TreatmentFilterChip(systemImage: "arrowtriangle.down.fill", tintColor: ConstantsGlucoseChart.bolusTreatmentColor, isSelected: viewModel.showBolusTreatments) {
+                        TreatmentFilterChip(
+                            systemImage: "arrowtriangle.down.fill",
+                            tintColor: ConstantsGlucoseChart.bolusTreatmentColor,
+                            isSelected: viewModel.showBolusTreatments
+                        ) {
                             viewModel.toggleBolusFilter()
                         }
 
-                        TreatmentFilterChip(systemImage: "arrowtriangle.down.fill", tintColor: ConstantsGlucoseChart.bolusTreatmentColor, isSelected: viewModel.showSmallBolusTreatments, isEnabled: viewModel.showBolusTreatments, symbolScale: .medium, symbolFont: .system(size: 11, weight: .regular)) {
+                        TreatmentFilterChip(
+                            systemImage: "arrowtriangle.down.fill",
+                            tintColor: ConstantsGlucoseChart.bolusTreatmentColor,
+                            isSelected: viewModel.showSmallBolusTreatments,
+                            isEnabled: viewModel.showBolusTreatments,
+                            symbolScale: .medium,
+                            symbolFont: .system(size: 11, weight: .regular)
+                        ) {
                             viewModel.toggleSmallBolusFilter()
                         }
 
-                        TreatmentFilterChip(systemImage: "circle.fill", tintColor: ConstantsGlucoseChart.carbsTreatmentColor, isSelected: viewModel.showCarbsTreatments) {
+                        TreatmentFilterChip(
+                            systemImage: "circle.fill",
+                            tintColor: ConstantsGlucoseChart.carbsTreatmentColor,
+                            isSelected: viewModel.showCarbsTreatments
+                        ) {
                             viewModel.toggleCarbsFilter()
                         }
 
-                        TreatmentFilterChip(systemImage: "drop.fill", tintColor: ConstantsGlucoseChart.bgCheckTreatmentColorInner, isSelected: viewModel.showBgCheckTreatments) {
+                        TreatmentFilterChip(
+                            systemImage: "drop.fill",
+                            tintColor: ConstantsGlucoseChart.bgCheckTreatmentColorInner,
+                            isSelected: viewModel.showBgCheckTreatments
+                        ) {
                             viewModel.toggleBgCheckFilter()
                         }
 
                         if viewModel.showBasalFilter {
-                            TreatmentFilterChip(systemImage: "chart.bar.fill", tintColor: ConstantsGlucoseChart.basalTreatmentColor, isSelected: viewModel.showBasalTreatments) {
+                            TreatmentFilterChip(
+                                systemImage: "chart.bar.fill",
+                                tintColor: ConstantsGlucoseChart.basalTreatmentColor,
+                                isSelected: viewModel.showBasalTreatments
+                            ) {
                                 viewModel.toggleBasalFilter()
                             }
                         }
@@ -140,7 +163,9 @@ struct TreatmentsListView: View {
         .onAppear {
             viewModel.initializeViewIfNeeded()
         }
-        .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification).receive(on: RunLoop.main)) { _ in
+        .onReceive(
+            NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification).receive(on: RunLoop.main)
+        ) { _ in
             viewModel.handleUserDefaultsDidChange()
         }
     }
@@ -204,7 +229,7 @@ private struct TreatmentRowView: View {
             .foregroundColor(Color(.colorPrimary))
 
         if let secondaryText = treatment.secondaryText {
-            title = title + Text(" " + secondaryText)
+            title = title + Text(" " + secondaryText) // swiftlint:disable:this shorthand_operator
                 .font(.subheadline)
                 .foregroundColor(Color(.colorTertiary))
         }
@@ -222,7 +247,15 @@ private struct TreatmentFilterChip: View {
     let symbolFont: Font?
     let action: () -> Void
 
-    init(systemImage: String, tintColor: UIColor, isSelected: Bool, isEnabled: Bool = true, symbolScale: Image.Scale = .medium, symbolFont: Font? = nil, action: @escaping () -> Void) {
+    init(
+        systemImage: String,
+        tintColor: UIColor,
+        isSelected: Bool,
+        isEnabled: Bool = true,
+        symbolScale: Image.Scale = .medium,
+        symbolFont: Font? = nil,
+        action: @escaping () -> Void
+    ) {
         self.systemImage = systemImage
         self.tintColor = tintColor
         self.isSelected = isSelected

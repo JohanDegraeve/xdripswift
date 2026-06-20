@@ -48,18 +48,11 @@ final class BluetoothPeripheralsRouter: ObservableObject {
                     BluetoothPeripheralListRow(
                         bluetoothPeripheral: bluetoothPeripheral,
                         title: bluetoothPeripheral.blePeripheral.alias ?? bluetoothPeripheral.blePeripheral.name,
-                        detail: BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(
-                            bluetoothPeripheral: bluetoothPeripheral,
-                            isScanning: false,
-                            nfcScanNeeded: nil,
-                            nfcScanSuccessful: nil,
-                            connectButtonOutlet: nil,
-                            expectedBluetoothPeripheralType: bluetoothPeripheral.bluetoothPeripheralType(),
-                            transmitterId: nil,
-                            bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager
-                        ),
-                        connectionStatus: BluetoothPeripheralConnectionDisplayStatus(
-                            bluetoothTransmitter: bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false)
+                        connectionStatus: BluetoothPeripheralDisplayStatus(
+                            bluetoothTransmitter: bluetoothPeripheralManager.getBluetoothTransmitter(
+                                for: bluetoothPeripheral,
+                                createANewOneIfNecesssary: false
+                            )
                         )
                     )
                 }
@@ -88,13 +81,23 @@ final class BluetoothPeripheralsRouter: ObservableObject {
 
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else { return true }
 
-        if bluetoothPeripheralManager.getBluetoothPeripherals().contains(where: { $0.bluetoothPeripheralType().category() == .CGM && $0.blePeripheral.shouldconnect }) {
-            pendingAlert = BluetoothPeripheralsAlert(title: Texts_Common.warning, message: Texts_BluetoothPeripheralsView.noMultipleActiveCGMsAllowed)
+        let alreadyHasActiveCGM = bluetoothPeripheralManager.getBluetoothPeripherals().contains {
+            $0.bluetoothPeripheralType().category() == .CGM && $0.blePeripheral.shouldconnect
+        }
+
+        if alreadyHasActiveCGM {
+            pendingAlert = BluetoothPeripheralsAlert(
+                title: Texts_Common.warning,
+                message: Texts_BluetoothPeripheralsView.noMultipleActiveCGMsAllowed
+            )
             return false
         }
 
         if !UserDefaults.standard.isMaster {
-            pendingAlert = BluetoothPeripheralsAlert(title: Texts_Common.warning, message: Texts_BluetoothPeripheralView.cannotActiveCGMInFollowerMode)
+            pendingAlert = BluetoothPeripheralsAlert(
+                title: Texts_Common.warning,
+                message: Texts_BluetoothPeripheralView.cannotActiveCGMInFollowerMode
+            )
             return false
         }
 
@@ -135,7 +138,10 @@ extension BluetoothPeripheralsViewModel: @preconcurrency BluetoothTransmitterDel
     }
 
     func deviceDidUpdateBluetoothState(state: CBManagerState, bluetoothTransmitter: BluetoothTransmitter) {
-        bluetoothPeripheralManager?.deviceDidUpdateBluetoothState(state: state, bluetoothTransmitter: bluetoothTransmitter)
+        bluetoothPeripheralManager?.deviceDidUpdateBluetoothState(
+            state: state,
+            bluetoothTransmitter: bluetoothTransmitter
+        )
         reload()
     }
 }
@@ -149,8 +155,7 @@ struct BluetoothPeripheralsSection: Identifiable {
 struct BluetoothPeripheralListRow: Identifiable {
     let bluetoothPeripheral: BluetoothPeripheral
     let title: String
-    let detail: String
-    let connectionStatus: BluetoothPeripheralConnectionDisplayStatus
+    let connectionStatus: BluetoothPeripheralDisplayStatus
 
     var id: String {
         bluetoothPeripheral.blePeripheral.address
@@ -165,7 +170,7 @@ struct BluetoothPeripheralListRow: Identifiable {
     }
 }
 
-enum BluetoothPeripheralConnectionDisplayStatus {
+enum BluetoothPeripheralDisplayStatus {
     case notScanning
     case scanning
     case connected
@@ -173,7 +178,9 @@ enum BluetoothPeripheralConnectionDisplayStatus {
     init(bluetoothTransmitter: BluetoothTransmitter?, isScanningForNewPeripheral: Bool = false) {
         if bluetoothTransmitter?.getConnectionStatus() == .connected {
             self = .connected
-        } else if bluetoothTransmitter?.getConnectionStatus() == .connecting || bluetoothTransmitter?.isScanning() == true || isScanningForNewPeripheral {
+        } else if bluetoothTransmitter?.getConnectionStatus() == .connecting ||
+            bluetoothTransmitter?.isScanning() == true ||
+            isScanningForNewPeripheral {
             self = .scanning
         } else {
             self = .notScanning
@@ -200,10 +207,12 @@ extension BluetoothPeripheralType {
 }
 
 extension BluetoothPeripheralCategory {
-    func systemImage(for connectionStatus: BluetoothPeripheralConnectionDisplayStatus = .notScanning) -> String {
+    func systemImage(for connectionStatus: BluetoothPeripheralDisplayStatus = .notScanning) -> String {
         switch self {
         case .CGM:
-            return connectionStatus == .connected ? "sensor.radiowaves.left.and.right.fill" : "sensor.radiowaves.left.and.right"
+            return connectionStatus == .connected
+                ? "sensor.radiowaves.left.and.right.fill"
+                : "sensor.radiowaves.left.and.right"
         case .M5Stack:
             return connectionStatus == .connected ? "tv.fill" : "tv"
         case .HeartBeat:

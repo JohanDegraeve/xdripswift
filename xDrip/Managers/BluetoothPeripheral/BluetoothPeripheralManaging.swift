@@ -49,12 +49,12 @@ protocol BluetoothPeripheralManaging: BluetoothTransmitterDelegate {
     
     /// to pass new value off nonFixedSlopeEnabled
     ///
-    /// when user changes the nonFixed value in BluetoothPeripheralViewController, this function will be called
+    /// when user changes the nonFixed value in the Bluetooth peripheral detail view, this function will be called
     func receivedNewValue(nonFixedSlopeEnabled: Bool, for bluetoothPeripheral: BluetoothPeripheral)
 
     /// to pass new value off webOOPEnabled
     ///
-    /// when user changes webOOP values in BluetoothPeripheralViewController, this function will be called
+    /// when user changes webOOP values in the Bluetooth peripheral detail view, this function will be called
     func receivedNewValue(webOOPEnabled: Bool, for bluetoothPeripheral: BluetoothPeripheral)
     
     /// - returns the currently in use CGMTransmitter, nil if non in use.

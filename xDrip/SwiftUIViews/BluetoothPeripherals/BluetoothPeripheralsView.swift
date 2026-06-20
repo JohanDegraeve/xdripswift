@@ -49,7 +49,11 @@ struct BluetoothPeripheralsView: View {
             }
         }
         .alert(item: $viewModel.pendingAlert) { alert in
-            Alert(title: Text(alert.title), message: Text(alert.message), dismissButton: .default(Text(Texts_Common.Ok)))
+            Alert(
+                title: Text(alert.title),
+                message: Text(alert.message),
+                dismissButton: .default(Text(Texts_Common.Ok))
+            )
         }
         .onAppear(perform: reload)
     }
@@ -97,7 +101,11 @@ struct BluetoothPeripheralCategorySelectionView: View {
         .navigationBarTitleDisplayMode(.large)
         .colorScheme(.dark)
         .alert(item: $viewModel.pendingAlert) { alert in
-            Alert(title: Text(alert.title), message: Text(alert.message), dismissButton: .default(Text(Texts_Common.Ok)))
+            Alert(
+                title: Text(alert.title),
+                message: Text(alert.message),
+                dismissButton: .default(Text(Texts_Common.Ok))
+            )
         }
     }
 
@@ -177,12 +185,6 @@ private struct BluetoothPeripheralListRowView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .layoutPriority(1)
 
-            Text(row.detail)
-                .font(.subheadline)
-                .foregroundStyle(Color(.colorSecondary))
-                .multilineTextAlignment(.trailing)
-                .lineLimit(2)
-
             if row.connectionStatus.showsActiveIndicator {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.subheadline.weight(.semibold))
@@ -198,7 +200,7 @@ private struct BluetoothPeripheralListRowView: View {
     }
 }
 
-private extension BluetoothPeripheralConnectionDisplayStatus {
+private extension BluetoothPeripheralDisplayStatus {
     var tintColor: Color {
         switch self {
         case .notScanning:

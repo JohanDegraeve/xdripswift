@@ -17,7 +17,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     @Published private(set) var sections: [BluetoothPeripheralDetailSection] = []
     @Published private(set) var connectButtonTitle = Texts_BluetoothPeripheralView.connect
     @Published private(set) var connectButtonIsEnabled = true
-    @Published private(set) var connectionStatus = BluetoothPeripheralConnectionDisplayStatus.notScanning
+    @Published private(set) var connectionStatus = BluetoothPeripheralDisplayStatus.notScanning
     @Published private(set) var category = BluetoothPeripheralCategory.CGM
     @Published private(set) var canDeletePeripheral = false
     @Published var pendingAlert: BluetoothPeripheralDetailAlert?
@@ -76,10 +76,6 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
 
         configureTransmitterDelegates()
         refresh()
-    }
-
-    convenience init(controller: BluetoothPeripheralViewController) {
-        fatalError("BluetoothPeripheralViewController is no longer the BLE detail workflow owner.")
     }
 
     deinit {
@@ -417,7 +413,7 @@ private extension BluetoothPeripheralDetailState {
         return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.scanning, isEnabled: false, statusText: Texts_BluetoothPeripheralView.scanning)
     }
 
-    func makeConnectionDisplayStatus() -> BluetoothPeripheralConnectionDisplayStatus {
+    func makeConnectionDisplayStatus() -> BluetoothPeripheralDisplayStatus {
         let bluetoothTransmitter: BluetoothTransmitter?
 
         if let bluetoothPeripheral = bluetoothPeripheral {
@@ -426,7 +422,7 @@ private extension BluetoothPeripheralDetailState {
             bluetoothTransmitter = nil
         }
 
-        return BluetoothPeripheralConnectionDisplayStatus(
+        return BluetoothPeripheralDisplayStatus(
             bluetoothTransmitter: bluetoothTransmitter,
             isScanningForNewPeripheral: isScanning
         )
@@ -1083,27 +1079,6 @@ struct BluetoothPeripheralDetailRow: Identifiable {
         self.action = action
     }
 
-    init(
-        id: String,
-        section: Int,
-        row: Int,
-        title: String,
-        detail: String?,
-        showsDisclosure: Bool,
-        isEnabled: Bool,
-        toggleIsOn: Bool?,
-        toggleAction: ((Bool) -> Void)?
-    ) {
-        self.id = id
-        self.title = title
-        self.detail = detail
-        self.showsDisclosure = showsDisclosure
-        self.isEnabled = isEnabled
-        self.toggle = toggleIsOn.map { isOn in
-            BluetoothPeripheralDetailToggle(isOn: isOn, setValue: toggleAction ?? { _ in })
-        }
-        self.action = nil
-    }
 }
 
 struct BluetoothPeripheralDetailToggle {
@@ -1163,26 +1138,6 @@ struct BluetoothPeripheralSelectionList: Identifiable {
     let data: [String]
     let selectedRow: Int?
     let actionHandler: (Int) -> Void
-}
-
-final class BluetoothPeripheralReloadingTableView: UITableView {
-    var onReload: (() -> Void)?
-
-    override func dequeueReusableCell(withIdentifier identifier: String, for indexPath: IndexPath) -> UITableViewCell {
-        SettingsTableViewCell(style: .value1, reuseIdentifier: identifier)
-    }
-
-    override func reloadData() {
-        onReload?()
-    }
-
-    override func reloadRows(at indexPaths: [IndexPath], with animation: UITableView.RowAnimation) {
-        onReload?()
-    }
-
-    override func reloadSections(_ sections: IndexSet, with animation: UITableView.RowAnimation) {
-        onReload?()
-    }
 }
 
 // MARK: - Dexcom G5/G6/ONE

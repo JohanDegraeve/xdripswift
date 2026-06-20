@@ -93,7 +93,10 @@ import CoreData
 
         if selectedDate > Date() {
             selectedDate = Date()
-            alertMessage = TreatmentEditorAlertMessage(title: Texts_Common.warning, message: Texts_TreatmentsView.cannotStoreFutureBGCheck)
+            alertMessage = TreatmentEditorAlertMessage(
+                title: Texts_Common.warning,
+                message: Texts_TreatmentsView.cannotStoreFutureBGCheck
+            )
         }
     }
 
@@ -101,7 +104,10 @@ import CoreData
         validateSelectedDateIfNeeded()
 
         guard let coreDataManager = coreDataManager, let value = normalizedValue(), value > 0 else {
-            alertMessage = TreatmentEditorAlertMessage(title: Texts_Common.warning, message: Texts_TreatmentsView.invalidValueMessage)
+            alertMessage = TreatmentEditorAlertMessage(
+                title: Texts_Common.warning,
+                message: Texts_TreatmentsView.invalidValueMessage
+            )
             return false
         }
 
@@ -132,7 +138,14 @@ import CoreData
                 setNightscoutSyncRequiredToTrue()
             }
         } else {
-            _ = TreatmentEntry(date: selectedDate, value: storedValue, treatmentType: selectedType, nightscoutEventType: nil, enteredBy: normalizedEnteredByValue(), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+            _ = TreatmentEntry(
+                date: selectedDate,
+                value: storedValue,
+                treatmentType: selectedType,
+                nightscoutEventType: nil,
+                enteredBy: normalizedEnteredByValue(),
+                nsManagedObjectContext: coreDataManager.mainManagedObjectContext
+            )
 
             coreDataManager.saveChanges()
             setNightscoutSyncRequiredToTrue()
@@ -180,11 +193,15 @@ import CoreData
             return nil
         }
 
-        return try? coreDataManager.mainManagedObjectContext.existingObject(with: treatmentToEditObjectID) as? TreatmentEntry
+        return try? coreDataManager.mainManagedObjectContext
+            .existingObject(with: treatmentToEditObjectID) as? TreatmentEntry
     }
 
     private func setNightscoutSyncRequiredToTrue() {
-        if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+        let latestSyncRequestDate = UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast
+
+        if latestSyncRequestDate.timeIntervalSinceNow <
+            -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
             UserDefaults.standard.timeStampLatestNightscoutSyncRequest = .now
             UserDefaults.standard.nightscoutSyncRequired = true
         }

@@ -61,7 +61,8 @@ import OSLog
     func reloadTreatments() {
         syncFilterSettingsFromUserDefaults()
 
-        allTreatments = treatmentEntryAccessor.getLatestTreatments(howOld: TimeInterval(days: Double(numberOfDaysOfTreatmentsToShow)))
+        allTreatments = treatmentEntryAccessor
+            .getLatestTreatments(howOld: TimeInterval(days: Double(numberOfDaysOfTreatmentsToShow)))
             .filter { !$0.treatmentdeleted }
             .sorted(by: { $0.date > $1.date })
             .map { TreatmentSnapshot(treatmentEntry: $0) }
@@ -119,7 +120,14 @@ import OSLog
             return
         }
 
-        trace("deleting treatment %{public}@ at %{public}@", log: log, category: ConstantsLog.categoryApplicationDataTreatments, type: .info, treatmentEntry.treatmentType.asString(), treatmentEntry.date.description)
+        trace(
+            "deleting treatment %{public}@ at %{public}@",
+            log: log,
+            category: ConstantsLog.categoryApplicationDataTreatments,
+            type: .info,
+            treatmentEntry.treatmentType.asString(),
+            treatmentEntry.date.description
+        )
 
         treatmentEntry.treatmentdeleted = true
         treatmentEntry.uploaded = false
@@ -130,7 +138,11 @@ import OSLog
     }
 
     func datePickerRange() -> ClosedRange<Date> {
-        let minimumDate = Calendar.current.date(byAdding: .day, value: -numberOfDaysOfTreatmentsToShow, to: Date().toMidnight()) ?? Date().toMidnight()
+        let minimumDate = Calendar.current.date(
+            byAdding: .day,
+            value: -numberOfDaysOfTreatmentsToShow,
+            to: Date().toMidnight()
+        ) ?? Date().toMidnight()
         let maximumTreatmentDate = allTreatments.map { $0.date.toMidnight() }.max() ?? Date().toMidnight()
         let maximumDate = max(Date().toMidnight(), maximumTreatmentDate)
 
@@ -162,7 +174,9 @@ import OSLog
         if !showBolusTreatments {
             filteredTreatments.removeAll(where: { $0.treatmentType == .Insulin })
         } else if !showSmallBolusTreatments {
-            filteredTreatments.removeAll(where: { $0.treatmentType == .Insulin && $0.rawValue < UserDefaults.standard.smallBolusTreatmentThreshold })
+            filteredTreatments.removeAll {
+                $0.treatmentType == .Insulin && $0.rawValue < UserDefaults.standard.smallBolusTreatmentThreshold
+            }
         }
 
         if !showCarbsTreatments {
@@ -187,7 +201,10 @@ import OSLog
     }
 
     private func setNightscoutSyncRequiredToTrue() {
-        if (UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast).timeIntervalSinceNow < -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
+        let latestSyncRequestDate = UserDefaults.standard.timeStampLatestNightscoutSyncRequest ?? Date.distantPast
+
+        if latestSyncRequestDate.timeIntervalSinceNow <
+            -ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
             UserDefaults.standard.timeStampLatestNightscoutSyncRequest = .now
             UserDefaults.standard.nightscoutSyncRequired = true
         }

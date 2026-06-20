@@ -37,44 +37,6 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// omnipod heartbeat
     case OmniPodHeartBeatType = "OmniPod HeartBeat"
 
-    /// - returns: the BluetoothPeripheralViewModel. If nil then there's no specific settings for the tpe of bluetoothPeripheral
-    func viewModel() -> BluetoothPeripheralViewModel? {
-        
-        switch self {
-            
-        case .M5StackType:
-            return M5StackBluetoothPeripheralViewModel()
-            
-        case .M5StickCType:
-            return M5StickCBluetoothPeripheralViewModel()
-            
-        case .DexcomType:
-            return DexcomG5BluetoothPeripheralViewModel()
-            
-        case .BubbleType:
-            return BubbleBluetoothPeripheralViewModel()
-            
-        case .MiaoMiaoType:
-            return MiaoMiaoBluetoothPeripheralViewModel()
-            
-        case .Libre2Type:
-            return Libre2BluetoothPeripheralViewModel()
-            
-        case .Libre3HeartBeatType:
-            return Libre3HeartBeatBluetoothPeripheralViewModel()
-            
-        case .DexcomG7HeartBeatType:
-            return DexcomG7HeartBeatBluetoothPeripheralViewModel()
-            
-        case .OmniPodHeartBeatType:
-            return OmniPodHeartBeatBluetoothPeripheralViewModel()
-
-        case .DexcomG7Type:
-            return DexcomG7BluetoothPeripheralViewModel()
-        }
-
-    }
-    
     func createNewBluetoothPeripheral(withAddress address: String, withName name: String, nsManagedObjectContext: NSManagedObjectContext) -> BluetoothPeripheral {
         
         switch self {
@@ -257,5 +219,4 @@ enum BluetoothPeripheralType: String, CaseIterable {
         }
     }
 }
-
 

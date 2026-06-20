@@ -98,7 +98,7 @@ struct BluetoothPeripheralDetailView: View {
     }
 }
 
-private extension BluetoothPeripheralConnectionDisplayStatus {
+private extension BluetoothPeripheralDisplayStatus {
     var tintColor: Color {
         switch self {
         case .notScanning:
