@@ -142,7 +142,6 @@ extension Libre2BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                     
                     // Libre 2 is not warming up so let's show the sensor start date and age
                     sensorStartTimeText = startDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short)
-                    sensorStartTimeText += " (" + startDate.daysAndHoursAgo() + ")"
                     
                 }
                 

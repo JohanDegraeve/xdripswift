@@ -1,5 +1,5 @@
-"screenTitle" = "Bluetooth";
-"selectCategory" = "Select Device Type";
+"screenTitle" = "Bluetooth-enheder";
+"selectCategory" = "Vælg type";
 "selectType" = "Select Transmitter Type";
 "batteryLevel" = "Battery Level";
 "noMultipleActiveCGMsAllowed" = "You already have one CGM transmitter connected.\n\nVerify your other CGM transmitters and click 'Stop Scanning', 'Disconnect' or just delete them if needed.";

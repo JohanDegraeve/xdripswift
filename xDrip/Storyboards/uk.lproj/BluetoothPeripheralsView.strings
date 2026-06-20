@@ -7,13 +7,13 @@
 "batteryLevel" = "Battery Level";
 
 /// when Bluetooth Peripheral list is shown, title of the view
-"screenTitle" = "Bluetooth";
+"screenTitle" = "Пристрої Bluetooth";
 
 /// When adding a new cgm transmitter, but the user has another one already which is either connected or trying to connect
 "noMultipleActiveCGMsAllowed" = "You already have one CGM transmitter connected.\n\nVerify your other CGM transmitters and click 'Stop Scanning', 'Disconnect' or just delete them if needed.";
 
 /// when clicking add button in screen with list of bluetoothperipherals, title of pop up where user  needs to select bluetooth peripheral category
-"selectCategory" = "Select Device Type";
+"selectCategory" = "Виберіть тип";
 
 /// when clicking add button in screen with list of bluetoothperipherals, after having selected the category, a new pop up appears, this is the title of pop up where user  needs to select bluetooth peripheral type
 "selectType" = "Select Transmitter Type";

@@ -1,4 +1,5 @@
 import CoreBluetooth
+import SwiftUI
 import UIKit
 
 /// uiviewcontroller to show list of BluetoothPeripherals, first uiviewcontroller when clicking the BluetoothPeripheral tab
@@ -367,5 +368,114 @@ extension BluetoothPeripheralsViewController: BluetoothTransmitterDelegate {
         if state == CBManagerState.poweredOff {
             updateRow(for: bluetoothPeripheral)
         }
+    }
+}
+
+final class BluetoothPeripheralsHostingController: PortraitLockedHostingController<AnyView> {
+    private let router: BluetoothPeripheralsRouter
+    private let viewModel: BluetoothPeripheralsViewModel
+    private weak var sensorProvider: ActiveSensorProviding?
+
+    init(coreDataManager: CoreDataManager, bluetoothPeripheralManager: BluetoothPeripheralManaging, sensorProvider: ActiveSensorProviding?) {
+        let router = BluetoothPeripheralsRouter()
+        let viewModel = BluetoothPeripheralsViewModel(bluetoothPeripheralManager: bluetoothPeripheralManager)
+
+        self.router = router
+        self.viewModel = viewModel
+        self.sensorProvider = sensorProvider
+
+        super.init(rootView: AnyView(BluetoothPeripheralsView(viewModel: viewModel, router: router)))
+
+        self.title = Texts_BluetoothPeripheralsView.screenTitle
+        navigationItem.largeTitleDisplayMode = .automatic
+
+        router.openPeripheral = { [weak self] bluetoothPeripheral, bluetoothPeripheralType in
+            guard let self = self else { return }
+
+            let detailState = BluetoothPeripheralDetailState(
+                bluetoothPeripheral: bluetoothPeripheral,
+                expectedBluetoothPeripheralType: bluetoothPeripheralType,
+                coreDataManager: coreDataManager,
+                bluetoothPeripheralManager: bluetoothPeripheralManager,
+                sensorProvider: self.sensorProvider,
+                closeDetailView: { [weak self] in
+                    self?.navigationController?.popViewController(animated: true)
+                },
+                presentTextEntryView: { [weak self] textEntry in
+                    guard let self = self else { return }
+
+                    let viewController = PortraitLockedHostingController(
+                        rootView: BluetoothPeripheralTextEntryView(textEntry: textEntry) { [weak self] in
+                            self?.navigationController?.popViewController(animated: true)
+                        }
+                    )
+                    viewController.title = textEntry.title
+                    viewController.navigationItem.largeTitleDisplayMode = .automatic
+
+                    self.navigationController?.pushViewController(viewController, animated: true)
+                },
+                presentSelectionListView: { [weak self] selectionList in
+                    guard let self = self else { return }
+
+                    let viewController = PortraitLockedHostingController(
+                        rootView: BluetoothPeripheralSelectionListView(selectionList: selectionList) { [weak self] in
+                            self?.navigationController?.popViewController(animated: true)
+                        }
+                    )
+                    viewController.title = selectionList.title
+                    viewController.navigationItem.largeTitleDisplayMode = .automatic
+
+                    self.navigationController?.pushViewController(viewController, animated: true)
+                }
+            )
+
+            let viewController = PortraitLockedHostingController(rootView: BluetoothPeripheralDetailView(state: detailState))
+            viewController.title = detailState.screenTitle
+            viewController.navigationItem.largeTitleDisplayMode = .automatic
+
+            self.navigationController?.pushViewController(viewController, animated: true)
+        }
+
+        router.showAddPeripheralCategories = { [weak self] in
+            guard let self = self else { return }
+
+            let viewController = PortraitLockedHostingController(
+                rootView: AnyView(BluetoothPeripheralCategorySelectionView(
+                    viewModel: viewModel,
+                    router: router
+                ))
+            )
+            viewController.title = Texts_BluetoothPeripheralsView.selectCategory
+            viewController.navigationItem.largeTitleDisplayMode = .automatic
+
+            self.navigationController?.pushViewController(viewController, animated: true)
+        }
+
+        router.showPeripheralTypes = { [weak self] category in
+            guard let self = self else { return }
+
+            let viewController = PortraitLockedHostingController(
+                rootView: AnyView(BluetoothPeripheralTypeSelectionView(
+                    category: category,
+                    viewModel: viewModel,
+                    router: router
+                ))
+            )
+            viewController.title = category.rawValue
+            viewController.navigationItem.largeTitleDisplayMode = .automatic
+
+            self.navigationController?.pushViewController(viewController, animated: true)
+        }
+    }
+
+    @objc required dynamic init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        viewModel.initializeBluetoothTransmitterDelegates()
+        viewModel.reload()
     }
 }

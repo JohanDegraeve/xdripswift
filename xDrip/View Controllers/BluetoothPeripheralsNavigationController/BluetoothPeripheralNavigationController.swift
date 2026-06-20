@@ -16,7 +16,12 @@ final class BluetoothPeripheralNavigationController: UINavigationController {
     private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging!
 
     /// provider for the current active sensor (injected by RootViewController)
-    public weak var sensorProvider: ActiveSensorProviding?
+    public weak var sensorProvider: ActiveSensorProviding? {
+        didSet {
+            viewControllers.forEach { applyProvider(to: $0) }
+            installSwiftUIBluetoothPeripheralsRootIfNeeded()
+        }
+    }
 
     // Apply the provider to any child VC that can accept it
     private func applyProvider(to viewController: UIViewController) {
@@ -38,6 +43,8 @@ final class BluetoothPeripheralNavigationController: UINavigationController {
         // initalize private properties
         self.coreDataManager = coreDataManager
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
+
+        installSwiftUIBluetoothPeripheralsRootIfNeeded()
         
     }
     
@@ -52,6 +59,7 @@ final class BluetoothPeripheralNavigationController: UINavigationController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
@@ -59,9 +67,12 @@ final class BluetoothPeripheralNavigationController: UINavigationController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
     
         // restrict rotation of this Navigation Controller to just portrait
         (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
+
+        configureNavigationBarAppearance()
         
     }
     
@@ -78,3 +89,42 @@ extension BluetoothPeripheralNavigationController: UINavigationControllerDelegat
     }
 }
 
+private extension BluetoothPeripheralNavigationController {
+    func configureNavigationBarAppearance() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = ConstantsUI.listBackGroundUIColor
+        appearance.shadowColor = nil
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+
+        navigationBar.barStyle = .black
+        navigationBar.isTranslucent = false
+        navigationBar.barTintColor = ConstantsUI.listBackGroundUIColor
+        navigationBar.tintColor = .yellow
+        navigationBar.prefersLargeTitles = true
+        navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
+        navigationBar.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        navigationBar.standardAppearance = appearance
+        navigationBar.scrollEdgeAppearance = appearance
+        navigationBar.compactAppearance = appearance
+    }
+
+    func installSwiftUIBluetoothPeripheralsRootIfNeeded() {
+        guard let coreDataManager = coreDataManager, let bluetoothPeripheralManager = bluetoothPeripheralManager else {
+            return
+        }
+
+        if viewControllers.first is BluetoothPeripheralsHostingController {
+            return
+        }
+
+        setViewControllers([
+            BluetoothPeripheralsHostingController(
+                coreDataManager: coreDataManager,
+                bluetoothPeripheralManager: bluetoothPeripheralManager,
+                sensorProvider: sensorProvider
+            )
+        ], animated: false)
+    }
+}

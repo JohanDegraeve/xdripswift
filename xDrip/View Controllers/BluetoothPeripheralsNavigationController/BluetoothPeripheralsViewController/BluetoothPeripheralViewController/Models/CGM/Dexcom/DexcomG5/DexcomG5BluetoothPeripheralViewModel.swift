@@ -213,7 +213,6 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                     } else {
                         // Dexcom is not warming up so let's show the sensor start date and age
                         startDateString = startDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short)
-                        startDateString += " (" + startDate.daysAndHoursAgo(showOnlyDays: true) + ")"
                     }
                 } else {
                     startDateString = Texts_HomeView.notStarted
@@ -228,8 +227,7 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                 var startDateString = ""
                 
                 if let startDate = dexcomG5.transmitterStartDate {
-                    startDateString = dexcomG5.transmitterStartDate?.toStringInUserLocale(timeStyle: .none, dateStyle: .short) ?? ""
-                    startDateString += " (" + startDate.daysAndHoursAgo(showOnlyDays: true) + ")"
+                    startDateString = startDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short)
                 }
                 
                 cell.textLabel?.text = Texts_BluetoothPeripheralView.transmittterStartDate
@@ -242,7 +240,7 @@ extension DexcomG5BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
                 
                 // add 90 days (or 180 days if Anubis) to the transmitter start date to get the expiry date
                 if let transmitterExpiryDate = dexcomG5.transmitterStartDate?.addingTimeInterval(60 * 60 * 24 * (dexcomG5.isAnubis ? ConstantsMaster.transmitterExpiryDaysDexcomG6Anubis : ConstantsMaster.transmitterExpiryDaysDexcomG5G6)) {
-                    cell.detailTextLabel?.text = transmitterExpiryDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short) + " (" + transmitterExpiryDate.daysAndHoursRemaining(showOnlyDays: true) + ")"
+                    cell.detailTextLabel?.text = transmitterExpiryDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short)
                 } else {
                     cell.detailTextLabel?.text = "-"
                 }

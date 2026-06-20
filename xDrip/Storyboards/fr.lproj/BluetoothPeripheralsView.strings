@@ -1,5 +1,5 @@
-"screenTitle" = "Bluetooth";
-"selectCategory" = "Sélectionner un type de périphérique";
+"screenTitle" = "Appareils Bluetooth";
+"selectCategory" = "Sélectionner un type";
 "selectType" = "Sélectionner un type";
 "batteryLevel" = "Niveau de batterie";
 "noMultipleActiveCGMsAllowed" = "Vous avez déjà un émetteur CGM connecté.\n\nVerifiez vos autres émetteurs CGM et cliquez 'Stopper Scan', 'Déconnecter' ou effacez-les si nécessaire.";

@@ -119,7 +119,6 @@ extension DexcomG7BluetoothPeripheralViewModel: BluetoothPeripheralViewModel {
             
             if let startDate = dexcomG7.sensorStartDate {
                 startDateString = startDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short)
-                startDateString += " (" + startDate.daysAndHoursAgo() + ")"
             }
             cell.textLabel?.text = Texts_BluetoothPeripheralView.sensorStartDate
             cell.detailTextLabel?.text = startDateString

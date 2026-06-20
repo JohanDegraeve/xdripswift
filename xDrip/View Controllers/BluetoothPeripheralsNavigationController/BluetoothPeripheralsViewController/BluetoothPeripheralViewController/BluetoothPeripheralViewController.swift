@@ -1,6 +1,7 @@
 import AVFoundation
 import CoreBluetooth
 import os
+import SwiftUI
 import UIKit
 
 fileprivate let generalSettingSectionNumber = 0
@@ -144,6 +145,20 @@ class BluetoothPeripheralViewController: UIViewController {
     
     /// Defers a full table reload until the table view is attached to a window.
     private var needsFullTableReloadOnAppear = false
+
+    /// Defers the initial transmitter ID prompt until this controller is attached to the navigation hierarchy.
+    private var needsInitialTransmitterIdRequestOnAppear = false
+
+    /// SwiftUI state object that renders this controller's current BLE detail data.
+    private var swiftUIDetailState: BluetoothPeripheralDetailState?
+
+    /// Hosting child for the SwiftUI detail surface.
+    private var swiftUIHostingController: PortraitLockedHostingController<BluetoothPeripheralDetailView>?
+
+    /// Strong references for outlets created when the controller is launched without storyboard wiring.
+    private var programmaticTableView: UITableView?
+    private var programmaticConnectButton: UIButton?
+    private var programmaticTrashButton: UIBarButtonItem?
     
     // MARK: - public functions
     
@@ -404,6 +419,8 @@ class BluetoothPeripheralViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        ensureProgrammaticOutletsIfNeeded()
         
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager else {
             fatalError("in BluetoothPeripheralViewController viewDidLoad, bluetoothPeripheralManager is nil")
@@ -423,10 +440,13 @@ class BluetoothPeripheralViewController: UIViewController {
         }
         
         setupView()
+        installSwiftUIViewIfNeeded()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+
+        (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
         
         // check if the observers have already been added. If not, then add them
         if !didAddObservers {
@@ -448,6 +468,7 @@ class BluetoothPeripheralViewController: UIViewController {
         
         flushPendingTableReloads()
         reloadGeneralSectionWhenVisible()
+        requestInitialTransmitterIdIfNeeded()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -513,7 +534,7 @@ class BluetoothPeripheralViewController: UIViewController {
             
             // if transmitterId needed, request for it now and set button text
             if expectedBluetoothPeripheralType.needsTransmitterId() {
-                requestTransmitterId()
+                needsInitialTransmitterIdRequestOnAppear = true
             }
         }
         
@@ -543,6 +564,172 @@ class BluetoothPeripheralViewController: UIViewController {
             fatalError("in BluetoothPeripheralViewController, coreDataManager is nil")
         }
     }
+
+    private func ensureProgrammaticOutletsIfNeeded() {
+        if tableView == nil {
+            let tableView = BluetoothPeripheralReloadingTableView(frame: .zero, style: .grouped)
+            programmaticTableView = tableView
+            self.tableView = tableView
+        }
+
+        if connectButtonOutlet == nil {
+            let connectButton = UIButton(type: .system)
+            programmaticConnectButton = connectButton
+            connectButtonOutlet = connectButton
+        }
+
+        if trashButtonOutlet == nil {
+            let trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(swiftUITrashButtonTapped))
+            programmaticTrashButton = trashButton
+            trashButtonOutlet = trashButton
+            trashButton.tintColor = .systemRed
+            navigationItem.rightBarButtonItem = trashButton
+        }
+    }
+
+    private func installSwiftUIViewIfNeeded() {
+        guard swiftUIHostingController == nil else { return }
+
+        let state = BluetoothPeripheralDetailState(controller: self)
+        swiftUIDetailState = state
+
+        if let reloadingTableView = tableView as? BluetoothPeripheralReloadingTableView {
+            reloadingTableView.onReload = { [weak state] in
+                state?.refresh()
+            }
+        }
+
+        let swiftUIView = BluetoothPeripheralDetailView(state: state)
+        let hostingController = PortraitLockedHostingController(rootView: swiftUIView)
+
+        addChild(hostingController)
+        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+        hostingController.view.backgroundColor = .clear
+        view.addSubview(hostingController.view)
+
+        NSLayoutConstraint.activate([
+            hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
+            hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+
+        hostingController.didMove(toParent: self)
+        swiftUIHostingController = hostingController
+        state.refresh()
+    }
+
+    @objc private func swiftUITrashButtonTapped() {
+        trashButtonClicked()
+    }
+
+    private func refreshSwiftUIDetail() {
+        swiftUIDetailState?.refresh()
+    }
+
+    private func requestInitialTransmitterIdIfNeeded() {
+        guard needsInitialTransmitterIdRequestOnAppear, isViewLoaded, view.window != nil else { return }
+
+        needsInitialTransmitterIdRequestOnAppear = false
+        requestTransmitterId()
+    }
+
+    func swiftUISectionsSnapshot() -> [BluetoothPeripheralDetailSection] {
+        guard isViewLoaded, tableView != nil else { return [] }
+
+        let sectionCount = numberOfSections(in: tableView)
+
+        return (0 ..< sectionCount).map { section in
+            let title = tableView(tableView, titleForHeaderInSection: section)
+            let rows = (0 ..< tableView(tableView, numberOfRowsInSection: section)).map { row in
+                swiftUIRowSnapshot(for: IndexPath(row: row, section: section))
+            }
+
+            return BluetoothPeripheralDetailSection(index: section, title: title, rows: rows)
+        }
+    }
+
+    func swiftUIRowSnapshot(for indexPath: IndexPath) -> BluetoothPeripheralDetailRow {
+        let cell = tableView(tableView, cellForRowAt: indexPath)
+        let switchAccessory = cell.accessoryView as? UISwitch
+
+        return BluetoothPeripheralDetailRow(
+            id: "\(indexPath.section)-\(indexPath.row)-\(cell.textLabel?.text ?? "")-\(cell.detailTextLabel?.text ?? "")",
+            section: indexPath.section,
+            row: indexPath.row,
+            title: cell.textLabel?.text ?? "",
+            detail: cell.detailTextLabel?.text,
+            showsDisclosure: switchAccessory == nil && (cell.accessoryType == .disclosureIndicator || cell.accessoryView != nil),
+            isEnabled: cell.selectionStyle != .none,
+            toggleIsOn: switchAccessory?.isOn,
+            toggleAction: switchAccessory.map { switchAccessory in
+                { isOn in
+                    switchAccessory.setOn(isOn, animated: false)
+                    switchAccessory.sendActions(for: .valueChanged)
+                }
+            }
+        )
+    }
+
+    func swiftUISelectRow(section: Int, row: Int) {
+        tableView(tableView, didSelectRowAt: IndexPath(row: row, section: section))
+        refreshSwiftUIDetail()
+    }
+
+    func swiftUIConnectButtonTitle() -> String {
+        _ = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(
+            bluetoothPeripheral: bluetoothPeripheral,
+            isScanning: isScanning,
+            nfcScanNeeded: nfcScanNeeded,
+            nfcScanSuccessful: nfcScanSuccessful,
+            connectButtonOutlet: connectButtonOutlet,
+            expectedBluetoothPeripheralType: expectedBluetoothPeripheralType,
+            transmitterId: transmitterIdTempValue,
+            bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager
+        )
+
+        return connectButtonOutlet.currentTitle ?? Texts_BluetoothPeripheralView.connect
+    }
+
+    func swiftUIConnectButtonIsEnabled() -> Bool {
+        _ = swiftUIConnectButtonTitle()
+        return connectButtonOutlet.isEnabled
+    }
+
+    func swiftUIConnectionDisplayStatus() -> BluetoothPeripheralConnectionDisplayStatus {
+        let bluetoothTransmitter: BluetoothTransmitter?
+
+        if let bluetoothPeripheral = bluetoothPeripheral {
+            bluetoothTransmitter = bluetoothPeripheralManager?.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false)
+        } else {
+            bluetoothTransmitter = nil
+        }
+
+        return BluetoothPeripheralConnectionDisplayStatus(
+            bluetoothTransmitter: bluetoothTransmitter,
+            isScanningForNewPeripheral: isScanning
+        )
+    }
+
+    func swiftUIPeripheralCategory() -> BluetoothPeripheralCategory {
+        expectedBluetoothPeripheralType?.category() ?? .CGM
+    }
+
+    func swiftUIConnectButtonTapped() {
+        connectButtonHandler()
+        refreshSwiftUIDetail()
+    }
+
+    func swiftUIPresentTextEntry(_ textEntry: BluetoothPeripheralTextEntry) {
+        let rootView = BluetoothPeripheralTextEntryView(textEntry: textEntry) { [weak self] in
+            self?.navigationController?.popViewController(animated: true)
+        }
+
+        let viewController = PortraitLockedHostingController(rootView: rootView)
+        viewController.title = textEntry.title
+        viewController.navigationItem.largeTitleDisplayMode = .automatic
+        navigationController?.pushViewController(viewController, animated: true)
+    }
     
     private func reloadGeneralSectionWhenVisible() {
         DispatchQueue.main.async { [weak self] in
@@ -550,11 +737,13 @@ class BluetoothPeripheralViewController: UIViewController {
             
             guard self.tableView.window != nil else {
                 self.needsGeneralSectionReloadOnAppear = true
+                self.refreshSwiftUIDetail()
                 return
             }
             
             self.tableView.reloadSections(IndexSet(integer: 0), with: .none)
             self.needsGeneralSectionReloadOnAppear = false
+            self.refreshSwiftUIDetail()
         }
     }
     
@@ -564,12 +753,14 @@ class BluetoothPeripheralViewController: UIViewController {
             
             guard self.tableView.window != nil else {
                 self.needsFullTableReloadOnAppear = true
+                self.refreshSwiftUIDetail()
                 return
             }
             
             self.tableView.reloadData()
             self.needsFullTableReloadOnAppear = false
             self.needsGeneralSectionReloadOnAppear = false
+            self.refreshSwiftUIDetail()
         }
     }
     
@@ -580,12 +771,14 @@ class BluetoothPeripheralViewController: UIViewController {
             tableView.reloadData()
             needsFullTableReloadOnAppear = false
             needsGeneralSectionReloadOnAppear = false
+            refreshSwiftUIDetail()
             return
         }
         
         if needsGeneralSectionReloadOnAppear {
             tableView.reloadSections(IndexSet(integer: 0), with: .none)
             needsGeneralSectionReloadOnAppear = false
+            refreshSwiftUIDetail()
         }
     }
     
@@ -876,6 +1069,7 @@ class BluetoothPeripheralViewController: UIViewController {
         var transmitterIdTitleText = Texts_SettingsView.labelTransmitterId
         var transmitterIdMessageText = Texts_SettingsView.labelGiveTransmitterId
         var placeHolder = "00000"
+        var actionIsEnabled: ((String) -> Bool)?
         
         // if using a special case (like a heartbeat), adapt the strings to include relevant instructions and information
         switch expectedBluetoothPeripheralType {
@@ -884,31 +1078,53 @@ class BluetoothPeripheralViewController: UIViewController {
             transmitterIdMessageText = Texts_SettingsView.heartbeatLibreMessage
             placeHolder = "000000000000"
         case .DexcomG7Type, .DexcomG7HeartBeatType:
-            transmitterIdTitleText = ""
             transmitterIdMessageText = Texts_SettingsView.dexcomG7Message
             placeHolder = "DX0000"
         default:
             break
         }
+
+        switch expectedBluetoothPeripheralType {
+        case .DexcomType, .DexcomG7Type:
+            actionIsEnabled = { transmitterId in
+                transmitterId.count == 6
+            }
+        default:
+            break
+        }
         
-        SettingsViewUtilities.runSelectedRowAction(selectedRowAction: SettingsSelectedRowAction.askText(title: (transmitterIdTitleText == "" ? nil : transmitterIdTitleText), message: transmitterIdMessageText, keyboardType: UIKeyboardType.alphabet, text: transmitterIdTempValue, placeHolder: placeHolder, actionTitle: nil, cancelTitle: nil, actionHandler: { (transmitterId: String) in
+        swiftUIDetailState?.presentTextEntry(BluetoothPeripheralTextEntry(
+            title: transmitterIdTitleText,
+            message: transmitterIdMessageText,
+            keyboardType: UIKeyboardType.alphabet,
+            text: transmitterIdTempValue,
+            placeholder: placeHolder,
+            actionTitle: Texts_Common.Ok,
+            cancelTitle: Texts_Common.Cancel,
+            actionHandler: { [weak self] transmitterId in
+                guard let self = self else { return }
             
-            // convert to uppercase
-            let transmitterIdUpper = transmitterId.uppercased().toNilIfLength0()
+                // convert to uppercase
+                let transmitterIdUpper = transmitterId.uppercased().toNilIfLength0()
             
-            self.transmitterIdTempValue = transmitterIdUpper ?? ConstantsBluetoothPairing.dummyDexcomG7TypeTransmitterId
+                self.transmitterIdTempValue = transmitterIdUpper ?? ConstantsBluetoothPairing.dummyDexcomG7TypeTransmitterId
             
-            // reload the specific row in the table - this will always be extraRow4 for the transmitter ID
-            self.tableView.reloadRows(at: [IndexPath(row: Setting.transmitterExtraRow4.rawValue, section: 0)], with: .none)
+                // reload the specific row in the table - this will always be extraRow4 for the transmitter ID
+                self.tableView.reloadRows(at: [IndexPath(row: Setting.transmitterExtraRow4.rawValue, section: 0)], with: .none)
             
-            // as transmitter id has been set (or set to nil), connect button label text must change
-            _ = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: self.bluetoothPeripheral, isScanning: self.isScanning, nfcScanNeeded: self.nfcScanNeeded, nfcScanSuccessful: self.nfcScanSuccessful, connectButtonOutlet: self.connectButtonOutlet, expectedBluetoothPeripheralType: self.expectedBluetoothPeripheralType, transmitterId: transmitterIdUpper, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
+                // as transmitter id has been set (or set to nil), connect button label text must change
+                _ = BluetoothPeripheralViewController.setConnectButtonLabelTextAndGetStatusDetailedText(bluetoothPeripheral: self.bluetoothPeripheral, isScanning: self.isScanning, nfcScanNeeded: self.nfcScanNeeded, nfcScanSuccessful: self.nfcScanSuccessful, connectButtonOutlet: self.connectButtonOutlet, expectedBluetoothPeripheralType: self.expectedBluetoothPeripheralType, transmitterId: transmitterIdUpper, bluetoothPeripheralManager: bluetoothPeripheralManager as! BluetoothPeripheralManager)
+
+                self.refreshSwiftUIDetail()
             
-        }, cancelHandler: nil, inputValidator: { transmitterId in
+            },
+            actionIsEnabled: actionIsEnabled,
+            inputValidator: { [weak self] transmitterId in
             
-            self.expectedBluetoothPeripheralType?.validateTransmitterId(transmitterId: transmitterId)
+                self?.expectedBluetoothPeripheralType?.validateTransmitterId(transmitterId: transmitterId)
             
-        }), forRowWithIndex: Setting.transmitterExtraRow4.rawValue, forSectionWithIndex: generalSettingSectionNumber, withSettingsViewModel: nil, tableView: tableView, forUIViewController: self)
+            }
+        ))
     }
     
     /// dismiss alert screen that shows info after clicking start scanning button (also used for nfc scan success/fail alerts)

@@ -3,7 +3,7 @@
 "batteryLevel" = "Batteriestand";
 
 /// when clicking add button in screen with list of bluetoothperipherals, title of pop up where user  needs to select bluetooth peripheral category
-"selectCategory" = "Gerät wählen";
+"selectCategory" = "Typ wählen";
 
 /// When adding a new cgm transmitter, but the user has another one already which is either connected or trying to connect
 "noMultipleActiveCGMsAllowed" = "Sie haben bereits einen Sensor verbunden.\n\nPrüfen Sie Ihre anderen CGM-Sensoren und klicken Sie auf 'Stop Scannen', 'Trennen' oder löschen Sie einfach.";
@@ -12,4 +12,4 @@
 "selectType" = "Transmitter wählen";
 
 /// when Bluetooth Peripheral list is shown, title of the view
-"screenTitle" = "Bluetooth";
+"screenTitle" = "Bluetooth-Geräte";
