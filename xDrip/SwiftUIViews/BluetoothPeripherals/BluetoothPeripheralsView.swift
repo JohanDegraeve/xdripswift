@@ -55,7 +55,8 @@ struct BluetoothPeripheralsView: View {
                 dismissButton: .default(Text(Texts_Common.Ok))
             )
         }
-        .onAppear(perform: reload)
+        .onAppear(perform: startStatusUpdates)
+        .onDisappear(perform: stopStatusUpdates)
     }
 
     private func showAddFlow() {
@@ -66,9 +67,12 @@ struct BluetoothPeripheralsView: View {
         router.openPeripheral?(row.bluetoothPeripheral, row.bluetoothPeripheral.bluetoothPeripheralType())
     }
 
-    private func reload() {
-        viewModel.initializeBluetoothTransmitterDelegates()
-        viewModel.reload()
+    private func startStatusUpdates() {
+        viewModel.startStatusUpdates()
+    }
+
+    private func stopStatusUpdates() {
+        viewModel.stopStatusUpdates()
     }
 }
 

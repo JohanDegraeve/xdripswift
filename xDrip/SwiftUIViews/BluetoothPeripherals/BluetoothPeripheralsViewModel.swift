@@ -21,6 +21,7 @@ final class BluetoothPeripheralsRouter: ObservableObject {
     @Published var pendingAlert: BluetoothPeripheralsAlert?
 
     private weak var bluetoothPeripheralManager: BluetoothPeripheralManaging?
+    private var statusRefreshTimer: AnyCancellable?
 
     init(bluetoothPeripheralManager: BluetoothPeripheralManaging) {
         self.bluetoothPeripheralManager = bluetoothPeripheralManager
@@ -61,6 +62,26 @@ final class BluetoothPeripheralsRouter: ObservableObject {
 
             return BluetoothPeripheralsSection(id: category.rawValue, title: category.rawValue, rows: rows)
         }
+    }
+
+    func startStatusUpdates() {
+        initializeBluetoothTransmitterDelegates()
+        reload()
+
+        guard statusRefreshTimer == nil else { return }
+
+        statusRefreshTimer = Timer.publish(every: 1, on: .main, in: .common)
+            .autoconnect()
+            .sink { [weak self] _ in
+                Task { @MainActor [weak self] in
+                    self?.reload()
+                }
+            }
+    }
+
+    func stopStatusUpdates() {
+        statusRefreshTimer?.cancel()
+        statusRefreshTimer = nil
     }
 
     func bluetoothPeripheralTypes(for category: BluetoothPeripheralCategory) -> [BluetoothPeripheralType] {
