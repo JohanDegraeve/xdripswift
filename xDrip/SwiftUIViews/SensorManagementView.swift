@@ -675,10 +675,12 @@ struct SensorManagementView: View {
             sensorActionNote = nil
         }
 
-        let currentCalibration = activeSensor.flatMap { calibrationsAccessor.lastCalibrationForActiveSensor(withActivesensor: $0) }.map(SensorManagementCalibrationDisplay.init)
-        let calibrationHistory = activeSensor.map { sensor in
+        let currentCalibration = calibrationsAccessor
+            .lastCalibrationForActiveSensor(withActivesensor: activeSensor)
+            .map(SensorManagementCalibrationDisplay.init)
+        let calibrationHistory = activeSensor.map { activeSensor in
             calibrationsAccessor
-                .getLatestCalibrations(howManyDays: 4, forSensor: sensor)
+                .getLatestCalibrations(howManyDays: 4, forSensor: activeSensor)
                 .map(SensorManagementCalibrationDisplay.init)
                 // The latest valid calibration is already shown in its own section.
                 .filter { $0.id != currentCalibration?.id }
@@ -706,7 +708,7 @@ struct SensorManagementView: View {
             showCalibrationUnavailableRow = true
             calibrationNote = nil
         } else if firstCalibration == nil && transmitter?.overruleIsWebOOPEnabled() == false {
-            let readingCount = bgReadingsAccessor.getLatestBgReadings(limit: 36, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true, includingSuppressed: true).count
+            let readingCount = bgReadingsAccessor.getLatestBgReadings(limit: 36, fromDate: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: true, includingSuppressed: true).count
             canCalibrate = false
             showCalibrationUnavailableRow = false
             calibrationNote = readingCount > 1 ? Texts_Calibrations.calibrationNotificationRequestBody : Texts_HomeView.thereMustBeAreadingBeforeCalibration
@@ -737,7 +739,7 @@ struct SensorManagementView: View {
             canCalibrate: canCalibrate,
             showCalibrationUnavailableRow: showCalibrationUnavailableRow,
             calibrationNote: calibrationNote,
-            currentBgDisplay: activeSensor.flatMap { bgReadingsAccessor.lastSnapshot(forSensor: $0) }.map {
+            currentBgDisplay: activeSensor.flatMap { bgReadingsAccessor.last(forSensor: $0) }.map {
                 SensorManagementEnteredBgValue(rawValue: displayEditableBgValue($0.finalValue), valueInMgDl: $0.finalValue)
             },
             currentCalibration: currentCalibration,

@@ -1,5 +1,6 @@
 import Foundation
 import CoreBluetooth
+import CoreData
 import os
 
 class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
@@ -96,6 +97,24 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMG5)
+
+    // CoreBluetooth callbacks run on bt.central, so keep pending transmitter
+    // calibration data detached from the Calibration managed object.
+    private struct PendingTransmitterCalibration {
+        let id: String
+        let bg: Double
+        let timeStamp: Date
+        let managedObjectContext: NSManagedObjectContext?
+        var sentToTransmitter: Bool
+
+        init(calibration: Calibration) {
+            id = calibration.id
+            bg = calibration.bg
+            timeStamp = calibration.timeStamp
+            managedObjectContext = calibration.managedObjectContext
+            sentToTransmitter = calibration.sentToTransmitter
+        }
+    }
     
     /// is G5 reset necessary or not
     private var G5ResetRequested = false
@@ -127,7 +146,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     /// - used to send calibration done by user via xDrip4iOS to Dexcom transmitter. For example, user may have given a calibration in the app, but it's not yet send to the transmitter.
     /// - calibrationToSendToTransmitter.sentToTransmitter says if it's been sent to transmitter or not
-    private var calibrationToSendToTransmitter: Calibration?
+    private var calibrationToSendToTransmitter: PendingTransmitterCalibration?
     
     /// if the user starts the sensor via xDrip4iOS, then only after having receivec a confirmation from the transmitter, then sensorStartDate will be assigned to the actual sensor start date
     /// - if set then call cGMG5TransmitterDelegate.received(sensorStartDate
@@ -165,16 +184,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     private var writeControlNotifyConfigured = false
     private var backfillNotifyConfigured = false
     private var authChallengeTxSent = false
-
-    // DEBUG START: removable firefly cycle diagnostics for missed-reading investigation.
-    private enum DebugFireflyCycle {
-        static let enabled = false
-        static let tracePrefix = "[DBG_G5_CYCLE]"
-    }
-    private var debugFireflyCycleSequence = 0
-    private var debugCurrentFireflyCycleID: Int?
-    private var debugCurrentFireflyCycleStartedAt: Date?
-    // DEBUG END: removable firefly cycle diagnostics for missed-reading investigation.
 
     // MARK: - public functions
     
@@ -220,7 +229,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         self.isAnubis = isAnubis
         
         // assign calibrationToSendToTransmitter
-        self.calibrationToSendToTransmitter = calibrationToSendToTransmitter
+        self.calibrationToSendToTransmitter = calibrationToSendToTransmitter.map(PendingTransmitterCalibration.init)
         
         // assign sensorStartDate
         self.sensorStartDate = sensorStartDate
@@ -670,14 +679,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         super.centralManager(central, didConnect: peripheral)
         
         timeStampLastConnection = Date()
-        // DEBUG START: removable firefly cycle diagnostics for missed-reading investigation.
-        if DebugFireflyCycle.enabled && useFireFlyFlow() {
-            debugFireflyCycleSequence += 1
-            debugCurrentFireflyCycleID = debugFireflyCycleSequence
-            debugCurrentFireflyCycleStartedAt = Date()
-            trace("%{public}@ in didConnect, started firefly cycle %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, DebugFireflyCycle.tracePrefix, debugFireflyCycleSequence.description)
-        }
-        // DEBUG END: removable firefly cycle diagnostics for missed-reading investigation.
 
         // to be sure waitingPairingConfirmation is reset to false
         waitingPairingConfirmation = false
@@ -854,8 +855,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         // set calibrationToSendToTransmitter to nil, because a new calibration needs to be sent
         calibrationToSendToTransmitter = nil
         
-        if calibrationIsValid(calibration: calibration) {
-            calibrationToSendToTransmitter = calibration
+        let pendingCalibration = PendingTransmitterCalibration(calibration: calibration)
+
+        if calibrationIsValid(calibration: pendingCalibration) {
+            calibrationToSendToTransmitter = pendingCalibration
             
             trace("in calibrate., new calibration stored, value = %{public}@, timestamp = %{public}@ ", log: log, category: ConstantsLog.categoryCGMG5, type: .info, calibration.bg.description, calibration.timeStamp.toStringForTrace(timeStyle: .long, dateStyle: .none))
         }
@@ -954,7 +957,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     }
     
     /// sends calibrationTxMessage. Will use super.writeDataToPeripheral, meaning, even if useOtherApp = true, then still it will send the data to the transmitter
-    private func sendCalibrationTxMessage(calibration: Calibration, transmitterStartDate: Date) {
+    private func sendCalibrationTxMessage(calibration: PendingTransmitterCalibration, transmitterStartDate: Date) {
         
         let calibrationTxMessage = DexcomCalibrationTxMessage(glucose: Int(calibration.bg), timeStamp: calibration.timeStamp, transmitterStartDate: transmitterStartDate)
         
@@ -965,7 +968,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             _ = super.writeDataToPeripheral(data: calibrationTxMessage.data, characteristicToWriteTo: writeControlCharacteristic, type: .withResponse)
             
             // set sentToTransmitter to true
-            calibration.sentToTransmitter = true
+            calibrationToSendToTransmitter?.sentToTransmitter = true
+            updateCalibrationTransmitterStatus(calibration: calibration, sentToTransmitter: true)
             
         } else {
             
@@ -1198,7 +1202,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             if let calibrationToSendToTransmitter = calibrationToSendToTransmitter {
                 
                 // assumption is that the stored calibration is the one for which we receive this dexcomCalibrationRxMessage
-                calibrationToSendToTransmitter.acceptedByTransmitter = dexcomCalibrationRxMessage.accepted
+                updateCalibrationTransmitterStatus(calibration: calibrationToSendToTransmitter, acceptedByTransmitter: dexcomCalibrationRxMessage.accepted)
                 
                 // set calibrationToSendToTransmitter to nil so it's not processed next run
                 self.calibrationToSendToTransmitter = nil
@@ -1626,11 +1630,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                     // next time don't ask again for glucoseTx, but ask for backfill if needed
                     glucoseTxSent = true
                 } else if Date().timeIntervalSince(timeStampOfLastG5Reading) > ConstantsDexcomG5.minPeriodOfLatestReadingsToStartBackFill && !backfillTxSent && sensorStartDate != nil && okToRequestBackfill {
-                    // DEBUG START: removable firefly cycle diagnostics for missed-reading investigation.
-                    if DebugFireflyCycle.enabled, let cycleID = debugCurrentFireflyCycleID {
-                        trace("%{public}@ in fireflyMessageFlow, cycle %{public}@ requesting backfill because last reading age is %{public}@ seconds", log: log, category: ConstantsLog.categoryCGMG5, type: .info, DebugFireflyCycle.tracePrefix, cycleID.description, Int(Date().timeIntervalSince(timeStampOfLastG5Reading)).description)
-                    }
-                    // DEBUG END: removable firefly cycle diagnostics for missed-reading investigation.
                     // check if backfill needed, and request backfill if needed
                     // if not needed continue with flow
                     // sensor must be active
@@ -1724,13 +1723,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 let v = String(format: "%.1f", latest.glucoseLevelRaw)
                 let t = DateFormatter.localizedString(from: latest.timeStamp, dateStyle: .none, timeStyle: .medium)
                 trace("in sendGlucoseDataToDelegate, G5/G6 connection cycle summary: value = %{public}@ mg/dL at %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, v, t)
-
-                // DEBUG START: removable firefly cycle diagnostics for missed-reading investigation.
-                if DebugFireflyCycle.enabled {
-                    let cycleDurationMilliseconds = Int(((debugCurrentFireflyCycleStartedAt.map { Date().timeIntervalSince($0) } ?? 0) * 1000.0).rounded())
-                    trace("%{public}@ delivered firefly cycle=%{public}@ value=%{public}@ mg/dL at %{public}@, count=%{public}@, duration=%{public}@ ms, hadBackfill=%{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, DebugFireflyCycle.tracePrefix, (debugCurrentFireflyCycleID?.description ?? "nil"), v, t, glucoseDataArray.count.description, cycleDurationMilliseconds.description, (!backFills.isEmpty).description)
-                }
-                // DEBUG END: removable firefly cycle diagnostics for missed-reading investigation.
             }
 
             DispatchQueue.main.async { [weak self] in
@@ -1740,13 +1732,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             }
         } else {
             trace("in sendGlucoseDataToDelegate, glucoseDataArray has no values", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
-
-            // DEBUG START: removable firefly cycle diagnostics for missed-reading investigation.
-            if DebugFireflyCycle.enabled {
-                let cycleDurationMilliseconds = Int(((debugCurrentFireflyCycleStartedAt.map { Date().timeIntervalSince($0) } ?? 0) * 1000.0).rounded())
-                trace("%{public}@ no values delivered, cycle=%{public}@, duration=%{public}@ ms, lastAlgorithmStatus=%{public}@, lastGlucosePresent=%{public}@, decodedBackfills=%{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .info, DebugFireflyCycle.tracePrefix, (debugCurrentFireflyCycleID?.description ?? "nil"), cycleDurationMilliseconds.description, String(describing: lastAlgorithmStatus), (lastGlucoseInSensorDataRxReading != nil).description, backFills.count.description)
-            }
-            // DEBUG END: removable firefly cycle diagnostics for missed-reading investigation.
         }
         
         // reset both backFillStream
@@ -1760,16 +1745,12 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         
         // reset glucoseTxSent to false
         glucoseTxSent = false
-        // DEBUG START: removable firefly cycle diagnostics for missed-reading investigation.
-        debugCurrentFireflyCycleID = nil
-        debugCurrentFireflyCycleStartedAt = nil
-        // DEBUG END: removable firefly cycle diagnostics for missed-reading investigation.
     }
     
     /// - check if stored calibration is valid or not, valid in the sense of "is it ok to send it to the transmitter"
     ///
     /// - returns: false if calibration.sentToTransmitter is true, false if calibrationToSendToTransmitter has a timestamp in the future, false if calibrationToSendToTransmitter has an invalid value ( < 40 or > 400). true in all other cases
-    private func calibrationIsValid(calibration: Calibration) -> Bool {
+    private func calibrationIsValid(calibration: PendingTransmitterCalibration) -> Bool {
         // if already sent to transmitter then invalid
         if calibration.sentToTransmitter {
             trace("in calibrationIsValid, calibration.sentToTransmitter is true, means this calibration is already sent to the transmitter", log: log, category: ConstantsLog.categoryCGMG5, type: .info)
@@ -1795,6 +1776,34 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         }
         
         return true
+    }
+
+    private func updateCalibrationTransmitterStatus(calibration: PendingTransmitterCalibration, sentToTransmitter: Bool? = nil, acceptedByTransmitter: Bool? = nil) {
+        guard let managedObjectContext = calibration.managedObjectContext else { return }
+
+        managedObjectContext.perform {
+            let fetchRequest: NSFetchRequest<Calibration> = Calibration.fetchRequest()
+            fetchRequest.fetchLimit = 1
+            fetchRequest.predicate = NSPredicate(format: "id == %@", calibration.id)
+
+            do {
+                guard let calibrationToUpdate = try managedObjectContext.fetch(fetchRequest).first else { return }
+
+                if let sentToTransmitter = sentToTransmitter {
+                    calibrationToUpdate.sentToTransmitter = sentToTransmitter
+                }
+
+                if let acceptedByTransmitter = acceptedByTransmitter {
+                    calibrationToUpdate.acceptedByTransmitter = acceptedByTransmitter
+                }
+
+                if managedObjectContext.hasChanges {
+                    try managedObjectContext.save()
+                }
+            } catch {
+                trace("in updateCalibrationTransmitterStatus, unable to update calibration transmitter status, error = %{public}@", log: self.log, category: ConstantsLog.categoryCGMG5, type: .error, error.localizedDescription)
+            }
+        }
     }
     
     /// Possibly webOOPEnabled might be set to false, even though it's a transmitter that can only use with webOOPEnabled true. This can happen if transmitter is known but disconnected, app is launched, user goes to bluetooth settings. At that time, view will show the option to disable weboopenabled, then user disables oopweb, then clicks 'connect'. App will crash, and then user relaunches. At that time, webOOPEnabled will not be shown (transmitter is known, it returns false to nonWebOOPAllowed), but it's actually enabled. To avoid that transmitter starts using raw, this function here i sused
