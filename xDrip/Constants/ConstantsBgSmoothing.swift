@@ -23,6 +23,15 @@ enum ConstantsBgSmoothing {
     /// limit, smoothing should stop at the gap instead of blending across it
     static let maximumGapBetweenReadingsInMinutes = ConstantsBGGraphBuilder.maxSlopeInMinutes
 
+    /// automatic live post processing can re-evaluate a recent history tail so
+    /// smoothing has enough context to update the newest readings consistently.
+    static let automaticProcessingLookbackInterval: TimeInterval = .hours(3)
+
+    /// automatic downstream replacement should stay much tighter than the local
+    /// smoothing context so metadata churn in older readings does not fan out
+    /// into broad Nightscout history rewrites.
+    static let automaticDownstreamRewriteLookbackInterval: TimeInterval = .minutes(30)
+
     /// Savitzky-Golay filter width to use for each smoothing strength.
     /// The existing filter utility accepts:
     /// - 2 = 5-point filter

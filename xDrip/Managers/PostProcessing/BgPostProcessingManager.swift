@@ -27,6 +27,21 @@ class BgPostProcessingManager {
         let isSuppressedByFiveMinuteCadence: Bool
     }
 
+    private struct BgReadingDownstreamChange {
+        let finalValueChanged: Bool
+        let slopeNameChanged: Bool
+        let hideSlopeChanged: Bool
+        let suppressionChanged: Bool
+
+        var affectsOlderDownstreamHistory: Bool {
+            return finalValueChanged || suppressionChanged
+        }
+
+        var affectsLatestDownstreamReading: Bool {
+            return finalValueChanged || slopeNameChanged || hideSlopeChanged || suppressionChanged
+        }
+    }
+
     /// for logging
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataBgReadings)
 
@@ -38,7 +53,6 @@ class BgPostProcessingManager {
 
     private weak var nightscoutSyncManager: NightscoutSyncManager?
     private weak var healthKitManager: HealthKitManager?
-    private let automaticProcessingLookbackInterval: TimeInterval = .hours(6)
 
     // DEBUG START: removable post-processing diagnostics for background load investigation.
     private enum DebugPostProcessing {
@@ -67,9 +81,13 @@ class BgPostProcessingManager {
     // MARK: - public functions
 
     /// reprocess the latest readings for the current source context
+    ///
+    /// Automatic live processing should run immediately. If post processing is
+    /// active, the recent visible downstream history is rewritten straight away
+    /// using the bounded automatic processing window.
     @discardableResult
     func processLatestReadings() -> Bool {
-        return processBgReadings(processingStartDateOverride: nil)
+        return processBgReadings(processingStartDateOverride: nil, allowHistoricalDownstreamRewrite: hasActiveDownstreamPostProcessing())
     }
 
     /// compare the resolved source context against the stored one and reset the
@@ -91,10 +109,13 @@ class BgPostProcessingManager {
         syncAdjustmentAvailabilityForCurrentSource()
     }
 
-    /// applies adjustment and smoothing to the requested readings, then updates
-    /// any downstream consumers that should reflect the new final values
+    /// applies adjustment and smoothing to the requested readings
+    ///
+    /// Automatic processing may immediately rewrite recent downstream history
+    /// when post processing is active. Manual historical apply explicitly opts
+    /// into a full selected-window rewrite.
     @discardableResult
-    func processBgReadings(processingStartDateOverride: Date?, fiveMinuteReadingsStartTimeStampOverride: Date? = nil, forceFullDownstreamRewrite: Bool = false) -> Bool {
+    func processBgReadings(processingStartDateOverride: Date?, fiveMinuteReadingsStartTimeStampOverride: Date? = nil, forceFullDownstreamRewrite: Bool = false, allowHistoricalDownstreamRewrite: Bool = false) -> Bool {
         // DEBUG START: removable post-processing diagnostics for background load investigation.
         let startedAt = Date()
         var debugProcessingRunID: Int?
@@ -141,46 +162,34 @@ class BgPostProcessingManager {
 
         coreDataManager.saveChanges()
 
+        let downstreamChangesByObjectID = Dictionary(uniqueKeysWithValues: bgReadings.map { bgReading in
+            let stateBeforeProcessing = statesBeforeProcessing[bgReading.objectID]
+            let change = BgReadingDownstreamChange(
+                finalValueChanged: stateBeforeProcessing == nil ? true : abs(stateBeforeProcessing!.finalValue - bgReading.finalValue) > 0.001,
+                slopeNameChanged: stateBeforeProcessing == nil ? true : stateBeforeProcessing!.slopeName != bgReading.slopeName,
+                hideSlopeChanged: stateBeforeProcessing == nil ? true : stateBeforeProcessing!.hideSlope != bgReading.hideSlope,
+                suppressionChanged: stateBeforeProcessing == nil ? true : stateBeforeProcessing!.isSuppressedByFiveMinuteCadence != bgReading.isSuppressedByFiveMinuteCadence
+            )
+            return (bgReading.objectID, change)
+        })
+
         let changedBgReadings = bgReadings.filter { bgReading in
-            guard let stateBeforeProcessing = statesBeforeProcessing[bgReading.objectID] else { return true }
-
-            if abs(stateBeforeProcessing.finalValue - bgReading.finalValue) > 0.001 {
-                return true
-            }
-
-            if stateBeforeProcessing.slopeName != bgReading.slopeName {
-                return true
-            }
-
-            if stateBeforeProcessing.hideSlope != bgReading.hideSlope {
-                return true
-            }
-
-            if stateBeforeProcessing.isSuppressedByFiveMinuteCadence != bgReading.isSuppressedByFiveMinuteCadence {
-                return true
-            }
-
-            return false
+            guard let change = downstreamChangesByObjectID[bgReading.objectID] else { return true }
+            return change.finalValueChanged || change.slopeNameChanged || change.hideSlopeChanged || change.suppressionChanged
         }
 
-        // A manual historical apply should always rewrite the full selected window.
-        // Automatic processing only needs downstream rewrites when post processing
-        // is actually active. During testing it was found that letting normal live
-        // readings go through the replace path while adjustment, smoothing and
-        // 5 minute reduction were all disabled could still trigger Nightscout
-        // deletes and re-uploads just because slope metadata changed.
-        // That interfered with the normal direct upload path and could leave
-        // historical Nightscout entries missing after an otherwise ordinary cycle.
-        let shouldRewriteFullDownstreamWindow = processingStartDateOverride != nil || forceFullDownstreamRewrite
+        // Manual historical apply rewrites the full selected window.
+        // Automatic live processing rewrites only the changed visible readings
+        // inside the bounded recent processing window.
+        let shouldRewriteFullDownstreamWindow = allowHistoricalDownstreamRewrite && (processingStartDateOverride != nil || forceFullDownstreamRewrite)
         let hasActiveAutomaticPostProcessing = hasActiveDownstreamPostProcessing()
-        let shouldUpdateDownstream = shouldRewriteFullDownstreamWindow || hasActiveAutomaticPostProcessing
 
         // DEBUG START: removable post-processing diagnostics for background load investigation.
         let processingDurationMilliseconds = Int((Date().timeIntervalSince(startedAt) * 1000.0).rounded())
         let changedVisibleReadingsCount = changedBgReadings.filter { !$0.isSuppressedByFiveMinuteCadence }.count
         // DEBUG END: removable post-processing diagnostics for background load investigation.
 
-        guard shouldUpdateDownstream else {
+        guard allowHistoricalDownstreamRewrite else {
             // DEBUG START: removable post-processing diagnostics for background load investigation.
             if DebugPostProcessing.enabled {
                 trace("%{public}@ finished without downstream rewrite, run=%{public}@, duration=%{public}@ ms, fetched=%{public}@, visibleBefore=%{public}@, changed=%{public}@, changedVisible=%{public}@, sourceContext=%{public}@, fromDate=%{public}@, effectiveAdjustment=%{public}@, smoothing=%{public}@, fiveMinute=%{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, DebugPostProcessing.tracePrefix, debugProcessingRunID?.description ?? "nil", processingDurationMilliseconds.description, bgReadings.count.description, visibleReadingsBeforeProcessingCount.description, changedBgReadings.count.description, changedVisibleReadingsCount.description, sourceContextIdentifier, String(describing: fromDate), hasEffectiveAdjustmentForCurrentSource().description, UserDefaults.standard.enableSmoothing.description, (UserDefaults.standard.useFiveMinuteReadings && currentSourceCanUseFiveMinuteReadings()).description)
@@ -189,31 +198,44 @@ class BgPostProcessingManager {
             return false
         }
 
-        var bgReadingsToReplaceDownstream = (shouldRewriteFullDownstreamWindow ? bgReadings : changedBgReadings).filter { !$0.isSuppressedByFiveMinuteCadence }
+        let bgReadingsToReplaceDownstream: [BgReading]
+        if shouldRewriteFullDownstreamWindow {
+            bgReadingsToReplaceDownstream = bgReadings.filter { !$0.isSuppressedByFiveMinuteCadence }
+        } else if let latestVisibleBgReading = bgReadings.last(where: { !$0.isSuppressedByFiveMinuteCadence }) {
+            let automaticRewriteStartDate = latestVisibleBgReading.timeStamp.addingTimeInterval(-ConstantsBgSmoothing.automaticDownstreamRewriteLookbackInterval)
+            bgReadingsToReplaceDownstream = bgReadings.filter { bgReading in
+                guard bgReading.timeStamp >= automaticRewriteStartDate else { return false }
+                guard !bgReading.isSuppressedByFiveMinuteCadence else { return false }
+                guard let change = downstreamChangesByObjectID[bgReading.objectID] else { return false }
+                return change.affectsOlderDownstreamHistory
+            }
+        } else {
+            bgReadingsToReplaceDownstream = []
+        }
+        var downstreamReadingsToReplace = bgReadingsToReplaceDownstream
 
-        if !shouldRewriteFullDownstreamWindow && hasActiveAutomaticPostProcessing, let latestVisibleBgReading = bgReadings.last(where: { !$0.isSuppressedByFiveMinuteCadence }) {
-            // During testing it was found that widening the live smoothing window
-            // can shift several recent readings while leaving the newest final
-            // value itself almost unchanged. Nightscout still needs that newest
-            // reading in the replacement payload so the live stream and the
-            // rewritten historical window always move forward together.
-            if !bgReadingsToReplaceDownstream.contains(where: { $0.objectID == latestVisibleBgReading.objectID }) {
-                bgReadingsToReplaceDownstream.append(latestVisibleBgReading)
+        if !shouldRewriteFullDownstreamWindow, hasActiveAutomaticPostProcessing, let latestVisibleBgReading = bgReadings.last(where: { !$0.isSuppressedByFiveMinuteCadence }) {
+            // Keep the newest visible reading in the replacement payload even
+            // when smoothing mainly changed slightly older values, so the live
+            // downstream stream still moves forward with the rewritten tail.
+            if (downstreamChangesByObjectID[latestVisibleBgReading.objectID]?.affectsLatestDownstreamReading ?? false)
+                && !downstreamReadingsToReplace.contains(where: { $0.objectID == latestVisibleBgReading.objectID }) {
+                downstreamReadingsToReplace.append(latestVisibleBgReading)
             }
         }
 
-        if bgReadingsToReplaceDownstream.count > 0 {
-            let earliestReplacementDate = bgReadingsToReplaceDownstream.map(\.timeStamp).min()
-            let latestReplacementDate = bgReadingsToReplaceDownstream.map(\.timeStamp).max()
+        if downstreamReadingsToReplace.count > 0 {
+            let earliestReplacementDate = downstreamReadingsToReplace.map(\.timeStamp).min()
+            let latestReplacementDate = downstreamReadingsToReplace.map(\.timeStamp).max()
             if shouldRewriteFullDownstreamWindow, let earliestBgReading = bgReadings.first, let latestBgReading = bgReadings.last {
-                nightscoutSyncManager?.replaceBgReadingsInNightscout(bgReadings: bgReadingsToReplaceDownstream, deleteFromTimeStamp: earliestBgReading.timeStamp, deleteToTimeStamp: latestBgReading.timeStamp)
+                nightscoutSyncManager?.replaceBgReadingsInNightscout(bgReadings: downstreamReadingsToReplace, deleteFromTimeStamp: earliestBgReading.timeStamp, deleteToTimeStamp: latestBgReading.timeStamp)
             } else {
-                nightscoutSyncManager?.replaceBgReadingsInNightscout(bgReadings: bgReadingsToReplaceDownstream)
+                nightscoutSyncManager?.replaceBgReadingsInNightscout(bgReadings: downstreamReadingsToReplace)
             }
-            healthKitManager?.replaceBgReadingsInHealthKit(bgReadings: bgReadingsToReplaceDownstream)
+            healthKitManager?.replaceBgReadingsInHealthKit(bgReadings: downstreamReadingsToReplace)
             // DEBUG START: removable post-processing diagnostics for background load investigation.
             if DebugPostProcessing.enabled {
-                trace("%{public}@ queued downstream rewrite, run=%{public}@, duration=%{public}@ ms, fetched=%{public}@, visibleBefore=%{public}@, changed=%{public}@, changedVisible=%{public}@, rewriteCount=%{public}@, fullWindow=%{public}@, sourceContext=%{public}@, replacementStart=%{public}@, replacementEnd=%{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, DebugPostProcessing.tracePrefix, debugProcessingRunID?.description ?? "nil", processingDurationMilliseconds.description, bgReadings.count.description, visibleReadingsBeforeProcessingCount.description, changedBgReadings.count.description, changedVisibleReadingsCount.description, bgReadingsToReplaceDownstream.count.description, shouldRewriteFullDownstreamWindow.description, sourceContextIdentifier, String(describing: earliestReplacementDate), String(describing: latestReplacementDate))
+                trace("%{public}@ queued downstream rewrite, run=%{public}@, duration=%{public}@ ms, fetched=%{public}@, visibleBefore=%{public}@, changed=%{public}@, changedVisible=%{public}@, rewriteCount=%{public}@, fullWindow=%{public}@, sourceContext=%{public}@, replacementStart=%{public}@, replacementEnd=%{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, DebugPostProcessing.tracePrefix, debugProcessingRunID?.description ?? "nil", processingDurationMilliseconds.description, bgReadings.count.description, visibleReadingsBeforeProcessingCount.description, changedBgReadings.count.description, changedVisibleReadingsCount.description, downstreamReadingsToReplace.count.description, shouldRewriteFullDownstreamWindow.description, sourceContextIdentifier, String(describing: earliestReplacementDate), String(describing: latestReplacementDate))
             }
             // DEBUG END: removable post-processing diagnostics for background load investigation.
             return true
@@ -258,7 +280,8 @@ class BgPostProcessingManager {
         }
 
         updateSmoothingSettings(enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingPeriodInMinutes: smoothingPeriodInMinutes, smoothingStrength: smoothingStrength)
-        _ = processBgReadings(processingStartDateOverride: nil)
+        let rewriteStartDate = UserDefaults.standard.postProcessingApplyFromTimeStamp ?? UserDefaults.standard.postProcessingStartTimeStamp
+        _ = processBgReadings(processingStartDateOverride: rewriteStartDate, fiveMinuteReadingsStartTimeStampOverride: rewriteStartDate, allowHistoricalDownstreamRewrite: true)
         notifyBgPostProcessingDidUpdate()
     }
 
@@ -285,7 +308,8 @@ class BgPostProcessingManager {
 
         updateSmoothingSettings(enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingPeriodInMinutes: smoothingPeriodInMinutes, smoothingStrength: smoothingStrength)
 
-        _ = processBgReadings(processingStartDateOverride: processingStartDateOverride, fiveMinuteReadingsStartTimeStampOverride: processingStartDateOverride)
+        let rewriteStartDate = processingStartDateOverride ?? applyFromTimeStamp
+        _ = processBgReadings(processingStartDateOverride: rewriteStartDate, fiveMinuteReadingsStartTimeStampOverride: rewriteStartDate, allowHistoricalDownstreamRewrite: true)
         notifyBgPostProcessingDidUpdate()
     }
 
@@ -489,7 +513,7 @@ class BgPostProcessingManager {
             return configuredStartDate
         }
 
-        let boundedAutomaticStartDate = latestBgReading.timeStamp.addingTimeInterval(-automaticProcessingLookbackInterval)
+        let boundedAutomaticStartDate = latestBgReading.timeStamp.addingTimeInterval(-ConstantsBgSmoothing.automaticProcessingLookbackInterval)
 
         if let configuredStartDate = configuredStartDate {
             return max(configuredStartDate, boundedAutomaticStartDate)

@@ -1457,14 +1457,11 @@ final class RootViewController: UIViewController, ObservableObject {
                     updateDataSourceInfo()
                 }
                 
-                // Once live post processing started rewriting a wider recent BG
-                // window, Nightscout could end up with two competing BG writers
-                // in the same cycle, the historical replacement path and the old
-                // direct latest-reading uploader. Let automatic post processing
-                // own the BG upload whenever it has already prepared a rewrite.
-                if !didReplaceDownstreamBgReadings {
-                    nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
-                }
+                // Always run the normal latest-reading Nightscout upload path.
+                // If post processing is also rewriting a recent BG tail, the
+                // sync manager serializes the overlap and runs this direct
+                // upload immediately afterwards.
+                nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 nightscoutSyncManager?.syncAllWithNightscout()
                 
