@@ -91,7 +91,6 @@
 		4752B400263570DA0081D551 /* ConstantsStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B3FF263570DA0081D551 /* ConstantsStatistics.swift */; };
 		4752B4062635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */; };
 		475F2A872D0DA81400DE6019 /* ShowHideItemsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */; };
-		4AC0D0012F1D000100000001 /* SnoozeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AC0D0022F1D000100000001 /* SnoozeView.swift */; };
 		475FBA082D7312DE004D068E /* PickerViewControllerModal.swift in Sources */ = {isa = PBXBuildFile; fileRef = 475FBA072D7312D5004D068E /* PickerViewControllerModal.swift */; };
 		476404892EA29034006CBE03 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476404882EA29034006CBE03 /* SceneDelegate.swift */; };
 		476698662BE2572C008EB2A9 /* ConstantsSettingsIcons.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */; };
@@ -101,7 +100,6 @@
 		476CAF792B9F6A7200743168 /* ComplicationSharedUserDefaultsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 474606632B95E48D00AC9214 /* ComplicationSharedUserDefaultsModel.swift */; };
 		476FA90C2BDC1EBA0091866C /* WatchComplication.strings in Resources */ = {isa = PBXBuildFile; fileRef = 476FA90A2BDC1EBA0091866C /* WatchComplication.strings */; };
 		476FA90E2BDC1EF80091866C /* TextsWatchComplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476FA90D2BDC1EF80091866C /* TextsWatchComplication.swift */; };
-		4B0C00022F3B000100000001 /* SensorManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0C00012F3B000100000001 /* SensorManagementView.swift */; };
 		476FE8FF2B2F1D1700537E0A /* ConstantsFollower.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */; };
 		4779BCEE2974306300515714 /* ActionClosurable in Frameworks */ = {isa = PBXBuildFile; productRef = 4779BCED2974306300515714 /* ActionClosurable */; };
 		4779BCF12974307700515714 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4779BCF02974307700515714 /* CryptoSwift */; };
@@ -238,6 +236,8 @@
 		4A9B10052F0A000100000001 /* BgPostProcessingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10152F0A000100000001 /* BgPostProcessingManager.swift */; };
 		4A9B10062F0A000100000001 /* BgAdjustmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10162F0A000100000001 /* BgAdjustmentsView.swift */; };
 		4A9B10072F0A000100000001 /* ConstantsBgAdjustment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10172F0A000100000001 /* ConstantsBgAdjustment.swift */; };
+		4AC0D0012F1D000100000001 /* SnoozeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AC0D0022F1D000100000001 /* SnoozeView.swift */; };
+		4B0C00022F3B000100000001 /* SensorManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0C00012F3B000100000001 /* SensorManagementView.swift */; };
 		4C1000012F64000100000001 /* TreatmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1000022F64000100000001 /* TreatmentsView.swift */; };
 		4C1000032F64000100000001 /* TreatmentEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1000042F64000100000001 /* TreatmentEditorView.swift */; };
 		4C1000062F64000100000001 /* TreatmentsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1000072F64000100000001 /* TreatmentsViewModel.swift */; };
@@ -904,7 +904,6 @@
 		4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewStatisticsSettingsViewModel.swift; sourceTree = "<group>"; };
 		475DED96244AF92A00F78473 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Alerts.strings; sourceTree = "<group>"; };
 		475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowHideItemsView.swift; sourceTree = "<group>"; };
-		4AC0D0022F1D000100000001 /* SnoozeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeView.swift; sourceTree = "<group>"; };
 		475FBA072D7312D5004D068E /* PickerViewControllerModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PickerViewControllerModal.swift; sourceTree = "<group>"; };
 		476404882EA29034006CBE03 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = "xDrip/Supporting Files/SceneDelegate.swift"; sourceTree = SOURCE_ROOT; };
 		476698652BE2572C008EB2A9 /* ConstantsSettingsIcons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsSettingsIcons.swift; sourceTree = "<group>"; };
@@ -913,7 +912,6 @@
 		476A897D2CCA7E680073ED83 /* NightscoutFollowType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutFollowType.swift; sourceTree = "<group>"; };
 		476FA90B2BDC1EBA0091866C /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/WatchComplication.strings; sourceTree = "<group>"; };
 		476FA90D2BDC1EF80091866C /* TextsWatchComplication.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsWatchComplication.swift; sourceTree = "<group>"; };
-		4B0C00012F3B000100000001 /* SensorManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorManagementView.swift; sourceTree = "<group>"; };
 		476FA9102BDC1FFF0091866C /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/WatchComplication.strings; sourceTree = "<group>"; };
 		476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConstantsFollower.swift; sourceTree = "<group>"; };
 		477B2C7D2B432775002F64A4 /* LiveActivityType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityType.swift; sourceTree = "<group>"; };
@@ -965,8 +963,6 @@
 		47A8B8862E392BF700081CBD /* LiveActivityViewContentActivityFamilies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityViewContentActivityFamilies.swift; sourceTree = "<group>"; };
 		47AB72F227105EF4005E7CAB /* SettingsViewHelpSettingModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewHelpSettingModel.swift; sourceTree = "<group>"; };
 		47AC0EE42FCE1FAF0098B607 /* xdrip v17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v17.xcdatamodel"; sourceTree = "<group>"; };
-		47BFA1232FD6A00100B4712A /* xdrip v19.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v19.xcdatamodel"; sourceTree = "<group>"; };
-		47D0F0012FE21A4B00B4712A /* xdrip v20.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v20.xcdatamodel"; sourceTree = "<group>"; };
 		47ACB9282D835838001EC891 /* DatePickerViewControllerModal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerViewControllerModal.swift; sourceTree = "<group>"; };
 		47ADD2DE27FAF8630025E2F4 /* ChartPointsScatterDownTrianglesLayer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ChartPointsScatterDownTrianglesLayer.swift; sourceTree = "<group>"; };
 		47AECB9D2CD2B618005F1814 /* NightscoutDeviceStatusModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutDeviceStatusModels.swift; sourceTree = "<group>"; };
@@ -978,6 +974,7 @@
 		47B65D442E3A755900C3140B /* LiveActivityViewContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityViewContent.swift; sourceTree = "<group>"; };
 		47B7313F2B83DC0200B0A450 /* ConstantsLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsLiveActivity.swift; sourceTree = "<group>"; };
 		47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBackgroundKeepAliveType.swift; sourceTree = "<group>"; };
+		47BFA1232FD6A00100B4712A /* xdrip v19.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v19.xcdatamodel"; sourceTree = "<group>"; };
 		47C210ED2B5298EB00005711 /* GlucoseChartType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlucoseChartType.swift; sourceTree = "<group>"; };
 		47C210EF2B52A05B00005711 /* GlucoseChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseChartView.swift; sourceTree = "<group>"; };
 		47CA61E32B965E7100C2A597 /* AccessoryCircularView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessoryCircularView.swift; sourceTree = "<group>"; };
@@ -991,6 +988,7 @@
 		47CD64242BEA9E5A002BDA68 /* xDrip Notification Context Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "xDrip Notification Context Extension.entitlements"; sourceTree = "<group>"; };
 		47CD642B2BEBEB0E002BDA68 /* AlertUrgencyType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertUrgencyType.swift; sourceTree = "<group>"; };
 		47CF18B12B37689A00FA6160 /* TimeInRangeType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeInRangeType.swift; sourceTree = "<group>"; };
+		47D0F0012FE21A4B00B4712A /* xdrip v20.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v20.xcdatamodel"; sourceTree = "<group>"; };
 		47D2DB3A2B14F6D000C8EE6B /* ScreenLockDimmingType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenLockDimmingType.swift; sourceTree = "<group>"; };
 		47D9BC942A78498500AB85B2 /* BgReadingsDetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BgReadingsDetailView.swift; sourceTree = "<group>"; };
 		47DB06C02A6FB3CC00267BE3 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/BgReadings.strings; sourceTree = "<group>"; };
@@ -1031,6 +1029,17 @@
 		4A9B10152F0A000100000001 /* BgPostProcessingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgPostProcessingManager.swift; sourceTree = "<group>"; };
 		4A9B10162F0A000100000001 /* BgAdjustmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgAdjustmentsView.swift; sourceTree = "<group>"; };
 		4A9B10172F0A000100000001 /* ConstantsBgAdjustment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBgAdjustment.swift; sourceTree = "<group>"; };
+		4AC0D0022F1D000100000001 /* SnoozeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeView.swift; sourceTree = "<group>"; };
+		4B0C00012F3B000100000001 /* SensorManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorManagementView.swift; sourceTree = "<group>"; };
+		4C1000022F64000100000001 /* TreatmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsView.swift; sourceTree = "<group>"; };
+		4C1000042F64000100000001 /* TreatmentEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentEditorView.swift; sourceTree = "<group>"; };
+		4C1000072F64000100000001 /* TreatmentsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsViewModel.swift; sourceTree = "<group>"; };
+		4C1000092F64000100000001 /* TreatmentEditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentEditorViewModel.swift; sourceTree = "<group>"; };
+		4C2000022F65000100000001 /* BluetoothPeripheralsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralsViewModel.swift; sourceTree = "<group>"; };
+		4C2000042F65000100000001 /* BluetoothPeripheralsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralsView.swift; sourceTree = "<group>"; };
+		4C2000062F65000100000001 /* BluetoothPeripheralDetailState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralDetailState.swift; sourceTree = "<group>"; };
+		4C2000082F65000100000001 /* BluetoothPeripheralDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralDetailView.swift; sourceTree = "<group>"; };
+		4C20000A2F65000100000001 /* BluetoothPeripheralSettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralSettingsRow.swift; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xDrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xDrip/Version.xcconfig; sourceTree = "<group>"; };
 		CE1B2FC825D0261500F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Alerts.strings; sourceTree = "<group>"; };
@@ -1050,15 +1059,6 @@
 		CE1B2FDD25D0264B00F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/M5StackView.strings; sourceTree = "<group>"; };
 		CE1B2FDE25D0264B00F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Snooze.strings; sourceTree = "<group>"; };
 		CE1B2FDF25D0264B00F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/BluetoothPeripheralView.strings; sourceTree = "<group>"; };
-		4C1000022F64000100000001 /* TreatmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsView.swift; sourceTree = "<group>"; };
-		4C1000042F64000100000001 /* TreatmentEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentEditorView.swift; sourceTree = "<group>"; };
-		4C1000072F64000100000001 /* TreatmentsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsViewModel.swift; sourceTree = "<group>"; };
-		4C1000092F64000100000001 /* TreatmentEditorViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentEditorViewModel.swift; sourceTree = "<group>"; };
-		4C2000022F65000100000001 /* BluetoothPeripheralsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralsViewModel.swift; sourceTree = "<group>"; };
-		4C2000042F65000100000001 /* BluetoothPeripheralsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralsView.swift; sourceTree = "<group>"; };
-		4C2000062F65000100000001 /* BluetoothPeripheralDetailState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralDetailState.swift; sourceTree = "<group>"; };
-		4C2000082F65000100000001 /* BluetoothPeripheralDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralDetailView.swift; sourceTree = "<group>"; };
-		4C20000A2F65000100000001 /* BluetoothPeripheralSettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralSettingsRow.swift; sourceTree = "<group>"; };
 		D400F8022778BD8000B57648 /* TextsTreatmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsTreatmentsView.swift; sourceTree = "<group>"; };
 		D4028CBF2774A50600341476 /* TreatmentsHostingController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsHostingController.swift; sourceTree = "<group>"; };
 		D40C3DA3277542C400111B73 /* TreatmentEntry+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "TreatmentEntry+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -2155,11 +2155,34 @@
 			path = PostProcessing;
 			sourceTree = "<group>";
 		};
+		4C1000052F64000100000001 /* Treatments */ = {
+			isa = PBXGroup;
+			children = (
+				4C1000042F64000100000001 /* TreatmentEditorView.swift */,
+				4C1000092F64000100000001 /* TreatmentEditorViewModel.swift */,
+				4C1000022F64000100000001 /* TreatmentsView.swift */,
+				4C1000072F64000100000001 /* TreatmentsViewModel.swift */,
+			);
+			path = Treatments;
+			sourceTree = "<group>";
+		};
+		4C20000B2F65000100000001 /* BluetoothPeripherals */ = {
+			isa = PBXGroup;
+			children = (
+				4C2000062F65000100000001 /* BluetoothPeripheralDetailState.swift */,
+				4C2000082F65000100000001 /* BluetoothPeripheralDetailView.swift */,
+				4C20000A2F65000100000001 /* BluetoothPeripheralSettingsRow.swift */,
+				4C2000042F65000100000001 /* BluetoothPeripheralsView.swift */,
+				4C2000022F65000100000001 /* BluetoothPeripheralsViewModel.swift */,
+			);
+			path = BluetoothPeripherals;
+			sourceTree = "<group>";
+		};
 		D4028CBE2774A4B900341476 /* Treatments */ = {
 			isa = PBXGroup;
 			children = (
-				D482BD932776153F003C4FB2 /* TreatmentsNavigationController.swift */,
 				D4028CBF2774A50600341476 /* TreatmentsHostingController.swift */,
+				D482BD932776153F003C4FB2 /* TreatmentsNavigationController.swift */,
 			);
 			path = Treatments;
 			sourceTree = "<group>";
@@ -2273,23 +2296,6 @@
 			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		F808D2C3240323750084B5DB /* Libre */ = {
-			isa = PBXGroup;
-			children = (
-				F808D2C6240323AE0084B5DB /* Bubble */,
-				F80D916624F70840006840B5 /* Libre2 */,
-				F8C9784E242A9FD500A09483 /* MiaoMiao */,
-			);
-			path = Libre;
-			sourceTree = "<group>";
-		};
-		F808D2C6240323AE0084B5DB /* Bubble */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Bubble;
-			sourceTree = "<group>";
-		};
 		F808D2CF240329D40084B5DB /* Libre */ = {
 			isa = PBXGroup;
 			children = (
@@ -2306,13 +2312,6 @@
 				F808D2D1240329E70084B5DB /* Bubble+BluetoothPeripheral.swift */,
 			);
 			path = Bubble;
-			sourceTree = "<group>";
-		};
-		F80D916624F70840006840B5 /* Libre2 */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Libre2;
 			sourceTree = "<group>";
 		};
 		F80D916924F828D5006840B5 /* Libre2 */ = {
@@ -2499,6 +2498,7 @@
 		F85DC2F921D2CCC000B9F74A /* Storyboards */ = {
 			isa = PBXGroup;
 			children = (
+				F64039B1281E90CF0051EFFE /* QuickActions.strings */,
 				F8B3A7B3226A0A71004BA588 /* Alerts.strings */,
 				F8B3A80B227A3E97004BA588 /* AlertTypesSettingsView.strings */,
 				47046EA92A6E8F7B00A6F736 /* BgReadings.strings */,
@@ -2519,7 +2519,6 @@
 				F8AC426321ADEBD60078C348 /* Main.storyboard */,
 				CE1B2FD425D0264900F642F5 /* Main.strings */,
 				F8B3A788225D4473004BA588 /* NightscoutTestResult.strings */,
-				F64039B1281E90CF0051EFFE /* QuickActions.strings */,
 				F8BDD457221DEF22006EAB84 /* SettingsViews.strings */,
 				F8E6C79324CEC2E3007C1199 /* Snooze.strings */,
 				F8B48A9A22B2FA66009BCC01 /* SpeakReading.strings */,
@@ -2569,34 +2568,11 @@
 				4B0C00012F3B000100000001 /* SensorManagementView.swift */,
 				475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */,
 				4AC0D0022F1D000100000001 /* SnoozeView.swift */,
-				F866974E2867A97000025441 /* Settings */,
 				4C20000B2F65000100000001 /* BluetoothPeripherals */,
+				F866974E2867A97000025441 /* Settings */,
 				4C1000052F64000100000001 /* Treatments */,
 			);
 			path = SwiftUIViews;
-			sourceTree = "<group>";
-		};
-		4C20000B2F65000100000001 /* BluetoothPeripherals */ = {
-			isa = PBXGroup;
-			children = (
-				4C2000062F65000100000001 /* BluetoothPeripheralDetailState.swift */,
-				4C2000082F65000100000001 /* BluetoothPeripheralDetailView.swift */,
-				4C20000A2F65000100000001 /* BluetoothPeripheralSettingsRow.swift */,
-				4C2000022F65000100000001 /* BluetoothPeripheralsViewModel.swift */,
-				4C2000042F65000100000001 /* BluetoothPeripheralsView.swift */,
-			);
-			path = BluetoothPeripherals;
-			sourceTree = "<group>";
-		};
-		4C1000052F64000100000001 /* Treatments */ = {
-			isa = PBXGroup;
-			children = (
-				4C1000092F64000100000001 /* TreatmentEditorViewModel.swift */,
-				4C1000042F64000100000001 /* TreatmentEditorView.swift */,
-				4C1000072F64000100000001 /* TreatmentsViewModel.swift */,
-				4C1000022F64000100000001 /* TreatmentsView.swift */,
-			);
-			path = Treatments;
 			sourceTree = "<group>";
 		};
 		F866974E2867A97000025441 /* Settings */ = {
@@ -3029,13 +3005,6 @@
 			path = Charts;
 			sourceTree = "<group>";
 		};
-		F8C9784E242A9FD500A09483 /* MiaoMiao */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = MiaoMiao;
-			sourceTree = "<group>";
-		};
 		F8C97857242AAE7A00A09483 /* MiaoMiao */ = {
 			isa = PBXGroup;
 			children = (
@@ -3061,31 +3030,6 @@
 			path = G5;
 			sourceTree = "<group>";
 		};
-		F8DF766923ED9AF100063910 /* CGM */ = {
-			isa = PBXGroup;
-			children = (
-				F8DF766A23ED9AF100063910 /* Dexcom */,
-				F808D2C3240323750084B5DB /* Libre */,
-			);
-			path = CGM;
-			sourceTree = "<group>";
-		};
-		F8DF766A23ED9AF100063910 /* Dexcom */ = {
-			isa = PBXGroup;
-			children = (
-				F8DF766B23ED9AF100063910 /* DexcomG5 */,
-				F8F71D7B2B7EA5EF005076E8 /* DexcomG7 */,
-			);
-			path = Dexcom;
-			sourceTree = "<group>";
-		};
-		F8DF766B23ED9AF100063910 /* DexcomG5 */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = DexcomG5;
-			sourceTree = "<group>";
-		};
 		F8E3A2A723D906B600E5E98A /* Calendar */ = {
 			isa = PBXGroup;
 			children = (
@@ -3108,9 +3052,10 @@
 		F8EA6C7D21B70DEA0082976B /* Constants */ = {
 			isa = PBXGroup;
 			children = (
-				47A05CCB2EF16110004DABE7 /* ConstantsMedtrumEasyView.swift */,
 				F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */,
+				4A9B10172F0A000100000001 /* ConstantsBgAdjustment.swift */,
 				F8A1585022EDB597007F5B5D /* ConstantsBGGraphBuilder.swift */,
+				4A9B10142F0A000100000001 /* ConstantsBgSmoothing.swift */,
 				F8A1585222EDB602007F5B5D /* ConstantsBloodGlucose.swift */,
 				F856CE5A22EDC8E50083E436 /* ConstantsBluetoothPairing.swift */,
 				F8E3A2AA23DA520B00E5E98A /* ConstantsCalendar.swift */,
@@ -3131,12 +3076,11 @@
 				F8E5404B2522624800052CE5 /* ConstantsHousekeeping.swift */,
 				F8252866243E50FE0067AF77 /* ConstantsLibre.swift */,
 				47DB06E62A715EC500267BE3 /* ConstantsLibreLinkUp.swift */,
-				4A9B10172F0A000100000001 /* ConstantsBgAdjustment.swift */,
-				4A9B10142F0A000100000001 /* ConstantsBgSmoothing.swift */,
 				47B7313F2B83DC0200B0A450 /* ConstantsLiveActivity.swift */,
 				F8A1585E22EDB81E007F5B5D /* ConstantsLog.swift */,
 				F8A389C723203E3E0010F405 /* ConstantsM5Stack.swift */,
 				F8A1586A22EDB967007F5B5D /* ConstantsMaster.swift */,
+				47A05CCB2EF16110004DABE7 /* ConstantsMedtrumEasyView.swift */,
 				F8A389EC23342EB10010F405 /* ConstantsNightscout.swift */,
 				F8A1586022EDB844007F5B5D /* ConstantsNotifications.swift */,
 				47F2E5C22D7CD45500EDA930 /* ConstantsPickerView.swift */,
@@ -3249,13 +3193,6 @@
 			path = HeartBeat;
 			sourceTree = "<group>";
 		};
-		F8EE3EA32B6833B400B27B96 /* HeartBeat */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = HeartBeat;
-			sourceTree = "<group>";
-		};
 		F8F1670F27274067001AA3D8 /* Generic */ = {
 			isa = PBXGroup;
 			children = (
@@ -3311,13 +3248,6 @@
 				F8F71D772B7D2754005076E8 /* CGMG7TransmitterDelegate.swift */,
 			);
 			path = G7;
-			sourceTree = "<group>";
-		};
-		F8F71D7B2B7EA5EF005076E8 /* DexcomG7 */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = DexcomG7;
 			sourceTree = "<group>";
 		};
 		F8F71D842B7EC19A005076E8 /* G7 */ = {
@@ -3534,31 +3464,6 @@
 				F8F9720023A5915900C3F17D /* BluetoothTransmitterDelegate.swift */,
 			);
 			path = Generic;
-			sourceTree = "<group>";
-		};
-		F8F9723623A5928D00C3F17D /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				F8DF766923ED9AF100063910 /* CGM */,
-				F8EE3EA32B6833B400B27B96 /* HeartBeat */,
-				F8F9723723A5928D00C3F17D /* M5Stack */,
-				F8F9723A23A5934300C3F17D /* M5StickC */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		F8F9723723A5928D00C3F17D /* M5Stack */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = M5Stack;
-			sourceTree = "<group>";
-		};
-		F8F9723A23A5934300C3F17D /* M5StickC */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = M5StickC;
 			sourceTree = "<group>";
 		};
 		F8FDFEA6260DE1A70047597D /* CustomColoredDisclosureIndicator */ = {
