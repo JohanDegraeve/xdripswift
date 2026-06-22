@@ -187,6 +187,12 @@ enum ConstantsGlucoseChart {
     
     /// bg check inner circle scale factor compared to the chart glucose circle size
     static let bgCheckTreatmentScaleInner: CGFloat = 1.4
+
+    /// note treatment color
+    static let noteTreatmentColor = UIColor(white: 0.9, alpha: 1.0)
+
+    /// note treatment scale factor compared to the chart glucose circle size
+    static let noteTreatmentScale: CGFloat = calibrationCircleScaleOuter
     
     // basal rate treatment color
     

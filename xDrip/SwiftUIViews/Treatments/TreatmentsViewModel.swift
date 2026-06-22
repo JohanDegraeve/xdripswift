@@ -25,6 +25,7 @@ import OSLog
     @Published private(set) var showCarbsTreatments = UserDefaults.standard.showCarbsTreatmentsInList
     @Published private(set) var showBasalTreatments = UserDefaults.standard.showBasalTreatmentsInList
     @Published private(set) var showBgCheckTreatments = UserDefaults.standard.showBgCheckTreatmentsInList
+    @Published private(set) var showNoteTreatments = UserDefaults.standard.showNoteTreatmentsInList
     @Published private(set) var selectedDate = Date().toMidnight()
 
     // MARK: - private properties
@@ -115,6 +116,12 @@ import OSLog
         applyFilters()
     }
 
+    func toggleNoteFilter() {
+        UserDefaults.standard.showNoteTreatmentsInList.toggle()
+        showNoteTreatments = UserDefaults.standard.showNoteTreatmentsInList
+        applyFilters()
+    }
+
     func deleteTreatment(_ treatment: TreatmentSnapshot) {
         guard let treatmentEntry = treatmentEntryAccessor.getTreatment(objectID: treatment.objectID) else {
             return
@@ -161,6 +168,7 @@ import OSLog
         showCarbsTreatments = UserDefaults.standard.showCarbsTreatmentsInList
         showBasalTreatments = UserDefaults.standard.showBasalTreatmentsInList
         showBgCheckTreatments = UserDefaults.standard.showBgCheckTreatmentsInList
+        showNoteTreatments = UserDefaults.standard.showNoteTreatmentsInList
         showBasalFilter = UserDefaults.standard.nightscoutFollowType != .none
     }
 
@@ -189,6 +197,10 @@ import OSLog
 
         if !showBgCheckTreatments {
             filteredTreatments.removeAll(where: { $0.treatmentType == .BgCheck })
+        }
+
+        if !showNoteTreatments {
+            filteredTreatments.removeAll(where: { $0.treatmentType == .Note })
         }
     }
 
@@ -232,6 +244,7 @@ struct TreatmentSnapshot: Hashable {
     let rawValue: Double
     let valueSecondary: Double
     let enteredBy: String?
+    let notes: String?
 
     init(treatmentEntry: TreatmentEntry) {
         objectID = treatmentEntry.objectID
@@ -240,11 +253,12 @@ struct TreatmentSnapshot: Hashable {
         rawValue = treatmentEntry.value
         valueSecondary = treatmentEntry.valueSecondary
         enteredBy = treatmentEntry.enteredBy
+        notes = treatmentEntry.notes
     }
 
     var isEditable: Bool {
         switch treatmentType {
-        case .Insulin, .Carbs, .Exercise, .BgCheck:
+        case .Insulin, .Carbs, .Exercise, .BgCheck, .Note:
             return true
         default:
             return false
@@ -269,6 +283,8 @@ struct TreatmentSnapshot: Hashable {
             return "sensor.tag.radiowaves.forward.fill"
         case .PumpBatteryChange:
             return "battery.100percent"
+        case .Note:
+            return "note.text"
         }
     }
 
@@ -288,6 +304,8 @@ struct TreatmentSnapshot: Hashable {
             baseColor = ConstantsGlucoseChart.basalTreatmentColor
         case .SiteChange, .SensorStart, .PumpBatteryChange:
             baseColor = .systemYellow
+        case .Note:
+            baseColor = ConstantsGlucoseChart.noteTreatmentColor
         }
 
         return Color(uiColor: date > Date() ? baseColor.withAlphaComponent(0.5) : baseColor)
@@ -300,6 +318,10 @@ struct TreatmentSnapshot: Hashable {
 
         if treatmentType == .BgCheck {
             return 15
+        }
+
+        if treatmentType == .Note {
+            return 14
         }
 
         return 13
@@ -319,7 +341,7 @@ struct TreatmentSnapshot: Hashable {
             return rawValue.mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
                 .bgValueRounded(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
                 .stringWithoutTrailingZeroes
-        case .SiteChange, .SensorStart, .PumpBatteryChange:
+        case .SiteChange, .SensorStart, .PumpBatteryChange, .Note:
             return nil
         default:
             return (round(rawValue * 100) / 100).stringWithoutTrailingZeroes
@@ -328,7 +350,7 @@ struct TreatmentSnapshot: Hashable {
 
     var unitText: String? {
         switch treatmentType {
-        case .SiteChange, .SensorStart, .PumpBatteryChange:
+        case .SiteChange, .SensorStart, .PumpBatteryChange, .Note:
             return nil
         default:
             return treatmentType.unit()
@@ -338,6 +360,10 @@ struct TreatmentSnapshot: Hashable {
     var secondaryText: String? {
         if treatmentType == .Basal {
             return "\(Int(valueSecondary))\(Texts_Common.minuteshort)"
+        }
+
+        if treatmentType == .Note {
+            return notePreviewText
         }
 
         return nil
@@ -357,5 +383,19 @@ struct TreatmentSnapshot: Hashable {
 
     private var isSmallBolus: Bool {
         treatmentType == .Insulin && rawValue < UserDefaults.standard.smallBolusTreatmentThreshold
+    }
+
+    private var notePreviewText: String? {
+        guard let notes else {
+            return nil
+        }
+
+        guard notes.hasPrefix(ConstantsNightscout.postProcessingNotePrefix) else {
+            return notes
+        }
+
+        return String(notes.dropFirst(ConstantsNightscout.postProcessingNotePrefix.count))
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .toNilIfLength0()
     }
 }

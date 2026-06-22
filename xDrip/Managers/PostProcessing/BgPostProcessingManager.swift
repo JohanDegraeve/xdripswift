@@ -44,6 +44,7 @@ class BgPostProcessingManager {
     private let coreDataManager: CoreDataManager
     private let bgReadingsAccessor: BgReadingsAccessor
     private let bgAdjustmentsAccessor: BgAdjustmentsAccessor
+    private let treatmentEntryAccessor: TreatmentEntryAccessor
     private let bLEPeripheralAccessor: BLEPeripheralAccessor
     private let sensorsAccessor: SensorsAccessor
 
@@ -65,6 +66,7 @@ class BgPostProcessingManager {
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.bgAdjustmentsAccessor = BgAdjustmentsAccessor(coreDataManager: coreDataManager)
+        self.treatmentEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
         self.bLEPeripheralAccessor = BLEPeripheralAccessor(coreDataManager: coreDataManager)
         self.sensorsAccessor = SensorsAccessor(coreDataManager: coreDataManager)
         self.nightscoutSyncManager = nightscoutSyncManager
@@ -314,6 +316,8 @@ class BgPostProcessingManager {
 
         let rewriteStartDate = processingStartDateOverride ?? applyFromTimeStamp
         _ = processBgReadings(processingStartDateOverride: rewriteStartDate, fiveMinuteReadingsStartTimeStampOverride: rewriteStartDate, allowHistoricalDownstreamRewrite: true)
+        replacePostProcessingNote(enableAdjustment: enableAdjustment, slope: slope, intercept: intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: applyFromTimeStamp, enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingStrength: smoothingStrength, noteWindowStartDate: rewriteStartDate)
+
         notifyBgPostProcessingDidUpdate()
     }
 
@@ -346,6 +350,66 @@ class BgPostProcessingManager {
 
     func shouldAllowNightscoutBgPostProcessingWrites() -> Bool {
         return nightscoutSyncManager?.shouldAllowNightscoutBgPostProcessingWrites() ?? false
+    }
+
+    private func replacePostProcessingNote(enableAdjustment: Bool, slope: Double?, intercept: Double?, adjustmentShapeType: BgAdjustmentShapeType, applyFromTimeStamp: Date, enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingStrength: Int, noteWindowStartDate: Date) {
+        let appliedAtTimeStamp = Date()
+        let noteWindowEndDate = appliedAtTimeStamp
+        let appName = ConstantsHomeView.applicationName
+        var notesToDelete = [TreatmentEntry]()
+        var noteToUpload: TreatmentEntry?
+
+        coreDataManager.mainManagedObjectContext.performAndWait {
+            let existingNotes = treatmentEntryAccessor.getTreatments(fromDate: noteWindowStartDate, toDate: noteWindowEndDate, on: coreDataManager.mainManagedObjectContext).filter { treatmentEntry in
+                !treatmentEntry.treatmentdeleted
+                    && treatmentEntry.treatmentType == .Note
+                    && treatmentEntry.enteredBy == appName
+                    && (treatmentEntry.notes?.hasPrefix(ConstantsNightscout.postProcessingNotePrefix) ?? false)
+            }
+
+            for existingNote in existingNotes {
+                existingNote.treatmentdeleted = true
+                existingNote.uploaded = false
+            }
+
+            let noteBody = postProcessingNoteText(enableAdjustment: enableAdjustment, slope: slope, intercept: intercept, adjustmentShapeType: adjustmentShapeType, appliedAtTimeStamp: appliedAtTimeStamp, enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingStrength: smoothingStrength)
+            let newNote = TreatmentEntry(date: applyFromTimeStamp, value: 0, treatmentType: .Note, nightscoutEventType: ConstantsNightscout.noteEventType, enteredBy: appName, notes: noteBody, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+
+            notesToDelete = existingNotes
+            noteToUpload = newNote
+
+            coreDataManager.saveChanges()
+        }
+
+        if let noteToUpload = noteToUpload {
+            nightscoutSyncManager?.replacePostProcessingNotesInNightscout(notesToDelete: notesToDelete, noteToUpload: noteToUpload)
+        }
+    }
+
+    private func postProcessingNoteText(enableAdjustment: Bool, slope: Double?, intercept: Double?, adjustmentShapeType: BgAdjustmentShapeType, appliedAtTimeStamp: Date, enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingStrength: Int) -> String {
+        var noteComponents = [String]()
+
+        noteComponents.append(ConstantsNightscout.postProcessingNotePrefix)
+
+        if enableAdjustment, let slope = slope, let intercept = intercept {
+            noteComponents.append("Adjustment: offset \(intercept.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes), scale \(slope.round(toDecimalPlaces: 2).stringWithoutTrailingZeroes), emphasis \(adjustmentShapeType.description). " + smoothingNoteText(enableSmoothing: enableSmoothing, smoothingStrength: smoothingStrength, useFiveMinuteReadings: useFiveMinuteReadings))
+        } else {
+            noteComponents.append("Adjustment: disabled. " + smoothingNoteText(enableSmoothing: enableSmoothing, smoothingStrength: smoothingStrength, useFiveMinuteReadings: useFiveMinuteReadings))
+        }
+
+        noteComponents.append("Applied at \(appliedAtTimeStamp.toStringInUserLocale(timeStyle: .short, dateStyle: .short)).")
+
+        return noteComponents.joined(separator: "\n")
+    }
+
+    private func smoothingNoteText(enableSmoothing: Bool, smoothingStrength: Int, useFiveMinuteReadings: Bool) -> String {
+        var noteText = enableSmoothing ? "Smoothing: \(smoothingStrengthDescription(smoothingStrength))." : "Smoothing: disabled."
+
+        if useFiveMinuteReadings {
+            noteText += " 5-minute readings: enabled."
+        }
+
+        return noteText
     }
 
     /// direct live uploads should only be bypassed when the current source

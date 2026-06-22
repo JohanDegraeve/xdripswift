@@ -161,6 +161,8 @@ extension UserDefaults {
         case showBasalTreatmentsInList = "showBasalTreatmentsInList"
         /// should the BG Checks be listed in the treatment list/table?
         case showBgCheckTreatmentsInList = "showBgCheckTreatmentsInList"
+        /// should the notes be listed in the treatment list/table?
+        case showNoteTreatmentsInList = "showNoteTreatmentsInList"
         /// override the default canula age value (CAGE = time since site change)?
         case CAGEMaxHours = "CAGEMaxHours"
 
@@ -1393,6 +1395,17 @@ extension UserDefaults {
         }
         set {
             set(!newValue, forKey: Key.showBgCheckTreatmentsInList.rawValue)
+        }
+    }
+
+    /// should the app show the Note treatments in the treatments list/table?
+    @objc dynamic var showNoteTreatmentsInList: Bool {
+        // default value for bool in userdefaults is false, by default we want the app to *show* the Note treatments in the treatments table
+        get {
+            return !bool(forKey: Key.showNoteTreatmentsInList.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showNoteTreatmentsInList.rawValue)
         }
     }
 

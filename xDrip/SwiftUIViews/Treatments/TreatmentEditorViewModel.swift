@@ -12,7 +12,7 @@ import CoreData
 @MainActor final class TreatmentEditorViewModel: ObservableObject {
     // MARK: - public static properties
 
-    static let supportedTreatmentTypes: [TreatmentType] = [.Insulin, .Carbs, .Exercise, .BgCheck]
+    static let supportedTreatmentTypes: [TreatmentType] = [.Insulin, .Carbs, .Exercise, .BgCheck, .Note]
 
     // MARK: - @Published properties
 
@@ -20,6 +20,7 @@ import CoreData
     @Published var selectedDate: Date
     @Published var enteredValue: String
     @Published var enteredByValue: String
+    @Published var enteredNotesValue: String
     @Published var alertMessage: TreatmentEditorAlertMessage?
 
     // MARK: - private properties
@@ -35,9 +36,12 @@ import CoreData
         self.selectedType = treatmentToEdit?.treatmentType ?? .Carbs
         self.selectedDate = treatmentToEdit?.date ?? Date()
         self.enteredByValue = treatmentToEdit?.enteredBy ?? ConstantsHomeView.applicationName
+        self.enteredNotesValue = treatmentToEdit?.notes ?? ""
 
         if let treatmentToEdit = treatmentToEdit {
-            if treatmentToEdit.treatmentType == .BgCheck {
+            if treatmentToEdit.treatmentType == .Note {
+                self.enteredValue = ""
+            } else if treatmentToEdit.treatmentType == .BgCheck {
                 self.enteredValue = treatmentToEdit.value
                     .mgDlToMmol(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
                     .bgValueRounded(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
@@ -64,6 +68,14 @@ import CoreData
         selectedType.unit()
     }
 
+    var showsNumericValueEditor: Bool {
+        selectedType != .Note
+    }
+
+    var showsNotesEditor: Bool {
+        selectedType == .Note
+    }
+
     var valuePlaceholder: String {
         if selectedType == .BgCheck {
             return Double(0).mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
@@ -73,6 +85,10 @@ import CoreData
     }
 
     var helperText: String? {
+        if selectedType == .Note {
+            return normalizedNotesValue() == nil && !enteredNotesValue.isEmpty ? Texts_TreatmentsView.invalidNoteMessage : nil
+        }
+
         if let value = normalizedValue(), value > 0 {
             return nil
         }
@@ -103,15 +119,36 @@ import CoreData
     func saveTreatment() -> Bool {
         validateSelectedDateIfNeeded()
 
-        guard let coreDataManager = coreDataManager, let value = normalizedValue(), value > 0 else {
-            alertMessage = TreatmentEditorAlertMessage(
-                title: Texts_Common.warning,
-                message: Texts_TreatmentsView.invalidValueMessage
-            )
+        guard let coreDataManager = coreDataManager else {
             return false
         }
 
-        let storedValue = storedValueForCurrentType(value)
+        let normalizedNotesValue = normalizedNotesValue()
+        let storedNotesValue = selectedType == .Note ? normalizedNotesValue : nil
+        let storedNightscoutEventType = selectedType == .Note ? ConstantsNightscout.noteEventType : nil
+        let storedValue: Double
+
+        if selectedType == .Note {
+            guard normalizedNotesValue != nil else {
+                alertMessage = TreatmentEditorAlertMessage(
+                    title: Texts_Common.warning,
+                    message: Texts_TreatmentsView.invalidNoteMessage
+                )
+                return false
+            }
+
+            storedValue = 0
+        } else {
+            guard let value = normalizedValue(), value > 0 else {
+                alertMessage = TreatmentEditorAlertMessage(
+                    title: Texts_Common.warning,
+                    message: Texts_TreatmentsView.invalidValueMessage
+                )
+                return false
+            }
+
+            storedValue = storedValueForCurrentType(value)
+        }
 
         if let treatmentToEdit = treatmentToEdit(in: coreDataManager) {
             var treatmentChanged = false
@@ -126,9 +163,24 @@ import CoreData
                 treatmentChanged = true
             }
 
+            if treatmentToEdit.treatmentType != selectedType {
+                treatmentToEdit.treatmentType = selectedType
+                treatmentChanged = true
+            }
+
+            if treatmentToEdit.nightscoutEventType != storedNightscoutEventType {
+                treatmentToEdit.nightscoutEventType = storedNightscoutEventType
+                treatmentChanged = true
+            }
+
             let normalizedEnteredByValue = normalizedEnteredByValue()
             if treatmentToEdit.enteredBy != normalizedEnteredByValue {
                 treatmentToEdit.enteredBy = normalizedEnteredByValue
+                treatmentChanged = true
+            }
+
+            if treatmentToEdit.notes != storedNotesValue {
+                treatmentToEdit.notes = storedNotesValue
                 treatmentChanged = true
             }
 
@@ -142,8 +194,9 @@ import CoreData
                 date: selectedDate,
                 value: storedValue,
                 treatmentType: selectedType,
-                nightscoutEventType: nil,
+                nightscoutEventType: storedNightscoutEventType,
                 enteredBy: normalizedEnteredByValue(),
+                notes: storedNotesValue,
                 nsManagedObjectContext: coreDataManager.mainManagedObjectContext
             )
 
@@ -176,6 +229,11 @@ import CoreData
 
     private func normalizedEnteredByValue() -> String? {
         enteredByValue.toNilIfLength0()
+    }
+
+    private func normalizedNotesValue() -> String? {
+        let trimmedNotes = enteredNotesValue.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmedNotes.isEmpty ? nil : trimmedNotes
     }
 
     private func storedValueForCurrentType(_ value: Double) -> Double {

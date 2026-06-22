@@ -117,6 +117,14 @@ struct TreatmentsListView: View {
                             viewModel.toggleBgCheckFilter()
                         }
 
+                        TreatmentFilterChip(
+                            systemImage: "note.text",
+                            tintColor: ConstantsGlucoseChart.noteTreatmentColor,
+                            isSelected: viewModel.showNoteTreatments
+                        ) {
+                            viewModel.toggleNoteFilter()
+                        }
+
                         if viewModel.showBasalFilter {
                             TreatmentFilterChip(
                                 systemImage: "chart.bar.fill",
@@ -189,18 +197,20 @@ private struct TreatmentRowView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Text(treatment.timeString)
-                .font(.body)
-                .foregroundStyle(treatment.primaryTextColor)
-                .frame(minWidth: 58, alignment: .leading)
+            HStack(spacing: 6) {
+                Text(treatment.timeString)
+                    .font(.body)
+                    .foregroundStyle(treatment.primaryTextColor)
+                    .frame(minWidth: 58, alignment: .leading)
 
-            Image(systemName: treatment.iconSystemName)
-                .font(.system(size: treatment.iconSize, weight: .regular))
-                .foregroundStyle(treatment.iconColor)
-                .frame(width: 16)
+                Image(systemName: treatment.iconSystemName)
+                    .font(.system(size: treatment.iconSize, weight: .regular))
+                    .foregroundStyle(treatment.iconColor)
+                    .frame(width: 16)
+            }
 
             treatmentTitleView
-                .lineLimit(1)
+                .lineLimit(treatment.treatmentType == .Note ? 2 : 1)
                 .truncationMode(.tail)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .layoutPriority(1)
@@ -229,7 +239,8 @@ private struct TreatmentRowView: View {
             .foregroundColor(Color(.colorPrimary))
 
         if let secondaryText = treatment.secondaryText {
-            title = title + Text(" " + secondaryText) // swiftlint:disable:this shorthand_operator
+            let separator = treatment.treatmentType == .Note ? ": " : " "
+            title = title + Text(separator + secondaryText) // swiftlint:disable:this shorthand_operator
                 .font(.subheadline)
                 .foregroundColor(Color(.colorTertiary))
         }
@@ -294,7 +305,7 @@ private struct TreatmentFilterChip: View {
             return Color(uiColor: tintColor).opacity(0.22)
         }
 
-        return Color(uiColor: UIColor(white: 0.18, alpha: 1.0))
+        return Color(uiColor: UIColor(white: 0.14, alpha: 1.0))
     }
 
     private var chipForegroundColor: Color {

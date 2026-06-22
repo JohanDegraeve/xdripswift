@@ -217,6 +217,60 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     public func shouldAllowNightscoutBgPostProcessingWrites() -> Bool {
         return UserDefaults.standard.isMaster || UserDefaults.standard.followerDataSourceType != .nightscout
     }
+
+    public func replacePostProcessingNotesInNightscout(notesToDelete: [TreatmentEntry], noteToUpload: TreatmentEntry) {
+        if !Thread.isMainThread {
+            DispatchQueue.main.async { [weak self] in
+                self?.replacePostProcessingNotesInNightscout(notesToDelete: notesToDelete, noteToUpload: noteToUpload)
+            }
+            return
+        }
+
+        guard UserDefaults.standard.nightscoutEnabled,
+              UserDefaults.standard.nightscoutUrl != nil,
+              UserDefaults.standard.nightscoutAPIKey != nil || UserDefaults.standard.nightscoutToken != nil,
+              shouldAllowNightscoutBgWrites(),
+              shouldAllowNightscoutBgPostProcessingWrites()
+        else { return }
+
+        var remainingNotesToDelete = notesToDelete
+
+        func uploadNewNote() {
+            uploadTreatmentsToNightscout(treatmentsToUpload: [noteToUpload]) { nightscoutResult in
+                if !nightscoutResult.successFull() {
+                    UserDefaults.standard.nightscoutSyncRequired = true
+                }
+            }
+        }
+
+        func deleteNextNote() {
+            guard let noteToDelete = remainingNotesToDelete.first else {
+                uploadNewNote()
+                return
+            }
+
+            remainingNotesToDelete.removeFirst()
+
+            guard noteToDelete.id != TreatmentEntry.EmptyId && noteToDelete.id.count > 0 else {
+                noteToDelete.uploaded = true
+                coreDataManager.saveChanges()
+                deleteNextNote()
+                return
+            }
+
+            deleteTreatmentAtNightscout(treatmentToDelete: noteToDelete) { nightscoutResult in
+                DispatchQueue.main.async {
+                    if !nightscoutResult.successFull() {
+                        UserDefaults.standard.nightscoutSyncRequired = true
+                    }
+
+                    deleteNextNote()
+                }
+            }
+        }
+
+        deleteNextNote()
+    }
     
     /// Public wrapper to allow external sync requests (e.g. after new BG reading)
     /// will always be forced to enact
@@ -526,10 +580,10 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         if let last = lastActualSyncTime, Date().timeIntervalSince(last) < ConstantsNightscout.minimiumTimeBetweenTwoTreatmentSyncsInSeconds {
             return
         }
-        
+
         // Only update lastActualSyncTime after a real sync is about to start
         lastActualSyncTime = Date()
-        
+
         // Ensure Core Data main-context objects are always accessed on the main thread
         if !Thread.isMainThread {
             DispatchQueue.main.async { [weak self] in
@@ -1743,6 +1797,11 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                             treatmentUpdated = true
                             treatmentEntry.value = treatmentNSResponse.value
                         }
+
+                        if (treatmentNSResponse.valueSecondary ?? 0) != treatmentEntry.valueSecondary {
+                            treatmentUpdated = true
+                            treatmentEntry.valueSecondary = treatmentNSResponse.valueSecondary ?? 0
+                        }
                         
                         if treatmentNSResponse.eventType != treatmentEntry.treatmentType {
                             treatmentUpdated = true
@@ -1752,6 +1811,16 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         if treatmentNSResponse.createdAt.toMillisecondsAsInt64() != treatmentEntry.date.toMillisecondsAsInt64() {
                             treatmentUpdated = true
                             treatmentEntry.date = treatmentNSResponse.createdAt
+                        }
+
+                        if treatmentNSResponse.enteredBy != treatmentEntry.enteredBy {
+                            treatmentUpdated = true
+                            treatmentEntry.enteredBy = treatmentNSResponse.enteredBy
+                        }
+
+                        if treatmentNSResponse.notes != treatmentEntry.notes {
+                            treatmentUpdated = true
+                            treatmentEntry.notes = treatmentNSResponse.notes
                         }
                         
                         if treatmentUpdated {

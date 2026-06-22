@@ -112,20 +112,42 @@ struct TreatmentEditorView: View {
                     Text(Texts_BgReadings.date)
                 }
 
-                HStack {
-                    Text(Texts_TreatmentsView.value)
-                    Spacer()
-                    TextField(viewModel.valuePlaceholder, text: $viewModel.enteredValue)
-                        .keyboardType(.decimalPad)
-                        .multilineTextAlignment(.trailing)
-                        .padding(.vertical, 7)
-                        .padding(.horizontal, 10)
-                        .background(Color(uiColor: .secondarySystemBackground))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .foregroundStyle(Color(.colorPrimary))
-                        .frame(minWidth: 72, maxWidth: 96, alignment: .trailing)
-                    Text(viewModel.unitText)
-                        .foregroundStyle(Color(.colorSecondary))
+                if viewModel.showsNumericValueEditor {
+                    HStack {
+                        Text(Texts_TreatmentsView.value)
+                        Spacer()
+                        TextField(viewModel.valuePlaceholder, text: $viewModel.enteredValue)
+                            .keyboardType(.decimalPad)
+                            .multilineTextAlignment(.trailing)
+                            .padding(.vertical, 7)
+                            .padding(.horizontal, 10)
+                            .background(Color(uiColor: .secondarySystemBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .foregroundStyle(Color(.colorPrimary))
+                            .frame(minWidth: 72, maxWidth: 96, alignment: .trailing)
+                        Text(viewModel.unitText)
+                            .foregroundStyle(Color(.colorSecondary))
+                    }
+                }
+
+                if viewModel.showsNotesEditor {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(Texts_TreatmentsView.notes)
+                        TextEditor(text: $viewModel.enteredNotesValue)
+                            .frame(minHeight: 120)
+                            .padding(6)
+                            .background(Color(uiColor: .secondarySystemBackground))
+                            .clipShape(RoundedRectangle(cornerRadius: 8))
+                            .foregroundStyle(Color(.colorPrimary))
+                            .overlay(alignment: .topLeading) {
+                                if viewModel.enteredNotesValue.isEmpty {
+                                    Text(Texts_TreatmentsView.notePlaceholder)
+                                        .foregroundStyle(Color(.placeholderText))
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 14)
+                                }
+                            }
+                    }
                 }
             }
 

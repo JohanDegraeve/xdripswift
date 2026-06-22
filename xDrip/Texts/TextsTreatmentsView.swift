@@ -56,6 +56,10 @@ enum Texts_TreatmentsView {
         return NSLocalizedString("treatments_pumpBatteryChange", tableName: filename, bundle: Bundle.main, value: "Pump Battery Change", comment: "Pump Battery Change")
     }()
 
+    static let note:String = {
+        return NSLocalizedString("treatments_note", tableName: filename, bundle: Bundle.main, value: "Note", comment: "Free-form note treatment")
+    }()
+
 	static let questionMark:String = {
 		return NSLocalizedString("treatments_question_mark", tableName: filename, bundle: Bundle.main, value: "?", comment: "Literally a question mark, used as unknown abbreviation.")
 	}()
@@ -92,12 +96,24 @@ enum Texts_TreatmentsView {
         return NSLocalizedString("treatments_value", tableName: filename, bundle: Bundle.main, value: "Value", comment: "Treatment value label.")
     }()
 
+    static let notes:String = {
+        return NSLocalizedString("treatments_notes", tableName: filename, bundle: Bundle.main, value: "Notes", comment: "Treatment note text label.")
+    }()
+
+    static let notePlaceholder:String = {
+        return NSLocalizedString("treatments_notePlaceholder", tableName: filename, bundle: Bundle.main, value: "Enter note", comment: "Placeholder for a treatment note")
+    }()
+
     static let deleteTreatment:String = {
         return NSLocalizedString("treatments_deleteTreatment", tableName: filename, bundle: Bundle.main, value: "Delete Treatment", comment: "Delete treatment button title.")
     }()
 
     static let invalidValueMessage:String = {
         return NSLocalizedString("treatments_invalidValueMessage", tableName: filename, bundle: Bundle.main, value: "Please enter a valid value greater than zero.", comment: "Shown when a treatment value is invalid.")
+    }()
+
+    static let invalidNoteMessage:String = {
+        return NSLocalizedString("treatments_invalidNoteMessage", tableName: filename, bundle: Bundle.main, value: "Please enter a note.", comment: "Shown when a note treatment is missing text.")
     }()
 
     static let saveTreatment:String = {
