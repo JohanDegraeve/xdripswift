@@ -93,6 +93,7 @@ final class DatePickerViewController: UIViewController {
         } else {
             okButton.setTitle(Texts_Common.Ok, for: .normal)
         }
+        okButton.applyPickerActionButtonStyle()
         
         //set cancelTitle
         if let cancelButtonTitle = cancelButtonTitle {
@@ -100,6 +101,7 @@ final class DatePickerViewController: UIViewController {
         } else {
             cancelButton.setTitle(Texts_Common.Cancel, for: .normal)
         }
+        cancelButton.applyPickerActionButtonStyle()
         
         // set the date
         if let date = date {datePickerView.setDate(date, animated: true)}

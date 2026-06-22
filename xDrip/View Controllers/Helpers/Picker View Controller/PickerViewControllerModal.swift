@@ -34,7 +34,6 @@ class PickerViewControllerModal: UIViewController {
         var configuration = UIButton.Configuration.gray()
         configuration.title = cancelButtonTitle ?? Texts_Common.Cancel
         configuration.baseForegroundColor = UIColor(resource: .colorPrimary)
-        configuration.buttonSize = .medium
         
         let button = UIButton(type: .system, primaryAction: UIAction(handler: { _ in
             if let cancelHandler = self.cancelHandler { cancelHandler() }
@@ -45,6 +44,7 @@ class PickerViewControllerModal: UIViewController {
         
         button.translatesAutoresizingMaskIntoConstraints = false
         button.configuration = configuration
+        button.applyConfiguredPickerActionButtonStyle()
         
         return button
     }()
@@ -54,7 +54,6 @@ class PickerViewControllerModal: UIViewController {
         configuration.title = addButtonTitle ?? Texts_Common.Ok
         configuration.baseForegroundColor = UIColor(resource: .colorPrimary)
         configuration.baseBackgroundColor = .green
-        configuration.buttonSize = .medium
         
         let button = UIButton(type: .system, primaryAction: UIAction(handler: { _ in
             if let selectedIndex = self.selectedRow { self.addHandler(selectedIndex) }
@@ -65,6 +64,7 @@ class PickerViewControllerModal: UIViewController {
         
         button.translatesAutoresizingMaskIntoConstraints = false
         button.configuration = configuration
+        button.applyConfiguredPickerActionButtonStyle()
         
         return button
     }()

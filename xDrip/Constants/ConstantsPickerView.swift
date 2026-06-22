@@ -6,7 +6,7 @@
 //  Copyright © 2025 Johan Degraeve. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 /// picker view specific constants
 enum ConstantsPickerView {
@@ -30,4 +30,13 @@ enum ConstantsPickerView {
     
     /// picker view subtitle font type
     static let subTitleFont: UIFont = .systemFont(ofSize: 15)
+
+    /// font used for the picker view cancel and confirmation buttons
+    static let actionButtonFont: UIFont = .systemFont(ofSize: 25)
+
+    /// size used by configured picker view cancel and confirmation buttons
+    static let actionButtonConfigurationSize: UIButton.Configuration.Size = .large
+
+    /// content insets used by configured picker view cancel and confirmation buttons
+    static let actionButtonContentInsets = NSDirectionalEdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
 }

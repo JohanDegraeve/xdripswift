@@ -102,6 +102,7 @@ final class PickerViewController : UIViewController {
         } else {
             addButton.setTitle(Texts_Common.Ok, for: .normal)
         }
+        addButton.applyPickerActionButtonStyle()
         
         //set cancelTitle
         if let cancelButtonTitle = cancelButtonTitle {
@@ -109,6 +110,7 @@ final class PickerViewController : UIViewController {
         } else {
             cancelButton.setTitle(Texts_Common.Cancel, for: .normal)
         }
+        cancelButton.applyPickerActionButtonStyle()
         
         // set selectedRow
         if let selectedRow = selectedRow {
