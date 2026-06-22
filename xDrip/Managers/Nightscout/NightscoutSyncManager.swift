@@ -109,6 +109,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// has only just re-uploaded.
     private var bgReadingsReplacementTask: Task<Void, Never>?
     private var bgReadingsReplacementTaskIdentifier: String?
+    private var bgReadingsReplacementBlocksDirectLiveUpload = false
     private var pendingDirectBgUploadAfterReplacement = false
     private var pendingDirectBgUploadLastConnectionStatusChangeTimeStamp: Date?
     
@@ -269,19 +270,12 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             UserDefaults.standard.nightscoutSyncRequired = true
         }
         
-        // During testing it was found that disabling smoothing or adjustment
-        // can switch the app back to the normal live upload path while an older
-        // BG replacement task is still finishing its delete and re-upload work.
-        // If the direct upload starts too early, that older replacement task can
-        // still delete the same Nightscout window afterwards and make it look
-        // like live uploads have stopped.
-        //
-        // Do not defer the direct upload into a new Task here. That looked tidy,
-        // but it meant the app could move to the background and be suspended
-        // before the actual BG upload ever started. Queue one pending direct
-        // upload request instead, then let the replacement task trigger it
-        // synchronously as soon as the delete and re-upload cycle is finished.
-        if bgReadingsReplacementTaskIdentifier != nil {
+        // Manual historical replacement deletes an explicit Nightscout window,
+        // so direct live upload must wait until that full-window rewrite is
+        // finished. Automatic smoothing tail replacement does not own the newest
+        // live reading and must not stall the normal live upload path in the
+        // background.
+        if bgReadingsReplacementTaskIdentifier != nil && bgReadingsReplacementBlocksDirectLiveUpload {
             trace("in uploadLatestBgReadings, pending BG replacement task detected, queuing direct BG upload until replacement completes", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
 
             pendingDirectBgUploadAfterReplacement = true
@@ -362,6 +356,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         let replacementTaskIdentifier = UUID().uuidString
 
         bgReadingsReplacementTaskIdentifier = replacementTaskIdentifier
+        bgReadingsReplacementBlocksDirectLiveUpload = deleteFromTimeStamp != nil && deleteToTimeStamp != nil
 
         bgReadingsReplacementTask = Task { @MainActor [weak self] in
             _ = await previousReplacementTask?.result
@@ -371,7 +366,16 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             // Nightscout BG upload while a replacement task is still queued.
             // Re-check the write permission after waiting so the delayed task
             // does not continue deleting and re-uploading BG values anyway.
-            guard self.shouldAllowNightscoutBgWrites() else { return }
+            guard self.shouldAllowNightscoutBgWrites() else {
+                if self.bgReadingsReplacementTaskIdentifier == replacementTaskIdentifier {
+                    self.bgReadingsReplacementTask = nil
+                    self.bgReadingsReplacementTaskIdentifier = nil
+                    self.bgReadingsReplacementBlocksDirectLiveUpload = false
+                    self.pendingDirectBgUploadAfterReplacement = false
+                    self.pendingDirectBgUploadLastConnectionStatusChangeTimeStamp = nil
+                }
+                return
+            }
 
             // Historical overwrite uses one explicit time window.
             // Normal live replacement uses per-reading windows so only the affected slots are replaced.
@@ -413,6 +417,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
 
             self.bgReadingsReplacementTask = nil
             self.bgReadingsReplacementTaskIdentifier = nil
+            self.bgReadingsReplacementBlocksDirectLiveUpload = false
 
             if self.pendingDirectBgUploadAfterReplacement {
                 let pendingDirectBgUploadLastConnectionStatusChangeTimeStamp = self.pendingDirectBgUploadLastConnectionStatusChangeTimeStamp

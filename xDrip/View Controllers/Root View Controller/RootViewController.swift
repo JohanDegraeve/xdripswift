@@ -1425,7 +1425,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // if a new reading is created, create either initial calibration request or bgreading notification - upload to nightscout and check alerts
             if newReadingCreated {
-                let didReplaceDownstreamBgReadings = bgPostProcessingManager?.processLatestReadings() ?? false
+                _ = bgPostProcessingManager?.processLatestReadings()
                 
                 // only if no webOOPEnabled and overruleIsWebOOPEnabled false : if no two calibration exist yet then create calibration request notification, otherwise a bgreading notification and update labels
                 if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil && (!cgmTransmitter.isWebOOPEnabled() && !cgmTransmitter.overruleIsWebOOPEnabled()) {
@@ -1465,9 +1465,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 nightscoutSyncManager?.syncAllWithNightscout()
                 
-                if !didReplaceDownstreamBgReadings {
-                    healthKitManager?.storeBgReadings()
-                }
+                healthKitManager?.storeBgReadings()
                 
                 bgReadingSpeaker?.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
@@ -3856,13 +3854,11 @@ extension RootViewController: FollowerDelegate {
                 // save in core data
                 coreDataManager.saveChanges()
                 
-                let didReplaceDownstreamBgReadings: Bool
-
                 if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled, let firstCreatedBgReadingTimeStamp = firstCreatedBgReadingTimeStamp {
                     let processingStartDateOverride = previousTimeStampLastBgReading.timeIntervalSince1970 > 0 ? previousTimeStampLastBgReading.addingTimeInterval(-1.0) : firstCreatedBgReadingTimeStamp
-                    didReplaceDownstreamBgReadings = bgPostProcessingManager?.processBgReadings(processingStartDateOverride: processingStartDateOverride) ?? false
+                    _ = bgPostProcessingManager?.processBgReadings(processingStartDateOverride: processingStartDateOverride)
                 } else {
-                    didReplaceDownstreamBgReadings = bgPostProcessingManager?.processLatestReadings() ?? false
+                    _ = bgPostProcessingManager?.processLatestReadings()
                 }
 
                 cleanUpChartMemoryForLivePostProcessingIfNeeded()
@@ -3888,16 +3884,12 @@ extension RootViewController: FollowerDelegate {
                 // The manager can safely no-op when nothing new needs uploading,
                 // and it avoids RootView having to predict whether a previous
                 // post processing pass already covered the newest reading.
-                if !didReplaceDownstreamBgReadings {
-                    nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
-                }
+                nightscoutSyncManager?.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())
                 
                 // check alerts, create notification, set app badge
                 checkAlertsCreateNotificationAndSetAppBadge()
                 
-                if !didReplaceDownstreamBgReadings, let healthKitManager = healthKitManager {
-                    healthKitManager.storeBgReadings()
-                }
+                healthKitManager?.storeBgReadings()
                 
                 if let bgReadingSpeaker = bgReadingSpeaker {
                     bgReadingSpeaker.speakNewReading(lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp())

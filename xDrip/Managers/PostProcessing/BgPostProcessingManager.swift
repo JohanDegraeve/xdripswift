@@ -36,10 +36,6 @@ class BgPostProcessingManager {
         var affectsOlderDownstreamHistory: Bool {
             return finalValueChanged || suppressionChanged
         }
-
-        var affectsLatestDownstreamReading: Bool {
-            return finalValueChanged || slopeNameChanged || hideSlopeChanged || suppressionChanged
-        }
     }
 
     /// for logging
@@ -182,8 +178,6 @@ class BgPostProcessingManager {
         // Automatic live processing rewrites only the changed visible readings
         // inside the bounded recent processing window.
         let shouldRewriteFullDownstreamWindow = allowHistoricalDownstreamRewrite && (processingStartDateOverride != nil || forceFullDownstreamRewrite)
-        let hasActiveAutomaticPostProcessing = hasActiveDownstreamPostProcessing()
-
         // DEBUG START: removable post-processing diagnostics for background load investigation.
         let processingDurationMilliseconds = Int((Date().timeIntervalSince(startedAt) * 1000.0).rounded())
         let changedVisibleReadingsCount = changedBgReadings.filter { !$0.isSuppressedByFiveMinuteCadence }.count
@@ -205,6 +199,7 @@ class BgPostProcessingManager {
             let automaticRewriteStartDate = latestVisibleBgReading.timeStamp.addingTimeInterval(-ConstantsBgSmoothing.automaticDownstreamRewriteLookbackInterval)
             bgReadingsToReplaceDownstream = bgReadings.filter { bgReading in
                 guard bgReading.timeStamp >= automaticRewriteStartDate else { return false }
+                guard bgReading.objectID != latestVisibleBgReading.objectID else { return false }
                 guard !bgReading.isSuppressedByFiveMinuteCadence else { return false }
                 guard let change = downstreamChangesByObjectID[bgReading.objectID] else { return false }
                 return change.affectsOlderDownstreamHistory
@@ -212,17 +207,7 @@ class BgPostProcessingManager {
         } else {
             bgReadingsToReplaceDownstream = []
         }
-        var downstreamReadingsToReplace = bgReadingsToReplaceDownstream
-
-        if !shouldRewriteFullDownstreamWindow, hasActiveAutomaticPostProcessing, let latestVisibleBgReading = bgReadings.last(where: { !$0.isSuppressedByFiveMinuteCadence }) {
-            // Keep the newest visible reading in the replacement payload even
-            // when smoothing mainly changed slightly older values, so the live
-            // downstream stream still moves forward with the rewritten tail.
-            if (downstreamChangesByObjectID[latestVisibleBgReading.objectID]?.affectsLatestDownstreamReading ?? false)
-                && !downstreamReadingsToReplace.contains(where: { $0.objectID == latestVisibleBgReading.objectID }) {
-                downstreamReadingsToReplace.append(latestVisibleBgReading)
-            }
-        }
+        let downstreamReadingsToReplace = bgReadingsToReplaceDownstream
 
         if downstreamReadingsToReplace.count > 0 {
             let earliestReplacementDate = downstreamReadingsToReplace.map(\.timeStamp).min()
