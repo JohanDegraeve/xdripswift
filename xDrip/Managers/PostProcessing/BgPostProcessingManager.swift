@@ -93,9 +93,20 @@ class BgPostProcessingManager {
         let sourceContextIdentifier = currentSourceContextIdentifier()
         let previousSourceContextIdentifier = UserDefaults.standard.postProcessingSourceContextIdentifier
 
+        guard let sourceContextIdentifier = sourceContextIdentifier else {
+            syncAdjustmentAvailabilityForCurrentSource()
+            return
+        }
+
+        guard let previousSourceContextIdentifier = previousSourceContextIdentifier else {
+            UserDefaults.standard.postProcessingSourceContextIdentifier = sourceContextIdentifier
+            syncAdjustmentAvailabilityForCurrentSource()
+            return
+        }
+
         if previousSourceContextIdentifier != sourceContextIdentifier {
             if UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing {
-                trace("in refreshSourceContext, resetting BG post processing because the source context changed from %{public}@ to %{public}@. BG adjustment enabled = %{public}@. Smoothing enabled = %{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, previousSourceContextIdentifier ?? "nil", sourceContextIdentifier ?? "nil", UserDefaults.standard.enableAdjustment.description, UserDefaults.standard.enableSmoothing.description)
+                trace("in refreshSourceContext, resetting BG post processing because the source context changed from %{public}@ to %{public}@. BG adjustment enabled = %{public}@. Smoothing enabled = %{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, previousSourceContextIdentifier, sourceContextIdentifier, UserDefaults.standard.enableAdjustment.description, UserDefaults.standard.enableSmoothing.description)
             }
 
             handleSourceContextChanged()
@@ -243,9 +254,17 @@ class BgPostProcessingManager {
         UserDefaults.standard.enableAdjustment = false
         updateSmoothingSettings(enableSmoothing: false, useFiveMinuteReadings: ConstantsBgSmoothing.defaultUseFiveMinuteReadings, smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes, smoothingStrength: ConstantsBgSmoothing.defaultSmoothingStrength)
         UserDefaults.standard.fiveMinuteReadingsStartTimeStamp = nil
-        UserDefaults.standard.postProcessingStartTimeStamp = Date()
+        UserDefaults.standard.postProcessingStartTimeStamp = sourceHistoryStartTimeStamp()
         UserDefaults.standard.postProcessingApplyFromTimeStamp = UserDefaults.standard.postProcessingStartTimeStamp
         UserDefaults.standard.postProcessingSourceContextIdentifier = nil
+    }
+
+    private func sourceHistoryStartTimeStamp() -> Date {
+        if UserDefaults.standard.isMaster, let activeSensor = sensorsAccessor.fetchActiveSensor() {
+            return activeSensor.startDate
+        }
+
+        return bgReadingsAccessor.getLatestBgReadings(limit: 1, fromDate: nil, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: true).first?.timeStamp ?? Date()
     }
 
     func latestActiveBgAdjustment() -> BgAdjustment? {
