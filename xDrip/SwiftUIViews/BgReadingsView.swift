@@ -77,8 +77,9 @@ struct BgReadingsView: View {
                     ForEach(filteredBgReadings, id: \.self) { bgReading in
                         NavigationLink(destination: BgReadingsDetailView(bgReading: bgReading)) {
                             HStack {
-                                visualIndicator(bgRangeDescription: bgReading.bgRangeDescription())
-                                    .font(.system(size: 10))
+                                Image(systemName: "circle.fill")
+                                    .font(.caption2)
+                                    .foregroundStyle(bgRangeIndicatorColor(bgRangeDescription: bgReading.bgRangeDescription()))
 
                                 Text(bgReading.finalValue.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).bgValueToString(mgDl: isMgDl))
                                     .foregroundColor(.primary)
@@ -227,29 +228,20 @@ struct BgReadingsView: View {
         editMode?.wrappedValue = .inactive
     }
     
-    /// returns the visual indicator symbol based on the BgRangeDescription from a BgReading
+    /// returns the visual indicator colour based on the BgRangeDescription from a BgReading
     /// - parameters:
     ///   - bgRangeDescription: an enum as defined in ConstantsCalendar
     /// - returns:
-    ///   - a Text view containing a string (in this case a coloured symbol)
-    private func visualIndicator(bgRangeDescription: BgRangeDescription) -> Text {
-        
-        var visualIndicator = ""
-        
-        // configure the indicator based on the relevant range colour/symbol
-        // copied from CalendarManager.createCalendarEvent()
+    ///   - a color for the row indicator
+    private func bgRangeIndicatorColor(bgRangeDescription: BgRangeDescription) -> Color {
         switch bgRangeDescription {
         case .inRange:
-            visualIndicator = ConstantsCalendar.visualIndicatorInRange
+            return Color(ConstantsGlucoseChart.glucoseInRangeColor)
         case .notUrgent:
-            visualIndicator = ConstantsCalendar.visualIndicatorNotUrgent
+            return Color(ConstantsGlucoseChart.glucoseNotUrgentRangeColor)
         case .urgent:
-            visualIndicator = ConstantsCalendar.visualIndicatorUrgent
+            return Color(ConstantsGlucoseChart.glucoseUrgentRangeColor)
         }
-        
-        // return the indicator symbol
-        return Text(visualIndicator)
-        
     }
     
     /// this updates the state variable with the day name string (in user locale) based on the date passed to it

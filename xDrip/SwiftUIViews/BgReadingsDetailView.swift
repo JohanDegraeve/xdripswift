@@ -25,7 +25,7 @@ struct BgReadingsDetailView: View {
         List {
             Section(header: Text(Texts_BgReadings.generalSectionHeader)) {
                 row(title: Texts_BgReadings.deviceName, data: bgReading.deviceName ?? nilString)
-                row(title: Texts_BgReadings.finalGlucose, data: displayBgValue(bgReading.finalValue))
+                row(title: Texts_BgReadings.finalGlucose, data: displayBgValue(bgReading.finalValue), indicatorColor: bgRangeIndicatorColor(bgRangeDescription: bgReading.bgRangeDescription()))
                 row(title: Texts_BgReadings.timestamp, data: bgReading.timeStamp.formatted(date: .abbreviated, time: .shortened))
             }
             
@@ -69,12 +69,18 @@ struct BgReadingsDetailView: View {
     ///   - data: the value text
     /// - returns:
     ///   - a view with the formatted row inside it
-    private func row(title: String, data: String) -> AnyView {
+    private func row(title: String, data: String, indicatorColor: Color? = nil) -> AnyView {
         // wrap the HStack in an AnyView so that it can be returned back to the caller
         let rowView = AnyView(HStack {
             Text(title)
             
             Spacer()
+
+            if let indicatorColor {
+                Image(systemName: "circle.fill")
+                    .font(.caption2)
+                    .foregroundStyle(indicatorColor)
+            }
             
             Text(data)
                 .foregroundColor(.secondary)
@@ -91,5 +97,16 @@ struct BgReadingsDetailView: View {
         guard let valueInMgDl = valueInMgDl else { return nilString }
         
         return displayBgValue(valueInMgDl)
+    }
+
+    private func bgRangeIndicatorColor(bgRangeDescription: BgRangeDescription) -> Color {
+        switch bgRangeDescription {
+        case .inRange:
+            return Color(ConstantsGlucoseChart.glucoseInRangeColor)
+        case .notUrgent:
+            return Color(ConstantsGlucoseChart.glucoseNotUrgentRangeColor)
+        case .urgent:
+            return Color(ConstantsGlucoseChart.glucoseUrgentRangeColor)
+        }
     }
 }
