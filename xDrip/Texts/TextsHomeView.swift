@@ -17,7 +17,7 @@ enum Texts_HomeView {
     }()
     
     static let snoozeAllSnoozed:String = {
-        return NSLocalizedString("snoozeAllSnoozedUntil", tableName: filename, bundle: Bundle.main, value: "All alarms are snoozed!", comment: "snooze all text in snooze screen")
+        return NSLocalizedString("snoozeAllSnoozed", tableName: filename, bundle: Bundle.main, value: "All alarms are snoozed!", comment: "snooze all text in snooze screen")
     }()
     
     static let snoozeAllSnoozedUntil:String = {

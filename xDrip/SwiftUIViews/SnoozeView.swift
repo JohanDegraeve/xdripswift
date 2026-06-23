@@ -154,10 +154,12 @@ struct SnoozeView: View {
         switch snoozeStatus {
         case .allSnoozed:
             if let snoozeAllAlertsUntilDate = UserDefaults.standard.snoozeAllAlertsUntilDate {
-                // If snoozed till after 00:00 then show date and time when it ends,
-                // else only show time. Reused from the previous UIKit view logic.
+                // Keep the same simple 2-line banner as the previous UIKit screen:
+                // line 1 confirms all alarms are snoozed, line 2 shows the remaining time.
                 snoozeAllSwitchIsOn = true
-                bannerText = "\(Texts_HomeView.snoozeAllSnoozed)\n\(snoozeAllAlertsUntilDate.daysAndHoursRemaining(appendRemaining: true))"
+                bannerText = Texts_HomeView.snoozeAllSnoozed
+                    + "\n"
+                    + snoozeAllAlertsUntilDate.daysAndHoursRemaining(appendRemaining: true)
                 bannerTextColor = Color(.colorPrimary)
                 bannerBackgroundColor = ConstantsUI.warningSectionBackgroundColor
             }

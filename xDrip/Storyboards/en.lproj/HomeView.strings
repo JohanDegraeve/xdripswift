@@ -102,6 +102,7 @@
 "noDataSourceConnectedWatch" = "Open xDrip";
 "snoozeAllTitle" = "Snooze All";
 "snoozeAllDisabled" = "Snooze All Disabled";
+"snoozeAllSnoozed" = "All alarms are snoozed!";
 "snoozeAllSnoozedUntil" = "Snoozed Until %@";
 "snoozeUrgentAlarms" = "Urgent Alarms Only";
 
