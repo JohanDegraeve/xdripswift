@@ -48,11 +48,15 @@
 "settingsviews_allowMainChartAutoReset" = "Auto Reset Main Chart";
 "settingsviews_showOriginalBGReadings" = "Show Original Values";
 "settingsviews_urgentHighValue" = "Urgent High Value";
+"settingsviews_urgentHighValueMessage" = "Enter the glucose value for the urgent high threshold.";
 "settingsviews_highValue" = "High Value";
+"settingsviews_highValueMessage" = "Enter the glucose value for the high threshold.";
 "settingsviews_targetValue" = "Target Value";
 "settingsviews_targetValueMessage" = "Set to 0 to disable the target";
 "settingsviews_lowValue" = "Low Value";
+"settingsviews_lowValueMessage" = "Enter the glucose value for the low threshold.";
 "settingsviews_urgentLowValue" = "Urgent Low Value";
+"settingsviews_urgentLowValueMessage" = "Enter the glucose value for the urgent low threshold.";
 "settingsviews_showcoloredobjectives" = "Show Colored Lines";
 "settingsviews_showtarget" = "Show Target Line";
 "settingsviews_sectiontitletreatments" = "Treatments";
@@ -72,7 +76,7 @@
 "settingsviews_transmitterid" = "Transmitter ID";
 "settingsviews_transmitterid_text_for_button"  = "Transmitter ID";
 "settingsviews_givetransmitterid" = "Enter Transmitter ID";
-"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
+"settingsviews_resetDexcomTransmitterMessage" = "This option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
 "settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
 "settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration";
 "settingsviews_labelNonFixed" = "Multi-point Calibration";
@@ -100,7 +104,7 @@
 "schedule" = "Schedule";
 "settingsviews_giveNightscoutUrl" = "Enter your Nightscout URL";
 "settingsviews_nightscoutAPIKey" = "API_SECRET";
-"settingsviews_giveNightscoutAPIKey" = "Enter your API_SECRET";
+"settingsviews_giveNightscoutAPIKey" = "Enter API_SECRET";
 "editScheduleTimePickerSubtitle" = "Change: ";
 "timeScheduleViewTitle" = "On/Off Time Schedule for ";
 "uploadSensorStartTime" = "Upload Sensor Start Time";
@@ -155,6 +159,9 @@
 "warningChangeFromMasterToFollowerDexcomShare" = "Switch from Master to Dexcom Share Follower will stop your current sensor and will also disable 'Upload to Dexcom Share'. Do you want to continue?";
 "warningChangeToFollowerDexcomShare" = "Switching to Dexcom Share Follower mode will disable 'Upload to Dexcom Share'.";
 "nightscoutPort" = "Port";
+"enterNightscoutPortNumber" = "Enter Port Number";
+"nightscoutToken" = "Token";
+"giveNightscoutToken" = "Enter Token";
 "developerSettings" = "Developer Settings";
 "nslog" = "NSLog";
 "oslog" = "OSLog";

@@ -1,367 +1,225 @@
+//
+//  SettingsViewController.swift
+//  xdrip
+//
+//  Created by Johan Degraeve.
+//  Copyright © 2026 Johan Degraeve. All rights reserved.
+//
+
+import SwiftUI
 import UIKit
 
-/// viewcontroller for first settings screen
-final class SettingsViewController: UIViewController {
+/// Retained only because the storyboard still creates this initial child before SwiftUI is installed.
+final class SettingsViewController: UIViewController {}
 
-    // MARK: - IBOutlet's and IPAction's
-    
-    @IBOutlet weak var tableView: UITableView!
-    
-    // MARK: - Private Properties
-    
-    /// reference to coreDataManager
-    private var coreDataManager:CoreDataManager?
-    
-    /// reference to soundPlayer
-    private var soundPlayer:SoundPlayer?
-    
-    /// will show pop up with title and message
-    private var messageHandler: ((String, String) -> Void)?
-    
-    /// UIAlertController used by messageHandler
-    private var messageHandlerUiAlertController: UIAlertController?
-    
-    /// array of viewmodels, one per section
-    private var viewModels = [SettingsViewModelProtocol]()
-    
-    private enum Section: Int, CaseIterable, SettingsProtocol {
-        
-        /// help section - open help and offer translation
-        case help
-        
-        /// data source settings - master or follower - if follower, data source
-        case dataSource
-        
-        ///General settings - language, glucose unit
-        case general
-        
-        ///Home Screen settings - urgent high, high, target, low and urgent low values for guidelines
-        case homescreen
-        
-        /// alarms
-        case alarms
-        
-        /// statistics settings
-        case statistics
-        
-        ///nightscout settings
-        case nightscout
-        
-        ///dexcom share settings
-        case dexcom
-        
-        /// healthkit
-        case healthkit
-        
-        /// store bg values in healthkit
-        case speak
-        
-        /// Apple Watch settings
-        case appleWatch
-        
-        /// Calendar event settings
-        case calendarEvents
-        
-        /// contact Image settings
-        case contactImage
-        
-        /// housekeeper settings
-        // case housekeeper // let's leave this out for now until an import function is added
-        
-        /// M5 stack settings
-        case M5stack
-        
-        /// tracing
-        case trace
-        
-        /// info
-        case info
-        
-        /// developer settings
-        case developer
-        
-        func viewModel(coreDataManager: CoreDataManager?) -> SettingsViewModelProtocol {
-            switch self {
-                
-            case .help:
-                return SettingsViewHelpSettingsViewModel()
-            case .dataSource:
-                return SettingsViewDataSourceSettingsViewModel(coreDataManager: coreDataManager)
-            case .general:
-                return SettingsViewNotificationsSettingsViewModel()
-            case .homescreen:
-                return SettingsViewHomeScreenSettingsViewModel()
-            case .alarms:
-                return SettingsViewAlertSettingsViewModel()
-            case .statistics:
-                return SettingsViewStatisticsSettingsViewModel()
-            case .nightscout:
-                return SettingsViewNightscoutSettingsViewModel()
-            case .dexcom:
-                return SettingsViewDexcomShareUploadSettingsViewModel()
-            case .healthkit:
-                return SettingsViewHealthKitSettingsViewModel()
-            case .speak:
-                return SettingsViewSpeakSettingsViewModel()
-            case .M5stack:
-                return SettingsViewM5StackSettingsViewModel()
-            case .developer:
-                return SettingsViewDevelopmentSettingsViewModel()
-            case .appleWatch:
-                return SettingsViewAppleWatchSettingsViewModel()
-            case .calendarEvents:
-                return SettingsViewCalendarEventsSettingsViewModel()
-            case .contactImage:
-                return SettingsViewContactImageSettingsViewModel()
-//            case .housekeeper:
-//                return SettingsViewHousekeeperSettingsViewModel(coreDataManager: coreDataManager)
-            case .trace:
-                return SettingsViewTraceSettingsViewModel()
-            case .info:
-                return SettingsViewInfoViewModel()
-                
-            }
-        }
-        
+extension SettingsViewController {
+    public enum SegueIdentifiers: String {
+        case settingsToAlertTypeSettings
+        case settingsToAlertSettings
+        case settingsToM5StackSettings
+        case settingsToSchedule
+        case settingsToLoopDelaySchedule
     }
-    
+}
 
-    // MARK: - public functions
-    
-    /// configure
-    public func configure(coreDataManager:CoreDataManager?, soundPlayer:SoundPlayer?) {
-        
+final class SettingsHostingController: PortraitLockedHostingController<AnyView> {
+    private let router: SettingsRouter
+    private let presenter: SettingsActionPresenter
+    private let listModel: SettingsListModel
+    private let coreDataManager: CoreDataManager?
+    private let soundPlayer: SoundPlayer?
+    private var progressBar: ProgressBarViewController?
+
+    init(coreDataManager: CoreDataManager?, soundPlayer: SoundPlayer?) {
+        let router = SettingsRouter()
+        let presenter = SettingsActionPresenter(router: router)
+        let sections = SettingsListFactory.makeRootSections(
+            coreDataManager: coreDataManager,
+            presenter: presenter
+        )
+        let listModel = SettingsListModel(sections: sections)
+
+        self.router = router
+        self.presenter = presenter
+        self.listModel = listModel
         self.coreDataManager = coreDataManager
         self.soundPlayer = soundPlayer
-       
-        // create messageHandler
-        messageHandler = {
-            (title, message) in
-            
-            // piece of code that we need two times
-            let createAndPresentMessageHandlerUIAlertController = {
-                
-                self.messageHandlerUiAlertController = UIAlertController(title: title, message: message, actionHandler: nil)
-                
-                if let messageHandlerUiAlertController = self.messageHandlerUiAlertController {
-                    self.present(messageHandlerUiAlertController, animated: true, completion: nil)
-                }
-                
-            }
-            
-            // first check if messageHandlerUiAlertController is not nil and is presenting. If it is, dismiss it and when completed call createAndPresentMessageHandlerUIAlertController
-            if let messageHandlerUiAlertController = self.messageHandlerUiAlertController {
-                if messageHandlerUiAlertController.isBeingPresented {
-                    
-                    messageHandlerUiAlertController.dismiss(animated: true, completion: createAndPresentMessageHandlerUIAlertController)
-                    
-                    return
-                    
-                }
-            }
-            
-            // we're here which means there wasn't a messageHandlerUiAlertController being presented, so present it now
-            createAndPresentMessageHandlerUIAlertController()
-            
-        }
 
-        // initialize viewModels
-        for section in Section.allCases {
+        super.init(rootView: AnyView(SettingsView(listModel: listModel, presenter: presenter)))
 
-            // get a viewModel for the section
-            let viewModel = section.viewModel(coreDataManager: coreDataManager)
-            
-            // unwrap messageHandler and store in the viewModel
-            if let messageHandler = messageHandler {
-                viewModel.storeMessageHandler(messageHandler: messageHandler)
-            }
-            
-            // store self as uiViewController in the viewModel
-            viewModel.storeUIViewController(uIViewController: self)
-            
-            // store row reload closure in the viewModel
-            viewModel.storeRowReloadClosure(rowReloadClosure: { [weak self] row in
-                // Avoid forcing table layout before SettingsViewController has entered the window hierarchy.
-                guard let self = self, self.isViewLoaded, self.view.window != nil else { return }
-                self.tableView.reloadRows(at: [IndexPath(row: row, section: section.rawValue)], with: .none)
-            })
-          
-            // store section reload closure in the viewModel
-            viewModel.storeSectionReloadClosure(sectionReloadClosure: { [weak self] in
-                // Avoid forcing table layout before SettingsViewController has entered the window hierarchy.
-                guard let self = self, self.isViewLoaded, self.view.window != nil else { return }
-                self.tableView.reloadSections([section.rawValue], with: .none)
-            })
-
-            // store the viewModel
-            self.viewModels.append(viewModel)
-            
-        }
-        
-    }
-
-    // MARK: - View Life Cycle
-    
-    override func viewDidLoad() {
-        
-        super.viewDidLoad()
-        
         title = Texts_SettingsView.screenTitle
-        
-        setupView()
-        
+        navigationItem.largeTitleDisplayMode = .never
+
+        presenter.attach(controller: self)
+        attachControllerToViewModels()
+        configureRouter()
     }
-    
-    // MARK: - other overriden functions
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
-        guard let segueIdentifier = segue.identifier else {
-            fatalError("In SettingsViewController, prepare for segue, Segue had no identifier")
-        }
-        
-        guard let segueIdentifierAsCase = SegueIdentifiers(rawValue: segueIdentifier) else {
-            fatalError("In SettingsViewController, segueIdentifierAsCase could not be initialized")
-        }
-        
-        switch segueIdentifierAsCase {
-            
-        case .settingsToAlertTypeSettings:
-            let vc = segue.destination as! AlertTypesSettingsViewController
-            vc.configure(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
-            
-        case .settingsToAlertSettings:
-            let vc = segue.destination as! AlertsSettingsViewController
-            vc.configure(coreDataManager: coreDataManager)
-            
-        case .settingsToM5StackSettings:
-            // nothing to configure
-            break
-            
-        case .settingsToSchedule:
-            if let vc = segue.destination as? TimeScheduleViewController, let sender = sender as? TimeSchedule {
-                vc.configure(timeSchedule: sender)
+
+    @objc required dynamic init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+}
+
+private extension SettingsHostingController {
+    /// Gives the old Settings view models a UIKit controller and reload callbacks.
+    /// This keeps their existing message, reload and navigation hooks working while
+    /// the rows are rendered by SwiftUI.
+    func attachControllerToViewModels() {
+        listModel.sections.forEach { section in
+            section.viewModel.storeUIViewController(uIViewController: self)
+            section.viewModel.storeRowReloadClosure { [weak self] row in
+                DispatchQueue.main.async {
+                    self?.listModel.reload(.row(section: section.id, row: row))
+                }
             }
-
-        case .settingsToLoopDelaySchedule:
-            //nothing to configure
-            break
-
+            section.viewModel.storeSectionReloadClosure { [weak self] in
+                DispatchQueue.main.async {
+                    self?.listModel.reload(.section(section.id))
+                }
+            }
         }
     }
 
-    // MARK: - Private helper functions
-    
-    private func setupView() {
-        setupTableView()
-    }
+    /// Connects router closures to the UIKit hosting controller so old segue-style
+    /// Settings actions can push the correct SwiftUI child view.
+    func configureRouter() {
+        router.openAlertTypes = { [weak self] in
+            self?.openAlertTypes()
+        }
 
-    /// setup datasource, delegate, seperatorInset
-    private func setupTableView() {
-        if let tableView = tableView {
-            // insert slightly the separator text so that it doesn't touch the safe area limit
-            tableView.separatorInset = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
-            tableView.dataSource = self
-            tableView.delegate = self
+        router.openAlerts = { [weak self] in
+            self?.openAlerts()
+        }
+
+        router.openM5Stack = { [weak self] in
+            self?.openM5Stack()
+        }
+
+        router.openTimeSchedule = { [weak self] timeSchedule in
+            self?.openTimeSchedule(timeSchedule)
+        }
+
+        router.openLoopDelaySchedule = { [weak self] in
+            self?.openLoopDelaySchedule()
+        }
+
+        router.presentShareFile = { [weak self] url in
+            self?.presentShareFile(url)
+        }
+
+        router.showProgress = { [weak self] progress in
+            self?.showProgress(progress)
         }
     }
-    
+
+    /// Opens the alert type Settings flow using the new SwiftUI hosting controller.
+    func openAlertTypes() {
+        guard let coreDataManager = coreDataManager, let soundPlayer = soundPlayer else { return }
+
+        let viewController = AlertTypesSettingsHostingController(
+            coreDataManager: coreDataManager,
+            soundPlayer: soundPlayer
+        )
+        navigationController?.pushViewController(viewController, animated: true)
+    }
+
+    /// Opens the alarm Settings flow using the new SwiftUI hosting controller.
+    func openAlerts() {
+        guard let coreDataManager = coreDataManager else { return }
+
+        let viewController = AlertsSettingsHostingController(coreDataManager: coreDataManager)
+        navigationController?.pushViewController(viewController, animated: true)
+    }
+
+    /// Builds the M5Stack child Settings list and pushes it as a SwiftUI screen.
+    /// This mirrors the main Settings setup because M5Stack is still made from
+    /// several old section view models.
+    func openM5Stack() {
+        let router = SettingsRouter()
+        let presenter = SettingsActionPresenter(router: router)
+        let sections = SettingsListFactory.makeM5StackSections(presenter: presenter)
+        let listModel = SettingsListModel(sections: sections)
+        let viewController = PortraitLockedHostingController(
+            rootView: AnyView(M5StackSettingsView(listModel: listModel, presenter: presenter))
+        )
+
+        presenter.attach(controller: viewController)
+        sections.forEach { section in
+            section.viewModel.storeUIViewController(uIViewController: viewController)
+            section.viewModel.storeRowReloadClosure { row in
+                DispatchQueue.main.async {
+                    listModel.reload(.row(section: section.id, row: row))
+                }
+            }
+            section.viewModel.storeSectionReloadClosure {
+                DispatchQueue.main.async {
+                    listModel.reload(.section(section.id))
+                }
+            }
+        }
+        configure(router: router, for: viewController)
+
+        viewController.title = Texts_SettingsView.m5StackSettingsViewScreenTitle
+        viewController.navigationItem.largeTitleDisplayMode = .never
+
+        navigationController?.pushViewController(viewController, animated: true)
+    }
+
+    /// Adds shared router actions needed by child Settings hosts, currently file
+    /// sharing from old view model actions.
+    func configure(router: SettingsRouter, for viewController: UIViewController) {
+        router.presentShareFile = { [weak viewController] url in
+            let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: [])
+            viewController?.present(activityViewController, animated: true)
+        }
+    }
+
+    /// Opens the SwiftUI schedule editor for rows that still pass a TimeSchedule
+    /// through the old SettingsSelectedRowAction sender.
+    func openTimeSchedule(_ timeSchedule: TimeSchedule) {
+        let viewController = TimeScheduleHostingController(timeSchedule: timeSchedule)
+        navigationController?.pushViewController(viewController, animated: true)
+    }
+
+    /// Opens the loop delay editor and injects the shared Settings navigation
+    /// actions so its child editors push from the side like the rest of Settings.
+    func openLoopDelaySchedule() {
+        let viewController = PortraitLockedHostingController(rootView: AnyView(LoopDelayScheduleView()))
+        viewController.title = Texts_SettingsView.loopDelaysScreenTitle
+        viewController.navigationItem.largeTitleDisplayMode = .never
+        viewController.rootView = AnyView(LoopDelayScheduleView()
+            .environment(\.settingsNavigationActions, viewController.settingsNavigationActions())
+        )
+
+        navigationController?.pushViewController(viewController, animated: true)
+    }
+
+    /// Presents the standard iOS share sheet for files created by Settings actions.
+    func presentShareFile(_ url: URL) {
+        let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: [])
+        present(activityViewController, animated: true)
+    }
+
+    /// Shows, updates or hides the old progress overlay while a Settings action is
+    /// exporting a file. The progress controller is kept because the old export
+    /// code already reports ProgressBarStatus values.
+    func showProgress(_ progress: ProgressBarStatus<URL>?) {
+        if progressBar == nil {
+            let progressBar = ProgressBarViewController()
+            progressBar.start(onParent: self)
+            self.progressBar = progressBar
+        }
+
+        guard let progress else {
+            progressBar?.end()
+            progressBar = nil
+            return
+        }
+
+        progressBar?.update(status: progress)
+
+        if progress.complete {
+            progressBar = nil
+        }
+    }
 }
-
-extension SettingsViewController:UITableViewDataSource, UITableViewDelegate {
-    
-    // MARK: - UITableViewDataSource protocol Methods
-    
-    func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        
-        if let view = view as? UITableViewHeaderFooterView {
-            
-            view.textLabel?.textColor = ConstantsUI.tableViewHeaderTextColor
-            
-        }
-        
-    }
-    
-    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        
-        return viewModels[section].sectionTitle()
-
-    }
-    
-    func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        
-        return viewModels[section].sectionFooter()
-
-    }
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return Section.allCases.count
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        return viewModels[section].numberOfRows()
-        
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        guard var cell = tableView.dequeueReusableCell(withIdentifier: SettingsTableViewCell.reuseIdentifier, for: indexPath) as? SettingsTableViewCell else { fatalError("Unexpected Table View Cell") }
-        
-        // Configure Cell
-
-        SettingsViewUtilities.configureSettingsCell(cell: &cell, forRowWithIndex: indexPath.row, forSectionWithIndex: indexPath.section, withViewModel: viewModels[indexPath.section], tableView: tableView)
-        
-        return cell
-    }
-    
-    // MARK: - UITableViewDelegate protocol Methods
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
-        tableView.deselectRow(at: indexPath, animated: true)
-        
-        let viewModel = viewModels[indexPath.section]
-        
-        if viewModel.isEnabled(index: indexPath.row) {
-            
-            let selectedRowAction = viewModel.onRowSelect(index: indexPath.row)
-            
-            SettingsViewUtilities.runSelectedRowAction(selectedRowAction: selectedRowAction, forRowWithIndex: indexPath.row, forSectionWithIndex: indexPath.section, withSettingsViewModel: viewModel, tableView: tableView, forUIViewController: self)
-            
-        }
-        
-    }
-    
-    func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-        
-        // apple doc says : Use this method to respond to taps in the detail button accessory view of a row. The table view does not call this method for other types of accessory views.
-        // when user clicks on of the detail buttons, then consider this as row selected, for now - as it's only license that is using this button for now
-        self.tableView(tableView, didSelectRowAt: indexPath)
-        
-    }
-}
-
-/// defines perform segue identifiers used within settingsviewcontroller
-extension SettingsViewController {
-    public enum SegueIdentifiers:String {
-
-        /// to go from general settings screen to alert types screen
-        case settingsToAlertTypeSettings = "settingsToAlertTypeSettings"
-        
-        /// to go from general settings screen to alert screen
-        case settingsToAlertSettings = "settingsToAlertSettings"
-        
-        /// to go from general settings screen to M5Stack settings screen
-        case settingsToM5StackSettings = "settingsToM5StackSettings"
-        
-        /// to go from general settings to schedule screen
-        case settingsToSchedule = "settingsToSchedule"
-        
-        /// to go from general settings to loop delay schedule
-        case settingsToLoopDelaySchedule = "settingsToLoopDelaySchedule"
-        
-    }
-}
-
-

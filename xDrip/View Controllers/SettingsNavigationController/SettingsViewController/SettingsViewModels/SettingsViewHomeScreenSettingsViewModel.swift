@@ -112,19 +112,19 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         switch setting {
             
         case .urgentHighMarkValue:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelUrgentHighValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.urgentHighMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultUrgentHighMarkInMgdl.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(urgentHighMarkValue:String) in UserDefaults.standard.urgentHighMarkValueInUserChosenUnitRounded = urgentHighMarkValue}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelUrgentHighValue, message: Texts_SettingsView.urgentHighValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.urgentHighMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultUrgentHighMarkInMgdl.description, unitText: glucoseUnitText, actionTitle: nil, cancelTitle: nil, actionHandler: {(urgentHighMarkValue:String) in UserDefaults.standard.urgentHighMarkValueInUserChosenUnitRounded = urgentHighMarkValue}, cancelHandler: nil, inputValidator: nil)
             
         case .highMarkValue:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelHighValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.highMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultHighMarkInMgdl.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(highMarkValue:String) in UserDefaults.standard.highMarkValueInUserChosenUnitRounded = highMarkValue}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelHighValue, message: Texts_SettingsView.highValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.highMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultHighMarkInMgdl.description, unitText: glucoseUnitText, actionTitle: nil, cancelTitle: nil, actionHandler: {(highMarkValue:String) in UserDefaults.standard.highMarkValueInUserChosenUnitRounded = highMarkValue}, cancelHandler: nil, inputValidator: nil)
             
         case .targetMarkValue:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelTargetValue, message: Texts_SettingsView.targetValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.targetMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultTargetMarkInMgdl.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(targetMarkValue:String) in UserDefaults.standard.targetMarkValueInUserChosenUnitRounded = targetMarkValue}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelTargetValue, message: Texts_SettingsView.targetValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.targetMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultTargetMarkInMgdl.description, unitText: glucoseUnitText, actionTitle: nil, cancelTitle: nil, actionHandler: {(targetMarkValue:String) in UserDefaults.standard.targetMarkValueInUserChosenUnitRounded = targetMarkValue}, cancelHandler: nil, inputValidator: nil)
             
         case .lowMarkValue:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelLowValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.lowMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultLowMarkInMgdl.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(lowMarkValue:String) in UserDefaults.standard.lowMarkValueInUserChosenUnitRounded = lowMarkValue}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelLowValue, message: Texts_SettingsView.lowValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.lowMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultLowMarkInMgdl.description, unitText: glucoseUnitText, actionTitle: nil, cancelTitle: nil, actionHandler: {(lowMarkValue:String) in UserDefaults.standard.lowMarkValueInUserChosenUnitRounded = lowMarkValue}, cancelHandler: nil, inputValidator: nil)
             
         case .urgentLowMarkValue:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelUrgentLowValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.urgentLowMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl.description, actionTitle: nil, cancelTitle: nil, actionHandler: {(urgentLowMarkValue:String) in UserDefaults.standard.urgentLowMarkValueInUserChosenUnitRounded = urgentLowMarkValue}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelUrgentLowValue, message: Texts_SettingsView.urgentLowValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.urgentLowMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl.description, unitText: glucoseUnitText, actionTitle: nil, cancelTitle: nil, actionHandler: {(urgentLowMarkValue:String) in UserDefaults.standard.urgentLowMarkValueInUserChosenUnitRounded = urgentLowMarkValue}, cancelHandler: nil, inputValidator: nil)
             
         case .allowScreenRotation:
             return SettingsSelectedRowAction.callFunction(function: {
@@ -239,19 +239,40 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
             return Texts_SettingsView.showOriginalBGReadings
             
         case .urgentHighMarkValue:
-            return "🔴 " + Texts_SettingsView.labelUrgentHighValue
+            return Texts_SettingsView.labelUrgentHighValue
             
         case .highMarkValue:
-            return "🟡 " + Texts_SettingsView.labelHighValue
+            return Texts_SettingsView.labelHighValue
             
         case .targetMarkValue:
-            return "🟢 " + Texts_SettingsView.labelTargetValue
+            return Texts_SettingsView.labelTargetValue
             
         case .lowMarkValue:
-            return "🟡 " + Texts_SettingsView.labelLowValue
+            return Texts_SettingsView.labelLowValue
             
         case .urgentLowMarkValue:
-            return "🔴 " + Texts_SettingsView.labelUrgentLowValue
+            return Texts_SettingsView.labelUrgentLowValue
+        }
+    }
+
+    /// Returns the colour for the small SwiftUI dot shown beside the glucose
+    /// threshold rows. The row title stays as plain localized text, and SwiftUI
+    /// decides whether to draw the indicator.
+    func rowIndicatorColor(index: Int) -> UIColor? {
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .urgentHighMarkValue, .urgentLowMarkValue:
+            return ConstantsGlucoseChart.glucoseUrgentRangeColor
+
+        case .highMarkValue, .lowMarkValue:
+            return ConstantsGlucoseChart.glucoseNotUrgentRangeColor
+
+        case .targetMarkValue:
+            return ConstantsGlucoseChart.glucoseInRangeColor
+
+        default:
+            return nil
         }
     }
     
@@ -275,19 +296,19 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         switch setting {
             
         case .urgentHighMarkValue:
-            return UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            return glucoseDetailText(for: UserDefaults.standard.urgentHighMarkValueInUserChosenUnit)
             
         case .highMarkValue:
-            return UserDefaults.standard.highMarkValueInUserChosenUnit.bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            return glucoseDetailText(for: UserDefaults.standard.highMarkValueInUserChosenUnit)
             
         case .targetMarkValue:
-            return UserDefaults.standard.targetMarkValueInUserChosenUnit == 0 ? Texts_Common.disabled : UserDefaults.standard.targetMarkValueInUserChosenUnit.bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            return UserDefaults.standard.targetMarkValueInUserChosenUnit == 0 ? Texts_Common.disabled : glucoseDetailText(for: UserDefaults.standard.targetMarkValueInUserChosenUnit)
             
         case .lowMarkValue:
-            return UserDefaults.standard.lowMarkValueInUserChosenUnit.bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            return glucoseDetailText(for: UserDefaults.standard.lowMarkValueInUserChosenUnit)
             
         case .urgentLowMarkValue:
-            return UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+            return glucoseDetailText(for: UserDefaults.standard.urgentLowMarkValueInUserChosenUnit)
             
         case .screenLockDimmingType:
             return UserDefaults.standard.screenLockDimmingType.description
@@ -296,6 +317,18 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
             return nil
             
         }
+    }
+
+    /// Formats the glucose threshold detail text with the current unit.
+    /// These Settings rows have enough space now, so the value and unit can live
+    /// together on the right-hand side.
+    private func glucoseDetailText(for value: Double) -> String {
+        return value.bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl) + " " + glucoseUnitText
+    }
+
+    /// Returns the current glucose unit text used beside glucose threshold values.
+    private var glucoseUnitText: String {
+        UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol
     }
 
     // MARK: - observe functions

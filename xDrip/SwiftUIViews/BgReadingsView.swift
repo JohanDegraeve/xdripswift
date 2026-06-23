@@ -228,11 +228,9 @@ struct BgReadingsView: View {
         editMode?.wrappedValue = .inactive
     }
     
-    /// returns the visual indicator colour based on the BgRangeDescription from a BgReading
-    /// - parameters:
-    ///   - bgRangeDescription: an enum as defined in ConstantsCalendar
-    /// - returns:
-    ///   - a color for the row indicator
+    /// Returns the colour for the small dot shown beside each glucose reading.
+    /// The reading still owns the range decision, while the SwiftUI row draws the
+    /// symbol instead of using the old emoji marker text.
     private func bgRangeIndicatorColor(bgRangeDescription: BgRangeDescription) -> Color {
         switch bgRangeDescription {
         case .inRange:

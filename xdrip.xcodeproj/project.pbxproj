@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		07ECB18D91AE096E637D1393 /* AlertsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */; };
+		2BB9AEE4FF9AF41B59A1AA52 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9C75EA5D78E3497AC44D3C8 /* SettingsView.swift */; };
 		47037B8E2C072346000BD6BD /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
 		47037B8F2C072973000BD6BD /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
 		47037B902C072974000BD6BD /* ConstantsAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F88EC279260120C000DF0EAF /* ConstantsAlerts.swift */; };
@@ -247,6 +249,8 @@
 		4C2000052F65000100000001 /* BluetoothPeripheralDetailState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2000062F65000100000001 /* BluetoothPeripheralDetailState.swift */; };
 		4C2000072F65000100000001 /* BluetoothPeripheralDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2000082F65000100000001 /* BluetoothPeripheralDetailView.swift */; };
 		4C2000092F65000100000001 /* BluetoothPeripheralSettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C20000A2F65000100000001 /* BluetoothPeripheralSettingsRow.swift */; };
+		7DDD89BD4ECFCE7BDA8D3AE2 /* SettingsSharedUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */; };
+		C2385D0CA6579919114B060A /* AlertTypesSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */; };
 		CE1B2FE025D0264B00F642F5 /* LaunchScreen.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */; };
 		CE1B2FE125D0264B00F642F5 /* Main.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD425D0264900F642F5 /* Main.strings */; };
 		D400F8032778BD8000B57648 /* TextsTreatmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D400F8022778BD8000B57648 /* TextsTreatmentsView.swift */; };
@@ -262,6 +266,7 @@
 		D4E499AB277B43E3000F8CBA /* TreatmentCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E499AA277B43E3000F8CBA /* TreatmentCollection.swift */; };
 		D4E499AD277B4CE7000F8CBA /* DateOnly.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E499AC277B4CE7000F8CBA /* DateOnly.swift */; };
 		D4FD899727772F9100689788 /* TreatmentEntryAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */; };
+		DB718DBF9805AC4B21C95739 /* TimeScheduleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD00FB5270FD0E5E2F710BE6 /* TimeScheduleView.swift */; };
 		E4C006212B3DE8EC00D59303 /* GlucoseIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4C006202B3DE8EC00D59303 /* GlucoseIntent.swift */; };
 		F227BF192B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F227BF182B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift */; };
 		F227BF1C2B9E426B00CEEAAD /* ContactImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F227BF1B2B9E426B00CEEAAD /* ContactImageManager.swift */; };
@@ -794,6 +799,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlertTypesSettingsView.swift; sourceTree = "<group>"; };
 		198D44C4260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Alerts.strings; sourceTree = "<group>"; };
 		198D44C5260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
 		198D44C6260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/BluetoothPeripheralsView.strings; sourceTree = "<group>"; };
@@ -1042,6 +1048,8 @@
 		4C20000A2F65000100000001 /* BluetoothPeripheralSettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralSettingsRow.swift; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xDrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xDrip/Version.xcconfig; sourceTree = "<group>"; };
+		763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlertsSettingsView.swift; sourceTree = "<group>"; };
+		CD00FB5270FD0E5E2F710BE6 /* TimeScheduleView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TimeScheduleView.swift; sourceTree = "<group>"; };
 		CE1B2FC825D0261500F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Alerts.strings; sourceTree = "<group>"; };
 		CE1B2FCD25D0264900F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
 		CE1B2FCF25D0264900F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/LibreNFC.strings; sourceTree = "<group>"; };
@@ -1085,8 +1093,10 @@
 		D4E499AA277B43E3000F8CBA /* TreatmentCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentCollection.swift; sourceTree = "<group>"; };
 		D4E499AC277B4CE7000F8CBA /* DateOnly.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateOnly.swift; sourceTree = "<group>"; };
 		D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TreatmentEntryAccessor.swift; sourceTree = "<group>"; };
+		D9C75EA5D78E3497AC44D3C8 /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		E4C006202B3DE8EC00D59303 /* GlucoseIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseIntent.swift; sourceTree = "<group>"; };
 		E4D530622B418FF80018C6A4 /* AppShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShortcuts.swift; sourceTree = "<group>"; };
+		E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsSharedUtilities.swift; sourceTree = "<group>"; };
 		F227BF182B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewContactImageSettingsViewModel.swift; sourceTree = "<group>"; };
 		F227BF1B2B9E426B00CEEAAD /* ContactImageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactImageManager.swift; sourceTree = "<group>"; };
 		F51B9F7C24B216CD00FC0643 /* Libre1NonFixedSlopeCalibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre1NonFixedSlopeCalibrator.swift; sourceTree = "<group>"; };
@@ -2579,6 +2589,11 @@
 			isa = PBXGroup;
 			children = (
 				F866974F2867AA4A00025441 /* LoopDelayScheduleView.swift */,
+				E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */,
+				D9C75EA5D78E3497AC44D3C8 /* SettingsView.swift */,
+				CD00FB5270FD0E5E2F710BE6 /* TimeScheduleView.swift */,
+				102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */,
+				763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -4418,6 +4433,11 @@
 				F8A1586522EDB89D007F5B5D /* ConstantsDefaultAlertTypeSettings.swift in Sources */,
 				D41F32922827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift in Sources */,
 				F8FDFEAD260DE1B90047597D /* ConstantsUI.swift in Sources */,
+				7DDD89BD4ECFCE7BDA8D3AE2 /* SettingsSharedUtilities.swift in Sources */,
+				2BB9AEE4FF9AF41B59A1AA52 /* SettingsView.swift in Sources */,
+				DB718DBF9805AC4B21C95739 /* TimeScheduleView.swift in Sources */,
+				C2385D0CA6579919114B060A /* AlertTypesSettingsView.swift in Sources */,
+				07ECB18D91AE096E637D1393 /* AlertsSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

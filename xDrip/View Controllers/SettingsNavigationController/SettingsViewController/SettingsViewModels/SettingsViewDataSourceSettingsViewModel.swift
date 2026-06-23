@@ -667,7 +667,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             return UserDefaults.standard.followerDataSourceType.description
             
         case .followerExtraRow5:
-            return followerServiceStatusResult.status.icon + " " + followerServiceStatusResult.description
+            return followerServiceStatusResult.description
             
         case .followerExtraRow6:
             return UserDefaults.standard.nightscoutEnabled ? nil : Texts_SettingsView.nightscoutNotEnabledRowText
@@ -826,6 +826,15 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             return nil
         }
     }
+
+    /// Returns the colour for the small SwiftUI dot shown beside the follower
+    /// service status detail text. The status description stays clean so the UI
+    /// can draw the indicator without adding emoji to the string.
+    func followerServiceStatusIndicatorColor(index: Int) -> UIColor? {
+        guard let setting = Setting(rawValue: index), setting == .followerExtraRow5 else { return nil }
+
+        return followerServiceStatusResult.status.indicatorColor
+    }
     
     func uiView(index: Int) -> UIView? {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
@@ -930,18 +939,14 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
 
 extension SettingsViewDataSourceSettingsViewModel {
     
-    /// defines the service status based upon the status.indicator attribute of the summary response
-    ///
-    /// "status": {
-    ///     "indicator": "none",
-    ///     "description": "All Systems Operational"
-    /// }
-    ///
-    /// https://status.atlassian.com/api#summary
-    ///
+    /// Represents the operational status returned by the follower service status endpoint.
+    /// The API gives us text such as `none`, `minor` or `critical`; SwiftUI uses this
+    /// enum to keep the displayed description and coloured detail dot in sync.
     enum FollowerServiceStatus {
         case notAvailable, ok, degraded, outage, unknown, error
 
+        /// Converts the remote status indicator string into the local status used
+        /// by Settings. Unknown strings are kept separate so the UI can show Checking.
         init(indicator: String = "") {
             switch indicator { // need to add more Nightscout status cases here
             case "":
@@ -957,21 +962,24 @@ extension SettingsViewDataSourceSettingsViewModel {
             }
         }
         
-        var icon: String {
+        /// Maps the follower service status to the colour used by the SwiftUI
+        /// detail indicator. States that should not show a marker return nil.
+        var indicatorColor: UIColor? {
             switch self {
             case .ok:
-                return "🟢 "
+                return .systemGreen
             case .degraded:
-                return "🟡 "
+                return .systemYellow
             case .outage:
-                return "🔴 "
+                return .systemRed
             case .error:
-                return "⚠️ "
+                return .systemOrange
             default:
-                return ""
+                return nil
             }
         }
         
+        /// Returns the short text shown in the service status row.
         var description: String {
             switch self {
             case .notAvailable:
@@ -994,9 +1002,10 @@ extension SettingsViewDataSourceSettingsViewModel {
         let status: FollowerServiceStatus
         let description: String
         
-        // set the default initialization values to unknown and "checking...", this is useful for the UI
+        /// Builds the row value shown in Settings. Nightscout follower mode is marked
+        /// as not available when Nightscout is disabled or has no URL, otherwise the
+        /// default starts as Checking until the async status request finishes.
         init(status: FollowerServiceStatus = .unknown, description: String? = nil) {
-            // make a quick check to set Nightscout follower service status to not available if Nightscout isn't enabled or if a valid URL doesn't exist
             if UserDefaults.standard.followerDataSourceType == .nightscout && (!UserDefaults.standard.nightscoutEnabled || UserDefaults.standard.nightscoutUrl == "") {
                 self.status = .notAvailable
             } else {

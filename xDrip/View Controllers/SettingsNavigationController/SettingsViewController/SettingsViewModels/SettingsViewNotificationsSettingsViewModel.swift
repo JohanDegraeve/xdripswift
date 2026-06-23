@@ -66,7 +66,7 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
             
         case .notificationInterval:
             
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_IntervalTitle, message: Texts_SettingsView.settingsviews_IntervalMessage, keyboardType: .numberPad, text: UserDefaults.standard.notificationInterval.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.notificationInterval = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_IntervalTitle, message: Texts_SettingsView.settingsviews_IntervalMessage, keyboardType: .numberPad, text: UserDefaults.standard.notificationInterval.description, placeHolder: "0", fieldTitle: Texts_Common.enterValue, unitText: Texts_Common.minutes, actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.notificationInterval = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
             
         case .liveActivityType:
             // live activities can only be used in master mode as follower mode
@@ -184,7 +184,7 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
             return nil
             
         case .notificationInterval:
-            return UserDefaults.standard.notificationInterval.description
+            return UserDefaults.standard.notificationInterval.description + " " + Texts_Common.minutes
             
         case .liveActivityType:
             return UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat ? UserDefaults.standard.liveActivityType.description : Texts_SettingsView.liveActivityDisabledInFollowerMode

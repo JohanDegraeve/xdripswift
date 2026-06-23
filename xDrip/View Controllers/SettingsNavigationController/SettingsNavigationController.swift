@@ -7,6 +7,14 @@ final class SettingsNavigationController: UINavigationController {
     override var preferredStatusBarStyle: UIStatusBarStyle {
         return .lightContent
     }
+
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return .portrait
+    }
+
+    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
+        return .portrait
+    }
     
     // MARK:- private properties
     
@@ -18,11 +26,14 @@ final class SettingsNavigationController: UINavigationController {
     
     // MARK:- public functions
     
-    /// configure
+    /// Stores the dependencies needed by the SwiftUI Settings root and installs it
+    /// once RootViewController has finished wiring the tab.
     public func configure(coreDataManager:CoreDataManager, soundPlayer:SoundPlayer) {
         
         self.coreDataManager = coreDataManager
         self.soundPlayer = soundPlayer
+
+        installSwiftUISettingsRootIfNeeded()
         
     }
     
@@ -49,6 +60,8 @@ final class SettingsNavigationController: UINavigationController {
     
         // restrict rotation of this Navigation Controller to just portrait
         (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
+
+        configureNavigationBarAppearance()
         
     }
 
@@ -56,9 +69,46 @@ final class SettingsNavigationController: UINavigationController {
 
 extension SettingsNavigationController:UINavigationControllerDelegate {
     func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
-        
-        if let settingsViewController = viewController as? SettingsViewController {
-            settingsViewController.configure(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
+    }
+}
+
+private extension SettingsNavigationController {
+    /// Applies the dark navigation bar used by the SwiftUI Settings host.
+    /// Keeping this in the navigation controller makes pushed Settings screens
+    /// inherit the same appearance.
+    func configureNavigationBarAppearance() {
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = ConstantsUI.listBackGroundUIColor
+        appearance.shadowColor = nil
+        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
+        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+
+        navigationBar.barStyle = .black
+        navigationBar.isTranslucent = false
+        navigationBar.barTintColor = ConstantsUI.listBackGroundUIColor
+        navigationBar.tintColor = .yellow
+        navigationBar.prefersLargeTitles = false
+        navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
+        navigationBar.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        navigationBar.standardAppearance = appearance
+        navigationBar.scrollEdgeAppearance = appearance
+        navigationBar.compactAppearance = appearance
+    }
+
+    /// Replaces the storyboard Settings child with the SwiftUI Settings root once
+    /// the dependencies have been provided by RootViewController.
+    func installSwiftUISettingsRootIfNeeded() {
+        guard coreDataManager != nil, soundPlayer != nil else {
+            return
         }
+
+        if viewControllers.first is SettingsHostingController {
+            return
+        }
+
+        setViewControllers([
+            SettingsHostingController(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
+        ], animated: false)
     }
 }

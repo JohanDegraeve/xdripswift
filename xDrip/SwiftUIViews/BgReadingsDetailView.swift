@@ -63,10 +63,13 @@ struct BgReadingsDetailView: View {
     
     // MARK: - private functions
     
-    /// returns a row view so that all rows are the same
+    /// Returns a row view so that all rows are laid out the same way.
+    /// Some rows can pass an indicator colour to show a small dot before the value
+    /// without adding any marker text to the value string.
     /// - parameters:
     ///   - title: the title text
     ///   - data: the value text
+    ///   - indicatorColor: optional colour for the dot before the value
     /// - returns:
     ///   - a view with the formatted row inside it
     private func row(title: String, data: String, indicatorColor: Color? = nil) -> AnyView {
@@ -99,6 +102,9 @@ struct BgReadingsDetailView: View {
         return displayBgValue(valueInMgDl)
     }
 
+    /// Returns the colour for the small dot shown before the final glucose value.
+    /// This uses the same range decision as the readings list so the detail view
+    /// stays visually consistent.
     private func bgRangeIndicatorColor(bgRangeDescription: BgRangeDescription) -> Color {
         switch bgRangeDescription {
         case .inRange:

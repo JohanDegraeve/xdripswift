@@ -144,7 +144,7 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
             return nil
             
         case .calendarInterval:
-            return UserDefaults.standard.calendarInterval.description
+            return UserDefaults.standard.calendarInterval.description + " " + Texts_Common.minutes
 
         }
     }
@@ -383,7 +383,7 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
 
         case .calendarInterval:
         
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_CalenderIntervalTitle, message: Texts_SettingsView.settingsviews_CalenderIntervalMessage, keyboardType: .numberPad, text: UserDefaults.standard.calendarInterval.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.calendarInterval = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_CalenderIntervalTitle, message: Texts_SettingsView.settingsviews_CalenderIntervalMessage, keyboardType: .numberPad, text: UserDefaults.standard.calendarInterval.description, placeHolder: "0", fieldTitle: Texts_Common.enterValue, unitText: Texts_Common.minutes, actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.calendarInterval = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
 
         }
         

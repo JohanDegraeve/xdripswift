@@ -50,7 +50,7 @@ class Texts_SettingsView {
     }()
     
     static let liveActivityDisabledInFollowerModeMessage: String = {
-        return NSLocalizedString("settingsviews_liveActivityDisabledInFollowerModeMessage", tableName: filename, bundle: Bundle.main, value: "\nLive activities can only be used in Follower mode when a valid heartbeat is enabled.", comment: "notification settings, live activities are not available in follower mode")
+        return NSLocalizedString("settingsviews_liveActivityDisabledInFollowerModeMessage", tableName: filename, bundle: Bundle.main, value: "Live activities can only be used in Follower mode when a valid heartbeat is enabled.", comment: "notification settings, live activities are not available in follower mode")
     }()
     
     static let liveActivityTypeMinimal: String = {
@@ -277,9 +277,17 @@ class Texts_SettingsView {
     static let labelUrgentHighValue: String = {
         return NSLocalizedString("settingsviews_urgentHighValue", tableName: filename, bundle: Bundle.main, value: "Urgent High Value", comment: "home screen settings, urgent high value")
     }()
+
+    static let urgentHighValueMessage: String = {
+        return NSLocalizedString("settingsviews_urgentHighValueMessage", tableName: filename, bundle: Bundle.main, value: "Enter the glucose value for the urgent high threshold.", comment: "home screen settings, ask the user to enter the urgent high glucose value")
+    }()
     
     static let labelHighValue: String = {
         return NSLocalizedString("settingsviews_highValue", tableName: filename, bundle: Bundle.main, value: "High Value", comment: "home screen settings, high value")
+    }()
+
+    static let highValueMessage: String = {
+        return NSLocalizedString("settingsviews_highValueMessage", tableName: filename, bundle: Bundle.main, value: "Enter the glucose value for the high threshold.", comment: "home screen settings, ask the user to enter the high glucose value")
     }()
     
     static let labelTargetValue: String = {
@@ -293,9 +301,17 @@ class Texts_SettingsView {
     static let labelLowValue: String = {
         return NSLocalizedString("settingsviews_lowValue", tableName: filename, bundle: Bundle.main, value: "Low Value", comment: "home screen settings, low value")
     }()
+
+    static let lowValueMessage: String = {
+        return NSLocalizedString("settingsviews_lowValueMessage", tableName: filename, bundle: Bundle.main, value: "Enter the glucose value for the low threshold.", comment: "home screen settings, ask the user to enter the low glucose value")
+    }()
     
     static let labelUrgentLowValue: String = {
         return NSLocalizedString("settingsviews_urgentLowValue", tableName: filename, bundle: Bundle.main, value: "Urgent Low Value", comment: "home screen settings, urgent low value")
+    }()
+
+    static let urgentLowValueMessage: String = {
+        return NSLocalizedString("settingsviews_urgentLowValueMessage", tableName: filename, bundle: Bundle.main, value: "Enter the glucose value for the urgent low threshold.", comment: "home screen settings, ask the user to enter the urgent low glucose value")
     }()
     
     static let labelShowTarget: String = {
@@ -402,7 +418,7 @@ class Texts_SettingsView {
     }()
     
     static let resetDexcomTransmitterMessage: String = {
-        return NSLocalizedString("settingsviews_resetDexcomTransmitterMessage", tableName: filename, bundle: Bundle.main, value: "\nThis option will attempt to reset your Anubis transmitter on the next connection.", comment: "transmitter settings, to explain that the reset option only works for certain transmitters")
+        return NSLocalizedString("settingsviews_resetDexcomTransmitterMessage", tableName: filename, bundle: Bundle.main, value: "This option will attempt to reset your Anubis transmitter on the next connection.", comment: "transmitter settings, to explain that the reset option only works for certain transmitters")
     }()
     
     static let labelWebOOPTransmitter:String = {
@@ -554,7 +570,7 @@ class Texts_SettingsView {
     }()
     
     static let giveNightscoutAPIKey = {
-        return NSLocalizedString("settingsviews_giveNightscoutAPIKey", tableName: filename, bundle: Bundle.main, value: "Enter your API_SECRET", comment: "nightscout settings, pop up that asks user to enter nightscout api key")
+        return NSLocalizedString("settingsviews_giveNightscoutAPIKey", tableName: filename, bundle: Bundle.main, value: "Enter API_SECRET", comment: "nightscout settings, pop up that asks user to enter nightscout api key")
     }()
     
     static let editScheduleTimePickerSubtitle: String = {
@@ -576,9 +592,17 @@ class Texts_SettingsView {
     static let nightscoutPort: String = {
         return NSLocalizedString("nightscoutPort", tableName: filename, bundle: Bundle.main, value: "Port:", comment: "nightscout settings, port to use")
     }()
+
+    static let enterNightscoutPortNumber: String = {
+        return NSLocalizedString("enterNightscoutPortNumber", tableName: filename, bundle: Bundle.main, value: "Enter Port Number", comment: "nightscout settings, row label when entering the port number")
+    }()
     
     static let nightscoutToken: String = {
         return NSLocalizedString("nightscoutToken", tableName: filename, bundle: Bundle.main, value: "Token", comment: "nightscout settings, token to use")
+    }()
+
+    static let giveNightscoutToken: String = {
+        return NSLocalizedString("giveNightscoutToken", tableName: filename, bundle: Bundle.main, value: "Enter Token", comment: "nightscout settings, pop up that asks user to enter token")
     }()
     
     static let openNightscout: String = {
@@ -915,7 +939,7 @@ class Texts_SettingsView {
     }()
     
     static let libreLinkUpVersionMessage = {
-        return String(format: NSLocalizedString("libreLinkUpVersionMessage", tableName: filename, bundle: Bundle.main, value: "\nSetting this value incorrectly could result in your LibreLinkUp account being locked.\n\nDo not touch this setting unless instructed by an xDrip4iOS developer.\n\nThe default version is: %@", comment: "developer settings, ask the user for the libre link up version"), ConstantsLibreLinkUp.libreLinkUpVersionDefault)        
+        return String(format: NSLocalizedString("libreLinkUpVersionMessage", tableName: filename, bundle: Bundle.main, value: "Setting this value incorrectly could result in your LibreLinkUp account being locked.\n\nDo not touch this setting unless instructed by an xDrip4iOS developer.\n\nThe default version is: %@", comment: "developer settings, ask the user for the libre link up version"), ConstantsLibreLinkUp.libreLinkUpVersionDefault)
     }()
     
     static let CAGEMaxHours: String = {
@@ -923,7 +947,7 @@ class Texts_SettingsView {
     }()
     
     static let CAGEMaxHoursMessage = {
-        return String(format: NSLocalizedString("CAGEMaxHoursMessage", tableName: filename, bundle: Bundle.main, value: "\nHow many hours until the canula should be considered as expired\n\nEnter 0 to set it back to the default value of %@ hours", comment: "developer settings, message asking the user to enter the number of hours until the canula should be considered as expired"), ConstantsHomeView.CAGEDefaultMaxHours.description)
+        return String(format: NSLocalizedString("CAGEMaxHoursMessage", tableName: filename, bundle: Bundle.main, value: "How many hours until the canula should be considered as expired\n\nEnter 0 to set it back to the default value of %@ hours", comment: "developer settings, message asking the user to enter the number of hours until the canula should be considered as expired"), ConstantsHomeView.CAGEDefaultMaxHours.description)
     }()
     
     // MARK: - Section Housekeeper

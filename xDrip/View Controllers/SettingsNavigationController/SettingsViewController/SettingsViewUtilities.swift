@@ -64,7 +64,7 @@ class SettingsViewUtilities {
             
             switch selectedRowAction {
                 
-            case let .askText(title, message, keyboardType, text, placeHolder, actionTitle, cancelTitle, actionHandler, cancelHandler, inputValidator):
+            case let .askText(title, message, keyboardType, text, placeHolder, _, _, actionTitle, cancelTitle, actionHandler, cancelHandler, inputValidator):
                 
                 let alert = UIAlertController(title: title, message: message, keyboardType: keyboardType, text: text, placeHolder: placeHolder, actionTitle: actionTitle, cancelTitle: cancelTitle, actionHandler: { (text:String) in
                     
