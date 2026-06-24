@@ -247,6 +247,12 @@
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Settings";
+"settingsviews_glucoseDisplaySectionTitle" = "Відображення глюкози";
+"settingsviews_glucoseRangesSectionTitle" = "Діапазони глюкози";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Оповіщення та сповіщення";
+"settingsviews_sharingAndServicesSectionTitle" = "Обмін і сервіси";
+"settingsviews_osAidLoopShareSectionTitle" = "Обмін OS-AID";
+"settingsviews_issueReportSectionTitle" = "Звіт про проблему";
 
 /// Advanced Settings, section title
 "developerSettings" = "Розширені налаштування";

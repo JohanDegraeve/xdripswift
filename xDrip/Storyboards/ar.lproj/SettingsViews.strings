@@ -1,4 +1,10 @@
 "settingsviews_settingstitle" = "الإعدادات";
+"settingsviews_glucoseDisplaySectionTitle" = "عرض الجلوكوز";
+"settingsviews_glucoseRangesSectionTitle" = "نطاقات الجلوكوز";
+"settingsviews_alertsAndNotificationsSectionTitle" = "التنبيهات والإشعارات";
+"settingsviews_sharingAndServicesSectionTitle" = "المشاركة والخدمات";
+"settingsviews_osAidLoopShareSectionTitle" = "مشاركة OS-AID";
+"settingsviews_issueReportSectionTitle" = "تقرير مشكلة";
 "settingsviews_sectiontitleNotifications" = "عام";
 "settingsviews_selectbgunit" = "وحدة قياس السكر";
 "settingsviews_masterorfollower" = "الاستخدام كتطبيق رئيسي أو للمتابعة؟";

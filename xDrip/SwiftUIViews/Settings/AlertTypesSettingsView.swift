@@ -478,7 +478,7 @@ final class AlertTypesSettingsHostingController: PortraitLockedHostingController
             self?.open(alertType: alertType)
         })
         title = Texts_AlertTypeSettingsView.alertTypesScreenTitle
-        navigationItem.largeTitleDisplayMode = .never
+        navigationItem.largeTitleDisplayMode = .automatic
     }
 
     @objc required dynamic init?(coder aDecoder: NSCoder) {

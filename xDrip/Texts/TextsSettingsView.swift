@@ -15,6 +15,30 @@ class Texts_SettingsView {
     static let screenTitle: String = {
         return NSLocalizedString("settingsviews_settingstitle", tableName: filename, bundle: Bundle.main, value: "Settings", comment: "shown on top of the first settings screen, literally 'Settings'")
     }()
+
+    static let glucoseDisplaySectionTitle: String = {
+        return NSLocalizedString("settingsviews_glucoseDisplaySectionTitle", tableName: filename, bundle: Bundle.main, value: "Glucose Display", comment: "settings group title for glucose display options")
+    }()
+
+    static let glucoseRangesSectionTitle: String = {
+        return NSLocalizedString("settingsviews_glucoseRangesSectionTitle", tableName: filename, bundle: Bundle.main, value: "Glucose Ranges", comment: "settings section title for glucose range threshold values")
+    }()
+
+    static let alertsAndNotificationsSectionTitle: String = {
+        return NSLocalizedString("settingsviews_alertsAndNotificationsSectionTitle", tableName: filename, bundle: Bundle.main, value: "Alerts and Notifications", comment: "settings group title for alerts and notifications")
+    }()
+
+    static let sharingAndServicesSectionTitle: String = {
+        return NSLocalizedString("settingsviews_sharingAndServicesSectionTitle", tableName: filename, bundle: Bundle.main, value: "Sharing and Services", comment: "settings group title for sharing and external services")
+    }()
+
+    static let osAidLoopShareSectionTitle: String = {
+        return NSLocalizedString("settingsviews_osAidLoopShareSectionTitle", tableName: filename, bundle: Bundle.main, value: "OS-AID Share", comment: "settings section title for OS-AID sharing")
+    }()
+
+    static let issueReportSectionTitle: String = {
+        return NSLocalizedString("settingsviews_issueReportSectionTitle", tableName: filename, bundle: Bundle.main, value: "Issue Report", comment: "settings section title for sending issue report logs")
+    }()
     
     // MARK: - Section Help
     

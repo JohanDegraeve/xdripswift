@@ -1,4 +1,10 @@
 "settingsviews_settingstitle" = "Settings";
+"settingsviews_glucoseDisplaySectionTitle" = "Glucose Display";
+"settingsviews_glucoseRangesSectionTitle" = "Glucose Ranges";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Alerts and Notifications";
+"settingsviews_sharingAndServicesSectionTitle" = "Sharing and Services";
+"settingsviews_osAidLoopShareSectionTitle" = "OS-AID Share";
+"settingsviews_issueReportSectionTitle" = "Issue Report";
 "settingsviews_valueIsRequired" = "⚠️ Required";
 "settingsviews_sectiontitlehelp" = "Help & Documentation";
 "settingsviews_showOnlineHelp" = "Open Online Help";

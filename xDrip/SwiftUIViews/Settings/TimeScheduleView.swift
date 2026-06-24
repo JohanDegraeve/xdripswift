@@ -171,11 +171,13 @@ struct SettingsDatePickerView: View {
 
     let datePicker: SettingsDatePickerContent
     let close: () -> Void
+    private let initialDate: Date
 
     /// Starts the picker on the date supplied by the calling Settings row.
     init(datePicker: SettingsDatePickerContent, close: @escaping () -> Void) {
         self.datePicker = datePicker
         self.close = close
+        self.initialDate = datePicker.date
         _selectedDate = State(initialValue: datePicker.date)
     }
 
@@ -217,6 +219,7 @@ struct SettingsDatePickerView: View {
                     datePicker.ok(selectedDate)
                     close()
                 }
+                .disabled(selectedDate == initialDate)
             }
         }
         .onDisappear {
@@ -252,7 +255,7 @@ final class TimeScheduleHostingController: PortraitLockedHostingController<AnyVi
         super.init(rootView: AnyView(TimeScheduleView(timeSchedule: timeSchedule)))
 
         title = timeSchedule.serviceName()
-        navigationItem.largeTitleDisplayMode = .never
+        navigationItem.largeTitleDisplayMode = .automatic
         rootView = AnyView(TimeScheduleView(timeSchedule: timeSchedule)
             .environment(\.settingsNavigationActions, settingsNavigationActions())
         )

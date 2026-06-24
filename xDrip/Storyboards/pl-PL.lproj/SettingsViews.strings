@@ -41,6 +41,12 @@
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Settings";
+"settingsviews_glucoseDisplaySectionTitle" = "Wyświetlanie glukozy";
+"settingsviews_glucoseRangesSectionTitle" = "Zakresy glukozy";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Alarmy i powiadomienia";
+"settingsviews_sharingAndServicesSectionTitle" = "Udostępnianie i usługi";
+"settingsviews_osAidLoopShareSectionTitle" = "Udostępnianie OS-AID";
+"settingsviews_issueReportSectionTitle" = "Raport problemu";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
 "settingsviews_IntervalMessage" = "Minimum interval between two notifications";

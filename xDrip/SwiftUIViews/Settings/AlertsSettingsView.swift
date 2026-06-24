@@ -739,7 +739,7 @@ final class AlertsSettingsHostingController: PortraitLockedHostingController<Any
             self?.open(request: request)
         })
         title = Texts_Alerts.alertsScreenTitle
-        navigationItem.largeTitleDisplayMode = .never
+        navigationItem.largeTitleDisplayMode = .automatic
     }
 
     @objc required dynamic init?(coder aDecoder: NSCoder) {

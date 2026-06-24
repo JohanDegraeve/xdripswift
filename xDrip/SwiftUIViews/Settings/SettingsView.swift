@@ -57,20 +57,11 @@ struct SettingsView: View {
 enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
     case help
     case dataSource
-    case general
-    case homescreen
-    case alarms
-    case statistics
-    case nightscout
-    case dexcom
-    case healthkit
-    case speak
-    case calendarEvents
-    case contactImage
-    case M5stack
-    case trace
-    case info
-    case developer
+    case glucoseDisplay
+    case alertsAndNotifications
+    case sharingAndServices
+    case about
+    case advanced
 
     /// Creates the old Settings section view model for this SwiftUI section.
     /// The SwiftUI list still asks these view models for row text, detail text,
@@ -81,36 +72,238 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
             return SettingsViewHelpSettingsViewModel()
         case .dataSource:
             return SettingsViewDataSourceSettingsViewModel(coreDataManager: coreDataManager)
-        case .general:
-            return SettingsViewNotificationsSettingsViewModel()
-        case .homescreen:
-            return SettingsViewHomeScreenSettingsViewModel()
-        case .alarms:
-            return SettingsViewAlertSettingsViewModel()
-        case .statistics:
-            return SettingsViewStatisticsSettingsViewModel()
-        case .nightscout:
-            return SettingsViewNightscoutSettingsViewModel()
-        case .dexcom:
-            return SettingsViewDexcomShareUploadSettingsViewModel()
-        case .healthkit:
-            return SettingsViewHealthKitSettingsViewModel()
-        case .speak:
-            return SettingsViewSpeakSettingsViewModel()
-        case .calendarEvents:
-            return SettingsViewCalendarEventsSettingsViewModel()
-        case .contactImage:
-            return SettingsViewContactImageSettingsViewModel()
-        case .M5stack:
-            return SettingsViewM5StackSettingsViewModel()
-        case .trace:
-            return SettingsViewTraceSettingsViewModel()
-        case .info:
+        case .glucoseDisplay:
+            return SettingsViewGroupedSettingsViewModel.glucoseDisplay()
+        case .alertsAndNotifications:
+            return SettingsViewGroupedSettingsViewModel.alertsAndNotifications()
+        case .sharingAndServices:
+            return SettingsViewGroupedSettingsViewModel.sharingAndServices()
+        case .about:
             return SettingsViewInfoViewModel()
-        case .developer:
+        case .advanced:
             return SettingsViewDevelopmentSettingsViewModel()
         }
     }
+}
+
+struct SettingsGroupedRow {
+    let id: String
+    let title: String
+    let settingsScreen: () -> SettingsScreen
+}
+
+/// SettingsViewGroupedSettingsViewModel creates the new parent sections in the
+/// Settings menu. Each row opens a child SettingsScreen made from existing
+/// section providers, so the old feature logic stays in the original view model.
+struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, SettingsNativeSectionProvider {
+    private let title: String
+    private let rows: [SettingsGroupedRow]
+
+    static func glucoseDisplay() -> SettingsViewGroupedSettingsViewModel {
+        SettingsViewGroupedSettingsViewModel(
+            title: ConstantsSettingsIcons.glucoseDisplaySettingsIcon + " " + Texts_SettingsView.glucoseDisplaySectionTitle,
+            rows: [
+                SettingsGroupedRow(
+                    id: "glucoseDisplay.homeScreen",
+                    title: Texts_SettingsView.sectionTitleHomeScreen,
+                    settingsScreen: {
+                        SettingsScreen(
+                            title: Texts_SettingsView.sectionTitleHomeScreen,
+                            providers: { [SettingsViewHomeScreenSettingsViewModel(rowGroup: .homeScreen)] }
+                        )
+                    }
+                ),
+                SettingsGroupedRow(
+                    id: "glucoseDisplay.glucoseRanges",
+                    title: Texts_SettingsView.glucoseRangesSectionTitle,
+                    settingsScreen: {
+                        SettingsScreen(
+                            title: Texts_SettingsView.glucoseRangesSectionTitle,
+                            providers: { [SettingsViewHomeScreenSettingsViewModel(rowGroup: .glucoseRanges)] }
+                        )
+                    }
+                ),
+                SettingsGroupedRow(
+                    id: "glucoseDisplay.statistics",
+                    title: Texts_SettingsView.sectionTitleStatistics,
+                    settingsScreen: {
+                        SettingsScreen(
+                            title: Texts_SettingsView.sectionTitleStatistics,
+                            providers: { [SettingsViewStatisticsSettingsViewModel()] }
+                        )
+                    }
+                )
+            ]
+        )
+    }
+
+    static func alertsAndNotifications() -> SettingsViewGroupedSettingsViewModel {
+        SettingsViewGroupedSettingsViewModel(
+            title: ConstantsSettingsIcons.notificationsSettingsIcon + " " + Texts_SettingsView.alertsAndNotificationsSectionTitle,
+            rows: [
+                SettingsGroupedRow(
+                    id: "alertsAndNotifications.notifications",
+                    title: Texts_SettingsView.sectionTitleNotifications,
+                    settingsScreen: {
+                        SettingsScreen(
+                            title: Texts_SettingsView.sectionTitleNotifications,
+                            providers: { [SettingsViewNotificationsSettingsViewModel()] }
+                        )
+                    }
+                ),
+                SettingsGroupedRow(
+                    id: "alertsAndNotifications.alerts",
+                    title: Texts_SettingsView.sectionTitleAlerting,
+                    settingsScreen: {
+                        SettingsScreen(
+                            title: Texts_SettingsView.sectionTitleAlerting,
+                            providers: { [SettingsViewAlertSettingsViewModel()] }
+                        )
+                    }
+                )
+            ]
+        )
+    }
+
+    static func sharingAndServices() -> SettingsViewGroupedSettingsViewModel {
+        SettingsViewGroupedSettingsViewModel(
+            title: ConstantsSettingsIcons.nightscoutSettingsIcon + " " + Texts_SettingsView.sharingAndServicesSectionTitle,
+            rows: [
+                SettingsGroupedRow(
+                    id: "sharingServices.nightscout",
+                    title: Texts_SettingsView.sectionTitleNightscout,
+                    settingsScreen: {
+                        SettingsScreen(
+                            title: Texts_SettingsView.sectionTitleNightscout,
+                            providers: { [SettingsViewNightscoutSettingsViewModel()] }
+                        )
+                    }
+                ),
+                SettingsGroupedRow(
+                    id: "sharingServices.dexcomShare",
+                    title: Texts_SettingsView.sectionTitleDexcomShareUpload,
+                    settingsScreen: {
+                        SettingsScreen(
+                            title: Texts_SettingsView.sectionTitleDexcomShareUpload,
+                            providers: { [SettingsViewDexcomShareUploadSettingsViewModel()] }
+                        )
+                    }
+                ),
+                SettingsGroupedRow(
+                    id: "sharingServices.healthKit",
+                    title: Texts_SettingsView.sectionTitleHealthKit,
+                    settingsScreen: {
+                        SettingsScreen(
+                            title: Texts_SettingsView.sectionTitleHealthKit,
+                            providers: { [SettingsViewHealthKitSettingsViewModel()] }
+                        )
+                    }
+                ),
+                SettingsGroupedRow(
+                    id: "sharingServices.calendarEvents",
+                    title: Texts_SettingsView.calendarEventsSectionTitle,
+                    settingsScreen: {
+                        SettingsScreen(
+                            title: Texts_SettingsView.calendarEventsSectionTitle,
+                            providers: { [SettingsViewCalendarEventsSettingsViewModel()] }
+                        )
+                    }
+                ),
+                SettingsGroupedRow(
+                    id: "sharingServices.contactImage",
+                    title: Texts_SettingsView.contactImageSectionTitle,
+                    settingsScreen: {
+                        SettingsScreen(
+                            title: Texts_SettingsView.contactImageSectionTitle,
+                            providers: { [SettingsViewContactImageSettingsViewModel()] }
+                        )
+                    }
+                ),
+                SettingsGroupedRow(
+                    id: "sharingServices.osAidLoopShare",
+                    title: Texts_SettingsView.osAidLoopShareSectionTitle,
+                    settingsScreen: {
+                        SettingsScreen(
+                            title: Texts_SettingsView.osAidLoopShareSectionTitle,
+                            providers: { [SettingsViewDevelopmentSettingsViewModel(rowGroup: .osAidLoopShare)] }
+                        )
+                    }
+                ),
+                SettingsGroupedRow(
+                    id: "sharingServices.speakReadings",
+                    title: Texts_SettingsView.sectionTitleSpeak,
+                    settingsScreen: {
+                        SettingsScreen(
+                            title: Texts_SettingsView.sectionTitleSpeak,
+                            providers: { [SettingsViewSpeakSettingsViewModel()] }
+                        )
+                    }
+                ),
+                SettingsGroupedRow(
+                    id: "sharingServices.m5Stack",
+                    title: "M5Stack",
+                    settingsScreen: {
+                        SettingsScreen(title: "M5Stack") { presenter in
+                            SettingsListFactory.makeM5StackSections(presenter: presenter)
+                        }
+                    }
+                )
+            ]
+        )
+    }
+
+    func sectionTitle() -> String? {
+        title
+    }
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        rows.map { row in
+            SettingsRow(
+                id: row.id,
+                title: row.title,
+                accessory: .disclosure,
+                action: .settingsScreen(row.settingsScreen)
+            )
+        }
+    }
+
+    func settingsRowText(index: Int) -> String {
+        rows[index].title
+    }
+
+    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+        .disclosureIndicator
+    }
+
+    func detailedText(index: Int) -> String? {
+        nil
+    }
+
+    func uiView(index: Int) -> UIView? {
+        nil
+    }
+
+    func numberOfRows() -> Int {
+        rows.count
+    }
+
+    func onRowSelect(index: Int) -> SettingsSelectedRowAction {
+        .nothing
+    }
+
+    func isEnabled(index: Int) -> Bool {
+        true
+    }
+
+    func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
+        false
+    }
+
+    func storeMessageHandler(messageHandler: @escaping ((String, String) -> Void)) {}
+
+    func storeUIViewController(uIViewController: UIViewController) {}
+
+    func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {}
 }
 
 @MainActor

@@ -45,33 +45,53 @@ fileprivate enum Setting:Int, CaseIterable {
     
 }
 
+enum SettingsViewHomeScreenSettingsRowGroup {
+    case all
+    case homeScreen
+    case glucoseRanges
+}
+
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
 class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtocol {
+
+    private let rowGroup: SettingsViewHomeScreenSettingsRowGroup
+
+    init(rowGroup: SettingsViewHomeScreenSettingsRowGroup = .all) {
+        self.rowGroup = rowGroup
+
+        super.init()
+
+        addObservers()
+    }
 
     // MARK: - Native SwiftUI rows
 
     func settingsRows(sectionID: Int) -> [SettingsRow] {
-        [
+        let homeScreenRows = [
             nativeSettingsRow(id: "homeScreen.allowScreenRotation", index: Setting.allowScreenRotation.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "homeScreen.showClockWhenScreenIsLocked", index: Setting.showClockWhenScreenIsLocked.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "homeScreen.screenLockDimmingType", index: Setting.screenLockDimmingType.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "homeScreen.showMiniChart", index: Setting.showMiniChart.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "homeScreen.allowMainChartAutoReset", index: Setting.allowMainChartAutoReset.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "homeScreen.showOriginalBGReadings", index: Setting.showOriginalBGReadings.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "homeScreen.showOriginalBGReadings", index: Setting.showOriginalBGReadings.rawValue, sectionID: sectionID)
+        ]
+
+        let glucoseRangeRows = [
             nativeSettingsRow(id: "homeScreen.urgentHighMarkValue", index: Setting.urgentHighMarkValue.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "homeScreen.highMarkValue", index: Setting.highMarkValue.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "homeScreen.targetMarkValue", index: Setting.targetMarkValue.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "homeScreen.lowMarkValue", index: Setting.lowMarkValue.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "homeScreen.urgentLowMarkValue", index: Setting.urgentLowMarkValue.rawValue, sectionID: sectionID)
         ]
-    }
 
-    override init() {
-
-        super.init()
-
-        addObservers()
-
+        switch rowGroup {
+        case .all:
+            return homeScreenRows + glucoseRangeRows
+        case .homeScreen:
+            return homeScreenRows
+        case .glucoseRanges:
+            return glucoseRangeRows
+        }
     }
 
     var sectionReloadClosure: (() -> Void)?
@@ -226,6 +246,10 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
     }
     
     func sectionTitle() -> String? {
+        if rowGroup == .glucoseRanges {
+            return ConstantsSettingsIcons.glucoseRangesSettingsIcon + " " + Texts_SettingsView.glucoseRangesSectionTitle
+        }
+
         return ConstantsSettingsIcons.homeScreenSettingsIcon + " " + Texts_SettingsView.sectionTitleHomeScreen
     }
     

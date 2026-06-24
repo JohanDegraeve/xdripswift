@@ -14,9 +14,6 @@ fileprivate enum Setting:Int, CaseIterable {
     /// link to open the project GitHub page
     case showGitHub = 3
     
-    /// link to icons8
-    case icons8 = 4
-    
 }
 
 struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
@@ -28,8 +25,7 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
             nativeSettingsRow(id: "info.versionNumber", index: Setting.versionNumber.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "info.buildNumber", index: Setting.buildNumber.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "info.licenseInfo", index: Setting.licenseInfo.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "info.showGitHub", index: Setting.showGitHub.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "info.icons8", index: Setting.icons8.rawValue, sectionID: sectionID)
+            nativeSettingsRow(id: "info.showGitHub", index: Setting.showGitHub.rawValue, sectionID: sectionID)
         ]
     }
 
@@ -63,9 +59,6 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
             
         case .showGitHub:
             return Texts_SettingsView.showGitHub
-            
-        case .icons8:
-            return "Icons from icons8.com"
 
         }
         
@@ -86,7 +79,7 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
         case .licenseInfo:
             return .detailButton
             
-        case .showGitHub, .icons8:
+        case .showGitHub:
             return .disclosureIndicator
             
         }
@@ -115,7 +108,7 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
 
             return version
             
-        case .licenseInfo, .showGitHub, .icons8:
+        case .licenseInfo, .showGitHub:
             
             return nil
 
@@ -148,13 +141,6 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
 
         case .showGitHub:
             guard let url = URL(string: ConstantsHomeView.gitHubURL) else { return .nothing}
-            
-            UIApplication.shared.open(url)
-            
-            return .nothing
-            
-        case .icons8:
-            guard let url = URL(string: "https://icons8.com") else { return .nothing}
             
             UIApplication.shared.open(url)
             

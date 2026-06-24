@@ -52,6 +52,12 @@
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Einstellungen";
+"settingsviews_glucoseDisplaySectionTitle" = "Glukoseanzeige";
+"settingsviews_glucoseRangesSectionTitle" = "Glukosebereiche";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Alarme und Mitteilungen";
+"settingsviews_sharingAndServicesSectionTitle" = "Teilen und Dienste";
+"settingsviews_osAidLoopShareSectionTitle" = "OS-AID teilen";
+"settingsviews_issueReportSectionTitle" = "Problembericht";
 
 /// used in settings, section Info, title of the version setting
 "settingsviews_Version" = "Version";

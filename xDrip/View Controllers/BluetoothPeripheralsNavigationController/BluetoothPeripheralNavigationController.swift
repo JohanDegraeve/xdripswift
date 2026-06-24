@@ -52,23 +52,13 @@ final class BluetoothPeripheralNavigationController: UINavigationController {
 
 private extension BluetoothPeripheralNavigationController {
     func configureNavigationBarAppearance() {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = ConstantsUI.listBackGroundUIColor
-        appearance.shadowColor = nil
-        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
-
         navigationBar.barStyle = .black
-        navigationBar.isTranslucent = false
-        navigationBar.barTintColor = ConstantsUI.listBackGroundUIColor
+        navigationBar.isTranslucent = true
+        navigationBar.barTintColor = .black
         navigationBar.tintColor = .yellow
         navigationBar.prefersLargeTitles = true
         navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
         navigationBar.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
-        navigationBar.standardAppearance = appearance
-        navigationBar.scrollEdgeAppearance = appearance
-        navigationBar.compactAppearance = appearance
     }
 
     func installSwiftUIBluetoothPeripheralsRootIfNeeded() {

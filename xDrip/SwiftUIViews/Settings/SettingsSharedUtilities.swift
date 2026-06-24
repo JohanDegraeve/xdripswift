@@ -134,7 +134,7 @@ extension UIViewController {
         }
 
         viewController.title = settingsScreen.title
-        viewController.navigationItem.largeTitleDisplayMode = .never
+        viewController.navigationItem.largeTitleDisplayMode = .automatic
         viewController.rootView = AnyView(SettingsListView(
             listModel: listModel,
             presenter: presenter,
@@ -1115,10 +1115,8 @@ extension View {
     func settingsListStyle(title: String) -> some View {
         self
             .listStyle(.insetGrouped)
-            .scrollContentBackground(.hidden)
-            .background(ConstantsUI.listBackGroundColor)
             .navigationTitle(title)
-            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarTitleDisplayMode(.large)
             .colorScheme(.dark)
     }
 
@@ -1349,12 +1347,15 @@ struct SettingsSelectionListView: View {
 
     let selectionList: SettingsSelectionListContent
     let close: () -> Void
+    private let initialSelectedRow: Int
 
     /// Starts the pushed picker on the same selected row the old picker would show.
     init(selectionList: SettingsSelectionListContent, close: @escaping () -> Void) {
         self.selectionList = selectionList
         self.close = close
-        _selectedRow = State(initialValue: selectionList.selectedRow ?? 0)
+        let initialSelectedRow = selectionList.selectedRow ?? 0
+        self.initialSelectedRow = initialSelectedRow
+        _selectedRow = State(initialValue: initialSelectedRow)
     }
 
     var body: some View {
@@ -1372,12 +1373,12 @@ struct SettingsSelectionListView: View {
                                 .foregroundStyle(.green)
                         }
                     }
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
             }
         }
         .settingsListStyle(title: selectionList.title ?? "")
-        .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button(selectionList.actionTitle) {
@@ -1385,6 +1386,7 @@ struct SettingsSelectionListView: View {
                     selectionList.action(selectedRow)
                     close()
                 }
+                .disabled(selectedRow == initialSelectedRow)
             }
         }
         .onDisappear {

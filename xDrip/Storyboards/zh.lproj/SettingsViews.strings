@@ -1,4 +1,10 @@
 "settingsviews_settingstitle" = "设置";
+"settingsviews_glucoseDisplaySectionTitle" = "葡萄糖显示";
+"settingsviews_glucoseRangesSectionTitle" = "葡萄糖范围";
+"settingsviews_alertsAndNotificationsSectionTitle" = "警报和通知";
+"settingsviews_sharingAndServicesSectionTitle" = "共享和服务";
+"settingsviews_osAidLoopShareSectionTitle" = "OS-AID 共享";
+"settingsviews_issueReportSectionTitle" = "问题报告";
 "settingsviews_sectiontitleNotifications" = "常规";
 "settingsviews_selectbgunit" = "选择单位";
 "settingsviews_lowValue" = "血糖低值";

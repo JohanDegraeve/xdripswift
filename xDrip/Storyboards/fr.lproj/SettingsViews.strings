@@ -1,4 +1,10 @@
 "settingsviews_settingstitle" = "Réglages";
+"settingsviews_glucoseDisplaySectionTitle" = "Affichage du glucose";
+"settingsviews_glucoseRangesSectionTitle" = "Plages de glucose";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Alertes et notifications";
+"settingsviews_sharingAndServicesSectionTitle" = "Partage et services";
+"settingsviews_osAidLoopShareSectionTitle" = "Partage OS-AID";
+"settingsviews_issueReportSectionTitle" = "Rapport de problème";
 "settingsviews_sectiontitleNotifications" = "Géneral";
 "settingsviews_selectbgunit" = "Unité glycémie";
 "settingsviews_lowValue" = "Valeur faible";

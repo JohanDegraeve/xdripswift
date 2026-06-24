@@ -1,4 +1,10 @@
 "settingsviews_settingstitle" = "Asetukset";
+"settingsviews_glucoseDisplaySectionTitle" = "Glukoosinäkymä";
+"settingsviews_glucoseRangesSectionTitle" = "Glukoosialueet";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Hälytykset ja ilmoitukset";
+"settingsviews_sharingAndServicesSectionTitle" = "Jakaminen ja palvelut";
+"settingsviews_osAidLoopShareSectionTitle" = "OS-AID-jakaminen";
+"settingsviews_issueReportSectionTitle" = "Ongelmaraportti";
 "settingsviews_sectiontitleNotifications" = "Yleinen";
 "settingsviews_sectiontitlehomescreen" = "Kotinäyttö";
 "settingsviews_selectbgunit" = "Verensokeriyksikkö";

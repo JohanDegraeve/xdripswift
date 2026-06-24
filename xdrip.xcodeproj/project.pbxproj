@@ -2586,12 +2586,12 @@
 		F866974E2867A97000025441 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */,
+				102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */,
 				F866974F2867AA4A00025441 /* LoopDelayScheduleView.swift */,
 				E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */,
 				D9C75EA5D78E3497AC44D3C8 /* SettingsView.swift */,
 				CD00FB5270FD0E5E2F710BE6 /* TimeScheduleView.swift */,
-				102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */,
-				763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";

@@ -42,14 +42,13 @@ final class SettingsNavigationController: UINavigationController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        delegate = self
-        
         // make sure that the developer settings are hidden when the navigation controller is loaded
         // this is needed in case the app was previously force-closed (or crashed) before the timer had a chance to hide them again
         UserDefaults.standard.showDeveloperSettings = false
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
@@ -57,45 +56,26 @@ final class SettingsNavigationController: UINavigationController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
     
         // restrict rotation of this Navigation Controller to just portrait
-        (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
-
-        configureNavigationBarAppearance()
+        (UIApplication.shared.delegate as? AppDelegate)?.restrictRotation = .portrait
+        
+        if let navigationBar = navigationBar as UINavigationBar? {
+            navigationBar.barStyle = .black
+            navigationBar.isTranslucent = true
+            navigationBar.barTintColor = .black
+            navigationBar.tintColor = .yellow
+            navigationBar.prefersLargeTitles = true
+            navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
+            navigationBar.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
+        }
         
     }
 
 }
 
-extension SettingsNavigationController:UINavigationControllerDelegate {
-    func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController, animated: Bool) {
-    }
-}
-
 private extension SettingsNavigationController {
-    /// Applies the dark navigation bar used by the SwiftUI Settings host.
-    /// Keeping this in the navigation controller makes pushed Settings screens
-    /// inherit the same appearance.
-    func configureNavigationBarAppearance() {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = ConstantsUI.listBackGroundUIColor
-        appearance.shadowColor = nil
-        appearance.titleTextAttributes = [.foregroundColor: UIColor.white]
-        appearance.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
-
-        navigationBar.barStyle = .black
-        navigationBar.isTranslucent = false
-        navigationBar.barTintColor = ConstantsUI.listBackGroundUIColor
-        navigationBar.tintColor = .yellow
-        navigationBar.prefersLargeTitles = false
-        navigationBar.titleTextAttributes = [.foregroundColor: UIColor.white]
-        navigationBar.largeTitleTextAttributes = [.foregroundColor: UIColor.white]
-        navigationBar.standardAppearance = appearance
-        navigationBar.scrollEdgeAppearance = appearance
-        navigationBar.compactAppearance = appearance
-    }
-
     /// Replaces the storyboard Settings child with the SwiftUI Settings root once
     /// the dependencies have been provided by RootViewController.
     func installSwiftUISettingsRootIfNeeded() {

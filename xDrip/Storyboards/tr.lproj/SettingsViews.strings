@@ -1,4 +1,10 @@
 "settingsviews_settingstitle" = "Ayarlar";
+"settingsviews_glucoseDisplaySectionTitle" = "Glikoz Görünümü";
+"settingsviews_glucoseRangesSectionTitle" = "Glikoz Aralıkları";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Uyarılar ve Bildirimler";
+"settingsviews_sharingAndServicesSectionTitle" = "Paylaşım ve Servisler";
+"settingsviews_osAidLoopShareSectionTitle" = "OS-AID Paylaşımı";
+"settingsviews_issueReportSectionTitle" = "Sorun Raporu";
 "settingsviews_sectiontitlehelp" = "Yardım & Dokümantasyon";
 "settingsviews_showOnlineHelp" = "Çevrimiçi Yardım'ı aç";
 "settingsviews_translateOnlineHelp" = "Otomatik Olarak Çevir";

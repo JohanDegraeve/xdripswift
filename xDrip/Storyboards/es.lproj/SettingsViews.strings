@@ -1,4 +1,10 @@
 "settingsviews_settingstitle" = "Configuración";
+"settingsviews_glucoseDisplaySectionTitle" = "Visualización de glucosa";
+"settingsviews_glucoseRangesSectionTitle" = "Rangos de glucosa";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Alertas y notificaciones";
+"settingsviews_sharingAndServicesSectionTitle" = "Compartir y servicios";
+"settingsviews_osAidLoopShareSectionTitle" = "Compartir con OS-AID";
+"settingsviews_issueReportSectionTitle" = "Informe de problema";
 "settingsviews_valueIsRequired" = "⚠️ Requerido";
 "settingsviews_sectiontitleNotifications" = "Notifications";
 "settingsviews_selectbgunit" = "Seleccionar Unidades";

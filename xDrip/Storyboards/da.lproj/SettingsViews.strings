@@ -1,4 +1,10 @@
 "settingsviews_settingstitle" = "Settings";
+"settingsviews_glucoseDisplaySectionTitle" = "Glukosevisning";
+"settingsviews_glucoseRangesSectionTitle" = "Glukoseområder";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Alarmer og notifikationer";
+"settingsviews_sharingAndServicesSectionTitle" = "Deling og tjenester";
+"settingsviews_osAidLoopShareSectionTitle" = "OS-AID-deling";
+"settingsviews_issueReportSectionTitle" = "Problemrapport";
 "settingsviews_sectiontitlehelp" = "Help & Documentation";
 "settingsviews_showOnlineHelp" = "Open Online Help";
 "settingsviews_translateOnlineHelp" = "Translate Automatically";

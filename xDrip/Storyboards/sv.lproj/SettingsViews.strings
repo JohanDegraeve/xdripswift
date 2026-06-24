@@ -1,4 +1,10 @@
 "settingsviews_settingstitle" = "Inställningar";
+"settingsviews_glucoseDisplaySectionTitle" = "Glukosvisning";
+"settingsviews_glucoseRangesSectionTitle" = "Glukosintervall";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Larm och notiser";
+"settingsviews_sharingAndServicesSectionTitle" = "Delning och tjänster";
+"settingsviews_osAidLoopShareSectionTitle" = "OS-AID-delning";
+"settingsviews_issueReportSectionTitle" = "Problemrapport";
 "settingsviews_sectiontitleNotifications" = "Allmänt";
 "settingsviews_selectbgunit" = "Blodglukosenheter";
 "settingsviews_masterorfollower" = "Användare eller Följare";

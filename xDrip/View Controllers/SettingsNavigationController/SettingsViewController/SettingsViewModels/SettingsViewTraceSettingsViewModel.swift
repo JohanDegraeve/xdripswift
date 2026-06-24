@@ -14,6 +14,8 @@ fileprivate enum Setting:Int, CaseIterable {
 
 class SettingsViewTraceSettingsViewModel: NSObject {
     
+    private let sectionTitleOverride: String?
+    
     /// need to present MFMailComposeViewController
     private var uIViewController: UIViewController?
     
@@ -27,6 +29,12 @@ class SettingsViewTraceSettingsViewModel: NSObject {
     ///
     /// the viewcontroller sets it by calling storeMessageHandler
     private var messageHandler: ((String, String) -> Void)?
+
+    init(sectionTitleOverride: String? = nil) {
+        self.sectionTitleOverride = sectionTitleOverride
+
+        super.init()
+    }
 
 }
 
@@ -52,6 +60,10 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
+        if let sectionTitleOverride {
+            return sectionTitleOverride
+        }
+
         return ConstantsSettingsIcons.traceSettingsIcon + " " + Texts_SettingsView.sectionTitleTrace
     }
     

@@ -1,4 +1,10 @@
 "settingsviews_settingstitle" = "Definições";
+"settingsviews_glucoseDisplaySectionTitle" = "Visualização da glicose";
+"settingsviews_glucoseRangesSectionTitle" = "Intervalos da glicose";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Alertas e notificações";
+"settingsviews_sharingAndServicesSectionTitle" = "Partilha e serviços";
+"settingsviews_osAidLoopShareSectionTitle" = "Partilha OS-AID";
+"settingsviews_issueReportSectionTitle" = "Relatório de problema";
 "settingsviews_sectiontitlehelp" = "Ajuda & Documentação";
 "settingsviews_showOnlineHelp" = "Abrir Ajuda Online";
 "settingsviews_translateOnlineHelp" = "Traduzir Automaticamente";

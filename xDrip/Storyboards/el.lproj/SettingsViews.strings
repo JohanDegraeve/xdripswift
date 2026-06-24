@@ -1,4 +1,10 @@
 "settingsviews_settingstitle" = "Ρυθμίσεις";
+"settingsviews_glucoseDisplaySectionTitle" = "Εμφάνιση γλυκόζης";
+"settingsviews_glucoseRangesSectionTitle" = "Εύρη γλυκόζης";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Συναγερμοί και ειδοποιήσεις";
+"settingsviews_sharingAndServicesSectionTitle" = "Κοινή χρήση και υπηρεσίες";
+"settingsviews_osAidLoopShareSectionTitle" = "Κοινή χρήση OS-AID";
+"settingsviews_issueReportSectionTitle" = "Αναφορά προβλήματος";
 "settingsviews_sectiontitlehelp" = "Βοήθεια & Τεκμηρίωση";
 "settingsviews_showOnlineHelp" = "Ανοίξτε τη Ηλεκτρονική Βοήθεια;";
 "settingsviews_translateOnlineHelp" = "Αυτόματη μετάφραση;";

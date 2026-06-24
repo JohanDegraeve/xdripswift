@@ -48,7 +48,7 @@ final class SettingsHostingController: PortraitLockedHostingController<AnyView> 
         super.init(rootView: AnyView(SettingsView(listModel: listModel, presenter: presenter)))
 
         title = Texts_SettingsView.screenTitle
-        navigationItem.largeTitleDisplayMode = .never
+        navigationItem.largeTitleDisplayMode = .automatic
 
         presenter.attach(controller: self)
         attachControllerToViewModels()
@@ -142,7 +142,7 @@ private extension SettingsHostingController {
     func openLoopDelaySchedule() {
         let viewController = PortraitLockedHostingController(rootView: AnyView(LoopDelayScheduleView()))
         viewController.title = Texts_SettingsView.loopDelaysScreenTitle
-        viewController.navigationItem.largeTitleDisplayMode = .never
+        viewController.navigationItem.largeTitleDisplayMode = .automatic
         viewController.rootView = AnyView(LoopDelayScheduleView()
             .environment(\.settingsNavigationActions, viewController.settingsNavigationActions())
         )

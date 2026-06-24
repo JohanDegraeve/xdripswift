@@ -42,29 +42,64 @@ fileprivate enum Setting:Int, CaseIterable {
     
 }
 
+enum SettingsViewDevelopmentSettingsRowGroup {
+    case advanced
+    case osAidLoopShare
+}
+
 class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProtocol {
     
     var sectionReloadClosure: (() -> Void)?
+
+    private let rowGroup: SettingsViewDevelopmentSettingsRowGroup
+
+    init(rowGroup: SettingsViewDevelopmentSettingsRowGroup = .advanced) {
+        self.rowGroup = rowGroup
+
+        super.init()
+    }
     
     // MARK: - Native SwiftUI rows
 
     func settingsRows(sectionID: Int) -> [SettingsRow] {
         let developerRowsVisible = UserDefaults.standard.showDeveloperSettings
 
-        return [
+        let advancedRows = [
             nativeSettingsRow(id: "developer.showDeveloperSettings", index: Setting.showDeveloperSettings.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "developer.NSLogEnabled", index: Setting.NSLogEnabled.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
-            nativeSettingsRow(id: "developer.OSLogEnabled", index: Setting.OSLogEnabled.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
-            nativeSettingsRow(id: "developer.suppressUnLockPayLoad", index: Setting.suppressUnLockPayLoad.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
-            nativeSettingsRow(id: "developer.loopShareType", index: Setting.loopShareType.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
-            nativeSettingsRow(id: "developer.loopDelay", index: Setting.loopDelay.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            SettingsRow(
+                id: "developer.issueReport",
+                title: Texts_SettingsView.issueReportSectionTitle,
+                accessory: .disclosure,
+                isVisible: developerRowsVisible,
+                action: .settingsScreen {
+                    SettingsScreen(
+                        title: Texts_SettingsView.issueReportSectionTitle,
+                        providers: { [SettingsViewTraceSettingsViewModel(sectionTitleOverride: ConstantsSettingsIcons.traceSettingsIcon + " " + Texts_SettingsView.issueReportSectionTitle)] }
+                    )
+                }
+            ),
+            nativeSettingsRow(id: "developer.storeFrequentReadingsInNightscout", index: Setting.storeFrequentReadingsInNightscout.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            nativeSettingsRow(id: "developer.storeFrequentReadingsInHealthKit", index: Setting.storeFrequentReadingsInHealthKit.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.libreLinkUpVersion", index: Setting.libreLinkUpVersion.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            nativeSettingsRow(id: "developer.suppressUnLockPayLoad", index: Setting.suppressUnLockPayLoad.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.CAGEMaxHours", index: Setting.CAGEMaxHours.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.allowStandByHighContrast", index: Setting.allowStandByHighContrast.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.forceStandByBigNumbers", index: Setting.forceStandByBigNumbers.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
-            nativeSettingsRow(id: "developer.storeFrequentReadingsInNightscout", index: Setting.storeFrequentReadingsInNightscout.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
-            nativeSettingsRow(id: "developer.storeFrequentReadingsInHealthKit", index: Setting.storeFrequentReadingsInHealthKit.rawValue, sectionID: sectionID, isVisible: developerRowsVisible)
+            nativeSettingsRow(id: "developer.NSLogEnabled", index: Setting.NSLogEnabled.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            nativeSettingsRow(id: "developer.OSLogEnabled", index: Setting.OSLogEnabled.rawValue, sectionID: sectionID, isVisible: developerRowsVisible)
         ]
+
+        let osAidLoopShareRows = [
+            nativeSettingsRow(id: "developer.loopShareType", index: Setting.loopShareType.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "developer.loopDelay", index: Setting.loopDelay.rawValue, sectionID: sectionID, isVisible: UserDefaults.standard.loopShareType != .disabled)
+        ]
+
+        switch rowGroup {
+        case .advanced:
+            return advancedRows
+        case .osAidLoopShare:
+            return osAidLoopShareRows
+        }
     }
 
     func storeSectionReloadClosure(sectionReloadClosure: @escaping (() -> Void)) {
@@ -80,6 +115,10 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
     }
 
     func sectionTitle() -> String? {
+        if rowGroup == .osAidLoopShare {
+            return ConstantsSettingsIcons.osAidLoopShareSettingsIcon + " " + Texts_SettingsView.osAidLoopShareSectionTitle
+        }
+
         return ConstantsSettingsIcons.developerSettingsIcon + " " + Texts_SettingsView.developerSettings
     }
     
@@ -343,6 +382,10 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
     }
     
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
+        if rowGroup == .osAidLoopShare && index == Setting.loopShareType.rawValue {
+            return true
+        }
+
         return false
     }
     

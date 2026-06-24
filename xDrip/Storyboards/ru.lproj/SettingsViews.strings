@@ -1,4 +1,10 @@
 "settingsviews_settingstitle" = "Настройки";
+"settingsviews_glucoseDisplaySectionTitle" = "Отображение глюкозы";
+"settingsviews_glucoseRangesSectionTitle" = "Диапазоны глюкозы";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Оповещения и уведомления";
+"settingsviews_sharingAndServicesSectionTitle" = "Обмен и сервисы";
+"settingsviews_osAidLoopShareSectionTitle" = "Обмен OS-AID";
+"settingsviews_issueReportSectionTitle" = "Отчет о проблеме";
 "settingsviews_sectiontitlehelp" = "Помощь и документация";
 "settingsviews_showOnlineHelp" = "Открыть онлайн документацию";
 "settingsviews_translateOnlineHelp" = "Переводить автоматически";
