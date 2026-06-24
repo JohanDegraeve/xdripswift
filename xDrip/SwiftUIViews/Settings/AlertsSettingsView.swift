@@ -114,7 +114,7 @@ struct AlertsSettingsView: View {
             }
         }
         .id(viewModel.reloadToken)
-        .settingsListStyle(title: Texts_Alerts.alertsScreenTitle)
+        .settingsListStyle(title: Texts_Alerts.alertsScreenTitle, titleDisplayMode: .inline)
     }
 }
 
@@ -415,7 +415,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
         case .value:
             textEntry = makeValueTextEntry(
                 title: alertKindValue.alertTitle(),
-                message: Texts_Alerts.changeAlertValue + " (" + alertKindValue.valueUnitText(transmitterType: UserDefaults.standard.cgmTransmitterType) + ")",
+                message: Texts_Alerts.changeAlertValue,
                 currentValue: value,
                 update: { [weak self] newValue in
                     self?.value = newValue
@@ -426,7 +426,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
         case .triggerValue:
             textEntry = makeValueTextEntry(
                 title: alertKindValue.alertTitle(),
-                message: triggerValueText + " (" + alertKindValue.valueUnitText(transmitterType: UserDefaults.standard.cgmTransmitterType) + ")",
+                message: triggerValueText,
                 currentValue: triggerValue,
                 update: { [weak self] newValue in
                     self?.triggerValue = newValue
@@ -645,7 +645,7 @@ struct AlertEntryEditorView: View {
                 }
             }
         }
-        .settingsListStyle(title: viewModel.title)
+        .settingsListStyle(title: viewModel.title, titleDisplayMode: .inline)
         .toolbar {
             ToolbarItemGroup(placement: .navigationBarTrailing) {
                 Button {

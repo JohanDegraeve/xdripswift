@@ -58,7 +58,7 @@ struct AlertTypesSettingsView: View {
             }
         }
         .id(viewModel.reloadToken)
-        .settingsListStyle(title: Texts_AlertTypeSettingsView.alertTypesScreenTitle)
+        .settingsListStyle(title: Texts_AlertTypeSettingsView.alertTypesScreenTitle, titleDisplayMode: .inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button {
@@ -378,7 +378,7 @@ struct AlertTypeEditorView: View {
                 }
             }
         }
-        .settingsListStyle(title: Texts_AlertTypeSettingsView.editAlertTypeScreenTitle)
+        .settingsListStyle(title: Texts_AlertTypeSettingsView.editAlertTypeScreenTitle, titleDisplayMode: .inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarLeading) {
                 Button(role: .destructive, action: viewModel.requestDelete) {

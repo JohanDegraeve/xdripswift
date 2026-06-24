@@ -119,7 +119,9 @@ extension UIViewController {
             rootView: AnyView(SettingsListView(
                 listModel: listModel,
                 presenter: presenter,
-                title: settingsScreen.title
+                title: settingsScreen.title,
+                titleDisplayMode: .inline,
+                showsSectionHeaders: false
             ))
         )
 
@@ -134,11 +136,13 @@ extension UIViewController {
         }
 
         viewController.title = settingsScreen.title
-        viewController.navigationItem.largeTitleDisplayMode = .automatic
+        viewController.navigationItem.largeTitleDisplayMode = .never
         viewController.rootView = AnyView(SettingsListView(
             listModel: listModel,
             presenter: presenter,
-            title: settingsScreen.title
+            title: settingsScreen.title,
+            titleDisplayMode: .inline,
+            showsSectionHeaders: false
         )
         .environment(\.settingsNavigationActions, viewController.settingsNavigationActions()))
 
@@ -609,6 +613,8 @@ struct SettingsListView: View {
     @ObservedObject var presenter: SettingsActionPresenter
 
     let title: String
+    var titleDisplayMode: NavigationBarItem.TitleDisplayMode = .large
+    var showsSectionHeaders = true
     var headerView: (() -> AnyView)? = nil
 
     var body: some View {
@@ -623,12 +629,13 @@ struct SettingsListView: View {
                 SettingsSectionView(
                     section: section,
                     presenter: presenter,
-                    reload: listModel.reload
+                    reload: listModel.reload,
+                    showsSectionHeader: showsSectionHeaders
                 )
                 .id("\(section.id)-\(listModel.reloadToken)")
             }
         }
-        .settingsListStyle(title: title)
+        .settingsListStyle(title: title, titleDisplayMode: titleDisplayMode)
         .settingsPresentation(presenter: presenter)
     }
 }
@@ -715,13 +722,15 @@ private struct SettingsSectionView: View {
     let section: SettingsSectionModel
     @ObservedObject var presenter: SettingsActionPresenter
     let reload: (SettingsReloadScope) -> Void
+    let showsSectionHeader: Bool
 
     var body: some View {
         SettingsNativeSectionView(
             sectionID: section.id,
             section: section.section(),
             presenter: presenter,
-            reload: reload
+            reload: reload,
+            showsSectionHeader: showsSectionHeader
         )
     }
 }
@@ -731,6 +740,7 @@ private struct SettingsNativeSectionView: View {
     let section: SettingsSection
     @ObservedObject var presenter: SettingsActionPresenter
     let reload: (SettingsReloadScope) -> Void
+    let showsSectionHeader: Bool
 
     private var visibleRows: [SettingsRow] {
         section.rows.filter(\.isVisible)
@@ -747,7 +757,7 @@ private struct SettingsNativeSectionView: View {
                 )
             }
         } header: {
-            if let title = section.title {
+            if showsSectionHeader, let title = section.title {
                 Text(title)
                     .foregroundStyle(Color(ConstantsUI.tableViewHeaderTextColor))
             }
@@ -1118,11 +1128,11 @@ struct SettingsSwitchAdapter {
 
 extension View {
     /// Applies the standard Settings list appearance used by all migrated screens.
-    func settingsListStyle(title: String) -> some View {
+    func settingsListStyle(title: String, titleDisplayMode: NavigationBarItem.TitleDisplayMode = .large) -> some View {
         self
             .listStyle(.insetGrouped)
             .navigationTitle(title)
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(titleDisplayMode)
             .colorScheme(.dark)
     }
 
@@ -1384,7 +1394,7 @@ struct SettingsSelectionListView: View {
                 .buttonStyle(.plain)
             }
         }
-        .settingsListStyle(title: selectionList.title ?? "")
+        .settingsListStyle(title: selectionList.title ?? "", titleDisplayMode: .inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button(selectionList.actionTitle) {

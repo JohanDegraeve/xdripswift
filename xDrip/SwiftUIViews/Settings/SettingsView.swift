@@ -76,8 +76,8 @@ private struct SettingsAppBannerView: View {
                     .foregroundStyle(Color(.colorPrimary))
 
                 Text(Texts_SettingsView.appBannerVersion(appVersion))
-                    .font(.headline)
-                    .fontWeight(.bold)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
                     .foregroundStyle(Color(.colorSecondary))
             }
         }

@@ -144,7 +144,7 @@ struct TimeScheduleView: View {
                 }
             }
         }
-        .settingsListStyle(title: Texts_SettingsView.timeScheduleViewTitle + " " + viewModel.serviceName)
+        .settingsListStyle(title: Texts_SettingsView.timeScheduleViewTitle + " " + viewModel.serviceName, titleDisplayMode: .inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: viewModel.addScheduleEntry) {

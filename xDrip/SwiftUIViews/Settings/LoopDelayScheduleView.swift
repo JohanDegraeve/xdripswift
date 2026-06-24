@@ -31,7 +31,7 @@ struct LoopDelayScheduleView: View {
             }
             .onDelete(perform: delete)
         }
-        .settingsListStyle(title: Texts_SettingsView.loopDelaysScreenTitle)
+        .settingsListStyle(title: Texts_SettingsView.loopDelaysScreenTitle, titleDisplayMode: .inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: openNewEditor) {
@@ -272,7 +272,7 @@ private struct LoopDelayEditorView: View {
                 Text(Texts_SettingsView.expanatoryTextSelectValue)
             }
         }
-        .settingsListStyle(title: Texts_SettingsView.loopDelaysScreenTitle)
+        .settingsListStyle(title: Texts_SettingsView.loopDelaysScreenTitle, titleDisplayMode: .inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button(Texts_Common.Ok) {
