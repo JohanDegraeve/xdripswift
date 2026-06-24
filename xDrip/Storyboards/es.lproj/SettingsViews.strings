@@ -5,6 +5,8 @@
 "settingsviews_sharingAndServicesSectionTitle" = "Compartir y servicios";
 "settingsviews_osAidLoopShareSectionTitle" = "Compartir con OS-AID";
 "settingsviews_issueReportSectionTitle" = "Informe de problema";
+"settingsviews_appBannerVersion" = "Versión %@";
+"settingsviews_appInstalledSince" = "Instalado";
 "settingsviews_valueIsRequired" = "⚠️ Requerido";
 "settingsviews_sectiontitleNotifications" = "Notifications";
 "settingsviews_selectbgunit" = "Seleccionar Unidades";
@@ -12,7 +14,7 @@
 "settingsviews_master" = "Master";
 "settingsviews_follower" = "Seguidor";
 
-"settingsviews_sectionTitleDataSource" = "Fuente de datos MGC";
+"settingsviews_sectionTitleDataSource" = "Fuente de datos";
 "settingsviews_labelFollowerDataSourceType" = "Fuente de datos de seguidor";
 "settingsviews_labelUploadDataToNightscout" = "Subir a Nightscout";
 "settingsviews_labelfollowerKeepAliveType" = "Mantener en segundo plano";
@@ -113,7 +115,6 @@
 "settingsviews_showMiniChart" = "Mostrar la mini-gráfica";
 "settingsviews_Version" = "Versión";
 "settingsviews_license" = "Licencia";
-"settingsviews_build" = "Compilación";
 "m5stack_settingsviews_settingstitle" = "Configuración M5 Stack";
 "m5stack_settingsviews_textColor" = "Color del Texto";
 "m5stack_settingsviews_backGroundColor" = "Color del Fondo";

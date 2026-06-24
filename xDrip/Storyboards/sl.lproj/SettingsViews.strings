@@ -47,6 +47,8 @@
 "settingsviews_sharingAndServicesSectionTitle" = "Deljenje in storitve";
 "settingsviews_osAidLoopShareSectionTitle" = "Deljenje OS-AID";
 "settingsviews_issueReportSectionTitle" = "Poročilo o težavi";
+"settingsviews_appBannerVersion" = "Različica %@";
+"settingsviews_appInstalledSince" = "Nameščeno";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
 "settingsviews_IntervalMessage" = "Minimum interval between two notifications";
@@ -112,7 +114,6 @@
 "settingsviews_dexcomShareUploadSerialNumber" = "Receiver Serial Number";
 
 /// used in settings, section Info, title of the build setting
-"settingsviews_build" = "Build";
 
 /// dexcom share settings, where user can set the dexcom share account name
 "settingsviews_dexcomShareAccountName" = "Account Name";
@@ -441,7 +442,7 @@
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+"settingsviews_sectionTitleDataSource" = "Vir podatkov";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

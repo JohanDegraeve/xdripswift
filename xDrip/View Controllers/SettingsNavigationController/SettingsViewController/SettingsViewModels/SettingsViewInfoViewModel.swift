@@ -5,8 +5,8 @@ fileprivate enum Setting:Int, CaseIterable {
     /// version Number
     case versionNumber = 0
     
-    /// build Number
-    case buildNumber = 1
+    /// app install date
+    case installDate = 1
     
     /// licenseInfo
     case licenseInfo = 2
@@ -23,7 +23,7 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
     func settingsRows(sectionID: Int) -> [SettingsRow] {
         [
             nativeSettingsRow(id: "info.versionNumber", index: Setting.versionNumber.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "info.buildNumber", index: Setting.buildNumber.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "info.installDate", index: Setting.installDate.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "info.licenseInfo", index: Setting.licenseInfo.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "info.showGitHub", index: Setting.showGitHub.rawValue, sectionID: sectionID)
         ]
@@ -51,11 +51,11 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
             
             return Texts_SettingsView.version
             
+        case .installDate:
+            return Texts_SettingsView.installedSince
+
         case .licenseInfo:
             return Texts_SettingsView.license
-            
-        case .buildNumber:
-            return Texts_SettingsView.build
             
         case .showGitHub:
             return Texts_SettingsView.showGitHub
@@ -70,14 +70,14 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
 
         switch setting {
             
-        case .versionNumber:
-            return .none
-            
-        case .buildNumber:
+        case .installDate:
             return .none
 
+        case .versionNumber:
+            return .disclosureIndicator
+
         case .licenseInfo:
-            return .detailButton
+            return .disclosureIndicator
             
         case .showGitHub:
             return .disclosureIndicator
@@ -98,19 +98,21 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
             
             guard let version = dictionary["CFBundleShortVersionString"] as? String else {return "unknown"}
             
-            return version
-            
-        case .buildNumber:
+            guard let build = dictionary["CFBundleVersion"] as? String else {return "unknown"}
 
-            guard let dictionary = Bundle.main.infoDictionary else {return "unknown"}
-            
-            guard let version = dictionary["CFBundleVersion"] as? String else {return "unknown"}
+            return version + " (" + build + ")"
 
-            return version
+        case .installDate:
+
+            return installDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short) + " (" + installDate.daysAndHoursAgo(showOnlyDays: true) + ")"
             
-        case .licenseInfo, .showGitHub:
+        case .licenseInfo:
+
+            return ConstantsHomeView.licenseType
+
+        case .showGitHub:
             
-            return nil
+            return ConstantsHomeView.gitHubRepositoryName
 
         }
         
@@ -131,9 +133,14 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
         switch setting {
             
         case .versionNumber:
-            return SettingsSelectedRowAction.nothing
-            
-        case .buildNumber:
+            guard let version = appVersion,
+                  let url = SettingsAppInfo.releaseNotesURL(version: version) else { return .nothing }
+
+            UIApplication.shared.open(url)
+
+            return .nothing
+
+        case .installDate:
             return .nothing
             
         case .licenseInfo:
@@ -159,6 +166,24 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
         
         return false
         
+    }
+
+    private var installDate: Date {
+        // this intentionally matches the install date used in the appinfo trace file
+        // it uses the Documents folder creation date as a reliable local install timestamp
+        if let documentsFolder = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last {
+            if let installDate = try? FileManager.default.attributesOfItem(atPath: documentsFolder.path)[.creationDate] as? Date {
+                return installDate
+            }
+        }
+
+        return Date()
+    }
+
+    private var appVersion: String? {
+        guard let dictionary = Bundle.main.infoDictionary else {return nil}
+
+        return dictionary["CFBundleShortVersionString"] as? String
     }
     
     

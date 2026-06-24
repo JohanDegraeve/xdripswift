@@ -5,6 +5,8 @@
 "settingsviews_sharingAndServicesSectionTitle" = "المشاركة والخدمات";
 "settingsviews_osAidLoopShareSectionTitle" = "مشاركة OS-AID";
 "settingsviews_issueReportSectionTitle" = "تقرير مشكلة";
+"settingsviews_appBannerVersion" = "الإصدار %@";
+"settingsviews_appInstalledSince" = "تم التثبيت";
 "settingsviews_sectiontitleNotifications" = "عام";
 "settingsviews_selectbgunit" = "وحدة قياس السكر";
 "settingsviews_masterorfollower" = "الاستخدام كتطبيق رئيسي أو للمتابعة؟";
@@ -68,7 +70,6 @@
 "settingsviews_sectiontitleAbout" = "عن %@";
 "settingsviews_Version" = "الإصدار";
 "settingsviews_license" = "رخصة";
-"settingsviews_build" = "رقم الإصدار";
 "m5stack_settingsviews_settingstitle" = "إعدادات M5 Stack";
 "m5stack_settingsviews_textColor" = "لون الخط";
 "m5stack_settingsviews_backGroundColor" = "لون الخلفية";
@@ -192,7 +193,7 @@
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+"settingsviews_sectionTitleDataSource" = "مصدر البيانات";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

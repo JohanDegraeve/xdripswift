@@ -5,6 +5,8 @@
 "settingsviews_sharingAndServicesSectionTitle" = "Jakaminen ja palvelut";
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID-jakaminen";
 "settingsviews_issueReportSectionTitle" = "Ongelmaraportti";
+"settingsviews_appBannerVersion" = "Versio %@";
+"settingsviews_appInstalledSince" = "Asennettu";
 "settingsviews_sectiontitleNotifications" = "Yleinen";
 "settingsviews_sectiontitlehomescreen" = "Kotinäyttö";
 "settingsviews_selectbgunit" = "Verensokeriyksikkö";
@@ -61,7 +63,6 @@
 "settingsviews_sectiontitleAbout" = "%@ info";
 "settingsviews_Version" = "Versio";
 "settingsviews_license" = "Lisenssi";
-"settingsviews_build" = "Build";
 "m5stack_settingsviews_settingstitle" = "M5 Stack asetukset";
 "m5stack_settingsviews_textColor" = "Tekstiväri";
 "m5stack_settingsviews_backGroundColor" = "Taustaväri";
@@ -223,7 +224,7 @@
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+"settingsviews_sectionTitleDataSource" = "Tietolähde";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

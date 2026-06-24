@@ -44,6 +44,12 @@ enum ConstantsHomeView {
 
     /// github.com repository URL for the project
     static let gitHubURL = "https://github.com/JohanDegraeve/xdripswift"
+
+    /// github.com repository name for the project
+    static let gitHubRepositoryName = "xdripswift"
+
+    /// license type for the project
+    static let licenseType = "GNU GPL v3"
     
     // MARK: - Sensor Info View
     

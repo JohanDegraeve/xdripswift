@@ -49,7 +49,8 @@ struct SettingsView: View {
         SettingsListView(
             listModel: listModel,
             presenter: presenter,
-            title: Texts_SettingsView.screenTitle
+            title: Texts_SettingsView.screenTitle,
+            headerView: { AnyView(SettingsAppBannerView()) }
         )
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
@@ -60,6 +61,65 @@ struct SettingsView: View {
                 .accessibilityLabel(Texts_SettingsView.showOnlineHelp)
             }
         }
+    }
+}
+
+private struct SettingsAppBannerView: View {
+    var body: some View {
+        HStack(spacing: 18) {
+            appIcon
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(ConstantsHomeView.applicationName)
+                    .font(.title3)
+                    .fontWeight(.bold)
+                    .foregroundStyle(Color(.colorPrimary))
+
+                Text(Texts_SettingsView.appBannerVersion(appVersion))
+                    .font(.headline)
+                    .fontWeight(.bold)
+                    .foregroundStyle(Color(.colorSecondary))
+            }
+        }
+        .padding(.vertical, 4)
+    }
+
+    private var appIcon: some View {
+        Group {
+            if let uiImage = Self.appIconImage {
+                Image(uiImage: uiImage)
+                    .resizable()
+            } else {
+                Image("Settings")
+                    .resizable()
+            }
+        }
+        .frame(width: 58, height: 58)
+        .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
+    }
+
+    private var appVersion: String {
+        Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
+    }
+
+    private static var appIconImage: UIImage? {
+        guard let icons = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String: Any],
+              let primaryIcon = icons["CFBundlePrimaryIcon"] as? [String: Any],
+              let iconFiles = primaryIcon["CFBundleIconFiles"] as? [String],
+              let iconName = iconFiles.last else {
+            return nil
+        }
+
+        return UIImage(named: iconName)
+    }
+}
+
+enum SettingsAppInfo {
+    static func releaseNotesURL(version: String) -> URL? {
+        let releaseURL = ConstantsHomeView.gitHubURL + "/releases/tag/" + version
+        let fallbackURL = ConstantsHomeView.gitHubURL + "/releases"
+
+        return URL(string: releaseURL) ?? URL(string: fallbackURL)
     }
 }
 

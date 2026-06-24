@@ -236,7 +236,6 @@
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 
 /// used in settings, section Info, title of the build setting
-"settingsviews_build" = "Build";
 
 /// used in settings, section Info, title of the version setting
 "settingsviews_Version" = "Version";
@@ -252,6 +251,8 @@
 "settingsviews_sharingAndServicesSectionTitle" = "Обмін і сервіси";
 "settingsviews_osAidLoopShareSectionTitle" = "Обмін OS-AID";
 "settingsviews_issueReportSectionTitle" = "Звіт про проблему";
+"settingsviews_appBannerVersion" = "Версія %@";
+"settingsviews_appInstalledSince" = "Встановлено";
 
 /// Advanced Settings, section title
 "developerSettings" = "Розширені налаштування";
@@ -401,7 +402,7 @@
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+"settingsviews_sectionTitleDataSource" = "Джерело даних";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

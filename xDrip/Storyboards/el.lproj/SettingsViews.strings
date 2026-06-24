@@ -5,6 +5,8 @@
 "settingsviews_sharingAndServicesSectionTitle" = "Κοινή χρήση και υπηρεσίες";
 "settingsviews_osAidLoopShareSectionTitle" = "Κοινή χρήση OS-AID";
 "settingsviews_issueReportSectionTitle" = "Αναφορά προβλήματος";
+"settingsviews_appBannerVersion" = "Έκδοση %@";
+"settingsviews_appInstalledSince" = "Εγκαταστάθηκε";
 "settingsviews_showOnlineHelp" = "Ανοίξτε τη Ηλεκτρονική Βοήθεια;";
 "settingsviews_translateOnlineHelp" = "Μετάφραση τεκμηρίωσης";
 "settingsviews_sectiontitleNotifications" = "Γενικά";
@@ -79,7 +81,6 @@
 "settingsviews_sectiontitleAbout" = "Σχετικά με %@";
 "settingsviews_Version" = "Έκδοση";
 "settingsviews_license" = "Άδεια";
-"settingsviews_build" = "Έκδοση";
 "m5stack_settingsviews_settingstitle" = "M5 Stack Ρυθμίσεις";
 "m5stack_settingsviews_textColor" = "Χρώμα κειμένου";
 "m5stack_settingsviews_backGroundColor" = "Χρώμα φόντου";
@@ -170,7 +171,7 @@
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+"settingsviews_sectionTitleDataSource" = "Πηγή δεδομένων";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

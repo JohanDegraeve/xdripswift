@@ -21,7 +21,6 @@
 "sectionTitleTrace" = "Fehlerbericht";
 
 /// used in settings, section Info, title of the build setting
-"settingsviews_build" = "Build";
 
 /// general settings, literally master
 "settingsviews_master" = "Master";
@@ -58,6 +57,8 @@
 "settingsviews_sharingAndServicesSectionTitle" = "Teilen und Dienste";
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID teilen";
 "settingsviews_issueReportSectionTitle" = "Problembericht";
+"settingsviews_appBannerVersion" = "Version %@";
+"settingsviews_appInstalledSince" = "Installiert";
 
 /// used in settings, section Info, title of the version setting
 "settingsviews_Version" = "Version";
@@ -407,7 +408,7 @@
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+"settingsviews_sectionTitleDataSource" = "Datenquelle";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

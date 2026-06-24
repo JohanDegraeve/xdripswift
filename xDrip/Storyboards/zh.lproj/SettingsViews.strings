@@ -5,6 +5,8 @@
 "settingsviews_sharingAndServicesSectionTitle" = "共享和服务";
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID 共享";
 "settingsviews_issueReportSectionTitle" = "问题报告";
+"settingsviews_appBannerVersion" = "版本 %@";
+"settingsviews_appInstalledSince" = "安装于";
 "settingsviews_sectiontitleNotifications" = "常规";
 "settingsviews_selectbgunit" = "选择单位";
 "settingsviews_lowValue" = "血糖低值";
@@ -109,7 +111,6 @@
 "settingsviews_Version" = "Version";
 
 /// used in settings, section Info, title of the build setting
-"settingsviews_build" = "Build";
 
 /// nightscout settings, where user can select to use schedule or not
 "settingsviews_useSchedule" = "Use Upload Schedule";
@@ -366,7 +367,7 @@
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+"settingsviews_sectionTitleDataSource" = "数据来源";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

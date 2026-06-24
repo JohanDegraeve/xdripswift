@@ -5,6 +5,8 @@
 "settingsviews_sharingAndServicesSectionTitle" = "Paylaşım ve Servisler";
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID Paylaşımı";
 "settingsviews_issueReportSectionTitle" = "Sorun Raporu";
+"settingsviews_appBannerVersion" = "Sürüm %@";
+"settingsviews_appInstalledSince" = "Yüklendi";
 "settingsviews_showOnlineHelp" = "Çevrimiçi Yardım'ı aç";
 "settingsviews_translateOnlineHelp" = "Belgeleri Çevir";
 "settingsviews_sectiontitleNotifications" = "Ana ayarlar";
@@ -74,7 +76,6 @@
 "settingsviews_sectiontitleAbout" = "%@ Hakkında";
 "settingsviews_Version" = "Sürüm";
 "settingsviews_license" = "Lisans";
-"settingsviews_build" = "Yapı ayarı";
 "m5stack_settingsviews_settingstitle" = "M5 Stack Ayarları";
 "m5stack_settingsviews_textColor" = "Metin Rengi";
 "m5stack_settingsviews_backGroundColor" = "Arka plan rengi";
@@ -172,7 +173,7 @@
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+"settingsviews_sectionTitleDataSource" = "Veri Kaynağı";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

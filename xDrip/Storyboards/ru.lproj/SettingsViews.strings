@@ -5,6 +5,8 @@
 "settingsviews_sharingAndServicesSectionTitle" = "Обмен и сервисы";
 "settingsviews_osAidLoopShareSectionTitle" = "Обмен OS-AID";
 "settingsviews_issueReportSectionTitle" = "Отчет о проблеме";
+"settingsviews_appBannerVersion" = "Версия %@";
+"settingsviews_appInstalledSince" = "Установлено";
 "settingsviews_showOnlineHelp" = "Открыть онлайн документацию";
 "settingsviews_translateOnlineHelp" = "Переводить документацию";
 "settingsviews_sectiontitleNotifications" = "Общие";
@@ -79,7 +81,6 @@
 "settingsviews_sectiontitleAbout" = "Об %@";
 "settingsviews_Version" = "Версия";
 "settingsviews_license" = "Лицензия";
-"settingsviews_build" = "Билд";
 "m5stack_settingsviews_settingstitle" = "M5 Stack Настройки";
 "m5stack_settingsviews_textColor" = "Цвет текста";
 "m5stack_settingsviews_backGroundColor" = "Цвет фона";
@@ -170,7 +171,7 @@
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+"settingsviews_sectionTitleDataSource" = "Источник данных";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

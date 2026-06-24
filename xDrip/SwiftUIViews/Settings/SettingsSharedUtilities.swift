@@ -609,9 +609,16 @@ struct SettingsListView: View {
     @ObservedObject var presenter: SettingsActionPresenter
 
     let title: String
+    var headerView: (() -> AnyView)? = nil
 
     var body: some View {
         List {
+            if let headerView {
+                Section {
+                    headerView()
+                }
+            }
+
             ForEach(listModel.sections) { section in
                 SettingsSectionView(
                     section: section,

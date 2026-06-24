@@ -39,7 +39,11 @@ class Texts_SettingsView {
     static let issueReportSectionTitle: String = {
         return NSLocalizedString("settingsviews_issueReportSectionTitle", tableName: filename, bundle: Bundle.main, value: "Issue Report", comment: "settings section title for sending issue report logs")
     }()
-    
+
+    static func appBannerVersion(_ version: String) -> String {
+        return String(format: NSLocalizedString("settingsviews_appBannerVersion", tableName: filename, bundle: Bundle.main, value: "Version %@", comment: "settings banner, app version label"), version)
+    }
+
     // MARK: - Online Help
     
     static let showOnlineHelp: String = {
@@ -82,9 +86,9 @@ class Texts_SettingsView {
     
     
     // MARK: - Section Data Source
-    
+
     static let sectionTitleDataSource: String = {
-        return NSLocalizedString("settingsviews_sectionTitleDataSource", tableName: filename, bundle: Bundle.main, value: "CGM Data Source", comment: "CGM data source settings, section title")
+        return NSLocalizedString("settingsviews_sectionTitleDataSource", tableName: filename, bundle: Bundle.main, value: "Data Source", comment: "data source settings, section title")
     }()
     
     static let labelMasterOrFollower: String = {
@@ -669,10 +673,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_Version", tableName: filename, bundle: Bundle.main, value: "Version:", comment: "used in settings, section Info, title of the version setting")
     }()
 
-    static let build = {
-        return NSLocalizedString("settingsviews_build", tableName: filename, bundle: Bundle.main, value: "Build:", comment: "used in settings, section Info, title of the build setting")
+    static let installedSince = {
+        return NSLocalizedString("settingsviews_appInstalledSince", tableName: filename, bundle: Bundle.main, value: "Installed", comment: "used in settings, section Info, title of the app install date setting")
     }()
-    
+
     static let license = {
         return NSLocalizedString("settingsviews_license", tableName: filename, bundle: Bundle.main, value: "License", comment: "used in settings, section Info, title of the license setting")
     }()

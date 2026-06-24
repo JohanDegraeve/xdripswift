@@ -5,6 +5,8 @@
 "settingsviews_sharingAndServicesSectionTitle" = "Partage et services";
 "settingsviews_osAidLoopShareSectionTitle" = "Partage OS-AID";
 "settingsviews_issueReportSectionTitle" = "Rapport de problème";
+"settingsviews_appBannerVersion" = "Version %@";
+"settingsviews_appInstalledSince" = "Installé";
 "settingsviews_sectiontitleNotifications" = "Géneral";
 "settingsviews_selectbgunit" = "Unité glycémie";
 "settingsviews_lowValue" = "Valeur faible";
@@ -65,7 +67,6 @@
 "settingsviews_IntervalMessage" = "Intervalle minimum entre deux notifications";
 "settingsviews_Version" = "Version";
 "settingsviews_license" = "License";
-"settingsviews_build" = "Build";
 "m5stack_settingsviews_settingstitle" = "Réglages M5 Stack";
 "m5stack_settingsviews_textColor" = "Couleur du texte";
 "m5stack_settingsviews_backGroundColor" = "Couleur de l'arrière-plan";
@@ -253,7 +254,7 @@
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+"settingsviews_sectionTitleDataSource" = "Source de données";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";

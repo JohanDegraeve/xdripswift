@@ -5,6 +5,8 @@
 "settingsviews_sharingAndServicesSectionTitle" = "Delning och tjänster";
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID-delning";
 "settingsviews_issueReportSectionTitle" = "Problemrapport";
+"settingsviews_appBannerVersion" = "Version %@";
+"settingsviews_appInstalledSince" = "Installerad";
 "settingsviews_sectiontitleNotifications" = "Allmänt";
 "settingsviews_selectbgunit" = "Blodglukosenheter";
 "settingsviews_masterorfollower" = "Användare eller Följare";
@@ -78,7 +80,6 @@
 "settingsviews_sectiontitleAbout" = "Om %@";
 "settingsviews_Version" = "Version";
 "settingsviews_license" = "Licens";
-"settingsviews_build" = "Kompilering";
 "m5stack_settingsviews_settingstitle" = "M5 Stack-inställningar";
 "m5stack_settingsviews_textColor" = "Textfärg";
 "m5stack_settingsviews_backGroundColor" = "Bakgrundsfärg";
@@ -211,7 +212,7 @@
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+"settingsviews_sectionTitleDataSource" = "Datakälla";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";
