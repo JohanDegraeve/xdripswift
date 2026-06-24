@@ -78,7 +78,6 @@
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 "m5stack_settingsviews_giveBluetoothPassword" = "Introduzir Senha Bluetooth";
 "m5stack_settingsviews_brightness" = "Brilho do Ecrã";
-"appleWatchSectionTitle" = "Apple Watch";
 "createCalendarEvent" = "Criar Eventos de Calendário";
 "calenderId" = "Calendário a Utilizar";
 "settingsviews_displayTrendInCalendarEvent" = "Mostrar Tendência";

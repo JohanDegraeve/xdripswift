@@ -239,8 +239,6 @@
 /// about settings, section title
 "settingsviews_sectiontitleAbout" = "Über %@";
 
-/// Apple Watch Settings - section title
-"appleWatchSectionTitle" = "Apple Watch";
 
 /// bluetooth settings, section title - also used in bluetooth peripheral view, eg when viewing M5Stack details. This is the title of the first section
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
@@ -495,8 +493,3 @@
 "settingsviews_enableContactImage" = "Erstelle Kontakt";
 "settingsviews_displayTrendInContactImage" = "Zeige Trend";
 "settingsviews_contactImageCreatedByString" = "Kontakt automatisch erstellt von";
-
-"appleWatchShowDataInComplications" = "Zeige Werte in Komplikation";
-"appleWatchShowDataInComplicationsMessage" = "Bitte beachten Sie, dass die Komplikationen der Apple Watch nicht in Echtzeit aktualisiert werden. Sie werden nur 2-3 Mal pro Stunde aktualisiert.\n\nTreffen Sie Behandlungsentscheidungen NICHT basierend auf Werten in der Komplikation.\n\n %@ Watch app öffnen, um aktuelle Werte zu erhalten.\n\nKlicken Sie nur 'OK', wenn Sie dies verstanden haben und zustimmen.";
-"appleWatchComplicationUserAgreementDate" = "Nutzungsvereinbarung";
-"appleWatchRemainingComplicationUserInfoTransfers" = "Verbleibende Komplikations-Updates";

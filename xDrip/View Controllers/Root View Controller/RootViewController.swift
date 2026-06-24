@@ -962,12 +962,6 @@ final class RootViewController: UIViewController, ObservableObject {
         // add observer for the last heartbeat timestamp in order to update the UI
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.timeStampOfLastHeartBeat.rawValue, options: .new, context: nil)
         
-        // if the user agrees to enable (or disable) Watch complications data
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showDataInWatchComplications.rawValue, options: .new, context: nil)
-        
-        // force a manual complication update
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.forceComplicationUpdate.rawValue, options: .new, context: nil)
-        
         // force the snooze icon status to be updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.updateSnoozeStatus.rawValue, options: .new, context: nil)
         
@@ -1635,15 +1629,6 @@ final class RootViewController: UIViewController, ObservableObject {
             
         case UserDefaults.Key.timeStampOfLastHeartBeat:
             updateDataSourceInfo()
-            
-        case UserDefaults.Key.showDataInWatchComplications:
-            watchManager?.updateWatchApp(forceComplicationUpdate: true)
-            
-        case UserDefaults.Key.forceComplicationUpdate:
-            if UserDefaults.standard.forceComplicationUpdate {
-                watchManager?.updateWatchApp(forceComplicationUpdate: true)
-                UserDefaults.standard.forceComplicationUpdate = false
-            }
             
         case UserDefaults.Key.updateSnoozeStatus:
             updateSnoozeStatus()

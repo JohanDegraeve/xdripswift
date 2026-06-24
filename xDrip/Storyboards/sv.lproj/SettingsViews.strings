@@ -79,7 +79,6 @@
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 "m5stack_settingsviews_giveBluetoothPassword" = "Ange Bluetooth-lösenord";
 "m5stack_settingsviews_brightness" = "Ljusstyrka";
-"appleWatchSectionTitle" = "Apple Watch";
 "createCalendarEvent" = "Skapa kalenderhändelser";
 "calenderId" = "Kalender att använda";
 "settingsviews_displayTrendInCalendarEvent" = "Visa trend";

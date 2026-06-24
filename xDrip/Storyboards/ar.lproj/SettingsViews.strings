@@ -69,7 +69,6 @@
 "m5stack_settingsviews_sectiontitlebluetooth" = "بلوتوث";
 "m5stack_settingsviews_giveBluetoothPassword" = "أدخل كلمة المرور للبلوتوث";
 "m5stack_settingsviews_brightness" = "سطوع الشاشة";
-"appleWatchSectionTitle" = "ساعة أبل";
 "createCalendarEvent" = "إنشاء أحداث التقويم؟";
 "calenderId" = "التقويم للاستخدام؟";
 "settingsviews_displayTrendInCalendarEvent" = "عرض الإتجاه؟";

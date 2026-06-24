@@ -62,7 +62,6 @@
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 "m5stack_settingsviews_giveBluetoothPassword" = "Anna bluetooth salasana";
 "m5stack_settingsviews_brightness" = "Näytön kirkkaus";
-"appleWatchSectionTitle" = "Apple Watch";
 "createCalendarEvent" = "Luo kalenteritapahtumat";
 "calenderId" = "Käytettävä kalenteri";
 "settingsviews_displayTrendInCalendarEvent" = "Näytä suunta";

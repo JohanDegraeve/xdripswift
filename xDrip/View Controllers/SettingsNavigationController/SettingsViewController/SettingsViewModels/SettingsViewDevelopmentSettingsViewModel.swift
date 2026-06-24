@@ -28,23 +28,20 @@ fileprivate enum Setting:Int, CaseIterable {
     /// LibreLinkUp version number that will be used for the LLU follower mode http request headers
     case libreLinkUpVersion = 7
     
-    /// number of remaining forced complication updates available today
-    case remainingComplicationUserInfoTransfers = 8
-    
     /// how many hours until the canula "expires"? Will show the default value until edited here
-    case CAGEMaxHours = 9
+    case CAGEMaxHours = 8
     
     /// allow StandBy mode to show a high contrast version of the widget at night
-    case allowStandByHighContrast = 10
+    case allowStandByHighContrast = 9
     
     /// force StandBy mode to show a big number version of the widget
-    case forceStandByBigNumbers = 11
+    case forceStandByBigNumbers = 10
     
     /// should we allow 60-second writes to Nightscout (in the case of Libre 2 Direct as an example)?
-    case storeFrequentReadingsInNightscout = 12
+    case storeFrequentReadingsInNightscout = 11
     
     /// should we allow 60-second writes to HealthKit (in the case of Libre 2 Direct as an example)?
-    case storeFrequentReadingsInHealthKit = 13
+    case storeFrequentReadingsInHealthKit = 12
     
 }
 
@@ -66,7 +63,6 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             nativeSettingsRow(id: "developer.shareToLoopOnceEvery5Minutes", index: Setting.shareToLoopOnceEvery5Minutes.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.loopDelay", index: Setting.loopDelay.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.libreLinkUpVersion", index: Setting.libreLinkUpVersion.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
-            nativeSettingsRow(id: "developer.remainingComplicationUserInfoTransfers", index: Setting.remainingComplicationUserInfoTransfers.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.CAGEMaxHours", index: Setting.CAGEMaxHours.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.allowStandByHighContrast", index: Setting.allowStandByHighContrast.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.forceStandByBigNumbers", index: Setting.forceStandByBigNumbers.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
@@ -121,9 +117,6 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         case .libreLinkUpVersion:
             return Texts_SettingsView.libreLinkUpVersion
             
-        case .remainingComplicationUserInfoTransfers:
-            return Texts_SettingsView.appleWatchRemainingComplicationUserInfoTransfers
-            
         case .CAGEMaxHours:
             return Texts_SettingsView.CAGEMaxHours
             
@@ -150,7 +143,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit:
             return .none
             
-        case .loopDelay, .libreLinkUpVersion, .remainingComplicationUserInfoTransfers, .CAGEMaxHours:
+        case .loopDelay, .libreLinkUpVersion, .CAGEMaxHours:
             return .disclosureIndicator
             
         case .loopShareType:
@@ -176,13 +169,6 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             
         case .libreLinkUpVersion:
             return UserDefaults.standard.libreLinkUpVersion
-            
-        case .remainingComplicationUserInfoTransfers:
-            if let remainingComplicationUserInfoTrans = UserDefaults.standard.remainingComplicationUserInfoTransfers {
-                return remainingComplicationUserInfoTrans.description + " / 50"
-            } else {
-                return "-"
-            }
             
         case .CAGEMaxHours:
             return "\(UserDefaults.standard.CAGEMaxHours.description) \(Texts_Common.hours)"
@@ -267,7 +253,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         case .storeFrequentReadingsInHealthKit:
             return UISwitch(isOn: UserDefaults.standard.storeFrequentReadingsInHealthKit, action: {(isOn:Bool) in UserDefaults.standard.storeFrequentReadingsInHealthKit = isOn})
             
-        case .loopShareType, .loopDelay, .remainingComplicationUserInfoTransfers, .libreLinkUpVersion, .CAGEMaxHours:
+        case .loopShareType, .loopDelay, .libreLinkUpVersion, .CAGEMaxHours:
             return nil
             
         }
@@ -342,11 +328,6 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                 
             }, cancelHandler: nil, inputValidator: nil)
             
-        case .remainingComplicationUserInfoTransfers:
-            return .askConfirmation(title: Texts_SettingsView.appleWatchForceManualComplicationUpdate, message: Texts_SettingsView.appleWatchForceManualComplicationUpdateMessage, actionHandler: {
-                UserDefaults.standard.forceComplicationUpdate = true
-            }, cancelHandler: nil)
-            
         case .CAGEMaxHours:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.CAGEMaxHours, message:  Texts_SettingsView.CAGEMaxHoursMessage, keyboardType: .numberPad, text: UserDefaults.standard.CAGEMaxHours.description, placeHolder: "0", fieldTitle: Texts_Common.enterValue, unitText: Texts_Common.hours, actionTitle: nil, cancelTitle: nil, actionHandler: {(CAGEMaxHoursString: String) in
                 
@@ -393,34 +374,4 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         return matches.first != nil
         
     }
-    
-    
-    // MARK: - observe functions
-    
-    private func addObservers() {
-        
-        // Listen for changes in the remaining complication transfers to trigger the UI to be updated
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.remainingComplicationUserInfoTransfers.rawValue, options: .new, context: nil)
-        
-    }
-    
-    override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        
-        guard let keyPath = keyPath,
-              let keyPathEnum = UserDefaults.Key(rawValue: keyPath)
-        else { return }
-        
-        switch keyPathEnum {
-        case UserDefaults.Key.remainingComplicationUserInfoTransfers:
-            
-            // we have to run this in the main thread to avoid access errors
-            DispatchQueue.main.async {
-                self.sectionReloadClosure?()
-            }
-            
-        default:
-            break
-        }
-    }
-    
 }

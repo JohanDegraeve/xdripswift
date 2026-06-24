@@ -212,8 +212,6 @@
 /// bluetooth settings, section title - also used in bluetooth peripheral view, eg when viewing M5Stack details. This is the title of the first section
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 
-/// Apple Watch Settings - section title
-"appleWatchSectionTitle" = "Apple Watch";
 
 /// dexcom share settings, section title
 "settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";

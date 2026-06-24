@@ -316,8 +316,6 @@
 /// speak settings, section title
 "settingsviews_sectiontitlespeak" = "Voice";
 
-/// Apple Watch Settings - section title
-"appleWatchSectionTitle" = "Apple Watch";
 
 /// general settings, section title
 "settingsviews_sectiontitleNotifications" = "Notifications";

@@ -145,10 +145,6 @@ enum ConstantsLog {
 
     /// WatchManager logging
     static let categoryWatchManager =                       "WatchManager                  "
-    
-    /// SettingsViewAppleWatchSettingsViewModel logging
-    static let categorySettingsViewAppleWatchSettingsViewModel = 
-                                                            "AppleWatchSettingsViewModel   "
 
     /// ContactImageManager logging
     static let categoryContactImageManager =                "ContactImageManager           "
@@ -213,4 +209,3 @@ enum ConstantsLog {
     /// for use in Omni¨PodHeartBeatTransmitter
     static let categoryHeartBeatOmnipod =                   "HeartBeatOmnipod              "
 }
-

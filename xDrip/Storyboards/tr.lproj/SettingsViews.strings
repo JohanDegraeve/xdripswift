@@ -77,7 +77,6 @@
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 "m5stack_settingsviews_giveBluetoothPassword" = "Bluetooth Şifresini Girin";
 "m5stack_settingsviews_brightness" = "Ekran parlaklığı";
-"appleWatchSectionTitle" = "Apple Watch";
 "calendarEventsSectionTitle" = "Takvim Etkinlikleri";
 "createCalendarEvent" = "Takvim Etkinlikleri Oluşturulsun mu";
 "calenderId" = "Takvim kullanılsın mı";

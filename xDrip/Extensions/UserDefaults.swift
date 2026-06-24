@@ -341,16 +341,8 @@ extension UserDefaults {
 
         // Apple Watch
 
-        /// enable the Watch complications
-        case showDataInWatchComplications = "showDataInWatchComplications"
-        /// timestamp that the user acknowledged that the complications will not show in real-time
-        case watchComplicationUserAgreementDate = "watchComplicationUserAgreementDate"
-        /// how many complication updates are remaining for the current day
+        /// how often to request a complication update while the Watch app is in the background
         case forceComplicationUpdateInMinutes = "forceComplicationUpdateInMinutes"
-        /// how many complication updates are remaining for the current day
-        case remainingComplicationUserInfoTransfers = "remainingComplicationUserInfoTransfers"
-        /// force a complication update
-        case forceComplicationUpdate = "forceComplicationUpdate"
 
         // Calendar Events
 
@@ -2127,27 +2119,7 @@ extension UserDefaults {
 
     // MARK: - Apple Watch
 
-    /// enable the Watch complications, default false
-    @objc dynamic var showDataInWatchComplications: Bool {
-        get {
-            return bool(forKey: Key.showDataInWatchComplications.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.showDataInWatchComplications.rawValue)
-        }
-    }
-
-    /// timestamp that the user acknowledged that the complications will not show in real-time
-    var watchComplicationUserAgreementDate: Date? {
-        get {
-            return object(forKey: Key.watchComplicationUserAgreementDate.rawValue) as? Date
-        }
-        set {
-            set(newValue, forKey: Key.watchComplicationUserAgreementDate.rawValue)
-        }
-    }
-
-    /// every how many minutes should we force a complication update (these updates counts against the 50 times limit per day)
+    /// every how many minutes should we request a complication update
     var forceComplicationUpdateInMinutes: Int {
         get {
             //read currentvalue in mgdl
@@ -2162,27 +2134,6 @@ extension UserDefaults {
             set(newValue, forKey: Key.forceComplicationUpdateInMinutes.rawValue)
         }
     }
-
-    /// how many complication updates are remaining for the current day
-    var remainingComplicationUserInfoTransfers: Int? {
-        get {
-            return integer(forKey: Key.remainingComplicationUserInfoTransfers.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.remainingComplicationUserInfoTransfers.rawValue)
-        }
-    }
-
-    /// force a complication update
-    @objc dynamic var forceComplicationUpdate: Bool {
-        get {
-            return bool(forKey: Key.forceComplicationUpdate.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.forceComplicationUpdate.rawValue)
-        }
-    }
-
 
     // MARK: - Calendar Events
 

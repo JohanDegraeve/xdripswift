@@ -12,7 +12,7 @@ import SwiftUI
 extension XDripWatchComplication.EntryView {
     @ViewBuilder
     var accessoryCircularView: some View {
-        if !entry.widgetState.keepAliveIsDisabled && entry.widgetState.liveDataIsEnabled {
+        if !entry.widgetState.keepAliveIsDisabled {
             Gauge(value: entry.widgetState.bgValueInMgDl ?? entry.widgetState.gaugeModel().nilValue, in: entry.widgetState.gaugeModel().minValue...entry.widgetState.gaugeModel().maxValue) {
                 Text("Not shown")
             } currentValueLabel: {

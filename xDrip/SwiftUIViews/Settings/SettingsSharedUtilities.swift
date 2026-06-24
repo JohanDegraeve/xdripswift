@@ -343,7 +343,6 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsNativeSectionProvider
 extension SettingsViewDexcomShareUploadSettingsViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewHealthKitSettingsViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewSpeakSettingsViewModel: SettingsNativeSectionProvider {}
-extension SettingsViewAppleWatchSettingsViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewCalendarEventsSettingsViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewContactImageSettingsViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewM5StackSettingsViewModel: SettingsNativeSectionProvider {}

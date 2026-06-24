@@ -445,17 +445,6 @@ class Trace {
             traceInfo.appendStringAndNewLine("    Speak interval: " + UserDefaults.standard.speakInterval.description + " minutes")
         }
         
-        traceInfo.appendStringAndNewLine("\nApple Watch settings:")
-        traceInfo.appendStringAndNewLine("    Show values in complications: " + UserDefaults.standard.showDataInWatchComplications.description)
-        if let agreementDate = UserDefaults.standard.watchComplicationUserAgreementDate {
-            traceInfo.appendStringAndNewLine("    User agreement date: " + agreementDate.toStringForTrace(timeStyle: .short, dateStyle: .medium) + " (" + agreementDate.daysAndHoursAgo(appendAgo: true, forTrace: true) + ")")
-            if let remainingComplicationUserInfoTransfers = UserDefaults.standard.remainingComplicationUserInfoTransfers {
-                traceInfo.appendStringAndNewLine("    Remaining complication updates: " + remainingComplicationUserInfoTransfers.description + " / 50")
-            }
-        } else {
-            traceInfo.appendStringAndNewLine("    User agreement date: nil")
-        }
-                                             
         traceInfo.appendStringAndNewLine("\nCalendar events settings:")
         traceInfo.appendStringAndNewLine("    Create calendar events: " + UserDefaults.standard.createCalendarEvent.description)
         if UserDefaults.standard.createCalendarEvent {

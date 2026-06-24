@@ -32,13 +32,12 @@ extension XDripWatchComplication.Entry {
         var highLimitInMgDl: Double
         var urgentHighLimitInMgDl: Double
         var keepAliveIsDisabled: Bool
-        var liveDataIsEnabled: Bool
         
         var bgUnitString: String
         var bgValueInMgDl: Double?
         var bgReadingDate: Date?
                 
-        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaValueInUserUnit: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, keepAliveIsDisabled: Bool? = false, remainingComplicationUserInfoTransfers: Int? = 99, liveDataIsEnabled: Bool? = false) {
+        init(bgReadingValues: [Double]? = nil, bgReadingDates: [Date]? = nil, isMgDl: Bool? = true, slopeOrdinal: Int? = 0, deltaValueInUserUnit: Double? = nil, urgentLowLimitInMgDl: Double? = 60, lowLimitInMgDl: Double? = 80, highLimitInMgDl: Double? = 180, urgentHighLimitInMgDl: Double? = 250, keepAliveIsDisabled: Bool? = false) {
             self.bgReadingValues = bgReadingValues
             self.bgReadingDates = bgReadingDates
             self.isMgDl = isMgDl ?? true
@@ -49,7 +48,6 @@ extension XDripWatchComplication.Entry {
             self.highLimitInMgDl = highLimitInMgDl ?? 180
             self.urgentHighLimitInMgDl = urgentHighLimitInMgDl ?? 250
             self.keepAliveIsDisabled = keepAliveIsDisabled ?? false
-            self.liveDataIsEnabled = liveDataIsEnabled ?? false
             
             self.bgValueInMgDl = (bgReadingValues?.count ?? 0) > 0 ? bgReadingValues?[0] : nil
             self.bgReadingDate = (bgReadingDates?.count ?? 0) > 0 ? bgReadingDates?[0] : nil
@@ -224,6 +222,6 @@ extension XDripWatchComplication.Entry {
 
 extension XDripWatchComplication.Entry {
     static var placeholder: Self {
-        .init(date: .now, widgetState: WidgetState(bgReadingValues: ConstantsWatchComplication.bgReadingValuesPlaceholderData, bgReadingDates: ConstantsWatchComplication.bgReadingDatesPlaceholderData(), isMgDl: true, slopeOrdinal: 4, deltaValueInUserUnit: 0, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 90, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, keepAliveIsDisabled: false, liveDataIsEnabled: true))
+        .init(date: .now, widgetState: WidgetState(bgReadingValues: ConstantsWatchComplication.bgReadingValuesPlaceholderData, bgReadingDates: ConstantsWatchComplication.bgReadingDatesPlaceholderData(), isMgDl: true, slopeOrdinal: 4, deltaValueInUserUnit: 0, urgentLowLimitInMgDl: 70, lowLimitInMgDl: 90, highLimitInMgDl: 140, urgentHighLimitInMgDl: 180, keepAliveIsDisabled: false))
     }
 }

@@ -135,7 +135,6 @@ final class WatchManager: NSObject, ObservableObject {
         watchState.followerDataSourceTypeRawValue = UserDefaults.standard.followerDataSourceType.rawValue
         watchState.followerBackgroundKeepAliveTypeRawValue = UserDefaults.standard.followerBackgroundKeepAliveType.rawValue
         watchState.keepAliveIsDisabled = !UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled
-        watchState.liveDataIsEnabled = UserDefaults.standard.showDataInWatchComplications
         
         if let sensorStartDate = UserDefaults.standard.activeSensorStartDate {
             let minutes = Calendar.current.dateComponents([.minute], from: sensorStartDate, to: .now).minute ?? 0
@@ -168,9 +167,7 @@ final class WatchManager: NSObject, ObservableObject {
             watchState.deviceStatusLastLoopDate = nil
         }
         
-        watchState.remainingComplicationUserInfoTransfers = session.remainingComplicationUserInfoTransfers
-        
-        sendStateToWatch(forceComplicationUpdate: false)
+        sendStateToWatch(forceComplicationUpdate: forceComplicationUpdate)
     }
     
     func sendStateToWatch(forceComplicationUpdate: Bool) {
@@ -202,14 +199,13 @@ final class WatchManager: NSObject, ObservableObject {
                     trace("error sending watch state, error = %{public}@", log: self.log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)
                 })
             } else {
-                if (lastForcedComplicationUpdateTimeStamp < .now.addingTimeInterval(-Double(UserDefaults.standard.forceComplicationUpdateInMinutes * 60)) && session.isComplicationEnabled && UserDefaults.standard.showDataInWatchComplications) || forceComplicationUpdate {
+                if (lastForcedComplicationUpdateTimeStamp < .now.addingTimeInterval(-Double(UserDefaults.standard.forceComplicationUpdateInMinutes * 60)) && session.isComplicationEnabled) || forceComplicationUpdate {
                     let updateType: String = forceComplicationUpdate ? "forcing" : "sending"
                     
-                    trace("%{public}@ background complication update every %{public}@ minutes, remaining complication transfers left today: %{public}@ / 50", log: log, category: ConstantsLog.categoryWatchManager, type: .info, updateType, UserDefaults.standard.forceComplicationUpdateInMinutes.description, session.remainingComplicationUserInfoTransfers.description)
+                    trace("%{public}@ background complication update every %{public}@ minutes", log: log, category: ConstantsLog.categoryWatchManager, type: .info, updateType, UserDefaults.standard.forceComplicationUpdateInMinutes.description)
                     
                     session.transferCurrentComplicationUserInfo(["watchState": userInfo])
                     lastForcedComplicationUpdateTimeStamp = .now
-                    UserDefaults.standard.remainingComplicationUserInfoTransfers = session.remainingComplicationUserInfoTransfers
                 } else {
                     trace("sending background watch state update", log: log, category: ConstantsLog.categoryWatchManager, type: .debug)
                     

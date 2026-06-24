@@ -75,7 +75,6 @@
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 "m5stack_settingsviews_giveBluetoothPassword" = "Voer Bluetooth Wachtwoord In";
 "m5stack_settingsviews_brightness" = "Schermhelderheid";
-"appleWatchSectionTitle" = "Apple Watch";
 "createCalendarEvent" = "Creëer Agenda Activiteit";
 "calenderId" = "Te Gebruiken Agenda";
 "settingsviews_displayTrendInCalendarEvent" = "Toon Trend";
@@ -98,10 +97,6 @@
 "warningChangeFromMasterToFollower" = "Wisselen van Master naar Volger stopt de huidige sensor. Wil je doorgaan ?";
 "nightscoutPort" = "Port";
 
-"appleWatchShowDataInComplications" = "Toon waardes in complicaties";
-"appleWatchShowDataInComplicationsMessage" = "Apple Watch complicaties zijn niet up-to-date. Updates gebeuren 2 tot 3 keer per uur.\n\nREKEN NIET op waardes in de complicaties.\n\nOm up-to-date waardes te zien, open de %@ Watch app.\n\nKlik 'OK' als je dit begrijpt en aanvaardt.";
-"appleWatchComplicationUserAgreementDate" = "Gebruikersovereenkomst";
-"appleWatchRemainingComplicationUserInfoTransfers" = "Overblijvende complicatie updates";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

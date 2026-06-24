@@ -65,7 +65,6 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
     case dexcom
     case healthkit
     case speak
-    case appleWatch
     case calendarEvents
     case contactImage
     case M5stack
@@ -98,8 +97,6 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
             return SettingsViewHealthKitSettingsViewModel()
         case .speak:
             return SettingsViewSpeakSettingsViewModel()
-        case .appleWatch:
-            return SettingsViewAppleWatchSettingsViewModel()
         case .calendarEvents:
             return SettingsViewCalendarEventsSettingsViewModel()
         case .contactImage:

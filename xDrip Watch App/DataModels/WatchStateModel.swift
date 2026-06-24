@@ -46,8 +46,6 @@ final class WatchStateModel: NSObject, ObservableObject {
     @Published var followerDataSourceType: FollowerDataSourceType = .nightscout
     @Published var followerBackgroundKeepAliveType: FollowerBackgroundKeepAliveType = .normal
     @Published var keepAliveIsDisabled: Bool = false
-    @Published var liveDataIsEnabled: Bool = false
-    @Published var remainingComplicationUserInfoTransfers: Int = 99
     
     @Published var lastUpdatedTextString: String = Texts_WatchApp.requestingData
     @Published var lastUpdatedTimeString: String = ""
@@ -441,8 +439,6 @@ final class WatchStateModel: NSObject, ObservableObject {
             timeStampOfLastHeartBeat = Date(timeIntervalSince1970: dictionary["timeStampOfLastHeartBeat"] as? Double ?? 0)
             secondsUntilHeartBeatDisconnectWarning = dictionary["secondsUntilHeartBeatDisconnectWarning"] as? Int ?? 0
             keepAliveIsDisabled = dictionary["keepAliveIsDisabled"] as? Bool ?? false
-            remainingComplicationUserInfoTransfers = dictionary["remainingComplicationUserInfoTransfers"] as? Int ?? 99
-            liveDataIsEnabled = dictionary["liveDataIsEnabled"] as? Bool ?? false
             
             if let lastLoopDateAsDouble = dictionary["deviceStatusLastLoopDate"] as? Double {
                 deviceStatusLastLoopDate = Date(timeIntervalSince1970: lastLoopDateAsDouble)
@@ -481,7 +477,7 @@ final class WatchStateModel: NSObject, ObservableObject {
             date.timeIntervalSince1970
         }
         
-        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl, keepAliveIsDisabled: keepAliveIsDisabled, liveDataIsEnabled: liveDataIsEnabled)
+        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl, keepAliveIsDisabled: keepAliveIsDisabled)
         
         // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
         // the user's device - this allows several copies of the app to be installed without cross-contamination of widget/complication data
@@ -507,10 +503,6 @@ final class WatchStateModel: NSObject, ObservableObject {
         }
         
         debugString += "\nBG values: \(bgReadingValues.count)"
-        
-        debugString += "\nComp enabled: \(liveDataIsEnabled.description)"
-        
-        debugString += "\nComp remain: \(remainingComplicationUserInfoTransfers.description)/50"
         
         if !isMaster {
             debugString += "\nFollower conn.: \(timeStampOfLastFollowerConnection.formatted(date: .omitted, time: .standard))"

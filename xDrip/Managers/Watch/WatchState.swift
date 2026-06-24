@@ -31,8 +31,6 @@ struct WatchState: Codable {
     var timeStampOfLastHeartBeat: Double?
     var secondsUntilHeartBeatDisconnectWarning: Int?
     var keepAliveIsDisabled: Bool?
-    var liveDataIsEnabled: Bool?
-    var remainingComplicationUserInfoTransfers: Int?
     
     // use this to track the AID/looping status if sent
     var deviceStatusCreatedAt: Double?
