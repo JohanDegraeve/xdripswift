@@ -75,7 +75,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                 action: .settingsScreen {
                     SettingsScreen(
                         title: Texts_SettingsView.issueReportSectionTitle,
-                        providers: { [SettingsViewTraceSettingsViewModel(sectionTitleOverride: ConstantsSettingsIcons.traceSettingsIcon + " " + Texts_SettingsView.issueReportSectionTitle)] }
+                        providers: { [SettingsViewTraceSettingsViewModel(sectionTitleOverride: Texts_SettingsView.issueReportSectionTitle)] }
                     )
                 }
             ),
@@ -119,10 +119,10 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
 
     func sectionTitle() -> String? {
         if rowGroup == .osAidLoopShare {
-            return ConstantsSettingsIcons.osAidLoopShareSettingsIcon + " " + Texts_SettingsView.osAidLoopShareSectionTitle
+            return Texts_SettingsView.osAidLoopShareSectionTitle
         }
 
-        return ConstantsSettingsIcons.developerSettingsIcon + " " + Texts_SettingsView.developerSettings
+        return Texts_SettingsView.developerSettings
     }
     
     func settingsRowText(index: Int) -> String {

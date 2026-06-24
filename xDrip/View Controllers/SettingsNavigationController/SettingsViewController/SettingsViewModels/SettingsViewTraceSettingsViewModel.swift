@@ -64,7 +64,7 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
             return sectionTitleOverride
         }
 
-        return ConstantsSettingsIcons.traceSettingsIcon + " " + Texts_SettingsView.sectionTitleTrace
+        return Texts_SettingsView.sectionTitleTrace
     }
     
     func settingsRowText(index: Int) -> String {

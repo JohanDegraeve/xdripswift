@@ -429,7 +429,7 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return ConstantsSettingsIcons.nightscoutSettingsIcon + " " + Texts_SettingsView.sectionTitleNightscout
+        return Texts_SettingsView.sectionTitleNightscout
     }
 
     func numberOfRows() -> Int {

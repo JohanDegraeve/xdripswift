@@ -177,7 +177,7 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
     }
     
     func sectionTitle() -> String? {
-        return ConstantsSettingsIcons.notificationsSettingsIcon + " " + Texts_SettingsView.sectionTitleNotifications
+        return Texts_SettingsView.sectionTitleNotifications
     }
 
     func numberOfRows() -> Int {

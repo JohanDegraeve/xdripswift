@@ -223,11 +223,13 @@ struct SettingsScreen {
 
 struct SettingsSection {
     let title: String?
+    let iconSymbolName: String?
     let footer: String?
     let rows: [SettingsRow]
 
-    init(title: String? = nil, footer: String? = nil, rows: [SettingsRow]) {
+    init(title: String? = nil, iconSymbolName: String? = nil, footer: String? = nil, rows: [SettingsRow]) {
         self.title = title
+        self.iconSymbolName = iconSymbolName
         self.footer = footer
         self.rows = rows
     }
@@ -758,8 +760,15 @@ private struct SettingsNativeSectionView: View {
             }
         } header: {
             if showsSectionHeader, let title = section.title {
-                Text(title)
-                    .foregroundStyle(Color(ConstantsUI.tableViewHeaderTextColor))
+                HStack(spacing: 6) {
+                    if let iconSymbolName = section.iconSymbolName {
+                        Image(systemName: iconSymbolName)
+                            .foregroundStyle(ConstantsUI.settingsSectionHeaderIconColor)
+                    }
+
+                    Text(title)
+                        .foregroundStyle(Color(ConstantsUI.tableViewHeaderTextColor))
+                }
             }
         } footer: {
             if let footer = section.footer {

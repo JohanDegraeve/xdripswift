@@ -7,6 +7,9 @@ enum ConstantsUI {
 
     /// color for section headers
     static let sectionHeaderColor = Color(UIColor.lightGray)
+
+    /// color for section header icons in SwiftUI settings views
+    static let settingsSectionHeaderIconColor = Color(red: 0.30, green: 0.55, blue: 0.75)
     
     /// color for section footer
     static let sectionFooterColor = Color(UIColor.lightGray)

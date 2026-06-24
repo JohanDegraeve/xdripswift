@@ -247,10 +247,10 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
     
     func sectionTitle() -> String? {
         if rowGroup == .glucoseRanges {
-            return ConstantsSettingsIcons.glucoseRangesSettingsIcon + " " + Texts_SettingsView.glucoseRangesSectionTitle
+            return Texts_SettingsView.glucoseRangesSectionTitle
         }
 
-        return ConstantsSettingsIcons.homeScreenSettingsIcon + " " + Texts_SettingsView.sectionTitleHomeScreen
+        return Texts_SettingsView.sectionTitleHomeScreen
     }
     
     func numberOfRows() -> Int {

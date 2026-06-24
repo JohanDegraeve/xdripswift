@@ -56,7 +56,7 @@ class SettingsViewContactImageSettingsViewModel: NSObject, SettingsViewModelProt
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
     func sectionTitle() -> String? {
-        return ConstantsSettingsIcons.contactImageSettingsIcon + " " + Texts_SettingsView.contactImageSectionTitle
+        return Texts_SettingsView.contactImageSectionTitle
     }
     
     func settingsRowText(index: Int) -> String {

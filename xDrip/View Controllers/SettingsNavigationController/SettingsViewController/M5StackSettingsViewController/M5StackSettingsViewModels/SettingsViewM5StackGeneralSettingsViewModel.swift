@@ -26,7 +26,7 @@ struct SettingsViewM5StackGeneralSettingsViewModel: SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return ConstantsSettingsIcons.m5StackGeneralSettingsIcon + " " + Texts_BgReadings.generalSectionHeader
+        return Texts_BgReadings.generalSectionHeader
     }
     
     func settingsRowText(index: Int) -> String {

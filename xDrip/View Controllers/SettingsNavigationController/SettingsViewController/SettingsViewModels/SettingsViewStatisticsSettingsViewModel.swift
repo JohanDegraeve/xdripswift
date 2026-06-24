@@ -159,7 +159,7 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
     }
     
     func sectionTitle() -> String? {
-        return ConstantsSettingsIcons.statisticsSettingsIcon + " " + Texts_SettingsView.sectionTitleStatistics
+        return Texts_SettingsView.sectionTitleStatistics
     }
     
     func numberOfRows() -> Int {

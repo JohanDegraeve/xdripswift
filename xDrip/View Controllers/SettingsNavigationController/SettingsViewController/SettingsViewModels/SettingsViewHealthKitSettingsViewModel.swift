@@ -50,7 +50,7 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
     }
     
     func sectionTitle() -> String? {
-        return ConstantsSettingsIcons.healthKitSettingsIcon + " " + Texts_SettingsView.sectionTitleHealthKit
+        return Texts_SettingsView.sectionTitleHealthKit
     }
     
     func numberOfRows() -> Int {
@@ -137,4 +137,3 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
         }
     }
 }
-

@@ -112,7 +112,7 @@ class SettingsViewDexcomShareUploadSettingsViewModel: SettingsViewModelProtocol 
     }
     
     func sectionTitle() -> String? {
-        return ConstantsSettingsIcons.dexcomSettingsIcon + " " + Texts_SettingsView.sectionTitleDexcomShareUpload
+        return Texts_SettingsView.sectionTitleDexcomShareUpload
     }
 
     func numberOfRows() -> Int {

@@ -131,6 +131,23 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
     case about
     case advanced
 
+    var iconSymbolName: String {
+        switch self {
+        case .dataSource:
+            return ConstantsSettingsIcons.dataSourceSettingsIcon
+        case .glucoseDisplay:
+            return ConstantsSettingsIcons.glucoseDisplaySettingsIcon
+        case .alertsAndNotifications:
+            return ConstantsSettingsIcons.notificationsSettingsIcon
+        case .sharingAndServices:
+            return ConstantsSettingsIcons.sharingAndServicesSettingsIcon
+        case .about:
+            return ConstantsSettingsIcons.infoSettingsIcon
+        case .advanced:
+            return ConstantsSettingsIcons.developerSettingsIcon
+        }
+    }
+
     /// Creates the old Settings section view model for this SwiftUI section.
     /// The SwiftUI list still asks these view models for row text, detail text,
     /// enabled state and row actions so the existing Settings logic stays in place.
@@ -185,7 +202,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
 
     static func glucoseDisplay() -> SettingsViewGroupedSettingsViewModel {
         SettingsViewGroupedSettingsViewModel(
-            title: ConstantsSettingsIcons.glucoseDisplaySettingsIcon + " " + Texts_SettingsView.glucoseDisplaySectionTitle,
+            title: Texts_SettingsView.glucoseDisplaySectionTitle,
             rows: [
                 SettingsGroupedRow(
                     id: "glucoseDisplay.homeScreen",
@@ -223,7 +240,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
 
     static func alertsAndNotifications() -> SettingsViewGroupedSettingsViewModel {
         SettingsViewGroupedSettingsViewModel(
-            title: ConstantsSettingsIcons.notificationsSettingsIcon + " " + Texts_SettingsView.alertsAndNotificationsSectionTitle,
+            title: Texts_SettingsView.alertsAndNotificationsSectionTitle,
             rows: [
                 SettingsGroupedRow(
                     id: "alertsAndNotifications.notifications",
@@ -251,7 +268,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
 
     static func sharingAndServices() -> SettingsViewGroupedSettingsViewModel {
         SettingsViewGroupedSettingsViewModel(
-            title: ConstantsSettingsIcons.nightscoutSettingsIcon + " " + Texts_SettingsView.sharingAndServicesSectionTitle,
+            title: Texts_SettingsView.sharingAndServicesSectionTitle,
             rows: [
                 SettingsGroupedRow(
                     id: "sharingServices.nightscout",
@@ -407,7 +424,14 @@ enum SettingsListFactory {
                     fatalError("Settings view model must provide a native Settings section")
                 }
 
-                return nativeProvider.settingsSection(sectionID: section.rawValue)
+                let settingsSection = nativeProvider.settingsSection(sectionID: section.rawValue)
+
+                return SettingsSection(
+                    title: settingsSection.title,
+                    iconSymbolName: section.iconSymbolName,
+                    footer: settingsSection.footer,
+                    rows: settingsSection.rows
+                )
             }
         }
     }

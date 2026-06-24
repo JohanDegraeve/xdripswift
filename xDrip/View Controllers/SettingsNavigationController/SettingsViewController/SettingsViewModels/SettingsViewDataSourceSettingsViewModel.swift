@@ -550,7 +550,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
     }
     
     func sectionTitle() -> String? {
-        return ConstantsSettingsIcons.dataSourceSettingsIcon + " " + Texts_SettingsView.sectionTitleDataSource
+        return Texts_SettingsView.sectionTitleDataSource
     }
 
     func numberOfRows() -> Int {
