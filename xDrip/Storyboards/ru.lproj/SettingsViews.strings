@@ -71,7 +71,7 @@
 "settingsviews_speakTrend" = "Говорить тенденцию";
 "settingsviews_speakDelta" = "Говорить дельта";
 "settingsviews_IntervalTitle" = "Интервал";
-"settingsviews_IntervalMessage" = "Минимальный интервал между двумя показаниями, в минутах";
+"settingsviews_IntervalMessage" = "Минимальный интервал между двумя показаниями";
 "settingsviews_sectiontitleAbout" = "Об %@";
 "settingsviews_Version" = "Версия";
 "settingsviews_license" = "Лицензия";
@@ -109,7 +109,7 @@
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Домашний экран";
 "settingsviews_sectionTitleHousekeeper" = "Управление данными";
-"settingsviews_housekeeperRetentionPeriod" = "Срок хранения (дней)";
+"settingsviews_housekeeperRetentionPeriod" = "Срок хранения";
 "settingsviews_housekeeperExportAllData" = "Экспорт всех данных";
 "settingsviews_housekeeperRetentionPeriodMessage" = "Сколько дней должны храниться данные? (минимум 90, максимум 365)\n\n(рекомендуется: 90 дней)";
 "suppressUnLockPayLoad" = "Остановить блок. нагрузки";
@@ -160,7 +160,7 @@
 /// treatments settings, offset the carb treatments on main chart
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
-"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
+"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calendar events";
 
 /// statistics settings, prefer user-defined range
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
@@ -193,7 +193,7 @@
 "settingsviews_libreLinkUpReAcceptNeeded" = "Need to accept terms";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two bg announcements, this is the pop up message - this is used for setting the interval between two readings in BG announcements, Speak readings, Apple Watch
-"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
+"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Patient Name";

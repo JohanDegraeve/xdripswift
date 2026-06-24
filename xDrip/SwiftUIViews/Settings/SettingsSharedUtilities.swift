@@ -24,6 +24,21 @@ final class SettingsRouter: ObservableObject {
     var openLoopDelaySchedule: (() -> Void)?
     var presentShareFile: ((URL) -> Void)?
     var showProgress: ((ProgressBarStatus<URL>?) -> Void)?
+
+    /// Reuses the route closures from the parent Settings screen when a grouped
+    /// child Settings screen is opened. This lets child rows keep using the same
+    /// old navigation actions without each grouped screen knowing about them.
+    func inheritActions(from parent: SettingsRouter?) {
+        guard let parent else { return }
+
+        openAlertTypes = parent.openAlertTypes
+        openAlerts = parent.openAlerts
+        openM5Stack = parent.openM5Stack
+        openTimeSchedule = parent.openTimeSchedule
+        openLoopDelaySchedule = parent.openLoopDelaySchedule
+        presentShareFile = parent.presentShareFile
+        showProgress = parent.showProgress
+    }
 }
 
 struct SettingsNavigationActions {
@@ -87,6 +102,49 @@ extension UIViewController {
         }
     }
 
+    /// Pushes a complete SwiftUI Settings screen made from native section models.
+    /// This is the shared path for grouped Settings menus: the parent row only
+    /// describes which sections belong in the child screen, and this keeps the
+    /// hosting, callbacks and navigation behaviour consistent.
+    func pushSettingsScreen(_ settingsScreen: SettingsScreen, parentRouter: SettingsRouter? = nil) {
+        guard let navigationController else { return }
+
+        let router = SettingsRouter()
+        router.inheritActions(from: parentRouter)
+
+        let presenter = SettingsActionPresenter(router: router)
+        let sections = settingsScreen.makeSections(presenter)
+        let listModel = SettingsListModel(sections: sections)
+        let viewController = PortraitLockedHostingController(
+            rootView: AnyView(SettingsListView(
+                listModel: listModel,
+                presenter: presenter,
+                title: settingsScreen.title
+            ))
+        )
+
+        presenter.attach(controller: viewController)
+        SettingsListFactory.attach(controller: viewController, sections: sections, listModel: listModel)
+
+        if router.presentShareFile == nil {
+            router.presentShareFile = { [weak viewController] url in
+                let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: [])
+                viewController?.present(activityViewController, animated: true)
+            }
+        }
+
+        viewController.title = settingsScreen.title
+        viewController.navigationItem.largeTitleDisplayMode = .never
+        viewController.rootView = AnyView(SettingsListView(
+            listModel: listModel,
+            presenter: presenter,
+            title: settingsScreen.title
+        )
+        .environment(\.settingsNavigationActions, viewController.settingsNavigationActions()))
+
+        navigationController.pushViewController(viewController, animated: true)
+    }
+
     func pushSettingsTextEntry(_ textEntry: SettingsTextEntryContent) {
         settingsNavigationActions().pushTextEntry(textEntry)
     }
@@ -125,8 +183,177 @@ final class SettingsListModel: ObservableObject {
 
 struct SettingsSectionModel: Identifiable {
     let id: Int
-    let viewModel: SettingsViewModelProtocol
+    let section: () -> SettingsSection
+    let legacyViewModel: SettingsViewModelProtocol?
+
+    init(id: Int, viewModel: SettingsViewModelProtocol? = nil, section: @escaping () -> SettingsSection) {
+        self.id = id
+        self.section = section
+        self.legacyViewModel = viewModel
+    }
 }
+
+struct SettingsScreen {
+    let title: String
+    let makeSections: @MainActor (SettingsActionPresenter) -> [SettingsSectionModel]
+
+    /// Describes a pushed Settings screen without coupling it to a specific host.
+    /// Future grouped menus can return this from a row action and provide any
+    /// mix of existing section providers for the child screen.
+    init(
+        title: String,
+        makeSections: @escaping @MainActor (SettingsActionPresenter) -> [SettingsSectionModel]
+    ) {
+        self.title = title
+        self.makeSections = makeSections
+    }
+
+    /// Convenience initializer for the common case where a child Settings screen
+    /// is just a title and a list of existing native section providers.
+    init(title: String, providers: @escaping () -> [SettingsNativeSectionProvider]) {
+        self.init(title: title) { presenter in
+            SettingsListFactory.makeSections(providers: providers(), presenter: presenter)
+        }
+    }
+}
+
+struct SettingsSection {
+    let title: String?
+    let footer: String?
+    let rows: [SettingsRow]
+
+    init(title: String? = nil, footer: String? = nil, rows: [SettingsRow]) {
+        self.title = title
+        self.footer = footer
+        self.rows = rows
+    }
+}
+
+struct SettingsRow: Identifiable {
+    let id: String
+    let title: String
+    var detail: String? = nil
+    var icon: SettingsIcon? = nil
+    var titleColor: Color? = nil
+    var detailColor: Color? = nil
+    var indicator: SettingsIndicator? = nil
+    var detailIndicator: SettingsIndicator? = nil
+    var accessory: SettingsAccessory = .automatic
+    var control: SettingsControl? = nil
+    var isEnabled: Bool = true
+    var isVisible: Bool = true
+    var reloadScope: SettingsReloadScope? = nil
+    var accessibility: SettingsAccessibility? = nil
+    var action: SettingsRowAction? = nil
+}
+
+struct SettingsIcon {
+    let symbolName: String
+    var color: Color? = nil
+    var backgroundColor: Color? = nil
+    var accessibilityLabel: String? = nil
+}
+
+struct SettingsIndicator {
+    let color: Color
+    var symbolName: String = "circle.fill"
+    var accessibilityLabel: String? = nil
+}
+
+enum SettingsAccessory {
+    case automatic
+    case none
+    case disclosure
+    case info
+    case infoDisclosure
+}
+
+enum SettingsControl {
+    case toggle(isOn: () -> Bool, setIsOn: (Bool) -> Void)
+}
+
+struct SettingsAccessibility {
+    var label: String? = nil
+    var value: String? = nil
+    var hint: String? = nil
+}
+
+enum SettingsRowAction {
+    case textEntry(() -> SettingsTextEntryContent)
+    case selectionList(() -> SettingsSelectionListContent)
+    case settingsScreen(() -> SettingsScreen)
+    case legacy(action: () -> SettingsSelectedRowAction, rowIndex: Int, viewModel: SettingsViewModelProtocol)
+    case run(() -> Void)
+    case showMessage(title: String, message: String?)
+
+    var prefersDisclosure: Bool {
+        switch self {
+        case .textEntry, .selectionList, .settingsScreen:
+            return true
+        case .legacy, .run, .showMessage:
+            return false
+        }
+    }
+}
+
+protocol SettingsNativeSectionProvider: SettingsViewModelProtocol {
+    func settingsSection(sectionID: Int) -> SettingsSection
+    func settingsSectionTitle() -> String?
+    func settingsSectionFooter() -> String?
+    func settingsRows(sectionID: Int) -> [SettingsRow]
+}
+
+extension SettingsNativeSectionProvider {
+    /// Builds the native SwiftUI section from the smaller title, footer and row
+    /// hooks below. Most sections can use this as-is, and sections that need
+    /// simple show/hide logic can usually override only settingsRows(sectionID:).
+    func settingsSection(sectionID: Int) -> SettingsSection {
+        SettingsSection(
+            title: settingsSectionTitle(),
+            footer: settingsSectionFooter(),
+            rows: settingsRows(sectionID: sectionID)
+        )
+    }
+
+    /// Uses the old section title by default so existing Settings headings keep
+    /// working while each section moves to native SwiftUI rows.
+    func settingsSectionTitle() -> String? {
+        sectionTitle()
+    }
+
+    /// Uses the old section footer by default, but gives native sections a clean
+    /// place to add conditional footer text without replacing the whole section.
+    func settingsSectionFooter() -> String? {
+        sectionFooter()
+    }
+
+}
+
+// These conformances mark the existing Settings view models as participants in
+// the SwiftUI row model. Each view model now declares its own rows near the top
+// of the file so the section layout is easy to inspect before the detailed logic.
+// The shared helper code below still lets those rows call into the old action
+// methods while we continue moving the settings screens to native SwiftUI.
+extension SettingsViewHelpSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewDataSourceSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewHomeScreenSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewAlertSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewStatisticsSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewNightscoutSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewDexcomShareUploadSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewHealthKitSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewSpeakSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewAppleWatchSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewCalendarEventsSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewContactImageSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewM5StackSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewTraceSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewInfoViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewDevelopmentSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewHousekeeperSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewM5StackGeneralSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewM5StackWiFiSettingsViewModel: SettingsNativeSectionProvider {}
+extension SettingsViewM5StackBluetoothSettingsViewModel: SettingsNativeSectionProvider {}
 
 enum SettingsReloadScope {
     case all
@@ -160,6 +387,25 @@ final class SettingsActionPresenter: ObservableObject {
     /// Shows the simple message alert used by many of the old Settings view models.
     func showMessage(title: String, message: String?) {
         alert = SettingsAlertContent(title: title, message: message, actionTitle: Texts_Common.Ok, action: nil)
+    }
+
+    /// Pushes a native Settings text-entry row without going through the old
+    /// SettingsSelectedRowAction bridge.
+    func show(textEntry: SettingsTextEntryContent) {
+        controller?.pushSettingsTextEntry(textEntry)
+    }
+
+    /// Pushes a native Settings selection row without rebuilding it as a legacy
+    /// view-model action first.
+    func show(selectionList: SettingsSelectionListContent) {
+        controller?.pushSettingsSelectionList(selectionList)
+    }
+
+    /// Pushes a child Settings screen built from existing section providers.
+    /// This is what lets us group sections such as Services later without moving
+    /// their underlying view model logic.
+    func show(settingsScreen: SettingsScreen) {
+        controller?.pushSettingsScreen(settingsScreen, parentRouter: router)
     }
 
     /// Converts a SettingsSelectedRowAction from the old view models into the
@@ -389,14 +635,16 @@ struct SettingsStaticRowView: View {
     let showsDisclosure: Bool
     let showsInfoButton: Bool
     let titleColor: Color?
+    let detailColor: Color?
+    let icon: SettingsIcon?
     /// Adds a small coloured SF Symbol dot before the row title.
     /// This is used when the old Settings row text included a status marker, but
     /// the SwiftUI row should draw that marker instead of storing it in the text.
-    let indicatorColor: Color?
+    let indicator: SettingsIndicator?
     /// Adds a small coloured SF Symbol dot before the row detail text.
     /// This is for rows where the status belongs with the value on the right,
     /// such as the follower service status.
-    let detailIndicatorColor: Color?
+    let detailIndicator: SettingsIndicator?
     let action: () -> Void
 
     init(
@@ -406,6 +654,10 @@ struct SettingsStaticRowView: View {
         showsDisclosure: Bool,
         showsInfoButton: Bool = false,
         titleColor: Color? = nil,
+        detailColor: Color? = nil,
+        icon: SettingsIcon? = nil,
+        indicator: SettingsIndicator? = nil,
+        detailIndicator: SettingsIndicator? = nil,
         indicatorColor: Color? = nil,
         detailIndicatorColor: Color? = nil,
         action: @escaping () -> Void
@@ -416,8 +668,10 @@ struct SettingsStaticRowView: View {
         self.showsDisclosure = showsDisclosure
         self.showsInfoButton = showsInfoButton
         self.titleColor = titleColor
-        self.indicatorColor = indicatorColor
-        self.detailIndicatorColor = detailIndicatorColor
+        self.detailColor = detailColor
+        self.icon = icon
+        self.indicator = indicator ?? indicatorColor.map { SettingsIndicator(color: $0) }
+        self.detailIndicator = detailIndicator ?? detailIndicatorColor.map { SettingsIndicator(color: $0) }
         self.action = action
     }
 
@@ -429,8 +683,10 @@ struct SettingsStaticRowView: View {
                     detail: detail,
                     isEnabled: isEnabled,
                     titleColor: titleColor,
-                    indicatorColor: indicatorColor,
-                    detailIndicatorColor: detailIndicatorColor
+                    detailColor: detailColor,
+                    icon: icon,
+                    indicator: indicator,
+                    detailIndicator: detailIndicator
                 )
 
                 if isEnabled {
@@ -456,23 +712,42 @@ private struct SettingsSectionView: View {
     let reload: (SettingsReloadScope) -> Void
 
     var body: some View {
+        SettingsNativeSectionView(
+            sectionID: section.id,
+            section: section.section(),
+            presenter: presenter,
+            reload: reload
+        )
+    }
+}
+
+private struct SettingsNativeSectionView: View {
+    let sectionID: Int
+    let section: SettingsSection
+    @ObservedObject var presenter: SettingsActionPresenter
+    let reload: (SettingsReloadScope) -> Void
+
+    private var visibleRows: [SettingsRow] {
+        section.rows.filter(\.isVisible)
+    }
+
+    var body: some View {
         Section {
-            ForEach(0..<section.viewModel.numberOfRows(), id: \.self) { rowIndex in
-                SettingsRowView(
-                    rowIndex: rowIndex,
-                    sectionIndex: section.id,
-                    viewModel: section.viewModel,
+            ForEach(visibleRows) { row in
+                SettingsNativeRowView(
+                    sectionID: sectionID,
+                    row: row,
                     presenter: presenter,
                     reload: reload
                 )
             }
         } header: {
-            if let title = section.viewModel.sectionTitle() {
+            if let title = section.title {
                 Text(title)
                     .foregroundStyle(Color(ConstantsUI.tableViewHeaderTextColor))
             }
         } footer: {
-            if let footer = section.viewModel.sectionFooter() {
+            if let footer = section.footer {
                 Text(footer)
                     .foregroundStyle(Color(.colorSecondary))
             }
@@ -480,92 +755,210 @@ private struct SettingsSectionView: View {
     }
 }
 
-private struct SettingsRowView: View {
-    let rowIndex: Int
-    let sectionIndex: Int
-    let viewModel: SettingsViewModelProtocol
+private struct SettingsNativeRowView: View {
+    let sectionID: Int
+    let row: SettingsRow
     @ObservedObject var presenter: SettingsActionPresenter
     let reload: (SettingsReloadScope) -> Void
 
     var body: some View {
-        if let switchAdapter = SettingsSwitchAdapter(viewModel: viewModel, rowIndex: rowIndex) {
+        switch row.control {
+        case let .some(.toggle(isOn, setIsOn)):
             Toggle(isOn: Binding(
-                get: { switchAdapter.isOn },
-                set: { setSwitch(switchAdapter, isOn: $0) }
+                get: isOn,
+                set: {
+                    setIsOn($0)
+                    reload(row.reloadScope ?? .section(sectionID))
+                }
             )) {
-                SettingsRowTextView(
-                    title: viewModel.settingsRowText(index: rowIndex),
-                    detail: viewModel.detailedText(index: rowIndex),
-                    isEnabled: isEnabled,
-                    indicatorColor: indicatorColor,
-                    detailIndicatorColor: detailIndicatorColor
-                )
+                rowText
             }
             .tint(.green)
-            .disabled(!isEnabled)
-        } else {
+            .disabled(!row.isEnabled)
+
+        case .none:
             SettingsStaticRowView(
-                title: viewModel.settingsRowText(index: rowIndex),
-                detail: viewModel.detailedText(index: rowIndex),
-                isEnabled: isEnabled,
-                showsDisclosure: isEnabled && (accessoryType == .disclosureIndicator || accessoryType == .detailDisclosureButton),
-                showsInfoButton: isEnabled && (accessoryType == .detailButton || accessoryType == .detailDisclosureButton),
-                indicatorColor: indicatorColor,
-                detailIndicatorColor: detailIndicatorColor,
+                title: row.title,
+                detail: row.detail,
+                isEnabled: row.isEnabled,
+                showsDisclosure: showsDisclosure,
+                showsInfoButton: showsInfoButton,
+                titleColor: row.titleColor,
+                detailColor: row.detailColor,
+                icon: row.icon,
+                indicator: row.indicator,
+                detailIndicator: row.detailIndicator,
                 action: selectRow
             )
         }
     }
 
-    private var isEnabled: Bool {
-        viewModel.isEnabled(index: rowIndex)
-    }
-
-    private var accessoryType: UITableViewCell.AccessoryType {
-        viewModel.accessoryType(index: rowIndex)
-    }
-
-    /// Gets the optional title-side indicator colour for rows that need a dot
-    /// before the row name. The row text stays clean and the SwiftUI view decides
-    /// how the marker is drawn.
-    private var indicatorColor: Color? {
-        guard let homeScreenViewModel = viewModel as? SettingsViewHomeScreenSettingsViewModel,
-              let color = homeScreenViewModel.rowIndicatorColor(index: rowIndex) else {
-            return nil
-        }
-
-        return Color(color)
-    }
-
-    /// Gets the optional detail-side indicator colour for rows that need a dot
-    /// before the value on the right. This keeps status symbols out of the detail
-    /// string while preserving the old row meaning.
-    private var detailIndicatorColor: Color? {
-        guard let dataSourceViewModel = viewModel as? SettingsViewDataSourceSettingsViewModel,
-              let color = dataSourceViewModel.followerServiceStatusIndicatorColor(index: rowIndex) else {
-            return nil
-        }
-
-        return Color(color)
-    }
-
-    /// Applies a SwiftUI Toggle change through the old UISwitch adapter and then
-    /// refreshes the same scope the old row would have refreshed.
-    private func setSwitch(_ switchAdapter: SettingsSwitchAdapter, isOn: Bool) {
-        switchAdapter.setIsOn(isOn)
-        reload(viewModel.completeSettingsViewRefreshNeeded(index: rowIndex) ? .all : .section(sectionIndex))
-    }
-
-    /// Runs the old view-model row action through SettingsActionPresenter so the
-    /// SwiftUI row keeps the previous action, alert and navigation behaviour.
-    private func selectRow() {
-        presenter.run(
-            selectedRowAction: viewModel.onRowSelect(index: rowIndex),
-            rowIndex: rowIndex,
-            sectionIndex: sectionIndex,
-            viewModel: viewModel,
-            reload: reload
+    private var rowText: some View {
+        SettingsRowTextView(
+            title: row.title,
+            detail: row.detail,
+            isEnabled: row.isEnabled,
+            titleColor: row.titleColor,
+            detailColor: row.detailColor,
+            icon: row.icon,
+            indicator: row.indicator,
+            detailIndicator: row.detailIndicator
         )
+    }
+
+    private var showsDisclosure: Bool {
+        guard row.isEnabled else { return false }
+
+        switch row.accessory {
+        case .automatic:
+            return row.action?.prefersDisclosure ?? false
+        case .disclosure:
+            return true
+        case .infoDisclosure:
+            return true
+        case .none, .info:
+            return false
+        }
+    }
+
+    private var showsInfoButton: Bool {
+        guard row.isEnabled else { return false }
+
+        if case .info = row.accessory {
+            return true
+        }
+
+        if case .infoDisclosure = row.accessory {
+            return true
+        }
+
+        return false
+    }
+
+    private func selectRow() {
+        guard row.isEnabled else { return }
+
+        switch row.action {
+        case let .textEntry(textEntry):
+            presenter.show(textEntry: textEntry())
+        case let .selectionList(selectionList):
+            presenter.show(selectionList: selectionList())
+        case let .settingsScreen(settingsScreen):
+            presenter.show(settingsScreen: settingsScreen())
+        case let .legacy(action, rowIndex, viewModel):
+            presenter.run(
+                selectedRowAction: action(),
+                rowIndex: rowIndex,
+                sectionIndex: sectionID,
+                viewModel: viewModel,
+                reload: reload
+            )
+        case let .run(action):
+            action()
+            reload(row.reloadScope ?? .section(sectionID))
+        case let .showMessage(title, message):
+            presenter.showMessage(title: title, message: message)
+        case nil:
+            break
+        }
+    }
+}
+
+extension SettingsViewModelProtocol {
+    /// Builds a row from the old row logic but lets the new Settings model choose
+    /// a stable row id and visibility. This is useful while a section is being
+    /// migrated because the row list can become explicit before every action is
+    /// rewritten by hand.
+    func nativeSettingsRow(
+        id: String,
+        index: Int,
+        sectionID: Int,
+        isVisible: Bool = true
+    ) -> SettingsRow {
+        nativeSettingsRow(id: Optional(id), index: index, sectionID: sectionID, isVisible: isVisible)
+    }
+
+    /// Builds one native row from the existing row-index methods. The display data
+    /// moves into SettingsRow, but the original row action is still used so the
+    /// behaviour stays unchanged during the migration.
+    private func nativeSettingsRow(
+        id: String? = nil,
+        index: Int,
+        sectionID: Int,
+        isVisible: Bool = true
+    ) -> SettingsRow {
+        let accessoryType = accessoryType(index: index)
+        let isEnabled = isEnabled(index: index)
+        let reloadScope: SettingsReloadScope? = completeSettingsViewRefreshNeeded(index: index) ? .all : nil
+
+        if let switchAdapter = SettingsSwitchAdapter(viewModel: self, rowIndex: index) {
+            return SettingsRow(
+                id: id ?? "\(sectionID).\(index)",
+                title: settingsRowText(index: index),
+                detail: detailedText(index: index),
+                indicator: nativeIndicator(index: index),
+                detailIndicator: nativeDetailIndicator(index: index),
+                accessory: nativeAccessory(accessoryType),
+                control: .toggle(
+                    isOn: { switchAdapter.isOn },
+                    setIsOn: { switchAdapter.setIsOn($0) }
+                ),
+                isEnabled: isEnabled,
+                isVisible: isVisible,
+                reloadScope: reloadScope
+            )
+        }
+
+        return SettingsRow(
+            id: id ?? "\(sectionID).\(index)",
+            title: settingsRowText(index: index),
+            detail: detailedText(index: index),
+            indicator: nativeIndicator(index: index),
+            detailIndicator: nativeDetailIndicator(index: index),
+            accessory: nativeAccessory(accessoryType),
+            isEnabled: isEnabled,
+            isVisible: isVisible,
+            reloadScope: reloadScope,
+            action: isEnabled ? .legacy(action: { onRowSelect(index: index) }, rowIndex: index, viewModel: self) : nil
+        )
+    }
+
+    /// Maps the old UIKit accessory values onto the native SwiftUI row accessory.
+    private func nativeAccessory(_ accessoryType: UITableViewCell.AccessoryType) -> SettingsAccessory {
+        switch accessoryType {
+        case .none:
+            return .none
+        case .disclosureIndicator:
+            return .disclosure
+        case .detailButton:
+            return .info
+        case .detailDisclosureButton:
+            return .infoDisclosure
+        case .checkmark:
+            return .none
+        @unknown default:
+            return .automatic
+        }
+    }
+
+    /// Carries over the few legacy rows that need a coloured marker before the title.
+    private func nativeIndicator(index: Int) -> SettingsIndicator? {
+        guard let homeScreenViewModel = self as? SettingsViewHomeScreenSettingsViewModel,
+              let color = homeScreenViewModel.rowIndicatorColor(index: index) else {
+            return nil
+        }
+
+        return SettingsIndicator(color: Color(color))
+    }
+
+    /// Carries over the few legacy rows that need a coloured marker before the detail.
+    private func nativeDetailIndicator(index: Int) -> SettingsIndicator? {
+        guard let dataSourceViewModel = self as? SettingsViewDataSourceSettingsViewModel,
+              let color = dataSourceViewModel.followerServiceStatusIndicatorColor(index: index) else {
+            return nil
+        }
+
+        return SettingsIndicator(color: Color(color))
     }
 }
 
@@ -574,27 +967,47 @@ struct SettingsRowTextView: View {
     let detail: String?
     let isEnabled: Bool
     let titleColor: Color?
+    let detailColor: Color?
+    let icon: SettingsIcon?
     /// Draws a small dot before the title when a row needs a visual range/status marker.
-    let indicatorColor: Color?
+    let indicator: SettingsIndicator?
     /// Draws a small dot before the detail value when the marker belongs with the value.
-    let detailIndicatorColor: Color?
+    let detailIndicator: SettingsIndicator?
 
-    init(title: String, detail: String?, isEnabled: Bool, titleColor: Color? = nil, indicatorColor: Color? = nil, detailIndicatorColor: Color? = nil) {
+    init(
+        title: String,
+        detail: String?,
+        isEnabled: Bool,
+        titleColor: Color? = nil,
+        detailColor: Color? = nil,
+        icon: SettingsIcon? = nil,
+        indicator: SettingsIndicator? = nil,
+        detailIndicator: SettingsIndicator? = nil,
+        indicatorColor: Color? = nil,
+        detailIndicatorColor: Color? = nil
+    ) {
         self.title = title
         self.detail = detail
         self.isEnabled = isEnabled
         self.titleColor = titleColor
-        self.indicatorColor = indicatorColor
-        self.detailIndicatorColor = detailIndicatorColor
+        self.detailColor = detailColor
+        self.icon = icon
+        self.indicator = indicator ?? indicatorColor.map { SettingsIndicator(color: $0) }
+        self.detailIndicator = detailIndicator ?? detailIndicatorColor.map { SettingsIndicator(color: $0) }
     }
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
             HStack(alignment: .firstTextBaseline, spacing: 7) {
-                if let indicatorColor {
-                    Image(systemName: "circle.fill")
+                if let icon {
+                    SettingsRowIconView(icon: icon, isEnabled: isEnabled)
+                }
+
+                if let indicator {
+                    Image(systemName: indicator.symbolName)
                         .font(.caption2)
-                        .foregroundStyle(isEnabled ? indicatorColor : .gray)
+                        .foregroundStyle(isEnabled ? indicator.color : .gray)
+                        .accessibilityLabel(indicator.accessibilityLabel ?? "")
                 }
 
                 Text(title)
@@ -603,24 +1016,26 @@ struct SettingsRowTextView: View {
                     .minimumScaleFactor(0.75)
                     .frame(alignment: .leading)
             }
+            .layoutPriority(1)
 
             Spacer(minLength: 8)
 
             if let detail, !detail.isEmpty {
                 HStack(spacing: 5) {
-                    if let detailIndicatorColor {
-                        Image(systemName: "circle.fill")
+                    if let detailIndicator {
+                        Image(systemName: detailIndicator.symbolName)
                             .font(.caption2)
-                            .foregroundStyle(isEnabled ? detailIndicatorColor : .gray)
+                            .foregroundStyle(isEnabled ? detailIndicator.color : .gray)
+                            .accessibilityLabel(detailIndicator.accessibilityLabel ?? "")
                     }
 
                     Text(detail)
-                        .foregroundStyle(isEnabled ? Color(.colorTertiary) : .gray)
+                        .foregroundStyle(isEnabled ? (detailColor ?? Color(.colorTertiary)) : .gray)
                         .lineLimit(1)
+                        .truncationMode(.tail)
                         .multilineTextAlignment(.trailing)
                         .frame(alignment: .trailing)
                 }
-                .layoutPriority(1)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -632,6 +1047,31 @@ struct SettingsDisclosureIndicator: View {
         Image(systemName: "chevron.right")
             .font(.footnote.weight(.semibold))
             .foregroundStyle(Color(ConstantsUI.disclosureIndicatorColor))
+    }
+}
+
+private struct SettingsRowIconView: View {
+    let icon: SettingsIcon
+    let isEnabled: Bool
+
+    var body: some View {
+        Group {
+            if let backgroundColor = icon.backgroundColor {
+                Image(systemName: icon.symbolName)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(isEnabled ? (icon.color ?? Color(.colorPrimary)) : .gray)
+                    .frame(width: 24, height: 24)
+                    .background(
+                        Circle()
+                            .fill(isEnabled ? backgroundColor : Color.gray.opacity(0.2))
+                    )
+            } else {
+                Image(systemName: icon.symbolName)
+                    .font(.body)
+                    .foregroundStyle(isEnabled ? (icon.color ?? Color(.colorPrimary)) : .gray)
+            }
+        }
+        .accessibilityLabel(icon.accessibilityLabel ?? "")
     }
 }
 
@@ -817,12 +1257,15 @@ struct SettingsTextEntryView: View {
 
     let textEntry: SettingsTextEntryContent
     let close: () -> Void
+    private let initialValue: String
 
     /// Starts the pushed text editor with the value supplied by the old row action.
     init(textEntry: SettingsTextEntryContent, close: @escaping () -> Void) {
         self.textEntry = textEntry
         self.close = close
-        _value = State(initialValue: textEntry.text ?? "")
+        let initialValue = textEntry.text ?? ""
+        self.initialValue = initialValue
+        _value = State(initialValue: initialValue)
     }
 
     var body: some View {
@@ -868,6 +1311,7 @@ struct SettingsTextEntryView: View {
                 Button(textEntry.actionTitle) {
                     submit()
                 }
+                .disabled(!hasModifiedValue)
             }
         }
         .onDisappear {
@@ -876,6 +1320,14 @@ struct SettingsTextEntryView: View {
             textEntry.cancel?()
         }
         .colorScheme(.dark)
+    }
+
+    private var hasModifiedValue: Bool {
+        if initialValue.isEmpty {
+            return !value.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+
+        return value != initialValue
     }
 
     /// Validates and commits the text entry. Validation errors stay on the pushed

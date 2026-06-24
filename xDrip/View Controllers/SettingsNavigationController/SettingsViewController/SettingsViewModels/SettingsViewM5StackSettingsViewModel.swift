@@ -9,6 +9,14 @@ fileprivate enum Setting:Int, CaseIterable {
 
 struct SettingsViewM5StackSettingsViewModel: SettingsViewModelProtocol {
     
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        [
+            nativeSettingsRow(id: "m5stack.m5stack", index: Setting.m5stack.rawValue, sectionID: sectionID)
+        ]
+    }
+
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
     func storeUIViewController(uIViewController: UIViewController) {}
@@ -68,7 +76,7 @@ struct SettingsViewM5StackSettingsViewModel: SettingsViewModelProtocol {
     func numberOfRows() -> Int {
         return Setting.allCases.count
     }
-    
+
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
         
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }

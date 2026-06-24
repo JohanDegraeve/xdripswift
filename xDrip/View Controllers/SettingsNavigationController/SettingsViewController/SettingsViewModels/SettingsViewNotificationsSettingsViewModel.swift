@@ -23,11 +23,67 @@ fileprivate enum Setting:Int, CaseIterable {
 }
 
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
-class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelProtocol {
+class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelProtocol, SettingsNativeSectionProvider {
     
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel)
     
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        [
+            SettingsRow(
+                id: "notifications.showReadingInNotification",
+                title: Texts_SettingsView.showReadingInNotification,
+                control: .toggle(
+                    isOn: { UserDefaults.standard.showReadingInNotification },
+                    setIsOn: { isOn in
+                        trace("showReadingInNotification changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
+                        UserDefaults.standard.showReadingInNotification = isOn
+                    }
+                )
+            ),
+            SettingsRow(
+                id: "notifications.notificationInterval",
+                title: Texts_SettingsView.settingsviews_IntervalTitle,
+                detail: notificationIntervalDetailText,
+                action: .textEntry(notificationIntervalTextEntry)
+            ),
+            SettingsRow(
+                id: "notifications.liveActivityType",
+                title: Texts_SettingsView.labelLiveActivityType,
+                detail: UserDefaults.standard.liveActivityType.description,
+                isVisible: liveActivitiesAvailable,
+                action: .selectionList(liveActivitySelectionList)
+            ),
+            SettingsRow(
+                id: "notifications.showReadingInAppBadge",
+                title: Texts_SettingsView.labelShowReadingInAppBadge,
+                control: .toggle(
+                    isOn: { UserDefaults.standard.showReadingInAppBadge },
+                    setIsOn: { isOn in
+                        trace("showReadingInAppBadge changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
+                        UserDefaults.standard.showReadingInAppBadge = isOn
+                    }
+                )
+            ),
+            SettingsRow(
+                id: "notifications.multipleAppBadgeValueWith10",
+                title: Texts_SettingsView.multipleAppBadgeValueWith10,
+                control: .toggle(
+                    isOn: { UserDefaults.standard.multipleAppBadgeValueWith10 },
+                    setIsOn: { isOn in
+                        trace("multipleAppBadgeValueWith10 changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
+                        UserDefaults.standard.multipleAppBadgeValueWith10 = isOn
+                    }
+                ),
+                isVisible: !UserDefaults.standard.bloodGlucoseUnitIsMgDl && UserDefaults.standard.showReadingInAppBadge
+            )
+        ]
+    }
+
+    // MARK: - Initialization
+
     override init() {
         super.init()
         addObservers()
@@ -214,6 +270,80 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
         case .notificationInterval, .liveActivityType:
             return nil
         }
+    }
+
+    func settingsSectionFooter() -> String? {
+        liveActivitiesAvailable ? nil : Texts_SettingsView.liveActivityDisabledInFollowerModeMessage
+    }
+
+    private var notificationIntervalDetailText: String {
+        UserDefaults.standard.notificationInterval.description + " " + Texts_Common.minutes
+    }
+
+    private var liveActivitiesAvailable: Bool {
+        UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat
+    }
+
+    private func notificationIntervalTextEntry() -> SettingsTextEntryContent {
+        SettingsTextEntryContent(
+            title: Texts_SettingsView.settingsviews_IntervalTitle,
+            message: Texts_SettingsView.settingsviews_IntervalMessage,
+            keyboardType: .numberPad,
+            text: UserDefaults.standard.notificationInterval.description,
+            placeholder: "0",
+            fieldTitle: Texts_Common.enterValue,
+            unitText: Texts_Common.minutes,
+            actionTitle: Texts_Common.Ok,
+            cancelTitle: Texts_Common.Cancel,
+            action: { interval in
+                if let interval = Int(interval) {
+                    UserDefaults.standard.notificationInterval = Int(interval)
+                    self.sectionReloadClosure?()
+                }
+            },
+            cancel: nil,
+            validator: nil
+        )
+    }
+
+    private func liveActivitySelectionList() -> SettingsSelectionListContent {
+        var data = [String]()
+        var selectedRow: Int?
+        var index = 0
+        let currentLiveActivityType = UserDefaults.standard.liveActivityType
+
+        for liveActivityType in LiveActivityType.allCasesForList {
+            data.append(liveActivityType.description)
+
+            if liveActivityType == currentLiveActivityType {
+                selectedRow = index
+            }
+
+            index += 1
+        }
+
+        return SettingsSelectionListContent(
+            title: Texts_SettingsView.labelLiveActivityType,
+            data: data,
+            selectedRow: selectedRow,
+            actionTitle: Texts_Common.Ok,
+            cancelTitle: Texts_Common.Cancel,
+            action: { index in
+                let oldLiveActivityType = UserDefaults.standard.liveActivityType
+
+                if index != selectedRow {
+                    UserDefaults.standard.liveActivityType = LiveActivityType(forRowAt: index) ?? .disabled
+
+                    let newLiveActivityType = UserDefaults.standard.liveActivityType
+
+                    trace("Live activity type was changed from '%{public}@' to '%{public}@'", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, oldLiveActivityType.description, newLiveActivityType.description)
+
+                    self.sectionReloadClosure?()
+                }
+            },
+            cancel: nil,
+            didSelectRow: nil
+        )
     }
     
     // MARK: - observe functions

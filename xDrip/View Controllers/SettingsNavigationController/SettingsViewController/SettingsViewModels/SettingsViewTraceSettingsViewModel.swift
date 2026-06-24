@@ -32,6 +32,15 @@ class SettingsViewTraceSettingsViewModel: NSObject {
 
 extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
     
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        [
+            nativeSettingsRow(id: "trace.sendTraceFile", index: Setting.sendTraceFile.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "trace.debugLevel", index: Setting.debugLevel.rawValue, sectionID: sectionID)
+        ]
+    }
+
     func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {}
     
     func storeUIViewController(uIViewController: UIViewController) {
@@ -111,7 +120,7 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
     func numberOfRows() -> Int {
         return Setting.allCases.count
     }
-    
+
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
         
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }

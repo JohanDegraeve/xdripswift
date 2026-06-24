@@ -21,6 +21,18 @@ fileprivate enum Setting:Int, CaseIterable {
 
 struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
     
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        [
+            nativeSettingsRow(id: "info.versionNumber", index: Setting.versionNumber.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "info.buildNumber", index: Setting.buildNumber.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "info.licenseInfo", index: Setting.licenseInfo.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "info.showGitHub", index: Setting.showGitHub.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "info.icons8", index: Setting.icons8.rawValue, sectionID: sectionID)
+        ]
+    }
+
     func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {}
     
     func storeUIViewController(uIViewController: UIViewController) {}
@@ -118,7 +130,7 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
     func numberOfRows() -> Int {
         return Setting.allCases.count
     }
-    
+
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
         
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
@@ -165,4 +177,3 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
     
     
 }
-

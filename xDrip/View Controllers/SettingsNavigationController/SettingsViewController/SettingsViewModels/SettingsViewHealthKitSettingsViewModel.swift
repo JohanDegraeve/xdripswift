@@ -15,8 +15,14 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
     /// for logging
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryHealthKitManager)
     
-    // MARK: - functions in protocol SettingsViewModelProtocol
+    // MARK: - Native SwiftUI rows
     
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        [
+            nativeSettingsRow(id: "healthKit.enabledHealthKit", index: Setting.enabledHealthKit.rawValue, sectionID: sectionID)
+        ]
+    }
+
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
     func storeUIViewController(uIViewController: UIViewController) {}
@@ -50,7 +56,7 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
     func numberOfRows() -> Int {
         return Setting.allCases.count
     }
-    
+
     func settingsRowText(index: Int) -> String {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
@@ -131,5 +137,4 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
         }
     }
 }
-
 

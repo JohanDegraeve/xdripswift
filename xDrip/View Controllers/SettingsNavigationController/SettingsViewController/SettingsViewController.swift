@@ -65,19 +65,7 @@ private extension SettingsHostingController {
     /// This keeps their existing message, reload and navigation hooks working while
     /// the rows are rendered by SwiftUI.
     func attachControllerToViewModels() {
-        listModel.sections.forEach { section in
-            section.viewModel.storeUIViewController(uIViewController: self)
-            section.viewModel.storeRowReloadClosure { [weak self] row in
-                DispatchQueue.main.async {
-                    self?.listModel.reload(.row(section: section.id, row: row))
-                }
-            }
-            section.viewModel.storeSectionReloadClosure { [weak self] in
-                DispatchQueue.main.async {
-                    self?.listModel.reload(.section(section.id))
-                }
-            }
-        }
+        SettingsListFactory.attach(controller: self, sections: listModel.sections, listModel: listModel)
     }
 
     /// Connects router closures to the UIKit hosting controller so old segue-style
@@ -135,43 +123,11 @@ private extension SettingsHostingController {
     /// This mirrors the main Settings setup because M5Stack is still made from
     /// several old section view models.
     func openM5Stack() {
-        let router = SettingsRouter()
-        let presenter = SettingsActionPresenter(router: router)
-        let sections = SettingsListFactory.makeM5StackSections(presenter: presenter)
-        let listModel = SettingsListModel(sections: sections)
-        let viewController = PortraitLockedHostingController(
-            rootView: AnyView(M5StackSettingsView(listModel: listModel, presenter: presenter))
-        )
-
-        presenter.attach(controller: viewController)
-        sections.forEach { section in
-            section.viewModel.storeUIViewController(uIViewController: viewController)
-            section.viewModel.storeRowReloadClosure { row in
-                DispatchQueue.main.async {
-                    listModel.reload(.row(section: section.id, row: row))
-                }
-            }
-            section.viewModel.storeSectionReloadClosure {
-                DispatchQueue.main.async {
-                    listModel.reload(.section(section.id))
-                }
-            }
+        let screen = SettingsScreen(title: Texts_SettingsView.m5StackSettingsViewScreenTitle) { presenter in
+            SettingsListFactory.makeM5StackSections(presenter: presenter)
         }
-        configure(router: router, for: viewController)
 
-        viewController.title = Texts_SettingsView.m5StackSettingsViewScreenTitle
-        viewController.navigationItem.largeTitleDisplayMode = .never
-
-        navigationController?.pushViewController(viewController, animated: true)
-    }
-
-    /// Adds shared router actions needed by child Settings hosts, currently file
-    /// sharing from old view model actions.
-    func configure(router: SettingsRouter, for viewController: UIViewController) {
-        router.presentShareFile = { [weak viewController] url in
-            let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: [])
-            viewController?.present(activityViewController, animated: true)
-        }
+        pushSettingsScreen(screen, parentRouter: router)
     }
 
     /// Opens the SwiftUI schedule editor for rows that still pass a TimeSchedule

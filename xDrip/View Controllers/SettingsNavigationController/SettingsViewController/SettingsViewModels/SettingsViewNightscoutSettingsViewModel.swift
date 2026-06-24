@@ -58,6 +58,32 @@ class SettingsViewNightscoutSettingsViewModel {
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMG5)
     
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        let nightscoutEnabled = UserDefaults.standard.nightscoutEnabled
+        let masterModeRowsVisible = nightscoutEnabled && UserDefaults.standard.isMaster
+
+        return [
+            nativeSettingsRow(id: "nightscout.enabled", index: Setting.nightscoutEnabled.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "nightscout.openNightscout", index: Setting.openNightscout.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
+            nativeSettingsRow(id: "nightscout.followType", index: Setting.nightscoutFollowType.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
+            nativeSettingsRow(id: "nightscout.url", index: Setting.nightscoutUrl.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
+            nativeSettingsRow(id: "nightscout.apiKey", index: Setting.nightscoutAPIKey.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
+            nativeSettingsRow(id: "nightscout.token", index: Setting.token.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
+            nativeSettingsRow(id: "nightscout.port", index: Setting.port.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
+            nativeSettingsRow(id: "nightscout.testUrlAndAPIKey", index: Setting.testUrlAndAPIKey.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
+            nativeSettingsRow(id: "nightscout.uploadSensorStartTime", index: Setting.uploadSensorStartTime.rawValue, sectionID: sectionID, isVisible: masterModeRowsVisible),
+            nativeSettingsRow(id: "nightscout.useSchedule", index: Setting.useSchedule.rawValue, sectionID: sectionID, isVisible: masterModeRowsVisible),
+            nativeSettingsRow(
+                id: "nightscout.schedule",
+                index: Setting.schedule.rawValue,
+                sectionID: sectionID,
+                isVisible: masterModeRowsVisible && UserDefaults.standard.nightscoutUseSchedule
+            )
+        ]
+    }
+
     // MARK: - private functions
     
     /// test the nightscout url and api key and send result to messageHandler
@@ -229,7 +255,7 @@ class SettingsViewNightscoutSettingsViewModel {
 
 /// conforms to SettingsViewModelProtocol for all nightscout settings in the first sections screen
 extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
-    
+
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
     func storeUIViewController(uIViewController: UIViewController) {}
@@ -349,14 +375,14 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
             }, cancelHandler: nil, inputValidator: nil)
 
         case .nightscoutAPIKey:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelNightscoutAPIKey, message:  Texts_SettingsView.giveNightscoutAPIKey, keyboardType: .default, text: UserDefaults.standard.nightscoutAPIKey, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(apiKey: String) in
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelNightscoutAPIKey, message:  Texts_SettingsView.giveNightscoutAPIKey, keyboardType: .default, text: UserDefaults.standard.nightscoutAPIKey, placeHolder: "MyAPISecret123", actionTitle: nil, cancelTitle: nil, actionHandler: {(apiKey: String) in
                 UserDefaults.standard.nightscoutAPIKey = apiKey.trimmingCharacters(in: .whitespaces).toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
 
         case .port:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.nightscoutPort, message: nil, keyboardType: .numberPad, text: UserDefaults.standard.nightscoutPort != 0 ? UserDefaults.standard.nightscoutPort.description : nil, placeHolder: nil, fieldTitle: Texts_SettingsView.enterNightscoutPortNumber, actionTitle: nil, cancelTitle: nil, actionHandler: {(port: String) in if let port = port.trimmingCharacters(in: .whitespaces).toNilIfLength0() { UserDefaults.standard.nightscoutPort = Int(port) ?? 0 } else {UserDefaults.standard.nightscoutPort = 0}}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.nightscoutPort, message: nil, keyboardType: .numberPad, text: UserDefaults.standard.nightscoutPort != 0 ? UserDefaults.standard.nightscoutPort.description : nil, placeHolder: "1337", fieldTitle: Texts_SettingsView.enterNightscoutPortNumber, actionTitle: nil, cancelTitle: nil, actionHandler: {(port: String) in if let port = port.trimmingCharacters(in: .whitespaces).toNilIfLength0() { UserDefaults.standard.nightscoutPort = Int(port) ?? 0 } else {UserDefaults.standard.nightscoutPort = 0}}, cancelHandler: nil, inputValidator: nil)
         
         case .token:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.nightscoutToken, message: Texts_SettingsView.giveNightscoutToken, keyboardType: .default, text: UserDefaults.standard.nightscoutToken, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(token: String) in
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.nightscoutToken, message: Texts_SettingsView.giveNightscoutToken, keyboardType: .default, text: UserDefaults.standard.nightscoutToken, placeHolder: "readable-3f033c4515e623c2", actionTitle: nil, cancelTitle: nil, actionHandler: {(token: String) in
                 UserDefaults.standard.nightscoutToken = token.trimmingCharacters(in: .whitespaces).toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
             
         case .testUrlAndAPIKey:
@@ -427,7 +453,7 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
             return 1
         }
     }
-    
+
     func settingsRowText(index: Int) -> String {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         

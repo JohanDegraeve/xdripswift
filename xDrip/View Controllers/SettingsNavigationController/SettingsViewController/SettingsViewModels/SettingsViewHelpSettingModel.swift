@@ -22,6 +22,15 @@ fileprivate enum Setting:Int, CaseIterable {
 /// conforms to SettingsViewModelProtocol for all alert settings in the first sections screen
 struct SettingsViewHelpSettingsViewModel:SettingsViewModelProtocol {
     
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        [
+            nativeSettingsRow(id: "help.showOnlineHelp", index: Setting.showOnlineHelp.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "help.translateOnlineHelp", index: Setting.translateOnlineHelp.rawValue, sectionID: sectionID)
+        ]
+    }
+
     func storeUIViewController(uIViewController: UIViewController) {}
 
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
@@ -79,7 +88,7 @@ struct SettingsViewHelpSettingsViewModel:SettingsViewModelProtocol {
     func numberOfRows() -> Int {
         return Setting.allCases.count
     }
-    
+
     func uiView(index: Int) -> UIView? {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
@@ -130,4 +139,3 @@ struct SettingsViewHelpSettingsViewModel:SettingsViewModelProtocol {
     
     
 }
-

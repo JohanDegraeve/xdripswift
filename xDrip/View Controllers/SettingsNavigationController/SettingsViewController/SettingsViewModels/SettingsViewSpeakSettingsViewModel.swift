@@ -26,6 +26,38 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categorySettingsViewSpeakSettingsViewModel)
     
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        [
+            nativeSettingsRow(id: "speak.speakBgReadings", index: Setting.speakBgReadings.rawValue, sectionID: sectionID),
+            nativeSettingsRow(
+                id: "speak.speakBgReadingLanguage",
+                index: Setting.speakBgReadingLanguage.rawValue,
+                sectionID: sectionID,
+                isVisible: UserDefaults.standard.speakReadings
+            ),
+            nativeSettingsRow(
+                id: "speak.speakTrend",
+                index: Setting.speakTrend.rawValue,
+                sectionID: sectionID,
+                isVisible: UserDefaults.standard.speakReadings
+            ),
+            nativeSettingsRow(
+                id: "speak.speakDelta",
+                index: Setting.speakDelta.rawValue,
+                sectionID: sectionID,
+                isVisible: UserDefaults.standard.speakReadings
+            ),
+            nativeSettingsRow(
+                id: "speak.speakInterval",
+                index: Setting.speakInterval.rawValue,
+                sectionID: sectionID,
+                isVisible: UserDefaults.standard.speakReadings
+            )
+        ]
+    }
+
     override init() {
         super.init()
         addObservers()
@@ -64,7 +96,7 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         case .speakDelta:
             return .nothing
         case .speakInterval:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_SpeakIntervalTitle, message: Texts_SettingsView.settingsviews_SpeakIntervalMessage, keyboardType: .numberPad, text: UserDefaults.standard.speakInterval.description, placeHolder: "0", actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.speakInterval = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_SpeakIntervalTitle, message: Texts_SettingsView.settingsviews_SpeakIntervalMessage, keyboardType: .numberPad, text: UserDefaults.standard.speakInterval.description, placeHolder: "0", fieldTitle: Texts_Common.enterValue, unitText: Texts_Common.minutes, actionTitle: nil, cancelTitle: nil, actionHandler: {(interval:String) in if let interval = Int(interval) {UserDefaults.standard.speakInterval = Int(interval)}}, cancelHandler: nil, inputValidator: nil)
         case .speakBgReadingLanguage:
             
             //find index for languageCode type currently stored in userdefaults
@@ -142,7 +174,7 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         case .speakDelta:
             return nil
         case .speakInterval:
-            return UserDefaults.standard.speakInterval.description
+            return UserDefaults.standard.speakInterval.description + " " + Texts_Common.minutes
         case .speakBgReadingLanguage:
             return Texts_SpeakReading.languageName
         }

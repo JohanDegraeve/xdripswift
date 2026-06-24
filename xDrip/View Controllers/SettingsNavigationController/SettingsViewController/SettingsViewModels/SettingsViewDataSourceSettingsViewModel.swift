@@ -82,6 +82,28 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
     /// warning symbol to be prefixed to a user-facing string where there is an error or further action needed
     private let warningPrefix = "⚠️ "
     
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        let visibleRowCount = visibleRowCountForCurrentDataSourceMode
+
+        return [
+            nativeSettingsRow(id: "dataSource.bloodGlucoseUnit", index: Setting.bloodGlucoseUnit.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "dataSource.masterFollower", index: Setting.masterFollower.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "dataSource.followerExtraRow2", index: Setting.followerExtraRow2.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow2.rawValue < visibleRowCount),
+            nativeSettingsRow(id: "dataSource.followerExtraRow3", index: Setting.followerExtraRow3.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow3.rawValue < visibleRowCount),
+            nativeSettingsRow(id: "dataSource.followerExtraRow4", index: Setting.followerExtraRow4.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow4.rawValue < visibleRowCount),
+            nativeSettingsRow(id: "dataSource.followerExtraRow5", index: Setting.followerExtraRow5.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow5.rawValue < visibleRowCount),
+            nativeSettingsRow(id: "dataSource.followerExtraRow6", index: Setting.followerExtraRow6.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow6.rawValue < visibleRowCount),
+            nativeSettingsRow(id: "dataSource.followerExtraRow7", index: Setting.followerExtraRow7.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow7.rawValue < visibleRowCount),
+            nativeSettingsRow(id: "dataSource.followerExtraRow8", index: Setting.followerExtraRow8.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow8.rawValue < visibleRowCount),
+            nativeSettingsRow(id: "dataSource.followerExtraRow9", index: Setting.followerExtraRow9.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow9.rawValue < visibleRowCount),
+            nativeSettingsRow(id: "dataSource.followerExtraRow10", index: Setting.followerExtraRow10.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow10.rawValue < visibleRowCount),
+            nativeSettingsRow(id: "dataSource.followerExtraRow11", index: Setting.followerExtraRow11.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow11.rawValue < visibleRowCount),
+            nativeSettingsRow(id: "dataSource.followerExtraRow12", index: Setting.followerExtraRow12.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow12.rawValue < visibleRowCount)
+        ]
+    }
+
     // MARK: - Initialization / Deinitialization
 
     init(coreDataManager: CoreDataManager?) {
@@ -371,7 +393,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .followerExtraRow7:
             switch UserDefaults.standard.followerDataSourceType {
             case .libreLinkUp, .libreLinkUpRussia:
-                return .askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterUsername, keyboardType: .default, text: UserDefaults.standard.libreLinkUpEmail, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (libreLinkUpEmail: String) in
+                return .askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterUsername, keyboardType: .default, text: UserDefaults.standard.libreLinkUpEmail, placeHolder: ConstantsSettingsPlaceholders.usernamePlaceholder, actionTitle: nil, cancelTitle: nil, actionHandler: { (libreLinkUpEmail: String) in
                         
                     UserDefaults.standard.libreLinkUpEmail = libreLinkUpEmail.trimmingCharacters(in: .whitespaces).toNilIfLength0()
                         
@@ -383,7 +405,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 }, cancelHandler: nil, inputValidator: nil)
                 
             case .dexcomShare:
-                return .askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterUsername, keyboardType: .default, text: UserDefaults.standard.dexcomShareAccountName, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (dexcomShareAccountName: String) in
+                return .askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterUsername, keyboardType: .default, text: UserDefaults.standard.dexcomShareAccountName, placeHolder: ConstantsSettingsPlaceholders.usernamePlaceholder, actionTitle: nil, cancelTitle: nil, actionHandler: { (dexcomShareAccountName: String) in
                         
                     UserDefaults.standard.dexcomShareAccountName = dexcomShareAccountName.trimmingCharacters(in: .whitespaces).toNilIfLength0()
 
@@ -392,7 +414,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 }, cancelHandler: nil, inputValidator: nil)
 
             case .medtrumEasyView:
-                return SettingsSelectedRowAction.askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterUsername, keyboardType: .default, text: UserDefaults.standard.medtrumEasyViewEmail, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (medtrumEasyViewEmail: String) in
+                return SettingsSelectedRowAction.askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterUsername, keyboardType: .default, text: UserDefaults.standard.medtrumEasyViewEmail, placeHolder: ConstantsSettingsPlaceholders.usernamePlaceholder, actionTitle: nil, cancelTitle: nil, actionHandler: { (medtrumEasyViewEmail: String) in
 
                     UserDefaults.standard.medtrumEasyViewEmail = medtrumEasyViewEmail.trimmingCharacters(in: .whitespaces).toNilIfLength0()
 
@@ -411,7 +433,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .followerExtraRow8:
             switch UserDefaults.standard.followerDataSourceType {
             case .libreLinkUp, .libreLinkUpRussia:
-                return .askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterPassword, keyboardType: .default, text: UserDefaults.standard.libreLinkUpPassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (libreLinkUpPassword: String) in
+                return .askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterPassword, keyboardType: .default, text: UserDefaults.standard.libreLinkUpPassword, placeHolder: ConstantsSettingsPlaceholders.passwordPlaceholder, actionTitle: nil, cancelTitle: nil, actionHandler: { (libreLinkUpPassword: String) in
     
                     UserDefaults.standard.libreLinkUpPassword = libreLinkUpPassword.trimmingCharacters(in: .whitespaces).toNilIfLength0()
                         
@@ -420,13 +442,13 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 }, cancelHandler: nil, inputValidator: nil)
                 
             case .dexcomShare:
-                return .askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterPassword, keyboardType: .default, text: UserDefaults.standard.dexcomSharePassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (dexcomSharePassword: String) in
+                return .askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterPassword, keyboardType: .default, text: UserDefaults.standard.dexcomSharePassword, placeHolder: ConstantsSettingsPlaceholders.passwordPlaceholder, actionTitle: nil, cancelTitle: nil, actionHandler: { (dexcomSharePassword: String) in
 
                     UserDefaults.standard.dexcomSharePassword = dexcomSharePassword.trimmingCharacters(in: .whitespaces).toNilIfLength0()
                 }, cancelHandler: nil, inputValidator: nil)
 
             case .medtrumEasyView:
-                return .askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterPassword, keyboardType: .default, text: UserDefaults.standard.medtrumEasyViewPassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { (medtrumEasyViewPassword: String) in
+                return .askText(title: UserDefaults.standard.followerDataSourceType.description, message: Texts_SettingsView.enterPassword, keyboardType: .default, text: UserDefaults.standard.medtrumEasyViewPassword, placeHolder: ConstantsSettingsPlaceholders.passwordPlaceholder, actionTitle: nil, cancelTitle: nil, actionHandler: { (medtrumEasyViewPassword: String) in
 
                     UserDefaults.standard.medtrumEasyViewPassword = medtrumEasyViewPassword.trimmingCharacters(in: .whitespaces).toNilIfLength0()
                     
@@ -558,6 +580,28 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 let isCaregiverAccount = UserDefaults.standard.medtrumEasyViewUserType == "M"
                 return isCaregiverAccount ? 10 : 9
             }
+        }
+    }
+
+    private var visibleRowCountForCurrentDataSourceMode: Int {
+        if UserDefaults.standard.isMaster {
+            return 3
+        }
+
+        let count = Setting.allCases.count
+
+        switch UserDefaults.standard.followerDataSourceType {
+        case .nightscout:
+            return 6
+
+        case .libreLinkUp, .libreLinkUpRussia:
+            return UserDefaults.standard.activeSensorSerialNumber != nil ? count : count - (UserDefaults.standard.libreLinkUpPassword == nil || UserDefaults.standard.libreLinkUpEmail == nil ? 4 : 3)
+
+        case .dexcomShare:
+            return 10
+
+        case .medtrumEasyView:
+            return UserDefaults.standard.medtrumEasyViewUserType == "M" ? 10 : 9
         }
     }
 

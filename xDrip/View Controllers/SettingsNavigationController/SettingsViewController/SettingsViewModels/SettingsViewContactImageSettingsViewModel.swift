@@ -21,7 +21,19 @@ class SettingsViewContactImageSettingsViewModel: NSObject, SettingsViewModelProt
     /// used for requesting authorization to access contacts
     let contactStore = CNContactStore()
     
-    // MARK: - Initialization / Deinitialization
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        let contactImageRowsVisible = contactImageRowsVisible
+
+        return [
+            nativeSettingsRow(id: "contactImage.enableContactImage", index: Setting.enableContactImage.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "contactImage.displayTrend", index: Setting.displayTrend.rawValue, sectionID: sectionID, isVisible: contactImageRowsVisible),
+            nativeSettingsRow(id: "contactImage.useHighContrastContactImage", index: Setting.useHighContrastContactImage.rawValue, sectionID: sectionID, isVisible: contactImageRowsVisible)
+        ]
+    }
+
+    // MARK: - Initialization
 
     override init() {
         super.init()
@@ -181,6 +193,17 @@ class SettingsViewContactImageSettingsViewModel: NSObject, SettingsViewModelProt
         } else {
             return 1
         }
+    }
+
+    private var contactImageRowsVisible: Bool {
+        guard UserDefaults.standard.enableContactImage else { return false }
+
+        if CNContactStore.authorizationStatus(for: .contacts) != .authorized {
+            UserDefaults.standard.enableContactImage = false
+            return false
+        }
+
+        return true
     }
     
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {

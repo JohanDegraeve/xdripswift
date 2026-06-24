@@ -4,7 +4,7 @@
 "alerttypesettingsview_enabled" = "Activer";
 "alerttypesettingsview_vibrate" = "Vibrer";
 "alerttypesettingsview_snoozevianotification" = "Snooze via Notification";
-"alerttypesettingsview_defaultsnoozeperiod" = "Durée Snooze (mins)";
+"alerttypesettingsview_defaultsnoozeperiod" = "Durée Snooze";
 "alerttypesettingsview_overridemute" = "Outrepasser le mode Silence";
 "alerttypesettingsview_soundname" = "Son";
 "alerttypesettingsview_defaultiossound" = "Son iOS";

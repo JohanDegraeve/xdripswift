@@ -8,7 +8,7 @@
 "alerttypesettingsview_overridemute" = "Ruhemodus überschreiben";
 
 /// when editing an alert type, field title for Snooze Period
-"alerttypesettingsview_defaultsnoozeperiod" = "Standard Schlummerzeit (Minuten)";
+"alerttypesettingsview_defaultsnoozeperiod" = "Standard Schlummerzeit";
 
 /// when editing an alert type, field title for Sound
 "alerttypesettingsview_sound" = "Ton";

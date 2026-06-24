@@ -29,6 +29,20 @@ class SettingsViewAppleWatchSettingsViewModel: NSObject, SettingsViewModelProtoc
     
     var sectionReloadClosure: (() -> Void)?
     
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        [
+            nativeSettingsRow(id: "appleWatch.showDataInWatchComplications", index: Setting.showDataInWatchComplications.rawValue, sectionID: sectionID),
+            nativeSettingsRow(
+                id: "appleWatch.watchComplicationUserAgreementDate",
+                index: Setting.watchComplicationUserAgreementDate.rawValue,
+                sectionID: sectionID,
+                isVisible: UserDefaults.standard.showDataInWatchComplications
+            )
+        ]
+    }
+
     func storeSectionReloadClosure(sectionReloadClosure: @escaping (() -> Void)) {
         self.sectionReloadClosure = sectionReloadClosure
     }
@@ -103,7 +117,7 @@ class SettingsViewAppleWatchSettingsViewModel: NSObject, SettingsViewModelProtoc
         // if the user doesn't enable the complications, then hide the rest of the settings
         return Setting.allCases.count - (UserDefaults.standard.showDataInWatchComplications ? 0 : 1)
     }
-    
+
     func settingsRowText(index: Int) -> String {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         

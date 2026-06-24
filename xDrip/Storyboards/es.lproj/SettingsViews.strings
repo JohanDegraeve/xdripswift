@@ -103,7 +103,7 @@
 "settingsviews_speakTrend" = "Anunciar Tendencia";
 "settingsviews_speakDelta" = "Anunciar Delta";
 "settingsviews_IntervalTitle" = "Intervalo entre notificaciones";
-"settingsviews_IntervalMessage" = "Intervalo mínimo entre dos notificaciones (mins)";
+"settingsviews_IntervalMessage" = "Intervalo mínimo entre dos notificaciones";
 "settingsviews_allowScreenRotation" = "Permitir rotación";
 "settingsviews_showMiniChart" = "Mostrar la mini-gráfica";
 "settingsviews_Version" = "Versión";
@@ -185,7 +185,7 @@
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
 
 "settingsviews_sectionTitleHousekeeper" = "Gestión de Datos";
-"settingsviews_housekeeperRetentionPeriod" = "Periodo de Retención (días)";
+"settingsviews_housekeeperRetentionPeriod" = "Periodo de Retención";
 "settingsviews_housekeeperExportAllData" = "Exportar Todo";
 "settingsviews_housekeeperRetentionPeriodMessage" = "¿Durante cuántos días debemos guardar los datos? (Min 90, Max 365)\n\n(Recomendado: 90 días)";
 
@@ -200,7 +200,7 @@
 "expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
-"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
+"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calendar events";
 
 /// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
 "warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
@@ -218,7 +218,7 @@
 "settingsviews_SpeakIntervalTitle" = "Speak Interval";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two bg announcements, this is the pop up message - this is used for setting the interval between two readings in BG announcements, Speak readings, Apple Watch
-"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
+"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// When enabled, then it should be possible to run xDrip4iOS/Libre 2 in parallel with other app(s)
 "suppressUnLockPayLoad" = "Suppress Unlock Payload";

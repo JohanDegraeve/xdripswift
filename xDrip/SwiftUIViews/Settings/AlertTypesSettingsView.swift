@@ -229,9 +229,9 @@ final class AlertTypeEditorViewModel: ObservableObject {
                 message: Texts_AlertTypeSettingsView.alertTypeGiveSnoozePeriod,
                 keyboardType: .numberPad,
                 text: snoozePeriod.description,
-                placeholder: nil,
-                fieldTitle: nil,
-                unitText: nil,
+                placeholder: ConstantsDefaultAlertTypeSettings.snoozePeriod.description,
+                fieldTitle: Texts_Common.enterValue,
+                unitText: Texts_Common.minutes,
                 actionTitle: Texts_Common.Ok,
                 cancelTitle: Texts_Common.Cancel,
                 action: { [weak self] text in
@@ -287,7 +287,7 @@ final class AlertTypeEditorViewModel: ObservableObject {
 
             return Texts_AlertTypeSettingsView.alertTypeDefaultIOSSound
         case .defaultSnoozePeriod:
-            return snoozePeriod.description
+            return snoozePeriod.description + " " + Texts_Common.minutes
         case .vibrate, .overrideMute, .snoozeViaNotification:
             return nil
         }

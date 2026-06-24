@@ -9,6 +9,14 @@ fileprivate enum Setting:Int, CaseIterable {
 
 struct SettingsViewM5StackBluetoothSettingsViewModel: SettingsViewModelProtocol {
     
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        [
+            nativeSettingsRow(id: "m5stackBluetooth.blePassword", index: Setting.blePassword.rawValue, sectionID: sectionID)
+        ]
+    }
+
     func storeUIViewController(uIViewController: UIViewController) {}
 
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
@@ -61,7 +69,7 @@ struct SettingsViewM5StackBluetoothSettingsViewModel: SettingsViewModelProtocol 
     func numberOfRows() -> Int {
         return Setting.allCases.count
     }
-    
+
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         

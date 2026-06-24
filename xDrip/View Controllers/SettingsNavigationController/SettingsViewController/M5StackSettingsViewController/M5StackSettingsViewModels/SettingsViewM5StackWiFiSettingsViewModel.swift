@@ -24,6 +24,19 @@ fileprivate enum Setting:Int, CaseIterable {
 
 struct SettingsViewM5StackWiFiSettingsViewModel: SettingsViewModelProtocol {
     
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        [
+            nativeSettingsRow(id: "m5stackWiFi.wifi1Name", index: Setting.wifi1Name.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "m5stackWiFi.wifi1Password", index: Setting.wifi1Password.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "m5stackWiFi.wifi2Name", index: Setting.wifi2Name.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "m5stackWiFi.wifi2Password", index: Setting.wifi2Password.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "m5stackWiFi.wifi3Name", index: Setting.wifi3Name.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "m5stackWiFi.wifi3Password", index: Setting.wifi3Password.rawValue, sectionID: sectionID)
+        ]
+    }
+
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
     func storeUIViewController(uIViewController: UIViewController) {}
@@ -95,7 +108,7 @@ struct SettingsViewM5StackWiFiSettingsViewModel: SettingsViewModelProtocol {
     func numberOfRows() -> Int {
         return Setting.allCases.count
     }
-    
+
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
@@ -124,6 +137,7 @@ struct SettingsViewM5StackWiFiSettingsViewModel: SettingsViewModelProtocol {
         var text:String?
         var actionHandler:((String) -> Void)?
         var titlePart = Texts_Common.name
+        var placeHolder = ""
         
         switch wifiNumber {
         case .wifi1Name:
@@ -143,19 +157,22 @@ struct SettingsViewM5StackWiFiSettingsViewModel: SettingsViewModelProtocol {
             text = UserDefaults.standard.m5StackWiFiPassword1
             actionHandler = {(password:String) in UserDefaults.standard.m5StackWiFiPassword1 = password.toNilIfLength0()}
             titlePart = Texts_Common.password
+            placeHolder = ConstantsSettingsPlaceholders.passwordPlaceholder
         case .wifi2Password:
             wifiNumberAsInt = 2
             text = UserDefaults.standard.m5StackWiFiPassword2
             actionHandler = {(password:String) in UserDefaults.standard.m5StackWiFiPassword2 = password.toNilIfLength0()}
             titlePart = Texts_Common.password
+            placeHolder = ConstantsSettingsPlaceholders.passwordPlaceholder
         case .wifi3Password:
             wifiNumberAsInt = 3
             text = UserDefaults.standard.m5StackWiFiPassword3
             actionHandler = {(password:String) in UserDefaults.standard.m5StackWiFiPassword3 = password.toNilIfLength0()}
             titlePart = Texts_Common.password
+            placeHolder = ConstantsSettingsPlaceholders.passwordPlaceholder
         }
         
-        return SettingsSelectedRowAction.askText(title: Texts_Common.WiFi + " " + titlePart + " " + wifiNumberAsInt!.description, message: nil, keyboardType: .default, text: text, placeHolder: "", actionTitle: nil, cancelTitle: nil, actionHandler: actionHandler!, cancelHandler: nil, inputValidator: nil)
+        return SettingsSelectedRowAction.askText(title: Texts_Common.WiFi + " " + titlePart + " " + wifiNumberAsInt!.description, message: nil, keyboardType: .default, text: text, placeHolder: placeHolder, actionTitle: nil, cancelTitle: nil, actionHandler: actionHandler!, cancelHandler: nil, inputValidator: nil)
     }
     
 }

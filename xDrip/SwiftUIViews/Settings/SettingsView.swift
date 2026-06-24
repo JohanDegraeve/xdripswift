@@ -9,9 +9,38 @@
 import SwiftUI
 import UIKit
 
-// This is the SwiftUI version of the main Settings screen. It still uses the old
-// section view models for the actual Settings logic, but renders the rows and
-// routes the actions through the new shared SwiftUI helpers.
+// This file is the starting point for the SwiftUI Settings screen.
+//
+// The important idea is that the Settings menu is now built from small section
+// providers instead of directly from a table view. SettingsRootSection defines the
+// order of the top-level Settings sections, and each case creates the view model
+// that owns that section. The view model then exposes its SwiftUI rows through
+// settingsRows(sectionID:), which should be near the top of the view model file so
+// the row order, row ids and visibility rules are easy to inspect.
+//
+// Most of the old Settings logic still lives in the existing view models. Row
+// titles, detail text, enabled state and tap actions can still come from the old
+// settingsRowText, detailedText, isEnabled and onRowSelect functions. The
+// nativeSettingsRow helper in SettingsSharedUtilities.swift adapts that existing
+// logic into a SwiftUI SettingsRow. This means we can rearrange and group the
+// Settings menu without rewriting stable feature logic unless we actually need to.
+//
+// For new or changed sections, start by editing settingsRows(sectionID:) in the
+// relevant view model. Use nativeSettingsRow(...) when the existing row logic
+// should be reused. Use a full SettingsRow(...) when the row is now easier to
+// describe directly in SwiftUI, for example when it needs custom visibility,
+// indicators, colours, a toggle, a text-entry action or a child Settings screen.
+//
+// Grouped child screens should be opened with SettingsScreen and the
+// .settingsScreen row action. A grouped screen is just a title plus one or more
+// existing section providers, so sections like Nightscout, HealthKit or Dexcom
+// Share can be moved under a future "Services" menu without moving their actual
+// logic out of their current view models.
+//
+// SettingsSharedUtilities.swift contains the shared row model, rendering code,
+// navigation bridge and old UIKit-action adapters. SettingsViewController.swift
+// owns the UIKit hosting controller and connects the SwiftUI settings screen back
+// into the existing navigation stack.
 struct SettingsView: View {
     @ObservedObject var listModel: SettingsListModel
     @ObservedObject var presenter: SettingsActionPresenter
@@ -99,7 +128,13 @@ enum SettingsListFactory {
             let viewModel = section.viewModel(coreDataManager: coreDataManager)
             configure(viewModel: viewModel, presenter: presenter)
 
-            return SettingsSectionModel(id: section.rawValue, viewModel: viewModel)
+            return SettingsSectionModel(id: section.rawValue, viewModel: viewModel) {
+                guard let nativeProvider = viewModel as? SettingsNativeSectionProvider else {
+                    fatalError("Settings view model must provide a native Settings section")
+                }
+
+                return nativeProvider.settingsSection(sectionID: section.rawValue)
+            }
         }
     }
 
@@ -110,7 +145,53 @@ enum SettingsListFactory {
             let viewModel = section.viewModel(coreDataManager: nil)
             configure(viewModel: viewModel, presenter: presenter)
 
-            return SettingsSectionModel(id: section.rawValue, viewModel: viewModel)
+            return SettingsSectionModel(id: section.rawValue, viewModel: viewModel) {
+                guard let nativeProvider = viewModel as? SettingsNativeSectionProvider else {
+                    fatalError("M5Stack Settings view model must provide a native Settings section")
+                }
+
+                return nativeProvider.settingsSection(sectionID: section.rawValue)
+            }
+        }
+    }
+
+    /// Builds section models from existing native section providers. This is the
+    /// common path for grouped Settings screens, where a simple parent row can
+    /// open one or more existing sections without moving their logic.
+    static func makeSections(
+        providers: [SettingsNativeSectionProvider],
+        presenter: SettingsActionPresenter
+    ) -> [SettingsSectionModel] {
+        providers.enumerated().map { offset, viewModel in
+            configure(viewModel: viewModel, presenter: presenter)
+
+            return SettingsSectionModel(id: offset, viewModel: viewModel) {
+                viewModel.settingsSection(sectionID: offset)
+            }
+        }
+    }
+
+    /// Gives all legacy-backed section view models the UIKit host and reload
+    /// closures they still expect while their rows are rendered in SwiftUI.
+    static func attach(
+        controller: UIViewController,
+        sections: [SettingsSectionModel],
+        listModel: SettingsListModel
+    ) {
+        sections.forEach { section in
+            guard let viewModel = section.legacyViewModel else { return }
+
+            viewModel.storeUIViewController(uIViewController: controller)
+            viewModel.storeRowReloadClosure { row in
+                DispatchQueue.main.async {
+                    listModel.reload(.row(section: section.id, row: row))
+                }
+            }
+            viewModel.storeSectionReloadClosure {
+                DispatchQueue.main.async {
+                    listModel.reload(.section(section.id))
+                }
+            }
         }
     }
 
@@ -135,19 +216,6 @@ enum SettingsListFactory {
                 presenter.objectWillChange.send()
             }
         }
-    }
-}
-
-struct M5StackSettingsView: View {
-    @ObservedObject var listModel: SettingsListModel
-    @ObservedObject var presenter: SettingsActionPresenter
-
-    var body: some View {
-        SettingsListView(
-            listModel: listModel,
-            presenter: presenter,
-            title: Texts_SettingsView.m5StackSettingsViewScreenTitle
-        )
     }
 }
 

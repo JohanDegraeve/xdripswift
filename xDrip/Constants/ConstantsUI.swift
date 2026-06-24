@@ -77,3 +77,11 @@ enum ConstantsUI {
     /// string to be used to show pm time if the user locale shows a 12 hour clock
     static let timeFormatPM = "pm"
 }
+
+enum ConstantsSettingsPlaceholders {
+    /// Shared example for settings rows that ask for an account username or email.
+    static let usernamePlaceholder = "username/e-mail"
+
+    /// Shared example for settings rows that ask for a password.
+    static let passwordPlaceholder = "MyPassword123"
+}

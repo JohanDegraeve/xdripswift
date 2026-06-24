@@ -52,6 +52,29 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
     
     var sectionReloadClosure: (() -> Void)?
     
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        let developerRowsVisible = UserDefaults.standard.showDeveloperSettings
+
+        return [
+            nativeSettingsRow(id: "developer.showDeveloperSettings", index: Setting.showDeveloperSettings.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "developer.NSLogEnabled", index: Setting.NSLogEnabled.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            nativeSettingsRow(id: "developer.OSLogEnabled", index: Setting.OSLogEnabled.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            nativeSettingsRow(id: "developer.suppressUnLockPayLoad", index: Setting.suppressUnLockPayLoad.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            nativeSettingsRow(id: "developer.loopShareType", index: Setting.loopShareType.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            nativeSettingsRow(id: "developer.shareToLoopOnceEvery5Minutes", index: Setting.shareToLoopOnceEvery5Minutes.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            nativeSettingsRow(id: "developer.loopDelay", index: Setting.loopDelay.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            nativeSettingsRow(id: "developer.libreLinkUpVersion", index: Setting.libreLinkUpVersion.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            nativeSettingsRow(id: "developer.remainingComplicationUserInfoTransfers", index: Setting.remainingComplicationUserInfoTransfers.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            nativeSettingsRow(id: "developer.CAGEMaxHours", index: Setting.CAGEMaxHours.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            nativeSettingsRow(id: "developer.allowStandByHighContrast", index: Setting.allowStandByHighContrast.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            nativeSettingsRow(id: "developer.forceStandByBigNumbers", index: Setting.forceStandByBigNumbers.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            nativeSettingsRow(id: "developer.storeFrequentReadingsInNightscout", index: Setting.storeFrequentReadingsInNightscout.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
+            nativeSettingsRow(id: "developer.storeFrequentReadingsInHealthKit", index: Setting.storeFrequentReadingsInHealthKit.rawValue, sectionID: sectionID, isVisible: developerRowsVisible)
+        ]
+    }
+
     func storeSectionReloadClosure(sectionReloadClosure: @escaping (() -> Void)) {
         self.sectionReloadClosure = sectionReloadClosure
     }
@@ -254,7 +277,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
     func numberOfRows() -> Int {
         return  UserDefaults.standard.showDeveloperSettings ? Setting.allCases.count : 1
     }
-    
+
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
         
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
@@ -308,7 +331,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToLoopDelaySchedule.rawValue, sender: self)
             
         case .libreLinkUpVersion:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.libreLinkUpVersion, message:  Texts_SettingsView.libreLinkUpVersionMessage, keyboardType: .default, text: UserDefaults.standard.libreLinkUpVersion, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(libreLinkUpVersion: String) in
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.libreLinkUpVersion, message:  Texts_SettingsView.libreLinkUpVersionMessage, keyboardType: .default, text: UserDefaults.standard.libreLinkUpVersion, placeHolder: nil, fieldTitle: Texts_Common.enterValue, actionTitle: nil, cancelTitle: nil, actionHandler: {(libreLinkUpVersion: String) in
                 
                 // check if the entered version is in the correct format before allowing it to help avoid problems with the server requests
                 if let versionNumber = libreLinkUpVersion.toNilIfLength0(), self.checkLibreLinkUpVersionFormat(for: libreLinkUpVersion) {
@@ -325,7 +348,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             }, cancelHandler: nil)
             
         case .CAGEMaxHours:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.CAGEMaxHours, message:  Texts_SettingsView.CAGEMaxHoursMessage, keyboardType: .numberPad, text: UserDefaults.standard.CAGEMaxHours.description, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(CAGEMaxHoursString: String) in
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.CAGEMaxHours, message:  Texts_SettingsView.CAGEMaxHoursMessage, keyboardType: .numberPad, text: UserDefaults.standard.CAGEMaxHours.description, placeHolder: "0", fieldTitle: Texts_Common.enterValue, unitText: Texts_Common.hours, actionTitle: nil, cancelTitle: nil, actionHandler: {(CAGEMaxHoursString: String) in
                 
                 // check that the user entered a plausible value although set it to the default if zero is entered
                 if let CAGEMaxHours = Int(CAGEMaxHoursString) {

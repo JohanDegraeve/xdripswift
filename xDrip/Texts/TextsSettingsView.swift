@@ -50,7 +50,7 @@ class Texts_SettingsView {
     }()
     
     static let liveActivityDisabledInFollowerModeMessage: String = {
-        return NSLocalizedString("settingsviews_liveActivityDisabledInFollowerModeMessage", tableName: filename, bundle: Bundle.main, value: "Live activities can only be used in Follower mode when a valid heartbeat is enabled.", comment: "notification settings, live activities are not available in follower mode")
+        return NSLocalizedString("settingsviews_liveActivityDisabledInFollowerModeMessage", tableName: filename, bundle: Bundle.main, value: "Live Activities are disabled in Follower Mode unless an external heartbeat is used for background keep-alive.", comment: "notification settings, live activities are not available in follower mode")
     }()
     
     static let liveActivityTypeMinimal: String = {
@@ -225,7 +225,7 @@ class Texts_SettingsView {
     }()
     
     static let settingsviews_IntervalMessage = {
-        return NSLocalizedString("settingsviews_IntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two notifications (mins)", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two notifications, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch")
+        return NSLocalizedString("settingsviews_IntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two notifications", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two notifications, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch")
     }()
     
     // MARK: - Section Home Screen
@@ -526,7 +526,7 @@ class Texts_SettingsView {
     }()
     
     static let labelNightscoutFollowType = {
-        return NSLocalizedString("settingsviews_nightscoutFollowType", tableName: filename, bundle: Bundle.main, value: "AID Follower type", comment: "nightscout settings, select the type of follower to use")
+        return NSLocalizedString("settingsviews_nightscoutFollowType", tableName: filename, bundle: Bundle.main, value: "AID Type", comment: "nightscout settings, select the type of follower to use")
     }()
     
     static let nightscoutFollowTypeNone = {
@@ -640,7 +640,7 @@ class Texts_SettingsView {
     }()
     
     static let settingsviews_SpeakIntervalMessage = {
-        return NSLocalizedString("settingsviews_SpeakIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two voice announcements (mins)", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two bg announcements, this is the pop up message - this is used for setting the interval between two readings in BG announcements, Speak readings, Apple Watch")
+        return NSLocalizedString("settingsviews_SpeakIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two voice announcements", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two bg announcements, this is the pop up message - this is used for setting the interval between two readings in BG announcements, Speak readings, Apple Watch")
     }()
     
     
@@ -781,7 +781,7 @@ class Texts_SettingsView {
     }()
     
     static let settingsviews_CalenderIntervalMessage = {
-        return NSLocalizedString("settingsviews_CalenderIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two calender events (mins)", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch")
+        return NSLocalizedString("settingsviews_CalenderIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two calendar events", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch")
     }()
         
     // MARK: - Contact image
@@ -957,7 +957,7 @@ class Texts_SettingsView {
     }()
 
     static let settingsviews_housekeeperRetentionPeriod: String = {
-        return NSLocalizedString("settingsviews_housekeeperRetentionPeriod", tableName: filename, bundle: Bundle.main, value: "Retention Period (days):", comment: "Housekeeper retention period, for how long to store data")
+        return NSLocalizedString("settingsviews_housekeeperRetentionPeriod", tableName: filename, bundle: Bundle.main, value: "Retention Period", comment: "Housekeeper retention period, for how long to store data")
     }()
 
     static let settingsviews_housekeeperExportAllData: String = {

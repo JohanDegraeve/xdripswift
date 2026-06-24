@@ -48,6 +48,24 @@ fileprivate enum Setting:Int, CaseIterable {
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
 class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtocol {
 
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        [
+            nativeSettingsRow(id: "homeScreen.allowScreenRotation", index: Setting.allowScreenRotation.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "homeScreen.showClockWhenScreenIsLocked", index: Setting.showClockWhenScreenIsLocked.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "homeScreen.screenLockDimmingType", index: Setting.screenLockDimmingType.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "homeScreen.showMiniChart", index: Setting.showMiniChart.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "homeScreen.allowMainChartAutoReset", index: Setting.allowMainChartAutoReset.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "homeScreen.showOriginalBGReadings", index: Setting.showOriginalBGReadings.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "homeScreen.urgentHighMarkValue", index: Setting.urgentHighMarkValue.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "homeScreen.highMarkValue", index: Setting.highMarkValue.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "homeScreen.targetMarkValue", index: Setting.targetMarkValue.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "homeScreen.lowMarkValue", index: Setting.lowMarkValue.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "homeScreen.urgentLowMarkValue", index: Setting.urgentLowMarkValue.rawValue, sectionID: sectionID)
+        ]
+    }
+
     override init() {
 
         super.init()
@@ -112,19 +130,19 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         switch setting {
             
         case .urgentHighMarkValue:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelUrgentHighValue, message: Texts_SettingsView.urgentHighValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.urgentHighMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultUrgentHighMarkInMgdl.description, unitText: glucoseUnitText, actionTitle: nil, cancelTitle: nil, actionHandler: {(urgentHighMarkValue:String) in UserDefaults.standard.urgentHighMarkValueInUserChosenUnitRounded = urgentHighMarkValue}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelUrgentHighValue, message: Texts_SettingsView.urgentHighValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.urgentHighMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultUrgentHighMarkInMgdl.description, fieldTitle: Texts_Common.enterValue, unitText: glucoseUnitText, actionTitle: nil, cancelTitle: nil, actionHandler: {(urgentHighMarkValue:String) in UserDefaults.standard.urgentHighMarkValueInUserChosenUnitRounded = urgentHighMarkValue}, cancelHandler: nil, inputValidator: nil)
             
         case .highMarkValue:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelHighValue, message: Texts_SettingsView.highValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.highMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultHighMarkInMgdl.description, unitText: glucoseUnitText, actionTitle: nil, cancelTitle: nil, actionHandler: {(highMarkValue:String) in UserDefaults.standard.highMarkValueInUserChosenUnitRounded = highMarkValue}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelHighValue, message: Texts_SettingsView.highValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.highMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultHighMarkInMgdl.description, fieldTitle: Texts_Common.enterValue, unitText: glucoseUnitText, actionTitle: nil, cancelTitle: nil, actionHandler: {(highMarkValue:String) in UserDefaults.standard.highMarkValueInUserChosenUnitRounded = highMarkValue}, cancelHandler: nil, inputValidator: nil)
             
         case .targetMarkValue:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelTargetValue, message: Texts_SettingsView.targetValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.targetMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultTargetMarkInMgdl.description, unitText: glucoseUnitText, actionTitle: nil, cancelTitle: nil, actionHandler: {(targetMarkValue:String) in UserDefaults.standard.targetMarkValueInUserChosenUnitRounded = targetMarkValue}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelTargetValue, message: Texts_SettingsView.targetValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.targetMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultTargetMarkInMgdl.description, fieldTitle: Texts_Common.enterValue, unitText: glucoseUnitText, actionTitle: nil, cancelTitle: nil, actionHandler: {(targetMarkValue:String) in UserDefaults.standard.targetMarkValueInUserChosenUnitRounded = targetMarkValue}, cancelHandler: nil, inputValidator: nil)
             
         case .lowMarkValue:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelLowValue, message: Texts_SettingsView.lowValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.lowMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultLowMarkInMgdl.description, unitText: glucoseUnitText, actionTitle: nil, cancelTitle: nil, actionHandler: {(lowMarkValue:String) in UserDefaults.standard.lowMarkValueInUserChosenUnitRounded = lowMarkValue}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelLowValue, message: Texts_SettingsView.lowValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.lowMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultLowMarkInMgdl.description, fieldTitle: Texts_Common.enterValue, unitText: glucoseUnitText, actionTitle: nil, cancelTitle: nil, actionHandler: {(lowMarkValue:String) in UserDefaults.standard.lowMarkValueInUserChosenUnitRounded = lowMarkValue}, cancelHandler: nil, inputValidator: nil)
             
         case .urgentLowMarkValue:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelUrgentLowValue, message: Texts_SettingsView.urgentLowValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.urgentLowMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl.description, unitText: glucoseUnitText, actionTitle: nil, cancelTitle: nil, actionHandler: {(urgentLowMarkValue:String) in UserDefaults.standard.urgentLowMarkValueInUserChosenUnitRounded = urgentLowMarkValue}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelUrgentLowValue, message: Texts_SettingsView.urgentLowValueMessage, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: UserDefaults.standard.urgentLowMarkValueInUserChosenUnitRounded, placeHolder: ConstantsBGGraphBuilder.defaultUrgentLowMarkInMgdl.description, fieldTitle: Texts_Common.enterValue, unitText: glucoseUnitText, actionTitle: nil, cancelTitle: nil, actionHandler: {(urgentLowMarkValue:String) in UserDefaults.standard.urgentLowMarkValueInUserChosenUnitRounded = urgentLowMarkValue}, cancelHandler: nil, inputValidator: nil)
             
         case .allowScreenRotation:
             return SettingsSelectedRowAction.callFunction(function: {
@@ -214,7 +232,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
     func numberOfRows() -> Int {
         return Setting.allCases.count
     }
-    
+
     func settingsRowText(index: Int) -> String {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         

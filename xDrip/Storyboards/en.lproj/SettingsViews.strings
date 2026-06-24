@@ -37,7 +37,8 @@
 "settingsviews_labelShowReadingInAppBadge" = "Show BG in the App Badge";
 "settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10";
 "settingsviews_IntervalTitle" = "Notification Interval";
-"settingsviews_IntervalMessage" = "Minimum interval between two notifications (mins)";
+"settingsviews_IntervalMessage" = "Minimum interval between two notifications";
+"settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for background keep-alive.";
 "settingsviews_allowScreenRotation" = "Allow Chart Rotation";
 "settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked";
 "settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
@@ -116,7 +117,7 @@
 "settingsviews_speakTrend" = "Speak Trend";
 "settingsviews_speakDelta" = "Speak Delta";
 "settingsviews_SpeakIntervalTitle" = "Speak Interval";
-"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
+"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 "settingsviews_sectiontitleAbout" = "About %@";
 "settingsviews_Version" = "Version";
 "settingsviews_license" = "License";
@@ -138,7 +139,7 @@
 "infoCalendarAccessWriteOnly" = "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.";
 "infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
 "settingsviews_CalenderIntervalTitle" = "Event Interval";
-"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
+"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calendar events";
 "settingsviews_infoContactsAccessRestricted" = "You cannot give authorization to %@ to access your contacts. This is possibly due to active restrictions such as parental controls being in place.";
 "settingsviews_contactImageSectionTitle" = "Contact Image";
 "settingsviews_enableContactImage" = "Enable Contact Image";
@@ -167,7 +168,7 @@
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
-"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days)";
+"settingsviews_housekeeperRetentionPeriod" = "Retention Period";
 "settingsviews_housekeeperExportAllData" = "Export All Data";
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 "suppressUnLockPayLoad" = "Suppress Unlock Payload";

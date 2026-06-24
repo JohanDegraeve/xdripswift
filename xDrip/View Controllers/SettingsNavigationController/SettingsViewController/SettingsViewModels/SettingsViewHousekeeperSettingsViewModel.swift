@@ -29,6 +29,15 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 	/// Instance of coreDataManager
 	private var coreDataManager: CoreDataManager?
     
+	// MARK: - Native SwiftUI rows
+
+	func settingsRows(sectionID: Int) -> [SettingsRow] {
+		[
+			nativeSettingsRow(id: "housekeeper.retentionPeriod", index: Setting.housekeeperRetentionPeriod.rawValue, sectionID: sectionID),
+			nativeSettingsRow(id: "housekeeper.exportAllData", index: Setting.exportAllData.rawValue, sectionID: sectionID)
+		]
+	}
+
     init(coreDataManager: CoreDataManager?) {
         self.coreDataManager = coreDataManager
     }
@@ -71,7 +80,7 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 		switch setting {
 			
 		case .housekeeperRetentionPeriod:
-			return UserDefaults.standard.retentionPeriodInDays.description
+			return UserDefaults.standard.retentionPeriodInDays.description + " " + Texts_Common.days
 			
 		case .exportAllData:
 			return nil
@@ -86,7 +95,7 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 	func numberOfRows() -> Int {
 		return Setting.allCases.count
 	}
-	
+
 	func onRowSelect(index: Int) -> SettingsSelectedRowAction {
 		guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
 		
@@ -94,7 +103,7 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 		
 		// When housekeeperRetentionPeriod is selected, display a popup asking for the new retention period.
 		case .housekeeperRetentionPeriod:
-			return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_housekeeperRetentionPeriod, message: Texts_SettingsView.settingsviews_housekeeperRetentionPeriodMessage, keyboardType: .numberPad, text: UserDefaults.standard.retentionPeriodInDays.description, placeHolder: "90", actionTitle: nil, cancelTitle: nil, actionHandler: {
+			return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_housekeeperRetentionPeriod, message: Texts_SettingsView.settingsviews_housekeeperRetentionPeriodMessage, keyboardType: .numberPad, text: UserDefaults.standard.retentionPeriodInDays.description, placeHolder: "90", fieldTitle: Texts_Common.enterValue, unitText: Texts_Common.days, actionTitle: nil, cancelTitle: nil, actionHandler: {
 				(retention:String) in if let retentionInt = Int(retention) {UserDefaults.standard.retentionPeriodInDays = retentionInt}}, cancelHandler: nil, inputValidator: nil)
 		
 		// When exportAllData is selected, calls DataExporter for generating and writing the data to a file, passing the callback down to exportAllData.
@@ -130,4 +139,3 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 	}
 	
 }
-

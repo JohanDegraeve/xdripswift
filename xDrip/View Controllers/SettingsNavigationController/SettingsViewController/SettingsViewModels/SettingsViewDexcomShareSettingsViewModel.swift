@@ -25,6 +25,27 @@ class SettingsViewDexcomShareUploadSettingsViewModel: SettingsViewModelProtocol 
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categorySettingsViewDexcomShareUploadSettingsViewModel)
     
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        let uploadEnabled = UserDefaults.standard.uploadReadingstoDexcomShare
+
+        return [
+            nativeSettingsRow(id: "dexcomShare.uploadReadingstoDexcomShare", index: Setting.uploadReadingstoDexcomShare.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "dexcomShare.accountName", index: Setting.dexcomShareAccountName.rawValue, sectionID: sectionID, isVisible: uploadEnabled),
+            nativeSettingsRow(id: "dexcomShare.password", index: Setting.dexcomSharePassword.rawValue, sectionID: sectionID, isVisible: uploadEnabled),
+            nativeSettingsRow(id: "dexcomShare.serialNumber", index: Setting.dexcomShareUploadSerialNumber.rawValue, sectionID: sectionID, isVisible: uploadEnabled),
+            nativeSettingsRow(id: "dexcomShare.useUSUrl", index: Setting.useUSDexcomShareurl.rawValue, sectionID: sectionID, isVisible: uploadEnabled),
+            nativeSettingsRow(id: "dexcomShare.useSchedule", index: Setting.useSchedule.rawValue, sectionID: sectionID, isVisible: uploadEnabled),
+            nativeSettingsRow(
+                id: "dexcomShare.schedule",
+                index: Setting.schedule.rawValue,
+                sectionID: sectionID,
+                isVisible: uploadEnabled && UserDefaults.standard.dexcomShareUploadUseSchedule
+            )
+        ]
+    }
+
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
     func storeUIViewController(uIViewController: UIViewController) {}
@@ -56,13 +77,13 @@ class SettingsViewDexcomShareUploadSettingsViewModel: SettingsViewModelProtocol 
             }
             
         case .dexcomShareAccountName:
-            return .askText(title: Texts_SettingsView.labelDexcomShareAccountName, message: Texts_SettingsView.giveDexcomShareAccountName, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareAccountName, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(accountName:String) in UserDefaults.standard.dexcomShareAccountName = accountName.trimmingCharacters(in: .whitespaces).toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
+            return .askText(title: Texts_SettingsView.labelDexcomShareAccountName, message: Texts_SettingsView.giveDexcomShareAccountName, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareAccountName, placeHolder: ConstantsSettingsPlaceholders.usernamePlaceholder, actionTitle: nil, cancelTitle: nil, actionHandler: {(accountName:String) in UserDefaults.standard.dexcomShareAccountName = accountName.trimmingCharacters(in: .whitespaces).toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
             
         case .dexcomSharePassword:
-            return .askText(title: Texts_Common.password, message: Texts_SettingsView.giveDexcomSharePassword, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomSharePassword, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(password:String) in UserDefaults.standard.dexcomSharePassword = password.trimmingCharacters(in: .whitespaces).toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
+            return .askText(title: Texts_Common.password, message: Texts_SettingsView.giveDexcomSharePassword, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomSharePassword, placeHolder: ConstantsSettingsPlaceholders.passwordPlaceholder, actionTitle: nil, cancelTitle: nil, actionHandler: {(password:String) in UserDefaults.standard.dexcomSharePassword = password.trimmingCharacters(in: .whitespaces).toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
             
         case .dexcomShareUploadSerialNumber:
-            return .askText(title: Texts_SettingsView.labeldexcomShareUploadSerialNumber, message: Texts_SettingsView.givedexcomShareUploadSerialNumber, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareUploadSerialNumber, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in
+            return .askText(title: Texts_SettingsView.labeldexcomShareUploadSerialNumber, message: Texts_SettingsView.givedexcomShareUploadSerialNumber, keyboardType: UIKeyboardType.alphabet, text: UserDefaults.standard.dexcomShareUploadSerialNumber, placeHolder: "AB12345678", actionTitle: nil, cancelTitle: nil, actionHandler: {(serialNumber:String) in
                 
                 // convert to uppercase
                 let serialNumberUpper = serialNumber.trimmingCharacters(in: .whitespaces).uppercased()
@@ -106,7 +127,7 @@ class SettingsViewDexcomShareUploadSettingsViewModel: SettingsViewModelProtocol 
             return Setting.allCases.count
         }
     }
-    
+
     func settingsRowText(index: Int) -> String {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
@@ -239,4 +260,3 @@ extension SettingsViewDexcomShareUploadSettingsViewModel: TimeSchedule {
     
     
 }
-

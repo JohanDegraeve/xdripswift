@@ -26,6 +26,26 @@ fileprivate enum Setting:Int, CaseIterable {
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
 class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtocol {
     
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        [
+            nativeSettingsRow(id: "statistics.showStatistics", index: Setting.showStatistics.rawValue, sectionID: sectionID),
+            nativeSettingsRow(
+                id: "statistics.timeInRangeType",
+                index: Setting.timeInRangeType.rawValue,
+                sectionID: sectionID,
+                isVisible: UserDefaults.standard.showStatistics
+            ),
+            nativeSettingsRow(
+                id: "statistics.useIFCCA1C",
+                index: Setting.useIFCCA1C.rawValue,
+                sectionID: sectionID,
+                isVisible: UserDefaults.standard.showStatistics
+            )
+        ]
+    }
+
     override init() {
         
         super.init()
@@ -151,7 +171,7 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
             return Setting.allCases.count - 2
         }
     }
-    
+
     func settingsRowText(index: Int) -> String {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
 

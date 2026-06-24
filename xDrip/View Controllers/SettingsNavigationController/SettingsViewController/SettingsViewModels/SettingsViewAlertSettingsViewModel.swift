@@ -20,6 +20,17 @@ fileprivate enum Setting:Int, CaseIterable {
 /// conforms to SettingsViewModelProtocol for all alert settings in the first sections screen
 struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
     
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        [
+            nativeSettingsRow(id: "alerts.alertTypes", index: Setting.alertTypes.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "alerts.alerts", index: Setting.alerts.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "alerts.volumeTestSoundPlayer", index: Setting.volumeTestSoundPlayer.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "alerts.volumeTestiOSSound", index: Setting.volumeTestiOSSound.rawValue, sectionID: sectionID)
+        ]
+    }
+
     func storeUIViewController(uIViewController: UIViewController) {}
 
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
@@ -95,7 +106,7 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
     func numberOfRows() -> Int {
         return Setting.allCases.count
     }
-    
+
     func uiView(index: Int) -> UIView? {
         return nil
     }

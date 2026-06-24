@@ -25,7 +25,7 @@
 "alerttypesettingsview_givename" = "Alarm Name";
 
 /// when editing an alert type, field title for Snooze Period
-"alerttypesettingsview_defaultsnoozeperiod" = "Default Snooze Time (mins)";
+"alerttypesettingsview_defaultsnoozeperiod" = "Default Snooze Time";
 
 /// when editing an alert type, field title for Sound
 "alerttypesettingsview_sound" = "Sound";

@@ -36,6 +36,22 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
     /// used for requesting authorization to access calendar
     let eventStore = EKEventStore()
     
+    // MARK: - Native SwiftUI rows
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        let calendarRowsVisible = calendarEventRowsVisible
+
+        return [
+            nativeSettingsRow(id: "calendarEvents.createCalendarEvent", index: Setting.createCalendarEvent.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "calendarEvents.calendarId", index: Setting.calenderId.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
+            nativeSettingsRow(id: "calendarEvents.displayTrend", index: Setting.displayTrend.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
+            nativeSettingsRow(id: "calendarEvents.displayDelta", index: Setting.displayDelta.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
+            nativeSettingsRow(id: "calendarEvents.displayUnits", index: Setting.displayUnits.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
+            nativeSettingsRow(id: "calendarEvents.displayVisualIndicator", index: Setting.displayVisualIndicator.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
+            nativeSettingsRow(id: "calendarEvents.calendarInterval", index: Setting.calendarInterval.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible)
+        ]
+    }
+
     func storeUIViewController(uIViewController: UIViewController) {}
     
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
@@ -307,6 +323,17 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
             
         }
         
+    }
+
+    private var calendarEventRowsVisible: Bool {
+        guard UserDefaults.standard.createCalendarEvent else { return false }
+
+        if EKEventStore.authorizationStatus(for: .event) != .authorized {
+            UserDefaults.standard.createCalendarEvent = false
+            return false
+        }
+
+        return true
     }
     
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
