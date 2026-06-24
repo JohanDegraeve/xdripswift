@@ -269,8 +269,9 @@
 /// deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog
 "nslog" = "NSLog";
 
-/// Developer Settings, section title
-"developerSettings" = "Entwickler Einstellungen";
+/// Advanced Settings, section title
+"developerSettings" = "Erweiterte Einstellungen";
+"showDeveloperSettings" = "Erweiterte Einstellungen anzeigen";
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Home Screen";

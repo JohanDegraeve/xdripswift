@@ -103,7 +103,8 @@
 "debugLevel" = "Συμπεριλάβετε λεπτομερή διαγνωστικά";
 "warningChangeFromMasterToFollower" = "Η εναλλαγή από κύριο σε ακόλουθο θα σταματήσει τον τρέχοντα αισθητήρα σας. Θέλετε να συνεχίσετε;";
 "nightscoutPort" = "Θύρα";
-"developerSettings" = "Ρυθμίσεις προγραμματιστή";
+"developerSettings" = "Ρυθμίσεις για προχωρημένους";
+"showDeveloperSettings" = "Εμφάνιση ρυθμίσεων για προχωρημένους";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Αρχική οθόνη";

@@ -129,8 +129,9 @@
 /// In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row
 "volumeTestiOSSound" = "Test Volume (Volume actuel iPhone)";
 
-/// Developer Settings, section title
-"developerSettings" = "Paramètres Développeur";
+/// Advanced Settings, section title
+"developerSettings" = "Paramètres avancés";
+"showDeveloperSettings" = "Afficher les paramètres avancés";
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Ecran d'accueil";

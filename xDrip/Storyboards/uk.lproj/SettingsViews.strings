@@ -248,8 +248,9 @@
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Settings";
 
-/// Developer Settings, section title
-"developerSettings" = "Developer Settings";
+/// Advanced Settings, section title
+"developerSettings" = "Розширені налаштування";
+"showDeveloperSettings" = "Показати розширені налаштування";
 
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
 "settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration";

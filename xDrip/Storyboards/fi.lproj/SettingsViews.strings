@@ -94,8 +94,9 @@
 /// deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog
 "nslog" = "NSLog";
 
-/// Developer Settings, section title
-"developerSettings" = "Kehittäjäasetukset";
+/// Advanced Settings, section title
+"developerSettings" = "Lisäasetukset";
+"showDeveloperSettings" = "Näytä lisäasetukset";
 
 /// statistics settings, how many days to use for calculations
 "settingsviews_daysToUseStatisticsMessage" = "Enimmäispäivät tilastojen laskemiseen?\n\n(0 laskeaksesi tänään keskiyöstä lähtien)    ";

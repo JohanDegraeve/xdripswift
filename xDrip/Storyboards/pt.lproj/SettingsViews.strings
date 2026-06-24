@@ -100,7 +100,8 @@
 "nightscoutPort" = "Porto";
 "oslog" = "OSLog";
 "nslog" = "NSLog";
-"developerSettings" = "Definições de Programador";
+"developerSettings" = "Definições avançadas";
+"showDeveloperSettings" = "Mostrar definições avançadas";
 "settingsviews_sectiontitlehomescreen" = "Ecrã Inicial";
 "settingsviews_showClockWhenScreenIsLocked" = "Mostrar Relógio quando Bloqueado";
 

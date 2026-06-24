@@ -841,7 +841,7 @@ class Texts_SettingsView {
     // MARK: - Section Developer
     
     static let developerSettings: String = {
-        return NSLocalizedString("developerSettings", tableName: filename, bundle: Bundle.main, value: "Developer Settings", comment: "Developer Settings, section title")
+        return NSLocalizedString("developerSettings", tableName: filename, bundle: Bundle.main, value: "Advanced Settings", comment: "Advanced Settings, section title")
     }()
     
     static let suppressUnLockPayLoad: String = {
@@ -889,7 +889,7 @@ class Texts_SettingsView {
     }()
     
     static let showDeveloperSettings: String = {
-        return NSLocalizedString("showDeveloperSettings", tableName: filename, bundle: Bundle.main, value: "Show Developer Settings", comment: "developer settings, show them or hide them")
+        return NSLocalizedString("showDeveloperSettings", tableName: filename, bundle: Bundle.main, value: "Show Advanced Settings", comment: "advanced settings, show them or hide them")
     }()
 
     static let nsLog: String = {

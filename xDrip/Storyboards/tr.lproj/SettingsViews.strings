@@ -98,7 +98,8 @@
 "debugLevel" = "Hata Ayıklama Düzeyini Dahil Et";
 "warningChangeFromMasterToFollower" = "Sahip'ten Takipciye geçmek mevcut sensörünüzü durduracaktır. Devam etmek istiyor musun?";
 "nightscoutPort" = "Port";
-"developerSettings" = "Geliştirici Ayarları";
+"developerSettings" = "Gelişmiş Ayarlar";
+"showDeveloperSettings" = "Gelişmiş Ayarları Göster";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Ana Ekran";

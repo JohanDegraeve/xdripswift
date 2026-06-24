@@ -89,7 +89,8 @@
 "debugLevel" = "تضمين مستوى التصحيح";
 "warningChangeFromMasterToFollower" = "سيؤدي التبديل من رئيسي إلى متابعة، إلى إيقاف الحساس الحالي. هل تريد الاستمرار ?";
 "nightscoutPort" = "المنفذ (اختياري)";
-"developerSettings" = "إعدادات المطور";
+"developerSettings" = "الإعدادات المتقدمة";
+"showDeveloperSettings" = "إظهار الإعدادات المتقدمة";
 "nslog" = "NSتقرير";
 "oslog" = "OSتقرير";
 "settingsviews_sectiontitlehomescreen" = "الشاشة الرئيسية";

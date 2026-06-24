@@ -103,7 +103,8 @@
 "debugLevel" = "Включить режим отладки";
 "warningChangeFromMasterToFollower" = "Переключение с главного на подписчика удалит ваш текущий сенсор. Вы хотите продолжить?";
 "nightscoutPort" = "Порт";
-"developerSettings" = "Настройки разработчика";
+"developerSettings" = "Расширенные настройки";
+"showDeveloperSettings" = "Показать расширенные настройки";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Домашний экран";

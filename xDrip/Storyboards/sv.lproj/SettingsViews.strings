@@ -99,7 +99,8 @@
 "debugLevel" = "Inkludera felsökningsnivå";
 "warningChangeFromMasterToFollower" = "Byte från användare till följare kommer att stoppa nuvarande sensor. Vill du fortsätta?";
 "nightscoutPort" = "Port";
-"developerSettings" = "Inställningar för utvecklare";
+"developerSettings" = "Avancerade inställningar";
+"showDeveloperSettings" = "Visa avancerade inställningar";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Hemskärm";

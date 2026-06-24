@@ -162,7 +162,8 @@
 "enterNightscoutPortNumber" = "Enter Port Number";
 "nightscoutToken" = "Token";
 "giveNightscoutToken" = "Enter Token";
-"developerSettings" = "Developer Settings";
+"developerSettings" = "Advanced Settings";
+"showDeveloperSettings" = "Show Advanced Settings";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
