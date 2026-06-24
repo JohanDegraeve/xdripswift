@@ -17,31 +17,28 @@ fileprivate enum Setting:Int, CaseIterable {
     /// should the BG values be written to a shared app group?
     case loopShareType = 4
     
-    /// if true, then readings will only be written to shared user defaults (for loop) every 5 minutes (>4.5 mins to be exact)
-    case shareToLoopOnceEvery5Minutes = 5
-    
     /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
     ///
     /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
-    case loopDelay = 6
+    case loopDelay = 5
     
     /// LibreLinkUp version number that will be used for the LLU follower mode http request headers
-    case libreLinkUpVersion = 7
+    case libreLinkUpVersion = 6
     
     /// how many hours until the canula "expires"? Will show the default value until edited here
-    case CAGEMaxHours = 8
+    case CAGEMaxHours = 7
     
     /// allow StandBy mode to show a high contrast version of the widget at night
-    case allowStandByHighContrast = 9
+    case allowStandByHighContrast = 8
     
     /// force StandBy mode to show a big number version of the widget
-    case forceStandByBigNumbers = 10
+    case forceStandByBigNumbers = 9
     
     /// should we allow 60-second writes to Nightscout (in the case of Libre 2 Direct as an example)?
-    case storeFrequentReadingsInNightscout = 11
+    case storeFrequentReadingsInNightscout = 10
     
     /// should we allow 60-second writes to HealthKit (in the case of Libre 2 Direct as an example)?
-    case storeFrequentReadingsInHealthKit = 12
+    case storeFrequentReadingsInHealthKit = 11
     
 }
 
@@ -60,7 +57,6 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             nativeSettingsRow(id: "developer.OSLogEnabled", index: Setting.OSLogEnabled.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.suppressUnLockPayLoad", index: Setting.suppressUnLockPayLoad.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.loopShareType", index: Setting.loopShareType.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
-            nativeSettingsRow(id: "developer.shareToLoopOnceEvery5Minutes", index: Setting.shareToLoopOnceEvery5Minutes.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.loopDelay", index: Setting.loopDelay.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.libreLinkUpVersion", index: Setting.libreLinkUpVersion.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.CAGEMaxHours", index: Setting.CAGEMaxHours.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
@@ -108,9 +104,6 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         case .loopShareType:
             return Texts_SettingsView.loopShare
             
-        case .shareToLoopOnceEvery5Minutes:
-            return Texts_SettingsView.shareToLoopOnceEvery5Minutes
-            
         case .loopDelay:
             return Texts_SettingsView.loopDelaysScreenTitle
             
@@ -140,7 +133,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit:
             return .none
             
         case .loopDelay, .libreLinkUpVersion, .CAGEMaxHours:
@@ -158,7 +151,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .loopDelay, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .loopDelay, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit:
             return nil
             
         case .loopShareType:
@@ -223,14 +216,6 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                 
             })
             
-        case .shareToLoopOnceEvery5Minutes:
-            return UISwitch(isOn: UserDefaults.standard.shareToLoopOnceEvery5Minutes, action: {
-                (isOn: Bool) in
-                
-                UserDefaults.standard.shareToLoopOnceEvery5Minutes = isOn
-                
-            })
-            
         case .allowStandByHighContrast:
             return UISwitch(isOn: UserDefaults.standard.allowStandByHighContrast, action: {
                 (isOn: Bool) in
@@ -270,7 +255,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .shareToLoopOnceEvery5Minutes, .allowStandByHighContrast, .forceStandByBigNumbers:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers:
             return .nothing
             
         case .loopShareType:

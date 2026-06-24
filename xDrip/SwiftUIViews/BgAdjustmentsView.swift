@@ -82,6 +82,7 @@ struct BgAdjustmentsView: View {
                 List {
                     adjustmentSection()
                     smoothingSection()
+                    readingFrequencySection()
                     applyFromSection()
                 }
             }
@@ -303,10 +304,14 @@ struct BgAdjustmentsView: View {
                     smoothingStrengthPickerItem(title: Texts_HomeView.postProcessingStrong, strength: 2)
                 }
                 .pickerStyle(.segmented)
+            }
+        }
+    }
 
-                if sourceCanUseFiveMinuteReadings() {
-                    Toggle(Texts_HomeView.postProcessingFiveMinuteReadings, isOn: $useFiveMinuteReadings)
-                }
+    @ViewBuilder private func readingFrequencySection() -> some View {
+        if sourceCanUseFiveMinuteReadings() {
+            Section(header: Text(Texts_HomeView.postProcessingReadingFrequency)) {
+                Toggle(Texts_HomeView.postProcessingFiveMinuteReadings, isOn: $useFiveMinuteReadings)
             }
         }
     }
@@ -407,7 +412,7 @@ struct BgAdjustmentsView: View {
 
         // Show the original calculated values behind the previewed final values
         // so the user can compare the effect of adjustment and smoothing.
-        if enableAdjustment || enableSmoothing {
+        if enableAdjustment || enableSmoothing || effectiveUseFiveMinuteReadings() {
             dataSets.append(GlucoseChartDataSet(bgReadingValues: calculatedBgReadingValues, bgReadingDates: calculatedBgReadingDates, seriesIdentifier: "original", lineColor: nil, pointColor: Color(ConstantsGlucoseChart.glucoseOriginalColor), lineWidth: 0, dash: [], showLine: false, showPoints: true, pointSizeMultiplier: 1.0, pointBorderColor: nil, pointBorderSizeMultiplier: nil))
         }
 
@@ -493,7 +498,7 @@ struct BgAdjustmentsView: View {
             return
         }
 
-        guard effectiveEnableAdjustment() || enableSmoothing else {
+        guard effectiveEnableAdjustment() || enableSmoothing || effectiveUseFiveMinuteReadings() else {
             previewAllFinalBgReadingValues = []
             previewAllFinalBgReadingDates = []
             previewVisibleFinalBgReadingValues = []

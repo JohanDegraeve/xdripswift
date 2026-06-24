@@ -96,6 +96,7 @@
 "postProcessingScaleBgCheckHint" = "At least two recent BG checks recommended";
 "postProcessingAdjustmentDisabledBecauseSensorIsCalibrated" = "Adjustment is disabled because this sensor already uses its own calibration.";
 "postProcessingAdjustmentDisabledUseNativeAlgorithm" = "Adjustment is disabled because this sensor already uses its own calibration. Change to the native algorithm to allow glucose adjustments.";
+"postProcessingReadingFrequency" = "Reading Frequency";
 "showTreatments" = "Show Treatments";
 "sensorRemaining" = "Sensor Remaining";
 "remaining" = "remaining";
