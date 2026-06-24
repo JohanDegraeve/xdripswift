@@ -128,7 +128,7 @@
 "m5stack_settingsviews_brightness" = "Screen Brightness";
 
 /// in Settings, row title to send settings
-"sendTraceFile" = "Send Issue Report";
+"sendTraceFile" = "发送问题报告";
 
 /// nightscout settings, title of row
 "uploadSensorStartTime" = "Upload Sensor Start Time";

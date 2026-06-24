@@ -68,13 +68,10 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         let developerRowsVisible = UserDefaults.standard.showDeveloperSettings
 
         let advancedRows = [
-            nativeSettingsRow(id: "developer.showDeveloperSettings", index: Setting.showDeveloperSettings.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "developer.translateOnlineHelp", index: Setting.translateOnlineHelp.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             SettingsRow(
                 id: "developer.issueReport",
-                title: Texts_SettingsView.issueReportSectionTitle,
+                title: Texts_SettingsView.sendTraceFile,
                 accessory: .disclosure,
-                isVisible: developerRowsVisible,
                 action: .settingsScreen {
                     SettingsScreen(
                         title: Texts_SettingsView.issueReportSectionTitle,
@@ -82,6 +79,8 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                     )
                 }
             ),
+            nativeSettingsRow(id: "developer.showDeveloperSettings", index: Setting.showDeveloperSettings.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "developer.translateOnlineHelp", index: Setting.translateOnlineHelp.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.storeFrequentReadingsInNightscout", index: Setting.storeFrequentReadingsInNightscout.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.storeFrequentReadingsInHealthKit", index: Setting.storeFrequentReadingsInHealthKit.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.libreLinkUpVersion", index: Setting.libreLinkUpVersion.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),

@@ -167,7 +167,7 @@
 "settingsviews_sectiontitleNotifications" = "Notifications";
 
 /// in Settings, row title to send settings
-"sendTraceFile" = "Send Issue Report";
+"sendTraceFile" = "Pošlji poročilo o težavi";
 
 /// transmitter settings, to explain that settings is about resetting the transmitter
 
