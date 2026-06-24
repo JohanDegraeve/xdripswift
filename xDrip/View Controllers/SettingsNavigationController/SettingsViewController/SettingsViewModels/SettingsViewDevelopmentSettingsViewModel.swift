@@ -39,6 +39,9 @@ fileprivate enum Setting:Int, CaseIterable {
     
     /// should we allow 60-second writes to HealthKit (in the case of Libre 2 Direct as an example)?
     case storeFrequentReadingsInHealthKit = 11
+
+    /// should the online help be automatically translated?
+    case translateOnlineHelp = 12
     
 }
 
@@ -66,6 +69,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
 
         let advancedRows = [
             nativeSettingsRow(id: "developer.showDeveloperSettings", index: Setting.showDeveloperSettings.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "developer.translateOnlineHelp", index: Setting.translateOnlineHelp.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             SettingsRow(
                 id: "developer.issueReport",
                 title: Texts_SettingsView.issueReportSectionTitle,
@@ -163,6 +167,9 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             
         case .storeFrequentReadingsInHealthKit:
             return Texts_SettingsView.labelStoreFrequentReadingsInHealthKit
+
+        case .translateOnlineHelp:
+            return Texts_SettingsView.translateOnlineHelp
         }
     }
     
@@ -172,7 +179,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp:
             return .none
             
         case .loopDelay, .libreLinkUpVersion, .CAGEMaxHours:
@@ -190,7 +197,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .loopDelay, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .loopDelay, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp:
             return nil
             
         case .loopShareType:
@@ -276,6 +283,9 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             
         case .storeFrequentReadingsInHealthKit:
             return UISwitch(isOn: UserDefaults.standard.storeFrequentReadingsInHealthKit, action: {(isOn:Bool) in UserDefaults.standard.storeFrequentReadingsInHealthKit = isOn})
+
+        case .translateOnlineHelp:
+            return UISwitch(isOn: UserDefaults.standard.translateOnlineHelp, action: {(isOn:Bool) in UserDefaults.standard.translateOnlineHelp = isOn})
             
         case .loopShareType, .loopDelay, .libreLinkUpVersion, .CAGEMaxHours:
             return nil
@@ -294,7 +304,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .translateOnlineHelp:
             return .nothing
             
         case .loopShareType:

@@ -5,10 +5,8 @@
 "settingsviews_sharingAndServicesSectionTitle" = "Обмен и сервисы";
 "settingsviews_osAidLoopShareSectionTitle" = "Обмен OS-AID";
 "settingsviews_issueReportSectionTitle" = "Отчет о проблеме";
-"settingsviews_sectiontitlehelp" = "Помощь и документация";
 "settingsviews_showOnlineHelp" = "Открыть онлайн документацию";
-"settingsviews_translateOnlineHelp" = "Переводить автоматически";
-"settingsviews_restartNeeded" = "(Требуется перезагрузка)";
+"settingsviews_translateOnlineHelp" = "Переводить документацию";
 "settingsviews_sectiontitleNotifications" = "Общие";
 "settingsviews_selectbgunit" = "Единицы измерения глюкозы";
 "settingsviews_masterorfollower" = "Главный или подписчик";

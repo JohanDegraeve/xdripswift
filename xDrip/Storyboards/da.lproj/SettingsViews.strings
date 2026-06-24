@@ -5,10 +5,8 @@
 "settingsviews_sharingAndServicesSectionTitle" = "Deling og tjenester";
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID-deling";
 "settingsviews_issueReportSectionTitle" = "Problemrapport";
-"settingsviews_sectiontitlehelp" = "Help & Documentation";
 "settingsviews_showOnlineHelp" = "Open Online Help";
-"settingsviews_translateOnlineHelp" = "Translate Automatically";
-"settingsviews_restartNeeded" = "(Restart required)";
+"settingsviews_translateOnlineHelp" = "Oversæt dokumentation";
 "settingsviews_sectiontitleNotifications" = "Notifications";
 "settingsviews_selectbgunit" = "Blood Glucose Units";
 "settingsviews_masterorfollower" = "Master or Follower";

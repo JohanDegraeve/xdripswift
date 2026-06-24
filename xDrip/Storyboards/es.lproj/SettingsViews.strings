@@ -35,8 +35,7 @@
 "settingsviews_medtrumSelectPatient" = "Elige Paciente";
 "settingsviews_medtrumSelectPatientFromList" = "Elige paciente de la lista";
 
-"settingsviews_translateOnlineHelp" = "Traducir Documentación";
-"settingsviews_restartNeeded" = "(Pendiente reiniciar)";
+"settingsviews_translateOnlineHelp" = "Traducir documentación";
 "settingsviews_showReadingInNotification" = "Mostrar en Notificaciones";
 "settingsviews_labelShowReadingInAppBadge" = "Mostrar en el icono de la app";
 "settingsviews_multipleAppBadgeValueWith10" = "Multiplicar valor por 10 en el icono de la app";
@@ -167,7 +166,6 @@
 "settingsviews_allowScreenRotation" = "Allow Chart Rotation";
 
 /// help settings, section title
-"settingsviews_sectiontitlehelp" = "Help & Documentation";
 
 /// Calendar Events Settings - section title
 "calendarEventsSectionTitle" = "Calendar Events";

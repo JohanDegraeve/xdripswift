@@ -7,7 +7,7 @@
 "settingsviews_license" = "License";
 
 /// help settings, should the online help be translated automatically if needed
-"settingsviews_translateOnlineHelp" = "Translate Automatically";
+"settingsviews_translateOnlineHelp" = "Перекласти документацію";
 
 /// dexcom share settings, where user can set the dexcom share account name
 "settingsviews_dexcomShareAccountName" = "Account Name";
@@ -231,7 +231,6 @@
 "debugLevel" = "Include Debug Level";
 
 /// help settings, restart needed
-"settingsviews_restartNeeded" = "(Restart required)";
 
 /// nightscout settings, section title
 "settingsviews_sectiontitlenightscout" = "Nightscout";
@@ -346,7 +345,6 @@
 "settingsviews_targetValue" = "Target Value";
 
 /// help settings, section title
-"settingsviews_sectiontitlehelp" = "Help & Documentation";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

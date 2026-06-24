@@ -328,13 +328,12 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the online help be translated automatically if needed
-"settingsviews_translateOnlineHelp" = "Translate Automatically";
+"settingsviews_translateOnlineHelp" = "Przetłumacz dokumentację";
 
 /// home screen settings, should the main glucose chart screen be allowed?
 "settingsviews_allowScreenRotation" = "Allow Chart Rotation";
 
 /// help settings, section title
-"settingsviews_sectiontitlehelp" = "Help & Documentation";
 
 /// Calendar Events Settings - section title
 "calendarEventsSectionTitle" = "Calendar Events";
@@ -357,7 +356,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// help settings, restart needed
-"settingsviews_restartNeeded" = "(Restart required)";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

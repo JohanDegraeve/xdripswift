@@ -101,14 +101,12 @@
 "oslog" = "OSتقرير";
 "settingsviews_sectiontitlehomescreen" = "الشاشة الرئيسية";
 "settingsviews_showClockWhenScreenIsLocked" = "عرض الساعة عند القفل؟";
-"settingsviews_translateOnlineHelp" = "هل تريد الترجمة تلقائيًا؟";
+"settingsviews_translateOnlineHelp" = "ترجمة الوثائق";
 "settingsviews_allowScreenRotation" = "السماح بإلتفاف المخطط؟";
-"settingsviews_sectiontitlehelp" = "المساعدة والتوثيق";
 "calendarEventsSectionTitle" = "أحداث التقويم";
 "settingsviews_showOnlineHelp" = "فتح المساعدة عبر الإنترنت؟";
 "settingsviews_webooptransmitter" = "استخدام خوارزمية جهاز الإرسال؟";
 "settingsviews_labelWebOOP" = "خوارزمية xDrip أو جهاز الإرسال";
-"settingsviews_restartNeeded" = "(مطلوب إعادة التشغيل) ";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

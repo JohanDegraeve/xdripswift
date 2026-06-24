@@ -123,13 +123,12 @@
 "settingsviews_showClockWhenScreenIsLocked" = "Näytetäänkö kello kun näyttö on lukittuna";
 
 /// general settings, should the online help be translated automatically if needed
-"settingsviews_translateOnlineHelp" = "Käännä automaattisesti";
+"settingsviews_translateOnlineHelp" = "Käännä dokumentaatio";
 
 /// home screen settings, should the main glucose chart screen be allowed?
 "settingsviews_allowScreenRotation" = "Salli kaavion kierto";
 
 /// help settings, section title
-"settingsviews_sectiontitlehelp" = "Ohje ja dokumentaatio";
 
 /// Calendar Events Settings - section title
 "calendarEventsSectionTitle" = "Kalenteritapahtumat";
@@ -144,7 +143,6 @@
 "settingsviews_labelWebOOP" = "xDrip tai lähetin algoritmi";
 
 /// help settings, restart needed
-"settingsviews_restartNeeded" = "(Uudelleenkäynnistys vaaditaan)";
 
 /// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
 "settingsviews_smallBolusTreatmentThreshold" = "Mikroboluksen kynnys";

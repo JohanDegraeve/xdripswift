@@ -5,10 +5,8 @@
 "settingsviews_sharingAndServicesSectionTitle" = "Paylaşım ve Servisler";
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID Paylaşımı";
 "settingsviews_issueReportSectionTitle" = "Sorun Raporu";
-"settingsviews_sectiontitlehelp" = "Yardım & Dokümantasyon";
 "settingsviews_showOnlineHelp" = "Çevrimiçi Yardım'ı aç";
-"settingsviews_translateOnlineHelp" = "Otomatik Olarak Çevir";
-"settingsviews_restartNeeded" = "(Yeniden başlatmak gerekli)";
+"settingsviews_translateOnlineHelp" = "Belgeleri Çevir";
 "settingsviews_sectiontitleNotifications" = "Ana ayarlar";
 "settingsviews_selectbgunit" = "Kan Şekeri Birimleri";
 "settingsviews_masterorfollower" = "Sahip veya Takipci";

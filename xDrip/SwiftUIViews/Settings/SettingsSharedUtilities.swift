@@ -334,7 +334,6 @@ extension SettingsNativeSectionProvider {
 // of the file so the section layout is easy to inspect before the detailed logic.
 // The shared helper code below still lets those rows call into the old action
 // methods while we continue moving the settings screens to native SwiftUI.
-extension SettingsViewHelpSettingsViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewDataSourceSettingsViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewHomeScreenSettingsViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewAlertSettingsViewModel: SettingsNativeSectionProvider {}

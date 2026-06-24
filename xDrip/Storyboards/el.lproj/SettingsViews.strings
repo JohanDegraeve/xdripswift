@@ -5,10 +5,8 @@
 "settingsviews_sharingAndServicesSectionTitle" = "Κοινή χρήση και υπηρεσίες";
 "settingsviews_osAidLoopShareSectionTitle" = "Κοινή χρήση OS-AID";
 "settingsviews_issueReportSectionTitle" = "Αναφορά προβλήματος";
-"settingsviews_sectiontitlehelp" = "Βοήθεια & Τεκμηρίωση";
 "settingsviews_showOnlineHelp" = "Ανοίξτε τη Ηλεκτρονική Βοήθεια;";
-"settingsviews_translateOnlineHelp" = "Αυτόματη μετάφραση;";
-"settingsviews_restartNeeded" = "(Απαιτείται επανεκκίνηση)";
+"settingsviews_translateOnlineHelp" = "Μετάφραση τεκμηρίωσης";
 "settingsviews_sectiontitleNotifications" = "Γενικά";
 "settingsviews_selectbgunit" = "Μονάδες μέτρησης γλυκόζης";
 "settingsviews_masterorfollower" = "Κύριος ή ακόλουθος;";

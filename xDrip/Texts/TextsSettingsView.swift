@@ -40,24 +40,15 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_issueReportSectionTitle", tableName: filename, bundle: Bundle.main, value: "Issue Report", comment: "settings section title for sending issue report logs")
     }()
     
-    // MARK: - Section Help
-    
-    static let sectionTitleHelp: String = {
-        return NSLocalizedString("settingsviews_sectiontitlehelp", tableName: filename, bundle: Bundle.main, value: "Help & Documentation", comment: "help settings, section title")
-    }()
+    // MARK: - Online Help
     
     static let showOnlineHelp: String = {
         return NSLocalizedString("settingsviews_showOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Open Online Help", comment: "help settings, open the online help")
     }()
     
     static let translateOnlineHelp: String = {
-        return NSLocalizedString("settingsviews_translateOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Translate Automatically", comment: "help settings, should the online help be translated automatically if needed")
+        return NSLocalizedString("settingsviews_translateOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Translate Documentation", comment: "help settings, should the online documentation be translated automatically if needed")
     }()
-    
-    static let restartNeeded: String = {
-        return NSLocalizedString("settingsviews_restartNeeded", tableName: filename, bundle: Bundle.main, value: "(Restart required)", comment: "help settings, restart needed")
-    }()
-    
     
     // MARK: - Notifications
         

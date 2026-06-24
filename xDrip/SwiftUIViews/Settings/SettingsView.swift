@@ -51,11 +51,19 @@ struct SettingsView: View {
             presenter: presenter,
             title: Texts_SettingsView.screenTitle
         )
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: SettingsOnlineHelp.open) {
+                    Image(systemName: "questionmark.circle")
+                }
+                .tint(.yellow)
+                .accessibilityLabel(Texts_SettingsView.showOnlineHelp)
+            }
+        }
     }
 }
 
 enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
-    case help
     case dataSource
     case glucoseDisplay
     case alertsAndNotifications
@@ -68,8 +76,6 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
     /// enabled state and row actions so the existing Settings logic stays in place.
     func viewModel(coreDataManager: CoreDataManager?) -> SettingsViewModelProtocol {
         switch self {
-        case .help:
-            return SettingsViewHelpSettingsViewModel()
         case .dataSource:
             return SettingsViewDataSourceSettingsViewModel(coreDataManager: coreDataManager)
         case .glucoseDisplay:
@@ -82,6 +88,24 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
             return SettingsViewInfoViewModel()
         case .advanced:
             return SettingsViewDevelopmentSettingsViewModel()
+        }
+    }
+}
+
+private enum SettingsOnlineHelp {
+    static func open() {
+        // get the 2 character language code for the App Locale, i.e. "en", "es", "nl", "fr"
+        // if the user has the app in a language other than English and they have the "auto translate" option selected, then load the help pages through Google Translate
+        // important to check that the URLs actually exist in ConstantsHomeView before trying to open them
+        if let languageCode = NSLocale.current.language.languageCode?.identifier, languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
+            guard let url = URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode + ConstantsHomeView.onlineHelpURLTranslated2) else { return }
+
+            UIApplication.shared.open(url)
+        } else {
+            // so the user is running the app in English or they don't want to translate so let's just load it directly
+            guard let url = URL(string: ConstantsHomeView.onlineHelpURL) else { return }
+
+            UIApplication.shared.open(url)
         }
     }
 }

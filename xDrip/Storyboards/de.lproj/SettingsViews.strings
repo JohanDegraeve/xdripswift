@@ -299,13 +299,12 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the online help be translated automatically if needed
-"settingsviews_translateOnlineHelp" = "Translate Automatically";
+"settingsviews_translateOnlineHelp" = "Dokumentation übersetzen";
 
 /// home screen settings, should the main glucose chart screen be allowed?
 "settingsviews_allowScreenRotation" = "Allow Chart Rotation";
 
 /// help settings, section title
-"settingsviews_sectiontitlehelp" = "Help & Documentation";
 
 /// Calendar Events Settings - section title
 "calendarEventsSectionTitle" = "Calendar Events";
@@ -323,7 +322,6 @@
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xdrip oder nativer Algorithmus";
 
-"settingsviews_restartNeeded" = "(Neustart notwendig)";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
