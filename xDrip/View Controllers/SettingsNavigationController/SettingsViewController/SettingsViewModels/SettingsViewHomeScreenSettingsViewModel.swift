@@ -252,6 +252,14 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
 
         return Texts_SettingsView.sectionTitleHomeScreen
     }
+
+    func settingsSectionFooter() -> String? {
+        if rowGroup == .glucoseRanges {
+            return Texts_SettingsView.glucoseRangesSectionFooter
+        }
+
+        return nil
+    }
     
     func numberOfRows() -> Int {
         return Setting.allCases.count

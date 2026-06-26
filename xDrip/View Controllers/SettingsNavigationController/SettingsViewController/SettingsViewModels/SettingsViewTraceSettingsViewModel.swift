@@ -66,6 +66,10 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
 
         return Texts_SettingsView.sectionTitleTrace
     }
+
+    func settingsSectionFooter() -> String? {
+        Texts_SettingsView.issueReportSectionFooter
+    }
     
     func settingsRowText(index: Int) -> String {
         

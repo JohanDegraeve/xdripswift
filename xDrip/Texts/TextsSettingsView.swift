@@ -24,6 +24,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_glucoseRangesSectionTitle", tableName: filename, bundle: Bundle.main, value: "Glucose Ranges", comment: "settings section title for glucose range threshold values")
     }()
 
+    static let glucoseRangesSectionFooter: String = {
+        return NSLocalizedString("settingsviews_glucoseRangesSectionFooter", tableName: filename, bundle: Bundle.main, value: "Glucose Ranges only affect the main chart display colours. They are not related to Alarm values.", comment: "settings footer explaining what glucose ranges affect")
+    }()
+
     static let alertsAndNotificationsSectionTitle: String = {
         return NSLocalizedString("settingsviews_alertsAndNotificationsSectionTitle", tableName: filename, bundle: Bundle.main, value: "Alerts and Notifications", comment: "settings group title for alerts and notifications")
     }()
@@ -38,6 +42,10 @@ class Texts_SettingsView {
 
     static let issueReportSectionTitle: String = {
         return NSLocalizedString("settingsviews_issueReportSectionTitle", tableName: filename, bundle: Bundle.main, value: "Issue Report", comment: "settings section title for sending issue report logs")
+    }()
+
+    static let issueReportSectionFooter: String = {
+        return NSLocalizedString("settingsviews_issueReportSectionFooter", tableName: filename, bundle: Bundle.main, value: "Do not send an Issue Report unless requested by an xDrip4iOS developer or your report will be automatically deleted.", comment: "settings footer warning users not to send issue reports unless requested")
     }()
 
     static func appBannerVersion(_ version: String) -> String {

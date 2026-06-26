@@ -115,14 +115,28 @@ extension UIViewController {
         let presenter = SettingsActionPresenter(router: router)
         let sections = settingsScreen.makeSections(presenter)
         let listModel = SettingsListModel(sections: sections)
+        let navigationActions = SettingsNavigationActions { [weak navigationController] title, content in
+            guard let navigationController else { return }
+
+            let viewController = PortraitLockedHostingController(
+                rootView: content {
+                    navigationController.popViewController(animated: true)
+                }
+            )
+            viewController.title = title
+            viewController.navigationItem.largeTitleDisplayMode = .never
+
+            navigationController.pushViewController(viewController, animated: true)
+        }
         let viewController = PortraitLockedHostingController(
             rootView: AnyView(SettingsListView(
                 listModel: listModel,
                 presenter: presenter,
                 title: settingsScreen.title,
-                titleDisplayMode: .inline,
+                titleDisplayMode: .large,
                 showsSectionHeaders: false
-            ))
+            )
+            .environment(\.settingsNavigationActions, navigationActions))
         )
 
         presenter.attach(controller: viewController)
@@ -136,15 +150,7 @@ extension UIViewController {
         }
 
         viewController.title = settingsScreen.title
-        viewController.navigationItem.largeTitleDisplayMode = .never
-        viewController.rootView = AnyView(SettingsListView(
-            listModel: listModel,
-            presenter: presenter,
-            title: settingsScreen.title,
-            titleDisplayMode: .inline,
-            showsSectionHeaders: false
-        )
-        .environment(\.settingsNavigationActions, viewController.settingsNavigationActions()))
+        viewController.navigationItem.largeTitleDisplayMode = .automatic
 
         navigationController.pushViewController(viewController, animated: true)
     }
@@ -181,7 +187,6 @@ final class SettingsListModel: ObservableObject {
     /// SwiftUI refreshes the visible list from the same token today.
     func reload(_ scope: SettingsReloadScope) {
         reloadToken = UUID()
-        objectWillChange.send()
     }
 }
 
@@ -630,11 +635,11 @@ struct SettingsListView: View {
             ForEach(listModel.sections) { section in
                 SettingsSectionView(
                     section: section,
+                    reloadToken: listModel.reloadToken,
                     presenter: presenter,
                     reload: listModel.reload,
                     showsSectionHeader: showsSectionHeaders
                 )
-                .id("\(section.id)-\(listModel.reloadToken)")
             }
         }
         .settingsListStyle(title: title, titleDisplayMode: titleDisplayMode)
@@ -722,11 +727,14 @@ struct SettingsStaticRowView: View {
 
 private struct SettingsSectionView: View {
     let section: SettingsSectionModel
+    let reloadToken: UUID
     @ObservedObject var presenter: SettingsActionPresenter
     let reload: (SettingsReloadScope) -> Void
     let showsSectionHeader: Bool
 
     var body: some View {
+        let _ = reloadToken
+
         SettingsNativeSectionView(
             sectionID: section.id,
             section: section.section(),

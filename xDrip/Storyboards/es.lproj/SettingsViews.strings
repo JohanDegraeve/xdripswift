@@ -1,10 +1,12 @@
 "settingsviews_settingstitle" = "Configuración";
 "settingsviews_glucoseDisplaySectionTitle" = "Visualización de glucosa";
 "settingsviews_glucoseRangesSectionTitle" = "Rangos de glucosa";
+"settingsviews_glucoseRangesSectionFooter" = "Los rangos de glucosa solo afectan a los colores del gráfico principal. No están relacionados con los valores de alarma.";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alertas y notificaciones";
 "settingsviews_sharingAndServicesSectionTitle" = "Compartir y servicios";
 "settingsviews_osAidLoopShareSectionTitle" = "Compartir con OS-AID";
 "settingsviews_issueReportSectionTitle" = "Informe de problema";
+"settingsviews_issueReportSectionFooter" = "No envíes un informe de problema a menos que te lo pida un desarrollador de xDrip4iOS o tu informe se eliminará automáticamente.";
 "settingsviews_appBannerVersion" = "Versión %@";
 "settingsviews_appInstalledSince" = "Instalado";
 "settingsviews_valueIsRequired" = "⚠️ Requerido";

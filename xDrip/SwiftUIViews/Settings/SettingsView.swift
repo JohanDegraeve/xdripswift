@@ -50,6 +50,7 @@ struct SettingsView: View {
             listModel: listModel,
             presenter: presenter,
             title: Texts_SettingsView.screenTitle,
+            titleDisplayMode: .large,
             headerView: { AnyView(SettingsAppBannerView()) }
         )
         .toolbar {

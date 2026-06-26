@@ -1,10 +1,12 @@
 "settingsviews_settingstitle" = "Settings";
 "settingsviews_glucoseDisplaySectionTitle" = "Glucose Display";
 "settingsviews_glucoseRangesSectionTitle" = "Glucose Ranges";
+"settingsviews_glucoseRangesSectionFooter" = "Glucose Ranges only affect the main chart display colours. They are not related to Alarm values.";
 "settingsviews_alertsAndNotificationsSectionTitle" = "Alerts and Notifications";
 "settingsviews_sharingAndServicesSectionTitle" = "Sharing and Services";
 "settingsviews_osAidLoopShareSectionTitle" = "OS-AID Share";
 "settingsviews_issueReportSectionTitle" = "Issue Report";
+"settingsviews_issueReportSectionFooter" = "Do not send an Issue Report unless requested by an xDrip4iOS developer or your report will be automatically deleted.";
 "settingsviews_appBannerVersion" = "Version %@";
 "settingsviews_appInstalledSince" = "Installed";
 "settingsviews_valueIsRequired" = "⚠️ Required";
