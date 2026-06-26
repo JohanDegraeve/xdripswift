@@ -1,5 +1,10 @@
 import UIKit
 
+struct SettingsToggleControl {
+    let isOn: () -> Bool
+    let setIsOn: (Bool) -> Void
+}
+
 /// functions that define the contents of a Section
 ///
 /// The protocol defines the Section title, the text and detailedText to be shown in a cell of that secion, the accessoryType (none, disclosure, detail button, detail disclosure button), the UIView to be shown if applicable (eg UISwitch), the nomber of rows in the Section, and last but not least is it enabled or not
@@ -36,6 +41,11 @@ protocol SettingsViewModelProtocol {
     /// - returns:
     ///     a UIView, nil if no UIView to be shown (example see SettingsViewHealthKitSettingsViewModel)
     func uiView(index:Int) -> UIView?
+
+    /// Native toggle state and action for SwiftUI Settings rows.
+    /// The old uiView(index:) hook still exists for storyboard/table based Settings
+    /// screens, but migrated SwiftUI rows should use this instead of creating a UISwitch.
+    func settingsToggle(index: Int) -> SettingsToggleControl?
     
     /// what's the number of rows in the section
     /// - returns:
@@ -84,6 +94,10 @@ protocol SettingsViewModelProtocol {
 // Add default implementations here so that ViewModels don't need to implement empty methods
 extension SettingsViewModelProtocol {
     func storeSectionReloadClosure(sectionReloadClosure: @escaping (() -> Void)) {}
+
+    func settingsToggle(index: Int) -> SettingsToggleControl? {
+        nil
+    }
     
     func sectionFooter() -> String? {
         nil

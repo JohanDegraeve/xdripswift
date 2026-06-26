@@ -54,6 +54,25 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
         
     }
     
+    func settingsToggle(index: Int) -> SettingsToggleControl? {
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .showStatistics:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.showStatistics },
+                setIsOn: { UserDefaults.standard.showStatistics = $0 }
+            )
+        case .useIFCCA1C:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.useIFCCA1C },
+                setIsOn: { UserDefaults.standard.useIFCCA1C = $0 }
+            )
+        case .timeInRangeType:
+            return nil
+        }
+    }
+
     func uiView(index: Int) -> UIView? {
         
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }

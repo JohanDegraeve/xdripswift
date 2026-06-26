@@ -95,6 +95,40 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
     }
 
     var sectionReloadClosure: (() -> Void)?
+
+    func settingsToggle(index: Int) -> SettingsToggleControl? {
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .allowScreenRotation:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.allowScreenRotation },
+                setIsOn: { UserDefaults.standard.allowScreenRotation = $0 }
+            )
+        case .showClockWhenScreenIsLocked:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.showClockWhenScreenIsLocked },
+                setIsOn: { UserDefaults.standard.showClockWhenScreenIsLocked = $0 }
+            )
+        case .showMiniChart:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.showMiniChart },
+                setIsOn: { UserDefaults.standard.showMiniChart = $0 }
+            )
+        case .allowMainChartAutoReset:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.allowMainChartAutoReset },
+                setIsOn: { UserDefaults.standard.allowMainChartAutoReset = $0 }
+            )
+        case .showOriginalBGReadings:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.showOriginalBGReadings },
+                setIsOn: { UserDefaults.standard.showOriginalBGReadings = $0 }
+            )
+        case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .targetMarkValue, .lowMarkValue, .urgentLowMarkValue:
+            return nil
+        }
+    }
     
     func uiView(index: Int) -> UIView? {
         

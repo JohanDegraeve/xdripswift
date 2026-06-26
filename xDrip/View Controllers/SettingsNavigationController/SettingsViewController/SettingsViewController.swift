@@ -58,6 +58,12 @@ final class SettingsHostingController: PortraitLockedHostingController<AnyView> 
     @objc required dynamic init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        listModel.reload(.all)
+    }
 }
 
 private extension SettingsHostingController {

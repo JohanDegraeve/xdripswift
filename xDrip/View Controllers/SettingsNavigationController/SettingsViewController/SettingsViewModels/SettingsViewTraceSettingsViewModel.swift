@@ -116,6 +116,20 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
         }
         
     }
+
+    func settingsToggle(index: Int) -> SettingsToggleControl? {
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .debugLevel:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog },
+                setIsOn: { UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog = $0 }
+            )
+        case .sendTraceFile:
+            return nil
+        }
+    }
     
     func uiView(index: Int) -> UIView? {
         

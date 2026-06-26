@@ -213,6 +213,71 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         }
         
     }
+
+    func settingsToggle(index: Int) -> SettingsToggleControl? {
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .showDeveloperSettings:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.showDeveloperSettings },
+                setIsOn: { [weak self] isOn in
+                    UserDefaults.standard.showDeveloperSettings = isOn
+
+                    // this is a bit messy, but seems to be the best way to reset the setting to false
+                    // this will usually happen when the view is not on screen anyway
+                    if isOn {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 120) {
+                            UserDefaults.standard.showDeveloperSettings = false
+                            self?.sectionReloadClosure?()
+                        }
+                    }
+                }
+            )
+        case .NSLogEnabled:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.NSLogEnabled },
+                setIsOn: { UserDefaults.standard.NSLogEnabled = $0 }
+            )
+        case .OSLogEnabled:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.OSLogEnabled },
+                setIsOn: { UserDefaults.standard.OSLogEnabled = $0 }
+            )
+        case .suppressUnLockPayLoad:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.suppressUnLockPayLoad },
+                setIsOn: { UserDefaults.standard.suppressUnLockPayLoad = $0 }
+            )
+        case .allowStandByHighContrast:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.allowStandByHighContrast },
+                setIsOn: { UserDefaults.standard.allowStandByHighContrast = $0 }
+            )
+        case .forceStandByBigNumbers:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.forceStandByBigNumbers },
+                setIsOn: { UserDefaults.standard.forceStandByBigNumbers = $0 }
+            )
+        case .storeFrequentReadingsInNightscout:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.storeFrequentReadingsInNightscout },
+                setIsOn: { UserDefaults.standard.storeFrequentReadingsInNightscout = $0 }
+            )
+        case .storeFrequentReadingsInHealthKit:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.storeFrequentReadingsInHealthKit },
+                setIsOn: { UserDefaults.standard.storeFrequentReadingsInHealthKit = $0 }
+            )
+        case .translateOnlineHelp:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.translateOnlineHelp },
+                setIsOn: { UserDefaults.standard.translateOnlineHelp = $0 }
+            )
+        case .loopShareType, .loopDelay, .libreLinkUpVersion, .CAGEMaxHours:
+            return nil
+        }
+    }
     
     func uiView(index: Int) -> UIView? {
         

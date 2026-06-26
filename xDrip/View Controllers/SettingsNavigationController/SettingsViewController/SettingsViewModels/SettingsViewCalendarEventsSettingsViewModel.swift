@@ -165,6 +165,61 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
         }
     }
 
+    func settingsToggle(index: Int) -> SettingsToggleControl? {
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .createCalendarEvent:
+            let authorizationStatus = EKEventStore.authorizationStatus(for: .event)
+            if authorizationStatus == .denied || authorizationStatus == .restricted { return nil }
+
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.createCalendarEvent },
+                setIsOn: { [weak self] isOn in
+                    self?.setCreateCalendarEvent(isOn)
+                }
+            )
+        case .displayTrend:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.displayTrendInCalendarEvent },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("displayTrend changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.displayTrendInCalendarEvent = isOn
+                }
+            )
+        case .displayDelta:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.displayDeltaInCalendarEvent },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("displayDelta changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.displayDeltaInCalendarEvent = isOn
+                }
+            )
+        case .displayUnits:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.displayUnitInCalendarEvent },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("displayUnits changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.displayUnitInCalendarEvent = isOn
+                }
+            )
+        case .displayVisualIndicator:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.displayVisualIndicatorInCalendarEvent },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("displayVisualIndicator changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.displayVisualIndicatorInCalendarEvent = isOn
+                }
+            )
+        case .calenderId, .calendarInterval:
+            return nil
+        }
+    }
+
     func uiView(index: Int) -> UIView? {
         
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
@@ -179,96 +234,7 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
             
             return UISwitch(isOn: UserDefaults.standard.createCalendarEvent, action: {
                 (isOn: Bool) in
-                trace("createCalendarEvent changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info, isOn.description)
-                
-                // if setting to false, then no need to check authorization status
-                if !isOn {
-                    UserDefaults.standard.createCalendarEvent = false
-                    return
-                }
-                
-                // check authorization status
-                switch EKEventStore.authorizationStatus(for: .event) {
-                    
-                case .notDetermined:
-#if swift(>=5.9)
-                    // the user is building with Xcode 15 so may be building to >=iOS17 (with the new EventKit calendar access methods), or to <=iOS16 or earlier so we must use the old methods
-                    if #available(iOS 17.0, *) {
-                        // if >=iOS17 then run the new access request method
-                        // https://developer.apple.com/documentation/eventkit/accessing_calendar_using_eventkit_and_eventkitui#4250785
-                        self.eventStore.requestFullAccessToEvents(completion:
-                                                                    {(granted: Bool, error: Error?) -> Void in
-                            if !granted {
-                                trace("EKEventStore access not granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
-                                UserDefaults.standard.createCalendarEvent = false
-                            } else {
-                                trace("EKEventStore access granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info)
-                                UserDefaults.standard.createCalendarEvent = true
-                            }
-                        })
-                    } else {
-                        
-                        // Fallback on earlier versions as .requestAccess() was deprecated in iOS17 and doesn't work anymore. We can still use it with <=iOS16
-                        self.eventStore.requestAccess(to: .event, completion:
-                                                        {(granted: Bool, error: Error?) -> Void in
-                            if !granted {
-                                trace("EKEventStore access not granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
-                                UserDefaults.standard.createCalendarEvent = false
-                            } else {
-                                trace("EKEventStore access granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info)
-                                UserDefaults.standard.createCalendarEvent = true
-                            }
-                        })
-                        
-                    }
-#else
-                    // so here we are still using <= Xcode14 or earlier so we can assume the user is also using <= iOS16 and must use the old methods
-                    self.eventStore.requestAccess(to: .event, completion:
-                                                    {(granted: Bool, error: Error?) -> Void in
-                        if !granted {
-                            trace("EKEventStore access not granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
-                            UserDefaults.standard.createCalendarEvent = false
-                        } else {
-                            trace("EKEventStore access granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info)
-                            UserDefaults.standard.createCalendarEvent = true
-                        }
-                    })
-#endif
-                    
-                case .restricted:
-                    // authorize not possible, according to apple doc "possibly due to active restrictions such as parental controls being in place", no need to change value of UserDefaults.standard.createCalendarEvent
-                    // we will probably never come here because if it's restricted, the uiview is not shown
-                    trace("EKEventStore access restricted, according to apple doc 'possibly due to active restrictions such as parental controls being in place'", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
-                    UserDefaults.standard.createCalendarEvent = false
-                    
-#if swift(>=5.9)
-                case .writeOnly:
-                    // Full Access permission has not been granted to the app so we won't be able to delete old BG events, no need to change value of UserDefaults.standard.createCalendarEvent
-                    trace("EKEventStore access is 'Write Only', the user must update this to 'Full Access'", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
-                    UserDefaults.standard.createCalendarEvent = false
-                    
-                case .fullAccess:
-                    // fullAccess is granted, no need to change value of UserDefaults.standard.createCalendarEvent
-                    trace("EKEventStore access authorized", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
-                    UserDefaults.standard.createCalendarEvent = true
-#endif
-                    
-                case .denied:
-                    // access denied by user, need to change value of UserDefaults.standard.createCalendarEvent
-                    // we will probably never come here because if it's denied, the uiview is not shown
-                    trace("EKEventStore access denied by user", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
-                    UserDefaults.standard.createCalendarEvent = false
-
-                case .authorized:
-                    // authorize successful, no need to change value of UserDefaults.standard.createCalendarEvent
-                    trace("EKEventStore access authorized", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
-                    UserDefaults.standard.createCalendarEvent = true
-                    
-                @unknown default:
-                    trace("unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
-                    
-                }
-                
+                self.setCreateCalendarEvent(isOn)
             })
             
         case .calenderId:
@@ -299,6 +265,91 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
             
         }
         
+    }
+
+    private func setCreateCalendarEvent(_ isOn: Bool) {
+        trace("createCalendarEvent changed by user to %{public}@", log: log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info, isOn.description)
+
+        // if setting to false, then no need to check authorization status
+        if !isOn {
+            UserDefaults.standard.createCalendarEvent = false
+            return
+        }
+
+        // check authorization status
+        switch EKEventStore.authorizationStatus(for: .event) {
+        case .notDetermined:
+#if swift(>=5.9)
+            // the user is building with Xcode 15 so may be building to >=iOS17 (with the new EventKit calendar access methods), or to <=iOS16 or earlier so we must use the old methods
+            if #available(iOS 17.0, *) {
+                // if >=iOS17 then run the new access request method
+                // https://developer.apple.com/documentation/eventkit/accessing_calendar_using_eventkit_and_eventkitui#4250785
+                eventStore.requestFullAccessToEvents(completion: { (granted: Bool, error: Error?) -> Void in
+                    if !granted {
+                        trace("EKEventStore access not granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
+                        UserDefaults.standard.createCalendarEvent = false
+                    } else {
+                        trace("EKEventStore access granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info)
+                        UserDefaults.standard.createCalendarEvent = true
+                    }
+                })
+            } else {
+                // Fallback on earlier versions as .requestAccess() was deprecated in iOS17 and doesn't work anymore. We can still use it with <=iOS16
+                eventStore.requestAccess(to: .event, completion: { (granted: Bool, error: Error?) -> Void in
+                    if !granted {
+                        trace("EKEventStore access not granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
+                        UserDefaults.standard.createCalendarEvent = false
+                    } else {
+                        trace("EKEventStore access granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info)
+                        UserDefaults.standard.createCalendarEvent = true
+                    }
+                })
+            }
+#else
+            // so here we are still using <= Xcode14 or earlier so we can assume the user is also using <= iOS16 and must use the old methods
+            eventStore.requestAccess(to: .event, completion: { (granted: Bool, error: Error?) -> Void in
+                if !granted {
+                    trace("EKEventStore access not granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
+                    UserDefaults.standard.createCalendarEvent = false
+                } else {
+                    trace("EKEventStore access granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info)
+                    UserDefaults.standard.createCalendarEvent = true
+                }
+            })
+#endif
+
+        case .restricted:
+            // authorize not possible, according to apple doc "possibly due to active restrictions such as parental controls being in place", no need to change value of UserDefaults.standard.createCalendarEvent
+            // we will probably never come here because if it's restricted, the uiview is not shown
+            trace("EKEventStore access restricted, according to apple doc 'possibly due to active restrictions such as parental controls being in place'", log: log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
+            UserDefaults.standard.createCalendarEvent = false
+
+#if swift(>=5.9)
+        case .writeOnly:
+            // Full Access permission has not been granted to the app so we won't be able to delete old BG events, no need to change value of UserDefaults.standard.createCalendarEvent
+            trace("EKEventStore access is 'Write Only', the user must update this to 'Full Access'", log: log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
+            UserDefaults.standard.createCalendarEvent = false
+
+        case .fullAccess:
+            // fullAccess is granted, no need to change value of UserDefaults.standard.createCalendarEvent
+            trace("EKEventStore access authorized", log: log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
+            UserDefaults.standard.createCalendarEvent = true
+#endif
+
+        case .denied:
+            // access denied by user, need to change value of UserDefaults.standard.createCalendarEvent
+            // we will probably never come here because if it's denied, the uiview is not shown
+            trace("EKEventStore access denied by user", log: log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
+            UserDefaults.standard.createCalendarEvent = false
+
+        case .authorized:
+            // authorize successful, no need to change value of UserDefaults.standard.createCalendarEvent
+            trace("EKEventStore access authorized", log: log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
+            UserDefaults.standard.createCalendarEvent = true
+
+        @unknown default:
+            trace("unknown case returned when authorizing EKEventStore ", log: log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
+        }
     }
     
     func numberOfRows() -> Int {

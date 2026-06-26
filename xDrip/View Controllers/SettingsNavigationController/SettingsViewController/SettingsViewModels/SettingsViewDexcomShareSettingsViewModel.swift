@@ -191,6 +191,42 @@ class SettingsViewDexcomShareUploadSettingsViewModel: SettingsViewModelProtocol 
             return nil
         }
     }
+
+    func settingsToggle(index: Int) -> SettingsToggleControl? {
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .uploadReadingstoDexcomShare:
+            if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .dexcomShare {
+                return nil
+            }
+
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.uploadReadingstoDexcomShare },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("uploadReadingstoDexcomShare changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewDexcomShareUploadSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.uploadReadingstoDexcomShare = isOn
+                }
+            )
+        case .useUSDexcomShareurl:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.useUSDexcomShareurl },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("useUSDexcomShareurl changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewDexcomShareUploadSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.useUSDexcomShareurl = isOn
+                }
+            )
+        case .useSchedule:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.dexcomShareUploadUseSchedule },
+                setIsOn: { UserDefaults.standard.dexcomShareUploadUseSchedule = $0 }
+            )
+        case .dexcomShareAccountName, .dexcomSharePassword, .dexcomShareUploadSerialNumber, .schedule:
+            return nil
+        }
+    }
     
     func uiView(index:Int) -> UIView? {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }

@@ -923,7 +923,7 @@ extension SettingsViewModelProtocol {
         let isEnabled = isEnabled(index: index)
         let reloadScope: SettingsReloadScope? = completeSettingsViewRefreshNeeded(index: index) ? .all : nil
 
-        if let switchAdapter = SettingsSwitchAdapter(viewModel: self, rowIndex: index) {
+        if let toggle = settingsToggle(index: index) {
             return SettingsRow(
                 id: id ?? "\(sectionID).\(index)",
                 title: settingsRowText(index: index),
@@ -932,8 +932,8 @@ extension SettingsViewModelProtocol {
                 detailIndicator: nativeDetailIndicator(index: index),
                 accessory: nativeAccessory(accessoryType),
                 control: .toggle(
-                    isOn: { switchAdapter.isOn },
-                    setIsOn: { switchAdapter.setIsOn($0) }
+                    isOn: toggle.isOn,
+                    setIsOn: toggle.setIsOn
                 ),
                 isEnabled: isEnabled,
                 isVisible: isVisible,
@@ -1112,34 +1112,6 @@ struct SettingsInfoIndicator: View {
         Image(systemName: "info.circle")
             .font(.body)
             .foregroundStyle(Color(ConstantsUI.disclosureIndicatorColor))
-    }
-}
-
-struct SettingsSwitchAdapter {
-    private let makeSwitch: () -> UISwitch?
-
-    /// Wraps the UISwitch returned by an old Settings view model so SwiftUI can
-    /// render it as a Toggle while still using the original switch action closure.
-    init?(viewModel: SettingsViewModelProtocol, rowIndex: Int) {
-        guard viewModel.uiView(index: rowIndex) is UISwitch else {
-            return nil
-        }
-
-        makeSwitch = {
-            viewModel.uiView(index: rowIndex) as? UISwitch
-        }
-    }
-
-    var isOn: Bool {
-        makeSwitch()?.isOn ?? false
-    }
-
-    /// Updates the old UISwitch and sends its value changed action so existing
-    /// Settings logic continues to run unchanged.
-    func setIsOn(_ isOn: Bool) {
-        guard let uiSwitch = makeSwitch() else { return }
-        uiSwitch.setOn(isOn, animated: false)
-        uiSwitch.sendActions(for: .valueChanged)
     }
 }
 

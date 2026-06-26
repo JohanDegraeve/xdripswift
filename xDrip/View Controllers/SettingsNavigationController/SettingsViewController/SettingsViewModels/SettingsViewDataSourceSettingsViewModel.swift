@@ -879,6 +879,51 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
 
         return followerServiceStatusResult.status.indicatorColor
     }
+
+    func settingsToggle(index: Int) -> SettingsToggleControl? {
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .followerExtraRow2:
+            guard UserDefaults.standard.isMaster, UserDefaults.standard.nightscoutEnabled else {
+                return nil
+            }
+
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.masterUploadDataToNightscout },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("isMaster changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.masterUploadDataToNightscout = isOn
+                }
+            )
+        case .followerExtraRow6:
+            guard UserDefaults.standard.nightscoutEnabled else {
+                return nil
+            }
+
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.followerUploadDataToNightscout },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("followerUploadDataToNightscout changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.followerUploadDataToNightscout = isOn
+                }
+            )
+        case .followerExtraRow12:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.libreLinkUpIs15DaySensor },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("libreLinkUpIs15DaySensor changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.libreLinkUpIs15DaySensor = isOn
+                    UserDefaults.standard.activeSensorMaxSensorAgeInDays = UserDefaults.standard.libreLinkUpIs15DaySensor ? ConstantsLibreLinkUp.libreLinkUpMaxSensorAgeInDaysLibrePlus : ConstantsLibreLinkUp.libreLinkUpMaxSensorAgeInDays
+                }
+            )
+        case .bloodGlucoseUnit, .masterFollower, .followerExtraRow3, .followerExtraRow4, .followerExtraRow5, .followerExtraRow7, .followerExtraRow8, .followerExtraRow9, .followerExtraRow10, .followerExtraRow11:
+            return nil
+        }
+    }
     
     func uiView(index: Int) -> UIView? {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }

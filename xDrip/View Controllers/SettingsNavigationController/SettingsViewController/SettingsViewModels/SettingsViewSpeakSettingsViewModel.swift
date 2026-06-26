@@ -179,6 +179,42 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
             return Texts_SpeakReading.languageName
         }
     }
+
+    func settingsToggle(index: Int) -> SettingsToggleControl? {
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .speakBgReadings:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.speakReadings },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("speakBgReadings changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewSpeakSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.speakReadings = isOn
+                }
+            )
+        case .speakTrend:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.speakTrend },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("speakTrend changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewSpeakSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.speakTrend = isOn
+                }
+            )
+        case .speakDelta:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.speakDelta },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("speakDelta changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewSpeakSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.speakDelta = isOn
+                }
+            )
+        case .speakInterval, .speakBgReadingLanguage:
+            return nil
+        }
+    }
     
     func uiView(index: Int) -> UIView? {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }

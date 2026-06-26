@@ -105,6 +105,38 @@ class SettingsViewContactImageSettingsViewModel: NSObject, SettingsViewModelProt
         }
     }
 
+    func settingsToggle(index: Int) -> SettingsToggleControl? {
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .enableContactImage:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.enableContactImage },
+                setIsOn: { [weak self] isOn in
+                    self?.setContactImageEnabled(isOn)
+                }
+            )
+        case .displayTrend:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.displayTrendInContactImage },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("displayTrend changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.displayTrendInContactImage = isOn
+                }
+            )
+        case .useHighContrastContactImage:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.useHighContrastContactImage },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("useHighContrastContactImage changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.useHighContrastContactImage = isOn
+                }
+            )
+        }
+    }
+
     func uiView(index: Int) -> UIView? {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
 
@@ -115,50 +147,7 @@ class SettingsViewContactImageSettingsViewModel: NSObject, SettingsViewModelProt
 //            if authorizationStatus == .denied || authorizationStatus == .restricted { return nil }
             
             return UISwitch(isOn: UserDefaults.standard.enableContactImage, action: { (isOn: Bool) in
-                trace("enableContactImage changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .info, isOn.description)
-                
-                // if setting to false, then no need to check authorization status
-                if !isOn {
-                    UserDefaults.standard.enableContactImage = false
-                    return
-                }
-                
-                let status = CNContactStore.authorizationStatus(for: .contacts)
-                
-                // check authorization status
-                switch status {
-                case .notDetermined:
-                    self.contactStore.requestAccess(for: .contacts) { (granted, error) in
-                        DispatchQueue.main.async {
-                            if !granted {
-                                trace("CNContactStore access not granted", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel , type: .error)
-                                UserDefaults.standard.enableContactImage = false
-                            } else {
-                                trace("CNContactStore access granted", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .info)
-                                UserDefaults.standard.enableContactImage = true
-                            }
-                        }
-                    }
-                    
-                case .restricted:
-                    trace("CNContactStore access restricted, according to apple doc 'possibly due to active restrictions such as parental controls being in place'", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
-                    UserDefaults.standard.enableContactImage = false
-                    
-                case .denied:
-                    trace("CNContactStore access denied by user", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
-                    UserDefaults.standard.enableContactImage = false
-                    
-                case .limited:
-                    trace("CNContactStore access is limited by user, Full Access is required", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
-                    UserDefaults.standard.enableContactImage = false
-                    
-                case .authorized:
-                    trace("CNContactStore access authorized", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
-                    UserDefaults.standard.enableContactImage = true
-                    
-                default:
-                    trace("unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
-                }
+                self.setContactImageEnabled(isOn)
             })
             
         case .displayTrend:
@@ -172,6 +161,53 @@ class SettingsViewContactImageSettingsViewModel: NSObject, SettingsViewModelProt
                 trace("useHighContrastContactImage changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .info, isOn.description)
                 UserDefaults.standard.useHighContrastContactImage = isOn
             })
+        }
+    }
+
+    private func setContactImageEnabled(_ isOn: Bool) {
+        trace("enableContactImage changed by user to %{public}@", log: log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .info, isOn.description)
+
+        // if setting to false, then no need to check authorization status
+        if !isOn {
+            UserDefaults.standard.enableContactImage = false
+            return
+        }
+
+        let status = CNContactStore.authorizationStatus(for: .contacts)
+
+        // check authorization status
+        switch status {
+        case .notDetermined:
+            contactStore.requestAccess(for: .contacts) { (granted, error) in
+                DispatchQueue.main.async {
+                    if !granted {
+                        trace("CNContactStore access not granted", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel , type: .error)
+                        UserDefaults.standard.enableContactImage = false
+                    } else {
+                        trace("CNContactStore access granted", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .info)
+                        UserDefaults.standard.enableContactImage = true
+                    }
+                }
+            }
+
+        case .restricted:
+            trace("CNContactStore access restricted, according to apple doc 'possibly due to active restrictions such as parental controls being in place'", log: log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
+            UserDefaults.standard.enableContactImage = false
+
+        case .denied:
+            trace("CNContactStore access denied by user", log: log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
+            UserDefaults.standard.enableContactImage = false
+
+        case .limited:
+            trace("CNContactStore access is limited by user, Full Access is required", log: log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
+            UserDefaults.standard.enableContactImage = false
+
+        case .authorized:
+            trace("CNContactStore access authorized", log: log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
+            UserDefaults.standard.enableContactImage = true
+
+        default:
+            trace("unknown case returned when authorizing EKEventStore ", log: log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .error)
         }
     }
     

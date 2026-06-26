@@ -86,32 +86,14 @@ private struct SettingsAppBannerView: View {
     }
 
     private var appIcon: some View {
-        Group {
-            if let uiImage = Self.appIconImage {
-                Image(uiImage: uiImage)
-                    .resizable()
-            } else {
-                Image("Settings")
-                    .resizable()
-            }
-        }
+        Image("AppIconPreview")
+            .resizable()
         .frame(width: 58, height: 58)
         .clipShape(RoundedRectangle(cornerRadius: 13, style: .continuous))
     }
 
     private var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "unknown"
-    }
-
-    private static var appIconImage: UIImage? {
-        guard let icons = Bundle.main.infoDictionary?["CFBundleIcons"] as? [String: Any],
-              let primaryIcon = icons["CFBundlePrimaryIcon"] as? [String: Any],
-              let iconFiles = primaryIcon["CFBundleIconFiles"] as? [String],
-              let iconName = iconFiles.last else {
-            return nil
-        }
-
-        return UIImage(named: iconName)
     }
 }
 
@@ -191,6 +173,7 @@ private enum SettingsOnlineHelp {
 struct SettingsGroupedRow {
     let id: String
     let title: String
+    var detail: (() -> String?)? = nil
     let settingsScreen: () -> SettingsScreen
 }
 
@@ -274,6 +257,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                 SettingsGroupedRow(
                     id: "sharingServices.nightscout",
                     title: Texts_SettingsView.sectionTitleNightscout,
+                    detail: {
+                        UserDefaults.standard.nightscoutEnabled ? Texts_Common.enabled : Texts_Common.disabled
+                    },
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleNightscout,
@@ -284,6 +270,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                 SettingsGroupedRow(
                     id: "sharingServices.dexcomShare",
                     title: Texts_SettingsView.sectionTitleDexcomShareUpload,
+                    detail: {
+                        UserDefaults.standard.uploadReadingstoDexcomShare ? Texts_Common.enabled : Texts_Common.disabled
+                    },
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleDexcomShareUpload,
@@ -294,6 +283,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                 SettingsGroupedRow(
                     id: "sharingServices.healthKit",
                     title: Texts_SettingsView.sectionTitleHealthKit,
+                    detail: {
+                        UserDefaults.standard.storeReadingsInHealthkit ? Texts_Common.enabled : Texts_Common.disabled
+                    },
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleHealthKit,
@@ -304,6 +296,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                 SettingsGroupedRow(
                     id: "sharingServices.calendarEvents",
                     title: Texts_SettingsView.calendarEventsSectionTitle,
+                    detail: {
+                        UserDefaults.standard.createCalendarEvent ? Texts_Common.enabled : Texts_Common.disabled
+                    },
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.calendarEventsSectionTitle,
@@ -314,6 +309,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                 SettingsGroupedRow(
                     id: "sharingServices.contactImage",
                     title: Texts_SettingsView.contactImageSectionTitle,
+                    detail: {
+                        UserDefaults.standard.enableContactImage ? Texts_Common.enabled : Texts_Common.disabled
+                    },
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.contactImageSectionTitle,
@@ -324,6 +322,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                 SettingsGroupedRow(
                     id: "sharingServices.osAidLoopShare",
                     title: Texts_SettingsView.osAidLoopShareSectionTitle,
+                    detail: {
+                        UserDefaults.standard.loopShareType.description
+                    },
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.osAidLoopShareSectionTitle,
@@ -334,6 +335,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                 SettingsGroupedRow(
                     id: "sharingServices.speakReadings",
                     title: Texts_SettingsView.sectionTitleSpeak,
+                    detail: {
+                        UserDefaults.standard.speakReadings ? Texts_Common.enabled : Texts_Common.disabled
+                    },
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleSpeak,
@@ -363,6 +367,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
             SettingsRow(
                 id: row.id,
                 title: row.title,
+                detail: row.detail?(),
                 accessory: .disclosure,
                 action: .settingsScreen(row.settingsScreen)
             )
@@ -378,7 +383,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
     }
 
     func detailedText(index: Int) -> String? {
-        nil
+        rows[index].detail?()
     }
 
     func uiView(index: Int) -> UIView? {

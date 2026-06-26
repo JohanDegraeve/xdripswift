@@ -516,6 +516,42 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
             return nil
         }
     }
+
+    func settingsToggle(index: Int) -> SettingsToggleControl? {
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .nightscoutEnabled:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.nightscoutEnabled },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("nightscoutEnabled changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNightscoutSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.nightscoutEnabled = isOn
+                }
+            )
+        case .useSchedule:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.nightscoutUseSchedule },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("useSchedule changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNightscoutSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.nightscoutUseSchedule = isOn
+                }
+            )
+        case .uploadSensorStartTime:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.uploadSensorStartTimeToNS },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("uploadSensorStartTime changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNightscoutSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.uploadSensorStartTimeToNS = isOn
+                }
+            )
+        default:
+            return nil
+        }
+    }
     
     func uiView(index: Int) -> UIView? {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }

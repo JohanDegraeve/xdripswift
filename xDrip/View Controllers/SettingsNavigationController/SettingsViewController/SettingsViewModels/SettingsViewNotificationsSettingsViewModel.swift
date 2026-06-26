@@ -246,6 +246,42 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
             return UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat ? UserDefaults.standard.liveActivityType.description : Texts_SettingsView.liveActivityDisabledInFollowerMode
         }
     }
+
+    func settingsToggle(index: Int) -> SettingsToggleControl? {
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .showReadingInNotification:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.showReadingInNotification },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("showReadingInNotification changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.showReadingInNotification = isOn
+                }
+            )
+        case .showReadingInAppBadge:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.showReadingInAppBadge },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("showReadingInAppBadge changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.showReadingInAppBadge = isOn
+                }
+            )
+        case .multipleAppBadgeValueWith10:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.multipleAppBadgeValueWith10 },
+                setIsOn: { [weak self] isOn in
+                    guard let self else { return }
+                    trace("multipleAppBadgeValueWith10 changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
+                    UserDefaults.standard.multipleAppBadgeValueWith10 = isOn
+                }
+            )
+        case .notificationInterval, .liveActivityType:
+            return nil
+        }
+    }
     
     func uiView(index: Int) -> UIView? {
         
