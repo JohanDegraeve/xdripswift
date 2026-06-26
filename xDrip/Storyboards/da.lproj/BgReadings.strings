@@ -38,3 +38,8 @@
 
 /// the slope arrow of the glucose reading
 "slopeArrow" = "Slope arrow";
+
+"glucoseRange" = "Glukoseområde";
+"bgRangeUrgent" = "Akut";
+"bgRangeNotUrgent" = "Ikke akut";
+"bgRangeInRange" = "I område";

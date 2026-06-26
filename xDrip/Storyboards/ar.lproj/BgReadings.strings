@@ -38,3 +38,8 @@
 
 /// the slope arrow of the glucose reading
 "slopeArrow" = "Slope arrow";
+
+"glucoseRange" = "نطاق الغلوكوز";
+"bgRangeUrgent" = "عاجل";
+"bgRangeNotUrgent" = "غير عاجل";
+"bgRangeInRange" = "ضمن النطاق";

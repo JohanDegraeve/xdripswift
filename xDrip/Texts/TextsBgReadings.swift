@@ -63,6 +63,22 @@ enum Texts_BgReadings {
     static let finalGlucose: String = {
         return NSLocalizedString("finalGlucose", tableName: filename, bundle: Bundle.main, value: "Glucose Value", comment: "final glucose value after post processing")
     }()
+
+    static let glucoseRange: String = {
+        return NSLocalizedString("glucoseRange", tableName: filename, bundle: Bundle.main, value: "Glucose Range", comment: "glucose range row title")
+    }()
+
+    static let bgRangeUrgent: String = {
+        return NSLocalizedString("bgRangeUrgent", tableName: filename, bundle: Bundle.main, value: "Urgent", comment: "urgent glucose range description")
+    }()
+
+    static let bgRangeNotUrgent: String = {
+        return NSLocalizedString("bgRangeNotUrgent", tableName: filename, bundle: Bundle.main, value: "Not Urgent", comment: "not urgent glucose range description")
+    }()
+
+    static let bgRangeInRange: String = {
+        return NSLocalizedString("bgRangeInRange", tableName: filename, bundle: Bundle.main, value: "In Range", comment: "in range glucose range description")
+    }()
     
     static let slopeArrow: String = {
         return NSLocalizedString("slopeArrow", tableName: filename, bundle: Bundle.main, value: "Slope Arrow", comment: "the slope arrow of the glucose reading")

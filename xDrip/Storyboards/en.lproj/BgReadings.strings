@@ -17,3 +17,7 @@
 "adjustedValue" = "Adjusted Value";
 "smoothedValue" = "Smoothed Value";
 "finalValue" = "Final Value";
+"glucoseRange" = "Glucose Range";
+"bgRangeUrgent" = "Urgent";
+"bgRangeNotUrgent" = "Not Urgent";
+"bgRangeInRange" = "In Range";

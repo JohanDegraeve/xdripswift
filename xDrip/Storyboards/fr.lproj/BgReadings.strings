@@ -38,3 +38,8 @@
 
 /// the slope arrow of the glucose reading
 "slopeArrow" = "Slope arrow";
+
+"glucoseRange" = "Plage de glycémie";
+"bgRangeUrgent" = "Urgent";
+"bgRangeNotUrgent" = "Non urgent";
+"bgRangeInRange" = "Dans la plage";

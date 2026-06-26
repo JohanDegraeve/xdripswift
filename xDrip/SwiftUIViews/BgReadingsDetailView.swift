@@ -22,10 +22,13 @@ struct BgReadingsDetailView: View {
     // MARK: - SwiftUI views
     
     var body: some View {
+        let bgRangeDescription = bgReading.bgRangeDescription()
+
         List {
             Section(header: Text(Texts_BgReadings.generalSectionHeader)) {
                 row(title: Texts_BgReadings.deviceName, data: bgReading.deviceName ?? nilString)
-                row(title: Texts_BgReadings.finalGlucose, data: displayBgValue(bgReading.finalValue), indicatorColor: bgRangeIndicatorColor(bgRangeDescription: bgReading.bgRangeDescription()))
+                row(title: Texts_BgReadings.finalGlucose, data: displayBgValue(bgReading.finalValue))
+                row(title: Texts_BgReadings.glucoseRange, data: bgRangeDescriptionText(bgRangeDescription), indicatorColor: bgRangeIndicatorColor(bgRangeDescription: bgRangeDescription))
                 row(title: Texts_BgReadings.timestamp, data: bgReading.timeStamp.formatted(date: .abbreviated, time: .shortened))
             }
             
@@ -102,7 +105,18 @@ struct BgReadingsDetailView: View {
         return displayBgValue(valueInMgDl)
     }
 
-    /// Returns the colour for the small dot shown before the final glucose value.
+    private func bgRangeDescriptionText(_ bgRangeDescription: BgRangeDescription) -> String {
+        switch bgRangeDescription {
+        case .inRange:
+            return Texts_BgReadings.bgRangeInRange
+        case .notUrgent:
+            return Texts_BgReadings.bgRangeNotUrgent
+        case .urgent:
+            return Texts_BgReadings.bgRangeUrgent
+        }
+    }
+
+    /// Returns the colour for the small dot shown before the glucose range text.
     /// This uses the same range decision as the readings list so the detail view
     /// stays visually consistent.
     private func bgRangeIndicatorColor(bgRangeDescription: BgRangeDescription) -> Color {

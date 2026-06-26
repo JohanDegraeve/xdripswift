@@ -38,3 +38,8 @@
 
 /// the slope arrow of the glucose reading
 "slopeArrow" = "Slope arrow";
+
+"glucoseRange" = "Диапазон глюкозы";
+"bgRangeUrgent" = "Срочно";
+"bgRangeNotUrgent" = "Не срочно";
+"bgRangeInRange" = "В диапазоне";

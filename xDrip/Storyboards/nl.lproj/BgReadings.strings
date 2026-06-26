@@ -10,3 +10,7 @@
 "id" = "ID";
 "deviceName" = "Toestelnaam";
 "rawData" = "Ruwe data";
+"glucoseRange" = "Glucosebereik";
+"bgRangeUrgent" = "Urgent";
+"bgRangeNotUrgent" = "Niet urgent";
+"bgRangeInRange" = "Binnen bereik";

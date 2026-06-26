@@ -10,3 +10,7 @@
 "id" = "ID";
 "deviceName" = "Dispositivo";
 "rawData" = "Valor interno";
+"glucoseRange" = "Rango de glucosa";
+"bgRangeUrgent" = "Urgente";
+"bgRangeNotUrgent" = "No urgente";
+"bgRangeInRange" = "En rango";
