@@ -16,26 +16,26 @@
 "settingsviews_masterorfollower" = "Master of Volger";
 "settingsviews_master" = "Master";
 "settingsviews_follower" = "Volger";
-"settingsviews_showReadingInNotification" = "Toon BG in Notificaties";
-"settingsviews_labelShowReadingInAppBadge" = "Toon BG in de App Badge";
-"settingsviews_multipleAppBadgeValueWith10" = "Vermenigvuldig App Badge Meting met 10";
-"settingsviews_showClockWhenScreenIsLocked" = "Toon klok indien gelockt";
+"settingsviews_showReadingInNotification" = "Glucosemeldingen";
+"settingsviews_labelShowReadingInAppBadge" = "Appbadge";
+"settingsviews_multipleAppBadgeValueWith10" = "Appbadge x10";
+"settingsviews_showClockWhenScreenIsLocked" = "Klok op vergrendelscherm";
 "settingsviews_urgentHighValue" = "Urgent Hoge Waarde";
 "settingsviews_highValue" = "Hoge Waarde";
 "settingsviews_targetValue" = "Doel Waarde";
 "settingsviews_targetValueMessage" = "Zet op 0 om doelwaarde uit te schakelen";
 "settingsviews_lowValue" = "Lage Waarde";
 "settingsviews_urgentLowValue" = "Urgent Lage Waarde";
-"settingsviews_showcoloredobjectives" = "Toon Gekleurde Lijnen";
-"settingsviews_showtarget" = "Toon Doel Lijn";
+"settingsviews_showcoloredobjectives" = "Gekleurde lijnen";
+"settingsviews_showtarget" = "Doellijn";
 "settingsviews_sectiontitlestatistics" = "Statistieken";
 "settingsviews_showStatistics" = "Toon Statistieken";
 "settingsviews_daysToUseStatisticsTitle" = "Hoeveel dagen berekenen";
 "settingsviews_daysToUseStatisticsMessage" = "Maximum aantal dagen te gebruiken om de statistieken te berekenen?\n\n(0 betekent vanaf vandaag 00:00)";
-"settingsviews_useIFCCA1C" = "Toon HbA1c in mmols/mol";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmitter";
 "settingsviews_givetransmitterid" = "Voer Transmitter ID In";
-"settingsviews_nonfixedtransmitter" = "Schakel Meerpuntskalibratie In";
+"settingsviews_nonfixedtransmitter" = "Meerpuntskalibratie";
 "settingsviews_labelNonFixed" = "Meerpuntskalibratie";
 "settingsviews_labelAlgorithmType" = "Type algoritme";
 "settingsviews_labelCalibrationTitle" = "Sensor Kalibratie";
@@ -44,11 +44,11 @@
 "settingsviews_row_alert_types" = "Alarm Types";
 "settingsviews_row_alerts" = "Alarmen";
 "settingsviews_sectiontitlehealthkit" = "Apple Gezondheid";
-"settingsviews_healthkit" = "Schrijf Data naar Apple Gezondheid";
-"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
-"settingsviews_uploadReadingstoDexcomShare" = "Uploaden naar Dexcom Share";
+"settingsviews_healthkit" = "Schrijf naar Apple Gezondheid";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Uploaden";
 "settingsviews_dexcomShareUploadSerialNumber" = "Ontvanger Serie Nummer";
-"settingsviews_useUSDexcomShareurl" = "Gebruik Dexcom US Servers";
+"settingsviews_useUSDexcomShareurl" = "US-servers";
 "settingsviews_dexcomShareAccountName" = "Account Naam";
 "settingsviews_giveDexcomShareAccountName" = "Voer Dexcom Share Account Nama In";
 "settingsviews_giveDexcomSharePassword" = "Voer Dexcom Share Wachtwoord In";
@@ -65,8 +65,7 @@
 "timeScheduleViewTitle" = "Aan/Uit Tijdschema Voor ";
 "uploadSensorStartTime" = "Upload Sensor Start Tijd";
 "testUrlAndAPIKey" = "Test Verbinding";
-"settingsviews_sectiontitlespeak" = "Spraak";
-"settingsviews_speakBgReadings" = "Spreek BG Metingen Uit";
+"settingsviews_speakBgReadings" = "Spreek glucose";
 "settingsviews_speakBgReadingslanguage" = "Taal";
 "settingsviews_speakreadingslanguageselection" = "Selecteer Taal";
 "settingsviews_speakTrend" = "Spreek Trend Uit";
@@ -84,9 +83,9 @@
 "m5stack_settingsviews_brightness" = "Schermhelderheid";
 "createCalendarEvent" = "Creëer Agenda Activiteit";
 "calenderId" = "Te Gebruiken Agenda";
-"settingsviews_displayTrendInCalendarEvent" = "Toon Trend";
-"displayUnitInCalendarEvent" = "Toon Eenheid";
-"displayDeltaInCalendarEvent" = "Toon Delta";
+"settingsviews_displayTrendInCalendarEvent" = "Trend";
+"displayUnitInCalendarEvent" = "Eenheid";
+"displayDeltaInCalendarEvent" = "Delta";
 "infoCalendarAccessDeniedByUser" = "In het verleden heb je toegang geweigerd tot je Agenda.\n\nGa naar iPhone-instellingen > Apps > %@ > Agenda's en kies 'Volledige toegang'.";
 "infoCalendarAccessWriteOnly" = "Je kunt Agenda Activiteiten niet gebruiken totdat je de Agenda-toegang hebt gewijzigd van 'Voeg alleen activiteiten toe' naar 'Volledige toegang'.\n\nGa naar iPhone-instellingen > Apps > %@ > Agenda's en kies 'Volledige toegang'.";
 "infoCalendarAccessRestricted" = "Geen toegang voor %@ tot je agenda. Dit komt waarschijnlijk door actieve beperkingen zoals Ouderlijk Toezicht.";
@@ -136,7 +135,7 @@
 "settingsviews_translateOnlineHelp" = "Documentatie vertalen";
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Allow Chart Rotation";
+"settingsviews_allowScreenRotation" = "Grafiekrotatie";
 
 /// help settings, section title
 
@@ -151,7 +150,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
+"settingsviews_webooptransmitter" = "Zenderalgoritme";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
@@ -220,7 +219,7 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
 
 /// statistics settings, the type of time in range selected
-"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
 "settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
@@ -315,7 +314,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dimmen vergrendelscherm";
 
 /// Should loop data be shared only every 5 minutes
 

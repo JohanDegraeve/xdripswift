@@ -17,25 +17,25 @@
 "settingsviews_masterorfollower" = "Isäntä vai seuraaja";
 "settingsviews_master" = "Isäntä";
 "settingsviews_follower" = "Seuraaja";
-"settingsviews_showReadingInNotification" = "Näytä lukema ilmoituksissa";
-"settingsviews_labelShowReadingInAppBadge" = "Näytä lukema kuvakkeessa";
-"settingsviews_multipleAppBadgeValueWith10" = "Kerrotaanko kuvake lukemat 10:llä";
+"settingsviews_showReadingInNotification" = "Glukoosi-ilmoitukset";
+"settingsviews_labelShowReadingInAppBadge" = "Apin merkki";
+"settingsviews_multipleAppBadgeValueWith10" = "Apin merkki x10";
 "settingsviews_sectiontitletransmitter" = "Lähetin";
 "settingsviews_transmittertype" = "Lähettimen tyyppi";
 "settingsviews_transmitterid" = "Lähettimen ID";
 "settingsviews_transmitterid_text_for_button" = "Lähettimen ID";
 "settingsviews_givetransmitterid" = "Anna lähetettimen ID";
-"settingsviews_nonfixedtransmitter" = "Käytä monipistekalibrointia";
+"settingsviews_nonfixedtransmitter" = "Monipistekalibrointi";
 "settingsviews_labelNonFixed" = "Monipistekalibrointi";
 "settingsviews_sectiontitlealerting" = "Hälytys";
 "settingsviews_row_alert_types" = "Hälytystyypit";
 "settingsviews_row_alerts" = "Hälytykset";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
-"settingsviews_healthkit" = "Kirjoita data Apple Healthiin";
-"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
-"settingsviews_uploadReadingstoDexcomShare" = "Lähetä Dexcom Share palveluun";
+"settingsviews_healthkit" = "Kirjoita Apple Healthiin";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Lähetä";
 "settingsviews_dexcomShareUploadSerialNumber" = "Vastaanottimen sarjanumero";
-"settingsviews_useUSDexcomShareurl" = "Käytä Dexcom US palvelimia";
+"settingsviews_useUSDexcomShareurl" = "US-palvelimet";
 "settingsviews_dexcomShareAccountName" = "Käyttäjätunnus";
 "settingsviews_giveDexcomShareAccountName" = "Anna Dexcom Sharen käyttäjätunnus";
 "settingsviews_giveDexcomSharePassword" = "Anna Dexcom Sharen salasana";
@@ -52,8 +52,7 @@
 "timeScheduleViewTitle" = "Päällä/pois aikataulu ";
 "uploadSensorStartTime" = "Lähetä sensorin aloitusaika";
 "testUrlAndAPIKey" = "Testaa Nightscout URL ja API_SECRET";
-"settingsviews_sectiontitlespeak" = "Ääni";
-"settingsviews_speakBgReadings" = "Puhu vs. lukemat";
+"settingsviews_speakBgReadings" = "Puhu glukoosi";
 "settingsviews_speakBgReadingslanguage" = "Kieli";
 "settingsviews_speakreadingslanguageselection" = "Valitse kieli";
 "settingsviews_speakTrend" = "Puhu suunta";
@@ -71,9 +70,9 @@
 "m5stack_settingsviews_brightness" = "Näytön kirkkaus";
 "createCalendarEvent" = "Luo kalenteritapahtumat";
 "calenderId" = "Käytettävä kalenteri";
-"settingsviews_displayTrendInCalendarEvent" = "Näytä suunta";
-"displayUnitInCalendarEvent" = "Näytä yksikkö";
-"displayDeltaInCalendarEvent" = "Näytä erotus";
+"settingsviews_displayTrendInCalendarEvent" = "Suunta";
+"displayUnitInCalendarEvent" = "Yksikkö";
+"displayDeltaInCalendarEvent" = "Erotus";
 "infoCalendarAccessDeniedByUser" = "Olet aiemmin kieltänyt pääsyn kalenteriin.\n\nOttaaksesi sen käyttöön, siirry laitteen asetuksiin, tietosuojaan, kalentereihin ja ota käyttöön.";
 "infoCalendarAccessRestricted" = "Et voi antaa %@:lle valtuutusta käyttää kalenteriasi. Tämä johtuu mahdollisesti aktiivisista rajoituksista, kuten vanhempien valvonnasta";
 "sectionTitleTrace" = "Ongelmien raportointi";
@@ -89,8 +88,8 @@
 "debugLevel" = "Sisällytä debug taso";
 "warningChangeFromMasterToFollower" = "Vaihtaminen masterista seuraajaan pysäyttää nykyisen anturin. Haluatko jatkaa?";
 "nightscoutPort" = "Portti";
-"settingsviews_showcoloredobjectives" = "Näytä värilliset tavoiteviivat ";
-"settingsviews_showtarget" = "Näytä kohdeviiva";
+"settingsviews_showcoloredobjectives" = "Värilliset viivat";
+"settingsviews_showtarget" = "Kohdeviiva";
 "settingsviews_targetValue" = "Tavoitearvo";
 
 /// deloper settings, row title for 'Smooth Libre Values?'
@@ -112,7 +111,7 @@
 "settingsviews_sectiontitlestatistics" = "Tilastot";
 
 /// statistics settings, use IFCC method for HbA1c?
-"settingsviews_useIFCCA1C" = "Näytä HbA1c mmol/mol muodossa";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 
 /// statistics settings, show statistics on home screen
 "settingsviews_showStatistics" = "Näytä tilastot";
@@ -121,13 +120,13 @@
 "settingsviews_daysToUseStatisticsTitle" = "Päiviä laskutoimitukseen";
 
 /// general settings, should the clock also be displayed when the screen is locked?
-"settingsviews_showClockWhenScreenIsLocked" = "Näytetäänkö kello kun näyttö on lukittuna";
+"settingsviews_showClockWhenScreenIsLocked" = "Lukitusnäytön kello";
 
 /// general settings, should the online help be translated automatically if needed
 "settingsviews_translateOnlineHelp" = "Käännä dokumentaatio";
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Salli kaavion kierto";
+"settingsviews_allowScreenRotation" = "Kaavion kierto";
 
 /// help settings, section title
 
@@ -138,7 +137,7 @@
 "settingsviews_showOnlineHelp" = "Avaa online ohje";
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Käytä lähettimen algoritmiä";
+"settingsviews_webooptransmitter" = "Lähettimen algoritmi";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip tai lähetin algoritmi";
@@ -204,7 +203,7 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
 
 /// statistics settings, the type of time in range selected
-"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
 "settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
@@ -302,7 +301,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Lukitusnäytön himmennys";
 
 /// Should loop data be shared only every 5 minutes
 

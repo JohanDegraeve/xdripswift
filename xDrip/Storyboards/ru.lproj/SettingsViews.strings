@@ -14,19 +14,19 @@
 "settingsviews_masterorfollower" = "Главный или подписчик";
 "settingsviews_master" = "Главный";
 "settingsviews_follower" = "Подписчик";
-"settingsviews_showReadingInNotification" = "Показывать ГК в уведомлениях";
-"settingsviews_labelShowReadingInAppBadge" = "Показывать ГК на иконке прил.";
-"settingsviews_multipleAppBadgeValueWith10" = "Умножить ГК на иконке на 10";
-"settingsviews_allowScreenRotation" = "Разрешить переворачивать график";
+"settingsviews_showReadingInNotification" = "Уведомления о глюкозе";
+"settingsviews_labelShowReadingInAppBadge" = "Бейдж приложения";
+"settingsviews_multipleAppBadgeValueWith10" = "Бейдж приложения x10";
+"settingsviews_allowScreenRotation" = "Поворот графика";
 "settingsviews_showMiniChart" = "Показать мини-диаграмму";
-"settingsviews_showClockWhenScreenIsLocked" = "Показывать часы при блок.";
+"settingsviews_showClockWhenScreenIsLocked" = "Часы на экране блокировки";
 "settingsviews_urgentHighValue" = "Очень высокий уровень";
 "settingsviews_highValue" = "Высокий уровень";
 "settingsviews_targetValue" = "Целевое значение";
 "settingsviews_lowValue" = "Низкое значение";
 "settingsviews_urgentLowValue" = "Опасно низкое значение";
-"settingsviews_showcoloredobjectives" = "Показывать цветные линии";
-"settingsviews_showtarget" = "Показать целевую линию";
+"settingsviews_showcoloredobjectives" = "Цветные линии";
+"settingsviews_showtarget" = "Целевая линия";
 "settingsviews_sectiontitletreatments" = "Терапия";
 "settingsviews_showTreatments" = "Показать лечение на графике";
 "settingsviews_smallBolusTreatmentThreshold" = "Пороговое значение микроболюса";
@@ -35,13 +35,13 @@
 "settingsviews_showStatistics" = "Показывать статистику";
 "settingsviews_daysToUseStatisticsTitle" = "Дней для расчета";
 "settingsviews_daysToUseStatisticsMessage" = "Максимальное количество дней, которые мы должны попытаться использовать для расчета статистики?\n\n(Введите 0, чтобы рассчитать сегодня с полуночи)";
-"settingsviews_useIFCCA1C" = "Показывать HbA1c в mmols/mol";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Транисмиттер";
 "settingsviews_transmittertype" = "Тип трансмиттера";
 "settingsviews_transmitterid" = "Идентификатор трансмиттера";
 "settingsviews_transmitterid_text_for_button"  = "Идентификатор трансмиттера";
 "settingsviews_givetransmitterid" = "Введите идентификатор трансмиттера";
-"settingsviews_webooptransmitter" = "Калибровка трансмиттера";
+"settingsviews_webooptransmitter" = "Алгоритм трансмиттера";
 "settingsviews_nonfixedtransmitter" = "Многоточечная калибровка";
 "settingsviews_labelNonFixed" = "Многоточечная калибровка";
 "settingsviews_labelWebOOP" = "Калибровка xDrip или Трансмиттер";
@@ -49,11 +49,11 @@
 "settingsviews_row_alert_types" = "Типы сигналов тревоги";
 "settingsviews_row_alerts" = "Уведомления";
 "settingsviews_sectiontitlehealthkit" = "Apple Здоровье";
-"settingsviews_healthkit" = "Записывать данные в Здоровье";
-"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
-"settingsviews_uploadReadingstoDexcomShare" = "Загружать в Dexcom Share";
+"settingsviews_healthkit" = "Записывать в Здоровье";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Загружать";
 "settingsviews_dexcomShareUploadSerialNumber" = "Серийный номер приемника";
-"settingsviews_useUSDexcomShareurl" = "Использовать Dexcom US сервер";
+"settingsviews_useUSDexcomShareurl" = "Серверы US";
 "settingsviews_dexcomShareAccountName" = "Имя аккаунта";
 "settingsviews_giveDexcomShareAccountName" = "Введите Dexcom Share имя аккаунта";
 "settingsviews_giveDexcomSharePassword" = "Введите Dexcom Share пароль";
@@ -70,8 +70,7 @@
 "timeScheduleViewTitle" = "Вкл/выкл расписание для ";
 "uploadSensorStartTime" = "Время начала загрузки сенсора";
 "testUrlAndAPIKey" = "Протестировать соединение";
-"settingsviews_sectiontitlespeak" = "Звук";
-"settingsviews_speakBgReadings" = "Проговаривать уровень глюкозы";
+"settingsviews_speakBgReadings" = "Проговаривать глюкозу";
 "settingsviews_speakBgReadingslanguage" = "Язык";
 "settingsviews_speakreadingslanguageselection" = "Выберите язык";
 "settingsviews_speakTrend" = "Говорить тенденцию";
@@ -90,9 +89,9 @@
 "calendarEventsSectionTitle" = "События календаря";
 "createCalendarEvent" = "Создавать событие в календаре";
 "calenderId" = "Календарь для использования";
-"settingsviews_displayTrendInCalendarEvent" = "Показывать тенденцию";
-"displayUnitInCalendarEvent" = "Показывать единицы";
-"displayDeltaInCalendarEvent" = "Показывать дельту";
+"settingsviews_displayTrendInCalendarEvent" = "Тенденция";
+"displayUnitInCalendarEvent" = "Единицы";
+"displayDeltaInCalendarEvent" = "Дельта";
 "infoCalendarAccessDeniedByUser" = "Ранее вы запретили доступ к своему календарю.\n\nЧтобы включить его, перейдите в настройки устройства, конфиденциальность, календари и включите его.";
 "infoCalendarAccessRestricted" = "Вы не можете разрешить %@ доступ к вашему календарю. Возможно, это связано с активными ограничениями, такими как родительский контроль.";
 "sectionTitleTrace" = "Сообщение о проблеме";
@@ -154,7 +153,7 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
 
 /// statistics settings, the type of time in range selected
-"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
 "settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
@@ -234,7 +233,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Затемнение экрана блокировки";
 
 /// Should loop data be shared only every 5 minutes
 

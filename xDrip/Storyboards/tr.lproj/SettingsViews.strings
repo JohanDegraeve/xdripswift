@@ -14,41 +14,41 @@
 "settingsviews_masterorfollower" = "Sahip veya Takipci";
 "settingsviews_master" = "Sahip";
 "settingsviews_follower" = "Takipci";
-"settingsviews_showReadingInNotification" = "Bildirimlerde KŞ gösterilsin mi";
-"settingsviews_labelShowReadingInAppBadge" = "Uygulama Rozetinde KŞ gösterilsin mi";
-"settingsviews_multipleAppBadgeValueWith10" = "Uygulama Rozeti Okuması 10 ile Çarpılsın mı";
-"settingsviews_allowScreenRotation" = "Grafik Döndürmeye İzin Verilsin mi";
-"settingsviews_showClockWhenScreenIsLocked" = "Kilitliyken Saati Göstersin mi";
+"settingsviews_showReadingInNotification" = "Glikoz bildirimleri";
+"settingsviews_labelShowReadingInAppBadge" = "Uygulama rozeti";
+"settingsviews_multipleAppBadgeValueWith10" = "Uygulama rozeti x10";
+"settingsviews_allowScreenRotation" = "Grafik döndürme";
+"settingsviews_showClockWhenScreenIsLocked" = "Kilit ekranı saati";
 "settingsviews_urgentHighValue" = "Acil Yüksek Değer";
 "settingsviews_highValue" = "Yüksek Değer";
 "settingsviews_targetValue" = "Hedef Değer";
 "settingsviews_lowValue" = "Düşük Değer";
 "settingsviews_urgentLowValue" = "Acil Düşük Değer";
-"settingsviews_showcoloredobjectives" = "Renkli Çizgileri Göstersin mi";
-"settingsviews_showtarget" = "Hedef Çizgiyi Göstersin mi";
+"settingsviews_showcoloredobjectives" = "Renkli çizgiler";
+"settingsviews_showtarget" = "Hedef çizgi";
 "settingsviews_sectiontitlestatistics" = "İstatistik";
 "settingsviews_showStatistics" = "İstatistikleri Göstersin mi";
 "settingsviews_daysToUseStatisticsTitle" = "Hesaplanacak Günler";
 "settingsviews_daysToUseStatisticsMessage" = "İstatistikleri hesaplamak için kullanmaya çalışmamız gereken maksimum gün sayısı?\n\n(Gece yarısından itibaren bugünü hesaplamak için 0 girin)";
-"settingsviews_useIFCCA1C" = "HbA1c'yi mmol/mol olarak göstersin";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Verici";
 "settingsviews_transmittertype" = "Verici Tipi";
 "settingsviews_transmitterid" = "Verici Kimliği";
 "settingsviews_transmitterid_text_for_button"  = "Verici Kimliği";
 "settingsviews_givetransmitterid" = "Verici Kimliğine Gir";
-"settingsviews_webooptransmitter" = "Verici algorithması Kullanılsın mı";
-"settingsviews_nonfixedtransmitter" = "Çok Noktalı Kalibrasyon Etkinleştirilsin mi";
+"settingsviews_webooptransmitter" = "Verici algoritması";
+"settingsviews_nonfixedtransmitter" = "Çok noktalı kalibrasyon";
 "settingsviews_labelNonFixed" = "Çok Noktalı Kalibrasyon";
 "settingsviews_labelWebOOP" = "xDrip veya Verici algorithması";
 "settingsviews_sectiontitlealerting" = "Uyarılar";
 "settingsviews_row_alert_types" = "Uyarı Türleri";
 "settingsviews_row_alerts" = "Uyarılar";
 "settingsviews_sectiontitlehealthkit" = "Apple Sağlık";
-"settingsviews_healthkit" = "Apple Sağlığa Veri Yazılsın mı";
-"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
-"settingsviews_uploadReadingstoDexcomShare" = "Dexcom Share'e yüklensin mi";
+"settingsviews_healthkit" = "Apple Sağlığa yaz";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Yükle";
 "settingsviews_dexcomShareUploadSerialNumber" = "Alıcı Seri Numarası";
-"settingsviews_useUSDexcomShareurl" = "Dexcom ABD Sunucuları Kullanılsın mı";
+"settingsviews_useUSDexcomShareurl" = "US sunucuları";
 "settingsviews_dexcomShareAccountName" = "Hesap Adı";
 "settingsviews_giveDexcomShareAccountName" = "Dexcom Share Hesabı Adını Girin";
 "settingsviews_giveDexcomSharePassword" = "Dexcom Share Parolasını Girin";
@@ -65,8 +65,7 @@
 "timeScheduleViewTitle" = "Açık/Kapalı Zaman Çizelgesi için ";
 "uploadSensorStartTime" = "Sensör Başlangıç Zamanı Yüklensin mi";
 "testUrlAndAPIKey" = "Bağlantıyı Test etsin mi";
-"settingsviews_sectiontitlespeak" = "Sesli Söyle";
-"settingsviews_speakBgReadings" = "KŞ değerlerini Söylesin mi";
+"settingsviews_speakBgReadings" = "Glikozu seslendir";
 "settingsviews_speakBgReadingslanguage" = "Dil";
 "settingsviews_speakreadingslanguageselection" = "Dil Seçin";
 "settingsviews_speakTrend" = "Eğilimi Söylesin mi";
@@ -85,9 +84,9 @@
 "calendarEventsSectionTitle" = "Takvim Etkinlikleri";
 "createCalendarEvent" = "Takvim Etkinlikleri Oluşturulsun mu";
 "calenderId" = "Takvim kullanılsın mı";
-"settingsviews_displayTrendInCalendarEvent" = "Eğilim gösterilsin mi";
-"displayUnitInCalendarEvent" = "Ünite gösterilsin mi";
-"displayDeltaInCalendarEvent" = "Delta gösterilsin mi";
+"settingsviews_displayTrendInCalendarEvent" = "Eğilim";
+"displayUnitInCalendarEvent" = "Birim";
+"displayDeltaInCalendarEvent" = "Delta";
 "infoCalendarAccessDeniedByUser" = "Daha önce Takviminize erişimi reddetmiştiniz.\n\nTakvimi etkinleştirmek için cihaz ayarlarınıza, gizliliğinize, takvimlerinize gidin ve etkinleştirin.";
 "infoCalendarAccessRestricted" = "Takviminize erişmesi için %@'a yetki veremezsiniz. Bu muhtemelen ebeveyn denetimlerinin yürürlükte olması gibi etkin kısıtlamalardan kaynaklanmaktadır.";
 "sectionTitleTrace" = "Sorun Raporlama";
@@ -144,7 +143,7 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
 
 /// statistics settings, the type of time in range selected
-"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
 "settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
@@ -263,7 +262,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Kilit ekranı karartma";
 
 /// Should loop data be shared only every 5 minutes
 

@@ -13,7 +13,7 @@
 "settingsviews_dexcomShareAccountName" = "Account Name";
 
 /// 
-"settingsviews_showcoloredobjectives" = "Show Colored Lines";
+"settingsviews_showcoloredobjectives" = "Кольорові лінії";
 
 /// transmitter settings, just the words that explain that the settings is about transmitter type
 "settingsviews_transmittertype" = "Transmitter Type";
@@ -34,7 +34,7 @@
 "m5stack_settingsviews_brightness" = "Screen Brightness";
 
 /// Calendar Events Settings - text in row where user needs to say if unit should be displayed or not
-"displayUnitInCalendarEvent" = "Display Unit";
+"displayUnitInCalendarEvent" = "Одиниця";
 
 /// name of setting for text color
 "m5stack_settingsviews_textColor" = "Text Color";
@@ -46,7 +46,7 @@
 "settingsviews_nightscoutUrl" = "URL";
 
 /// general settings, should reading be multiplied with 10 yes or no
-"settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10";
+"settingsviews_multipleAppBadgeValueWith10" = "Бейдж програми x10";
 
 /// in Settings, section title for Trace
 "sectionTitleTrace" = "Issue Reporting";
@@ -55,7 +55,7 @@
 "settingsviews_giveDexcomSharePassword" = "Give Dexcom Share Password";
 
 /// speak settings, where user can enable or disable speak readings
-"settingsviews_speakBgReadings" = "Speak BG Readings";
+"settingsviews_speakBgReadings" = "Промовляти глюкозу";
 
 /// general settings, literally master
 "settingsviews_master" = "Master";
@@ -106,7 +106,7 @@
 "settingsviews_urgentHighValue" = "Urgent High Value";
 
 /// statistics settings, use IFCC method for HbA1c?
-"settingsviews_useIFCCA1C" = "Show HbA1c in mmols/mol";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 
 /// dexcom share settings settings, where user can set dexcom serial number to be used for dexcom share upload
 "settingsviews_dexcomShareUploadSerialNumber" = "Receiver Serial Number";
@@ -118,10 +118,10 @@
 "settingsviews_sectiontitlestatistics" = "Statistics";
 
 /// dexcom share settings, where user can choose to use US url or not
-"settingsviews_useUSDexcomShareurl" = "Use Dexcom US Servers";
+"settingsviews_useUSDexcomShareurl" = "Сервери US";
 
 /// healthkit settings, literally 'healthkit'
-"settingsviews_healthkit" = "Write Data to Apple Health";
+"settingsviews_healthkit" = "Записувати в Apple Health";
 
 /// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test
 "volumeTestiOSSoundExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.";
@@ -150,7 +150,7 @@
 /// transmitter settings, to explain that settings is about resetting the transmitter
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Allow Chart Rotation";
+"settingsviews_allowScreenRotation" = "Обертання графіка";
 
 /// Calendar Events Settings - section title
 "calendarEventsSectionTitle" = "Calendar Events";
@@ -168,7 +168,7 @@
 "settingsviews_urgentLowValue" = "Urgent Low Value";
 
 /// general settings, should reading be shown in app badge yes or no
-"settingsviews_labelShowReadingInAppBadge" = "Show BG in the App Badge";
+"settingsviews_labelShowReadingInAppBadge" = "Бейдж програми";
 
 /// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for sound player volume test
 "volumeTestSoundPlayerExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = On\n\n(Used for all alarms except Missed Reading alerts which always use the iOS volume.)\n\nChange the volume with the volume buttons and press OK when done.";
@@ -201,10 +201,10 @@
 "settingsviews_IntervalMessage" = "Minimum interval between two notifications";
 
 /// home screen settings, should the clock also be displayed when the screen is locked?
-"settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked";
+"settingsviews_showClockWhenScreenIsLocked" = "Годинник екрана блокування";
 
 /// dexcom share settings, section title
-"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
 
 /// user tries to send trace file but there's no native email account configured
 "emailNotConfigured" = "You must configure an e-mail account on your iOS device.";
@@ -259,7 +259,7 @@
 "showDeveloperSettings" = "Показати розширені налаштування";
 
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
-"settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration";
+"settingsviews_nonfixedtransmitter" = "Багатоточкова калібровка";
 
 /// bluetooth settings, section title - also used in bluetooth peripheral view, eg when viewing M5Stack details. This is the title of the first section
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
@@ -271,25 +271,25 @@
 "settingsviews_transmitterid_text_for_button" = "Transmitter ID";
 
 /// dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no
-"settingsviews_uploadReadingstoDexcomShare" = "Upload to Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Завантажити";
 
 /// nightscout or dexcom share settings, where user can select to edit the schedule
 "schedule" = "Schedule";
 
 /// general settings, should reading be shown in notification yes or no
-"settingsviews_showReadingInNotification" = "Show BG in Notifications";
+"settingsviews_showReadingInNotification" = "Сповіщення глюкози";
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
+"settingsviews_webooptransmitter" = "Алгоритм трансмітера";
 
 /// home screen settings, show target line
-"settingsviews_showtarget" = "Show Target Line";
+"settingsviews_showtarget" = "Цільова лінія";
 
 /// nightscout  settings, pop up that asks user to enter nightscout url
 "settingsviews_giveNightscoutUrl" = "Enter your Nightscout URL";
 
 /// Calendar Events Settings - text in row where user needs to say if delta should be displayed or not
-"displayDeltaInCalendarEvent" = "Display Delta";
+"displayDeltaInCalendarEvent" = "Дельта";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
@@ -315,13 +315,12 @@
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate";
 
 /// Calendar Events Settings - text in row where user needs to say if trend should be displayed or not
-"settingsviews_displayTrendInCalendarEvent" = "Display Trend";
+"settingsviews_displayTrendInCalendarEvent" = "Тренд";
 
 /// In case user tries to send trace file via email but error occurs.
 "failedToSendEmail" = "Failed to Send Email";
 
 /// speak settings, section title
-"settingsviews_sectiontitlespeak" = "Voice";
 
 
 /// general settings, section title
@@ -382,7 +381,7 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
 
 /// statistics settings, the type of time in range selected
-"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
 "settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
@@ -480,7 +479,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Затемнення екрана блокування";
 
 /// Should loop data be shared only every 5 minutes
 

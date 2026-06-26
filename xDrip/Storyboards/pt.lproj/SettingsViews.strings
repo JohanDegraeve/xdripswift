@@ -14,17 +14,17 @@
 "settingsviews_masterorfollower" = "Mestre ou Seguidor";
 "settingsviews_master" = "Mestre";
 "settingsviews_follower" = "Seguidor";
-"settingsviews_showReadingInNotification" = "Mostrar Glicose nas Notificações";
-"settingsviews_labelShowReadingInAppBadge" = "Mostrar Glicose no Distintivo da App";
-"settingsviews_multipleAppBadgeValueWith10" = "Multiplicar Distintivo da App por 10";
-"settingsviews_allowScreenRotation" = "Permitir Rotação do Gráfico";
+"settingsviews_showReadingInNotification" = "Notificações de glicose";
+"settingsviews_labelShowReadingInAppBadge" = "Distintivo da app";
+"settingsviews_multipleAppBadgeValueWith10" = "Distintivo da app x10";
+"settingsviews_allowScreenRotation" = "Rotação do gráfico";
 "settingsviews_urgentHighValue" = "Valor Hiper Urgente";
 "settingsviews_highValue" = "Valor Hiper";
 "settingsviews_targetValue" = "Valor Alvo";
 "settingsviews_lowValue" = "Valor Hipo";
 "settingsviews_urgentLowValue" = "Valor Hipo Urgente";
-"settingsviews_showcoloredobjectives" = "Mostrar Linhas Coloridas";
-"settingsviews_showtarget" = "Mostrar Linha Alvo";
+"settingsviews_showcoloredobjectives" = "Linhas coloridas";
+"settingsviews_showtarget" = "Linha alvo";
 "settingsviews_sectiontitletreatments" = "Tratamentos";
 "settingsviews_showTreatments" = "Show Treatments";
 "settingsviews_smallBolusTreatmentThreshold" = "Limiar Micro-bolus";
@@ -33,23 +33,23 @@
 "settingsviews_showStatistics" = "Mostrar Estatísticas";
 "settingsviews_daysToUseStatisticsTitle" = "Dias para Calcular";
 "settingsviews_daysToUseStatisticsMessage" = "Máximo de dias que devemos tentar usar para calcular as estatísticas?\n\n(Introduza 0 para calcular desde a meia-noite de hoje)";
-"settingsviews_useIFCCA1C" = "Mostar A1C em mmols/mol";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmissor";
 "settingsviews_transmittertype" = "Tipo de Transmissor";
 "settingsviews_transmitterid" = "ID de Transmissor";
 "settingsviews_transmitterid_text_for_button" = "ID de Transmissor";
 "settingsviews_givetransmitterid" = "Introduzir ID Transmissor";
-"settingsviews_nonfixedtransmitter" = "Activar Calibração Multi-ponto";
+"settingsviews_nonfixedtransmitter" = "Calibração multiponto";
 "settingsviews_labelNonFixed" = "Calibração Multi-ponto";
 "settingsviews_sectiontitlealerting" = "Alarme";
 "settingsviews_row_alert_types" = "Tipos de Alarmes";
 "settingsviews_row_alerts" = "Alarmes";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
-"settingsviews_healthkit" = "Escrever Dados para Apple Health";
-"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
-"settingsviews_uploadReadingstoDexcomShare" = "Enviar para Dexcom Share";
+"settingsviews_healthkit" = "Escrever para Apple Health";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Enviar";
 "settingsviews_dexcomShareUploadSerialNumber" = "Nº. de Série do Receptor";
-"settingsviews_useUSDexcomShareurl" = "Utilizar Servidores Dexcom US";
+"settingsviews_useUSDexcomShareurl" = "Servidores US";
 "settingsviews_dexcomShareAccountName" = "Nome da Conta";
 "settingsviews_giveDexcomShareAccountName" = "Introduzir Nome da Conta Dexcom Share";
 "settingsviews_giveDexcomSharePassword" = "Introduzir Senha Dexcom Shared";
@@ -66,8 +66,7 @@
 "timeScheduleViewTitle" = "Lig./Desl. Hora Agendamento por ";
 "uploadSensorStartTime" = "Enviar Hora de Início de Sensor";
 "testUrlAndAPIKey" = "Verificar Ligação";
-"settingsviews_sectiontitlespeak" = "Voz";
-"settingsviews_speakBgReadings" = "Falar Leituras Glicose";
+"settingsviews_speakBgReadings" = "Falar glicose";
 "settingsviews_speakBgReadingslanguage" = "Idioma";
 "settingsviews_speakreadingslanguageselection" = "Escolher Idioma";
 "settingsviews_speakTrend" = "Falar Tendência";
@@ -85,9 +84,9 @@
 "m5stack_settingsviews_brightness" = "Brilho do Ecrã";
 "createCalendarEvent" = "Criar Eventos de Calendário";
 "calenderId" = "Calendário a Utilizar";
-"settingsviews_displayTrendInCalendarEvent" = "Mostrar Tendência";
-"displayUnitInCalendarEvent" = "Mostrar Unidade";
-"displayDeltaInCalendarEvent" = "Mostrar Delta";
+"settingsviews_displayTrendInCalendarEvent" = "Tendência";
+"displayUnitInCalendarEvent" = "Unidade";
+"displayDeltaInCalendarEvent" = "Delta";
 "infoCalendarAccessDeniedByUser" = "Anteriormente negou accesso ao Calendário.\n\nPara activá-lo vá às definições do seu dispositivo, privacidade, calendários e active-o.";
 "infoCalendarAccessRestricted" = "Não pode autorizar %@ para aceder ao calendário. Possivelmente por restrições activas tais como controlo parental.";
 "sectionTitleTrace" = "Reportar Problema";
@@ -108,7 +107,7 @@
 "developerSettings" = "Definições avançadas";
 "showDeveloperSettings" = "Mostrar definições avançadas";
 "settingsviews_sectiontitlehomescreen" = "Ecrã Inicial";
-"settingsviews_showClockWhenScreenIsLocked" = "Mostrar Relógio quando Bloqueado";
+"settingsviews_showClockWhenScreenIsLocked" = "Relógio no ecrã bloqueado";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -122,7 +121,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
+"settingsviews_webooptransmitter" = "Algoritmo do transmissor";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
@@ -178,7 +177,7 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
 
 /// statistics settings, the type of time in range selected
-"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
 "settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
@@ -276,7 +275,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Escurecimento do ecrã bloqueado";
 
 /// Should loop data be shared only every 5 minutes
 

@@ -12,17 +12,17 @@
 "settingsviews_masterorfollower" = "Användare eller Följare";
 "settingsviews_master" = "Användare";
 "settingsviews_follower" = "Följare";
-"settingsviews_showReadingInNotification" = "Visa BS som notiser";
-"settingsviews_labelShowReadingInAppBadge" = "Visa BS i appikon";
-"settingsviews_multipleAppBadgeValueWith10" = "Multiplicera BS med 10";
-"settingsviews_showClockWhenScreenIsLocked" = "Visa klocka när skärmen är låst";
+"settingsviews_showReadingInNotification" = "Glukosnotiser";
+"settingsviews_labelShowReadingInAppBadge" = "Appbricka";
+"settingsviews_multipleAppBadgeValueWith10" = "Appbricka x10";
+"settingsviews_showClockWhenScreenIsLocked" = "Klocka på låsskärm";
 "settingsviews_urgentHighValue" = "Akut högt värde";
 "settingsviews_highValue" = "Högt värde";
 "settingsviews_targetValue" = "Målvärde";
 "settingsviews_lowValue" = "Lågt värde";
 "settingsviews_urgentLowValue" = "Akut lågt värde";
-"settingsviews_showcoloredobjectives" = "Visa färgade linjer";
-"settingsviews_showtarget" = "Visa målvärdeslinje";
+"settingsviews_showcoloredobjectives" = "Färgade linjer";
+"settingsviews_showtarget" = "Mållinje";
 "settingsviews_sectiontitletreatments" = "Behandlingar";
 "settingsviews_showTreatments" = "Visa behandlingar i diagram";
 "settingsviews_smallBolusTreatmentThreshold" = "Tröskelvärde för mikrobolus";
@@ -31,13 +31,13 @@
 "settingsviews_showStatistics" = "Visa statistik";
 "settingsviews_daysToUseStatisticsTitle" = "Dagar att beräkna";
 "settingsviews_daysToUseStatisticsMessage" = "Maximalt antal dagar för beräkning av statistik?\n\n(ange 0 för beräkning sedan midnatt)";
-"settingsviews_useIFCCA1C" = "Visa HbA1c som mmol/mol (IFCC)";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Sändare";
 "settingsviews_transmittertype" = "Typ av sändare";
 "settingsviews_transmitterid" = "Sändar-ID";
 "settingsviews_transmitterid_text_for_button"  = "Sändar-ID";
 "settingsviews_givetransmitterid" = "Ange sändar-ID";
-"settingsviews_nonfixedtransmitter" = "Använd flerpunktskalibrering";
+"settingsviews_nonfixedtransmitter" = "Flerpunktskalibrering";
 "settingsviews_labelNonFixed" = "Flerpunktskalibrering";
 
 "settingsviews_labelAlgorithmType" = "Algoritm typ";
@@ -48,11 +48,11 @@
 "settingsviews_row_alert_types" = "Typ av larm";
 "settingsviews_row_alerts" = "Larm";
 "settingsviews_sectiontitlehealthkit" = "Apple Hälsa";
-"settingsviews_healthkit" = "Skriv data till Apple Hälsa";
-"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
-"settingsviews_uploadReadingstoDexcomShare" = "Ladda upp till Dexcom Share";
+"settingsviews_healthkit" = "Skriv till Apple Hälsa";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Ladda upp";
 "settingsviews_dexcomShareUploadSerialNumber" = "Sändarens serienummer";
-"settingsviews_useUSDexcomShareurl" = "Använd Dexcom-server i USA";
+"settingsviews_useUSDexcomShareurl" = "US-servrar";
 "settingsviews_dexcomShareAccountName" = "Användarnamn";
 "settingsviews_giveDexcomShareAccountName" = "Ange Dexcom Share användarnamn";
 "settingsviews_giveDexcomSharePassword" = "Ange Dexcom Share lösenord";
@@ -69,8 +69,7 @@
 "timeScheduleViewTitle" = "På/Av tidschema för ";
 "uploadSensorStartTime" = "Ladda upp sensorstarttid";
 "testUrlAndAPIKey" = "Testa anslutning";
-"settingsviews_sectiontitlespeak" = "Röst";
-"settingsviews_speakBgReadings" = "Läs upp BS-avläsningar";
+"settingsviews_speakBgReadings" = "Läs upp glukos";
 "settingsviews_speakBgReadingslanguage" = "Språk";
 "settingsviews_speakreadingslanguageselection" = "Välj språk";
 "settingsviews_speakTrend" = "Läs upp trend";
@@ -88,9 +87,9 @@
 "m5stack_settingsviews_brightness" = "Ljusstyrka";
 "createCalendarEvent" = "Skapa kalenderhändelser";
 "calenderId" = "Kalender att använda";
-"settingsviews_displayTrendInCalendarEvent" = "Visa trend";
-"displayUnitInCalendarEvent" = "Visa enhet";
-"displayDeltaInCalendarEvent" = "Visa delta";
+"settingsviews_displayTrendInCalendarEvent" = "Trend";
+"displayUnitInCalendarEvent" = "Enhet";
+"displayDeltaInCalendarEvent" = "Delta";
 "infoCalendarAccessDeniedByUser" = "Du har tidigare nekat tillgång till din kalender.\n\nFör att tillåta tillgång gå till 'Inställningar', 'Integritet', 'Kalendrar' och sätt på";
 "infoCalendarAccessRestricted" = "Du kan inte ge auktorisation till %@ att få tillgång till din kalender. Detta beror möjligtvis på inställda begränsningar i Skärmtidsinställningar.";
 "sectionTitleTrace" = "Problemrapportering";
@@ -121,7 +120,7 @@
 "settingsviews_translateOnlineHelp" = "Översätt dokumentation";
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Allow Chart Rotation";
+"settingsviews_allowScreenRotation" = "Diagramrotation";
 
 /// help settings, section title
 
@@ -136,7 +135,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
+"settingsviews_webooptransmitter" = "Sändaralgoritm";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
@@ -192,7 +191,7 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
 
 /// statistics settings, the type of time in range selected
-"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
 "settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
@@ -290,7 +289,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dämpning på låsskärm";
 
 /// Should loop data be shared only every 5 minutes
 

@@ -3,7 +3,7 @@
 "emailbodyText" = "Problem Beschreibung: ";
 
 /// dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no
-"settingsviews_uploadReadingstoDexcomShare" = "Upload zu Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Upload";
 
 /// for text in pop up where user can select bg unit
 "settingsviews_selectbgunit" = "Blutzucker Einheit";
@@ -15,7 +15,7 @@
 "createCalendarEvent" = "Kalendereinträge anlegen";
 
 /// dexcom share settings, section title
-"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
 
 /// in Settings, section title for Trace
 "sectionTitleTrace" = "Fehlerbericht";
@@ -73,7 +73,7 @@
 "settingsviews_sectiontitlenightscout" = "Nightscout";
 
 /// Apple Watch Settings - text in row where user needs to say if delta should be displayed or not
-"displayDeltaInCalendarEvent" = "Delta anzeigen";
+"displayDeltaInCalendarEvent" = "Delta";
 
 /// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test
 "volumeTestiOSSoundExplanation" = "Ein Alarm mit eingestellter Systemlautstärke wird gespielt (nicht im Stummmodus).\n\n(gilt auch bei verpasster Datenübertragung.)\n\nLautstärketaste drücken um Test abzubrechen, danach können Sie die Lautstärke wie gewünscht einstellen und noch einmal testen.";
@@ -82,13 +82,13 @@
 "settingsviews_highValue" = "Hoher Wert";
 
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
-"settingsviews_nonfixedtransmitter" = "Aktiviere Mehrpunkt-Kalibrierung";
+"settingsviews_nonfixedtransmitter" = "Mehrpunkt-Kalibrierung";
 
 /// used in settings, section Info, title of the license setting
 "settingsviews_license" = "Lizenz";
 
 /// general settings, should reading be multiplied with 10 yes or no
-"settingsviews_multipleAppBadgeValueWith10" = "mit 10 multiplizieren";
+"settingsviews_multipleAppBadgeValueWith10" = "App-Kennzeichen x10";
 
 /// nightscout settings, pop up that asks user to enter nightscout api key
 "settingsviews_giveNightscoutAPIKey" = "API_SECRET Eingabe";
@@ -101,10 +101,9 @@
 "settingsviews_labelCalibrationType" = "Kalibrierungs Typ";
 
 /// healthkit settings, literally 'healthkit'
-"settingsviews_healthkit" = "Apple Health nutzen";
+"settingsviews_healthkit" = "In Apple Health schreiben";
 
 /// speak settings, section title
-"settingsviews_sectiontitlespeak" = "Vorlesen";
 
 /// used for editing schedule for Nightscout upload and Dexcom Share upload
 "editScheduleTimePickerSubtitle" = "Ändern: ";
@@ -119,7 +118,7 @@
 "settingsviews_speakTrend" = "Trend vorlesen";
 
 /// Apple Watch Settings - text in row where user needs to say if trend should be displayed or not
-"settingsviews_displayTrendInCalendarEvent" = "Trend anzeigen";
+"settingsviews_displayTrendInCalendarEvent" = "Trend";
 
 /// If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown
 "infoCalendarAccessRestricted" = "Richtlinien auf ihrem Gerät verhindern das Sie %@ Zugang zu ihrem Kalender geben.";
@@ -148,16 +147,16 @@
 "settingsviews_targetValueMessage" = "Setze auf 0 um Zielwert zu deaktivieren";
 
 /// home screen settings, show target line
-"settingsviews_showtarget" = "Zielwert Linie anzeigen";
+"settingsviews_showtarget" = "Ziellinie";
 
 /// 
-"settingsviews_showcoloredobjectives" = "Farbige Linien anzeigen";
+"settingsviews_showcoloredobjectives" = "Farbige Linien";
 
 /// M5 stack bluetooth  settings, pop up that asks user to enter the password
 "m5stack_settingsviews_giveBluetoothPassword" = "Eingabe Bluetooth Passwort";
 
 /// Apple Watch Settings - text in row where user needs to say if unit should be displayed or not
-"displayUnitInCalendarEvent" = "Einheiten anzeigen";
+"displayUnitInCalendarEvent" = "Einheit";
 
 /// Text in pop up shown when user wants to send the trace file
 "describeProblem" = "Helfen Sie uns in dem sie uns so viele Innformationen als möglich mitteilen. Sollten Sie das Problem schon in unsere Facebook Gruppe gemeldet haben, teilen Sie uns bitte ihren Facebook Namen per E-Mail mit.";
@@ -175,7 +174,7 @@
 "settingsviews_sectiontitlealerting" = "Alarms";
 
 /// speak settings, where user can enable or disable speak readings
-"settingsviews_speakBgReadings" = "BZ Werte vorlesen";
+"settingsviews_speakBgReadings" = "Glukose sprechen";
 
 /// home screen settings, urgent high value
 "settingsviews_urgentHighValue" = "Hohe Werte dringend";
@@ -223,7 +222,7 @@
 "settingsviews_row_alerts" = "Schwellwerte";
 
 /// general settings, should reading be shown in app badge yes or no
-"settingsviews_labelShowReadingInAppBadge" = "BZ Werte auf der App-Kachel anzeigen";
+"settingsviews_labelShowReadingInAppBadge" = "App-Kennzeichen";
 
 /// home screen settings, low value
 "settingsviews_lowValue" = "Niedriger Wert";
@@ -257,10 +256,10 @@
 "settingsviews_speakreadingslanguageselection" = "Sprache wählen";
 
 /// general settings, should reading be shown in notification yes or no
-"settingsviews_showReadingInNotification" = "BZ in Mitteilungszentrale";
+"settingsviews_showReadingInNotification" = "Glukose-Mitteilungen";
 
 /// dexcom share settings, where user can choose to use US url or not
-"settingsviews_useUSDexcomShareurl" = "Benutzung von Dexcom US Server";
+"settingsviews_useUSDexcomShareurl" = "US-Server";
 
 /// general settings, master or follower
 "settingsviews_masterorfollower" = "Master or Follower";
@@ -291,9 +290,9 @@
 "settingsviews_showStatistics" = "Zeige Verlauf";
 "settingsviews_daysToUseStatisticsTitle" = "Tage zum berechnen";
 "settingsviews_daysToUseStatisticsMessage" = "Maximale Tage anhand dessen versucht wird den Verlauf zu berechnen?\n\n(Bei 0 wird heute ab Mitternacht berechnet)";
-"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol anzeigen";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 
-"settingsviews_showClockWhenScreenIsLocked" = "Uhr anzeigen wenn gesperrt";
+"settingsviews_showClockWhenScreenIsLocked" = "Sperrbildschirm-Uhr";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -303,7 +302,7 @@
 "settingsviews_translateOnlineHelp" = "Dokumentation übersetzen";
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Allow Chart Rotation";
+"settingsviews_allowScreenRotation" = "Diagrammdrehung";
 
 /// help settings, section title
 
@@ -318,7 +317,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
+"settingsviews_webooptransmitter" = "Transmitter-Algorithmus";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xdrip oder nativer Algorithmus";
@@ -388,7 +387,7 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
 
 /// statistics settings, the type of time in range selected
-"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
 "settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
@@ -486,7 +485,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Sperrbildschirm-Dimmung";
 
 /// Should loop data be shared only every 5 minutes
 
@@ -495,6 +494,6 @@
 
 "settingsviews_infoContactsAccessRestricted" = "Authorisierung von %@ zum Zugriff auf Kontakte nicht möglich. Möglicherweise sind Einschränkungen, bspw. Elternkontrolle, aktiv.";
 "settingsviews_contactImageSectionTitle" = "Kontaktbild";
-"settingsviews_enableContactImage" = "Erstelle Kontakt";
+"settingsviews_enableContactImage" = "Kontaktbild";
 "settingsviews_displayTrendInContactImage" = "Zeige Trend";
 "settingsviews_contactImageCreatedByString" = "Kontakt automatisch erstellt von";

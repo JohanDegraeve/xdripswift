@@ -14,19 +14,19 @@
 "settingsviews_masterorfollower" = "Κύριος ή ακόλουθος;";
 "settingsviews_master" = "Κύριος";
 "settingsviews_follower" = "Ακόλουθος";
-"settingsviews_showReadingInNotification" = "Εμφάνιση BG στις Ειδοποιήσεις;";
-"settingsviews_labelShowReadingInAppBadge" = "Εμφάνιση BG στη τεμπέλα εφαρμογής;";
-"settingsviews_multipleAppBadgeValueWith10" = "Πολ/σμός BG στη ταμπλέλα εφαρμογής επί 10;";
-"settingsviews_allowScreenRotation" = "Κάθετη εναλλαγή γραφήματος ενεργή;";
+"settingsviews_showReadingInNotification" = "Ειδοποιήσεις γλυκόζης";
+"settingsviews_labelShowReadingInAppBadge" = "Σήμα εφαρμογής";
+"settingsviews_multipleAppBadgeValueWith10" = "Σήμα εφαρμογής x10";
+"settingsviews_allowScreenRotation" = "Περιστροφή γραφήματος";
 "settingsviews_showMiniChart" = "Εμφάνιση μίνι-γραφήματος;";
-"settingsviews_showClockWhenScreenIsLocked" = "Εμφάνιση ρολογιού όταν κλειδωμένο;";
+"settingsviews_showClockWhenScreenIsLocked" = "Ρολόι οθόνης κλειδώματος";
 "settingsviews_urgentHighValue" = "Επείγον Υψηλή γλυκόζη";
 "settingsviews_highValue" = "Υψηλή γλυκόζη";
 "settingsviews_targetValue" = "Τιμή στόχου";
 "settingsviews_lowValue" = "Χαμηλή γλυκόζη";
 "settingsviews_urgentLowValue" = "Επείγον Χαμηλή γλυκόζη";
-"settingsviews_showcoloredobjectives" = "Εμφάνιση έγχρωμων γραμμών;";
-"settingsviews_showtarget" = "Εμφάνιση γραμμής στόχου;";
+"settingsviews_showcoloredobjectives" = "Έγχρωμες γραμμές";
+"settingsviews_showtarget" = "Γραμμή στόχου";
 "settingsviews_sectiontitletreatments" = "Θεραπείες";
 "settingsviews_showTreatments" = "Εμφάνιση θεραπειών στο γράφημα;";
 "settingsviews_smallBolusTreatmentThreshold" = "Όριο Micro-bolus (ταχείας δράσης)";
@@ -35,25 +35,25 @@
 "settingsviews_showStatistics" = "Εμφάνιση στατιστικών;";
 "settingsviews_daysToUseStatisticsTitle" = "Μέρες για υπολογισμό;";
 "settingsviews_daysToUseStatisticsMessage" = "Μέγιστος αριθμός ημερών για στατιστικό υπολογισμό;\n\n(Εισαγάγετε 0 για υπολογισμό από σήμερα τα μεσάνυχτα)";
-"settingsviews_useIFCCA1C" = "Εμφάνιση HbA1c ως mmols/mol";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Πομπός";
 "settingsviews_transmittertype" = "Τύπος πομπού";
 "settingsviews_transmitterid" = "Αναγνωριστικό πομπού";
 "settingsviews_transmitterid_text_for_button"  = "Αναγνωριστικό πομπού";
 "settingsviews_givetransmitterid" = "Εισαγάγετε αναγνωριστικό πομπού";
-"settingsviews_webooptransmitter" = "Χρήση αλγόριθμου πομπού;";
-"settingsviews_nonfixedtransmitter" = "Ενεργοποίηση βαθμονόμησης πολλών σημείων;";
+"settingsviews_webooptransmitter" = "Αλγόριθμος πομπού";
+"settingsviews_nonfixedtransmitter" = "Βαθμονόμηση πολλών σημείων";
 "settingsviews_labelNonFixed" = "Βαθμονόμηση πολλαπλών σημείων";
 "settingsviews_labelWebOOP" = "xDrip ή αλγόριθμος πομπού";
 "settingsviews_sectiontitlealerting" = "Ειδοποιήσεις";
 "settingsviews_row_alert_types" = "Τύποι ειδοποιήσεων";
 "settingsviews_row_alerts" = "Ειδοποιήσεις";
 "settingsviews_sectiontitlehealthkit" = "Apple Health (Υγεία)";
-"settingsviews_healthkit" = "Εγγραφή δεδομένων στο Apple Health;";
-"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
-"settingsviews_uploadReadingstoDexcomShare" = "Μεταφόρτωση σε Dexcom Share;";
+"settingsviews_healthkit" = "Εγγραφή στο Apple Health";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Μεταφόρτωση";
 "settingsviews_dexcomShareUploadSerialNumber" = "Σειριακός αριθμός δέκτη";
-"settingsviews_useUSDexcomShareurl" = "Να χρησιμοποιηθούν διακομιστές Dexcom US;";
+"settingsviews_useUSDexcomShareurl" = "Διακομιστές US";
 "settingsviews_dexcomShareAccountName" = "Όνομα λογαριασμού";
 "settingsviews_giveDexcomShareAccountName" = "Εισαγάγετε όνομα λογαριασμού Dexcom Share";
 "settingsviews_giveDexcomSharePassword" = "Κοινοποίηση κωδικού πρόσβασης για κοινή χρήση Dexcom";
@@ -70,8 +70,7 @@
 "timeScheduleViewTitle" = "Χρονοδιάγραμμα On/Off για ";
 "uploadSensorStartTime" = "Μεταφόρτωση ώρα έναρξης αισθητήρα;";
 "testUrlAndAPIKey" = "Δοκιμή σύνδεσης;";
-"settingsviews_sectiontitlespeak" = "Ομιλία";
-"settingsviews_speakBgReadings" = "Εκφώνηση της μέτρησης;";
+"settingsviews_speakBgReadings" = "Εκφώνηση γλυκόζης";
 "settingsviews_speakBgReadingslanguage" = "Γλώσσα";
 "settingsviews_speakreadingslanguageselection" = "Επιλέξτε γλώσσα";
 "settingsviews_speakTrend" = "Εκφώνηση της τάσης;";
@@ -90,9 +89,9 @@
 "calendarEventsSectionTitle" = "Ημερολογιακά γεγονότα";
 "createCalendarEvent" = "Προσθήκη στο ημερολόγιο;";
 "calenderId" = "Ημερολόγιο για χρήση;";
-"settingsviews_displayTrendInCalendarEvent" = "Εμφάνιση τάσης;";
-"displayUnitInCalendarEvent" = "Εμφάνιση μονάδας γλυκόζης;";
-"displayDeltaInCalendarEvent" = "Εμφάνιση τιμής Δ;";
+"settingsviews_displayTrendInCalendarEvent" = "Τάση";
+"displayUnitInCalendarEvent" = "Μονάδα";
+"displayDeltaInCalendarEvent" = "Δέλτα";
 "infoCalendarAccessDeniedByUser" = "Προηγουμένως αρνηθήκατε την πρόσβαση στο Ημερολόγιό σας.\n\nΓια να το ενεργοποιήσετε, μεταβείτε στις ρυθμίσεις της συσκευής σας, απόρρητο, ημερολόγια και ενεργοποιήστε το.";
 "infoCalendarAccessRestricted" = "Δεν μπορείτε να δώσετε εξουσιοδότηση στο %@ για πρόσβαση στο ημερολόγιό σας. Αυτό οφείλεται πιθανώς σε ενεργούς περιορισμούς όπως γονικοί έλεγχοι που μπορεί να υπάρχουν.";
 "sectionTitleTrace" = "Αναφορά προβλημάτων";
@@ -154,7 +153,7 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
 
 /// statistics settings, the type of time in range selected
-"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
 "settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
@@ -234,7 +233,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Μείωση φωτεινότητας οθόνης κλειδώματος";
 
 /// Should loop data be shared only every 5 minutes
 

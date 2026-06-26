@@ -12,37 +12,37 @@
 "settingsviews_masterorfollower" = "الاستخدام كتطبيق رئيسي أو للمتابعة؟";
 "settingsviews_master" = "رئيسي";
 "settingsviews_follower" = "متابعة";
-"settingsviews_showReadingInNotification" = "عرض قراءات السكر في الإشعارات؟";
-"settingsviews_labelShowReadingInAppBadge" = "عرض قراءة السكر على أيقونة التطبيق؟";
-"settingsviews_multipleAppBadgeValueWith10" = "مضاعفة قراءة أيقونة التطبيق في 10؟";
+"settingsviews_showReadingInNotification" = "إشعارات الغلوكوز";
+"settingsviews_labelShowReadingInAppBadge" = "شارة التطبيق";
+"settingsviews_multipleAppBadgeValueWith10" = "شارة التطبيق x10";
 "settingsviews_urgentHighValue" = "قيمة الحد الأعلى الخطر";
 "settingsviews_highValue" = "القيمة العليا";
 "settingsviews_targetValue" = "قيمة الهدف";
 "settingsviews_lowValue" = "القيمة الدنيا";
 "settingsviews_urgentLowValue" = "قيمة الحد الأدنى الخطر";
-"settingsviews_showcoloredobjectives" = "عرض خطوط ملونة";
-"settingsviews_showtarget" = "عرض خط الهدف";
+"settingsviews_showcoloredobjectives" = "خطوط ملونة";
+"settingsviews_showtarget" = "خط الهدف";
 "settingsviews_sectiontitlestatistics" = "إحصائيات";
 "settingsviews_showStatistics" = "عرض الإحصائيات";
 "settingsviews_daysToUseStatisticsTitle" = "عدد الأيام للاحصائيات";
 "settingsviews_daysToUseStatisticsMessage" = "الحد الأقصى للأيام التي يجب أن نحاول استخدامها لحساب الإحصائيات?\n\n(أدخل 0 لحساب احصائيات اليوم منذ منتصف الليل)";
-"settingsviews_useIFCCA1C" = "اعرض وحدة التراكمي  mmols/mol";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "جهاز الإرسال";
 "settingsviews_transmittertype" = "نوع جهاز الإرسال";
 "settingsviews_transmitterid" = "رقم هوية جهاز الإرسال";
 "settingsviews_transmitterid_text_for_button" = "رقم هوية جهاز الإرسال";
 "settingsviews_givetransmitterid" = "أدخل رقم هوية جهاز الإرسال";
-"settingsviews_nonfixedtransmitter" = "تفعيل المعايرة متعددة النقاط ";
+"settingsviews_nonfixedtransmitter" = "معايرة متعددة النقاط";
 "settingsviews_labelNonFixed" = "المعايرة متعددة النقاط";
 "settingsviews_sectiontitlealerting" = "التنبيهات";
 "settingsviews_row_alert_types" = "أنواع التنبيهات";
 "settingsviews_row_alerts" = "التنبيهات";
 "settingsviews_sectiontitlehealthkit" = "تطبيق صحتي";
-"settingsviews_healthkit" = "كتابة البيانات إلى تطبيق صحتي؟";
+"settingsviews_healthkit" = "الكتابة إلى Apple Health";
 "settingsviews_sectiontitledexcomshareupload" = "ديكسكوم شير";
-"settingsviews_uploadReadingstoDexcomShare" = "التحميل إلى ديكسكوم شير؟";
+"settingsviews_uploadReadingstoDexcomShare" = "تحميل";
 "settingsviews_dexcomShareUploadSerialNumber" = "الرمز التسلسلي لجهاز الإستقبال";
-"settingsviews_useUSDexcomShareurl" = "استخدم سيرفرات ديكسكوم الأمريكية؟";
+"settingsviews_useUSDexcomShareurl" = "خوادم US";
 "settingsviews_dexcomShareAccountName" = "اسم الحساب";
 "settingsviews_giveDexcomShareAccountName" = "أدخل اسم الحساب لديكسكوم شير";
 "settingsviews_giveDexcomSharePassword" = "أعط ديكسكوم شير كلمة مرور";
@@ -59,8 +59,7 @@
 "timeScheduleViewTitle" = "جدولة وقت تفعيل/إغلاق لـ";
 "uploadSensorStartTime" = "تحميل بداية وقت الحساس؟";
 "testUrlAndAPIKey" = "اختبر الاتصال؟";
-"settingsviews_sectiontitlespeak" = "النطق";
-"settingsviews_speakBgReadings" = "نطق قراءات السكر؟";
+"settingsviews_speakBgReadings" = "نطق الغلوكوز";
 "settingsviews_speakBgReadingslanguage" = "اللغة";
 "settingsviews_speakreadingslanguageselection" = "اختر اللغة";
 "settingsviews_speakTrend" = "نطق الاتجاه؟";
@@ -78,9 +77,9 @@
 "m5stack_settingsviews_brightness" = "سطوع الشاشة";
 "createCalendarEvent" = "إنشاء أحداث التقويم؟";
 "calenderId" = "التقويم للاستخدام؟";
-"settingsviews_displayTrendInCalendarEvent" = "عرض الإتجاه؟";
-"displayUnitInCalendarEvent" = "عرض الوحدة؟";
-"displayDeltaInCalendarEvent" = "عرض الفرق؟";
+"settingsviews_displayTrendInCalendarEvent" = "الاتجاه";
+"displayUnitInCalendarEvent" = "الوحدة";
+"displayDeltaInCalendarEvent" = "الفرق";
 "infoCalendarAccessDeniedByUser" = "لقد رفضت الوصول إلى التقويم الخاص بك مسبقًا.\n\nلتمكينه ، انتقل إلى إعدادات جهازك ثم الخصوصية ثم التقويم ثم قم بتمكينه.";
 "infoCalendarAccessRestricted" = "لا يمكنك منح إذن لـ %@ للوصول إلى التقويم الخاص بك. قد يكون هذا بسبب القيود النشطة مثل وجود أدوات الرقابة الأبوية.";
 "sectionTitleTrace" = "الإبلاغ عن المشاكل";
@@ -101,12 +100,12 @@
 "nslog" = "NSتقرير";
 "oslog" = "OSتقرير";
 "settingsviews_sectiontitlehomescreen" = "الشاشة الرئيسية";
-"settingsviews_showClockWhenScreenIsLocked" = "عرض الساعة عند القفل؟";
+"settingsviews_showClockWhenScreenIsLocked" = "ساعة شاشة القفل";
 "settingsviews_translateOnlineHelp" = "ترجمة الوثائق";
-"settingsviews_allowScreenRotation" = "السماح بإلتفاف المخطط؟";
+"settingsviews_allowScreenRotation" = "تدوير المخطط";
 "calendarEventsSectionTitle" = "أحداث التقويم";
 "settingsviews_showOnlineHelp" = "فتح المساعدة عبر الإنترنت؟";
-"settingsviews_webooptransmitter" = "استخدام خوارزمية جهاز الإرسال؟";
+"settingsviews_webooptransmitter" = "خوارزمية جهاز الإرسال";
 "settingsviews_labelWebOOP" = "خوارزمية xDrip أو جهاز الإرسال";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -173,7 +172,7 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
 
 /// statistics settings, the type of time in range selected
-"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
 "settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
@@ -271,7 +270,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "تعتيم شاشة القفل";
 
 /// Should loop data be shared only every 5 minutes
 

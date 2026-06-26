@@ -14,10 +14,10 @@
 "settingsviews_masterorfollower" = "Utilisation Maitre ou Suiveur";
 "settingsviews_master" = "Maitre";
 "settingsviews_follower" = "Suiveur";
-"settingsviews_showReadingInNotification" = "Afficher Glyc dans notification";
-"settingsviews_labelShowReadingInAppBadge" = "Afficher Glyc dans le badge";
-"settingsviews_multipleAppBadgeValueWith10" = "Multiplier par 10 dans le badge";
-"settingsviews_showClockWhenScreenIsLocked" = "Visualiser l'heure sur écran verrouillé";
+"settingsviews_showReadingInNotification" = "Notifications de glycémie";
+"settingsviews_labelShowReadingInAppBadge" = "Pastille d’app";
+"settingsviews_multipleAppBadgeValueWith10" = "Pastille d’app x10";
+"settingsviews_showClockWhenScreenIsLocked" = "Horloge écran verrouillé";
 "settingsviews_sectiontitletreatments" = "Traitements";
 "settingsviews_showTreatments" = "Visualiser les traitements";
 "settingsviews_smallBolusTreatmentThreshold" = "Seuil des micro-bolus";
@@ -26,7 +26,7 @@
 "settingsviews_showStatistics" = "Visualiser les statistiques";
 "settingsviews_daysToUseStatisticsTitle" = "Nombre de jours";
 "settingsviews_daysToUseStatisticsMessage" = "Nombre maximum de jours utilisés pour le calcul des statistiques?\n\n(Saisir 0 pour aujourd'hui depuis minuit)";
-"settingsviews_useIFCCA1C" = "Visualiser HbA1c en mmol/mol";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmetteur";
 "settingsviews_transmittertype" = "Type de Transmetteur";
 "settingsviews_transmitterid" = "Transmetteur ID";
@@ -36,11 +36,11 @@
 "settingsviews_row_alert_types" = "Types d'alarme";
 "settingsviews_row_alerts" = "Alarmes";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
-"settingsviews_healthkit" = "Sauver les données dans Apple Health";
-"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
-"settingsviews_uploadReadingstoDexcomShare" = "Charger dans le Dexcom Share";
+"settingsviews_healthkit" = "Écrire dans Apple Health";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Envoyer";
 "settingsviews_dexcomShareUploadSerialNumber" = "Numéro de série du receveur";
-"settingsviews_useUSDexcomShareurl" = "Utiliser les serveurs US Dexcom US";
+"settingsviews_useUSDexcomShareurl" = "Serveurs US";
 "settingsviews_dexcomShareAccountName" = "Nom du compte";
 "settingsviews_giveDexcomShareAccountName" = "Entrer le nom du compte Dexcom";
 "settingsviews_giveDexcomSharePassword" = "Entrer le mot de passe Dexcom Share";
@@ -57,8 +57,7 @@
 "timeScheduleViewTitle" = "On/Off Time Schedule pour";
 "uploadSensorStartTime" = "Charger heure démarrage capteur";
 "testUrlAndAPIKey" = "Tester l'URL et API_SECRET de Nightscout";
-"settingsviews_sectiontitlespeak" = "Vocal";
-"settingsviews_speakBgReadings" = "Lire les glycémies ";
+"settingsviews_speakBgReadings" = "Lire la glycémie";
 "settingsviews_speakBgReadingslanguage" = "Langue";
 "settingsviews_speakreadingslanguageselection" = "Sélectionner la langue";
 "settingsviews_speakTrend" = "Lire la tendance";
@@ -75,9 +74,9 @@
 "m5stack_settingsviews_brightness" = "Luminosité de l'écran";
 "createCalendarEvent" = "Créer un calendrier";
 "calenderId" = "Utiliser le calendrier";
-"settingsviews_displayTrendInCalendarEvent" = "Afficher Tendance";
-"displayUnitInCalendarEvent" = "Afficher Unité";
-"displayDeltaInCalendarEvent" = "Afficher Variation";
+"settingsviews_displayTrendInCalendarEvent" = "Tendance";
+"displayUnitInCalendarEvent" = "Unité";
+"displayDeltaInCalendarEvent" = "Variation";
 "infoCalendarAccessDeniedByUser" = "Vous avez refusé l'accès au calendrier.\n\nPour permettre cette fonctionnalités, modifiez les autorissations dans les réglages de votre iPhone.";
 "infoCalendarAccessRestricted" = "Vous n'avez pas donné les autorisations à %@ pour accéder à votre calendrier. Cela peut aussi être du à une restriction parentale.";
 "sectionTitleTrace" = "Trace";
@@ -97,7 +96,7 @@
 "volumeTestiOSSoundExplanation" =" Le son d'une alarme est joué actuellement avec le même volume que celui qui sera utilisé pour le type d'alarme avec 'Ignorer Mode Silencieux' = Off\n\n(Utilisé aussi dans le cas de l'alarme Lecture manquante).\n\n Presser l'un des boutons Volume pour arrêter, puis changer le volume avec les boutons au niveau souhaité et tester à nouveau";
 
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
-"settingsviews_nonfixedtransmitter" = "Permettre la calibration multi-point ";
+"settingsviews_nonfixedtransmitter" = "Calibration multipoint";
 
 /// in Settings, to enable debug level in trace file
 "debugLevel" = "Inclure le mode Debug";
@@ -113,7 +112,7 @@
 "settingsviews_targetValueMessage" = "Mettre à 0 pour désactiver l'objectif";
 
 /// home screen settings, show target line
-"settingsviews_showtarget" = "Montrer la ligne Cible";
+"settingsviews_showtarget" = "Ligne cible";
 
 /// non fixed settings, title of the section
 "settingsviews_labelNonFixed" = "Calibration Multi-point";
@@ -131,7 +130,7 @@
 "volumeTestSoundPlayerExplanation" = "Le son d'une alarme est joué actuellement avec le même volume que celui qui sera utilisé pour le type d'alarme avec 'Ignorer Mode Silencieux' = On\n\n(Utilisé pour toutes les alarmes à l'exception de l'alarme Lecture manquante).\n\n Presser l'un des boutons Volume pour arrêter, puis changer le volume avec les boutons au niveau souhaité et tester à nouveau";
 
 /// 
-"settingsviews_showcoloredobjectives" = "Montrer les lignes colorées ";
+"settingsviews_showcoloredobjectives" = "Lignes colorées";
 
 /// In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row
 "volumeTestiOSSound" = "Test Volume (Volume actuel iPhone)";
@@ -163,7 +162,7 @@
 "settingsviews_translateOnlineHelp" = "Traduire la documentation";
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Autoriser la rotation du graphique";
+"settingsviews_allowScreenRotation" = "Rotation du graphique";
 
 /// help settings, section title
 
@@ -178,7 +177,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
+"settingsviews_webooptransmitter" = "Algorithme du transmetteur";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
@@ -234,7 +233,7 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
 
 /// statistics settings, the type of time in range selected
-"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
 "settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
@@ -332,7 +331,7 @@
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Assombrissement écran verrouillé";
 
 /// Should loop data be shared only every 5 minutes
 

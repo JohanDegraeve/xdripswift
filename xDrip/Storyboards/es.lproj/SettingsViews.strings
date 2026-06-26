@@ -40,11 +40,11 @@
 "settingsviews_medtrumSelectPatientFromList" = "Elige paciente de la lista";
 
 "settingsviews_translateOnlineHelp" = "Traducir documentación";
-"settingsviews_showReadingInNotification" = "Mostrar en Notificaciones";
-"settingsviews_labelShowReadingInAppBadge" = "Mostrar en el icono de la app";
-"settingsviews_multipleAppBadgeValueWith10" = "Multiplicar valor por 10 en el icono de la app";
-"settingsviews_showClockWhenScreenIsLocked" = "Mostrar reloj al bloquear";
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Oscurecer pantalla";
+"settingsviews_showReadingInNotification" = "Notificaciones de glucosa";
+"settingsviews_labelShowReadingInAppBadge" = "Globo de la app";
+"settingsviews_multipleAppBadgeValueWith10" = "Globo de app x10";
+"settingsviews_showClockWhenScreenIsLocked" = "Reloj en pantalla bloqueada";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Atenuación en pantalla bloqueada";
 "settingsviews_screenLockDimmingTypeDisabled" = "Deshabilitado";
 "settingsviews_screenLockDimmingTypeDimmed" = "Atenuado";
 "settingsviews_screenLockDimmingTypeDark" = "Oscuro";
@@ -55,8 +55,8 @@
 "settingsviews_targetValueMessage" = "Usar 0 para deshabilitar el valor objectivo en la gráfica";
 "settingsviews_lowValue" = "Valor de Glucemia Baja";
 "settingsviews_urgentLowValue" = "Valor de Glucemia Baja (Urgente)";
-"settingsviews_showcoloredobjectives" = "Mostrar Colores";
-"settingsviews_showtarget" = "Mostrar Línea Target";
+"settingsviews_showcoloredobjectives" = "Líneas de colores";
+"settingsviews_showtarget" = "Línea objetivo";
 "settingsviews_sectiontitletreatments" = "Tratamientos";
 "settingsviews_showTreatments" = "Mostrar Tratamientos";
 "settingsviews_smallBolusTreatmentThreshold" = "Límite Micro-bolo";
@@ -69,7 +69,7 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Rango Estándar";
 "settingsviews_timeInRangeTypeTightRange" = "Rango Estrecho";
 "settingsviews_timeInRangeTypeUserDefinedRange" = "Rango Usuario";
-"settingsviews_useIFCCA1C" = "Ver HbA1c en mmols/mol";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmisor";
 "settingsviews_transmittertype" = "Tipo de Transmisor";
 "settingsviews_transmitterid" = "ID del Transmisor";
@@ -77,7 +77,7 @@
 "settingsviews_givetransmitterid" = "ID del Transmisor";
 "settingsviews_resettransmitter" = "Transmisor Anubis";
 "settingsviews_resetDexcomTransmitterMessage" = "Esta opción intentará resetear el transmisor durante la próxima conexión.\n\nEsto solo puede funcionar con transmisores G5 y transmisores G6 Anubis.\n\nNo funciona para transmisores normales tipo G6 y One.";
-"settingsviews_nonfixedtransmitter" = "Habilitar Calibración Multi-punto";
+"settingsviews_nonfixedtransmitter" = "Calibración multipunto";
 "settingsviews_labelNonFixed" = "Calibración Multi-punto";
 "settingsviews_labelAlgorithmType" = "Tipo de Algoritmo";
 "settingsviews_labelCalibrationTitle" = "Calibración de Sensor";
@@ -86,11 +86,11 @@
 "settingsviews_row_alert_types" = "Tipos de Alarmas";
 "settingsviews_row_alerts" = "Alarmas";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
-"settingsviews_healthkit" = "Grabar Datos en Apple Health";
-"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
-"settingsviews_uploadReadingstoDexcomShare" = "Subir Datos a Dexcom Share";
+"settingsviews_healthkit" = "Escribir en Apple Health";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Subir";
 "settingsviews_dexcomShareUploadSerialNumber" = "Número de Serie del Receptor";
-"settingsviews_useUSDexcomShareurl" = "Usar Servidores Dexcom EEUU";
+"settingsviews_useUSDexcomShareurl" = "Servidores US";
 "settingsviews_dexcomShareAccountName" = "Nombre de Cuenta";
 "settingsviews_giveDexcomShareAccountName" = "Entrar el Nombre de tu Cuenta Dexcom Share";
 "settingsviews_giveDexcomSharePassword" = "Entrar la  Contraseña para tu Cuenta Dexcom Share";
@@ -105,15 +105,14 @@
 "timeScheduleViewTitle" = "Fijar horario para ";
 "uploadSensorStartTime" = "Subir Hora de Inicio de Sensor";
 "testUrlAndAPIKey" = "Comprobar Conexión";
-"settingsviews_sectiontitlespeak" = "Voz";
-"settingsviews_speakBgReadings" = "Anunciar Lecturas Glucemia";
+"settingsviews_speakBgReadings" = "Anunciar glucosa";
 "settingsviews_speakBgReadingslanguage" = "Idioma";
 "settingsviews_speakreadingslanguageselection" = "Seleccionar Idioma";
 "settingsviews_speakTrend" = "Anunciar Tendencia";
 "settingsviews_speakDelta" = "Anunciar Delta";
 "settingsviews_IntervalTitle" = "Intervalo entre notificaciones";
 "settingsviews_IntervalMessage" = "Intervalo mínimo entre dos notificaciones";
-"settingsviews_allowScreenRotation" = "Permitir rotación";
+"settingsviews_allowScreenRotation" = "Rotación del gráfico";
 "settingsviews_showMiniChart" = "Mostrar la mini-gráfica";
 "settingsviews_Version" = "Versión";
 "settingsviews_license" = "Licencia";
@@ -125,9 +124,9 @@
 "m5stack_settingsviews_brightness" = "Brillo de Pantalla Brightness";
 "createCalendarEvent" = "Crear Eventos en el Calendario";
 "calenderId" = "Qué calendario se debe usar";
-"settingsviews_displayTrendInCalendarEvent" = "Mostrar Tendencia";
-"displayUnitInCalendarEvent" = "Mostrar Unidad";
-"displayDeltaInCalendarEvent" = "Mostrar Delta";
+"settingsviews_displayTrendInCalendarEvent" = "Tendencia";
+"displayUnitInCalendarEvent" = "Unidad";
+"displayDeltaInCalendarEvent" = "Delta";
 "infoCalendarAccessDeniedByUser" = "Has denegado previamente permiso para acceder al calendario.\n\nIr a Configuración iPhone > Apps > %@ > Calendarios y habilitarlo.";
 "infoCalendarAccessWriteOnly" = "No puedes usar Eventos de Calendario hasta que actualices los permisos de 'Sólo agregar eventos' a 'Acceso completo'.\n\nIr a Configuración iPhone > > Apps %@ > Calendarios y seleccionar 'Acceso completo'.";
 "infoCalendarAccessRestricted" = "No se puede autorizar a que %@ tenga acceso a tu calendario. Podría ser debido a que restricciones tipo Controles Parentales o similares lo están impidiendo.";
@@ -156,7 +155,7 @@
 "settingsviews_sectiontitlehomescreen" = "Inicio";
 "settingsviews_infoContactsAccessRestricted" = "No has podido dar permiso a %@ para accesar a tus contactos. Esto es probablemente debido a restriciones como el control parental o similar.";
 "settingsviews_contactImageSectionTitle" = "Imagen de Contacto";
-"settingsviews_enableContactImage" = "Habilitar Contacto";
+"settingsviews_enableContactImage" = "Imagen de contacto";
 "settingsviews_displayTrendInContactImage" = "Mostrar Tendencia";
 "settingsviews_contactImageCreatedByString" = "Contacto creado automáticamente por";
 
@@ -166,7 +165,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Allow Chart Rotation";
+"settingsviews_allowScreenRotation" = "Rotación del gráfico";
 
 /// help settings, section title
 
@@ -181,7 +180,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
+"settingsviews_webooptransmitter" = "Algoritmo del transmisor";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
