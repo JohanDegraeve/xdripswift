@@ -401,13 +401,12 @@ struct SensorManagementView: View {
         VStack(alignment: .leading, spacing: 10) {
             validationMessageView()
             Text(Texts_HomeView.sensorManagementCalibrationSafetyFooter)
-            Spacer()
-                .frame(height: 6)
             Button(action: {
                 openCalibrationHelp()
             }) {
                 Label(Texts_HomeView.sensorManagementCalibrationHelp, systemImage: "questionmark.circle")
             }
+            .padding(.top, 6)
         }
     }
 
