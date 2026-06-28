@@ -32,8 +32,8 @@ enum ConstantsUI {
     /// Extra bottom padding for SwiftUI section footers when grouped lists feel too compressed.
     static let listSectionFooterBottomPadding: CGFloat = 8
 
-    /// Muted text color for SwiftUI grouped list section footers.
-    static let listSectionFooterTextColor = Color(.colorTertiary)
+    /// Text color for SwiftUI grouped list section footers.
+    static let listSectionFooterTextColor = Color(.colorSecondary)
 
     /// dark red tint used for warning-style SwiftUI sections
     static let warningSectionBackgroundColor = Color(red: 0.20, green: 0.12, blue: 0.12)
