@@ -643,10 +643,14 @@ public class AlertManager: NSObject {
                 content.userInfo = userInfo
             }
             
-            // add a small BG chart image as an attachment to the notification content
-            let thumbnailAttachment = try! UNNotificationAttachment(identifier: "thumbnail", url: URL.documentsDirectory.appendingPathComponent("\(ConstantsGlucoseChartSwiftUI.filenameNotificationThumbnailImage).png"), options: [UNNotificationAttachmentOptionsThumbnailHiddenKey: false])
-            
-            content.attachments = [thumbnailAttachment]
+            // Add the chart thumbnail when available, but do not let a missing
+            // or invalid image crash the reading pipeline before downstream sync.
+            do {
+                let thumbnailAttachment = try UNNotificationAttachment(identifier: "thumbnail", url: URL.documentsDirectory.appendingPathComponent("\(ConstantsGlucoseChartSwiftUI.filenameNotificationThumbnailImage).png"), options: [UNNotificationAttachmentOptionsThumbnailHiddenKey: false])
+                content.attachments = [thumbnailAttachment]
+            } catch {
+                trace("in checkAlerts, failed to attach notification thumbnail: %{public}@", log: log, category: ConstantsLog.categoryAlertManager, type: .error, error.localizedDescription)
+            }
             
             // if snooze from notification in homescreen is needed then set the categoryIdentifier
             if applicableAlertType.snooze {

@@ -54,9 +54,18 @@ public final class LiveActivityManager {
 extension LiveActivityManager {
     /// Public API: Debounced update entry point
     func update(contentState: XDripWidgetAttributes.ContentState, forceRestart: Bool = false) {
+        Task { @MainActor [weak self] in
+            self?.scheduleUpdate(contentState: contentState, forceRestart: forceRestart)
+        }
+    }
+
+    @MainActor
+    private func scheduleUpdate(contentState: XDripWidgetAttributes.ContentState, forceRestart: Bool) {
         debouncedUpdateTask?.cancel()
+        let debounceNanoseconds = UInt64(debounceInterval * 1_000_000_000)
         debouncedUpdateTask = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: UInt64(self?.debounceInterval ?? 0.5 * 1_000_000_000))
+            try? await Task.sleep(nanoseconds: debounceNanoseconds)
+            guard !Task.isCancelled else { return }
             await self?.ensureActivity(contentState: contentState, forceRestart: forceRestart)
         }
     }
@@ -162,6 +171,7 @@ extension LiveActivityManager {
     }
     
     /// end all live activities that are spawned from the app
+    @MainActor
     func endAllActivities() async {
         for activity in Activity<XDripWidgetAttributes>.activities {
             trace("in endAllActivities, ending live activity: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, String(describing: activity.id))
