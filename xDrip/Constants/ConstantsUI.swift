@@ -20,6 +20,15 @@ enum ConstantsUI {
     /// List background color
     static let listBackGroundColor = Color(listBackGroundUIColor)
 
+    /// Background color for active rows in SwiftUI grouped lists.
+    static let activeRowBackgroundColor = Color.green.opacity(0.24)
+
+    /// Insets for the Bluetooth peripheral status banner row.
+    static let bluetoothPeripheralStatusBannerRowInsets = EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16)
+
+    /// Insets for the Bluetooth peripheral status action button row.
+    static let bluetoothPeripheralStatusButtonRowInsets = EdgeInsets(top: 0, leading: 16, bottom: 13, trailing: 16)
+
     /// Extra bottom padding for SwiftUI section footers when grouped lists feel too compressed.
     static let listSectionFooterBottomPadding: CGFloat = 8
 

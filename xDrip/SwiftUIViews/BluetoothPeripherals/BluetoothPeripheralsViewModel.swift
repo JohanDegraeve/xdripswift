@@ -60,7 +60,7 @@ final class BluetoothPeripheralsRouter: ObservableObject {
 
             guard !rows.isEmpty else { return nil }
 
-            return BluetoothPeripheralsSection(id: category.rawValue, title: category.rawValue, rows: rows)
+            return BluetoothPeripheralsSection(id: category.rawValue, title: category.rawValue, category: category, rows: rows)
         }
     }
 
@@ -170,7 +170,12 @@ extension BluetoothPeripheralsViewModel: @preconcurrency BluetoothTransmitterDel
 struct BluetoothPeripheralsSection: Identifiable {
     let id: String
     let title: String
+    let category: BluetoothPeripheralCategory
     let rows: [BluetoothPeripheralListRow]
+
+    var systemImage: String {
+        category.systemImage()
+    }
 }
 
 struct BluetoothPeripheralListRow: Identifiable {
@@ -186,9 +191,6 @@ struct BluetoothPeripheralListRow: Identifiable {
         bluetoothPeripheral.bluetoothPeripheralType().rawValue
     }
 
-    var systemImage: String {
-        bluetoothPeripheral.bluetoothPeripheralType().category().systemImage(for: connectionStatus)
-    }
 }
 
 enum BluetoothPeripheralDisplayStatus {

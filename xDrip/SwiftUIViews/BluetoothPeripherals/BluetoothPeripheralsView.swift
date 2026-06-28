@@ -19,7 +19,7 @@ struct BluetoothPeripheralsView: View {
                     .foregroundStyle(Color(.colorSecondary))
             } else {
                 ForEach(viewModel.sections) { section in
-                    Section(section.title) {
+                    Section {
                         ForEach(section.rows) { row in
                             Button {
                                 open(row: row)
@@ -30,6 +30,8 @@ struct BluetoothPeripheralsView: View {
                             .contentShape(Rectangle())
                             .listRowBackground(row.connectionStatus.rowBackgroundColor)
                         }
+                    } header: {
+                        BluetoothPeripheralSectionHeaderView(section: section)
                     }
                 }
             }
@@ -168,15 +170,15 @@ private struct BluetoothPeripheralListRowView: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Image(systemName: row.systemImage)
-                .font(.system(size: 18, weight: .regular))
+            Image(systemName: row.connectionStatus.antennaSystemImage)
+                .font(.system(size: 20, weight: .regular))
                 .foregroundStyle(row.connectionStatus.tintColor)
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 3) {
                 Text(row.title)
-                    .fontWeight(.bold)
-                    .foregroundStyle(Color(.colorPrimary))
+                    .fontWeight(row.connectionStatus.isActive ? .bold : .regular)
+                    .foregroundStyle(row.connectionStatus.isActive ? Color(.colorPrimary) : Color(.colorSecondary))
                     .lineLimit(1)
                     .minimumScaleFactor(0.75)
 
@@ -187,13 +189,14 @@ private struct BluetoothPeripheralListRowView: View {
                     .minimumScaleFactor(0.75)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .layoutPriority(1)
 
-            if row.connectionStatus.showsActiveIndicator {
-                Image(systemName: "checkmark.circle.fill")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.green)
-            }
+            Text(row.connectionStatus.statusText)
+                .font(.subheadline)
+                .foregroundStyle(Color(.colorSecondary))
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .fixedSize(horizontal: true, vertical: false)
+                .layoutPriority(1)
 
             Image(systemName: "chevron.right")
                 .font(.footnote.weight(.semibold))
@@ -204,13 +207,38 @@ private struct BluetoothPeripheralListRowView: View {
     }
 }
 
+private struct BluetoothPeripheralSectionHeaderView: View {
+    let section: BluetoothPeripheralsSection
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: section.systemImage)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(ConstantsUI.settingsSectionHeaderIconColor)
+                .frame(width: 16)
+
+            Text(section.title)
+                .foregroundStyle(Color(ConstantsUI.tableViewHeaderTextColor))
+        }
+    }
+}
+
 private extension BluetoothPeripheralDisplayStatus {
     var tintColor: Color {
         switch self {
         case .notScanning:
-            return Color(.colorSecondary)
+            return Color(.colorTertiary)
         case .scanning, .connected:
             return .green
+        }
+    }
+
+    var isActive: Bool {
+        switch self {
+        case .notScanning:
+            return false
+        case .scanning, .connected:
+            return true
         }
     }
 
@@ -219,16 +247,27 @@ private extension BluetoothPeripheralDisplayStatus {
         case .notScanning:
             return Color(.secondarySystemGroupedBackground)
         case .scanning, .connected:
-            return Color.green.opacity(0.18)
+            return ConstantsUI.activeRowBackgroundColor
         }
     }
 
-    var showsActiveIndicator: Bool {
+    var antennaSystemImage: String {
         switch self {
         case .notScanning:
-            return false
+            return "antenna.radiowaves.left.and.right.slash"
         case .scanning, .connected:
-            return true
+            return "antenna.radiowaves.left.and.right"
+        }
+    }
+
+    var statusText: String {
+        switch self {
+        case .notScanning:
+            return Texts_BluetoothPeripheralView.notTryingToConnect
+        case .scanning:
+            return Texts_BluetoothPeripheralView.tryingToConnect
+        case .connected:
+            return Texts_BluetoothPeripheralView.connected
         }
     }
 }
