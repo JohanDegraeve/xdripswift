@@ -80,8 +80,8 @@ enum Texts_TreatmentsView {
         return NSLocalizedString("treatments_edit_title", tableName: filename, bundle: Bundle.main, value: "Edit Treatment", comment: "Title of edit treatment view.")
     }()
 
-    static let selectedDateFooterFormat:String = {
-        return NSLocalizedString("treatments_selectedDateFooterFormat", tableName: filename, bundle: Bundle.main, value: "Showing treatments from the last %@ days.", comment: "Footer text shown below the selected treatment date.")
+    static let filterTreatmentsLabel:String = {
+        return NSLocalizedString("treatments_filterTreatmentsLabel", tableName: filename, bundle: Bundle.main, value: "Filter", comment: "Section header above the treatment type filter chips.")
     }()
 
     static let noTreatmentsToShow:String = {

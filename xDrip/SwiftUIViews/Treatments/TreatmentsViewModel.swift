@@ -156,10 +156,6 @@ import OSLog
         return minimumDate...maximumDate
     }
 
-    func selectedDateFooterText() -> String {
-        String(format: Texts_TreatmentsView.selectedDateFooterFormat, numberOfDaysOfTreatmentsToShow.description)
-    }
-
     // MARK: - private functions
 
     private func syncFilterSettingsFromUserDefaults() {

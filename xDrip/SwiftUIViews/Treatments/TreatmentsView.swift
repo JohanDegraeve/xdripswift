@@ -63,7 +63,7 @@ struct TreatmentsListView: View {
 
     var body: some View {
         List {
-            Section(footer: Text(viewModel.selectedDateFooterText())) {
+            Section {
                 DatePicker(selection: Binding(get: {
                     viewModel.selectedDate
                 }, set: { newDate in
@@ -79,7 +79,7 @@ struct TreatmentsListView: View {
                 .id(viewModel.datePickerReset)
             }
 
-            Section {
+            Section(header: Text(Texts_TreatmentsView.filterTreatmentsLabel)) {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 10) {
                         TreatmentFilterChip(
