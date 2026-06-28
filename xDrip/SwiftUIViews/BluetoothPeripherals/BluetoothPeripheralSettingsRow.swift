@@ -11,12 +11,23 @@ import SwiftUI
 struct BluetoothPeripheralSettingsRow: View {
     let title: String
     let detail: String?
+    let detailIndicator: SettingsIndicator?
+    let detailSymbol: BluetoothPeripheralDetailSymbol?
     let showsDisclosure: Bool
     let isEnabled: Bool
 
-    init(title: String, detail: String?, showsDisclosure: Bool = false, isEnabled: Bool = true) {
+    init(
+        title: String,
+        detail: String?,
+        detailIndicator: SettingsIndicator? = nil,
+        detailSymbol: BluetoothPeripheralDetailSymbol? = nil,
+        showsDisclosure: Bool = false,
+        isEnabled: Bool = true
+    ) {
         self.title = title
         self.detail = detail
+        self.detailIndicator = detailIndicator
+        self.detailSymbol = detailSymbol
         self.showsDisclosure = showsDisclosure
         self.isEnabled = isEnabled
     }
@@ -30,10 +41,25 @@ struct BluetoothPeripheralSettingsRow: View {
             Spacer(minLength: 12)
 
             if let detail = detail, !detail.isEmpty {
-                Text(detail)
-                    .foregroundStyle(isEnabled ? Color(.colorSecondary) : Color.gray)
-                    .multilineTextAlignment(.trailing)
-                    .lineLimit(2)
+                HStack(spacing: 5) {
+                    if let detailIndicator {
+                        Image(systemName: detailIndicator.symbolName)
+                            .font(.caption2)
+                            .foregroundStyle(isEnabled ? detailIndicator.color : .gray)
+                            .accessibilityLabel(detailIndicator.accessibilityLabel ?? "")
+                    }
+
+                    if let detailSymbol {
+                        Image(systemName: detailSymbol.systemName)
+                            .foregroundStyle(isEnabled ? detailSymbol.color : .gray)
+                            .imageScale(.medium)
+                    }
+
+                    Text(detail)
+                        .foregroundStyle(isEnabled ? Color(.colorSecondary) : Color.gray)
+                        .multilineTextAlignment(.trailing)
+                        .lineLimit(2)
+                }
             }
 
             if showsDisclosure {

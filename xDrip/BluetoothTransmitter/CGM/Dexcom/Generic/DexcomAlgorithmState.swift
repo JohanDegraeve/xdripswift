@@ -8,7 +8,14 @@
 
 import Foundation
 
-enum DexcomAlgorithmState: UInt8, CustomStringConvertible {
+enum DexcomSensorStatusIndicatorColor {
+    case green
+    case yellow
+    case orange
+    case red
+}
+
+enum DexcomAlgorithmState: UInt8, CustomStringConvertible, CaseIterable {
     
     case None = 0x00
     case SessionStopped = 0x01
@@ -50,7 +57,7 @@ enum DexcomAlgorithmState: UInt8, CustomStringConvertible {
         case .okay: return "OK / Calibrated"
         case .needsCalibration: return "needs calibration"
         case .CalibrationError1: return "Calibration error 1"
-        case .CalibrationError2: return "Calibration error "
+        case .CalibrationError2: return "Calibration error 2"
         case .CalibrationLinearityFitFailure: return "Calibration LinearityFitFailure"
         case .SensorFailedDuetoCountsAberration: return "Sensor failed due to counts aberration"
         case .SensorFailedDuetoResidualAberration: return "Sensor failed due to residual aberration"
@@ -70,5 +77,21 @@ enum DexcomAlgorithmState: UInt8, CustomStringConvertible {
         }
         
     }
-    
+
+    var indicatorColor: DexcomSensorStatusIndicatorColor {
+        switch self {
+        case .okay, .needsCalibration:
+            return .green
+        case .SensorWarmup, .FirstofTwoBGsNeeded, .SecondofTwoBGsNeeded:
+            return .yellow
+        case .excessNoise, .OutOfCalibrationDueToOutlier, .OutlierCalibrationRequest, .TemporarySensorIssue, .questionMarks:
+            return .orange
+        default:
+            return .red
+        }
+    }
+
+    static func indicatorColor(forDescription description: String) -> DexcomSensorStatusIndicatorColor? {
+        allCases.first { $0.description == description }?.indicatorColor
+    }
 }

@@ -17,6 +17,9 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     @Published private(set) var sections: [BluetoothPeripheralDetailSection] = []
     @Published private(set) var connectButtonTitle = Texts_BluetoothPeripheralView.connect
     @Published private(set) var connectButtonIsEnabled = true
+    @Published private(set) var connectButtonStatusText = ""
+    @Published private(set) var connectButtonIsStopAction = false
+    @Published private(set) var statusFooterText: String?
     @Published private(set) var connectionStatus = BluetoothPeripheralDisplayStatus.notScanning
     @Published private(set) var category = BluetoothPeripheralCategory.CGM
     @Published private(set) var canDeletePeripheral = false
@@ -39,6 +42,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     private var previousScanningResult: BluetoothTransmitter.startScanningResult?
     private var cachedTransmitterReadSuccessSummaryText: String?
     private var cachedTransmitterReadSuccessSummaryMessage: String?
+    private var cachedTransmitterReadSuccessSummaryIndicatorColor: Color?
     private var transmitterReadSuccessTimer: Timer?
     private var didAddObservers = false
     private var didStart = false
@@ -94,6 +98,14 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         }
     }
 
+    var displayTitle: String {
+        if let alias = bluetoothPeripheral?.blePeripheral.alias, !alias.isEmpty {
+            return alias
+        }
+
+        return bluetoothPeripheral?.blePeripheral.name ?? screenTitle
+    }
+
     func start() {
         guard !didStart else {
             refresh()
@@ -126,6 +138,9 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
 
         connectButtonTitle = connectButtonState.title
         connectButtonIsEnabled = connectButtonState.isEnabled
+        connectButtonStatusText = connectButtonState.statusText
+        connectButtonIsStopAction = connectButtonState.isStopAction
+        statusFooterText = makeStatusFooterText()
         connectionStatus = makeConnectionDisplayStatus()
         category = expectedBluetoothPeripheralType.category()
         canDeletePeripheral = bluetoothPeripheral != nil
@@ -235,6 +250,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
                 id: "read-success",
                 title: Texts_BluetoothPeripheralView.readSuccess,
                 detail: cachedTransmitterReadSuccessSummaryText ?? "",
+                detailIndicator: transmitterReadSuccessDetailIndicator(),
                 showsDisclosure: cachedTransmitterReadSuccessSummaryMessage?.isEmpty == false,
                 isEnabled: cachedTransmitterReadSuccessSummaryMessage?.isEmpty == false,
                 action: { [weak self] in
@@ -328,6 +344,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         id: String,
         title: String,
         detail: String? = nil,
+        detailIndicator: SettingsIndicator? = nil,
+        detailSymbol: BluetoothPeripheralDetailSymbol? = nil,
         showsDisclosure: Bool = false,
         isEnabled: Bool = true,
         action: (() -> Void)? = nil
@@ -336,6 +354,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
             id: id,
             title: title,
             detail: detail,
+            detailIndicator: detailIndicator,
+            detailSymbol: detailSymbol,
             showsDisclosure: showsDisclosure,
             isEnabled: isEnabled,
             toggle: nil,
@@ -354,6 +374,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
             id: id,
             title: title,
             detail: nil,
+            detailIndicator: nil,
+            detailSymbol: nil,
             showsDisclosure: false,
             isEnabled: isEnabled,
             toggle: BluetoothPeripheralDetailToggle(isOn: isOn, setValue: setValue),
@@ -379,16 +401,18 @@ private extension BluetoothPeripheralDetailState {
         }
 
         if let bluetoothPeripheral = bluetoothPeripheral {
-            if bluetoothPeripheralIsConnected(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager) {
-                return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.disconnect, isEnabled: true, statusText: Texts_BluetoothPeripheralView.connected)
-            }
-
             if bluetoothPeripheral.blePeripheral.shouldconnect {
+                // Keep this as a stop action while the device is active.
+                // Dexcom can rapidly move between scanning and connected during each reading cycle.
                 if nfcScanNeeded {
-                    return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: true, statusText: Texts_BluetoothPeripheralView.nfcScanNeeded)
+                    return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: true, statusText: Texts_BluetoothPeripheralView.nfcScanNeeded, isStopAction: true)
                 }
 
-                return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: true, statusText: Texts_BluetoothPeripheralView.tryingToConnect)
+                let statusText = bluetoothPeripheralIsConnected(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager)
+                    ? Texts_BluetoothPeripheralView.connected
+                    : Texts_BluetoothPeripheralView.tryingToConnect
+
+                return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: true, statusText: statusText, isStopAction: true)
             }
 
             return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.connect, isEnabled: true, statusText: Texts_BluetoothPeripheralView.notTryingToConnect)
@@ -403,7 +427,7 @@ private extension BluetoothPeripheralDetailState {
         }
 
         if nfcScanSuccessful {
-            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: false, statusText: Texts_BluetoothPeripheralView.tryingToConnect)
+            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: false, statusText: Texts_BluetoothPeripheralView.tryingToConnect, isStopAction: true)
         }
 
         if !isScanning {
@@ -424,8 +448,21 @@ private extension BluetoothPeripheralDetailState {
 
         return BluetoothPeripheralDisplayStatus(
             bluetoothTransmitter: bluetoothTransmitter,
-            isScanningForNewPeripheral: isScanning
+            // A saved device that should connect is still active while waiting for the next Bluetooth cycle.
+            isScanningForNewPeripheral: isScanning || bluetoothPeripheral?.blePeripheral.shouldconnect == true
         )
+    }
+
+    func makeStatusFooterText() -> String? {
+        guard expectedBluetoothPeripheralType == .DexcomType,
+              let dexcomG5 = bluetoothPeripheral as? DexcomG5
+        else {
+            return nil
+        }
+
+        return dexcomG5.useOtherApp
+            ? Texts_BluetoothPeripheralView.runningInCoexistenceMode
+            : Texts_BluetoothPeripheralView.runningInPrimaryMode
     }
 
     func connectionTimestampTitle() -> String {
@@ -447,6 +484,51 @@ private extension BluetoothPeripheralDetailState {
         }
 
         return transmitterIdTempValue
+    }
+
+    func batterySymbol(percent: Int) -> BluetoothPeripheralDetailSymbol? {
+        guard percent > 0 else { return nil }
+
+        switch percent {
+        case 0...10:
+            return BluetoothPeripheralDetailSymbol(systemName: batterySystemName(percent: 0), color: Color(.systemRed))
+        case 11...25:
+            return BluetoothPeripheralDetailSymbol(systemName: batterySystemName(percent: 25), color: Color(.systemYellow))
+        case 26...65:
+            return BluetoothPeripheralDetailSymbol(systemName: batterySystemName(percent: 50), color: .green)
+        case 66...90:
+            return BluetoothPeripheralDetailSymbol(systemName: batterySystemName(percent: 75), color: .green)
+        default:
+            return BluetoothPeripheralDetailSymbol(systemName: batterySystemName(percent: 100), color: .green)
+        }
+    }
+
+    func batterySymbol(voltageB: Int32) -> BluetoothPeripheralDetailSymbol? {
+        guard voltageB > 0 else { return nil }
+
+        // Dexcom G5/G6 battery state is based on voltage B, not a percentage.
+        if voltageB < 270 {
+            return BluetoothPeripheralDetailSymbol(systemName: batterySystemName(percent: 0), color: Color(.systemRed))
+        } else if voltageB < 280 {
+            return BluetoothPeripheralDetailSymbol(systemName: batterySystemName(percent: 25), color: Color(.systemYellow))
+        } else {
+            return BluetoothPeripheralDetailSymbol(systemName: batterySystemName(percent: 100), color: .green)
+        }
+    }
+
+    func batterySystemName(percent: Int) -> String {
+        if #available(iOS 17.0, *) {
+            return "battery.\(percent)percent"
+        }
+
+        switch percent {
+        case 0:
+            return "minus.plus.batteryblock.slash"
+        case 25, 50:
+            return "minus.plus.batteryblock"
+        default:
+            return "minus.plus.batteryblock.fill"
+        }
     }
 
     func connectButtonHandler() {
@@ -607,6 +689,40 @@ private extension BluetoothPeripheralDetailState {
             title: Texts_BluetoothPeripheralView.readSuccess,
             message: message
         )
+    }
+
+    func transmitterReadSuccessDetailIndicator() -> SettingsIndicator? {
+        cachedTransmitterReadSuccessSummaryIndicatorColor.map { SettingsIndicator(color: $0) }
+    }
+
+    func sensorStatusDetailIndicator(for sensorStatus: String?) -> SettingsIndicator? {
+        guard let sensorStatus = sensorStatus, !sensorStatus.isEmpty else {
+            return nil
+        }
+
+        // Sensor status is stored as display text, so match the known Dexcom descriptions exactly.
+        if let indicatorColor = DexcomAlgorithmState.indicatorColor(forDescription: sensorStatus) {
+            return SettingsIndicator(color: color(for: indicatorColor))
+        }
+
+        if let indicatorColor = DexcomSessionStartResponse.indicatorColor(forDescription: sensorStatus) {
+            return SettingsIndicator(color: color(for: indicatorColor))
+        }
+
+        return SettingsIndicator(color: color(for: .red))
+    }
+
+    func color(for sensorStatusIndicatorColor: DexcomSensorStatusIndicatorColor) -> Color {
+        switch sensorStatusIndicatorColor {
+        case .green:
+            return .green
+        case .yellow:
+            return Color(.systemYellow)
+        case .orange:
+            return Color(.systemOrange)
+        case .red:
+            return Color(.systemRed)
+        }
     }
 }
 
@@ -783,12 +899,15 @@ private extension BluetoothPeripheralDetailState {
         var transmitterIdMessageText = Texts_SettingsView.labelGiveTransmitterId
         var placeholder = "00000"
         var actionIsEnabled: ((String) -> Bool)?
+        var textInputAutocapitalization = TextInputAutocapitalization.words
 
         switch expectedBluetoothPeripheralType {
         case .Libre3HeartBeatType:
             transmitterIdTitleText = Texts_SettingsView.labelBluetoothDeviceName
             transmitterIdMessageText = Texts_SettingsView.heartbeatLibreMessage
             placeholder = "000000000000"
+        case .DexcomType:
+            textInputAutocapitalization = .characters
         case .DexcomG7Type, .DexcomG7HeartBeatType:
             transmitterIdMessageText = Texts_SettingsView.dexcomG7Message
             placeholder = "DX0000"
@@ -809,6 +928,7 @@ private extension BluetoothPeripheralDetailState {
             title: transmitterIdTitleText,
             message: transmitterIdMessageText,
             keyboardType: .alphabet,
+            textInputAutocapitalization: textInputAutocapitalization,
             text: transmitterIdTempValue,
             placeholder: placeholder,
             actionTitle: Texts_Common.Ok,
@@ -824,9 +944,10 @@ private extension BluetoothPeripheralDetailState {
     }
 
     func setTransmitterId(_ transmitterId: String) {
-        let transmitterIdUpper = transmitterId.uppercased().toNilIfLength0()
+        // Only G5/G6 transmitter IDs must be uppercase. Other Bluetooth names can use mixed case.
+        let transmitterIdValue = expectedBluetoothPeripheralType == .DexcomType ? transmitterId.uppercased() : transmitterId
 
-        transmitterIdTempValue = transmitterIdUpper ?? ConstantsBluetoothPairing.dummyDexcomG7TypeTransmitterId
+        transmitterIdTempValue = transmitterIdValue.toNilIfLength0() ?? ConstantsBluetoothPairing.dummyDexcomG7TypeTransmitterId
         refresh()
     }
 }
@@ -957,6 +1078,7 @@ private extension BluetoothPeripheralDetailState {
         else {
             cachedTransmitterReadSuccessSummaryText = "Waiting..."
             cachedTransmitterReadSuccessSummaryMessage = ""
+            cachedTransmitterReadSuccessSummaryIndicatorColor = nil
             refresh()
             return
         }
@@ -987,13 +1109,13 @@ private extension BluetoothPeripheralDetailState {
         let okSuccessPercentage = display.nominalGapInSeconds > 180 ? 95.0 : 80.0
         let warningSuccessPercentage = display.nominalGapInSeconds > 180 ? 90.0 : 70.0
 
-        func visualIndicator(for successPercentage: Double) -> String {
+        func indicatorColor(for successPercentage: Double) -> Color {
             if successPercentage >= okSuccessPercentage {
-                return "🟢"
+                return .green
             } else if successPercentage >= warningSuccessPercentage {
-                return "🟡"
+                return Color(.systemYellow)
             } else {
-                return "🔴"
+                return Color(.systemRed)
             }
         }
 
@@ -1005,6 +1127,7 @@ private extension BluetoothPeripheralDetailState {
         if display.expected24h == 0 {
             cachedTransmitterReadSuccessSummaryText = "Waiting..."
             cachedTransmitterReadSuccessSummaryMessage = ""
+            cachedTransmitterReadSuccessSummaryIndicatorColor = nil
             refresh()
             return
         }
@@ -1013,18 +1136,19 @@ private extension BluetoothPeripheralDetailState {
         let label12h = windowLabel(for: 12, expected: display.expected12h, fullExpected: fullExpected12h)
         let label24h = windowLabel(for: 24, expected: display.expected24h, fullExpected: fullExpected24h)
 
-        cachedTransmitterReadSuccessSummaryText = "\(visualIndicator(for: display.success24h)) \(String(format: "%0.0f", display.success24h))% (\(label24h))"
+        cachedTransmitterReadSuccessSummaryText = "\(String(format: "%0.0f", display.success24h))% (\(label24h))"
+        cachedTransmitterReadSuccessSummaryIndicatorColor = indicatorColor(for: display.success24h)
 
         var summaryMessageLines = [String]()
         summaryMessageLines.append("Expecting \(expectedBluetoothPeripheralType.rawValue) readings every \(display.nominalGapInSeconds) seconds.")
-        summaryMessageLines.append("\(visualIndicator(for: display.success6h)) \(String(format: "%0.1f", display.success6h))% (\(label6h): \(display.expected6h - display.actual6h) dropped)")
+        summaryMessageLines.append("\(String(format: "%0.1f", display.success6h))% (\(label6h): \(display.expected6h - display.actual6h) dropped)")
 
         if display.expected12h >= fullExpected6h {
-            summaryMessageLines.append("\(visualIndicator(for: display.success12h)) \(String(format: "%0.1f", display.success12h))% (\(label12h): \(display.expected12h - display.actual12h) dropped)")
+            summaryMessageLines.append("\(String(format: "%0.1f", display.success12h))% (\(label12h): \(display.expected12h - display.actual12h) dropped)")
         }
 
         if display.expected24h >= fullExpected12h {
-            summaryMessageLines.append("\(visualIndicator(for: display.success24h)) \(String(format: "%0.1f", display.success24h))% (\(label24h): \(display.expected24h - display.actual24h) dropped)")
+            summaryMessageLines.append("\(String(format: "%0.1f", display.success24h))% (\(label24h): \(display.expected24h - display.actual24h) dropped)")
         }
 
         cachedTransmitterReadSuccessSummaryMessage = summaryMessageLines.joined(separator: "\n\n")
@@ -1037,17 +1161,26 @@ private extension BluetoothPeripheralDetailState {
 struct BluetoothPeripheralDetailSection: Identifiable {
     let id: String
     let title: String?
+    let headerDetail: String?
+    let headerSymbol: BluetoothPeripheralDetailSymbol?
+    let footer: String?
     let rows: [BluetoothPeripheralDetailRow]
 
-    init(id: String, title: String?, rows: [BluetoothPeripheralDetailRow]) {
+    init(id: String, title: String?, headerDetail: String? = nil, headerSymbol: BluetoothPeripheralDetailSymbol? = nil, footer: String? = nil, rows: [BluetoothPeripheralDetailRow]) {
         self.id = id
         self.title = title
+        self.headerDetail = headerDetail
+        self.headerSymbol = headerSymbol
+        self.footer = footer
         self.rows = rows
     }
 
-    init(index: Int, title: String?, rows: [BluetoothPeripheralDetailRow]) {
+    init(index: Int, title: String?, headerDetail: String? = nil, headerSymbol: BluetoothPeripheralDetailSymbol? = nil, footer: String? = nil, rows: [BluetoothPeripheralDetailRow]) {
         self.id = String(index)
         self.title = title
+        self.headerDetail = headerDetail
+        self.headerSymbol = headerSymbol
+        self.footer = footer
         self.rows = rows
     }
 }
@@ -1056,6 +1189,8 @@ struct BluetoothPeripheralDetailRow: Identifiable {
     let id: String
     let title: String
     let detail: String?
+    let detailIndicator: SettingsIndicator?
+    let detailSymbol: BluetoothPeripheralDetailSymbol?
     let showsDisclosure: Bool
     let isEnabled: Bool
     let toggle: BluetoothPeripheralDetailToggle?
@@ -1065,6 +1200,8 @@ struct BluetoothPeripheralDetailRow: Identifiable {
         id: String,
         title: String,
         detail: String?,
+        detailIndicator: SettingsIndicator?,
+        detailSymbol: BluetoothPeripheralDetailSymbol?,
         showsDisclosure: Bool,
         isEnabled: Bool,
         toggle: BluetoothPeripheralDetailToggle?,
@@ -1073,6 +1210,8 @@ struct BluetoothPeripheralDetailRow: Identifiable {
         self.id = id
         self.title = title
         self.detail = detail
+        self.detailIndicator = detailIndicator
+        self.detailSymbol = detailSymbol
         self.showsDisclosure = showsDisclosure
         self.isEnabled = isEnabled
         self.toggle = toggle
@@ -1086,10 +1225,23 @@ struct BluetoothPeripheralDetailToggle {
     let setValue: (Bool) -> Void
 }
 
+struct BluetoothPeripheralDetailSymbol {
+    let systemName: String
+    let color: Color
+}
+
 struct BluetoothPeripheralConnectButtonState {
     let title: String
     let isEnabled: Bool
     let statusText: String
+    let isStopAction: Bool
+
+    init(title: String, isEnabled: Bool, statusText: String, isStopAction: Bool = false) {
+        self.title = title
+        self.isEnabled = isEnabled
+        self.statusText = statusText
+        self.isStopAction = isStopAction
+    }
 }
 
 struct BluetoothPeripheralDetailAlert: Identifiable {
@@ -1123,6 +1275,7 @@ struct BluetoothPeripheralTextEntry: Identifiable {
     let title: String?
     let message: String?
     let keyboardType: UIKeyboardType
+    let textInputAutocapitalization: TextInputAutocapitalization?
     let text: String?
     let placeholder: String?
     let actionTitle: String
@@ -1130,6 +1283,32 @@ struct BluetoothPeripheralTextEntry: Identifiable {
     let actionHandler: (String) -> Void
     let actionIsEnabled: ((String) -> Bool)?
     let inputValidator: ((String) -> String?)?
+
+    init(
+        title: String?,
+        message: String?,
+        keyboardType: UIKeyboardType,
+        textInputAutocapitalization: TextInputAutocapitalization? = .words,
+        text: String?,
+        placeholder: String?,
+        actionTitle: String,
+        cancelTitle: String,
+        actionHandler: @escaping (String) -> Void,
+        actionIsEnabled: ((String) -> Bool)?,
+        inputValidator: ((String) -> String?)?
+    ) {
+        self.title = title
+        self.message = message
+        self.keyboardType = keyboardType
+        self.textInputAutocapitalization = textInputAutocapitalization
+        self.text = text
+        self.placeholder = placeholder
+        self.actionTitle = actionTitle
+        self.cancelTitle = cancelTitle
+        self.actionHandler = actionHandler
+        self.actionIsEnabled = actionIsEnabled
+        self.inputValidator = inputValidator
+    }
 }
 
 struct BluetoothPeripheralSelectionList: Identifiable {
@@ -1149,12 +1328,21 @@ private extension BluetoothPeripheralDetailState {
         var sections = [
             BluetoothPeripheralDetailSection(
                 id: "dexcom-g5",
-                title: "Dexcom" + (dexcomG5.isAnubis ? " (Anubis ✅)" : ""),
+                title: "Dexcom",
+                headerDetail: dexcomG5.isAnubis ? "Anubis" : nil,
+                headerSymbol: dexcomG5.isAnubis ? BluetoothPeripheralDetailSymbol(systemName: "checkmark.circle", color: .green) : nil,
                 rows: makeDexcomG5CommonRows(dexcomG5: dexcomG5)
+            ),
+            BluetoothPeripheralDetailSection(
+                id: "dexcom-g5-coexistence",
+                title: nil,
+                footer: Texts_BluetoothPeripheralView.useOtherDexcomAppFooter,
+                rows: makeDexcomG5CoexistenceRows(dexcomG5: dexcomG5)
             ),
             BluetoothPeripheralDetailSection(
                 id: "dexcom-g5-battery",
                 title: Texts_BluetoothPeripheralView.battery,
+                headerSymbol: batterySymbol(voltageB: dexcomG5.voltageB),
                 rows: makeDexcomG5BatteryRows(dexcomG5: dexcomG5)
             )
         ]
@@ -1211,12 +1399,18 @@ private extension BluetoothPeripheralDetailState {
                 id: "dexcom-g5-sensor-status",
                 title: Texts_Common.sensorStatus,
                 detail: dexcomG5.sensorStatus,
+                detailIndicator: sensorStatusDetailIndicator(for: dexcomG5.sensorStatus),
                 showsDisclosure: dexcomG5.sensorStatus != nil,
                 isEnabled: dexcomG5.sensorStatus != nil,
                 action: { [weak self] in
                     self?.showInfo(title: Texts_Common.sensorStatus, message: dexcomG5.sensorStatus.map { "\n" + $0 })
                 }
-            ),
+            )
+        ]
+    }
+
+    func makeDexcomG5CoexistenceRows(dexcomG5: DexcomG5) -> [BluetoothPeripheralDetailRow] {
+        [
             toggleRow(
                 id: "dexcom-g5-use-other-app",
                 title: Texts_BluetoothPeripheralView.useOtherDexcomApp,
@@ -1297,16 +1491,7 @@ private extension BluetoothPeripheralDetailState {
     func dexcomG5VoltageBText(dexcomG5: DexcomG5) -> String {
         guard dexcomG5.voltageB != 0 else { return "Waiting for data..." }
 
-        let batteryLevelIndicator: String
-        if dexcomG5.voltageB < 270 {
-            batteryLevelIndicator = "🔴 "
-        } else if dexcomG5.voltageB < 280 {
-            batteryLevelIndicator = "🟡 "
-        } else {
-            batteryLevelIndicator = "🟢 "
-        }
-
-        return batteryLevelIndicator + dexcomG5.voltageB.description + "0 mV"
+        return dexcomG5.voltageB.description + "0 mV"
     }
 
     func dexcomG5OverrideSensorMaxDaysText() -> String {
@@ -1339,7 +1524,7 @@ private extension BluetoothPeripheralDetailState {
         let expiryDays = dexcomG5.isAnubis ? ConstantsMaster.transmitterExpiryDaysDexcomG6Anubis : ConstantsMaster.transmitterExpiryDaysDexcomG5G6
         var expiryDateString = transmitterExpiryDate.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
         expiryDateString += "\n\n" + transmitterExpiryDate.daysAndHoursRemaining(showOnlyDays: true) + " / " + expiryDays.stringWithoutTrailingZeroes + Texts_Common.dayshort + " " + Texts_HomeView.remaining
-        expiryDateString += dexcomG5.isAnubis ? "\n\n Anubis ✅" : ""
+        expiryDateString += dexcomG5.isAnubis ? "\n\n Anubis" : ""
         showInfo(title: Texts_BluetoothPeripheralView.transmittterExpiryDate, message: "\n" + expiryDateString)
     }
 
@@ -1417,7 +1602,8 @@ private extension BluetoothPeripheralDetailState {
             row(
                 id: "dexcom-g7-sensor-status",
                 title: Texts_Common.sensorStatus,
-                detail: dexcomG7.sensorStatus
+                detail: dexcomG7.sensorStatus,
+                detailIndicator: sensorStatusDetailIndicator(for: dexcomG7.sensorStatus)
             )
         ]
 
@@ -1564,7 +1750,12 @@ private extension BluetoothPeripheralDetailState {
                 }
             ),
             row(id: "\(idPrefix)-sensor-state", title: Texts_Common.sensorStatus, detail: sensorState),
-            row(id: "\(idPrefix)-battery-level", title: Texts_BluetoothPeripheralsView.batteryLevel, detail: batteryLevel > 0 ? batteryLevel.description + " %" : ""),
+            row(
+                id: "\(idPrefix)-battery-level",
+                title: Texts_BluetoothPeripheralsView.batteryLevel,
+                detail: batteryLevel > 0 ? batteryLevel.description + " %" : "",
+                detailSymbol: batterySymbol(percent: batteryLevel)
+            ),
             row(
                 id: "\(idPrefix)-firmware",
                 title: Texts_Common.firmware,
@@ -1666,7 +1857,12 @@ private extension BluetoothPeripheralDetailState {
 
     func makeM5StackSpecificRows(m5Stack: M5Stack) -> [BluetoothPeripheralDetailRow] {
         [
-            row(id: "m5-battery-level", title: Texts_BluetoothPeripheralsView.batteryLevel, detail: m5Stack.batteryLevel > 0 ? m5Stack.batteryLevel.description : ""),
+            row(
+                id: "m5-battery-level",
+                title: Texts_BluetoothPeripheralsView.batteryLevel,
+                detail: m5Stack.batteryLevel > 0 ? m5Stack.batteryLevel.description + " %" : "",
+                detailSymbol: batterySymbol(percent: m5Stack.batteryLevel)
+            ),
             row(
                 id: "m5-brightness",
                 title: Texts_SettingsView.m5StackBrightness,

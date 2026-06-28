@@ -1,6 +1,6 @@
 import Foundation
 
-enum DexcomSessionStartResponse: UInt8 {
+enum DexcomSessionStartResponse: UInt8, CaseIterable {
     
     
     case manualCalibrationSessionStarted = 0x01
@@ -40,5 +40,21 @@ enum DexcomSessionStartResponse: UInt8 {
         }
         
     }
-    
+
+    var indicatorColor: DexcomSensorStatusIndicatorColor {
+        switch self {
+        case .manualCalibrationSessionStarted,
+             .manualCalibrationSessionInProgress,
+             .autoCalibrationSessionInProgress:
+            return .yellow
+        case .staleStartComand, .error:
+            return .orange
+        case .transmitterEndOfLife:
+            return .red
+        }
+    }
+
+    static func indicatorColor(forDescription description: String) -> DexcomSensorStatusIndicatorColor? {
+        allCases.first { $0.description == description }?.indicatorColor
+    }
 }

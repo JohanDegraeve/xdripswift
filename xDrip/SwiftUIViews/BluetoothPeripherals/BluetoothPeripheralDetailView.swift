@@ -14,26 +14,43 @@ struct BluetoothPeripheralDetailView: View {
     var body: some View {
         List {
             Section {
+                BluetoothPeripheralStatusBannerView(state: state)
+                    .listRowInsets(ConstantsUI.bluetoothPeripheralStatusBannerRowInsets)
+                    .listRowBackground(state.connectionStatus.rowBackgroundColor)
+
                 Button(action: state.connectButtonTapped) {
-                    HStack {
-                        Text(state.connectButtonTitle)
-                            .font(.headline)
-
-                        Spacer()
-
-                        Image(systemName: state.category.systemImage(for: state.connectionStatus))
-                            .font(.title3.weight(.semibold))
-                            .foregroundStyle(state.connectionStatus.tintColor)
-                    }
-                    .foregroundStyle(state.connectButtonIsEnabled ? ConstantsUI.plusButtonColor : Color.gray)
+                    Text(state.connectButtonTitle)
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
                 }
+                .buttonStyle(.borderedProminent)
+                .tint(connectButtonTint)
                 .disabled(!state.connectButtonIsEnabled)
+                .listRowInsets(ConstantsUI.bluetoothPeripheralStatusButtonRowInsets)
+                .listRowBackground(state.connectionStatus.rowBackgroundColor)
+            } header: {
+                Text(Texts_BluetoothPeripheralView.status)
+                    .foregroundStyle(Color(ConstantsUI.tableViewHeaderTextColor))
+            } footer: {
+                if let statusFooterText = state.statusFooterText {
+                    Text(statusFooterText)
+                        .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
+                        .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
+                }
             }
 
             ForEach(state.sections) { section in
-                Section(section.title ?? "") {
+                Section {
                     ForEach(section.rows) { row in
                         BluetoothPeripheralDetailRowView(row: row)
+                    }
+                } header: {
+                    BluetoothPeripheralDetailSectionHeaderView(section: section)
+                } footer: {
+                    if let footer = section.footer {
+                        Text(footer)
+                            .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
+                            .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
                     }
                 }
             }
@@ -56,6 +73,10 @@ struct BluetoothPeripheralDetailView: View {
         }
         .alert(item: $state.pendingAlert, content: makeAlert)
         .onAppear(perform: state.start)
+    }
+
+    private var connectButtonTint: Color {
+        state.connectButtonIsStopAction ? .red : .green
     }
 
     private func makeAlert(_ alert: BluetoothPeripheralDetailAlert) -> Alert {
@@ -102,9 +123,88 @@ private extension BluetoothPeripheralDisplayStatus {
     var tintColor: Color {
         switch self {
         case .notScanning:
-            return Color(.colorSecondary)
+            return Color(.colorTertiary)
         case .scanning, .connected:
             return .green
+        }
+    }
+
+    var rowBackgroundColor: Color {
+        switch self {
+        case .notScanning:
+            return Color(.secondarySystemGroupedBackground)
+        case .scanning, .connected:
+            return ConstantsUI.activeRowBackgroundColor
+        }
+    }
+
+    var antennaSystemImage: String {
+        switch self {
+        case .notScanning:
+            return "antenna.radiowaves.left.and.right.slash"
+        case .scanning, .connected:
+            return "antenna.radiowaves.left.and.right"
+        }
+    }
+}
+
+private struct BluetoothPeripheralStatusBannerView: View {
+    @ObservedObject var state: BluetoothPeripheralDetailState
+
+    var body: some View {
+        HStack(alignment: .center, spacing: 10) {
+            Image(systemName: state.connectionStatus.antennaSystemImage)
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(state.connectionStatus.tintColor)
+                .frame(width: 24)
+
+            Text(state.displayTitle)
+                .font(.headline)
+                .fontWeight(.semibold)
+                .foregroundStyle(Color(.colorPrimary))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+                .layoutPriority(1)
+
+            Spacer(minLength: 8)
+
+            Text(state.connectButtonStatusText)
+                .font(.body)
+                .foregroundStyle(Color(.colorSecondary))
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .fixedSize(horizontal: true, vertical: false)
+        }
+        .padding(.vertical, 3)
+    }
+}
+
+private struct BluetoothPeripheralDetailSectionHeaderView: View {
+    let section: BluetoothPeripheralDetailSection
+
+    var body: some View {
+        if section.title != nil || section.headerDetail != nil || section.headerSymbol != nil {
+            HStack {
+                if let title = section.title {
+                    Text(title)
+                        .foregroundStyle(Color(ConstantsUI.tableViewHeaderTextColor))
+                }
+
+                Spacer()
+
+                HStack(spacing: 4) {
+                    if let headerDetail = section.headerDetail {
+                        Text(headerDetail)
+                            .foregroundStyle(Color(ConstantsUI.tableViewHeaderTextColor))
+                    }
+
+                    if let headerSymbol = section.headerSymbol {
+                        Image(systemName: headerSymbol.systemName)
+                            .foregroundStyle(headerSymbol.color)
+                            .imageScale(.medium)
+                    }
+                }
+            }
         }
     }
 }
@@ -134,7 +234,7 @@ struct BluetoothPeripheralTextEntryView: View {
             Section {
                 TextField(textEntry.placeholder ?? "", text: $text)
                     .keyboardType(textEntry.keyboardType)
-                    .textInputAutocapitalization(.characters)
+                    .textInputAutocapitalization(textEntry.textInputAutocapitalization)
                     .autocorrectionDisabled()
                     .submitLabel(.done)
                     .onSubmit(submit)
@@ -246,6 +346,8 @@ private struct BluetoothPeripheralDetailRowView: View {
                 BluetoothPeripheralSettingsRow(
                     title: row.title,
                     detail: row.detail,
+                    detailIndicator: row.detailIndicator,
+                    detailSymbol: row.detailSymbol,
                     showsDisclosure: row.showsDisclosure,
                     isEnabled: row.isEnabled
                 )
@@ -255,6 +357,8 @@ private struct BluetoothPeripheralDetailRowView: View {
             BluetoothPeripheralSettingsRow(
                 title: row.title,
                 detail: row.detail,
+                detailIndicator: row.detailIndicator,
+                detailSymbol: row.detailSymbol,
                 showsDisclosure: false,
                 isEnabled: row.isEnabled
             )
