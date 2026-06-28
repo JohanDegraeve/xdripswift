@@ -33,7 +33,6 @@
 "useOtherDexcomAppFooter" = "Rinnakkaiskäyttötila sallii meidän toimia toisen sovelluksen, kuten Dexcomin tai CamAPSin, kanssa. Sovelluksen on pysyttävä käynnissä taustalla. Ensisijainen tila yhdistää pääsovelluksena ja hallitsee yhteyttä.";
 "runningInCoexistenceMode" = "Käytössä rinnakkaiskäyttötilassa";
 "runningInPrimaryMode" = "Käytössä ensisijaisessa tilassa";
-
 /// Disconnect transmitter, title
 "confirmDisconnectTitle" = "Vahvista yhteyden katkaisu";
 

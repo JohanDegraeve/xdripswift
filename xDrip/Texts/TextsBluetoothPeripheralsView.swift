@@ -19,6 +19,14 @@ class Texts_BluetoothPeripheralsView {
     static let noBluetoothPeripheralsConfigured: String = {
         return NSLocalizedString("noBluetoothPeripheralsConfigured", tableName: filename, bundle: Bundle.main, value: "No Bluetooth peripherals configured", comment: "Shown when the Bluetooth peripherals list is empty")
     }()
+
+    static let heartbeatDeviceFooter: String = {
+        return NSLocalizedString("heartbeatDeviceFooter", tableName: filename, bundle: Bundle.main, value: "A heartbeat device does not provide glucose readings. It uses Bluetooth activity to wake the app in the background so follower updates, alarms, badges and notifications can keep running.", comment: "Follower HeartBeat bluetooth list footer. Explains that the device wakes the app in the background but does not provide glucose readings.")
+    }()
+
+    static let m5StackDeviceFooter: String = {
+        return NSLocalizedString("m5StackDeviceFooter", tableName: filename, bundle: Bundle.main, value: "M5Stack devices are small ESP32-based external displays. They can show glucose values sent from xDrip4iOS over Bluetooth.", comment: "M5Stack bluetooth type selection footer. Explains what M5Stack devices do.")
+    }()
     
     static let batteryLevel: String = {
         return NSLocalizedString("batteryLevel", tableName: filename, bundle: Bundle.main, value: "Battery Level", comment: "title of the cell where transmitter battery level is shown in detailed screen")

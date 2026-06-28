@@ -131,6 +131,7 @@ struct BluetoothPeripheralCategorySelectionView: View {
 struct BluetoothPeripheralTypeSelectionView: View {
     let category: BluetoothPeripheralCategory
 
+    @Environment(\.openURL) private var openURL
     @ObservedObject var viewModel: BluetoothPeripheralsViewModel
     @ObservedObject var router: BluetoothPeripheralsRouter
 
@@ -150,6 +151,8 @@ struct BluetoothPeripheralTypeSelectionView: View {
                     .buttonStyle(.plain)
                     .contentShape(Rectangle())
                 }
+            } footer: {
+                footerView
             }
         }
         .listStyle(.insetGrouped)
@@ -162,6 +165,33 @@ struct BluetoothPeripheralTypeSelectionView: View {
 
     private func open(type bluetoothPeripheralType: BluetoothPeripheralType) {
         router.openPeripheral?(nil, bluetoothPeripheralType)
+    }
+
+    @ViewBuilder private var footerView: some View {
+        switch category {
+        case .HeartBeat:
+            footerText(Texts_BluetoothPeripheralsView.heartbeatDeviceFooter)
+        case .M5Stack:
+            VStack(alignment: .leading, spacing: 6) {
+                footerText(Texts_BluetoothPeripheralsView.m5StackDeviceFooter)
+
+                Button {
+                    if let url = URL(string: "https://m5stack.com") {
+                        openURL(url)
+                    }
+                } label: {
+                    Text("m5stack.com")
+                }
+            }
+        case .CGM:
+            EmptyView()
+        }
+    }
+
+    private func footerText(_ text: String) -> some View {
+        Text(text)
+            .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
+            .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
     }
 }
 

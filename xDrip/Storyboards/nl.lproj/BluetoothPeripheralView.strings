@@ -42,7 +42,6 @@
 "useOtherDexcomAppFooter" = "In co-existentiemodus kunnen we samenwerken met een andere app, zoals Dexcom of CamAPS. Die app moet op de achtergrond blijven draaien. Primaire modus verbindt als hoofdapp en beheert de verbinding.";
 "runningInCoexistenceMode" = "Actief in co-existentiemodus";
 "runningInPrimaryMode" = "Actief in primaire modus";
-
 /// cell text, sensor start time
 "sensorStartDate" = "Sensor Started";
 

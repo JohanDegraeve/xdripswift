@@ -2,6 +2,9 @@
 /// title of the cell where transmitter battery level is shown in detailed screen
 "batteryLevel" = "Batteriestand";
 
+"heartbeatDeviceFooter" = "Ein Heartbeat-Gerät liefert keine Glukosewerte. Es nutzt Bluetooth-Aktivität, um die App im Hintergrund zu wecken, damit Follower-Aktualisierungen, Alarme, Badges und Benachrichtigungen weiterlaufen können.";
+"m5StackDeviceFooter" = "M5Stack-Geräte sind kleine ESP32-basierte externe Displays. Sie können Glukosewerte anzeigen, die xDrip4iOS per Bluetooth sendet.";
+
 /// when clicking add button in screen with list of bluetoothperipherals, title of pop up where user  needs to select bluetooth peripheral category
 "selectCategory" = "Typ wählen";
 

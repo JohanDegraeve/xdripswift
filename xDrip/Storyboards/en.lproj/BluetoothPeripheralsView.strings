@@ -2,4 +2,6 @@
 "selectCategory" = "Select Type";
 "selectType" = "Select Transmitter Type";
 "batteryLevel" = "Battery Level";
+"heartbeatDeviceFooter" = "A heartbeat device does not provide glucose readings. It uses Bluetooth activity to wake the app in the background so follower updates, alarms, badges and notifications can keep running.";
+"m5StackDeviceFooter" = "M5Stack devices are small ESP32-based external displays. They can show glucose values sent from xDrip4iOS over Bluetooth.";
 "noMultipleActiveCGMsAllowed" = "You already have one CGM transmitter connected.\n\nVerify your other CGM transmitters and click 'Stop Scanning', 'Disconnect' or just delete them if needed.";

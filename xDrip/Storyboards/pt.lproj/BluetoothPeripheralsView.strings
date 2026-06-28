@@ -2,4 +2,6 @@
 "selectCategory" = "Escolher Tipo";
 "selectType" = "Escolher Tipo de Transmissor";
 "batteryLevel" = "Nível de Bateria";
+"heartbeatDeviceFooter" = "Um dispositivo de heartbeat não fornece leituras de glicose. Usa a atividade Bluetooth para despertar a app em segundo plano, para que atualizações de seguidor, alarmes, emblemas e notificações possam continuar a funcionar.";
+"m5StackDeviceFooter" = "Os dispositivos M5Stack são pequenos ecrãs externos baseados em ESP32. Podem mostrar valores de glicose enviados pelo xDrip4iOS por Bluetooth.";
 "noMultipleActiveCGMsAllowed" = "Já tem um transmissor CGM conectado.\n\nVerifique os outros transmissores CGM e pressione 'Parar de Procurar', 'Desconectar' ou elimine-os se preciso.";

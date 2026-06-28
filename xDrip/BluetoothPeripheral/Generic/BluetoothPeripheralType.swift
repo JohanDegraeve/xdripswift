@@ -25,17 +25,14 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// Dexcom
     case DexcomType = "Dexcom G5/G6/ONE"
     
-    /// Dexcom G7
-    case DexcomG7Type = "Dexcom G7/ONE+/Stelo"
+    /// Dexcom G7, Dexcom G7 heartbeat
+    case DexcomG7Type, DexcomG7HeartBeatType = "Dexcom G7/ONE+/Stelo"
     
     /// to use a Libre (such as L2 US/CA/AUS or Libre 3/Libre 3 Plus) or just any generic heartbeat device as heartbeat
-    case Libre3HeartBeatType = "Libre/Generic HeartBeat"
-    
-    /// DexcomG7 heartbeat
-    case DexcomG7HeartBeatType = "Dexcom G7/ONE+/Stelo HeartBeat"
+    case Libre3HeartBeatType = "Libre/Generic"
     
     /// omnipod heartbeat
-    case OmniPodHeartBeatType = "OmniPod HeartBeat"
+    case OmniPodHeartBeatType = "OmniPod"
 
     func createNewBluetoothPeripheral(withAddress address: String, withName name: String, nsManagedObjectContext: NSManagedObjectContext) -> BluetoothPeripheral {
         
