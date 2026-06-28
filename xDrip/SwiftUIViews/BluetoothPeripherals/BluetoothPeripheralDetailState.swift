@@ -19,6 +19,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     @Published private(set) var connectButtonIsEnabled = true
     @Published private(set) var connectButtonStatusText = ""
     @Published private(set) var connectButtonIsStopAction = false
+    @Published private(set) var connectButtonTintColor = BluetoothPeripheralConnectButtonTintColor.green
     @Published private(set) var statusFooterText: String?
     @Published private(set) var connectionStatus = BluetoothPeripheralDisplayStatus.notScanning
     @Published private(set) var category = BluetoothPeripheralCategory.CGM
@@ -140,6 +141,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         connectButtonIsEnabled = connectButtonState.isEnabled
         connectButtonStatusText = connectButtonState.statusText
         connectButtonIsStopAction = connectButtonState.isStopAction
+        connectButtonTintColor = connectButtonState.tintColor
         statusFooterText = makeStatusFooterText()
         connectionStatus = makeConnectionDisplayStatus()
         category = expectedBluetoothPeripheralType.category()
@@ -397,7 +399,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
 private extension BluetoothPeripheralDetailState {
     func makeConnectButtonState() -> BluetoothPeripheralConnectButtonState {
         guard let bluetoothPeripheralManager = bluetoothPeripheralManager as? BluetoothPeripheralManager else {
-            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.connect, isEnabled: false, statusText: "")
+            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.connect, isEnabled: false, statusText: "", tintColor: .disabledGray)
         }
 
         if let bluetoothPeripheral = bluetoothPeripheral {
@@ -405,36 +407,36 @@ private extension BluetoothPeripheralDetailState {
                 // Keep this as a stop action while the device is active.
                 // Dexcom can rapidly move between scanning and connected during each reading cycle.
                 if nfcScanNeeded {
-                    return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: true, statusText: Texts_BluetoothPeripheralView.nfcScanNeeded, isStopAction: true)
+                    return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: true, statusText: Texts_BluetoothPeripheralView.nfcScanNeeded, isStopAction: true, tintColor: .red)
                 }
 
                 let statusText = bluetoothPeripheralIsConnected(bluetoothPeripheral: bluetoothPeripheral, bluetoothPeripheralManager: bluetoothPeripheralManager)
                     ? Texts_BluetoothPeripheralView.connected
                     : Texts_BluetoothPeripheralView.tryingToConnect
 
-                return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: true, statusText: statusText, isStopAction: true)
+                return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: true, statusText: statusText, isStopAction: true, tintColor: .red)
             }
 
             return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.connect, isEnabled: true, statusText: Texts_BluetoothPeripheralView.notTryingToConnect)
         }
 
         if expectedBluetoothPeripheralType.needsTransmitterId(), transmitterIdTempValue == nil {
-            return BluetoothPeripheralConnectButtonState(title: Texts_SettingsView.labelTransmitterIdTextForButton, isEnabled: true, statusText: Texts_BluetoothPeripheralView.needsTransmitterId)
+            return BluetoothPeripheralConnectButtonState(title: Texts_SettingsView.labelTransmitterIdTextForButton, isEnabled: true, statusText: Texts_BluetoothPeripheralView.needsTransmitterId, tintColor: .blue)
         }
 
         if nfcScanNeeded {
-            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.scanning, isEnabled: true, statusText: Texts_BluetoothPeripheralView.nfcScanNeeded)
+            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.scanning, isEnabled: true, statusText: Texts_BluetoothPeripheralView.nfcScanNeeded, tintColor: .neutral)
         }
 
         if nfcScanSuccessful {
-            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: false, statusText: Texts_BluetoothPeripheralView.tryingToConnect, isStopAction: true)
+            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: false, statusText: Texts_BluetoothPeripheralView.tryingToConnect, isStopAction: true, tintColor: .disabledGray)
         }
 
         if !isScanning {
             return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.scan, isEnabled: true, statusText: Texts_BluetoothPeripheralView.readyToScan)
         }
 
-        return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.scanning, isEnabled: false, statusText: Texts_BluetoothPeripheralView.scanning)
+        return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.scanning, isEnabled: false, statusText: Texts_BluetoothPeripheralView.scanning, tintColor: .disabledGray)
     }
 
     func makeConnectionDisplayStatus() -> BluetoothPeripheralDisplayStatus {
@@ -1235,13 +1237,23 @@ struct BluetoothPeripheralConnectButtonState {
     let isEnabled: Bool
     let statusText: String
     let isStopAction: Bool
+    let tintColor: BluetoothPeripheralConnectButtonTintColor
 
-    init(title: String, isEnabled: Bool, statusText: String, isStopAction: Bool = false) {
+    init(title: String, isEnabled: Bool, statusText: String, isStopAction: Bool = false, tintColor: BluetoothPeripheralConnectButtonTintColor = .green) {
         self.title = title
         self.isEnabled = isEnabled
         self.statusText = statusText
         self.isStopAction = isStopAction
+        self.tintColor = tintColor
     }
+}
+
+enum BluetoothPeripheralConnectButtonTintColor {
+    case disabledGray
+    case neutral
+    case green
+    case blue
+    case red
 }
 
 struct BluetoothPeripheralDetailAlert: Identifiable {

@@ -76,7 +76,7 @@ struct BluetoothPeripheralDetailView: View {
     }
 
     private var connectButtonTint: Color {
-        state.connectButtonIsStopAction ? .red : .green
+        state.connectButtonTintColor.color
     }
 
     private func makeAlert(_ alert: BluetoothPeripheralDetailAlert) -> Alert {
@@ -144,6 +144,23 @@ private extension BluetoothPeripheralDisplayStatus {
             return "antenna.radiowaves.left.and.right.slash"
         case .scanning, .connected:
             return "antenna.radiowaves.left.and.right"
+        }
+    }
+}
+
+private extension BluetoothPeripheralConnectButtonTintColor {
+    var color: Color {
+        switch self {
+        case .disabledGray:
+            return Color(.systemGray)
+        case .neutral:
+            return Color(.systemGray2)
+        case .green:
+            return .green
+        case .blue:
+            return .blue
+        case .red:
+            return .red
         }
     }
 }
