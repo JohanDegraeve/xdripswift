@@ -781,7 +781,8 @@ private struct SettingsNativeSectionView: View {
         } footer: {
             if let footer = section.footer {
                 Text(footer)
-                    .foregroundStyle(Color(.colorSecondary))
+                    .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
+                    .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
             }
         }
     }
