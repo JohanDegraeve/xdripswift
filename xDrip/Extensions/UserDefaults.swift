@@ -99,6 +99,8 @@ extension UserDefaults {
         case bgSmoothingPeriodInMinutes = "bgSmoothingPeriodInMinutes"
         /// BG smoothing strength
         case bgSmoothingStrength = "bgSmoothingStrength"
+        /// BG smoothing algorithm
+        case bgSmoothingAlgorithm = "bgSmoothingAlgorithm"
         /// should faster CGM streams be reduced to visible 5 minute readings?
         case useFiveMinuteReadings = "useFiveMinuteReadings"
         /// timestamp from which the current 5 minute readings setting should be applied
@@ -866,6 +868,20 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.bgSmoothingStrength.rawValue)
+        }
+    }
+
+    /// smoothing algorithm
+    var bgSmoothingAlgorithm: BgSmoothingAlgorithm {
+        get {
+            guard let smoothingAlgorithmRawValue = string(forKey: Key.bgSmoothingAlgorithm.rawValue) else {
+                return ConstantsBgSmoothing.defaultSmoothingAlgorithm
+            }
+
+            return BgSmoothingAlgorithm(rawValue: smoothingAlgorithmRawValue) ?? ConstantsBgSmoothing.defaultSmoothingAlgorithm
+        }
+        set {
+            set(newValue.rawValue, forKey: Key.bgSmoothingAlgorithm.rawValue)
         }
     }
 

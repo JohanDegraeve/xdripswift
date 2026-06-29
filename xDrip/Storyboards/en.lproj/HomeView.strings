@@ -108,3 +108,6 @@
 "snoozeUrgentAlarms" = "Urgent Alarms Only";
 
 "postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+"postProcessingAlgorithmSavitzkyGolayDescription" = "Savitzky-Golay smooths the glucose curve by fitting short local windows while preserving the general shape of peaks and troughs.";

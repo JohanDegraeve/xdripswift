@@ -419,6 +419,18 @@ enum Texts_HomeView {
         return NSLocalizedString("postProcessingStrength", tableName: filename, bundle: Bundle.main, value: "Strength", comment: "post processing smoothing strength picker title")
     }()
 
+    static let postProcessingAlgorithm: String = {
+        return NSLocalizedString("postProcessingAlgorithm", tableName: filename, bundle: Bundle.main, value: "Algorithm", comment: "post processing smoothing algorithm picker title")
+    }()
+
+    static let postProcessingAlgorithmSavitzkyGolay: String = {
+        return NSLocalizedString("postProcessingAlgorithmSavitzkyGolay", tableName: filename, bundle: Bundle.main, value: "Savitzky-Golay", comment: "post processing Savitzky-Golay smoothing algorithm")
+    }()
+
+    static let postProcessingAlgorithmSavitzkyGolayDescription: String = {
+        return NSLocalizedString("postProcessingAlgorithmSavitzkyGolayDescription", tableName: filename, bundle: Bundle.main, value: "Savitzky-Golay smooths the glucose curve by fitting short local windows while preserving the general shape of peaks and troughs.", comment: "post processing footer text explaining the selected Savitzky-Golay smoothing algorithm")
+    }()
+
     static let postProcessingLight: String = {
         return NSLocalizedString("postProcessingLight", tableName: filename, bundle: Bundle.main, value: "Light", comment: "post processing smoothing light option")
     }()

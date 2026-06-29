@@ -260,7 +260,7 @@ class BgPostProcessingManager {
         // or a different follower stream. Reset the entire editing state so any
         // new source starts from neutral values and disabled post processing.
         UserDefaults.standard.enableAdjustment = false
-        updateSmoothingSettings(enableSmoothing: false, useFiveMinuteReadings: ConstantsBgSmoothing.defaultUseFiveMinuteReadings, smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes, smoothingStrength: ConstantsBgSmoothing.defaultSmoothingStrength)
+        updateSmoothingSettings(enableSmoothing: false, useFiveMinuteReadings: ConstantsBgSmoothing.defaultUseFiveMinuteReadings, smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes, smoothingStrength: ConstantsBgSmoothing.defaultSmoothingStrength, smoothingAlgorithm: ConstantsBgSmoothing.defaultSmoothingAlgorithm)
         UserDefaults.standard.fiveMinuteReadingsStartTimeStamp = nil
         UserDefaults.standard.postProcessingStartTimeStamp = sourceHistoryStartTimeStamp()
         UserDefaults.standard.postProcessingApplyFromTimeStamp = UserDefaults.standard.postProcessingStartTimeStamp
@@ -286,18 +286,18 @@ class BgPostProcessingManager {
     }
 
     /// store the current smoothing settings and immediately reprocess the latest readings
-    func updateSmoothing(enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingPeriodInMinutes: Int, smoothingStrength: Int) {
+    func updateSmoothing(enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingPeriodInMinutes: Int, smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm = UserDefaults.standard.bgSmoothingAlgorithm) {
         if UserDefaults.standard.useFiveMinuteReadings != useFiveMinuteReadings {
             UserDefaults.standard.fiveMinuteReadingsStartTimeStamp = latestBgReadingForCurrentSourceContext()?.timeStamp ?? Date()
         }
 
-        updateSmoothingSettings(enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingPeriodInMinutes: smoothingPeriodInMinutes, smoothingStrength: smoothingStrength)
+        updateSmoothingSettings(enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingPeriodInMinutes: smoothingPeriodInMinutes, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm)
         let rewriteStartDate = UserDefaults.standard.postProcessingApplyFromTimeStamp ?? UserDefaults.standard.postProcessingStartTimeStamp
         _ = processBgReadings(processingStartDateOverride: rewriteStartDate, fiveMinuteReadingsStartTimeStampOverride: rewriteStartDate, allowHistoricalDownstreamRewrite: true)
         notifyBgPostProcessingDidUpdate()
     }
 
-    func applyPostProcessing(enableAdjustment: Bool, slope: Double?, intercept: Double?, adjustmentShapeType: BgAdjustmentShapeType, applyFromTimeStamp: Date, isBasicAdjustment: Bool, enteredBgValue: Double?, sourceCalculatedValue: Double?, enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingPeriodInMinutes: Int, smoothingStrength: Int, processingStartDateOverride: Date? = nil) {
+    func applyPostProcessing(enableAdjustment: Bool, slope: Double?, intercept: Double?, adjustmentShapeType: BgAdjustmentShapeType, applyFromTimeStamp: Date, isBasicAdjustment: Bool, enteredBgValue: Double?, sourceCalculatedValue: Double?, enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingPeriodInMinutes: Int, smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm = UserDefaults.standard.bgSmoothingAlgorithm, processingStartDateOverride: Date? = nil) {
         trace("%{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, applyPostProcessingDescription(enableAdjustment: enableAdjustment, slope: slope, intercept: intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: applyFromTimeStamp, enteredBgValue: enteredBgValue, sourceCalculatedValue: sourceCalculatedValue, enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingStrength: smoothingStrength, processingStartDateOverride: processingStartDateOverride))
 
         if enableAdjustment, let slope = slope, let intercept = intercept {
@@ -318,7 +318,7 @@ class BgPostProcessingManager {
         // reprocess the intended range.
         UserDefaults.standard.postProcessingApplyFromTimeStamp = applyFromTimeStamp
 
-        updateSmoothingSettings(enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingPeriodInMinutes: smoothingPeriodInMinutes, smoothingStrength: smoothingStrength)
+        updateSmoothingSettings(enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingPeriodInMinutes: smoothingPeriodInMinutes, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm)
 
         let rewriteStartDate = processingStartDateOverride ?? applyFromTimeStamp
         _ = processBgReadings(processingStartDateOverride: rewriteStartDate, fiveMinuteReadingsStartTimeStampOverride: rewriteStartDate, allowHistoricalDownstreamRewrite: true)
@@ -660,11 +660,12 @@ class BgPostProcessingManager {
         UserDefaults.standard.enableAdjustment = false
     }
 
-    private func updateSmoothingSettings(enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingPeriodInMinutes: Int, smoothingStrength: Int) {
+    private func updateSmoothingSettings(enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingPeriodInMinutes: Int, smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm) {
         UserDefaults.standard.enableSmoothing = enableSmoothing
         UserDefaults.standard.useFiveMinuteReadings = useFiveMinuteReadings
         UserDefaults.standard.bgSmoothingPeriodInMinutes = smoothingPeriodInMinutes
         UserDefaults.standard.bgSmoothingStrength = smoothingStrength
+        UserDefaults.standard.bgSmoothingAlgorithm = smoothingAlgorithm
     }
 
     private func recomputeSmoothedValues(bgReadings: [BgReading]) {
@@ -823,7 +824,7 @@ class BgPostProcessingManager {
 
     /// preview smoothing uses the same grouped path as stored processing so
     /// the chart always mirrors the values that would actually be written
-    func smoothedValuesSeparatedByReadingGap(values: [Double], readingDates: [Date], smoothingStrength: Int) -> [Double] {
+    func smoothedValuesSeparatedByReadingGap(values: [Double], readingDates: [Date], smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm = UserDefaults.standard.bgSmoothingAlgorithm) -> [Double] {
         guard values.count == readingDates.count else { return values }
         guard values.count >= ConstantsBgSmoothing.minimumReadingsForSmoothing else { return values }
 
@@ -838,7 +839,7 @@ class BgPostProcessingManager {
 
             let contiguousValues = contiguousReadingIndexes.map { values[$0] }
             let contiguousReadingDates = contiguousReadingIndexes.map { readingDates[$0] }
-            let smoothedValues = cadenceAwareSmoothedValues(values: contiguousValues, readingDates: contiguousReadingDates, smoothingStrength: smoothingStrength)
+            let smoothedValues = cadenceAwareSmoothedValues(values: contiguousValues, readingDates: contiguousReadingDates, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm)
 
             for (segmentIndex, readingIndex) in contiguousReadingIndexes.enumerated() {
                 groupedSmoothedValues[readingIndex] = smoothedValues[segmentIndex]
@@ -848,14 +849,17 @@ class BgPostProcessingManager {
         return groupedSmoothedValues
     }
 
-    private func cadenceAwareSmoothedValues(values: [Double], readingDates: [Date], smoothingStrength: Int) -> [Double] {
+    private func cadenceAwareSmoothedValues(values: [Double], readingDates: [Date], smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm) -> [Double] {
         guard values.count == readingDates.count else { return values }
 
-        if sourceCanUseFiveMinuteReadings(readingDates: readingDates) {
-            return fastCadenceSmoothedValues(values: values, readingDates: readingDates, smoothingStrength: smoothingStrength)
-        }
+        switch smoothingAlgorithm {
+        case .savitzkyGolay:
+            if sourceCanUseFiveMinuteReadings(readingDates: readingDates) {
+                return fastCadenceSmoothedValues(values: values, readingDates: readingDates, smoothingStrength: smoothingStrength)
+            }
 
-        return savitzkyGolaySmoothedValues(values: values, smoothingStrength: smoothingStrength)
+            return savitzkyGolaySmoothedValues(values: values, smoothingStrength: smoothingStrength)
+        }
     }
 
     private func fastCadenceSmoothedValues(values: [Double], readingDates: [Date], smoothingStrength: Int) -> [Double] {

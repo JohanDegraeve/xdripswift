@@ -1,5 +1,23 @@
 import Foundation
 
+enum BgSmoothingAlgorithm: String, CaseIterable {
+    case savitzkyGolay = "savitzkyGolay"
+
+    var description: String {
+        switch self {
+        case .savitzkyGolay:
+            return Texts_HomeView.postProcessingAlgorithmSavitzkyGolay
+        }
+    }
+
+    var footerDescription: String {
+        switch self {
+        case .savitzkyGolay:
+            return Texts_HomeView.postProcessingAlgorithmSavitzkyGolayDescription
+        }
+    }
+}
+
 enum ConstantsBgSmoothing {
     
     /// default smoothing period in minutes
@@ -7,6 +25,9 @@ enum ConstantsBgSmoothing {
 
     /// default smoothing strength
     static let defaultSmoothingStrength = 1
+
+    /// default smoothing algorithm
+    static let defaultSmoothingAlgorithm: BgSmoothingAlgorithm = .savitzkyGolay
 
     /// default state for reducing faster CGM streams down to one visible reading
     /// approximately every 5 minutes

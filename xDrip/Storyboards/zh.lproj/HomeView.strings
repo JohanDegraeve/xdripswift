@@ -124,3 +124,5 @@
 "noDataSourceConnected" = "No CGM data source connected";
 
 "postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";

@@ -56,6 +56,7 @@ struct BgAdjustmentsView: View {
     @State private var adjustmentShapeTypeRawValue = ConstantsBgAdjustment.defaultShapeType.rawValue
     @State private var openedSlopeValue = 1.00
     @State private var openedInterceptValue = 0.0
+    @State private var smoothingAlgorithm = UserDefaults.standard.bgSmoothingAlgorithm
     @State private var smoothingStrength = UserDefaults.standard.bgSmoothingStrength
     @State private var selectedApplyFromPeriodIndex = 0
     @State private var chartHoursToShow = Double(UserDefaults.standard.postProcessingPreviewChartHoursToShow)
@@ -78,6 +79,7 @@ struct BgAdjustmentsView: View {
             VStack(spacing: 0) {
                 chartView()
                     .padding(.top, 8)
+                    .padding(.bottom, 10)
 
                 List {
                     adjustmentSection()
@@ -131,6 +133,9 @@ struct BgAdjustmentsView: View {
             .onChange(of: smoothingStrength) { _ in
                 updatePreviewData()
             }
+            .onChange(of: smoothingAlgorithm) { _ in
+                updatePreviewData()
+            }
             .onChange(of: chartHoursToShow) { newValue in
                 UserDefaults.standard.postProcessingPreviewChartHoursToShow = Int(newValue)
                 loadBgReadings()
@@ -149,13 +154,13 @@ struct BgAdjustmentsView: View {
     }
 
     @ViewBuilder private func chartView() -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        let chartBackgroundColor = Color(.secondarySystemGroupedBackground)
+
+        VStack(alignment: .leading, spacing: 2) {
             chartContextView()
-                .padding(.horizontal)
                 .font(.subheadline)
 
-            GlucoseChartView(glucoseChartType: .siriGlucoseIntent, bgReadingValues: previewBgReadingValues(), bgReadingDates: previewBgReadingDates(), additionalBgReadingDataSets: chartDataSets(), isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: nil, hoursToShowScalingHours: chartHoursToShow, glucoseCircleDiameterScalingHours: chartHoursToShow, overrideChartHeight: 150, overrideChartWidth: nil, highContrast: nil)
-                .padding(.horizontal)
+            GlucoseChartView(glucoseChartType: .siriGlucoseIntent, bgReadingValues: previewBgReadingValues(), bgReadingDates: previewBgReadingDates(), additionalBgReadingDataSets: chartDataSets(), isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: nil, hoursToShowScalingHours: chartHoursToShow, glucoseCircleDiameterScalingHours: chartHoursToShow, overrideChartHeight: 120, overrideChartWidth: nil, highContrast: nil)
 
             HStack {
                 Text(Texts_HomeView.postProcessingPreviewHours)
@@ -176,23 +181,26 @@ struct BgAdjustmentsView: View {
                 .pickerStyle(.segmented)
                 .frame(maxWidth: 240)
             }
-            .padding(.horizontal)
-            .padding(.bottom, 8)
-
-            if let previewBgCheckHintText = previewBgCheckHintText() {
-                Text(previewBgCheckHintText)
-                    .font(.footnote)
-                    .foregroundStyle(Color(.systemRed))
-                    .padding(.horizontal)
-                    .padding(.bottom, 8)
-            }
         }
+        .padding(.vertical, 8)
+        .padding(.horizontal)
+        .background(chartBackgroundColor)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .padding(.horizontal)
     }
 
     private func adjustmentSection() -> some View {
         Section(header: Text(Texts_HomeView.postProcessingAdjustment), footer: adjustmentSectionFooter()) {
-            Toggle(Texts_HomeView.postProcessingEnable, isOn: $enableAdjustment)
-                .disabled(!shouldAllowAdjustmentForCurrentSource())
+            VStack(alignment: .leading, spacing: 4) {
+                Toggle(Texts_HomeView.postProcessingEnable, isOn: $enableAdjustment)
+                    .disabled(!shouldAllowAdjustmentForCurrentSource())
+
+                if effectiveEnableAdjustment(), let previewBgCheckHintText = previewBgCheckHintText() {
+                    Text(previewBgCheckHintText)
+                        .font(.footnote)
+                        .foregroundStyle(Color(.systemRed))
+                }
+            }
 
             if effectiveEnableAdjustment() {
                 offsetAdjustmentValueRow()
@@ -304,6 +312,20 @@ struct BgAdjustmentsView: View {
                     smoothingStrengthPickerItem(title: Texts_HomeView.postProcessingStrong, strength: 2)
                 }
                 .pickerStyle(.segmented)
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Picker(Texts_HomeView.postProcessingAlgorithm, selection: $smoothingAlgorithm) {
+                        ForEach(BgSmoothingAlgorithm.allCases, id: \.self) { smoothingAlgorithm in
+                            Text(smoothingAlgorithm.description)
+                                .tag(smoothingAlgorithm)
+                        }
+                    }
+
+                    Text(smoothingAlgorithm.footerDescription)
+                        .font(.footnote)
+                        .foregroundStyle(Color(.colorSecondary))
+                }
+                .padding(.vertical, 2)
             }
         }
     }
@@ -319,30 +341,26 @@ struct BgAdjustmentsView: View {
     private func applyFromSection() -> some View {
         let applyFromOptions = availableApplyFromOptions()
 
-        return Section(header: Text(Texts_HomeView.postProcessingApplyFrom)) {
+        return Section(header: Text(applyFromSectionTitle())) {
             VStack(alignment: .leading, spacing: 10) {
                 compactApplyFromControl(applyFromOptions: applyFromOptions)
 
                 if let sourceDataNotUpdatedWarningText = sourceDataNotUpdatedWarningText() {
-                    Text("⚠️ " + sourceDataNotUpdatedWarningText)
-                        .font(.footnote)
-                        .foregroundStyle(Color(.colorSecondary))
-                }
-
-                if selectedApplyFromPeriodIndex > 0 {
-                    Text("⚠️ " + String(format: Texts_HomeView.postProcessingUpdateAllReadingsLastPeriod, applyFromOptions[selectedApplyFromPeriodIndex].title.replacingOccurrences(of: "-", with: "")))
+                    Text(sourceDataNotUpdatedWarningText)
                         .font(.footnote)
                         .foregroundStyle(Color(.colorSecondary))
                 }
             }
-            .listRowBackground(applyFromSectionBackgroundColor())
 
-            Button(Texts_HomeView.postProcessingApply) {
+            Button(action: {
                 applySelectedChanges()
+            }) {
+                Text(Texts_HomeView.postProcessingApply)
+                    .frame(maxWidth: .infinity)
             }
-            .frame(maxWidth: .infinity, alignment: .center)
+            .buttonStyle(.borderedProminent)
+            .tint(applyButtonTintColor())
             .disabled(!canApplySelectedChanges())
-            .listRowBackground(applyFromSectionBackgroundColor())
         }
     }
 
@@ -428,6 +446,7 @@ struct BgAdjustmentsView: View {
         enableAdjustment = UserDefaults.standard.enableAdjustment
         enableSmoothing = UserDefaults.standard.enableSmoothing
         useFiveMinuteReadings = UserDefaults.standard.useFiveMinuteReadings
+        smoothingAlgorithm = UserDefaults.standard.bgSmoothingAlgorithm
         smoothingStrength = UserDefaults.standard.bgSmoothingStrength
         chartHoursToShow = Double(UserDefaults.standard.postProcessingPreviewChartHoursToShow)
         currentBgAdjustment = bgPostProcessingManager.latestActiveBgAdjustment()
@@ -577,13 +596,13 @@ struct BgAdjustmentsView: View {
     }
 
     private func smoothPreviewValues(previewValues: [Double]) -> [Double] {
-        return bgPostProcessingManager.smoothedValuesSeparatedByReadingGap(values: previewValues, readingDates: bgReadings.map { $0.timeStamp }, smoothingStrength: smoothingStrength)
+        return bgPostProcessingManager.smoothedValuesSeparatedByReadingGap(values: previewValues, readingDates: bgReadings.map { $0.timeStamp }, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm)
     }
 
     private func applyNowChanges() {
         let adjustmentPreview = currentAdjustmentPreview()
 
-        bgPostProcessingManager.applyPostProcessing(enableAdjustment: effectiveEnableAdjustment(), slope: adjustmentPreview?.slope, intercept: adjustmentPreview?.intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: selectedApplyFromTimeStamp(), isBasicAdjustment: false, enteredBgValue: currentAdjustedGlucoseValueInMgDl(), sourceCalculatedValue: bgReadings.last?.calculatedValue, enableSmoothing: enableSmoothing, useFiveMinuteReadings: effectiveUseFiveMinuteReadings(), smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes, smoothingStrength: smoothingStrength)
+        bgPostProcessingManager.applyPostProcessing(enableAdjustment: effectiveEnableAdjustment(), slope: adjustmentPreview?.slope, intercept: adjustmentPreview?.intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: selectedApplyFromTimeStamp(), isBasicAdjustment: false, enteredBgValue: currentAdjustedGlucoseValueInMgDl(), sourceCalculatedValue: bgReadings.last?.calculatedValue, enableSmoothing: enableSmoothing, useFiveMinuteReadings: effectiveUseFiveMinuteReadings(), smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm)
         presentationMode.wrappedValue.dismiss()
     }
 
@@ -591,7 +610,7 @@ struct BgAdjustmentsView: View {
         let adjustmentPreview = currentAdjustmentPreview()
         let historicalApplyFromTimeStamp = selectedHistoricalApplyFromTimeStamp()
 
-        bgPostProcessingManager.applyPostProcessing(enableAdjustment: effectiveEnableAdjustment(), slope: adjustmentPreview?.slope, intercept: adjustmentPreview?.intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: historicalApplyFromTimeStamp, isBasicAdjustment: false, enteredBgValue: currentAdjustedGlucoseValueInMgDl(), sourceCalculatedValue: bgReadings.last?.calculatedValue, enableSmoothing: enableSmoothing, useFiveMinuteReadings: effectiveUseFiveMinuteReadings(), smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes, smoothingStrength: smoothingStrength, processingStartDateOverride: historicalApplyFromTimeStamp)
+        bgPostProcessingManager.applyPostProcessing(enableAdjustment: effectiveEnableAdjustment(), slope: adjustmentPreview?.slope, intercept: adjustmentPreview?.intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: historicalApplyFromTimeStamp, isBasicAdjustment: false, enteredBgValue: currentAdjustedGlucoseValueInMgDl(), sourceCalculatedValue: bgReadings.last?.calculatedValue, enableSmoothing: enableSmoothing, useFiveMinuteReadings: effectiveUseFiveMinuteReadings(), smoothingPeriodInMinutes: ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm, processingStartDateOverride: historicalApplyFromTimeStamp)
         presentationMode.wrappedValue.dismiss()
     }
 
@@ -620,7 +639,12 @@ struct BgAdjustmentsView: View {
             return currentAdjustmentPreview() != nil
         }
 
-        return enableSmoothing != UserDefaults.standard.enableSmoothing || effectiveUseFiveMinuteReadings() != UserDefaults.standard.useFiveMinuteReadings || smoothingStrength != UserDefaults.standard.bgSmoothingStrength || currentBgAdjustment != nil
+        let smoothingEnabledChanged = enableSmoothing != UserDefaults.standard.enableSmoothing
+        let fiveMinuteReadingsChanged = effectiveUseFiveMinuteReadings() != UserDefaults.standard.useFiveMinuteReadings
+        let smoothingStrengthChanged = smoothingStrength != UserDefaults.standard.bgSmoothingStrength
+        let smoothingAlgorithmChanged = smoothingAlgorithm != UserDefaults.standard.bgSmoothingAlgorithm
+
+        return smoothingEnabledChanged || fiveMinuteReadingsChanged || smoothingStrengthChanged || smoothingAlgorithmChanged || currentBgAdjustment != nil
     }
 
     private func canApplySelectedChanges() -> Bool {
@@ -633,12 +657,14 @@ struct BgAdjustmentsView: View {
         return canApplyChanges()
     }
 
-    private func applyFromSectionBackgroundColor() -> Color {
-        if selectedApplyFromPeriodIndex > 0 {
-            return ConstantsUI.warningSectionBackgroundColor
-        }
+    private func applyFromSectionTitle() -> String {
+        guard selectedApplyFromPeriodIndex > 0 else { return Texts_HomeView.postProcessingApplyFrom }
 
-        return Color(.clear)
+        return Texts_HomeView.postProcessingApplyFrom + " " + selectedHistoricalApplyFromTimeStamp().toString(timeStyle: .short, dateStyle: .none)
+    }
+
+    private func applyButtonTintColor() -> Color {
+        return selectedApplyFromPeriodIndex > 0 ? Color(.systemRed) : Color(.systemBlue)
     }
 
     private func shouldAllowAdjustmentForCurrentSource() -> Bool {
@@ -730,10 +756,6 @@ struct BgAdjustmentsView: View {
         guard let value = value else { return Texts_Common.unknown }
 
         return String(format: "%.2f", value)
-    }
-
-    private func adjustmentValueColor(isChanged: Bool) -> Color {
-        return isChanged ? Color(.colorPrimary) : Color(.colorTertiary)
     }
 
     private func scaleValueTextColor() -> Color {
