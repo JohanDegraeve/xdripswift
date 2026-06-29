@@ -203,12 +203,25 @@ class BgPostProcessingManager {
             bgReadingsToReplaceDownstream = bgReadings.filter { !$0.isSuppressedByFiveMinuteCadence }
         } else if let latestVisibleBgReading = bgReadings.last(where: { !$0.isSuppressedByFiveMinuteCadence }) {
             let automaticRewriteStartDate = latestVisibleBgReading.timeStamp.addingTimeInterval(-ConstantsBgSmoothing.automaticDownstreamRewriteLookbackInterval)
-            bgReadingsToReplaceDownstream = bgReadings.filter { bgReading in
-                guard bgReading.timeStamp >= automaticRewriteStartDate else { return false }
-                guard bgReading.objectID != latestVisibleBgReading.objectID else { return false }
-                guard !bgReading.isSuppressedByFiveMinuteCadence else { return false }
-                guard let change = downstreamChangesByObjectID[bgReading.objectID] else { return false }
-                return change.affectsOlderDownstreamHistory
+            let automaticRewriteCandidates = bgReadings.filter { bgReading in
+                return bgReading.timeStamp >= automaticRewriteStartDate
+                    && bgReading.objectID != latestVisibleBgReading.objectID
+                    && !bgReading.isSuppressedByFiveMinuteCadence
+            }
+
+            if UserDefaults.standard.enableSmoothing {
+                // Live smoothing recomputes a recent history tail on every cycle.
+                // During testing it was found that only sending locally changed
+                // readings could leave Nightscout and HealthKit with older values
+                // from the previous smoothing pass. When smoothing is enabled,
+                // rewrite the whole recent visible tail so downstream stores stay
+                // aligned with the current smoothed Core Data values.
+                bgReadingsToReplaceDownstream = automaticRewriteCandidates
+            } else {
+                bgReadingsToReplaceDownstream = automaticRewriteCandidates.filter { bgReading in
+                    guard let change = downstreamChangesByObjectID[bgReading.objectID] else { return false }
+                    return change.affectsOlderDownstreamHistory
+                }
             }
         } else {
             bgReadingsToReplaceDownstream = []
