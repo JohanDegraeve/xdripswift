@@ -35,6 +35,9 @@ enum ConstantsUI {
     /// Text color for SwiftUI grouped list section footers.
     static let listSectionFooterTextColor = Color(.colorSecondary)
 
+    /// Muted red used for Settings parent row summaries when the child feature is disabled.
+    static let rowTitleColorFalse = Color(red: 0.45, green: 0.18, blue: 0.18)
+
     /// dark red tint used for warning-style SwiftUI sections
     static let warningSectionBackgroundColor = Color(red: 0.20, green: 0.12, blue: 0.12)
     

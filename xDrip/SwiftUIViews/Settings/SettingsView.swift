@@ -174,6 +174,7 @@ struct SettingsGroupedRow {
     let id: String
     let title: String
     var detail: (() -> String?)? = nil
+    var detailColor: (() -> Color?)? = nil
     let settingsScreen: () -> SettingsScreen
 }
 
@@ -260,6 +261,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     detail: {
                         UserDefaults.standard.nightscoutEnabled ? Texts_Common.enabled : Texts_Common.disabled
                     },
+                    detailColor: {
+                        groupedStatusDetailColor(isEnabled: UserDefaults.standard.nightscoutEnabled)
+                    },
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleNightscout,
@@ -272,6 +276,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     title: Texts_SettingsView.sectionTitleDexcomShareUpload,
                     detail: {
                         UserDefaults.standard.uploadReadingstoDexcomShare ? Texts_Common.enabled : Texts_Common.disabled
+                    },
+                    detailColor: {
+                        groupedStatusDetailColor(isEnabled: UserDefaults.standard.uploadReadingstoDexcomShare)
                     },
                     settingsScreen: {
                         SettingsScreen(
@@ -286,6 +293,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     detail: {
                         UserDefaults.standard.storeReadingsInHealthkit ? Texts_Common.enabled : Texts_Common.disabled
                     },
+                    detailColor: {
+                        groupedStatusDetailColor(isEnabled: UserDefaults.standard.storeReadingsInHealthkit)
+                    },
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleHealthKit,
@@ -298,6 +308,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     title: Texts_SettingsView.calendarEventsSectionTitle,
                     detail: {
                         UserDefaults.standard.createCalendarEvent ? Texts_Common.enabled : Texts_Common.disabled
+                    },
+                    detailColor: {
+                        groupedStatusDetailColor(isEnabled: UserDefaults.standard.createCalendarEvent)
                     },
                     settingsScreen: {
                         SettingsScreen(
@@ -312,6 +325,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     detail: {
                         UserDefaults.standard.enableContactImage ? Texts_Common.enabled : Texts_Common.disabled
                     },
+                    detailColor: {
+                        groupedStatusDetailColor(isEnabled: UserDefaults.standard.enableContactImage)
+                    },
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.contactImageSectionTitle,
@@ -325,6 +341,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     detail: {
                         UserDefaults.standard.loopShareType.description
                     },
+                    detailColor: {
+                        groupedStatusDetailColor(isEnabled: UserDefaults.standard.loopShareType != .disabled)
+                    },
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.osAidLoopShareSectionTitle,
@@ -337,6 +356,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     title: Texts_SettingsView.sectionTitleSpeak,
                     detail: {
                         UserDefaults.standard.speakReadings ? Texts_Common.enabled : Texts_Common.disabled
+                    },
+                    detailColor: {
+                        groupedStatusDetailColor(isEnabled: UserDefaults.standard.speakReadings)
                     },
                     settingsScreen: {
                         SettingsScreen(
@@ -358,6 +380,12 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
         )
     }
 
+    /// Colours parent row summaries that represent an enabled/disabled child
+    /// feature, so the state is clear without adding extra text or symbols.
+    private static func groupedStatusDetailColor(isEnabled: Bool) -> Color? {
+        isEnabled ? nil : ConstantsUI.rowTitleColorFalse
+    }
+
     func sectionTitle() -> String? {
         title
     }
@@ -368,6 +396,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                 id: row.id,
                 title: row.title,
                 detail: row.detail?(),
+                detailColor: row.detailColor?(),
                 accessory: .disclosure,
                 action: .settingsScreen(row.settingsScreen)
             )
