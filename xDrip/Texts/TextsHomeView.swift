@@ -73,7 +73,7 @@ enum Texts_HomeView {
     }()
 
     static let sensorManagementStatusActive:String = {
-        return NSLocalizedString("sensorManagementStatusActive", tableName: filename, bundle: Bundle.main, value: "Active", comment: "sensor management status label")
+        return NSLocalizedString("sensorManagementStatusActive", tableName: filename, bundle: Bundle.main, value: "Sensor Session Active", comment: "sensor management status label")
     }()
 
     static let sensorManagementStatusWarmingUp:String = {

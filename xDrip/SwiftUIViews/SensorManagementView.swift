@@ -57,7 +57,7 @@ struct SensorManagementView: View {
                             Spacer()
 
                             Image(systemName: "sensor.tag.radiowaves.forward")
-                                .font(.system(size: 30, weight: .semibold))
+                                .font(.system(size: 28, weight: .semibold))
                                 .foregroundStyle(state.statusColor)
                         }
                     }
@@ -65,68 +65,79 @@ struct SensorManagementView: View {
                     .id(refreshView)
                 }
 
-                Section(header: Text(Texts_HomeView.sensorManagementSummaryTitle), footer: summaryFooter(for: state)) {
-                    row(title: Texts_HomeView.sensorStart, data: state.startDateString)
-                    row(title: state.secondarySessionTitle, data: state.secondarySessionValue, dataColor: state.secondarySessionColor)
-                    if state.showsRemainingRow {
-                        row(title: Texts_HomeView.sensorManagementRemaining, data: state.remainingString, dataColor: state.remainingColor)
-                    }
-                }
-
-                Section(header: Text(Texts_HomeView.sensorManagementActionsTitle), footer: actionFooter(for: state)) {
-                    HStack(spacing: 12) {
-                        Button(action: handleStartTap) {
-                            Text(Texts_HomeView.startSensorActionTitle)
-                                .frame(maxWidth: .infinity)
+                if state.hasTransmitter {
+                    Section(header: Text(Texts_HomeView.sensorManagementSummaryTitle), footer: summaryFooter(for: state)) {
+                        row(title: Texts_HomeView.sensorStart, data: state.startDateString)
+                        row(title: state.secondarySessionTitle, data: state.secondarySessionValue, dataColor: state.secondarySessionColor)
+                        if state.showsRemainingRow {
+                            row(title: Texts_HomeView.sensorManagementRemaining, data: state.remainingString, dataColor: state.remainingColor)
                         }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.green)
-                        .disabled(!state.canStartSensor)
+                    }
 
-                        Button(role: .destructive, action: {
-                            showingStopConfirmation = true
+                    Section(header: Text(Texts_HomeView.sensorManagementActionsTitle), footer: actionFooter(for: state)) {
+                        Button(role: state.canStopSensor ? .destructive : nil, action: {
+                            if state.canStopSensor {
+                                showingStopConfirmation = true
+                            } else {
+                                handleStartTap()
+                            }
                         }) {
-                            Text(Texts_HomeView.stopSensorActionTitle)
+                            Text(state.canStopSensor ? Texts_HomeView.stopSensorActionTitle : Texts_HomeView.startSensorActionTitle)
                                 .frame(maxWidth: .infinity)
                         }
                         .buttonStyle(.borderedProminent)
-                        .tint(.red)
-                        .disabled(!state.canStopSensor)
+                        .tint(state.canStopSensor ? .red : .green)
+                        .disabled(!state.canStartSensor && !state.canStopSensor)
+                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                     }
-                    .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-                }
 
-                Section(header: Text(Texts_HomeView.sensorManagementCalibrationTitle), footer: calibrationFooter(for: state)) {
-                    if state.showCalibrationUnavailableRow {
-                        row(title: Texts_HomeView.calibrationButton, data: Texts_Common.notAvailable)
-                    } else {
-                        Button(action: {
-                            calibrationValue = ""
-                            showingCalibrationSheet = true
-                        }) {
-                            Text(Texts_HomeView.calibrationButton)
-                                .frame(maxWidth: .infinity)
+                    Section(header: Text(Texts_HomeView.sensorManagementCalibrationTitle), footer: calibrationFooter(for: state)) {
+                        if state.showCalibrationUnavailableRow {
+                            row(title: Texts_HomeView.calibrationButton, data: Texts_Common.notAvailable)
+                        } else {
+                            Button(action: {
+                                calibrationValue = ""
+                                showingCalibrationSheet = true
+                            }) {
+                                Text(Texts_HomeView.calibrationButton)
+                                    .frame(maxWidth: .infinity)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(Color(.systemBlue))
+                            .disabled(!state.canCalibrate || state.currentBgDisplay == nil)
                         }
-                        .buttonStyle(.borderedProminent)
-                        .tint(Color(.systemBlue))
-                        .disabled(!state.canCalibrate || state.currentBgDisplay == nil)
+
+                        if let currentCalibration = state.currentCalibration {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(Texts_HomeView.sensorManagementCurrentCalibrationTitle)
+                                    .font(.headline)
+                                calibrationSummaryView(calibration: currentCalibration, isHistoric: false)
+                            }
+                            .padding(.vertical, 4)
+                        }
                     }
 
-                    if let currentCalibration = state.currentCalibration {
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(Texts_HomeView.sensorManagementCurrentCalibrationTitle)
+                    if !state.calibrationHistory.isEmpty {
+                        Section(header: Text(Texts_HomeView.sensorManagementHistoryTitle)) {
+                            ForEach(state.calibrationHistory, id: \.id) { calibration in
+                                calibrationSummaryView(calibration: calibration, isHistoric: !calibration.isValid)
+                            }
+                        }
+                    }
+                } else {
+                    Section {
+                        VStack(spacing: 10) {
+                            Image(systemName: "antenna.radiowaves.left.and.right.slash")
+                                .font(.system(size: 30, weight: .semibold))
+                                .foregroundStyle(Color(.colorSecondary))
+
+                            Text(Texts_HomeView.sensorManagementNoTransmitterNote)
                                 .font(.headline)
-                            calibrationSummaryView(calibration: currentCalibration, isHistoric: false)
+                                .multilineTextAlignment(.center)
+                                .foregroundStyle(Color(.colorPrimary))
                         }
-                        .padding(.vertical, 4)
-                    }
-                }
-
-                if !state.calibrationHistory.isEmpty {
-                    Section(header: Text(Texts_HomeView.sensorManagementHistoryTitle)) {
-                        ForEach(state.calibrationHistory, id: \.id) { calibration in
-                            calibrationSummaryView(calibration: calibration, isHistoric: !calibration.isValid)
-                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 24)
                     }
                 }
             }
@@ -718,6 +729,7 @@ struct SensorManagementView: View {
         }
 
         return SensorManagementState(
+            hasTransmitter: transmitter != nil,
             bannerTitle: sensorDescription,
             statusTitle: statusTitle,
             statusColor: statusColor,
@@ -748,6 +760,7 @@ struct SensorManagementView: View {
 }
 
 private struct SensorManagementState {
+    let hasTransmitter: Bool
     let bannerTitle: String
     let statusTitle: String
     let statusColor: Color
