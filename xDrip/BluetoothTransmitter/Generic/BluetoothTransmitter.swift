@@ -97,9 +97,18 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     /// used in BluetoothTransmitter class, eg if after calling discoverServices new method is called and time is exceed, then cancel connection
     private let maxTimeToWaitForPeripheralResponse = 5.0
     
-    /// when trying to connect to a discovered device for the first time, a timer will be used to avoid that connection attempts take forever
-    private var connectTimeOutTimer: Timer?
-    
+    /// Token for the currently active connection timeout.
+    /// Keep this on `centralQueue`: the previous run-loop Timer could be installed after a successful
+    /// `didConnect`, leaving a stale timeout that later disconnected an active Dexcom exchange.
+    private var connectTimeoutAttemptID: Int?
+    private var nextConnectTimeoutAttemptID = 0
+
+    /// Token for the currently active post-connect setup timeout.
+    /// This mirrors LoopKit's timed service-discovery setup: a session that
+    /// reaches `didConnect` must reach service discovery promptly.
+    private var connectionSetupTimeoutAttemptID: Int?
+    private var nextConnectionSetupTimeoutAttemptID = 0
+
     /// de-dup state for connection log spam
     private var lastConnectLogAt: Date = .distantPast
     private var lastConnectLogName: String? = nil
@@ -220,7 +229,21 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             }
         }
     }
-    
+
+    /// Reconnect after an unexpected disconnect. Subclasses can override the
+    /// policy without duplicating the disconnect bookkeeping in this base class.
+    func reconnectAfterDisconnect(_ central: CBCentralManager) {
+        if let ownPeripheral = self.peripheral {
+            central.connect(ownPeripheral, options: connectOptions)
+        }
+    }
+
+    /// Subclasses can opt in when a restored/already-connected session must quickly make
+    /// service-discovery progress or be abandoned. Generic transmitters keep legacy behavior.
+    func shouldTimeoutStalledConnectionSetup() -> Bool {
+        false
+    }
+
     /// gets peripheral connection status, nil if peripheral not existing yet
     func getConnectionStatus() -> CBPeripheralState? {
         return peripheral?.state
@@ -228,33 +251,56 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     /// disconnect the device (reconnect policy unchanged, see `disconnectAndForget()` to disable)
     func disconnect() {
-        centralQueue.async { [weak self] in
-            guard let self = self else { return }
-            if let peripheral = self.peripheral {
-                if let receiveCharacteristic = self.receiveCharacteristic {
-                    peripheral.setNotifyValue(false, for: receiveCharacteristic)
-                }
-                if let centralManager = self.centralManager {
-                    trace("in disconnect, disconnecting, for peripheral with name %{public}@", log: self.log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, self.deviceName ?? "'unknown'")
-                    centralManager.cancelPeripheralConnection(peripheral)
-                }
+        if DispatchQueue.getSpecific(key: centralQueueSpecificKey) != nil {
+            disconnectOnCentralQueue()
+        } else {
+            centralQueue.async { [weak self] in
+                self?.disconnectOnCentralQueue()
+            }
+        }
+    }
+
+    /// Runs the actual CoreBluetooth disconnect work on centralQueue.
+    /// This keeps disconnect, timeout and forget paths serialized with callbacks.
+    private func disconnectOnCentralQueue() {
+        assertOnCentral()
+
+        if let peripheral = peripheral {
+            if let receiveCharacteristic = receiveCharacteristic {
+                peripheral.setNotifyValue(false, for: receiveCharacteristic)
+            }
+            if let centralManager = centralManager {
+                trace("in disconnect, disconnecting, for peripheral with name %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, deviceName ?? "'unknown'")
+                centralManager.cancelPeripheralConnection(peripheral)
             }
         }
     }
     
     /// in case a new device is being scanned for, and we connected (because name matched) but later we want to forget that device, then call this function
     func disconnectAndForget() {
-        // do not auto‑reconnect after a user‑initiated forget (for the next disconnect only)
-        shouldReconnectOnNextDisconnect = false
-        // request disconnect first so OS callbacks can complete
-        disconnect()
-        // clear local references (we are intentionally *not* clearing central/peripheral delegates here
-        // final teardown should call prepareForRelease() when the instance is actually being released)
-        peripheral = nil
-        deviceName = nil
-        deviceAddress = nil
+        let forget = { [weak self] in
+            guard let self = self else { return }
+            // do not auto-reconnect after a user-initiated forget or connection timeout
+            shouldReconnectOnNextDisconnect = false
+            // Request disconnect before clearing the peripheral reference.
+            // Otherwise the timeout path can forget the handle and fail to cancel the actual connection.
+            disconnectOnCentralQueue()
+            // clear local references (we are intentionally *not* clearing central/peripheral delegates here
+            // final teardown should call prepareForRelease() when the instance is actually being released)
+            peripheral = nil
+            deviceName = nil
+            deviceAddress = nil
+        }
+
+        if DispatchQueue.getSpecific(key: centralQueueSpecificKey) != nil {
+            forget()
+        } else {
+            centralQueue.async {
+                forget()
+            }
+        }
     }
-    
+
     /// stops scanning
     func stopScanning() {
         centralQueue.async { [weak self] in
@@ -393,9 +439,16 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func setNotifyValue(_ enabled: Bool, for characteristic: CBCharacteristic) {
         if let peripheral = peripheral {
             trace("in setNotifyValue, for peripheral with name %{public}@, setting notify for characteristic %{public}@, to %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug, deviceName ?? "'unknown'", characteristic.uuid.uuidString, enabled.description)
-            
-            centralQueue.async {
+
+            // CoreBluetooth delegate callbacks already arrive on centralQueue. In Dexcom
+            // passive/co-existence mode the control notification window can be very short,
+            // so do not queue-hop from an auth callback before subscribing to Write_Control.
+            if DispatchQueue.getSpecific(key: centralQueueSpecificKey) != nil {
                 peripheral.setNotifyValue(enabled, for: characteristic)
+            } else {
+                centralQueue.async {
+                    peripheral.setNotifyValue(enabled, for: characteristic)
+                }
             }
         } else {
             trace("in setNotifyValue, for peripheral with name %{public}@, failed to set notify for characteristic %{public}@, to %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .error, deviceName ?? "'unknown'", characteristic.uuid.uuidString, enabled.description)
@@ -421,6 +474,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     fileprivate func stopScanAndconnect(to peripheral: CBPeripheral) {
         
         self.centralManager?.stopScan()
+        let forgetDeviceOnTimeout = deviceAddress != peripheral.identifier.uuidString
         self.deviceAddress = peripheral.identifier.uuidString
         self.deviceName = peripheral.name
         peripheral.delegate = self
@@ -430,11 +484,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         if peripheral.state == .disconnected {
             trace("in stopScanAndconnect, trying to connect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
             
-            // set timer to avoid that connection attempt takes forever
-            // schedule timer on main thread because background queues do not have a run loop
-            DispatchQueue.main.async { [weak self] in
-                self?.connectTimeOutTimer = Timer.scheduledTimer(timeInterval: 5.0, target: self as Any, selector: #selector(BluetoothTransmitter.stopConnectAndRestartScanning), userInfo: nil, repeats: false)
-            }
+            scheduleConnectTimeout(forgetDeviceOnTimeout: forgetDeviceOnTimeout)
             
             centralManager?.connect(peripheral, options: connectOptions)
             
@@ -446,12 +496,19 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         }
     }
     
-    ///
-    @objc fileprivate func stopConnectAndRestartScanning() {
+    /// Abandons a connect attempt that has not completed quickly enough and
+    /// returns to scanning for a fresh peripheral session.
+    fileprivate func stopConnectAndRestartScanning(forgetDeviceOnTimeout: Bool) {
         
         trace("in stopConnectAndRestartScanning, disconnecting due to timeout, will restart scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
         
-        disconnectAndForget()
+        if forgetDeviceOnTimeout {
+            disconnectAndForget()
+        } else {
+            shouldReconnectOnNextDisconnect = false
+            disconnectOnCentralQueue()
+            peripheral = nil
+        }
         
         _ =  startScanning()
         
@@ -459,12 +516,43 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     /// connectionTimer monitors the connection setup for a new device. This function checks if the timer is running and if so cancels the timer
     public func cancelConnectionTimer() {
-        
-        if let connectTimeOutTimer = connectTimeOutTimer {
-            connectTimeOutTimer.invalidate()
-            self.connectTimeOutTimer = nil
+        connectTimeoutAttemptID = nil
+    }
+
+    /// Sets a queue-serialized timeout for this specific CoreBluetooth connect attempt.
+    /// This is used for both scan-driven and retrieve-driven connects so stale OS-level
+    /// restored peripherals cannot wait indefinitely without falling back to scanning.
+    private func scheduleConnectTimeout(forgetDeviceOnTimeout: Bool) {
+        nextConnectTimeoutAttemptID += 1
+        let attemptID = nextConnectTimeoutAttemptID
+        connectTimeoutAttemptID = attemptID
+        centralQueue.asyncAfter(deadline: .now() + maxTimeToWaitForPeripheralResponse) { [weak self] in
+            guard let self = self, self.connectTimeoutAttemptID == attemptID else { return }
+            self.connectTimeoutAttemptID = nil
+            self.stopConnectAndRestartScanning(forgetDeviceOnTimeout: forgetDeviceOnTimeout)
         }
-        
+    }
+
+    /// Starts a one-shot setup timeout for sessions that reach `didConnect`
+    /// but do not complete the subclass-defined setup checkpoint.
+    private func scheduleConnectionSetupTimeout() {
+        guard shouldTimeoutStalledConnectionSetup() else { return }
+
+        nextConnectionSetupTimeoutAttemptID += 1
+        let attemptID = nextConnectionSetupTimeoutAttemptID
+        connectionSetupTimeoutAttemptID = attemptID
+        centralQueue.asyncAfter(deadline: .now() + maxTimeToWaitForPeripheralResponse) { [weak self] in
+            guard let self = self, self.connectionSetupTimeoutAttemptID == attemptID else { return }
+            self.connectionSetupTimeoutAttemptID = nil
+            trace("in connection setup timeout, connection setup did not complete after didConnect, will restart scanning", log: self.log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+            self.stopConnectAndRestartScanning(forgetDeviceOnTimeout: false)
+        }
+    }
+
+    /// Cancels the post-connect setup timeout once service discovery starts or the
+    /// connection is closed.
+    func cancelConnectionSetupTimeout() {
+        connectionSetupTimeoutAttemptID = nil
     }
     
     /// try to connect to peripheral to which connection was successfully done previously, and that has a uuid that matches the stored deviceAddress. If such peripheral exists, then try to connect, it's not necessary to start scanning. iOS will connect as soon as the peripheral comes in range, or bluetooth status is switched on, whatever is necessary
@@ -481,6 +569,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                     if let peripheral = peripheral {
                         trace("in retrievePeripherals, trying to connect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
                         peripheral.delegate = self
+                        scheduleConnectTimeout(forgetDeviceOnTimeout: false)
                         central.connect(peripheral, options: connectOptions)
                         return true
                     } else {
@@ -493,6 +582,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                 trace("in retrievePeripherals, uuid is nil", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
             }
         }
+
         return false
     }
     
@@ -556,6 +646,11 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         
         cancelConnectionTimer()
+        scheduleConnectionSetupTimeout()
+        // A previous timed-out connect attempt can temporarily disable reconnect.
+        // Once CoreBluetooth reports a real connection, the next disconnect must
+        // use the normal reconnect policy again.
+        shouldReconnectOnNextDisconnect = true
         
         timeStampLastStatusUpdate = Date()
         
@@ -640,6 +735,8 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         
         timeStampLastStatusUpdate = Date()
+        cancelConnectionTimer()
+        cancelConnectionSetupTimeout()
         // delegate can update UI / Core Data. Ensure main thread
         dispatchToMain { [weak self] in
             guard let self = self else { return }
@@ -681,9 +778,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         // Keep noisy reconnect intent at debug
         // if self.peripheral == nil, then a manual disconnect or something like that has occurred, no need to reconnect
         // otherwise disconnect occurred because of other (like out of range), so let's try to reconnect
-        if shouldReconnectOnNextDisconnect, let ownPeripheral = self.peripheral {
+        if shouldReconnectOnNextDisconnect, self.peripheral != nil {
             trace("in didDisconnectPeripheral, will try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug)
-            centralManager?.connect(ownPeripheral, options: connectOptions)
+            reconnectAfterDisconnect(central)
         } else {
             trace("in didDisconnectPeripheral, reconnect disabled for this disconnect or peripheral is nil, will not try to reconnect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
             _ = startScanning()
@@ -695,6 +792,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         
         timeStampLastStatusUpdate = Date()
+        cancelConnectionSetupTimeout()
         trace("in didDiscoverServices, for peripheral with name %{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .debug, deviceName ?? "'unknown'")
         
         if let error = error {
@@ -779,8 +877,16 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
         // Attempt to reuse the restored peripheral (if any) without forcing a rescan.
         if let restoredPeripherals = dict[CBCentralManagerRestoredStatePeripheralsKey] as? [CBPeripheral], let restoredPeripheral = restoredPeripherals.first {
             // Re-attach references and delegates
+            if let deviceAddress = deviceAddress, restoredPeripheral.identifier.uuidString != deviceAddress {
+                trace("in willRestoreState, ignoring restored peripheral %{public}@ because it does not match stored address", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, restoredPeripheral.name ?? "'unknown'")
+                central.cancelPeripheralConnection(restoredPeripheral)
+                return
+            }
+
             self.peripheral = restoredPeripheral
-            self.deviceAddress = restoredPeripheral.identifier.uuidString
+            if self.deviceAddress == nil {
+                self.deviceAddress = restoredPeripheral.identifier.uuidString
+            }
             self.deviceName = restoredPeripheral.name
             restoredPeripheral.delegate = self
             
