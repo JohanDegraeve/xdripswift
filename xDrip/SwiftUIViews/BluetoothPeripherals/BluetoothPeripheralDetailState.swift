@@ -21,6 +21,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     @Published private(set) var connectButtonIsStopAction = false
     @Published private(set) var connectButtonTintColor = BluetoothPeripheralConnectButtonTintColor.green
     @Published private(set) var statusFooterText: String?
+    // Allows the status footer to show a warning without changing the banner status text.
+    @Published private(set) var statusFooterIsWarning = false
     @Published private(set) var connectionStatus = BluetoothPeripheralDisplayStatus.notScanning
     @Published private(set) var category = BluetoothPeripheralCategory.CGM
     @Published private(set) var canDeletePeripheral = false
@@ -95,7 +97,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         case .M5StickCType:
             return Texts_M5StackView.m5StickCViewscreenTitle
         default:
-            return expectedBluetoothPeripheralType.rawValue
+            return expectedBluetoothPeripheralType.bluetoothPeripheralDisplayTitle
         }
     }
 
@@ -142,7 +144,11 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         connectButtonStatusText = connectButtonState.statusText
         connectButtonIsStopAction = connectButtonState.isStopAction
         connectButtonTintColor = connectButtonState.tintColor
-        statusFooterText = makeStatusFooterText()
+        // Use a short footer message here. The full explanation is still shown by
+        // the alert guard when activation is attempted from any stale path.
+        let activationBlockedMessage = activationBlockedFooterMessageForCurrentPeripheral()
+        statusFooterText = makeStatusFooterText(activationBlockedMessage: activationBlockedMessage)
+        statusFooterIsWarning = activationBlockedMessage != nil
         connectionStatus = makeConnectionDisplayStatus()
         category = expectedBluetoothPeripheralType.category()
         canDeletePeripheral = bluetoothPeripheral != nil
@@ -247,7 +253,10 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
             ))
         }
 
-        if expectedBluetoothPeripheralType.canShowTransmitterReadSuccess(), sensorProvider?.activeSensor != nil {
+        // Read success only has meaning for the transmitter currently selected for use.
+        if expectedBluetoothPeripheralType.canShowTransmitterReadSuccess(),
+           sensorProvider?.activeSensor != nil,
+           bluetoothPeripheral?.blePeripheral.shouldconnect == true {
             rows.append(row(
                 id: "read-success",
                 title: Texts_BluetoothPeripheralView.readSuccess,
@@ -417,6 +426,10 @@ private extension BluetoothPeripheralDetailState {
                 return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: true, statusText: statusText, isStopAction: true, tintColor: .red)
             }
 
+            if activationIsBlockedForCurrentPeripheral() {
+                return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.connect, isEnabled: false, statusText: Texts_BluetoothPeripheralView.notTryingToConnect, tintColor: .disabledGray)
+            }
+
             return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.connect, isEnabled: true, statusText: Texts_BluetoothPeripheralView.notTryingToConnect)
         }
 
@@ -430,6 +443,10 @@ private extension BluetoothPeripheralDetailState {
 
         if nfcScanSuccessful {
             return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.donotconnect, isEnabled: false, statusText: Texts_BluetoothPeripheralView.tryingToConnect, isStopAction: true, tintColor: .disabledGray)
+        }
+
+        if activationIsBlockedForCurrentPeripheral() {
+            return BluetoothPeripheralConnectButtonState(title: Texts_BluetoothPeripheralView.scan, isEnabled: false, statusText: Texts_BluetoothPeripheralView.readyToScan, tintColor: .disabledGray)
         }
 
         if !isScanning {
@@ -455,16 +472,44 @@ private extension BluetoothPeripheralDetailState {
         )
     }
 
-    func makeStatusFooterText() -> String? {
-        guard expectedBluetoothPeripheralType == .DexcomType,
-              let dexcomG5 = bluetoothPeripheral as? DexcomG5
-        else {
-            return nil
+    // Used by the disabled button state. The alert text is not needed here
+    // because the detail footer explains the reason before the user taps.
+    func activationIsBlockedForCurrentPeripheral() -> Bool {
+        guard expectedBluetoothPeripheralType.category() == .CGM else { return false }
+
+        return otherCGMTransmitterHasShouldConnectTrue() || !UserDefaults.standard.isMaster
+    }
+
+    // Keep the footer short so the Status section remains readable.
+    // The full alert text is still used by canActivateCurrentPeripheral().
+    func activationBlockedFooterMessageForCurrentPeripheral() -> String? {
+        guard expectedBluetoothPeripheralType.category() == .CGM else { return nil }
+
+        if otherCGMTransmitterHasShouldConnectTrue() {
+            return Texts_BluetoothPeripheralsView.noMultipleActiveCGMsAllowedFooter
         }
 
-        return dexcomG5.useOtherApp
-            ? Texts_BluetoothPeripheralView.runningInCoexistenceMode
-            : Texts_BluetoothPeripheralView.runningInPrimaryMode
+        if !UserDefaults.standard.isMaster {
+            return Texts_BluetoothPeripheralView.cannotActiveCGMInFollowerMode
+        }
+
+        return nil
+    }
+
+    // Warning text has priority over the normal Dexcom mode footer because it
+    // explains why the action button is disabled.
+    func makeStatusFooterText(activationBlockedMessage: String?) -> String? {
+        if let activationBlockedMessage = activationBlockedMessage {
+            return "⚠️ " + activationBlockedMessage
+        }
+
+        if expectedBluetoothPeripheralType == .DexcomType, let dexcomG5 = bluetoothPeripheral as? DexcomG5 {
+            return dexcomG5.useOtherApp
+                ? Texts_BluetoothPeripheralView.runningInCoexistenceMode
+                : Texts_BluetoothPeripheralView.runningInPrimaryMode
+        }
+
+        return nil
     }
 
     func connectionTimestampTitle() -> String {
@@ -1142,7 +1187,7 @@ private extension BluetoothPeripheralDetailState {
         cachedTransmitterReadSuccessSummaryIndicatorColor = indicatorColor(for: display.success24h)
 
         var summaryMessageLines = [String]()
-        summaryMessageLines.append("Expecting \(expectedBluetoothPeripheralType.rawValue) readings every \(display.nominalGapInSeconds) seconds.")
+        summaryMessageLines.append("Expecting \(expectedBluetoothPeripheralType.bluetoothPeripheralDisplayTitle) readings every \(display.nominalGapInSeconds) seconds.")
         summaryMessageLines.append("\(String(format: "%0.1f", display.success6h))% (\(label6h): \(display.expected6h - display.actual6h) dropped)")
 
         if display.expected12h >= fullExpected6h {
@@ -1411,7 +1456,9 @@ private extension BluetoothPeripheralDetailState {
                 id: "dexcom-g5-sensor-status",
                 title: Texts_Common.sensorStatus,
                 detail: dexcomG5.sensorStatus,
-                detailIndicator: sensorStatusDetailIndicator(for: dexcomG5.sensorStatus),
+                // Only the active transmitter should show a health indicator.
+                // Stored inactive devices may have stale sensor status values.
+                detailIndicator: dexcomG5.blePeripheral.shouldconnect ? sensorStatusDetailIndicator(for: dexcomG5.sensorStatus) : nil,
                 showsDisclosure: dexcomG5.sensorStatus != nil,
                 isEnabled: dexcomG5.sensorStatus != nil,
                 action: { [weak self] in
@@ -1615,7 +1662,9 @@ private extension BluetoothPeripheralDetailState {
                 id: "dexcom-g7-sensor-status",
                 title: Texts_Common.sensorStatus,
                 detail: dexcomG7.sensorStatus,
-                detailIndicator: sensorStatusDetailIndicator(for: dexcomG7.sensorStatus)
+                // Only the active transmitter should show a health indicator.
+                // Stored inactive devices may have stale sensor status values.
+                detailIndicator: dexcomG7.blePeripheral.shouldconnect ? sensorStatusDetailIndicator(for: dexcomG7.sensorStatus) : nil
             )
         ]
 

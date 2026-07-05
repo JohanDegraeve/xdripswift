@@ -34,7 +34,7 @@ struct BluetoothPeripheralDetailView: View {
             } footer: {
                 if let statusFooterText = state.statusFooterText {
                     Text(statusFooterText)
-                        .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
+                        .foregroundStyle(state.statusFooterIsWarning ? Color(.systemRed) : ConstantsUI.listSectionFooterTextColor)
                         .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
                 }
             }

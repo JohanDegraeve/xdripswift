@@ -45,18 +45,31 @@ final class BluetoothPeripheralsRouter: ObservableObject {
         sections = BluetoothPeripheralCategory.allCases.compactMap { category in
             let rows = bluetoothPeripheralManager.getBluetoothPeripherals()
                 .filter { $0.bluetoothPeripheralType().category() == category }
-                .map { bluetoothPeripheral in
-                    BluetoothPeripheralListRow(
-                        bluetoothPeripheral: bluetoothPeripheral,
-                        title: bluetoothPeripheral.blePeripheral.alias ?? bluetoothPeripheral.blePeripheral.name,
-                        connectionStatus: BluetoothPeripheralDisplayStatus(
-                            bluetoothTransmitter: bluetoothPeripheralManager.getBluetoothTransmitter(
-                                for: bluetoothPeripheral,
-                                createANewOneIfNecesssary: false
+                .enumerated()
+                .map { index, bluetoothPeripheral in
+                    (
+                        index: index,
+                        row: BluetoothPeripheralListRow(
+                            bluetoothPeripheral: bluetoothPeripheral,
+                            title: bluetoothPeripheral.blePeripheral.alias ?? bluetoothPeripheral.blePeripheral.name,
+                            shouldConnect: bluetoothPeripheral.blePeripheral.shouldconnect,
+                            connectionStatus: BluetoothPeripheralDisplayStatus(
+                                bluetoothTransmitter: bluetoothPeripheralManager.getBluetoothTransmitter(
+                                    for: bluetoothPeripheral,
+                                    createANewOneIfNecesssary: false
+                                )
                             )
                         )
                     )
                 }
+                .sorted {
+                    if $0.row.sortPriority != $1.row.sortPriority {
+                        return $0.row.sortPriority < $1.row.sortPriority
+                    }
+
+                    return $0.index < $1.index
+                }
+                .map(\.row)
 
             guard !rows.isEmpty else { return nil }
 
@@ -181,14 +194,25 @@ struct BluetoothPeripheralsSection: Identifiable {
 struct BluetoothPeripheralListRow: Identifiable {
     let bluetoothPeripheral: BluetoothPeripheral
     let title: String
+    let shouldConnect: Bool
     let connectionStatus: BluetoothPeripheralDisplayStatus
 
     var id: String {
         bluetoothPeripheral.blePeripheral.address
     }
 
+    // The selected transmitter belongs at the top even when Bluetooth is between
+    // scanning and connected phases. The remaining rows keep the manager order.
+    var sortPriority: Int {
+        if shouldConnect {
+            return 0
+        }
+
+        return connectionStatus.sortPriority
+    }
+
     var typeTitle: String {
-        bluetoothPeripheral.bluetoothPeripheralType().rawValue
+        bluetoothPeripheral.bluetoothPeripheralType().bluetoothPeripheralDisplayTitle
     }
 
 }
@@ -202,11 +226,24 @@ enum BluetoothPeripheralDisplayStatus {
         if bluetoothTransmitter?.getConnectionStatus() == .connected {
             self = .connected
         } else if bluetoothTransmitter?.getConnectionStatus() == .connecting ||
-            bluetoothTransmitter?.isScanning() == true ||
-            isScanningForNewPeripheral {
+                    bluetoothTransmitter?.isScanning() == true ||
+                    isScanningForNewPeripheral {
             self = .scanning
         } else {
             self = .notScanning
+        }
+    }
+
+    // Active rows are handled by BluetoothPeripheralListRow. This only orders
+    // the remaining live Bluetooth states.
+    var sortPriority: Int {
+        switch self {
+        case .connected:
+            return 1
+        case .scanning:
+            return 2
+        case .notScanning:
+            return 3
         }
     }
 }
@@ -218,6 +255,17 @@ struct BluetoothPeripheralsAlert: Identifiable {
 }
 
 extension BluetoothPeripheralType {
+    // DexcomG7Type shares the same user-facing label as DexcomG7HeartBeatType,
+    // but its synthesized raw value is the enum case name.
+    var bluetoothPeripheralDisplayTitle: String {
+        switch self {
+        case .DexcomG7Type:
+            return BluetoothPeripheralType.DexcomG7HeartBeatType.rawValue
+        default:
+            return rawValue
+        }
+    }
+
     static let addFlowPreferredOrder: [BluetoothPeripheralCategory: [BluetoothPeripheralType]] = [
         .CGM: [
             .Libre2Type,

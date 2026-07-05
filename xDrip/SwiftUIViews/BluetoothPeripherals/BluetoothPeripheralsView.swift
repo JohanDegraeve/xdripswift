@@ -143,7 +143,7 @@ struct BluetoothPeripheralTypeSelectionView: View {
                         open(type: bluetoothPeripheralType)
                     } label: {
                         BluetoothPeripheralSelectionRow(
-                            title: bluetoothPeripheralType.rawValue,
+                            title: bluetoothPeripheralType.bluetoothPeripheralDisplayTitle,
                             subtitle: nil,
                             systemImage: category.systemImage()
                         )

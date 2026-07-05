@@ -5,3 +5,4 @@
 "heartbeatDeviceFooter" = "Heartbeat-laite ei tuota glukoosilukemia. Se käyttää Bluetooth-toimintaa herättääkseen sovelluksen taustalla, jotta seuraajapäivitykset, hälytykset, merkit ja ilmoitukset voivat jatkua.";
 "m5StackDeviceFooter" = "M5Stack-laitteet ovat pieniä ESP32-pohjaisia ulkoisia näyttöjä. Ne voivat näyttää xDrip4iOS:n Bluetoothilla lähettämiä glukoosiarvoja.";
 "noMultipleActiveCGMsAllowed" = "Sinulla voi olla vain yksi CGM-lähetin, joka on yhdistetty tai jota etsitään.\nVarmista muut CGM-lähettimet ja napsauta 'Lopeta skannaus', 'Katkaise yhteys' tai vain poista ne";
+"noMultipleActiveCGMsAllowedFooter" = "Sinulla on jo yksi CGM yhdistettynä.";
