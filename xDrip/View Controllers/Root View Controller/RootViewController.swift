@@ -1362,6 +1362,15 @@ final class RootViewController: UIViewController, ObservableObject {
                 timeStampLastBgReading = lastReading.timeStamp
             }
             
+            let duplicateReadingWindow = TimeInterval(minutes: 2.5)
+            let oldestIncomingTimeStamp = glucoseData.map { $0.timeStamp }.min()
+            let newestIncomingTimeStamp = glucoseData.map { $0.timeStamp }.max()
+            var existingBgReadingsInIncomingRange = [BgReading]()
+            
+            if let oldestIncomingTimeStamp = oldestIncomingTimeStamp, let newestIncomingTimeStamp = newestIncomingTimeStamp {
+                existingBgReadingsInIncomingRange = bgReadingsAccessor.getBgReadings(from: oldestIncomingTimeStamp.addingTimeInterval(-duplicateReadingWindow), to: newestIncomingTimeStamp.addingTimeInterval(duplicateReadingWindow), on: coreDataManager.mainManagedObjectContext, includingSuppressed: true)
+            }
+            
             /// in case loopdelay > 0, this will be used to share with Loop
             /// - it will contain the full range off per minute readings (in stead of filtered by 5 minutes
             /// - reset to empty array
@@ -1374,13 +1383,24 @@ final class RootViewController: UIViewController, ObservableObject {
             for (index, glucose) in glucoseData.enumerated().reversed() {
                 // we only add new glucose values if 5 minutes - 10 seconds younger than latest already existing reading, or, if it's the latest, it needs to be just younger
                 let checktimestamp = Date(timeInterval: 5.0 * 60.0 - 10.0, since: timeStampLastBgReading)
+                let existingReadingInSameSlot = existingBgReadingsInIncomingRange.contains { abs($0.timeStamp.timeIntervalSince(glucose.timeStamp)) <= duplicateReadingWindow }
+                
+                // Backfill can arrive after a newer live reading has already been stored.
+                // Accept older samples only when they fill an empty 5-minute slot.
+                let isHistoricalGapFill = glucose.timeStamp <= checktimestamp && !existingReadingInSameSlot
                 
                 // timestamp of glucose being processed must be higher (ie more recent) than checktimestamp except if it's the last one (ie the first in the array), because there we don't care if it's less than 5 minutes different with the last but one
                 // adding 10 seconds to timeStampLastBgReading to handle case of G7, with backfills, because the array contains two times the same reading with a timestamp difference of a few seconds
-                if (glucose.timeStamp > checktimestamp || ((index == 0) && (glucose.timeStamp > timeStampLastBgReading.addingTimeInterval(10)))) {
+                if (glucose.timeStamp > checktimestamp || ((index == 0) && (glucose.timeStamp > timeStampLastBgReading.addingTimeInterval(10))) || isHistoricalGapFill) {
                     // check on glucoseLevelRaw > 0 because I've had a case where a faulty sensor was giving negative values
                     if glucose.glucoseLevelRaw > 0 {
-                        let newReading = calibrator.createNewBgReading(rawData: glucose.glucoseLevelRaw, timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+                        var last3ReadingsForNewReading = latest3BgReadings
+                        
+                        if isHistoricalGapFill {
+                            last3ReadingsForNewReading = Array(existingBgReadingsInIncomingRange.filter { $0.timeStamp < glucose.timeStamp }.reversed().prefix(3))
+                        }
+                        
+                        let newReading = calibrator.createNewBgReading(rawData: glucose.glucoseLevelRaw, timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &last3ReadingsForNewReading, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                         
                         if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
                             trace("in processNewGlucoseData, new reading created, timestamp = %{public}@, calculatedValue = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, newReading.timeStamp.description(with: .current), newReading.calculatedValue.description.replacingOccurrences(of: ".", with: ","))
@@ -1393,7 +1413,12 @@ final class RootViewController: UIViewController, ObservableObject {
                         newReadingCreated = true
                         
                         // set timeStampLastBgReading to new timestamp
-                        timeStampLastBgReading = glucose.timeStamp
+                        if glucose.timeStamp > timeStampLastBgReading {
+                            timeStampLastBgReading = glucose.timeStamp
+                        }
+                        
+                        existingBgReadingsInIncomingRange.append(newReading)
+                        existingBgReadingsInIncomingRange.sort { $0.timeStamp < $1.timeStamp }
                         
                         // reset latest3BgReadings
                         latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false, includingSuppressed: true)
