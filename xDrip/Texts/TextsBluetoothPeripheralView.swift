@@ -148,8 +148,12 @@ class Texts_BluetoothPeripheralView {
         return NSLocalizedString("useOtherDexcomApp", tableName: filename, bundle: Bundle.main, value: "Coexistence Mode", comment: "Dexcom bluetooth screen. Toggle title. When enabled, another app such as Dexcom or CamAPS authenticates with the transmitter while this app receives alongside it.")
     }()
 
-    static let useOtherDexcomAppFooter: String = {
-        return NSLocalizedString("useOtherDexcomAppFooter", tableName: filename, bundle: Bundle.main, value: "Coexistence mode allows us to work with another app such as the Dexcom or CamAPS apps. That app must keep running in the background. Primary mode connects as the main app and controls the connection.", comment: "Dexcom bluetooth screen. Footer explaining coexistence mode and primary mode.")
+    static let useOtherDexcomAppCoexistenceFooter: String = {
+        return NSLocalizedString("useOtherDexcomAppCoexistenceFooter", tableName: filename, bundle: Bundle.main, value: "Coexistence mode allows us to work with another app such as the Dexcom or CamAPS apps. That app must keep running in the background.", comment: "Dexcom bluetooth screen. Footer explaining coexistence mode.")
+    }()
+
+    static let useOtherDexcomAppPrimaryFooter: String = {
+        return NSLocalizedString("useOtherDexcomAppPrimaryFooter", tableName: filename, bundle: Bundle.main, value: "Primary mode connects as the main app and controls the connection.", comment: "Dexcom bluetooth screen. Footer explaining primary mode.")
     }()
     
     static let useOtherDexcomAppMessageEnabled: String = {

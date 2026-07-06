@@ -32,7 +32,8 @@
 "transmittterStartDate" = "Vericiyi Başlatın";
 "sensorStartDate" = "Sensörü Başlat";
 "useOtherDexcomApp" = "Birlikte çalışma modu";
-"useOtherDexcomAppFooter" = "Birlikte çalışma modu, Dexcom veya CamAPS gibi başka bir uygulamayla çalışmamızı sağlar. Bu uygulama arka planda çalışmaya devam etmelidir. Birincil mod ana uygulama olarak bağlanır ve bağlantıyı kontrol eder.";
+"useOtherDexcomAppCoexistenceFooter" = "Birlikte çalışma modu, Dexcom veya CamAPS gibi başka bir uygulamayla çalışmamızı sağlar. Bu uygulama arka planda çalışmaya devam etmelidir.";
+"useOtherDexcomAppPrimaryFooter" = "Birincil mod ana uygulama olarak bağlanır ve bağlantıyı kontrol eder.";
 "runningInCoexistenceMode" = "Birlikte çalışma modunda çalışıyor";
 "runningInPrimaryMode" = "Birincil modda çalışıyor";
 

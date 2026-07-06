@@ -57,7 +57,8 @@ final class BluetoothPeripheralsRouter: ObservableObject {
                                 bluetoothTransmitter: bluetoothPeripheralManager.getBluetoothTransmitter(
                                     for: bluetoothPeripheral,
                                     createANewOneIfNecesssary: false
-                                )
+                                ),
+                                isScanningForNewPeripheral: bluetoothPeripheral.blePeripheral.shouldconnect
                             )
                         )
                     )

@@ -28,7 +28,8 @@
 "bootLoader" = "محمل الإقلاع";
 "cannotActiveCGMInFollowerMode" = "لا يمكنك تفعيل نظام متابعة سكر الدم المستمرة CGM في وضع المتابعة";
 "useOtherDexcomApp" = "وضع التعايش";
-"useOtherDexcomAppFooter" = "يتيح لنا وضع التعايش العمل مع تطبيق آخر، مثل Dexcom أو CamAPS. يجب أن يظل ذلك التطبيق قيد التشغيل في الخلفية. يتصل الوضع الأساسي كتطبيق رئيسي ويتحكم في الاتصال.";
+"useOtherDexcomAppCoexistenceFooter" = "يتيح لنا وضع التعايش العمل مع تطبيق آخر، مثل Dexcom أو CamAPS. يجب أن يظل ذلك التطبيق قيد التشغيل في الخلفية.";
+"useOtherDexcomAppPrimaryFooter" = "يتصل الوضع الأساسي كتطبيق رئيسي ويتحكم في الاتصال.";
 "runningInCoexistenceMode" = "يعمل في وضع التعايش";
 "runningInPrimaryMode" = "يعمل في الوضع الأساسي";
 "confirmDisconnectTitle" = "تأكيد قطع الاتصال";

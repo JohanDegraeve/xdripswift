@@ -95,7 +95,8 @@
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
 "useOtherDexcomApp" = "Режим співіснування";
-"useOtherDexcomAppFooter" = "Режим співіснування дозволяє нам працювати з іншою програмою, наприклад Dexcom або CamAPS. Ця програма має продовжувати працювати у фоновому режимі. Основний режим підключається як головна програма та керує з'єднанням.";
+"useOtherDexcomAppCoexistenceFooter" = "Режим співіснування дозволяє нам працювати з іншою програмою, наприклад Dexcom або CamAPS. Ця програма має продовжувати працювати у фоновому режимі.";
+"useOtherDexcomAppPrimaryFooter" = "Основний режим підключається як головна програма та керує з'єднанням.";
 "runningInCoexistenceMode" = "Працює в режимі співіснування";
 "runningInPrimaryMode" = "Працює в основному режимі";
 

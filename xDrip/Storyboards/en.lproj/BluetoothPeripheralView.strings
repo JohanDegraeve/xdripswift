@@ -32,7 +32,8 @@
 "transmittterStartDate" = "Transmitter Started";
 "sensorStartDate" = "Sensor Started";
 "useOtherDexcomApp" = "Coexistence Mode";
-"useOtherDexcomAppFooter" = "Coexistence mode allows us to work with another app such as the Dexcom or CamAPS apps. That app must keep running in the background. Primary mode connects as the main app and controls the connection.";
+"useOtherDexcomAppCoexistenceFooter" = "Coexistence mode allows us to work with another app such as the Dexcom or CamAPS apps. That app must keep running in the background.";
+"useOtherDexcomAppPrimaryFooter" = "Primary mode connects as the main app and controls the connection.";
 "runningInCoexistenceMode" = "Running in Coexistence mode";
 "runningInPrimaryMode" = "Running in Primary mode";
 "nfcScanNeeded" = "NFC scan needed";

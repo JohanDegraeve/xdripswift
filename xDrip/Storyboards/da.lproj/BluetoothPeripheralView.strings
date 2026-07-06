@@ -32,7 +32,8 @@
 "transmittterStartDate" = "Transmitter Started";
 "sensorStartDate" = "Sensor Started";
 "useOtherDexcomApp" = "Sameksistenstilstand";
-"useOtherDexcomAppFooter" = "Sameksistenstilstand lader os arbejde sammen med en anden app, f.eks. Dexcom eller CamAPS. Den app skal fortsat køre i baggrunden. Primær tilstand forbinder som hovedappen og styrer forbindelsen.";
+"useOtherDexcomAppCoexistenceFooter" = "Sameksistenstilstand lader os arbejde sammen med en anden app, f.eks. Dexcom eller CamAPS. Den app skal fortsat køre i baggrunden.";
+"useOtherDexcomAppPrimaryFooter" = "Primær tilstand forbinder som hovedappen og styrer forbindelsen.";
 "runningInCoexistenceMode" = "Kører i sameksistenstilstand";
 "runningInPrimaryMode" = "Kører i primær tilstand";
 

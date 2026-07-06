@@ -21,6 +21,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     @Published private(set) var connectButtonIsStopAction = false
     @Published private(set) var connectButtonTintColor = BluetoothPeripheralConnectButtonTintColor.green
     @Published private(set) var statusFooterText: String?
+    @Published private(set) var statusFooterSystemImage: String?
     // Allows the status footer to show a warning without changing the banner status text.
     @Published private(set) var statusFooterIsWarning = false
     @Published private(set) var connectionStatus = BluetoothPeripheralDisplayStatus.notScanning
@@ -148,6 +149,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         // the alert guard when activation is attempted from any stale path.
         let activationBlockedMessage = activationBlockedFooterMessageForCurrentPeripheral()
         statusFooterText = makeStatusFooterText(activationBlockedMessage: activationBlockedMessage)
+        statusFooterSystemImage = makeStatusFooterSystemImage(activationBlockedMessage: activationBlockedMessage)
         statusFooterIsWarning = activationBlockedMessage != nil
         connectionStatus = makeConnectionDisplayStatus()
         category = expectedBluetoothPeripheralType.category()
@@ -379,6 +381,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         title: String,
         isOn: Bool,
         isEnabled: Bool = true,
+        detailSymbol: BluetoothPeripheralDetailSymbol? = nil,
         setValue: @escaping (Bool) -> Void
     ) -> BluetoothPeripheralDetailRow {
         BluetoothPeripheralDetailRow(
@@ -386,7 +389,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
             title: title,
             detail: nil,
             detailIndicator: nil,
-            detailSymbol: nil,
+            detailSymbol: detailSymbol,
             showsDisclosure: false,
             isEnabled: isEnabled,
             toggle: BluetoothPeripheralDetailToggle(isOn: isOn, setValue: setValue),
@@ -510,6 +513,25 @@ private extension BluetoothPeripheralDetailState {
         }
 
         return nil
+    }
+
+    // Primary and co-existence labels are localized text, but the leading symbol
+    // is a fixed visual cue and should not be part of the localized string.
+    func makeStatusFooterSystemImage(activationBlockedMessage: String?) -> String? {
+        guard activationBlockedMessage == nil,
+              expectedBluetoothPeripheralType == .DexcomType,
+              let dexcomG5 = bluetoothPeripheral as? DexcomG5
+        else {
+            return nil
+        }
+
+        return dexcomG5ModeSystemImage(useOtherApp: dexcomG5.useOtherApp)
+    }
+
+    // The Dexcom G5/G6/ONE mode symbol is a fixed UI marker.
+    // It should change with the switch state but not be localized.
+    func dexcomG5ModeSystemImage(useOtherApp: Bool) -> String {
+        useOtherApp ? "c.circle" : "p.circle"
     }
 
     func connectionTimestampTitle() -> String {
@@ -1211,25 +1233,52 @@ struct BluetoothPeripheralDetailSection: Identifiable {
     let headerDetail: String?
     let headerSymbol: BluetoothPeripheralDetailSymbol?
     let footer: String?
+    let footerLines: [BluetoothPeripheralDetailFooterLine]
     let rows: [BluetoothPeripheralDetailRow]
 
-    init(id: String, title: String?, headerDetail: String? = nil, headerSymbol: BluetoothPeripheralDetailSymbol? = nil, footer: String? = nil, rows: [BluetoothPeripheralDetailRow]) {
+    init(
+        id: String,
+        title: String?,
+        headerDetail: String? = nil,
+        headerSymbol: BluetoothPeripheralDetailSymbol? = nil,
+        footer: String? = nil,
+        footerLines: [BluetoothPeripheralDetailFooterLine] = [],
+        rows: [BluetoothPeripheralDetailRow]
+    ) {
         self.id = id
         self.title = title
         self.headerDetail = headerDetail
         self.headerSymbol = headerSymbol
         self.footer = footer
+        self.footerLines = footerLines
         self.rows = rows
     }
 
-    init(index: Int, title: String?, headerDetail: String? = nil, headerSymbol: BluetoothPeripheralDetailSymbol? = nil, footer: String? = nil, rows: [BluetoothPeripheralDetailRow]) {
+    init(
+        index: Int,
+        title: String?,
+        headerDetail: String? = nil,
+        headerSymbol: BluetoothPeripheralDetailSymbol? = nil,
+        footer: String? = nil,
+        footerLines: [BluetoothPeripheralDetailFooterLine] = [],
+        rows: [BluetoothPeripheralDetailRow]
+    ) {
         self.id = String(index)
         self.title = title
         self.headerDetail = headerDetail
         self.headerSymbol = headerSymbol
         self.footer = footer
+        self.footerLines = footerLines
         self.rows = rows
     }
+}
+
+struct BluetoothPeripheralDetailFooterLine: Identifiable {
+    let id = UUID()
+    let systemImage: String
+    let text: String
+    // Used to mute the mode description that does not match the current switch state.
+    let isActive: Bool
 }
 
 struct BluetoothPeripheralDetailRow: Identifiable {
@@ -1393,7 +1442,7 @@ private extension BluetoothPeripheralDetailState {
             BluetoothPeripheralDetailSection(
                 id: "dexcom-g5-coexistence",
                 title: nil,
-                footer: Texts_BluetoothPeripheralView.useOtherDexcomAppFooter,
+                footerLines: dexcomG5CoexistenceFooterLines(dexcomG5: dexcomG5),
                 rows: makeDexcomG5CoexistenceRows(dexcomG5: dexcomG5)
             ),
             BluetoothPeripheralDetailSection(
@@ -1474,11 +1523,35 @@ private extension BluetoothPeripheralDetailState {
                 id: "dexcom-g5-use-other-app",
                 title: Texts_BluetoothPeripheralView.useOtherDexcomApp,
                 isOn: dexcomG5.useOtherApp,
+                detailSymbol: BluetoothPeripheralDetailSymbol(
+                    systemName: dexcomG5ModeSystemImage(useOtherApp: dexcomG5.useOtherApp),
+                    color: Color(.colorSecondary)
+                ),
                 setValue: { [weak self] isOn in
                     self?.setDexcomG5UseOtherApp(isOn, dexcomG5: dexcomG5)
                 }
             )
         ]
+    }
+
+    // Keep the two mode explanations separate so each line can carry its own mode symbol.
+    // The active mode is first because it explains the current switch state.
+    func dexcomG5CoexistenceFooterLines(dexcomG5: DexcomG5) -> [BluetoothPeripheralDetailFooterLine] {
+        let coexistenceLine = BluetoothPeripheralDetailFooterLine(
+            systemImage: "c.circle",
+            text: Texts_BluetoothPeripheralView.useOtherDexcomAppCoexistenceFooter,
+            isActive: dexcomG5.useOtherApp
+        )
+
+        let primaryLine = BluetoothPeripheralDetailFooterLine(
+            systemImage: "p.circle",
+            text: Texts_BluetoothPeripheralView.useOtherDexcomAppPrimaryFooter,
+            isActive: !dexcomG5.useOtherApp
+        )
+
+        return dexcomG5.useOtherApp
+            ? [coexistenceLine, primaryLine]
+            : [primaryLine, coexistenceLine]
     }
 
     func makeDexcomG5BatteryRows(dexcomG5: DexcomG5) -> [BluetoothPeripheralDetailRow] {

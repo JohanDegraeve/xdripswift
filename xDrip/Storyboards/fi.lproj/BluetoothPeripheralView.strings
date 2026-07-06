@@ -30,7 +30,8 @@
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
 "useOtherDexcomApp" = "Rinnakkaiskäyttötila";
-"useOtherDexcomAppFooter" = "Rinnakkaiskäyttötila sallii meidän toimia toisen sovelluksen, kuten Dexcomin tai CamAPSin, kanssa. Sovelluksen on pysyttävä käynnissä taustalla. Ensisijainen tila yhdistää pääsovelluksena ja hallitsee yhteyttä.";
+"useOtherDexcomAppCoexistenceFooter" = "Rinnakkaiskäyttötila sallii meidän toimia toisen sovelluksen, kuten Dexcomin tai CamAPSin, kanssa. Sovelluksen on pysyttävä käynnissä taustalla.";
+"useOtherDexcomAppPrimaryFooter" = "Ensisijainen tila yhdistää pääsovelluksena ja hallitsee yhteyttä.";
 "runningInCoexistenceMode" = "Käytössä rinnakkaiskäyttötilassa";
 "runningInPrimaryMode" = "Käytössä ensisijaisessa tilassa";
 /// Disconnect transmitter, title

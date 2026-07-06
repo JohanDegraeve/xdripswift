@@ -33,7 +33,13 @@ struct BluetoothPeripheralDetailView: View {
                     .foregroundStyle(Color(ConstantsUI.tableViewHeaderTextColor))
             } footer: {
                 if let statusFooterText = state.statusFooterText {
-                    Text(statusFooterText)
+                    HStack(alignment: .firstTextBaseline, spacing: 4) {
+                        if let statusFooterSystemImage = state.statusFooterSystemImage {
+                            Image(systemName: statusFooterSystemImage)
+                        }
+
+                        Text(statusFooterText)
+                    }
                         .foregroundStyle(state.statusFooterIsWarning ? Color(.systemRed) : ConstantsUI.listSectionFooterTextColor)
                         .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
                 }
@@ -47,7 +53,18 @@ struct BluetoothPeripheralDetailView: View {
                 } header: {
                     BluetoothPeripheralDetailSectionHeaderView(section: section)
                 } footer: {
-                    if let footer = section.footer {
+                    if !section.footerLines.isEmpty {
+                        VStack(alignment: .leading, spacing: 4) {
+                            ForEach(section.footerLines) { footerLine in
+                                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                                    Image(systemName: footerLine.systemImage)
+                                    Text(footerLine.text)
+                                }
+                                .foregroundStyle(footerLine.isActive ? ConstantsUI.listSectionFooterTextColor : Color(.colorTertiary))
+                            }
+                        }
+                        .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
+                    } else if let footer = section.footer {
                         Text(footer)
                             .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
                             .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
@@ -351,11 +368,22 @@ private struct BluetoothPeripheralDetailRowView: View {
 
     var body: some View {
         if let toggle = row.toggle {
-            Toggle(isOn: Binding(get: {
-                toggle.isOn
-            }, set: toggle.setValue)) {
+            HStack(spacing: 12) {
                 Text(row.title)
                     .foregroundStyle(row.isEnabled ? Color(.colorPrimary) : Color.gray)
+
+                Spacer(minLength: 12)
+
+                if let detailSymbol = row.detailSymbol {
+                    Image(systemName: detailSymbol.systemName)
+                        .foregroundStyle(row.isEnabled ? detailSymbol.color : .gray)
+                        .imageScale(.medium)
+                }
+
+                Toggle("", isOn: Binding(get: {
+                    toggle.isOn
+                }, set: toggle.setValue))
+                .labelsHidden()
             }
             .disabled(!row.isEnabled)
         } else if let action = row.action, row.isEnabled {

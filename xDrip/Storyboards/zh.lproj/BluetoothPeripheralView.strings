@@ -96,7 +96,8 @@
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
 "useOtherDexcomApp" = "共存模式";
-"useOtherDexcomAppFooter" = "共存模式允许我们与其他应用（例如 Dexcom 或 CamAPS）配合使用。该应用必须持续在后台运行。主模式作为主应用连接并控制连接。";
+"useOtherDexcomAppCoexistenceFooter" = "共存模式允许我们与其他应用（例如 Dexcom 或 CamAPS）配合使用。该应用必须持续在后台运行。";
+"useOtherDexcomAppPrimaryFooter" = "主模式作为主应用连接并控制连接。";
 "runningInCoexistenceMode" = "正在共存模式下运行";
 "runningInPrimaryMode" = "正在主模式下运行";
 
