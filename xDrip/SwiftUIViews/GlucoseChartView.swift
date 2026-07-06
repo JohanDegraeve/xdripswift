@@ -119,12 +119,25 @@ struct GlucoseChartView: View {
         }
             
     }
+
+    private func xAxisLabelEveryHours() -> Int {
+        switch hoursToShow {
+        case 24...:
+            return 4
+        case 12...:
+            return 3
+        case 8...:
+            return 2
+        default:
+            return chartType.xAxisLabelEveryHours()
+        }
+    }
     
     var body: some View {
         let additionalValues = additionalBgReadingDataSets.flatMap { $0.bgReadingValues }
         let allBgValues = bgReadingValues + additionalValues
         let domain = (min((allBgValues.min() ?? 40), urgentLowLimitInMgDl) - 6) ... (max((allBgValues.max() ?? urgentHighLimitInMgDl), urgentHighLimitInMgDl) + 6)
-        let xAxisLabelEveryHours = hoursToShow > 8 ? 2 : chartType.xAxisLabelEveryHours()
+        let xAxisLabelEveryHours = xAxisLabelEveryHours()
         
         let yAxisLineSize = chartType.yAxisLineSize()
         
