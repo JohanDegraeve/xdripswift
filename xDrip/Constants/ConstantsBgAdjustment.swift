@@ -47,4 +47,8 @@ enum ConstantsBgAdjustment {
     static let defaultShapeType: BgAdjustmentShapeType = .neutral
     static let defaultPreviewChartHoursToShow = 5
     static let previewChartHoursToShowOptions = [5, 8, 12, 24]
+
+    /// Set this to true if the preview chart should only show readings from the
+    /// current sensor or follower source context.
+    static let showOnlyLatestDataSourceInPreviewChart = false
 }

@@ -479,8 +479,8 @@ struct BgAdjustmentsView: View {
 
     private func loadBgReadings() {
         let chartWindowStartDate = Date(timeIntervalSinceNow: -(chartHoursToShow * 3600))
-        let fromDate = max(chartWindowStartDate, UserDefaults.standard.postProcessingStartTimeStamp ?? .distantPast)
-        let currentSensor = bgPostProcessingManager.currentSensorForPostProcessing()
+        let fromDate = previewChartStartDate(chartWindowStartDate: chartWindowStartDate)
+        let currentSensor = previewChartSensor()
 
         bgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: fromDate, forSensor: currentSensor, ignoreRawData: true, ignoreCalculatedValue: false, includingSuppressed: true).sorted { $0.timeStamp < $1.timeStamp }
 
@@ -497,6 +497,18 @@ struct BgAdjustmentsView: View {
         previewAllFinalBgReadingDates = []
         previewVisibleFinalBgReadingValues = []
         previewVisibleFinalBgReadingDates = []
+    }
+
+    private func previewChartStartDate(chartWindowStartDate: Date) -> Date {
+        guard ConstantsBgAdjustment.showOnlyLatestDataSourceInPreviewChart else { return chartWindowStartDate }
+
+        return max(chartWindowStartDate, UserDefaults.standard.postProcessingStartTimeStamp ?? .distantPast)
+    }
+
+    private func previewChartSensor() -> Sensor? {
+        guard ConstantsBgAdjustment.showOnlyLatestDataSourceInPreviewChart else { return nil }
+
+        return bgPostProcessingManager.currentSensorForPostProcessing()
     }
 
     private func loadBgCheckTreatmentChartPoints(fromDate: Date) {
