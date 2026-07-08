@@ -925,7 +925,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             deviceStatus.updatedDate = .distantPast
             deviceStatus.lastLoopDate = .distantPast
         }
-        let previousDeviceStatusSignature = (createdAt: deviceStatus.createdAt, lastLoopDate: deviceStatus.lastLoopDate, id: deviceStatus.id)
+        let previousDeviceStatusSignature = (createdAt: deviceStatus.createdAt, lastLoopDate: deviceStatus.lastLoopDate, id: deviceStatus.id, iob: deviceStatus.iob, cob: deviceStatus.cob)
         Task {
             do {
                 let unifiedResponses: [NightscoutDeviceStatusResponse]? = try await nightscoutRequest(path: nightscoutDeviceStatusPath, responseType: [NightscoutDeviceStatusResponse].self)
@@ -997,7 +997,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 if let mostRecent = pumpBatteryCandidates.sorted(by: { $0.date > $1.date }).first {
                     deviceStatus.pumpBatteryPercent = mostRecent.percent
                 }
-                let signatureChanged = deviceStatus.createdAt != previousDeviceStatusSignature.createdAt || deviceStatus.lastLoopDate != previousDeviceStatusSignature.lastLoopDate || deviceStatus.id != previousDeviceStatusSignature.id
+                let signatureChanged = deviceStatus.createdAt != previousDeviceStatusSignature.createdAt || deviceStatus.lastLoopDate != previousDeviceStatusSignature.lastLoopDate || deviceStatus.id != previousDeviceStatusSignature.id || deviceStatus.iob != previousDeviceStatusSignature.iob || deviceStatus.cob != previousDeviceStatusSignature.cob
                 self.deviceStatus = deviceStatus
                 self.deviceStatus.lastCheckedDate = .now
                 self.deviceStatus.updatedDate = .now
