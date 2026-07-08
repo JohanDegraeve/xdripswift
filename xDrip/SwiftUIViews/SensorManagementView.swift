@@ -598,6 +598,8 @@ struct SensorManagementView: View {
             warmupMinutes = ConstantsMaster.minimumSensorWarmUpRequiredInMinutes
         case .Dexcom:
             warmupMinutes = isAnubis ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis : ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6
+        case .Medtrum:
+            warmupMinutes = nil
         case .none:
             warmupMinutes = nil
         }

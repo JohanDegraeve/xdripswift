@@ -102,7 +102,8 @@ enum CGMTransmitterType:String, CaseIterable {
     case Libre2 = "Libre2"
 
     /// Medtrum TouchCare Nano CGM (data relayed via the paired Medtrum patch pump's BLE)
-    case medtrumTouchCareNano = "Medtrum TouchCare Nano"
+    /// Shortened to "Medtrum Nano" for display space reasons
+    case medtrumTouchCareNano = "Medtrum Nano"
 
     /// what sensorType does this CGMTransmitter type support
     func sensorType() -> CGMSensorType {

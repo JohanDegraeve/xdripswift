@@ -35,7 +35,8 @@ enum BluetoothPeripheralType: String, CaseIterable {
     case OmniPodHeartBeatType = "OmniPod"
 
     /// Medtrum TouchCare Nano CGM (data relayed by the paired Medtrum patch pump)
-    case MedtrumTouchCareNanoType = "Medtrum TouchCare Nano"
+    /// Shortened to "Medtrum Nano" for display space reasons
+    case MedtrumTouchCareNanoType = "Medtrum Nano"
 
     func createNewBluetoothPeripheral(withAddress address: String, withName name: String, nsManagedObjectContext: NSManagedObjectContext) -> BluetoothPeripheral {
         

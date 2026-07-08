@@ -272,6 +272,7 @@ extension BluetoothPeripheralType {
             .Libre2Type,
             .DexcomType,
             .DexcomG7Type,
+            .MedtrumTouchCareNanoType,
             .MiaoMiaoType,
             .BubbleType
         ]

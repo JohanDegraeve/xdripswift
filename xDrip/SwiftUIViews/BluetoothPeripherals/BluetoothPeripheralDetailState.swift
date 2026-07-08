@@ -344,6 +344,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
             return makeMiaoMiaoSections(bluetoothPeripheral: bluetoothPeripheral)
         case .BubbleType:
             return makeBubbleSections(bluetoothPeripheral: bluetoothPeripheral)
+        case .MedtrumTouchCareNanoType:
+            return makeMedtrumTouchCareNanoSections(bluetoothPeripheral: bluetoothPeripheral)
         case .M5StackType:
             return makeM5StackSections(bluetoothPeripheral: bluetoothPeripheral, includesSpecificM5StackSection: true)
         case .M5StickCType:
@@ -1862,6 +1864,29 @@ private extension BluetoothPeripheralDetailState {
         ]
     }
 
+    func makeMedtrumTouchCareNanoSections(bluetoothPeripheral: BluetoothPeripheral) -> [BluetoothPeripheralDetailSection] {
+        guard let medtrumNano = bluetoothPeripheral as? MedtrumTouchCareNano else { return [] }
+
+        return [
+            BluetoothPeripheralDetailSection(
+                id: "medtrum-touchcare-nano",
+                title: BluetoothPeripheralType.MedtrumTouchCareNanoType.rawValue,
+                rows: [
+                    row(
+                        id: "medtrum-touchcare-nano-dependency",
+                        title: "Requires Medtrum EasyPatch",
+                        detail: "EasyPatch must be installed and running for sensor data."
+                    ),
+                    row(
+                        id: "medtrum-touchcare-nano-firmware",
+                        title: Texts_Common.firmware,
+                        detail: medtrumNano.firmware
+                    )
+                ]
+            )
+        ]
+    }
+
     func makeLibreBridgeRows(
         idPrefix: String,
         sensorType: String?,
@@ -2181,6 +2206,8 @@ private extension BluetoothPeripheralDetailState {
             cGMMiaoMiaoTransmitter.cGMMiaoMiaoTransmitterDelegate = self
         } else if let cGMBubbleTransmitter = bluetoothTransmitter as? CGMBubbleTransmitter {
             cGMBubbleTransmitter.cGMBubbleTransmitterDelegate = self
+        } else if let cGMMedtrumTouchCareNanoTransmitter = bluetoothTransmitter as? CGMMedtrumTouchCareNanoTransmitter {
+            cGMMedtrumTouchCareNanoTransmitter.cGMMedtrumTouchCareNanoTransmitterDelegate = self
         }
     }
 
@@ -2206,6 +2233,8 @@ private extension BluetoothPeripheralDetailState {
             cGMMiaoMiaoTransmitter.cGMMiaoMiaoTransmitterDelegate = bluetoothPeripheralManager as? CGMMiaoMiaoTransmitterDelegate
         } else if let cGMBubbleTransmitter = bluetoothTransmitter as? CGMBubbleTransmitter {
             cGMBubbleTransmitter.cGMBubbleTransmitterDelegate = bluetoothPeripheralManager as? CGMBubbleTransmitterDelegate
+        } else if let cGMMedtrumTouchCareNanoTransmitter = bluetoothTransmitter as? CGMMedtrumTouchCareNanoTransmitter {
+            cGMMedtrumTouchCareNanoTransmitter.cGMMedtrumTouchCareNanoTransmitterDelegate = bluetoothPeripheralManager as? CGMMedtrumTouchCareNanoTransmitterDelegate
         }
     }
 
@@ -2459,6 +2488,13 @@ extension BluetoothPeripheralDetailState: CGMBubbleTransmitterDelegate {
 
     func received(libreSensorType: LibreSensorType, from cGMBubbleTransmitter: CGMBubbleTransmitter) {
         (bluetoothPeripheralManager as? CGMBubbleTransmitterDelegate)?.received(libreSensorType: libreSensorType, from: cGMBubbleTransmitter)
+        refreshOnMain()
+    }
+}
+
+extension BluetoothPeripheralDetailState: CGMMedtrumTouchCareNanoTransmitterDelegate {
+    func received(firmware: String, from cGMMedtrumTouchCareNanoTransmitter: CGMMedtrumTouchCareNanoTransmitter) {
+        (bluetoothPeripheralManager as? CGMMedtrumTouchCareNanoTransmitterDelegate)?.received(firmware: firmware, from: cGMMedtrumTouchCareNanoTransmitter)
         refreshOnMain()
     }
 }
