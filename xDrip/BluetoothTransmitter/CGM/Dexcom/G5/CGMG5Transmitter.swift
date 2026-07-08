@@ -334,6 +334,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     }
 
     override func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
+        // Let the base BLE path arm the next connection first. In co-existence
+        // background wakes, current glucose is already published as soon as the
+        // frame is received, and delaying reconnect bookkeeping here can let iOS
+        // suspend before the next BLE connection is requested.
         super.centralManager(central, didDisconnectPeripheral: peripheral, error: error)
         
         if waitingPairingConfirmation {
@@ -346,8 +350,6 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             }
         }
 
-        // In co-existence mode current glucose is published immediately when observed,
-        // but any observed backfill stream is only complete once the connection closes.
         sendGlucoseDataToDelegate()
 
         // setting characteristics to nil, they will be reinitialized at next connect
