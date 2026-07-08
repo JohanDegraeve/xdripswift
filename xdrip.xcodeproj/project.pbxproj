@@ -247,6 +247,12 @@
 		4C2000052F65000100000001 /* BluetoothPeripheralDetailState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2000062F65000100000001 /* BluetoothPeripheralDetailState.swift */; };
 		4C2000072F65000100000001 /* BluetoothPeripheralDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2000082F65000100000001 /* BluetoothPeripheralDetailView.swift */; };
 		4C2000092F65000100000001 /* BluetoothPeripheralSettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C20000A2F65000100000001 /* BluetoothPeripheralSettingsRow.swift */; };
+		4D7180012FE8000100000001 /* MedtrumTouchCareNano+BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7180022FE8000100000001 /* MedtrumTouchCareNano+BluetoothPeripheral.swift */; };
+		4D7180032FE8000100000001 /* CGMMedtrumTouchCareNanoTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7180042FE8000100000001 /* CGMMedtrumTouchCareNanoTransmitter.swift */; };
+		4D7180052FE8000100000001 /* CGMMedtrumTouchCareNanoTransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7180062FE8000100000001 /* CGMMedtrumTouchCareNanoTransmitterDelegate.swift */; };
+		4D7180072FE8000100000001 /* MedtrumTouchCareNano+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7180082FE8000100000001 /* MedtrumTouchCareNano+CoreDataClass.swift */; };
+		4D7180092FE8000100000001 /* MedtrumTouchCareNano+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D71800A2FE8000100000001 /* MedtrumTouchCareNano+CoreDataProperties.swift */; };
+		4D71800B2FE8000100000001 /* BluetoothPeripheralManager+CGMMedtrumTouchCareNanoTransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D71800C2FE8000100000001 /* BluetoothPeripheralManager+CGMMedtrumTouchCareNanoTransmitterDelegate.swift */; };
 		7DDD89BD4ECFCE7BDA8D3AE2 /* SettingsSharedUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */; };
 		C2385D0CA6579919114B060A /* AlertTypesSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */; };
 		CE1B2FE025D0264B00F642F5 /* LaunchScreen.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */; };
@@ -1042,6 +1048,13 @@
 		4C2000062F65000100000001 /* BluetoothPeripheralDetailState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralDetailState.swift; sourceTree = "<group>"; };
 		4C2000082F65000100000001 /* BluetoothPeripheralDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralDetailView.swift; sourceTree = "<group>"; };
 		4C20000A2F65000100000001 /* BluetoothPeripheralSettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralSettingsRow.swift; sourceTree = "<group>"; };
+		4D7180022FE8000100000001 /* MedtrumTouchCareNano+BluetoothPeripheral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MedtrumTouchCareNano+BluetoothPeripheral.swift"; sourceTree = "<group>"; };
+		4D7180042FE8000100000001 /* CGMMedtrumTouchCareNanoTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMMedtrumTouchCareNanoTransmitter.swift; sourceTree = "<group>"; };
+		4D7180062FE8000100000001 /* CGMMedtrumTouchCareNanoTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMMedtrumTouchCareNanoTransmitterDelegate.swift; sourceTree = "<group>"; };
+		4D7180082FE8000100000001 /* MedtrumTouchCareNano+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MedtrumTouchCareNano+CoreDataClass.swift"; sourceTree = "<group>"; };
+		4D71800A2FE8000100000001 /* MedtrumTouchCareNano+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MedtrumTouchCareNano+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		4D71800C2FE8000100000001 /* BluetoothPeripheralManager+CGMMedtrumTouchCareNanoTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BluetoothPeripheralManager+CGMMedtrumTouchCareNanoTransmitterDelegate.swift"; sourceTree = "<group>"; };
+		4D71800D2FE8000100000001 /* xdrip v21.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v21.xcdatamodel"; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xDrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xDrip/Version.xcconfig; sourceTree = "<group>"; };
 		763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlertsSettingsView.swift; sourceTree = "<group>"; };
@@ -2320,6 +2333,22 @@
 			path = Bubble;
 			sourceTree = "<group>";
 		};
+		4D7180102FE8000100000001 /* Medtrum */ = {
+			isa = PBXGroup;
+			children = (
+				4D7180112FE8000100000001 /* TouchCareNano */,
+			);
+			path = Medtrum;
+			sourceTree = "<group>";
+		};
+		4D7180112FE8000100000001 /* TouchCareNano */ = {
+			isa = PBXGroup;
+			children = (
+				4D7180022FE8000100000001 /* MedtrumTouchCareNano+BluetoothPeripheral.swift */,
+			);
+			path = TouchCareNano;
+			sourceTree = "<group>";
+		};
 		F80D916924F828D5006840B5 /* Libre2 */ = {
 			isa = PBXGroup;
 			children = (
@@ -2603,6 +2632,7 @@
 				F8A2BC1E25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMG5TransmitterDelegate.swift */,
 				F8F71D822B7EACC9005076E8 /* BluetoothPeripheralManager+CGMG7TransmitterDelegate.swift */,
 				F8A2BC2A25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMLibre2TransmitterDelegate.swift */,
+				4D71800C2FE8000100000001 /* BluetoothPeripheralManager+CGMMedtrumTouchCareNanoTransmitterDelegate.swift */,
 				F8A2BC2825DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMMiaoMiaoTransmitterDelegate.swift */,
 				F8A2BC2225DB0D6D001D1E78 /* BluetoothPeripheralManager+M5StackBluetoothTransmitterDelegate.swift */,
 				F8A2BC2325DB0D6D001D1E78 /* BluetoothPeripheralManaging.swift */,
@@ -3155,6 +3185,8 @@
 				F8EE3EAB2B6834FD00B27B96 /* Libre2HeartBeat+CoreDataProperties.swift */,
 				F804870A2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift */,
 				F804870B2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift */,
+				4D7180082FE8000100000001 /* MedtrumTouchCareNano+CoreDataClass.swift */,
+				4D71800A2FE8000100000001 /* MedtrumTouchCareNano+CoreDataProperties.swift */,
 				F8C97851242AA70C00A09483 /* MiaoMiao+CoreDataClass.swift */,
 				F8C97852242AA70C00A09483 /* MiaoMiao+CoreDataProperties.swift */,
 				F85542312B7573D20058CE09 /* OmniPodHeartBeat+CoreDataClass.swift */,
@@ -3267,6 +3299,23 @@
 			path = G7;
 			sourceTree = "<group>";
 		};
+		4D7180122FE8000100000001 /* Medtrum */ = {
+			isa = PBXGroup;
+			children = (
+				4D7180132FE8000100000001 /* TouchCareNano */,
+			);
+			path = Medtrum;
+			sourceTree = "<group>";
+		};
+		4D7180132FE8000100000001 /* TouchCareNano */ = {
+			isa = PBXGroup;
+			children = (
+				4D7180042FE8000100000001 /* CGMMedtrumTouchCareNanoTransmitter.swift */,
+				4D7180062FE8000100000001 /* CGMMedtrumTouchCareNanoTransmitterDelegate.swift */,
+			);
+			path = TouchCareNano;
+			sourceTree = "<group>";
+		};
 		F8F7B8E9259A7A9400C47B04 /* SavitzkyGolayFilter */ = {
 			isa = PBXGroup;
 			children = (
@@ -3291,6 +3340,7 @@
 			children = (
 				F8DF765923E350B100063910 /* Dexcom */,
 				F808D2CF240329D40084B5DB /* Libre */,
+				4D7180102FE8000100000001 /* Medtrum */,
 			);
 			path = CGM;
 			sourceTree = "<group>";
@@ -3347,6 +3397,7 @@
 				F8F971BB23A5915900C3F17D /* Dexcom */,
 				F8F971F023A5915900C3F17D /* Generic */,
 				F8F971D623A5915900C3F17D /* Libre */,
+				4D7180122FE8000100000001 /* Medtrum */,
 			);
 			path = CGM;
 			sourceTree = "<group>";
@@ -4043,6 +4094,7 @@
 				F8B3A84A227F090E004BA588 /* SettingsViewNotificationsSettingsViewModel.swift in Sources */,
 				F83098FE23AD3F84005741DF /* UITabBarController.swift in Sources */,
 				F80D916D24F82A17006840B5 /* CGMLibre2TransmitterDelegate.swift in Sources */,
+				4D7180052FE8000100000001 /* CGMMedtrumTouchCareNanoTransmitterDelegate.swift in Sources */,
 				F8B955EB2591355200C06016 /* CGMLibre2Transmitter+TestData.swift in Sources */,
 				F8B3A85B2280CCD1004BA588 /* AlertSettingsViewController.swift in Sources */,
 				F8F9722E23A5915900C3F17D /* M5StackTransmitterOpCode.swift in Sources */,
@@ -4054,6 +4106,7 @@
 				F8B3A85D22821BB6004BA588 /* Int.swift in Sources */,
 				F808D2CE2403292C0084B5DB /* Bubble+CoreDataProperties.swift in Sources */,
 				F8F71D862B7EC1AD005076E8 /* DexcomG7+BluetoothPeripheral.swift in Sources */,
+				4D7180012FE8000100000001 /* MedtrumTouchCareNano+BluetoothPeripheral.swift in Sources */,
 				47046EA42A6E8BA700A6F736 /* TextsBgReadings.swift in Sources */,
 				F8E0475E28CC8E330049D8C9 /* GlucoseData+LoopShare.swift in Sources */,
 				476698662BE2572C008EB2A9 /* ConstantsSettingsIcons.swift in Sources */,
@@ -4116,6 +4169,7 @@
 				47A6ABFF2B795DA30047A4BA /* GlucoseChartType.swift in Sources */,
 				F227BF192B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift in Sources */,
 				F8A2BC3B25DB0D6D001D1E78 /* BluetoothPeripheralManager+CGMBubbleTransmitterDelegate.swift in Sources */,
+				4D71800B2FE8000100000001 /* BluetoothPeripheralManager+CGMMedtrumTouchCareNanoTransmitterDelegate.swift in Sources */,
 				47E3DB372C769C9600DE1AF0 /* AlgorithmType.swift in Sources */,
 				F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */,
 				F8A1585122EDB597007F5B5D /* ConstantsBGGraphBuilder.swift in Sources */,
@@ -4137,6 +4191,7 @@
 				47B60F3726F389E2003198D3 /* LandscapeChartViewController.swift in Sources */,
 				F8025E5421EE8D2100ECF0C0 /* Libre1Calibrator.swift in Sources */,
 				F8F71D742B7C1143005076E8 /* CGMG7Transmitter.swift in Sources */,
+				4D7180032FE8000100000001 /* CGMMedtrumTouchCareNanoTransmitter.swift in Sources */,
 				F81FA00A228F53680028C70F /* TextsHomeView.swift in Sources */,
 				F8E3C3AD21FE551C00907A04 /* DexcomCalibrator.swift in Sources */,
 				F8F9723523A5915900C3F17D /* BluetoothTransmitter.swift in Sources */,
@@ -4147,6 +4202,7 @@
 				4A9B10052F0A000100000001 /* BgPostProcessingManager.swift in Sources */,
 				F8F9721023A5915900C3F17D /* TransmitterVersionRxMessage.swift in Sources */,
 				F8A1587122EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift in Sources */,
+				4D7180072FE8000100000001 /* MedtrumTouchCareNano+CoreDataClass.swift in Sources */,
 				F8A1585522EDB706007F5B5D /* ConstantsCalibrationAlgorithms.swift in Sources */,
 				4752B4062635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift in Sources */,
 				F897AAF92200F2D200CDDD10 /* CBPeripheralState.swift in Sources */,
@@ -4167,6 +4223,7 @@
 				F821CF9522ADB0D7005C1E43 /* HealthKitManager.swift in Sources */,
 				F8CB59CE27444D6300BA199E /* DexcomSessionStopResponse.swift in Sources */,
 				F8F71D812B7EAA2E005076E8 /* DexcomG7+CoreDataProperties.swift in Sources */,
+				4D7180092FE8000100000001 /* MedtrumTouchCareNano+CoreDataProperties.swift in Sources */,
 				F8B3A81D227DEC92004BA588 /* CalibrationsAccessor.swift in Sources */,
 				F821CF9D22AEF483005C1E43 /* BGReadingSpeaker.swift in Sources */,
 				F8297F4E238DCAD800D74D66 /* BluetoothPeripheralsViewController.swift in Sources */,
@@ -5644,6 +5701,7 @@
 		F85FF3C2252D0C32004E6FF1 /* xdrip.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				4D71800D2FE8000100000001 /* xdrip v21.xcdatamodel */,
 				47D0F0012FE21A4B00B4712A /* xdrip v20.xcdatamodel */,
 				47BFA1232FD6A00100B4712A /* xdrip v19.xcdatamodel */,
 				47B4A7B42FD0AAC600B4712A /* xdrip v18.xcdatamodel */,
@@ -5654,7 +5712,7 @@
 				F85FF3CB252F9C9A004E6FF1 /* xdrip v13.xcdatamodel */,
 				F85FF3C3252D0C32004E6FF1 /* xdrip v12.xcdatamodel */,
 			);
-			currentVersion = 47D0F0012FE21A4B00B4712A /* xdrip v20.xcdatamodel */;
+			currentVersion = 4D71800D2FE8000100000001 /* xdrip v21.xcdatamodel */;
 			path = xdrip.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

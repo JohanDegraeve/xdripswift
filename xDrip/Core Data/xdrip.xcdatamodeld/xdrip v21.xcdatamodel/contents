@@ -73,6 +73,7 @@
         <relationship name="libre2" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Libre2" inverseName="blePeripheral" inverseEntity="Libre2"/>
         <relationship name="libre2heartbeat" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="Libre2HeartBeat" inverseName="blePeripheral" inverseEntity="Libre2HeartBeat"/>
         <relationship name="m5Stack" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="M5Stack" inverseName="blePeripheral" inverseEntity="M5Stack"/>
+        <relationship name="medtrumTouchCareNano" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="MedtrumTouchCareNano" inverseName="blePeripheral" inverseEntity="MedtrumTouchCareNano"/>
         <relationship name="miaoMiao" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="MiaoMiao" inverseName="blePeripheral" inverseEntity="MiaoMiao"/>
         <relationship name="omniPodHeartBeat" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="OmniPodHeartBeat" inverseName="blePeripheral" inverseEntity="OmniPodHeartBeat"/>
     </entity>
@@ -140,6 +141,10 @@
         <attribute name="rotation" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="textcolor" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <relationship name="blePeripheral" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="m5Stack" inverseEntity="BLEPeripheral"/>
+    </entity>
+    <entity name="MedtrumTouchCareNano" representedClassName=".MedtrumTouchCareNano" syncable="YES">
+        <attribute name="firmware" optional="YES" attributeType="String"/>
+        <relationship name="blePeripheral" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="BLEPeripheral" inverseName="medtrumTouchCareNano" inverseEntity="BLEPeripheral"/>
     </entity>
     <entity name="MiaoMiao" representedClassName=".MiaoMiao" syncable="YES">
         <attribute name="firmware" optional="YES" attributeType="String"/>

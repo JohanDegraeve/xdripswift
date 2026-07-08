@@ -467,6 +467,32 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
             self?.pendingTemporaryRejectionDeviceName = name
         }
     }
+
+    /// Find a peripheral already connected to the iOS Bluetooth stack (possibly by another app),
+    /// matching at least one of the given service UUIDs, and connect to it without scanning.
+    ///
+    /// Used to piggy-back on a third-party app's authenticated BLE session (e.g. Medtrum EasyPatch).
+    /// iOS multiplexes a single ACL link between apps, so notifications fan out to us once subscribed.
+    ///
+    /// - returns: true if a matching peripheral was found and connection was initiated.
+    func retrieveConnectedPeripheral(withServiceUUIDs serviceUUIDs: [CBUUID]) -> Bool {
+        return runOnCentralQueueSync {
+            guard let central = centralManager else { return false }
+            let peripherals = central.retrieveConnectedPeripherals(withServices: serviceUUIDs)
+            guard !peripherals.isEmpty else {
+                trace("in retrieveConnectedPeripheral, no system-connected peripherals match given services", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
+                return false
+            }
+            // Prefer one matching expectedName if set; otherwise take the first.
+            let candidate: CBPeripheral = peripherals.first(where: { p in
+                guard let expected = expectedName, let n = p.name else { return false }
+                return n.range(of: expected, options: .caseInsensitive) != nil
+            }) ?? peripherals[0]
+            trace("in retrieveConnectedPeripheral, connecting to system-connected peripheral name=%{public}@ id=%{public}@", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info, candidate.name ?? "<unnamed>", candidate.identifier.uuidString)
+            stopScanAndconnect(to: candidate)
+            return true
+        }
+    }
     
     // MARK: - fileprivate functions
     

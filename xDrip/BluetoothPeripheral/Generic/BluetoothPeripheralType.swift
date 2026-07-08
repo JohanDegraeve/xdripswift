@@ -34,6 +34,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
     /// omnipod heartbeat
     case OmniPodHeartBeatType = "OmniPod"
 
+    /// Medtrum TouchCare Nano CGM (data relayed by the paired Medtrum patch pump)
+    case MedtrumTouchCareNanoType = "Medtrum TouchCare Nano"
+
     func createNewBluetoothPeripheral(withAddress address: String, withName name: String, nsManagedObjectContext: NSManagedObjectContext) -> BluetoothPeripheral {
         
         switch self {
@@ -73,6 +76,9 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .DexcomG7Type:
             return DexcomG7(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
 
+        case .MedtrumTouchCareNanoType:
+            return MedtrumTouchCareNano(address: address, name: name, alias: nil, nsManagedObjectContext: nsManagedObjectContext)
+
         }
 
     }
@@ -85,7 +91,7 @@ enum BluetoothPeripheralType: String, CaseIterable {
         case .M5StackType, .M5StickCType:
             return .M5Stack
             
-        case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .DexcomG7Type:
+        case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .DexcomG7Type, .MedtrumTouchCareNanoType:
             return .CGM
 
         case .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType:
@@ -216,4 +222,3 @@ enum BluetoothPeripheralType: String, CaseIterable {
         }
     }
 }
-

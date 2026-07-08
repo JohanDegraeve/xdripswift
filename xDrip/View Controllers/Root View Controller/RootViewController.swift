@@ -2052,6 +2052,11 @@ final class RootViewController: UIViewController, ObservableObject {
                 calibrator = Libre1Calibrator()
             }
 
+        case .medtrumTouchCareNano:
+            // Values arrive already calibrated to mg/dL — the transmitter applies the Medtrum per-sensor
+            // calibration factor decoded from each packet, so xDrip should not run its own calibrator.
+            calibrator = NoCalibrator()
+
         }
         
         trace("in getCalibrator, calibrator = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .info, calibrator.description())

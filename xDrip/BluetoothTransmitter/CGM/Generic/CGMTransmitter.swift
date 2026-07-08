@@ -100,7 +100,10 @@ enum CGMTransmitterType:String, CaseIterable {
     
     /// Libre2
     case Libre2 = "Libre2"
-    
+
+    /// Medtrum TouchCare Nano CGM (data relayed via the paired Medtrum patch pump's BLE)
+    case medtrumTouchCareNano = "Medtrum TouchCare Nano"
+
     /// what sensorType does this CGMTransmitter type support
     func sensorType() -> CGMSensorType {
         
@@ -111,7 +114,10 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .miaomiao, .Bubble, .Libre2:
             return .Libre
-            
+
+        case .medtrumTouchCareNano:
+            return .Medtrum
+
         }
         
     }
@@ -138,7 +144,13 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .dexcomG7:
             return true
-            
+
+        case .medtrumTouchCareNano:
+            // EasyPatch runs the actual sensor lifecycle, but we *can* infer sensor start by combining
+            // packet timestamp with the reading-counter we decode. Returning true lets xDrip auto-start
+            // its internal sensor record from the sensorAge we pass with each reading.
+            return true
+
         }
     }
     
@@ -157,7 +169,11 @@ enum CGMTransmitterType:String, CaseIterable {
             
         case .dexcomG7:
             return false
-        
+
+        case .medtrumTouchCareNano:
+            // EasyPatch owns sensor lifecycle; xDrip should not offer a manual start UI.
+            return false
+
         }
     }
         
@@ -180,7 +196,11 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG7:
             // we don't use this
             return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelDexcomG5
-            
+
+        case .medtrumTouchCareNano:
+            // No pump-battery surface in xDrip; reuse the generic threshold so the UI has a sane default.
+            return ConstantsDefaultAlertLevels.defaultBatteryAlertLevelLibre2
+
         }
     }
     
@@ -203,7 +223,10 @@ enum CGMTransmitterType:String, CaseIterable {
         case .dexcomG7:
             // we don't use this
             return ""
-            
+
+        case .medtrumTouchCareNano:
+            return ""
+
         }
     }
     
