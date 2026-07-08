@@ -35,6 +35,12 @@ enum ConstantsUI {
     /// Text color for SwiftUI grouped list section footers.
     static let listSectionFooterTextColor = Color(.colorSecondary)
 
+    /// Dot color used to identify glucose readings that were received through backfill.
+    static let backfilledReadingIndicatorDotColor = Color.orange
+
+    /// Dot size used to identify glucose readings that were received through backfill.
+    static let backfilledReadingIndicatorDotSize: CGFloat = 5
+
     /// Muted red used for Settings parent row summaries when the child feature is disabled.
     static let rowTitleColorFalse = Color(red: 0.45, green: 0.18, blue: 0.18)
 

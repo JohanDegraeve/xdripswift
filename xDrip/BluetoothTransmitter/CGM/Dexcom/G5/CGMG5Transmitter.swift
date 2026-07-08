@@ -346,11 +346,9 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
             }
         }
 
-        // In co-existence mode current glucose is published immediately when
-        // observed. Backfill is flushed separately on glucoseBackfillRx.
-        if !useOtherApp {
-            sendGlucoseDataToDelegate()
-        }
+        // In co-existence mode current glucose is published immediately when observed,
+        // but any observed backfill stream is only complete once the connection closes.
+        sendGlucoseDataToDelegate()
 
         // setting characteristics to nil, they will be reinitialized at next connect
         writeControlCharacteristic = nil
@@ -708,7 +706,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                             processGlucoseBackfillRxMessage(value: value)
                             // if firefly continue with the firefly message flow
                             if useOtherApp {
-                                sendGlucoseDataToDelegate()
+                                trace("in didUpdateValueFor characteristic, glucoseBackfillRx, coexistence mode will flush observed backfill on disconnect", log: log, category: ConstantsLog.categoryCGMG5, type: .debug)
                             } else if useFireFlyFlow() {
                                 fireflyMessageFlow()
                             }
@@ -1530,6 +1528,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
         // mode and publish the observed glucose frame immediately.
         if useOtherApp {
             if let latestReading = lastGlucoseInSensorDataRxReading {
+                latestReading.backfilledAt = delayedBackfilledAt(for: latestReading.timeStamp)
                 timeStampOfLastG5Reading = latestReading.timeStamp
                 DispatchQueue.main.async { [weak self] in
                     guard let self = self else { return }
@@ -1543,6 +1542,12 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
 
         // Primary / non-coexistence mode: keep the existing behaviour.
         // The reading will be delivered later as part of sendGlucoseDataToDelegate().
+    }
+
+    private func delayedBackfilledAt(for timeStamp: Date) -> Date? {
+        let now = Date()
+
+        return now.timeIntervalSince(timeStamp) > ConstantsBloodGlucose.minimumSecondsToConsiderAsBackfillDelay ? now : nil
     }
 
     /// process transmitterTimeRxMessage
@@ -1822,10 +1827,10 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
     
     /// - sends contents of backFillStream and lastGlucoseInSensorDataRxReading
     /// - also assigns timeStampOfLastG5Reading to timestamp of lastGlucoseInSensorDataRxReading
-    /// - only to be used for firefly
+    /// - used for Firefly primary mode and passive co-existence backfill flushes
     /// - reset backFillStream, lastGlucoseInSensorDataRxReading, backfillTxSent, glucoseTxSent
     private func sendGlucoseDataToDelegate() {
-        guard useFireFlyFlow() else {return}
+        guard useFireFlyFlow() || useOtherApp else { return }
         
         // transmitterDate should be non nil
         guard let transmitterStartDate = transmitterStartDate else {
@@ -1851,7 +1856,7 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 // readings older dan maxBackfillPeriod are ignored
                 guard diff > 0, diff < TimeInterval.hours(ConstantsDexcomG5.maxBackfillPeriod) else { continue }
                 
-                glucoseDataArray.insert(GlucoseData(timeStamp: backfillDate, glucoseLevelRaw: Double(backFill.glucose)), at: 0)
+                glucoseDataArray.insert(GlucoseData(timeStamp: backfillDate, glucoseLevelRaw: Double(backFill.glucose), backfilledAt: Date()), at: 0)
                 
                 trace("in sendGlucoseDataToDelegate, new backfill, value = %{public}@, date = %{public}@", log: log, category: ConstantsLog.categoryCGMG5, type: .debug, backFill.glucose.description, backfillDate.toStringForTrace(timeStyle: .long, dateStyle: .long))
             }

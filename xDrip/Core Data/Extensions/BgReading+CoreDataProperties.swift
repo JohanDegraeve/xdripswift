@@ -11,6 +11,7 @@ extension BgReading {
     @NSManaged public var a: Double
     @NSManaged public var adjustedValue: NSNumber?
     @NSManaged public var ageAdjustedRawValue: Double
+    @NSManaged public var backfilledAt: Date?
     @NSManaged public var b: Double
     @NSManaged public var c: Double
     @NSManaged public var calculatedValue: Double

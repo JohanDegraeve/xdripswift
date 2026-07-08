@@ -1401,6 +1401,11 @@ final class RootViewController: UIViewController, ObservableObject {
                         }
                         
                         let newReading = calibrator.createNewBgReading(rawData: glucose.glucoseLevelRaw, timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &last3ReadingsForNewReading, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
+
+                        if let backfilledAt = glucose.backfilledAt ?? (isHistoricalGapFill ? Date() : nil),
+                           backfilledAt.timeIntervalSince(glucose.timeStamp) > ConstantsBloodGlucose.minimumSecondsToConsiderAsBackfillDelay {
+                            newReading.backfilledAt = backfilledAt
+                        }
                         
                         if UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog {
                             trace("in processNewGlucoseData, new reading created, timestamp = %{public}@, calculatedValue = %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, newReading.timeStamp.description(with: .current), newReading.calculatedValue.description.replacingOccurrences(of: ".", with: ","))
@@ -2046,6 +2051,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 // no oop web, fixed slope
                 calibrator = Libre1Calibrator()
             }
+
         }
         
         trace("in getCalibrator, calibrator = %{public}@", log: log, category: ConstantsLog.categoryRootView, type: .info, calibrator.description())

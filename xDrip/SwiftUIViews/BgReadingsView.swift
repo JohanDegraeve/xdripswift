@@ -93,8 +93,12 @@ struct BgReadingsView: View {
 
                                 Spacer()
 
-                                Text(bgReading.timeStamp.toStringInUserLocale(timeStyle: .short, dateStyle: .none))
-                                    .foregroundColor(.secondary)
+                                HStack {
+                                    BackfilledReadingIndicatorDot(isVisible: bgReading.backfilledAt != nil)
+
+                                    Text(bgReading.timeStamp.toStringInUserLocale(timeStyle: .short, dateStyle: .none))
+                                        .foregroundColor(.secondary)
+                                }
                             }
                             .foregroundColor(.white)
                         }
@@ -259,6 +263,18 @@ struct BgReadingsView: View {
 struct BgReadingsView_Previews: PreviewProvider {
     static var previews: some View {
         BgReadingsView()
+    }
+}
+
+struct BackfilledReadingIndicatorDot: View {
+    var isVisible: Bool = true
+
+    var body: some View {
+        Circle()
+            .foregroundStyle(isVisible ? ConstantsUI.backfilledReadingIndicatorDotColor : .clear)
+            .accessibilityLabel(Texts_BgReadings.backfilled)
+            .accessibilityHidden(!isVisible)
+            .frame(width: ConstantsUI.backfilledReadingIndicatorDotSize, height: ConstantsUI.backfilledReadingIndicatorDotSize)
     }
 }
 

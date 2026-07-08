@@ -5,6 +5,7 @@
 "generalSectionHeader" = "Algemeen";
 "internalDataSectionHeader" = "Interne data";
 "timestamp" = "Tijdstip";
+"backfilledAtFooterFormat" = "Aangevuld %@";
 "calculatedValue" = "Berekende waarde";
 "slopeArrow" = "Helling arrow";
 "id" = "ID";

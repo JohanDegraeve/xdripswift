@@ -227,7 +227,7 @@ class BgReadingsAccessor: ObservableObject {
                         calibrationSnapshot = nil
                     }
 
-                    returnValue.append(BgReadingSnapshot(timeStamp: bgReading.timeStamp, calculatedValue: bgReading.calculatedValue, rawData: bgReading.rawData, finalValue: bgReading.finalValue, adjustedValue: bgReading.adjustedValue?.doubleValue, smoothedValue: bgReading.smoothedValue?.doubleValue, calculatedValueSlope: bgReading.calculatedValueSlope, hideSlope: bgReading.hideSlope, id: bgReading.id, deviceName: bgReading.deviceName, calibrationSnapshot: calibrationSnapshot, sensorID: bgReading.sensor?.id, objectID: bgReading.objectID))
+                    returnValue.append(BgReadingSnapshot(timeStamp: bgReading.timeStamp, calculatedValue: bgReading.calculatedValue, rawData: bgReading.rawData, finalValue: bgReading.finalValue, adjustedValue: bgReading.adjustedValue?.doubleValue, smoothedValue: bgReading.smoothedValue?.doubleValue, backfilledAt: bgReading.backfilledAt, calculatedValueSlope: bgReading.calculatedValueSlope, hideSlope: bgReading.hideSlope, id: bgReading.id, deviceName: bgReading.deviceName, calibrationSnapshot: calibrationSnapshot, sensorID: bgReading.sensor?.id, objectID: bgReading.objectID))
 
                     if let limit = limit, returnValue.count == limit { break }
                 }

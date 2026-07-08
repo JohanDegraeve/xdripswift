@@ -5,6 +5,7 @@
 "generalSectionHeader" = "General";
 "internalDataSectionHeader" = "Datos internos";
 "timestamp" = "Fecha";
+"backfilledAtFooterFormat" = "Rellenado %@";
 "calculatedValue" = "Valor calculado";
 "slopeArrow" = "Flecha tendencia";
 "id" = "ID";

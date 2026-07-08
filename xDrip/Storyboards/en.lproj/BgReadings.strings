@@ -6,6 +6,8 @@
 "glucoseValueSectionHeader" = "Glucose Value";
 "internalDataSectionHeader" = "Internal data";
 "timestamp" = "Timestamp";
+"backfilled" = "Backfilled";
+"backfilledAtFooterFormat" = "Backfilled %@";
 "calculatedValue" = "Calculated value";
 "calibratedValue" = "Calibrated Value";
 "finalGlucose" = "Glucose Value";

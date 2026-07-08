@@ -15,6 +15,7 @@ public class BgReading: NSManagedObject {
         self.calibration = calibration
         self.rawData = rawData
         self.deviceName = deviceName
+        self.backfilledAt = nil
         
         ageAdjustedRawValue = 0
         calibrationFlag = false
@@ -43,6 +44,7 @@ public class BgReading: NSManagedObject {
         r += "\n" + indentation + "uniqueid = " + id
         r += "\n" + indentation + "a = " + a.description
         r += "\n" + indentation + "ageAdjustedRawValue = " + ageAdjustedRawValue.description
+        r += "\n" + indentation + "backfilledAt = " + (backfilledAt?.description ?? "nil")
         r += "\n" + indentation + "b = " + b.description
         r += "\n" + indentation + "c = " + c.description
         r += "\n" + indentation + "calculatedValue = " + calculatedValue.description
@@ -297,6 +299,7 @@ public struct BgReadingSnapshot: Sendable, Hashable {
     public let finalValue: Double
     public let adjustedValue: Double?
     public let smoothedValue: Double?
+    public let backfilledAt: Date?
     public let calculatedValueSlope: Double
     public let hideSlope: Bool
     public let id: String

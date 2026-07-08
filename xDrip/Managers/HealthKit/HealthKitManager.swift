@@ -145,7 +145,7 @@ public class HealthKitManager: NSObject {
     
     public func replaceBgReadingsInHealthKit(bgReadings: [BgReading]) {
         let bgReadingSnapshots = bgReadings.map {
-            BgReadingSnapshot(timeStamp: $0.timeStamp, calculatedValue: $0.calculatedValue, rawData: $0.rawData, finalValue: $0.finalValue, adjustedValue: $0.adjustedValue?.doubleValue, smoothedValue: $0.smoothedValue?.doubleValue, calculatedValueSlope: $0.calculatedValueSlope, hideSlope: $0.hideSlope, id: $0.id, deviceName: $0.deviceName, calibrationSnapshot: $0.calibration.map { CalibrationSnapshot(id: $0.id, timeStamp: $0.timeStamp, slope: $0.slope, intercept: $0.intercept, bg: $0.bg, rawValue: $0.rawValue) }, sensorID: $0.sensor?.id, objectID: $0.objectID)
+            BgReadingSnapshot(timeStamp: $0.timeStamp, calculatedValue: $0.calculatedValue, rawData: $0.rawData, finalValue: $0.finalValue, adjustedValue: $0.adjustedValue?.doubleValue, smoothedValue: $0.smoothedValue?.doubleValue, backfilledAt: $0.backfilledAt, calculatedValueSlope: $0.calculatedValueSlope, hideSlope: $0.hideSlope, id: $0.id, deviceName: $0.deviceName, calibrationSnapshot: $0.calibration.map { CalibrationSnapshot(id: $0.id, timeStamp: $0.timeStamp, slope: $0.slope, intercept: $0.intercept, bg: $0.bg, rawValue: $0.rawValue) }, sensorID: $0.sensor?.id, objectID: $0.objectID)
         }
         
         replaceBgReadingsInHealthKit(bgReadings: bgReadingSnapshots)

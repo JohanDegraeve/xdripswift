@@ -25,11 +25,23 @@ struct BgReadingsDetailView: View {
         let bgRangeDescription = bgReading.bgRangeDescription()
 
         List {
-            Section(header: Text(Texts_BgReadings.generalSectionHeader)) {
+            Section {
                 row(title: Texts_BgReadings.deviceName, data: bgReading.deviceName ?? nilString)
                 row(title: Texts_BgReadings.finalGlucose, data: displayBgValue(bgReading.finalValue))
                 row(title: Texts_BgReadings.glucoseRange, data: bgRangeDescriptionText(bgRangeDescription), indicatorColor: bgRangeIndicatorColor(bgRangeDescription: bgRangeDescription))
                 row(title: Texts_BgReadings.timestamp, data: bgReading.timeStamp.formatted(date: .abbreviated, time: .shortened))
+            } header: {
+                Text(Texts_BgReadings.generalSectionHeader)
+            } footer: {
+                if let backfilledAt = bgReading.backfilledAt {
+                    HStack(alignment: .center, spacing: 6) {
+                        BackfilledReadingIndicatorDot()
+
+                        Text(backfilledAtFooterText(backfilledAt: backfilledAt))
+                            .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
+                    }
+                    .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
+                }
             }
             
             Section(header: Text(Texts_BgReadings.slopeSectionHeader)) {
@@ -103,6 +115,12 @@ struct BgReadingsDetailView: View {
         guard let valueInMgDl = valueInMgDl else { return nilString }
         
         return displayBgValue(valueInMgDl)
+    }
+
+    private func backfilledAtFooterText(backfilledAt: Date) -> String {
+        let backfilledAtString = backfilledAt.formatted(date: .abbreviated, time: .shortened)
+
+        return String(format: Texts_BgReadings.backfilledAtFooterFormat, backfilledAtString)
     }
 
     private func bgRangeDescriptionText(_ bgRangeDescription: BgRangeDescription) -> String {

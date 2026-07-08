@@ -5,6 +5,7 @@
 
 /// timestamp of glucose reading
 "timestamp" = "Timestamp";
+"backfilledAtFooterFormat" = "Nachgetragen %@";
 
 /// glucose reading
 "glucoseReadingTitle" = "Glucose Reading";

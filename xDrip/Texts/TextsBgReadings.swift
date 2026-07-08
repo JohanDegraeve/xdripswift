@@ -51,6 +51,14 @@ enum Texts_BgReadings {
     static let timestamp: String = {
         return NSLocalizedString("timestamp", tableName: filename, bundle: Bundle.main, value: "Timestamp", comment: "timestamp of glucose reading")
     }()
+
+    static let backfilled: String = {
+        return NSLocalizedString("backfilled", tableName: filename, bundle: Bundle.main, value: "Backfilled", comment: "accessibility label for a glucose reading that was added from backfill")
+    }()
+
+    static let backfilledAtFooterFormat: String = {
+        return NSLocalizedString("backfilledAtFooterFormat", tableName: filename, bundle: Bundle.main, value: "Backfilled %@", comment: "footer text explaining when a glucose reading was backfilled")
+    }()
     
     static let calculatedValue: String = {
         return NSLocalizedString("calculatedValue", tableName: filename, bundle: Bundle.main, value: "Calculated Value", comment: "calculated value of the glucose readings")
