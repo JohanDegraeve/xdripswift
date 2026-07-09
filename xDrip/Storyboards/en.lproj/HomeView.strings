@@ -100,7 +100,7 @@
 "showTreatments" = "Show Treatments";
 "sensorRemaining" = "Sensor Remaining";
 "remaining" = "remaining";
-"noDataSourceConnectedWatch" = "Open xDrip";
+"noDataSourceConnectedWatch" = "Open iOS App";
 "snoozeAllTitle" = "Snooze All";
 "snoozeAllDisabled" = "Snooze All Disabled";
 "snoozeAllSnoozed" = "All alarms are snoozed!";

@@ -79,7 +79,7 @@ enum ConstantsGlucoseChart {
     static let glucoseNotUrgentRangeColor = UIColor.yellow
     
     /// glucose colors - for original values when post processing is enabled
-    static let glucoseOriginalColor = UIColor.darkGray.withAlphaComponent(0.4)
+    static let glucoseOriginalColor = UIColor.gray.withAlphaComponent(0.55)
 
     /// glucose colors - for original values when peek mode is active
     static let glucoseOriginalPeekColor = UIColor.lightGray
