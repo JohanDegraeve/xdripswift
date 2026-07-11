@@ -6,670 +6,799 @@
 //  Copyright © 2021 Johan Degraeve. All rights reserved.
 //
 
-import PieCharts
-import SwiftCharts
+import SwiftUI
 import UIKit
 
+/// Temporary UIKit container for the SwiftUI landscape chart screen.
+///
+/// RootViewController still owns rotation and presents this controller from the storyboard. The
+/// actual landscape screen is now SwiftUI, so when navigation is migrated later this file can be
+/// reduced to just the SwiftUI view/state or removed entirely.
 final class LandscapeChartViewController: UIViewController {
-    // MARK: - TIR Chart Data Structure
-    
-    /// structure to hold daily TIR statistics
-    private struct DailyTIRData {
+
+    // MARK: - Properties
+
+    private let stateModel = LandscapeChartStateModel()
+    private var hostingController: UIHostingController<LandscapeChartView>?
+
+    // MARK: - View Lifecycle
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        installLandscapeChartView()
+    }
+
+    // MARK: - Configuration
+
+    func configure(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager) {
+        stateModel.configure(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager)
+    }
+
+    // MARK: - Private Functions
+
+    private func installLandscapeChartView() {
+        let landscapeChartView = LandscapeChartView(stateModel: stateModel)
+        let hostingController = UIHostingController(rootView: landscapeChartView)
+
+        hostingController.view.backgroundColor = .clear
+        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+
+        addChild(hostingController)
+        view.addSubview(hostingController.view)
+
+        NSLayoutConstraint.activate([
+            hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
+            hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
+
+        hostingController.didMove(toParent: self)
+        self.hostingController = hostingController
+    }
+
+}
+
+// MARK: - State Model
+
+private final class LandscapeChartStateModel: ObservableObject {
+
+    // MARK: - TIR Data Structure
+
+    struct DailyTIRData: Identifiable {
         let date: Date
         let lowPercentage: Double
         let inRangePercentage: Double
         let highPercentage: Double
-        
-        init(date: Date, lowPercentage: Double = 0, inRangePercentage: Double = 0, highPercentage: Double = 0) {
-            self.date = date
-            self.lowPercentage = lowPercentage
-            self.inRangePercentage = inRangePercentage
-            self.highPercentage = highPercentage
-        }
-    }
-    
-    /// shared helper struct for TIR chart layout so drawing and hit-testing stay in sync
-    private struct TIRLayout {
-        let topPadding: CGFloat
-        let bottomPadding: CGFloat
-        let leadingPadding: CGFloat
-        let yAxisLabelWidth: CGFloat
-        let yAxisLabelRightPadding: CGFloat
-        let trailingPadding: CGFloat
-        let barCornerRadius: CGFloat
-        let percentLabelFontSize: CGFloat
-        let dayLabelFontSize: CGFloat
-        let yAxisLabelFontSize: CGFloat
-        let barSpacing: CGFloat
-        let chartWidth: CGFloat
-        let chartHeight: CGFloat
-        let barWidth: CGFloat
-        let stride: CGFloat
-    }
-    
-    // MARK: - Outlets and IBActions
 
-    // header section
-    @IBOutlet weak var dateLabelOutlet: UILabel!
-    
-    @IBOutlet weak var showTreatmentsOnChartLabelOutlet: UILabel!
-    @IBOutlet weak var showTreatmentsOnChartSwitch: UISwitch!
-    @IBAction func showTreatmentsOnChartValueChanged(_ sender: UISwitch) {
-        UserDefaults.standard.showTreatmentsOnLandscapeChart = sender.isOn
-        updateView()
-    }
-    
-    @IBOutlet weak var showStatisticsOnChartLabelOutlet: UILabel!
-    @IBOutlet weak var showStatisticsOnChartSwitch: UISwitch!
-    @IBAction func showStatisticsOnChartValueChanged(_ sender: UISwitch) {
-        UserDefaults.standard.showStatisticsOnLandscapeChart = sender.isOn
-        updateView()
-        // the TIR chart doesn't redraw correctly the first time after it's container view has
-        // been unhidden. Just force a second redraw immediately after. It's annoying but works for now.
-        // This should be removed and fixed properly in the future
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
-            self.updateView()
+        var id: Date {
+            date
         }
     }
-    
-    /// when the back button is pressed we'll subtract a day from the currently selected date and refresh the view
-    @IBOutlet weak var backButtonOutlet: UIButton!
-    @IBAction func backButtonPressed(_ sender: Any) {
-        if Calendar.current.isDate(selectedDate, inSameDayAs: tirWindowStartDate) {
-            tirWindowStartDate = tirWindowStartDate.addingTimeInterval(-24 * 60 * 60)
-            selectedDate = tirWindowStartDate
-            // window changed so recalculate cache
-            calculateDailyTIRData()
-        } else {
-            selectedDate = selectedDate.addingTimeInterval(-24 * 60 * 60).toMidnight()
-        }
-        updateView()
-    }
-    
-    /// when the forward button is pressed we'll add a day from to currently selected date and refresh the view
-    @IBOutlet weak var forwardButtonOutlet: UIButton!
-    @IBAction func forwardButtonPressed(_ sender: Any) {
-        // add a day to the selected date
-        if !Calendar.current.isDateInToday(selectedDate) {
-            if Calendar.current.isDate(selectedDate, inSameDayAs: tirWindowEndDate) {
-                tirWindowStartDate = tirWindowStartDate.addingTimeInterval(24 * 60 * 60).toMidnight()
-                selectedDate = selectedDate.addingTimeInterval(24 * 60 * 60).toMidnight()
-                // window changed so recalculate cache
-                calculateDailyTIRData()
-            } else {
-                selectedDate = selectedDate.addingTimeInterval(24 * 60 * 60).toMidnight()
-            }
-        }
-        updateView()
-    }
-    
-    // left section with statistics data
-    @IBOutlet weak var statisticsSidebarViewOutlet: UIView!
-    
-    @IBOutlet weak var highTitleLabelOutlet: UILabel!
-    @IBOutlet weak var highLabelOutlet: UILabel!
-    @IBOutlet weak var highStatisticLabelOutlet: UILabel!
-    
-    @IBOutlet weak var inRangeTitleLabelOutlet: UILabel!
-    @IBOutlet weak var inRangeStatisticLabelOutlet: UILabel!
-    
-    @IBOutlet weak var lowTitleLabelOutlet: UILabel!
-    @IBOutlet weak var lowLabelOutlet: UILabel!
-    @IBOutlet weak var lowStatisticLabelOutlet: UILabel!
-    
-    @IBOutlet weak var pieChartOutlet: PieChart!
-    
-    @IBOutlet weak var averageTitleLabelOutlet: UILabel!
-    @IBOutlet weak var averageStatisticLabelOutlet: UILabel!
-    
-    @IBOutlet weak var a1CTitleLabelOutlet: UILabel!
-    @IBOutlet weak var a1CStatisticLabelOutlet: UILabel!
-    
-    @IBOutlet weak var cVTitleLabelOutlet: UILabel!
-    @IBOutlet weak var cVStatisticLabelOutlet: UILabel!
-        
-    // right-upper section with TIR chart
-    /// outlet for TIR chart
-    @IBOutlet weak var tirChartContainerOutlet: UIView!
-    
-    /// tap gesture action to make the y-axis fixed/dynamic by double tapping
-    @IBAction func tirChartTap(_ sender: UITapGestureRecognizer) {
-        UserDefaults.standard.tirChartHasDynamicYAxis.toggle()
-        updateView()
-    }
-    
-    // right-lower section with 24hr glucose chart
-    /// outlet for glucose chart
-    @IBOutlet weak var glucoseChartOutlet: BloodGlucoseChartView!
-    
-    /// action to swipe left and right to change the selected date
-    @IBAction func glucoseChartSwipe(_ sender: UISwipeGestureRecognizer) {
-        switch sender.direction {
-        case .left:
-            if !Calendar.current.isDateInToday(selectedDate) {
-                if Calendar.current.isDate(selectedDate, inSameDayAs: tirWindowEndDate) {
-                    tirWindowStartDate = tirWindowStartDate.addingTimeInterval(24 * 60 * 60).toMidnight()
-                    selectedDate = selectedDate.addingTimeInterval(24 * 60 * 60).toMidnight()
-                    // window changed so recalculate cache
-                    calculateDailyTIRData()
-                } else {
-                    selectedDate = selectedDate.addingTimeInterval(24 * 60 * 60).toMidnight()
-                }
-            }
-            updateView()
-        case .right:
-            if Calendar.current.isDate(selectedDate, inSameDayAs: tirWindowStartDate) {
-                tirWindowStartDate = tirWindowStartDate.addingTimeInterval(-24 * 60 * 60)
-                selectedDate = tirWindowStartDate
-                // window changed so recalculate cache
-                calculateDailyTIRData()
-            } else {
-                selectedDate = selectedDate.addingTimeInterval(-24 * 60 * 60).toMidnight()
-            }
-            updateView()
-        default:
-            break
-        }
-    }
-    
-    /// tap gesture action to quickly change selected date back to today
-    @IBAction func glucoseChartTap(_ sender: UITapGestureRecognizer) {
-        // select today
-        selectedDate = Date().toMidnight()
-        tirWindowStartDate = selectedDate.addingTimeInterval(Double(-(ConstantsStatistics.numberOfDaysForTIRChartLandscapeView - 1)) * 24 * 60 * 60)
-        calculateDailyTIRData()
-        updateView()
-    }
-    
-    // MARK: - private variables
 
-    private var tirWindowStartDate: Date = .init()
-    
-    private var tirWindowEndDate: Date {
-        return tirWindowStartDate.addingTimeInterval(Double(ConstantsStatistics.numberOfDaysForTIRChartLandscapeView * 24 * 60 * 60) - 1)
-    }
-    
-    /// cache for daily TIR data to avoid repeated calculations
-    private var dailyTIRCache: [DailyTIRData] = []
-    
-    /// reference to the TIR chart
-    private var tirChart: Chart?
-    
-    /// glucoseChartManager
-    private var glucoseChartManager: GlucoseChartManager?
-    
-    /// BgReadingsAccessor instance
-    private var bgReadingsAccessor: BgReadingsAccessor?
-    
-    /// NightscoutSyncManager instance
-    private var nightscoutSyncManager: NightscoutSyncManager?
-    
-    /// coreDataManager to be used throughout the project
-    private var coreDataManager: CoreDataManager?
-    
-    /// statisticsManager needed to calculate the stats
+    // MARK: - Published State
+
+    @Published var selectedDate = Date().toMidnight()
+    @Published var dailyTIRData = [DailyTIRData]()
+    @Published var statistics = RootHomeStatisticsState()
+    @Published var chartState = GlucoseChartState.empty(startDate: Date().toMidnight(), endDate: Date().toMidnight().addingTimeInterval(.hours(24) - 1))
+    @Published var isLoadingChart = false
+    @Published var isLoadingStatistics = false
+    @Published var showTreatments = UserDefaults.standard.showTreatmentsOnLandscapeChart
+    @Published var showStatistics = UserDefaults.standard.showStatisticsOnLandscapeChart
+
+    // MARK: - Private Properties
+
+    private var tirWindowStartDate = Date().toMidnight()
+    private var chartStateManager: GlucoseChartStateManager?
     private var statisticsManager: StatisticsManager?
-    
-    /// date that will be used to show the 24 hour chart. Initialise it for today. Make a small haptic feedback if the value is changed.
-    private var selectedDate: Date = Date().toMidnight() {
-        didSet {
-            if oldValue != selectedDate {
-                UISelectionFeedbackGenerator().selectionChanged()
-            }
-        }
-    }
-    
-    /// store the first and last BgReading dates to make it easier to enable/disable the buttons
-    private var firstBgReadingDate: Date = .init()
-    
+
     private let dateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
-        
         dateFormatter.setLocalizedDateFormatFromTemplate(ConstantsGlucoseChart.dateFormatLandscapeChart)
-        
+
         return dateFormatter
-        
     }()
-    
-    /// stored value to make it common through the view
-    private let colorNoData = UIColor(resource: .colorTertiary)
-    
-    /// stored value to make it common through the view
-    private let colorData = UIColor(resource: .colorPrimary)
-    
-    /// persisted low limit value
-    private var lowLimitForTIR = 0.0
-    
-    /// persisted high limit value
-    private var highLimitForTIR = 0.0
-    
-    // MARK: - overriden functions
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        // Setup Core Data Manager - setting up coreDataManager happens asynchronously
-        // completion handler is called when finished. This gives the app time to already continue setup which is independent of coredata, like initializing the views
-        coreDataManager = CoreDataManager(modelName: ConstantsCoreData.modelName, completion: {
-            // if coreDataManager is nil then there's no reason to continue
-            guard self.coreDataManager != nil else {
-                return
-            }
-            
-            // setup nightscout sync manager
-            self.nightscoutSyncManager = NightscoutSyncManager(coreDataManager: self.coreDataManager!, messageHandler: { (title: String, message: String) in
-                let alert = UIAlertController(title: title, message: message, actionHandler: nil)
-                self.present(alert, animated: true, completion: nil)
-            })
-            
-            // initialize glucoseChartManager
-            self.glucoseChartManager = GlucoseChartManager(coreDataManager: self.coreDataManager!, nightscoutSyncManager: self.nightscoutSyncManager!)
-            
-            // initialize statisticsManager
-            self.statisticsManager = StatisticsManager(coreDataManager: self.coreDataManager!)
-            
-            // initialize chartGenerator in chartOutlet
-            self.glucoseChartOutlet.chartGenerator = { [weak self] frame in
-                return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
-            }
-            
-            self.selectedDate = Date().toMidnight()
-            
-            self.tirWindowStartDate = self.selectedDate.addingTimeInterval(Double(-(ConstantsStatistics.numberOfDaysForTIRChartLandscapeView - 1)) * 24 * 60 * 60)
-            
-            self.lowLimitForTIR = UserDefaults.standard.timeInRangeType.lowerLimit
-            self.highLimitForTIR = UserDefaults.standard.timeInRangeType.higherLimit
-            
-            // Calculate daily TIR data once managers are initialized
-            self.calculateDailyTIRData()
-            
-            self.updateTIRChart()
 
-            // Add tap recognizer for tap-to-select on TIR bars
-            let tirChartTapGesture = UITapGestureRecognizer(target: self, action: #selector(self.handleTIRChartBarTap(_:)))
-            self.tirChartContainerOutlet.addGestureRecognizer(tirChartTapGesture)
-            self.tirChartContainerOutlet.isUserInteractionEnabled = true
-            
-            // finally, now that everything is set up, let's update the whole view
-            self.updateView()
-        })
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        // set the title labels to their correct localization
-        highTitleLabelOutlet.text = Texts_Common.highStatistics
-        inRangeTitleLabelOutlet.text = UserDefaults.standard.timeInRangeType.title
-        lowTitleLabelOutlet.text = Texts_Common.lowStatistics
-        averageTitleLabelOutlet.text = Texts_Common.averageStatistics
-        a1CTitleLabelOutlet.text = Texts_Common.a1cStatistics
-        cVTitleLabelOutlet.text = Texts_Common.cvStatistics
-        showTreatmentsOnChartLabelOutlet.text = Texts_SettingsView.sectionTitleTreatments
-        showStatisticsOnChartLabelOutlet.text = Texts_SettingsView.sectionTitleStatistics
-        
-        // show a smaller outer radius for the pie chart view if an iPhone mini screen
-        pieChartOutlet.outerRadius = UIScreen.main.nativeBounds.height == 2340 ? 30 : 40
-                
-        showTreatmentsOnChartSwitch.isOn = UserDefaults.standard.showTreatmentsOnLandscapeChart
-        showStatisticsOnChartSwitch.isOn = UserDefaults.standard.showStatisticsOnLandscapeChart
-    }
-        
-    // MARK: - private functions
-    
-    /// Updates the view with latest data
-    private func updateView() {
-        let showStatistics = UserDefaults.standard.showStatisticsOnLandscapeChart
-        
-        statisticsSidebarViewOutlet.isHidden = !showStatistics
-        tirChartContainerOutlet.isHidden = !showStatistics
-        
-        // update the date outlet
-        dateLabelOutlet.text = dateFormatter.string(from: selectedDate)
-        
-        // set the start of the day from the selected date
-        let startOfDay = selectedDate
-        
-        // add a day and subtract one second to get one second before midnight
-        let endOfDay = startOfDay.addingTimeInterval((24 * 60 * 60) - 1)
-        
-        // update the main glucose chart
-        glucoseChartManager?.updateChartPoints(endDate: endOfDay, startDate: startOfDay, chartOutlet: glucoseChartOutlet, showTreaments: UserDefaults.standard.showTreatmentsOnLandscapeChart, completionHandler: nil)
-        
-        updateTIRChart()
-        
-        updateStatistics(startOfDay: startOfDay, endOfDay: endOfDay)
-        
-        // enable the forward button if the selected date is not today
-        forwardButtonOutlet.isEnabled = !Calendar.current.isDateInToday(selectedDate)
-    }
-    
-    /// helper function to calculate the statistics and update the pie chart and label outlets
-    private func updateStatistics(startOfDay: Date, endOfDay: Date) {
-        // just to make things easier to read
-        let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-        
-        // remove all data models from the pie chart
-        pieChartOutlet.models = []
-        
-        // statisticsManager will calculate the statistics in background thread and call the callback function in the main thread
-        statisticsManager?.calculateStatistics(fromDate: startOfDay, toDate: endOfDay, callback: { statistics in
-            
-            // set the low and high limit labels - this is common to whether we have valid statistics to show or not
-            self.lowLabelOutlet.text = "(<" + (isMgDl ? Int(self.lowLimitForTIR).description : self.lowLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
-            self.highLabelOutlet.text = "(>" + (isMgDl ? Int(self.highLimitForTIR).description : self.highLimitForTIR.round(toDecimalPlaces: 1).description) + ")"
-            
-            // we've got values so let's configure the value to show them
-            if statistics.lowStatisticValue.value != 0 || statistics.inRangeStatisticValue.value != 0 || statistics.highStatisticValue.value != 0 {
-                self.lowLabelOutlet.textColor = UIColor(resource: .colorSecondary)
-                self.highLabelOutlet.textColor = UIColor(resource: .colorSecondary)
-                
-                self.lowStatisticLabelOutlet.textColor = ConstantsStatistics.labelLowColor
-                self.lowStatisticLabelOutlet.text = Int(statistics.lowStatisticValue.round(toDecimalPlaces: 0)).description + " %"
-                
-                self.inRangeStatisticLabelOutlet.textColor = ConstantsStatistics.labelInRangeColor
-                self.inRangeStatisticLabelOutlet.text = Int(statistics.inRangeStatisticValue.round(toDecimalPlaces: 0)).description + " %"
-                
-                self.highStatisticLabelOutlet.textColor = ConstantsStatistics.labelHighColor
-                self.highStatisticLabelOutlet.text = Int(statistics.highStatisticValue.round(toDecimalPlaces: 0)).description + " %"
-                
-                self.averageStatisticLabelOutlet.textColor = self.colorData
-                self.averageStatisticLabelOutlet.text = (isMgDl ? Int(statistics.averageStatisticValue.round(toDecimalPlaces: 0)).description : statistics.averageStatisticValue.round(toDecimalPlaces: 1).description) + (isMgDl ? " mg/dl" : " mmol/l")
-                
-                self.a1CStatisticLabelOutlet.textColor = self.colorData
-                if UserDefaults.standard.useIFCCA1C {
-                    self.a1CStatisticLabelOutlet.text = Int(statistics.a1CStatisticValue.round(toDecimalPlaces: 0)).description + " mmol"
-                } else {
-                    self.a1CStatisticLabelOutlet.text = statistics.a1CStatisticValue.round(toDecimalPlaces: 1).description + " %"
-                }
-                
-                self.cVStatisticLabelOutlet.textColor = self.colorData
-                self.cVStatisticLabelOutlet.text = Int(statistics.cVStatisticValue.round(toDecimalPlaces: 0)).description + " %"
-                
-                // set the reference angle of the pie chart to ensure that the in range slice is centered
-                self.pieChartOutlet.referenceAngle = 90.0 - (1.8 * CGFloat(statistics.inRangeStatisticValue))
-                self.pieChartOutlet.innerRadius = 0
-                self.pieChartOutlet.models = [
-                    PieSliceModel(value: Double(statistics.inRangeStatisticValue), color: ConstantsStatistics.pieChartInRangeSliceColor),
-                    PieSliceModel(value: Double(statistics.lowStatisticValue), color: ConstantsStatistics.pieChartLowSliceColor),
-                    PieSliceModel(value: Double(statistics.highStatisticValue), color: ConstantsStatistics.pieChartHighSliceColor)
-                ]
-            } else {
-                // there are no values to show, so let's just gray everything out
-                self.lowLabelOutlet.textColor = self.colorNoData
-                self.highLabelOutlet.textColor = self.colorNoData
-                
-                self.lowStatisticLabelOutlet.textColor = ConstantsStatistics.labelLowColor
-                self.lowStatisticLabelOutlet.text = "- %"
-                
-                self.inRangeStatisticLabelOutlet.textColor = ConstantsStatistics.labelInRangeColor
-                self.inRangeStatisticLabelOutlet.text = "- %"
-                
-                self.highStatisticLabelOutlet.textColor = ConstantsStatistics.labelHighColor
-                self.highStatisticLabelOutlet.text = "- %"
-                
-                self.averageStatisticLabelOutlet.textColor = self.colorNoData
-                self.averageStatisticLabelOutlet.text = isMgDl ? "- mg/dl" : "- mmol/l"
-                
-                self.a1CStatisticLabelOutlet.textColor = self.colorNoData
-                if UserDefaults.standard.useIFCCA1C {
-                    self.a1CStatisticLabelOutlet.text = "- mmol"
-                } else {
-                    self.a1CStatisticLabelOutlet.text = "- %"
-                }
-                
-                self.cVStatisticLabelOutlet.textColor = self.colorNoData
-                self.cVStatisticLabelOutlet.text = "- %"
-                
-                self.pieChartOutlet.innerRadius = 0
-                self.pieChartOutlet.models = [
-                    PieSliceModel(value: 1, color: self.colorNoData)
-                ]
-            }
-        })
-    }
-    
-    // MARK: - helper functions
-    
-    // return a shortened, locale-friendly month name
-    private func shortMonthName(for monthNumber: Int) -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale.current // ensures localization, e.g. “sept.” in French, “sept.” in Catalan
-        dateFormatter.setLocalizedDateFormatFromTemplate("MMM")
-        
-        // Construct a date with the given month number
-        var components = DateComponents()
-        components.month = monthNumber
-        components.day = 1
-        components.year = 2000 // arbitrary non-leap year
-        
-        if let date = Calendar.current.date(from: components) {
-            return dateFormatter.string(from: date).capitalized
-        } else {
-            return ""
-        }
+    // MARK: - Configuration
+
+    func configure(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager) {
+        guard chartStateManager == nil else { return }
+
+        chartStateManager = GlucoseChartStateManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager)
+        statisticsManager = StatisticsManager(coreDataManager: coreDataManager)
+
+        selectedDate = Date().toMidnight()
+        tirWindowStartDate = selectedDate.addingTimeInterval(Double(-(ConstantsStatistics.numberOfDaysForTIRChartLandscapeView - 1)) * .hours(24))
+
+        calculateDailyTIRData()
+        refreshSelectedDay(forceReset: true)
     }
 
-    // MARK: - TIR chart functions
-    
-    /// Updates the TIR column chart with cached daily data
-    private func updateTIRChart() {
-        // Clear existing chart views
-        tirChartContainerOutlet.subviews.forEach { $0.removeFromSuperview() }
-        
-        // Guard against empty cache
-        guard !dailyTIRCache.isEmpty else { return }
-        
-        let containerFrame = tirChartContainerOutlet.bounds
-        let layout = makeTIRLayout(containerBounds: containerFrame, barCount: dailyTIRCache.count)
-        let topPadding = layout.topPadding, leadingPadding = layout.leadingPadding
-        let yAxisLabelWidth = layout.yAxisLabelWidth, yAxisLabelRightPadding = layout.yAxisLabelRightPadding
-        let barCornerRadius = layout.barCornerRadius, percentLabelFontSize = layout.percentLabelFontSize, dayLabelFontSize = layout.dayLabelFontSize, yAxisLabelFontSize = layout.yAxisLabelFontSize
-        let barSpacing = layout.barSpacing
-        let chartHeight = layout.chartHeight
-        let chartWidth = layout.chartWidth
-        let barWidth = layout.barWidth
-        
-        // Calculate y-axis range
-        let tirValues = dailyTIRCache.map { $0.inRangePercentage }.filter { $0 > 0 }
+    // MARK: - Derived State
+
+    var selectedDateText: String {
+        dateFormatter.string(from: selectedDate)
+    }
+
+    var canMoveForward: Bool {
+        !Calendar.current.isDateInToday(selectedDate)
+    }
+
+    var yAxisMinimumForTIR: Double {
+        let tirValues = dailyTIRData.map(\.inRangePercentage).filter { $0 > 0 }
         let tirValuesMin = min(ConstantsStatistics.tirChartYAxisMinimumAxisValue, tirValues.min() ?? 0)
-        let yAxisMin = UserDefaults.standard.tirChartHasDynamicYAxis ? max(0.0, tirValuesMin - ConstantsStatistics.tirChartYAxisMinimumOffset) : 0
-        let yAxisMax: Double = 100
-        let yRange = yAxisMax - yAxisMin
 
-        // Draw horizontal reference lines at 0%, 25%, 50%, 75%, 100% - pixel aligned and extended under y-axis labels
-        let referencePercents: [Double] = [0, 25, 50, 75, 100]
-        let screenScale = UIScreen.main.scale
-        let lineHeight = 1.0 / screenScale
-        // Make gridlines extend slightly under the y-axis labels, but not the full label width
-        let gridlineRightExtension: CGFloat = yAxisLabelRightPadding + yAxisLabelWidth * 0.05
-        for percent in referencePercents {
-            guard percent >= yAxisMin else { continue }
-            let clampedPercent = min(percent, yAxisMax)
-            let normalized = (clampedPercent - yAxisMin) / yRange
-            let rawY = topPadding + chartHeight - CGFloat(normalized) * chartHeight
-            let alignedY = floor(rawY * screenScale) / screenScale
-            // Extend lines under the y-axis label lane for easier visual matching
-            let extendedWidth = chartWidth + gridlineRightExtension
-            let lineView = UIView(frame: CGRect(x: leadingPadding, y: alignedY, width: extendedWidth, height: lineHeight))
-            lineView.backgroundColor = UIColor(resource: .colorSecondary).withAlphaComponent(0.40)
-            tirChartContainerOutlet.addSubview(lineView)
+        return UserDefaults.standard.tirChartHasDynamicYAxis ? max(0.0, tirValuesMin - ConstantsStatistics.tirChartYAxisMinimumOffset) : 0
+    }
+
+    // MARK: - User Actions
+
+    func setShowTreatments(_ value: Bool) {
+        showTreatments = value
+        UserDefaults.standard.showTreatmentsOnLandscapeChart = value
+        refreshChart(forceReset: false)
+    }
+
+    func setShowStatistics(_ value: Bool) {
+        showStatistics = value
+        UserDefaults.standard.showStatisticsOnLandscapeChart = value
+    }
+
+    func moveBackOneDay() {
+        if Calendar.current.isDate(selectedDate, inSameDayAs: tirWindowStartDate) {
+            tirWindowStartDate = tirWindowStartDate.addingTimeInterval(-.hours(24))
+            selectedDate = tirWindowStartDate
+            calculateDailyTIRData()
+        } else {
+            selectedDate = selectedDate.addingTimeInterval(-.hours(24)).toMidnight()
         }
 
-        // Draw y-axis labels on the right next to the gridlines, pixel-aligned and centered to gridline
-        for percent in referencePercents {
-            guard percent >= yAxisMin else { continue }
-            let clampedPercent = min(percent, yAxisMax)
-            let normalized = (clampedPercent - yAxisMin) / yRange
-            let rawY = topPadding + chartHeight - CGFloat(normalized) * chartHeight
-            let alignedY = floor(rawY * screenScale) / screenScale
-            let label = UILabel()
-            label.text = "\(Int(clampedPercent))%"
-            label.font = UIFont.systemFont(ofSize: yAxisLabelFontSize, weight: .regular)
-            label.textColor = UIColor(resource: .colorSecondary).withAlphaComponent(0.85)
-            label.textAlignment = .right
-            label.numberOfLines = 1
-            label.adjustsFontSizeToFitWidth = true
-            label.minimumScaleFactor = 0.8
-            let labelHeight = ceil(label.font.lineHeight)
-            let labelX = containerFrame.width - yAxisLabelWidth - yAxisLabelRightPadding
-            // Center vertically on the gridline, pixel-aligned
-            label.frame = CGRect(x: labelX, y: alignedY - labelHeight / 2, width: yAxisLabelWidth, height: labelHeight)
-            tirChartContainerOutlet.addSubview(label)
+        UISelectionFeedbackGenerator().selectionChanged()
+        refreshSelectedDay(forceReset: false)
+    }
+
+    func moveForwardOneDay() {
+        guard !Calendar.current.isDateInToday(selectedDate) else { return }
+
+        if Calendar.current.isDate(selectedDate, inSameDayAs: tirWindowEndDate) {
+            tirWindowStartDate = tirWindowStartDate.addingTimeInterval(.hours(24)).toMidnight()
+            selectedDate = selectedDate.addingTimeInterval(.hours(24)).toMidnight()
+            calculateDailyTIRData()
+        } else {
+            selectedDate = selectedDate.addingTimeInterval(.hours(24)).toMidnight()
         }
-        
-        // used to persist the previous month number during the for loop
-        // used to display the abbreviated month name on the first bar and on the 1st of each new month
-        // set it to 0 so that the first date will always trigger a "new month" condition
-        var previousMonth = 0
-        
-        // Draw each bar
-        for (index, tirData) in dailyTIRCache.enumerated() {
-            let xPosition = leadingPadding + (CGFloat(index) * (barWidth + barSpacing))
-            
-            // Calculate bar height
-            let tirValue = tirData.inRangePercentage
-            let barHeight: CGFloat
-            if tirValue > 0 {
-                let normalizedValue = (tirValue - yAxisMin) / yRange
-                barHeight = CGFloat(normalizedValue) * chartHeight
-            } else {
-                barHeight = 0 // No bar for empty data
-            }
-            
-            let barY = topPadding + chartHeight - barHeight
-            
-            // Check if this is the selected date
-            let isSelectedDate = Calendar.current.isDate(tirData.date, inSameDayAs: selectedDate)
-            
-            // Create bar view (only if there's data)
-            if barHeight > 0 {
-                let barView = UIView(frame: CGRect(x: xPosition, y: barY, width: barWidth, height: barHeight))
-                barView.backgroundColor = isSelectedDate ? ConstantsStatistics.pieChartInRangeSliceColor : ConstantsStatistics.pieChartInRangeSliceColorDarkened
-                barView.layer.cornerRadius = barCornerRadius
-                
-                tirChartContainerOutlet.addSubview(barView)
-            }
-            
-            // Add percentage label on top
-            let percentLabel = UILabel()
-            percentLabel.text = tirValue > 0 ? "\(Int(tirValue.rounded()))%" : "-"
-            percentLabel.font = UIFont.systemFont(ofSize: percentLabelFontSize + (isSelectedDate ? 1 : 0), weight: isSelectedDate ? .bold : .regular)
-            percentLabel.textColor = isSelectedDate ? UIColor(resource: .colorPrimary) : (tirValue > 0 ? UIColor(resource: .colorSecondary) : UIColor(resource: .colorQuaternary))
-            percentLabel.textAlignment = .center
-            percentLabel.numberOfLines = 1
-            percentLabel.adjustsFontSizeToFitWidth = true
-            percentLabel.minimumScaleFactor = 0.8
-            percentLabel.lineBreakMode = .byClipping
-            percentLabel.sizeToFit()
-            percentLabel.frame = CGRect(x: xPosition, y: topPadding - 18, width: barWidth, height: 15)
-            
-            tirChartContainerOutlet.addSubview(percentLabel)
-            
-            // Add day number label at bottom
-            let calendar = Calendar.current
-            let day = calendar.component(.day, from: tirData.date)
-            let month = calendar.component(.month, from: tirData.date)
-            
-            let dayLabel = UILabel()
-            dayLabel.text = month != previousMonth ? "\(shortMonthName(for: month))" : "\(day)"
-            dayLabel.font = UIFont.systemFont(ofSize: dayLabelFontSize + (isSelectedDate ? 4 : 0), weight: isSelectedDate ? .heavy : .regular)
-            dayLabel.textColor = isSelectedDate ? UIColor(resource: .colorPrimary) : (tirValue > 0 ? UIColor(resource: .colorSecondary) : UIColor(resource: .colorQuaternary))
-            dayLabel.textAlignment = .center
-            dayLabel.numberOfLines = 1
-            dayLabel.adjustsFontSizeToFitWidth = true
-            dayLabel.minimumScaleFactor = 0.7
-            dayLabel.lineBreakMode = .byClipping
-            dayLabel.sizeToFit()
-            dayLabel.frame = CGRect(x: xPosition, y: topPadding + chartHeight + 5, width: barWidth, height: 15)
-            
-            tirChartContainerOutlet.addSubview(dayLabel)
-            previousMonth = month
+
+        UISelectionFeedbackGenerator().selectionChanged()
+        refreshSelectedDay(forceReset: false)
+    }
+
+    func selectToday() {
+        selectedDate = Date().toMidnight()
+        tirWindowStartDate = selectedDate.addingTimeInterval(Double(-(ConstantsStatistics.numberOfDaysForTIRChartLandscapeView - 1)) * .hours(24))
+
+        UISelectionFeedbackGenerator().selectionChanged()
+        calculateDailyTIRData()
+        refreshSelectedDay(forceReset: false)
+    }
+
+    func selectTIRDate(_ date: Date) {
+        guard !Calendar.current.isDate(date, inSameDayAs: selectedDate) else { return }
+
+        selectedDate = date.toMidnight()
+        UISelectionFeedbackGenerator().selectionChanged()
+        refreshSelectedDay(forceReset: false)
+    }
+
+    func toggleTIRYAxisMode() {
+        UserDefaults.standard.tirChartHasDynamicYAxis.toggle()
+        objectWillChange.send()
+    }
+
+    // MARK: - Refresh
+
+    private func refreshSelectedDay(forceReset: Bool) {
+        refreshChart(forceReset: forceReset)
+        refreshStatistics()
+    }
+
+    private func refreshChart(forceReset: Bool) {
+        guard let chartStateManager = chartStateManager else { return }
+
+        let startOfDay = selectedDate
+        let endOfDay = startOfDay.addingTimeInterval(.hours(24) - 1)
+
+        isLoadingChart = true
+        chartStateManager.updateState(
+            endDate: endOfDay,
+            startDate: startOfDay,
+            forceReset: forceReset,
+            showTreatments: showTreatments
+        ) { [weak self] chartState in
+            self?.chartState = chartState
+            self?.isLoadingChart = false
         }
     }
-    
-    /// Calculates TIR statistics for the last X days and caches the results
-    /// This is called once on viewDidLoad to populate the cache
-    private func calculateDailyTIRData() {
-        guard let statisticsManager = statisticsManager else {
-            return
+
+    private func refreshStatistics() {
+        guard let statisticsManager = statisticsManager else { return }
+
+        let startOfDay = selectedDate
+        let endOfDay = startOfDay.addingTimeInterval(.hours(24) - 1)
+
+        isLoadingStatistics = true
+        statisticsManager.calculateStatistics(fromDate: startOfDay, toDate: endOfDay) { [weak self] statistics in
+            self?.statistics = Self.makeStatisticsState(from: statistics)
+            self?.isLoadingStatistics = false
         }
-        
-        dailyTIRCache.removeAll()
-        
+    }
+
+    private func calculateDailyTIRData() {
+        guard let statisticsManager = statisticsManager else { return }
+
         let startDayForWindow = tirWindowStartDate
-        let endOfWindow = startDayForWindow.addingTimeInterval(Double(ConstantsStatistics.numberOfDaysForTIRChartLandscapeView * 24 * 60 * 60) - 1)
-        
+        let endOfWindow = startDayForWindow.addingTimeInterval(Double(ConstantsStatistics.numberOfDaysForTIRChartLandscapeView) * .hours(24) - 1)
+
         statisticsManager.calculateDailyTIR(fromDate: startDayForWindow, toDate: endOfWindow) { [weak self] statisticsByDay in
             guard let self = self else { return }
-            
-            // Build ordered results (oldest to newest), guaranteeing an entry per day
-            var orderedResults: [DailyTIRData] = []
+
+            var values = [DailyTIRData]()
+
             for dayIndex in 0 ..< ConstantsStatistics.numberOfDaysForTIRChartLandscapeView {
-                let dayDate = startDayForWindow.addingTimeInterval(Double(dayIndex) * 24 * 60 * 60)
-                let dayKey = Calendar.current.startOfDay(for: dayDate)
-                let statistics = statisticsByDay[dayKey] ?? StatisticsManager.Statistics(lowStatisticValue: 0, highStatisticValue: 0, inRangeStatisticValue: 0, averageStatisticValue: 0, a1CStatisticValue: 0, cVStatisticValue: 0, lowLimitForTIR: UserDefaults.standard.timeInRangeType.lowerLimit, highLimitForTIR: UserDefaults.standard.timeInRangeType.higherLimit, numberOfDaysUsed: 0)
-                let tirData = DailyTIRData(date: dayKey, lowPercentage: statistics.lowStatisticValue, inRangePercentage: statistics.inRangeStatisticValue, highPercentage: statistics.highStatisticValue)
-                orderedResults.append(tirData)
+                let date = Calendar.current.startOfDay(for: startDayForWindow.addingTimeInterval(Double(dayIndex) * .hours(24)))
+                let statistics = statisticsByDay[date] ?? StatisticsManager.Statistics(
+                    lowStatisticValue: 0,
+                    highStatisticValue: 0,
+                    inRangeStatisticValue: 0,
+                    averageStatisticValue: 0,
+                    a1CStatisticValue: 0,
+                    cVStatisticValue: 0,
+                    lowLimitForTIR: UserDefaults.standard.timeInRangeType.lowerLimit,
+                    highLimitForTIR: UserDefaults.standard.timeInRangeType.higherLimit,
+                    numberOfDaysUsed: 0
+                )
+
+                values.append(
+                    DailyTIRData(
+                        date: date,
+                        lowPercentage: statistics.lowStatisticValue,
+                        inRangePercentage: statistics.inRangeStatisticValue,
+                        highPercentage: statistics.highStatisticValue
+                    )
+                )
             }
-            
-            self.dailyTIRCache = orderedResults
-            self.updateTIRChart()
+
+            self.dailyTIRData = values
         }
     }
-    
-    private func makeTIRLayout(containerBounds: CGRect, barCount: Int) -> TIRLayout {
+
+    // MARK: - Formatting
+
+    private var tirWindowEndDate: Date {
+        tirWindowStartDate.addingTimeInterval(Double(ConstantsStatistics.numberOfDaysForTIRChartLandscapeView) * .hours(24) - 1)
+    }
+
+    private static func makeStatisticsState(from statistics: StatisticsManager.Statistics) -> RootHomeStatisticsState {
+        let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        let lowLimitText = "(<\(formattedLimit(statistics.lowLimitForTIR, isMgDl: isMgDl)))"
+        let highLimitText = "(>\(formattedLimit(statistics.highLimitForTIR, isMgDl: isMgDl)))"
+        let hasData = statistics.lowStatisticValue.value != 0 || statistics.inRangeStatisticValue.value != 0 || statistics.highStatisticValue.value != 0
+
+        guard hasData else {
+            return RootHomeStatisticsState(
+                low: RootHomeMetricState(title: Texts_Common.lowStatistics, value: "-%", valueColor: ConstantsAppColors.statisticsLow),
+                inRange: RootHomeMetricState(title: UserDefaults.standard.timeInRangeType.title, value: "-%", valueColor: ConstantsAppColors.statisticsInRange),
+                high: RootHomeMetricState(title: Texts_Common.highStatistics, value: "-%", valueColor: ConstantsAppColors.statisticsHigh),
+                average: RootHomeMetricState(title: Texts_Common.averageStatistics, value: isMgDl ? "- mg/dl" : "- mmol/l", valueColor: ConstantsAppColors.tertiaryText),
+                a1c: RootHomeMetricState(title: Texts_Common.a1cStatistics, value: UserDefaults.standard.useIFCCA1C ? "- mmol" : "-%", valueColor: ConstantsAppColors.tertiaryText),
+                cv: RootHomeMetricState(title: Texts_Common.cvStatistics, value: "-%", valueColor: ConstantsAppColors.tertiaryText),
+                lowLimitText: lowLimitText,
+                highLimitText: highLimitText,
+                timePeriodText: Texts_Common.today,
+                showsActivityIndicator: false
+            )
+        }
+
+        let averageValue = isMgDl
+            ? "\(Int(statistics.averageStatisticValue.round(toDecimalPlaces: 0))) mg/dl"
+            : "\(statistics.averageStatisticValue.round(toDecimalPlaces: 1)) mmol/l"
+        let a1cValue = UserDefaults.standard.useIFCCA1C
+            ? "\(Int(statistics.a1CStatisticValue.round(toDecimalPlaces: 0))) mmol"
+            : "\(statistics.a1CStatisticValue.round(toDecimalPlaces: 1))%"
+
+        return RootHomeStatisticsState(
+            low: RootHomeMetricState(title: Texts_Common.lowStatistics, value: "\(Int(statistics.lowStatisticValue.round(toDecimalPlaces: 0)))%", valueColor: ConstantsAppColors.statisticsLow),
+            inRange: RootHomeMetricState(title: UserDefaults.standard.timeInRangeType.title, value: "\(Int(statistics.inRangeStatisticValue.round(toDecimalPlaces: 0)))%", valueColor: ConstantsAppColors.statisticsInRange),
+            high: RootHomeMetricState(title: Texts_Common.highStatistics, value: "\(Int(statistics.highStatisticValue.round(toDecimalPlaces: 0)))%", valueColor: ConstantsAppColors.statisticsHigh),
+            average: RootHomeMetricState(title: Texts_Common.averageStatistics, value: averageValue),
+            a1c: RootHomeMetricState(title: Texts_Common.a1cStatistics, value: a1cValue),
+            cv: RootHomeMetricState(title: Texts_Common.cvStatistics, value: "\(Int(statistics.cVStatisticValue.round(toDecimalPlaces: 0)))%"),
+            lowLimitText: lowLimitText,
+            highLimitText: highLimitText,
+            timePeriodText: Texts_Common.today,
+            showsActivityIndicator: false
+        )
+    }
+
+    private static func formattedLimit(_ value: Double, isMgDl: Bool) -> String {
+        isMgDl ? Int(value).description : value.round(toDecimalPlaces: 1).description
+    }
+
+}
+
+// MARK: - Main View
+
+private struct LandscapeChartView: View {
+
+    @ObservedObject var stateModel: LandscapeChartStateModel
+
+    private enum Layout {
+        static let screenPadding: CGFloat = 10
+        static let spacing: CGFloat = 10
+        static let toolbarHeight: CGFloat = 40
+        static let statisticsWidth: CGFloat = 190
+        static let tirChartHeight: CGFloat = 110
+    }
+
+    var body: some View {
+        VStack(spacing: Layout.spacing) {
+            toolbar
+
+            HStack(spacing: Layout.spacing) {
+                if stateModel.showStatistics {
+                    LandscapeStatisticsPanel(state: stateModel.statistics, isLoading: stateModel.isLoadingStatistics)
+                        .frame(width: Layout.statisticsWidth)
+                }
+
+                VStack(spacing: Layout.spacing) {
+                    if stateModel.showStatistics {
+                        LandscapeTIRChartView(
+                            values: stateModel.dailyTIRData,
+                            selectedDate: stateModel.selectedDate,
+                            yAxisMinimum: stateModel.yAxisMinimumForTIR,
+                            selectDate: stateModel.selectTIRDate
+                        )
+                        .frame(height: Layout.tirChartHeight)
+                        .onTapGesture(count: 3, perform: stateModel.toggleTIRYAxisMode)
+                    }
+
+                    LandscapeGlucoseChartView(
+                        chartState: stateModel.chartState,
+                        isLoading: stateModel.isLoadingChart,
+                        moveBackOneDay: stateModel.moveBackOneDay,
+                        moveForwardOneDay: stateModel.moveForwardOneDay,
+                        selectToday: stateModel.selectToday
+                    )
+                    .frame(maxHeight: .infinity)
+                }
+            }
+            .frame(maxHeight: .infinity)
+        }
+        .padding(Layout.screenPadding)
+        .background(ConstantsAppColors.background)
+    }
+
+    private var toolbar: some View {
+        HStack(spacing: 14) {
+            Text(stateModel.selectedDateText)
+                .font(.title3)
+                .foregroundStyle(ConstantsAppColors.primaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            Toggle(Texts_SettingsView.sectionTitleTreatments, isOn: Binding(get: {
+                stateModel.showTreatments
+            }, set: {
+                stateModel.setShowTreatments($0)
+            }))
+            .toggleStyle(.switch)
+            .font(.callout)
+            .foregroundStyle(ConstantsAppColors.primaryText)
+
+            Toggle(Texts_SettingsView.sectionTitleStatistics, isOn: Binding(get: {
+                stateModel.showStatistics
+            }, set: {
+                stateModel.setShowStatistics($0)
+            }))
+            .toggleStyle(.switch)
+            .font(.callout)
+            .foregroundStyle(ConstantsAppColors.primaryText)
+
+            HStack(spacing: 8) {
+                Button(action: stateModel.moveBackOneDay) {
+                    Image(systemName: "chevron.backward")
+                        .font(.headline)
+                }
+
+                Button(action: stateModel.moveForwardOneDay) {
+                    Image(systemName: "chevron.forward")
+                        .font(.headline)
+                }
+                .disabled(!stateModel.canMoveForward)
+            }
+            .buttonStyle(.bordered)
+        }
+        .frame(height: Layout.toolbarHeight)
+    }
+
+}
+
+// MARK: - Glucose Chart
+
+private struct LandscapeGlucoseChartView: View {
+
+    let chartState: GlucoseChartState
+    let isLoading: Bool
+    let moveBackOneDay: () -> Void
+    let moveForwardOneDay: () -> Void
+    let selectToday: () -> Void
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .topTrailing) {
+                GlucoseChartView(
+                    glucoseChartType: .widgetSystemLarge,
+                    bgReadingValues: nil,
+                    bgReadingDates: nil,
+                    isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl,
+                    urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue,
+                    lowLimitInMgDl: UserDefaults.standard.lowMarkValue,
+                    highLimitInMgDl: UserDefaults.standard.highMarkValue,
+                    urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue,
+                    liveActivityType: nil,
+                    hoursToShowScalingHours: 24,
+                    glucoseCircleDiameterScalingHours: 6,
+                    overrideChartHeight: geometry.size.height,
+                    overrideChartWidth: geometry.size.width,
+                    highContrast: nil,
+                    chartState: chartState
+                )
+                .mainChartYAxisContext()
+                .transaction { transaction in
+                    transaction.animation = nil
+                }
+                .contentShape(Rectangle())
+                .gesture(
+                    DragGesture(minimumDistance: 30)
+                        .onEnded { value in
+                            guard abs(value.translation.width) > abs(value.translation.height) else { return }
+
+                            if value.translation.width < 0 {
+                                moveForwardOneDay()
+                            } else {
+                                moveBackOneDay()
+                            }
+                        }
+                )
+                .onTapGesture(count: 2, perform: selectToday)
+                .clipped()
+
+                if isLoading {
+                    ProgressView()
+                        .padding(8)
+                }
+            }
+        }
+    }
+
+}
+
+// MARK: - Statistics
+
+private struct LandscapeStatisticsPanel: View {
+
+    let state: RootHomeStatisticsState
+    let isLoading: Bool
+
+    var body: some View {
+        VStack(spacing: 16) {
+            VStack(spacing: 7) {
+                LandscapeStatisticRow(metric: state.low, limitText: state.lowLimitText)
+                LandscapeStatisticRow(metric: state.inRange)
+                LandscapeStatisticRow(metric: state.high, limitText: state.highLimitText)
+            }
+
+            Spacer(minLength: 0)
+
+            ZStack {
+                LandscapePieChartView(
+                    low: state.low.percentValue,
+                    inRange: state.inRange.percentValue,
+                    high: state.high.percentValue
+                )
+
+                if isLoading {
+                    ProgressView()
+                        .tint(ConstantsAppColors.primaryText)
+                }
+            }
+            .frame(maxHeight: .infinity)
+
+            Spacer(minLength: 0)
+
+            VStack(spacing: 7) {
+                LandscapeStatisticRow(metric: state.average)
+                LandscapeStatisticRow(metric: state.a1c)
+                LandscapeStatisticRow(metric: state.cv)
+            }
+        }
+        .padding(.horizontal, 15)
+        .padding(.vertical, 12)
+        .background(ConstantsAppColors.homePanelBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        .transaction { transaction in
+            transaction.animation = nil
+        }
+    }
+
+}
+
+private struct LandscapeStatisticRow: View {
+
+    let metric: RootHomeMetricState
+    var limitText = ""
+
+    var body: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 4) {
+            HStack(spacing: 4) {
+                Text(metric.title)
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(ConstantsAppColors.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+
+                if !limitText.isEmpty {
+                    Text(limitText)
+                        .font(.system(size: 15))
+                        .foregroundStyle(ConstantsAppColors.secondaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+            }
+
+            Spacer(minLength: 4)
+
+            Text(metric.value)
+                .font(.system(size: 15))
+                .foregroundStyle(metric.valueColor)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+    }
+
+}
+
+private struct LandscapePieChartView: View {
+
+    let low: Double
+    let inRange: Double
+    let high: Double
+
+    var body: some View {
+        ZStack {
+            if total > 0 {
+                LandscapePieSlice(startAngle: .degrees(referenceAngle), endAngle: .degrees(referenceAngle + inRangeAngle))
+                    .fill(ConstantsAppColors.statisticsInRange)
+
+                LandscapePieSlice(startAngle: .degrees(referenceAngle + inRangeAngle), endAngle: .degrees(referenceAngle + inRangeAngle + lowAngle))
+                    .fill(ConstantsAppColors.statisticsLow)
+
+                LandscapePieSlice(startAngle: .degrees(referenceAngle + inRangeAngle + lowAngle), endAngle: .degrees(referenceAngle + 360))
+                    .fill(ConstantsAppColors.statisticsHigh)
+            } else {
+                Circle()
+                    .fill(ConstantsAppColors.tertiaryText)
+            }
+        }
+        .frame(width: 80, height: 80)
+    }
+
+    private var total: Double {
+        low + inRange + high
+    }
+
+    private var inRangeAngle: Double {
+        360 * inRange / total
+    }
+
+    private var lowAngle: Double {
+        360 * low / total
+    }
+
+    private var referenceAngle: Double {
+        90 - (inRangeAngle / 2)
+    }
+
+}
+
+private struct LandscapePieSlice: Shape {
+
+    let startAngle: Angle
+    let endAngle: Angle
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let radius = min(rect.width, rect.height) / 2
+
+        path.move(to: center)
+        path.addArc(center: center, radius: radius, startAngle: startAngle, endAngle: endAngle, clockwise: false)
+        path.closeSubpath()
+
+        return path
+    }
+
+}
+
+// MARK: - TIR Chart
+
+private struct LandscapeTIRChartView: View {
+
+    let values: [LandscapeChartStateModel.DailyTIRData]
+    let selectedDate: Date
+    let yAxisMinimum: Double
+    let selectDate: (Date) -> Void
+
+    private let yAxisMaximum = 100.0
+    private let referencePercents = [0.0, 25.0, 50.0, 75.0, 100.0]
+
+    var body: some View {
+        GeometryReader { geometry in
+            let layout = makeLayout(size: geometry.size)
+
+            ZStack(alignment: .topLeading) {
+                ForEach(referencePercents.filter { $0 >= yAxisMinimum }, id: \.self) { percent in
+                    referenceLine(percent: percent, layout: layout)
+                }
+
+                HStack(alignment: .bottom, spacing: layout.barSpacing) {
+                    ForEach(values) { value in
+                        tirBar(value, layout: layout)
+                    }
+                }
+                .frame(width: layout.chartWidth, height: layout.totalHeight, alignment: .bottom)
+                .offset(x: layout.leadingPadding, y: 0)
+            }
+            .frame(width: geometry.size.width, height: geometry.size.height)
+            .background(ConstantsAppColors.homePanelBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+        }
+        .transaction { transaction in
+            transaction.animation = nil
+        }
+    }
+
+    private func referenceLine(percent: Double, layout: TIRLayout) -> some View {
+        let y = yPosition(percent: percent, layout: layout)
+
+        return ZStack(alignment: .topLeading) {
+            Rectangle()
+                .fill(ConstantsAppColors.secondaryText.opacity(0.4))
+                .frame(width: layout.chartWidth + layout.yAxisLabelWidth * 0.2, height: 1)
+                .offset(x: layout.leadingPadding, y: y)
+
+            Text("\(Int(percent))%")
+                .font(.system(size: 10))
+                .foregroundStyle(ConstantsAppColors.secondaryText.opacity(0.85))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .frame(width: layout.yAxisLabelWidth, alignment: .trailing)
+                .offset(x: layout.leadingPadding + layout.chartWidth + 4, y: y - 6)
+        }
+    }
+
+    private func tirBar(_ value: LandscapeChartStateModel.DailyTIRData, layout: TIRLayout) -> some View {
+        let isSelected = Calendar.current.isDate(value.date, inSameDayAs: selectedDate)
+        let normalizedHeight = normalized(value.inRangePercentage)
+        let barHeight = max(0, CGFloat(normalizedHeight) * layout.chartHeight)
+        let dayText = dayLabel(for: value.date)
+
+        return VStack(spacing: 0) {
+            Text(value.inRangePercentage > 0 ? "\(Int(value.inRangePercentage.rounded()))%" : "-")
+                .font(.system(size: isSelected ? 11 : 10, weight: isSelected ? .bold : .regular))
+                .foregroundStyle(isSelected ? ConstantsAppColors.primaryText : (value.inRangePercentage > 0 ? ConstantsAppColors.secondaryText : ConstantsAppColors.tertiaryText))
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+                .frame(height: layout.topPadding)
+
+            ZStack(alignment: .bottom) {
+                RoundedRectangle(cornerRadius: 3, style: .continuous)
+                    .fill(isSelected ? ConstantsAppColors.statisticsInRange : ConstantsAppColors.statisticsInRange.opacity(0.55))
+                    .frame(height: barHeight)
+            }
+            .frame(height: layout.chartHeight, alignment: .bottom)
+
+            Text(dayText)
+                .font(.system(size: isSelected ? 15 : 12, weight: isSelected ? .heavy : .regular))
+                .foregroundStyle(isSelected ? ConstantsAppColors.primaryText : (value.inRangePercentage > 0 ? ConstantsAppColors.secondaryText : ConstantsAppColors.tertiaryText))
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+                .frame(height: layout.bottomPadding)
+        }
+        .frame(width: layout.barWidth, height: layout.totalHeight)
+        .contentShape(Rectangle())
+        .onTapGesture {
+            selectDate(value.date)
+        }
+    }
+
+    private func makeLayout(size: CGSize) -> TIRLayout {
         let topPadding: CGFloat = 24
         let bottomPadding: CGFloat = 24
         let leadingPadding: CGFloat = 10
         let yAxisLabelWidth: CGFloat = 28
-        let yAxisLabelRightPadding: CGFloat = 8
-        let trailingPadding: CGFloat = 14 + yAxisLabelWidth + yAxisLabelRightPadding
-        let barCornerRadius: CGFloat = 3
-        let percentLabelFontSize: CGFloat = 10
-        let dayLabelFontSize: CGFloat = 12
-        let yAxisLabelFontSize: CGFloat = 10
+        let trailingPadding: CGFloat = 18 + yAxisLabelWidth
+        let chartWidth = max(1, size.width - leadingPadding - trailingPadding)
+        let chartHeight = max(1, size.height - topPadding - bottomPadding)
         let barSpacing: CGFloat = 6
-        let chartHeight = containerBounds.height - topPadding - bottomPadding
-        let chartWidth = containerBounds.width - (leadingPadding + trailingPadding)
-        let count = max(1, barCount)
-        let totalSpacing = barSpacing * (CGFloat(count) - 1)
-        let barWidth = (chartWidth - totalSpacing) / CGFloat(count)
-        let stride = barWidth + barSpacing
-        return TIRLayout(topPadding: topPadding, bottomPadding: bottomPadding, leadingPadding: leadingPadding, yAxisLabelWidth: yAxisLabelWidth, yAxisLabelRightPadding: yAxisLabelRightPadding, trailingPadding: trailingPadding, barCornerRadius: barCornerRadius, percentLabelFontSize: percentLabelFontSize, dayLabelFontSize: dayLabelFontSize, yAxisLabelFontSize: yAxisLabelFontSize, barSpacing: barSpacing, chartWidth: chartWidth, chartHeight: chartHeight, barWidth: barWidth, stride: stride)
+        let totalSpacing = barSpacing * CGFloat(max(values.count - 1, 0))
+        let barWidth = max(1, (chartWidth - totalSpacing) / CGFloat(max(values.count, 1)))
+
+        return TIRLayout(topPadding: topPadding, bottomPadding: bottomPadding, leadingPadding: leadingPadding, yAxisLabelWidth: yAxisLabelWidth, barSpacing: barSpacing, chartWidth: chartWidth, chartHeight: chartHeight, barWidth: barWidth)
     }
-    
-    // handles taps on the TIR chart bars to select a date
-    @objc private func handleTIRChartBarTap(_ gesture: UITapGestureRecognizer) {
-        guard !dailyTIRCache.isEmpty else { return }
-        let location = gesture.location(in: tirChartContainerOutlet)
 
-        let containerFrame = tirChartContainerOutlet.bounds
-        let layout = makeTIRLayout(containerBounds: containerFrame, barCount: dailyTIRCache.count)
+    private func normalized(_ percent: Double) -> Double {
+        guard percent > 0 else { return 0 }
 
-        // map x location to bar index using the same stride and bounds as drawing
-        let relativeX = location.x - layout.leadingPadding
-        guard relativeX >= 0, relativeX <= layout.chartWidth else { return }
-        let stride = layout.stride
-        let barWidth = layout.barWidth
-        let barSpacing = layout.barSpacing
-        let barCount = CGFloat(dailyTIRCache.count)
-        var index = Int(floor(relativeX / stride))
-        index = max(0, min(Int(barCount - 1), index))
+        return max(0, min(1, (percent - yAxisMinimum) / (yAxisMaximum - yAxisMinimum)))
+    }
 
-        // verify tap is within the bar's horizontal bounds (avoid selecting gaps)
-        let barXStart = CGFloat(index) * stride
-        let insideBar = relativeX >= barXStart && relativeX <= (barXStart + barWidth)
-        if !insideBar {
-            // if tapped in the spacing then snap to the nearest bar only if within half spacing; else ignore
-            let leftEdgeDistance = abs(relativeX - barXStart)
-            let rightEdgeDistance = abs(relativeX - (barXStart + barWidth))
-            if min(leftEdgeDistance, rightEdgeDistance) > (barSpacing / 2) { return }
+    private func yPosition(percent: Double, layout: TIRLayout) -> CGFloat {
+        let normalized = max(0, min(1, (percent - yAxisMinimum) / (yAxisMaximum - yAxisMinimum)))
+
+        return layout.topPadding + layout.chartHeight - CGFloat(normalized) * layout.chartHeight
+    }
+
+    private func dayLabel(for date: Date) -> String {
+        let day = Calendar.current.component(.day, from: date)
+        let month = Calendar.current.component(.month, from: date)
+        guard let firstDate = values.first?.date else { return "\(day)" }
+
+        let previousDate = Calendar.current.date(byAdding: .day, value: -1, to: date)
+        let previousMonth = previousDate.map { Calendar.current.component(.month, from: $0) } ?? 0
+
+        if Calendar.current.isDate(date, inSameDayAs: firstDate) || month != previousMonth {
+            return shortMonthName(for: month)
         }
 
-        // select the tapped bar/day's date and refresh
-        let tappedDate = dailyTIRCache[index].date
-        if !Calendar.current.isDate(tappedDate, inSameDayAs: selectedDate) {
-            selectedDate = tappedDate
-            updateView()
-        }
+        return "\(day)"
+    }
+
+    private func shortMonthName(for monthNumber: Int) -> String {
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.current
+        dateFormatter.setLocalizedDateFormatFromTemplate("MMM")
+
+        var components = DateComponents()
+        components.month = monthNumber
+        components.day = 1
+        components.year = 2000
+
+        return Calendar.current.date(from: components).map { dateFormatter.string(from: $0).capitalized } ?? ""
+    }
+
+}
+
+private struct TIRLayout {
+    let topPadding: CGFloat
+    let bottomPadding: CGFloat
+    let leadingPadding: CGFloat
+    let yAxisLabelWidth: CGFloat
+    let barSpacing: CGFloat
+    let chartWidth: CGFloat
+    let chartHeight: CGFloat
+    let barWidth: CGFloat
+
+    var totalHeight: CGFloat {
+        topPadding + chartHeight + bottomPadding
+    }
+}
+
+private extension RootHomeMetricState {
+    var percentValue: Double {
+        Double(value.replacingOccurrences(of: "%", with: "")) ?? 0
     }
 }

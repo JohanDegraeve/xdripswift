@@ -2021,13 +2021,19 @@ final class RootViewController: UIViewController {
     
     
     func showChartLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
-        guard landscapeChartViewController == nil else { return }
+        guard landscapeChartViewController == nil,
+              let coreDataManager = coreDataManager,
+              let nightscoutSyncManager = nightscoutSyncManager
+        else {
+            return
+        }
         
         landscapeChartViewController = storyboard!.instantiateViewController(
             withIdentifier: "LandscapeChartViewController")
         as? LandscapeChartViewController
         
         if let landscapeChartViewController = landscapeChartViewController {
+            landscapeChartViewController.configure(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager)
             landscapeChartViewController.view.frame = view.bounds
             landscapeChartViewController.view.alpha = 0
             view.addSubview(landscapeChartViewController.view)
