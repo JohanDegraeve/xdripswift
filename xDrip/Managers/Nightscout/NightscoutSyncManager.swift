@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 import os
 import UIKit
@@ -34,7 +35,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     var profile = NightscoutProfile()
     
     /// holds and persists the nightscout device status data
-    var deviceStatus = NightscoutDeviceStatus()
+    @Published var deviceStatus = NightscoutDeviceStatus()
     
     // MARK: - private properties
     
@@ -169,8 +170,10 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             self.profile = nightscoutProfile
         }
         
-        deviceStatus.lastCheckedDate = .distantPast
-        deviceStatus.updatedDate = .distantPast
+        var initialDeviceStatus = NightscoutDeviceStatus()
+        initialDeviceStatus.lastCheckedDate = .distantPast
+        initialDeviceStatus.updatedDate = .distantPast
+        deviceStatus = initialDeviceStatus
         
         // add observers for nightscout settings which may require testing and/or start upload
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutAPIKey.rawValue, options: .new, context: nil)
@@ -495,7 +498,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 switch keyPathEnum {
                 case UserDefaults.Key.nightscoutUrl, UserDefaults.Key.nightscoutAPIKey, UserDefaults.Key.nightscoutToken, UserDefaults.Key.nightscoutPort:
                     // Reset deviceStatus and profile to empty when Nightscout connection settings change
-                    deviceStatus = NightscoutDeviceStatus()
+                    DispatchQueue.main.async {
+                        self.deviceStatus = NightscoutDeviceStatus()
+                    }
                     profile = NightscoutProfile()
                     // apikey or nightscout api key change is triggered by user, should not be done within 200 ms
                     if keyValueObserverTimeKeeper.verifyKey(forKey: keyPathEnum.rawValue, withMinimumDelayMilliSeconds: 200) {
@@ -550,7 +555,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                     
                 case UserDefaults.Key.nightscoutFollowType:
                     // nillify the deviceStatus to force a new sync/parse using the new model selected
-                    deviceStatus = NightscoutDeviceStatus()
+                    DispatchQueue.main.async {
+                        self.deviceStatus = NightscoutDeviceStatus()
+                    }
                     
                     DispatchQueue.main.async { [weak self] in
                         self?.syncWithNightscout()
@@ -920,12 +927,16 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             return
         }
         let currentDate = Date().addingTimeInterval(20)
-        if deviceStatus.createdAt > currentDate || deviceStatus.updatedDate > currentDate || deviceStatus.lastLoopDate > currentDate {
-            deviceStatus.createdAt = .distantPast
-            deviceStatus.updatedDate = .distantPast
-            deviceStatus.lastLoopDate = .distantPast
+        var currentDeviceStatus = deviceStatus
+        if currentDeviceStatus.createdAt > currentDate || currentDeviceStatus.updatedDate > currentDate || currentDeviceStatus.lastLoopDate > currentDate {
+            currentDeviceStatus.createdAt = .distantPast
+            currentDeviceStatus.updatedDate = .distantPast
+            currentDeviceStatus.lastLoopDate = .distantPast
+            let resetDeviceStatus = currentDeviceStatus
+            DispatchQueue.main.async {
+                self.deviceStatus = resetDeviceStatus
+            }
         }
-        let previousDeviceStatusSignature = (createdAt: deviceStatus.createdAt, lastLoopDate: deviceStatus.lastLoopDate, id: deviceStatus.id, iob: deviceStatus.iob, cob: deviceStatus.cob)
         Task {
             do {
                 let unifiedResponses: [NightscoutDeviceStatusResponse]? = try await nightscoutRequest(path: nightscoutDeviceStatusPath, responseType: [NightscoutDeviceStatusResponse].self)
@@ -934,6 +945,17 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                     return
                 }
                 var deviceStatus = NightscoutDeviceStatus(from: latest)
+                let deviceStatusesByCreatedAt = unifiedResponses
+                    .map { NightscoutDeviceStatus(from: $0) }
+                    .sorted { $0.createdAt > $1.createdAt }
+                
+                // The newest Nightscout devicestatus row is not always the richest row. Fill any
+                // missing display values from nearby rows before publishing, so a heartbeat-style
+                // update does not briefly clear pump, IOB/COB or detailed AID fields.
+                deviceStatusesByCreatedAt.forEach { fallbackDeviceStatus in
+                    deviceStatus.fillMissingDisplayValues(from: fallbackDeviceStatus)
+                }
+                
                 // --- Aggregate for most recent temp basal rate/duration, uploader battery, and pump battery from all entries (all systems) ---
                 // 1. Temp basal rate/duration
                 let tempBasalCandidates = unifiedResponses.compactMap { resp -> (rate: Double, duration: Int, date: Date)? in
@@ -997,19 +1019,64 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 if let mostRecent = pumpBatteryCandidates.sorted(by: { $0.date > $1.date }).first {
                     deviceStatus.pumpBatteryPercent = mostRecent.percent
                 }
-                let signatureChanged = deviceStatus.createdAt != previousDeviceStatusSignature.createdAt || deviceStatus.lastLoopDate != previousDeviceStatusSignature.lastLoopDate || deviceStatus.id != previousDeviceStatusSignature.id || deviceStatus.iob != previousDeviceStatusSignature.iob || deviceStatus.cob != previousDeviceStatusSignature.cob
-                self.deviceStatus = deviceStatus
-                self.deviceStatus.lastCheckedDate = .now
-                self.deviceStatus.updatedDate = .now
-                trace("in updateDeviceStatus, updated device status with createdAt = %{public}@. Last looping date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, self.deviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened), self.deviceStatus.lastLoopDate.formatted(date: .abbreviated, time: .shortened))
-                trace("in updateDeviceStatus, deviceStatus data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, String(describing: self.deviceStatus))
+
+                // Nightscout can briefly return a fresh device-status document whose embedded
+                // loop/openAPS timestamp is older than a nearby document. The status row should
+                // follow the most recent valid loop timestamp, not regress just because `created_at`
+                // advanced on a heartbeat/status-only update.
+                let mostRecentLoopDate = unifiedResponses
+                    .flatMap { loopDates(from: $0) }
+                    .max() ?? .distantPast
+                deviceStatus.lastLoopDate = max(deviceStatus.lastLoopDate, mostRecentLoopDate)
+
+                let downloadedDeviceStatus = deviceStatus
                 await MainActor.run {
+                    var mergedDeviceStatus = downloadedDeviceStatus
+                    let storedDeviceStatus = self.deviceStatus
+                    
+                    // Merge against the currently published value at publish time, not the value
+                    // captured before the async request started. This keeps overlapping Nightscout
+                    // requests from overwriting fresh complete data with an older partial response.
+                    if storedDeviceStatus.createdAt > Date().addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
+                        mergedDeviceStatus.fillMissingDisplayValues(from: storedDeviceStatus)
+                    }
+                    mergedDeviceStatus.lastLoopDate = max(mergedDeviceStatus.lastLoopDate, storedDeviceStatus.lastLoopDate)
+                    
+                    let signatureChanged = mergedDeviceStatus.createdAt != storedDeviceStatus.createdAt || mergedDeviceStatus.lastLoopDate != storedDeviceStatus.lastLoopDate || mergedDeviceStatus.id != storedDeviceStatus.id || mergedDeviceStatus.iob != storedDeviceStatus.iob || mergedDeviceStatus.cob != storedDeviceStatus.cob
+                    
+                    mergedDeviceStatus.lastCheckedDate = .now
+                    mergedDeviceStatus.updatedDate = .now
+                    
+                    trace("in updateDeviceStatus, updated device status with createdAt = %{public}@. Last looping date = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, mergedDeviceStatus.createdAt.formatted(date: .abbreviated, time: .shortened), mergedDeviceStatus.lastLoopDate.formatted(date: .abbreviated, time: .shortened))
+                    trace("in updateDeviceStatus, deviceStatus data = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .debug, String(describing: mergedDeviceStatus))
+                    
+                    self.deviceStatus = mergedDeviceStatus
                     self.didUpdateDeviceStatusDuringLastSync = signatureChanged
                 }
             } catch {
-                self.deviceStatus.lastCheckedDate = .now
                 trace("in updateDeviceStatus, error = %{public}@", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error, error.localizedDescription)
+                await MainActor.run {
+                    var currentDeviceStatus = self.deviceStatus
+                    currentDeviceStatus.lastCheckedDate = .now
+                    self.deviceStatus = currentDeviceStatus
+                }
             }
+        }
+
+        func loopDates(from response: NightscoutDeviceStatusResponse) -> [Date] {
+            [
+                response.openAPS?.enacted?.timestamp,
+                response.openAPS?.suggested?.timestamp,
+                response.loop?.enacted?.timestamp,
+                response.loop?.timestamp
+            ]
+            .compactMap { date(from: $0) }
+        }
+
+        func date(from string: String?) -> Date? {
+            guard let string = string else { return nil }
+
+            return ISO8601DateFormatter.withFractionalSeconds.date(from: string) ?? ISO8601DateFormatter().date(from: string)
         }
     }
     

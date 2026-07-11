@@ -322,6 +322,58 @@ struct NightscoutDeviceStatus: Codable {
 // MARK: Internal NightscoutDeviceStatus initializer
 
 extension NightscoutDeviceStatus {
+    /// Fill missing display values from another device status response.
+    ///
+    /// Nightscout can return a newest devicestatus document that is more like a heartbeat than a
+    /// complete AID/pump status payload. The old root view effectively tolerated this because it
+    /// refreshed from a long-lived manager object. SwiftUI observes full value publishes, so a
+    /// partial response must not wipe values that are still valid in a nearby response.
+    mutating func fillMissingDisplayValues(from fallback: NightscoutDeviceStatus) {
+        if device == nil { device = fallback.device }
+        if appVersion == nil { appVersion = fallback.appVersion }
+        
+        if activeProfile == nil { activeProfile = fallback.activeProfile }
+        if baseBasalRate == nil { baseBasalRate = fallback.baseBasalRate }
+        if bolusVolume == nil { bolusVolume = fallback.bolusVolume }
+        if cob == nil { cob = fallback.cob }
+        if currentTarget == nil { currentTarget = fallback.currentTarget }
+        if duration == nil { duration = fallback.duration }
+        if eventualBG == nil { eventualBG = fallback.eventualBG }
+        if iob == nil { iob = fallback.iob }
+        if isf == nil { isf = fallback.isf }
+        if insulinReq == nil { insulinReq = fallback.insulinReq }
+        if rate == nil { rate = fallback.rate }
+        if reason == nil { reason = fallback.reason }
+        if sensitivityRatio == nil { sensitivityRatio = fallback.sensitivityRatio }
+        if tdd == nil { tdd = fallback.tdd }
+        if timestamp == nil { timestamp = fallback.timestamp }
+        if error == nil { error = fallback.error }
+        
+        if overrideActive == nil { overrideActive = fallback.overrideActive }
+        if overrideName == nil { overrideName = fallback.overrideName }
+        if overrideMaxValue == nil { overrideMaxValue = fallback.overrideMaxValue }
+        if overrideMinValue == nil { overrideMinValue = fallback.overrideMinValue }
+        if overrideMultiplier == nil { overrideMultiplier = fallback.overrideMultiplier }
+        
+        if pumpBatteryPercent == nil { pumpBatteryPercent = fallback.pumpBatteryPercent }
+        if pumpClock == nil { pumpClock = fallback.pumpClock }
+        if pumpID == nil { pumpID = fallback.pumpID }
+        if pumpIsBolusing == nil { pumpIsBolusing = fallback.pumpIsBolusing }
+        if pumpIsSuspended == nil { pumpIsSuspended = fallback.pumpIsSuspended }
+        if pumpStatus == nil { pumpStatus = fallback.pumpStatus }
+        if pumpStatusTimestamp == nil { pumpStatusTimestamp = fallback.pumpStatusTimestamp }
+        if pumpManufacturer == nil { pumpManufacturer = fallback.pumpManufacturer }
+        if pumpModel == nil { pumpModel = fallback.pumpModel }
+        if pumpReservoir == nil { pumpReservoir = fallback.pumpReservoir }
+        
+        if uploaderBatteryPercent == nil { uploaderBatteryPercent = fallback.uploaderBatteryPercent }
+        if uploaderIsCharging == nil { uploaderIsCharging = fallback.uploaderIsCharging }
+        
+        if lastLoopDate == .distantPast {
+            lastLoopDate = fallback.lastLoopDate
+        }
+    }
+    
     /// Initialize from a unified NightscoutDeviceStatusResponse
     init(from unified: NightscoutDeviceStatusResponse) {
         self.init()
