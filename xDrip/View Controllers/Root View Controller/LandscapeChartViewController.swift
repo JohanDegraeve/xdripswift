@@ -62,7 +62,7 @@ final class LandscapeChartViewController: UIViewController {
 
 // MARK: - State Model
 
-private final class LandscapeChartStateModel: ObservableObject {
+final class LandscapeChartStateModel: ObservableObject {
 
     // MARK: - TIR Data Structure
 
@@ -101,6 +101,14 @@ private final class LandscapeChartStateModel: ObservableObject {
         return dateFormatter
     }()
 
+    // MARK: - Initialisation
+
+    init() {}
+
+    init(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager) {
+        configure(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager)
+    }
+
     // MARK: - Configuration
 
     func configure(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager) {
@@ -108,6 +116,12 @@ private final class LandscapeChartStateModel: ObservableObject {
 
         chartStateManager = GlucoseChartStateManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager)
         statisticsManager = StatisticsManager(coreDataManager: coreDataManager)
+
+        refreshForDisplay()
+    }
+
+    func refreshForDisplay() {
+        guard chartStateManager != nil, statisticsManager != nil else { return }
 
         selectedDate = Date().toMidnight()
         tirWindowStartDate = selectedDate.addingTimeInterval(Double(-(ConstantsStatistics.numberOfDaysForTIRChartLandscapeView - 1)) * .hours(24))
@@ -329,7 +343,7 @@ private final class LandscapeChartStateModel: ObservableObject {
 
 // MARK: - Main View
 
-private struct LandscapeChartView: View {
+struct LandscapeChartView: View {
 
     @ObservedObject var stateModel: LandscapeChartStateModel
 
@@ -371,11 +385,14 @@ private struct LandscapeChartView: View {
                         selectToday: stateModel.selectToday
                     )
                     .frame(maxHeight: .infinity)
+                    .layoutPriority(1)
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
-            .frame(maxHeight: .infinity)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .padding(Layout.screenPadding)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(ConstantsAppColors.background)
     }
 
@@ -649,44 +666,55 @@ private struct LandscapeTIRChartView: View {
         GeometryReader { geometry in
             let layout = makeLayout(size: geometry.size)
 
-            ZStack(alignment: .topLeading) {
-                ForEach(referencePercents.filter { $0 >= yAxisMinimum }, id: \.self) { percent in
-                    referenceLine(percent: percent, layout: layout)
-                }
+            HStack(spacing: layout.axisLabelGap) {
+                plotArea(layout: layout)
+                    .frame(width: layout.chartWidth, height: layout.totalHeight, alignment: .topLeading)
 
-                HStack(alignment: .bottom, spacing: layout.barSpacing) {
-                    ForEach(values) { value in
-                        tirBar(value, layout: layout)
-                    }
-                }
-                .frame(width: layout.chartWidth, height: layout.totalHeight, alignment: .bottom)
-                .offset(x: layout.leadingPadding, y: 0)
+                yAxisLabels(layout: layout)
+                    .frame(width: layout.yAxisLabelWidth, height: layout.totalHeight, alignment: .topLeading)
             }
+            .padding(.horizontal, layout.horizontalPadding)
             .frame(width: geometry.size.width, height: geometry.size.height)
             .background(ConstantsAppColors.homePanelBackground)
             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+            .clipped()
         }
         .transaction { transaction in
             transaction.animation = nil
         }
     }
 
-    private func referenceLine(percent: Double, layout: TIRLayout) -> some View {
-        let y = yPosition(percent: percent, layout: layout)
+    private func plotArea(layout: TIRLayout) -> some View {
+        ZStack(alignment: .topLeading) {
+            ForEach(referencePercents.filter { $0 >= yAxisMinimum }, id: \.self) { percent in
+                Rectangle()
+                    .fill(ConstantsAppColors.secondaryText.opacity(0.4))
+                    .frame(width: layout.chartWidth, height: 1)
+                    .offset(y: yPosition(percent: percent, layout: layout))
+            }
 
-        return ZStack(alignment: .topLeading) {
-            Rectangle()
-                .fill(ConstantsAppColors.secondaryText.opacity(0.4))
-                .frame(width: layout.chartWidth + layout.yAxisLabelWidth * 0.2, height: 1)
-                .offset(x: layout.leadingPadding, y: y)
+            HStack(alignment: .bottom, spacing: layout.barSpacing) {
+                ForEach(values) { value in
+                    tirBar(value, layout: layout)
+                }
+            }
+            .frame(width: layout.chartWidth, height: layout.totalHeight, alignment: .bottom)
+        }
+    }
 
-            Text("\(Int(percent))%")
-                .font(.system(size: 10))
-                .foregroundStyle(ConstantsAppColors.secondaryText.opacity(0.85))
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .frame(width: layout.yAxisLabelWidth, alignment: .trailing)
-                .offset(x: layout.leadingPadding + layout.chartWidth + 4, y: y - 6)
+    private func yAxisLabels(layout: TIRLayout) -> some View {
+        ZStack(alignment: .topLeading) {
+            ForEach(referencePercents.filter { $0 >= yAxisMinimum }, id: \.self) { percent in
+                let y = yPosition(percent: percent, layout: layout)
+
+                Text("\(Int(percent))%")
+                    .font(.system(size: 10))
+                    .foregroundStyle(ConstantsAppColors.secondaryText.opacity(0.85))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .frame(width: layout.yAxisLabelWidth, alignment: .trailing)
+                    .offset(y: y - 6)
+            }
         }
     }
 
@@ -719,6 +747,7 @@ private struct LandscapeTIRChartView: View {
                 .frame(height: layout.bottomPadding)
         }
         .frame(width: layout.barWidth, height: layout.totalHeight)
+        .clipped()
         .contentShape(Rectangle())
         .onTapGesture {
             selectDate(value.date)
@@ -728,16 +757,16 @@ private struct LandscapeTIRChartView: View {
     private func makeLayout(size: CGSize) -> TIRLayout {
         let topPadding: CGFloat = 24
         let bottomPadding: CGFloat = 24
-        let leadingPadding: CGFloat = 10
-        let yAxisLabelWidth: CGFloat = 28
-        let trailingPadding: CGFloat = 18 + yAxisLabelWidth
-        let chartWidth = max(1, size.width - leadingPadding - trailingPadding)
+        let horizontalPadding: CGFloat = 8
+        let yAxisLabelWidth: CGFloat = 30
+        let axisLabelGap: CGFloat = 4
+        let chartWidth = max(1, size.width - (horizontalPadding * 2) - axisLabelGap - yAxisLabelWidth)
         let chartHeight = max(1, size.height - topPadding - bottomPadding)
         let barSpacing: CGFloat = 6
         let totalSpacing = barSpacing * CGFloat(max(values.count - 1, 0))
         let barWidth = max(1, (chartWidth - totalSpacing) / CGFloat(max(values.count, 1)))
 
-        return TIRLayout(topPadding: topPadding, bottomPadding: bottomPadding, leadingPadding: leadingPadding, yAxisLabelWidth: yAxisLabelWidth, barSpacing: barSpacing, chartWidth: chartWidth, chartHeight: chartHeight, barWidth: barWidth)
+        return TIRLayout(topPadding: topPadding, bottomPadding: bottomPadding, horizontalPadding: horizontalPadding, axisLabelGap: axisLabelGap, yAxisLabelWidth: yAxisLabelWidth, barSpacing: barSpacing, chartWidth: chartWidth, chartHeight: chartHeight, barWidth: barWidth)
     }
 
     private func normalized(_ percent: Double) -> Double {
@@ -785,7 +814,8 @@ private struct LandscapeTIRChartView: View {
 private struct TIRLayout {
     let topPadding: CGFloat
     let bottomPadding: CGFloat
-    let leadingPadding: CGFloat
+    let horizontalPadding: CGFloat
+    let axisLabelGap: CGFloat
     let yAxisLabelWidth: CGFloat
     let barSpacing: CGFloat
     let chartWidth: CGFloat
