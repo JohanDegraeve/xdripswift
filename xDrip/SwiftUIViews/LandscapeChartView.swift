@@ -1,5 +1,5 @@
 //
-//  LandscapeChartViewController.swift
+//  LandscapeChartView.swift
 //  xdrip
 //
 //  Created by Paul Plant on 16/9/21.
@@ -7,58 +7,6 @@
 //
 
 import SwiftUI
-import UIKit
-
-/// Temporary UIKit container for the SwiftUI landscape chart screen.
-///
-/// RootViewController still owns rotation and presents this controller from the storyboard. The
-/// actual landscape screen is now SwiftUI, so when navigation is migrated later this file can be
-/// reduced to just the SwiftUI view/state or removed entirely.
-final class LandscapeChartViewController: UIViewController {
-
-    // MARK: - Properties
-
-    private let stateModel = LandscapeChartStateModel()
-    private var hostingController: UIHostingController<LandscapeChartView>?
-
-    // MARK: - View Lifecycle
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        installLandscapeChartView()
-    }
-
-    // MARK: - Configuration
-
-    func configure(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager) {
-        stateModel.configure(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager)
-    }
-
-    // MARK: - Private Functions
-
-    private func installLandscapeChartView() {
-        let landscapeChartView = LandscapeChartView(stateModel: stateModel)
-        let hostingController = UIHostingController(rootView: landscapeChartView)
-
-        hostingController.view.backgroundColor = .clear
-        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-
-        addChild(hostingController)
-        view.addSubview(hostingController.view)
-
-        NSLayoutConstraint.activate([
-            hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
-            hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-
-        hostingController.didMove(toParent: self)
-        self.hostingController = hostingController
-    }
-
-}
 
 // MARK: - State Model
 

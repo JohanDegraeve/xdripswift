@@ -1,76 +1,18 @@
 //
-//  LandscapeValueViewController.swift
+//  LandscapeValueView.swift
 //  xdrip
 //
 //  Created by Johan Degraeve on 24/12/2024.
 //  Copyright © 2024 Johan Degraeve. All rights reserved.
 //
 
-import UIKit
 import SwiftUI
 
-/// Temporary UIKit container for the SwiftUI landscape value screen.
-///
-/// RootViewController still owns rotation and child-controller presentation during this migration
-/// phase. The landscape value UI itself is now SwiftUI so it can consume the same
-/// RootHomeGlucoseState as the portrait Home view without copying through UIKit labels.
-final class LandscapeValueViewController: UIViewController {
+struct LandscapeValueView: View {
 
     // MARK: - Properties
 
-    private let stateModel = LandscapeValueStateModel()
-    private var hostingController: UIHostingController<LandscapeValueView>?
-
-    // MARK: - View Lifecycle
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        installLandscapeValueView()
-    }
-
-    // MARK: - Public Methods
-
-    /// updates the landscape value screen from the same presentation state used by the SwiftUI
-    /// portrait home view
-    public func updateLabels(glucoseState: RootHomeGlucoseState) {
-        stateModel.glucoseState = glucoseState
-    }
-
-    // MARK: - Private Methods
-
-    private func installLandscapeValueView() {
-        guard hostingController == nil else { return }
-
-        let landscapeValueView = LandscapeValueView(stateModel: stateModel)
-        let hostingController = UIHostingController(rootView: landscapeValueView)
-        hostingController.view.backgroundColor = .clear
-        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-
-        addChild(hostingController)
-        view.addSubview(hostingController.view)
-
-        NSLayoutConstraint.activate([
-            hostingController.view.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            hostingController.view.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            hostingController.view.topAnchor.constraint(equalTo: view.topAnchor),
-            hostingController.view.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
-
-        hostingController.didMove(toParent: self)
-        self.hostingController = hostingController
-    }
-}
-
-private final class LandscapeValueStateModel: ObservableObject {
-    @Published var glucoseState = RootHomeGlucoseState()
-}
-
-private struct LandscapeValueView: View {
-
-    // MARK: - Properties
-
-    @ObservedObject var stateModel: LandscapeValueStateModel
+    let glucoseState: RootHomeGlucoseState
     @State private var currentDate = Date()
 
     private let clockTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -126,10 +68,10 @@ private struct LandscapeValueView: View {
             .lineLimit(1)
             .minimumScaleFactor(0.25)
 
-            Text(stateModel.glucoseState.valueText)
+            Text(glucoseState.valueText)
                 .font(.system(size: valueFontSize(availableSize: availableSize), weight: .regular))
-                .foregroundStyle(stateModel.glucoseState.valueColor)
-                .strikethrough(stateModel.glucoseState.valueHasStrikethrough, color: stateModel.glucoseState.valueColor)
+                .foregroundStyle(glucoseState.valueColor)
+                .strikethrough(glucoseState.valueHasStrikethrough, color: glucoseState.valueColor)
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.08)
@@ -139,22 +81,22 @@ private struct LandscapeValueView: View {
 
     private var minutesView: some View {
         HStack(alignment: .firstTextBaseline, spacing: 3) {
-            Text(stateModel.glucoseState.minutesText)
-                .foregroundStyle(stateModel.glucoseState.minutesColor)
+            Text(glucoseState.minutesText)
+                .foregroundStyle(glucoseState.minutesColor)
                 .monospacedDigit()
 
-            Text(stateModel.glucoseState.minutesAgoText)
+            Text(glucoseState.minutesAgoText)
                 .foregroundStyle(ConstantsAppColors.secondaryText)
         }
     }
 
     private var deltaView: some View {
         HStack(alignment: .firstTextBaseline, spacing: 3) {
-            Text(stateModel.glucoseState.deltaText)
-                .foregroundStyle(stateModel.glucoseState.deltaColor)
+            Text(glucoseState.deltaText)
+                .foregroundStyle(glucoseState.deltaColor)
                 .monospacedDigit()
 
-            Text(stateModel.glucoseState.deltaUnitText)
+            Text(glucoseState.deltaUnitText)
                 .foregroundStyle(ConstantsAppColors.secondaryText)
         }
     }

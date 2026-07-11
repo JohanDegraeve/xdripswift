@@ -11,36 +11,6 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Landscape Value View Controller-->
-        <scene sceneID="x7b-Va-73O">
-            <objects>
-                <viewController storyboardIdentifier="LandscapeValueViewController" title="Landscape Value View Controller" id="xVF-Zb-ZOa" customClass="LandscapeValueViewController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="S7N-yl-lqt">
-                        <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="85l-sB-tT8"/>
-                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="MUo-Ma-lyI" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-566.58767772511851" y="-1615.3846153846152"/>
-        </scene>
-        <!--Landscape Chart View Controller-->
-        <scene sceneID="KAv-Gy-osb">
-            <objects>
-                <viewController storyboardIdentifier="LandscapeChartViewController" id="JFI-0j-dhi" userLabel="Landscape Chart View Controller" customClass="LandscapeChartViewController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="2c4-db-2dM">
-                        <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="yKY-e9-IrT"/>
-                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="KZT-Nh-dNE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="-566" y="-891"/>
-        </scene>
         <!--View Controller-->
         <scene sceneID="9ri-2S-eW8">
             <objects>
@@ -76,7 +46,7 @@
         <!--Home-->
         <scene sceneID="hNz-n2-bh7">
             <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" id="9pv-A4-QxB" customClass="RootViewController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="RootViewController" automaticallyAdjustsScrollViewInsets="NO" id="9pv-A4-QxB" customClass="RootViewController" customModule="xdrip" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="tsR-hK-woN">
                         <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

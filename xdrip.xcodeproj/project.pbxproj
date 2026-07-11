@@ -59,6 +59,7 @@
 		4D20C0062FF1000100000001 /* ConstantsAppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0052FF1000100000001 /* ConstantsAppColors.swift */; };
 		4D20C0022FF1000100000001 /* RootHomeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0012FF1000100000001 /* RootHomeState.swift */; };
 		4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0032FF1000100000001 /* RootHomeView.swift */; };
+		4D20C00A2FF1000100000001 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0092FF1000100000001 /* RootTabView.swift */; };
 		473775872C14DCFB00525B90 /* TextsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD451221DEAB1006EAB84 /* TextsSettingsView.swift */; };
 		473775882C14DD2200525B90 /* ConstantsHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A1586622EDB8BF007F5B5D /* ConstantsHomeView.swift */; };
 		473775892C14DD3100525B90 /* ConstantsLibreLinkUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47DB06E62A715EC500267BE3 /* ConstantsLibreLinkUp.swift */; };
@@ -187,7 +188,7 @@
 		47AECB9E2CD2B62B005F1814 /* NightscoutDeviceStatusModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47AECB9D2CD2B618005F1814 /* NightscoutDeviceStatusModels.swift */; };
 		47B136DB2BC9BB55001E7ED3 /* ContactImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B136DA2BC9BB55001E7ED3 /* ContactImageView.swift */; };
 		47B136DD2BCA9151001E7ED3 /* ConstantsContactImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B136DC2BCA9151001E7ED3 /* ConstantsContactImage.swift */; };
-		47B60F3726F389E2003198D3 /* LandscapeChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */; };
+		47B60F3726F389E2003198D3 /* LandscapeChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B60F3626F389E2003198D3 /* LandscapeChartView.swift */; };
 		47B65D412E3A31B100C3140B /* LiveActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B65D402E3A319D00C3140B /* LiveActivityView.swift */; };
 		47B65D452E3A756300C3140B /* LiveActivityViewContent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B65D442E3A755900C3140B /* LiveActivityViewContent.swift */; };
 		47B731412B83DD3C00B0A450 /* ConstantsLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B7313F2B83DC0200B0A450 /* ConstantsLiveActivity.swift */; };
@@ -624,7 +625,7 @@
 		F8CB59CC2744471100BA199E /* DexcomSessionStartResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59CB2744471000BA199E /* DexcomSessionStartResponse.swift */; };
 		F8CB59CE27444D6300BA199E /* DexcomSessionStopResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59CD27444D6300BA199E /* DexcomSessionStopResponse.swift */; };
 		F8CB59D3274D94AF00BA199E /* DexcomSessionStartTxMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CB59D2274D94AE00BA199E /* DexcomSessionStartTxMessage.swift */; };
-		F8CCBB4F2D1B6DF900F14867 /* LandscapeValueViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CCBB4E2D1B6DF900F14867 /* LandscapeValueViewController.swift */; };
+		F8CCBB4F2D1B6DF900F14867 /* LandscapeValueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8CCBB4E2D1B6DF900F14867 /* LandscapeValueView.swift */; };
 		F8D0587C24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8D0587B24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift */; };
 		F8DB19D22B89583F00569C37 /* DexcomG7BackfillMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DB19D12B89583F00569C37 /* DexcomG7BackfillMessage.swift */; };
 		F8DF765323E34F4500063910 /* DexcomG5+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF765223E34F4500063910 /* DexcomG5+CoreDataClass.swift */; };
@@ -981,7 +982,7 @@
 		47B136DA2BC9BB55001E7ED3 /* ContactImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactImageView.swift; sourceTree = "<group>"; };
 		47B136DC2BCA9151001E7ED3 /* ConstantsContactImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsContactImage.swift; sourceTree = "<group>"; };
 		47B4A7B42FD0AAC600B4712A /* xdrip v18.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v18.xcdatamodel"; sourceTree = "<group>"; };
-		47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandscapeChartViewController.swift; sourceTree = "<group>"; };
+		47B60F3626F389E2003198D3 /* LandscapeChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandscapeChartView.swift; sourceTree = "<group>"; };
 		47B65D402E3A319D00C3140B /* LiveActivityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityView.swift; sourceTree = "<group>"; };
 		47B65D442E3A755900C3140B /* LiveActivityViewContent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityViewContent.swift; sourceTree = "<group>"; };
 		47B7313F2B83DC0200B0A450 /* ConstantsLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsLiveActivity.swift; sourceTree = "<group>"; };
@@ -994,6 +995,7 @@
 		4D20C0052FF1000100000001 /* ConstantsAppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsAppColors.swift; sourceTree = "<group>"; };
 		4D20C0012FF1000100000001 /* RootHomeState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeState.swift; sourceTree = "<group>"; };
 		4D20C0032FF1000100000001 /* RootHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeView.swift; sourceTree = "<group>"; };
+		4D20C0092FF1000100000001 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
 		47CA61E32B965E7100C2A597 /* AccessoryCircularView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessoryCircularView.swift; sourceTree = "<group>"; };
 		47CA61E52B966A9700C2A597 /* AccessoryRectangularView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessoryRectangularView.swift; sourceTree = "<group>"; };
 		47CD64122BE9506C002BDA68 /* xDrip Notification Context Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "xDrip Notification Context Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1671,7 +1673,7 @@
 		F8CB59CB2744471000BA199E /* DexcomSessionStartResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomSessionStartResponse.swift; sourceTree = "<group>"; };
 		F8CB59CD27444D6300BA199E /* DexcomSessionStopResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomSessionStopResponse.swift; sourceTree = "<group>"; };
 		F8CB59D2274D94AE00BA199E /* DexcomSessionStartTxMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DexcomSessionStartTxMessage.swift; sourceTree = "<group>"; };
-		F8CCBB4E2D1B6DF900F14867 /* LandscapeValueViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandscapeValueViewController.swift; sourceTree = "<group>"; };
+		F8CCBB4E2D1B6DF900F14867 /* LandscapeValueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandscapeValueView.swift; sourceTree = "<group>"; };
 		F8D0587B24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewHomeScreenSettingsViewModel.swift; sourceTree = "<group>"; };
 		F8D094EC2846BDD50087FFEA /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Treatments.strings; sourceTree = "<group>"; };
 		F8D094ED2846BDD50087FFEA /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Alerts.strings; sourceTree = "<group>"; };
@@ -2289,8 +2291,6 @@
 		F8025E5921F7861200ECF0C0 /* Root View Controller */ = {
 			isa = PBXGroup;
 			children = (
-				47B60F3626F389E2003198D3 /* LandscapeChartViewController.swift */,
-				F8CCBB4E2D1B6DF900F14867 /* LandscapeValueViewController.swift */,
 				F8AC425F21ADEBD60078C348 /* RootViewController.swift */,
 			);
 			path = "Root View Controller";
@@ -2598,8 +2598,11 @@
 				47B136DA2BC9BB55001E7ED3 /* ContactImageView.swift */,
 				F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */,
 				47C210EF2B52A05B00005711 /* GlucoseChartView.swift */,
+				47B60F3626F389E2003198D3 /* LandscapeChartView.swift */,
+				F8CCBB4E2D1B6DF900F14867 /* LandscapeValueView.swift */,
 				4D20C0012FF1000100000001 /* RootHomeState.swift */,
 				4D20C0032FF1000100000001 /* RootHomeView.swift */,
+				4D20C0092FF1000100000001 /* RootTabView.swift */,
 				4B0C00012F3B000100000001 /* SensorManagementView.swift */,
 				475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */,
 				4AC0D0022F1D000100000001 /* SnoozeView.swift */,
@@ -4177,7 +4180,7 @@
 				47E3DB372C769C9600DE1AF0 /* AlgorithmType.swift in Sources */,
 				F8EA6CA921BBE3010082976B /* UniqueId.swift in Sources */,
 				F8A1585122EDB597007F5B5D /* ConstantsBGGraphBuilder.swift in Sources */,
-				F8CCBB4F2D1B6DF900F14867 /* LandscapeValueViewController.swift in Sources */,
+				F8CCBB4F2D1B6DF900F14867 /* LandscapeValueView.swift in Sources */,
 				F81D6D4822BD5F62005EFAE2 /* DexcomShareUploadManager.swift in Sources */,
 				F8C9784D2428052E00A09483 /* CGMSensorType.swift in Sources */,
 				F8A1586B22EDB967007F5B5D /* ConstantsMaster.swift in Sources */,
@@ -4192,7 +4195,7 @@
 				D40C3DA62775438F00111B73 /* TreatmentEntry+CoreDataProperties.swift in Sources */,
 				F80D917024F85C7A006840B5 /* Libre2+BluetoothPeripheral.swift in Sources */,
 				F8F9721423A5915900C3F17D /* AuthChallengeRxMessage.swift in Sources */,
-				47B60F3726F389E2003198D3 /* LandscapeChartViewController.swift in Sources */,
+				47B60F3726F389E2003198D3 /* LandscapeChartView.swift in Sources */,
 				F8025E5421EE8D2100ECF0C0 /* Libre1Calibrator.swift in Sources */,
 				F8F71D742B7C1143005076E8 /* CGMG7Transmitter.swift in Sources */,
 				4D7180032FE8000100000001 /* CGMMedtrumTouchCareNanoTransmitter.swift in Sources */,
@@ -4450,6 +4453,7 @@
 				C8BA6BBA5746888144511D55 /* GlucoseChartStateManager.swift in Sources */,
 				4D20C0022FF1000100000001 /* RootHomeState.swift in Sources */,
 				4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */,
+				4D20C00A2FF1000100000001 /* RootTabView.swift in Sources */,
 				D4E499AD277B4CE7000F8CBA /* DateOnly.swift in Sources */,
 				F8E51D5D2448D8B5001C9E5A /* LoopManager.swift in Sources */,
 				473D9ECE2C2DC53A00364060 /* LoopShareType.swift in Sources */,

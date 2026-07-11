@@ -183,12 +183,6 @@ final class RootViewController: UIViewController {
     /// UIAlertController to use when user chooses to lock the screen. Defined here so we can dismiss it when app goes to the background
     private var screenLockAlertController: UIAlertController?
     
-    /// create the chart landscape view
-    private var landscapeChartViewController: LandscapeChartViewController?
-
-    /// create the value  landscape view
-    private var landscapeValueViewController: LandscapeValueViewController?
-
     /// uiview to be used for the night-mode overlay to darken the app screen
     private var overlayView: UIView?
     
@@ -206,6 +200,9 @@ final class RootViewController: UIViewController {
     /// RootViewController still starts and owns the services used by the app, but the visible
     /// portrait home surface is now entirely provided by RootHomeView.
     private var rootHomeHostingController: UIHostingController<RootHomeView>?
+
+    /// Publishes the services needed by the native SwiftUI tabs after startup completes.
+    private weak var rootTabStateModel: RootTabStateModel?
     
     // MARK: - overriden functions
     
@@ -240,9 +237,7 @@ final class RootViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        
-        // remove titles from tabbar items
-        self.tabBarController?.cleanTitles()
+        super.viewDidAppear(animated)
         
         watchManager?.updateWatchApp(forceComplicationUpdate: false)
         
@@ -321,6 +316,20 @@ final class RootViewController: UIViewController {
         coreDataManager = CoreDataManager(modelName: ConstantsCoreData.modelName, completion: {
             
             self.setupApplicationData()
+
+            if let coreDataManager = self.coreDataManager,
+               let bluetoothPeripheralManager = self.bluetoothPeripheralManager,
+               let soundPlayer = self.soundPlayer,
+               let nightscoutSyncManager = self.nightscoutSyncManager {
+                self.rootTabStateModel?.configure(
+                    coreDataManager: coreDataManager,
+                    bluetoothPeripheralManager: bluetoothPeripheralManager,
+                    soundPlayer: soundPlayer,
+                    nightscoutSyncManager: nightscoutSyncManager,
+                    rootHomeStateModel: self.rootHomeStateModel,
+                    sensorProvider: self
+                )
+            }
             
             // Install the SwiftUI home surface only after the service objects used by its chart
             // state managers are available.
@@ -369,9 +378,6 @@ final class RootViewController: UIViewController {
             self.updateLiveActivityAndWidgets(forceRestart: false)
             
         })
-        
-        // Setup View
-        setupView()
         
         // observe setting changes
         // changing from follower to master or vice versa
@@ -484,9 +490,6 @@ final class RootViewController: UIViewController {
                 break
             }
         }
-        
-        // setup self as delegate for tabbarcontroller
-        self.tabBarController?.delegate = self
         
         // setup the timer logic for updating the view regularly
         setupUpdateLabelsAndChartTimer()
@@ -1094,30 +1097,6 @@ final class RootViewController: UIViewController {
         }
     }
     
-    override func willTransition(
-        to newCollection: UITraitCollection,
-        with coordinator: UIViewControllerTransitionCoordinator) {
-            super.willTransition(to: newCollection, with: coordinator)
-            
-            switch newCollection.verticalSizeClass {
-            case .compact:
-                if screenIsLocked {
-                    showValueLandscape(with: coordinator)
-                } else {
-                    showChartLandscape(with: coordinator)
-                }
-            case .regular, .unspecified:
-                hideLandscape(with: coordinator)
-                
-                // rezise the dimming overlay frame if we are returning from the "big numbers" landscape view and dimming is enabled
-                if screenIsLocked && UserDefaults.standard.screenLockDimmingType != .disabled {
-                    overlayView?.frame = UIScreen.main.bounds
-                }
-            @unknown default:
-                fatalError()
-            }
-        }
-    
     // MARK:- observe function
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
@@ -1130,12 +1109,9 @@ final class RootViewController: UIViewController {
         }
     }
     
-    // MARK: - View Methods
-    
-    /// Configure View, only stuff that is independent of coredata
-    private func setupView() {
-        // remove titles from tabbar items
-        self.tabBarController?.cleanTitles()
+    /// Connects the service coordinator to the state model owned by RootTabView.
+    func configure(rootTabStateModel: RootTabStateModel) {
+        self.rootTabStateModel = rootTabStateModel
     }
 
     // MARK: - SwiftUI Home Bridge
@@ -1703,8 +1679,7 @@ final class RootViewController: UIViewController {
         updateLiveActivityAndWidgets(forceRestart: false)
     }
     
-    /// - updates the labels and the chart,
-    ///    - also in the landscapeValueViewController, if it exists.
+    /// - updates the labels and the chart
     /// - but only if the chart is not panned backward
     /// - and if app is in foreground
     /// - and if overrideApplicationState = false
@@ -1729,9 +1704,6 @@ final class RootViewController: UIViewController {
         
         publishRootHomeState()
 
-        // The landscape value screen is hosted separately by the rotation coordinator, but it now
-        // renders the same SwiftUI glucose state as the portrait Home view.
-        landscapeValueViewController?.updateLabels(glucoseState: rootHomeStateModel.landscapeGlucoseState())
     }
     
     /// if the user has chosen to show the mini-chart, then update it. If not, just return without doing anything.
@@ -1894,14 +1866,14 @@ final class RootViewController: UIViewController {
                     // set a tap gesture so that we can remove the overlay view when the user taps it
                     let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTapCoverView(_:)))
                     
-                    //create a new view with the same size as the app screen
-                    overlayView = UIView(frame: UIScreen.main.bounds)
+                    // Add the dimming view at window level so it also covers the SwiftUI tab bar.
+                    overlayView = UIView(frame: view.window?.bounds ?? view.bounds)
                     overlayView?.backgroundColor = UserDefaults.standard.screenLockDimmingType.dimmingColor
                     overlayView?.isUserInteractionEnabled = true
+                    overlayView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
                     overlayView?.addGestureRecognizer(tap)
                     
-                    // add it to the tab bar controller so that it cover the whole app window
-                    tabBarController?.view.addSubview(overlayView!)
+                    view.window?.addSubview(overlayView!)
                 }
             }
             
@@ -2019,96 +1991,6 @@ final class RootViewController: UIViewController {
         }
     }
     
-    
-    func showChartLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
-        guard landscapeChartViewController == nil,
-              let coreDataManager = coreDataManager,
-              let nightscoutSyncManager = nightscoutSyncManager
-        else {
-            return
-        }
-        
-        landscapeChartViewController = storyboard!.instantiateViewController(
-            withIdentifier: "LandscapeChartViewController")
-        as? LandscapeChartViewController
-        
-        if let landscapeChartViewController = landscapeChartViewController {
-            landscapeChartViewController.configure(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager)
-            landscapeChartViewController.view.frame = view.bounds
-            landscapeChartViewController.view.alpha = 0
-            view.addSubview(landscapeChartViewController.view)
-            addChild(landscapeChartViewController)
-            coordinator.animate(alongsideTransition: { _ in
-                landscapeChartViewController.view.alpha = 1
-            }, completion: { _ in
-                landscapeChartViewController.didMove(toParent: self)
-            })
-            
-        }
-    }
-    
-    func showValueLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
-        guard landscapeValueViewController == nil else { return }
-        
-        landscapeValueViewController = storyboard!.instantiateViewController(
-            withIdentifier: "LandscapeValueViewController")
-        as? LandscapeValueViewController
-        
-        if let landscapeValueViewController = landscapeValueViewController {
-            landscapeValueViewController.view.frame = view.bounds
-            landscapeValueViewController.view.alpha = 0
-            view.addSubview(landscapeValueViewController.view)
-            addChild(landscapeValueViewController)
-
-            // disable user interaction, if user wants to interact then device needs to rotate back to portrait
-            if let overlayView = self.overlayView {
-                overlayView.isUserInteractionEnabled = false
-            }
-
-            coordinator.animate(alongsideTransition: { _ in
-                // if the screen dimming overlay is enabled, then resize it to fit the landscape view
-                if UserDefaults.standard.screenLockDimmingType != .disabled {
-                    self.overlayView?.frame = UIScreen.main.bounds
-                }
-                
-                landscapeValueViewController.view.alpha = 1
-                
-            }, completion: { _ in
-                landscapeValueViewController.didMove(toParent: self)
-                // this function updates also the labels in the landscapeChartViewController
-                self.updateLabelsAndChart()
-            })
-        }
-    }
-    
-    func hideLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
-        if let controller = landscapeChartViewController {
-            controller.willMove(toParent: nil)
-            coordinator.animate(alongsideTransition: { _ in
-                controller.view.alpha = 0
-            }, completion: { _ in
-                controller.view.removeFromSuperview()
-                controller.removeFromParent()
-                self.landscapeChartViewController = nil
-            })
-        }
-
-        if let controller = landscapeValueViewController {
-            controller.willMove(toParent: nil)
-            coordinator.animate(alongsideTransition: { _ in
-                controller.view.alpha = 0
-            }, completion: { _ in
-                controller.view.removeFromSuperview()
-                controller.removeFromParent()
-                self.landscapeValueViewController = nil
-            })
-        }
-        
-        // disable user interaction, if user wants to interact then device needs to rotate back to portrait
-        if let overlayView = self.overlayView {
-            overlayView.isUserInteractionEnabled = true
-        }
-    }
     
     /// if allowed set the main screen rotation settings
     fileprivate func updateScreenRotationSettings() {
@@ -2523,24 +2405,6 @@ extension RootViewController: CGMTransmitterDelegate {
         if xDripError.priority == .HIGH {
             
             createNotification(title: Texts_Common.warning, body: xDripError.errorDescription, identifier: ConstantsNotifications.notificationIdentifierForxCGMTransmitterDelegatexDripError, sound: nil)
-        }
-    }
-}
-
-// MARK: - conform to UITabBarControllerDelegate protocol
-
-/// conform to UITabBarControllerDelegate, want to receive info when user clicks specific tabs
-extension RootViewController: UITabBarControllerDelegate {
-    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-        // check which tab is being clicked
-        if let navigationController = viewController as? SettingsNavigationController, let coreDataManager = coreDataManager, let soundPlayer = soundPlayer {
-            navigationController.configure(coreDataManager: coreDataManager, soundPlayer: soundPlayer)
-        } else if let navigationController = viewController as? BluetoothPeripheralNavigationController, let bluetoothPeripheralManager = bluetoothPeripheralManager, let coreDataManager = coreDataManager {
-            navigationController.configure(coreDataManager: coreDataManager, bluetoothPeripheralManager: bluetoothPeripheralManager)
-            // Inject provider at the navigation-controller level so it forwards to all BPVC children
-            navigationController.sensorProvider = self
-        } else if let navigationController = viewController as? TreatmentsNavigationController, let coreDataManager = coreDataManager {
-            navigationController.configure(coreDataManager: coreDataManager)
         }
     }
 }
