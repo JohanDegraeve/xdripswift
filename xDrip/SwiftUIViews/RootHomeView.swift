@@ -116,6 +116,7 @@ struct RootHomeView: View {
 
     private let actions: RootHomeActions
     private let chartRefreshTimer = Timer.publish(every: ConstantsHomeView.updateHomeViewIntervalInSeconds, on: .main, in: .common).autoconnect()
+    private let clockRefreshTimer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     private static let pannedReadingDateFormatter: DateFormatter = {
         let dateFormatter = DateFormatter()
         dateFormatter.amSymbol = ConstantsUI.timeFormatAM
@@ -164,6 +165,11 @@ struct RootHomeView: View {
             refreshCurrentTimeRangeIfNeeded(showsLoading: false)
             requestMiniChartState(forceReset: false)
         }
+        .onReceive(clockRefreshTimer) { _ in
+            if state.visibility.showsClock {
+                stateModel.updateClock()
+            }
+        }
         .onReceive(scrollCoordinator.$endDate.throttle(for: .milliseconds(120), scheduler: RunLoop.main, latest: true)) { _ in
             requestChartStateIfNeeded()
         }
@@ -172,7 +178,6 @@ struct RootHomeView: View {
         }
         .onChange(of: selectedRange) { newRange in
             chartWidthInHours = newRange.rawValue
-            actions.chartHoursChanged(newRange.rawValue)
             scrollCoordinator.setVisibleTimeInterval(newRange.timeInterval)
             requestChartState(forceReset: true)
         }
@@ -462,8 +467,6 @@ struct RootHomeView: View {
         default:
             miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
         }
-
-        actions.miniChartHoursChanged(miniChartHoursToShow)
     }
 
     private func updateStatisticsDays(_ days: Int) {
