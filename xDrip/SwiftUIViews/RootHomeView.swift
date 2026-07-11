@@ -1,0 +1,1157 @@
+//
+//  RootHomeView.swift
+//  xdrip
+//
+//  Created by Paul Plant on 11/7/26.
+//  Copyright © 2026 Johan Degraeve. All rights reserved.
+//
+
+import Combine
+import SwiftUI
+import UIKit
+
+/// SwiftUI replacement surface for the RootViewController home screen.
+///
+/// This view owns only presentation-level state and chart scrolling state. The existing
+/// RootViewController still coordinates app services while we migrate the home screen because it is
+/// also the entry point for transmitter delegates, notifications, app lifecycle work and navigation.
+struct RootHomeView: View {
+
+    // MARK: - Layout
+
+    /// Native SwiftUI layout contract for the home screen.
+    ///
+    /// Compact rows keep stable heights because they contain fixed-format status information.
+    /// The main chart is the flexible row and expands to consume the remaining vertical space.
+    fileprivate enum Layout {
+        static let sectionSpacing: CGFloat = 10
+        static let rowSpacing: CGFloat = 8
+        static let screenHorizontalMargin: CGFloat = 8
+        static let horizontalMargin: CGFloat = 8
+        static let toolbarMinimumHeight: CGFloat = 44
+        static let glucoseRowHeight: CGFloat = 120
+        static let glucoseInfoRowHeight: CGFloat = 24
+        static let pumpWidth: CGFloat = 158
+        static let loopHeight: CGFloat = 35
+        static let loopTopPadding: CGFloat = 2
+        static let loopBottomPadding: CGFloat = 2
+        static let loopStatusSymbolSize: CGFloat = 18
+        static let mainChartLeadingSpacer: CGFloat = 10
+        static let miniChartHeight: CGFloat = 58
+        static let selectorHeight: CGFloat = 28
+        static let statisticsHeight: CGFloat = 90
+        static let sensorProgressHeight: CGFloat = 10
+        static let dataSourceHeight: CGFloat = 30
+        static let bottomStatusSpacing: CGFloat = 2
+        static let clockHeight: CGFloat = 140
+        static let statusCornerRadius: CGFloat = 10
+    }
+
+    // MARK: - Chart Range
+
+    fileprivate enum ChartRange: Double, CaseIterable, Identifiable {
+        case threeHours = 3
+        case fiveHours = 5
+        case eightHours = 8
+        case twelveHours = 12
+
+        var id: Double {
+            rawValue
+        }
+
+        var title: String {
+            "\(Int(rawValue))\(Texts_Common.hourshort)"
+        }
+
+        var timeInterval: TimeInterval {
+            .hours(-rawValue)
+        }
+
+        /// Baseline used by `GlucoseChartView` to keep glucose points readable as the visible range widens.
+        var glucoseCircleDiameterScalingHours: Double {
+            switch self {
+            case .threeHours:
+                return 3.0
+            case .fiveHours:
+                return 4.5
+            case .eightHours:
+                return 6.0
+            case .twelveHours:
+                return 7.2
+            }
+        }
+
+        static func closest(to hours: Double) -> ChartRange {
+            ChartRange.allCases.min { abs($0.rawValue - hours) < abs($1.rawValue - hours) } ?? .fiveHours
+        }
+    }
+
+    /// Settings that affect which cached chart series are included in the main chart state.
+    ///
+    /// The stored UserDefaults values are observed with `@AppStorage`, but the chart only needs a
+    /// manager refresh when the effective renderable series changes. This mirrors the old
+    /// RootViewController observer behaviour without listening to every UserDefaults write.
+    private struct ChartSeriesSettings: Equatable {
+        let showTreatments: Bool
+        let showOriginalBGReadings: Bool
+    }
+
+    // MARK: - State
+
+    @ObservedObject private var displayManager: RootHomeDisplayManager
+    @StateObject private var glucoseChartStateManager: GlucoseChartStateManager
+    @StateObject private var miniChartStateManager: GlucoseChartStateManager
+    @StateObject private var scrollCoordinator: GlucoseChartScrollCoordinator
+
+    private let nightscoutSyncManager: NightscoutSyncManager
+    @State private var selectedRange: ChartRange
+    @State private var isLoadingChart = false
+    @State private var isBackgroundLoadingChart = false
+    @State private var showOriginalBGReadingsOnly = false
+    @AppStorage(UserDefaults.KeysCharts.chartWidthInHours.rawValue) private var chartWidthInHours = ConstantsGlucoseChart.defaultChartWidthInHours
+    @AppStorage(UserDefaults.Key.miniChartHoursToShow.rawValue) private var miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
+    @AppStorage(UserDefaults.Key.showTreatmentsOnChart.rawValue) private var hideTreatmentsOnChart = false
+    @AppStorage(UserDefaults.Key.showOriginalBGReadings.rawValue) private var hideOriginalBGReadings = false
+    @AppStorage(UserDefaults.Key.enableAdjustment.rawValue) private var enableAdjustment = false
+    @AppStorage(UserDefaults.Key.enableSmoothing.rawValue) private var enableSmoothing = false
+
+    private let actions: RootHomeActions
+    private let chartRefreshTimer = Timer.publish(every: ConstantsHomeView.updateHomeViewIntervalInSeconds, on: .main, in: .common).autoconnect()
+    private static let pannedReadingDateFormatter: DateFormatter = {
+        let dateFormatter = DateFormatter()
+        dateFormatter.amSymbol = ConstantsUI.timeFormatAM
+        dateFormatter.pmSymbol = ConstantsUI.timeFormatPM
+        dateFormatter.setLocalizedDateFormatFromTemplate(ConstantsGlucoseChart.dateFormatLatestChartPointWhenPanning)
+
+        return dateFormatter
+    }()
+
+    // MARK: - Initialisation
+
+    init(displayManager: RootHomeDisplayManager, coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager, actions: RootHomeActions) {
+        let initialRange = ChartRange.closest(to: UserDefaults.standard.chartWidthInHours)
+
+        self.displayManager = displayManager
+        self.actions = actions
+        self.nightscoutSyncManager = nightscoutSyncManager
+        _glucoseChartStateManager = StateObject(wrappedValue: GlucoseChartStateManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager))
+        _miniChartStateManager = StateObject(wrappedValue: GlucoseChartStateManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager))
+        _scrollCoordinator = StateObject(wrappedValue: GlucoseChartScrollCoordinator(visibleTimeInterval: initialRange.timeInterval))
+        _selectedRange = State(initialValue: initialRange)
+    }
+
+    // MARK: - Body
+
+    var body: some View {
+        ZStack {
+            ConstantsAppColors.background
+                .ignoresSafeArea()
+
+            rootContent()
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        }
+        .colorScheme(.dark)
+        .onAppear {
+            refreshChartRangeFromStoredSettings()
+            requestChartState(forceReset: true)
+            requestMiniChartState(forceReset: true)
+        }
+        .onDisappear {
+            scrollCoordinator.stopDeceleration()
+            glucoseChartStateManager.cleanUpMemory()
+            miniChartStateManager.cleanUpMemory()
+        }
+        .onReceive(chartRefreshTimer) { _ in
+            refreshCurrentTimeRangeIfNeeded(showsLoading: false)
+            requestMiniChartState(forceReset: false)
+        }
+        .onReceive(scrollCoordinator.$endDate.throttle(for: .milliseconds(120), scheduler: RunLoop.main, latest: true)) { _ in
+            requestChartStateIfNeeded()
+        }
+        .onReceive(nightscoutSyncManager.$deviceStatus.receive(on: RunLoop.main)) { _ in
+            actions.refreshPumpAndLoopStatus()
+        }
+        .onChange(of: selectedRange) { newRange in
+            chartWidthInHours = newRange.rawValue
+            actions.chartHoursChanged(newRange.rawValue)
+            scrollCoordinator.setVisibleTimeInterval(newRange.timeInterval)
+            requestChartState(forceReset: true)
+        }
+        .onChange(of: chartWidthInHours) { _ in
+            refreshChartRangeFromStoredSettings()
+        }
+        .onChange(of: miniChartHoursToShow) { _ in
+            requestMiniChartState(forceReset: true)
+        }
+        .onChange(of: chartSeriesSettings) { _ in
+            requestChartState(forceReset: false)
+        }
+    }
+
+    private func rootContent() -> some View {
+        VStack(spacing: Layout.sectionSpacing) {
+            RootHomeToolbarView(
+                state: state,
+                actions: actions,
+                beginOriginalGlucosePeek: beginOriginalGlucosePeek,
+                endOriginalGlucosePeek: endOriginalGlucosePeek
+            )
+                .frame(minHeight: Layout.toolbarMinimumHeight)
+
+            VStack(spacing: Layout.rowSpacing) {
+                HStack(spacing: 0) {
+                    if state.visibility.showsPump {
+                        RootHomePumpView(state: state.pump)
+                            .frame(width: Layout.pumpWidth, height: Layout.glucoseRowHeight)
+                    }
+
+                    RootHomeGlucoseReadingView(state: glucoseDisplayState, isScreenLocked: state.isScreenLocked, actions: actions)
+                        .frame(maxWidth: .infinity)
+                }
+                .frame(height: Layout.glucoseRowHeight)
+
+                if state.visibility.showsLoop {
+                    RootHomeLoopView(state: state.loop, actions: actions)
+                        .frame(height: Layout.loopHeight)
+                        .padding(.top, Layout.loopTopPadding)
+                        .padding(.bottom, Layout.loopBottomPadding)
+                }
+
+                HStack(spacing: 0) {
+                    Color.clear
+                        .frame(width: Layout.mainChartLeadingSpacer)
+
+                    RootHomeMainChartView(
+                        selectedRange: selectedRange,
+                        chartState: visibleChartState,
+                        isLoading: isLoadingChart,
+                        scrollCoordinator: scrollCoordinator,
+                        updateChartStateIfNeeded: requestChartStateIfNeeded,
+                        finishChartScroll: { forceReset, showsLoading in
+                            requestChartState(forceReset: forceReset, showsLoading: showsLoading)
+                        }
+                    )
+                }
+                .frame(maxHeight: .infinity)
+                .layoutPriority(1)
+
+                if state.visibility.showsMiniChart {
+                    RootHomeMiniChartView(
+                        miniChartHoursToShow: miniChartHoursToShowForChart,
+                        chartState: miniChartState,
+                        cycleMiniChartHoursToShow: cycleMiniChartHoursToShow
+                    )
+                    .frame(height: Layout.miniChartHeight)
+                }
+
+                if state.visibility.showsControls {
+                    RootHomeSelectorView(
+                        selectedRange: $selectedRange,
+                        statisticsDays: state.controls.statisticsDays,
+                        showsStatistics: state.visibility.showsStatistics,
+                        onStatisticsDaysChanged: updateStatisticsDays
+                    )
+                    .frame(height: Layout.selectorHeight)
+                }
+
+                if state.visibility.showsStatistics {
+                    RootHomeStatisticsView(state: state.statistics, action: actions.cycleStatisticsType)
+                        .frame(height: Layout.statisticsHeight)
+                }
+
+                if state.visibility.showsClock {
+                    RootHomeClockView(text: state.controls.clockText)
+                        .frame(height: Layout.clockHeight)
+                }
+
+                if state.visibility.showsSensor || state.visibility.showsDataSource {
+                    VStack(spacing: Layout.bottomStatusSpacing) {
+                        if state.visibility.showsSensor {
+                            RootHomeSensorLifetimeView(state: state.sensor)
+                                .frame(height: Layout.sensorProgressHeight)
+                        }
+
+                        if state.visibility.showsDataSource {
+                            RootHomeDataSourceView(state: state.dataSource, sensorState: state.sensor, action: actions.hideFollowerUrl)
+                                .frame(height: Layout.dataSourceHeight)
+                        }
+                    }
+                }
+            }
+            .frame(maxHeight: .infinity, alignment: .top)
+        }
+        .padding(.horizontal, Layout.screenHorizontalMargin)
+        .frame(maxHeight: .infinity, alignment: .top)
+    }
+
+    // MARK: - Derived State
+
+    private var state: RootHomeState {
+        displayManager.state
+    }
+
+    private var startDate: Date {
+        scrollCoordinator.startDate
+    }
+
+    private var endDate: Date {
+        scrollCoordinator.endDate
+    }
+
+    private var visibleChartState: GlucoseChartState {
+        var state = glucoseChartStateManager.state
+        state.startDate = startDate
+        state.endDate = endDate
+
+        return state
+    }
+
+    private var glucoseDisplayState: RootHomeGlucoseState {
+        guard !scrollCoordinator.isShowingCurrentTimeRange, let pannedReading = latestVisibleReadingAtChartEndDate() else {
+            return state.glucose
+        }
+
+        let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        let valueInUserUnit = pannedReading.valueInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl)
+
+        // Match the original UIKit panning behaviour: while the chart is scrolled back, the top
+        // reading shows the latest visible chart point, uses the point timestamp instead of
+        // "minutes ago", clears the delta, and marks the value as historical with strikethrough.
+        return RootHomeGlucoseState(
+            valueText: valueInUserUnit.bgValueToString(mgDl: isMgDl),
+            valueColor: ConstantsAppColors.disabledText,
+            valueHasStrikethrough: true,
+            minutesText: Self.pannedReadingDateFormatter.string(from: pannedReading.date),
+            minutesAgoText: "",
+            minutesColor: ConstantsAppColors.urgent,
+            deltaText: "",
+            deltaUnitText: "",
+            deltaColor: ConstantsAppColors.primaryText
+        )
+    }
+
+    private var miniChartState: GlucoseChartState {
+        let state = miniChartStateManager.state
+
+        return GlucoseChartState(
+            startDate: state.startDate,
+            endDate: state.endDate,
+            dataStartDate: state.dataStartDate,
+            dataEndDate: state.dataEndDate,
+            bgReadingValues: state.bgReadingValues,
+            bgReadingDates: state.bgReadingDates,
+            additionalBgReadingDataSets: [],
+            calibrationPoints: [],
+            treatmentPoints: GlucoseChartTreatmentPoints(),
+            minimumChartValueInMgDl: ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl,
+            overlayWindowStartDate: startDate,
+            overlayWindowEndDate: endDate
+        )
+    }
+
+    private var showTreatments: Bool {
+        !hideTreatmentsOnChart
+    }
+
+    private var showOriginalBGReadings: Bool {
+        !hideOriginalBGReadings && postProcessingEnabled
+    }
+
+    private var postProcessingEnabled: Bool {
+        enableAdjustment || enableSmoothing
+    }
+
+    private var chartSeriesSettings: ChartSeriesSettings {
+        ChartSeriesSettings(showTreatments: showTreatments, showOriginalBGReadings: showOriginalBGReadings)
+    }
+
+    private var miniChartHoursToShowForChart: Double {
+        miniChartHoursToShow == 0 ? ConstantsGlucoseChart.miniChartHoursToShow1 : miniChartHoursToShow
+    }
+
+    private func latestVisibleReadingAtChartEndDate() -> (date: Date, valueInMgDl: Double)? {
+        let readings = zip(glucoseChartStateManager.state.bgReadingDates, glucoseChartStateManager.state.bgReadingValues)
+
+        return readings
+            .filter { date, value in
+                value > 0 && date >= startDate && date <= endDate
+            }
+            .max { lhs, rhs in
+                lhs.0 < rhs.0
+            }
+            .map { (date: $0.0, valueInMgDl: $0.1) }
+    }
+
+    // MARK: - Actions
+
+    private func refreshChartRangeFromStoredSettings() {
+        let range = ChartRange.closest(to: chartWidthInHours == 0 ? ConstantsGlucoseChart.defaultChartWidthInHours : chartWidthInHours)
+        if range != selectedRange {
+            selectedRange = range
+        }
+    }
+
+    private func refreshCurrentTimeRangeIfNeeded(showsLoading: Bool = true) {
+        guard scrollCoordinator.refreshCurrentTimeRangeIfNeeded() else { return }
+
+        requestChartState(forceReset: false, showsLoading: showsLoading)
+    }
+
+    private func requestChartStateIfNeeded() {
+        guard !isBackgroundLoadingChart else { return }
+
+        let state = glucoseChartStateManager.state
+        let preloadInterval = min(max(abs(selectedRange.timeInterval) * 0.4, .hours(1)), .hours(3))
+        let needsLeadingData = startDate < state.dataStartDate.addingTimeInterval(preloadInterval)
+        let canLoadTrailingData = state.dataEndDate < Date().addingTimeInterval(-60)
+        let needsTrailingData = canLoadTrailingData && endDate > state.dataEndDate.addingTimeInterval(-preloadInterval)
+
+        guard needsLeadingData || needsTrailingData else { return }
+
+        requestChartState(forceReset: false, showsLoading: false)
+    }
+
+    private func requestChartState(forceReset: Bool, showsLoading: Bool = true) {
+        if showsLoading {
+            isLoadingChart = true
+            isBackgroundLoadingChart = false
+        } else {
+            guard !isBackgroundLoadingChart else { return }
+
+            isBackgroundLoadingChart = true
+        }
+
+        glucoseChartStateManager.updateState(endDate: endDate, startDate: startDate, forceReset: forceReset, showTreatments: showTreatments, showOriginalReadingsOnly: showOriginalBGReadingsOnly) { _ in
+            isLoadingChart = false
+            isBackgroundLoadingChart = false
+        }
+    }
+
+    private func requestMiniChartState(forceReset: Bool) {
+        let endDate = Date()
+        let startDate = endDate.addingTimeInterval(.hours(-miniChartHoursToShowForChart))
+
+        miniChartStateManager.updateState(endDate: endDate, startDate: startDate, forceReset: forceReset, showTreatments: false)
+    }
+
+    private func cycleMiniChartHoursToShow() {
+        switch miniChartHoursToShowForChart {
+        case ConstantsGlucoseChart.miniChartHoursToShow1:
+            miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow2
+        case ConstantsGlucoseChart.miniChartHoursToShow2:
+            miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow3
+        case ConstantsGlucoseChart.miniChartHoursToShow3:
+            miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow4
+        default:
+            miniChartHoursToShow = ConstantsGlucoseChart.miniChartHoursToShow1
+        }
+
+        actions.miniChartHoursChanged(miniChartHoursToShow)
+    }
+
+    private func updateStatisticsDays(_ days: Int) {
+        UserDefaults.standard.daysToUseStatistics = days
+        actions.statisticsDaysChanged(days)
+    }
+
+    private func beginOriginalGlucosePeek() {
+        guard postProcessingEnabled, !showOriginalBGReadingsOnly else { return }
+
+        showOriginalBGReadingsOnly = true
+        requestChartState(forceReset: false, showsLoading: false)
+    }
+
+    private func endOriginalGlucosePeek() {
+        guard showOriginalBGReadingsOnly else { return }
+
+        showOriginalBGReadingsOnly = false
+        requestChartState(forceReset: false, showsLoading: false)
+    }
+}
+
+// MARK: - Toolbar
+
+private struct RootHomeToolbarView: View {
+    let state: RootHomeState
+    let actions: RootHomeActions
+    let beginOriginalGlucosePeek: () -> Void
+    let endOriginalGlucosePeek: () -> Void
+
+    @State private var originalGlucosePeekIsActive = false
+    @State private var shouldIgnoreNextPostProcessingTap = false
+
+    var body: some View {
+        HStack(spacing: 0) {
+            toolbarButton(systemImage: state.controls.snoozeSystemImage, label: Texts_HomeView.snoozeButton, action: actions.showSnooze)
+            toolbarButton(systemImage: "drop", label: "BgReadings", action: actions.showBgReadings)
+            toolbarButton(systemImage: "sensor.tag.radiowaves.forward", label: Texts_HomeView.sensor, action: actions.showSensorManagement)
+                .disabled(!state.controls.sensorButtonEnabled)
+                .opacity(state.controls.sensorButtonEnabled ? 1 : 0.35)
+            postProcessingToolbarButton()
+            toolbarButton(systemImage: "rectangle.3.group", label: "Show/Hide", action: actions.showHideItems)
+            toolbarButton(systemImage: state.isScreenLocked ? "lock.fill" : "lock", label: Texts_HomeView.lockButton, action: actions.toggleScreenLock)
+                .foregroundStyle(state.isScreenLocked ? ConstantsAppColors.toolbarLockedIcon : ConstantsAppColors.toolbarIcon)
+        }
+        .padding(.horizontal, 8)
+        .frame(maxWidth: .infinity)
+    }
+
+    private func postProcessingToolbarButton() -> some View {
+        Image(systemName: state.controls.postProcessingSystemImage)
+            .font(.system(size: 23, weight: .regular))
+            .frame(width: 38, height: 38)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                guard !shouldIgnoreNextPostProcessingTap else {
+                    shouldIgnoreNextPostProcessingTap = false
+                    return
+                }
+
+                actions.showBgAdjustments()
+            }
+            .simultaneousGesture(originalGlucosePeekGesture())
+            .foregroundStyle(ConstantsAppColors.toolbarIcon)
+            .frame(maxWidth: .infinity)
+            .accessibilityLabel(Texts_HomeView.postProcessingTitle)
+    }
+
+    private func originalGlucosePeekGesture() -> some Gesture {
+        LongPressGesture(minimumDuration: 0.35)
+            .sequenced(before: DragGesture(minimumDistance: 0))
+            .onChanged { value in
+                guard case .second(true, _) = value else { return }
+                guard state.controls.postProcessingEnabled, !originalGlucosePeekIsActive else { return }
+
+                originalGlucosePeekIsActive = true
+                shouldIgnoreNextPostProcessingTap = true
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                beginOriginalGlucosePeek()
+            }
+            .onEnded { _ in
+                guard originalGlucosePeekIsActive else { return }
+
+                originalGlucosePeekIsActive = false
+                endOriginalGlucosePeek()
+
+                // The old UIKit button ignored the touch-up event after a successful long press so
+                // releasing the peek did not also open the adjustments screen. SwiftUI tap delivery
+                // can vary slightly with combined gestures, so clear the guard shortly after release
+                // if no tap event consumed it.
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+                    shouldIgnoreNextPostProcessingTap = false
+                }
+            }
+    }
+
+    private func toolbarButton(systemImage: String, label: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.system(size: 23, weight: .regular))
+                .frame(width: 38, height: 38)
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(ConstantsAppColors.toolbarIcon)
+        .frame(maxWidth: .infinity)
+        .accessibilityLabel(label)
+    }
+}
+
+// MARK: - Pump and Loop
+
+private struct RootHomePumpView: View {
+    let state: RootHomePumpState
+
+    var body: some View {
+        VStack(spacing: 0) {
+            RootHomeHorizontalMetricView(metric: state.basal)
+            RootHomeHorizontalMetricView(metric: state.reservoir)
+            RootHomeHorizontalMetricView(metric: state.battery)
+            RootHomeHorizontalMetricView(metric: state.cage)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 5)
+        .background(ConstantsAppColors.homePanelBackground)
+        .clipShape(RoundedRectangle(cornerRadius: RootHomeView.Layout.statusCornerRadius, style: .continuous))
+    }
+}
+
+private struct RootHomeLoopView: View {
+    let state: RootHomeLoopState
+    let actions: RootHomeActions
+
+    var body: some View {
+        Button(action: actions.showAIDStatus) {
+            HStack(spacing: 0) {
+                RootHomeInlineMetricView(metric: state.iob)
+                Spacer(minLength: 16)
+                RootHomeInlineMetricView(metric: state.cob)
+                Spacer(minLength: 16)
+
+                HStack(spacing: 6) {
+                    if state.showsUploaderBattery {
+                        Image(systemName: "battery.75")
+                            .font(.system(size: 14))
+                            .foregroundStyle(ConstantsAppColors.primaryText)
+                    }
+
+                    if state.showsActivityIndicator {
+                        ProgressView()
+                            .scaleEffect(0.75)
+                            .tint(ConstantsAppColors.primaryText)
+                    }
+
+                    if let statusSystemImage = state.statusSystemImage {
+                        Image(systemName: statusSystemImage)
+                            .font(.system(size: RootHomeView.Layout.loopStatusSymbolSize, weight: .black))
+                            .symbolRenderingMode(.monochrome)
+                            .foregroundStyle(state.statusColor)
+                    }
+
+                    Text(state.statusTitle)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(state.statusColor)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.65)
+
+                    if state.showsStatusTimeAgo {
+                        Text(state.statusTimeAgo)
+                            .font(.system(size: 16))
+                            .foregroundStyle(ConstantsAppColors.primaryText)
+                            .monospacedDigit()
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.65)
+                    }
+                }
+            }
+            .padding(.horizontal, 10)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(ConstantsAppColors.homePanelBackground)
+            .clipShape(RoundedRectangle(cornerRadius: RootHomeView.Layout.statusCornerRadius, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .transaction { transaction in
+            // Match the old UIKit statistics labels: calculation updates replace the label text
+            // immediately, while only the separate threshold-highlight colours are animated.
+            transaction.animation = nil
+        }
+    }
+}
+
+private struct RootHomeInlineMetricView: View {
+    let metric: RootHomeMetricState
+
+    var body: some View {
+        HStack(spacing: 6) {
+            Text(metric.title)
+                .font(.system(size: 16))
+                .foregroundStyle(ConstantsAppColors.secondaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+
+            Text(metric.value)
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(metric.valueColor)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.65)
+        }
+    }
+}
+
+private struct RootHomeHorizontalMetricView: View {
+    let metric: RootHomeMetricState
+
+    var body: some View {
+        HStack(spacing: 4) {
+            Text(metric.title)
+                .font(.system(size: 15))
+                .foregroundStyle(ConstantsAppColors.secondaryText)
+                .lineLimit(1)
+
+            Spacer(minLength: 4)
+
+            Text(metric.value)
+                .font(.system(size: 15, weight: .medium))
+                .foregroundStyle(metric.valueColor)
+                .monospacedDigit()
+                .lineLimit(1)
+        }
+        .frame(maxHeight: .infinity)
+    }
+}
+
+// MARK: - Glucose
+
+private struct RootHomeGlucoseReadingView: View {
+    let state: RootHomeGlucoseState
+    let isScreenLocked: Bool
+    let actions: RootHomeActions
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                HStack(spacing: 4) {
+                    Text(state.minutesText)
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundStyle(state.minutesColor)
+                        .monospacedDigit()
+
+                    Text(state.minutesAgoText)
+                        .font(.system(size: 20))
+                        .foregroundStyle(ConstantsAppColors.secondaryText)
+                }
+
+                Spacer(minLength: 8)
+
+                HStack(spacing: 4) {
+                    Text(state.deltaText)
+                        .font(.system(size: 20, weight: .medium))
+                        .foregroundStyle(state.deltaColor)
+                        .monospacedDigit()
+
+                    Text(state.deltaUnitText)
+                        .font(.system(size: 20))
+                        .foregroundStyle(ConstantsAppColors.secondaryText)
+                }
+            }
+            .frame(height: RootHomeView.Layout.glucoseInfoRowHeight)
+            .padding(.horizontal, RootHomeView.Layout.horizontalMargin)
+
+            Text(state.valueText)
+                .font(.system(size: isScreenLocked ? 120 : 65, weight: .medium))
+                .foregroundStyle(state.valueColor)
+                .strikethrough(state.valueHasStrikethrough, color: state.valueColor)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.2)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .onTapGesture(perform: actions.toggleExpandedAIDInfo)
+                .onLongPressGesture(minimumDuration: 0.5, perform: actions.keepScreenAwake)
+        }
+    }
+}
+
+// MARK: - Charts
+
+private struct RootHomeMainChartView: View {
+    let selectedRange: RootHomeView.ChartRange
+    let chartState: GlucoseChartState
+    let isLoading: Bool
+    let scrollCoordinator: GlucoseChartScrollCoordinator
+    let updateChartStateIfNeeded: () -> Void
+    let finishChartScroll: (_ forceReset: Bool, _ showsLoading: Bool) -> Void
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack(alignment: .topTrailing) {
+                GlucoseChartView(
+                    glucoseChartType: .widgetSystemLarge,
+                    bgReadingValues: nil,
+                    bgReadingDates: nil,
+                    isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl,
+                    urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue,
+                    lowLimitInMgDl: UserDefaults.standard.lowMarkValue,
+                    highLimitInMgDl: UserDefaults.standard.highMarkValue,
+                    urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue,
+                    liveActivityType: nil,
+                    hoursToShowScalingHours: selectedRange.rawValue,
+                    glucoseCircleDiameterScalingHours: selectedRange.glucoseCircleDiameterScalingHours,
+                    overrideChartHeight: geometry.size.height,
+                    overrideChartWidth: geometry.size.width,
+                    highContrast: nil,
+                    chartState: chartState
+                )
+                .mainChartYAxisContext()
+                .transaction { transaction in
+                    transaction.animation = nil
+                }
+                .contentShape(Rectangle())
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            scrollCoordinator.updateVisibleRange(value: value, chartWidth: geometry.size.width)
+                            updateChartStateIfNeeded()
+                        }
+                        .onEnded { value in
+                            scrollCoordinator.finishUpdatingVisibleRange(value: value, chartWidth: geometry.size.width)
+                            finishChartScroll(false, false)
+                        }
+                )
+                .simultaneousGesture(TapGesture(count: 2).onEnded {
+                    scrollCoordinator.resetToNow()
+                    finishChartScroll(true, true)
+                })
+                .clipped()
+
+                if isLoading {
+                    ProgressView()
+                        .padding(8)
+                }
+            }
+        }
+    }
+}
+
+private struct RootHomeMiniChartView: View {
+    let miniChartHoursToShow: Double
+    let chartState: GlucoseChartState
+    let cycleMiniChartHoursToShow: () -> Void
+
+    var body: some View {
+        GeometryReader { geometry in
+            GlucoseChartView(
+                glucoseChartType: .miniChart,
+                bgReadingValues: nil,
+                bgReadingDates: nil,
+                isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl,
+                urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue,
+                lowLimitInMgDl: UserDefaults.standard.lowMarkValue,
+                highLimitInMgDl: UserDefaults.standard.highMarkValue,
+                urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue,
+                liveActivityType: nil,
+                hoursToShowScalingHours: miniChartHoursToShow,
+                glucoseCircleDiameterScalingHours: miniChartHoursToShow,
+                overrideChartHeight: geometry.size.height,
+                overrideChartWidth: geometry.size.width,
+                highContrast: nil,
+                chartState: chartState
+            )
+            .transaction { transaction in
+                transaction.animation = nil
+            }
+            .contentShape(Rectangle())
+            .onTapGesture(count: 2, perform: cycleMiniChartHoursToShow)
+            .clipped()
+        }
+    }
+}
+
+// MARK: - Controls
+
+private struct RootHomeSelectorView: View {
+    @Binding var selectedRange: RootHomeView.ChartRange
+    let statisticsDays: Int
+    let showsStatistics: Bool
+    let onStatisticsDaysChanged: (Int) -> Void
+
+    private let statisticsOptions = [0, 1, 7, 30, 90]
+
+    var body: some View {
+        GeometryReader { geometry in
+            let horizontalPadding: CGFloat = 6
+            let controlSpacing: CGFloat = showsStatistics ? 4 : 0
+            let availableWidth = max(0, geometry.size.width - (horizontalPadding * 2) - controlSpacing)
+            let statisticsWidth = availableWidth * 0.68
+            let chartWidth = showsStatistics ? availableWidth * 0.32 : availableWidth
+
+            HStack(spacing: controlSpacing) {
+                if showsStatistics {
+                    Picker("", selection: Binding(get: { statisticsDays }, set: onStatisticsDaysChanged)) {
+                        ForEach(statisticsOptions, id: \.self) { days in
+                            Text(title(for: days))
+                                .lineLimit(1)
+                                .tag(days)
+                        }
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                    .font(.system(size: 10))
+                    .controlSize(.small)
+                    .frame(width: statisticsWidth)
+                }
+
+                Picker("", selection: $selectedRange) {
+                    ForEach(RootHomeView.ChartRange.allCases) { range in
+                        Text(range.title)
+                            .lineLimit(1)
+                            .tag(range)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .font(.system(size: 10))
+                .controlSize(.small)
+                .frame(width: chartWidth)
+            }
+            .padding(.horizontal, horizontalPadding)
+            .frame(maxHeight: .infinity, alignment: .center)
+        }
+    }
+
+    private func title(for days: Int) -> String {
+        switch days {
+        case 0:
+            return Texts_Common.todayshort
+        case 1:
+            return "24\(Texts_Common.hourshort)"
+        default:
+            return "\(days)\(Texts_Common.dayshort)"
+        }
+    }
+}
+
+// MARK: - Statistics
+
+private struct RootHomeStatisticsView: View {
+    let state: RootHomeStatisticsState
+    let action: () -> Void
+
+    var body: some View {
+        HStack(spacing: 0) {
+            RootHomeStatisticsColumn(top: state.low, bottom: state.average, limitText: state.lowLimitText)
+            RootHomeStatisticsColumn(top: state.inRange, bottom: state.a1c, limitText: "")
+            RootHomeStatisticsColumn(top: state.high, bottom: state.cv, limitText: state.highLimitText)
+
+            VStack(spacing: 6) {
+                ZStack {
+                    RootHomePieChartView(
+                        low: state.low.percentValue,
+                        inRange: state.inRange.percentValue,
+                        high: state.high.percentValue
+                    )
+
+                    if state.showsActivityIndicator {
+                        ProgressView()
+                            .tint(ConstantsAppColors.primaryText)
+                    }
+                }
+                .frame(height: 52)
+
+                Text(state.timePeriodText)
+                    .font(.system(size: 12))
+                    .foregroundStyle(ConstantsAppColors.tertiaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
+            .frame(maxWidth: .infinity)
+        }
+        .padding(.horizontal, RootHomeView.Layout.horizontalMargin)
+        .padding(.vertical, 9)
+        .contentShape(Rectangle())
+        .onTapGesture(count: 2, perform: action)
+        .transaction { transaction in
+            // Match the old UIKit statistics labels: calculation updates replace the label text
+            // immediately, while only the separate threshold-highlight colours are animated.
+            transaction.animation = nil
+        }
+    }
+}
+
+private struct RootHomeStatisticsColumn: View {
+    let top: RootHomeMetricState
+    let bottom: RootHomeMetricState
+    let limitText: String
+
+    var body: some View {
+        VStack(spacing: 10) {
+            RootHomeStatisticsMetricView(metric: top, limitText: limitText)
+            RootHomeStatisticsMetricView(metric: bottom)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+private struct RootHomeStatisticsMetricView: View {
+    let metric: RootHomeMetricState
+    var limitText = ""
+
+    var body: some View {
+        VStack(spacing: 2) {
+            HStack(spacing: 2) {
+                Text(metric.title)
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(ConstantsAppColors.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.65)
+
+                if !limitText.isEmpty {
+                    Text(limitText)
+                        .font(.system(size: 12))
+                        .foregroundStyle(ConstantsAppColors.secondaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.65)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+
+            Text(metric.value)
+                .font(.system(size: 12))
+                .foregroundStyle(metric.valueColor)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.65)
+                .frame(maxWidth: .infinity, alignment: .center)
+        }
+    }
+}
+
+private struct RootHomePieChartView: View {
+    let low: Double
+    let inRange: Double
+    let high: Double
+
+    var body: some View {
+        ZStack {
+            if total > 0 {
+                RootHomePieSlice(startAngle: .degrees(referenceAngle), endAngle: .degrees(referenceAngle + inRangeAngle))
+                    .fill(ConstantsAppColors.statisticsInRange)
+
+                RootHomePieSlice(startAngle: .degrees(referenceAngle + inRangeAngle), endAngle: .degrees(referenceAngle + inRangeAngle + lowAngle))
+                    .fill(ConstantsAppColors.statisticsLow)
+
+                RootHomePieSlice(startAngle: .degrees(referenceAngle + inRangeAngle + lowAngle), endAngle: .degrees(referenceAngle + 360))
+                    .fill(ConstantsAppColors.statisticsHigh)
+            }
+        }
+        .frame(width: 52, height: 52)
+    }
+    
+    private var total: Double {
+        low + inRange + high
+    }
+    
+    private var inRangeAngle: Double {
+        360 * inRange / total
+    }
+    
+    private var lowAngle: Double {
+        360 * low / total
+    }
+    
+    private var referenceAngle: Double {
+        90 - (inRangeAngle / 2)
+    }
+}
+
+private struct RootHomePieSlice: Shape {
+    let startAngle: Angle
+    let endAngle: Angle
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let center = CGPoint(x: rect.midX, y: rect.midY)
+        let radius = min(rect.width, rect.height) / 2
+
+        path.move(to: center)
+        path.addArc(center: center, radius: radius, startAngle: startAngle, endAngle: endAngle, clockwise: false)
+        path.closeSubpath()
+
+        return path
+    }
+}
+
+private extension RootHomeMetricState {
+    var percentValue: Double {
+        Double(value.replacingOccurrences(of: "%", with: "")) ?? 0
+    }
+}
+
+// MARK: - Sensor and Data Source
+
+private struct RootHomeSensorLifetimeView: View {
+    let state: RootHomeSensorState
+
+    var body: some View {
+        GeometryReader { geometry in
+            let progress = min(max(state.progress, 0), 1)
+            let arrowPosition = min(max(progress * geometry.size.width, 7), geometry.size.width - 7)
+
+            ProgressView(value: progress)
+                .progressViewStyle(.linear)
+                .tint(state.progressColor)
+                .frame(height: 5)
+                .overlay {
+                    Image(systemName: "arrowtriangle.right.fill")
+                        .font(.system(size: 14, weight: .semibold))
+                        .scaleEffect(x: 0.75, y: 0.95)
+                        .foregroundStyle(state.progressColor)
+                        .opacity(0.85)
+                        .position(x: arrowPosition, y: 2.5)
+                }
+                .frame(maxHeight: .infinity, alignment: .center)
+        }
+        .padding(.horizontal, 10)
+    }
+}
+
+private struct RootHomeDataSourceView: View {
+    let state: RootHomeDataSourceState
+    let sensorState: RootHomeSensorState
+    let action: () -> Void
+
+    var body: some View {
+        HStack(spacing: 5) {
+            HStack(spacing: 5) {
+                if state.showsConnectionIcon {
+                    Image(systemName: state.connectionSystemImage)
+                        .font(.system(size: 15))
+                        .foregroundStyle(state.connectionColor)
+                }
+
+                if state.showsKeepAliveIcon {
+                    Image(systemName: state.keepAliveSystemImage)
+                        .font(.system(size: 15))
+                        .foregroundStyle(state.keepAliveColor)
+                }
+
+                Text(state.title)
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(ConstantsAppColors.dataSourceText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
+            .layoutPriority(1)
+
+            Spacer(minLength: 8)
+
+            HStack(spacing: 0) {
+                Text(dataSourceDetailText)
+                    .font(.system(size: 13))
+                    .foregroundStyle(dataSourceDetailColor)
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+
+                if let maxAgeText {
+                    Text(maxAgeText)
+                        .font(.system(size: 13))
+                        .foregroundStyle(ConstantsAppColors.dataSourceText)
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+            }
+        }
+        .padding(.horizontal, 10)
+        .contentShape(Rectangle())
+        .onTapGesture(count: 2, perform: action)
+    }
+
+    private var dataSourceDetailText: String {
+        sensorState.currentAge.isEmpty ? state.detail : sensorState.currentAge
+    }
+
+    private var maxAgeText: String? {
+        sensorState.currentAge.isEmpty || sensorState.maxAge.isEmpty ? nil : sensorState.maxAge
+    }
+
+    private var dataSourceDetailColor: Color {
+        sensorState.currentAge.isEmpty ? state.detailColor : sensorState.currentAgeColor
+    }
+}
+
+// MARK: - Clock
+
+private struct RootHomeClockView: View {
+    let text: String
+
+    var body: some View {
+        Text(text)
+            .font(.system(size: 120))
+            .foregroundStyle(ConstantsAppColors.clockText)
+            .monospacedDigit()
+            .lineLimit(1)
+            .minimumScaleFactor(0.2)
+            .frame(maxWidth: .infinity)
+    }
+}

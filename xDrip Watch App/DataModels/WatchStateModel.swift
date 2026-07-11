@@ -356,13 +356,13 @@ final class WatchStateModel: NSObject, ObservableObject {
     func deviceStatusIconImage() -> Image? {
         if deviceStatusLastLoopDate != .distantPast {
             if deviceStatusLastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-                return Image(systemName: "checkmark.circle.fill")
+                return Image(systemName: ConstantsHomeView.loopStatusRecentSystemImage)
             } else if deviceStatusLastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                return Image(systemName: "checkmark.circle")
+                return Image(systemName: ConstantsHomeView.loopStatusAcceptableSystemImage)
             } else if deviceStatusCreatedAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                return Image(systemName: "questionmark.circle")
+                return Image(systemName: ConstantsHomeView.loopStatusNotLoopingSystemImage)
             } else {
-                return Image(systemName: "exclamationmark.circle")
+                return Image(systemName: ConstantsHomeView.loopStatusNoDataSystemImage)
             }
         } else {
             return nil

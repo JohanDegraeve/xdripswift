@@ -246,13 +246,13 @@ extension XDripWidget.Entry {
         func deviceStatusIconImage() -> Image? {
             if let lastLoopDate = deviceStatusLastLoopDate, let createdAt = deviceStatusCreatedAt {
                 if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-                    return Image(systemName: "checkmark.circle.fill")
+                    return Image(systemName: ConstantsHomeView.loopStatusRecentSystemImage)
                 } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                    return Image(systemName: "checkmark.circle")
+                    return Image(systemName: ConstantsHomeView.loopStatusAcceptableSystemImage)
                 } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                    return Image(systemName: "questionmark.circle")
+                    return Image(systemName: ConstantsHomeView.loopStatusNotLoopingSystemImage)
                 } else {
-                    return Image(systemName: "exclamationmark.circle")
+                    return Image(systemName: ConstantsHomeView.loopStatusNoDataSystemImage)
                 }
             } else {
                 return nil

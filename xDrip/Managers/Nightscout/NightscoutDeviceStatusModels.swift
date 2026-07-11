@@ -206,7 +206,7 @@ struct NightscoutDeviceStatus: Codable {
         if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
             return .green
         } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return .green
+            return .yellow
         } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
             return .yellow
         } else {
@@ -218,7 +218,7 @@ struct NightscoutDeviceStatus: Codable {
         if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
             return Color(red: 0, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
         } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return Color(red: 0, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
+            return Color(red: 1, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
         } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
             return Color(red: 1, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
         } else {
@@ -230,7 +230,7 @@ struct NightscoutDeviceStatus: Codable {
         if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
             return .systemGreen
         } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return .systemGreen
+            return .systemYellow
         } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
             return .systemYellow
         } else {
@@ -249,28 +249,24 @@ struct NightscoutDeviceStatus: Codable {
             return "Error/No data"
         }
     }
-    
+
     func deviceStatusIconImage() -> Image {
-        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-            return Image(systemName: "checkmark.circle.fill")
-        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return Image(systemName: "checkmark.circle")
-        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return Image(systemName: "questionmark.circle")
-        } else {
-            return Image(systemName: "exclamationmark.circle")
-        }
+        Image(systemName: deviceStatusIconSystemName())
     }
-    
+
     func deviceStatusIconUIImage() -> UIImage {
+        UIImage(systemName: deviceStatusIconSystemName()) ?? UIImage()
+    }
+
+    func deviceStatusIconSystemName() -> String {
         if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-            return UIImage(systemName: "checkmark.circle.fill") ?? UIImage()
+            return ConstantsHomeView.loopStatusRecentSystemImage
         } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return UIImage(systemName: "checkmark.circle") ?? UIImage()
+            return ConstantsHomeView.loopStatusAcceptableSystemImage
         } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return UIImage(systemName: "questionmark.circle") ?? UIImage()
+            return ConstantsHomeView.loopStatusNotLoopingSystemImage
         } else {
-            return UIImage(systemName: "exclamationmark.circle") ?? UIImage()
+            return ConstantsHomeView.loopStatusNoDataSystemImage
         }
     }
     

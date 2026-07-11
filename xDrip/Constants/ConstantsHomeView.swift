@@ -98,6 +98,18 @@ enum ConstantsHomeView {
     
     /// after how many seconds should the loop status be shown as having no current data to show
     static let loopShowNoDataAfterMinutes: TimeInterval = 60 * 17
+
+    /// symbol to show when the loop has run recently
+    static let loopStatusRecentSystemImage = "circle"
+
+    /// symbol to show when the loop is older but still within the acceptable window
+    static let loopStatusAcceptableSystemImage = "circle"
+
+    /// symbol to show when device status is current but there is no recent loop
+    static let loopStatusNotLoopingSystemImage = "circle.slash"
+
+    /// symbol to show when device status is stale or missing
+    static let loopStatusNoDataSystemImage = "circle.slash"
     
     /// opacity level for the background of the AID status banner
     static let AIDStatusBannerBackgroundOpacity = 0.1

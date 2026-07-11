@@ -649,6 +649,17 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// Last timestamp when a log line was produced by TransmitterReadSuccessManager
     private var transmitterReadSuccessTimeStampOfLastLogCreated: Date?
+
+    /// Published state for the hosted SwiftUI home screen.
+    ///
+    /// RootViewController still owns the app services during this migration step. This manager is
+    /// only the display bridge from existing home-screen calculations to the SwiftUI home view.
+    private let rootHomeDisplayManager = RootHomeDisplayManager()
+
+    /// Hosted SwiftUI home screen installed over the storyboard home layout once app dependencies
+    /// are available. The storyboard outlets stay alive underneath so existing controller logic can
+    /// continue to run while the visual layer migrates.
+    private var rootHomeHostingController: UIHostingController<RootHomeView>?
     
     // MARK: - overriden functions
     
@@ -861,6 +872,11 @@ final class RootViewController: UIViewController, ObservableObject {
             
             self.setupApplicationData()
             
+            // Install the SwiftUI home surface only after the service objects used by its chart
+            // state managers are available. The old storyboard outlets remain underneath and
+            // continue to drive the mirrored display state during this migration step.
+            self.installRootHomeViewIfNeeded()
+
             // housekeeper should be non nil here, kall housekeeper
             self.houseKeeper?.doAppStartUpHouseKeeping()
             
@@ -1737,6 +1753,394 @@ final class RootViewController: UIViewController, ObservableObject {
         self.miniChartOutlet.reloadChart()
     }
 
+    // MARK: - SwiftUI Home Bridge
+
+    /// Installs the SwiftUI home surface over the existing storyboard home layout.
+    ///
+    /// This is intentionally a hosted view during the first RootViewController migration step. The
+    /// old outlets remain in place and continue to receive updates from existing methods, while
+    /// `publishRootHomeState()` mirrors their display values into SwiftUI. Once the SwiftUI state
+    /// path is proven, the remaining coordinator work can move out of RootViewController.
+    private func installRootHomeViewIfNeeded() {
+        guard rootHomeHostingController == nil, let coreDataManager = coreDataManager, let nightscoutSyncManager = nightscoutSyncManager else {
+            return
+        }
+
+        let rootHomeView = RootHomeView(
+            displayManager: rootHomeDisplayManager,
+            coreDataManager: coreDataManager,
+            nightscoutSyncManager: nightscoutSyncManager,
+            actions: makeRootHomeActions()
+        )
+
+        let hostingController = UIHostingController(rootView: rootHomeView)
+        hostingController.view.backgroundColor = .clear
+        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
+
+        addChild(hostingController)
+        view.addSubview(hostingController.view)
+
+        NSLayoutConstraint.activate([
+            hostingController.view.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            hostingController.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            hostingController.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            hostingController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
+
+        hostingController.didMove(toParent: self)
+        rootHomeHostingController = hostingController
+        publishRootHomeState()
+    }
+
+    private func makeRootHomeActions() -> RootHomeActions {
+        RootHomeActions(
+            showSnooze: { [weak self] in
+                self?.showSnoozeView()
+            },
+            showBgReadings: { [weak self] in
+                guard let self = self, let bgReadingsAccessor = self.bgReadingsAccessor, let nightscoutSyncManager = self.nightscoutSyncManager else { return }
+
+                self.showViewController(BgReadingsHostingController(bgReadingsAccessor: bgReadingsAccessor, nightscoutSyncManager: nightscoutSyncManager))
+            },
+            showSensorManagement: { [weak self] in
+                self?.showSensorManagementView()
+            },
+            showBgAdjustments: { [weak self] in
+                self?.showBgAdjustmentsView()
+            },
+            showHideItems: { [weak self] in
+                self?.showViewController(ShowHideItemsHostingController())
+            },
+            toggleScreenLock: { [weak self] in
+                self?.screenLockAlert(nightMode: true)
+            },
+            keepScreenAwake: { [weak self] in
+                self?.screenLockAlert(overrideScreenIsLocked: true, nightMode: false)
+            },
+            toggleExpandedAIDInfo: { [weak self] in
+                guard UserDefaults.standard.nightscoutFollowType != .none else { return }
+
+                UserDefaults.standard.nightscoutFollowShowExpandedInfo.toggle()
+                self?.updatePumpAndAIDStatusViews()
+            },
+            refreshPumpAndLoopStatus: { [weak self] in
+                self?.updatePumpAndAIDStatusViews()
+            },
+            chartHoursChanged: { [weak self] hours in
+                self?.setChartHoursFromRootHome(hours)
+            },
+            statisticsDaysChanged: { [weak self] days in
+                self?.setStatisticsDaysFromRootHome(days)
+            },
+            miniChartHoursChanged: { [weak self] _ in
+                self?.updateMiniChart()
+            },
+            cycleStatisticsType: { [weak self] in
+                self?.statisticsViewDoubleTapGestureRecognizer(UITapGestureRecognizer())
+            },
+            hideFollowerUrl: { [weak self] in
+                self?.urlDoubleTapGestureRecognizerAction(UITapGestureRecognizer())
+            },
+            showAIDStatus: { [weak self] in
+                self?.showAIDStatusView()
+            }
+        )
+    }
+
+    private func setChartHoursFromRootHome(_ hours: Double) {
+        switch hours {
+        case 3:
+            segmentedControlChartHours.selectedSegmentIndex = 0
+        case 5:
+            segmentedControlChartHours.selectedSegmentIndex = 1
+        case 8:
+            segmentedControlChartHours.selectedSegmentIndex = 2
+        case 12:
+            segmentedControlChartHours.selectedSegmentIndex = 3
+        default:
+            break
+        }
+
+        if let glucoseChartManager = glucoseChartManager {
+            glucoseChartManager.updateChartPoints(endDate: glucoseChartManager.endDate, startDate: glucoseChartManager.endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, forceReset: false, showTreaments: UserDefaults.standard.showTreatmentsOnChart, completionHandler: nil)
+        }
+
+        publishRootHomeState()
+    }
+
+    private func setStatisticsDaysFromRootHome(_ days: Int) {
+        switch days {
+        case 0:
+            segmentedControlStatisticsDays.selectedSegmentIndex = 0
+        case 1:
+            segmentedControlStatisticsDays.selectedSegmentIndex = 1
+        case 7:
+            segmentedControlStatisticsDays.selectedSegmentIndex = 2
+        case 30:
+            segmentedControlStatisticsDays.selectedSegmentIndex = 3
+        case 90:
+            segmentedControlStatisticsDays.selectedSegmentIndex = 4
+        default:
+            break
+        }
+
+        updateStatistics(animate: false, overrideApplicationState: false)
+        publishRootHomeState()
+    }
+
+    private func publishRootHomeState() {
+        guard isViewLoaded else { return }
+
+        guard Thread.isMainThread else {
+            DispatchQueue.main.async {
+                self.publishRootHomeState()
+            }
+
+            return
+        }
+
+        rootHomeDisplayManager.update(rootHomeStateSnapshot())
+    }
+
+    private func rootHomeStateSnapshot() -> RootHomeState {
+        RootHomeState(
+            glucose: RootHomeGlucoseState(
+                valueText: valueLabelOutlet.attributedText?.string ?? valueLabelOutlet.text ?? "---",
+                valueColor: rootHomeGlucoseValueColor(),
+                valueHasStrikethrough: labelHasStrikethrough(valueLabelOutlet),
+                minutesText: minutesLabelOutlet.text ?? "",
+                minutesAgoText: minutesAgoLabelOutlet.text ?? "",
+                minutesColor: rootHomeMinutesColor(),
+                deltaText: diffLabelOutlet.text ?? "",
+                deltaUnitText: diffLabelUnitOutlet.text ?? "",
+                deltaColor: rootHomeDeltaColor()
+            ),
+            pump: RootHomePumpState(
+                basal: RootHomeMetricState(title: pumpBasalLabelOutlet.text ?? "Basal", value: pumpBasalValueOutlet.text ?? "-", valueColor: ConstantsAppColors.primaryText),
+                reservoir: RootHomeMetricState(title: pumpReservoirLabelOutlet.text ?? "Reservoir", value: pumpReservoirValueOutlet.text ?? "-", valueColor: rootHomePumpReservoirColor()),
+                battery: RootHomeMetricState(title: pumpBatteryLabelOutlet.text ?? "Battery", value: pumpBatteryValueOutlet.text ?? "-", valueColor: rootHomePumpBatteryColor()),
+                cage: RootHomeMetricState(title: pumpCAGELabelOutlet.text ?? "CAGE", value: pumpCAGEValueOutlet.text ?? "-", valueColor: rootHomePumpCAGEColor())
+            ),
+            loop: RootHomeLoopState(
+                iob: RootHomeMetricState(title: infoIOBLabelOutlet.text ?? "IOB", value: infoIOBValueOutlet.text ?? "-", valueColor: ConstantsAppColors.primaryText),
+                cob: RootHomeMetricState(title: infoCOBLabelOutlet.text ?? "COB", value: infoCOBValueOutlet.text ?? "-", valueColor: ConstantsAppColors.primaryText),
+                statusTitle: infoStatusButtonOutlet.currentTitle ?? "-",
+                statusSystemImage: rootHomeLoopStatusSystemImage(),
+                statusColor: rootHomeLoopStatusColor(),
+                statusTimeAgo: infoStatusTimeAgoOutlet.text ?? "",
+                showsStatusTimeAgo: !infoStatusTimeAgoOutlet.isHidden,
+                showsActivityIndicator: !infoStatusActivityIndicatorOutlet.isHidden,
+                showsUploaderBattery: !infoUploaderBatteryOutlet.isHidden
+            ),
+            statistics: RootHomeStatisticsState(
+                low: RootHomeMetricState(title: lowTitleLabelOutlet.text ?? Texts_Common.lowStatistics, value: lowStatisticLabelOutlet.text ?? "-", valueColor: ConstantsAppColors.statisticsLow),
+                inRange: RootHomeMetricState(title: inRangeTitleLabelOutlet.text ?? UserDefaults.standard.timeInRangeType.title, value: inRangeStatisticLabelOutlet.text ?? "-", valueColor: ConstantsAppColors.statisticsInRange),
+                high: RootHomeMetricState(title: highTitleLabelOutlet.text ?? Texts_Common.highStatistics, value: highStatisticLabelOutlet.text ?? "-", valueColor: ConstantsAppColors.statisticsHigh),
+                average: RootHomeMetricState(title: averageTitleLabelOutlet.text ?? Texts_Common.averageStatistics, value: averageStatisticLabelOutlet.text ?? "-", valueColor: ConstantsAppColors.primaryText),
+                a1c: RootHomeMetricState(title: a1cTitleLabelOutlet.text ?? Texts_Common.a1cStatistics, value: a1CStatisticLabelOutlet.text ?? "-", valueColor: ConstantsAppColors.primaryText),
+                cv: RootHomeMetricState(title: cvTitleLabelOutlet.text ?? Texts_Common.cvStatistics, value: cVStatisticLabelOutlet.text ?? "-", valueColor: ConstantsAppColors.primaryText),
+                lowLimitText: lowLabelOutlet.text ?? "",
+                highLimitText: highLabelOutlet.text ?? "",
+                timePeriodText: timePeriodLabelOutlet.text ?? "- - -",
+                showsActivityIndicator: !activityMonitorOutlet.isHidden
+            ),
+            sensor: RootHomeSensorState(
+                title: dataSourceLabelOutlet.text ?? "",
+                currentAge: dataSourceSensorCurrentAgeOutlet.text ?? "",
+                maxAge: dataSourceSensorMaxAgeOutlet.text ?? "",
+                currentAgeColor: rootHomeSensorAgeColor(),
+                progressColor: rootHomeSensorProgressColor(),
+                progress: Double(sensorProgressOutlet.progress)
+            ),
+            dataSource: RootHomeDataSourceState(
+                title: dataSourceLabelOutlet.text ?? "",
+                detail: dataSourceSensorMaxAgeOutlet.text ?? "",
+                detailColor: rootHomeDataSourceDetailColor(),
+                showsConnectionIcon: !dataSourceConnectionStatusImage.isHidden,
+                connectionSystemImage: rootHomeDataSourceConnectionSystemImage(),
+                connectionColor: rootHomeDataSourceConnectionColor(),
+                showsKeepAliveIcon: !dataSourceKeepAliveImageOutlet.isHidden,
+                keepAliveSystemImage: UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImageString,
+                keepAliveColor: rootHomeDataSourceKeepAliveColor()
+            ),
+            visibility: RootHomeVisibilityState(
+                showsPump: !pumpViewOutlet.isHidden,
+                showsLoop: !infoViewOutlet.isHidden,
+                showsMiniChart: !miniChartOutlet.isHidden,
+                showsStatistics: !statisticsView.isHidden,
+                showsSensor: !sensorProgressViewOutlet.isHidden,
+                showsDataSource: !dataSourceViewOutlet.isHidden,
+                showsControls: !segmentedControlsView.isHidden,
+                showsClock: !clockView.isHidden
+            ),
+            controls: RootHomeControlsState(
+                chartHours: UserDefaults.standard.chartWidthInHours,
+                statisticsDays: UserDefaults.standard.daysToUseStatistics,
+                clockText: clockLabelOutlet.text ?? "",
+                sensorButtonEnabled: sensorToolbarButtonOutlet.isEnabled,
+                postProcessingSystemImage: postProcessingToolbarButtonImageSystemName(),
+                postProcessingEnabled: UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing,
+                snoozeSystemImage: rootHomeSnoozeSystemImageName()
+            ),
+            isScreenLocked: screenIsLocked
+        )
+    }
+
+    private func rootHomeGlucoseValueColor() -> Color {
+        guard !rootHomeIsShowingPannedReading() else { return ConstantsAppColors.disabledText }
+        guard let latestReading = bgReadingsAccessor?.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0).first else { return ConstantsAppColors.disabledText }
+
+        let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+
+        if latestReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11) {
+            return ConstantsAppColors.disabledText
+        } else if latestReading.finalValue.bgValueRounded(mgDl: isMgDl) >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl) || latestReading.finalValue.bgValueRounded(mgDl: isMgDl) <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl) {
+            return ConstantsAppColors.urgent
+        } else if latestReading.finalValue.bgValueRounded(mgDl: isMgDl) >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl) || latestReading.finalValue.bgValueRounded(mgDl: isMgDl) <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl) {
+            return ConstantsAppColors.warning
+        } else {
+            return ConstantsAppColors.normal
+        }
+    }
+
+    private func rootHomeMinutesColor() -> Color {
+        rootHomeIsShowingPannedReading() ? ConstantsAppColors.urgent : ConstantsAppColors.primaryText
+    }
+
+    private func rootHomeDeltaColor() -> Color {
+        ConstantsAppColors.primaryText
+    }
+
+    private func rootHomePumpReservoirColor() -> Color {
+        nightscoutSyncManager?.deviceStatus.pumpReservoirColor() ?? ConstantsAppColors.primaryText
+    }
+
+    private func rootHomePumpBatteryColor() -> Color {
+        nightscoutSyncManager?.deviceStatus.pumpBatteryPercentColor() ?? ConstantsAppColors.primaryText
+    }
+
+    private func rootHomePumpCAGEColor() -> Color {
+        guard let siteChangeDate = treatmentEntryAccessor?.getLatestTreatments(howOld: TimeInterval(days: 90)).first(where: { !$0.treatmentdeleted && $0.treatmentType == .SiteChange })?.date else {
+            return ConstantsAppColors.primaryText
+        }
+
+        let maximumAge = TimeInterval(UserDefaults.standard.CAGEMaxHours * 60 * 60)
+        let currentAge = -siteChangeDate.timeIntervalSinceNow
+
+        if currentAge > maximumAge {
+            return ConstantsAppColors.urgent
+        } else if currentAge > maximumAge - ConstantsHomeView.CAGEUrgentTimeIntervalBeforeMaxHours {
+            return ConstantsAppColors.caution
+        } else if currentAge > maximumAge - ConstantsHomeView.CAGEWarningTimeIntervalBeforeMaxHours {
+            return ConstantsAppColors.warning
+        } else {
+            return ConstantsAppColors.primaryText
+        }
+    }
+
+    private func rootHomeLoopStatusSystemImage() -> String? {
+        guard !infoStatusIconOutlet.isHidden else { return nil }
+
+        return nightscoutSyncManager?.deviceStatus.deviceStatusIconSystemName()
+    }
+
+    private func rootHomeLoopStatusColor() -> Color {
+        guard !infoStatusIconOutlet.isHidden else { return ConstantsAppColors.secondaryText }
+
+        return nightscoutSyncManager?.deviceStatus.deviceStatusColor() ?? ConstantsAppColors.secondaryText
+    }
+
+    private func rootHomeSensorAgeColor() -> Color {
+        guard let sensorStartDate = UserDefaults.standard.activeSensorStartDate, let sensorMaxAgeInDays = UserDefaults.standard.activeSensorMaxSensorAgeInDays, sensorMaxAgeInDays > 0 else {
+            return ConstantsAppColors.sensorText
+        }
+
+        let sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: Date()).minute ?? 0)
+        let sensorTimeLeftInMinutes = (sensorMaxAgeInDays * 24 * 60) - sensorAgeInMinutes
+
+        if sensorTimeLeftInMinutes < 0 {
+            return ConstantsAppColors.sensorExpired
+        } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewUrgentInMinutes {
+            return ConstantsAppColors.sensorUrgent
+        } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewWarningInMinutes {
+            return ConstantsAppColors.sensorWarning
+        } else {
+            return ConstantsAppColors.sensorText
+        }
+    }
+
+    private func rootHomeSensorProgressColor() -> Color {
+        ConstantsAppColors.sensorProgress
+    }
+
+    private func rootHomeDataSourceDetailColor() -> Color {
+        let detailText = dataSourceSensorMaxAgeOutlet.text ?? ""
+        let errorTexts = [
+            Texts_HomeView.hidingUrlForXSeconds,
+            Texts_HomeView.nightscoutNotEnabled,
+            Texts_HomeView.nightscoutURLMissing,
+            Texts_HomeView.followerAccountCredentialsMissing,
+            Texts_HomeView.followerAccountCredentialsInvalid
+        ]
+
+        return errorTexts.contains(detailText) ? ConstantsAppColors.urgent : ConstantsAppColors.dataSourceText
+    }
+
+    private func rootHomeDataSourceConnectionSystemImage() -> String {
+        rootHomeFollowerConnectionIsRecent() ? "network" : "network.slash"
+    }
+
+    private func rootHomeDataSourceConnectionColor() -> Color {
+        rootHomeFollowerConnectionIsRecent() ? ConstantsAppColors.normal : ConstantsAppColors.urgent
+    }
+
+    private func rootHomeDataSourceKeepAliveColor() -> Color {
+        guard UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat else { return ConstantsAppColors.tertiaryText }
+
+        return rootHomeFollowerHeartbeatIsRecent() ? ConstantsAppColors.normal : ConstantsAppColors.urgent
+    }
+
+    private func rootHomeFollowerConnectionIsRecent() -> Bool {
+        guard let timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection else { return false }
+
+        return timeStampOfLastFollowerConnection > Date().addingTimeInterval(-Double(UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning))
+    }
+
+    private func rootHomeFollowerHeartbeatIsRecent() -> Bool {
+        guard let timeStampOfLastHeartBeat = UserDefaults.standard.timeStampOfLastHeartBeat, let secondsUntilHeartBeatDisconnectWarning = UserDefaults.standard.secondsUntilHeartBeatDisconnectWarning else { return false }
+
+        return timeStampOfLastHeartBeat > Date().addingTimeInterval(-secondsUntilHeartBeatDisconnectWarning)
+    }
+
+    private func rootHomeIsShowingPannedReading() -> Bool {
+        labelHasStrikethrough(valueLabelOutlet) && (minutesAgoLabelOutlet.text ?? "").isEmpty
+    }
+
+    private func labelHasStrikethrough(_ label: UILabel) -> Bool {
+        guard let attributedText = label.attributedText, attributedText.length > 0 else {
+            return false
+        }
+
+        let value = attributedText.attribute(.strikethroughStyle, at: 0, effectiveRange: nil) as? Int
+
+        return (value ?? 0) != 0
+    }
+
+    private func rootHomeSnoozeSystemImageName() -> String {
+        guard let alertManager = alertManager else {
+            return "speaker.wave.2"
+        }
+
+        switch alertManager.snoozeStatus() {
+        case .allSnoozed:
+            return "speaker.slash.fill"
+        case .urgent, .notUrgent:
+            return "speaker.slash"
+        default:
+            return "speaker.wave.2"
+        }
+    }
+
     private func configureToolbarButtons() {
         let makeToolbarButton: (String, String, Selector) -> UIButton = { title, imageSystemName, action in
             let button = UIButton(type: .system)
@@ -2256,6 +2660,13 @@ final class RootViewController: UIViewController, ObservableObject {
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabelsAndChart is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
         
+        // Keep the hosted SwiftUI surface aligned with the same values that are written into the
+        // existing UIKit outlets below. This mirrors the old implementation rather than creating a
+        // second source of truth while RootViewController is still the app coordinator.
+        defer {
+            publishRootHomeState()
+        }
+
         // to make the following code a bit more readable
         let mgdl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         
@@ -2368,6 +2779,10 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// if the user has chosen to show the mini-chart, then update it. If not, just return without doing anything.
     private func updateMiniChart() {
+        defer {
+            publishRootHomeState()
+        }
+
         if UserDefaults.standard.showMiniChart {
             switch UserDefaults.standard.miniChartHoursToShow {
             case ConstantsGlucoseChart.miniChartHoursToShow1:
@@ -2444,6 +2859,10 @@ final class RootViewController: UIViewController, ObservableObject {
         // don't calculate statis if app is not running in the foreground
         guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
         
+        defer {
+            publishRootHomeState()
+        }
+
         if !screenIsLocked {
             // show (or even hide) the view if required
             statisticsView.isHidden = !UserDefaults.standard.showStatistics
@@ -2611,6 +3030,8 @@ final class RootViewController: UIViewController, ObservableObject {
                 
                 self.pieChartLabelOutlet.text = ""
             }
+
+            self.publishRootHomeState()
         })
     }
     
@@ -2667,6 +3088,10 @@ final class RootViewController: UIViewController, ObservableObject {
     ///     - enabled : when true this will force the screen to lock
     ///     - nightMode : when false, this will enable a simple screen lock without changing the UI - useful for keeping the screen open on your desk. True will bring the full screen lock changes to the UI
     private func screenLockUpdate(enabled: Bool = true, nightMode: Bool = true) {
+        defer {
+            publishRootHomeState()
+        }
+
         if enabled {
             screenLockToolbarButtonOutlet.accessibilityLabel = Texts_HomeView.unlockButton
             
@@ -2779,6 +3204,7 @@ final class RootViewController: UIViewController, ObservableObject {
     /// update the label in the clock view every time this function is called
     @objc private func updateClockView() {
         self.clockLabelOutlet.text = clockDateFormatter.string(from: Date())
+        publishRootHomeState()
     }
     
     /// checks if screenLockAlertController is not nil and if not dismisses the presentedViewController
@@ -2792,6 +3218,10 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// update the data source information view and also the sensor progress view (if needed)
     private func updateDataSourceInfo() {
+        defer {
+            publishRootHomeState()
+        }
+
         let isMaster: Bool = UserDefaults.standard.isMaster
         
         // use this as a flag to identify if an Anubis transmitter is being used
@@ -2993,6 +3423,10 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// this should be called when the data source view is refreshed or when called by the followerConnectionTimer object
     @objc private func setFollowerConnectionAndHeartbeatStatus() {
+        defer {
+            publishRootHomeState()
+        }
+
         // if in master mode, hide the connection status and destroy the timer if it was initialized
         // (for example if the user just changed from follower to master)
         if UserDefaults.standard.isMaster {
@@ -3455,11 +3889,14 @@ final class RootViewController: UIViewController, ObservableObject {
                 preSnoozeToolbarButtonOutlet.setImage(UIImage(systemName: "speaker.wave.2"), for: .normal)
             }
         }
+
+        publishRootHomeState()
     }
     
     private func updatePostProcessingStatus() {
         bgAdjustmentsToolbarButtonOutlet.tintColor = .white
         bgAdjustmentsToolbarButtonOutlet.setImage(UIImage(systemName: postProcessingToolbarButtonImageSystemName()), for: .normal)
+        publishRootHomeState()
     }
     
     private func postProcessingToolbarButtonImageSystemName() -> String {
@@ -3489,6 +3926,10 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     private func updatePumpAndAIDStatusViews() {
+        defer {
+            publishRootHomeState()
+        }
+
         // hide the views if not wanted/needed
         pumpViewOutlet.isHidden = !UserDefaults.standard.nightscoutEnabled || UserDefaults.standard.nightscoutUrl == nil || UserDefaults.standard.nightscoutFollowType == .none || !UserDefaults.standard.nightscoutFollowShowExpandedInfo || screenIsLocked
         infoViewOutlet.isHidden = !UserDefaults.standard.nightscoutEnabled || UserDefaults.standard.nightscoutUrl == nil || UserDefaults.standard.nightscoutFollowType == .none || screenIsLocked
