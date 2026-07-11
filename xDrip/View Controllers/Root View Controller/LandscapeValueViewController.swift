@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 class LandscapeValueViewController: UIViewController {
 
@@ -124,6 +125,33 @@ class LandscapeValueViewController: UIViewController {
         // adjust size for value label, because the length of the text may have changed, eg when going from a value below 100 mg/dl to a value above 100 mg/dl
         LandscapeValueViewController.adjustFontSizeToFitHeight(for: valueLabelOutlet)
         
+    }
+
+    /// updates the landscape value screen from the same presentation state used by the SwiftUI
+    /// portrait home view. The previous migration bridge copied values from hidden portrait UIKit
+    /// labels; this keeps landscape support while letting the portrait hierarchy be removed.
+    public func updateLabels(glucoseState: RootHomeGlucoseState) {
+        minutesLabelOutlet.textColor = UIColor(glucoseState.minutesColor)
+        minutesLabelOutlet.text = glucoseState.minutesText
+        minutesAgoLabelOutlet.textColor = UIColor(ConstantsAppColors.secondaryText)
+        minutesAgoLabelOutlet.text = " " + glucoseState.minutesAgoText
+        diffLabelOutlet.textColor = UIColor(glucoseState.deltaColor)
+        diffLabelOutlet.text = glucoseState.deltaText
+        diffLabelUnitOutlet.textColor = UIColor(ConstantsAppColors.secondaryText)
+        diffLabelUnitOutlet.text = " " + glucoseState.deltaUnitText
+        valueLabelOutlet.textColor = UIColor(glucoseState.valueColor)
+
+        let valueText = glucoseState.valueText
+        let attributeString = NSMutableAttributedString(string: valueText)
+        attributeString.addAttribute(
+            .strikethroughStyle,
+            value: glucoseState.valueHasStrikethrough ? 2 : 0,
+            range: NSMakeRange(0, attributeString.length)
+        )
+        valueLabelOutlet.attributedText = attributeString
+
+        // adjust size for value label, because the length of the text may have changed, eg when going from a value below 100 mg/dl to a value above 100 mg/dl
+        LandscapeValueViewController.adjustFontSizeToFitHeight(for: valueLabelOutlet)
     }
 
     // MARK: - private functions

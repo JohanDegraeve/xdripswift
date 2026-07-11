@@ -323,47 +323,13 @@ final class RootViewController: UIViewController, ObservableObject {
     // ******************************************
     @IBOutlet var chartPanGestureRecognizerOutlet: UIPanGestureRecognizer!
     @IBAction func chartPanGestureRecognizerAction(_ sender: UIPanGestureRecognizer) {
-        guard let glucoseChartManager = glucoseChartManager else {return}
-        
-        glucoseChartManager.handleUIGestureRecognizer(recognizer: sender, chartOutlet: chartOutlet, completionHandler: {
-            // user has been panning, if chart is panned backward, then need to set valueLabel to value of latest chartPoint shown in the chart, and minutesAgo text to timeStamp of latestChartPoint
-            if glucoseChartManager.chartIsPannedBackward {
-                if let lastChartPointEarlierThanEndDate = glucoseChartManager.lastChartPointEarlierThanEndDate, let chartAxisValueDate = lastChartPointEarlierThanEndDate.x as? ChartAxisValueDate  {
-                    
-                    // valueLabel text should not be strikethrough (might still be strikethrough in case latest reading is older than 10 minutes
-                    self.valueLabelOutlet.attributedText = nil
-                    // set value to value of latest chartPoint
-                    self.valueLabelOutlet.text = lastChartPointEarlierThanEndDate.y.scalar.bgValueToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
-                    // set timestamp to timestamp of latest chartPoint, in red so user can notice this is an old value
-                    self.minutesLabelOutlet.text =  self.dateTimeFormatterForMinutesLabelWhenPanning.string(from: chartAxisValueDate.date)
-                    self.minutesLabelOutlet.textColor = UIColor.red
-                    self.minutesAgoLabelOutlet.text = ""
-                    self.valueLabelOutlet.textColor = UIColor.lightGray
-                    
-                    // apply strikethrough to the BG value text format
-                    let attributedString = NSMutableAttributedString(string: self.valueLabelOutlet.text!)
-                    attributedString.addAttribute(NSAttributedString.Key.strikethroughStyle, value: 1, range: NSMakeRange(0, attributedString.length))
-                    self.valueLabelOutlet.attributedText = attributedString
-                    
-                    // don't show anything in diff outlet
-                    self.diffLabelOutlet.text = ""
-                    self.diffLabelUnitOutlet.text = ""
-                } else {
-                    // this would only be the case if there's no readings withing the shown timeframe
-                    self.updateLabelsAndChart(overrideApplicationState: false)
-                }
-            } else {
-                // chart is not panned, update labels is necessary
-                self.updateLabelsAndChart(overrideApplicationState: false)
-            }
-        })
+        // The visible SwiftUI chart owns its drag gesture. This action remains connected only to
+        // the retired storyboard chart until that scene is removed in the navigation migration.
     }
     
     @IBOutlet var chartLongPressGestureRecognizerOutlet: UILongPressGestureRecognizer!
     @IBAction func chartLongPressGestureRecognizerAction(_ sender: UILongPressGestureRecognizer) {
-        // this one needs trigger in case user has panned, chart is decelerating, user clicks to stop the decleration, call to handleUIGestureRecognizer will stop the deceleration
-        // there's no completionhandler needed because the call in chartPanGestureRecognizerAction to handleUIGestureRecognizer already includes a completionhandler
-        glucoseChartManager?.handleUIGestureRecognizer(recognizer: sender, chartOutlet: chartOutlet, completionHandler: nil)
+        // Long-press handling is now owned by GlucoseChartView.
     }
     
     @IBAction func chartDoubleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
@@ -488,10 +454,7 @@ final class RootViewController: UIViewController, ObservableObject {
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillTerminate - trace that app goes to background
     private let applicationManagerKeyTraceAppWillTerminate = "applicationManagerKeyTraceAppWillTerminate"
     
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground - to clean GlucoseChartManager memory
-    private let applicationManagerKeyCleanMemoryGlucoseChartManager = "applicationManagerKeyCleanMemoryGlucoseChartManager"
-    
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - to initialize the glucoseChartManager and update labels and chart
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - to update labels and chart
     private let applicationManagerKeyUpdateLabelsAndChart = "applicationManagerKeyUpdateLabelsAndChart"
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - to dismiss screenLockAlertController
@@ -575,35 +538,11 @@ final class RootViewController: UIViewController, ObservableObject {
     /// manages bluetoothPeripherals that this app knows
     private var bluetoothPeripheralManager: BluetoothPeripheralManager?
     
-    /// - manage glucose chart
-    /// - will be nillified each time the app goes to the background, to avoid unnecessary ram usage (which seems to cause app getting killed)
-    /// - will be reinitialized each time the app comes to the foreground
-    private var glucoseChartManager: GlucoseChartManager?
-    
-    /// - manage the mini glucose chart that shows a fixed amount of data
-    /// - will be nillified each time the app goes to the background, to avoid unnecessary ram usage (which seems to cause app getting killed)
-    /// - will be reinitialized each time the app comes to the foreground
-    private var glucoseMiniChartManager: GlucoseMiniChartManager?
-    
     /// statisticsManager instance
     private var statisticsManager: StatisticsManager?
     
     /// watchManager instance
     private var watchManager: WatchManager?
-    
-    /// dateformatter for minutesLabelOutlet, when user is panning the chart
-    private let dateTimeFormatterForMinutesLabelWhenPanning: DateFormatter = {
-        
-        let dateFormatter = DateFormatter()
-        
-        dateFormatter.amSymbol = ConstantsUI.timeFormatAM
-        
-        dateFormatter.pmSymbol = ConstantsUI.timeFormatPM
-        
-        dateFormatter.setLocalizedDateFormatFromTemplate(ConstantsGlucoseChart.dateFormatLatestChartPointWhenPanning)
-        
-        return dateFormatter
-    }()
     
     /// housekeeper instance
     private var houseKeeper: HouseKeeper?
@@ -625,6 +564,10 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// to hold the current state of the screen keep-alive
     private var screenIsLocked: Bool = false
+
+    /// True only when screen lock is using the full night layout. The keep-awake variant still
+    /// locks interaction but deliberately leaves the normal home sections visible.
+    private var screenLockUsesNightLayout = false
     
     /// date formatter for the clock view
     private var clockDateFormatter = DateFormatter()
@@ -650,11 +593,11 @@ final class RootViewController: UIViewController, ObservableObject {
     /// Last timestamp when a log line was produced by TransmitterReadSuccessManager
     private var transmitterReadSuccessTimeStampOfLastLogCreated: Date?
 
-    /// Published state for the hosted SwiftUI home screen.
+    /// Presentation state for the hosted SwiftUI home screen.
     ///
-    /// RootViewController still owns the app services during this migration step. This manager is
-    /// only the display bridge from existing home-screen calculations to the SwiftUI home view.
-    private let rootHomeDisplayManager = RootHomeDisplayManager()
+    /// RootViewController still owns the app services during this migration step, while the state
+    /// model now calculates display values directly instead of mirroring the old storyboard views.
+    private let rootHomeStateModel = RootHomeStateModel()
 
     /// Hosted SwiftUI home screen installed over the storyboard home layout once app dependencies
     /// are available. The storyboard outlets stay alive underneath so existing controller logic can
@@ -670,9 +613,6 @@ final class RootViewController: UIViewController, ObservableObject {
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // never seen it triggered, copied that from Loop
-        glucoseChartManager?.cleanUpMemory()
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -1112,11 +1052,7 @@ final class RootViewController: UIViewController, ObservableObject {
             trace("*******************************************************************", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
         })
         
-        ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyCleanMemoryGlucoseChartManager, closure: {
-            self.glucoseChartManager?.cleanUpMemory()
-        })
-        
-        // reinitialise glucose chart and also to update labels and chart
+        // update the home screen when returning to the foreground
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyUpdateLabelsAndChart, closure: {
             // if view is appeared, view did appear will not get called when app moves to the foreground
             // so need to donate here
@@ -1310,27 +1246,11 @@ final class RootViewController: UIViewController, ObservableObject {
         // setup contactImageManager
         contactImageManager = ContactImageManager(coreDataManager: coreDataManager)
         
-        // initialize glucoseChartManager
-        glucoseChartManager = GlucoseChartManager(chartLongPressGestureRecognizer: chartLongPressGestureRecognizerOutlet, coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager!)
-        
-        // initialize glucoseMiniChartManager
-        glucoseMiniChartManager = GlucoseMiniChartManager(coreDataManager: coreDataManager)
-        
         // initialize statisticsManager
         statisticsManager = StatisticsManager(coreDataManager: coreDataManager)
         
         // initialize watchManager
         watchManager = WatchManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager!)
-        
-        // initialize chartGenerator in chartOutlet
-        self.chartOutlet.chartGenerator = { [weak self] (frame) in
-            return self?.glucoseChartManager?.glucoseChartWithFrame(frame)?.view
-        }
-        
-        // initialize chartGenerator in miniChartOutlet
-        self.miniChartOutlet.chartGenerator = { [weak self] (frame) in
-            return self?.glucoseMiniChartManager?.glucoseChartWithFrame(frame)?.view
-        }
         
     }
     
@@ -1480,7 +1400,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 } else {
                     // check alerts, create notification, set app badge
                     checkAlertsCreateNotificationAndSetAppBadge()
-                    cleanUpChartMemoryForLivePostProcessingIfNeeded()
+                    rootHomeStateModel.invalidateCharts()
                     
                     // update all text in  first screen
                     updateLabelsAndChart(overrideApplicationState: false)
@@ -1554,10 +1474,7 @@ final class RootViewController: UIViewController, ObservableObject {
         
         switch keyPathEnumCharts {
         case UserDefaults.KeysCharts.chartWidthInHours:
-            // redraw chart is necessary
-            if let glucoseChartManager = glucoseChartManager {
-                glucoseChartManager.updateChartPoints(endDate: glucoseChartManager.endDate, startDate: glucoseChartManager.endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, forceReset: false, showTreaments: UserDefaults.standard.showTreatmentsOnChart, completionHandler: nil)
-            }
+            publishRootHomeState()
         }
     }
     
@@ -1652,11 +1569,7 @@ final class RootViewController: UIViewController, ObservableObject {
             updateChartWithResetEndDate()
 
         case UserDefaults.Key.showOriginalBGReadings:
-            // redraw chart is necessary
-            if let glucoseChartManager = glucoseChartManager {
-                glucoseChartManager.cleanUpMemory()
-                glucoseChartManager.updateChartPoints(endDate: glucoseChartManager.endDate, startDate: glucoseChartManager.endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, forceReset: false, showTreaments: UserDefaults.standard.showTreatmentsOnChart, completionHandler: nil)
-            }
+            rootHomeStateModel.invalidateCharts()
             
         case UserDefaults.Key.showClockWhenScreenIsLocked:
             // refresh screenLock function if it is currently activated in order to show/hide the clock as requested
@@ -1743,31 +1656,39 @@ final class RootViewController: UIViewController, ObservableObject {
     private func setupView() {
         // remove titles from tabbar items
         self.tabBarController?.cleanTitles()
-        
-        chartLongPressGestureRecognizerOutlet.delegate = self
-        chartPanGestureRecognizerOutlet.delegate = self
-        
-        // at this moment, coreDataManager is not yet initialized, we're just calling here prerender and reloadChart to show the chart with x and y axis and gridlines, but without readings. The readings will be loaded once coreDataManager is setup, after which updateChart() will be called, which will initiate loading of readings from coredata
-        self.chartOutlet.reloadChart()
-        
-        self.miniChartOutlet.reloadChart()
     }
 
     // MARK: - SwiftUI Home Bridge
 
     /// Installs the SwiftUI home surface over the existing storyboard home layout.
     ///
-    /// This is intentionally a hosted view during the first RootViewController migration step. The
-    /// old outlets remain in place and continue to receive updates from existing methods, while
-    /// `publishRootHomeState()` mirrors their display values into SwiftUI. Once the SwiftUI state
-    /// path is proven, the remaining coordinator work can move out of RootViewController.
+    /// RootViewController remains the application-service and navigation coordinator during this
+    /// migration phase. RootHomeStateModel is the presentation source of truth; the old storyboard
+    /// hierarchy is no longer used to construct the visible home state.
     private func installRootHomeViewIfNeeded() {
-        guard rootHomeHostingController == nil, let coreDataManager = coreDataManager, let nightscoutSyncManager = nightscoutSyncManager else {
+        guard rootHomeHostingController == nil,
+              let coreDataManager = coreDataManager,
+              let bgReadingsAccessor = bgReadingsAccessor,
+              let treatmentEntryAccessor = treatmentEntryAccessor,
+              let nightscoutSyncManager = nightscoutSyncManager,
+              let bluetoothPeripheralManager = bluetoothPeripheralManager,
+              let alertManager = alertManager,
+              let bgPostProcessingManager = bgPostProcessingManager
+        else {
             return
         }
 
+        rootHomeStateModel.configure(
+            bgReadingsAccessor: bgReadingsAccessor,
+            treatmentEntryAccessor: treatmentEntryAccessor,
+            nightscoutSyncManager: nightscoutSyncManager,
+            bluetoothPeripheralManager: bluetoothPeripheralManager,
+            alertManager: alertManager,
+            bgPostProcessingManager: bgPostProcessingManager
+        )
+
         let rootHomeView = RootHomeView(
-            displayManager: rootHomeDisplayManager,
+            stateModel: rootHomeStateModel,
             coreDataManager: coreDataManager,
             nightscoutSyncManager: nightscoutSyncManager,
             actions: makeRootHomeActions()
@@ -1808,6 +1729,9 @@ final class RootViewController: UIViewController, ObservableObject {
             showBgAdjustments: { [weak self] in
                 self?.showBgAdjustmentsView()
             },
+            originalGlucosePeekActivated: {
+                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+            },
             showHideItems: { [weak self] in
                 self?.showViewController(ShowHideItemsHostingController())
             },
@@ -1839,7 +1763,7 @@ final class RootViewController: UIViewController, ObservableObject {
                 self?.statisticsViewDoubleTapGestureRecognizer(UITapGestureRecognizer())
             },
             hideFollowerUrl: { [weak self] in
-                self?.urlDoubleTapGestureRecognizerAction(UITapGestureRecognizer())
+                self?.rootHomeStateModel.hideFollowerURL()
             },
             showAIDStatus: { [weak self] in
                 self?.showAIDStatusView()
@@ -1859,10 +1783,6 @@ final class RootViewController: UIViewController, ObservableObject {
             segmentedControlChartHours.selectedSegmentIndex = 3
         default:
             break
-        }
-
-        if let glucoseChartManager = glucoseChartManager {
-            glucoseChartManager.updateChartPoints(endDate: glucoseChartManager.endDate, startDate: glucoseChartManager.endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, forceReset: false, showTreaments: UserDefaults.standard.showTreatmentsOnChart, completionHandler: nil)
         }
 
         publishRootHomeState()
@@ -1899,246 +1819,11 @@ final class RootViewController: UIViewController, ObservableObject {
             return
         }
 
-        rootHomeDisplayManager.update(rootHomeStateSnapshot())
-    }
-
-    private func rootHomeStateSnapshot() -> RootHomeState {
-        RootHomeState(
-            glucose: RootHomeGlucoseState(
-                valueText: valueLabelOutlet.attributedText?.string ?? valueLabelOutlet.text ?? "---",
-                valueColor: rootHomeGlucoseValueColor(),
-                valueHasStrikethrough: labelHasStrikethrough(valueLabelOutlet),
-                minutesText: minutesLabelOutlet.text ?? "",
-                minutesAgoText: minutesAgoLabelOutlet.text ?? "",
-                minutesColor: rootHomeMinutesColor(),
-                deltaText: diffLabelOutlet.text ?? "",
-                deltaUnitText: diffLabelUnitOutlet.text ?? "",
-                deltaColor: rootHomeDeltaColor()
-            ),
-            pump: RootHomePumpState(
-                basal: RootHomeMetricState(title: pumpBasalLabelOutlet.text ?? "Basal", value: pumpBasalValueOutlet.text ?? "-", valueColor: ConstantsAppColors.primaryText),
-                reservoir: RootHomeMetricState(title: pumpReservoirLabelOutlet.text ?? "Reservoir", value: pumpReservoirValueOutlet.text ?? "-", valueColor: rootHomePumpReservoirColor()),
-                battery: RootHomeMetricState(title: pumpBatteryLabelOutlet.text ?? "Battery", value: pumpBatteryValueOutlet.text ?? "-", valueColor: rootHomePumpBatteryColor()),
-                cage: RootHomeMetricState(title: pumpCAGELabelOutlet.text ?? "CAGE", value: pumpCAGEValueOutlet.text ?? "-", valueColor: rootHomePumpCAGEColor())
-            ),
-            loop: RootHomeLoopState(
-                iob: RootHomeMetricState(title: infoIOBLabelOutlet.text ?? "IOB", value: infoIOBValueOutlet.text ?? "-", valueColor: ConstantsAppColors.primaryText),
-                cob: RootHomeMetricState(title: infoCOBLabelOutlet.text ?? "COB", value: infoCOBValueOutlet.text ?? "-", valueColor: ConstantsAppColors.primaryText),
-                statusTitle: infoStatusButtonOutlet.currentTitle ?? "-",
-                statusSystemImage: rootHomeLoopStatusSystemImage(),
-                statusColor: rootHomeLoopStatusColor(),
-                statusTimeAgo: infoStatusTimeAgoOutlet.text ?? "",
-                showsStatusTimeAgo: !infoStatusTimeAgoOutlet.isHidden,
-                showsActivityIndicator: !infoStatusActivityIndicatorOutlet.isHidden,
-                showsUploaderBattery: !infoUploaderBatteryOutlet.isHidden
-            ),
-            statistics: RootHomeStatisticsState(
-                low: RootHomeMetricState(title: lowTitleLabelOutlet.text ?? Texts_Common.lowStatistics, value: lowStatisticLabelOutlet.text ?? "-", valueColor: ConstantsAppColors.statisticsLow),
-                inRange: RootHomeMetricState(title: inRangeTitleLabelOutlet.text ?? UserDefaults.standard.timeInRangeType.title, value: inRangeStatisticLabelOutlet.text ?? "-", valueColor: ConstantsAppColors.statisticsInRange),
-                high: RootHomeMetricState(title: highTitleLabelOutlet.text ?? Texts_Common.highStatistics, value: highStatisticLabelOutlet.text ?? "-", valueColor: ConstantsAppColors.statisticsHigh),
-                average: RootHomeMetricState(title: averageTitleLabelOutlet.text ?? Texts_Common.averageStatistics, value: averageStatisticLabelOutlet.text ?? "-", valueColor: ConstantsAppColors.primaryText),
-                a1c: RootHomeMetricState(title: a1cTitleLabelOutlet.text ?? Texts_Common.a1cStatistics, value: a1CStatisticLabelOutlet.text ?? "-", valueColor: ConstantsAppColors.primaryText),
-                cv: RootHomeMetricState(title: cvTitleLabelOutlet.text ?? Texts_Common.cvStatistics, value: cVStatisticLabelOutlet.text ?? "-", valueColor: ConstantsAppColors.primaryText),
-                lowLimitText: lowLabelOutlet.text ?? "",
-                highLimitText: highLabelOutlet.text ?? "",
-                timePeriodText: timePeriodLabelOutlet.text ?? "- - -",
-                showsActivityIndicator: !activityMonitorOutlet.isHidden
-            ),
-            sensor: RootHomeSensorState(
-                title: dataSourceLabelOutlet.text ?? "",
-                currentAge: dataSourceSensorCurrentAgeOutlet.text ?? "",
-                maxAge: dataSourceSensorMaxAgeOutlet.text ?? "",
-                currentAgeColor: rootHomeSensorAgeColor(),
-                progressColor: rootHomeSensorProgressColor(),
-                progress: Double(sensorProgressOutlet.progress)
-            ),
-            dataSource: RootHomeDataSourceState(
-                title: dataSourceLabelOutlet.text ?? "",
-                detail: dataSourceSensorMaxAgeOutlet.text ?? "",
-                detailColor: rootHomeDataSourceDetailColor(),
-                showsConnectionIcon: !dataSourceConnectionStatusImage.isHidden,
-                connectionSystemImage: rootHomeDataSourceConnectionSystemImage(),
-                connectionColor: rootHomeDataSourceConnectionColor(),
-                showsKeepAliveIcon: !dataSourceKeepAliveImageOutlet.isHidden,
-                keepAliveSystemImage: UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImageString,
-                keepAliveColor: rootHomeDataSourceKeepAliveColor()
-            ),
-            visibility: RootHomeVisibilityState(
-                showsPump: !pumpViewOutlet.isHidden,
-                showsLoop: !infoViewOutlet.isHidden,
-                showsMiniChart: !miniChartOutlet.isHidden,
-                showsStatistics: !statisticsView.isHidden,
-                showsSensor: !sensorProgressViewOutlet.isHidden,
-                showsDataSource: !dataSourceViewOutlet.isHidden,
-                showsControls: !segmentedControlsView.isHidden,
-                showsClock: !clockView.isHidden
-            ),
-            controls: RootHomeControlsState(
-                chartHours: UserDefaults.standard.chartWidthInHours,
-                statisticsDays: UserDefaults.standard.daysToUseStatistics,
-                clockText: clockLabelOutlet.text ?? "",
-                sensorButtonEnabled: sensorToolbarButtonOutlet.isEnabled,
-                postProcessingSystemImage: postProcessingToolbarButtonImageSystemName(),
-                postProcessingEnabled: UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing,
-                snoozeSystemImage: rootHomeSnoozeSystemImageName()
-            ),
-            isScreenLocked: screenIsLocked
+        rootHomeStateModel.refresh(
+            activeSensor: activeSensor,
+            isScreenLocked: screenIsLocked,
+            usesScreenLockNightLayout: screenLockUsesNightLayout
         )
-    }
-
-    private func rootHomeGlucoseValueColor() -> Color {
-        guard !rootHomeIsShowingPannedReading() else { return ConstantsAppColors.disabledText }
-        guard let latestReading = bgReadingsAccessor?.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0).first else { return ConstantsAppColors.disabledText }
-
-        let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-
-        if latestReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11) {
-            return ConstantsAppColors.disabledText
-        } else if latestReading.finalValue.bgValueRounded(mgDl: isMgDl) >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit.mmolToMgdl(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl) || latestReading.finalValue.bgValueRounded(mgDl: isMgDl) <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit.mmolToMgdl(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl) {
-            return ConstantsAppColors.urgent
-        } else if latestReading.finalValue.bgValueRounded(mgDl: isMgDl) >= UserDefaults.standard.highMarkValueInUserChosenUnit.mmolToMgdl(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl) || latestReading.finalValue.bgValueRounded(mgDl: isMgDl) <= UserDefaults.standard.lowMarkValueInUserChosenUnit.mmolToMgdl(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl) {
-            return ConstantsAppColors.warning
-        } else {
-            return ConstantsAppColors.normal
-        }
-    }
-
-    private func rootHomeMinutesColor() -> Color {
-        rootHomeIsShowingPannedReading() ? ConstantsAppColors.urgent : ConstantsAppColors.primaryText
-    }
-
-    private func rootHomeDeltaColor() -> Color {
-        ConstantsAppColors.primaryText
-    }
-
-    private func rootHomePumpReservoirColor() -> Color {
-        nightscoutSyncManager?.deviceStatus.pumpReservoirColor() ?? ConstantsAppColors.primaryText
-    }
-
-    private func rootHomePumpBatteryColor() -> Color {
-        nightscoutSyncManager?.deviceStatus.pumpBatteryPercentColor() ?? ConstantsAppColors.primaryText
-    }
-
-    private func rootHomePumpCAGEColor() -> Color {
-        guard let siteChangeDate = treatmentEntryAccessor?.getLatestTreatments(howOld: TimeInterval(days: 90)).first(where: { !$0.treatmentdeleted && $0.treatmentType == .SiteChange })?.date else {
-            return ConstantsAppColors.primaryText
-        }
-
-        let maximumAge = TimeInterval(UserDefaults.standard.CAGEMaxHours * 60 * 60)
-        let currentAge = -siteChangeDate.timeIntervalSinceNow
-
-        if currentAge > maximumAge {
-            return ConstantsAppColors.urgent
-        } else if currentAge > maximumAge - ConstantsHomeView.CAGEUrgentTimeIntervalBeforeMaxHours {
-            return ConstantsAppColors.caution
-        } else if currentAge > maximumAge - ConstantsHomeView.CAGEWarningTimeIntervalBeforeMaxHours {
-            return ConstantsAppColors.warning
-        } else {
-            return ConstantsAppColors.primaryText
-        }
-    }
-
-    private func rootHomeLoopStatusSystemImage() -> String? {
-        guard !infoStatusIconOutlet.isHidden else { return nil }
-
-        return nightscoutSyncManager?.deviceStatus.deviceStatusIconSystemName()
-    }
-
-    private func rootHomeLoopStatusColor() -> Color {
-        guard !infoStatusIconOutlet.isHidden else { return ConstantsAppColors.secondaryText }
-
-        return nightscoutSyncManager?.deviceStatus.deviceStatusColor() ?? ConstantsAppColors.secondaryText
-    }
-
-    private func rootHomeSensorAgeColor() -> Color {
-        guard let sensorStartDate = UserDefaults.standard.activeSensorStartDate, let sensorMaxAgeInDays = UserDefaults.standard.activeSensorMaxSensorAgeInDays, sensorMaxAgeInDays > 0 else {
-            return ConstantsAppColors.sensorText
-        }
-
-        let sensorAgeInMinutes = Double(Calendar.current.dateComponents([.minute], from: sensorStartDate, to: Date()).minute ?? 0)
-        let sensorTimeLeftInMinutes = (sensorMaxAgeInDays * 24 * 60) - sensorAgeInMinutes
-
-        if sensorTimeLeftInMinutes < 0 {
-            return ConstantsAppColors.sensorExpired
-        } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewUrgentInMinutes {
-            return ConstantsAppColors.sensorUrgent
-        } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewWarningInMinutes {
-            return ConstantsAppColors.sensorWarning
-        } else {
-            return ConstantsAppColors.sensorText
-        }
-    }
-
-    private func rootHomeSensorProgressColor() -> Color {
-        ConstantsAppColors.sensorProgress
-    }
-
-    private func rootHomeDataSourceDetailColor() -> Color {
-        let detailText = dataSourceSensorMaxAgeOutlet.text ?? ""
-        let errorTexts = [
-            Texts_HomeView.hidingUrlForXSeconds,
-            Texts_HomeView.nightscoutNotEnabled,
-            Texts_HomeView.nightscoutURLMissing,
-            Texts_HomeView.followerAccountCredentialsMissing,
-            Texts_HomeView.followerAccountCredentialsInvalid
-        ]
-
-        return errorTexts.contains(detailText) ? ConstantsAppColors.urgent : ConstantsAppColors.dataSourceText
-    }
-
-    private func rootHomeDataSourceConnectionSystemImage() -> String {
-        rootHomeFollowerConnectionIsRecent() ? "network" : "network.slash"
-    }
-
-    private func rootHomeDataSourceConnectionColor() -> Color {
-        rootHomeFollowerConnectionIsRecent() ? ConstantsAppColors.normal : ConstantsAppColors.urgent
-    }
-
-    private func rootHomeDataSourceKeepAliveColor() -> Color {
-        guard UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat else { return ConstantsAppColors.tertiaryText }
-
-        return rootHomeFollowerHeartbeatIsRecent() ? ConstantsAppColors.normal : ConstantsAppColors.urgent
-    }
-
-    private func rootHomeFollowerConnectionIsRecent() -> Bool {
-        guard let timeStampOfLastFollowerConnection = UserDefaults.standard.timeStampOfLastFollowerConnection else { return false }
-
-        return timeStampOfLastFollowerConnection > Date().addingTimeInterval(-Double(UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning))
-    }
-
-    private func rootHomeFollowerHeartbeatIsRecent() -> Bool {
-        guard let timeStampOfLastHeartBeat = UserDefaults.standard.timeStampOfLastHeartBeat, let secondsUntilHeartBeatDisconnectWarning = UserDefaults.standard.secondsUntilHeartBeatDisconnectWarning else { return false }
-
-        return timeStampOfLastHeartBeat > Date().addingTimeInterval(-secondsUntilHeartBeatDisconnectWarning)
-    }
-
-    private func rootHomeIsShowingPannedReading() -> Bool {
-        labelHasStrikethrough(valueLabelOutlet) && (minutesAgoLabelOutlet.text ?? "").isEmpty
-    }
-
-    private func labelHasStrikethrough(_ label: UILabel) -> Bool {
-        guard let attributedText = label.attributedText, attributedText.length > 0 else {
-            return false
-        }
-
-        let value = attributedText.attribute(.strikethroughStyle, at: 0, effectiveRange: nil) as? Int
-
-        return (value ?? 0) != 0
-    }
-
-    private func rootHomeSnoozeSystemImageName() -> String {
-        guard let alertManager = alertManager else {
-            return "speaker.wave.2"
-        }
-
-        switch alertManager.snoozeStatus() {
-        case .allSnoozed:
-            return "speaker.slash.fill"
-        case .urgent, .notUrgent:
-            return "speaker.slash"
-        default:
-            return "speaker.wave.2"
-        }
     }
 
     private func configureToolbarButtons() {
@@ -2216,35 +1901,13 @@ final class RootViewController: UIViewController, ObservableObject {
     /// - parameters:
     ///     - forceReset : if true, then we'll force a rescale of the chart y-axis
     private func updateChartWithResetEndDate(forceReset: Bool = false) {
-        glucoseChartManager?.updateChartPoints(endDate: Date(), startDate: nil, chartOutlet: chartOutlet, forceReset: forceReset, showTreaments: UserDefaults.standard.showTreatmentsOnChart, completionHandler: nil)
+        rootHomeStateModel.invalidateCharts()
     }
 
-    /// live post processing can update several recent readings, not just the
-    /// newest point. Clear both chart caches before the next redraw so the
-    /// visible curve is rebuilt from the latest stored values.
-    private func cleanUpChartMemoryForLivePostProcessingIfNeeded() {
-        guard bgPostProcessingManager?.hasActiveDownstreamPostProcessing() ?? false else { return }
-
-        glucoseChartManager?.cleanUpMemory()
-        glucoseMiniChartManager?.cleanUpMemory()
-    }
-    
-    /// redraw the main chart using the current visible time window so a temporary
-    /// peek mode can switch between post processed and original values instantly
-    private func updateMainChartKeepingCurrentTimeWindow(forceReset: Bool = false) {
-        if let glucoseChartManager = glucoseChartManager {
-            glucoseChartManager.cleanUpMemory()
-            glucoseChartManager.updateChartPoints(endDate: glucoseChartManager.endDate, startDate: glucoseChartManager.endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours)), chartOutlet: chartOutlet, forceReset: forceReset, showTreaments: UserDefaults.standard.showTreatmentsOnChart, completionHandler: nil)
-        }
-    }
-    
     /// switch the main chart between the normal post processed view and a
     /// temporary original-only view while the adjustments button is held down
     private func setShowOriginalGlucoseChartPointsOnly(_ showOriginalGlucoseChartPointsOnly: Bool) {
-        let shouldShowOriginalOnly = showOriginalGlucoseChartPointsOnly && (UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing)
-        
-        glucoseChartManager?.setShowOriginalGlucoseChartPointsOnly(shouldShowOriginalOnly)
-        updateMainChartKeepingCurrentTimeWindow()
+        rootHomeStateModel.invalidateCharts()
     }
     
     /// launches timer that will do regular screen updates - and adds closure to ApplicationManager : when going to background, stop the timer, when coming to foreground, restart the timer
@@ -2616,14 +2279,7 @@ final class RootViewController: UIViewController, ObservableObject {
         }
     }
     
-    // need to add this as an objc helper function as we can't pass the needed parameters when calling the main function from a timer
-    // MAYBE DELETE
-    @objc private func updateLabelsAndChartWithReset() {
-        updateLabelsAndChart(forceReset: UserDefaults.standard.allowMainChartAutoReset)
-    }
-    
     @objc private func handleBgPostProcessingDidUpdate() {
-        glucoseChartManager?.cleanUpMemory()
         updateLabelsAndChart(overrideApplicationState: true, forceReset: true)
         updatePostProcessingStatus()
         watchManager?.updateWatchApp(forceComplicationUpdate: true)
@@ -2645,24 +2301,25 @@ final class RootViewController: UIViewController, ObservableObject {
         // take advantage of the timer execution to update the AID status views
         updatePumpAndAIDStatusViews()
         
-        // if glucoseChartManager not nil, then check if panned backward and if so then don't update the chart
-        // if landscapeValueViewController != nil then it means the device is in landscape mode and the value is shown, and that case ignore the status of the chart
-        if let glucoseChartManager = glucoseChartManager, landscapeValueViewController == nil {
-            // check that app is in foreground, but only if overrideApplicationState = false
-            // if we are not forcing to reset even if the chart is currently panned back in time (such as by double-tapping the main chart, then check if it is panned back in that case we don't update the labels
-            if !forceReset {
-                guard !glucoseChartManager.chartIsPannedBackward else {return}
-            }
-        }
-        
         guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
+
+        // The SwiftUI home state reads the latest values directly. Keep updating the old labels
+        // only while the separate UIKit landscape value view needs them.
+        guard landscapeValueViewController != nil else {
+            if forceReset {
+                rootHomeStateModel.invalidateCharts()
+            }
+
+            updateSnoozeStatus()
+            publishRootHomeState()
+            return
+        }
         
         // check that bgReadingsAccessor exists, otherwise return - this happens if updateLabelsAndChart is called from viewDidload at app launch
         guard let bgReadingsAccessor = bgReadingsAccessor else {return}
         
-        // Keep the hosted SwiftUI surface aligned with the same values that are written into the
-        // existing UIKit outlets below. This mirrors the old implementation rather than creating a
-        // second source of truth while RootViewController is still the app coordinator.
+        // UIKit labels are still updated for the separate landscape value controller. The visible
+        // portrait home screen is refreshed directly from RootHomeStateModel in the defer block.
         defer {
             publishRootHomeState()
         }
@@ -2764,11 +2421,9 @@ final class RootViewController: UIViewController, ObservableObject {
         let diffLabelUnitText = mgdl ? Texts_Common.mgdl : Texts_Common.mmol
         diffLabelUnitOutlet.text = diffLabelUnitText
         
-        // update the chart up to now
-        // if we're reacting to a double tap, then also rescale the chart y-axis to the current values
-        updateChartWithResetEndDate(forceReset: forceReset)
-        
-        self.updateMiniChart()
+        if forceReset {
+            rootHomeStateModel.invalidateCharts()
+        }
         
         // force a snooze status update to see if the current snooze status has changed in the last minutes
         updateSnoozeStatus()
@@ -2779,25 +2434,7 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// if the user has chosen to show the mini-chart, then update it. If not, just return without doing anything.
     private func updateMiniChart() {
-        defer {
-            publishRootHomeState()
-        }
-
-        if UserDefaults.standard.showMiniChart {
-            switch UserDefaults.standard.miniChartHoursToShow {
-            case ConstantsGlucoseChart.miniChartHoursToShow1:
-                miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow).description + " " + Texts_Common.hours
-                
-            case ConstantsGlucoseChart.miniChartHoursToShow2, ConstantsGlucoseChart.miniChartHoursToShow3, ConstantsGlucoseChart.miniChartHoursToShow4:
-                miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow / 24).description + " " + Texts_Common.days
-                
-            default:
-                miniChartHoursLabelOutlet.text = Int(UserDefaults.standard.miniChartHoursToShow).description + " " + Texts_Common.hours
-            }
-            
-            // update the chart
-            glucoseMiniChartManager?.updateChartPoints(chartOutlet: miniChartOutlet, completionHandler: nil)
-        }
+        publishRootHomeState()
     }
     
     private func getCGMTransmitterDeviceName(for cgmTransmitter: CGMTransmitter) -> String? {
@@ -2810,6 +2447,11 @@ final class RootViewController: UIViewController, ObservableObject {
     
     /// enables or disables the sensor management button on top of the screen
     private func changeButtonsStatusTo(enabled: Bool) {
+        guard rootHomeHostingController == nil else {
+            publishRootHomeState()
+            return
+        }
+
         if enabled {
             sensorToolbarButtonOutlet.isEnabled = true
             
@@ -2878,17 +2520,23 @@ final class RootViewController: UIViewController, ObservableObject {
         
         // declare constants/variables
         let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-        var daysToUseStatistics: Int = 0
-        var fromDate: Date = Date()
-        
-        // get the maximum number of calculation days requested by the user
-        daysToUseStatistics = UserDefaults.standard.daysToUseStatistics
+        let daysToUseStatistics = UserDefaults.standard.daysToUseStatistics
+        let fromDate: Date
         
         // if the user has selected 0 (to chose "today") then set the fromDate to the previous midnight
         if daysToUseStatistics == 0 {
             fromDate = Calendar(identifier: .gregorian).startOfDay(for: Date())
         } else {
             fromDate = Date(timeIntervalSinceNow: -3600.0 * 24.0 * Double(daysToUseStatistics))
+        }
+
+        if rootHomeHostingController != nil {
+            rootHomeStateModel.setStatisticsLoading()
+            statisticsManager?.calculateStatistics(fromDate: fromDate, toDate: nil) { [weak self] statistics in
+                self?.rootHomeStateModel.updateStatistics(statistics, days: daysToUseStatistics)
+            }
+
+            return
         }
         
         // let's clean up statistics UI before calling the Statistics Manager
@@ -2915,9 +2563,12 @@ final class RootViewController: UIViewController, ObservableObject {
         self.cVStatisticLabelOutlet.textColor = UIColor(resource: .colorSecondary)
         self.cVStatisticLabelOutlet.text = "-"
         self.timePeriodLabelOutlet.text = "- - -"
+        rootHomeStateModel.setStatisticsLoading()
                 
         // statisticsManager will calculate the statistics in background thread and call the callback function in the main thread
         statisticsManager?.calculateStatistics(fromDate: fromDate, toDate: nil, callback: { statistics in
+            self.rootHomeStateModel.updateStatistics(statistics, days: daysToUseStatistics)
+
             // set the title labels to their correct localization
             self.lowTitleLabelOutlet.text = Texts_Common.lowStatistics
             self.inRangeTitleLabelOutlet.text = UserDefaults.standard.timeInRangeType.title
@@ -3093,6 +2744,7 @@ final class RootViewController: UIViewController, ObservableObject {
         }
 
         if enabled {
+            screenLockUsesNightLayout = nightMode
             screenLockToolbarButtonOutlet.accessibilityLabel = Texts_HomeView.unlockButton
             
             screenLockToolbarButtonOutlet.tintColor = UIColor.red
@@ -3157,6 +2809,7 @@ final class RootViewController: UIViewController, ObservableObject {
             
             trace("screen lock : screen lock / keep-awake enabled. Night mode set to '%{public}@'. Dimming type set to '%{public}@'", log: self.log, category: ConstantsLog.categoryRootView, type: .info, nightMode.description, UserDefaults.standard.screenLockDimmingType.description)
         } else {
+            screenLockUsesNightLayout = false
             screenLockToolbarButtonOutlet.accessibilityLabel = Texts_HomeView.lockButton
             
             screenLockToolbarButtonOutlet.tintColor = .white
@@ -3204,6 +2857,7 @@ final class RootViewController: UIViewController, ObservableObject {
     /// update the label in the clock view every time this function is called
     @objc private func updateClockView() {
         self.clockLabelOutlet.text = clockDateFormatter.string(from: Date())
+        rootHomeStateModel.updateClock()
         publishRootHomeState()
     }
     
@@ -3251,6 +2905,13 @@ final class RootViewController: UIViewController, ObservableObject {
             
             // update the isAnubis flag
             isAnubis = cgmTransmitter.isAnubisG6()
+        }
+
+        // The state model owns all visible sensor and data-source formatting. The controller keeps
+        // only the source metadata and follower timer maintenance that other app services use.
+        if rootHomeHostingController != nil {
+            setFollowerConnectionAndHeartbeatStatus()
+            return
         }
         
         // let's just check that we've got enough information to display the view
@@ -3869,6 +3530,11 @@ final class RootViewController: UIViewController, ObservableObject {
     
     // updates the toolbar UI to show the current snooze status of the app
     private func updateSnoozeStatus() {
+        guard rootHomeHostingController == nil else {
+            publishRootHomeState()
+            return
+        }
+
         if let alertManager = alertManager {
             switch alertManager.snoozeStatus() {
             case .allSnoozed:
@@ -3894,6 +3560,11 @@ final class RootViewController: UIViewController, ObservableObject {
     }
     
     private func updatePostProcessingStatus() {
+        guard rootHomeHostingController == nil else {
+            publishRootHomeState()
+            return
+        }
+
         bgAdjustmentsToolbarButtonOutlet.tintColor = .white
         bgAdjustmentsToolbarButtonOutlet.setImage(UIImage(systemName: postProcessingToolbarButtonImageSystemName()), for: .normal)
         publishRootHomeState()
@@ -3929,6 +3600,11 @@ final class RootViewController: UIViewController, ObservableObject {
         defer {
             publishRootHomeState()
         }
+
+        // RootHomeStateModel now calculates this complete section directly from Nightscout and
+        // treatment data. The remaining outlet code is retained only as a temporary storyboard
+        // fallback until RootViewController itself is replaced by the hosting controller.
+        guard rootHomeHostingController == nil else { return }
 
         // hide the views if not wanted/needed
         pumpViewOutlet.isHidden = !UserDefaults.standard.nightscoutEnabled || UserDefaults.standard.nightscoutUrl == nil || UserDefaults.standard.nightscoutFollowType == .none || !UserDefaults.standard.nightscoutFollowShowExpandedInfo || screenIsLocked
@@ -4323,7 +3999,7 @@ extension RootViewController: FollowerDelegate {
                     _ = bgPostProcessingManager?.processLatestReadings()
                 }
 
-                cleanUpChartMemoryForLivePostProcessingIfNeeded()
+                rootHomeStateModel.invalidateCharts()
 
                 // update all text in  first screen
                 updateLabelsAndChart(overrideApplicationState: false)
@@ -4371,22 +4047,6 @@ extension RootViewController: FollowerDelegate {
                 updateLiveActivityAndWidgets(forceRestart: false)
             }
         }
-    }
-}
-
-// MARK: - conform to UIGestureRecognizerDelegate protocol
-
-extension RootViewController: UIGestureRecognizerDelegate {
-    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
-        if gestureRecognizer.view != chartOutlet {
-            return false
-        }
-        
-        if gestureRecognizer.view != otherGestureRecognizer.view {
-            return false
-        }
-        
-        return true
     }
 }
 

@@ -8,7 +8,6 @@
 
 import Combine
 import SwiftUI
-import UIKit
 
 /// SwiftUI replacement surface for the RootViewController home screen.
 ///
@@ -98,7 +97,7 @@ struct RootHomeView: View {
 
     // MARK: - State
 
-    @ObservedObject private var displayManager: RootHomeDisplayManager
+    @ObservedObject private var stateModel: RootHomeStateModel
     @StateObject private var glucoseChartStateManager: GlucoseChartStateManager
     @StateObject private var miniChartStateManager: GlucoseChartStateManager
     @StateObject private var scrollCoordinator: GlucoseChartScrollCoordinator
@@ -128,10 +127,10 @@ struct RootHomeView: View {
 
     // MARK: - Initialisation
 
-    init(displayManager: RootHomeDisplayManager, coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager, actions: RootHomeActions) {
+    init(stateModel: RootHomeStateModel, coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager, actions: RootHomeActions) {
         let initialRange = ChartRange.closest(to: UserDefaults.standard.chartWidthInHours)
 
-        self.displayManager = displayManager
+        self.stateModel = stateModel
         self.actions = actions
         self.nightscoutSyncManager = nightscoutSyncManager
         _glucoseChartStateManager = StateObject(wrappedValue: GlucoseChartStateManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager))
@@ -185,6 +184,9 @@ struct RootHomeView: View {
         }
         .onChange(of: chartSeriesSettings) { _ in
             requestChartState(forceReset: false)
+        }
+        .onChange(of: state.chartRevision) { _ in
+            refreshChartsForDataChange()
         }
     }
 
@@ -287,7 +289,7 @@ struct RootHomeView: View {
     // MARK: - Derived State
 
     private var state: RootHomeState {
-        displayManager.state
+        stateModel.state
     }
 
     private var startDate: Date {
@@ -411,27 +413,42 @@ struct RootHomeView: View {
         requestChartState(forceReset: false, showsLoading: false)
     }
 
-    private func requestChartState(forceReset: Bool, showsLoading: Bool = true) {
+    private func requestChartState(forceReset: Bool, showsLoading: Bool = true, refreshCachedData: Bool = false) {
         if showsLoading {
             isLoadingChart = true
             isBackgroundLoadingChart = false
         } else {
-            guard !isBackgroundLoadingChart else { return }
+            guard !isBackgroundLoadingChart || refreshCachedData else { return }
 
             isBackgroundLoadingChart = true
         }
 
-        glucoseChartStateManager.updateState(endDate: endDate, startDate: startDate, forceReset: forceReset, showTreatments: showTreatments, showOriginalReadingsOnly: showOriginalBGReadingsOnly) { _ in
+        glucoseChartStateManager.updateState(endDate: endDate, startDate: startDate, forceReset: forceReset, refreshCachedData: refreshCachedData, showTreatments: showTreatments, showOriginalReadingsOnly: showOriginalBGReadingsOnly) { _ in
             isLoadingChart = false
             isBackgroundLoadingChart = false
         }
     }
 
-    private func requestMiniChartState(forceReset: Bool) {
+    private func requestMiniChartState(forceReset: Bool, refreshCachedData: Bool = false) {
         let endDate = Date()
         let startDate = endDate.addingTimeInterval(.hours(-miniChartHoursToShowForChart))
 
-        miniChartStateManager.updateState(endDate: endDate, startDate: startDate, forceReset: forceReset, showTreatments: false)
+        miniChartStateManager.updateState(endDate: endDate, startDate: startDate, forceReset: forceReset, refreshCachedData: refreshCachedData, showTreatments: false)
+    }
+
+    private func refreshChartsForDataChange() {
+        refreshMainChartForDataChange()
+        requestMiniChartState(forceReset: false, refreshCachedData: true)
+    }
+
+    private func refreshMainChartForDataChange() {
+        guard scrollCoordinator.isShowingCurrentTimeRange else { return }
+
+        // Move the live window to the actual current time before loading the new tail. A chart that
+        // the user has deliberately scrolled back remains fixed, matching the previous behaviour.
+        _ = scrollCoordinator.refreshCurrentTimeRangeIfNeeded()
+
+        requestChartState(forceReset: false, showsLoading: false, refreshCachedData: true)
     }
 
     private func cycleMiniChartHoursToShow() {
@@ -524,7 +541,7 @@ private struct RootHomeToolbarView: View {
 
                 originalGlucosePeekIsActive = true
                 shouldIgnoreNextPostProcessingTap = true
-                UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+                actions.originalGlucosePeekActivated()
                 beginOriginalGlucosePeek()
             }
             .onEnded { _ in
@@ -589,9 +606,9 @@ private struct RootHomeLoopView: View {
 
                 HStack(spacing: 6) {
                     if state.showsUploaderBattery {
-                        Image(systemName: "battery.75")
+                        Image(systemName: state.uploaderBatterySystemImage)
                             .font(.system(size: 14))
-                            .foregroundStyle(ConstantsAppColors.primaryText)
+                            .foregroundStyle(state.uploaderBatteryColor)
                     }
 
                     if state.showsActivityIndicator {

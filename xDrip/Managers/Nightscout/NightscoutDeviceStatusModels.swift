@@ -190,6 +190,28 @@ struct NightscoutDeviceStatus: Codable {
         }
         return nil
     }
+
+    /// SwiftUI style for the low uploader-battery warning shown on compact status views.
+    func uploaderBatteryStatusStyle() -> (systemImage: String, color: Color)? {
+        guard let uploaderBatteryPercent, uploaderIsCharging == false else { return nil }
+
+        switch uploaderBatteryPercent {
+        case 0...10:
+            if #available(iOS 17.0, *) {
+                return ("battery.0percent", ConstantsAppColors.urgent)
+            } else {
+                return ("minus.plus.batteryblock.slash", ConstantsAppColors.urgent)
+            }
+        case 11...25:
+            if #available(iOS 17.0, *) {
+                return ("battery.25percent", ConstantsAppColors.warning)
+            } else {
+                return ("minus.plus.batteryblock", ConstantsAppColors.warning)
+            }
+        default:
+            return nil
+        }
+    }
     
     func uploaderBatteryChargingImage() -> (image: Image, color: Color)? {
         if let uploaderIsCharging {
