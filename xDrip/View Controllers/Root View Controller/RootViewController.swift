@@ -1729,9 +1729,8 @@ final class RootViewController: UIViewController {
         
         publishRootHomeState()
 
-        // The separate landscape value controller is still UIKit for this migration phase, but it
-        // now reads the same state model as the SwiftUI portrait home instead of hidden portrait
-        // labels. This mirrors the old timer behaviour without requiring the retired home outlets.
+        // The landscape value screen is hosted separately by the rotation coordinator, but it now
+        // renders the same SwiftUI glucose state as the portrait Home view.
         landscapeValueViewController?.updateLabels(glucoseState: rootHomeStateModel.landscapeGlucoseState())
     }
     
