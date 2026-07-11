@@ -225,8 +225,9 @@ final class RootViewController: UIViewController {
         // check if allowed to rotate to landscape view
         updateScreenRotationSettings()
         
-        // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value needs to be shown on the view, and also update minutes ago etc.
-        updateLabelsAndChart(overrideApplicationState: true)
+        // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value
+        // needs to be shown on the view, and the live chart should be returned to the real current time.
+        updateLabelsAndChart(overrideApplicationState: true, forceReset: true)
         
         updatePumpAndAIDStatusViews()
 
@@ -272,7 +273,7 @@ final class RootViewController: UIViewController {
         
         IntentDonationManager.shared.donate(intent: GlucoseIntent())
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -1316,9 +1317,8 @@ final class RootViewController: UIViewController {
     
     /// will update the chart with endDate = currentDate
     /// - parameters:
-    ///     - forceReset : if true, then we'll force a rescale of the chart y-axis
-    private func updateChartWithResetEndDate(forceReset: Bool = false) {
-        rootHomeStateModel.invalidateCharts()
+    private func updateChartWithResetEndDate() {
+        rootHomeStateModel.resetChartsToNow()
     }
 
     /// switch the main chart between the normal post processed view and a
@@ -1721,7 +1721,7 @@ final class RootViewController: UIViewController {
         guard UIApplication.shared.applicationState == .active || overrideApplicationState else {return}
 
         if forceReset {
-            rootHomeStateModel.invalidateCharts()
+            rootHomeStateModel.resetChartsToNow()
         }
         
         // force a snooze status update to see if the current snooze status has changed in the last minutes

@@ -25,6 +25,7 @@ struct RootHomeState {
     var controls = RootHomeControlsState()
     var isScreenLocked = false
     var chartRevision = 0
+    var chartResetToNowRevision = 0
 
 }
 
@@ -262,6 +263,12 @@ final class RootHomeStateModel: ObservableObject {
     func invalidateCharts() {
         updateState { state in
             state.chartRevision &+= 1
+        }
+    }
+
+    func resetChartsToNow() {
+        updateState { state in
+            state.chartResetToNowRevision &+= 1
         }
     }
 

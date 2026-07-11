@@ -18,9 +18,9 @@ enum ConstantsAppColors {
     // MARK: - Base
 
     static let background = Color.black
-    static let primaryText = Color(.colorPrimary)
-    static let secondaryText = Color(.colorSecondary)
-    static let tertiaryText = Color(.colorTertiary)
+    static let primaryText = Color("colorPrimary")
+    static let secondaryText = Color("colorSecondary")
+    static let tertiaryText = Color("colorTertiary")
     static let disabledText = Color.gray
 
     // MARK: - Status
@@ -49,8 +49,9 @@ enum ConstantsAppColors {
 
     // MARK: - Statistics
 
-    static let statisticsLow = urgent
-    static let statisticsInRange = Color(red: 0.0, green: 0.6, blue: 0.0)
-    static let statisticsHigh = warning
+    /// SwiftUI-native statistics colours used by pie charts and TIR value labels.
+    static let statisticsLow = Color.red
+    static let statisticsInRange = Color.green
+    static let statisticsHigh = Color.yellow
 
 }

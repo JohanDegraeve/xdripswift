@@ -97,6 +97,7 @@ struct RootHomeView: View {
 
     // MARK: - State
 
+    @Environment(\.scenePhase) private var scenePhase
     @ObservedObject private var stateModel: RootHomeStateModel
     @StateObject private var glucoseChartStateManager: GlucoseChartStateManager
     @StateObject private var miniChartStateManager: GlucoseChartStateManager
@@ -192,6 +193,14 @@ struct RootHomeView: View {
         }
         .onChange(of: state.chartRevision) { _ in
             refreshChartsForDataChange()
+        }
+        .onChange(of: state.chartResetToNowRevision) { _ in
+            resetChartsToNow()
+        }
+        .onChange(of: scenePhase) { newPhase in
+            guard newPhase == .active else { return }
+
+            resetChartsToNow()
         }
     }
 
@@ -443,6 +452,12 @@ struct RootHomeView: View {
 
     private func refreshChartsForDataChange() {
         refreshMainChartForDataChange()
+        requestMiniChartState(forceReset: false, refreshCachedData: true)
+    }
+
+    private func resetChartsToNow() {
+        scrollCoordinator.resetToNow()
+        requestChartState(forceReset: false, showsLoading: false, refreshCachedData: true)
         requestMiniChartState(forceReset: false, refreshCachedData: true)
     }
 
