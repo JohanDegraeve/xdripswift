@@ -84,7 +84,7 @@ struct SettingsViewM5StackSettingsViewModel: SettingsViewModelProtocol {
         switch setting {
             
         case .m5stack:
-            return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToM5StackSettings.rawValue, sender: nil)
+            return .performSegue(withIdentifier: SettingsSegueIdentifier.settingsToM5StackSettings.rawValue, sender: nil)
             
         }
     }

@@ -50,9 +50,9 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
 
         switch setting {
         case .alertTypes:
-            return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToAlertTypeSettings.rawValue, sender: nil)
+            return .performSegue(withIdentifier: SettingsSegueIdentifier.settingsToAlertTypeSettings.rawValue, sender: nil)
         case .alerts:
-            return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToAlertSettings.rawValue, sender: nil)
+            return .performSegue(withIdentifier: SettingsSegueIdentifier.settingsToAlertSettings.rawValue, sender: nil)
             
         case .volumeTestSoundPlayer:
             

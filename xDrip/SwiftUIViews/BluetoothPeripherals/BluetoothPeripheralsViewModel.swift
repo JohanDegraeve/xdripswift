@@ -11,9 +11,62 @@ import CoreBluetooth
 import Foundation
 
 final class BluetoothPeripheralsRouter: ObservableObject {
-    var openPeripheral: ((BluetoothPeripheral?, BluetoothPeripheralType) -> Void)?
-    var showAddPeripheralCategories: (() -> Void)?
-    var showPeripheralTypes: ((BluetoothPeripheralCategory) -> Void)?
+    @Published var path = [BluetoothPeripheralsRoute]()
+
+    func openPeripheral(_ bluetoothPeripheral: BluetoothPeripheral?, type: BluetoothPeripheralType) {
+        path.append(BluetoothPeripheralsRoute(.peripheral(bluetoothPeripheral, type)))
+    }
+
+    func showAddPeripheralCategories() {
+        path.append(BluetoothPeripheralsRoute(.categories))
+    }
+
+    func showPeripheralTypes(category: BluetoothPeripheralCategory) {
+        path.append(BluetoothPeripheralsRoute(.types(category)))
+    }
+
+    func showTextEntry(_ textEntry: BluetoothPeripheralTextEntry) {
+        path.append(BluetoothPeripheralsRoute(.textEntry(textEntry)))
+    }
+
+    func showSelectionList(_ selectionList: BluetoothPeripheralSelectionList) {
+        path.append(BluetoothPeripheralsRoute(.selectionList(selectionList)))
+    }
+
+    func closeCurrentView() {
+        guard !path.isEmpty else { return }
+
+        path.removeLast()
+    }
+}
+
+/// Typed route stored by the Bluetooth tab's native NavigationStack.
+///
+/// Route identity is intentionally independent of its payload because several existing editor
+/// models contain action closures and therefore cannot conform to Hashable themselves.
+struct BluetoothPeripheralsRoute: Hashable {
+    enum Destination {
+        case categories
+        case types(BluetoothPeripheralCategory)
+        case peripheral(BluetoothPeripheral?, BluetoothPeripheralType)
+        case textEntry(BluetoothPeripheralTextEntry)
+        case selectionList(BluetoothPeripheralSelectionList)
+    }
+
+    let id = UUID()
+    let destination: Destination
+
+    init(_ destination: Destination) {
+        self.destination = destination
+    }
+
+    static func == (lhs: BluetoothPeripheralsRoute, rhs: BluetoothPeripheralsRoute) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }
 
 @MainActor final class BluetoothPeripheralsViewModel: ObservableObject {

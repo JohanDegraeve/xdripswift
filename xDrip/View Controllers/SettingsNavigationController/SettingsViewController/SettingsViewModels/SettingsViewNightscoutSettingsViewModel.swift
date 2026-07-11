@@ -421,7 +421,7 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
             return .nothing
             
         case .schedule:
-            return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToSchedule.rawValue, sender: self)
+            return .performSegue(withIdentifier: SettingsSegueIdentifier.settingsToSchedule.rawValue, sender: self)
             
         case .uploadSensorStartTime:
             return SettingsSelectedRowAction.nothing

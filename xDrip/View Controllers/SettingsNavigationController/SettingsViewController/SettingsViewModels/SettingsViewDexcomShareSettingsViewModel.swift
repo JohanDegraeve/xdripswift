@@ -106,7 +106,7 @@ class SettingsViewDexcomShareUploadSettingsViewModel: SettingsViewModelProtocol 
             return .nothing
             
         case .schedule:
-            return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToSchedule.rawValue, sender: self)
+            return .performSegue(withIdentifier: SettingsSegueIdentifier.settingsToSchedule.rawValue, sender: self)
             
         }
     }

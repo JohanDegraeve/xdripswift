@@ -247,21 +247,3 @@ struct SettingsDatePickerView: View {
         }
     }
 }
-
-final class TimeScheduleHostingController: PortraitLockedHostingController<AnyView> {
-    /// Hosts the SwiftUI schedule editor from UIKit and injects the shared Settings
-    /// navigation actions used by its pushed date picker.
-    init(timeSchedule: TimeSchedule) {
-        super.init(rootView: AnyView(TimeScheduleView(timeSchedule: timeSchedule)))
-
-        title = timeSchedule.serviceName()
-        navigationItem.largeTitleDisplayMode = .automatic
-        rootView = AnyView(TimeScheduleView(timeSchedule: timeSchedule)
-            .environment(\.settingsNavigationActions, settingsNavigationActions())
-        )
-    }
-
-    @objc required dynamic init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}

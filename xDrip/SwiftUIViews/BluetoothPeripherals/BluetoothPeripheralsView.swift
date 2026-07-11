@@ -8,6 +8,100 @@
 
 import SwiftUI
 
+/// Native SwiftUI navigation owner for the Bluetooth tab.
+struct BluetoothPeripheralsNavigationView: View {
+    @StateObject private var router: BluetoothPeripheralsRouter
+    @StateObject private var viewModel: BluetoothPeripheralsViewModel
+
+    private let coreDataManager: CoreDataManager
+    private let bluetoothPeripheralManager: BluetoothPeripheralManaging
+    private let sensorProvider: ActiveSensorProviding?
+
+    init(
+        coreDataManager: CoreDataManager,
+        bluetoothPeripheralManager: BluetoothPeripheralManaging,
+        sensorProvider: ActiveSensorProviding?
+    ) {
+        self.coreDataManager = coreDataManager
+        self.bluetoothPeripheralManager = bluetoothPeripheralManager
+        self.sensorProvider = sensorProvider
+        _router = StateObject(wrappedValue: BluetoothPeripheralsRouter())
+        _viewModel = StateObject(wrappedValue: BluetoothPeripheralsViewModel(
+            bluetoothPeripheralManager: bluetoothPeripheralManager
+        ))
+    }
+
+    var body: some View {
+        NavigationStack(path: $router.path) {
+            BluetoothPeripheralsView(viewModel: viewModel, router: router)
+                .navigationDestination(for: BluetoothPeripheralsRoute.self, destination: destination)
+        }
+        .tint(.yellow)
+        .colorScheme(.dark)
+    }
+
+    @ViewBuilder private func destination(for route: BluetoothPeripheralsRoute) -> some View {
+        switch route.destination {
+        case .categories:
+            BluetoothPeripheralCategorySelectionView(viewModel: viewModel, router: router)
+
+        case let .types(category):
+            BluetoothPeripheralTypeSelectionView(category: category, viewModel: viewModel, router: router)
+
+        case let .peripheral(bluetoothPeripheral, bluetoothPeripheralType):
+            BluetoothPeripheralDetailContainerView(
+                bluetoothPeripheral: bluetoothPeripheral,
+                bluetoothPeripheralType: bluetoothPeripheralType,
+                coreDataManager: coreDataManager,
+                bluetoothPeripheralManager: bluetoothPeripheralManager,
+                sensorProvider: sensorProvider,
+                router: router,
+                viewModel: viewModel
+            )
+
+        case let .textEntry(textEntry):
+            BluetoothPeripheralTextEntryView(textEntry: textEntry, close: router.closeCurrentView)
+
+        case let .selectionList(selectionList):
+            BluetoothPeripheralSelectionListView(selectionList: selectionList, close: router.closeCurrentView)
+        }
+    }
+}
+
+/// Owns one peripheral detail state for as long as its NavigationStack destination is visible.
+private struct BluetoothPeripheralDetailContainerView: View {
+    @StateObject private var state: BluetoothPeripheralDetailState
+
+    init(
+        bluetoothPeripheral: BluetoothPeripheral?,
+        bluetoothPeripheralType: BluetoothPeripheralType,
+        coreDataManager: CoreDataManager,
+        bluetoothPeripheralManager: BluetoothPeripheralManaging,
+        sensorProvider: ActiveSensorProviding?,
+        router: BluetoothPeripheralsRouter,
+        viewModel: BluetoothPeripheralsViewModel
+    ) {
+        _state = StateObject(wrappedValue: BluetoothPeripheralDetailState(
+            bluetoothPeripheral: bluetoothPeripheral,
+            expectedBluetoothPeripheralType: bluetoothPeripheralType,
+            coreDataManager: coreDataManager,
+            bluetoothPeripheralManager: bluetoothPeripheralManager,
+            sensorProvider: sensorProvider,
+            closeDetailView: {
+                router.closeCurrentView()
+                viewModel.reload()
+            },
+            presentTextEntryView: router.showTextEntry,
+            presentSelectionListView: router.showSelectionList
+        ))
+    }
+
+    var body: some View {
+        BluetoothPeripheralDetailView(state: state)
+            .onDisappear(perform: state.stop)
+    }
+}
+
 struct BluetoothPeripheralsView: View {
     @ObservedObject var viewModel: BluetoothPeripheralsViewModel
     @ObservedObject var router: BluetoothPeripheralsRouter
@@ -62,11 +156,11 @@ struct BluetoothPeripheralsView: View {
     }
 
     private func showAddFlow() {
-        router.showAddPeripheralCategories?()
+        router.showAddPeripheralCategories()
     }
 
     private func open(row: BluetoothPeripheralListRow) {
-        router.openPeripheral?(row.bluetoothPeripheral, row.bluetoothPeripheral.bluetoothPeripheralType())
+        router.openPeripheral(row.bluetoothPeripheral, type: row.bluetoothPeripheral.bluetoothPeripheralType())
     }
 
     private func startStatusUpdates() {
@@ -118,7 +212,7 @@ struct BluetoothPeripheralCategorySelectionView: View {
     private func select(category: BluetoothPeripheralCategory) {
         guard viewModel.validateCanAdd(category: category) else { return }
 
-        router.showPeripheralTypes?(category)
+        router.showPeripheralTypes(category: category)
     }
 
     private func subtitle(for category: BluetoothPeripheralCategory) -> String {
@@ -164,7 +258,7 @@ struct BluetoothPeripheralTypeSelectionView: View {
     }
 
     private func open(type bluetoothPeripheralType: BluetoothPeripheralType) {
-        router.openPeripheral?(nil, bluetoothPeripheralType)
+        router.openPeripheral(nil, type: bluetoothPeripheralType)
     }
 
     @ViewBuilder private var footerView: some View {

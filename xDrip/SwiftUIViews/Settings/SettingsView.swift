@@ -8,6 +8,7 @@
 
 import SwiftUI
 import UIKit
+import MessageUI
 
 // This file is the starting point for the SwiftUI Settings screen.
 //
@@ -37,11 +38,294 @@ import UIKit
 // Share can be moved under a future "Services" menu without moving their actual
 // logic out of their current view models.
 //
-// SettingsSharedUtilities.swift contains the shared row model, rendering code,
-// navigation bridge and old UIKit-action adapters. SettingsViewController.swift
-// owns the UIKit hosting controller and connects the SwiftUI settings screen back
-// into the existing navigation stack.
+// SettingsSharedUtilities.swift contains the shared row model, rendering code and
+// native navigation destinations used throughout the Settings flow.
+struct SettingsNavigationView: View {
+    @StateObject private var router: SettingsRouter
+    @StateObject private var presenter: SettingsActionPresenter
+    @StateObject private var listModel: SettingsListModel
+
+    private let coreDataManager: CoreDataManager
+    private let soundPlayer: SoundPlayer
+
+    init(coreDataManager: CoreDataManager, soundPlayer: SoundPlayer) {
+        let router = SettingsRouter()
+        let presenter = SettingsActionPresenter(router: router)
+        let sections = SettingsListFactory.makeRootSections(
+            coreDataManager: coreDataManager,
+            presenter: presenter
+        )
+
+        self.coreDataManager = coreDataManager
+        self.soundPlayer = soundPlayer
+        _router = StateObject(wrappedValue: router)
+        _presenter = StateObject(wrappedValue: presenter)
+        _listModel = StateObject(wrappedValue: SettingsListModel(sections: sections))
+    }
+
+    var body: some View {
+        NavigationStack(path: $router.path) {
+            SettingsView(listModel: listModel, presenter: presenter)
+                .navigationDestination(for: SettingsRoute.self, destination: destination)
+        }
+        .environment(\.settingsNavigationActions, navigationActions)
+        .overlay {
+            if let progress = router.progress {
+                SettingsProgressView(progress: progress.progress)
+            }
+        }
+        .sheet(isPresented: shareSheetIsPresented) {
+            if let shareURL = router.shareURL {
+                SettingsShareSheet(url: shareURL)
+            }
+        }
+        .sheet(isPresented: $router.showsTraceEmail) {
+            SettingsTraceMailView(isPresented: $router.showsTraceEmail) {
+                presenter.showMessage(title: Texts_Common.warning, message: Texts_SettingsView.failedToSendEmail)
+            }
+        }
+        .tint(.yellow)
+        .colorScheme(.dark)
+        .onAppear {
+            UserDefaults.standard.showDeveloperSettings = false
+            listModel.reload(.all)
+        }
+    }
+
+    private var navigationActions: SettingsNavigationActions {
+        SettingsNavigationActions { title, content in
+            router.show(.custom(title: title, content: content))
+        }
+    }
+
+    private var shareSheetIsPresented: Binding<Bool> {
+        Binding {
+            router.shareURL != nil
+        } set: { isPresented in
+            if !isPresented {
+                router.shareURL = nil
+            }
+        }
+    }
+
+    @ViewBuilder private func destination(for route: SettingsRoute) -> some View {
+        switch route.destination {
+        case let .settingsScreen(settingsScreen):
+            SettingsScreenDestinationView(settingsScreen: settingsScreen, presenter: presenter)
+
+        case let .textEntry(textEntry):
+            SettingsTextEntryView(textEntry: textEntry, close: router.closeCurrentView)
+
+        case let .selectionList(selectionList):
+            SettingsSelectionListView(selectionList: selectionList, close: router.closeCurrentView)
+
+        case let .datePicker(datePicker):
+            SettingsDatePickerView(datePicker: datePicker, close: router.closeCurrentView)
+
+        case .alertTypes:
+            NativeAlertTypesSettingsView(coreDataManager: coreDataManager, router: router)
+
+        case let .alertTypeEditor(alertType, listViewModel):
+            AlertTypeEditorView(
+                alertType: alertType,
+                coreDataManager: coreDataManager,
+                soundPlayer: soundPlayer,
+                close: {
+                    router.closeCurrentView()
+                    listViewModel.reload()
+                }
+            )
+
+        case .alerts:
+            NativeAlertsSettingsView(coreDataManager: coreDataManager, router: router)
+
+        case let .alertEditor(mode, listViewModel):
+            AlertEntryEditorView(
+                mode: mode,
+                coreDataManager: coreDataManager,
+                close: {
+                    router.closeCurrentView()
+                    listViewModel.reload()
+                },
+                openNewAlert: { newMode in
+                    router.show(.alertEditor(newMode, listViewModel))
+                }
+            )
+
+        case .m5Stack:
+            SettingsScreenDestinationView(
+                settingsScreen: SettingsScreen(title: Texts_SettingsView.m5StackSettingsViewScreenTitle) { presenter in
+                    SettingsListFactory.makeM5StackSections(presenter: presenter)
+                },
+                presenter: presenter
+            )
+
+        case let .timeSchedule(timeSchedule):
+            TimeScheduleView(timeSchedule: timeSchedule)
+
+        case .loopDelaySchedule:
+            LoopDelayScheduleView()
+
+        case let .custom(title, content):
+            content(router.closeCurrentView)
+                .navigationTitle(title)
+                .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
+
+private struct SettingsScreenDestinationView: View {
+    @StateObject private var listModel: SettingsListModel
+    @ObservedObject private var presenter: SettingsActionPresenter
+    private let title: String
+
+    init(settingsScreen: SettingsScreen, presenter: SettingsActionPresenter) {
+        self.presenter = presenter
+        self.title = settingsScreen.title
+        _listModel = StateObject(wrappedValue: SettingsListModel(
+            sections: settingsScreen.makeSections(presenter)
+        ))
+    }
+
+    var body: some View {
+        SettingsListView(
+            listModel: listModel,
+            presenter: presenter,
+            title: title,
+            titleDisplayMode: .large,
+            showsSectionHeaders: false
+        )
+        .onAppear {
+            listModel.reload(.all)
+        }
+    }
+}
+
+private struct NativeAlertTypesSettingsView: View {
+    @StateObject private var viewModel: AlertTypesSettingsViewModel
+    @ObservedObject private var router: SettingsRouter
+
+    init(coreDataManager: CoreDataManager, router: SettingsRouter) {
+        self.router = router
+        _viewModel = StateObject(wrappedValue: AlertTypesSettingsViewModel(coreDataManager: coreDataManager))
+    }
+
+    var body: some View {
+        AlertTypesSettingsView(viewModel: viewModel) { alertType in
+            router.show(.alertTypeEditor(alertType, viewModel))
+        }
+        .onAppear(perform: viewModel.reload)
+    }
+}
+
+private struct NativeAlertsSettingsView: View {
+    @StateObject private var viewModel: AlertsSettingsViewModel
+    @ObservedObject private var router: SettingsRouter
+
+    init(coreDataManager: CoreDataManager, router: SettingsRouter) {
+        self.router = router
+        _viewModel = StateObject(wrappedValue: AlertsSettingsViewModel(coreDataManager: coreDataManager))
+    }
+
+    var body: some View {
+        AlertsSettingsView(viewModel: viewModel) { request in
+            router.show(.alertEditor(.edit(
+                alertEntry: request.alertEntry,
+                minimumStart: request.minimumStart,
+                maximumStart: request.maximumStart
+            ), viewModel))
+        }
+        .onAppear(perform: viewModel.reload)
+    }
+}
+
+private struct SettingsProgressView: View {
+    let progress: Float
+
+    var body: some View {
+        ZStack {
+            Color.black.opacity(0.8)
+                .ignoresSafeArea()
+
+            ProgressView(value: Double(progress))
+                .progressViewStyle(.linear)
+                .frame(maxWidth: 240)
+        }
+    }
+}
+
+private struct SettingsShareSheet: UIViewControllerRepresentable {
+    let url: URL
+
+    func makeUIViewController(context: Context) -> UIActivityViewController {
+        UIActivityViewController(activityItems: [url], applicationActivities: nil)
+    }
+
+    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
+private struct SettingsTraceMailView: UIViewControllerRepresentable {
+    @Binding var isPresented: Bool
+    let onFailure: () -> Void
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(isPresented: $isPresented, onFailure: onFailure)
+    }
+
+    func makeUIViewController(context: Context) -> MFMailComposeViewController {
+        let mailViewController = MFMailComposeViewController()
+        mailViewController.mailComposeDelegate = context.coordinator
+        mailViewController.setToRecipients([ConstantsTrace.traceFileDestinationAddress])
+        mailViewController.setMessageBody(Texts_SettingsView.emailbodyText, isHTML: true)
+
+        let traceFiles = Trace.getTraceFilesInData()
+        for (index, traceFile) in traceFiles.0.enumerated() {
+            mailViewController.addAttachmentData(
+                traceFile as Data,
+                mimeType: "text/txt",
+                fileName: traceFiles.1[index]
+            )
+        }
+
+        let appInfo = Trace.getAppInfoFileAsData()
+        if let appInfoData = appInfo.0 {
+            mailViewController.addAttachmentData(
+                appInfoData as Data,
+                mimeType: "text/txt",
+                fileName: appInfo.1
+            )
+        }
+
+        return mailViewController
+    }
+
+    func updateUIViewController(_ uiViewController: MFMailComposeViewController, context: Context) {}
+
+    final class Coordinator: NSObject, MFMailComposeViewControllerDelegate {
+        @Binding private var isPresented: Bool
+        private let onFailure: () -> Void
+
+        init(isPresented: Binding<Bool>, onFailure: @escaping () -> Void) {
+            _isPresented = isPresented
+            self.onFailure = onFailure
+        }
+
+        func mailComposeController(
+            _ controller: MFMailComposeViewController,
+            didFinishWith result: MFMailComposeResult,
+            error: Error?
+        ) {
+            isPresented = false
+
+            if result == .failed || error != nil {
+                onFailure()
+            }
+        }
+    }
+}
+
 struct SettingsView: View {
+    @Environment(\.openURL) private var openURL
     @ObservedObject var listModel: SettingsListModel
     @ObservedObject var presenter: SettingsActionPresenter
 
@@ -55,7 +339,11 @@ struct SettingsView: View {
         )
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: SettingsOnlineHelp.open) {
+                Button {
+                    if let url = SettingsOnlineHelp.url() {
+                        openURL(url)
+                    }
+                } label: {
                     Image(systemName: "questionmark.circle")
                 }
                 .tint(.yellow)
@@ -153,19 +441,15 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
 }
 
 private enum SettingsOnlineHelp {
-    static func open() {
+    static func url() -> URL? {
         // get the 2 character language code for the App Locale, i.e. "en", "es", "nl", "fr"
         // if the user has the app in a language other than English and they have the "auto translate" option selected, then load the help pages through Google Translate
         // important to check that the URLs actually exist in ConstantsHomeView before trying to open them
         if let languageCode = NSLocale.current.language.languageCode?.identifier, languageCode != ConstantsHomeView.onlineHelpBaseLocale && UserDefaults.standard.translateOnlineHelp {
-            guard let url = URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode + ConstantsHomeView.onlineHelpURLTranslated2) else { return }
-
-            UIApplication.shared.open(url)
+            return URL(string: ConstantsHomeView.onlineHelpURLTranslated1 + languageCode + ConstantsHomeView.onlineHelpURLTranslated2)
         } else {
             // so the user is running the app in English or they don't want to translate so let's just load it directly
-            guard let url = URL(string: ConstantsHomeView.onlineHelpURL) else { return }
-
-            UIApplication.shared.open(url)
+            return URL(string: ConstantsHomeView.onlineHelpURL)
         }
     }
 }
@@ -454,7 +738,7 @@ enum SettingsListFactory {
             let viewModel = section.viewModel(coreDataManager: coreDataManager)
             configure(viewModel: viewModel, presenter: presenter)
 
-            return SettingsSectionModel(id: section.rawValue, viewModel: viewModel) {
+            return SettingsSectionModel(id: section.rawValue) {
                 guard let nativeProvider = viewModel as? SettingsNativeSectionProvider else {
                     fatalError("Settings view model must provide a native Settings section")
                 }
@@ -478,7 +762,7 @@ enum SettingsListFactory {
             let viewModel = section.viewModel(coreDataManager: nil)
             configure(viewModel: viewModel, presenter: presenter)
 
-            return SettingsSectionModel(id: section.rawValue, viewModel: viewModel) {
+            return SettingsSectionModel(id: section.rawValue) {
                 guard let nativeProvider = viewModel as? SettingsNativeSectionProvider else {
                     fatalError("M5Stack Settings view model must provide a native Settings section")
                 }
@@ -498,32 +782,8 @@ enum SettingsListFactory {
         providers.enumerated().map { offset, viewModel in
             configure(viewModel: viewModel, presenter: presenter)
 
-            return SettingsSectionModel(id: offset, viewModel: viewModel) {
+            return SettingsSectionModel(id: offset) {
                 viewModel.settingsSection(sectionID: offset)
-            }
-        }
-    }
-
-    /// Gives all legacy-backed section view models the UIKit host and reload
-    /// closures they still expect while their rows are rendered in SwiftUI.
-    static func attach(
-        controller: UIViewController,
-        sections: [SettingsSectionModel],
-        listModel: SettingsListModel
-    ) {
-        sections.forEach { section in
-            guard let viewModel = section.legacyViewModel else { return }
-
-            viewModel.storeUIViewController(uIViewController: controller)
-            viewModel.storeRowReloadClosure { row in
-                DispatchQueue.main.async {
-                    listModel.reload(.row(section: section.id, row: row))
-                }
-            }
-            viewModel.storeSectionReloadClosure {
-                DispatchQueue.main.async {
-                    listModel.reload(.section(section.id))
-                }
             }
         }
     }

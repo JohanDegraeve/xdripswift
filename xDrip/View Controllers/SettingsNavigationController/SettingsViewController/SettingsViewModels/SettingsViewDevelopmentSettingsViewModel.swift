@@ -412,7 +412,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             }, cancelHandler: nil, didSelectRowHandler: nil)
             
         case .loopDelay:
-            return .performSegue(withIdentifier: SettingsViewController.SegueIdentifiers.settingsToLoopDelaySchedule.rawValue, sender: self)
+            return .performSegue(withIdentifier: SettingsSegueIdentifier.settingsToLoopDelaySchedule.rawValue, sender: self)
             
         case .libreLinkUpVersion:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.libreLinkUpVersion, message:  Texts_SettingsView.libreLinkUpVersionMessage, keyboardType: .default, text: UserDefaults.standard.libreLinkUpVersion, placeHolder: nil, fieldTitle: Texts_Common.enterValue, actionTitle: nil, cancelTitle: nil, actionHandler: {(libreLinkUpVersion: String) in

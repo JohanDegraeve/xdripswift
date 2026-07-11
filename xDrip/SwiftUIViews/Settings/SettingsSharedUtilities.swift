@@ -8,41 +8,84 @@
 
 import SwiftUI
 import UIKit
+import MessageUI
 
 // This file supports the Settings migration from the old UIKit table view controllers
 // and view models to SwiftUI. The goal is to keep the existing Settings workflow
 // familiar by matching the old row actions, alerts, edit screens and navigation as
 // closely as possible while the UI is rebuilt in SwiftUI.
+enum SettingsSegueIdentifier: String {
+    case settingsToAlertTypeSettings
+    case settingsToAlertSettings
+    case settingsToM5StackSettings
+    case settingsToSchedule
+    case settingsToLoopDelaySchedule
+}
+
 final class SettingsRouter: ObservableObject {
-    // UIKit owns the navigation stack, but the row actions now come from SwiftUI.
-    // These closures are the small bridge between the old segue-based Settings
-    // actions and the new pushed SwiftUI screens.
-    var openAlertTypes: (() -> Void)?
-    var openAlerts: (() -> Void)?
-    var openM5Stack: (() -> Void)?
-    var openTimeSchedule: ((TimeSchedule) -> Void)?
-    var openLoopDelaySchedule: (() -> Void)?
-    var presentShareFile: ((URL) -> Void)?
-    var showProgress: ((ProgressBarStatus<URL>?) -> Void)?
+    @Published var path = [SettingsRoute]()
+    @Published var progress: ProgressBarStatus<URL>?
+    @Published var shareURL: URL?
+    @Published var showsTraceEmail = false
 
-    /// Reuses the route closures from the parent Settings screen when a grouped
-    /// child Settings screen is opened. This lets child rows keep using the same
-    /// old navigation actions without each grouped screen knowing about them.
-    func inheritActions(from parent: SettingsRouter?) {
-        guard let parent else { return }
+    func show(_ destination: SettingsRoute.Destination) {
+        path.append(SettingsRoute(destination))
+    }
 
-        openAlertTypes = parent.openAlertTypes
-        openAlerts = parent.openAlerts
-        openM5Stack = parent.openM5Stack
-        openTimeSchedule = parent.openTimeSchedule
-        openLoopDelaySchedule = parent.openLoopDelaySchedule
-        presentShareFile = parent.presentShareFile
-        showProgress = parent.showProgress
+    func closeCurrentView() {
+        guard !path.isEmpty else { return }
+
+        path.removeLast()
+    }
+
+    func showProgress(_ progress: ProgressBarStatus<URL>?) {
+        self.progress = progress
+
+        guard let fileURL = progress?.data, progress?.complete == true else { return }
+
+        self.progress = nil
+        shareURL = fileURL
+    }
+}
+
+/// Typed destination used by the native Settings NavigationStack.
+///
+/// Existing settings editors contain closures, Core Data objects and service models which are not
+/// Hashable. A route therefore hashes only its stable identity while retaining the typed payload.
+struct SettingsRoute: Hashable {
+    enum Destination {
+        case settingsScreen(SettingsScreen)
+        case textEntry(SettingsTextEntryContent)
+        case selectionList(SettingsSelectionListContent)
+        case datePicker(SettingsDatePickerContent)
+        case alertTypes
+        case alertTypeEditor(AlertType?, AlertTypesSettingsViewModel)
+        case alerts
+        case alertEditor(AlertEntryEditorMode, AlertsSettingsViewModel)
+        case m5Stack
+        case timeSchedule(TimeSchedule)
+        case loopDelaySchedule
+        case custom(title: String, content: (@escaping () -> Void) -> AnyView)
+    }
+
+    let id = UUID()
+    let destination: Destination
+
+    init(_ destination: Destination) {
+        self.destination = destination
+    }
+
+    static func == (lhs: SettingsRoute, rhs: SettingsRoute) -> Bool {
+        lhs.id == rhs.id
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
     }
 }
 
 struct SettingsNavigationActions {
-    let push: (_ title: String, _ content: (_ close: @escaping () -> Void) -> AnyView) -> Void
+    let push: (_ title: String, _ content: @escaping (_ close: @escaping () -> Void) -> AnyView) -> Void
 
     /// Pushes the SwiftUI text entry replacement for the old UIKit text alert.
     /// The caller only supplies the old alert content and this keeps the new
@@ -83,95 +126,6 @@ extension EnvironmentValues {
     }
 }
 
-extension UIViewController {
-    /// Builds the navigation actions used by SwiftUI Settings views when they need
-    /// to push another SwiftUI screen from a UIKit navigation controller.
-    func settingsNavigationActions() -> SettingsNavigationActions {
-        SettingsNavigationActions { [weak self] title, content in
-            guard let navigationController = self?.navigationController else { return }
-
-            let viewController = PortraitLockedHostingController(
-                rootView: content {
-                    navigationController.popViewController(animated: true)
-                }
-            )
-            viewController.title = title
-            viewController.navigationItem.largeTitleDisplayMode = .never
-
-            navigationController.pushViewController(viewController, animated: true)
-        }
-    }
-
-    /// Pushes a complete SwiftUI Settings screen made from native section models.
-    /// This is the shared path for grouped Settings menus: the parent row only
-    /// describes which sections belong in the child screen, and this keeps the
-    /// hosting, callbacks and navigation behaviour consistent.
-    func pushSettingsScreen(_ settingsScreen: SettingsScreen, parentRouter: SettingsRouter? = nil) {
-        guard let navigationController else { return }
-
-        let router = SettingsRouter()
-        router.inheritActions(from: parentRouter)
-
-        let presenter = SettingsActionPresenter(router: router)
-        let sections = settingsScreen.makeSections(presenter)
-        let listModel = SettingsListModel(sections: sections)
-        let navigationActions = SettingsNavigationActions { [weak navigationController] title, content in
-            guard let navigationController else { return }
-
-            let viewController = PortraitLockedHostingController(
-                rootView: content {
-                    navigationController.popViewController(animated: true)
-                }
-            )
-            viewController.title = title
-            viewController.navigationItem.largeTitleDisplayMode = .never
-
-            navigationController.pushViewController(viewController, animated: true)
-        }
-        let viewController = PortraitLockedHostingController(
-            rootView: AnyView(SettingsListView(
-                listModel: listModel,
-                presenter: presenter,
-                title: settingsScreen.title,
-                titleDisplayMode: .large,
-                showsSectionHeaders: false
-            )
-            .environment(\.settingsNavigationActions, navigationActions))
-        )
-
-        presenter.attach(controller: viewController)
-        SettingsListFactory.attach(controller: viewController, sections: sections, listModel: listModel)
-
-        if router.presentShareFile == nil {
-            router.presentShareFile = { [weak viewController] url in
-                let activityViewController = UIActivityViewController(activityItems: [url], applicationActivities: [])
-                viewController?.present(activityViewController, animated: true)
-            }
-        }
-
-        viewController.title = settingsScreen.title
-        viewController.navigationItem.largeTitleDisplayMode = .automatic
-
-        navigationController.pushViewController(viewController, animated: true)
-    }
-
-    func pushSettingsTextEntry(_ textEntry: SettingsTextEntryContent) {
-        settingsNavigationActions().pushTextEntry(textEntry)
-    }
-
-    /// Convenience wrapper for old view models that still have a UIKit controller
-    /// reference and need to open the SwiftUI list picker.
-    func pushSettingsSelectionList(_ selectionList: SettingsSelectionListContent) {
-        settingsNavigationActions().pushSelectionList(selectionList)
-    }
-
-    /// Convenience wrapper for old view models that still have a UIKit controller
-    /// reference and need to open the SwiftUI date picker.
-    func pushSettingsDatePicker(_ datePicker: SettingsDatePickerContent) {
-        settingsNavigationActions().pushDatePicker(datePicker)
-    }
-}
-
 @MainActor
 final class SettingsListModel: ObservableObject {
     @Published private(set) var reloadToken = UUID()
@@ -193,12 +147,10 @@ final class SettingsListModel: ObservableObject {
 struct SettingsSectionModel: Identifiable {
     let id: Int
     let section: () -> SettingsSection
-    let legacyViewModel: SettingsViewModelProtocol?
 
-    init(id: Int, viewModel: SettingsViewModelProtocol? = nil, section: @escaping () -> SettingsSection) {
+    init(id: Int, section: @escaping () -> SettingsSection) {
         self.id = id
         self.section = section
-        self.legacyViewModel = viewModel
     }
 }
 
@@ -296,12 +248,13 @@ enum SettingsRowAction {
     case legacy(action: () -> SettingsSelectedRowAction, rowIndex: Int, viewModel: SettingsViewModelProtocol)
     case run(() -> Void)
     case showMessage(title: String, message: String?)
+    case sendTraceEmail
 
     var prefersDisclosure: Bool {
         switch self {
         case .textEntry, .selectionList, .settingsScreen:
             return true
-        case .legacy, .run, .showMessage:
+        case .legacy, .run, .showMessage, .sendTraceEmail:
             return false
         }
     }
@@ -378,19 +331,9 @@ final class SettingsActionPresenter: ObservableObject {
     @Published var datePicker: SettingsDatePickerContent?
 
     private let router: SettingsRouter
-    private weak var controller: UIViewController?
 
-    /// Keeps the router and optional UIKit host together so old row actions can
-    /// be presented from SwiftUI without changing every Settings view model at once.
-    init(router: SettingsRouter, controller: UIViewController? = nil) {
+    init(router: SettingsRouter) {
         self.router = router
-        self.controller = controller
-    }
-
-    /// Stores the current UIKit host so old Settings actions can still push
-    /// SwiftUI replacement screens through the existing navigation controller.
-    func attach(controller: UIViewController) {
-        self.controller = controller
     }
 
     /// Shows the simple message alert used by many of the old Settings view models.
@@ -401,20 +344,20 @@ final class SettingsActionPresenter: ObservableObject {
     /// Pushes a native Settings text-entry row without going through the old
     /// SettingsSelectedRowAction bridge.
     func show(textEntry: SettingsTextEntryContent) {
-        controller?.pushSettingsTextEntry(textEntry)
+        router.show(.textEntry(textEntry))
     }
 
     /// Pushes a native Settings selection row without rebuilding it as a legacy
     /// view-model action first.
     func show(selectionList: SettingsSelectionListContent) {
-        controller?.pushSettingsSelectionList(selectionList)
+        router.show(.selectionList(selectionList))
     }
 
     /// Pushes a child Settings screen built from existing section providers.
     /// This is what lets us group sections such as Services later without moving
     /// their underlying view model logic.
     func show(settingsScreen: SettingsScreen) {
-        controller?.pushSettingsScreen(settingsScreen, parentRouter: router)
+        router.show(.settingsScreen(settingsScreen))
     }
 
     /// Converts a SettingsSelectedRowAction from the old view models into the
@@ -431,7 +374,7 @@ final class SettingsActionPresenter: ObservableObject {
             break
 
         case let .askText(title, message, keyboardType, text, placeholder, fieldTitle, unitText, actionTitle, cancelTitle, actionHandler, cancelHandler, inputValidator):
-            controller?.pushSettingsTextEntry(SettingsTextEntryContent(
+            router.show(.textEntry(SettingsTextEntryContent(
                 title: title,
                 message: message,
                 keyboardType: keyboardType,
@@ -452,7 +395,7 @@ final class SettingsActionPresenter: ObservableObject {
                 },
                 cancel: cancelHandler,
                 validator: inputValidator
-            ))
+            )))
 
         case let .callFunction(function):
             function()
@@ -460,18 +403,14 @@ final class SettingsActionPresenter: ObservableObject {
 
         case let .callFunctionAndShareFile(function):
             function { [weak self] progress in
-                self?.router.showProgress?(progress)
-
-                if let fileURL = progress?.data, progress?.complete == true {
-                    DispatchQueue.main.async {
-                        self?.router.presentShareFile?(fileURL)
-                    }
+                DispatchQueue.main.async {
+                    self?.router.showProgress(progress)
                 }
             }
             reloadIfNeeded(viewModel: viewModel, rowIndex: rowIndex, sectionIndex: sectionIndex, reload: reload)
 
         case let .selectFromList(title, data, selectedRow, actionTitle, cancelTitle, actionHandler, cancelHandler, didSelectRowHandler):
-            controller?.pushSettingsSelectionList(SettingsSelectionListContent(
+            router.show(.selectionList(SettingsSelectionListContent(
                 title: title,
                 data: data,
                 selectedRow: selectedRow,
@@ -487,7 +426,7 @@ final class SettingsActionPresenter: ObservableObject {
                     UserDefaults.standard.updateSnoozeStatus.toggle()
                 },
                 didSelectRow: didSelectRowHandler
-            ))
+            )))
 
         case let .performSegue(identifier, sender):
             route(identifier: identifier, sender: sender)
@@ -515,7 +454,24 @@ final class SettingsActionPresenter: ObservableObject {
     /// Opens a date picker using the same pushed-screen pattern as text and list
     /// editors, so all Settings edit flows behave the same way.
     func show(datePicker: SettingsDatePickerContent) {
-        controller?.pushSettingsDatePicker(datePicker)
+        router.show(.datePicker(datePicker))
+    }
+
+    func requestTraceEmail() {
+        guard MFMailComposeViewController.canSendMail() else {
+            showMessage(title: Texts_Common.warning, message: Texts_SettingsView.emailNotConfigured)
+            return
+        }
+
+        confirmation = SettingsConfirmationContent(
+            title: Texts_HomeView.info,
+            message: Texts_SettingsView.describeProblem,
+            action: { [weak self] in
+                self?.confirmation = nil
+                self?.router.showsTraceEmail = true
+            },
+            cancel: nil
+        )
     }
 
     /// Applies the refresh rule from the old view model after a row action finishes.
@@ -539,20 +495,20 @@ final class SettingsActionPresenter: ObservableObject {
     /// by SettingsRouter. This keeps the old view models from knowing about SwiftUI.
     private func route(identifier: String, sender: Any?) {
         switch identifier {
-        case SettingsViewController.SegueIdentifiers.settingsToAlertTypeSettings.rawValue:
-            router.openAlertTypes?()
-        case SettingsViewController.SegueIdentifiers.settingsToAlertSettings.rawValue:
-            router.openAlerts?()
-        case SettingsViewController.SegueIdentifiers.settingsToM5StackSettings.rawValue:
-            router.openM5Stack?()
-        case SettingsViewController.SegueIdentifiers.settingsToSchedule.rawValue:
+        case SettingsSegueIdentifier.settingsToAlertTypeSettings.rawValue:
+            router.show(.alertTypes)
+        case SettingsSegueIdentifier.settingsToAlertSettings.rawValue:
+            router.show(.alerts)
+        case SettingsSegueIdentifier.settingsToM5StackSettings.rawValue:
+            router.show(.m5Stack)
+        case SettingsSegueIdentifier.settingsToSchedule.rawValue:
             if let timeSchedule = sender as? TimeSchedule {
-                router.openTimeSchedule?(timeSchedule)
+                router.show(.timeSchedule(timeSchedule))
             }
-        case SettingsViewController.SegueIdentifiers.settingsToLoopDelaySchedule.rawValue:
-            router.openLoopDelaySchedule?()
+        case SettingsSegueIdentifier.settingsToLoopDelaySchedule.rawValue:
+            router.show(.loopDelaySchedule)
         default:
-            controller?.performSegue(withIdentifier: identifier, sender: sender)
+            break
         }
     }
 }
@@ -891,6 +847,8 @@ private struct SettingsNativeRowView: View {
             reload(row.reloadScope ?? .section(sectionID))
         case let .showMessage(title, message):
             presenter.showMessage(title: title, message: message)
+        case .sendTraceEmail:
+            presenter.requestTraceEmail()
         case nil:
             break
         }
@@ -1228,8 +1186,7 @@ private struct SettingsPushPresentationModifier: ViewModifier {
     @Binding var selectionList: SettingsSelectionListContent?
     @Binding var datePicker: SettingsDatePickerContent?
 
-    /// Watches for new editor content and immediately pushes the matching Settings
-    /// edit screen through the hosting navigation controller.
+    /// Watches for new editor content and pushes the matching native Settings destination.
     func body(content: Content) -> some View {
         content
             .onChange(of: textEntry?.id) { _ in

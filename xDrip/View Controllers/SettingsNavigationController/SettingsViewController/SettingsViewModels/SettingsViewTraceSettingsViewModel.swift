@@ -1,6 +1,4 @@
 import UIKit
-import MessageUI
-import os
 
 fileprivate enum Setting:Int, CaseIterable {
     
@@ -16,20 +14,6 @@ class SettingsViewTraceSettingsViewModel: NSObject {
     
     private let sectionTitleOverride: String?
     
-    /// need to present MFMailComposeViewController
-    private var uIViewController: UIViewController?
-    
-    /// for logging
-    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryTraceSettingsViewModel)
-
-    /// in case info message or errors occur like credential check error, then this closure will be called with title and message
-    /// - parameters:
-    ///     - first parameter is title
-    ///     - second parameter is the message
-    ///
-    /// the viewcontroller sets it by calling storeMessageHandler
-    private var messageHandler: ((String, String) -> Void)?
-
     init(sectionTitleOverride: String? = nil) {
         self.sectionTitleOverride = sectionTitleOverride
 
@@ -44,20 +28,21 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
 
     func settingsRows(sectionID: Int) -> [SettingsRow] {
         [
-            nativeSettingsRow(id: "trace.sendTraceFile", index: Setting.sendTraceFile.rawValue, sectionID: sectionID),
+            SettingsRow(
+                id: "trace.sendTraceFile",
+                title: Texts_SettingsView.sendTraceFile,
+                accessory: .disclosure,
+                action: .sendTraceEmail
+            ),
             nativeSettingsRow(id: "trace.debugLevel", index: Setting.debugLevel.rawValue, sectionID: sectionID)
         ]
     }
 
     func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {}
     
-    func storeUIViewController(uIViewController: UIViewController) {
-        self.uIViewController = uIViewController
-    }
+    func storeUIViewController(uIViewController: UIViewController) {}
 
-    func storeMessageHandler(messageHandler: @escaping ((String, String) -> Void)) {
-        self.messageHandler = messageHandler
-    }
+    func storeMessageHandler(messageHandler: @escaping ((String, String) -> Void)) {}
     
     func sectionTitle() -> String? {
         if let sectionTitleOverride {
@@ -158,39 +143,7 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
         switch setting {
             
         case .sendTraceFile:
-
-            guard let uIViewController = uIViewController else {fatalError("in SettingsViewTraceSettingsViewModel, onRowSelect, uIViewController is nil")}
-            
-                // check if iOS device can send email, this depends of an email account is configured
-                if MFMailComposeViewController.canSendMail() {
-                    
-                    return .askConfirmation(title: Texts_HomeView.info, message: Texts_SettingsView.describeProblem, actionHandler: {
-                        
-                        let mail = MFMailComposeViewController()
-                        mail.mailComposeDelegate = self
-                        mail.setToRecipients([ConstantsTrace.traceFileDestinationAddress])
-                        mail.setMessageBody(Texts_SettingsView.emailbodyText, isHTML: true)
-                        
-                        // add all trace files as attachment
-                        let traceFilesInData = Trace.getTraceFilesInData()
-                        for (index, traceFileInData) in traceFilesInData.0.enumerated() {
-                            mail.addAttachmentData(traceFileInData as Data, mimeType: "text/txt", fileName: traceFilesInData.1[index])
-                        }
-                        
-                        if let appInfoAsData = Trace.getAppInfoFileAsData().0 {
-                            mail.addAttachmentData(appInfoAsData as Data, mimeType: "text/txt", fileName: Trace.getAppInfoFileAsData().1)
-                        }
-                        
-                        uIViewController.present(mail, animated: true)
-                        
-                    }, cancelHandler: nil)
-                    
-                    
-                } else {
-                    
-                    return .showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.emailNotConfigured)
-                    
-                }
+            return .nothing
             
         case .debugLevel:
             return .nothing
@@ -205,34 +158,6 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
         
         return false
-        
-    }
-    
-}
-
-extension SettingsViewTraceSettingsViewModel: MFMailComposeViewControllerDelegate {
-    
-    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
-        
-        controller.dismiss(animated: true, completion: nil)
-        
-        switch result {
-            
-        case .cancelled:
-            break
-            
-        case .sent, .saved:
-            break
-            
-        case .failed:
-            if let messageHandler = messageHandler {
-                messageHandler(Texts_Common.warning, Texts_SettingsView.failedToSendEmail)
-            }
-            
-        @unknown default:
-            break
-            
-        }
         
     }
     
