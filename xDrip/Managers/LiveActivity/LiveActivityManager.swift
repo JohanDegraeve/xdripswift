@@ -19,9 +19,10 @@ public final class LiveActivityManager {
     private var eventAttributes: XDripWidgetAttributes
     private var eventActivity: Activity<XDripWidgetAttributes>?
     
-    // Debounced update task
-    private var debouncedUpdateTask: Task<Void, Never>?
-    private let debounceInterval: TimeInterval = 0.5
+    // ActivityKit updates are serialized so a second request cannot race an update already in progress.
+    // If another request arrives while ActivityKit is updating, only the newest content needs to follow it.
+    private var pendingUpdate: (contentState: XDripWidgetAttributes.ContentState, forceRestart: Bool)?
+    private var isUpdating = false
     
     // initialize an "empty" contentState and use this to hold the current context state of the live activity after each start/update
     // this makes it much easier to restart from an App Intent without needing to generate a new context to send
@@ -52,21 +53,28 @@ public final class LiveActivityManager {
 // MARK: - Helper Extension
 
 extension LiveActivityManager {
-    /// Public API: Debounced update entry point
+    /// Public API: serialized update entry point
+    @MainActor
     func update(contentState: XDripWidgetAttributes.ContentState, forceRestart: Bool = false) {
+        // Keep the newest content, but do not lose a pending restart request when updates are coalesced.
+        let shouldForceRestart = forceRestart || pendingUpdate?.forceRestart == true
+        pendingUpdate = (contentState, shouldForceRestart)
+
+        guard !isUpdating else { return }
+
+        isUpdating = true
         Task { @MainActor [weak self] in
-            self?.scheduleUpdate(contentState: contentState, forceRestart: forceRestart)
+            await self?.processPendingUpdates()
         }
     }
 
     @MainActor
-    private func scheduleUpdate(contentState: XDripWidgetAttributes.ContentState, forceRestart: Bool) {
-        debouncedUpdateTask?.cancel()
-        let debounceNanoseconds = UInt64(debounceInterval * 1_000_000_000)
-        debouncedUpdateTask = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: debounceNanoseconds)
-            guard !Task.isCancelled else { return }
-            await self?.ensureActivity(contentState: contentState, forceRestart: forceRestart)
+    private func processPendingUpdates() async {
+        defer { isUpdating = false }
+
+        while let update = pendingUpdate {
+            pendingUpdate = nil
+            await ensureActivity(contentState: update.contentState, forceRestart: update.forceRestart)
         }
     }
 

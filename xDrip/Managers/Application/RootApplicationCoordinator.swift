@@ -2017,7 +2017,7 @@ import AppIntents
                     // create the contentState that will update the dynamic attributes of the Live Activity Widget
                     let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: UserDefaults.standard.liveActivityType, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, deviceStatusCreatedAt: deviceStatusCreatedAt, deviceStatusLastLoopDate: deviceStatusLastLoopDate)
                     
-                    Task { LiveActivityManager.shared.update(contentState: contentState, forceRestart: forceRestart) }
+                    LiveActivityManager.shared.update(contentState: contentState, forceRestart: forceRestart)
                 } else {
                     Task { await LiveActivityManager.shared.endAllActivities() }
                 }
