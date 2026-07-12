@@ -30,11 +30,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         }
     }
 
-    /// Creates the native SwiftUI tab shell around the existing Home service coordinator.
-    /// RootViewController no longer has a visible view or storyboard contract; it remains mounted
-    /// only while its application services and delegate responsibilities are being extracted.
+    /// Creates the native SwiftUI tab shell and starts the application-service coordinator.
     private func makeRootViewController() -> UIViewController {
-        let rootViewController = RootViewController()
+        let applicationCoordinator = RootApplicationCoordinator()
         let stateModel = RootTabStateModel()
         let tabTitles = RootTabTitles(
             home: localizedTabTitle(key: "acW-dT-cKf.title", fallback: "Home"),
@@ -43,14 +41,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             settings: localizedTabTitle(key: "cPa-gy-q4n.title", fallback: Texts_SettingsView.screenTitle)
         )
 
-        rootViewController.configure(rootTabStateModel: stateModel)
-
         let hostingController = RootTabHostingController(rootView: RootTabView(
             stateModel: stateModel,
-            rootViewController: rootViewController,
+            applicationCoordinator: applicationCoordinator,
             tabTitles: tabTitles
         ))
         hostingController.view.backgroundColor = .black
+
+        applicationCoordinator.start(
+            rootTabStateModel: stateModel,
+            presentingViewController: hostingController
+        )
 
         return hostingController
     }

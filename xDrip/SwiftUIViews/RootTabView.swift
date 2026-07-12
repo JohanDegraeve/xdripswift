@@ -58,7 +58,7 @@ struct RootTabDependencies {
 
 /// Publishes existing application services to the SwiftUI tab hierarchy.
 ///
-/// RootViewController remains their owner during this migration phase. This state model only
+/// RootApplicationCoordinator remains their owner during this migration phase. This state model only
 /// publishes references once asynchronous Core Data setup has completed; it never creates a
 /// second manager or mirrors service data.
 @MainActor final class RootTabStateModel: ObservableObject {
@@ -125,15 +125,15 @@ struct RootTabView: View {
     @StateObject private var stateModel: RootTabStateModel
     @State private var selectedTab = Tab.home
 
-    private let rootViewController: RootViewController
+    private let applicationCoordinator: RootApplicationCoordinator
     private let tabTitles: RootTabTitles
 
     init(
         stateModel: RootTabStateModel,
-        rootViewController: RootViewController,
+        applicationCoordinator: RootApplicationCoordinator,
         tabTitles: RootTabTitles
     ) {
-        self.rootViewController = rootViewController
+        self.applicationCoordinator = applicationCoordinator
         self.tabTitles = tabTitles
         _stateModel = StateObject(wrappedValue: stateModel)
     }
@@ -142,7 +142,7 @@ struct RootTabView: View {
         ZStack {
             TabView(selection: $selectedTab) {
                 RootHomeTabView(
-                    viewController: rootViewController,
+                    applicationCoordinator: applicationCoordinator,
                     dependencies: stateModel.dependencies,
                     snoozeDismissalRequest: stateModel.snoozeDismissalRequest
                 )
@@ -238,11 +238,17 @@ struct RootTabView: View {
         RootTabOrientationPolicy.supportedOrientations = supportedOrientations
         (UIApplication.shared.delegate as? AppDelegate)?.restrictRotation = supportedOrientations
 
-        guard let rootController = rootViewController.view.window?.rootViewController else { return }
+        guard let windowScene = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first(where: { $0.activationState == .foregroundActive }),
+              let rootController = windowScene.keyWindow?.rootViewController
+        else {
+            return
+        }
 
         rootController.setNeedsUpdateOfSupportedInterfaceOrientations()
 
-        if tab != .home, let windowScene = rootController.view.window?.windowScene {
+        if tab != .home {
             windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
         }
     }
@@ -271,16 +277,12 @@ private struct RootHomeTabView: View {
     @State private var presentedView: PresentedView?
     @State private var showsScreenLockInformation = false
 
-    let viewController: RootViewController
+    let applicationCoordinator: RootApplicationCoordinator
     let dependencies: RootTabDependencies?
     let snoozeDismissalRequest: Int
 
     var body: some View {
         ZStack {
-            // Keep the service-owning controller mounted across rotations. Only the visible
-            // presentation changes, so its timers and application managers keep one lifecycle.
-            RootHomeControllerView(viewController: viewController)
-
             if let dependencies {
                 if verticalSizeClass == .compact {
                     RootHomeLandscapeView(dependencies: dependencies)
@@ -299,6 +301,9 @@ private struct RootHomeTabView: View {
             verticalSizeClass == .compact ? 0 : RootTabLayout.contentBottomPadding
         )
         .toolbar(verticalSizeClass == .compact ? .hidden : .automatic, for: .tabBar)
+        .onAppear {
+            applicationCoordinator.homeDidBecomeVisible()
+        }
         .sheet(item: $presentedView) { presentedView in
             destinationView(presentedView)
                 .colorScheme(.dark)
@@ -469,16 +474,4 @@ struct RootTabTitles {
     let treatments: String
     let bluetooth: String
     let settings: String
-}
-
-/// Temporary lifecycle bridge while RootViewController still starts application services.
-/// RootHomeView and all root navigation are already owned by SwiftUI.
-private struct RootHomeControllerView: UIViewControllerRepresentable {
-    let viewController: RootViewController
-
-    func makeUIViewController(context: Context) -> RootViewController {
-        viewController
-    }
-
-    func updateUIViewController(_ uiViewController: RootViewController, context: Context) {}
 }

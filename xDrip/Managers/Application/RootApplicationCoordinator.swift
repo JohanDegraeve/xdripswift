@@ -1,3 +1,11 @@
+//
+//  RootApplicationCoordinator.swift
+//  xdrip
+//
+//  Created by Paul Plant on 12/7/26.
+//  Copyright © 2026 Johan Degraeve. All rights reserved.
+//
+
 import UIKit
 import CoreData
 import os
@@ -10,8 +18,12 @@ import SwiftUI
 import WidgetKit
 import AppIntents
 
-/// viewcontroller for the home screen
-final class RootViewController: UIViewController {
+/// Owns the long-lived application services previously created by RootViewController.
+///
+/// SwiftUI owns the complete root view hierarchy. This coordinator remains an NSObject because it
+/// receives transmitter, follower, notification and UserDefaults callbacks, none of which require
+/// a view-controller lifecycle.
+@MainActor final class RootApplicationCoordinator: NSObject {
     
     // MARK: - Constants for ApplicationManager usage
     
@@ -46,7 +58,7 @@ final class RootViewController: UIViewController {
     // MARK: - Properties - other private properties
     
     /// for logging
-    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryRootView)
+    nonisolated private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryRootView)
     
     /// CoreDataManager to be used throughout the project
     private var coreDataManager: CoreDataManager?
@@ -156,27 +168,23 @@ final class RootViewController: UIViewController {
 
     /// Presentation state shared with the native SwiftUI home screen.
     ///
-    /// RootViewController still owns the app services during this migration step, while the state
-    /// model now calculates display values directly instead of mirroring the old storyboard views.
+    /// The coordinator owns app services while this model calculates display values directly.
     private let rootHomeStateModel = RootHomeStateModel()
 
     /// Publishes the services needed by the native SwiftUI tabs after startup completes.
     private weak var rootTabStateModel: RootTabStateModel?
+
+    /// Temporary UIKit presentation endpoint for service alerts that have not yet been migrated.
+    /// Application ownership no longer depends on this controller or its lifecycle.
+    private weak var presentingViewController: UIViewController?
+
+    private var hasStarted = false
     
-    // MARK: - overriden functions
-    
-    // set the status bar content colour to light to match new darker theme
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
-    }
-    
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        
-        super.viewWillAppear(animated)
+    // MARK: - SwiftUI Lifecycle
+
+    /// Runs the refresh work previously triggered by RootViewController's viewWillAppear and viewDidAppear.
+    /// RootHomeTabView calls this whenever the Home tab becomes visible.
+    func homeDidBecomeVisible() {
         
         // check if allowed to rotate to landscape view
         updateScreenRotationSettings()
@@ -192,11 +200,6 @@ final class RootViewController: UIViewController {
         
         // update statistics related outlets
         updateStatistics(animate: true, overrideApplicationState: true)
-        
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
         
         watchManager?.updateWatchApp(forceComplicationUpdate: false)
         
@@ -228,15 +231,24 @@ final class RootViewController: UIViewController {
         IntentDonationManager.shared.donate(intent: GlucoseIntent())
     }
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    /// Starts application services once the SwiftUI root host is available.
+    func start(rootTabStateModel: RootTabStateModel, presentingViewController: UIViewController) {
+        guard !hasStarted else { return }
+
+        hasStarted = true
+        self.rootTabStateModel = rootTabStateModel
+        self.presentingViewController = presentingViewController
+        startServices(presentingViewController: presentingViewController)
+    }
+
+    private func startServices(presentingViewController: UIViewController) {
         
         // Run a quick check to see if the currently stored followerDataSourceType is now on the ignore list
         // if so, then reset back to Nightscout. This is unlikely to ever happen, but it *is* possible.
         let storedType = UserDefaults.standard.followerDataSourceType
         if !FollowerDataSourceType.allEnabledCases.contains(storedType) {
             UserDefaults.standard.followerDataSourceType = .nightscout
-            trace("in viewDidLoad, reset followerDataSourceType from newly ignored %{public}@ to %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, storedType.description, UserDefaults.standard.followerDataSourceType.description)
+            trace("in startServices, reset followerDataSourceType from newly ignored %{public}@ to %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info, storedType.description, UserDefaults.standard.followerDataSourceType.description)
         }
         
         // from 5.2.0 the showTarget userdefault will be deprecated
@@ -353,11 +365,11 @@ final class RootViewController: UIViewController {
                     // create info screen about transmitters
                     let infoScreenAlert = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.transmitterInfo, actionHandler: nil)
                     
-                    self.present(infoScreenAlert, animated: true, completion: nil)
+                    self.presentingViewController?.present(infoScreenAlert, animated: true, completion: nil)
                     
                 })
                 
-                self.present(alert, animated: true, completion: nil)
+                self.presentingViewController?.present(alert, animated: true, completion: nil)
                 
             }
             
@@ -472,7 +484,7 @@ final class RootViewController: UIViewController {
             case .notDetermined, .denied:
                 UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (success, error) in
                     if let error = error {
-                        trace("in viewDidLoad, request notification authorization failed : %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .error, error.localizedDescription)
+                        trace("in startServices, request notification authorization failed : %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .error, error.localizedDescription)
                     }
                 }
             default:
@@ -599,7 +611,7 @@ final class RootViewController: UIViewController {
         // setup nightscout synchronizer
         nightscoutSyncManager = NightscoutSyncManager(coreDataManager: coreDataManager, messageHandler: { (title:String, message:String) in
             let alert = UIAlertController(title: title, message: message, actionHandler: nil)
-            self.present(alert, animated: true, completion: nil)
+            self.presentingViewController?.present(alert, animated: true, completion: nil)
         })
         
         // instantiate treatment entry accessor
@@ -641,7 +653,7 @@ final class RootViewController: UIViewController {
         // setup dexcomShareUploadManager
         dexcomShareUploadManager = DexcomShareUploadManager(bgReadingsAccessor: bgReadingsAccessor, messageHandler: { (title:String, message:String) in
             let alert = UIAlertController(title: title, message: message, actionHandler: nil)
-            self.present(alert, animated: true, completion: nil)
+            self.presentingViewController?.present(alert, animated: true, completion: nil)
         })
         
         /// will be called by BluetoothPeripheralManager if cgmTransmitterType changed and/or webOOPEnabled value changed
@@ -695,7 +707,11 @@ final class RootViewController: UIViewController {
         }
         
         // setup bluetoothPeripheralManager
-        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self, uIViewController: self, heartBeatFunction: {
+        guard let presentingViewController else {
+            fatalError("RootApplicationCoordinator requires a presentation endpoint before starting Bluetooth services")
+        }
+
+        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self, uIViewController: presentingViewController, heartBeatFunction: {
             self.loopFollowManager?.getReading()
             self.nightscoutFollowManager?.download()
             self.libreLinkUpFollowManager?.download()
@@ -1083,11 +1099,6 @@ final class RootViewController: UIViewController {
         }
     }
     
-    /// Connects the service coordinator to the state model owned by RootTabView.
-    func configure(rootTabStateModel: RootTabStateModel) {
-        self.rootTabStateModel = rootTabStateModel
-    }
-
     // MARK: - SwiftUI Home Actions
 
     private func makeRootHomeActions() -> RootHomeActions {
@@ -1137,7 +1148,7 @@ final class RootViewController: UIViewController {
     }
 
     private func publishRootHomeState() {
-        guard isViewLoaded else { return }
+        guard hasStarted else { return }
 
         guard Thread.isMainThread else {
             DispatchQueue.main.async {
@@ -1226,7 +1237,7 @@ final class RootViewController: UIViewController {
             return Timer.scheduledTimer(timeInterval: ConstantsHomeView.updateHomeViewIntervalInSeconds, target: self, selector: #selector(self.updateLabelsAndChart), userInfo: nil, repeats: true)
         }
         
-        // call scheduleUpdateLabelsAndChartTimer function now - as the function setupUpdateLabelsAndChartTimer is called from viewdidload, it will be called immediately after app launch
+        // call scheduleUpdateLabelsAndChartTimer function now so that it starts immediately after app launch
         updateLabelsAndChartTimer = createAndScheduleUpdateLabelsAndChartTimer()
         
         // updateLabelsAndChartTimer needs to be created when app comes back from background to foreground
@@ -1264,7 +1275,7 @@ final class RootViewController: UIViewController {
         guard let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let bluetoothTransmitter = cgmTransmitter as? BluetoothTransmitter else {
             trace("in requestCalibration, calibrationsAccessor or cgmTransmitter is nil, no further processing", log: log, category: ConstantsLog.categoryRootView, type: .info)
             
-            self.present(UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.theresNoCGMTransmitterActive, actionHandler: nil), animated: true, completion: nil)
+            self.presentingViewController?.present(UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.theresNoCGMTransmitterActive, actionHandler: nil), animated: true, completion: nil)
             
             return
         }
@@ -1273,7 +1284,7 @@ final class RootViewController: UIViewController {
         guard let activeSensor = activeSensor else {
             trace("in requestCalibration, there is no active sensor, no further processing", log: log, category: ConstantsLog.categoryRootView, type: .info)
             
-            self.present(UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.startSensorBeforeCalibration, actionHandler: nil), animated: true, completion: nil)
+            self.presentingViewController?.present(UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.startSensorBeforeCalibration, actionHandler: nil), animated: true, completion: nil)
             
             return
         }
@@ -1281,7 +1292,7 @@ final class RootViewController: UIViewController {
         // if it's a user requested calibration, but there's no calibration yet, then give info and return - first calibration will be requested by app via notification
         // cgmTransmitter.overruleIsWebOOPEnabled() : that means it's a transmitter that gives calibrated values (ie doesn't need to be calibrated) but it can use calibration
         if calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) == nil && userRequested && !cgmTransmitter.overruleIsWebOOPEnabled() {
-            self.present(UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.thereMustBeAreadingBeforeCalibration, actionHandler: nil), animated: true, completion: nil)
+            self.presentingViewController?.present(UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.thereMustBeAreadingBeforeCalibration, actionHandler: nil), animated: true, completion: nil)
             
             return
         }
@@ -1291,7 +1302,7 @@ final class RootViewController: UIViewController {
         
         let alert = UIAlertController(title: Texts_Calibrations.enterCalibrationValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: nil, placeHolder: "...", actionTitle: nil, cancelTitle: nil, actionHandler: { (text:String) in
             guard let valueAsDouble = text.toDouble() else {
-                self.present(UIAlertController(title: Texts_Common.warning, message: Texts_Common.invalidValue, actionHandler: nil), animated: true, completion: nil)
+                self.presentingViewController?.present(UIAlertController(title: Texts_Common.warning, message: Texts_Common.invalidValue, actionHandler: nil), animated: true, completion: nil)
                 return
             }
 
@@ -1304,12 +1315,12 @@ final class RootViewController: UIViewController {
                 activeSensor: activeSensor,
                 deviceName: deviceName
             ) {
-                self.present(UIAlertController(title: Texts_Common.warning, message: errorMessage, actionHandler: nil), animated: true, completion: nil)
+                self.presentingViewController?.present(UIAlertController(title: Texts_Common.warning, message: errorMessage, actionHandler: nil), animated: true, completion: nil)
             }
         }, cancelHandler: nil)
         
         // present the alert
-        self.present(alert, animated: true, completion: nil)
+        self.presentingViewController?.present(alert, animated: true, completion: nil)
     }
 
     private func submitCalibrationValue(
@@ -1731,7 +1742,7 @@ final class RootViewController: UIViewController {
             // prevent screen dim/lock
             UIApplication.shared.isIdleTimerDisabled = true
             
-            // set the private var so that we can track the screen lock activation state within the RootViewController
+            // set the private var so that the coordinator can track the screen lock activation state
             screenIsLocked = true
             
             trace("screen lock : screen lock / keep-awake enabled. Night mode set to '%{public}@'. Dimming type set to '%{public}@'", log: self.log, category: ConstantsLog.categoryRootView, type: .info, nightMode.description, UserDefaults.standard.screenLockDimmingType.description)
@@ -1832,7 +1843,7 @@ final class RootViewController: UIViewController {
     
     /// if allowed set the main screen rotation settings
     fileprivate func updateScreenRotationSettings() {
-        // if allowed, then permit the Root View Controller which is the main screen, to rotate left/right to show the landscape view
+        // if allowed, then permit the SwiftUI Home tab to rotate left/right to show the landscape view
         if UserDefaults.standard.allowScreenRotation {
             (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .allButUpsideDown
         } else {
@@ -2092,7 +2103,7 @@ final class RootViewController: UIViewController {
 // MARK: - conform to CGMTransmitter protocol
 
 /// conform to CGMTransmitterDelegate
-extension RootViewController: CGMTransmitterDelegate {
+extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
     func sensorStopDetected() {
         trace("sensor stop detected", log: log, category: ConstantsLog.categoryRootView, type: .info)
         
@@ -2196,7 +2207,7 @@ extension RootViewController: CGMTransmitterDelegate {
 // MARK: - conform to UNUserNotificationCenterDelegate protocol
 
 /// conform to UNUserNotificationCenterDelegate, for notifications
-extension RootViewController: UNUserNotificationCenterDelegate {
+extension RootApplicationCoordinator: @preconcurrency UNUserNotificationCenterDelegate {
     // called when notification created while app is in foreground
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         if notification.request.identifier == ConstantsNotifications.NotificationIdentifiersForCalibration.initialCalibrationRequest {
@@ -2220,7 +2231,12 @@ extension RootViewController: UNUserNotificationCenterDelegate {
             bluetoothPeripheralManager?.initiatePairing()
             // this will verify if it concerns an alert notification, if not pickerviewData will be nil
         } else if let pickerViewData = alertManager?.userNotificationCenter(center, willPresent: notification, withCompletionHandler: completionHandler) {
-            PickerViewControllerModal.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+            guard let presentingViewController else {
+                completionHandler([])
+                return
+            }
+
+            PickerViewControllerModal.displayPickerViewController(pickerViewData: pickerViewData, parentController: presentingViewController)
         }  else if notification.request.identifier == ConstantsNotifications.notificationIdentifierForVolumeTest {
             // user is testing iOS Sound volume in the settings. Only the sound should be played, the alert itself will not be shown
             completionHandler([.sound, .list])
@@ -2245,14 +2261,18 @@ extension RootViewController: UNUserNotificationCenterDelegate {
             // if user clicks notification "sensor not detected", then show uialert with title and body
             let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.sensorNotDetected, actionHandler: nil)
             
-            self.present(alert, animated: true, completion: nil)
+            self.presentingViewController?.present(alert, animated: true, completion: nil)
         } else if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
             // nothing required, the pairing function will be called as it's been added to ApplicationManager in function cgmTransmitterNeedsPairing
         } else {
             // it's not an initial calibration request notification that the user clicked, by calling alertManager?.userNotificationCenter, we check if it was an alert notification that was clicked and if yes pickerViewData will have the list of alert snooze values
             if let pickerViewData = alertManager?.userNotificationCenter(center, didReceive: response) {
                 trace("in userNotificationCenter didReceive, user pressed an alert notification to open the app", log: log, category: ConstantsLog.categoryRootView, type: .info)
-                PickerViewControllerModal.displayPickerViewController(pickerViewData: pickerViewData, parentController: self)
+                guard let presentingViewController else {
+                    return
+                }
+
+                PickerViewControllerModal.displayPickerViewController(pickerViewData: pickerViewData, parentController: presentingViewController)
             } else {
                 // it as also not an alert notification that the user clicked, there might come in other types of notifications in the future
             }
@@ -2262,7 +2282,7 @@ extension RootViewController: UNUserNotificationCenterDelegate {
 
 // MARK: - conform to FollowerDelegate protocol
 
-extension RootViewController: FollowerDelegate {
+extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
     func followerInfoReceived(followGlucoseDataArray: inout [FollowerBgReading]) {
         if let coreDataManager = coreDataManager, let bgReadingsAccessor = bgReadingsAccessor { //}, let followManager = (UserDefaults.standard.followerDataSourceType == .nightscout ? self.nightscoutFollowManager : self.libreLinkUpFollowManager) {
 
@@ -2390,4 +2410,4 @@ extension RootViewController: FollowerDelegate {
 
 // MARK: - conform to ActiveSensorProviding protocol
 
-extension RootViewController: ActiveSensorProviding { }
+extension RootApplicationCoordinator: @preconcurrency ActiveSensorProviding { }

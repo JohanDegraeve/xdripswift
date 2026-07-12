@@ -130,7 +130,7 @@ struct RootHomeMetricState: Identifiable {
 
 /// Main state model for the SwiftUI home screen.
 ///
-/// RootViewController still owns long-lived application services and calls `refresh` from the same
+/// RootApplicationCoordinator owns long-lived application services and calls `refresh` from the same
 /// lifecycle, glucose and follower callbacks used by the previous UIKit home screen. Unlike the
 /// first migration bridge, this model calculates presentation values directly from those services;
 /// it does not read or mirror the retired storyboard home views.
@@ -670,7 +670,7 @@ final class RootHomeStateModel: ObservableObject {
 /// Commands emitted by controls in the SwiftUI home screen.
 ///
 /// RootTabView supplies navigation and presentation commands. The remaining service commands are
-/// supplied by RootViewController until its application-service responsibilities are extracted.
+/// supplied by RootApplicationCoordinator while its presentation responsibilities are extracted.
 struct RootHomeActions {
     var showSnooze: () -> Void = {}
     var showBgReadings: () -> Void = {}

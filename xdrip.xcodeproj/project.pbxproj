@@ -533,7 +533,7 @@
 		F8A5EEB8257CF2940085E660 /* TextsLibreNFC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEB7257CF2940085E660 /* TextsLibreNFC.swift */; };
 		F8A5EEC2257D18DC0085E660 /* LibreNFCDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEC1257D18DC0085E660 /* LibreNFCDelegate.swift */; };
 		F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425D21ADEBD60078C348 /* AppDelegate.swift */; };
-		F8AC426021ADEBD60078C348 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425F21ADEBD60078C348 /* RootViewController.swift */; };
+		F8AC426021ADEBD60078C348 /* RootApplicationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425F21ADEBD60078C348 /* RootApplicationCoordinator.swift */; };
 		F8AC426521ADEBD60078C348 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426321ADEBD60078C348 /* Main.storyboard */; };
 		F8AC426721ADEBD70078C348 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426621ADEBD70078C348 /* Assets.xcassets */; };
 		F8AC426A21ADEBD70078C348 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426821ADEBD70078C348 /* LaunchScreen.storyboard */; };
@@ -1539,7 +1539,7 @@
 		F8A5EEC5257EDC910085E660 /* xdripDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = xdripDebug.entitlements; sourceTree = "<group>"; };
 		F8AC425A21ADEBD60078C348 /* xdrip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xdrip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8AC425D21ADEBD60078C348 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		F8AC425F21ADEBD60078C348 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
+		F8AC425F21ADEBD60078C348 /* RootApplicationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootApplicationCoordinator.swift; sourceTree = "<group>"; };
 		F8AC426421ADEBD60078C348 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		F8AC426621ADEBD70078C348 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F8AC426921ADEBD70078C348 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -2288,14 +2288,6 @@
 			path = Protocol;
 			sourceTree = "<group>";
 		};
-		F8025E5921F7861200ECF0C0 /* Root View Controller */ = {
-			isa = PBXGroup;
-			children = (
-				F8AC425F21ADEBD60078C348 /* RootViewController.swift */,
-			);
-			path = "Root View Controller";
-			sourceTree = "<group>";
-		};
 		F8025E5A21F7AFA100ECF0C0 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
@@ -2428,6 +2420,7 @@
 			isa = PBXGroup;
 			children = (
 				F821CF55229BF43A005C1E43 /* ApplicationManager.swift */,
+				F8AC425F21ADEBD60078C348 /* RootApplicationCoordinator.swift */,
 			);
 			path = Application;
 			sourceTree = "<group>";
@@ -2564,7 +2557,6 @@
 			children = (
 				F8297F47238DCAD800D74D66 /* BluetoothPeripheralsNavigationController */,
 				F8B3A806227A28F9004BA588 /* Helpers */,
-				F8025E5921F7861200ECF0C0 /* Root View Controller */,
 				F8B3A823227E4B7D004BA588 /* SettingsNavigationController */,
 				D4028CBE2774A4B900341476 /* Treatments */,
 			);
@@ -4393,7 +4385,7 @@
 				F8AF11FA24B1FB3500AE5BA2 /* DexcomError.swift in Sources */,
 				F88EC27A260120C000DF0EAF /* ConstantsAlerts.swift in Sources */,
 				F8F9720B23A5915900C3F17D /* SensorDataRxMessage.swift in Sources */,
-				F8AC426021ADEBD60078C348 /* RootViewController.swift in Sources */,
+				F8AC426021ADEBD60078C348 /* RootApplicationCoordinator.swift in Sources */,
 				F8B3A78B225D473D004BA588 /* UIAlertController.swift in Sources */,
 				47A6AC292B7D3DAB0047A4BA /* GlucoseChartView.swift in Sources */,
 				360BF345E424B38E3822AA76 /* GlucoseChartState.swift in Sources */,

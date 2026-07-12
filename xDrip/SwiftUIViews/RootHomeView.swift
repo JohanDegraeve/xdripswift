@@ -9,11 +9,11 @@
 import Combine
 import SwiftUI
 
-/// SwiftUI replacement surface for the RootViewController home screen.
+/// Native SwiftUI home screen.
 ///
 /// This view owns presentation-level state and chart scrolling state. RootTabView owns its
-/// navigation and sheets, while the existing RootViewController temporarily remains the entry
-/// point for transmitter delegates, notifications and application service lifecycle work.
+/// navigation and sheets, while RootApplicationCoordinator owns transmitter delegates,
+/// notifications and application service lifecycle work.
 struct RootHomeView: View {
 
     // MARK: - Layout
