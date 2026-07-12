@@ -170,7 +170,7 @@
 		47A6AC462B7D43110047A4BA /* Common.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8BDD444221C9D0D006EAB84 /* Common.strings */; };
 		47A8B8872E392BFE00081CBD /* LiveActivityViewContentActivityFamilies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47A8B8862E392BF700081CBD /* LiveActivityViewContentActivityFamilies.swift */; };
 		47AECB9E2CD2B62B005F1814 /* NightscoutDeviceStatusModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47AECB9D2CD2B618005F1814 /* NightscoutDeviceStatusModels.swift */; };
-		47B136DB2BC9BB55001E7ED3 /* ContactImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B136DA2BC9BB55001E7ED3 /* ContactImageView.swift */; };
+		47B136DB2BC9BB55001E7ED3 /* ContactImageRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B136DA2BC9BB55001E7ED3 /* ContactImageRenderer.swift */; };
 		47B136DD2BCA9151001E7ED3 /* ConstantsContactImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B136DC2BCA9151001E7ED3 /* ConstantsContactImage.swift */; };
 		47B60F3726F389E2003198D3 /* LandscapeChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B60F3626F389E2003198D3 /* LandscapeChartView.swift */; };
 		47B65D412E3A31B100C3140B /* LiveActivityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 47B65D402E3A319D00C3140B /* LiveActivityView.swift */; };
@@ -938,7 +938,7 @@
 		47A8B8862E392BF700081CBD /* LiveActivityViewContentActivityFamilies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActivityViewContentActivityFamilies.swift; sourceTree = "<group>"; };
 		47AC0EE42FCE1FAF0098B607 /* xdrip v17.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v17.xcdatamodel"; sourceTree = "<group>"; };
 		47AECB9D2CD2B618005F1814 /* NightscoutDeviceStatusModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutDeviceStatusModels.swift; sourceTree = "<group>"; };
-		47B136DA2BC9BB55001E7ED3 /* ContactImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactImageView.swift; sourceTree = "<group>"; };
+		47B136DA2BC9BB55001E7ED3 /* ContactImageRenderer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContactImageRenderer.swift; sourceTree = "<group>"; };
 		47B136DC2BCA9151001E7ED3 /* ConstantsContactImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsContactImage.swift; sourceTree = "<group>"; };
 		47B4A7B42FD0AAC600B4712A /* xdrip v18.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v18.xcdatamodel"; sourceTree = "<group>"; };
 		47B60F3626F389E2003198D3 /* LandscapeChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandscapeChartView.swift; sourceTree = "<group>"; };
@@ -2220,6 +2220,7 @@
 			isa = PBXGroup;
 			children = (
 				F227BF1B2B9E426B00CEEAAD /* ContactImageManager.swift */,
+				47B136DA2BC9BB55001E7ED3 /* ContactImageRenderer.swift */,
 			);
 			path = ContactImage;
 			sourceTree = "<group>";
@@ -2506,7 +2507,6 @@
 				4A9B10162F0A000100000001 /* BgAdjustmentsView.swift */,
 				47D9BC942A78498500AB85B2 /* BgReadingsDetailView.swift */,
 				47228B142996BDD2008725DB /* BgReadingsView.swift */,
-				47B136DA2BC9BB55001E7ED3 /* ContactImageView.swift */,
 				F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */,
 				47C210EF2B52A05B00005711 /* GlucoseChartView.swift */,
 				47B60F3626F389E2003198D3 /* LandscapeChartView.swift */,
@@ -4058,7 +4058,7 @@
 				F8A1585922EDB7C6007F5B5D /* ConstantsDefaultAlertLevels.swift in Sources */,
 				F8A54AAD22D6859200934E7A /* SlopeParameters.swift in Sources */,
 				472596052B76301F00459D12 /* WatchManager.swift in Sources */,
-				47B136DB2BC9BB55001E7ED3 /* ContactImageView.swift in Sources */,
+				47B136DB2BC9BB55001E7ED3 /* ContactImageRenderer.swift in Sources */,
 				47A05CCC2EF16110004DABE7 /* ConstantsMedtrumEasyView.swift in Sources */,
 				F8025C0A21D94FD700ECF0C0 /* CBManagerState.swift in Sources */,
 				F8E3A2A923D906C200E5E98A /* CalendarManager.swift in Sources */,

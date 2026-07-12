@@ -1,8 +1,15 @@
+//
+//  ContactImageRenderer.swift
+//  xdrip
+//
+//  Created by Paul Plant on 13/4/24.
+//  Copyright © 2024 Johan Degraeve. All rights reserved.
+//
+
 import Foundation
-import SwiftUI
 import UIKit
 
-struct ContactImageView: View {
+struct ContactImageRenderer {
     
     // public vars that need to be initialized when creating an instance of the view
     var bgValue: Double
@@ -15,11 +22,6 @@ struct ContactImageView: View {
 
     var uiImage: UIImage {
         return getImage()
-    }
-    
-    var body: some View {
-        Image(uiImage: uiImage)
-            .frame(width: 256, height: 256)
     }
     
     var bgColor: UIColor {
@@ -146,54 +148,5 @@ struct ContactImageView: View {
                 }
             }
         }
-    }
-}
-
-struct ContactImageViewPreview: View {
-    var bgValue: Double
-    var isMgDl: Bool
-    var slopeArrow: String
-    var bgRangeDescription: BgRangeDescription
-    var valueIsUpToDate: Bool
-    var useHighContrastContactImage: Bool
-    var disableContactImage: Bool
-    
-    var body: some View {
-        ZStack {
-            ContactImageView(bgValue: bgValue, isMgDl: isMgDl, slopeArrow: slopeArrow, bgRangeDescription: bgRangeDescription, valueIsUpToDate: valueIsUpToDate, useHighContrastContactImage: useHighContrastContactImage, disableContactImage: disableContactImage)
-            Circle()
-                .stroke(lineWidth: 20)
-                .foregroundColor(.white)
-        }
-        .frame(width: 256, height: 256)
-        .clipShape(Circle())
-        .preferredColorScheme(.dark)
-    }
-}
-
-struct ContactImageView_Previews: PreviewProvider {
-    struct Preview: View {
-        var body: some View {
-            ContactImageViewPreview(bgValue: 88, isMgDl: true, slopeArrow: "", bgRangeDescription: BgRangeDescription.notUrgent, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: true).previewDisplayName("OFF")
-            
-            ContactImageViewPreview(bgValue: 88, isMgDl: true, slopeArrow: "", bgRangeDescription: BgRangeDescription.notUrgent, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("88")
-            ContactImageViewPreview(bgValue: 88, isMgDl: true, slopeArrow: "\u{2192}" /* → */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: true, disableContactImage: false).previewDisplayName("88 →")
-            ContactImageViewPreview(bgValue: 188, isMgDl: true, slopeArrow: "", bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("188")
-            ContactImageViewPreview(bgValue: 188, isMgDl: true, slopeArrow: "\u{2198}" /* ↘ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("188 ↘")
-            ContactImageViewPreview(bgValue: 388, isMgDl: true, slopeArrow: "", bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("388")
-            ContactImageViewPreview(bgValue: 388, isMgDl: true, slopeArrow: "\u{2191}\u{2191}" /* ↑↑ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("388 ↑↑")
-            
-            ContactImageViewPreview(bgValue: 160, isMgDl: false, slopeArrow: "",  bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("8.9") /* → */
-            ContactImageViewPreview(bgValue: 160, isMgDl: false, slopeArrow: "\u{2198}" /* ↘ */,  bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("8.9 ↘") /* → */
-            ContactImageViewPreview(bgValue: 188, isMgDl: false, slopeArrow: "", bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("10.4")
-            ContactImageViewPreview(bgValue: 188, isMgDl: false, slopeArrow: "\u{2198}" /* ↘ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("10.4 ↘")
-            ContactImageViewPreview(bgValue: 400, isMgDl: false, slopeArrow: "", bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("22.2")
-            ContactImageViewPreview(bgValue: 400, isMgDl: false, slopeArrow: "\u{2191}\u{2191}" /* ↑↑ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: true, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("22.2 ↑↑")
-            
-            ContactImageViewPreview(bgValue: 120, isMgDl: true, slopeArrow: "\u{2191}" /* ↑ */, bgRangeDescription: BgRangeDescription.inRange, valueIsUpToDate: false, useHighContrastContactImage: false, disableContactImage: false).previewDisplayName("120, not current")
-        }
-    }
-    static var previews: some View {
-        Preview()
     }
 }
