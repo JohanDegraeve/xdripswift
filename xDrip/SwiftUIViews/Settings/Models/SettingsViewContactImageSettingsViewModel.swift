@@ -1,6 +1,5 @@
 import Foundation
 import Contacts
-import UIKit
 import os
 
 fileprivate enum Setting: Int, CaseIterable {
@@ -48,7 +47,6 @@ class SettingsViewContactImageSettingsViewModel: NSObject, SettingsViewModelProt
         self.sectionReloadClosure = sectionReloadClosure
     }
     
-    func storeUIViewController(uIViewController: UIViewController) {}
     
     // this ViewModel does need to send back messages to the viewcontroller asynchronously
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {}
@@ -74,7 +72,7 @@ class SettingsViewContactImageSettingsViewModel: NSObject, SettingsViewModelProt
         }
     }
     
-    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+    func accessoryType(index: Int) -> SettingsAccessory {
         guard let _ = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         return .none
@@ -137,32 +135,6 @@ class SettingsViewContactImageSettingsViewModel: NSObject, SettingsViewModelProt
         }
     }
 
-    func uiView(index: Int) -> UIView? {
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-
-        switch setting {
-        case .enableContactImage:
-            // if authorizationStatus is denied or restricted, then don't show the uiswitch
-//            let authorizationStatus = CNContactStore.authorizationStatus(for: .contacts)
-//            if authorizationStatus == .denied || authorizationStatus == .restricted { return nil }
-            
-            return UISwitch(isOn: UserDefaults.standard.enableContactImage, action: { (isOn: Bool) in
-                self.setContactImageEnabled(isOn)
-            })
-            
-        case .displayTrend:
-            return UISwitch(isOn: UserDefaults.standard.displayTrendInContactImage, action: { (isOn:Bool) in
-                trace("displayTrend changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.displayTrendInContactImage = isOn
-            })
-            
-        case .useHighContrastContactImage:
-            return UISwitch(isOn: UserDefaults.standard.useHighContrastContactImage, action: { (isOn:Bool) in
-                trace("useHighContrastContactImage changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.useHighContrastContactImage = isOn
-            })
-        }
-    }
 
     private func setContactImageEnabled(_ isOn: Bool) {
         trace("enableContactImage changed by user to %{public}@", log: log, category: ConstantsLog.categorySettingsViewContactImageSettingsViewModel, type: .info, isOn.description)

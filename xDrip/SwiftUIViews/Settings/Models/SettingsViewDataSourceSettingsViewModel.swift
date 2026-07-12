@@ -7,8 +7,7 @@
 //
 
 import os
-import UIKit
-import SafariServices
+import SwiftUI
 
 fileprivate enum Setting: Int, CaseIterable {
     /// blood glucose  unit
@@ -131,34 +130,6 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         }
     }
     
-    // open a Safari web view with the provided URL
-    private func openWeb(_ url: URL) {
-        let vc = SFSafariViewController(url: url)
-        vc.modalPresentationStyle = .pageSheet
-        DispatchQueue.main.async {
-            self.topViewController()?.present(vc, animated: true)
-        }
-    }
-    
-    // returns the view controller on the top of the navigation stack
-    private func topViewController(_ base: UIViewController? = {
-        UIApplication.shared.connectedScenes
-            .compactMap {
-                $0 as? UIWindowScene
-            }
-            .flatMap {
-                $0.windows
-            }
-            .first {
-                $0.isKeyWindow
-            }?.rootViewController
-    }()) -> UIViewController? {
-        if let nav = base as? UINavigationController { return topViewController(nav.visibleViewController) }
-        if let tab = base as? UITabBarController, let selected = tab.selectedViewController { return topViewController(selected) }
-        if let presented = base?.presentedViewController { return topViewController(presented) }
-        return base
-    }
-    
     private func resetLibreLinkUpData() {
         UserDefaults.standard.libreLinkUpRegion = nil
         UserDefaults.standard.activeSensorStartDate = nil
@@ -214,7 +185,6 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         self.sectionReloadClosure = sectionReloadClosure
     }
     
-    func storeUIViewController(uIViewController: UIViewController) {}
     
     func storeMessageHandler(messageHandler: @escaping ((String, String) -> Void)) {
         self.messageHandler = messageHandler
@@ -383,7 +353,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             
         case .followerExtraRow5:
             if let url = URL(string: UserDefaults.standard.followerDataSourceType.serviceStatusBaseUrlString(nightscoutUrl: UserDefaults.standard.nightscoutUrl)), (UserDefaults.standard.followerDataSourceType.hasServiceStatus() && followerServiceStatusResult.status != .notAvailable) {
-                openWeb(url)
+                return .openURL(url)
             }
             return .nothing
             
@@ -660,7 +630,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         }
     }
     
-    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+    func accessoryType(index: Int) -> SettingsAccessory {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
 
         switch setting {
@@ -668,26 +638,26 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             return .none
 
         case .followerExtraRow2:
-            return UserDefaults.standard.isMaster ? .none : .disclosureIndicator
+            return UserDefaults.standard.isMaster ? .none : .disclosure
             
         case .followerExtraRow5:
-            return (UserDefaults.standard.followerDataSourceType.hasServiceStatus() && followerServiceStatusResult.status != .notAvailable) ? .disclosureIndicator : .none
+            return (UserDefaults.standard.followerDataSourceType.hasServiceStatus() && followerServiceStatusResult.status != .notAvailable) ? .disclosure : .none
 
         case .followerExtraRow9:
             // Show disclosure indicator for Dexcom region selection or Medtrum patient selection
             if UserDefaults.standard.followerDataSourceType == .dexcomShare && UserDefaults.standard.dexcomShareRegion != .none {
-                return .disclosureIndicator
+                return .disclosure
             } else if UserDefaults.standard.followerDataSourceType == .medtrumEasyView && UserDefaults.standard.medtrumEasyViewUserType == "M" && UserDefaults.standard.medtrumEasyViewSelectedPatientUid == 0 {
-                return .disclosureIndicator
+                return .disclosure
             } else {
                 return .none
             }
 
         case .followerExtraRow10:
-            return UserDefaults.standard.activeSensorStartDate != nil ? .disclosureIndicator : .none
+            return UserDefaults.standard.activeSensorStartDate != nil ? .disclosure : .none
             
         case .followerExtraRow3, .followerExtraRow4, .followerExtraRow7, .followerExtraRow8:
-            return .disclosureIndicator
+            return .disclosure
         }
     }
     
@@ -874,7 +844,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
     /// Returns the colour for the small SwiftUI dot shown beside the follower
     /// service status detail text. The status description stays clean so the UI
     /// can draw the indicator without adding emoji to the string.
-    func followerServiceStatusIndicatorColor(index: Int) -> UIColor? {
+    func followerServiceStatusIndicatorColor(index: Int) -> Color? {
         guard let setting = Setting(rawValue: index), setting == .followerExtraRow5 else { return nil }
 
         return followerServiceStatusResult.status.indicatorColor
@@ -925,35 +895,6 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         }
     }
     
-    func uiView(index: Int) -> UIView? {
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-        
-        switch setting {
-        case .followerExtraRow2:
-            if UserDefaults.standard.isMaster {
-                return UserDefaults.standard.nightscoutEnabled ? UISwitch(isOn: UserDefaults.standard.masterUploadDataToNightscout, action: { (isOn: Bool) in
-                    trace("isMaster changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, isOn.description)
-                    UserDefaults.standard.masterUploadDataToNightscout = isOn } ) : nil
-            } else {
-                return nil
-            }
-            
-        case .followerExtraRow6:
-            return UserDefaults.standard.nightscoutEnabled ? UISwitch(isOn: UserDefaults.standard.followerUploadDataToNightscout, action: { (isOn: Bool) in
-                trace("followerUploadDataToNightscout changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.followerUploadDataToNightscout = isOn } ) : nil
-            
-        case .followerExtraRow12:
-            return UISwitch(isOn: UserDefaults.standard.libreLinkUpIs15DaySensor, action: { (isOn: Bool) in
-                trace("libreLinkUpIs15DaySensor changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.libreLinkUpIs15DaySensor = isOn
-                UserDefaults.standard.activeSensorMaxSensorAgeInDays = UserDefaults.standard.libreLinkUpIs15DaySensor ? ConstantsLibreLinkUp.libreLinkUpMaxSensorAgeInDaysLibrePlus : ConstantsLibreLinkUp.libreLinkUpMaxSensorAgeInDays
-            })
-
-        case .bloodGlucoseUnit, .masterFollower, .followerExtraRow3, .followerExtraRow4, .followerExtraRow5, .followerExtraRow7, .followerExtraRow8, .followerExtraRow9, .followerExtraRow10, .followerExtraRow11:
-            return nil
-        }
-    }
     
     // MARK: - observe functions
     
@@ -1053,16 +994,16 @@ extension SettingsViewDataSourceSettingsViewModel {
         
         /// Maps the follower service status to the colour used by the SwiftUI
         /// detail indicator. States that should not show a marker return nil.
-        var indicatorColor: UIColor? {
+        var indicatorColor: Color? {
             switch self {
             case .ok:
-                return .systemGreen
+                return .green
             case .degraded:
-                return .systemYellow
+                return .yellow
             case .outage:
-                return .systemRed
+                return .red
             case .error:
-                return .systemOrange
+                return .orange
             default:
                 return nil
             }

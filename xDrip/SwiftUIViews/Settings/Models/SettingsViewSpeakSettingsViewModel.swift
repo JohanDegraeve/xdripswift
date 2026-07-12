@@ -1,5 +1,5 @@
 import os
-import UIKit
+import Foundation
 
 fileprivate enum Setting:Int, CaseIterable {
     
@@ -71,7 +71,6 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         self.sectionReloadClosure = sectionReloadClosure
     }
     
-    func storeUIViewController(uIViewController: UIViewController) {}
     
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
         // this ViewModel does need to send back messages to the viewcontroller asynchronously
@@ -146,20 +145,20 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         }
     }
     
-    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+    func accessoryType(index: Int) -> SettingsAccessory {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
         case .speakBgReadings:
-            return UITableViewCell.AccessoryType.none
+            return SettingsAccessory.none
         case .speakTrend:
-            return UITableViewCell.AccessoryType.none
+            return SettingsAccessory.none
         case .speakDelta:
-            return UITableViewCell.AccessoryType.none
+            return SettingsAccessory.none
         case .speakInterval:
-            return UITableViewCell.AccessoryType.disclosureIndicator
+            return SettingsAccessory.disclosure
         case .speakBgReadingLanguage:
-            return UITableViewCell.AccessoryType.disclosureIndicator
+            return SettingsAccessory.disclosure
         }
     }
     
@@ -216,34 +215,6 @@ class SettingsViewSpeakSettingsViewModel: NSObject, SettingsViewModelProtocol {
         }
     }
     
-    func uiView(index: Int) -> UIView? {
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-        
-        switch setting {
-            
-        case .speakBgReadings:
-            return UISwitch(isOn: UserDefaults.standard.speakReadings, action: {(isOn:Bool) in
-                trace("speakBgReadings changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewSpeakSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.speakReadings = isOn
-            })
-
-        case .speakTrend:
-            return UISwitch(isOn: UserDefaults.standard.speakTrend, action: {(isOn:Bool) in
-                trace("speakTrend changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewSpeakSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.speakTrend = isOn})
-
-        case .speakDelta:
-            return UISwitch(isOn: UserDefaults.standard.speakDelta, action: {(isOn:Bool) in
-                trace("speakDelta changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewSpeakSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.speakDelta = isOn})
-
-        case .speakInterval:
-            return nil
-            
-        case .speakBgReadingLanguage:
-            return nil
-        }
-    }
     
     // MARK: - observe functions
     

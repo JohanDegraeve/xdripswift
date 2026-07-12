@@ -1,4 +1,4 @@
-import UIKit
+import Foundation
 
 fileprivate enum Setting:Int, CaseIterable {
     
@@ -19,7 +19,6 @@ struct SettingsViewM5StackGeneralSettingsViewModel: SettingsViewModelProtocol {
 
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
-    func storeUIViewController(uIViewController: UIViewController) {}
 
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
         // this ViewModel does need to send back messages to the viewcontroller asynchronously
@@ -39,12 +38,12 @@ struct SettingsViewM5StackGeneralSettingsViewModel: SettingsViewModelProtocol {
 
     }
     
-    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+    func accessoryType(index: Int) -> SettingsAccessory {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
         case .textColor:
-            return UITableViewCell.AccessoryType.disclosureIndicator
+            return SettingsAccessory.disclosure
         }
     }
     
@@ -61,14 +60,6 @@ struct SettingsViewM5StackGeneralSettingsViewModel: SettingsViewModelProtocol {
         }
     }
     
-    func uiView(index: Int) -> UIView? {
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-        
-        switch setting {
-        case .textColor:
-            return nil
-        }
-    }
     
     func numberOfRows() -> Int {
         return Setting.allCases.count

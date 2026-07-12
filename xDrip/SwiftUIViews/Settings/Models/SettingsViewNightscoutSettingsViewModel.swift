@@ -1,7 +1,6 @@
-import UIKit
+import Foundation
 import os
 import Foundation
-import SafariServices
 
 fileprivate enum Setting:Int, CaseIterable {
     
@@ -223,34 +222,6 @@ class SettingsViewNightscoutSettingsViewModel {
         
     }
     
-    // open a Safari web view with the provided URL
-    private func openWeb(_ url: URL) {
-        let vc = SFSafariViewController(url: url)
-        vc.modalPresentationStyle = .pageSheet
-        DispatchQueue.main.async {
-            self.topViewController()?.present(vc, animated: true)
-        }
-    }
-    
-    // returns the view controller on the top of the navigation stack
-    private func topViewController(_ base: UIViewController? = {
-        UIApplication.shared.connectedScenes
-            .compactMap {
-                $0 as? UIWindowScene
-            }
-            .flatMap {
-                $0.windows
-            }
-            .first {
-                $0.isKeyWindow
-            }?.rootViewController
-    }()) -> UIViewController? {
-        if let nav = base as? UINavigationController { return topViewController(nav.visibleViewController) }
-        if let tab = base as? UITabBarController, let selected = tab.selectedViewController { return topViewController(selected) }
-        if let presented = base?.presentedViewController { return topViewController(presented) }
-        return base
-    }
-    
 }
 
 /// conforms to SettingsViewModelProtocol for all nightscout settings in the first sections screen
@@ -258,7 +229,6 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
 
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
-    func storeUIViewController(uIViewController: UIViewController) {}
 
     func storeMessageHandler(messageHandler: @escaping ((String, String) -> Void)) {
         self.messageHandler = messageHandler
@@ -398,24 +368,23 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
             }
             
         case .openNightscout:
-            return .callFunction { [weak self] in
-                guard let self else { return }
-
-                if let nightscoutURL = UserDefaults.standard.nightscoutUrl, let url = URL(string: nightscoutURL), var URLComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) {
-                    if UserDefaults.standard.nightscoutPort != 0 {
-                        URLComponents.port = UserDefaults.standard.nightscoutPort
-                    }
-
-                    // if token not nil, then add also the token
-                    if let token = UserDefaults.standard.nightscoutToken {
-                        URLComponents.queryItems = [URLQueryItem(name: "token", value: token)]
-                    }
-
-                    if let url = URLComponents.url {
-                        self.openWeb(url)
-                    }
-                }
+            guard let nightscoutURL = UserDefaults.standard.nightscoutUrl,
+                  let url = URL(string: nightscoutURL),
+                  var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+                return .nothing
             }
+
+            if UserDefaults.standard.nightscoutPort != 0 {
+                components.port = UserDefaults.standard.nightscoutPort
+            }
+
+            if let token = UserDefaults.standard.nightscoutToken {
+                components.queryItems = [URLQueryItem(name: "token", value: token)]
+            }
+
+            guard let url = components.url else { return .nothing }
+
+            return .openURL(url)
 
         case .useSchedule:
             return .nothing
@@ -483,14 +452,14 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
         }
     }
     
-    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+    func accessoryType(index: Int) -> SettingsAccessory {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
         case .nightscoutFollowType, .nightscoutUrl, .nightscoutAPIKey, .port, .token, .schedule:
-            return .disclosureIndicator
+            return .disclosure
         case .openNightscout:
-            return UserDefaults.standard.nightscoutUrl == nil ? .none : .disclosureIndicator
+            return UserDefaults.standard.nightscoutUrl == nil ? .none : .disclosure
         default:
             return .none
         }
@@ -553,26 +522,6 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
         }
     }
     
-    func uiView(index: Int) -> UIView? {
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-        
-        switch setting {
-        case .nightscoutEnabled:
-            return UISwitch(isOn: UserDefaults.standard.nightscoutEnabled, action: {(isOn: Bool) in
-                trace("nightscoutEnabled changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNightscoutSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.nightscoutEnabled = isOn})
-        case .useSchedule:
-            return UISwitch(isOn: UserDefaults.standard.nightscoutUseSchedule, action: {(isOn: Bool) in
-                trace("useSchedule changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNightscoutSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.nightscoutUseSchedule = isOn})
-        case .uploadSensorStartTime:
-            return UISwitch(isOn: UserDefaults.standard.uploadSensorStartTimeToNS, action: {(isOn: Bool) in
-                trace("uploadSensorStartTime changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNightscoutSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.uploadSensorStartTimeToNS = isOn})
-        default:
-            return nil
-        }
-    }
     
 }
 

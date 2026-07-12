@@ -1,5 +1,4 @@
 import Foundation
-import UIKit
 import EventKit
 import os
 
@@ -52,7 +51,6 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
         ]
     }
 
-    func storeUIViewController(uIViewController: UIViewController) {}
     
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
         // this ViewModel does need to send back messages to the viewcontroller asynchronously
@@ -95,7 +93,7 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
 
     }
     
-    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+    func accessoryType(index: Int) -> SettingsAccessory {
         
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
@@ -108,41 +106,41 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
             switch EKEventStore.authorizationStatus(for: .event) {
             case .denied:
                 // by clicking row, show info how to authorized
-                return UITableViewCell.AccessoryType.disclosureIndicator
+                return SettingsAccessory.disclosure
                 
             case .notDetermined:
-                return UITableViewCell.AccessoryType.none
+                return SettingsAccessory.none
                 
             case .restricted:
                 // by clicking row, show what it means to be restricted, according to Apple doc
-                return UITableViewCell.AccessoryType.disclosureIndicator
+                return SettingsAccessory.disclosure
                 
             case .authorized:
-                return UITableViewCell.AccessoryType.none
+                return SettingsAccessory.none
                 
 #if swift(>=5.9)
             case .writeOnly:
                 // by clicking row, show that the permission is restricted to Add Events Only instead of Full Access
-                return UITableViewCell.AccessoryType.disclosureIndicator
+                return SettingsAccessory.disclosure
                 
             case .fullAccess:
-                return UITableViewCell.AccessoryType.none
+                return SettingsAccessory.none
 #endif
                 
             @unknown default:
                 trace("unknown case returned when authorizing EKEventStore ", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
-                return UITableViewCell.AccessoryType.none
+                return SettingsAccessory.none
                 
             }
             
         case .calenderId:
-            return UITableViewCell.AccessoryType.disclosureIndicator
+            return SettingsAccessory.disclosure
             
         case .displayTrend, .displayDelta, .displayUnits, .displayVisualIndicator:
-            return UITableViewCell.AccessoryType.none
+            return SettingsAccessory.none
             
         case .calendarInterval:
-            return UITableViewCell.AccessoryType.disclosureIndicator
+            return SettingsAccessory.disclosure
             
         }
     }
@@ -220,52 +218,6 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
         }
     }
 
-    func uiView(index: Int) -> UIView? {
-        
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-
-        switch setting {
-            
-        case .createCalendarEvent:
-            
-            // if authorizationStatus is denied or restricted, then don't show the uiswitch
-            let authorizationStatus = EKEventStore.authorizationStatus(for: .event)
-            if authorizationStatus == .denied || authorizationStatus == .restricted {return nil}
-            
-            return UISwitch(isOn: UserDefaults.standard.createCalendarEvent, action: {
-                (isOn: Bool) in
-                self.setCreateCalendarEvent(isOn)
-            })
-            
-        case .calenderId:
-            return nil
-            
-        case .displayTrend:
-            return UISwitch(isOn: UserDefaults.standard.displayTrendInCalendarEvent, action: {(isOn:Bool) in
-                trace("displayTrend changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.displayTrendInCalendarEvent = isOn})
-            
-        case .displayDelta:
-            return UISwitch(isOn: UserDefaults.standard.displayDeltaInCalendarEvent, action: {(isOn:Bool) in
-                trace("displayDelta changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.displayDeltaInCalendarEvent = isOn})
-            
-        case .displayUnits:
-            return UISwitch(isOn: UserDefaults.standard.displayUnitInCalendarEvent, action: {(isOn:Bool) in
-                trace("displayUnits changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.displayUnitInCalendarEvent = isOn})
-            
-        case .displayVisualIndicator:
-            return UISwitch(isOn: UserDefaults.standard.displayVisualIndicatorInCalendarEvent, action: {(isOn:Bool) in
-                trace("displayVisualIndicator changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.displayVisualIndicatorInCalendarEvent = isOn})
-            
-        case .calendarInterval:
-            return nil
-            
-        }
-        
-    }
 
     private func setCreateCalendarEvent(_ isOn: Bool) {
         trace("createCalendarEvent changed by user to %{public}@", log: log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info, isOn.description)

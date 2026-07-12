@@ -1,4 +1,4 @@
-import UIKit
+import Foundation
 import OSLog
 import ActivityKit
 
@@ -97,7 +97,6 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
         self.sectionReloadClosure = sectionReloadClosure
     }
     
-    func storeUIViewController(uIViewController: UIViewController) {}
     
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
         // this ViewModel does need to send back messages to the viewcontroller asynchronously
@@ -215,7 +214,7 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
         }
     }
     
-    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+    func accessoryType(index: Int) -> SettingsAccessory {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
@@ -224,10 +223,10 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
             return .none
             
         case .notificationInterval:
-            return .disclosureIndicator
+            return .disclosure
             
         case .liveActivityType:
-            return UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat ? .disclosureIndicator : .none
+            return UserDefaults.standard.isMaster || UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat ? .disclosure : .none
         }
     }
     
@@ -283,30 +282,6 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
         }
     }
     
-    func uiView(index: Int) -> UIView? {
-        
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-        
-        switch setting {
-        case .showReadingInNotification:
-            return UISwitch(isOn: UserDefaults.standard.showReadingInNotification, action: {(isOn:Bool) in
-                trace("showReadingInNotification changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.showReadingInNotification = isOn})
-            
-        case .showReadingInAppBadge:
-            return UISwitch(isOn: UserDefaults.standard.showReadingInAppBadge, action: {(isOn:Bool) in
-                trace("showReadingInAppBadge changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.showReadingInAppBadge = isOn})
-
-        case .multipleAppBadgeValueWith10:
-            return UISwitch(isOn: UserDefaults.standard.multipleAppBadgeValueWith10, action: {(isOn:Bool) in
-                trace("multipleAppBadgeValueWith10 changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
-                UserDefaults.standard.multipleAppBadgeValueWith10 = isOn})
-
-        case .notificationInterval, .liveActivityType:
-            return nil
-        }
-    }
 
     func settingsSectionFooter() -> String? {
         liveActivitiesAvailable ? nil : Texts_SettingsView.liveActivityDisabledInFollowerModeMessage

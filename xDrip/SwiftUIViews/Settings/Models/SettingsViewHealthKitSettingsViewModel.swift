@@ -1,4 +1,4 @@
-import UIKit
+import Foundation
 import HealthKit
 import os
 
@@ -25,7 +25,6 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
 
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
-    func storeUIViewController(uIViewController: UIViewController) {}
     
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
         // this ViewModel does need to send back messages to the viewcontroller asynchronously
@@ -66,7 +65,7 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
         }
     }
     
-    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+    func accessoryType(index: Int) -> SettingsAccessory {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
@@ -98,18 +97,6 @@ class SettingsViewHealthKitSettingsViewModel:SettingsViewModelProtocol {
         }
     }
     
-    func uiView(index:Int) -> UIView? {
-        
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-        
-        switch setting {
-        case .enabledHealthKit:
-            return UISwitch(isOn: UserDefaults.standard.storeReadingsInHealthkit, action: {
-                (isOn: Bool) in
-                self.setStoreReadingsInHealthKit(isOn)
-            })
-        }
-    }
 
     private func setStoreReadingsInHealthKit(_ isOn: Bool) {
         trace("storeReadingsInHealthkit changed by user to %{public}@", log: log, category: ConstantsLog.categorySettingsViewHealthKitSettingsViewModel, type: .info, isOn.description)

@@ -1,4 +1,4 @@
-import UIKit
+import Foundation
 
 fileprivate enum Setting:Int, CaseIterable {
 
@@ -111,7 +111,6 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
     
     func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {}
     
-    func storeUIViewController(uIViewController: UIViewController) {}
     
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
         // this ViewModel does need to send back messages to the viewcontroller asynchronously
@@ -172,7 +171,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         }
     }
     
-    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+    func accessoryType(index: Int) -> SettingsAccessory {
         
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
@@ -182,10 +181,10 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             return .none
             
         case .loopDelay, .libreLinkUpVersion, .CAGEMaxHours:
-            return .disclosureIndicator
+            return .disclosure
             
         case .loopShareType:
-            return (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .medtrumEasyView) ? .none : .disclosureIndicator
+            return (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .medtrumEasyView) ? .none : .disclosure
             
         }
     }
@@ -279,84 +278,6 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         }
     }
     
-    func uiView(index: Int) -> UIView? {
-        
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-        
-        switch setting {
-            
-        case .showDeveloperSettings:
-            return UISwitch(isOn: UserDefaults.standard.showDeveloperSettings, action: {
-                (isOn: Bool) in
-                
-                UserDefaults.standard.showDeveloperSettings = isOn
-                
-                // this is a bit messy, but seems to be the best way to reset the setting to false
-                // this will usually happen when the view is not on screen anyway
-                if isOn {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 120) {
-                        UserDefaults.standard.showDeveloperSettings = false
-                        self.sectionReloadClosure?()
-                    }
-                }
-                
-            })
-            
-        case .NSLogEnabled:
-            return UISwitch(isOn: UserDefaults.standard.NSLogEnabled, action: {
-                (isOn: Bool) in
-                
-                UserDefaults.standard.NSLogEnabled = isOn
-                
-            })
-            
-        case .OSLogEnabled:
-            return UISwitch(isOn: UserDefaults.standard.OSLogEnabled, action: {
-                (isOn:Bool) in
-                
-                UserDefaults.standard.OSLogEnabled = isOn
-                
-            })
-
-        case .suppressUnLockPayLoad:
-            return UISwitch(isOn: UserDefaults.standard.suppressUnLockPayLoad, action: {
-                (isOn: Bool) in
-                
-                UserDefaults.standard.suppressUnLockPayLoad = isOn
-                
-            })
-            
-        case .allowStandByHighContrast:
-            return UISwitch(isOn: UserDefaults.standard.allowStandByHighContrast, action: {
-                (isOn: Bool) in
-                
-                UserDefaults.standard.allowStandByHighContrast = isOn
-                
-            })
-            
-        case .forceStandByBigNumbers:
-            return UISwitch(isOn: UserDefaults.standard.forceStandByBigNumbers, action: {
-                (isOn: Bool) in
-                
-                UserDefaults.standard.forceStandByBigNumbers = isOn
-                
-            })
-            
-        case .storeFrequentReadingsInNightscout:
-            return UISwitch(isOn: UserDefaults.standard.storeFrequentReadingsInNightscout, action: {(isOn:Bool) in UserDefaults.standard.storeFrequentReadingsInNightscout = isOn})
-            
-        case .storeFrequentReadingsInHealthKit:
-            return UISwitch(isOn: UserDefaults.standard.storeFrequentReadingsInHealthKit, action: {(isOn:Bool) in UserDefaults.standard.storeFrequentReadingsInHealthKit = isOn})
-
-        case .translateOnlineHelp:
-            return UISwitch(isOn: UserDefaults.standard.translateOnlineHelp, action: {(isOn:Bool) in UserDefaults.standard.translateOnlineHelp = isOn})
-            
-        case .loopShareType, .loopDelay, .libreLinkUpVersion, .CAGEMaxHours:
-            return nil
-            
-        }
-        
-    }
 
     func numberOfRows() -> Int {
         return  UserDefaults.standard.showDeveloperSettings ? Setting.allCases.count : 1

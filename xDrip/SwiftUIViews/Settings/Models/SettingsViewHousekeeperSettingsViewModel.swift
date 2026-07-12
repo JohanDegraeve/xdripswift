@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import UIKit
 
 
 /// Enum used for each row of HousekeeperSettings.
@@ -60,16 +59,16 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 		}
 	}
 	
-	func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+	func accessoryType(index: Int) -> SettingsAccessory {
 		guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
 		
 		switch setting {
 
 		case .housekeeperRetentionPeriod:
-			return UITableViewCell.AccessoryType.disclosureIndicator
+			return SettingsAccessory.disclosure
 			
 		case .exportAllData:
-			return UITableViewCell.AccessoryType.none
+			return SettingsAccessory.none
 			
 		}
 	}
@@ -88,9 +87,6 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 		}
 	}
 	
-	func uiView(index: Int) -> UIView? {
-		return nil
-	}
 	
 	func numberOfRows() -> Int {
 		return Setting.allCases.count
@@ -132,8 +128,6 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 		// this ViewModel does need to send back messages to the viewcontroller asynchronously
 	}
 	
-	func storeUIViewController(uIViewController: UIViewController) {
-	}
 	
 	func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {
 	}

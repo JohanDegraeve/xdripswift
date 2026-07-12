@@ -1,4 +1,12 @@
-import UIKit
+import Foundation
+
+enum SettingsKeyboardType {
+    case `default`
+    case alphabet
+    case numberPad
+    case decimalPad
+    case URL
+}
 
 /// alows to define what should happen if a user has selected a row in the Settings screen. Applicable to for example to first Setting screen, where there's just a list of Sections, and items which require basic actions.
 ///
@@ -17,7 +25,7 @@ enum SettingsSelectedRowAction {
     /// do nothing at all
     case nothing
     
-    /// ask for text. A variable of tpye UIKeyboardType is used here, this is just to indicate what type of input is asked. It doesn't necessarily mean the viewcontroller needs to use it.
+    /// Ask for text with the keyboard best suited to the expected value.
     /// - title: title that can be shown when asking for input
     /// - message: message that can be shown when asking for input
     /// - keyboardType: value can be used to define what kind of input is expected. In the end it's up to the viewcontroller or view to define what kind of keyboard will be used
@@ -30,12 +38,15 @@ enum SettingsSelectedRowAction {
     /// - inputValidator : closure to execute to validate the input, input a string and returns either nil if validation was ok or a string giving the error message to show to the user if validation fails - if inputValidator = nil then not validation is done - if result is not nil, then actionHandler will not be executed
     /// - actionHandler: code to execute when user confirms input, with text that was entered by user, text is not optional here - actionHandler will not be executed if there's an inputValidator and that inputValidator returns false
     /// - cancelHandler: code to execute when user cancels input - if nil then no validation must be done
-    case askText (title:String?, message:String?, keyboardType:UIKeyboardType?, text:String?, placeHolder:String?, fieldTitle:String? = nil, unitText:String? = nil, actionTitle:String?, cancelTitle:String?, actionHandler: ((_ text: String) -> Void), cancelHandler: (() -> Void)?, inputValidator: ((String) -> String?)?)
+    case askText (title:String?, message:String?, keyboardType:SettingsKeyboardType?, text:String?, placeHolder:String?, fieldTitle:String? = nil, unitText:String? = nil, actionTitle:String?, cancelTitle:String?, actionHandler: ((_ text: String) -> Void), cancelHandler: (() -> Void)?, inputValidator: ((String) -> String?)?)
     
     /// when clicked, the function parameter needs to be called
     ///
     /// example, the chosen unit, is either mgdl or mmol. When user clicks, there's no need to show pop up with the two options. Just switch immediately. The function would do that in this case (ie change the setting)
     case callFunction(function :(() -> Void))
+
+    /// Open a web address. Presentation remains owned by the SwiftUI Settings layer.
+    case openURL(URL)
 	
 	/// takes as argument a callback that when called returns a ProgressBarStatus
     /// - Important: Displays a progress bar, so all routies MUST call the callback or will result in an endless loading.
@@ -70,7 +81,7 @@ enum SettingsSelectedRowAction {
     
 }
 
-/* explanation UITableViewCell.AccessoryType
+/* explanation SettingsAccessory
  None. The cell does not have any accessory view. This is the default value.
  
  Disclosure indicator. Is a grey arrow, it usually opens a new table with settings

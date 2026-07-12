@@ -8,7 +8,6 @@
 
 import Foundation
 
-import UIKit
 
 fileprivate enum Setting:Int, CaseIterable {
     
@@ -73,23 +72,6 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
         }
     }
 
-    func uiView(index: Int) -> UIView? {
-        
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-        
-        switch setting {
-
-        case .showStatistics:
-            return UISwitch(isOn: UserDefaults.standard.showStatistics, action: {(isOn:Bool) in UserDefaults.standard.showStatistics = isOn})
-                        
-        case .timeInRangeType:
-            return nil
-            
-        case .useIFCCA1C :
-            return UISwitch(isOn: UserDefaults.standard.useIFCCA1C, action: {(isOn:Bool) in UserDefaults.standard.useIFCCA1C = isOn})
-            
-        }
-    }
     
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
         
@@ -107,7 +89,6 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
         self.sectionReloadClosure = sectionReloadClosure
     }
     
-    func storeUIViewController(uIViewController: UIViewController) {}
 
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
         // this ViewModel does need to send back messages to the viewcontroller asynchronously
@@ -208,16 +189,16 @@ class SettingsViewStatisticsSettingsViewModel: NSObject, SettingsViewModelProtoc
         }
     }
     
-    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+    func accessoryType(index: Int) -> SettingsAccessory {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
             
         case .showStatistics, .useIFCCA1C:
-            return UITableViewCell.AccessoryType.none
+            return SettingsAccessory.none
             
         case .timeInRangeType:
-            return UITableViewCell.AccessoryType.disclosureIndicator
+            return SettingsAccessory.disclosure
             
         }
     }

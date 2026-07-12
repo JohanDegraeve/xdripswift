@@ -1,4 +1,4 @@
-import UIKit
+import Foundation
 
 fileprivate enum Setting:Int, CaseIterable {
     
@@ -17,7 +17,6 @@ struct SettingsViewM5StackBluetoothSettingsViewModel: SettingsViewModelProtocol 
         ]
     }
 
-    func storeUIViewController(uIViewController: UIViewController) {}
 
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
         // this ViewModel does need to send back messages to the viewcontroller asynchronously
@@ -39,12 +38,12 @@ struct SettingsViewM5StackBluetoothSettingsViewModel: SettingsViewModelProtocol 
         
     }
     
-    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+    func accessoryType(index: Int) -> SettingsAccessory {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
         case .blePassword:
-            return UITableViewCell.AccessoryType.disclosureIndicator
+            return SettingsAccessory.disclosure
         }
     }
     
@@ -57,14 +56,6 @@ struct SettingsViewM5StackBluetoothSettingsViewModel: SettingsViewModelProtocol 
         }
     }
     
-    func uiView(index: Int) -> UIView? {
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-        
-        switch setting {
-        case .blePassword:
-            return nil
-        }
-    }
     
     func numberOfRows() -> Int {
         return Setting.allCases.count

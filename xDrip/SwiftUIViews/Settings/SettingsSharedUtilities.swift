@@ -427,6 +427,9 @@ final class SettingsActionPresenter: ObservableObject {
             function()
             reloadIfNeeded(viewModel: viewModel, rowIndex: rowIndex, sectionIndex: sectionIndex, reload: reload)
 
+        case let .openURL(url):
+            UIApplication.shared.open(url)
+
         case let .callFunctionAndShareFile(function):
             function { [weak self] progress in
                 DispatchQueue.main.async {
@@ -551,7 +554,7 @@ struct SettingsTextEntryContent: Identifiable {
     let id = UUID()
     let title: String?
     let message: String?
-    let keyboardType: UIKeyboardType?
+    let keyboardType: SettingsKeyboardType?
     let text: String?
     let placeholder: String?
     let fieldTitle: String?
@@ -561,6 +564,23 @@ struct SettingsTextEntryContent: Identifiable {
     let action: (String) -> Void
     let cancel: (() -> Void)?
     let validator: ((String) -> String?)?
+}
+
+private extension SettingsKeyboardType {
+    var uiKeyboardType: UIKeyboardType {
+        switch self {
+        case .default:
+            return .default
+        case .alphabet:
+            return .alphabet
+        case .numberPad:
+            return .numberPad
+        case .decimalPad:
+            return .decimalPad
+        case .URL:
+            return .URL
+        }
+    }
 }
 
 struct SettingsConfirmationContent: Identifiable {
@@ -915,7 +935,7 @@ extension SettingsViewModelProtocol {
                 detail: detailedText(index: index),
                 indicator: nativeIndicator(index: index),
                 detailIndicator: nativeDetailIndicator(index: index),
-                accessory: nativeAccessory(accessoryType),
+                accessory: accessoryType,
                 control: .toggle(
                     isOn: toggle.isOn,
                     setIsOn: toggle.setIsOn
@@ -932,30 +952,12 @@ extension SettingsViewModelProtocol {
             detail: detailedText(index: index),
             indicator: nativeIndicator(index: index),
             detailIndicator: nativeDetailIndicator(index: index),
-            accessory: nativeAccessory(accessoryType),
+            accessory: accessoryType,
             isEnabled: isEnabled,
             isVisible: isVisible,
             reloadScope: reloadScope,
             action: isEnabled ? .legacy(action: { onRowSelect(index: index) }, rowIndex: index, viewModel: self) : nil
         )
-    }
-
-    /// Maps the old UIKit accessory values onto the native SwiftUI row accessory.
-    private func nativeAccessory(_ accessoryType: UITableViewCell.AccessoryType) -> SettingsAccessory {
-        switch accessoryType {
-        case .none:
-            return .none
-        case .disclosureIndicator:
-            return .disclosure
-        case .detailButton:
-            return .info
-        case .detailDisclosureButton:
-            return .infoDisclosure
-        case .checkmark:
-            return .none
-        @unknown default:
-            return .automatic
-        }
     }
 
     /// Carries over the few legacy rows that need a coloured marker before the title.
@@ -965,7 +967,7 @@ extension SettingsViewModelProtocol {
             return nil
         }
 
-        return SettingsIndicator(color: Color(color))
+        return SettingsIndicator(color: color)
     }
 
     /// Carries over the few legacy rows that need a coloured marker before the detail.
@@ -975,7 +977,7 @@ extension SettingsViewModelProtocol {
             return nil
         }
 
-        return SettingsIndicator(color: Color(color))
+        return SettingsIndicator(color: color)
     }
 }
 
@@ -1266,7 +1268,7 @@ struct SettingsTextEntryView: View {
                 LabeledContent(fieldTitle) {
                     HStack(spacing: 6) {
                         TextField(textEntry.placeholder ?? "", text: $value)
-                            .keyboardType(textEntry.keyboardType ?? .default)
+                            .keyboardType(textEntry.keyboardType?.uiKeyboardType ?? .default)
                             .multilineTextAlignment(.trailing)
                             .frame(minWidth: 70, idealWidth: 90, maxWidth: 120)
 
@@ -1278,7 +1280,7 @@ struct SettingsTextEntryView: View {
                 }
             } else {
                 TextField(textEntry.placeholder ?? "", text: $value)
-                    .keyboardType(textEntry.keyboardType ?? .default)
+                    .keyboardType(textEntry.keyboardType?.uiKeyboardType ?? .default)
             }
 
             if let validationMessage {

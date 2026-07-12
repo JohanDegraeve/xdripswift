@@ -1,4 +1,4 @@
-import UIKit
+import Foundation
 import AVFoundation
 
 fileprivate enum Setting:Int, CaseIterable {
@@ -31,7 +31,6 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
         ]
     }
 
-    func storeUIViewController(uIViewController: UIViewController) {}
 
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
         // this ViewModel does need to send back messages to the viewcontroller asynchronously
@@ -107,9 +106,6 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
         return Setting.allCases.count
     }
 
-    func uiView(index: Int) -> UIView? {
-        return nil
-    }
     
     func settingsRowText(index: Int) -> String {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Setting in SettingsViewAlertSettingsViewModel onRowSelect") }
@@ -130,7 +126,7 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
         }
     }
     
-    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+    func accessoryType(index: Int) -> SettingsAccessory {
         
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
@@ -138,7 +134,7 @@ struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
 
         case .alertTypes, .alerts:
             
-            return .disclosureIndicator
+            return .disclosure
             
         case .volumeTestSoundPlayer, .volumeTestiOSSound:
             

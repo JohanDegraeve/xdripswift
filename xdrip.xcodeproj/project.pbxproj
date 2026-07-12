@@ -333,7 +333,6 @@
 		F821CF7D22A46CDD005C1E43 /* 1-millisecond-of-silence.caf in Resources */ = {isa = PBXBuildFile; fileRef = F821CF7C22A46CDD005C1E43 /* 1-millisecond-of-silence.caf */; };
 		F821CF7F22A4EDCF005C1E43 /* 20ms-of-silence.caf in Resources */ = {isa = PBXBuildFile; fileRef = F821CF7E22A4EDCF005C1E43 /* 20ms-of-silence.caf */; };
 		F821CF8122A5C814005C1E43 /* RepeatingTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */; };
-		F821CF9022AB1068005C1E43 /* DatePickerViewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF8F22AB1068005C1E43 /* DatePickerViewData.swift */; };
 		F821CF9522ADB0D7005C1E43 /* HealthKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF9422ADB0D7005C1E43 /* HealthKitManager.swift */; };
 		F821CF9722AE589E005C1E43 /* HealthKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F821CF9622AE589E005C1E43 /* HealthKit.framework */; };
 		F821CF9D22AEF483005C1E43 /* BGReadingSpeaker.swift in Sources */ = {isa = PBXBuildFile; fileRef = F821CF9C22AEF483005C1E43 /* BGReadingSpeaker.swift */; };
@@ -1292,7 +1291,6 @@
 		F821CF7C22A46CDD005C1E43 /* 1-millisecond-of-silence.caf */ = {isa = PBXFileReference; lastKnownFileType = audio.caf; path = "1-millisecond-of-silence.caf"; sourceTree = "<group>"; };
 		F821CF7E22A4EDCF005C1E43 /* 20ms-of-silence.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "20ms-of-silence.caf"; sourceTree = "<group>"; };
 		F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RepeatingTimer.swift; sourceTree = "<group>"; };
-		F821CF8F22AB1068005C1E43 /* DatePickerViewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatePickerViewData.swift; sourceTree = "<group>"; };
 		F821CF9422ADB0D7005C1E43 /* HealthKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HealthKitManager.swift; sourceTree = "<group>"; };
 		F821CF9622AE589E005C1E43 /* HealthKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HealthKit.framework; path = System/Library/Frameworks/HealthKit.framework; sourceTree = SDKROOT; };
 		F821CF9822AE589E005C1E43 /* xdrip.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = xdrip.entitlements; sourceTree = "<group>"; };
@@ -2199,6 +2197,35 @@
 			path = TouchCareNano;
 			sourceTree = "<group>";
 		};
+		6E033988052CBCF93DBE169B /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				F8B3A807227A2933004BA588 /* SettingsSelectedRowAction.swift */,
+				F8B3A7F22278E0E7004BA588 /* SettingsViewModelProtocol.swift */,
+				F80ED2E9236F68F90005C035 /* SettingsViewM5StackBluetoothSettingsViewModel.swift */,
+				F80ED2EA236F68F90005C035 /* SettingsViewM5StackGeneralSettingsViewModel.swift */,
+				F80ED2EB236F68F90005C035 /* SettingsViewM5StackWiFiSettingsViewModel.swift */,
+				F8B3A838227F090D004BA588 /* SettingsViewAlertSettingsViewModel.swift */,
+				47DB06C52A6FC72000267BE3 /* SettingsViewCalendarEventsSettingsViewModel.swift */,
+				F227BF182B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift */,
+				47DB06C12A6FC02200267BE3 /* SettingsViewDataSourceSettingsViewModel.swift */,
+				F8A1584C22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift */,
+				F8B3A839227F090D004BA588 /* SettingsViewDexcomShareSettingsViewModel.swift */,
+				F8B3A83C227F090D004BA588 /* SettingsViewHealthKitSettingsViewModel.swift */,
+				F8D0587B24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift */,
+				D41F32912827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift */,
+				F8A1584E22ECB281007F5B5D /* SettingsViewInfoViewModel.swift */,
+				F8A389EA233175A10010F405 /* SettingsViewM5StackSettingsViewModel.swift */,
+				F8B3A83B227F090D004BA588 /* SettingsViewNightscoutSettingsViewModel.swift */,
+				F8B3A83E227F090D004BA588 /* SettingsViewNotificationsSettingsViewModel.swift */,
+				F8B3A83D227F090D004BA588 /* SettingsViewSpeakSettingsViewModel.swift */,
+				4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */,
+				F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */,
+			);
+			name = Models;
+			path = Models;
+			sourceTree = "<group>";
+		};
 		D4E499A9277B4363000F8CBA /* Treatments */ = {
 			isa = PBXGroup;
 			children = (
@@ -2332,16 +2359,6 @@
 			path = Libre2;
 			sourceTree = "<group>";
 		};
-		F80ED2E8236F68D90005C035 /* M5StackSettingsViewModels */ = {
-			isa = PBXGroup;
-			children = (
-				F80ED2E9236F68F90005C035 /* SettingsViewM5StackBluetoothSettingsViewModel.swift */,
-				F80ED2EA236F68F90005C035 /* SettingsViewM5StackGeneralSettingsViewModel.swift */,
-				F80ED2EB236F68F90005C035 /* SettingsViewM5StackWiFiSettingsViewModel.swift */,
-			);
-			path = M5StackSettingsViewModels;
-			sourceTree = "<group>";
-		};
 		F81D6D4622BD5F43005EFAE2 /* DexcomShare */ = {
 			isa = PBXGroup;
 			children = (
@@ -2362,6 +2379,7 @@
 				47CD642B2BEBEB0E002BDA68 /* AlertUrgencyType.swift */,
 				4734FF542BEFE3F200C7115A /* AlertNotificationDictionary.swift */,
 				F821CF4A229BF43A005C1E43 /* SnoozeParameters.swift */,
+				F8B3A832227F08AC004BA588 /* PickerViewData.swift */,
 			);
 			path = Alerts;
 			sourceTree = "<group>";
@@ -2405,14 +2423,6 @@
 				F821CF6A229FC22D005C1E43 /* Endpoint.swift */,
 			);
 			path = Network;
-			sourceTree = "<group>";
-		};
-		F821CF8C22AB08F6005C1E43 /* Date Picker View Controller */ = {
-			isa = PBXGroup;
-			children = (
-				F821CF8F22AB1068005C1E43 /* DatePickerViewData.swift */,
-			);
-			path = "Date Picker View Controller";
 			sourceTree = "<group>";
 		};
 		F821CF9122ADB064005C1E43 /* HealthKit */ = {
@@ -2508,15 +2518,6 @@
 			path = Storyboards;
 			sourceTree = "<group>";
 		};
-		F85DC2FA21D2CD3000B9F74A /* View Controllers */ = {
-			isa = PBXGroup;
-			children = (
-				F8B3A806227A28F9004BA588 /* Helpers */,
-				F8B3A823227E4B7D004BA588 /* SettingsNavigationController */,
-			);
-			path = "View Controllers";
-			sourceTree = "<group>";
-		};
 		F85DC2FB21D2CD7000B9F74A /* Application Delegate */ = {
 			isa = PBXGroup;
 			children = (
@@ -2569,6 +2570,7 @@
 				E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */,
 				D9C75EA5D78E3497AC44D3C8 /* SettingsView.swift */,
 				CD00FB5270FD0E5E2F710BE6 /* TimeScheduleView.swift */,
+				6E033988052CBCF93DBE169B /* Models */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -2588,14 +2590,6 @@
 				F8A2BC2325DB0D6D001D1E78 /* BluetoothPeripheralManaging.swift */,
 			);
 			name = BluetoothPeripheral;
-			sourceTree = "<group>";
-		};
-		F8A389CD232A6A6F0010F405 /* M5StackSettingsViewController */ = {
-			isa = PBXGroup;
-			children = (
-				F80ED2E8236F68D90005C035 /* M5StackSettingsViewModels */,
-			);
-			path = M5StackSettingsViewController;
 			sourceTree = "<group>";
 		};
 		F8AC425121ADEBD60078C348 = {
@@ -2652,7 +2646,6 @@
 				F8BDD44C221CAA26006EAB84 /* Texts */,
 				D4E499A9277B4363000F8CBA /* Treatments */,
 				F8EA6C8021B723A80082976B /* Utilities */,
-				F85DC2FA21D2CD3000B9F74A /* View Controllers */,
 				F8BECB00235CE3E20060DAE1 /* Views */,
 			);
 			path = xDrip;
@@ -2815,17 +2808,6 @@
 			path = SoundPlayer;
 			sourceTree = "<group>";
 		};
-		F8B3A806227A28F9004BA588 /* Helpers */ = {
-			isa = PBXGroup;
-			children = (
-				F8B3A807227A2933004BA588 /* SettingsSelectedRowAction.swift */,
-				F8B3A7F22278E0E7004BA588 /* SettingsViewModelProtocol.swift */,
-				F821CF8C22AB08F6005C1E43 /* Date Picker View Controller */,
-				F8B3A831227F08AC004BA588 /* Picker View Controller */,
-			);
-			path = Helpers;
-			sourceTree = "<group>";
-		};
 		F8B3A814227DEA69004BA588 /* accessors */ = {
 			isa = PBXGroup;
 			children = (
@@ -2841,54 +2823,6 @@
 				D4FD899627772F9100689788 /* TreatmentEntryAccessor.swift */,
 			);
 			path = accessors;
-			sourceTree = "<group>";
-		};
-		F8B3A823227E4B7D004BA588 /* SettingsNavigationController */ = {
-			isa = PBXGroup;
-			children = (
-				F8B3A836227F090D004BA588 /* SettingsViewController */,
-			);
-			path = SettingsNavigationController;
-			sourceTree = "<group>";
-		};
-		F8B3A831227F08AC004BA588 /* Picker View Controller */ = {
-			isa = PBXGroup;
-			children = (
-				F8B3A832227F08AC004BA588 /* PickerViewData.swift */,
-			);
-			path = "Picker View Controller";
-			sourceTree = "<group>";
-		};
-		F8B3A836227F090D004BA588 /* SettingsViewController */ = {
-			isa = PBXGroup;
-			children = (
-				F8A389CD232A6A6F0010F405 /* M5StackSettingsViewController */,
-				F8B3A837227F090D004BA588 /* SettingsViewModels */,
-			);
-			path = SettingsViewController;
-			sourceTree = "<group>";
-		};
-		F8B3A837227F090D004BA588 /* SettingsViewModels */ = {
-			isa = PBXGroup;
-			children = (
-				F8B3A838227F090D004BA588 /* SettingsViewAlertSettingsViewModel.swift */,
-				47DB06C52A6FC72000267BE3 /* SettingsViewCalendarEventsSettingsViewModel.swift */,
-				F227BF182B9DF76D00CEEAAD /* SettingsViewContactImageSettingsViewModel.swift */,
-				47DB06C12A6FC02200267BE3 /* SettingsViewDataSourceSettingsViewModel.swift */,
-				F8A1584C22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift */,
-				F8B3A839227F090D004BA588 /* SettingsViewDexcomShareSettingsViewModel.swift */,
-				F8B3A83C227F090D004BA588 /* SettingsViewHealthKitSettingsViewModel.swift */,
-				F8D0587B24BCB570008C8734 /* SettingsViewHomeScreenSettingsViewModel.swift */,
-				D41F32912827240E00861B3D /* SettingsViewHousekeeperSettingsViewModel.swift */,
-				F8A1584E22ECB281007F5B5D /* SettingsViewInfoViewModel.swift */,
-				F8A389EA233175A10010F405 /* SettingsViewM5StackSettingsViewModel.swift */,
-				F8B3A83B227F090D004BA588 /* SettingsViewNightscoutSettingsViewModel.swift */,
-				F8B3A83E227F090D004BA588 /* SettingsViewNotificationsSettingsViewModel.swift */,
-				F8B3A83D227F090D004BA588 /* SettingsViewSpeakSettingsViewModel.swift */,
-				4752B4052635878E0081D551 /* SettingsViewStatisticsSettingsViewModel.swift */,
-				F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */,
-			);
-			path = SettingsViewModels;
 			sourceTree = "<group>";
 		};
 		F8BDD44C221CAA26006EAB84 /* Texts */ = {
@@ -4007,7 +3941,6 @@
 				F8A1585722EDB754007F5B5D /* ConstantsCoreData.swift in Sources */,
 				476A897E2CCA7E740073ED83 /* NightscoutFollowType.swift in Sources */,
 				F8797CEA255B43960033956B /* GlucoseData+Smoothable.swift in Sources */,
-				F821CF9022AB1068005C1E43 /* DatePickerViewData.swift in Sources */,
 				47B731412B83DD3C00B0A450 /* ConstantsLiveActivity.swift in Sources */,
 				F8025E4E21ED450300ECF0C0 /* Double.swift in Sources */,
 				F8F9723423A5915900C3F17D /* BluetoothTransmitterDelegate.swift in Sources */,

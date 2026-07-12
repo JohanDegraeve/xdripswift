@@ -6,7 +6,7 @@
 //  Copyright © 2020 Johan Degraeve. All rights reserved.
 //
 
-import UIKit
+import SwiftUI
 
 fileprivate enum Setting:Int, CaseIterable {
     
@@ -130,32 +130,6 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         }
     }
     
-    func uiView(index: Int) -> UIView? {
-        
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-        
-        switch setting {
-            
-        case .allowScreenRotation:
-            return UISwitch(isOn: UserDefaults.standard.allowScreenRotation, action: {(isOn:Bool) in UserDefaults.standard.allowScreenRotation = isOn})
-            
-        case .showClockWhenScreenIsLocked:
-            return UISwitch(isOn: UserDefaults.standard.showClockWhenScreenIsLocked, action: {(isOn:Bool) in UserDefaults.standard.showClockWhenScreenIsLocked = isOn})
-            
-        case .showMiniChart:
-            return UISwitch(isOn: UserDefaults.standard.showMiniChart, action: {(isOn:Bool) in UserDefaults.standard.showMiniChart = isOn})
-            
-        case .allowMainChartAutoReset:
-            return UISwitch(isOn: UserDefaults.standard.allowMainChartAutoReset, action: {(isOn:Bool) in UserDefaults.standard.allowMainChartAutoReset = isOn})
-
-        case .showOriginalBGReadings:
-            return UISwitch(isOn: UserDefaults.standard.showOriginalBGReadings, action: {(isOn:Bool) in UserDefaults.standard.showOriginalBGReadings = isOn})
-            
-        case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .targetMarkValue, .lowMarkValue, .urgentLowMarkValue:
-            return nil
-            
-        }
-    }
     
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
         return false
@@ -168,7 +142,6 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         self.sectionReloadClosure = sectionReloadClosure
     }
     
-    func storeUIViewController(uIViewController: UIViewController) {}
     
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
         // this ViewModel does need to send back messages to the viewcontroller asynchronously
@@ -342,34 +315,34 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
     /// Returns the colour for the small SwiftUI dot shown beside the glucose
     /// threshold rows. The row title stays as plain localized text, and SwiftUI
     /// decides whether to draw the indicator.
-    func rowIndicatorColor(index: Int) -> UIColor? {
+    func rowIndicatorColor(index: Int) -> Color? {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
 
         switch setting {
         case .urgentHighMarkValue, .urgentLowMarkValue:
-            return ConstantsGlucoseChart.glucoseUrgentRangeColor
+            return .red
 
         case .highMarkValue, .lowMarkValue:
-            return ConstantsGlucoseChart.glucoseNotUrgentRangeColor
+            return .yellow
 
         case .targetMarkValue:
-            return ConstantsGlucoseChart.glucoseInRangeColor
+            return .green
 
         default:
             return nil
         }
     }
     
-    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+    func accessoryType(index: Int) -> SettingsAccessory {
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
             
         case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .lowMarkValue, .urgentLowMarkValue, .targetMarkValue:
-            return UITableViewCell.AccessoryType.disclosureIndicator
+            return SettingsAccessory.disclosure
             
         case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings:
-            return UITableViewCell.AccessoryType.none
+            return SettingsAccessory.none
             
         }
     }

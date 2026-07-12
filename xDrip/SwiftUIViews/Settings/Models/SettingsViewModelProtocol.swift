@@ -1,5 +1,3 @@
-import UIKit
-
 struct SettingsToggleControl {
     let isOn: () -> Bool
     let setIsOn: (Bool) -> Void
@@ -7,7 +5,7 @@ struct SettingsToggleControl {
 
 /// functions that define the contents of a Section
 ///
-/// The protocol defines the Section title, the text and detailedText to be shown in a cell of that secion, the accessoryType (none, disclosure, detail button, detail disclosure button), the UIView to be shown if applicable (eg UISwitch), the nomber of rows in the Section, and last but not least is it enabled or not
+/// The protocol defines the section title, row text, detail text, accessory, toggle control, number of rows and whether each setting is enabled.
 ///
 /// in case isEnabled returns false, then the didSelectRow action will never be applied
 protocol SettingsViewModelProtocol {
@@ -30,21 +28,14 @@ protocol SettingsViewModelProtocol {
     /// the accessoryType to be shown for a specific row in the Section (none, disclosure, detail button, detail disclosure button)
     /// - returns:
     ///     the accessoryType
-    func accessoryType(index:Int) -> UITableViewCell.AccessoryType
+    func accessoryType(index:Int) -> SettingsAccessory
     
     /// the detailedText to be shown for a specific row in the Section
     /// - returns:
     ///     the detailedText corresponding to cel on index
     func detailedText(index:Int) -> String?
     
-    /// used for adding a a view in a settings cell, for the moment only used for UISwitch (on/off) - maybe can also be used to add a button with an image ? eg + sign for alert entries
-    /// - returns:
-    ///     a UIView, nil if no UIView to be shown (example see SettingsViewHealthKitSettingsViewModel)
-    func uiView(index:Int) -> UIView?
-
     /// Native toggle state and action for SwiftUI Settings rows.
-    /// The old uiView(index:) hook still exists for storyboard/table based Settings
-    /// screens, but migrated SwiftUI rows should use this instead of creating a UISwitch.
     func settingsToggle(index: Int) -> SettingsToggleControl?
     
     /// what's the number of rows in the section
@@ -78,9 +69,6 @@ protocol SettingsViewModelProtocol {
     /// - parameters:
     ///     - two strings, a title and a message.
     func storeMessageHandler(messageHandler : @escaping ((String, String) -> Void))
-    
-    /// store uiviewcontroller that created the model, in case it's needed
-    func storeUIViewController(uIViewController: UIViewController)
     
     /// closure to call to reload a row specified by index in the section that the viewmodel is implementing (ie not in another section)
     ///

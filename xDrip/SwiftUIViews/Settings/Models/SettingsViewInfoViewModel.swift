@@ -1,4 +1,4 @@
-import UIKit
+import Foundation
 
 fileprivate enum Setting:Int, CaseIterable {
     
@@ -31,7 +31,6 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
 
     func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {}
     
-    func storeUIViewController(uIViewController: UIViewController) {}
     
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
         // this ViewModel does need to send back messages to the viewcontroller asynchronously
@@ -64,7 +63,7 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
         
     }
     
-    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+    func accessoryType(index: Int) -> SettingsAccessory {
         
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
 
@@ -74,13 +73,13 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
             return .none
 
         case .versionNumber:
-            return .disclosureIndicator
+            return .disclosure
 
         case .licenseInfo:
-            return .disclosureIndicator
+            return .disclosure
             
         case .showGitHub:
-            return .disclosureIndicator
+            return .disclosure
             
         }
         
@@ -118,9 +117,6 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
         
     }
     
-    func uiView(index: Int) -> UIView? {
-        return nil
-    }
     
     func numberOfRows() -> Int {
         return Setting.allCases.count
@@ -136,9 +132,7 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
             guard let version = appVersion,
                   let url = SettingsAppInfo.releaseNotesURL(version: version) else { return .nothing }
 
-            UIApplication.shared.open(url)
-
-            return .nothing
+            return .openURL(url)
 
         case .installDate:
             return .nothing
@@ -149,9 +143,7 @@ struct SettingsViewInfoViewModel:SettingsViewModelProtocol {
         case .showGitHub:
             guard let url = URL(string: ConstantsHomeView.gitHubURL) else { return .nothing}
             
-            UIApplication.shared.open(url)
-            
-            return .nothing
+            return .openURL(url)
             
         }
     }

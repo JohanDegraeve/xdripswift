@@ -691,17 +691,14 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
         rows[index].title
     }
 
-    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
-        .disclosureIndicator
+    func accessoryType(index: Int) -> SettingsAccessory {
+        .disclosure
     }
 
     func detailedText(index: Int) -> String? {
         rows[index].detail?()
     }
 
-    func uiView(index: Int) -> UIView? {
-        nil
-    }
 
     func numberOfRows() -> Int {
         rows.count
@@ -721,7 +718,6 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
 
     func storeMessageHandler(messageHandler: @escaping ((String, String) -> Void)) {}
 
-    func storeUIViewController(uIViewController: UIViewController) {}
 
     func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {}
 }

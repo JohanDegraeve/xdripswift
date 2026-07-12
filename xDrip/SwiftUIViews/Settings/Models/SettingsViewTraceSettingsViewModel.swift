@@ -1,4 +1,4 @@
-import UIKit
+import Foundation
 
 fileprivate enum Setting:Int, CaseIterable {
     
@@ -40,7 +40,6 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
 
     func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {}
     
-    func storeUIViewController(uIViewController: UIViewController) {}
 
     func storeMessageHandler(messageHandler: @escaping ((String, String) -> Void)) {}
     
@@ -71,14 +70,14 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
         }
     }
     
-    func accessoryType(index: Int) -> UITableViewCell.AccessoryType {
+    func accessoryType(index: Int) -> SettingsAccessory {
         
         guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
         
         switch setting {
             
         case .sendTraceFile:
-            return .disclosureIndicator
+            return .disclosure
             
         case .debugLevel:
             return .none
@@ -116,21 +115,6 @@ extension SettingsViewTraceSettingsViewModel: SettingsViewModelProtocol {
         }
     }
     
-    func uiView(index: Int) -> UIView? {
-        
-        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-        
-        switch setting {
-            
-        case .sendTraceFile:
-            return nil
-            
-        case .debugLevel:
-            return UISwitch(isOn: UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog, action: {(isOn:Bool) in UserDefaults.standard.addDebugLevelLogsInTraceFileAndNSLog = isOn})
-            
-        }
-        
-    }
     
     func numberOfRows() -> Int {
         return Setting.allCases.count

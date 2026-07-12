@@ -531,7 +531,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
     ) -> SettingsTextEntryContent {
         let valueIsBg = alertKindValue.valueIsABgValue()
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-        let keyboardType: UIKeyboardType = valueIsBg && !isMgDl ? .decimalPad : .numberPad
+        let keyboardType: SettingsKeyboardType = valueIsBg && !isMgDl ? .decimalPad : .numberPad
 
         return SettingsTextEntryContent(
             title: title,
