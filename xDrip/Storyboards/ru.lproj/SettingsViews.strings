@@ -114,7 +114,6 @@
 "settingsviews_sectiontitlehomescreen" = "Домашний экран";
 "settingsviews_sectionTitleHousekeeper" = "Управление данными";
 "settingsviews_housekeeperRetentionPeriod" = "Срок хранения";
-"settingsviews_housekeeperExportAllData" = "Экспорт всех данных";
 "settingsviews_housekeeperRetentionPeriodMessage" = "Сколько дней должны храниться данные? (минимум 90, максимум 365)\n\n(рекомендуется: 90 дней)";
 "suppressUnLockPayLoad" = "Остановить блок. нагрузки";
 "suppressLoopShare" = "Остановить раздачу в Loop";

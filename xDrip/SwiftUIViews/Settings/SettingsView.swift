@@ -71,16 +71,6 @@ struct SettingsNavigationView: View {
                 .navigationDestination(for: SettingsRoute.self, destination: destination)
         }
         .environment(\.settingsNavigationActions, navigationActions)
-        .overlay {
-            if let progress = router.progress {
-                SettingsProgressView(progress: progress.progress)
-            }
-        }
-        .sheet(isPresented: shareSheetIsPresented) {
-            if let shareURL = router.shareURL {
-                SettingsShareSheet(url: shareURL)
-            }
-        }
         .sheet(isPresented: $router.showsTraceEmail) {
             SettingsTraceMailView(isPresented: $router.showsTraceEmail) {
                 presenter.showMessage(title: Texts_Common.warning, message: Texts_SettingsView.failedToSendEmail)
@@ -97,16 +87,6 @@ struct SettingsNavigationView: View {
     private var navigationActions: SettingsNavigationActions {
         SettingsNavigationActions { title, content in
             router.show(.custom(title: title, content: content))
-        }
-    }
-
-    private var shareSheetIsPresented: Binding<Bool> {
-        Binding {
-            router.shareURL != nil
-        } set: { isPresented in
-            if !isPresented {
-                router.shareURL = nil
-            }
         }
     }
 
@@ -247,33 +227,6 @@ private struct NativeAlertsSettingsView: View {
 }
 
 // MARK: - System Presentation
-
-/// Blocks Settings interaction while an existing settings action reports progress.
-private struct SettingsProgressView: View {
-    let progress: Float
-
-    var body: some View {
-        ZStack {
-            Color.black.opacity(0.8)
-                .ignoresSafeArea()
-
-            ProgressView(value: Double(progress))
-                .progressViewStyle(.linear)
-                .frame(maxWidth: 240)
-        }
-    }
-}
-
-/// SwiftUI adapter for the system share sheet, which has no native SwiftUI equivalent.
-private struct SettingsShareSheet: UIViewControllerRepresentable {
-    let url: URL
-
-    func makeUIViewController(context: Context) -> UIActivityViewController {
-        UIActivityViewController(activityItems: [url], applicationActivities: nil)
-    }
-
-    func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
-}
 
 /// SwiftUI adapter for the system mail composer used to send trace files.
 private struct SettingsTraceMailView: UIViewControllerRepresentable {

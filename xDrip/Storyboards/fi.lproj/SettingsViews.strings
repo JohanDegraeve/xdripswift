@@ -156,8 +156,6 @@
 /// treatments settings, show the treatments on main chart
 "settingsviews_showTreatments" = "Näytä hoidot kaaviossa";
 
-/// Button to export all data
-"settingsviews_housekeeperExportAllData" = "Vie kaikki tiedot";
 
 /// Housekeeper settings, section title
 "settingsviews_sectionTitleHousekeeper" = "Tiedon hallinta";

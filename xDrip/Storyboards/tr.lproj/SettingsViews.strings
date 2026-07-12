@@ -234,8 +234,6 @@
 /// Settings screen for loop delay
 "Select Value" = "Select Value";
 
-/// Button to export all data
-"settingsviews_housekeeperExportAllData" = "Export All Data";
 
 /// Settings screen for loop delay, explanatory text for time
 "expanatoryTextSelectTime" = "As of what time should the value apply";

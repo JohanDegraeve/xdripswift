@@ -130,8 +130,6 @@
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-/// Button to export all data
-"settingsviews_housekeeperExportAllData" = "Export All Data";
 
 /// Housekeeper settings, section title
 "settingsviews_sectionTitleHousekeeper" = "Data Management";

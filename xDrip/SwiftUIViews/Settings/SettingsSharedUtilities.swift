@@ -10,25 +10,6 @@ import SwiftUI
 import UIKit
 import MessageUI
 
-/// Progress reported by long-running settings actions such as exporting stored data.
-struct ProgressBarStatus<T> {
-    let complete: Bool
-    let progress: Float
-    let data: T?
-
-    init(complete: Bool, progress: Float, data: T?) {
-        self.complete = complete
-        self.progress = progress
-        self.data = data
-    }
-
-    init(progress: Float) {
-        self.complete = progress >= 1
-        self.progress = progress
-        self.data = nil
-    }
-}
-
 /// Storage contract used by the native SwiftUI time-schedule editor.
 protocol TimeSchedule {
     func getSchedule() -> [Int]
@@ -47,8 +28,6 @@ enum SettingsSegueIdentifier: String {
 
 final class SettingsRouter: ObservableObject {
     @Published var path = [SettingsRoute]()
-    @Published var progress: ProgressBarStatus<URL>?
-    @Published var shareURL: URL?
     @Published var showsTraceEmail = false
 
     func show(_ destination: SettingsRoute.Destination) {
@@ -61,14 +40,6 @@ final class SettingsRouter: ObservableObject {
         path.removeLast()
     }
 
-    func showProgress(_ progress: ProgressBarStatus<URL>?) {
-        self.progress = progress
-
-        guard let fileURL = progress?.data, progress?.complete == true else { return }
-
-        self.progress = nil
-        shareURL = fileURL
-    }
 }
 
 /// Typed destination used by the native Settings NavigationStack.
@@ -411,14 +382,6 @@ final class SettingsActionPresenter: ObservableObject {
 
         case let .openURL(url):
             UIApplication.shared.open(url)
-
-        case let .callFunctionAndShareFile(function):
-            function { [weak self] progress in
-                DispatchQueue.main.async {
-                    self?.router.showProgress(progress)
-                }
-            }
-            reloadIfNeeded(viewModel: viewModel, rowIndex: rowIndex, sectionIndex: sectionIndex, reload: reload)
 
         case let .selectFromList(title, data, selectedRow, actionTitle, cancelTitle, actionHandler, cancelHandler, didSelectRowHandler):
             router.show(.selectionList(SettingsSelectionListContent(

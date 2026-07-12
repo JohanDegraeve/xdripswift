@@ -48,10 +48,6 @@ enum SettingsSelectedRowAction {
     /// Open a web address. Presentation remains owned by the SwiftUI Settings layer.
     case openURL(URL)
 	
-	/// takes as argument a callback that when called returns a ProgressBarStatus
-    /// - Important: Displays a progress bar, so all routies MUST call the callback or will result in an endless loading.
-	case callFunctionAndShareFile(function: ((_ callback: @escaping ((_ progress: ProgressBarStatus<URL>?) -> Void)) -> Void))
-    
     /// when clicked a list of items must be presented form which the user needs to pick one, for example transmitter type
     /// - title: title that can be shown when asking for input
     /// - data: array of strings, items from which user can select

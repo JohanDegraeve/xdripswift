@@ -15,9 +15,6 @@ fileprivate enum Setting: Int, CaseIterable {
 	/// For how many days should we store BgReadings, Calibrations and Treatments, in days
 	case housekeeperRetentionPeriod = 0
 	
-	/// Export all data button
-	case exportAllData = 1
-	
 }
 
 
@@ -25,21 +22,15 @@ fileprivate enum Setting: Int, CaseIterable {
 /// Implements SettingsViewModelProtocol.
 struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 
-	/// Instance of coreDataManager
-	private var coreDataManager: CoreDataManager?
-    
 	// MARK: - Native SwiftUI rows
 
 	func settingsRows(sectionID: Int) -> [SettingsRow] {
 		[
-			nativeSettingsRow(id: "housekeeper.retentionPeriod", index: Setting.housekeeperRetentionPeriod.rawValue, sectionID: sectionID),
-			nativeSettingsRow(id: "housekeeper.exportAllData", index: Setting.exportAllData.rawValue, sectionID: sectionID)
+			nativeSettingsRow(id: "housekeeper.retentionPeriod", index: Setting.housekeeperRetentionPeriod.rawValue, sectionID: sectionID)
 		]
 	}
 
-    init(coreDataManager: CoreDataManager?) {
-        self.coreDataManager = coreDataManager
-    }
+    init(coreDataManager _: CoreDataManager?) {}
 	
 	func sectionTitle() -> String? {
 		return Texts_SettingsView.sectionTitleHousekeeper;
@@ -53,9 +44,6 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 		case .housekeeperRetentionPeriod:
 			return Texts_SettingsView.settingsviews_housekeeperRetentionPeriod
 			
-		case .exportAllData:
-			return Texts_SettingsView.settingsviews_housekeeperExportAllData
-			
 		}
 	}
 	
@@ -66,9 +54,6 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 
 		case .housekeeperRetentionPeriod:
 			return SettingsAccessory.disclosure
-			
-		case .exportAllData:
-			return SettingsAccessory.none
 			
 		}
 	}
@@ -81,9 +66,6 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 		case .housekeeperRetentionPeriod:
 			return UserDefaults.standard.retentionPeriodInDays.description + " " + Texts_Common.days
 			
-		case .exportAllData:
-			return nil
-
 		}
 	}
 	
@@ -102,17 +84,6 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 			return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_housekeeperRetentionPeriod, message: Texts_SettingsView.settingsviews_housekeeperRetentionPeriodMessage, keyboardType: .numberPad, text: UserDefaults.standard.retentionPeriodInDays.description, placeHolder: "90", fieldTitle: Texts_Common.enterValue, unitText: Texts_Common.days, actionTitle: nil, cancelTitle: nil, actionHandler: {
 				(retention:String) in if let retentionInt = Int(retention) {UserDefaults.standard.retentionPeriodInDays = retentionInt}}, cancelHandler: nil, inputValidator: nil)
 		
-		// When exportAllData is selected, calls DataExporter for generating and writing the data to a file, passing the callback down to exportAllData.
-		case .exportAllData:
-			return SettingsSelectedRowAction.callFunctionAndShareFile { callback in
-				// coreDataManager must not be nil.
-				if let coreDataManager = coreDataManager {
-					DataExporter(coreDataManager: coreDataManager, callback: callback).exportAllData()
-				} else {
-					// All routines MUST call callback
-					callback(nil)
-				}
-			}
 		}
 	}
 	

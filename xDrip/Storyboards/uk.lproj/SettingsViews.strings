@@ -96,8 +96,6 @@
 /// non fixed settings, title of the section
 "settingsviews_labelNonFixed" = "Multi-point Calibration";
 
-/// Button to export all data
-"settingsviews_housekeeperExportAllData" = "Export All Data";
 
 /// nightscout settings, where user can enable or disable nightscout
 "settingsviews_nightscoutEnabled" = "Enable Nightscout";

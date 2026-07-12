@@ -175,7 +175,6 @@
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
 "settingsviews_housekeeperRetentionPeriod" = "Retention Period";
-"settingsviews_housekeeperExportAllData" = "Export All Data";
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 "suppressUnLockPayLoad" = "Suppress Unlock Payload";
 "Select Time" = "Select Time";

@@ -953,10 +953,6 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_housekeeperRetentionPeriod", tableName: filename, bundle: Bundle.main, value: "Retention Period", comment: "Housekeeper retention period, for how long to store data")
     }()
 
-    static let settingsviews_housekeeperExportAllData: String = {
-        return NSLocalizedString("settingsviews_housekeeperExportAllData", tableName: filename, bundle: Bundle.main, value: "Export All Data", comment: "Button to export all data")
-    }()
-    
     static let settingsviews_housekeeperRetentionPeriodMessage = {
         return NSLocalizedString("settingsviews_housekeeperRetentionPeriodMessage", tableName: filename, bundle: Bundle.main, value: "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)", comment: "When clicking the retention setting, a pop up asks for how many days should data be stored")
     }()

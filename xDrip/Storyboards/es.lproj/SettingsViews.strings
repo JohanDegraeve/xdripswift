@@ -187,7 +187,6 @@
 
 "settingsviews_sectionTitleHousekeeper" = "Gestión de Datos";
 "settingsviews_housekeeperRetentionPeriod" = "Periodo de Retención";
-"settingsviews_housekeeperExportAllData" = "Exportar Todo";
 "settingsviews_housekeeperRetentionPeriodMessage" = "¿Durante cuántos días debemos guardar los datos? (Min 90, Max 365)\n\n(Recomendado: 90 días)";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
