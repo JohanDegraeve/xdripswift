@@ -19,6 +19,26 @@ private enum RootTabLayout {
         : .portrait
 }
 
+/// Simple application alert requested by a manager or delegate callback.
+struct RootAlertRequest: Identifiable {
+    let id = UUID()
+    let title: String
+    let message: String
+    let actionTitle: String
+    let cancelTitle: String?
+    let action: () -> Void
+    let cancel: () -> Void
+}
+
+/// Text entry requested outside the visible SwiftUI hierarchy, currently used for calibration.
+struct RootTextInputRequest: Identifiable {
+    let id = UUID()
+    let title: String
+    let placeholder: String
+    let usesDecimalKeyboard: Bool
+    let action: (String) -> Void
+}
+
 /// Root hosting boundary which exposes the orientation policy selected by RootTabView.
 /// SwiftUI does not currently provide an equivalent supported-orientations modifier.
 final class RootTabHostingController<Content: View>: UIHostingController<Content> {
@@ -64,10 +84,51 @@ struct RootTabDependencies {
 @MainActor final class RootTabStateModel: ObservableObject {
     @Published private(set) var dependencies: RootTabDependencies?
     @Published private(set) var snoozeDismissalRequest = 0
+    @Published var alertRequest: RootAlertRequest?
+    @Published var textInputRequest: RootTextInputRequest?
+    @Published var textInput = ""
+    @Published var pickerData: SnoozePickerData?
     weak var sensorProvider: ActiveSensorProviding?
 
     func dismissSnooze() {
         snoozeDismissalRequest += 1
+    }
+
+    func presentAlert(
+        title: String,
+        message: String,
+        actionTitle: String = Texts_Common.Ok,
+        cancelTitle: String? = nil,
+        action: @escaping () -> Void = {},
+        cancel: @escaping () -> Void = {}
+    ) {
+        alertRequest = RootAlertRequest(
+            title: title,
+            message: message,
+            actionTitle: actionTitle,
+            cancelTitle: cancelTitle,
+            action: action,
+            cancel: cancel
+        )
+    }
+
+    func presentTextInput(
+        title: String,
+        placeholder: String,
+        usesDecimalKeyboard: Bool,
+        action: @escaping (String) -> Void
+    ) {
+        textInput = ""
+        textInputRequest = RootTextInputRequest(
+            title: title,
+            placeholder: placeholder,
+            usesDecimalKeyboard: usesDecimalKeyboard,
+            action: action
+        )
+    }
+
+    func presentPicker(_ pickerViewData: PickerViewData) {
+        pickerData = SnoozePickerData(pickerViewData)
     }
 
     func configure(
@@ -199,6 +260,43 @@ struct RootTabView: View {
         }
         .onChange(of: selectedTab) { selectedTab in
             updateSupportedOrientations(for: selectedTab)
+        }
+        .alert(item: $stateModel.alertRequest) { request in
+            if let cancelTitle = request.cancelTitle {
+                return Alert(
+                    title: Text(request.title),
+                    message: Text(request.message),
+                    primaryButton: .default(Text(request.actionTitle), action: request.action),
+                    secondaryButton: .cancel(Text(cancelTitle), action: request.cancel)
+                )
+            }
+
+            return Alert(
+                title: Text(request.title),
+                message: Text(request.message),
+                dismissButton: .default(Text(request.actionTitle), action: request.action)
+            )
+        }
+        .alert(
+            stateModel.textInputRequest?.title ?? "",
+            isPresented: Binding(
+                get: { stateModel.textInputRequest != nil },
+                set: { if !$0 { stateModel.textInputRequest = nil } }
+            )
+        ) {
+            if let request = stateModel.textInputRequest {
+                TextField(request.placeholder, text: $stateModel.textInput)
+                    .keyboardType(request.usesDecimalKeyboard ? .decimalPad : .numberPad)
+
+                Button(Texts_Common.Cancel, role: .cancel) {}
+                Button(Texts_Common.Ok) {
+                    request.action(stateModel.textInput)
+                }
+            }
+        }
+        .sheet(item: $stateModel.pickerData) { pickerData in
+            SnoozePickerView(pickerData: pickerData)
+                .colorScheme(.dark)
         }
     }
 

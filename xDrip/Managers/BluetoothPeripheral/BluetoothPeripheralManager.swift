@@ -2,7 +2,6 @@ import Foundation
 import os
 import CoreBluetooth
 import CoreData
-import UIKit
 
 class BluetoothPeripheralManager: NSObject {
     
@@ -30,8 +29,8 @@ class BluetoothPeripheralManager: NSObject {
     /// if scan is called, and a connection is successfully made to a new device, then this function must be called
     public var callBackAfterDiscoveringDevice: ((BluetoothPeripheral) -> Void)?
 
-    /// used to present alert messages
-    public let uIViewController: UIViewController
+    /// sends user-facing Bluetooth messages to the presentation owner
+    public let messageHandler: (_ title: String, _ message: String) -> Void
     
     /// bluetoothtransmitter may need pairing, but app is in background. Notification will be sent to user, user will open the app, at that moment pairing can happen. variable bluetoothTransmitterThatNeedsPairing will temporary store the BluetoothTransmitter that needs the pairing
     public var bluetoothTransmitterThatNeedsPairing: BluetoothTransmitter?
@@ -95,8 +94,8 @@ class BluetoothPeripheralManager: NSObject {
     
     /// - parameters:
     ///     - cgmTransmitterInfoChanged : to be called when currently used cgmTransmitter changes
-    ///     - uIViewController : used to present alert messages
-    init(coreDataManager: CoreDataManager, cgmTransmitterDelegate: CGMTransmitterDelegate, uIViewController: UIViewController, heartBeatFunction: (() -> ())?, cgmTransmitterInfoChanged: @escaping () -> ()) {
+    ///     - messageHandler : sends user-facing messages without giving the manager a view controller
+    init(coreDataManager: CoreDataManager, cgmTransmitterDelegate: CGMTransmitterDelegate, messageHandler: @escaping (_ title: String, _ message: String) -> Void, heartBeatFunction: (() -> ())?, cgmTransmitterInfoChanged: @escaping () -> ()) {
         
         // initialize properties
         self.coreDataManager = coreDataManager
@@ -106,7 +105,7 @@ class BluetoothPeripheralManager: NSObject {
         self.cgmTransmitterDelegate = cgmTransmitterDelegate
         self.cgmTransmitterInfoChanged = cgmTransmitterInfoChanged
         self.bLEPeripheralAccessor = BLEPeripheralAccessor(coreDataManager: coreDataManager)
-        self.uIViewController = uIViewController
+        self.messageHandler = messageHandler
         self.heartBeatFunction = heartBeatFunction
         
         super.init()

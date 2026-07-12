@@ -1,6 +1,6 @@
 import Foundation
 
-/// used by BluetoothPeripheral UI view controllers - it's the glue between BluetoothPeripheralManager and UIViewControllers
+/// Operations exposed by BluetoothPeripheralManager to the SwiftUI Bluetooth views.
 protocol BluetoothPeripheralManaging: BluetoothTransmitterDelegate {
     
     /// to scan for a new BluetoothPeripheral - callback will be called when a new BluetoothPeripheral is found and connected

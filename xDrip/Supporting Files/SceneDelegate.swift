@@ -48,10 +48,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         ))
         hostingController.view.backgroundColor = .black
 
-        applicationCoordinator.start(
-            rootTabStateModel: stateModel,
-            presentingViewController: hostingController
-        )
+        applicationCoordinator.start(rootTabStateModel: stateModel)
 
         return hostingController
     }

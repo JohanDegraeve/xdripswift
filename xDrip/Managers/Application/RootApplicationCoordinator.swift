@@ -174,10 +174,6 @@ import AppIntents
     /// Publishes the services needed by the native SwiftUI tabs after startup completes.
     private weak var rootTabStateModel: RootTabStateModel?
 
-    /// Temporary UIKit presentation endpoint for service alerts that have not yet been migrated.
-    /// Application ownership no longer depends on this controller or its lifecycle.
-    private weak var presentingViewController: UIViewController?
-
     private var hasStarted = false
     
     // MARK: - SwiftUI Lifecycle
@@ -231,17 +227,16 @@ import AppIntents
         IntentDonationManager.shared.donate(intent: GlucoseIntent())
     }
 
-    /// Starts application services once the SwiftUI root host is available.
-    func start(rootTabStateModel: RootTabStateModel, presentingViewController: UIViewController) {
+    /// Starts application services once the SwiftUI root state is available.
+    func start(rootTabStateModel: RootTabStateModel) {
         guard !hasStarted else { return }
 
         hasStarted = true
         self.rootTabStateModel = rootTabStateModel
-        self.presentingViewController = presentingViewController
-        startServices(presentingViewController: presentingViewController)
+        startServices()
     }
 
-    private func startServices(presentingViewController: UIViewController) {
+    private func startServices() {
         
         // Run a quick check to see if the currently stored followerDataSourceType is now on the ignore list
         // if so, then reset back to Nightscout. This is unlikely to ever happen, but it *is* possible.
@@ -357,19 +352,13 @@ import AppIntents
             // if licenseinfo not yet accepted, show license info with only ok button
             if !UserDefaults.standard.licenseInfoAccepted {
                 
-                let alert = UIAlertController(title: ConstantsHomeView.applicationName, message: Texts_HomeView.licenseInfo + ConstantsHomeView.infoEmailAddress, actionHandler: {
-                    
+                self.presentAlert(title: ConstantsHomeView.applicationName, message: Texts_HomeView.licenseInfo + ConstantsHomeView.infoEmailAddress) {
                     // set licenseInfoAccepted to true
                     UserDefaults.standard.licenseInfoAccepted = true
-                    
+
                     // create info screen about transmitters
-                    let infoScreenAlert = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.transmitterInfo, actionHandler: nil)
-                    
-                    self.presentingViewController?.present(infoScreenAlert, animated: true, completion: nil)
-                    
-                })
-                
-                self.presentingViewController?.present(alert, animated: true, completion: nil)
+                    self.presentAlert(title: Texts_HomeView.info, message: Texts_HomeView.transmitterInfo)
+                }
                 
             }
             
@@ -610,8 +599,7 @@ import AppIntents
         
         // setup nightscout synchronizer
         nightscoutSyncManager = NightscoutSyncManager(coreDataManager: coreDataManager, messageHandler: { (title:String, message:String) in
-            let alert = UIAlertController(title: title, message: message, actionHandler: nil)
-            self.presentingViewController?.present(alert, animated: true, completion: nil)
+            self.presentAlert(title: title, message: message)
         })
         
         // instantiate treatment entry accessor
@@ -652,8 +640,7 @@ import AppIntents
         
         // setup dexcomShareUploadManager
         dexcomShareUploadManager = DexcomShareUploadManager(bgReadingsAccessor: bgReadingsAccessor, messageHandler: { (title:String, message:String) in
-            let alert = UIAlertController(title: title, message: message, actionHandler: nil)
-            self.presentingViewController?.present(alert, animated: true, completion: nil)
+            self.presentAlert(title: title, message: message)
         })
         
         /// will be called by BluetoothPeripheralManager if cgmTransmitterType changed and/or webOOPEnabled value changed
@@ -707,11 +694,9 @@ import AppIntents
         }
         
         // setup bluetoothPeripheralManager
-        guard let presentingViewController else {
-            fatalError("RootApplicationCoordinator requires a presentation endpoint before starting Bluetooth services")
-        }
-
-        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self, uIViewController: presentingViewController, heartBeatFunction: {
+        bluetoothPeripheralManager = BluetoothPeripheralManager(coreDataManager: coreDataManager, cgmTransmitterDelegate: self, messageHandler: { title, message in
+            self.presentAlert(title: title, message: message)
+        }, heartBeatFunction: {
             self.loopFollowManager?.getReading()
             self.nightscoutFollowManager?.download()
             self.libreLinkUpFollowManager?.download()
@@ -1101,6 +1086,18 @@ import AppIntents
     
     // MARK: - SwiftUI Home Actions
 
+    private func presentAlert(
+        title: String,
+        message: String,
+        action: @escaping () -> Void = {}
+    ) {
+        rootTabStateModel?.presentAlert(title: title, message: message, action: action)
+    }
+
+    private func presentPicker(_ pickerViewData: PickerViewData) {
+        rootTabStateModel?.presentPicker(pickerViewData)
+    }
+
     private func makeRootHomeActions() -> RootHomeActions {
         RootHomeActions(
             originalGlucosePeekActivated: {
@@ -1275,7 +1272,7 @@ import AppIntents
         guard let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter(), let bluetoothTransmitter = cgmTransmitter as? BluetoothTransmitter else {
             trace("in requestCalibration, calibrationsAccessor or cgmTransmitter is nil, no further processing", log: log, category: ConstantsLog.categoryRootView, type: .info)
             
-            self.presentingViewController?.present(UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.theresNoCGMTransmitterActive, actionHandler: nil), animated: true, completion: nil)
+            presentAlert(title: Texts_HomeView.info, message: Texts_HomeView.theresNoCGMTransmitterActive)
             
             return
         }
@@ -1284,7 +1281,7 @@ import AppIntents
         guard let activeSensor = activeSensor else {
             trace("in requestCalibration, there is no active sensor, no further processing", log: log, category: ConstantsLog.categoryRootView, type: .info)
             
-            self.presentingViewController?.present(UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.startSensorBeforeCalibration, actionHandler: nil), animated: true, completion: nil)
+            presentAlert(title: Texts_HomeView.info, message: Texts_HomeView.startSensorBeforeCalibration)
             
             return
         }
@@ -1292,7 +1289,7 @@ import AppIntents
         // if it's a user requested calibration, but there's no calibration yet, then give info and return - first calibration will be requested by app via notification
         // cgmTransmitter.overruleIsWebOOPEnabled() : that means it's a transmitter that gives calibrated values (ie doesn't need to be calibrated) but it can use calibration
         if calibrationsAccessor.firstCalibrationForActiveSensor(withActivesensor: activeSensor) == nil && userRequested && !cgmTransmitter.overruleIsWebOOPEnabled() {
-            self.presentingViewController?.present(UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.thereMustBeAreadingBeforeCalibration, actionHandler: nil), animated: true, completion: nil)
+            presentAlert(title: Texts_HomeView.info, message: Texts_HomeView.thereMustBeAreadingBeforeCalibration)
             
             return
         }
@@ -1300,9 +1297,13 @@ import AppIntents
         // assign deviceName, needed in the closure when creating alert. As closures can create strong references (to bluetoothTransmitter in this case), I'm fetching the deviceName here
         let deviceName = bluetoothTransmitter.deviceName
         
-        let alert = UIAlertController(title: Texts_Calibrations.enterCalibrationValue, message: nil, keyboardType: UserDefaults.standard.bloodGlucoseUnitIsMgDl ? .numberPad:.decimalPad, text: nil, placeHolder: "...", actionTitle: nil, cancelTitle: nil, actionHandler: { (text:String) in
+        rootTabStateModel?.presentTextInput(
+            title: Texts_Calibrations.enterCalibrationValue,
+            placeholder: "...",
+            usesDecimalKeyboard: !UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        ) { text in
             guard let valueAsDouble = text.toDouble() else {
-                self.presentingViewController?.present(UIAlertController(title: Texts_Common.warning, message: Texts_Common.invalidValue, actionHandler: nil), animated: true, completion: nil)
+                self.presentAlert(title: Texts_Common.warning, message: Texts_Common.invalidValue)
                 return
             }
 
@@ -1315,12 +1316,9 @@ import AppIntents
                 activeSensor: activeSensor,
                 deviceName: deviceName
             ) {
-                self.presentingViewController?.present(UIAlertController(title: Texts_Common.warning, message: errorMessage, actionHandler: nil), animated: true, completion: nil)
+                self.presentAlert(title: Texts_Common.warning, message: errorMessage)
             }
-        }, cancelHandler: nil)
-        
-        // present the alert
-        self.presentingViewController?.present(alert, animated: true, completion: nil)
+        }
     }
 
     private func submitCalibrationValue(
@@ -2231,12 +2229,7 @@ extension RootApplicationCoordinator: @preconcurrency UNUserNotificationCenterDe
             bluetoothPeripheralManager?.initiatePairing()
             // this will verify if it concerns an alert notification, if not pickerviewData will be nil
         } else if let pickerViewData = alertManager?.userNotificationCenter(center, willPresent: notification, withCompletionHandler: completionHandler) {
-            guard let presentingViewController else {
-                completionHandler([])
-                return
-            }
-
-            PickerViewControllerModal.displayPickerViewController(pickerViewData: pickerViewData, parentController: presentingViewController)
+            presentPicker(pickerViewData)
         }  else if notification.request.identifier == ConstantsNotifications.notificationIdentifierForVolumeTest {
             // user is testing iOS Sound volume in the settings. Only the sound should be played, the alert itself will not be shown
             completionHandler([.sound, .list])
@@ -2259,20 +2252,14 @@ extension RootApplicationCoordinator: @preconcurrency UNUserNotificationCenterDe
             trace("in userNotificationCenter didReceive, user pressed calibration notification to open the app, requestCalibration should be called because closure is added in ApplicationManager.shared", log: log, category: ConstantsLog.categoryRootView, type: .info)
         } else if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifierForSensorNotDetected.sensorNotDetected {
             // if user clicks notification "sensor not detected", then show uialert with title and body
-            let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.sensorNotDetected, actionHandler: nil)
-            
-            self.presentingViewController?.present(alert, animated: true, completion: nil)
+            presentAlert(title: Texts_Common.warning, message: Texts_HomeView.sensorNotDetected)
         } else if response.notification.request.identifier == ConstantsNotifications.NotificationIdentifierForTransmitterNeedsPairing.transmitterNeedsPairing {
             // nothing required, the pairing function will be called as it's been added to ApplicationManager in function cgmTransmitterNeedsPairing
         } else {
             // it's not an initial calibration request notification that the user clicked, by calling alertManager?.userNotificationCenter, we check if it was an alert notification that was clicked and if yes pickerViewData will have the list of alert snooze values
             if let pickerViewData = alertManager?.userNotificationCenter(center, didReceive: response) {
                 trace("in userNotificationCenter didReceive, user pressed an alert notification to open the app", log: log, category: ConstantsLog.categoryRootView, type: .info)
-                guard let presentingViewController else {
-                    return
-                }
-
-                PickerViewControllerModal.displayPickerViewController(pickerViewData: pickerViewData, parentController: presentingViewController)
+                presentPicker(pickerViewData)
             } else {
                 // it as also not an alert notification that the user clicked, there might come in other types of notifications in the future
             }

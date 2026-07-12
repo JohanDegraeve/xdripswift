@@ -302,7 +302,7 @@ struct SnoozePickerData: Identifiable {
 }
 
 /// Native replacement for PickerViewControllerModal when choosing a snooze duration.
-private struct SnoozePickerView: View {
+struct SnoozePickerView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selectedRow: Int
 
