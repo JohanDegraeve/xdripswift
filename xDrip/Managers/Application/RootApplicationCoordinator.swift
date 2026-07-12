@@ -1843,9 +1843,9 @@ import AppIntents
     fileprivate func updateScreenRotationSettings() {
         // if allowed, then permit the SwiftUI Home tab to rotate left/right to show the landscape view
         if UserDefaults.standard.allowScreenRotation {
-            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .allButUpsideDown
+            AppDelegate.supportedOrientations = .allButUpsideDown
         } else {
-            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
+            AppDelegate.supportedOrientations = .portrait
         }
     }
     

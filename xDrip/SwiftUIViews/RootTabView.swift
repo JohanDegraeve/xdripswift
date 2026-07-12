@@ -13,12 +13,6 @@ private enum RootTabLayout {
     static let contentBottomPadding: CGFloat = 4
 }
 
-@MainActor private enum RootTabOrientationPolicy {
-    static var supportedOrientations: UIInterfaceOrientationMask = UserDefaults.standard.allowScreenRotation
-        ? .allButUpsideDown
-        : .portrait
-}
-
 /// Simple application alert requested by a manager or delegate callback.
 struct RootAlertRequest: Identifiable {
     let id = UUID()
@@ -37,22 +31,6 @@ struct RootTextInputRequest: Identifiable {
     let placeholder: String
     let usesDecimalKeyboard: Bool
     let action: (String) -> Void
-}
-
-/// Root hosting boundary which exposes the orientation policy selected by RootTabView.
-/// SwiftUI does not currently provide an equivalent supported-orientations modifier.
-final class RootTabHostingController<Content: View>: UIHostingController<Content> {
-    override var shouldAutorotate: Bool {
-        return RootTabOrientationPolicy.supportedOrientations != .portrait
-    }
-
-    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
-        return RootTabOrientationPolicy.supportedOrientations
-    }
-
-    override var preferredInterfaceOrientationForPresentation: UIInterfaceOrientation {
-        .portrait
-    }
 }
 
 /// Services needed by the native SwiftUI tabs after application startup has completed.
@@ -333,8 +311,7 @@ struct RootTabView: View {
             supportedOrientations = .portrait
         }
 
-        RootTabOrientationPolicy.supportedOrientations = supportedOrientations
-        (UIApplication.shared.delegate as? AppDelegate)?.restrictRotation = supportedOrientations
+        AppDelegate.supportedOrientations = supportedOrientations
 
         guard let windowScene = UIApplication.shared.connectedScenes
             .compactMap({ $0 as? UIWindowScene })
