@@ -118,15 +118,6 @@ struct ShowHideItemsView_Previews: PreviewProvider {
     }
 }
 
-final class ShowHideItemsHostingController: PortraitLockedHostingController<ShowHideItemsView> {
-    init() {
-        super.init(rootView: ShowHideItemsView())
-    }
-
-    @objc required dynamic init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}
 
     //                    Section(header: Text(Texts_SettingsView.showMiniChart)) {
     //                        HStack(alignment: .center, spacing: 20) {

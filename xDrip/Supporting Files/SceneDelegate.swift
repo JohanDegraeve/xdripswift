@@ -31,17 +31,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     /// Creates the native SwiftUI tab shell around the existing Home service coordinator.
-    /// The storyboard now constructs only RootViewController; no UIKit tab or navigation
-    /// controller participates in the root hierarchy.
+    /// RootViewController no longer has a visible view or storyboard contract; it remains mounted
+    /// only while its application services and delegate responsibilities are being extracted.
     private func makeRootViewController() -> UIViewController {
-        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-
-        guard let rootViewController = storyboard.instantiateViewController(
-            withIdentifier: "RootViewController"
-        ) as? RootViewController else {
-            fatalError("The Main storyboard does not contain RootViewController")
-        }
-
+        let rootViewController = RootViewController()
         let stateModel = RootTabStateModel()
         let tabTitles = RootTabTitles(
             home: localizedTabTitle(key: "acW-dT-cKf.title", fallback: "Home"),

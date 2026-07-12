@@ -277,19 +277,3 @@ struct BackfilledReadingIndicatorDot: View {
             .frame(width: ConstantsUI.backfilledReadingIndicatorDotSize, height: ConstantsUI.backfilledReadingIndicatorDotSize)
     }
 }
-
-final class BgReadingsHostingController: PortraitLockedHostingController<AnyView> {
-    init(bgReadingsAccessor: BgReadingsAccessor, nightscoutSyncManager: NightscoutSyncManager) {
-        let rootView = AnyView(
-            BgReadingsView()
-                .environmentObject(bgReadingsAccessor)
-                .environmentObject(nightscoutSyncManager)
-        )
-
-        super.init(rootView: rootView)
-    }
-
-    @objc required dynamic init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-}

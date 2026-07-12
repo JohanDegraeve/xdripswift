@@ -38,10 +38,22 @@ final class RootTabHostingController<Content: View>: UIHostingController<Content
 /// Services needed by the native SwiftUI tabs after application startup has completed.
 struct RootTabDependencies {
     let coreDataManager: CoreDataManager
+    let bgReadingsAccessor: BgReadingsAccessor
+    let calibrationsAccessor: CalibrationsAccessor
+    let treatmentEntryAccessor: TreatmentEntryAccessor
+    let alertManager: AlertManager
+    let bgPostProcessingManager: BgPostProcessingManager
     let bluetoothPeripheralManager: BluetoothPeripheralManaging
     let soundPlayer: SoundPlayer
     let nightscoutSyncManager: NightscoutSyncManager
     let rootHomeStateModel: RootHomeStateModel
+    let rootHomeActions: RootHomeActions
+    let activeSensorProvider: () -> Sensor?
+    let transmitterProvider: () -> CGMTransmitter?
+    let startSensor: (Date, String?) -> Void
+    let stopSensor: () -> Void
+    let submitCalibration: (Double) -> String?
+    let updateScreenLock: (Bool, Bool) -> Bool
 }
 
 /// Publishes existing application services to the SwiftUI tab hierarchy.
@@ -51,23 +63,52 @@ struct RootTabDependencies {
 /// second manager or mirrors service data.
 @MainActor final class RootTabStateModel: ObservableObject {
     @Published private(set) var dependencies: RootTabDependencies?
+    @Published private(set) var snoozeDismissalRequest = 0
     weak var sensorProvider: ActiveSensorProviding?
+
+    func dismissSnooze() {
+        snoozeDismissalRequest += 1
+    }
 
     func configure(
         coreDataManager: CoreDataManager,
+        bgReadingsAccessor: BgReadingsAccessor,
+        calibrationsAccessor: CalibrationsAccessor,
+        treatmentEntryAccessor: TreatmentEntryAccessor,
+        alertManager: AlertManager,
+        bgPostProcessingManager: BgPostProcessingManager,
         bluetoothPeripheralManager: BluetoothPeripheralManaging,
         soundPlayer: SoundPlayer,
         nightscoutSyncManager: NightscoutSyncManager,
         rootHomeStateModel: RootHomeStateModel,
+        rootHomeActions: RootHomeActions,
+        activeSensorProvider: @escaping () -> Sensor?,
+        transmitterProvider: @escaping () -> CGMTransmitter?,
+        startSensor: @escaping (Date, String?) -> Void,
+        stopSensor: @escaping () -> Void,
+        submitCalibration: @escaping (Double) -> String?,
+        updateScreenLock: @escaping (Bool, Bool) -> Bool,
         sensorProvider: ActiveSensorProviding
     ) {
         self.sensorProvider = sensorProvider
         dependencies = RootTabDependencies(
             coreDataManager: coreDataManager,
+            bgReadingsAccessor: bgReadingsAccessor,
+            calibrationsAccessor: calibrationsAccessor,
+            treatmentEntryAccessor: treatmentEntryAccessor,
+            alertManager: alertManager,
+            bgPostProcessingManager: bgPostProcessingManager,
             bluetoothPeripheralManager: bluetoothPeripheralManager,
             soundPlayer: soundPlayer,
             nightscoutSyncManager: nightscoutSyncManager,
-            rootHomeStateModel: rootHomeStateModel
+            rootHomeStateModel: rootHomeStateModel,
+            rootHomeActions: rootHomeActions,
+            activeSensorProvider: activeSensorProvider,
+            transmitterProvider: transmitterProvider,
+            startSensor: startSensor,
+            stopSensor: stopSensor,
+            submitCalibration: submitCalibration,
+            updateScreenLock: updateScreenLock
         )
     }
 }
@@ -98,48 +139,58 @@ struct RootTabView: View {
     }
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            RootHomeTabView(
-                viewController: rootViewController,
-                dependencies: stateModel.dependencies
-            )
+        ZStack {
+            TabView(selection: $selectedTab) {
+                RootHomeTabView(
+                    viewController: rootViewController,
+                    dependencies: stateModel.dependencies,
+                    snoozeDismissalRequest: stateModel.snoozeDismissalRequest
+                )
                 .tag(Tab.home)
                 .tabItem {
                     tabLabel(title: tabTitles.home, image: "Home")
                 }
 
-            tabContent { dependencies in
-                NavigationStack {
-                    TreatmentsView(coreDataManager: dependencies.coreDataManager)
+                tabContent { dependencies in
+                    NavigationStack {
+                        TreatmentsView(coreDataManager: dependencies.coreDataManager)
+                    }
+                    .tint(.yellow)
                 }
-                .tint(.yellow)
-            }
-            .tag(Tab.treatments)
-            .tabItem {
-                tabLabel(title: tabTitles.treatments, image: "Treatments")
+                .tag(Tab.treatments)
+                .tabItem {
+                    tabLabel(title: tabTitles.treatments, image: "Treatments")
+                }
+
+                tabContent { dependencies in
+                    BluetoothPeripheralsNavigationView(
+                        coreDataManager: dependencies.coreDataManager,
+                        bluetoothPeripheralManager: dependencies.bluetoothPeripheralManager,
+                        sensorProvider: stateModel.sensorProvider
+                    )
+                }
+                .tag(Tab.bluetooth)
+                .tabItem {
+                    tabLabel(title: tabTitles.bluetooth, image: "Bluetooth")
+                }
+
+                tabContent { dependencies in
+                    SettingsNavigationView(
+                        coreDataManager: dependencies.coreDataManager,
+                        soundPlayer: dependencies.soundPlayer
+                    )
+                }
+                .tag(Tab.settings)
+                .tabItem {
+                    tabLabel(title: tabTitles.settings, image: "Settings")
+                }
             }
 
-            tabContent { dependencies in
-                BluetoothPeripheralsNavigationView(
-                    coreDataManager: dependencies.coreDataManager,
-                    bluetoothPeripheralManager: dependencies.bluetoothPeripheralManager,
-                    sensorProvider: stateModel.sensorProvider
+            if let dependencies = stateModel.dependencies {
+                RootScreenLockOverlay(
+                    stateModel: dependencies.rootHomeStateModel,
+                    unlock: { _ = dependencies.updateScreenLock(false, true) }
                 )
-            }
-            .tag(Tab.bluetooth)
-            .tabItem {
-                tabLabel(title: tabTitles.bluetooth, image: "Bluetooth")
-            }
-
-            tabContent { dependencies in
-                SettingsNavigationView(
-                    coreDataManager: dependencies.coreDataManager,
-                    soundPlayer: dependencies.soundPlayer
-                )
-            }
-            .tag(Tab.settings)
-            .tabItem {
-                tabLabel(title: tabTitles.settings, image: "Settings")
             }
         }
         .colorScheme(.dark)
@@ -204,10 +255,25 @@ struct RootTabView: View {
 /// same tab hierarchy during one rotation. Keeping both presentations here gives rotation one
 /// owner and keeps the landscape screen contained inside the Home tab.
 private struct RootHomeTabView: View {
+    @Environment(\.scenePhase) private var scenePhase
+    private enum PresentedView: String, Identifiable {
+        case snooze
+        case bgReadings
+        case sensorManagement
+        case bgAdjustments
+        case showHideItems
+        case aidStatus
+
+        var id: String { rawValue }
+    }
+
     @Environment(\.verticalSizeClass) private var verticalSizeClass
+    @State private var presentedView: PresentedView?
+    @State private var showsScreenLockInformation = false
 
     let viewController: RootViewController
     let dependencies: RootTabDependencies?
+    let snoozeDismissalRequest: Int
 
     var body: some View {
         ZStack {
@@ -215,8 +281,17 @@ private struct RootHomeTabView: View {
             // presentation changes, so its timers and application managers keep one lifecycle.
             RootHomeControllerView(viewController: viewController)
 
-            if verticalSizeClass == .compact, let dependencies {
-                RootHomeLandscapeView(dependencies: dependencies)
+            if let dependencies {
+                if verticalSizeClass == .compact {
+                    RootHomeLandscapeView(dependencies: dependencies)
+                } else {
+                    RootHomeView(
+                        stateModel: dependencies.rootHomeStateModel,
+                        coreDataManager: dependencies.coreDataManager,
+                        nightscoutSyncManager: dependencies.nightscoutSyncManager,
+                        actions: rootHomeActions(from: dependencies)
+                    )
+                }
             }
         }
         .padding(
@@ -224,6 +299,117 @@ private struct RootHomeTabView: View {
             verticalSizeClass == .compact ? 0 : RootTabLayout.contentBottomPadding
         )
         .toolbar(verticalSizeClass == .compact ? .hidden : .automatic, for: .tabBar)
+        .sheet(item: $presentedView) { presentedView in
+            destinationView(presentedView)
+                .colorScheme(.dark)
+        }
+        .onChange(of: snoozeDismissalRequest) { _ in
+            dismissSnoozeIfNeeded()
+        }
+        .onChange(of: scenePhase) { scenePhase in
+            if scenePhase == .background {
+                dismissSnoozeIfNeeded()
+                showsScreenLockInformation = false
+            }
+        }
+        .alert(Texts_HomeView.screenLockTitle, isPresented: $showsScreenLockInformation) {
+            Button(Texts_Common.dontShowAgain, role: .destructive) {
+                UserDefaults.standard.lockScreenDontShowAgain = true
+            }
+            Button(Texts_Common.Ok, role: .cancel) {}
+        } message: {
+            Text(Texts_HomeView.screenLockInfo)
+        }
+        .task(id: showsScreenLockInformation) {
+            guard showsScreenLockInformation else { return }
+
+            try? await Task.sleep(nanoseconds: 30_000_000_000)
+            showsScreenLockInformation = false
+        }
+    }
+
+    private func rootHomeActions(from dependencies: RootTabDependencies) -> RootHomeActions {
+        var actions = dependencies.rootHomeActions
+        actions.showSnooze = { presentedView = .snooze }
+        actions.showBgReadings = { presentedView = .bgReadings }
+        actions.showSensorManagement = { presentedView = .sensorManagement }
+        actions.showBgAdjustments = { presentedView = .bgAdjustments }
+        actions.showHideItems = { presentedView = .showHideItems }
+        actions.showAIDStatus = { presentedView = .aidStatus }
+        actions.toggleScreenLock = { updateScreenLock(using: dependencies, overrideCurrentState: false, nightMode: true) }
+        actions.keepScreenAwake = { updateScreenLock(using: dependencies, overrideCurrentState: true, nightMode: false) }
+        return actions
+    }
+
+    @ViewBuilder private func destinationView(_ presentedView: PresentedView) -> some View {
+        if let dependencies {
+            switch presentedView {
+            case .snooze:
+                SnoozeView(viewModel: SnoozeViewModel(alertManager: dependencies.alertManager))
+            case .bgReadings:
+                BgReadingsView()
+                    .environmentObject(dependencies.bgReadingsAccessor)
+                    .environmentObject(dependencies.nightscoutSyncManager)
+            case .sensorManagement:
+                SensorManagementView(
+                    activeSensorProvider: dependencies.activeSensorProvider,
+                    transmitterProvider: dependencies.transmitterProvider,
+                    calibrationsAccessor: dependencies.calibrationsAccessor,
+                    bgReadingsAccessor: dependencies.bgReadingsAccessor,
+                    onStartSensor: dependencies.startSensor,
+                    onStopSensor: dependencies.stopSensor,
+                    onSubmitCalibration: dependencies.submitCalibration
+                )
+            case .bgAdjustments:
+                BgAdjustmentsView(
+                    bgReadingsAccessor: dependencies.bgReadingsAccessor,
+                    treatmentEntryAccessor: dependencies.treatmentEntryAccessor,
+                    bgPostProcessingManager: dependencies.bgPostProcessingManager
+                )
+            case .showHideItems:
+                ShowHideItemsView()
+            case .aidStatus:
+                AIDStatusView()
+                    .environmentObject(dependencies.nightscoutSyncManager)
+            }
+        }
+    }
+
+    private func dismissSnoozeIfNeeded() {
+        if presentedView == .snooze {
+            presentedView = nil
+        }
+    }
+
+    private func updateScreenLock(using dependencies: RootTabDependencies, overrideCurrentState: Bool, nightMode: Bool) {
+        let didEnable = dependencies.updateScreenLock(overrideCurrentState, nightMode)
+
+        if didEnable && !UserDefaults.standard.lockScreenDontShowAgain {
+            showsScreenLockInformation = true
+        }
+    }
+}
+
+/// Covers the complete tab hierarchy while the full night screen lock is active.
+///
+/// The previous RootViewController added an intercepting UIView directly to the window. Keeping
+/// the overlay here gives SwiftUI one owner for both the visible lock state and tap-to-unlock.
+private struct RootScreenLockOverlay: View {
+    @ObservedObject var stateModel: RootHomeStateModel
+    let unlock: () -> Void
+
+    var body: some View {
+        let state = stateModel.state
+        let dimmingType = UserDefaults.standard.screenLockDimmingType
+
+        if state.isScreenLocked,
+           state.usesScreenLockNightLayout,
+           dimmingType != .disabled {
+            dimmingType.dimmingColor
+                .ignoresSafeArea()
+                .contentShape(Rectangle())
+                .onTapGesture(perform: unlock)
+        }
     }
 }
 
@@ -285,8 +471,8 @@ struct RootTabTitles {
     let settings: String
 }
 
-/// Temporary containment bridge for Home while RootViewController still starts app services.
-/// All tab and non-home navigation ownership is already native SwiftUI.
+/// Temporary lifecycle bridge while RootViewController still starts application services.
+/// RootHomeView and all root navigation are already owned by SwiftUI.
 private struct RootHomeControllerView: UIViewControllerRepresentable {
     let viewController: RootViewController
 

@@ -24,6 +24,7 @@ struct RootHomeState {
     var visibility = RootHomeVisibilityState()
     var controls = RootHomeControlsState()
     var isScreenLocked = false
+    var usesScreenLockNightLayout = false
     var chartRevision = 0
     var chartResetToNowRevision = 0
 
@@ -194,6 +195,7 @@ final class RootHomeStateModel: ObservableObject {
         newState.visibility = visibilityState(sensorState: newState.sensor, usesScreenLockNightLayout: usesScreenLockNightLayout)
         newState.controls = controlsState(alertManager: alertManager, bgPostProcessingManager: bgPostProcessingManager)
         newState.isScreenLocked = isScreenLocked
+        newState.usesScreenLockNightLayout = usesScreenLockNightLayout
 
         publish(newState)
     }
@@ -665,10 +667,10 @@ final class RootHomeStateModel: ObservableObject {
 
 }
 
-/// Actions that the SwiftUI home screen can ask the existing RootViewController coordinator to run.
+/// Commands emitted by controls in the SwiftUI home screen.
 ///
-/// These closures keep view code declarative while RootViewController still coordinates
-/// navigation, calibration, sensor management, screen lock and alert flows during the migration.
+/// RootTabView supplies navigation and presentation commands. The remaining service commands are
+/// supplied by RootViewController until its application-service responsibilities are extracted.
 struct RootHomeActions {
     var showSnooze: () -> Void = {}
     var showBgReadings: () -> Void = {}

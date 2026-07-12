@@ -10,34 +10,8 @@ import SwiftUI
 import WidgetKit
 import AppIntents
 
-/// Shared hosting controller for SwiftUI flows that should stay in portrait while they are visible.
-class PortraitLockedHostingController<Content: View>: UIHostingController<Content> {
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-
-        (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-
-        if UserDefaults.standard.allowScreenRotation {
-            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .allButUpsideDown
-        } else {
-            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
-        }
-    }
-}
-
 /// viewcontroller for the home screen
 final class RootViewController: UIViewController {
-    
-    // MARK: - Screen Lock Overlay
-    
-    /// function which is triggered when hideCoverView is called
-    @objc func handleTapCoverView(_ sender: UITapGestureRecognizer) {
-        screenLockUpdate(enabled: false)
-    }
     
     // MARK: - Constants for ApplicationManager usage
     
@@ -64,9 +38,6 @@ final class RootViewController: UIViewController {
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - to update labels and chart
     private let applicationManagerKeyUpdateLabelsAndChart = "applicationManagerKeyUpdateLabelsAndChart"
-    
-    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - to dismiss screenLockAlertController
-    private let applicationManagerKeyDismissScreenLockAlertController = "applicationManagerKeyDismissScreenLockAlertController"
     
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - to do a Nightscout Treatment sync
     private let applicationManagerKeyStartNightscoutTreatmentSync = "applicationManagerKeyStartNightscoutTreatmentSync"
@@ -180,26 +151,14 @@ final class RootViewController: UIViewController {
     /// initiate a Timer object that we will use keep the follower connection status updated every 30 seconds or so
     private var followerConnectionTimer: Timer?
     
-    /// UIAlertController to use when user chooses to lock the screen. Defined here so we can dismiss it when app goes to the background
-    private var screenLockAlertController: UIAlertController?
-    
-    /// uiview to be used for the night-mode overlay to darken the app screen
-    private var overlayView: UIView?
-    
     /// Last timestamp when a log line was produced by TransmitterReadSuccessManager
     private var transmitterReadSuccessTimeStampOfLastLogCreated: Date?
 
-    /// Presentation state for the hosted SwiftUI home screen.
+    /// Presentation state shared with the native SwiftUI home screen.
     ///
     /// RootViewController still owns the app services during this migration step, while the state
     /// model now calculates display values directly instead of mirroring the old storyboard views.
     private let rootHomeStateModel = RootHomeStateModel()
-
-    /// Hosted SwiftUI home screen installed once app dependencies are available.
-    ///
-    /// RootViewController still starts and owns the services used by the app, but the visible
-    /// portrait home surface is now entirely provided by RootHomeView.
-    private var rootHomeHostingController: UIHostingController<RootHomeView>?
 
     /// Publishes the services needed by the native SwiftUI tabs after startup completes.
     private weak var rootTabStateModel: RootTabStateModel?
@@ -318,22 +277,52 @@ final class RootViewController: UIViewController {
             self.setupApplicationData()
 
             if let coreDataManager = self.coreDataManager,
+               let bgReadingsAccessor = self.bgReadingsAccessor,
+               let calibrationsAccessor = self.calibrationsAccessor,
+               let treatmentEntryAccessor = self.treatmentEntryAccessor,
+               let alertManager = self.alertManager,
+               let bgPostProcessingManager = self.bgPostProcessingManager,
                let bluetoothPeripheralManager = self.bluetoothPeripheralManager,
                let soundPlayer = self.soundPlayer,
                let nightscoutSyncManager = self.nightscoutSyncManager {
+                self.rootHomeStateModel.configure(
+                    bgReadingsAccessor: bgReadingsAccessor,
+                    treatmentEntryAccessor: treatmentEntryAccessor,
+                    nightscoutSyncManager: nightscoutSyncManager,
+                    bluetoothPeripheralManager: bluetoothPeripheralManager,
+                    alertManager: alertManager,
+                    bgPostProcessingManager: bgPostProcessingManager
+                )
+
                 self.rootTabStateModel?.configure(
                     coreDataManager: coreDataManager,
+                    bgReadingsAccessor: bgReadingsAccessor,
+                    calibrationsAccessor: calibrationsAccessor,
+                    treatmentEntryAccessor: treatmentEntryAccessor,
+                    alertManager: alertManager,
+                    bgPostProcessingManager: bgPostProcessingManager,
                     bluetoothPeripheralManager: bluetoothPeripheralManager,
                     soundPlayer: soundPlayer,
                     nightscoutSyncManager: nightscoutSyncManager,
                     rootHomeStateModel: self.rootHomeStateModel,
+                    rootHomeActions: self.makeRootHomeActions(),
+                    activeSensorProvider: { [weak self] in self?.activeSensor },
+                    transmitterProvider: { [weak self] in self?.bluetoothPeripheralManager?.getCGMTransmitter() },
+                    startSensor: { [weak self] startDate, sensorCode in
+                        self?.startSensorFromManagementView(startDate: startDate, sensorCode: sensorCode)
+                    },
+                    stopSensor: { [weak self] in
+                        self?.stopSensorFromManagementView()
+                    },
+                    submitCalibration: { [weak self] value in
+                        self?.submitCalibrationFromManagementView(value)
+                    },
+                    updateScreenLock: { [weak self] overrideCurrentState, nightMode in
+                        self?.updateScreenLock(overrideCurrentState: overrideCurrentState, nightMode: nightMode) ?? false
+                    },
                     sensorProvider: self
                 )
             }
-            
-            // Install the SwiftUI home surface only after the service objects used by its chart
-            // state managers are available.
-            self.installRootHomeViewIfNeeded()
 
             // housekeeper should be non nil here, kall housekeeper
             self.houseKeeper?.doAppStartUpHouseKeeping()
@@ -562,10 +551,6 @@ final class RootViewController: UIViewController {
             }
         })
         
-        
-        ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyDismissScreenLockAlertController, closure: {
-            self.dismissScreenLockAlertController()
-        })
         
         // launch nightscout treatment sync whenever the app comes to the foreground
         ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyStartNightscoutTreatmentSync, closure: {
@@ -932,18 +917,7 @@ final class RootViewController: UIViewController {
     
     /// closes the SwiftUI snooze screen if it is currently visible
     private func closeSnoozeScreen() {
-        if let presentedViewController = self.presentedViewController {
-            if presentedViewController is SnoozeHostingController {
-                presentedViewController.dismiss(animated: true, completion: nil)
-                return
-            }
-        }
-
-        if let navigationController = navigationController,
-           let topViewController = navigationController.topViewController,
-           topViewController is SnoozeHostingController {
-            navigationController.popViewController(animated: false)
-        }
+        rootTabStateModel?.dismissSnooze()
     }
     
     /// used by observevalue for UserDefaults.KeysCharts
@@ -1114,87 +1088,12 @@ final class RootViewController: UIViewController {
         self.rootTabStateModel = rootTabStateModel
     }
 
-    // MARK: - SwiftUI Home Bridge
-
-    /// Installs the SwiftUI home surface inside the bare storyboard root container.
-    ///
-    /// RootViewController remains the application-service and navigation coordinator during this
-    /// migration phase. RootHomeStateModel is the presentation source of truth.
-    private func installRootHomeViewIfNeeded() {
-        guard rootHomeHostingController == nil,
-              let coreDataManager = coreDataManager,
-              let bgReadingsAccessor = bgReadingsAccessor,
-              let treatmentEntryAccessor = treatmentEntryAccessor,
-              let nightscoutSyncManager = nightscoutSyncManager,
-              let bluetoothPeripheralManager = bluetoothPeripheralManager,
-              let alertManager = alertManager,
-              let bgPostProcessingManager = bgPostProcessingManager
-        else {
-            return
-        }
-
-        rootHomeStateModel.configure(
-            bgReadingsAccessor: bgReadingsAccessor,
-            treatmentEntryAccessor: treatmentEntryAccessor,
-            nightscoutSyncManager: nightscoutSyncManager,
-            bluetoothPeripheralManager: bluetoothPeripheralManager,
-            alertManager: alertManager,
-            bgPostProcessingManager: bgPostProcessingManager
-        )
-
-        let rootHomeView = RootHomeView(
-            stateModel: rootHomeStateModel,
-            coreDataManager: coreDataManager,
-            nightscoutSyncManager: nightscoutSyncManager,
-            actions: makeRootHomeActions()
-        )
-
-        let hostingController = UIHostingController(rootView: rootHomeView)
-        hostingController.view.backgroundColor = .clear
-        hostingController.view.translatesAutoresizingMaskIntoConstraints = false
-
-        addChild(hostingController)
-        view.addSubview(hostingController.view)
-
-        NSLayoutConstraint.activate([
-            hostingController.view.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            hostingController.view.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            hostingController.view.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            hostingController.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-        ])
-
-        hostingController.didMove(toParent: self)
-        rootHomeHostingController = hostingController
-        publishRootHomeState()
-    }
+    // MARK: - SwiftUI Home Actions
 
     private func makeRootHomeActions() -> RootHomeActions {
         RootHomeActions(
-            showSnooze: { [weak self] in
-                self?.showSnoozeView()
-            },
-            showBgReadings: { [weak self] in
-                guard let self = self, let bgReadingsAccessor = self.bgReadingsAccessor, let nightscoutSyncManager = self.nightscoutSyncManager else { return }
-
-                self.showViewController(BgReadingsHostingController(bgReadingsAccessor: bgReadingsAccessor, nightscoutSyncManager: nightscoutSyncManager))
-            },
-            showSensorManagement: { [weak self] in
-                self?.showSensorManagementView()
-            },
-            showBgAdjustments: { [weak self] in
-                self?.showBgAdjustmentsView()
-            },
             originalGlucosePeekActivated: {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-            },
-            showHideItems: { [weak self] in
-                self?.showViewController(ShowHideItemsHostingController())
-            },
-            toggleScreenLock: { [weak self] in
-                self?.screenLockAlert(nightMode: true)
-            },
-            keepScreenAwake: { [weak self] in
-                self?.screenLockAlert(overrideScreenIsLocked: true, nightMode: false)
             },
             toggleExpandedAIDInfo: { [weak self] in
                 guard UserDefaults.standard.nightscoutFollowType != .none else { return }
@@ -1213,9 +1112,6 @@ final class RootViewController: UIViewController {
             },
             hideFollowerUrl: { [weak self] in
                 self?.rootHomeStateModel.hideFollowerURL()
-            },
-            showAIDStatus: { [weak self] in
-                self?.showAIDStatusView()
             }
         )
     }
@@ -1793,51 +1689,22 @@ final class RootViewController: UIViewController {
         return
     }
     
-    /// swaps status from locked to unlocked or vice versa, and creates alert to inform user
+    /// swaps status from locked to unlocked or vice versa
     /// - Parameters:
-    ///   - overrideScreenIsLocked: if true, then screen will be locked even if it's already locked. If false, then status swaps from locked to unlocked or unlocked to locked
-    ///   - nightMode: when true this parameter will be passed to the screeLockUpdate function and this will lock the screen with the screen dimming and other features activated as selected
-    private func screenLockAlert(overrideScreenIsLocked: Bool = false, nightMode: Bool = true) {
-        if !screenIsLocked || overrideScreenIsLocked {
+    ///   - overrideCurrentState: if true, then screen will be locked even if it's already locked. If false, then status swaps from locked to unlocked or unlocked to locked
+    ///   - nightMode: when true this parameter will be passed to screenLockUpdate and will activate the selected night screen features
+    /// - returns: true if screen lock was enabled
+    private func updateScreenLock(overrideCurrentState: Bool, nightMode: Bool) -> Bool {
+        if !screenIsLocked || overrideCurrentState {
             trace("screen lock : user clicked the lock button or long pressed the value", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-            
-            // lock and update the screen
-            self.screenLockUpdate(enabled: true, nightMode: nightMode)
-            
-            // only trigger the UIAlert if the user hasn't previously asked to not show it again
-            if !UserDefaults.standard.lockScreenDontShowAgain {
-                // create uialertcontroller to inform user
-                screenLockAlertController = UIAlertController(title: Texts_HomeView.screenLockTitle, message: Texts_HomeView.screenLockInfo, preferredStyle: .alert)
-                
-                // create "don't show again" button for uialertcontroller
-                let dontShowAgainAction = UIAlertAction(title: Texts_Common.dontShowAgain, style: .destructive) {
-                    (action:UIAlertAction!) in
-                    // if clicked set the user default key to false so that the next time the user locks the screen, the UIAlert isn't triggered
-                    UserDefaults.standard.lockScreenDontShowAgain = true
-                }
-                
-                // create OK button for uialertcontroller
-                let OKAction = UIAlertAction(title: Texts_Common.Ok, style: .default) {
-                    (action:UIAlertAction!) in
-                    // set screenLockAlertController to nil because this variable is used when app comes to foreground, to check if alert is still presented
-                    self.screenLockAlertController = nil
-                }
-                
-                // add buttons to the alert
-                screenLockAlertController!.addAction(dontShowAgainAction)
-                screenLockAlertController!.addAction(OKAction)
-                
-                // show alert
-                self.present(screenLockAlertController!, animated: true, completion: nil)
-            }
-                       
-            // schedule timer to dismiss the uialert controller after some time, in case user doesn't click ok
-            Timer.scheduledTimer(timeInterval: 30, target: self, selector: #selector(dismissScreenLockAlertController), userInfo: nil, repeats:false)
+
+            screenLockUpdate(enabled: true, nightMode: nightMode)
+            return true
         } else {
             trace("screen lock : user clicked the unlock button", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
-            
-            // this means the user has clicked the button whilst the screen look in already in place so let's turn the function off
-            self.screenLockUpdate(enabled: false, nightMode: nightMode)
+
+            screenLockUpdate(enabled: false, nightMode: nightMode)
+            return false
         }
     }
     
@@ -1857,24 +1724,8 @@ final class RootViewController: UIViewController {
             // we use a soft, short vibration so that it isn't too noisy at night when selected.
             AudioServicesPlaySystemSound(1519)
 
-            if nightMode {
-                if UserDefaults.standard.showClockWhenScreenIsLocked {
-                    rootHomeStateModel.updateClock()
-                }
-
-                if UserDefaults.standard.screenLockDimmingType != .disabled {
-                    // set a tap gesture so that we can remove the overlay view when the user taps it
-                    let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTapCoverView(_:)))
-                    
-                    // Add the dimming view at window level so it also covers the SwiftUI tab bar.
-                    overlayView = UIView(frame: view.window?.bounds ?? view.bounds)
-                    overlayView?.backgroundColor = UserDefaults.standard.screenLockDimmingType.dimmingColor
-                    overlayView?.isUserInteractionEnabled = true
-                    overlayView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-                    overlayView?.addGestureRecognizer(tap)
-                    
-                    view.window?.addSubview(overlayView!)
-                }
+            if nightMode && UserDefaults.standard.showClockWhenScreenIsLocked {
+                rootHomeStateModel.updateClock()
             }
             
             // prevent screen dim/lock
@@ -1892,10 +1743,6 @@ final class RootViewController: UIViewController {
             
             trace("screen lock / keep-awake disabled", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
             
-            if UserDefaults.standard.screenLockDimmingType != .disabled {
-                overlayView?.removeFromSuperview()
-            }
-            
             // set the flag to false. This must be done before we update the views
             screenIsLocked = false
             
@@ -1909,15 +1756,6 @@ final class RootViewController: UIViewController {
     @objc private func updateClockView() {
         rootHomeStateModel.updateClock()
         publishRootHomeState()
-    }
-    
-    /// checks if screenLockAlertController is not nil and if not dismisses the presentedViewController
-    @objc private func dismissScreenLockAlertController() {
-        // possibly screenLockAlertController is still on the screen which would happen if user chooses to lock the screen but brings the app to the background before clicking ok
-        if self.screenLockAlertController != nil {
-            self.presentedViewController?.dismiss(animated: false, completion: nil)
-            self.screenLockAlertController = nil
-        }
     }
     
     /// update the data source information view and also the sensor progress view (if needed)
@@ -2058,60 +1896,6 @@ final class RootViewController: UIViewController {
         updateDataSourceInfo()
     }
     
-    /// show the SwiftUI Automated Insulin Devliery system info view via UIHostingController
-    private func showAIDStatusView() {
-        showSwiftUIView(AIDStatusView().environmentObject(nightscoutSyncManager!))
-    }
-
-    private func showSnoozeView() {
-        guard let alertManager = alertManager else { return }
-
-        showViewController(SnoozeHostingController(alertManager: alertManager))
-    }
-
-    private func showBgAdjustmentsView() {
-        guard let bgReadingsAccessor = bgReadingsAccessor, let treatmentEntryAccessor = treatmentEntryAccessor, let bgPostProcessingManager = bgPostProcessingManager else { return }
-        
-        showViewController(BgAdjustmentsHostingController(bgReadingsAccessor: bgReadingsAccessor, treatmentEntryAccessor: treatmentEntryAccessor, bgPostProcessingManager: bgPostProcessingManager))
-    }
-
-    private func showSensorManagementView() {
-        guard let calibrationsAccessor = calibrationsAccessor, let bgReadingsAccessor = bgReadingsAccessor else { return }
-
-        showViewController(
-            SensorManagementHostingController(
-                activeSensorProvider: { [weak self] in self?.activeSensor },
-                transmitterProvider: { [weak self] in self?.bluetoothPeripheralManager?.getCGMTransmitter() },
-                calibrationsAccessor: calibrationsAccessor,
-                bgReadingsAccessor: bgReadingsAccessor,
-                onStartSensor: { [weak self] startDate, sensorCode in
-                    self?.startSensorFromManagementView(startDate: startDate, sensorCode: sensorCode)
-                },
-                onStopSensor: { [weak self] in
-                    self?.stopSensorFromManagementView()
-                },
-                onSubmitCalibration: { [weak self] value in
-                    self?.submitCalibrationFromManagementView(value)
-                }
-            )
-        )
-    }
-
-    /// Show a SwiftUI view from the UIKit root view controller.
-    /// This keeps the SwiftUI bridge in code so we do not need storyboard segues
-    /// or destination creation selectors for every hosted SwiftUI screen.
-    private func showSwiftUIView<Content: View>(_ rootView: Content) {
-        showViewController(UIHostingController(rootView: rootView))
-    }
-
-    /// Use the same code-based UIKit presentation path for both plain SwiftUI
-    /// hosting controllers and custom container view controllers.
-    private func showViewController(_ viewController: UIViewController) {
-        // Use show so UIKit can choose the same navigation behavior that the
-        // previous storyboard-based show segues were using in this controller.
-        show(viewController, sender: self)
-    }
-
     private func startSensorFromManagementView(startDate: Date, sensorCode: String?) {
         guard let coreDataManager = coreDataManager, let cgmTransmitter = self.bluetoothPeripheralManager?.getCGMTransmitter() else { return }
 

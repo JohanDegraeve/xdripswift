@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import UIKit
 import os
 
 struct SensorManagementView: View {
@@ -825,14 +824,4 @@ private struct SensorManagementMessage: Identifiable {
     let id = UUID()
     let title: String
     let message: String
-}
-
-final class SensorManagementHostingController: PortraitLockedHostingController<SensorManagementView> {
-    init(activeSensorProvider: @escaping () -> Sensor?, transmitterProvider: @escaping () -> CGMTransmitter?, calibrationsAccessor: CalibrationsAccessor, bgReadingsAccessor: BgReadingsAccessor, onStartSensor: @escaping (Date, String?) -> Void, onStopSensor: @escaping () -> Void, onSubmitCalibration: @escaping (Double) -> String?) {
-        super.init(rootView: SensorManagementView(activeSensorProvider: activeSensorProvider, transmitterProvider: transmitterProvider, calibrationsAccessor: calibrationsAccessor, bgReadingsAccessor: bgReadingsAccessor, onStartSensor: onStartSensor, onStopSensor: onStopSensor, onSubmitCalibration: onSubmitCalibration))
-    }
-
-    @objc required dynamic init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 }

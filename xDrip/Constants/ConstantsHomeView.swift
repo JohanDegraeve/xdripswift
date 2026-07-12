@@ -83,13 +83,13 @@ enum ConstantsHomeView {
     // MARK: - Screen lock
     
     /// colour for the dimmed screen lock overlay view
-    static let screenLockDimmingOptionsDimmed: UIColor = .black.withAlphaComponent(0.3)
+    static let screenLockDimmingOptionsDimmed = Color.black.opacity(0.3)
     
     /// colour for the dark screen lock overlay view
-    static let screenLockDimmingOptionsDark: UIColor = .black.withAlphaComponent(0.5)
+    static let screenLockDimmingOptionsDark = Color.black.opacity(0.5)
     
     /// colour for the very dark screen lock overlay view
-    static let screenLockDimmingOptionsVeryDark: UIColor = .black.withAlphaComponent(0.7)
+    static let screenLockDimmingOptionsVeryDark = Color.black.opacity(0.7)
     
     // MARK: - For loop/AID status
     

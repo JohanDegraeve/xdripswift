@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import UIKit
 
 // ported into SwiftUI from the old storyboard-based Snooze view controller
 struct SnoozeView: View {
@@ -44,6 +43,12 @@ struct SnoozeView: View {
             }
         }
         .colorScheme(.dark)
+        .sheet(item: $viewModel.pickerData) { pickerData in
+            SnoozePickerView(pickerData: pickerData)
+        }
+        .onDisappear {
+            UserDefaults.standard.updateSnoozeStatus.toggle()
+        }
     }
     
     @ViewBuilder private func contentList() -> some View {
@@ -137,8 +142,7 @@ struct SnoozeView: View {
     @Published private(set) var bannerTextColor = Color(ConstantsAlerts.bannerTextColorWhenNotAllSnoozed)
     @Published private(set) var bannerBackgroundColor = Color(ConstantsAlerts.bannerBackgroundColorWhenNotAllSnoozed)
     @Published private(set) var showAllSnoozedImage = false
-    
-    weak var presentingViewController: UIViewController?
+    @Published var pickerData: SnoozePickerData?
     
     private let alertManager: AlertManager
     
@@ -194,23 +198,16 @@ struct SnoozeView: View {
     
     func handleAlertToggleChanged(alertKind: AlertKind, isOn: Bool) {
         if isOn {
-            guard let presentingViewController = presentingViewController else { return }
-            
-            // Reuse the existing AlertManager picker flow so presnooze behavior
-            // stays aligned with the previous UIKit screen.
-            PickerViewControllerModal.displayPickerViewController(
-                pickerViewData: alertManager.createPickerViewData(
+            pickerData = SnoozePickerData(
+                alertManager.createPickerViewData(
                     forAlertKind: alertKind,
                     content: nil,
-                    actionHandler: {
-                        self.refresh()
-                    },
+                    actionHandler: { self.refresh() },
                     cancelHandler: {
                         self.alertManager.unSnooze(alertKind: alertKind)
                         self.refresh()
                     }
-                ),
-                parentController: presentingViewController
+                )
             )
         } else {
             // Changing from on to off means user wants to unsnooze.
@@ -236,8 +233,6 @@ struct SnoozeView: View {
     }
     
     private func presentSnoozeAllPicker() {
-        guard let presentingViewController = presentingViewController else { return }
-        
         // Reused from snoozeAllUISwitchAction(_:) in SnoozeViewController:
         // default to the closest configured Snooze All duration.
         let defaultSnoozeAllPeriodInMinutes = ConstantsAlerts.defaultSnoozeAllPeriodInMinutes
@@ -252,7 +247,7 @@ struct SnoozeView: View {
             }
         }
         
-        let pickerViewData = PickerViewData(
+        pickerData = SnoozePickerData(PickerViewData(
             withMainTitle: Texts_HomeView.snoozeAllTitle,
             withSubTitle: Texts_Alerts.selectSnoozeTime,
             withData: ConstantsAlerts.snoozeAllValueStrings,
@@ -274,9 +269,7 @@ struct SnoozeView: View {
                 self.refresh()
             },
             didSelectRowHandler: nil
-        )
-        
-        PickerViewControllerModal.displayPickerViewController(pickerViewData: pickerViewData, parentController: presentingViewController)
+        ))
     }
     
     private func sectionTitle(for alertKind: AlertKind) -> String {
@@ -298,38 +291,72 @@ struct SnoozeView: View {
     }
 }
 
-final class SnoozeHostingController: UIHostingController<SnoozeView> {
-    private let snoozeViewModel: SnoozeViewModel
-    
-    init(alertManager: AlertManager) {
-        let snoozeViewModel = SnoozeViewModel(alertManager: alertManager)
-        self.snoozeViewModel = snoozeViewModel
-        
-        super.init(rootView: SnoozeView(viewModel: snoozeViewModel))
-        
-        snoozeViewModel.presentingViewController = self
+/// Value wrapper used to present the existing alert picker data from SwiftUI.
+struct SnoozePickerData: Identifiable {
+    let id = UUID()
+    let pickerViewData: PickerViewData
+
+    init(_ pickerViewData: PickerViewData) {
+        self.pickerViewData = pickerViewData
     }
-    
-    @objc required dynamic init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+}
+
+/// Native replacement for PickerViewControllerModal when choosing a snooze duration.
+private struct SnoozePickerView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var selectedRow: Int
+
+    let pickerData: SnoozePickerData
+
+    init(pickerData: SnoozePickerData) {
+        self.pickerData = pickerData
+        _selectedRow = State(initialValue: pickerData.pickerViewData.selectedRow)
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
-        snoozeViewModel.refresh()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        
-        if UserDefaults.standard.allowScreenRotation {
-            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .allButUpsideDown
-        } else {
-            (UIApplication.shared.delegate as! AppDelegate).restrictRotation = .portrait
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 8) {
+                if let subTitle = pickerData.pickerViewData.subTitle {
+                    Text(subTitle)
+                        .font(.headline)
+                }
+
+                Picker("", selection: $selectedRow) {
+                    ForEach(pickerData.pickerViewData.data.indices, id: \.self) { index in
+                        Text(pickerData.pickerViewData.data[index])
+                            .tag(index)
+                    }
+                }
+                .pickerStyle(.wheel)
+                .onChange(of: selectedRow) { selectedRow in
+                    pickerData.pickerViewData.didSelectRowHandler?(selectedRow)
+                }
+            }
+            .padding(.horizontal)
+            .navigationTitle(pickerData.pickerViewData.mainTitle ?? "")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(pickerData.pickerViewData.cancelTitle ?? Texts_Common.Cancel) {
+                        pickerData.pickerViewData.cancelHandler?()
+                        finish()
+                    }
+                }
+
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(pickerData.pickerViewData.actionTitle ?? Texts_Common.Ok) {
+                        pickerData.pickerViewData.actionHandler(selectedRow)
+                        finish()
+                    }
+                }
+            }
         }
-        
-        UserDefaults.standard.updateSnoozeStatus = !UserDefaults.standard.updateSnoozeStatus
+        .presentationDetents([.medium])
+        .interactiveDismissDisabled()
+    }
+
+    private func finish() {
+        UserDefaults.standard.updateSnoozeStatus.toggle()
+        dismiss()
     }
 }

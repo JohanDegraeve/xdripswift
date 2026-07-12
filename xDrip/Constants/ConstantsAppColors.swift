@@ -18,6 +18,7 @@ enum ConstantsAppColors {
     // MARK: - Base
 
     static let background = Color.black
+    static let groupedBackground = Color(white: 0.11)
     static let primaryText = Color("colorPrimary")
     static let secondaryText = Color("colorSecondary")
     static let tertiaryText = Color("colorTertiary")

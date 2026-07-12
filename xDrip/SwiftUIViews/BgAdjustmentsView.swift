@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import UIKit
 
 struct BgAdjustmentsView: View {
     private let minimumGlucoseValueInMgDl = ConstantsCalibrationAlgorithms.minimumBgReadingCalculatedValue
@@ -75,20 +74,27 @@ struct BgAdjustmentsView: View {
     }
 
     var body: some View {
-        NavigationView {
-            VStack(spacing: 0) {
-                chartView()
-                    .padding(.top, 8)
-                    .padding(.bottom, 10)
+        NavigationStack {
+            ZStack {
+                ConstantsAppColors.groupedBackground
+                    .ignoresSafeArea()
 
-                List {
-                    adjustmentSection()
-                    smoothingSection()
-                    readingFrequencySection()
-                    applyFromSection()
+                VStack(spacing: 0) {
+                    chartView()
+                        .padding(.top, 8)
+                        .padding(.bottom, 10)
+
+                    List {
+                        adjustmentSection()
+                        smoothingSection()
+                        readingFrequencySection()
+                        applyFromSection()
+                    }
                 }
             }
             .navigationTitle(Texts_HomeView.postProcessingTitle)
+            .toolbarBackground(ConstantsAppColors.groupedBackground, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(Texts_Common.Cancel, action: {
@@ -146,7 +152,7 @@ struct BgAdjustmentsView: View {
                 updatePreviewData()
             }
         }
-        .colorScheme(.dark)
+        .preferredColorScheme(.dark)
     }
 
     private var adjustmentShapeType: BgAdjustmentShapeType {
@@ -1199,15 +1205,5 @@ private struct AutoSelectingNumericTextField: UIViewRepresentable {
                 textField.selectAll(nil)
             }
         }
-    }
-}
-
-final class BgAdjustmentsHostingController: PortraitLockedHostingController<BgAdjustmentsView> {
-    init(bgReadingsAccessor: BgReadingsAccessor, treatmentEntryAccessor: TreatmentEntryAccessor, bgPostProcessingManager: BgPostProcessingManager) {
-        super.init(rootView: BgAdjustmentsView(bgReadingsAccessor: bgReadingsAccessor, treatmentEntryAccessor: treatmentEntryAccessor, bgPostProcessingManager: bgPostProcessingManager))
-    }
-
-    @objc required dynamic init?(coder aDecoder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }
