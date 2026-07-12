@@ -859,6 +859,9 @@ import AppIntents
             // if a new reading is created, create either initial calibration request or bgreading notification - upload to nightscout and check alerts
             if newReadingCreated {
                 _ = bgPostProcessingManager?.processLatestReadings()
+
+                // Publish the final stored value before optional downstream consumers perform their work.
+                updateLiveActivityAndWidgets(forceRestart: false)
                 
                 // only if no webOOPEnabled and overruleIsWebOOPEnabled false : if no two calibration exist yet then create calibration request notification, otherwise a bgreading notification and update labels
                 if firstCalibrationForActiveSensor == nil && lastCalibrationForActiveSensor == nil && (!cgmTransmitter.isWebOOPEnabled() && !cgmTransmitter.overruleIsWebOOPEnabled()) {
@@ -913,8 +916,6 @@ import AppIntents
                 loopManager?.share()
                 
                 watchManager?.updateWatchApp(forceComplicationUpdate: false)
-                
-                updateLiveActivityAndWidgets(forceRestart: false)
             }
         }
     }
@@ -2341,10 +2342,18 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                 
                 if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled, let firstCreatedBgReadingTimeStamp = firstCreatedBgReadingTimeStamp {
                     let processingStartDateOverride = previousTimeStampLastBgReading.timeIntervalSince1970 > 0 ? previousTimeStampLastBgReading.addingTimeInterval(-1.0) : firstCreatedBgReadingTimeStamp
-                    _ = bgPostProcessingManager?.processBgReadings(processingStartDateOverride: processingStartDateOverride)
+                    if let bgPostProcessingManager = bgPostProcessingManager {
+                        _ = bgPostProcessingManager.processBgReadings(
+                            processingStartDateOverride: processingStartDateOverride,
+                            allowHistoricalDownstreamRewrite: bgPostProcessingManager.hasActiveDownstreamPostProcessing()
+                        )
+                    }
                 } else {
                     _ = bgPostProcessingManager?.processLatestReadings()
                 }
+
+                // Publish the final stored value before optional downstream consumers perform their work.
+                updateLiveActivityAndWidgets(forceRestart: false)
 
                 rootHomeStateModel.invalidateCharts()
 
@@ -2390,8 +2399,6 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                 loopManager?.share()
                 
                 watchManager?.updateWatchApp(forceComplicationUpdate: false)
-                
-                updateLiveActivityAndWidgets(forceRestart: false)
             }
         }
     }

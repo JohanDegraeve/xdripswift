@@ -116,13 +116,11 @@ struct GlucoseChartView: View {
         let sourceBgReadingDates = chartState?.bgReadingDates ?? bgReadingDates
 
         if let bgReadingValues = sourceBgReadingValues, let bgReadingDates = sourceBgReadingDates {
-            var index = 0
-            for _ in bgReadingValues {
-                if bgReadingDates[index] >= startDate && bgReadingDates[index] <= endDate {
-                    self.bgReadingValues.append(bgReadingValues[index])
-                    self.bgReadingDates.append(bgReadingDates[index])
+            for (bgReadingValue, bgReadingDate) in zip(bgReadingValues, bgReadingDates) {
+                if bgReadingDate >= startDate && bgReadingDate <= endDate {
+                    self.bgReadingValues.append(bgReadingValue)
+                    self.bgReadingDates.append(bgReadingDate)
                 }
-                index += 1
             }
         }
 

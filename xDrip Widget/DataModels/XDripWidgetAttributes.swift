@@ -63,20 +63,20 @@ struct XDripWidgetAttributes: ActivityAttributes {
         }
         /// the latest bg reading
         var bgValueInMgDl: Double? {
-            bgReadingValues[0]
+            bgReadingValues.first
         }
         /// the latest bg reading date
         var bgReadingDate: Date? {
-            bgReadingDates[0]
+            bgReadingDates.first
         }
 
         init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, dataSourceDescription: String? = "", followerPatientName: String? = nil, deviceStatusCreatedAt: Date?, deviceStatusLastLoopDate: Date?) {
-        
-            self.bgReadingFloats = bgReadingValues.map(Float16.init)
+            let readings = Array(zip(bgReadingValues, bgReadingDates))
+            self.bgReadingFloats = readings.map { Float16($0.0) }
 
-            let firstDate = bgReadingDates.last ?? .now
+            let firstDate = readings.last?.1 ?? .now
             self.firstDate = firstDate
-            self.secondsSinceFirstDate = bgReadingDates.map { UInt16(truncatingIfNeeded: Int($0.timeIntervalSince(firstDate))) }
+            self.secondsSinceFirstDate = readings.map { UInt16(truncatingIfNeeded: Int($0.1.timeIntervalSince(firstDate))) }
             
             self.isMgDl = isMgDl
             self.slopeOrdinal = slopeOrdinal
@@ -91,6 +91,33 @@ struct XDripWidgetAttributes: ActivityAttributes {
             
             self.deviceStatusCreatedAt = deviceStatusCreatedAt
             self.deviceStatusLastLoopDate = deviceStatusLastLoopDate
+        }
+
+        /// Reduces chart history until the encoded state fits safely below ActivityKit's payload limit.
+        func limitedForActivityPayload(maximumEncodedBytes: Int) -> ContentState {
+            var limitedState = self
+            let maximumDescriptionCharacters = 80
+
+            limitedState.dataSourceDescription = String(limitedState.dataSourceDescription.prefix(maximumDescriptionCharacters))
+            if let followerPatientName = limitedState.followerPatientName {
+                limitedState.followerPatientName = String(followerPatientName.prefix(maximumDescriptionCharacters))
+            }
+
+            while limitedState.bgReadingFloats.count > 2 {
+                let encodedByteCount = (try? JSONEncoder().encode(limitedState).count) ?? Int.max
+                guard encodedByteCount > maximumEncodedBytes else { break }
+
+                let sourceCount = limitedState.bgReadingFloats.count
+                let targetCount = max(2, sourceCount * 3 / 4)
+                let indexes = (0 ..< targetCount).map { index in
+                    index * (sourceCount - 1) / (targetCount - 1)
+                }
+
+                limitedState.bgReadingFloats = indexes.map { limitedState.bgReadingFloats[$0] }
+                limitedState.secondsSinceFirstDate = indexes.map { limitedState.secondsSinceFirstDate[$0] }
+            }
+
+            return limitedState
         }
         
         /// returns blood glucose value as a string in the user-defined measurement unit. Will check and display also high, low and error texts as required.

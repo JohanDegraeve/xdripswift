@@ -403,7 +403,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         let replacementTaskIdentifier = UUID().uuidString
 
         bgReadingsReplacementTaskIdentifier = replacementTaskIdentifier
-        bgReadingsReplacementBlocksDirectLiveUpload = deleteFromTimeStamp != nil && deleteToTimeStamp != nil
+        bgReadingsReplacementBlocksDirectLiveUpload = bgReadingsReplacementBlocksDirectLiveUpload || (deleteFromTimeStamp != nil && deleteToTimeStamp != nil)
 
         bgReadingsReplacementTask = Task { @MainActor [weak self] in
             _ = await previousReplacementTask?.result
