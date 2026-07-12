@@ -8,6 +8,10 @@
 
 import SwiftUI
 
+/// Glucose post-processing controls and a live preview of their effect on stored readings.
+///
+/// Draft form values remain local until confirmed. The preview arrays are rebuilt from the same
+/// post-processing manager used by the application rather than applying separate display logic.
 struct BgAdjustmentsView: View {
     private let minimumGlucoseValueInMgDl = ConstantsCalibrationAlgorithms.minimumBgReadingCalculatedValue
     private let maximumGlucoseValueInMgDl = ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValue
@@ -1060,6 +1064,7 @@ struct BgAdjustmentsView: View {
 
 }
 
+/// Compact direct-entry sheet for a basic glucose adjustment.
 private struct BasicAdjustmentInputView: View {
     @State private var shouldFocusEnteredGlucoseValue = false
 
@@ -1154,6 +1159,7 @@ private struct BasicAdjustmentInputView: View {
     }
 }
 
+/// Numeric field adapter used only to select the complete initial value when editing begins.
 private struct AutoSelectingNumericTextField: UIViewRepresentable {
     let placeholder: String
     @Binding var text: String

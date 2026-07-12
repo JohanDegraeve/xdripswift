@@ -13,7 +13,14 @@ import UIKit
 import UserNotifications
 import os
 
+/// Presentation and action state for one Bluetooth peripheral detail screen.
+///
+/// This class retains the established transmitter-specific logic while publishing value-based
+/// sections and rows for SwiftUI. It also remains the delegate boundary for scan and connection
+/// callbacks, which is why it inherits from `NSObject`.
 final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
+    // MARK: - Published State
+
     @Published private(set) var sections: [BluetoothPeripheralDetailSection] = []
     @Published private(set) var connectButtonTitle = Texts_BluetoothPeripheralView.connect
     @Published private(set) var connectButtonIsEnabled = true
@@ -29,6 +36,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     @Published private(set) var canDeletePeripheral = false
     @Published var pendingAlert: BluetoothPeripheralDetailAlert?
 
+    // MARK: - Dependencies
+
     private var bluetoothPeripheral: BluetoothPeripheral?
     private let expectedBluetoothPeripheralType: BluetoothPeripheralType
     private let coreDataManager: CoreDataManager
@@ -38,6 +47,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     private let closeDetailView: () -> Void
     private let presentTextEntryView: (BluetoothPeripheralTextEntry) -> Void
     private let presentSelectionListView: (BluetoothPeripheralSelectionList) -> Void
+
+    // MARK: - Working State
 
     private var transmitterIdTempValue: String?
     private var isScanning = false
@@ -1229,6 +1240,7 @@ private extension BluetoothPeripheralDetailState {
 
 // MARK: - Models
 
+/// One grouped detail section and its current rows.
 struct BluetoothPeripheralDetailSection: Identifiable {
     let id: String
     let title: String?
@@ -1275,6 +1287,7 @@ struct BluetoothPeripheralDetailSection: Identifiable {
     }
 }
 
+/// One styled line in a section footer.
 struct BluetoothPeripheralDetailFooterLine: Identifiable {
     let id = UUID()
     let systemImage: String
@@ -1283,6 +1296,7 @@ struct BluetoothPeripheralDetailFooterLine: Identifiable {
     let isActive: Bool
 }
 
+/// Value model for one configurable peripheral row.
 struct BluetoothPeripheralDetailRow: Identifiable {
     let id: String
     let title: String
@@ -1318,16 +1332,19 @@ struct BluetoothPeripheralDetailRow: Identifiable {
 
 }
 
+/// Binding actions used by a Boolean detail row.
 struct BluetoothPeripheralDetailToggle {
     let isOn: Bool
     let setValue: (Bool) -> Void
 }
 
+/// Optional symbol and color displayed with a detail value.
 struct BluetoothPeripheralDetailSymbol {
     let systemName: String
     let color: Color
 }
 
+/// Complete presentation state for the connect or stop button.
 struct BluetoothPeripheralConnectButtonState {
     let title: String
     let isEnabled: Bool
@@ -1344,6 +1361,7 @@ struct BluetoothPeripheralConnectButtonState {
     }
 }
 
+/// Semantic tint used by the native connect button.
 enum BluetoothPeripheralConnectButtonTintColor {
     case disabledGray
     case neutral
@@ -1352,6 +1370,7 @@ enum BluetoothPeripheralConnectButtonTintColor {
     case red
 }
 
+/// Alert requested by transmitter validation or connection actions.
 struct BluetoothPeripheralDetailAlert: Identifiable {
     let id = UUID()
     let title: String
@@ -1378,6 +1397,7 @@ struct BluetoothPeripheralDetailAlert: Identifiable {
     }
 }
 
+/// Text-entry route supplied by transmitter-specific configuration logic.
 struct BluetoothPeripheralTextEntry: Identifiable {
     let id = UUID()
     let title: String?
@@ -1419,6 +1439,7 @@ struct BluetoothPeripheralTextEntry: Identifiable {
     }
 }
 
+/// Selection-list route supplied by transmitter-specific configuration logic.
 struct BluetoothPeripheralSelectionList: Identifiable {
     let id = UUID()
     let title: String

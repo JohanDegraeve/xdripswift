@@ -8,7 +8,10 @@
 
 import SwiftUI
 
-// ported into SwiftUI from the old storyboard-based Snooze view controller
+/// Displays active alerts and controls individual or global snooze periods.
+///
+/// Alert state and snooze actions remain in `SnoozeViewModel`; this view owns only presentation and
+/// dismissal of the picker used by configurable snooze periods.
 struct SnoozeView: View {
     @StateObject private var viewModel: SnoozeViewModel
     @Environment(\.presentationMode) private var presentationMode: Binding<PresentationMode>
@@ -125,6 +128,7 @@ struct SnoozeView: View {
     }
 }
 
+/// Builds active alert rows and applies snooze or unsnooze commands through `AlertManager`.
 @MainActor final class SnoozeViewModel: ObservableObject {
     struct Row: Identifiable {
         let alertKind: AlertKind
@@ -151,15 +155,13 @@ struct SnoozeView: View {
     }
     
     func refresh() {
-        // This is the SwiftUI equivalent of configureSnoozeAllView() from
-        // SnoozeViewController.swift, including the same banner text and reset rules.
+        // Apply the shared snooze-all banner text and reset rules.
         let snoozeStatus = alertManager.snoozeStatus()
         
         switch snoozeStatus {
         case .allSnoozed:
             if let snoozeAllAlertsUntilDate = UserDefaults.standard.snoozeAllAlertsUntilDate {
-                // Keep the same simple 2-line banner as the previous UIKit screen:
-                // line 1 confirms all alarms are snoozed, line 2 shows the remaining time.
+                // Line 1 confirms all alarms are snoozed; line 2 shows the remaining time.
                 snoozeAllSwitchIsOn = true
                 bannerText = Texts_HomeView.snoozeAllSnoozed
                     + "\n"
@@ -257,8 +259,7 @@ struct SnoozeView: View {
             cancelButtonText: Texts_Common.Cancel,
             isFullScreen: true,
             onActionClick: { snoozeIndex in
-                // Get snooze period and apply both timestamps, mirroring the
-                // previous UIKit implementation.
+                // Get the snooze period and apply both timestamps.
                 let snoozePeriod = snoozeAllValueMinutes[snoozeIndex]
                 
                 UserDefaults.standard.snoozeAllAlertsFromDate = Date()
@@ -291,7 +292,7 @@ struct SnoozeView: View {
     }
 }
 
-/// Value wrapper used to present the existing alert picker data from SwiftUI.
+/// Value model used to present the shared snooze-duration picker as a SwiftUI sheet.
 struct SnoozePickerData: Identifiable {
     let id = UUID()
     let pickerViewData: PickerViewData
@@ -301,7 +302,7 @@ struct SnoozePickerData: Identifiable {
     }
 }
 
-/// Native replacement for PickerViewControllerModal when choosing a snooze duration.
+/// Native wheel picker for one alert snooze duration.
 struct SnoozePickerView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var selectedRow: Int

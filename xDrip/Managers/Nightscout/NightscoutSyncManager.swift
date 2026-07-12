@@ -13,17 +13,11 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         }
     }
 
-    /// During testing it was found that historical BG replacement can no longer
-    /// safely hold live BgReading objects until upload time.
-    /// Those replacement requests may first need to wait for a previous delete
-    /// and upload cycle, then delete the selected window, and finally upload the
-    /// new values in chunks because the full payload may be too large for a
-    /// single Nightscout request. That means the upload no longer happens
-    /// immediately after the readings are fetched.
-    /// This delay caused crashes when the queued task later tried to rebuild the
-    /// Nightscout dictionary from managed objects that had changed or faulted.
-    /// Snapshot the exact upload payload up front so the queued replacement path
-    /// only works with plain values.
+    /// Plain snapshot used by queued historical BG replacement.
+    ///
+    /// Replacement may wait for an active delete/upload cycle and split a large payload into several
+    /// requests. Managed objects may change or fault during that delay, so the queued work receives
+    /// the exact timestamp and Nightscout dictionary captured at scheduling time.
     private struct BgReadingReplacementPayload {
         let timeStamp: Date
         let dictionaryRepresentationForNightscoutUpload: [String: Any]
@@ -370,10 +364,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     /// - parameters:
     ///     - timeStampOfBgReadingToDelete : the timestamp of the BG reading that we want to try and remove
     public func deleteBgReadingFromNightscout(timeStampOfBgReadingToDelete: Date) {
-        // During testing it was found that the historical BG replacement path
-        // could still delete and re-upload values even when the normal master
-        // Nightscout BG upload switch had been turned off. Use the same BG
-        // write permission gate here so there is no replacement escape path.
+        // Historical replacement uses the same master BG write gate as direct upload.
         guard UserDefaults.standard.nightscoutEnabled,
               UserDefaults.standard.nightscoutUrl != nil,
               shouldAllowNightscoutBgWrites(),
@@ -397,8 +388,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         else { return }
         
         // Build plain payload snapshots before the queued async work starts.
-        // During testing it was found that the historical replacement path can
-        // no longer upload immediately because it may need to delete first,
+        // The historical replacement path may need to delete first,
         // wait for an earlier replacement task, and then split a large upload
         // into several Nightscout requests. Keeping managed objects alive across
         // that whole delayed path caused crashes when the dictionary payload was
@@ -419,8 +409,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             _ = await previousReplacementTask?.result
 
             guard let self = self else { return }
-            // During testing it was found that the user can turn off master
-            // Nightscout BG upload while a replacement task is still queued.
+            // The user can turn off master Nightscout BG upload while a replacement task is queued.
             // Re-check the write permission after waiting so the delayed task
             // does not continue deleting and re-uploading BG values anyway.
             guard self.shouldAllowNightscoutBgWrites() else {
@@ -454,8 +443,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 let minimiumTimeBetweenTwoReadingsInMinutes = UserDefaults.standard.storeFrequentReadingsInNightscout ? ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutesFrequentUploads : ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutes
                 let replacementHandoffTimeStamp = newestTimeStamp.addingTimeInterval(-minimiumTimeBetweenTwoReadingsInMinutes * 60.0)
 
-                // During testing it was found that a historical overwrite can
-                // finish only a few seconds before the next normal live reading.
+                // A historical overwrite can finish only a few seconds before the next live reading.
                 // If the latest uploaded Nightscout timestamp is moved all the
                 // way to the newest overwritten reading, the next live cycle can
                 // think that the new reading is still inside the normal upload

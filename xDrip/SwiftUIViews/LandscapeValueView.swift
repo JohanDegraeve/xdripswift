@@ -8,6 +8,10 @@
 
 import SwiftUI
 
+/// Full-screen glucose value used by the locked landscape Home presentation.
+///
+/// It consumes the same formatted glucose state as portrait Home, so value age, delta, colors and
+/// stale-reading treatment remain consistent between orientations.
 struct LandscapeValueView: View {
 
     // MARK: - Properties
@@ -45,6 +49,7 @@ struct LandscapeValueView: View {
 
     // MARK: - Views
 
+    /// Optional clock sized from the available landscape height.
     private func clockView(availableHeight: CGFloat) -> some View {
         Text(currentDate.formatted(date: .omitted, time: .shortened))
             .font(.system(size: max(34, availableHeight * 0.16), weight: .heavy))
@@ -55,6 +60,7 @@ struct LandscapeValueView: View {
             .frame(maxWidth: .infinity)
     }
 
+    /// Glucose age, delta and main value scaled to the complete remaining area.
     private func glucoseContent(availableSize: CGSize) -> some View {
         VStack(spacing: -10) {
             HStack(alignment: .firstTextBaseline, spacing: 12) {

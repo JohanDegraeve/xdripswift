@@ -9,10 +9,11 @@
 import Foundation
 import SwiftUI
 
+// MARK: - Presentation State
+
 /// Complete presentation state for the SwiftUI home screen.
 ///
-/// The values here are independent of any view implementation. They can therefore be rendered by
-/// SwiftUI without keeping the old storyboard labels as an intermediate source of truth.
+/// The values are independent of any individual view and can be shared by portrait and landscape.
 struct RootHomeState {
 
     var glucose = RootHomeGlucoseState()
@@ -30,6 +31,7 @@ struct RootHomeState {
 
 }
 
+/// Formatted glucose value, age and delta shown by portrait and landscape Home views.
 struct RootHomeGlucoseState {
     var valueText = "---"
     var valueColor = ConstantsAppColors.disabledText
@@ -42,6 +44,7 @@ struct RootHomeGlucoseState {
     var deltaColor = ConstantsAppColors.primaryText
 }
 
+/// Pump metrics displayed beside the current glucose reading.
 struct RootHomePumpState {
     var basal = RootHomeMetricState(title: "Basal", value: "-")
     var reservoir = RootHomeMetricState(title: "Reservoir", value: "-")
@@ -49,6 +52,7 @@ struct RootHomePumpState {
     var cage = RootHomeMetricState(title: "CAGE", value: "-")
 }
 
+/// Loop status and optional uploader-battery presentation.
 struct RootHomeLoopState {
     var iob = RootHomeMetricState(title: "IOB", value: "-")
     var cob = RootHomeMetricState(title: "COB", value: "-")
@@ -63,6 +67,7 @@ struct RootHomeLoopState {
     var uploaderBatteryColor = ConstantsAppColors.primaryText
 }
 
+/// Calculated statistics and their loading state for the selected period.
 struct RootHomeStatisticsState {
     var low = RootHomeMetricState(title: Texts_Common.lowStatistics, value: "-")
     var inRange = RootHomeMetricState(title: UserDefaults.standard.timeInRangeType.title, value: "-")
@@ -76,6 +81,7 @@ struct RootHomeStatisticsState {
     var showsActivityIndicator = false
 }
 
+/// Active sensor lifetime presentation.
 struct RootHomeSensorState {
     var title = ""
     var currentAge = ""
@@ -85,6 +91,7 @@ struct RootHomeSensorState {
     var progress: Double = 0
 }
 
+/// Current data-source description and connection indicators.
 struct RootHomeDataSourceState {
     var title = ""
     var detail = ""
@@ -97,6 +104,7 @@ struct RootHomeDataSourceState {
     var keepAliveColor = ConstantsAppColors.secondaryText
 }
 
+/// Controls which optional Home sections are included in the current layout.
 struct RootHomeVisibilityState {
     var showsPump = false
     var showsLoop = false
@@ -108,6 +116,7 @@ struct RootHomeVisibilityState {
     var showsClock = false
 }
 
+/// Values used by Home controls which are not part of the clinical status sections.
 struct RootHomeControlsState {
     var chartHours = UserDefaults.standard.chartWidthInHours
     var statisticsDays = UserDefaults.standard.daysToUseStatistics
@@ -118,6 +127,7 @@ struct RootHomeControlsState {
     var snoozeSystemImage = "speaker.wave.2"
 }
 
+/// One title, value and color used by the compact Home metric views.
 struct RootHomeMetricState: Identifiable {
     var title: String
     var value: String
@@ -128,12 +138,13 @@ struct RootHomeMetricState: Identifiable {
     }
 }
 
+// MARK: - State Model
+
 /// Main state model for the SwiftUI home screen.
 ///
-/// RootApplicationCoordinator owns long-lived application services and calls `refresh` from the same
-/// lifecycle, glucose and follower callbacks used by the previous UIKit home screen. Unlike the
-/// first migration bridge, this model calculates presentation values directly from those services;
-/// it does not read or mirror the retired storyboard home views.
+/// `RootApplicationCoordinator` owns long-lived services and calls `refresh` from application,
+/// glucose and follower callbacks. This model calculates presentation values directly from those
+/// services and publishes one consistent Home state.
 final class RootHomeStateModel: ObservableObject {
 
     @Published private(set) var state = RootHomeState()
@@ -149,6 +160,7 @@ final class RootHomeStateModel: ObservableObject {
 
     // MARK: - Configuration and Refresh
 
+    /// Attaches the existing application services without taking ownership of them.
     func configure(
         bgReadingsAccessor: BgReadingsAccessor,
         treatmentEntryAccessor: TreatmentEntryAccessor,
@@ -165,6 +177,7 @@ final class RootHomeStateModel: ObservableObject {
         self.bgPostProcessingManager = bgPostProcessingManager
     }
 
+    /// Rebuilds the complete lightweight presentation state from the latest manager values.
     func refresh(activeSensor: Sensor?, isScreenLocked: Bool, usesScreenLockNightLayout: Bool) {
         guard Thread.isMainThread else {
             DispatchQueue.main.async {
@@ -666,6 +679,8 @@ final class RootHomeStateModel: ObservableObject {
     }
 
 }
+
+// MARK: - View Actions
 
 /// Commands emitted by controls in the SwiftUI home screen.
 ///

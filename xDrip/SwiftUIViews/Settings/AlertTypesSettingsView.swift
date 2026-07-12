@@ -8,9 +8,7 @@
 
 import SwiftUI
 
-// This is the SwiftUI replacement for the old alert type Settings flow. The
-// Core Data and validation behaviour is kept close to the original controller,
-// while the list and edit screens now use the shared Settings SwiftUI patterns.
+// Alert-type Core Data and validation behavior is owned by the list and editor models.
 @MainActor
 final class AlertTypesSettingsViewModel: ObservableObject {
     @Published var reloadToken = UUID()
@@ -107,7 +105,7 @@ final class AlertTypeEditorViewModel: ObservableObject {
         close: @escaping () -> Void
     ) {
         // Copy the existing alert type into editable SwiftUI state. The original
-        // Core Data object is only updated when Save is tapped, matching the old editor.
+        // The Core Data object is updated only when Save is tapped.
         self.alertType = alertType
         self.coreDataManager = coreDataManager
         self.soundPlayer = soundPlayer
@@ -124,13 +122,13 @@ final class AlertTypeEditorViewModel: ObservableObject {
         }
     }
 
-    /// Matches the old editor by hiding advanced rows when the alert type is disabled.
+    /// Hides advanced rows when the alert type is disabled.
     var rows: [AlertTypeEditorSetting] {
         enabled ? AlertTypeEditorSetting.allCases : [.enabled, .name]
     }
 
     /// Alert types that are still used by alarms cannot be deleted.
-    /// This keeps the same protection as the old UIKit editor.
+    /// Alert types that are still referenced by alarms remain protected.
     var canDelete: Bool {
         guard let alertType else { return false }
 
@@ -139,7 +137,7 @@ final class AlertTypeEditorViewModel: ObservableObject {
 
     /// Validates the alert type name, writes the edited values to Core Data and
     /// closes the editor. New alert types are created with the same defaults as the
-    /// old Settings controller.
+    /// standard Settings defaults.
     func save() {
         let alertTypesAccessor = AlertTypesAccessor(coreDataManager: coreDataManager)
         for storedAlertType in alertTypesAccessor.getAllAlertTypes() {
@@ -252,7 +250,7 @@ final class AlertTypeEditorViewModel: ObservableObject {
     }
 
     /// Returns the localized row title for the editor setting.
-    /// Keeping this in the view model makes the SwiftUI rows match the old table rows.
+    /// Keeping this in the view model gives every row the same derived title.
     func title(for setting: AlertTypeEditorSetting) -> String {
         switch setting {
         case .enabled:
@@ -273,7 +271,7 @@ final class AlertTypeEditorViewModel: ObservableObject {
     }
 
     /// Returns the right-hand detail text for rows that show a current value.
-    /// The sound row keeps the old meanings for nil, empty and named sounds.
+    /// The sound row distinguishes nil, empty and named sounds.
     func detail(for setting: AlertTypeEditorSetting) -> String? {
         switch setting {
         case .enabled:
@@ -294,7 +292,7 @@ final class AlertTypeEditorViewModel: ObservableObject {
     }
 
     /// Builds the sound picker and plays preview sounds as the user moves through
-    /// the list. The first two rows keep the old meanings: no sound and default iOS sound.
+    /// the list. The first two rows represent no sound and the default iOS sound.
     private func showSoundSelection() {
         var sounds = ConstantsSounds.allSoundsBySoundNameAndFileName()
         sounds.soundNames.insert(Texts_AlertTypeSettingsView.alertTypeDefaultIOSSound, at: 0)
@@ -418,7 +416,7 @@ struct AlertTypeEditorView: View {
 
     /// Builds the SwiftUI row for each alert type editor setting.
     /// Toggle rows bind directly to editor state; value rows use the pushed Settings
-    /// editors so they behave like the rest of the migration.
+    /// editors so all Settings value rows use the same navigation behavior.
     @ViewBuilder
     private func row(for setting: AlertTypeEditorSetting) -> some View {
         switch setting {

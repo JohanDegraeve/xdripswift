@@ -54,16 +54,15 @@ enum ConstantsGlucoseChartSwiftUI {
     // ------------------------------------------
     // main chart y-axis context values
     //
-    // The old UIKit home chart always gave the user some fixed vertical context, even when the
-    // visible glucose/treatment values were clustered into a smaller range. Compact chart surfaces
-    // should still adapt, so these values are only used when `mainChartYAxisContext()` is applied.
+    // The main Home chart always keeps fixed vertical context, even when visible glucose and
+    // treatment values are clustered into a smaller range. Compact charts remain data-driven.
     static let yAxisLowContextGridLineInMgDl: Double = 40
     static let yAxisLowContextMinimumUrgentLowInMgDl: Double = 50
     static let yAxisMainChartContextTopPaddingInMgDl: Double = 6
     static let yAxisUpperContextGridLinesInMgDl = [150.0, 200.0, 250.0, 300.0, 350.0, 400.0]
     static let yAxisMainChartObjectiveLabelFontSize: CGFloat = 15
     static let yAxisMainChartSecondaryLabelFontSize: CGFloat = 14
-    // the UIKit chart reserved a fixed 30pt trailing label area for the main y-axis
+    // fixed trailing label area reserved by the main y-axis
     static let yAxisMainChartLabelWidth: CGFloat = 30
     static let yAxisMainChartLabelOffsetX: CGFloat = 0
     static let yAxisMainChartObjectiveLabelColor = Color.white

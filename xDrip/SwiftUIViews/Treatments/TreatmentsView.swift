@@ -10,6 +10,7 @@ import Foundation
 import SwiftUI
 import Combine
 
+/// Owns the treatment list model and presents the add/edit sheet.
 struct TreatmentsView: View {
     // MARK: - private properties
 
@@ -50,6 +51,7 @@ struct TreatmentsView: View {
     }
 }
 
+/// Displays treatments for one day with the persisted treatment filters.
 struct TreatmentsListView: View {
     // MARK: - private properties
 
@@ -191,6 +193,7 @@ struct TreatmentsListView: View {
     }
 }
 
+/// One treatment row using the same symbols and units as the glucose chart.
 private struct TreatmentRowView: View {
     let treatment: TreatmentSnapshot
 
@@ -248,6 +251,7 @@ private struct TreatmentRowView: View {
     }
 }
 
+/// Compact native button used to enable or disable one treatment category.
 private struct TreatmentFilterChip: View {
     let systemImage: String
     let tintColor: Color

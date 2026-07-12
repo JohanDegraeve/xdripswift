@@ -36,10 +36,7 @@ protocol TimeSchedule {
     func serviceName() -> String
 }
 
-// This file supports the Settings migration from the old UIKit table view controllers
-// and view models to SwiftUI. The goal is to keep the existing Settings workflow
-// familiar by matching the old row actions, alerts, edit screens and navigation as
-// closely as possible while the UI is rebuilt in SwiftUI.
+// Shared models, routing and row rendering used by the complete Settings flow.
 enum SettingsSegueIdentifier: String {
     case settingsToAlertTypeSettings
     case settingsToAlertSettings
@@ -113,27 +110,21 @@ struct SettingsRoute: Hashable {
 struct SettingsNavigationActions {
     let push: (_ title: String, _ content: @escaping (_ close: @escaping () -> Void) -> AnyView) -> Void
 
-    /// Pushes the SwiftUI text entry replacement for the old UIKit text alert.
-    /// The caller only supplies the old alert content and this keeps the new
-    /// navigation behaviour consistent across Settings.
+    /// Pushes a text-entry screen using the shared Settings navigation.
     func pushTextEntry(_ textEntry: SettingsTextEntryContent) {
         push(textEntry.title ?? "") { close in
             AnyView(SettingsTextEntryView(textEntry: textEntry, close: close))
         }
     }
 
-    /// Pushes the SwiftUI list picker replacement for the old UIKit picker alert.
-    /// This keeps selection screens in the navigation stack instead of presenting
-    /// them as bottom sheets.
+    /// Pushes a list picker inside the Settings navigation stack.
     func pushSelectionList(_ selectionList: SettingsSelectionListContent) {
         push(selectionList.title ?? "") { close in
             AnyView(SettingsSelectionListView(selectionList: selectionList, close: close))
         }
     }
 
-    /// Pushes the SwiftUI date picker replacement for the old UIKit date picker.
-    /// The actual picker view lives in TimeScheduleView because that is the only
-    /// Settings flow that currently needs the shared picker screen.
+    /// Pushes the date picker used by schedule settings.
     func pushDatePicker(_ datePicker: SettingsDatePickerContent) {
         push(datePicker.title ?? "") { close in
             AnyView(SettingsDatePickerView(datePicker: datePicker, close: close))
@@ -162,9 +153,8 @@ final class SettingsListModel: ObservableObject {
         self.sections = sections
     }
 
-    /// Triggers a SwiftUI refresh for rows backed by the old Settings view models.
-    /// The scope is kept so call sites still describe what changed, even though
-    /// SwiftUI refreshes the visible list from the same token today.
+    /// Triggers a refresh for rows backed by indexed Settings view models. The scope remains part of
+    /// the contract so call sites describe what changed.
     func reload(_ scope: SettingsReloadScope) {
         reloadToken = UUID()
     }
@@ -305,25 +295,20 @@ extension SettingsNativeSectionProvider {
         )
     }
 
-    /// Uses the old section title by default so existing Settings headings keep
-    /// working while each section moves to native SwiftUI rows.
+    /// Uses the section provider's title by default.
     func settingsSectionTitle() -> String? {
         sectionTitle()
     }
 
-    /// Uses the old section footer by default, but gives native sections a clean
-    /// place to add conditional footer text without replacing the whole section.
+    /// Uses the section provider's footer by default.
     func settingsSectionFooter() -> String? {
         sectionFooter()
     }
 
 }
 
-// These conformances mark the existing Settings view models as participants in
-// the SwiftUI row model. Each view model now declares its own rows near the top
-// of the file so the section layout is easy to inspect before the detailed logic.
-// The shared helper code below still lets those rows call into the old action
-// methods while we continue moving the settings screens to native SwiftUI.
+// These conformances mark Settings view models as participants in the shared row model. Each view
+// model declares its rows near the top of the file so section layout is easy to inspect.
 extension SettingsViewDataSourceSettingsViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewHomeScreenSettingsViewModel: SettingsNativeSectionProvider {}
 extension SettingsViewAlertSettingsViewModel: SettingsNativeSectionProvider {}
@@ -362,19 +347,17 @@ final class SettingsActionPresenter: ObservableObject {
         self.router = router
     }
 
-    /// Shows the simple message alert used by many of the old Settings view models.
+    /// Shows the simple message alert requested by a Settings view model.
     func showMessage(title: String, message: String?) {
         alert = SettingsAlertContent(title: title, message: message, actionTitle: Texts_Common.Ok, action: nil)
     }
 
-    /// Pushes a native Settings text-entry row without going through the old
-    /// SettingsSelectedRowAction bridge.
+    /// Pushes a Settings text-entry destination directly.
     func show(textEntry: SettingsTextEntryContent) {
         router.show(.textEntry(textEntry))
     }
 
-    /// Pushes a native Settings selection row without rebuilding it as a legacy
-    /// view-model action first.
+    /// Pushes a Settings selection destination directly.
     func show(selectionList: SettingsSelectionListContent) {
         router.show(.selectionList(selectionList))
     }
@@ -386,8 +369,7 @@ final class SettingsActionPresenter: ObservableObject {
         router.show(.settingsScreen(settingsScreen))
     }
 
-    /// Converts a SettingsSelectedRowAction from the old view models into the
-    /// equivalent SwiftUI alert, pushed editor, picker, segue route, or function call.
+    /// Converts a SettingsSelectedRowAction into an alert, editor, picker, route or function call.
     func run(
         selectedRowAction: SettingsSelectedRowAction,
         rowIndex: Int,
@@ -503,9 +485,7 @@ final class SettingsActionPresenter: ObservableObject {
         )
     }
 
-    /// Applies the refresh rule from the old view model after a row action finishes.
-    /// Some rows only need their section refreshed, while others still ask for the
-    /// full Settings list to be rebuilt.
+    /// Applies the view model's refresh rule after a row action finishes.
     private func reloadIfNeeded(
         viewModel: SettingsViewModelProtocol?,
         rowIndex: Int,
@@ -520,8 +500,7 @@ final class SettingsActionPresenter: ObservableObject {
         reload(viewModel.completeSettingsViewRefreshNeeded(index: rowIndex) ? .all : .section(sectionIndex))
     }
 
-    /// Maps the old storyboard segue identifiers to the SwiftUI routes now handled
-    /// by SettingsRouter. This keeps the old view models from knowing about SwiftUI.
+    /// Maps identifiers emitted by Settings view models to typed navigation routes.
     private func route(identifier: String, sender: Any?) {
         switch identifier {
         case SettingsSegueIdentifier.settingsToAlertTypeSettings.rawValue:
@@ -658,9 +637,7 @@ struct SettingsStaticRowView: View {
     let titleColor: Color?
     let detailColor: Color?
     let icon: SettingsIcon?
-    /// Adds a small coloured SF Symbol dot before the row title.
-    /// This is used when the old Settings row text included a status marker, but
-    /// the SwiftUI row should draw that marker instead of storing it in the text.
+    /// Adds a small colored SF Symbol dot before the row title.
     let indicator: SettingsIndicator?
     /// Adds a small coloured SF Symbol dot before the row detail text.
     /// This is for rows where the status belongs with the value on the right,
@@ -902,10 +879,7 @@ private struct SettingsNativeRowView: View {
 }
 
 extension SettingsViewModelProtocol {
-    /// Builds a row from the old row logic but lets the new Settings model choose
-    /// a stable row id and visibility. This is useful while a section is being
-    /// migrated because the row list can become explicit before every action is
-    /// rewritten by hand.
+    /// Builds a row from indexed view-model logic with explicit identity and visibility.
     func nativeSettingsRow(
         id: String,
         index: Int,
@@ -915,9 +889,7 @@ extension SettingsViewModelProtocol {
         nativeSettingsRow(id: Optional(id), index: index, sectionID: sectionID, isVisible: isVisible)
     }
 
-    /// Builds one native row from the existing row-index methods. The display data
-    /// moves into SettingsRow, but the original row action is still used so the
-    /// behaviour stays unchanged during the migration.
+    /// Builds one row from the indexed title, detail, state and action methods.
     private func nativeSettingsRow(
         id: String? = nil,
         index: Int,
@@ -960,7 +932,7 @@ extension SettingsViewModelProtocol {
         )
     }
 
-    /// Carries over the few legacy rows that need a coloured marker before the title.
+    /// Returns the optional colored marker shown before the title.
     private func nativeIndicator(index: Int) -> SettingsIndicator? {
         guard let homeScreenViewModel = self as? SettingsViewHomeScreenSettingsViewModel,
               let color = homeScreenViewModel.rowIndicatorColor(index: index) else {
@@ -970,7 +942,7 @@ extension SettingsViewModelProtocol {
         return SettingsIndicator(color: color)
     }
 
-    /// Carries over the few legacy rows that need a coloured marker before the detail.
+    /// Returns the optional colored marker shown before the detail.
     private func nativeDetailIndicator(index: Int) -> SettingsIndicator? {
         guard let dataSourceViewModel = self as? SettingsViewDataSourceSettingsViewModel,
               let color = dataSourceViewModel.followerServiceStatusIndicatorColor(index: index) else {
@@ -1103,7 +1075,7 @@ struct SettingsInfoIndicator: View {
 }
 
 extension View {
-    /// Applies the standard Settings list appearance used by all migrated screens.
+    /// Applies the standard appearance used by all Settings lists.
     func settingsListStyle(title: String, titleDisplayMode: NavigationBarItem.TitleDisplayMode = .large) -> some View {
         self
             .listStyle(.insetGrouped)
@@ -1118,8 +1090,6 @@ extension View {
     }
 
     /// Adds pushed edit screens for text, selection and date picker requests.
-    /// This replaces the old modal popup flow with the same navigation pattern
-    /// across the migrated Settings screens.
     func settingsPushPresentation(
         textEntry: Binding<SettingsTextEntryContent?> = .constant(nil),
         selectionList: Binding<SettingsSelectionListContent?> = .constant(nil),
@@ -1247,7 +1217,7 @@ struct SettingsTextEntryView: View {
     let close: () -> Void
     private let initialValue: String
 
-    /// Starts the pushed text editor with the value supplied by the old row action.
+    /// Starts the text editor with the value supplied by the row action.
     init(textEntry: SettingsTextEntryContent, close: @escaping () -> Void) {
         self.textEntry = textEntry
         self.close = close
@@ -1340,7 +1310,7 @@ struct SettingsSelectionListView: View {
     let close: () -> Void
     private let initialSelectedRow: Int
 
-    /// Starts the pushed picker on the same selected row the old picker would show.
+    /// Starts the picker on the supplied selected row.
     init(selectionList: SettingsSelectionListContent, close: @escaping () -> Void) {
         self.selectionList = selectionList
         self.close = close
@@ -1387,8 +1357,7 @@ struct SettingsSelectionListView: View {
         }
     }
 
-    /// Updates the selected row and runs the old did-select preview callback if one
-    /// was supplied by the original Settings action.
+    /// Updates the selected row and runs its optional preview callback.
     private func select(index: Int) {
         selectedRow = index
         selectionList.didSelectRow?(index)

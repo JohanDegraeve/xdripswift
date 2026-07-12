@@ -36,8 +36,7 @@ struct GlucoseChartDataSet {
 /// define the wider cached data range already loaded by `GlucoseChartStateManager`.
 ///
 /// This is intentionally a plain value type. The state manager owns loading, cache mutation and
-/// Core Data access; the chart view owns rendering. That keeps the SwiftUI migration close to the
-/// old manager's proven performance idea without coupling the renderer back to database work.
+/// Core Data access; the chart view owns rendering and remains independent of database work.
 ///
 /// `overlayWindowStartDate`/`overlayWindowEndDate` optionally define a highlighted time window
 /// inside an overview chart. They are ignored unless both dates are supplied.
@@ -77,9 +76,8 @@ struct GlucoseChartState {
 
 /// Bucketed treatment and basal points in the form expected by `GlucoseChartView`.
 ///
-/// This mirrors the old UIKit `TreatmentChartPointsType`: separate buckets let the renderer apply
-/// the correct marker size, label policy and layer ordering without recalculating treatment meaning
-/// during every body pass.
+/// Separate buckets let the renderer apply the correct marker size, label policy and layer ordering
+/// without recalculating treatment meaning during every body pass.
 struct GlucoseChartTreatmentPoints {
 
     var smallBolus: [GlucoseChartTreatmentPoint] = []
@@ -121,8 +119,8 @@ struct GlucoseChartPoint: Identifiable, Hashable {
 
 /// Dated treatment marker with its display y-value and optional treatment label/notes.
 ///
-/// `yValue` is already resolved by the state manager. For bolus/carbs/notes that means "near the
-/// glucose line", matching the old chart's treatment positioning. The view should only draw it.
+/// `yValue` is already resolved by the state manager. For bolus, carbs and notes this means near the
+/// glucose line; the view only draws the supplied position.
 struct GlucoseChartTreatmentPoint: Identifiable, Hashable {
 
     let id: String
@@ -143,10 +141,7 @@ struct GlucoseChartTreatmentPoint: Identifiable, Hashable {
 
 }
 
-/// Styling constants for SwiftUI treatment marks.
-///
-/// These mirror the visual vocabulary of the UIKit chart while staying local to SwiftUI chart
-/// rendering. The values can be tuned without changing the cached data model.
+/// Styling constants for treatment marks, kept separate from the cached data model.
 enum GlucoseChartTreatmentStyle {
 
     // MARK: - Calibration

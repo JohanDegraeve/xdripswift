@@ -9,9 +9,7 @@
 import CoreData
 import SwiftUI
 
-// This is the SwiftUI replacement for the old alarm Settings flow. The rules for
-// which alarms and rows are shown are intentionally kept here so they remain easy
-// to compare with the previous UIKit implementation.
+// Rules for which alarms and rows are shown are kept with the list model.
 @MainActor
 final class AlertsSettingsViewModel: ObservableObject {
     @Published var reloadToken = UUID()
@@ -20,8 +18,7 @@ final class AlertsSettingsViewModel: ObservableObject {
     private let alertEntriesAccessor: AlertEntriesAccessor
     private let alertTypesAccessor: AlertTypesAccessor
 
-    /// Keeps the existing Core Data accessors inside the SwiftUI list model.
-    /// This lets the list rebuild from the same alarm grouping logic as UIKit.
+    /// Keeps the Core Data accessors inside the list model so it can rebuild alarm groups.
     init(coreDataManager: CoreDataManager) {
         self.coreDataManager = coreDataManager
         self.alertEntriesAccessor = AlertEntriesAccessor(coreDataManager: coreDataManager)
@@ -29,8 +26,7 @@ final class AlertsSettingsViewModel: ObservableObject {
     }
 
     /// Reads the current alarms grouped by alert kind.
-    /// The grouping comes from the existing accessor so the SwiftUI list keeps the
-    /// same section order as the old table view.
+    /// The grouping comes from the accessor and preserves its section order.
     var alertEntriesPerAlertKind: [[AlertEntry]] {
         alertEntriesAccessor.getAllEntriesPerAlertKind(alertTypesAccessor: alertTypesAccessor)
     }
@@ -42,8 +38,7 @@ final class AlertsSettingsViewModel: ObservableObject {
     }
 
     /// Returns the visible alarm rows for a section.
-    /// If the first alarm for a kind is disabled, the old UI only showed that
-    /// disabled summary row, so the SwiftUI list does the same.
+    /// If the first alarm for a kind is disabled, only its disabled summary row is shown.
     func rows(for section: Int) -> [AlertEntry] {
         let entries = alertEntriesPerAlertKind[AlertKind.alertKindRawValue(forSection: section)]
 
@@ -55,7 +50,7 @@ final class AlertsSettingsViewModel: ObservableObject {
     }
 
     /// Returns the section title for an alert kind.
-    /// Urgent alert kinds keep the old exclamation marker in the section header.
+    /// Urgent alert kinds include an exclamation marker in the section header.
     func title(for section: Int) -> String {
         let alertKind = AlertKind(forSection: section)
 
@@ -63,7 +58,7 @@ final class AlertsSettingsViewModel: ObservableObject {
     }
 
     /// Builds the edit request for the selected alarm row.
-    /// The previous and next alarms define the allowed start-time range.
+    /// Adjacent alarms define the allowed start-time range.
     func editData(section: Int, row: Int) -> AlertEntryEditRequest {
         let mappedSection = AlertKind.alertKindRawValue(forSection: section)
         let entries = alertEntriesPerAlertKind[mappedSection]
@@ -134,8 +129,7 @@ private struct AlertEntrySummaryRow: View {
     }
 
     /// Builds the summary text shown in the alarm list.
-    /// This mirrors the old table row by combining start time, values, trigger
-    /// values and alert type name into one title string.
+    /// Combines start time, values, trigger values and alert type name into one title.
     private var title: String {
         guard !alertEntry.isDisabled else {
             return ConstantsAlerts.disabledAlertSymbol + " " + Texts_Common.disabled
@@ -261,8 +255,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
     }
 
     /// Returns the rows that should be visible for the current alarm state.
-    /// This mirrors the old editor: disabled alarms only show the enabled switch,
-    /// and trigger value rows only appear for alarms that need them.
+    /// Disabled alarms show only the enabled switch; trigger rows appear only where required.
     var rows: [AlertEntryEditorSetting] {
         if isDisabled {
             return [.isDisabled]
@@ -480,7 +473,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
     }
 
     /// Compares the current editor state with the original alarm so toolbar buttons
-    /// can match the old enable/disable rules.
+    /// can apply the enable and disable rules.
     private var hasChanges: Bool {
         isDisabled != original.isDisabled ||
             start != original.start ||
@@ -503,7 +496,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
     }
 
     /// Applies the enabled/disabled state to all alarms of the same kind.
-    /// The old alarm flow treats this as a setting for the whole alarm group.
+    /// This setting applies to the complete alarm group.
     private func updateAllEntriesForCurrentKindDisabledState() {
         let context = coreDataManager.mainManagedObjectContext
         let fetchRequest: NSFetchRequest<AlertEntry> = AlertEntry.fetchRequest()
@@ -520,7 +513,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
     }
 
     /// Builds the text editor for alarm values and trigger values.
-    /// It keeps the old validation and converts mmol/L input back to mg/dL before
+    /// Converts mmol/L input back to mg/dL before
     /// storing because AlertEntry values are persisted in mg/dL.
     private func makeValueTextEntry(
         title: String,
@@ -564,7 +557,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
     }
 
     /// Opens the alert type picker and stores the selected AlertType object.
-    /// Disabled alert types stay visible with their disabled marker, matching the old list.
+    /// Disabled alert types remain visible with their disabled marker.
     private func showAlertTypeSelection() {
         let allAlertTypes = AlertTypesAccessor(coreDataManager: coreDataManager).getAllAlertTypes()
         let names = allAlertTypes.map(format(alertType:))
@@ -585,7 +578,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
     }
 
     /// Formats alert type names for rows and pickers, including the disabled marker
-    /// used by the old Settings screens.
+    /// used by Settings rows and pickers.
     private func format(alertType: AlertType) -> String {
         alertType.name + (alertType.enabled ? "" : ConstantsAlerts.disabledAlertSymbolStringToAppend)
     }
@@ -691,7 +684,7 @@ struct AlertEntryEditorView: View {
 
     /// Builds the SwiftUI row for each alarm editor setting.
     /// Toggle rows update editor state directly; value rows open the pushed
-    /// Settings editors that replace the old popups.
+    /// shared Settings editors.
     @ViewBuilder
     private func row(for setting: AlertEntryEditorSetting) -> some View {
         switch setting {

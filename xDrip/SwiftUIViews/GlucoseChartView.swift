@@ -12,13 +12,11 @@ import Foundation
 
 /// Swift Charts implementation for rendering glucose readings and related chart annotations.
 ///
-/// The view can still be used in its original lightweight mode by passing BG values/dates directly.
-/// Newer full-chart callers should pass `chartState`, which carries the visible time range, glucose
-/// readings, optional original readings, calibrations, treatments and basal points.
+/// Lightweight callers can pass BG values and dates directly. Full-chart callers pass `chartState`,
+/// which carries the visible range, glucose readings, calibrations, treatments and basal points.
 ///
-/// The view does not load or mutate chart data. For the full chart migration, `GlucoseChartState`
-/// is the boundary between the cached state manager and this renderer, replacing the old UIKit
-/// manager's combined "load data + create layers" responsibility with a cleaner split.
+/// The view does not load or mutate chart data. `GlucoseChartState` is the boundary between the
+/// cached state manager and this renderer.
 struct GlucoseChartView: View {
 
     // MARK: - Input Data
@@ -28,8 +26,7 @@ struct GlucoseChartView: View {
     var additionalBgReadingDataSets: [GlucoseChartDataSet]
     /// Full cached/renderable chart state.
     ///
-    /// When present, this overrides the direct BG arrays and allows the chart to render the same
-    /// treatment/basal/calibration surface as the old UIKit chart.
+    /// When present, this overrides the direct BG arrays and enables the complete chart surface.
     var chartState: GlucoseChartState?
 
     // MARK: - Configuration
@@ -51,9 +48,8 @@ struct GlucoseChartView: View {
     let visibleEndDate: Date
     /// Opt-in fixed y-axis context for the main glucose chart.
     ///
-    /// Widgets, watch, notification and Live Activity charts stay adaptive by default. The main home
-    /// chart needs the older UIKit behaviour where there is always enough low/high context to make
-    /// scrolling feel visually coherent.
+    /// Widgets, watch, notification and Live Activity charts stay adaptive by default. The main Home
+    /// chart keeps enough low and high context for visually coherent scrolling.
     var usesMainChartYAxisContext = false
 
     private enum YAxisLabelStyle {
@@ -199,8 +195,8 @@ struct GlucoseChartView: View {
             return miniChartXAxisLabelDates()
         }
 
-        // Keep labels anchored to real clock hours, not to the current scroll offset. This prevents
-        // the old "13/15/17 suddenly becomes 14/16/18" effect while scrolling by a few minutes.
+        // Keep labels anchored to real clock hours so a small scroll cannot switch between odd and
+        // even hour labels.
         let hourInterval = max(everyHours, 1)
         let calendar = Calendar.current
         let startOfVisibleHourComponents = calendar.dateComponents([.year, .month, .day, .hour], from: visibleStartDate)
@@ -285,9 +281,8 @@ struct GlucoseChartView: View {
             return ([], [])
         }
 
-        // These are context marks, not data-derived ticks. The old UIKit chart kept sensible upper
-        // reference lines visible on the main chart even when the current glucose range was smaller.
-        // That makes scroll/zoom comparisons easier while allowing compact charts to remain adaptive.
+        // These are context marks, not data-derived ticks. Keeping upper reference lines visible
+        // makes scroll and zoom comparisons easier while compact charts remain adaptive.
         var labeledValues = [Double]()
         var gridOnlyValues = [Double]()
 
@@ -384,10 +379,8 @@ struct GlucoseChartView: View {
     }
 
     private func yAxisLabelAlignment() -> Alignment {
-        // The original UIKit home chart reserved a fixed right-side label lane. Within that lane,
-        // the labels were visually read from the same leading edge instead of being right-aligned
-        // to the chart edge. Keep that behaviour only for the main chart context so the existing
-        // generated widget/intent chart presets are not changed unexpectedly.
+        // Main-chart labels share a fixed right-side lane and the same leading edge. Generated
+        // widget and intent chart presets retain their trailing alignment.
         usesMainChartYAxisContext ? .leading : .trailing
     }
 
@@ -474,9 +467,8 @@ struct GlucoseChartView: View {
         let chartPadding = chartType.padding()
         let yAxisLineSize = chartType.yAxisLineSize()
 
-        // Swift Charts renders marks in declaration order. This ordering follows the old layer
-        // stack: guides first, basal/treatments below glucose, primary glucose, then calibration and
-        // overlay marks above the plot.
+        // Swift Charts renders marks in declaration order: guides first, basal and treatments below
+        // glucose, then calibration and overlay marks above the plot.
         Chart {
             // Mini-chart overview highlight.
             //
@@ -541,9 +533,8 @@ struct GlucoseChartView: View {
 
             // Basal areas/lines and primary treatments are drawn below glucose points.
             //
-            // The state manager has already produced step points and fill points matching the old
-            // scheduled basal/temp basal layers, so the view only chooses the Swift Charts mark type
-            // and visual style.
+            // The state manager has already produced scheduled and temporary basal step/fill points,
+            // so the view only chooses the mark type and visual style.
             if let chartState = chartState {
                 ForEach(visibleTreatmentPoints.basalRateFill) { point in
                     AreaMark(x: .value("Time", point.date),
@@ -940,9 +931,8 @@ private extension Array where Element == GlucoseChartPoint {
 
     /// Adds synthetic start/end edge points so step lines remain continuous when a visible range cuts through a basal segment.
     ///
-    /// This is the Swift Charts replacement for the old manager's explicit "finish previous rate /
-    /// start new rate" point pairs. It is applied at visible-filter time so the cached basal series
-    /// can be wider than the chart without losing the first or last visible horizontal segment.
+    /// Applied at visible-filter time so the cached basal series can be wider than the chart without
+    /// losing the first or last visible horizontal segment.
     func visibleStepPoints(from startDate: Date, to endDate: Date, idPrefix: String) -> [GlucoseChartPoint] {
         guard startDate < endDate, !isEmpty else { return [] }
 

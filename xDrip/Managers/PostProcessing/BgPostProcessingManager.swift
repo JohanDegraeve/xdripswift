@@ -211,9 +211,8 @@ class BgPostProcessingManager {
 
             if UserDefaults.standard.enableSmoothing {
                 // Live smoothing recomputes a recent history tail on every cycle.
-                // During testing it was found that only sending locally changed
-                // readings could leave Nightscout and HealthKit with older values
-                // from the previous smoothing pass. When smoothing is enabled,
+                // Sending only locally changed readings can leave Nightscout and HealthKit with values
+                // from an earlier smoothing pass. When smoothing is enabled,
                 // rewrite the whole recent visible tail so downstream stores stay
                 // aligned with the current smoothed Core Data values.
                 bgReadingsToReplaceDownstream = automaticRewriteCandidates
@@ -310,8 +309,7 @@ class BgPostProcessingManager {
             UserDefaults.standard.fiveMinuteReadingsStartTimeStamp = applyFromTimeStamp
         }
 
-        // During testing it was found that "Apply from Now" could look correct
-        // at first, but the next automatic processing pass would still start
+        // After "Apply from Now", the next automatic processing pass must not start
         // from the older source start timestamp and reach back into historical
         // readings. Keep the source history boundary unchanged, but store the
         // active apply-from timestamp separately so future live cycles only
@@ -418,13 +416,10 @@ class BgPostProcessingManager {
         return noteText
     }
 
-    /// direct live uploads should only be bypassed when the current source
-    /// really has an active downstream change to apply.
-    /// During testing it was found that raw stored flags could stay true even
-    /// when the current source no longer had any effective offset, smoothing
-    /// or cadence reduction. Using those raw flags alone could suppress the
-    /// normal Nightscout upload path even though nothing was actually being
-    /// changed downstream.
+    /// Returns whether the current source has an effective downstream change to apply.
+    ///
+    /// Stored flags can remain true after an offset, smoothing or cadence reduction stops being
+    /// effective. Checking the effective state prevents suppression of normal Nightscout uploads.
     func hasActiveDownstreamPostProcessing() -> Bool {
         if hasEffectiveAdjustmentForCurrentSource() {
             return true
@@ -677,9 +672,7 @@ class BgPostProcessingManager {
             return
         }
 
-        // During testing it was found that the preview and the stored live values
-        // could diverge because the preview smooths the whole visible series while
-        // the persisted path only smoothed a shorter rolling window. Recompute the
+        // Preview and stored live values can diverge if they use different smoothing windows. Recompute the
         // full fetched processing segment here so every automatic and historical
         // pass uses the same smoothing scope.
         let readingsToSmooth = bgReadings
@@ -706,17 +699,15 @@ class BgPostProcessingManager {
         let sourceCanUseFiveMinuteReadings = sourceCanUseFiveMinuteReadings(bgReadings: bgReadings)
 
         if !sourceCanUseFiveMinuteReadings {
-            // During testing it was found that stale suppression flags can block
-            // normal 5 minute sources from being uploaded. If the current source
-            // cannot use cadence reduction, clear from the source start because
+            // Stale suppression flags can block normal five-minute sources from upload. If the current
+            // source cannot use cadence reduction, clear from the source start because
             // every suppressed value in this source is invalid.
             clearFiveMinuteCadenceSuppression(bgReadings: bgReadings, from: sourceStartTimeStamp)
             return
         }
 
         if !UserDefaults.standard.useFiveMinuteReadings {
-            // During testing it was found that 5 minute output needs to work as
-            // its own downstream option even when smoothing is disabled.
+            // Five minute output remains an independent downstream option when smoothing is disabled.
             // When a faster source has been reduced and the user switches the
             // option off from Now, old suppressed history should remain unchanged.
             clearFiveMinuteCadenceSuppression(bgReadings: bgReadings, from: fiveMinuteReadingsStartTimeStamp)
@@ -868,10 +859,8 @@ class BgPostProcessingManager {
             return savitzkyGolaySmoothedValues(values: values, smoothingStrength: smoothingStrength)
         }
 
-        // During testing it was found that minute cadence Libre values hardly changed
-        // after the post processing smoothing was enabled. The previous Libre-specific
-        // path used two stages, first on the minute stream and then again on points
-        // spaced roughly 5 minutes apart. Keep that behavior here so faster streams
+        // Minute-cadence Libre values need two smoothing stages: first on the minute stream, then on
+        // points spaced roughly five minutes apart. This ensures faster streams
         // still get meaningful smoothing inside the shared manager.
         let readingsPerFiveMinutes = max(2, Int((5.0 / medianReadingGapInMinutes).rounded()))
         var fullySmoothedValues = values

@@ -14,10 +14,9 @@ import SwiftUI
 /// This class deliberately does not load chart data or render marks. Callers observe `endDate`,
 /// derive `startDate`, and ask `GlucoseChartStateManager` to fill any missing cached data.
 ///
-/// This separation matches the useful architecture of the UIKit chart: gesture handling changes the
-/// visible time window, and the data manager responds by extending/cleaning its local cache. Keeping
-/// this coordinator free of Core Data and chart marks lets the same behaviour be reused by the home
-/// chart, debug chart, watch chart or any future SwiftUI chart surface.
+/// Gesture handling changes the visible time window, and the data manager responds by extending or
+/// cleaning its local cache. Keeping this coordinator free of Core Data and chart marks allows reuse
+/// by any interactive glucose chart.
 final class GlucoseChartScrollCoordinator: ObservableObject {
 
     // MARK: - Published State
@@ -32,8 +31,7 @@ final class GlucoseChartScrollCoordinator: ObservableObject {
 
     /// Drag tracking is stored in points, then converted to seconds using the current chart width.
     ///
-    /// The UIKit manager used `diffInSecondsBetweenTwoPoints` from the inner frame width. This is
-    /// the same model expressed without depending on the old `BloodGlucoseChartView` frame.
+    /// Drag distance is converted to time using the inner chart width and visible duration.
     private var dragStartEndDate: Date?
     private var dragLastTranslationWidth: CGFloat?
     private var dragLastUpdateDate: Date?
@@ -44,12 +42,9 @@ final class GlucoseChartScrollCoordinator: ObservableObject {
     private static let minimumDecelerationDistanceWidth: CGFloat = 1
     private static let minimumPublishDistanceWidth: CGFloat = 1
     private static let maximumReleaseVelocityWidth: CGFloat = 6_000
-    /// SwiftUI's predicted drag velocity is a little more conservative than the old
-    /// `UIPanGestureRecognizer.velocity(in:)`, so we apply a small multiplier to keep fast swipes
-    /// feeling close to the UIKit chart without changing the state manager or renderer.
+    /// Small multiplier applied to predicted drag velocity so fast swipes travel far enough.
     private static let releaseVelocityMultiplier: CGFloat = 1.3
-    /// The old chart uses `UIScrollView.DecelerationRate.normal`. The tiny boost here gives the new
-    /// chart a little more carry after a fast release while still using the same exponential formula.
+    /// Small boost to the normal exponential deceleration rate after a fast release.
     private static let decelerationRateBoost = 0.00035
     private static let maximumDecelerationRate = 0.999
 
@@ -99,8 +94,7 @@ final class GlucoseChartScrollCoordinator: ObservableObject {
     // MARK: - Drag Handling
 
     func updateVisibleRange(value: DragGesture.Value, chartWidth: CGFloat) {
-        // Same behaviour as the old long-press/pan combination: the moment the user touches and
-        // starts another drag, any in-flight deceleration must stop immediately.
+        // A new touch stops any in-flight deceleration immediately.
         stopDeceleration()
         updateDragVelocity(translationWidth: value.translation.width, date: value.time)
         updateVisibleRange(translationWidth: value.translation.width, chartWidth: chartWidth, forcePublish: false)

@@ -9,6 +9,7 @@
 import Foundation
 import SwiftUI
 
+/// Owns one treatment editor model for the lifetime of its sheet.
 struct TreatmentEditorContainerView: View {
     // MARK: - private properties
 
@@ -79,6 +80,7 @@ struct TreatmentEditorContainerView: View {
     }
 }
 
+/// Native form used to add or edit a treatment.
 struct TreatmentEditorView: View {
     // MARK: - private properties
 

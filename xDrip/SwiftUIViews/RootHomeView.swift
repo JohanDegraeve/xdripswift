@@ -88,8 +88,8 @@ struct RootHomeView: View {
     /// Settings that affect which cached chart series are included in the main chart state.
     ///
     /// The stored UserDefaults values are observed with `@AppStorage`, but the chart only needs a
-    /// manager refresh when the effective renderable series changes. This mirrors the old
-    /// RootViewController observer behaviour without listening to every UserDefaults write.
+    /// manager refresh when the effective renderable series changes, without listening to every
+    /// UserDefaults write.
     private struct ChartSeriesSettings: Equatable {
         let showTreatments: Bool
         let showOriginalBGReadings: Bool
@@ -330,8 +330,8 @@ struct RootHomeView: View {
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         let valueInUserUnit = pannedReading.valueInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl)
 
-        // Match the original UIKit panning behaviour: while the chart is scrolled back, the top
-        // reading shows the latest visible chart point, uses the point timestamp instead of
+        // While the chart is scrolled back, the top reading shows the latest visible chart point,
+        // uses the point timestamp instead of
         // "minutes ago", clears the delta, and marks the value as historical with strikethrough.
         return RootHomeGlucoseState(
             valueText: valueInUserUnit.bgValueToString(mgDl: isMgDl),
@@ -464,8 +464,8 @@ struct RootHomeView: View {
     private func refreshMainChartForDataChange() {
         guard scrollCoordinator.isShowingCurrentTimeRange else { return }
 
-        // Move the live window to the actual current time before loading the new tail. A chart that
-        // the user has deliberately scrolled back remains fixed, matching the previous behaviour.
+        // Move the live window to the current time before loading the new tail. A chart deliberately
+        // scrolled back by the user remains fixed.
         _ = scrollCoordinator.refreshCurrentTimeRangeIfNeeded()
 
         requestChartState(forceReset: false, showsLoading: false, refreshCachedData: true)
@@ -506,6 +506,9 @@ struct RootHomeView: View {
 
 // MARK: - Toolbar
 
+// MARK: - Toolbar
+
+/// Home toolbar with commands supplied by the tab and application coordinator.
 private struct RootHomeToolbarView: View {
     let state: RootHomeState
     let actions: RootHomeActions
@@ -568,10 +571,8 @@ private struct RootHomeToolbarView: View {
                 originalGlucosePeekIsActive = false
                 endOriginalGlucosePeek()
 
-                // The old UIKit button ignored the touch-up event after a successful long press so
-                // releasing the peek did not also open the adjustments screen. SwiftUI tap delivery
-                // can vary slightly with combined gestures, so clear the guard shortly after release
-                // if no tap event consumed it.
+                // Do not let release of a completed peek also open the adjustments screen. Clear the
+                // guard shortly afterwards if no tap event consumed it.
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                     shouldIgnoreNextPostProcessingTap = false
                 }
@@ -593,6 +594,9 @@ private struct RootHomeToolbarView: View {
 
 // MARK: - Pump and Loop
 
+// MARK: - Current Status
+
+/// Compact pump status displayed beside the current glucose reading.
 private struct RootHomePumpView: View {
     let state: RootHomePumpState
 
@@ -610,6 +614,7 @@ private struct RootHomePumpView: View {
     }
 }
 
+/// Loop status row displayed below the pump and glucose values.
 private struct RootHomeLoopView: View {
     let state: RootHomeLoopState
     let actions: RootHomeActions
@@ -665,13 +670,13 @@ private struct RootHomeLoopView: View {
         }
         .buttonStyle(.plain)
         .transaction { transaction in
-            // Match the old UIKit statistics labels: calculation updates replace the label text
-            // immediately, while only the separate threshold-highlight colours are animated.
+            // Calculation updates replace label text immediately. Threshold colors animate separately.
             transaction.animation = nil
         }
     }
 }
 
+/// One compact title and value pair used inside the pump panel.
 private struct RootHomeInlineMetricView: View {
     let metric: RootHomeMetricState
 
@@ -693,6 +698,7 @@ private struct RootHomeInlineMetricView: View {
     }
 }
 
+/// One horizontal title and value pair used by the loop row.
 private struct RootHomeHorizontalMetricView: View {
     let metric: RootHomeMetricState
 
@@ -717,6 +723,7 @@ private struct RootHomeHorizontalMetricView: View {
 
 // MARK: - Glucose
 
+/// Current glucose value, age and delta presentation.
 private struct RootHomeGlucoseReadingView: View {
     let state: RootHomeGlucoseState
     let isScreenLocked: Bool
@@ -768,6 +775,9 @@ private struct RootHomeGlucoseReadingView: View {
 
 // MARK: - Charts
 
+// MARK: - Charts
+
+/// Main interactive chart with loading state and the reading shown at the panned end date.
 private struct RootHomeMainChartView: View {
     let selectedRange: RootHomeView.ChartRange
     let chartState: GlucoseChartState
@@ -827,6 +837,7 @@ private struct RootHomeMainChartView: View {
     }
 }
 
+/// Twenty-four hour overview chart and the active main-chart window.
 private struct RootHomeMiniChartView: View {
     let miniChartHoursToShow: Double
     let chartState: GlucoseChartState
@@ -863,6 +874,9 @@ private struct RootHomeMiniChartView: View {
 
 // MARK: - Controls
 
+// MARK: - Statistics
+
+/// Native controls for selecting the statistics period and main-chart width.
 private struct RootHomeSelectorView: View {
     @Binding var selectedRange: RootHomeView.ChartRange
     let statisticsDays: Int
@@ -927,6 +941,7 @@ private struct RootHomeSelectorView: View {
 
 // MARK: - Statistics
 
+/// Statistics values and time-in-range pie chart for the selected period.
 private struct RootHomeStatisticsView: View {
     let state: RootHomeStatisticsState
     let action: () -> Void
@@ -965,13 +980,13 @@ private struct RootHomeStatisticsView: View {
         .contentShape(Rectangle())
         .onTapGesture(count: 2, perform: action)
         .transaction { transaction in
-            // Match the old UIKit statistics labels: calculation updates replace the label text
-            // immediately, while only the separate threshold-highlight colours are animated.
+            // Calculation updates replace label text immediately. Threshold colors animate separately.
             transaction.animation = nil
         }
     }
 }
 
+/// Vertical group of statistics with matching column alignment.
 private struct RootHomeStatisticsColumn: View {
     let top: RootHomeMetricState
     let bottom: RootHomeMetricState
@@ -986,6 +1001,7 @@ private struct RootHomeStatisticsColumn: View {
     }
 }
 
+/// One statistics title, optional limit and calculated value.
 private struct RootHomeStatisticsMetricView: View {
     let metric: RootHomeMetricState
     var limitText = ""
@@ -1020,6 +1036,7 @@ private struct RootHomeStatisticsMetricView: View {
     }
 }
 
+/// Time-in-range pie chart drawn from low, in-range and high percentages.
 private struct RootHomePieChartView: View {
     let low: Double
     let inRange: Double
@@ -1058,6 +1075,7 @@ private struct RootHomePieChartView: View {
     }
 }
 
+/// One percentage slice in the Home time-in-range pie chart.
 private struct RootHomePieSlice: Shape {
     let startAngle: Angle
     let endAngle: Angle
@@ -1083,6 +1101,9 @@ private extension RootHomeMetricState {
 
 // MARK: - Sensor and Data Source
 
+// MARK: - Footer Status
+
+/// Sensor age and directional lifetime progress indicator.
 private struct RootHomeSensorLifetimeView: View {
     let state: RootHomeSensorState
 
@@ -1109,6 +1130,7 @@ private struct RootHomeSensorLifetimeView: View {
     }
 }
 
+/// Active data source, connection state and follower keep-alive status.
 private struct RootHomeDataSourceView: View {
     let state: RootHomeDataSourceState
     let sensorState: RootHomeSensorState
@@ -1177,6 +1199,7 @@ private struct RootHomeDataSourceView: View {
 
 // MARK: - Clock
 
+/// Large clock used by the locked night layout.
 private struct RootHomeClockView: View {
     let text: String
 

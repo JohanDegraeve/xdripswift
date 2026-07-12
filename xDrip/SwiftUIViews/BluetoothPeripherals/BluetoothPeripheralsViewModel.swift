@@ -10,6 +10,9 @@ import Combine
 import CoreBluetooth
 import Foundation
 
+// MARK: - Navigation
+
+/// Owns the typed path for the Bluetooth tab's native navigation stack.
 final class BluetoothPeripheralsRouter: ObservableObject {
     @Published var path = [BluetoothPeripheralsRoute]()
 
@@ -69,6 +72,9 @@ struct BluetoothPeripheralsRoute: Hashable {
     }
 }
 
+// MARK: - List State
+
+/// Builds Bluetooth list sections from the existing peripheral manager and refreshes live status.
 @MainActor final class BluetoothPeripheralsViewModel: ObservableObject {
     @Published private(set) var sections: [BluetoothPeripheralsSection] = []
     @Published var pendingAlert: BluetoothPeripheralsAlert?
@@ -131,6 +137,7 @@ struct BluetoothPeripheralsRoute: Hashable {
         }
     }
 
+    /// Starts the lightweight status refresh used while the Bluetooth list is visible.
     func startStatusUpdates() {
         initializeBluetoothTransmitterDelegates()
         reload()
@@ -234,6 +241,9 @@ extension BluetoothPeripheralsViewModel: @preconcurrency BluetoothTransmitterDel
     }
 }
 
+// MARK: - Row Models
+
+/// One Bluetooth category and its currently configured peripherals.
 struct BluetoothPeripheralsSection: Identifiable {
     let id: String
     let title: String
@@ -245,6 +255,7 @@ struct BluetoothPeripheralsSection: Identifiable {
     }
 }
 
+/// Value presentation for one configured Bluetooth peripheral.
 struct BluetoothPeripheralListRow: Identifiable {
     let bluetoothPeripheral: BluetoothPeripheral
     let title: String
@@ -302,6 +313,7 @@ enum BluetoothPeripheralDisplayStatus {
     }
 }
 
+/// Alert requested while validating or adding a Bluetooth peripheral.
 struct BluetoothPeripheralsAlert: Identifiable {
     let id = UUID()
     let title: String

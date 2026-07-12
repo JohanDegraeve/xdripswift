@@ -14,14 +14,10 @@ import SwiftUI
 
 /// Incremental data source for the SwiftUI glucose chart.
 ///
-/// This is the SwiftUI equivalent of the useful part of `GlucoseChartManager`: it keeps a local
-/// copy of chart data and moves the visible window through that cache instead of rebuilding the
-/// complete chart payload on every scroll update.
-///
-/// The old UIKit manager only really had this performance behaviour for glucose chart points. This
-/// manager applies the same append/prepend/trim pattern to glucose, original glucose, calibrations,
-/// treatments and the derived treatment/basal chart points so the SwiftUI renderer can be fed with
-/// stable, already-materialised data.
+/// It keeps a local copy of chart data and moves the visible window through that cache instead of
+/// rebuilding the complete payload on every scroll update. The append, prepend and trim pattern is
+/// applied to glucose, original glucose, calibrations, treatments and derived basal points so the
+/// renderer receives stable, already-materialised data.
 final class GlucoseChartStateManager: ObservableObject {
 
     // MARK: - Published State
@@ -44,8 +40,8 @@ final class GlucoseChartStateManager: ObservableObject {
     ///
     /// These arrays are intentionally wider than `state.startDate ... state.endDate`. When the user
     /// scrolls a little, `loadMissingData` only loads the missing leading or trailing date range and
-    /// `trimCache` later removes points that are too far away to be useful. This mirrors the old
-    /// UIKit glucose cache behaviour, but includes treatment and basal source data as well.
+    /// `trimCache` later removes points that are too far away to be useful. Glucose, treatments and
+    /// basal source data all follow the same cache boundaries.
     private var cachedReadings = [CachedBgReading]()
     private var cachedOriginalReadings = [CachedBgReading]()
     private var cachedCalibrations = [CachedCalibration]()
@@ -66,10 +62,8 @@ final class GlucoseChartStateManager: ObservableObject {
 
     /// Scheduled basal values expanded around the chart start date.
     ///
-    /// The UIKit manager populated the profile basal array for the current chart start date and
-    /// refreshed it when the start date moved by more than a few hours. We keep the same contract
-    /// here so temp basal gaps can be filled with the scheduled basal profile without repeatedly
-    /// expanding the profile on every tiny scroll update.
+    /// The array is refreshed when the chart start moves by more than a few hours. Temp basal gaps
+    /// can then use the scheduled profile without expanding it on every small scroll update.
     private var scheduledBasalRates = [(date: Date, value: Double)]()
     private var scheduledBasalRatesLastUpdatedForStartDate: Date = .distantPast
     private var basalRateMaximum: Double = 0
@@ -218,8 +212,7 @@ final class GlucoseChartStateManager: ObservableObject {
 
         let managedObjectContext = coreDataManager.privateManagedObjectContext
 
-        // Load all source series for the same missing range so scrolling does not give glucose the
-        // old cached behaviour while forcing treatments or calibrations to rebuild from scratch.
+        // Load all source series for the same missing range so no series is rebuilt independently.
         cachedReadings.merge(
             mapBgReadings(
                 bgReadingsAccessor.getBgReadings(from: startDate, to: endDate, on: managedObjectContext),
@@ -386,10 +379,8 @@ final class GlucoseChartStateManager: ObservableObject {
 
     /// Ensures derived treatment chart points cover the current cached source range.
     ///
-    /// This is the main structural difference from the UIKit manager. In UIKit, treatment chart
-    /// points were generally rebuilt for the current render pass while only glucose points benefited
-    /// from a stronger local cache. Here, treatment points are materialised into the same kind of
-    /// local cache and only the missing leading/trailing treatment point ranges are generated.
+    /// Treatment points are materialised into the local cache and only missing leading or trailing
+    /// ranges are generated.
     ///
     /// Basal lines are refreshed after appending/prepending because a step series needs a consistent
     /// first/last point and because the basal scaler can change if a newly loaded basal treatment is
@@ -461,8 +452,7 @@ final class GlucoseChartStateManager: ObservableObject {
         let treatmentOffset = treatmentSeparationOffset()
         let sortedBgReadings = bgReadings.sorted { $0.date < $1.date }
 
-        // Keep the same treatment grouping model as the old `TreatmentChartPointsType`: different
-        // bolus/carb magnitudes are separate arrays so the renderer can size and label them without
+        // Different bolus and carb magnitudes use separate arrays so the renderer can size and label them without
         // recalculating thresholds inside the view.
         for treatment in insulinTreatments {
             let yValue = closestYAxisValue(treatmentDate: treatment.date, bgReadings: sortedBgReadings) - treatmentOffset
@@ -534,9 +524,7 @@ final class GlucoseChartStateManager: ObservableObject {
 
         let basalTreatments = cachedTreatments.filter { $0.date >= startDate && $0.date <= endDate && !$0.isDeleted && $0.type == .Basal }.sorted { $0.date < $1.date }
 
-        // The UIKit chart rendered scheduled basal, temp basal line and temp basal fill as separate
-        // layers. Swift Charts gets the same separation here: scheduled profile, enacted temp basal
-        // line, and a baseline-to-temp-basal fill series.
+        // Keep scheduled profile, enacted temp basal line and baseline fill as separate series.
         updateScheduledBasalRatesIfNeeded(startDate: startDate)
         updateBasalScaler(minimumChartValue: minimumChartValue)
         treatmentPoints.scheduledBasalRates = makeScheduledBasalPoints(startDate: startDate, endDate: endDate, minimumChartValue: minimumChartValue)
@@ -598,8 +586,8 @@ final class GlucoseChartStateManager: ObservableObject {
 
     /// Calculates the basal-to-y-axis scaler once from recent basal history and scheduled profile.
     ///
-    /// This follows the old chart behaviour: basal U/hr values are not plotted on their real glucose
-    /// scale. They are compressed into the reserved basal band below the normal glucose floor so the
+    /// Basal U/hr values are not plotted on the glucose scale. They are compressed into the reserved
+    /// basal band below the normal glucose floor so the
     /// basal graph can share the glucose chart without needing a second y-axis.
     private func updateBasalScaler(minimumChartValue: Double) {
         if basalRateMaximum == 0 {
@@ -641,9 +629,8 @@ final class GlucoseChartStateManager: ObservableObject {
 
         scheduledBasalRates.removeAll()
 
-        // Expand yesterday/today/tomorrow around the requested start date. This is the same idea as
-        // the UIKit manager and prevents midnight/profile-boundary gaps when the visible range cuts
-        // across a scheduled basal change.
+        // Expand yesterday, today and tomorrow to prevent gaps where the visible range crosses a
+        // midnight or scheduled profile change.
         for hoursToAddToStartDate in stride(from: -24, to: 25, by: 24) {
             for scheduledBasalRate in scheduledBasalRatesFromProfile {
                 scheduledBasalRates.append((date: scheduledBasalRate.toDate(date: startDate.toMidnight().addingTimeInterval(TimeInterval(60 * 60 * hoursToAddToStartDate))), value: scheduledBasalRate.value))
@@ -665,8 +652,7 @@ final class GlucoseChartStateManager: ObservableObject {
         let basalRates = scheduledBasalRates.filter { $0.date >= startDate && $0.date <= endDate }
 
         // Step charts need two points at a rate change: one to finish the previous rate and one to
-        // start the new rate at the same timestamp. Swift Charts then draws the same horizontal/step
-        // profile as the old SwiftCharts line layer.
+        // start the new rate at the same timestamp.
         if basalRates.isEmpty {
             if let initialBasalRate = scheduledBasalRates.filter({ $0.date < startDate }).last {
                 chartPoints.append(basalPoint(value: initialBasalRate.value, date: startDate, minimumChartValue: minimumChartValue, idPrefix: "scheduled-basal"))
@@ -697,9 +683,8 @@ final class GlucoseChartStateManager: ObservableObject {
         var chartPoints = [GlucoseChartPoint]()
         var previousBasalTreatment: CachedTreatment?
 
-        // If a temp basal expires before the next temp basal starts, fill the gap with scheduled
-        // basal points. This preserves the old manager's "continuous" basal model and prevents the
-        // rendered line from dropping out between enacted temp basal treatments.
+        // If a temp basal expires before the next one starts, fill the gap with scheduled basal
+        // points so the rendered line remains continuous.
         func addScheduledBasalPointsIfNeeded(isFirstEntry: Bool, previousBasalRate: Double, previousBasalEndDate: Date, nextBasalDate: Date?) {
             let scheduledStartDate = max(previousBasalEndDate, startDate)
             let scheduledEndDate = nextBasalDate ?? min(endDate, Date())

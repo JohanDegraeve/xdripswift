@@ -8,11 +8,7 @@
 
 import SwiftUI
 
-/// Shared SwiftUI colour palette for app-native views.
-///
-/// Older screens still use their historical constants. New SwiftUI migration work should use
-/// these semantic colours instead so that the app gradually moves towards one common visual
-/// language without making SwiftUI views depend on view-controller-era formatting constants.
+/// Shared semantic colour palette for the application interface.
 enum ConstantsAppColors {
 
     // MARK: - Base

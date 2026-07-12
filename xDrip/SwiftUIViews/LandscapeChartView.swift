@@ -10,10 +10,15 @@ import SwiftUI
 
 // MARK: - State Model
 
+/// Owns the selected day, chart cache and statistics used by the landscape Home presentation.
+///
+/// The same chart and statistics managers remain alive while the user moves between days, avoiding
+/// a new data stack for each SwiftUI body update.
 final class LandscapeChartStateModel: ObservableObject {
 
     // MARK: - TIR Data Structure
 
+    /// Time-in-range percentages calculated for one calendar day.
     struct DailyTIRData: Identifiable {
         let date: Date
         let lowPercentage: Double
@@ -59,6 +64,7 @@ final class LandscapeChartStateModel: ObservableObject {
 
     // MARK: - Configuration
 
+    /// Creates the managers once and loads the current landscape presentation.
     func configure(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager) {
         guard chartStateManager == nil else { return }
 
@@ -68,6 +74,7 @@ final class LandscapeChartStateModel: ObservableObject {
         refreshForDisplay()
     }
 
+    /// Resets the selected day to today when the landscape screen becomes visible.
     func refreshForDisplay() {
         guard chartStateManager != nil, statisticsManager != nil else { return }
 
@@ -291,6 +298,7 @@ final class LandscapeChartStateModel: ObservableObject {
 
 // MARK: - Main View
 
+/// Full-screen landscape Home view containing daily navigation, statistics and the glucose chart.
 struct LandscapeChartView: View {
 
     @ObservedObject var stateModel: LandscapeChartStateModel
@@ -392,6 +400,7 @@ struct LandscapeChartView: View {
 
 // MARK: - Glucose Chart
 
+/// Renders the selected day using the shared SwiftUI glucose chart.
 private struct LandscapeGlucoseChartView: View {
 
     let chartState: GlucoseChartState
@@ -452,6 +461,7 @@ private struct LandscapeGlucoseChartView: View {
 
 // MARK: - Statistics
 
+/// Selected-day statistics displayed beside the chart when enabled.
 private struct LandscapeStatisticsPanel: View {
 
     let state: RootHomeStatisticsState
@@ -500,6 +510,7 @@ private struct LandscapeStatisticsPanel: View {
 
 }
 
+/// One title and value pair in the landscape statistics panel.
 private struct LandscapeStatisticRow: View {
 
     let metric: RootHomeMetricState
@@ -536,6 +547,7 @@ private struct LandscapeStatisticRow: View {
 
 }
 
+/// Selected-day low, in-range and high percentages as a pie chart.
 private struct LandscapePieChartView: View {
 
     let low: Double
@@ -579,6 +591,7 @@ private struct LandscapePieChartView: View {
 
 }
 
+/// One percentage slice in the landscape time-in-range pie chart.
 private struct LandscapePieSlice: Shape {
 
     let startAngle: Angle
@@ -600,6 +613,7 @@ private struct LandscapePieSlice: Shape {
 
 // MARK: - TIR Chart
 
+/// Multi-day time-in-range bar chart used to select the day shown below.
 private struct LandscapeTIRChartView: View {
 
     let values: [LandscapeChartStateModel.DailyTIRData]
@@ -759,6 +773,7 @@ private struct LandscapeTIRChartView: View {
 
 }
 
+/// Stable dimensions shared by all bars, labels and gridlines in the TIR plot.
 private struct TIRLayout {
     let topPadding: CGFloat
     let bottomPadding: CGFloat

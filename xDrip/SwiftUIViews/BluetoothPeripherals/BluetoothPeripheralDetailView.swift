@@ -8,6 +8,7 @@
 
 import SwiftUI
 
+/// Native detail screen for an existing or newly configured Bluetooth peripheral.
 struct BluetoothPeripheralDetailView: View {
     @ObservedObject var state: BluetoothPeripheralDetailState
 
@@ -182,6 +183,7 @@ private extension BluetoothPeripheralConnectButtonTintColor {
     }
 }
 
+/// Current scan or connection state shown above the detail sections.
 private struct BluetoothPeripheralStatusBannerView: View {
     @ObservedObject var state: BluetoothPeripheralDetailState
 
@@ -213,6 +215,7 @@ private struct BluetoothPeripheralStatusBannerView: View {
     }
 }
 
+/// Section title and optional transmitter status indicator.
 private struct BluetoothPeripheralDetailSectionHeaderView: View {
     let section: BluetoothPeripheralDetailSection
 
@@ -243,6 +246,7 @@ private struct BluetoothPeripheralDetailSectionHeaderView: View {
     }
 }
 
+/// Native text-entry destination requested by a peripheral detail row.
 struct BluetoothPeripheralTextEntryView: View {
     let textEntry: BluetoothPeripheralTextEntry
     let close: () -> Void
@@ -316,6 +320,7 @@ struct BluetoothPeripheralTextEntryView: View {
     }
 }
 
+/// Native selection destination requested by a peripheral detail row.
 struct BluetoothPeripheralSelectionListView: View {
     let selectionList: BluetoothPeripheralSelectionList
     let close: () -> Void
@@ -363,6 +368,7 @@ struct BluetoothPeripheralSelectionListView: View {
     }
 }
 
+/// Renders the action, toggle, text, selection or information represented by one row model.
 private struct BluetoothPeripheralDetailRowView: View {
     let row: BluetoothPeripheralDetailRow
 

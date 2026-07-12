@@ -11,6 +11,10 @@ import SwiftUI
 import CoreData
 import OSLog
 
+/// Loads treatment snapshots and applies the selected day and persisted filters.
+///
+/// Core Data objects are converted to value snapshots before publication so the SwiftUI list does
+/// not retain managed objects while rows are filtered, edited or deleted.
 @MainActor final class TreatmentsViewModel: ObservableObject {
     // MARK: - @Published properties
 
@@ -48,6 +52,7 @@ import OSLog
 
     // MARK: - public functions
 
+    /// Performs the first load, or refreshes the existing model when the tab becomes visible again.
     func initializeViewIfNeeded() {
         if didInitializeView {
             reloadTreatments()
@@ -58,6 +63,7 @@ import OSLog
         reloadTreatments()
     }
 
+    /// Reloads the bounded treatment history and reapplies the current filters.
     func reloadTreatments() {
         syncFilterSettingsFromUserDefaults()
 
@@ -232,6 +238,7 @@ enum TreatmentEditorState: Identifiable {
     }
 }
 
+/// Immutable treatment data used by list rows and the treatment editor route.
 struct TreatmentSnapshot: Hashable {
     let objectID: NSManagedObjectID
     let date: Date

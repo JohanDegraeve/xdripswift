@@ -236,6 +236,9 @@ import AppIntents
         startServices()
     }
 
+    /// Recreates the established application manager graph after Core Data is ready, then publishes
+    /// only the references required by the SwiftUI root. This remains separate from view creation so
+    /// selecting or rebuilding a tab cannot restart application services.
     private func startServices() {
         
         // Run a quick check to see if the currently stored followerDataSourceType is now on the ignore list
@@ -1664,8 +1667,7 @@ import AppIntents
     
     /// helper function to calculate statistics and publish them into the SwiftUI home state
     /// - Parameters:
-    ///   - animate: kept in the signature while migration work is in progress, but SwiftUI updates
-    ///              currently replace values without the old UIKit pie-chart animation.
+    ///   - animate: requests animation where the current statistics presentation supports it
     ///   - overrideApplicationState: if true, it will update the statistics even if the app is, for example, in the background
     private func updateStatistics(animate: Bool = false, overrideApplicationState: Bool = false) {
         // don't calculate statis if app is not running in the foreground

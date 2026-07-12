@@ -9,6 +9,10 @@
 import SwiftUI
 import os
 
+/// Sensor summary and the start, stop and calibration workflows opened from Home.
+///
+/// Sensor and calibration changes are passed back to the application coordinator. The view only
+/// owns temporary form and confirmation state.
 struct SensorManagementView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
 
@@ -760,6 +764,7 @@ struct SensorManagementView: View {
     }
 }
 
+/// Complete value presentation derived from the current sensor and transmitter.
 private struct SensorManagementState {
     let hasTransmitter: Bool
     let bannerTitle: String
@@ -787,6 +792,7 @@ private struct SensorManagementState {
     let calibrationHistory: [SensorManagementCalibrationDisplay]
 }
 
+/// Parsed calibration input in display and mg/dL units.
 private struct SensorManagementEnteredBgValue {
     let rawValue: String
     let valueInMgDl: Double
@@ -796,6 +802,7 @@ private struct SensorManagementEnteredBgValue {
     }
 }
 
+/// One previous calibration displayed in the sensor summary.
 private struct SensorManagementCalibrationDisplay {
     let id: String
     let timeStamp: Date
@@ -820,6 +827,7 @@ private struct SensorManagementCalibrationDisplay {
     }
 }
 
+/// Transient result or validation message shown by the sensor workflow.
 private struct SensorManagementMessage: Identifiable {
     let id = UUID()
     let title: String

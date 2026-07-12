@@ -9,9 +9,14 @@
 import SwiftUI
 import UIKit
 
+// MARK: - Layout
+
+/// Layout values shared by the root tabs.
 private enum RootTabLayout {
     static let contentBottomPadding: CGFloat = 4
 }
+
+// MARK: - Presentation Requests
 
 /// Simple application alert requested by a manager or delegate callback.
 struct RootAlertRequest: Identifiable {
@@ -33,7 +38,12 @@ struct RootTextInputRequest: Identifiable {
     let action: (String) -> Void
 }
 
+// MARK: - Application Dependencies
+
 /// Services needed by the native SwiftUI tabs after application startup has completed.
+///
+/// The coordinator creates these services once. Keeping the references together prevents views
+/// from creating duplicate managers as the user changes tabs.
 struct RootTabDependencies {
     let coreDataManager: CoreDataManager
     let bgReadingsAccessor: BgReadingsAccessor
@@ -56,10 +66,11 @@ struct RootTabDependencies {
 
 /// Publishes existing application services to the SwiftUI tab hierarchy.
 ///
-/// RootApplicationCoordinator remains their owner during this migration phase. This state model only
-/// publishes references once asynchronous Core Data setup has completed; it never creates a
-/// second manager or mirrors service data.
+/// `RootApplicationCoordinator` owns the services. This state model publishes their references once
+/// asynchronous Core Data setup has completed; it never creates a second manager or mirrors data.
 @MainActor final class RootTabStateModel: ObservableObject {
+    // MARK: - Published State
+
     @Published private(set) var dependencies: RootTabDependencies?
     @Published private(set) var snoozeDismissalRequest = 0
     @Published var alertRequest: RootAlertRequest?
@@ -67,6 +78,8 @@ struct RootTabDependencies {
     @Published var textInput = ""
     @Published var pickerData: SnoozePickerData?
     weak var sensorProvider: ActiveSensorProviding?
+
+    // MARK: - Presentation
 
     func dismissSnooze() {
         snoozeDismissalRequest += 1
@@ -109,6 +122,9 @@ struct RootTabDependencies {
         pickerData = SnoozePickerData(pickerViewData)
     }
 
+    // MARK: - Configuration
+
+    /// Publishes the application services after asynchronous startup has completed.
     func configure(
         coreDataManager: CoreDataManager,
         bgReadingsAccessor: BgReadingsAccessor,
@@ -152,6 +168,8 @@ struct RootTabDependencies {
     }
 }
 
+// MARK: - Root Tabs
+
 /// Native SwiftUI owner for the app's root tabs and the navigation stack in each non-home tab.
 struct RootTabView: View {
     private enum Tab: Hashable {
@@ -167,6 +185,7 @@ struct RootTabView: View {
     private let applicationCoordinator: RootApplicationCoordinator
     private let tabTitles: RootTabTitles
 
+    /// Creates the permanent root view around the coordinator-owned state model.
     init(
         stateModel: RootTabStateModel,
         applicationCoordinator: RootApplicationCoordinator,
@@ -176,6 +195,8 @@ struct RootTabView: View {
         self.tabTitles = tabTitles
         _stateModel = StateObject(wrappedValue: stateModel)
     }
+
+    // MARK: - View
 
     var body: some View {
         ZStack {
@@ -278,12 +299,16 @@ struct RootTabView: View {
         }
     }
 
+    // MARK: - Tab Content
+
+    /// Builds the image and localized title used by the native tab bar.
     @ViewBuilder private func tabLabel(title: String, image: String) -> some View {
         Image(image)
             .renderingMode(.template)
         Text(title)
     }
 
+    /// Delays a tab's real content until the application services are ready.
     @ViewBuilder private func tabContent<Content: View>(
         @ViewBuilder content: (RootTabDependencies) -> Content
     ) -> some View {
@@ -300,8 +325,7 @@ struct RootTabView: View {
         }
     }
 
-    /// Only Home supports the optional landscape chart. The remaining tabs stay portrait just as
-    /// they did when their UIKit navigation controllers owned orientation policy.
+    /// Only Home supports the optional landscape chart. The remaining tabs stay portrait.
     private func updateSupportedOrientations(for tab: Tab) {
         let supportedOrientations: UIInterfaceOrientationMask
 
@@ -329,12 +353,9 @@ struct RootTabView: View {
     }
 }
 
-/// Switches the Home presentation at the SwiftUI level when the device rotates.
-///
-/// The previous implementation inserted a landscape child controller from RootViewController's
-/// trait callback. That conflicts with TabView layout because UIKit and SwiftUI then update the
-/// same tab hierarchy during one rotation. Keeping both presentations here gives rotation one
-/// owner and keeps the landscape screen contained inside the Home tab.
+// MARK: - Home Tab
+
+/// Switches between portrait and landscape Home content within the same tab hierarchy.
 private struct RootHomeTabView: View {
     @Environment(\.scenePhase) private var scenePhase
     private enum PresentedView: String, Identifiable {
@@ -355,6 +376,8 @@ private struct RootHomeTabView: View {
     let applicationCoordinator: RootApplicationCoordinator
     let dependencies: RootTabDependencies?
     let snoozeDismissalRequest: Int
+
+    // MARK: - View
 
     var body: some View {
         ZStack {
@@ -408,6 +431,9 @@ private struct RootHomeTabView: View {
         }
     }
 
+    // MARK: - Actions and Presentation
+
+    /// Connects Home commands to the sheets and screen-lock presentation owned by this tab.
     private func rootHomeActions(from dependencies: RootTabDependencies) -> RootHomeActions {
         var actions = dependencies.rootHomeActions
         actions.showSnooze = { presentedView = .snooze }
@@ -421,6 +447,7 @@ private struct RootHomeTabView: View {
         return actions
     }
 
+    /// Builds the sheet requested by a Home toolbar or status action.
     @ViewBuilder private func destinationView(_ presentedView: PresentedView) -> some View {
         if let dependencies {
             switch presentedView {
@@ -470,10 +497,9 @@ private struct RootHomeTabView: View {
     }
 }
 
-/// Covers the complete tab hierarchy while the full night screen lock is active.
-///
-/// The previous RootViewController added an intercepting UIView directly to the window. Keeping
-/// the overlay here gives SwiftUI one owner for both the visible lock state and tap-to-unlock.
+// MARK: - Screen Lock
+
+/// Covers the complete tab hierarchy while the full night screen lock is active and owns tap-to-unlock.
 private struct RootScreenLockOverlay: View {
     @ObservedObject var stateModel: RootHomeStateModel
     let unlock: () -> Void
@@ -493,8 +519,9 @@ private struct RootScreenLockOverlay: View {
     }
 }
 
-/// Observes Home presentation state so locking and unlocking can switch the landscape content
-/// immediately without relying on a UIKit rotation or view-controller callback.
+// MARK: - Landscape Home
+
+/// Observes Home state so locking and unlocking switch landscape content immediately.
 private struct RootHomeLandscapeView: View {
     @ObservedObject private var rootHomeStateModel: RootHomeStateModel
     private let coreDataManager: CoreDataManager
@@ -543,7 +570,9 @@ private struct RootHomeLandscapeValueView: View {
     }
 }
 
-/// Localized titles retained from the existing Main storyboard strings during the migration.
+// MARK: - Localized Titles
+
+/// Localized titles used by the root tab bar.
 struct RootTabTitles {
     let home: String
     let treatments: String

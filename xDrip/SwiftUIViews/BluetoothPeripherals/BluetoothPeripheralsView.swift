@@ -8,6 +8,8 @@
 
 import SwiftUI
 
+// MARK: - Navigation
+
 /// Native SwiftUI navigation owner for the Bluetooth tab.
 struct BluetoothPeripheralsNavigationView: View {
     @StateObject private var router: BluetoothPeripheralsRouter
@@ -102,6 +104,9 @@ private struct BluetoothPeripheralDetailContainerView: View {
     }
 }
 
+// MARK: - Peripheral List
+
+/// Lists configured peripherals and keeps their connection status current while visible.
 struct BluetoothPeripheralsView: View {
     @ObservedObject var viewModel: BluetoothPeripheralsViewModel
     @ObservedObject var router: BluetoothPeripheralsRouter
@@ -172,6 +177,9 @@ struct BluetoothPeripheralsView: View {
     }
 }
 
+// MARK: - Add Peripheral
+
+/// First add-peripheral step, selecting the required device category.
 struct BluetoothPeripheralCategorySelectionView: View {
     @ObservedObject var viewModel: BluetoothPeripheralsViewModel
     @ObservedObject var router: BluetoothPeripheralsRouter
@@ -222,6 +230,7 @@ struct BluetoothPeripheralCategorySelectionView: View {
 
 }
 
+/// Second add-peripheral step, selecting a supported peripheral type.
 struct BluetoothPeripheralTypeSelectionView: View {
     let category: BluetoothPeripheralCategory
 
@@ -289,6 +298,9 @@ struct BluetoothPeripheralTypeSelectionView: View {
     }
 }
 
+// MARK: - Rows
+
+/// Configured peripheral title, connection state and disclosure presentation.
 private struct BluetoothPeripheralListRowView: View {
     let row: BluetoothPeripheralListRow
 
@@ -331,6 +343,7 @@ private struct BluetoothPeripheralListRowView: View {
     }
 }
 
+/// Category heading and optional connected-peripheral summary.
 private struct BluetoothPeripheralSectionHeaderView: View {
     let section: BluetoothPeripheralsSection
 
@@ -396,6 +409,7 @@ private extension BluetoothPeripheralDisplayStatus {
     }
 }
 
+/// One selectable value used by peripheral detail configuration lists.
 private struct BluetoothPeripheralSelectionRow: View {
     let title: String
     let subtitle: String?

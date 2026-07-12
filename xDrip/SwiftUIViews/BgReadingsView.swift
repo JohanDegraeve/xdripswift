@@ -234,7 +234,7 @@ struct BgReadingsView: View {
     
     /// Returns the colour for the small dot shown beside each glucose reading.
     /// The reading still owns the range decision, while the SwiftUI row draws the
-    /// symbol instead of using the old emoji marker text.
+    /// symbol rather than storing a marker inside the text.
     private func bgRangeIndicatorColor(bgRangeDescription: BgRangeDescription) -> Color {
         switch bgRangeDescription {
         case .inRange:

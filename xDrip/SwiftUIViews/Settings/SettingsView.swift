@@ -10,26 +10,24 @@ import SwiftUI
 import UIKit
 import MessageUI
 
-// This file is the starting point for the SwiftUI Settings screen.
+// This file is the starting point for the Settings screen.
 //
 // The important idea is that the Settings menu is now built from small section
-// providers instead of directly from a table view. SettingsRootSection defines the
+// providers. SettingsRootSection defines the
 // order of the top-level Settings sections, and each case creates the view model
 // that owns that section. The view model then exposes its SwiftUI rows through
 // settingsRows(sectionID:), which should be near the top of the view model file so
 // the row order, row ids and visibility rules are easy to inspect.
 //
-// Most of the old Settings logic still lives in the existing view models. Row
-// titles, detail text, enabled state and tap actions can still come from the old
+// Stable Settings logic remains in the existing view models. Row titles, detail
+// text, enabled state and tap actions can come from the indexed
 // settingsRowText, detailedText, isEnabled and onRowSelect functions. The
-// nativeSettingsRow helper in SettingsSharedUtilities.swift adapts that existing
-// logic into a SwiftUI SettingsRow. This means we can rearrange and group the
-// Settings menu without rewriting stable feature logic unless we actually need to.
+// nativeSettingsRow helper adapts that logic into a SettingsRow.
 //
 // For new or changed sections, start by editing settingsRows(sectionID:) in the
 // relevant view model. Use nativeSettingsRow(...) when the existing row logic
-// should be reused. Use a full SettingsRow(...) when the row is now easier to
-// describe directly in SwiftUI, for example when it needs custom visibility,
+// should be reused. Use a full SettingsRow(...) when a row is easier to describe
+// directly, for example when it needs custom visibility,
 // indicators, colours, a toggle, a text-entry action or a child Settings screen.
 //
 // Grouped child screens should be opened with SettingsScreen and the
@@ -40,6 +38,10 @@ import MessageUI
 //
 // SettingsSharedUtilities.swift contains the shared row model, rendering code and
 // native navigation destinations used throughout the Settings flow.
+
+// MARK: - Navigation
+
+/// Owns the Settings navigation path and the system sheets requested by settings actions.
 struct SettingsNavigationView: View {
     @StateObject private var router: SettingsRouter
     @StateObject private var presenter: SettingsActionPresenter
@@ -174,6 +176,7 @@ struct SettingsNavigationView: View {
     }
 }
 
+/// Creates a fresh list model for one grouped child Settings screen.
 private struct SettingsScreenDestinationView: View {
     @StateObject private var listModel: SettingsListModel
     @ObservedObject private var presenter: SettingsActionPresenter
@@ -201,6 +204,9 @@ private struct SettingsScreenDestinationView: View {
     }
 }
 
+// MARK: - Native Destinations
+
+/// Bridges the existing alert-type manager into its native SwiftUI destination.
 private struct NativeAlertTypesSettingsView: View {
     @StateObject private var viewModel: AlertTypesSettingsViewModel
     @ObservedObject private var router: SettingsRouter
@@ -218,6 +224,7 @@ private struct NativeAlertTypesSettingsView: View {
     }
 }
 
+/// Bridges the existing alert manager into its native SwiftUI destination.
 private struct NativeAlertsSettingsView: View {
     @StateObject private var viewModel: AlertsSettingsViewModel
     @ObservedObject private var router: SettingsRouter
@@ -239,6 +246,9 @@ private struct NativeAlertsSettingsView: View {
     }
 }
 
+// MARK: - System Presentation
+
+/// Blocks Settings interaction while an existing settings action reports progress.
 private struct SettingsProgressView: View {
     let progress: Float
 
@@ -254,6 +264,7 @@ private struct SettingsProgressView: View {
     }
 }
 
+/// SwiftUI adapter for the system share sheet, which has no native SwiftUI equivalent.
 private struct SettingsShareSheet: UIViewControllerRepresentable {
     let url: URL
 
@@ -264,6 +275,7 @@ private struct SettingsShareSheet: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
 }
 
+/// SwiftUI adapter for the system mail composer used to send trace files.
 private struct SettingsTraceMailView: UIViewControllerRepresentable {
     @Binding var isPresented: Bool
     let onFailure: () -> Void
@@ -324,6 +336,9 @@ private struct SettingsTraceMailView: UIViewControllerRepresentable {
     }
 }
 
+// MARK: - Root Settings View
+
+/// Displays the root Settings sections supplied by `SettingsListModel`.
 struct SettingsView: View {
     @Environment(\.openURL) private var openURL
     @ObservedObject var listModel: SettingsListModel
@@ -419,9 +434,7 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
         }
     }
 
-    /// Creates the old Settings section view model for this SwiftUI section.
-    /// The SwiftUI list still asks these view models for row text, detail text,
-    /// enabled state and row actions so the existing Settings logic stays in place.
+    /// Creates the Settings view model for this root section.
     func viewModel(coreDataManager: CoreDataManager?) -> SettingsViewModelProtocol {
         switch self {
         case .dataSource:
@@ -462,9 +475,7 @@ struct SettingsGroupedRow {
     let settingsScreen: () -> SettingsScreen
 }
 
-/// SettingsViewGroupedSettingsViewModel creates the new parent sections in the
-/// Settings menu. Each row opens a child SettingsScreen made from existing
-/// section providers, so the old feature logic stays in the original view model.
+/// Creates parent Settings sections whose rows open grouped child sections.
 struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, SettingsNativeSectionProvider {
     private let title: String
     private let rows: [SettingsGroupedRow]
@@ -724,8 +735,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
 
 @MainActor
 enum SettingsListFactory {
-    /// Builds the main Settings sections and wires each old view model into the
-    /// SwiftUI presenter before the list is shown.
+    /// Builds the root Settings sections and connects each view model to the presenter.
     static func makeRootSections(
         coreDataManager: CoreDataManager?,
         presenter: SettingsActionPresenter
@@ -751,8 +761,7 @@ enum SettingsListFactory {
         }
     }
 
-    /// Builds the M5Stack child sections using the same old view model bridge as
-    /// the main Settings list.
+    /// Builds the M5Stack child sections from their existing section providers.
     static func makeM5StackSections(presenter: SettingsActionPresenter) -> [SettingsSectionModel] {
         M5StackSettingsSection.allCases.map { section in
             let viewModel = section.viewModel(coreDataManager: nil)
@@ -784,9 +793,7 @@ enum SettingsListFactory {
         }
     }
 
-    /// Connects callbacks from the old Settings view models to the SwiftUI presenter.
-    /// This replaces the old table view reload/message calls with SwiftUI refreshes
-    /// and SwiftUI alerts.
+    /// Connects view-model message and row-reload callbacks to the Settings presenter.
     static func configure(viewModel: SettingsViewModelProtocol, presenter: SettingsActionPresenter) {
         viewModel.storeMessageHandler { title, message in
             DispatchQueue.main.async {
@@ -813,7 +820,7 @@ enum M5StackSettingsSection: Int, CaseIterable, SettingsProtocol {
     case wifi
     case bluetooth
 
-    /// Creates the old M5Stack Settings view model for the selected subsection.
+    /// Creates the M5Stack Settings view model for the selected subsection.
     /// The unused Core Data parameter is kept so this enum still matches SettingsProtocol.
     func viewModel(coreDataManager: CoreDataManager?) -> SettingsViewModelProtocol {
         switch self {

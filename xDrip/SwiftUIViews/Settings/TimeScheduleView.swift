@@ -8,9 +8,7 @@
 
 import SwiftUI
 
-// This is the SwiftUI version of the schedule editor used by several Settings
-// options. It keeps the existing TimeSchedule storage logic, but presents the
-// list and time picker using the same pushed Settings screens as the rest of the migration.
+// Schedule editor used by Settings options that store one or more daily times.
 final class TimeScheduleViewModel: ObservableObject {
     @Published var schedule: [Int]
     @Published var datePicker: SettingsDatePickerContent?
@@ -63,8 +61,7 @@ final class TimeScheduleViewModel: ObservableObject {
     }
 
     /// Builds the shared pushed date picker content for adding or editing a
-    /// schedule transition. The old flow used a modal picker; this keeps the same
-    /// limits and save/delete behaviour in SwiftUI.
+    /// schedule transition with the required limits and save/delete behavior.
     private func showTimePicker(minimumStart: Int, maximumStart: Int, indexInSchedule: Int?) {
         let midnight = Date().toMidnight()
         let selectedMinutes = indexInSchedule.map { schedule[$0] } ?? minimumStart + 1
