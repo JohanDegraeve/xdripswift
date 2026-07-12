@@ -1,6 +1,5 @@
 import Foundation
 import SwiftUI
-import UIKit
 
 enum ConstantsAlerts {
     
@@ -14,10 +13,10 @@ enum ConstantsAlerts {
     
     // Snooze all
     /// the snooze all banner background color when not activated
-    static let bannerBackgroundColorWhenNotAllSnoozed = UIColor(red: 0.2, green: 0.2, blue: 0.2, alpha: 1)
+    static let bannerBackgroundColorWhenNotAllSnoozed = Color(white: 0.2)
     
     /// the snooze all banner text color when not activated
-    static let bannerTextColorWhenNotAllSnoozed = UIColor.gray
+    static let bannerTextColorWhenNotAllSnoozed = Color.gray
     
     /// the symbol used to indicate a disabled alert type - basically indicating that "no alarm will happen"
     static let disabledAlertSymbol = "\u{26A0}"

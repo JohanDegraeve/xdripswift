@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import UIKit
 import SwiftUI
 
 /// Holds and returns the different parameters used for creating the newer (2024) SwiftUI glucose charts.

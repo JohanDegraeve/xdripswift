@@ -1,6 +1,5 @@
 /// constants for home view, ie first view
 
-import UIKit
 import SwiftUI
 
 enum ConstantsHomeView {
@@ -56,27 +55,18 @@ enum ConstantsHomeView {
     /// how many seconds the Nightscout URL (if displayed in the data source info view) should be hidden when double tapped
     static let hideUrlDuringTimeInSeconds: Int = 10
     
-    /// progress view
-    static let sensorProgressViewProgressColorInitial: UIColor = .white
-    static let sensorProgressViewProgressColor: UIColor = .gray
-    static let sensorProgressViewTrackingColor: UIColor = UIColor(white: 0.15, alpha: 1.0)
-    
     /// warning time left / colour
     static let sensorProgressViewWarningInMinutes: Double = 60 * 24.0 // 24 hours before the sensor reaches max age
-    static let sensorProgressViewProgressColorWarning: UIColor = .yellow
     static let sensorProgressViewProgressColorWarningSwiftUI: Color = .yellow
     
     /// urgent time left / colour
     static let sensorProgressViewUrgentInMinutes: Double = 60 * 12.0 // 12 hours before the sensor reaches max age
-    static let sensorProgressViewProgressColorUrgent: UIColor = .orange
     static let sensorProgressViewProgressColorUrgentSwiftUI: Color = .orange
     
     /// colour for an expired sensor
-    static let sensorProgressExpired: UIColor = .red
     static let sensorProgressExpiredSwiftUI: Color = .red
     
     /// colour for an normal text
-    static let sensorProgressNormalTextColor: UIColor = .lightGray
     static let sensorProgressNormalTextColorSwiftUI: Color = .white
     static let sensorProgressViewNormalColorSwiftUI: Color = .gray
     

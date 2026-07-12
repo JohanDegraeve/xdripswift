@@ -139,8 +139,8 @@ struct SnoozeView: View {
     @Published private(set) var rows: [Row] = []
     @Published private(set) var snoozeAllSwitchIsOn = false
     @Published private(set) var bannerText = Texts_HomeView.snoozeAllDisabled
-    @Published private(set) var bannerTextColor = Color(ConstantsAlerts.bannerTextColorWhenNotAllSnoozed)
-    @Published private(set) var bannerBackgroundColor = Color(ConstantsAlerts.bannerBackgroundColorWhenNotAllSnoozed)
+    @Published private(set) var bannerTextColor = ConstantsAlerts.bannerTextColorWhenNotAllSnoozed
+    @Published private(set) var bannerBackgroundColor = ConstantsAlerts.bannerBackgroundColorWhenNotAllSnoozed
     @Published private(set) var showAllSnoozedImage = false
     @Published var pickerData: SnoozePickerData?
     
@@ -172,13 +172,13 @@ struct SnoozeView: View {
             snoozeAllSwitchIsOn = false
             bannerText = Texts_HomeView.snoozeUrgentAlarms
             bannerTextColor = .red
-            bannerBackgroundColor = Color(ConstantsAlerts.bannerBackgroundColorWhenNotAllSnoozed)
+            bannerBackgroundColor = ConstantsAlerts.bannerBackgroundColorWhenNotAllSnoozed
         case .inactive, .notUrgent:
             UserDefaults.standard.snoozeAllAlertsFromDate = nil
             snoozeAllSwitchIsOn = false
             bannerText = Texts_HomeView.snoozeAllDisabled
-            bannerTextColor = Color(ConstantsAlerts.bannerTextColorWhenNotAllSnoozed)
-            bannerBackgroundColor = Color(ConstantsAlerts.bannerBackgroundColorWhenNotAllSnoozed)
+            bannerTextColor = ConstantsAlerts.bannerTextColorWhenNotAllSnoozed
+            bannerBackgroundColor = ConstantsAlerts.bannerBackgroundColorWhenNotAllSnoozed
         }
         
         showAllSnoozedImage = snoozeStatus == .allSnoozed

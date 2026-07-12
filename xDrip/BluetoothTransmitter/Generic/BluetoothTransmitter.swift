@@ -1,7 +1,6 @@
 import Foundation
 import CoreBluetooth
 import os
-import UIKit
 
 /// Generic bluetoothtransmitter class that handles scanning, connect, discover services, discover characteristics, subscribe to receive characteristic, reconnect. This class is a base class for specific type of transmitters.
 ///
