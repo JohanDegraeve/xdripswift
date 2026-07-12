@@ -142,6 +142,11 @@ class ContactImageManager: NSObject {
                 // create an 'empty' image view if there is no BG data to show
                 contactImageView = ContactImageRenderer(bgValue: 0, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: "", bgRangeDescription: .inRange, valueIsUpToDate: false, useHighContrastContactImage: false, disableContactImage:  disableContactImage)
             }
+
+            guard let contactImageData = MainActor.assumeIsolated({ contactImageView.pngData() }) else {
+                trace("in updateContact, failed to render contact image data", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error)
+                return
+            }
             
             // we're going to use the app name as the given name of the contact we want to use/create/update
             let keyToFetch = [CNContactGivenNameKey, CNContactFamilyNameKey, CNContactOrganizationNameKey, CNContactImageDataKey] as [CNKeyDescriptor]
@@ -167,7 +172,7 @@ class ContactImageManager: NSObject {
 
                     let saveRequest = CNSaveRequest()
                     guard let mutableContact = identifierMatchedContact.mutableCopy() as? CNMutableContact else { return }
-                    mutableContact.imageData = contactImageView.getImage().pngData()
+                    mutableContact.imageData = contactImageData
                     mutableContact.organizationName = updatedString
                     saveRequest.update(mutableContact)
                     self.executeSaveRequest(saveRequest: saveRequest)
@@ -197,7 +202,7 @@ class ContactImageManager: NSObject {
                 let saveRequest = CNSaveRequest()
 
                 guard let mutableContact = nameMatchedContact.mutableCopy() as? CNMutableContact else { return }
-                mutableContact.imageData = contactImageView.getImage().pngData()
+                mutableContact.imageData = contactImageData
                 mutableContact.organizationName = updatedString
                 saveRequest.update(mutableContact)
 
@@ -218,7 +223,7 @@ class ContactImageManager: NSObject {
 
             let contactToCreate = CNMutableContact()
             contactToCreate.givenName = ConstantsHomeView.applicationName
-            contactToCreate.imageData = contactImageView.getImage().pngData()
+            contactToCreate.imageData = contactImageData
             contactToCreate.organizationName = updatedString
 
             let saveRequest = CNSaveRequest()

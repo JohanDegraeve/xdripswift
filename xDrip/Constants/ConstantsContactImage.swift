@@ -7,17 +7,16 @@
 //
 
 import Foundation
-import UIKit
+import SwiftUI
 
 enum ConstantsContactImage {
     
-    // Contact images are rendered as UIImages for the Contacts framework. These values mirror the
-    // standard SwiftUI chart colours while remaining in the bitmap renderer's native colour type.
-    static let inRangeColor = UIColor.green
-    static let notUrgentColor = UIColor.yellow
-    static let urgentColor = UIColor.red
+    // Contact images use the same semantic range colors as the application interface.
+    static let inRangeColor = ConstantsAppColors.normal
+    static let notUrgentColor = ConstantsAppColors.warning
+    static let urgentColor = ConstantsAppColors.urgent
     
-    static let unknownColor = UIColor.gray
+    static let unknownColor = ConstantsAppColors.disabledText
     
     /// the vertical offset of the bg value if the slope arrow is present (bigger number is higher)
     static let bgValueVerticalOffsetIfSlopeArrow: Double = 1.5

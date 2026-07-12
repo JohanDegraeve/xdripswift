@@ -7,9 +7,11 @@
 //
 
 import Foundation
-import UIKit
+import ImageIO
+import SwiftUI
+import UniformTypeIdentifiers
 
-struct ContactImageRenderer {
+struct ContactImageRenderer: View {
     
     // public vars that need to be initialized when creating an instance of the view
     var bgValue: Double
@@ -20,13 +22,9 @@ struct ContactImageRenderer {
     var useHighContrastContactImage: Bool
     var disableContactImage: Bool
 
-    var uiImage: UIImage {
-        return getImage()
-    }
-    
-    var bgColor: UIColor {
+    private var bgColor: Color {
         if disableContactImage {
-            return useHighContrastContactImage ? .white : .systemCyan
+            return useHighContrastContactImage ? .white : .cyan
         }
         
         guard bgValue > 0, valueIsUpToDate else { return ConstantsContactImage.unknownColor }
@@ -48,7 +46,7 @@ struct ContactImageRenderer {
         }
     }
     
-    var bgValueFont: UIFont {
+    private var bgValueFontSize: CGFloat {
         var fontSize: CGFloat = 100
         let showSlopeArrow: Bool = (valueIsUpToDate && slopeArrow != "") ? true : false
         
@@ -76,77 +74,80 @@ struct ContactImageRenderer {
             fontSize = 100
         }
         
-        return UIFont.systemFont(ofSize: fontSize, weight: .bold)
+        return fontSize
     }
 
-    var imageBackgroundColor: UIColor {
-        .black
-    }
-    
-    func getImage() -> UIImage {
-        let width = 256.0
-        let height = 256.0
-        let rect = CGRect(x: 0, y: 0, width: width, height: height)
-        
+    private var content: (value: String, showsSlopeArrow: Bool) {
         // if there is no current value, 0 will be received so show this as a relevant "---" string
         var bgValueString: String = bgValue > 0 ? bgValue.mgDlToMmolAndToString(mgDl: isMgDl) : isMgDl ? "---" : "-.-"
-        
         var showSlopeArrow: Bool = (valueIsUpToDate && slopeArrow != "") ? true : false
-        
+
         // override the value and slope if the user is in follower mode and has disabled the keep-alive (to prevent showing an almost always out of date value)
         if disableContactImage {
             bgValueString = "OFF"
             showSlopeArrow = false
         }
-        
-        let bgValueAttributes: [NSAttributedString.Key : Any] = [
-            .font : bgValueFont,
-            .foregroundColor: bgColor,
-            .tracking : -0.025, // "tight"
-        ]
-        
-        let slopeArrowAttributes: [NSAttributedString.Key : Any] = [
-            .font: UIFont.systemFont(ofSize: 80, weight: .bold),
-            .foregroundColor: bgColor,
-        ]
 
-        let format = UIGraphicsImageRendererFormat.default()
-        format.opaque = true
-        format.scale = 1
+        return (bgValueString, showSlopeArrow)
+    }
 
-        let renderer = UIGraphicsImageRenderer(size: rect.size, format: format)
+    var body: some View {
+        let content = content
 
-        return renderer.image { _ in
-            imageBackgroundColor.setFill()
-            UIRectFill(rect)
+        Canvas { context, size in
+            context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(.black))
 
-            if bgValueString != "" {
-                var size = bgValueString.size(withAttributes: bgValueAttributes)
+            guard !content.value.isEmpty else { return }
 
-                bgValueString.draw(
-                    in: CGRectMake(
-                        (width - size.width) / 2,
-                        (height - size.height) / (showSlopeArrow ? 2 + ConstantsContactImage.bgValueVerticalOffsetIfSlopeArrow : 2),
-                        size.width,
-                        size.height
-                    ),
-                    withAttributes: bgValueAttributes
+            let value = context.resolve(
+                Text(content.value)
+                    .font(.system(size: bgValueFontSize, weight: .bold))
+                    .foregroundColor(bgColor)
+                    .tracking(-0.025)
+            )
+            let valueSize = value.measure(in: size)
+            let valueOriginY = (size.height - valueSize.height) / (content.showsSlopeArrow ? 2 + ConstantsContactImage.bgValueVerticalOffsetIfSlopeArrow : 2)
+
+            context.draw(
+                value,
+                at: CGPoint(x: size.width / 2, y: valueOriginY + valueSize.height / 2),
+                anchor: .center
+            )
+
+            if content.showsSlopeArrow {
+                let arrow = context.resolve(
+                    Text(slopeArrow)
+                        .font(.system(size: 80, weight: .bold))
+                        .foregroundColor(bgColor)
                 )
+                let arrowSize = arrow.measure(in: size)
+                let arrowOriginY = (size.height - arrowSize.height) / (2 + ConstantsContactImage.slopeArrowVerticalOffset)
 
-                if showSlopeArrow {
-                    size = slopeArrow.size(withAttributes: slopeArrowAttributes)
-
-                    slopeArrow.draw(
-                        in: CGRectMake(
-                            (width - size.width) / 2,
-                            (height - size.height) / (2 + ConstantsContactImage.slopeArrowVerticalOffset),
-                            size.width,
-                            size.height
-                        ),
-                        withAttributes: slopeArrowAttributes
-                    )
-                }
+                context.draw(
+                    arrow,
+                    at: CGPoint(x: size.width / 2, y: arrowOriginY + arrowSize.height / 2),
+                    anchor: .center
+                )
             }
         }
+        .frame(width: 256, height: 256)
+    }
+
+    /// Renders the contact image directly to PNG data without creating a UIKit image.
+    @MainActor
+    func pngData() -> Data? {
+        let renderer = ImageRenderer(content: self)
+        renderer.scale = 1
+
+        guard let cgImage = renderer.cgImage else { return nil }
+
+        let imageData = NSMutableData()
+        guard let destination = CGImageDestinationCreateWithData(imageData, UTType.png.identifier as CFString, 1, nil) else { return nil }
+
+        CGImageDestinationAddImage(destination, cgImage, nil)
+
+        guard CGImageDestinationFinalize(destination) else { return nil }
+
+        return imageData as Data
     }
 }
