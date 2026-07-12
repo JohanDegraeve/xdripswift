@@ -36,6 +36,9 @@ final class GlucoseChartScrollCoordinator: ObservableObject {
     private var dragLastTranslationWidth: CGFloat?
     private var dragLastUpdateDate: Date?
     private var dragVelocityWidth: CGFloat = 0
+    /// Captures the main chart's end date once per mini-chart drag so every update remains relative
+    /// to the same starting window rather than accumulating translations.
+    private var overviewDragStartEndDate: Date?
     private var decelerationTimer: Timer?
 
     private static let minimumDecelerationVelocityWidth: CGFloat = 20
@@ -71,6 +74,7 @@ final class GlucoseChartScrollCoordinator: ObservableObject {
     /// Updates the visible duration while preserving the current end date.
     func setVisibleTimeInterval(_ visibleTimeInterval: TimeInterval) {
         stopDeceleration()
+        overviewDragStartEndDate = nil
         self.visibleTimeInterval = abs(visibleTimeInterval)
     }
 
@@ -79,6 +83,7 @@ final class GlucoseChartScrollCoordinator: ObservableObject {
         stopDeceleration()
         publishEndDate(Date(), force: true)
         dragStartEndDate = nil
+        overviewDragStartEndDate = nil
         resetDragTracking()
     }
 
@@ -96,6 +101,7 @@ final class GlucoseChartScrollCoordinator: ObservableObject {
     func updateVisibleRange(value: DragGesture.Value, chartWidth: CGFloat) {
         // A new touch stops any in-flight deceleration immediately.
         stopDeceleration()
+        overviewDragStartEndDate = nil
         updateDragVelocity(translationWidth: value.translation.width, date: value.time)
         updateVisibleRange(translationWidth: value.translation.width, chartWidth: chartWidth, forcePublish: false)
     }
@@ -110,6 +116,29 @@ final class GlucoseChartScrollCoordinator: ObservableObject {
 
         resetDragTracking()
         startDeceleration(velocityWidth: velocityWidth, chartWidth: chartWidth)
+    }
+
+    /// Moves the visible window directly within a fixed overview chart.
+    ///
+    /// Unlike the main-chart gesture, the overview itself does not scroll: the drag moves its
+    /// active-window selection in the same direction as the user's finger.
+    func updateVisibleRangeFromOverview(value: DragGesture.Value, overviewStartDate: Date, overviewEndDate: Date, chartWidth: CGFloat) {
+        stopDeceleration()
+
+        let baseEndDate = overviewDragStartEndDate ?? endDate
+        let overviewTimeInterval = max(overviewEndDate.timeIntervalSince(overviewStartDate), 0)
+        let secondsPerPoint = overviewTimeInterval / max(Double(chartWidth), 1)
+        let proposedEndDate = baseEndDate.addingTimeInterval(Double(value.translation.width) * secondsPerPoint)
+
+        overviewDragStartEndDate = baseEndDate
+        let clampedEndDate = clampedOverviewEndDate(proposedEndDate, overviewStartDate: overviewStartDate, overviewEndDate: overviewEndDate)
+        publishEndDate(clampedEndDate, minimumTimeInterval: secondsPerPoint * Double(Self.minimumPublishDistanceWidth))
+    }
+
+    /// Applies the final overview translation and ends direct manipulation without inertia.
+    func finishUpdatingVisibleRangeFromOverview(value: DragGesture.Value, overviewStartDate: Date, overviewEndDate: Date, chartWidth: CGFloat) {
+        updateVisibleRangeFromOverview(value: value, overviewStartDate: overviewStartDate, overviewEndDate: overviewEndDate, chartWidth: chartWidth)
+        overviewDragStartEndDate = nil
     }
 
     // MARK: - Deceleration
@@ -129,6 +158,17 @@ final class GlucoseChartScrollCoordinator: ObservableObject {
 
         dragStartEndDate = baseEndDate
         publishEndDate(clampedEndDate, minimumTimeInterval: secondsPerPoint * Double(Self.minimumPublishDistanceWidth), force: forcePublish)
+    }
+
+    private func clampedOverviewEndDate(_ proposedEndDate: Date, overviewStartDate: Date, overviewEndDate: Date) -> Date {
+        let latestEndDate = min(overviewEndDate, Date())
+        // The end date cannot move so far left that the main chart's fixed-width window extends
+        // beyond the overview's leading edge.
+        let earliestEndDate = overviewStartDate.addingTimeInterval(visibleTimeInterval)
+
+        guard earliestEndDate <= latestEndDate else { return latestEndDate }
+
+        return min(max(proposedEndDate, earliestEndDate), latestEndDate)
     }
 
     private func updateDragVelocity(translationWidth: CGFloat, date: Date) {

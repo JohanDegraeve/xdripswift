@@ -255,6 +255,11 @@ struct RootHomeView: View {
                     RootHomeMiniChartView(
                         miniChartHoursToShow: miniChartHoursToShowForChart,
                         chartState: miniChartState,
+                        scrollCoordinator: scrollCoordinator,
+                        updateChartStateIfNeeded: requestChartStateIfNeeded,
+                        finishChartScroll: {
+                            requestChartState(forceReset: false, showsLoading: false)
+                        },
                         cycleMiniChartHoursToShow: cycleMiniChartHoursToShow
                     )
                     .frame(height: Layout.miniChartHeight)
@@ -841,7 +846,13 @@ private struct RootHomeMainChartView: View {
 private struct RootHomeMiniChartView: View {
     let miniChartHoursToShow: Double
     let chartState: GlucoseChartState
+    let scrollCoordinator: GlucoseChartScrollCoordinator
+    let updateChartStateIfNeeded: () -> Void
+    let finishChartScroll: () -> Void
     let cycleMiniChartHoursToShow: () -> Void
+    /// `nil` until a new drag is classified. The result is then held for the whole gesture because
+    /// the active window moves away from its original touch point during a valid drag.
+    @State private var activeWindowDragIsEnabled: Bool?
 
     var body: some View {
         GeometryReader { geometry in
@@ -866,9 +877,66 @@ private struct RootHomeMiniChartView: View {
                 transaction.animation = nil
             }
             .contentShape(Rectangle())
-            .onTapGesture(count: 2, perform: cycleMiniChartHoursToShow)
+            // Treat the fixed mini-chart as a scrubber: moving its active window updates the shared
+            // coordinator and therefore the main chart, while the overview data stays stationary.
+            .gesture(
+                DragGesture(minimumDistance: 5)
+                    .onChanged { value in
+                        if activeWindowDragIsEnabled == nil {
+                            activeWindowDragIsEnabled = activeWindowContains(xPosition: value.startLocation.x, chartWidth: geometry.size.width)
+                        }
+
+                        guard activeWindowDragIsEnabled == true else { return }
+
+                        scrollCoordinator.updateVisibleRangeFromOverview(
+                            value: value,
+                            overviewStartDate: chartState.startDate,
+                            overviewEndDate: chartState.endDate,
+                            chartWidth: geometry.size.width
+                        )
+                        updateChartStateIfNeeded()
+                    }
+                    .onEnded { value in
+                        let shouldFinishDrag = activeWindowDragIsEnabled ?? activeWindowContains(xPosition: value.startLocation.x, chartWidth: geometry.size.width)
+                        activeWindowDragIsEnabled = nil
+
+                        guard shouldFinishDrag else { return }
+
+                        scrollCoordinator.finishUpdatingVisibleRangeFromOverview(
+                            value: value,
+                            overviewStartDate: chartState.startDate,
+                            overviewEndDate: chartState.endDate,
+                            chartWidth: geometry.size.width
+                        )
+                        finishChartScroll()
+                    }
+            )
+            .simultaneousGesture(TapGesture(count: 2).onEnded(cycleMiniChartHoursToShow))
             .clipped()
         }
+    }
+
+    /// Converts the active window's dates into the fixed mini-chart's horizontal coordinate space.
+    private func activeWindowContains(xPosition: CGFloat, chartWidth: CGFloat) -> Bool {
+        guard chartWidth > 0,
+              let activeWindowStartDate = chartState.overlayWindowStartDate,
+              let activeWindowEndDate = chartState.overlayWindowEndDate,
+              activeWindowStartDate < activeWindowEndDate else {
+            return false
+        }
+
+        let overviewStartDate = chartState.startDate
+        let overviewEndDate = chartState.endDate
+        let overviewTimeInterval = overviewEndDate.timeIntervalSince(overviewStartDate)
+        let visibleActiveStartDate = max(activeWindowStartDate, overviewStartDate)
+        let visibleActiveEndDate = min(activeWindowEndDate, overviewEndDate)
+
+        guard overviewTimeInterval > 0, visibleActiveStartDate < visibleActiveEndDate else { return false }
+
+        let activeStartX = CGFloat(visibleActiveStartDate.timeIntervalSince(overviewStartDate) / overviewTimeInterval) * chartWidth
+        let activeEndX = CGFloat(visibleActiveEndDate.timeIntervalSince(overviewStartDate) / overviewTimeInterval) * chartWidth
+
+        return xPosition >= activeStartX && xPosition <= activeEndX
     }
 }
 
