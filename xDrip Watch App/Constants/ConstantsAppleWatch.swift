@@ -50,6 +50,17 @@ enum ConstantsAppleWatch {
         return 0
         #endif
     }
+
+    // return the physical screen height so the watch app can size layouts across different watch models
+    static func screenHeight() -> Double {
+        #if canImport(WatchKit)
+        return WKInterfaceDevice.current().screenBounds.size.height
+        #elseif canImport(UIKit)
+        return UIScreen.main.bounds.size.height
+        #else
+        return 0
+        #endif
+    }
     
     static func isSmallScreen() -> Bool {
         return screenWidth() < pixelWidthLimitForSmallScreen

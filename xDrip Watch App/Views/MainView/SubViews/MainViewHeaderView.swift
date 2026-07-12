@@ -23,11 +23,14 @@ struct MainViewHeaderView: View {
             Text("\(watchState.bgValueStringInUserChosenUnit())\(watchState.trendArrow())")
                 .font(.system(size: isSmallScreen ? 40 : 50)).fontWeight(.semibold)
                 .foregroundStyle(watchState.bgTextColor())
-                .scaledToFill()
+                // let large BG values and double trend arrows shrink before they truncate
                 .minimumScaleFactor(0.5)
+                .allowsTightening(true)
                 .lineLimit(1)
+                .layoutPriority(1)
+                .scaleEffect(textScaleValue)
             
-            Spacer()
+            Spacer(minLength: 2)
             
             VStack(alignment: .trailing, spacing: 0) {
                 Spacer()
@@ -35,6 +38,9 @@ struct MainViewHeaderView: View {
                 Text(watchState.deltaChangeStringInUserChosenUnit())
                     .font(.system(size: isSmallScreen ? 24 : 28)).fontWeight(.semibold)
                     .lineLimit(1)
+                    // the delta is less important than the BG value but should still stay readable
+                    .minimumScaleFactor(0.65)
+                    .allowsTightening(true)
                     .padding(.bottom, isSmallScreen ? -5 : -6)
                 
                 Text(watchState.bgUnitString())
@@ -43,7 +49,6 @@ struct MainViewHeaderView: View {
                     .lineLimit(1)
             }
         }
-        .scaleEffect(textScaleValue)
         .padding(.trailing, 10)
         .animation(.easeOut(duration: 0.3), value: textScaleValue)
         .onChange(of: watchState.bgValueStringInUserChosenUnit()) { oldState, newState in
