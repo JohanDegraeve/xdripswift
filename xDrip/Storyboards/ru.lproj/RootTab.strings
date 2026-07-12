@@ -1,0 +1,5 @@
+/* Root tab titles. */
+"rootTab.home" = "Домой";
+"rootTab.treatments" = "Терапия";
+"rootTab.bluetooth" = "Bluetooth";
+"rootTab.settings" = "Настройки";
