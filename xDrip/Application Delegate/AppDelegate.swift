@@ -9,7 +9,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     private let quickActionsManager = QuickActionsManager()
     
     /// Orientations currently allowed by the active SwiftUI tab.
-    static var supportedOrientations: UIInterfaceOrientationMask = .all
+    static var supportedOrientations: UIInterfaceOrientationMask = .portrait
     
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryAppDelegate)
     

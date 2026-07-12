@@ -472,7 +472,11 @@ final class AlertEntryEditorViewModel: ObservableObject {
     }
 
     private var alertKindValue: AlertKind {
-        AlertSettingsViewControllerData.getAlertKind(alertKind: alertKind)
+        guard let alertKindValue = AlertKind(rawValue: Int(alertKind)) else {
+            fatalError("AlertEntryEditorState could not create AlertKind from the stored value")
+        }
+
+        return alertKindValue
     }
 
     /// Compares the current editor state with the original alarm so toolbar buttons

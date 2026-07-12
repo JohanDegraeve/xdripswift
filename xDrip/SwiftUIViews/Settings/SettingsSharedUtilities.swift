@@ -10,6 +10,32 @@ import SwiftUI
 import UIKit
 import MessageUI
 
+/// Progress reported by long-running settings actions such as exporting stored data.
+struct ProgressBarStatus<T> {
+    let complete: Bool
+    let progress: Float
+    let data: T?
+
+    init(complete: Bool, progress: Float, data: T?) {
+        self.complete = complete
+        self.progress = progress
+        self.data = data
+    }
+
+    init(progress: Float) {
+        self.complete = progress >= 1
+        self.progress = progress
+        self.data = nil
+    }
+}
+
+/// Storage contract used by the native SwiftUI time-schedule editor.
+protocol TimeSchedule {
+    func getSchedule() -> [Int]
+    func storeSchedule(schedule: [Int])
+    func serviceName() -> String
+}
+
 // This file supports the Settings migration from the old UIKit table view controllers
 // and view models to SwiftUI. The goal is to keep the existing Settings workflow
 // familiar by matching the old row actions, alerts, edit screens and navigation as
