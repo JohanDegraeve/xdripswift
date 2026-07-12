@@ -140,11 +140,11 @@ struct BgReadingsDetailView: View {
     private func bgRangeIndicatorColor(bgRangeDescription: BgRangeDescription) -> Color {
         switch bgRangeDescription {
         case .inRange:
-            return Color(ConstantsGlucoseChart.glucoseInRangeColor)
+            return ConstantsGlucoseChart.glucoseInRangeColor
         case .notUrgent:
-            return Color(ConstantsGlucoseChart.glucoseNotUrgentRangeColor)
+            return ConstantsGlucoseChart.glucoseNotUrgentRangeColor
         case .urgent:
-            return Color(ConstantsGlucoseChart.glucoseUrgentRangeColor)
+            return ConstantsGlucoseChart.glucoseUrgentRangeColor
         }
     }
 }

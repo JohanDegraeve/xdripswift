@@ -777,7 +777,7 @@ private struct SettingsNativeSectionView: View {
                     }
 
                     Text(title)
-                        .foregroundStyle(Color(ConstantsUI.tableViewHeaderTextColor))
+                        .foregroundStyle(ConstantsUI.tableViewHeaderTextColor)
                 }
             }
         } footer: {
@@ -1065,7 +1065,7 @@ struct SettingsDisclosureIndicator: View {
     var body: some View {
         Image(systemName: "chevron.right")
             .font(.footnote.weight(.semibold))
-            .foregroundStyle(Color(ConstantsUI.disclosureIndicatorColor))
+            .foregroundStyle(ConstantsUI.disclosureIndicatorColor)
     }
 }
 
@@ -1098,7 +1098,7 @@ struct SettingsInfoIndicator: View {
     var body: some View {
         Image(systemName: "info.circle")
             .font(.body)
-            .foregroundStyle(Color(ConstantsUI.disclosureIndicatorColor))
+            .foregroundStyle(ConstantsUI.disclosureIndicatorColor)
     }
 }
 

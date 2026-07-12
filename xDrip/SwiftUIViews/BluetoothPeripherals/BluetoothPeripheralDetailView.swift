@@ -30,7 +30,7 @@ struct BluetoothPeripheralDetailView: View {
                 .listRowBackground(state.connectionStatus.rowBackgroundColor)
             } header: {
                 Text(Texts_BluetoothPeripheralView.status)
-                    .foregroundStyle(Color(ConstantsUI.tableViewHeaderTextColor))
+                    .foregroundStyle(ConstantsUI.tableViewHeaderTextColor)
             } footer: {
                 if let statusFooterText = state.statusFooterText {
                     HStack(alignment: .firstTextBaseline, spacing: 4) {
@@ -221,7 +221,7 @@ private struct BluetoothPeripheralDetailSectionHeaderView: View {
             HStack {
                 if let title = section.title {
                     Text(title)
-                        .foregroundStyle(Color(ConstantsUI.tableViewHeaderTextColor))
+                        .foregroundStyle(ConstantsUI.tableViewHeaderTextColor)
                 }
 
                 Spacer()
@@ -229,7 +229,7 @@ private struct BluetoothPeripheralDetailSectionHeaderView: View {
                 HStack(spacing: 4) {
                     if let headerDetail = section.headerDetail {
                         Text(headerDetail)
-                            .foregroundStyle(Color(ConstantsUI.tableViewHeaderTextColor))
+                            .foregroundStyle(ConstantsUI.tableViewHeaderTextColor)
                     }
 
                     if let headerSymbol = section.headerSymbol {

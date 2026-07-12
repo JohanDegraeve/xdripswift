@@ -81,7 +81,7 @@ struct SnoozeView: View {
                                 .foregroundStyle(row.statusTextColor)
                         }
                         .tint(.green)
-                        .listRowBackground(row.isSnoozed ? ConstantsUI.warningSectionBackgroundColor : Color(uiColor: .secondarySystemGroupedBackground))
+                        .listRowBackground(row.isSnoozed ? ConstantsUI.warningSectionBackgroundColor : ConstantsAppColors.groupedBackground)
                     }
                 }
             }

@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import UIKit
 import SwiftUI
 import Combine
 
@@ -251,7 +250,7 @@ private struct TreatmentRowView: View {
 
 private struct TreatmentFilterChip: View {
     let systemImage: String
-    let tintColor: UIColor
+    let tintColor: Color
     let isSelected: Bool
     let isEnabled: Bool
     let symbolScale: Image.Scale
@@ -260,7 +259,7 @@ private struct TreatmentFilterChip: View {
 
     init(
         systemImage: String,
-        tintColor: UIColor,
+        tintColor: Color,
         isSelected: Bool,
         isEnabled: Bool = true,
         symbolScale: Image.Scale = .medium,
@@ -302,15 +301,15 @@ private struct TreatmentFilterChip: View {
 
     private var chipBackgroundColor: Color {
         if displayAsSelected {
-            return Color(uiColor: tintColor).opacity(0.22)
+            return tintColor.opacity(0.22)
         }
 
-        return Color(uiColor: UIColor(white: 0.14, alpha: 1.0))
+        return Color(white: 0.14)
     }
 
     private var chipForegroundColor: Color {
         if displayAsSelected {
-            return Color(uiColor: tintColor)
+            return tintColor
         }
 
         return Color(.colorSecondary)
@@ -318,7 +317,7 @@ private struct TreatmentFilterChip: View {
 
     private var chipBorderColor: Color {
         if displayAsSelected {
-            return Color(uiColor: tintColor)
+            return tintColor
         }
 
         return Color(.colorSecondary)

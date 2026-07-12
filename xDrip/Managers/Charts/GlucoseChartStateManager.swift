@@ -332,7 +332,7 @@ final class GlucoseChartStateManager: ObservableObject {
                 bgReadingDates: cachedOriginalReadingsToRender.map { $0.date },
                 seriesIdentifier: "original",
                 lineColor: nil,
-                pointColor: Color(showOriginalReadingsOnly ? ConstantsGlucoseChart.glucoseOriginalPeekColor : ConstantsGlucoseChart.glucoseOriginalColor),
+                pointColor: showOriginalReadingsOnly ? ConstantsGlucoseChart.glucoseOriginalPeekColor : ConstantsGlucoseChart.glucoseOriginalColor,
                 lineWidth: 0,
                 dash: [],
                 showLine: false,

@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import UIKit
 import SwiftUI
 
 /// types of background keep-alive
@@ -71,11 +70,6 @@ public enum FollowerBackgroundKeepAliveType: Int, CaseIterable {
         case .heartbeat:
             return "heart.circle"
         }
-    }
-    
-    // return the keep-alive image for UIKit views
-    var keepAliveUIImage: UIImage {
-        return UIImage(systemName: keepAliveImageString) ?? UIImage()
     }
     
     // return the keep-alive image for SwiftUI views

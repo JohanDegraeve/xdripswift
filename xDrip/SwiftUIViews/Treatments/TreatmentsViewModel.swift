@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import UIKit
 import SwiftUI
 import CoreData
 import OSLog
@@ -285,7 +284,7 @@ struct TreatmentSnapshot: Hashable {
     }
 
     var iconColor: Color {
-        let baseColor: UIColor
+        let baseColor: Color
 
         switch treatmentType {
         case .Insulin:
@@ -293,18 +292,18 @@ struct TreatmentSnapshot: Hashable {
         case .Carbs:
             baseColor = ConstantsGlucoseChart.carbsTreatmentColor
         case .Exercise:
-            baseColor = .magenta
+            baseColor = Color(red: 1, green: 0, blue: 1)
         case .BgCheck:
             baseColor = ConstantsGlucoseChart.bgCheckTreatmentColorInner
         case .Basal:
             baseColor = ConstantsGlucoseChart.basalTreatmentColor
         case .SiteChange, .SensorStart, .PumpBatteryChange:
-            baseColor = .systemYellow
+            baseColor = .yellow
         case .Note:
             baseColor = ConstantsGlucoseChart.noteTreatmentColor
         }
 
-        return Color(uiColor: date > Date() ? baseColor.withAlphaComponent(0.5) : baseColor)
+        return date > Date() ? baseColor.opacity(0.5) : baseColor
     }
 
     var iconSize: CGFloat {

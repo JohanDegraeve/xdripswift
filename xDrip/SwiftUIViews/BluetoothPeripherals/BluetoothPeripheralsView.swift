@@ -342,7 +342,7 @@ private struct BluetoothPeripheralSectionHeaderView: View {
                 .frame(width: 16)
 
             Text(section.title)
-                .foregroundStyle(Color(ConstantsUI.tableViewHeaderTextColor))
+                .foregroundStyle(ConstantsUI.tableViewHeaderTextColor)
         }
     }
 }

@@ -437,11 +437,11 @@ struct BgAdjustmentsView: View {
         // Show the original calculated values behind the previewed final values
         // so the user can compare the effect of adjustment and smoothing.
         if enableAdjustment || enableSmoothing || effectiveUseFiveMinuteReadings() {
-            dataSets.append(GlucoseChartDataSet(bgReadingValues: calculatedBgReadingValues, bgReadingDates: calculatedBgReadingDates, seriesIdentifier: "original", lineColor: nil, pointColor: Color(ConstantsGlucoseChart.glucoseOriginalColor), lineWidth: 0, dash: [], showLine: false, showPoints: true, pointSizeMultiplier: 1.0, pointBorderColor: nil, pointBorderSizeMultiplier: nil))
+            dataSets.append(GlucoseChartDataSet(bgReadingValues: calculatedBgReadingValues, bgReadingDates: calculatedBgReadingDates, seriesIdentifier: "original", lineColor: nil, pointColor: ConstantsGlucoseChart.glucoseOriginalColor, lineWidth: 0, dash: [], showLine: false, showPoints: true, pointSizeMultiplier: 1.0, pointBorderColor: nil, pointBorderSizeMultiplier: nil))
         }
 
         if bgCheckTreatmentChartPointsValues.count > 0 {
-            dataSets.append(GlucoseChartDataSet(bgReadingValues: bgCheckTreatmentChartPointsValues, bgReadingDates: bgCheckTreatmentChartPointsDates, seriesIdentifier: "bgCheckTreatments", lineColor: nil, pointColor: Color(ConstantsGlucoseChart.bgCheckTreatmentColorInner), lineWidth: 0, dash: [], showLine: false, showPoints: true, pointSizeMultiplier: Double(ConstantsGlucoseChart.bgCheckTreatmentScaleInner) * 1.15, pointBorderColor: Color(ConstantsGlucoseChart.bgCheckTreatmentColorOuter), pointBorderSizeMultiplier: Double(ConstantsGlucoseChart.bgCheckTreatmentScaleOuter) * 1.25))
+            dataSets.append(GlucoseChartDataSet(bgReadingValues: bgCheckTreatmentChartPointsValues, bgReadingDates: bgCheckTreatmentChartPointsDates, seriesIdentifier: "bgCheckTreatments", lineColor: nil, pointColor: ConstantsGlucoseChart.bgCheckTreatmentColorInner, lineWidth: 0, dash: [], showLine: false, showPoints: true, pointSizeMultiplier: Double(ConstantsGlucoseChart.bgCheckTreatmentScaleInner) * 1.15, pointBorderColor: ConstantsGlucoseChart.bgCheckTreatmentColorOuter, pointBorderSizeMultiplier: Double(ConstantsGlucoseChart.bgCheckTreatmentScaleOuter) * 1.25))
         }
 
         return dataSets
@@ -1018,14 +1018,14 @@ struct BgAdjustmentsView: View {
 
     private func glucoseTextColor(for valueInMgDl: Double) -> Color {
         if valueInMgDl >= UserDefaults.standard.urgentHighMarkValue || valueInMgDl <= UserDefaults.standard.urgentLowMarkValue {
-            return Color(ConstantsGlucoseChart.glucoseUrgentRangeColor)
+            return ConstantsGlucoseChart.glucoseUrgentRangeColor
         }
 
         if valueInMgDl >= UserDefaults.standard.highMarkValue || valueInMgDl <= UserDefaults.standard.lowMarkValue {
-            return Color(ConstantsGlucoseChart.glucoseNotUrgentRangeColor)
+            return ConstantsGlucoseChart.glucoseNotUrgentRangeColor
         }
 
-        return Color(ConstantsGlucoseChart.glucoseInRangeColor)
+        return ConstantsGlucoseChart.glucoseInRangeColor
     }
 
     private func currentAdjustedGlucoseValueInMgDl() -> Double? {
