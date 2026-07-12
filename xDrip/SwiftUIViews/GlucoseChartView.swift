@@ -468,21 +468,6 @@ struct GlucoseChartView: View {
         // Swift Charts renders marks in declaration order: guides first, basal and treatments below
         // glucose, then calibration and overlay marks above the plot.
         Chart {
-            // Mini-chart overview highlight.
-            //
-            // The first overlay version made the whole mini-chart background brighter and then
-            // dimmed the inactive regions. That worked structurally, but it contaminated the
-            // inactive area and forced the dimming layer to become too opaque. Drawing only the
-            // active window background here keeps the rest of the plot on the normal black chart
-            // background while still making the selected window read as active.
-            if !overlayWindowDimsWholeVisibleRange, let overlayWindow = overlayWindow {
-                RectangleMark(xStart: .value("Overlay window start", overlayWindow.startDate),
-                              xEnd: .value("Overlay window end", overlayWindow.endDate),
-                              yStart: .value("Overlay minimum", domain.lowerBound),
-                              yEnd: .value("Overlay maximum", domain.upperBound))
-                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.overlayWindowActiveBackgroundColor)
-            }
-
             if chartType != .miniChart {
                 ForEach(xAxisMidnightDates, id: \.self) { xAxisMidnightDate in
                     RuleMark(x: .value("Midnight", xAxisMidnightDate))
@@ -659,14 +644,26 @@ struct GlucoseChartView: View {
                               xEnd: .value("Overlay end", visibleEndDate),
                               yStart: .value("Overlay minimum", domain.lowerBound),
                               yEnd: .value("Overlay maximum", domain.upperBound))
-                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.overlayWindowDimColor)
+                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.overlayWindowShadeColor)
+
+                RectangleMark(xStart: .value("Overlay start", visibleStartDate),
+                              xEnd: .value("Overlay end", visibleEndDate),
+                              yStart: .value("Overlay minimum", domain.lowerBound),
+                              yEnd: .value("Overlay maximum", domain.upperBound))
+                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.overlayWindowTintColor)
             } else if let overlayWindow = overlayWindow {
                 if visibleStartDate < overlayWindow.startDate {
                     RectangleMark(xStart: .value("Overlay start", visibleStartDate),
                                   xEnd: .value("Overlay window start", overlayWindow.startDate),
                                   yStart: .value("Overlay minimum", domain.lowerBound),
                                   yEnd: .value("Overlay maximum", domain.upperBound))
-                        .foregroundStyle(ConstantsGlucoseChartSwiftUI.overlayWindowDimColor)
+                        .foregroundStyle(ConstantsGlucoseChartSwiftUI.overlayWindowShadeColor)
+
+                    RectangleMark(xStart: .value("Overlay start", visibleStartDate),
+                                  xEnd: .value("Overlay window start", overlayWindow.startDate),
+                                  yStart: .value("Overlay minimum", domain.lowerBound),
+                                  yEnd: .value("Overlay maximum", domain.upperBound))
+                        .foregroundStyle(ConstantsGlucoseChartSwiftUI.overlayWindowTintColor)
                 }
 
                 if overlayWindow.endDate < visibleEndDate {
@@ -674,7 +671,13 @@ struct GlucoseChartView: View {
                                   xEnd: .value("Overlay end", visibleEndDate),
                                   yStart: .value("Overlay minimum", domain.lowerBound),
                                   yEnd: .value("Overlay maximum", domain.upperBound))
-                        .foregroundStyle(ConstantsGlucoseChartSwiftUI.overlayWindowDimColor)
+                        .foregroundStyle(ConstantsGlucoseChartSwiftUI.overlayWindowShadeColor)
+
+                    RectangleMark(xStart: .value("Overlay window end", overlayWindow.endDate),
+                                  xEnd: .value("Overlay end", visibleEndDate),
+                                  yStart: .value("Overlay minimum", domain.lowerBound),
+                                  yEnd: .value("Overlay maximum", domain.upperBound))
+                        .foregroundStyle(ConstantsGlucoseChartSwiftUI.overlayWindowTintColor)
                 }
 
                 if let overlayWindowStartRuleDate = overlayWindowStartRuleDate {

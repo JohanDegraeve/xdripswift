@@ -77,6 +77,7 @@ enum ConstantsGlucoseChartSwiftUI {
     static let miniChartHoursToShow: Double = 24
     static let miniChartGlucoseCircleDiameter: Double = 3
     static let miniChartBackgroundColor: Color = .black
+    static let miniChartCornerRadius: CGFloat = 10
     static let miniChartYAxisLineSize: Double = 0.5
     static let miniChartXAxisMidnightLineColor = Color(white: 0.35)
     static let miniChartXAxisMidnightLineSize: Double = 1.25
@@ -87,8 +88,8 @@ enum ConstantsGlucoseChartSwiftUI {
     // If a chart state supplies overlay start/end dates, the renderer dims the plot area outside
     // that window and draws visible edge bars. Normal charts will never render this unless the
     // optional state values are present.
-    static let overlayWindowActiveBackgroundColor = Color(white: 0.2)
-    static let overlayWindowDimColor = Color.black.opacity(0.3)
+    static let overlayWindowShadeColor = Color.black.opacity(0.4)
+    static let overlayWindowTintColor = Color(white: 0.35).opacity(0.4)
     static let overlayWindowEdgeColor = Color(white: 0.5).opacity(0.5)
     static let overlayWindowEdgeLineWidth: CGFloat = 2.5
     static let overlayWindowCurrentTimeEdgeTolerance: TimeInterval = 5 * 60
