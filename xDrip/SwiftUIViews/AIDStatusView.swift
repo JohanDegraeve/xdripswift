@@ -355,6 +355,8 @@ struct AIDStatusView: View {
                 }
             }
             .navigationTitle("Follow Status")
+            .toolbarBackground(ConstantsAppColors.groupedBackground, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(Texts_Common.Cancel, action: {
