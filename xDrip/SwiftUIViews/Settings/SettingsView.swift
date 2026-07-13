@@ -49,8 +49,15 @@ struct SettingsNavigationView: View {
 
     private let coreDataManager: CoreDataManager
     private let soundPlayer: SoundPlayer
+    private let incomingBackupRequest: IncomingBackupRequest?
+    private let consumeIncomingBackup: (UUID) -> Void
 
-    init(coreDataManager: CoreDataManager, soundPlayer: SoundPlayer) {
+    init(
+        coreDataManager: CoreDataManager,
+        soundPlayer: SoundPlayer,
+        incomingBackupRequest: IncomingBackupRequest?,
+        consumeIncomingBackup: @escaping (UUID) -> Void
+    ) {
         let router = SettingsRouter()
         let presenter = SettingsActionPresenter(router: router)
         let sections = SettingsListFactory.makeRootSections(
@@ -60,6 +67,8 @@ struct SettingsNavigationView: View {
 
         self.coreDataManager = coreDataManager
         self.soundPlayer = soundPlayer
+        self.incomingBackupRequest = incomingBackupRequest
+        self.consumeIncomingBackup = consumeIncomingBackup
         _router = StateObject(wrappedValue: router)
         _presenter = StateObject(wrappedValue: presenter)
         _listModel = StateObject(wrappedValue: SettingsListModel(sections: sections))
@@ -81,7 +90,18 @@ struct SettingsNavigationView: View {
         .onAppear {
             UserDefaults.standard.showDeveloperSettings = false
             listModel.reload(.all)
+            openIncomingBackupIfNeeded()
         }
+        .onChange(of: incomingBackupRequest?.id) { _ in
+            openIncomingBackupIfNeeded()
+        }
+    }
+
+    /// Replaces any existing Settings path with the restore screen requested by iOS.
+    private func openIncomingBackupIfNeeded() {
+        guard let incomingBackupRequest else { return }
+
+        router.path = [SettingsRoute(.incomingBackup(incomingBackupRequest))]
     }
 
     private var navigationActions: SettingsNavigationActions {
@@ -147,6 +167,21 @@ struct SettingsNavigationView: View {
 
         case .loopDelaySchedule:
             LoopDelayScheduleView()
+
+        case let .dataManagement(flow):
+            DataManagementView(coreDataManager: coreDataManager, flow: flow)
+                .navigationTitle(flow.navigationTitle)
+                .navigationBarTitleDisplayMode(.inline)
+
+        case let .incomingBackup(request):
+            DataManagementView(
+                coreDataManager: coreDataManager,
+                flow: .restore,
+                initialBackupURL: request.url,
+                initialBackupDidOpen: { consumeIncomingBackup(request.id) }
+            )
+                .navigationTitle(DataManagementFlow.restore.navigationTitle)
+                .navigationBarTitleDisplayMode(.inline)
 
         case let .custom(title, content):
             content(router.closeCurrentView)
@@ -367,6 +402,7 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
     case glucoseDisplay
     case alertsAndNotifications
     case sharingAndServices
+    case dataManagement
     case about
     case advanced
 
@@ -380,6 +416,8 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
             return ConstantsSettingsIcons.notificationsSettingsIcon
         case .sharingAndServices:
             return ConstantsSettingsIcons.sharingAndServicesSettingsIcon
+        case .dataManagement:
+            return "externaldrive.badge.timemachine"
         case .about:
             return ConstantsSettingsIcons.infoSettingsIcon
         case .advanced:
@@ -398,6 +436,8 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
             return SettingsViewGroupedSettingsViewModel.alertsAndNotifications()
         case .sharingAndServices:
             return SettingsViewGroupedSettingsViewModel.sharingAndServices()
+        case .dataManagement:
+            return SettingsViewDataManagementSettingsViewModel()
         case .about:
             return SettingsViewInfoViewModel()
         case .advanced:

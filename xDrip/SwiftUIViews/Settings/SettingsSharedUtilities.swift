@@ -59,6 +59,8 @@ struct SettingsRoute: Hashable {
         case m5Stack
         case timeSchedule(TimeSchedule)
         case loopDelaySchedule
+        case dataManagement(DataManagementFlow)
+        case incomingBackup(IncomingBackupRequest)
         case custom(title: String, content: (@escaping () -> Void) -> AnyView)
     }
 
@@ -232,6 +234,7 @@ enum SettingsRowAction {
     case textEntry(() -> SettingsTextEntryContent)
     case selectionList(() -> SettingsSelectionListContent)
     case settingsScreen(() -> SettingsScreen)
+    case dataManagement(DataManagementFlow)
     case legacy(action: () -> SettingsSelectedRowAction, rowIndex: Int, viewModel: SettingsViewModelProtocol)
     case run(() -> Void)
     case showMessage(title: String, message: String?)
@@ -239,7 +242,7 @@ enum SettingsRowAction {
 
     var prefersDisclosure: Bool {
         switch self {
-        case .textEntry, .selectionList, .settingsScreen:
+        case .textEntry, .selectionList, .settingsScreen, .dataManagement:
             return true
         case .legacy, .run, .showMessage, .sendTraceEmail:
             return false
@@ -338,6 +341,11 @@ final class SettingsActionPresenter: ObservableObject {
     /// their underlying view model logic.
     func show(settingsScreen: SettingsScreen) {
         router.show(.settingsScreen(settingsScreen))
+    }
+
+    /// Pushes one of the native Data Management workflows.
+    func show(dataManagementFlow: DataManagementFlow) {
+        router.show(.dataManagement(dataManagementFlow))
     }
 
     /// Converts a SettingsSelectedRowAction into an alert, editor, picker, route or function call.
@@ -820,6 +828,8 @@ private struct SettingsNativeRowView: View {
             presenter.show(selectionList: selectionList())
         case let .settingsScreen(settingsScreen):
             presenter.show(settingsScreen: settingsScreen())
+        case let .dataManagement(flow):
+            presenter.show(dataManagementFlow: flow)
         case let .legacy(action, rowIndex, viewModel):
             presenter.run(
                 selectedRowAction: action(),

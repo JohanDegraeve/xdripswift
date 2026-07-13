@@ -6,6 +6,7 @@
 //  Copyright © 2026 Johan Degraeve. All rights reserved.
 //
 
+import os
 import SwiftUI
 import UIKit
 
@@ -36,6 +37,12 @@ struct RootTextInputRequest: Identifiable {
     let placeholder: String
     let usesDecimalKeyboard: Bool
     let action: (String) -> Void
+}
+
+/// A backup document copied into this app instance and waiting for the restore screen.
+struct IncomingBackupRequest: Identifiable {
+    let id = UUID()
+    let url: URL
 }
 
 // MARK: - Application Dependencies
@@ -73,11 +80,17 @@ struct RootTabDependencies {
 
     @Published private(set) var dependencies: RootTabDependencies?
     @Published private(set) var snoozeDismissalRequest = 0
+    @Published private(set) var incomingBackupRequest: IncomingBackupRequest?
+    @Published private(set) var isPreparingIncomingBackup = false
     @Published var alertRequest: RootAlertRequest?
     @Published var textInputRequest: RootTextInputRequest?
     @Published var textInput = ""
     @Published var pickerData: SnoozePickerData?
     weak var sensorProvider: ActiveSensorProviding?
+    private let dataManagementLog = OSLog(
+        subsystem: ConstantsLog.subSystem,
+        category: ConstantsLog.categoryDataManagement
+    )
 
     // MARK: - Presentation
 
@@ -120,6 +133,52 @@ struct RootTabDependencies {
 
     func presentPicker(_ pickerViewData: PickerViewData) {
         pickerData = SnoozePickerData(pickerViewData)
+    }
+
+    /// Copies a document supplied by iOS before handing it to the restore workflow.
+    func receiveIncomingBackup(_ sourceURL: URL) {
+        guard !isPreparingIncomingBackup else { return }
+
+        isPreparingIncomingBackup = true
+        trace(
+            "in receiveIncomingBackup, received backup document",
+            log: dataManagementLog,
+            category: ConstantsLog.categoryDataManagement,
+            type: .info
+        )
+
+        Task {
+            do {
+                let localURL = try await Task.detached(priority: .userInitiated) {
+                    try BackupService.copyIncomingBackup(from: sourceURL)
+                }.value
+                incomingBackupRequest = IncomingBackupRequest(url: localURL)
+                isPreparingIncomingBackup = false
+                trace(
+                    "in receiveIncomingBackup, copied backup document and requested restore screen",
+                    log: dataManagementLog,
+                    category: ConstantsLog.categoryDataManagement,
+                    type: .info
+                )
+            } catch {
+                isPreparingIncomingBackup = false
+                let description = (error as? BackupError)?.traceDescription ?? String(describing: type(of: error))
+                trace(
+                    "in receiveIncomingBackup, failed. error = %{public}@",
+                    log: dataManagementLog,
+                    category: ConstantsLog.categoryDataManagement,
+                    type: .error,
+                    description
+                )
+                presentAlert(title: "Backup & Restore", message: error.localizedDescription)
+            }
+        }
+    }
+
+    /// Clears a request after the Settings navigation stack has accepted it.
+    func consumeIncomingBackup(id: UUID) {
+        guard incomingBackupRequest?.id == id else { return }
+        incomingBackupRequest = nil
     }
 
     // MARK: - Configuration
@@ -237,7 +296,9 @@ struct RootTabView: View {
                 tabContent { dependencies in
                     SettingsNavigationView(
                         coreDataManager: dependencies.coreDataManager,
-                        soundPlayer: dependencies.soundPlayer
+                        soundPlayer: dependencies.soundPlayer,
+                        incomingBackupRequest: stateModel.incomingBackupRequest,
+                        consumeIncomingBackup: stateModel.consumeIncomingBackup
                     )
                 }
                 .tag(Tab.settings)
@@ -252,13 +313,34 @@ struct RootTabView: View {
                     unlock: { _ = dependencies.updateScreenLock(false, true) }
                 )
             }
+
+            if stateModel.isPreparingIncomingBackup {
+                ZStack {
+                    Color.black.opacity(0.75).ignoresSafeArea()
+                    VStack(spacing: 18) {
+                        ProgressView()
+                            .controlSize(.large)
+                            .tint(.white)
+                        Text("Opening backup…")
+                            .foregroundStyle(.white)
+                    }
+                }
+            }
         }
         .colorScheme(.dark)
         .onAppear {
+            if stateModel.incomingBackupRequest != nil {
+                selectedTab = .settings
+            }
             updateSupportedOrientations(for: selectedTab)
         }
         .onChange(of: selectedTab) { selectedTab in
             updateSupportedOrientations(for: selectedTab)
+        }
+        .onChange(of: stateModel.incomingBackupRequest?.id) { requestID in
+            if requestID != nil {
+                selectedTab = .settings
+            }
         }
         .alert(item: $stateModel.alertRequest) { request in
             if let cancelTitle = request.cancelTitle {

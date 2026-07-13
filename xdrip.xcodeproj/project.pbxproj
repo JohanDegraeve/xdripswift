@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		BA0000010000000000000001 /* BackupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000011 /* BackupModels.swift */; };
+		BA0000010000000000000002 /* BackupCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000012 /* BackupCrypto.swift */; };
+		BA0000010000000000000003 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000013 /* BackupService.swift */; };
+		BA0000010000000000000004 /* DataManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000014 /* DataManagementView.swift */; };
 		07ECB18D91AE096E637D1393 /* AlertsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */; };
 		16A7F56E1D1ED24F03F2070F /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
 		1E83ECCFB4B5916FC5738267 /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
@@ -771,6 +775,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		BA0000010000000000000011 /* BackupModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupModels.swift; sourceTree = "<group>"; };
+		BA0000010000000000000012 /* BackupCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupCrypto.swift; sourceTree = "<group>"; };
+		BA0000010000000000000013 /* BackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupService.swift; sourceTree = "<group>"; };
+		BA0000010000000000000014 /* DataManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagementView.swift; sourceTree = "<group>"; };
 		102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlertTypesSettingsView.swift; sourceTree = "<group>"; };
 		198D44C4260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Alerts.strings; sourceTree = "<group>"; };
 		198D44C5260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
@@ -1801,6 +1809,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BA0000010000000000000020 /* Backup */ = {
+			isa = PBXGroup;
+			children = (
+				BA0000010000000000000011 /* BackupModels.swift */,
+				BA0000010000000000000012 /* BackupCrypto.swift */,
+				BA0000010000000000000013 /* BackupService.swift */,
+			);
+			path = Backup;
+			sourceTree = "<group>";
+		};
 		4716A4F22B406C3D00419052 /* xDrip Widget */ = {
 			isa = PBXGroup;
 			children = (
@@ -2524,6 +2542,7 @@
 		F866974E2867A97000025441 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
+				BA0000010000000000000014 /* DataManagementView.swift */,
 				763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */,
 				102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */,
 				F866974F2867AA4A00025441 /* LoopDelayScheduleView.swift */,
@@ -2918,6 +2937,7 @@
 		F8EA6C8021B723A80082976B /* Utilities */ = {
 			isa = PBXGroup;
 			children = (
+				BA0000010000000000000020 /* Backup */,
 				F81F9FF722861E6D0028C70F /* KeyValueObserverTimeKeeper.swift */,
 				F821CF8022A5C814005C1E43 /* RepeatingTimer.swift */,
 				47D2DB3A2B14F6D000C8EE6B /* ScreenLockDimmingType.swift */,
@@ -3839,6 +3859,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BA0000010000000000000001 /* BackupModels.swift in Sources */,
+				BA0000010000000000000002 /* BackupCrypto.swift in Sources */,
+				BA0000010000000000000003 /* BackupService.swift in Sources */,
+				BA0000010000000000000004 /* DataManagementView.swift in Sources */,
 				F8BDD450221CAA64006EAB84 /* TextsCommon.swift in Sources */,
 				47B136DD2BCA9151001E7ED3 /* ConstantsContactImage.swift in Sources */,
 				F81D6D4E22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift in Sources */,

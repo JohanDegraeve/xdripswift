@@ -43,6 +43,7 @@ import SwiftUI
                 applicationCoordinator: applicationCoordinator,
                 tabTitles: tabTitles
             )
+            .onOpenURL(perform: stateModel.receiveIncomingBackup)
         }
     }
 }

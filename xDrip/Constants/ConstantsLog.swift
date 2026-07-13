@@ -44,6 +44,9 @@ enum ConstantsLog {
     
     /// core data manager
     static let categoryCoreDataManager =                    "CoreDataManager               "
+
+    /// data management, backup and restore
+    static let categoryDataManagement =                     "DataManagement                "
     
     /// application data bgreadings
     static let categoryApplicationDataBgReadings =          "ApplicationDataBgReadings     "
