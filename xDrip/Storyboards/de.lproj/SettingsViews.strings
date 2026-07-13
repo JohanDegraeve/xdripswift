@@ -490,6 +490,64 @@
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
 
+// MARK: - Automatic Housekeeping
+"settingsviews_cleanDataAutomaticHousekeeping" = "Automatische Bereinigung";
+"settingsviews_cleanDataKeepHistoricalData" = "Historische Daten behalten";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "Zuletzt abgeschlossen";
+"settingsviews_cleanDataLastHousekeepingResult" = "Letztes Ergebnis";
+"settingsviews_cleanDataNoHousekeepingRequired" = "Keine Bereinigung nötig";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "Läuft höchstens einmal täglich beim Öffnen der App. Ältere BZ-Werte, Behandlungen und ungenutzte Kalibrierungen werden lokal entfernt.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Historische Daten werden nur mit den manuellen Optionen unten entfernt.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "%@ Datensatz entfernt";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "%@ Datensätze entfernt";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "Daten bereinigen";
+"settingsviews_cleanDataStorageUsed" = "Belegter Speicher";
+"settingsviews_cleanDataStoredData" = "Gespeicherte Daten";
+"settingsviews_cleanDataBgReadings" = "BZ-Werte";
+"settingsviews_cleanDataTreatments" = "Behandlungen";
+"settingsviews_cleanDataCalibrations" = "Kalibrierungen";
+"settingsviews_cleanDataSelectData" = "Daten zum Löschen wählen";
+"settingsviews_cleanDataCleanupMethod" = "Bereinigung";
+"settingsviews_cleanDataKeepRecent" = "Aktuelle behalten";
+"settingsviews_cleanDataDateRange" = "Zeitraum";
+"settingsviews_cleanDataDeleteAll" = "Alles löschen";
+"settingsviews_cleanDataKeep" = "Behalten";
+"settingsviews_cleanDataFrom" = "Von";
+"settingsviews_cleanDataUntil" = "Bis";
+"settingsviews_cleanDataOlderDataFooter" = "Ältere Daten werden gelöscht, aktuelle bleiben erhalten.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "Beide Daten sind eingeschlossen.";
+"settingsviews_cleanDataDeleteAllFooter" = "Alle gewählten Daten werden gelöscht.";
+"settingsviews_cleanDataContinue" = "Weiter";
+"settingsviews_cleanDataReviewFooter" = "Vor dem Löschen wird eine Zusammenfassung angezeigt.";
+"settingsviews_cleanDataPermanentDeletion" = "Dauerhaftes Löschen";
+"settingsviews_cleanDataCannotUndo" = "Dies kann nicht rückgängig gemacht werden.";
+"settingsviews_cleanDataUnusedCalibrations" = "Ungenutzte Kalibrierungen";
+"settingsviews_cleanDataEarliestStoredData" = "Älteste gespeicherte Daten";
+"settingsviews_cleanDataDataToDelete" = "Zu löschende Daten";
+"settingsviews_cleanDataEnterCode" = "Diesen sechsstelligen Code eingeben";
+"settingsviews_cleanDataSixDigitCode" = "Sechsstelliger Code";
+"settingsviews_cleanDataConfirmDelete" = "LÖSCHEN BESTÄTIGEN";
+"settingsviews_cleanDataSuccessfullyDeleted" = "Daten erfolgreich gelöscht";
+"settingsviews_cleanDataCompleted" = "Abgeschlossen";
+"settingsviews_cleanDataBgReadingsDeleted" = "BZ-Werte gelöscht";
+"settingsviews_cleanDataTreatmentsDeleted" = "Behandlungen gelöscht";
+"settingsviews_cleanDataStorageBefore" = "Speicher vorher";
+"settingsviews_cleanDataStorageAfter" = "Speicher nachher";
+"settingsviews_cleanDataCleanupSummary" = "Bereinigungsübersicht";
+"settingsviews_cleanDataDatabaseReuseFooter" = "Die Datenbank kann ihre Größe behalten und freien Platz wiederverwenden.";
+"settingsviews_cleanDataCheckingStatus" = "Daten werden geprüft…";
+"settingsviews_cleanDataCountingStatus" = "Daten werden gezählt…";
+"settingsviews_cleanDataDeletingStatus" = "Daten werden dauerhaft gelöscht…\nBitte die App geöffnet lassen.";
+"settingsviews_cleanDataInvalidDateRangeError" = "Das Startdatum muss vor dem Enddatum liegen.";
+"settingsviews_cleanDataNoSelectionError" = "Mindestens einen Datentyp auswählen.";
+"settingsviews_cleanDataNoMatchingDataError" = "In diesem Zeitraum sind keine gewählten Daten vorhanden.";
+"settingsviews_cleanDataChangedError" = "Die Daten haben sich nach der Zusammenfassung geändert. Bitte erneut prüfen.";
+"settingsviews_cleanDataDeleteFailedError" = "Die gewählten Daten konnten nicht gelöscht werden. Die Bereinigung wurde beendet.";
+"settingsviews_cleanDataDays" = "%d Tage";
+"settingsviews_cleanDataConfirmationCode" = "Bestätigungscode %@";
+
 "settingsviews_infoContactsAccessRestricted" = "Authorisierung von %@ zum Zugriff auf Kontakte nicht möglich. Möglicherweise sind Einschränkungen, bspw. Elternkontrolle, aktiv.";
 "settingsviews_contactImageSectionTitle" = "Kontaktbild";
 "settingsviews_enableContactImage" = "Kontaktbild";

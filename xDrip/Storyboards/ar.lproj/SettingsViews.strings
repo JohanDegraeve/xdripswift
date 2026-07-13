@@ -274,3 +274,61 @@
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_cleanDataAutomaticHousekeeping" = "تنظيف تلقائي";
+"settingsviews_cleanDataKeepHistoricalData" = "الاحتفاظ بالبيانات السابقة";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "آخر اكتمال";
+"settingsviews_cleanDataLastHousekeepingResult" = "النتيجة الأخيرة";
+"settingsviews_cleanDataNoHousekeepingRequired" = "لا حاجة إلى التنظيف";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "يعمل مرة واحدة يوميًا كحد أقصى عند فتح التطبيق. تُحذف محليًا القراءات والعلاجات والمعايرات غير المستخدمة الأقدم من المدة المحددة.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "لن تُحذف البيانات السابقة إلا عبر الخيارات اليدوية أدناه.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "تم حذف سجل واحد (%@)";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "تم حذف %@ سجلات";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "تنظيف البيانات";
+"settingsviews_cleanDataStorageUsed" = "المساحة المستخدمة";
+"settingsviews_cleanDataStoredData" = "البيانات المحفوظة";
+"settingsviews_cleanDataBgReadings" = "قراءات السكر";
+"settingsviews_cleanDataTreatments" = "العلاجات";
+"settingsviews_cleanDataCalibrations" = "المعايرات";
+"settingsviews_cleanDataSelectData" = "اختر البيانات للحذف";
+"settingsviews_cleanDataCleanupMethod" = "طريقة التنظيف";
+"settingsviews_cleanDataKeepRecent" = "الاحتفاظ بالحديثة";
+"settingsviews_cleanDataDateRange" = "نطاق التاريخ";
+"settingsviews_cleanDataDeleteAll" = "حذف الكل";
+"settingsviews_cleanDataKeep" = "احتفاظ";
+"settingsviews_cleanDataFrom" = "من";
+"settingsviews_cleanDataUntil" = "حتى";
+"settingsviews_cleanDataOlderDataFooter" = "ستُحذف البيانات القديمة وتبقى الحديثة.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "التاريخان مشمولان.";
+"settingsviews_cleanDataDeleteAllFooter" = "ستُحذف كل البيانات المحددة.";
+"settingsviews_cleanDataContinue" = "متابعة";
+"settingsviews_cleanDataReviewFooter" = "ستراجع الملخص قبل حذف أي بيانات.";
+"settingsviews_cleanDataPermanentDeletion" = "حذف دائم للبيانات";
+"settingsviews_cleanDataCannotUndo" = "لا يمكن التراجع عن هذا الإجراء.";
+"settingsviews_cleanDataUnusedCalibrations" = "المعايرات غير المستخدمة";
+"settingsviews_cleanDataEarliestStoredData" = "أقدم بيانات محفوظة";
+"settingsviews_cleanDataDataToDelete" = "البيانات التي ستُحذف";
+"settingsviews_cleanDataEnterCode" = "أدخل هذا الرمز المكون من ستة أرقام";
+"settingsviews_cleanDataSixDigitCode" = "رمز من ستة أرقام";
+"settingsviews_cleanDataConfirmDelete" = "تأكيد الحذف";
+"settingsviews_cleanDataSuccessfullyDeleted" = "تم حذف البيانات";
+"settingsviews_cleanDataCompleted" = "اكتمل";
+"settingsviews_cleanDataBgReadingsDeleted" = "تم حذف قراءات السكر";
+"settingsviews_cleanDataTreatmentsDeleted" = "تم حذف العلاجات";
+"settingsviews_cleanDataStorageBefore" = "المساحة قبل";
+"settingsviews_cleanDataStorageAfter" = "المساحة بعد";
+"settingsviews_cleanDataCleanupSummary" = "ملخص التنظيف";
+"settingsviews_cleanDataDatabaseReuseFooter" = "قد تحتفظ قاعدة البيانات بحجمها وتعيد استخدام المساحة المحررة.";
+"settingsviews_cleanDataCheckingStatus" = "جارٍ فحص البيانات…";
+"settingsviews_cleanDataCountingStatus" = "جارٍ عدّ البيانات…";
+"settingsviews_cleanDataDeletingStatus" = "جارٍ حذف البيانات نهائيًا…\nأبقِ التطبيق مفتوحًا.";
+"settingsviews_cleanDataInvalidDateRangeError" = "يجب أن يسبق تاريخ البدء تاريخ الانتهاء.";
+"settingsviews_cleanDataNoSelectionError" = "اختر نوع بيانات واحدًا على الأقل.";
+"settingsviews_cleanDataNoMatchingDataError" = "لا توجد بيانات محددة في هذا النطاق.";
+"settingsviews_cleanDataChangedError" = "تغيرت البيانات بعد إنشاء الملخص. راجعها قبل التأكيد.";
+"settingsviews_cleanDataDeleteFailedError" = "تعذر حذف البيانات المحددة. تم إيقاف التنظيف.";
+"settingsviews_cleanDataDays" = "%d يوم";
+"settingsviews_cleanDataConfirmationCode" = "رمز التأكيد %@";

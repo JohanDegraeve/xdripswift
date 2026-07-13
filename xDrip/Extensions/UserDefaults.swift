@@ -196,6 +196,22 @@ extension UserDefaults {
 
         /// For how many days should we keep Readings, Treatments and Calibrations?
         case retentionPeriodInDays = "retentionPeriodInDays"
+        /// Should historical data be removed automatically during housekeeping?
+        case automaticHousekeepingEnabled = "automaticHousekeepingEnabled"
+        /// When did automatic housekeeping last complete successfully?
+        case lastHousekeepingDate = "lastHousekeepingDate"
+        /// When was automatic housekeeping last attempted?
+        case lastHousekeepingAttemptDate = "lastHousekeepingAttemptDate"
+        /// Which retention period was used by the last housekeeping attempt?
+        case lastHousekeepingAttemptRetentionPeriodInDays = "lastHousekeepingAttemptRetentionPeriodInDays"
+        /// Which retention period was used by the last successful housekeeping run?
+        case lastHousekeepingRetentionPeriodInDays = "lastHousekeepingRetentionPeriodInDays"
+        /// How many BG readings did the last housekeeping run remove?
+        case lastHousekeepingBgReadingsDeleted = "lastHousekeepingBgReadingsDeleted"
+        /// How many treatments did the last housekeeping run remove?
+        case lastHousekeepingTreatmentsDeleted = "lastHousekeepingTreatmentsDeleted"
+        /// How many unused calibrations did the last housekeeping run remove?
+        case lastHousekeepingCalibrationsDeleted = "lastHousekeepingCalibrationsDeleted"
 
         // Sensor Info settings
 
@@ -1637,6 +1653,61 @@ extension UserDefaults {
 
             set(value, forKey: Key.retentionPeriodInDays.rawValue)
         }
+    }
+
+    /// Whether automatic housekeeping should remove historical data when the app starts.
+    var automaticHousekeepingEnabled: Bool {
+        get {
+            guard object(forKey: Key.automaticHousekeepingEnabled.rawValue) != nil else { return true }
+            return bool(forKey: Key.automaticHousekeepingEnabled.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.automaticHousekeepingEnabled.rawValue)
+        }
+    }
+
+    /// The most recent successful automatic housekeeping run on this device.
+    var lastHousekeepingDate: Date? {
+        get {
+            return object(forKey: Key.lastHousekeepingDate.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.lastHousekeepingDate.rawValue)
+        }
+    }
+
+    var lastHousekeepingAttemptDate: Date? {
+        get {
+            return object(forKey: Key.lastHousekeepingAttemptDate.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.lastHousekeepingAttemptDate.rawValue)
+        }
+    }
+
+    var lastHousekeepingAttemptRetentionPeriodInDays: Int {
+        get { return integer(forKey: Key.lastHousekeepingAttemptRetentionPeriodInDays.rawValue) }
+        set { set(newValue, forKey: Key.lastHousekeepingAttemptRetentionPeriodInDays.rawValue) }
+    }
+
+    var lastHousekeepingRetentionPeriodInDays: Int {
+        get { return integer(forKey: Key.lastHousekeepingRetentionPeriodInDays.rawValue) }
+        set { set(newValue, forKey: Key.lastHousekeepingRetentionPeriodInDays.rawValue) }
+    }
+
+    var lastHousekeepingBgReadingsDeleted: Int {
+        get { return integer(forKey: Key.lastHousekeepingBgReadingsDeleted.rawValue) }
+        set { set(newValue, forKey: Key.lastHousekeepingBgReadingsDeleted.rawValue) }
+    }
+
+    var lastHousekeepingTreatmentsDeleted: Int {
+        get { return integer(forKey: Key.lastHousekeepingTreatmentsDeleted.rawValue) }
+        set { set(newValue, forKey: Key.lastHousekeepingTreatmentsDeleted.rawValue) }
+    }
+
+    var lastHousekeepingCalibrationsDeleted: Int {
+        get { return integer(forKey: Key.lastHousekeepingCalibrationsDeleted.rawValue) }
+        set { set(newValue, forKey: Key.lastHousekeepingCalibrationsDeleted.rawValue) }
     }
 
     // MARK: Transmitter Settings

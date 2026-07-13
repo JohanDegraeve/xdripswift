@@ -238,3 +238,61 @@
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_cleanDataAutomaticHousekeeping" = "Автоматическая очистка";
+"settingsviews_cleanDataKeepHistoricalData" = "Хранить историю";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "Последнее выполнение";
+"settingsviews_cleanDataLastHousekeepingResult" = "Последний результат";
+"settingsviews_cleanDataNoHousekeepingRequired" = "Очистка не требуется";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "Запускается не чаще раза в день при открытии приложения. Старые показания, лечение и неиспользуемые калибровки удаляются локально.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "История удаляется только вручную с помощью параметров ниже.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "Удалена %@ запись";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "Удалено записей: %@";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "Очистить данные";
+"settingsviews_cleanDataStorageUsed" = "Занято памяти";
+"settingsviews_cleanDataStoredData" = "Сохранённые данные";
+"settingsviews_cleanDataBgReadings" = "Показания глюкозы";
+"settingsviews_cleanDataTreatments" = "Лечение";
+"settingsviews_cleanDataCalibrations" = "Калибровки";
+"settingsviews_cleanDataSelectData" = "Выберите данные";
+"settingsviews_cleanDataCleanupMethod" = "Способ очистки";
+"settingsviews_cleanDataKeepRecent" = "Сохранить недавние";
+"settingsviews_cleanDataDateRange" = "Диапазон дат";
+"settingsviews_cleanDataDeleteAll" = "Удалить всё";
+"settingsviews_cleanDataKeep" = "Сохранить";
+"settingsviews_cleanDataFrom" = "С";
+"settingsviews_cleanDataUntil" = "По";
+"settingsviews_cleanDataOlderDataFooter" = "Старые данные будут удалены, недавние сохранены.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "Обе даты включены.";
+"settingsviews_cleanDataDeleteAllFooter" = "Все выбранные данные будут удалены.";
+"settingsviews_cleanDataContinue" = "Продолжить";
+"settingsviews_cleanDataReviewFooter" = "Перед удалением появится сводка.";
+"settingsviews_cleanDataPermanentDeletion" = "Безвозвратное удаление";
+"settingsviews_cleanDataCannotUndo" = "Это действие нельзя отменить.";
+"settingsviews_cleanDataUnusedCalibrations" = "Неиспользуемые калибровки";
+"settingsviews_cleanDataEarliestStoredData" = "Самые ранние данные";
+"settingsviews_cleanDataDataToDelete" = "Данные для удаления";
+"settingsviews_cleanDataEnterCode" = "Введите этот шестизначный код";
+"settingsviews_cleanDataSixDigitCode" = "Шестизначный код";
+"settingsviews_cleanDataConfirmDelete" = "ПОДТВЕРДИТЬ УДАЛЕНИЕ";
+"settingsviews_cleanDataSuccessfullyDeleted" = "Данные удалены";
+"settingsviews_cleanDataCompleted" = "Завершено";
+"settingsviews_cleanDataBgReadingsDeleted" = "Показания удалены";
+"settingsviews_cleanDataTreatmentsDeleted" = "Записи лечения удалены";
+"settingsviews_cleanDataStorageBefore" = "Память до";
+"settingsviews_cleanDataStorageAfter" = "Память после";
+"settingsviews_cleanDataCleanupSummary" = "Итоги очистки";
+"settingsviews_cleanDataDatabaseReuseFooter" = "База может сохранить размер и повторно использовать свободное место.";
+"settingsviews_cleanDataCheckingStatus" = "Проверка данных…";
+"settingsviews_cleanDataCountingStatus" = "Подсчёт данных…";
+"settingsviews_cleanDataDeletingStatus" = "Безвозвратное удаление…\nНе закрывайте приложение.";
+"settingsviews_cleanDataInvalidDateRangeError" = "Начальная дата должна быть раньше конечной.";
+"settingsviews_cleanDataNoSelectionError" = "Выберите хотя бы один тип данных.";
+"settingsviews_cleanDataNoMatchingDataError" = "В этом диапазоне нет выбранных данных.";
+"settingsviews_cleanDataChangedError" = "Данные изменились после создания сводки. Проверьте их снова.";
+"settingsviews_cleanDataDeleteFailedError" = "Не удалось удалить выбранные данные. Очистка остановлена.";
+"settingsviews_cleanDataDays" = "%d дн.";
+"settingsviews_cleanDataConfirmationCode" = "Код подтверждения %@";

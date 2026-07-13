@@ -28,14 +28,27 @@ struct SettingsViewDataManagementSettingsViewModel: SettingsViewModelProtocol, S
                 accessory: .disclosure,
                 action: .dataManagement(.restore)
             ),
+            SettingsRow(
+                id: "dataManagement.cleanData",
+                title: Texts_SettingsView.cleanData,
+                accessory: .disclosure,
+                action: .dataManagement(.clean)
+            ),
         ]
     }
 
-    func sectionTitle() -> String? { "Data Management" }
-    func settingsRowText(index: Int) -> String { index == 0 ? "Create Backup" : "Restore Backup" }
+    func sectionTitle() -> String? { Texts_SettingsView.sectionTitleHousekeeper }
+    func settingsRowText(index: Int) -> String {
+        switch index {
+        case 0: "Create Backup"
+        case 1: "Restore Backup"
+        default: Texts_SettingsView.cleanData
+        }
+    }
+
     func accessoryType(index _: Int) -> SettingsAccessory { .disclosure }
     func detailedText(index _: Int) -> String? { nil }
-    func numberOfRows() -> Int { 2 }
+    func numberOfRows() -> Int { 3 }
     func onRowSelect(index _: Int) -> SettingsSelectedRowAction { .nothing }
     func isEnabled(index _: Int) -> Bool { true }
     func completeSettingsViewRefreshNeeded(index _: Int) -> Bool { false }
@@ -46,11 +59,13 @@ struct SettingsViewDataManagementSettingsViewModel: SettingsViewModelProtocol, S
 enum DataManagementFlow {
     case create
     case restore
+    case clean
 
     var navigationTitle: String {
         switch self {
         case .create: "Create Backup"
         case .restore: "Restore Backup"
+        case .clean: Texts_SettingsView.cleanData
         }
     }
 }
@@ -62,6 +77,7 @@ struct DataManagementView: View {
     private static let successColor = Color.green
 
     @StateObject private var viewModel: DataManagementViewModel
+    private let coreDataManager: CoreDataManager
     private let flow: DataManagementFlow
     private let initialBackupURL: URL?
     private let initialBackupDidOpen: () -> Void
@@ -75,13 +91,24 @@ struct DataManagementView: View {
         initialBackupURL: URL? = nil,
         initialBackupDidOpen: @escaping () -> Void = {}
     ) {
+        self.coreDataManager = coreDataManager
         self.flow = flow
         self.initialBackupURL = initialBackupURL
         self.initialBackupDidOpen = initialBackupDidOpen
         _viewModel = StateObject(wrappedValue: DataManagementViewModel(coreDataManager: coreDataManager))
     }
 
+    @ViewBuilder
     var body: some View {
+        switch flow {
+        case .clean:
+            CleanDataView(coreDataManager: coreDataManager)
+        case .create, .restore:
+            backupAndRestoreView
+        }
+    }
+
+    private var backupAndRestoreView: some View {
         Form {
             switch flow {
             case .create:
@@ -109,6 +136,8 @@ struct DataManagementView: View {
                     backupContentsSection(inspection.payload)
                     restoreOptionsSection
                 }
+            case .clean:
+                EmptyView()
             }
         }
         .tint(Color(.systemBlue))

@@ -524,3 +524,61 @@
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_cleanDataAutomaticHousekeeping" = "Pulizia automatica";
+"settingsviews_cleanDataKeepHistoricalData" = "Conserva dati storici";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "Ultima esecuzione";
+"settingsviews_cleanDataLastHousekeepingResult" = "Ultimo risultato";
+"settingsviews_cleanDataNoHousekeepingRequired" = "Nessuna pulizia necessaria";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "Viene eseguita al massimo una volta al giorno all’apertura dell’app. Letture, trattamenti e calibrazioni inutilizzate meno recenti vengono eliminati localmente.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "I dati storici saranno eliminati solo con le opzioni manuali qui sotto.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "%@ record eliminato";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "%@ record eliminati";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "Pulisci dati";
+"settingsviews_cleanDataStorageUsed" = "Spazio usato";
+"settingsviews_cleanDataStoredData" = "Dati archiviati";
+"settingsviews_cleanDataBgReadings" = "Letture glicemia";
+"settingsviews_cleanDataTreatments" = "Trattamenti";
+"settingsviews_cleanDataCalibrations" = "Calibrazioni";
+"settingsviews_cleanDataSelectData" = "Seleziona dati da eliminare";
+"settingsviews_cleanDataCleanupMethod" = "Metodo di pulizia";
+"settingsviews_cleanDataKeepRecent" = "Mantieni recenti";
+"settingsviews_cleanDataDateRange" = "Intervallo date";
+"settingsviews_cleanDataDeleteAll" = "Elimina tutto";
+"settingsviews_cleanDataKeep" = "Mantieni";
+"settingsviews_cleanDataFrom" = "Da";
+"settingsviews_cleanDataUntil" = "Fino a";
+"settingsviews_cleanDataOlderDataFooter" = "I dati meno recenti saranno eliminati; quelli recenti resteranno.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "Entrambe le date sono incluse.";
+"settingsviews_cleanDataDeleteAllFooter" = "Tutti i dati selezionati saranno eliminati.";
+"settingsviews_cleanDataContinue" = "Continua";
+"settingsviews_cleanDataReviewFooter" = "Potrai controllare il riepilogo prima dell’eliminazione.";
+"settingsviews_cleanDataPermanentDeletion" = "Eliminazione permanente";
+"settingsviews_cleanDataCannotUndo" = "Questa azione non può essere annullata.";
+"settingsviews_cleanDataUnusedCalibrations" = "Calibrazioni inutilizzate";
+"settingsviews_cleanDataEarliestStoredData" = "Primo dato archiviato";
+"settingsviews_cleanDataDataToDelete" = "Dati da eliminare";
+"settingsviews_cleanDataEnterCode" = "Inserisci questo codice di sei cifre";
+"settingsviews_cleanDataSixDigitCode" = "Codice di sei cifre";
+"settingsviews_cleanDataConfirmDelete" = "CONFERMA ELIMINAZIONE";
+"settingsviews_cleanDataSuccessfullyDeleted" = "Dati eliminati";
+"settingsviews_cleanDataCompleted" = "Completato";
+"settingsviews_cleanDataBgReadingsDeleted" = "Letture eliminate";
+"settingsviews_cleanDataTreatmentsDeleted" = "Trattamenti eliminati";
+"settingsviews_cleanDataStorageBefore" = "Spazio prima";
+"settingsviews_cleanDataStorageAfter" = "Spazio dopo";
+"settingsviews_cleanDataCleanupSummary" = "Riepilogo pulizia";
+"settingsviews_cleanDataDatabaseReuseFooter" = "Il database può mantenere le dimensioni e riutilizzare lo spazio liberato.";
+"settingsviews_cleanDataCheckingStatus" = "Controllo dati…";
+"settingsviews_cleanDataCountingStatus" = "Conteggio dati…";
+"settingsviews_cleanDataDeletingStatus" = "Eliminazione permanente…\nTieni l’app aperta.";
+"settingsviews_cleanDataInvalidDateRangeError" = "La data iniziale deve precedere quella finale.";
+"settingsviews_cleanDataNoSelectionError" = "Seleziona almeno un tipo di dati.";
+"settingsviews_cleanDataNoMatchingDataError" = "Nessun dato selezionato in questo intervallo.";
+"settingsviews_cleanDataChangedError" = "I dati sono cambiati dopo il riepilogo. Controllali prima di confermare.";
+"settingsviews_cleanDataDeleteFailedError" = "Impossibile eliminare i dati selezionati. La pulizia è stata interrotta.";
+"settingsviews_cleanDataDays" = "%d giorni";
+"settingsviews_cleanDataConfirmationCode" = "Codice di conferma %@";

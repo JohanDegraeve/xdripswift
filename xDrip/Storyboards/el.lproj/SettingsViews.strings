@@ -238,3 +238,61 @@
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_cleanDataAutomaticHousekeeping" = "Αυτόματη εκκαθάριση";
+"settingsviews_cleanDataKeepHistoricalData" = "Διατήρηση ιστορικού";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "Τελευταία ολοκλήρωση";
+"settingsviews_cleanDataLastHousekeepingResult" = "Τελευταίο αποτέλεσμα";
+"settingsviews_cleanDataNoHousekeepingRequired" = "Δεν απαιτείται εκκαθάριση";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "Εκτελείται το πολύ μία φορά την ημέρα όταν ανοίγει η εφαρμογή. Παλαιότερες μετρήσεις, θεραπείες και αχρησιμοποίητες βαθμονομήσεις αφαιρούνται τοπικά.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Το ιστορικό αφαιρείται μόνο με τις παρακάτω χειροκίνητες επιλογές.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "Αφαιρέθηκε %@ εγγραφή";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "Αφαιρέθηκαν %@ εγγραφές";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "Εκκαθάριση δεδομένων";
+"settingsviews_cleanDataStorageUsed" = "Χώρος σε χρήση";
+"settingsviews_cleanDataStoredData" = "Αποθηκευμένα δεδομένα";
+"settingsviews_cleanDataBgReadings" = "Μετρήσεις γλυκόζης";
+"settingsviews_cleanDataTreatments" = "Θεραπείες";
+"settingsviews_cleanDataCalibrations" = "Βαθμονομήσεις";
+"settingsviews_cleanDataSelectData" = "Επιλογή δεδομένων";
+"settingsviews_cleanDataCleanupMethod" = "Μέθοδος εκκαθάρισης";
+"settingsviews_cleanDataKeepRecent" = "Διατήρηση πρόσφατων";
+"settingsviews_cleanDataDateRange" = "Εύρος ημερομηνιών";
+"settingsviews_cleanDataDeleteAll" = "Διαγραφή όλων";
+"settingsviews_cleanDataKeep" = "Διατήρηση";
+"settingsviews_cleanDataFrom" = "Από";
+"settingsviews_cleanDataUntil" = "Έως";
+"settingsviews_cleanDataOlderDataFooter" = "Τα παλαιότερα δεδομένα θα διαγραφούν και τα πρόσφατα θα διατηρηθούν.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "Περιλαμβάνονται και οι δύο ημερομηνίες.";
+"settingsviews_cleanDataDeleteAllFooter" = "Όλα τα επιλεγμένα δεδομένα θα διαγραφούν.";
+"settingsviews_cleanDataContinue" = "Συνέχεια";
+"settingsviews_cleanDataReviewFooter" = "Θα δείτε σύνοψη πριν από τη διαγραφή.";
+"settingsviews_cleanDataPermanentDeletion" = "Οριστική διαγραφή";
+"settingsviews_cleanDataCannotUndo" = "Αυτή η ενέργεια δεν αναιρείται.";
+"settingsviews_cleanDataUnusedCalibrations" = "Αχρησιμοποίητες βαθμονομήσεις";
+"settingsviews_cleanDataEarliestStoredData" = "Πρώτα αποθηκευμένα δεδομένα";
+"settingsviews_cleanDataDataToDelete" = "Δεδομένα προς διαγραφή";
+"settingsviews_cleanDataEnterCode" = "Εισαγάγετε αυτόν τον εξαψήφιο κωδικό";
+"settingsviews_cleanDataSixDigitCode" = "Εξαψήφιος κωδικός";
+"settingsviews_cleanDataConfirmDelete" = "ΕΠΙΒΕΒΑΙΩΣΗ ΔΙΑΓΡΑΦΗΣ";
+"settingsviews_cleanDataSuccessfullyDeleted" = "Τα δεδομένα διαγράφηκαν";
+"settingsviews_cleanDataCompleted" = "Ολοκληρώθηκε";
+"settingsviews_cleanDataBgReadingsDeleted" = "Μετρήσεις διαγράφηκαν";
+"settingsviews_cleanDataTreatmentsDeleted" = "Θεραπείες διαγράφηκαν";
+"settingsviews_cleanDataStorageBefore" = "Χώρος πριν";
+"settingsviews_cleanDataStorageAfter" = "Χώρος μετά";
+"settingsviews_cleanDataCleanupSummary" = "Σύνοψη εκκαθάρισης";
+"settingsviews_cleanDataDatabaseReuseFooter" = "Η βάση μπορεί να κρατήσει το μέγεθός της και να επαναχρησιμοποιήσει τον ελεύθερο χώρο.";
+"settingsviews_cleanDataCheckingStatus" = "Έλεγχος δεδομένων…";
+"settingsviews_cleanDataCountingStatus" = "Καταμέτρηση δεδομένων…";
+"settingsviews_cleanDataDeletingStatus" = "Οριστική διαγραφή δεδομένων…\nΚρατήστε την εφαρμογή ανοικτή.";
+"settingsviews_cleanDataInvalidDateRangeError" = "Η ημερομηνία έναρξης πρέπει να προηγείται της λήξης.";
+"settingsviews_cleanDataNoSelectionError" = "Επιλέξτε τουλάχιστον έναν τύπο δεδομένων.";
+"settingsviews_cleanDataNoMatchingDataError" = "Δεν υπάρχουν επιλεγμένα δεδομένα σε αυτό το εύρος.";
+"settingsviews_cleanDataChangedError" = "Τα δεδομένα άλλαξαν μετά τη σύνοψη. Ελέγξτε τα ξανά.";
+"settingsviews_cleanDataDeleteFailedError" = "Δεν ήταν δυνατή η διαγραφή. Η εκκαθάριση σταμάτησε.";
+"settingsviews_cleanDataDays" = "%d ημέρες";
+"settingsviews_cleanDataConfirmationCode" = "Κωδικός επιβεβαίωσης %@";

@@ -523,3 +523,61 @@
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_cleanDataAutomaticHousekeeping" = "Samodejno čiščenje";
+"settingsviews_cleanDataKeepHistoricalData" = "Ohrani zgodovino";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "Nazadnje končano";
+"settingsviews_cleanDataLastHousekeepingResult" = "Zadnji rezultat";
+"settingsviews_cleanDataNoHousekeepingRequired" = "Čiščenje ni potrebno";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "Izvede se največ enkrat dnevno ob odprtju aplikacije. Starejše meritve, terapije in neuporabljena umerjanja se odstranijo lokalno.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Zgodovina se odstrani le z ročnimi možnostmi spodaj.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "Odstranjen %@ zapis";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "Odstranjenih %@ zapisov";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "Počisti podatke";
+"settingsviews_cleanDataStorageUsed" = "Porabljen prostor";
+"settingsviews_cleanDataStoredData" = "Shranjeni podatki";
+"settingsviews_cleanDataBgReadings" = "Meritve glukoze";
+"settingsviews_cleanDataTreatments" = "Terapije";
+"settingsviews_cleanDataCalibrations" = "Umerjanja";
+"settingsviews_cleanDataSelectData" = "Izberite podatke";
+"settingsviews_cleanDataCleanupMethod" = "Način čiščenja";
+"settingsviews_cleanDataKeepRecent" = "Ohrani nedavne";
+"settingsviews_cleanDataDateRange" = "Datumski obseg";
+"settingsviews_cleanDataDeleteAll" = "Izbriši vse";
+"settingsviews_cleanDataKeep" = "Ohrani";
+"settingsviews_cleanDataFrom" = "Od";
+"settingsviews_cleanDataUntil" = "Do";
+"settingsviews_cleanDataOlderDataFooter" = "Starejši podatki bodo izbrisani, nedavni pa ohranjeni.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "Oba datuma sta vključena.";
+"settingsviews_cleanDataDeleteAllFooter" = "Vsi izbrani podatki bodo izbrisani.";
+"settingsviews_cleanDataContinue" = "Nadaljuj";
+"settingsviews_cleanDataReviewFooter" = "Pred izbrisom boste pregledali povzetek.";
+"settingsviews_cleanDataPermanentDeletion" = "Trajni izbris podatkov";
+"settingsviews_cleanDataCannotUndo" = "Tega ni mogoče razveljaviti.";
+"settingsviews_cleanDataUnusedCalibrations" = "Neuporabljena umerjanja";
+"settingsviews_cleanDataEarliestStoredData" = "Najstarejši shranjeni podatki";
+"settingsviews_cleanDataDataToDelete" = "Podatki za izbris";
+"settingsviews_cleanDataEnterCode" = "Vnesite to šestmestno kodo";
+"settingsviews_cleanDataSixDigitCode" = "Šestmestna koda";
+"settingsviews_cleanDataConfirmDelete" = "POTRDI IZBRIS";
+"settingsviews_cleanDataSuccessfullyDeleted" = "Podatki so izbrisani";
+"settingsviews_cleanDataCompleted" = "Končano";
+"settingsviews_cleanDataBgReadingsDeleted" = "Meritve izbrisane";
+"settingsviews_cleanDataTreatmentsDeleted" = "Terapije izbrisane";
+"settingsviews_cleanDataStorageBefore" = "Prostor prej";
+"settingsviews_cleanDataStorageAfter" = "Prostor potem";
+"settingsviews_cleanDataCleanupSummary" = "Povzetek čiščenja";
+"settingsviews_cleanDataDatabaseReuseFooter" = "Zbirka lahko ohrani velikost in znova uporabi sproščeni prostor.";
+"settingsviews_cleanDataCheckingStatus" = "Preverjanje podatkov…";
+"settingsviews_cleanDataCountingStatus" = "Štetje podatkov…";
+"settingsviews_cleanDataDeletingStatus" = "Trajno brisanje podatkov…\nPustite aplikacijo odprto.";
+"settingsviews_cleanDataInvalidDateRangeError" = "Začetni datum mora biti pred končnim.";
+"settingsviews_cleanDataNoSelectionError" = "Izberite vsaj eno vrsto podatkov.";
+"settingsviews_cleanDataNoMatchingDataError" = "V tem obsegu ni izbranih podatkov.";
+"settingsviews_cleanDataChangedError" = "Podatki so se po povzetku spremenili. Preglejte jih znova.";
+"settingsviews_cleanDataDeleteFailedError" = "Izbranih podatkov ni bilo mogoče izbrisati. Čiščenje je ustavljeno.";
+"settingsviews_cleanDataDays" = "%d dni";
+"settingsviews_cleanDataConfirmationCode" = "Potrditvena koda %@";

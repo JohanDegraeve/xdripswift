@@ -293,3 +293,61 @@
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_cleanDataAutomaticHousekeeping" = "Automatisk rensning";
+"settingsviews_cleanDataKeepHistoricalData" = "Behåll historik";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "Senast slutförd";
+"settingsviews_cleanDataLastHousekeepingResult" = "Senaste resultat";
+"settingsviews_cleanDataNoHousekeepingRequired" = "Ingen rensning behövs";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "Körs högst en gång per dag när appen öppnas. Äldre mätningar, behandlingar och oanvända kalibreringar tas bort lokalt.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Historiska data tas bara bort med de manuella alternativen nedan.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "%@ post borttagen";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "%@ poster borttagna";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "Rensa data";
+"settingsviews_cleanDataStorageUsed" = "Använt lagringsutrymme";
+"settingsviews_cleanDataStoredData" = "Sparade data";
+"settingsviews_cleanDataBgReadings" = "Glukosvärden";
+"settingsviews_cleanDataTreatments" = "Behandlingar";
+"settingsviews_cleanDataCalibrations" = "Kalibreringar";
+"settingsviews_cleanDataSelectData" = "Välj data att radera";
+"settingsviews_cleanDataCleanupMethod" = "Rensningsmetod";
+"settingsviews_cleanDataKeepRecent" = "Behåll senaste";
+"settingsviews_cleanDataDateRange" = "Datumintervall";
+"settingsviews_cleanDataDeleteAll" = "Radera allt";
+"settingsviews_cleanDataKeep" = "Behåll";
+"settingsviews_cleanDataFrom" = "Från";
+"settingsviews_cleanDataUntil" = "Till";
+"settingsviews_cleanDataOlderDataFooter" = "Äldre data raderas och aktuella data behålls.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "Båda datumen ingår.";
+"settingsviews_cleanDataDeleteAllFooter" = "Alla valda data raderas.";
+"settingsviews_cleanDataContinue" = "Fortsätt";
+"settingsviews_cleanDataReviewFooter" = "Du får granska en sammanfattning innan något raderas.";
+"settingsviews_cleanDataPermanentDeletion" = "Permanent radering";
+"settingsviews_cleanDataCannotUndo" = "Detta går inte att ångra.";
+"settingsviews_cleanDataUnusedCalibrations" = "Oanvända kalibreringar";
+"settingsviews_cleanDataEarliestStoredData" = "Tidigaste sparade data";
+"settingsviews_cleanDataDataToDelete" = "Data som ska raderas";
+"settingsviews_cleanDataEnterCode" = "Ange den här sexsiffriga koden";
+"settingsviews_cleanDataSixDigitCode" = "Sexsiffrig kod";
+"settingsviews_cleanDataConfirmDelete" = "BEKRÄFTA RADERING";
+"settingsviews_cleanDataSuccessfullyDeleted" = "Data har raderats";
+"settingsviews_cleanDataCompleted" = "Slutfört";
+"settingsviews_cleanDataBgReadingsDeleted" = "Glukosvärden raderade";
+"settingsviews_cleanDataTreatmentsDeleted" = "Behandlingar raderade";
+"settingsviews_cleanDataStorageBefore" = "Lagring före";
+"settingsviews_cleanDataStorageAfter" = "Lagring efter";
+"settingsviews_cleanDataCleanupSummary" = "Rensningssammanfattning";
+"settingsviews_cleanDataDatabaseReuseFooter" = "Databasen kan behålla sin storlek och återanvända ledigt utrymme.";
+"settingsviews_cleanDataCheckingStatus" = "Kontrollerar data…";
+"settingsviews_cleanDataCountingStatus" = "Räknar data…";
+"settingsviews_cleanDataDeletingStatus" = "Raderar data permanent…\nHåll appen öppen.";
+"settingsviews_cleanDataInvalidDateRangeError" = "Startdatumet måste vara före slutdatumet.";
+"settingsviews_cleanDataNoSelectionError" = "Välj minst en datatyp.";
+"settingsviews_cleanDataNoMatchingDataError" = "Det finns inga valda data i intervallet.";
+"settingsviews_cleanDataChangedError" = "Data ändrades efter sammanfattningen. Granska dem igen.";
+"settingsviews_cleanDataDeleteFailedError" = "Valda data kunde inte raderas. Rensningen avbröts.";
+"settingsviews_cleanDataDays" = "%d dagar";
+"settingsviews_cleanDataConfirmationCode" = "Bekräftelsekod %@";

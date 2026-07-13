@@ -305,3 +305,61 @@
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_cleanDataAutomaticHousekeeping" = "Automaattinen siivous";
+"settingsviews_cleanDataKeepHistoricalData" = "Säilytä historiatiedot";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "Viimeksi valmis";
+"settingsviews_cleanDataLastHousekeepingResult" = "Viimeisin tulos";
+"settingsviews_cleanDataNoHousekeepingRequired" = "Siivousta ei tarvita";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "Suoritetaan enintään kerran päivässä, kun sovellus avataan. Vanhemmat lukemat, hoidot ja käyttämättömät kalibroinnit poistetaan paikallisesti.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Historiatiedot poistetaan vain alla olevilla manuaalisilla valinnoilla.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "%@ tietue poistettu";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "%@ tietuetta poistettu";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "Siivoa tiedot";
+"settingsviews_cleanDataStorageUsed" = "Käytetty tila";
+"settingsviews_cleanDataStoredData" = "Tallennetut tiedot";
+"settingsviews_cleanDataBgReadings" = "Glukoosilukemat";
+"settingsviews_cleanDataTreatments" = "Hoidot";
+"settingsviews_cleanDataCalibrations" = "Kalibroinnit";
+"settingsviews_cleanDataSelectData" = "Valitse poistettavat";
+"settingsviews_cleanDataCleanupMethod" = "Siivoustapa";
+"settingsviews_cleanDataKeepRecent" = "Säilytä uusimmat";
+"settingsviews_cleanDataDateRange" = "Aikaväli";
+"settingsviews_cleanDataDeleteAll" = "Poista kaikki";
+"settingsviews_cleanDataKeep" = "Säilytä";
+"settingsviews_cleanDataFrom" = "Alkaen";
+"settingsviews_cleanDataUntil" = "Asti";
+"settingsviews_cleanDataOlderDataFooter" = "Vanhat tiedot poistetaan ja uudet säilytetään.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "Molemmat päivät sisältyvät.";
+"settingsviews_cleanDataDeleteAllFooter" = "Kaikki valitut tiedot poistetaan.";
+"settingsviews_cleanDataContinue" = "Jatka";
+"settingsviews_cleanDataReviewFooter" = "Näet yhteenvedon ennen poistamista.";
+"settingsviews_cleanDataPermanentDeletion" = "Pysyvä tietojen poisto";
+"settingsviews_cleanDataCannotUndo" = "Tätä ei voi kumota.";
+"settingsviews_cleanDataUnusedCalibrations" = "Käyttämättömät kalibroinnit";
+"settingsviews_cleanDataEarliestStoredData" = "Vanhin tallennettu tieto";
+"settingsviews_cleanDataDataToDelete" = "Poistettavat tiedot";
+"settingsviews_cleanDataEnterCode" = "Syötä tämä kuusinumeroinen koodi";
+"settingsviews_cleanDataSixDigitCode" = "Kuusinumeroinen koodi";
+"settingsviews_cleanDataConfirmDelete" = "VAHVISTA POISTO";
+"settingsviews_cleanDataSuccessfullyDeleted" = "Tiedot poistettu";
+"settingsviews_cleanDataCompleted" = "Valmis";
+"settingsviews_cleanDataBgReadingsDeleted" = "Glukoosilukemat poistettu";
+"settingsviews_cleanDataTreatmentsDeleted" = "Hoidot poistettu";
+"settingsviews_cleanDataStorageBefore" = "Tila ennen";
+"settingsviews_cleanDataStorageAfter" = "Tila jälkeen";
+"settingsviews_cleanDataCleanupSummary" = "Siivouksen yhteenveto";
+"settingsviews_cleanDataDatabaseReuseFooter" = "Tietokanta voi säilyttää kokonsa ja käyttää vapautuneen tilan uudelleen.";
+"settingsviews_cleanDataCheckingStatus" = "Tarkistetaan tietoja…";
+"settingsviews_cleanDataCountingStatus" = "Lasketaan tietoja…";
+"settingsviews_cleanDataDeletingStatus" = "Poistetaan tietoja pysyvästi…\nPidä sovellus avoinna.";
+"settingsviews_cleanDataInvalidDateRangeError" = "Alkupäivän on oltava ennen loppupäivää.";
+"settingsviews_cleanDataNoSelectionError" = "Valitse vähintään yksi tietotyyppi.";
+"settingsviews_cleanDataNoMatchingDataError" = "Aikavälillä ei ole valittuja tietoja.";
+"settingsviews_cleanDataChangedError" = "Tiedot muuttuivat yhteenvedon jälkeen. Tarkista ne uudelleen.";
+"settingsviews_cleanDataDeleteFailedError" = "Valittuja tietoja ei voitu poistaa. Siivous keskeytettiin.";
+"settingsviews_cleanDataDays" = "%d päivää";
+"settingsviews_cleanDataConfirmationCode" = "Vahvistuskoodi %@";

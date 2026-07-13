@@ -972,5 +972,72 @@ class Texts_SettingsView {
     static let labelStoreFrequentReadingsInHealthKitMessage: String = {
         return NSLocalizedString("settingsviews_storeFrequentReadingsInHealthKitMessage", tableName: filename, bundle: Bundle.main, value: "This option will override the 5-minute write limits and allow much frequent data to be added to Apple Health. Such as for 60-second Libre 2 Direct values.\n\nPlease only enable this option if you really need/want more frequent data. Most users should leave this option disabled.", comment: "developer settings, should we allow the app to perform very frequent writes to healthkit if the CGM data is more often than every 5 minutes")
     }()
+
+    // MARK: - Clean Data
+
+    static let cleanData = NSLocalizedString("settingsviews_cleanData", tableName: filename, bundle: Bundle.main, value: "Clean Data", comment: "data management, clean stored data screen title")
+    static let cleanDataAutomaticHousekeeping = NSLocalizedString("settingsviews_cleanDataAutomaticHousekeeping", tableName: filename, bundle: Bundle.main, value: "Automatic Housekeeping", comment: "clean data, automatic cleanup setting and section title")
+    static let cleanDataKeepHistoricalData = NSLocalizedString("settingsviews_cleanDataKeepHistoricalData", tableName: filename, bundle: Bundle.main, value: "Keep Historical Data", comment: "clean data, automatic retention period picker")
+    static let cleanDataLastHousekeepingCompleted = NSLocalizedString("settingsviews_cleanDataLastHousekeepingCompleted", tableName: filename, bundle: Bundle.main, value: "Last Completed", comment: "clean data, last successful automatic housekeeping date")
+    static let cleanDataLastHousekeepingResult = NSLocalizedString("settingsviews_cleanDataLastHousekeepingResult", tableName: filename, bundle: Bundle.main, value: "Last Result", comment: "clean data, last automatic housekeeping result")
+    static let cleanDataNoHousekeepingRequired = NSLocalizedString("settingsviews_cleanDataNoHousekeepingRequired", tableName: filename, bundle: Bundle.main, value: "No cleanup required", comment: "clean data, automatic housekeeping removed no records")
+    static let cleanDataAutomaticHousekeepingFooter = NSLocalizedString("settingsviews_cleanDataAutomaticHousekeepingFooter", tableName: filename, bundle: Bundle.main, value: "Runs at most once per day when the app opens. BG readings, treatments and unused calibrations older than the selected period are removed locally.", comment: "clean data, automatic housekeeping explanation")
+    static let cleanDataAutomaticHousekeepingDisabledFooter = NSLocalizedString("settingsviews_cleanDataAutomaticHousekeepingDisabledFooter", tableName: filename, bundle: Bundle.main, value: "Historical data will only be removed when you use the manual cleanup options below.", comment: "clean data, disabled automatic housekeeping explanation")
+    static let cleanDataStorageUsed = NSLocalizedString("settingsviews_cleanDataStorageUsed", tableName: filename, bundle: Bundle.main, value: "Storage Used", comment: "clean data, storage occupied by the database")
+    static let cleanDataStoredData = NSLocalizedString("settingsviews_cleanDataStoredData", tableName: filename, bundle: Bundle.main, value: "Stored Data", comment: "clean data, stored data section title")
+    static let cleanDataBgReadings = NSLocalizedString("settingsviews_cleanDataBgReadings", tableName: filename, bundle: Bundle.main, value: "BG Readings", comment: "clean data, blood glucose readings")
+    static let cleanDataTreatments = NSLocalizedString("settingsviews_cleanDataTreatments", tableName: filename, bundle: Bundle.main, value: "Treatments", comment: "clean data, treatment entries")
+    static let cleanDataCalibrations = NSLocalizedString("settingsviews_cleanDataCalibrations", tableName: filename, bundle: Bundle.main, value: "Calibrations", comment: "clean data, calibration entries")
+    static let cleanDataSelectData = NSLocalizedString("settingsviews_cleanDataSelectData", tableName: filename, bundle: Bundle.main, value: "Select Data to Delete", comment: "clean data, data type selection section title")
+    static let cleanDataCleanupMethod = NSLocalizedString("settingsviews_cleanDataCleanupMethod", tableName: filename, bundle: Bundle.main, value: "Cleanup Method", comment: "clean data, deletion range method")
+    static let cleanDataKeepRecent = NSLocalizedString("settingsviews_cleanDataKeepRecent", tableName: filename, bundle: Bundle.main, value: "Keep Recent", comment: "clean data, retain recent data option")
+    static let cleanDataDateRange = NSLocalizedString("settingsviews_cleanDataDateRange", tableName: filename, bundle: Bundle.main, value: "Date Range", comment: "clean data, custom date range option and section title")
+    static let cleanDataDeleteAll = NSLocalizedString("settingsviews_cleanDataDeleteAll", tableName: filename, bundle: Bundle.main, value: "Delete All", comment: "clean data, delete all selected data option")
+    static let cleanDataKeep = NSLocalizedString("settingsviews_cleanDataKeep", tableName: filename, bundle: Bundle.main, value: "Keep", comment: "clean data, number of recent days to retain")
+    static let cleanDataFrom = NSLocalizedString("settingsviews_cleanDataFrom", tableName: filename, bundle: Bundle.main, value: "From", comment: "clean data, inclusive start date")
+    static let cleanDataUntil = NSLocalizedString("settingsviews_cleanDataUntil", tableName: filename, bundle: Bundle.main, value: "Until", comment: "clean data, inclusive end date")
+    static let cleanDataOlderDataFooter = NSLocalizedString("settingsviews_cleanDataOlderDataFooter", tableName: filename, bundle: Bundle.main, value: "Older data will be deleted; recent data will be kept.", comment: "clean data, retain recent data explanation")
+    static let cleanDataInclusiveDatesFooter = NSLocalizedString("settingsviews_cleanDataInclusiveDatesFooter", tableName: filename, bundle: Bundle.main, value: "Both dates are inclusive.", comment: "clean data, custom date range explanation")
+    static let cleanDataDeleteAllFooter = NSLocalizedString("settingsviews_cleanDataDeleteAllFooter", tableName: filename, bundle: Bundle.main, value: "All selected data will be deleted.", comment: "clean data, delete all explanation")
+    static let cleanDataContinue = NSLocalizedString("settingsviews_cleanDataContinue", tableName: filename, bundle: Bundle.main, value: "Continue", comment: "clean data, continue to next confirmation step")
+    static let cleanDataReviewFooter = NSLocalizedString("settingsviews_cleanDataReviewFooter", tableName: filename, bundle: Bundle.main, value: "You will review the deletion before anything is removed.", comment: "clean data, preview reassurance")
+    static let cleanDataPermanentDeletion = NSLocalizedString("settingsviews_cleanDataPermanentDeletion", tableName: filename, bundle: Bundle.main, value: "Permanent Data Deletion", comment: "clean data, destructive action warning title")
+    static let cleanDataCannotUndo = NSLocalizedString("settingsviews_cleanDataCannotUndo", tableName: filename, bundle: Bundle.main, value: "This cannot be undone.", comment: "clean data, destructive action warning")
+    static let cleanDataUnusedCalibrations = NSLocalizedString("settingsviews_cleanDataUnusedCalibrations", tableName: filename, bundle: Bundle.main, value: "Unused Calibrations", comment: "clean data, unused calibrations included in deletion")
+    static let cleanDataEarliestStoredData = NSLocalizedString("settingsviews_cleanDataEarliestStoredData", tableName: filename, bundle: Bundle.main, value: "Earliest stored data", comment: "clean data, beginning of all stored data")
+    static let cleanDataDataToDelete = NSLocalizedString("settingsviews_cleanDataDataToDelete", tableName: filename, bundle: Bundle.main, value: "Data to Be Deleted", comment: "clean data, deletion summary section title")
+    static let cleanDataEnterCode = NSLocalizedString("settingsviews_cleanDataEnterCode", tableName: filename, bundle: Bundle.main, value: "Enter this six-digit code to confirm", comment: "clean data, captcha instruction")
+    static let cleanDataSixDigitCode = NSLocalizedString("settingsviews_cleanDataSixDigitCode", tableName: filename, bundle: Bundle.main, value: "Six-digit code", comment: "clean data, captcha entry field accessibility label")
+    static let cleanDataConfirmDelete = NSLocalizedString("settingsviews_cleanDataConfirmDelete", tableName: filename, bundle: Bundle.main, value: "CONFIRM DELETE", comment: "clean data, final destructive confirmation button")
+    static let cleanDataSuccessfullyDeleted = NSLocalizedString("settingsviews_cleanDataSuccessfullyDeleted", tableName: filename, bundle: Bundle.main, value: "Data Successfully Deleted", comment: "clean data, deletion success banner")
+    static let cleanDataCompleted = NSLocalizedString("settingsviews_cleanDataCompleted", tableName: filename, bundle: Bundle.main, value: "Completed", comment: "clean data, deletion completion date")
+    static let cleanDataBgReadingsDeleted = NSLocalizedString("settingsviews_cleanDataBgReadingsDeleted", tableName: filename, bundle: Bundle.main, value: "BG Readings Deleted", comment: "clean data, deleted blood glucose reading count")
+    static let cleanDataTreatmentsDeleted = NSLocalizedString("settingsviews_cleanDataTreatmentsDeleted", tableName: filename, bundle: Bundle.main, value: "Treatments Deleted", comment: "clean data, deleted treatment count")
+    static let cleanDataStorageBefore = NSLocalizedString("settingsviews_cleanDataStorageBefore", tableName: filename, bundle: Bundle.main, value: "Storage Before", comment: "clean data, database storage before deletion")
+    static let cleanDataStorageAfter = NSLocalizedString("settingsviews_cleanDataStorageAfter", tableName: filename, bundle: Bundle.main, value: "Storage After", comment: "clean data, database storage after deletion")
+    static let cleanDataCleanupSummary = NSLocalizedString("settingsviews_cleanDataCleanupSummary", tableName: filename, bundle: Bundle.main, value: "Cleanup Summary", comment: "clean data, completion summary section title")
+    static let cleanDataDatabaseReuseFooter = NSLocalizedString("settingsviews_cleanDataDatabaseReuseFooter", tableName: filename, bundle: Bundle.main, value: "The database may keep its current size and reuse the freed space.", comment: "clean data, database file size explanation")
+    static let cleanDataCheckingStatus = NSLocalizedString("settingsviews_cleanDataCheckingStatus", tableName: filename, bundle: Bundle.main, value: "Checking stored data…", comment: "clean data, inventory progress status")
+    static let cleanDataCountingStatus = NSLocalizedString("settingsviews_cleanDataCountingStatus", tableName: filename, bundle: Bundle.main, value: "Counting data to delete…", comment: "clean data, deletion preview progress status")
+    static let cleanDataDeletingStatus = NSLocalizedString("settingsviews_cleanDataDeletingStatus", tableName: filename, bundle: Bundle.main, value: "Permanently deleting data…\nPlease keep the app open.", comment: "clean data, deletion progress status")
+    static let cleanDataInvalidDateRangeError = NSLocalizedString("settingsviews_cleanDataInvalidDateRangeError", tableName: filename, bundle: Bundle.main, value: "The start date must be before the end date.", comment: "clean data, invalid date range error")
+    static let cleanDataNoSelectionError = NSLocalizedString("settingsviews_cleanDataNoSelectionError", tableName: filename, bundle: Bundle.main, value: "Select at least one type of data to delete.", comment: "clean data, no data type selected error")
+    static let cleanDataNoMatchingDataError = NSLocalizedString("settingsviews_cleanDataNoMatchingDataError", tableName: filename, bundle: Bundle.main, value: "There is no selected data in this date range.", comment: "clean data, no data in selected range error")
+    static let cleanDataChangedError = NSLocalizedString("settingsviews_cleanDataChangedError", tableName: filename, bundle: Bundle.main, value: "Stored data changed after the summary was created. Review the updated data before confirming again.", comment: "clean data, stored data changed during confirmation error")
+    static let cleanDataDeleteFailedError = NSLocalizedString("settingsviews_cleanDataDeleteFailedError", tableName: filename, bundle: Bundle.main, value: "The selected data could not be deleted. No further cleanup was attempted.", comment: "clean data, deletion failed error")
+
+    static func cleanDataDays(_ days: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_cleanDataDays", tableName: filename, bundle: Bundle.main, value: "%d days", comment: "clean data, number of days to retain"), days)
+    }
+
+    static func cleanDataHousekeepingRecordsRemoved(_ count: Int) -> String {
+        let key = count == 1 ? "settingsviews_cleanDataOneHousekeepingRecordRemoved" : "settingsviews_cleanDataHousekeepingRecordsRemoved"
+        let value = count == 1 ? "%@ record removed" : "%@ records removed"
+        return String(format: NSLocalizedString(key, tableName: filename, bundle: Bundle.main, value: value, comment: "clean data, records removed by automatic housekeeping"), count.formatted())
+    }
+
+    static func cleanDataConfirmationCode(_ code: String) -> String {
+        return String(format: NSLocalizedString("settingsviews_cleanDataConfirmationCode", tableName: filename, bundle: Bundle.main, value: "Confirmation code %@", comment: "clean data, accessibility label for captcha code"), code)
+    }
     
 }

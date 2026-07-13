@@ -318,3 +318,61 @@
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_cleanDataAutomaticHousekeeping" = "Automatisch opschonen";
+"settingsviews_cleanDataKeepHistoricalData" = "Historische gegevens bewaren";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "Laatst voltooid";
+"settingsviews_cleanDataLastHousekeepingResult" = "Laatste resultaat";
+"settingsviews_cleanDataNoHousekeepingRequired" = "Opschonen niet nodig";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "Wordt hoogstens eenmaal per dag uitgevoerd bij het openen van de app. Oudere metingen, behandelingen en ongebruikte kalibraties worden lokaal verwijderd.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Historische gegevens worden alleen verwijderd met de handmatige opties hieronder.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "%@ record verwijderd";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "%@ records verwijderd";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "Gegevens opschonen";
+"settingsviews_cleanDataStorageUsed" = "Gebruikte opslag";
+"settingsviews_cleanDataStoredData" = "Opgeslagen gegevens";
+"settingsviews_cleanDataBgReadings" = "Glucosemetingen";
+"settingsviews_cleanDataTreatments" = "Behandelingen";
+"settingsviews_cleanDataCalibrations" = "Kalibraties";
+"settingsviews_cleanDataSelectData" = "Te verwijderen gegevens";
+"settingsviews_cleanDataCleanupMethod" = "Opschoonmethode";
+"settingsviews_cleanDataKeepRecent" = "Recente behouden";
+"settingsviews_cleanDataDateRange" = "Datumbereik";
+"settingsviews_cleanDataDeleteAll" = "Alles verwijderen";
+"settingsviews_cleanDataKeep" = "Behouden";
+"settingsviews_cleanDataFrom" = "Van";
+"settingsviews_cleanDataUntil" = "Tot";
+"settingsviews_cleanDataOlderDataFooter" = "Oudere gegevens worden verwijderd; recente blijven bewaard.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "Beide datums tellen mee.";
+"settingsviews_cleanDataDeleteAllFooter" = "Alle geselecteerde gegevens worden verwijderd.";
+"settingsviews_cleanDataContinue" = "Doorgaan";
+"settingsviews_cleanDataReviewFooter" = "Je krijgt eerst een overzicht te zien.";
+"settingsviews_cleanDataPermanentDeletion" = "Gegevens permanent verwijderen";
+"settingsviews_cleanDataCannotUndo" = "Dit kan niet ongedaan worden gemaakt.";
+"settingsviews_cleanDataUnusedCalibrations" = "Ongebruikte kalibraties";
+"settingsviews_cleanDataEarliestStoredData" = "Eerste opgeslagen gegevens";
+"settingsviews_cleanDataDataToDelete" = "Te verwijderen gegevens";
+"settingsviews_cleanDataEnterCode" = "Voer deze zescijferige code in";
+"settingsviews_cleanDataSixDigitCode" = "Zescijferige code";
+"settingsviews_cleanDataConfirmDelete" = "VERWIJDEREN BEVESTIGEN";
+"settingsviews_cleanDataSuccessfullyDeleted" = "Gegevens verwijderd";
+"settingsviews_cleanDataCompleted" = "Voltooid";
+"settingsviews_cleanDataBgReadingsDeleted" = "Metingen verwijderd";
+"settingsviews_cleanDataTreatmentsDeleted" = "Behandelingen verwijderd";
+"settingsviews_cleanDataStorageBefore" = "Opslag vóór";
+"settingsviews_cleanDataStorageAfter" = "Opslag na";
+"settingsviews_cleanDataCleanupSummary" = "Opschoonoverzicht";
+"settingsviews_cleanDataDatabaseReuseFooter" = "De database kan even groot blijven en vrije ruimte hergebruiken.";
+"settingsviews_cleanDataCheckingStatus" = "Gegevens controleren…";
+"settingsviews_cleanDataCountingStatus" = "Gegevens tellen…";
+"settingsviews_cleanDataDeletingStatus" = "Gegevens permanent verwijderen…\nHoud de app open.";
+"settingsviews_cleanDataInvalidDateRangeError" = "De begindatum moet vóór de einddatum liggen.";
+"settingsviews_cleanDataNoSelectionError" = "Selecteer minstens één gegevenstype.";
+"settingsviews_cleanDataNoMatchingDataError" = "Geen geselecteerde gegevens in dit bereik.";
+"settingsviews_cleanDataChangedError" = "De gegevens zijn na het overzicht gewijzigd. Controleer ze opnieuw.";
+"settingsviews_cleanDataDeleteFailedError" = "De geselecteerde gegevens konden niet worden verwijderd. Opschonen is gestopt.";
+"settingsviews_cleanDataDays" = "%d dagen";
+"settingsviews_cleanDataConfirmationCode" = "Bevestigingscode %@";

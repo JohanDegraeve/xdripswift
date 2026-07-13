@@ -81,6 +81,13 @@ final class BackupService: @unchecked Sendable {
         UserDefaults.Key.timeStampOfLastHeartBeat.rawValue,
         UserDefaults.Key.updateSnoozeStatus.rawValue,
         UserDefaults.Key.calenderId.rawValue,
+        UserDefaults.Key.lastHousekeepingDate.rawValue,
+        UserDefaults.Key.lastHousekeepingAttemptDate.rawValue,
+        UserDefaults.Key.lastHousekeepingAttemptRetentionPeriodInDays.rawValue,
+        UserDefaults.Key.lastHousekeepingRetentionPeriodInDays.rawValue,
+        UserDefaults.Key.lastHousekeepingBgReadingsDeleted.rawValue,
+        UserDefaults.Key.lastHousekeepingTreatmentsDeleted.rawValue,
+        UserDefaults.Key.lastHousekeepingCalibrationsDeleted.rawValue,
     ]
 
     private let coreDataManager: CoreDataManager

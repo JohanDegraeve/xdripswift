@@ -266,3 +266,61 @@
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_cleanDataAutomaticHousekeeping" = "Otomatik temizleme";
+"settingsviews_cleanDataKeepHistoricalData" = "Geçmiş verileri koru";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "Son tamamlanma";
+"settingsviews_cleanDataLastHousekeepingResult" = "Son sonuç";
+"settingsviews_cleanDataNoHousekeepingRequired" = "Temizleme gerekmiyor";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "Uygulama açıldığında günde en fazla bir kez çalışır. Seçilen süreden eski ölçümler, tedaviler ve kullanılmayan kalibrasyonlar yerel olarak silinir.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Geçmiş veriler yalnızca aşağıdaki elle temizleme seçenekleriyle silinir.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "%@ kayıt silindi";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "%@ kayıt silindi";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "Verileri temizle";
+"settingsviews_cleanDataStorageUsed" = "Kullanılan alan";
+"settingsviews_cleanDataStoredData" = "Saklanan veriler";
+"settingsviews_cleanDataBgReadings" = "Glikoz ölçümleri";
+"settingsviews_cleanDataTreatments" = "Tedaviler";
+"settingsviews_cleanDataCalibrations" = "Kalibrasyonlar";
+"settingsviews_cleanDataSelectData" = "Silinecek verileri seçin";
+"settingsviews_cleanDataCleanupMethod" = "Temizleme yöntemi";
+"settingsviews_cleanDataKeepRecent" = "Son verileri koru";
+"settingsviews_cleanDataDateRange" = "Tarih aralığı";
+"settingsviews_cleanDataDeleteAll" = "Tümünü sil";
+"settingsviews_cleanDataKeep" = "Koru";
+"settingsviews_cleanDataFrom" = "Başlangıç";
+"settingsviews_cleanDataUntil" = "Bitiş";
+"settingsviews_cleanDataOlderDataFooter" = "Eski veriler silinir, son veriler korunur.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "Her iki tarih dahildir.";
+"settingsviews_cleanDataDeleteAllFooter" = "Seçilen tüm veriler silinir.";
+"settingsviews_cleanDataContinue" = "Devam";
+"settingsviews_cleanDataReviewFooter" = "Silmeden önce özeti inceleyeceksiniz.";
+"settingsviews_cleanDataPermanentDeletion" = "Kalıcı veri silme";
+"settingsviews_cleanDataCannotUndo" = "Bu işlem geri alınamaz.";
+"settingsviews_cleanDataUnusedCalibrations" = "Kullanılmayan kalibrasyonlar";
+"settingsviews_cleanDataEarliestStoredData" = "En eski kayıtlı veri";
+"settingsviews_cleanDataDataToDelete" = "Silinecek veriler";
+"settingsviews_cleanDataEnterCode" = "Bu altı haneli kodu girin";
+"settingsviews_cleanDataSixDigitCode" = "Altı haneli kod";
+"settingsviews_cleanDataConfirmDelete" = "SİLMEYİ ONAYLA";
+"settingsviews_cleanDataSuccessfullyDeleted" = "Veriler silindi";
+"settingsviews_cleanDataCompleted" = "Tamamlandı";
+"settingsviews_cleanDataBgReadingsDeleted" = "Ölçümler silindi";
+"settingsviews_cleanDataTreatmentsDeleted" = "Tedaviler silindi";
+"settingsviews_cleanDataStorageBefore" = "Önceki alan";
+"settingsviews_cleanDataStorageAfter" = "Sonraki alan";
+"settingsviews_cleanDataCleanupSummary" = "Temizleme özeti";
+"settingsviews_cleanDataDatabaseReuseFooter" = "Veritabanı boyutunu koruyup boşalan alanı yeniden kullanabilir.";
+"settingsviews_cleanDataCheckingStatus" = "Veriler kontrol ediliyor…";
+"settingsviews_cleanDataCountingStatus" = "Veriler sayılıyor…";
+"settingsviews_cleanDataDeletingStatus" = "Veriler kalıcı olarak siliniyor…\nUygulamayı açık tutun.";
+"settingsviews_cleanDataInvalidDateRangeError" = "Başlangıç tarihi bitiş tarihinden önce olmalıdır.";
+"settingsviews_cleanDataNoSelectionError" = "En az bir veri türü seçin.";
+"settingsviews_cleanDataNoMatchingDataError" = "Bu aralıkta seçilen veri yok.";
+"settingsviews_cleanDataChangedError" = "Özet oluşturulduktan sonra veriler değişti. Yeniden inceleyin.";
+"settingsviews_cleanDataDeleteFailedError" = "Seçilen veriler silinemedi. Temizleme durduruldu.";
+"settingsviews_cleanDataDays" = "%d gün";
+"settingsviews_cleanDataConfirmationCode" = "Onay kodu %@";

@@ -448,3 +448,61 @@
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_cleanDataAutomaticHousekeeping" = "自动清理";
+"settingsviews_cleanDataKeepHistoricalData" = "保留历史数据";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "上次完成";
+"settingsviews_cleanDataLastHousekeepingResult" = "上次结果";
+"settingsviews_cleanDataNoHousekeepingRequired" = "无需清理";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "打开应用时每天最多运行一次。本地删除超过所选期限的读数、治疗和未使用校准。";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "历史数据只会通过下方手动选项删除。";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "已删除 %@ 条记录";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "已删除 %@ 条记录";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "清理数据";
+"settingsviews_cleanDataStorageUsed" = "已用空间";
+"settingsviews_cleanDataStoredData" = "已存数据";
+"settingsviews_cleanDataBgReadings" = "血糖读数";
+"settingsviews_cleanDataTreatments" = "治疗记录";
+"settingsviews_cleanDataCalibrations" = "校准记录";
+"settingsviews_cleanDataSelectData" = "选择要删除的数据";
+"settingsviews_cleanDataCleanupMethod" = "清理方式";
+"settingsviews_cleanDataKeepRecent" = "保留近期数据";
+"settingsviews_cleanDataDateRange" = "日期范围";
+"settingsviews_cleanDataDeleteAll" = "全部删除";
+"settingsviews_cleanDataKeep" = "保留";
+"settingsviews_cleanDataFrom" = "开始";
+"settingsviews_cleanDataUntil" = "截止";
+"settingsviews_cleanDataOlderDataFooter" = "将删除较早数据并保留近期数据。";
+"settingsviews_cleanDataInclusiveDatesFooter" = "包含起止日期。";
+"settingsviews_cleanDataDeleteAllFooter" = "将删除所有已选数据。";
+"settingsviews_cleanDataContinue" = "继续";
+"settingsviews_cleanDataReviewFooter" = "删除前可查看摘要。";
+"settingsviews_cleanDataPermanentDeletion" = "永久删除数据";
+"settingsviews_cleanDataCannotUndo" = "此操作无法撤销。";
+"settingsviews_cleanDataUnusedCalibrations" = "未使用的校准";
+"settingsviews_cleanDataEarliestStoredData" = "最早的已存数据";
+"settingsviews_cleanDataDataToDelete" = "将删除的数据";
+"settingsviews_cleanDataEnterCode" = "输入此六位数验证码";
+"settingsviews_cleanDataSixDigitCode" = "六位数验证码";
+"settingsviews_cleanDataConfirmDelete" = "确认删除";
+"settingsviews_cleanDataSuccessfullyDeleted" = "数据已成功删除";
+"settingsviews_cleanDataCompleted" = "已完成";
+"settingsviews_cleanDataBgReadingsDeleted" = "已删除血糖读数";
+"settingsviews_cleanDataTreatmentsDeleted" = "已删除治疗记录";
+"settingsviews_cleanDataStorageBefore" = "清理前空间";
+"settingsviews_cleanDataStorageAfter" = "清理后空间";
+"settingsviews_cleanDataCleanupSummary" = "清理摘要";
+"settingsviews_cleanDataDatabaseReuseFooter" = "数据库可能保持当前大小并重复使用释放的空间。";
+"settingsviews_cleanDataCheckingStatus" = "正在检查数据…";
+"settingsviews_cleanDataCountingStatus" = "正在统计数据…";
+"settingsviews_cleanDataDeletingStatus" = "正在永久删除数据…\n请保持应用打开。";
+"settingsviews_cleanDataInvalidDateRangeError" = "开始日期必须早于结束日期。";
+"settingsviews_cleanDataNoSelectionError" = "请至少选择一种数据。";
+"settingsviews_cleanDataNoMatchingDataError" = "此日期范围内没有所选数据。";
+"settingsviews_cleanDataChangedError" = "创建摘要后数据已改变。请重新检查后再确认。";
+"settingsviews_cleanDataDeleteFailedError" = "无法删除所选数据，清理已停止。";
+"settingsviews_cleanDataDays" = "%d 天";
+"settingsviews_cleanDataConfirmationCode" = "验证码 %@";

@@ -523,3 +523,61 @@
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_cleanDataAutomaticHousekeeping" = "Automatyczne czyszczenie";
+"settingsviews_cleanDataKeepHistoricalData" = "Zachowaj historię";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "Ostatnio ukończono";
+"settingsviews_cleanDataLastHousekeepingResult" = "Ostatni wynik";
+"settingsviews_cleanDataNoHousekeepingRequired" = "Czyszczenie nie jest potrzebne";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "Uruchamia się najwyżej raz dziennie przy otwarciu aplikacji. Starsze odczyty, zabiegi i nieużywane kalibracje są usuwane lokalnie.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Dane historyczne zostaną usunięte tylko za pomocą opcji ręcznych poniżej.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "Usunięto %@ rekord";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "Usunięto %@ rekordów";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "Wyczyść dane";
+"settingsviews_cleanDataStorageUsed" = "Użyta pamięć";
+"settingsviews_cleanDataStoredData" = "Zapisane dane";
+"settingsviews_cleanDataBgReadings" = "Odczyty glukozy";
+"settingsviews_cleanDataTreatments" = "Zabiegi";
+"settingsviews_cleanDataCalibrations" = "Kalibracje";
+"settingsviews_cleanDataSelectData" = "Wybierz dane do usunięcia";
+"settingsviews_cleanDataCleanupMethod" = "Sposób czyszczenia";
+"settingsviews_cleanDataKeepRecent" = "Zachowaj ostatnie";
+"settingsviews_cleanDataDateRange" = "Zakres dat";
+"settingsviews_cleanDataDeleteAll" = "Usuń wszystko";
+"settingsviews_cleanDataKeep" = "Zachowaj";
+"settingsviews_cleanDataFrom" = "Od";
+"settingsviews_cleanDataUntil" = "Do";
+"settingsviews_cleanDataOlderDataFooter" = "Starsze dane zostaną usunięte, a nowsze zachowane.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "Obie daty są uwzględnione.";
+"settingsviews_cleanDataDeleteAllFooter" = "Wszystkie wybrane dane zostaną usunięte.";
+"settingsviews_cleanDataContinue" = "Dalej";
+"settingsviews_cleanDataReviewFooter" = "Przed usunięciem zobaczysz podsumowanie.";
+"settingsviews_cleanDataPermanentDeletion" = "Trwałe usuwanie danych";
+"settingsviews_cleanDataCannotUndo" = "Tej operacji nie można cofnąć.";
+"settingsviews_cleanDataUnusedCalibrations" = "Nieużywane kalibracje";
+"settingsviews_cleanDataEarliestStoredData" = "Najstarsze zapisane dane";
+"settingsviews_cleanDataDataToDelete" = "Dane do usunięcia";
+"settingsviews_cleanDataEnterCode" = "Wpisz ten sześciocyfrowy kod";
+"settingsviews_cleanDataSixDigitCode" = "Sześciocyfrowy kod";
+"settingsviews_cleanDataConfirmDelete" = "POTWIERDŹ USUNIĘCIE";
+"settingsviews_cleanDataSuccessfullyDeleted" = "Dane zostały usunięte";
+"settingsviews_cleanDataCompleted" = "Zakończono";
+"settingsviews_cleanDataBgReadingsDeleted" = "Usunięte odczyty";
+"settingsviews_cleanDataTreatmentsDeleted" = "Usunięte zabiegi";
+"settingsviews_cleanDataStorageBefore" = "Pamięć przed";
+"settingsviews_cleanDataStorageAfter" = "Pamięć po";
+"settingsviews_cleanDataCleanupSummary" = "Podsumowanie czyszczenia";
+"settingsviews_cleanDataDatabaseReuseFooter" = "Baza może zachować rozmiar i ponownie użyć zwolnionego miejsca.";
+"settingsviews_cleanDataCheckingStatus" = "Sprawdzanie danych…";
+"settingsviews_cleanDataCountingStatus" = "Zliczanie danych…";
+"settingsviews_cleanDataDeletingStatus" = "Trwałe usuwanie danych…\nPozostaw aplikację otwartą.";
+"settingsviews_cleanDataInvalidDateRangeError" = "Data początkowa musi być wcześniejsza niż końcowa.";
+"settingsviews_cleanDataNoSelectionError" = "Wybierz co najmniej jeden typ danych.";
+"settingsviews_cleanDataNoMatchingDataError" = "Brak wybranych danych w tym zakresie.";
+"settingsviews_cleanDataChangedError" = "Dane zmieniły się po utworzeniu podsumowania. Sprawdź je ponownie.";
+"settingsviews_cleanDataDeleteFailedError" = "Nie udało się usunąć wybranych danych. Czyszczenie przerwano.";
+"settingsviews_cleanDataDays" = "%d dni";
+"settingsviews_cleanDataConfirmationCode" = "Kod potwierdzający %@";

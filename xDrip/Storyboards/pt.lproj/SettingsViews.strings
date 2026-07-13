@@ -279,3 +279,61 @@
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_cleanDataAutomaticHousekeeping" = "Limpeza automática";
+"settingsviews_cleanDataKeepHistoricalData" = "Manter histórico";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "Última execução";
+"settingsviews_cleanDataLastHousekeepingResult" = "Último resultado";
+"settingsviews_cleanDataNoHousekeepingRequired" = "Nenhuma limpeza necessária";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "É executada no máximo uma vez por dia ao abrir a app. Leituras, tratamentos e calibrações não usadas mais antigas são removidos localmente.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Os dados históricos só serão removidos pelas opções manuais abaixo.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "%@ registo removido";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "%@ registos removidos";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "Limpar dados";
+"settingsviews_cleanDataStorageUsed" = "Espaço usado";
+"settingsviews_cleanDataStoredData" = "Dados guardados";
+"settingsviews_cleanDataBgReadings" = "Leituras de glicose";
+"settingsviews_cleanDataTreatments" = "Tratamentos";
+"settingsviews_cleanDataCalibrations" = "Calibrações";
+"settingsviews_cleanDataSelectData" = "Selecionar dados";
+"settingsviews_cleanDataCleanupMethod" = "Método de limpeza";
+"settingsviews_cleanDataKeepRecent" = "Manter recentes";
+"settingsviews_cleanDataDateRange" = "Intervalo de datas";
+"settingsviews_cleanDataDeleteAll" = "Apagar tudo";
+"settingsviews_cleanDataKeep" = "Manter";
+"settingsviews_cleanDataFrom" = "De";
+"settingsviews_cleanDataUntil" = "Até";
+"settingsviews_cleanDataOlderDataFooter" = "Os dados antigos serão apagados; os recentes serão mantidos.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "Ambas as datas estão incluídas.";
+"settingsviews_cleanDataDeleteAllFooter" = "Todos os dados selecionados serão apagados.";
+"settingsviews_cleanDataContinue" = "Continuar";
+"settingsviews_cleanDataReviewFooter" = "Poderá rever o resumo antes de apagar.";
+"settingsviews_cleanDataPermanentDeletion" = "Eliminação permanente";
+"settingsviews_cleanDataCannotUndo" = "Esta ação não pode ser anulada.";
+"settingsviews_cleanDataUnusedCalibrations" = "Calibrações não usadas";
+"settingsviews_cleanDataEarliestStoredData" = "Primeiro dado guardado";
+"settingsviews_cleanDataDataToDelete" = "Dados a apagar";
+"settingsviews_cleanDataEnterCode" = "Introduza este código de seis dígitos";
+"settingsviews_cleanDataSixDigitCode" = "Código de seis dígitos";
+"settingsviews_cleanDataConfirmDelete" = "CONFIRMAR ELIMINAÇÃO";
+"settingsviews_cleanDataSuccessfullyDeleted" = "Dados apagados";
+"settingsviews_cleanDataCompleted" = "Concluído";
+"settingsviews_cleanDataBgReadingsDeleted" = "Leituras apagadas";
+"settingsviews_cleanDataTreatmentsDeleted" = "Tratamentos apagados";
+"settingsviews_cleanDataStorageBefore" = "Espaço antes";
+"settingsviews_cleanDataStorageAfter" = "Espaço depois";
+"settingsviews_cleanDataCleanupSummary" = "Resumo da limpeza";
+"settingsviews_cleanDataDatabaseReuseFooter" = "A base de dados pode manter o tamanho e reutilizar o espaço libertado.";
+"settingsviews_cleanDataCheckingStatus" = "A verificar dados…";
+"settingsviews_cleanDataCountingStatus" = "A contar dados…";
+"settingsviews_cleanDataDeletingStatus" = "A apagar dados permanentemente…\nMantenha a app aberta.";
+"settingsviews_cleanDataInvalidDateRangeError" = "A data inicial deve ser anterior à data final.";
+"settingsviews_cleanDataNoSelectionError" = "Selecione pelo menos um tipo de dados.";
+"settingsviews_cleanDataNoMatchingDataError" = "Não existem dados selecionados neste intervalo.";
+"settingsviews_cleanDataChangedError" = "Os dados mudaram após o resumo. Reveja-os antes de confirmar.";
+"settingsviews_cleanDataDeleteFailedError" = "Não foi possível apagar os dados selecionados. A limpeza foi interrompida.";
+"settingsviews_cleanDataDays" = "%d dias";
+"settingsviews_cleanDataConfirmationCode" = "Código de confirmação %@";
