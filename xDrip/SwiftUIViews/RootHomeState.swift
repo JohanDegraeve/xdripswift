@@ -97,7 +97,6 @@ struct RootHomeDataSourceState {
     var detail = ""
     var detailColor = ConstantsAppColors.secondaryText
     var showsConnectionIcon = false
-    var connectionSystemImage = "network.slash"
     var connectionColor = ConstantsAppColors.urgent
     var showsKeepAliveIcon = false
     var keepAliveSystemImage = "antenna.radiowaves.left.and.right"
@@ -559,7 +558,6 @@ final class RootHomeStateModel: ObservableObject {
             detail: detail,
             detailColor: detailColor,
             showsConnectionIcon: !isMaster,
-            connectionSystemImage: followerConnectionIsRecent ? "network" : "network.slash",
             connectionColor: followerConnectionIsRecent ? ConstantsAppColors.normal : ConstantsAppColors.urgent,
             showsKeepAliveIcon: !isMaster,
             keepAliveSystemImage: UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImageString,

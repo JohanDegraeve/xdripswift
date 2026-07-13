@@ -1207,16 +1207,16 @@ private struct RootHomeDataSourceView: View {
     var body: some View {
         HStack(spacing: 5) {
             HStack(spacing: 5) {
-                if state.showsConnectionIcon {
-                    Image(systemName: state.connectionSystemImage)
-                        .font(.system(size: 15))
-                        .foregroundStyle(state.connectionColor)
-                }
+//                if state.showsKeepAliveIcon {
+//                    Image(systemName: state.keepAliveSystemImage)
+//                        .font(.system(size: 15))
+//                        .foregroundStyle(state.keepAliveColor)
+//                }
 
-                if state.showsKeepAliveIcon {
-                    Image(systemName: state.keepAliveSystemImage)
-                        .font(.system(size: 15))
-                        .foregroundStyle(state.keepAliveColor)
+                if state.showsConnectionIcon {
+                    Circle()
+                        .fill(state.connectionColor)
+                        .frame(width: 8, height: 8)
                 }
 
                 Text(state.title)
