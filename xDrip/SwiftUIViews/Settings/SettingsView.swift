@@ -547,10 +547,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     id: "sharingServices.nightscout",
                     title: Texts_SettingsView.sectionTitleNightscout,
                     detail: {
-                        UserDefaults.standard.nightscoutEnabled ? Texts_Common.enabled : Texts_Common.disabled
-                    },
-                    detailColor: {
-                        groupedStatusDetailColor(isEnabled: UserDefaults.standard.nightscoutEnabled)
+                        groupedStatusDetail(isEnabled: UserDefaults.standard.nightscoutEnabled)
                     },
                     settingsScreen: {
                         SettingsScreen(
@@ -563,10 +560,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     id: "sharingServices.dexcomShare",
                     title: Texts_SettingsView.sectionTitleDexcomShareUpload,
                     detail: {
-                        UserDefaults.standard.uploadReadingstoDexcomShare ? Texts_Common.enabled : Texts_Common.disabled
-                    },
-                    detailColor: {
-                        groupedStatusDetailColor(isEnabled: UserDefaults.standard.uploadReadingstoDexcomShare)
+                        groupedStatusDetail(isEnabled: UserDefaults.standard.uploadReadingstoDexcomShare)
                     },
                     settingsScreen: {
                         SettingsScreen(
@@ -579,10 +573,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     id: "sharingServices.healthKit",
                     title: Texts_SettingsView.sectionTitleHealthKit,
                     detail: {
-                        UserDefaults.standard.storeReadingsInHealthkit ? Texts_Common.enabled : Texts_Common.disabled
-                    },
-                    detailColor: {
-                        groupedStatusDetailColor(isEnabled: UserDefaults.standard.storeReadingsInHealthkit)
+                        groupedStatusDetail(isEnabled: UserDefaults.standard.storeReadingsInHealthkit)
                     },
                     settingsScreen: {
                         SettingsScreen(
@@ -595,10 +586,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     id: "sharingServices.calendarEvents",
                     title: Texts_SettingsView.calendarEventsSectionTitle,
                     detail: {
-                        UserDefaults.standard.createCalendarEvent ? Texts_Common.enabled : Texts_Common.disabled
-                    },
-                    detailColor: {
-                        groupedStatusDetailColor(isEnabled: UserDefaults.standard.createCalendarEvent)
+                        groupedStatusDetail(isEnabled: UserDefaults.standard.createCalendarEvent)
                     },
                     settingsScreen: {
                         SettingsScreen(
@@ -611,10 +599,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     id: "sharingServices.contactImage",
                     title: Texts_SettingsView.contactImageSectionTitle,
                     detail: {
-                        UserDefaults.standard.enableContactImage ? Texts_Common.enabled : Texts_Common.disabled
-                    },
-                    detailColor: {
-                        groupedStatusDetailColor(isEnabled: UserDefaults.standard.enableContactImage)
+                        groupedStatusDetail(isEnabled: UserDefaults.standard.enableContactImage)
                     },
                     settingsScreen: {
                         SettingsScreen(
@@ -627,10 +612,8 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     id: "sharingServices.osAidLoopShare",
                     title: Texts_SettingsView.osAidLoopShareSectionTitle,
                     detail: {
-                        UserDefaults.standard.loopShareType.description
-                    },
-                    detailColor: {
-                        groupedStatusDetailColor(isEnabled: UserDefaults.standard.loopShareType != .disabled)
+                        let shareType = UserDefaults.standard.loopShareType
+                        return shareType == .disabled ? nil : shareType.description
                     },
                     settingsScreen: {
                         SettingsScreen(
@@ -643,10 +626,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     id: "sharingServices.speakReadings",
                     title: Texts_SettingsView.sectionTitleSpeak,
                     detail: {
-                        UserDefaults.standard.speakReadings ? Texts_Common.enabled : Texts_Common.disabled
-                    },
-                    detailColor: {
-                        groupedStatusDetailColor(isEnabled: UserDefaults.standard.speakReadings)
+                        groupedStatusDetail(isEnabled: UserDefaults.standard.speakReadings)
                     },
                     settingsScreen: {
                         SettingsScreen(
@@ -668,10 +648,9 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
         )
     }
 
-    /// Colours parent row summaries that represent an enabled/disabled child
-    /// feature, so the state is clear without adding extra text or symbols.
-    private static func groupedStatusDetailColor(isEnabled: Bool) -> Color? {
-        isEnabled ? nil : ConstantsUI.rowTitleColorFalse
+    /// Shows an enabled summary while leaving disabled parent rows uncluttered.
+    private static func groupedStatusDetail(isEnabled: Bool) -> String? {
+        isEnabled ? Texts_Common.enabled : nil
     }
 
     func sectionTitle() -> String? {
