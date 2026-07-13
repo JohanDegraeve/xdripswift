@@ -28,7 +28,7 @@ import SwiftUI
         self.tabTitles = RootTabTitles(
             home: NSLocalizedString("rootTab.home", tableName: "RootTab", bundle: .main, value: "Home", comment: "Home tab title."),
             treatments: NSLocalizedString("rootTab.treatments", tableName: "RootTab", bundle: .main, value: "Treatments", comment: "Treatments tab title."),
-            bluetooth: NSLocalizedString("rootTab.bluetooth", tableName: "RootTab", bundle: .main, value: "Bluetooth", comment: "Bluetooth tab title."),
+            devices: NSLocalizedString("rootTab.devices", tableName: "RootTab", bundle: .main, value: "Devices", comment: "Devices tab title."),
             settings: NSLocalizedString("rootTab.settings", tableName: "RootTab", bundle: .main, value: "Settings", comment: "Settings tab title.")
         )
         _stateModel = StateObject(wrappedValue: stateModel)

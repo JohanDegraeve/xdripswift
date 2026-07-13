@@ -4,7 +4,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// when Bluetooth Peripheral list is shown, title of the view
-"screenTitle" = "Urządzenia Bluetooth";
+"screenTitle" = "Urządzenia";
 
 /// when clicking add button in screen with list of bluetoothperipherals, title of pop up where user  needs to select bluetooth peripheral category
 "selectCategory" = "Wybierz typ";

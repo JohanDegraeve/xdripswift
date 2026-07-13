@@ -2,7 +2,7 @@
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-"screenTitle" = "Συσκευές Bluetooth";
+"screenTitle" = "Συσκευές";
 "selectCategory" = "Επιλέξτε τύπο";
 "selectType" = "Select Transmitter Type";
 "batteryLevel" = "Battery Level";

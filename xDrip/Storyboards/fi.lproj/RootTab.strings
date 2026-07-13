@@ -1,5 +1,5 @@
 /* Root tab titles. */
 "rootTab.home" = "Koti";
 "rootTab.treatments" = "Hoidot";
-"rootTab.bluetooth" = "Bluetooth";
+"rootTab.devices" = "Laitteet";
 "rootTab.settings" = "Asetukset";

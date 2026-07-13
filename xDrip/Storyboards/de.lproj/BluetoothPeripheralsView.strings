@@ -16,4 +16,4 @@
 "selectType" = "Transmitter wählen";
 
 /// when Bluetooth Peripheral list is shown, title of the view
-"screenTitle" = "Bluetooth-Geräte";
+"screenTitle" = "Geräte";

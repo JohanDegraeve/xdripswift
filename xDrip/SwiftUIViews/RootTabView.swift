@@ -267,7 +267,7 @@ struct RootTabView: View {
                 )
                 .tag(Tab.home)
                 .tabItem {
-                    tabLabel(title: tabTitles.home, image: "Home")
+                    tabLabel(title: tabTitles.home, systemImage: "drop.fill")
                 }
 
                 tabContent { dependencies in
@@ -278,7 +278,7 @@ struct RootTabView: View {
                 }
                 .tag(Tab.treatments)
                 .tabItem {
-                    tabLabel(title: tabTitles.treatments, image: "Treatments")
+                    tabLabel(title: tabTitles.treatments, systemImage: "list.clipboard.fill")
                 }
 
                 tabContent { dependencies in
@@ -290,7 +290,10 @@ struct RootTabView: View {
                 }
                 .tag(Tab.bluetooth)
                 .tabItem {
-                    tabLabel(title: tabTitles.bluetooth, image: "Bluetooth")
+                    tabLabel(
+                        title: tabTitles.devices,
+                        systemImage: "antenna.radiowaves.left.and.right"
+                    )
                 }
 
                 tabContent { dependencies in
@@ -303,7 +306,7 @@ struct RootTabView: View {
                 }
                 .tag(Tab.settings)
                 .tabItem {
-                    tabLabel(title: tabTitles.settings, image: "Settings")
+                    tabLabel(title: tabTitles.settings, systemImage: "gearshape.fill")
                 }
             }
 
@@ -384,9 +387,8 @@ struct RootTabView: View {
     // MARK: - Tab Content
 
     /// Builds the image and localized title used by the native tab bar.
-    @ViewBuilder private func tabLabel(title: String, image: String) -> some View {
-        Image(image)
-            .renderingMode(.template)
+    @ViewBuilder private func tabLabel(title: String, systemImage: String) -> some View {
+        Image(systemName: systemImage)
         Text(title)
     }
 
@@ -658,6 +660,6 @@ private struct RootHomeLandscapeValueView: View {
 struct RootTabTitles {
     let home: String
     let treatments: String
-    let bluetooth: String
+    let devices: String
     let settings: String
 }

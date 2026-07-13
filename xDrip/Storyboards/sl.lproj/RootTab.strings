@@ -1,5 +1,5 @@
 /* Root tab titles. */
 "rootTab.home" = "Home";
 "rootTab.treatments" = "Treatments";
-"rootTab.bluetooth" = "Bluetooth";
+"rootTab.devices" = "Naprave";
 "rootTab.settings" = "Settings";

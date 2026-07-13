@@ -1,5 +1,5 @@
 /* Root tab titles. */
 "rootTab.home" = "Ana Ekran";
 "rootTab.treatments" = "Tedaviler";
-"rootTab.bluetooth" = "Bluetooth";
+"rootTab.devices" = "Cihazlar";
 "rootTab.settings" = "Ayarlar";

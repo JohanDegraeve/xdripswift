@@ -7,7 +7,7 @@
 "batteryLevel" = "Battery Level";
 
 /// when Bluetooth Peripheral list is shown, title of the view
-"screenTitle" = "Пристрої Bluetooth";
+"screenTitle" = "Пристрої";
 
 /// When adding a new cgm transmitter, but the user has another one already which is either connected or trying to connect
 "noMultipleActiveCGMsAllowed" = "You already have one CGM transmitter connected.\n\nVerify your other CGM transmitters and click 'Stop Scanning', 'Disconnect' or just delete them if needed.";
