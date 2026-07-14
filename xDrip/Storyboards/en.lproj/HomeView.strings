@@ -47,7 +47,7 @@
 "waitingForDataSource" = "CGM connected. Waiting for data...";
 "hidingUrlForXSeconds" = "Hiding URL for %@s...";
 "nightscoutNotEnabled" = "Nightscout is disabled";
-"nightscoutURLMissing" = "Nightscout URL missing";
+"nightscoutURLMissing" = "URL missing";
 "followerAccountCredentialsMissing" = "Username/password missing";
 "followerAccountCredentialsInvalid" = "Invalid Account";
 "showHideItemsTitle" = "Quick Show/Hide";

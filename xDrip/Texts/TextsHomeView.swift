@@ -316,7 +316,7 @@ enum Texts_HomeView {
     }()
     
     static let nightscoutURLMissing: String = {
-        return NSLocalizedString("nightscoutURLMissing", tableName: filename, bundle: Bundle.main, value: "Nightscout URL missing", comment: "nightscout is not enabled")
+        return NSLocalizedString("nightscoutURLMissing", tableName: filename, bundle: Bundle.main, value: "URL missing", comment: "nightscout is not enabled")
     }()
     
     static let followerAccountCredentialsMissing: String = {
