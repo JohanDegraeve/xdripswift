@@ -1319,7 +1319,13 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         let minimiumTimeBetweenTwoReadingsInMinutes = UserDefaults.standard.storeFrequentReadingsInNightscout ? ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutesFrequentUploads : ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutes
         
         // get latest readings, filter : minimiumTimeBetweenTwoReadingsInMinutes beteen two readings, except for the first if a dis/reconnect occured since the latest reading
-        let filteredBgReadingsToUpload = bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: timeStamp, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false).filter(minimumTimeBetweenTwoReadingsInMinutes: minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: timeStamp)
+        // Historical records imported from this same Nightscout site are local read-only copies.
+        // Excluding their namespaced IDs prevents a download/upload feedback loop when the normal
+        // uploader cursor is older than the newly imported range.
+        let uploadCandidates = bgReadingsAccessor
+            .getLatestBgReadings(limit: nil, fromDate: timeStamp, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+            .filter { !NightscoutImportService.isImportedBgReadingID($0.id) }
+        let filteredBgReadingsToUpload = uploadCandidates.filter(minimumTimeBetweenTwoReadingsInMinutes: minimiumTimeBetweenTwoReadingsInMinutes, lastConnectionStatusChangeTimeStamp: lastConnectionStatusChangeTimeStamp, timeStampLastProcessedBgReading: timeStamp)
         var bgReadingsToUpload = Array(filteredBgReadingsToUpload.reversed())
         
         if bgReadingsToUpload.count > 0 {

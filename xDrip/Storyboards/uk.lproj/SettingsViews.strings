@@ -79,7 +79,7 @@
 "settingsviews_speakreadingslanguageselection" = "Select Language";
 
 /// In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row
-"volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
+"volumeTestiOSSound" = "Коли тихий режим вимкнено";
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
@@ -129,6 +129,9 @@
 
 /// alerting settings, row alert types
 "settingsviews_row_alert_types" = "Alarm Types";
+"settingsviews_volume_tests_section_title" = "Перевірити гучність сигналу";
+"settingsviews_alert_types_section_footer" = "Типи сигналів визначають поведінку сигналів, зокрема звук, вібрацію, відкладання та обхід тихого режиму.";
+"settingsviews_alerts_section_footer" = "Сигнали визначають, коли застосунок має повідомляти про рівні глюкози, пропущені показники та інші умови.";
 
 /// in Settings, row title to send settings
 "sendTraceFile" = "Надіслати звіт про проблему";
@@ -184,7 +187,7 @@
 "editScheduleTimePickerSubtitle" = "Change: ";
 
 /// In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row
-"volumeTestSoundPlayer" = "Test Volume (if Override Mute On)";
+"volumeTestSoundPlayer" = "Коли тихий режим увімкнено";
 
 /// speak settings, where enable or disable speak trend
 "settingsviews_speakTrend" = "Speak Trend";
@@ -485,13 +488,30 @@
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
 
 // MARK: - Automatic Housekeeping
+"settingsviews_dataManagementStorageInfo" = "Сховище";
+"settingsviews_dataManagementManageData" = "Керування даними";
+"settingsviews_dataManagementDataRetention" = "Зберігання даних";
+"settingsviews_dataManagementDataDeletion" = "Видалення даних";
+"settingsviews_dataManagementImportData" = "Імпорт даних";
+"settingsviews_dataManagementLastHousekeeping" = "Останнє очищення";
+"settingsviews_storageInfoDatabase" = "База даних";
+"settingsviews_storageInfoDatabaseSize" = "Розмір бази";
+"settingsviews_storageInfoTrackedRecords" = "Враховані записи";
+"settingsviews_storageInfoDevices" = "Пристрої";
+"settingsviews_storageInfoSensors" = "Сенсори";
+"settingsviews_storageInfoRetentionFooter" = "Налаштований період зберігання даних становить %d днів.";
+"settingsviews_storageInfoHistory" = "Збережена історія";
+"settingsviews_storageInfoEarliestRecord" = "Найраніший запис";
+"settingsviews_storageInfoLatestRecord" = "Найновіший запис";
+"settingsviews_storageInfoCheckingStatus" = "Перевірка сховища…";
+"settingsviews_nightscoutImportRetentionFooter" = "Імпорт обмежено періодом зберігання у %d днів. Старіші дані видаляються під час очищення.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Автоматичне очищення";
 "settingsviews_cleanDataKeepHistoricalData" = "Зберігати історію";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Останнє виконання";
 "settingsviews_cleanDataLastHousekeepingResult" = "Останній результат";
 "settingsviews_cleanDataNoHousekeepingRequired" = "Очищення не потрібне";
 "settingsviews_cleanDataAutomaticHousekeepingFooter" = "Запускається не частіше разу на день під час відкриття програми. Старі показники, лікування й невикористані калібрування видаляються локально.";
-"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Історія видаляється лише вручну за допомогою параметрів нижче.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Історичні дані видаляються вручну лише в розділі «Видалення даних».";
 "settingsviews_cleanDataOneHousekeepingRecordRemoved" = "Видалено %@ запис";
 "settingsviews_cleanDataHousekeepingRecordsRemoved" = "Видалено записів: %@";
 
@@ -502,7 +522,7 @@
 "settingsviews_cleanDataBgReadings" = "Показники глюкози";
 "settingsviews_cleanDataTreatments" = "Лікування";
 "settingsviews_cleanDataCalibrations" = "Калібрування";
-"settingsviews_cleanDataSelectData" = "Виберіть дані";
+"settingsviews_cleanDataSelectData" = "Дані для видалення";
 "settingsviews_cleanDataCleanupMethod" = "Спосіб очищення";
 "settingsviews_cleanDataKeepRecent" = "Зберегти останні";
 "settingsviews_cleanDataDateRange" = "Діапазон дат";
@@ -510,7 +530,7 @@
 "settingsviews_cleanDataKeep" = "Зберегти";
 "settingsviews_cleanDataFrom" = "Від";
 "settingsviews_cleanDataUntil" = "До";
-"settingsviews_cleanDataOlderDataFooter" = "Старі дані буде видалено, новіші збережено.";
+"settingsviews_cleanDataOlderDataFooter" = "Старі дані буде видалено. Новіші дані буде збережено.";
 "settingsviews_cleanDataInclusiveDatesFooter" = "Обидві дати включено.";
 "settingsviews_cleanDataDeleteAllFooter" = "Усі вибрані дані буде видалено.";
 "settingsviews_cleanDataContinue" = "Продовжити";
@@ -540,4 +560,118 @@
 "settingsviews_cleanDataChangedError" = "Дані змінилися після створення підсумку. Перевірте їх знову.";
 "settingsviews_cleanDataDeleteFailedError" = "Не вдалося видалити вибрані дані. Очищення зупинено.";
 "settingsviews_cleanDataDays" = "%d дн.";
+"settingsviews_nightscoutImportCompleted" = "Імпорт із Nightscout завершено";
+"settingsviews_nightscoutImportSummary" = "Підсумок імпорту";
+"settingsviews_nightscoutImportURLMissing" = "URL Nightscout не налаштовано";
+"settingsviews_nightscoutImportConfigureURL" = "Перед імпортом даних налаштуйте URL у налаштуваннях Nightscout.";
+"settingsviews_nightscoutImportDownloaded" = "Завантажено";
+"settingsviews_nightscoutImportAdded" = "Додано";
+"settingsviews_nightscoutImportSkipped" = "Пропущено";
+"settingsviews_nightscoutImportInvalid" = "Недійсні";
+"settingsviews_nightscoutImportSummaryFooter" = "Записи, уже збережені локально, було пропущено. Недійсні документи Nightscout не імпортовано.";
+"settingsviews_nightscoutImportingData" = "Імпортування даних";
 "settingsviews_cleanDataConfirmationCode" = "Код підтвердження %@";
+"settingsviews_backupCreate" = "Створити резервну копію";
+"settingsviews_backupRestore" = "Відновити резервну копію";
+"settingsviews_backupCreated" = "Резервну копію успішно створено";
+"settingsviews_backupRestored" = "Резервну копію успішно відновлено";
+"settingsviews_backupReplaceQuestion" = "Замінити наявні дані?";
+"settingsviews_backupReplaceData" = "Замінити дані";
+"settingsviews_backupReplaceWarning" = "Існуючі показники рівня ГК і лікування в діапазонах дат резервної копії буде видалено перед відновленням резервної копії.";
+"settingsviews_backupAndRestore" = "Резервне копіювання та відновлення";
+"settingsviews_backupAppSettingsAndAlerts" = "Налаштування програми та сповіщення";
+"settingsviews_backupEncrypt" = "Зашифрувати резервну копію";
+"settingsviews_backupAccounts" = "Резервні облікові записи";
+"settingsviews_backupConfirmPassword" = "Підтвердьте пароль";
+"settingsviews_backupPasswordProtection" = "Захист паролем";
+"settingsviews_backupPasswordProtectionFooter" = "Додавання захисту паролем також дозволяє створювати резервні копії облікових записів, які містять конфіденційну інформацію.";
+"settingsviews_backupAccountDetailsFooter" = "Деталі облікового запису можуть включати URL-адреси сервера, імена користувачів, паролі та маркери доступу.";
+"settingsviews_backupCreateAndShare" = "Створіть резервну копію та надайте спільний доступ";
+"settingsviews_backupEncryptedCreationFooter" = "Створення зашифрованих резервних копій займає більше часу. Тримайте програму відкритою та запасіться терпінням.";
+"settingsviews_backupCreatedAt" = "Створено";
+"settingsviews_backupEarliestData" = "Найдавніші дані";
+"settingsviews_backupSettingsAndAlerts" = "Налаштування та сповіщення";
+"settingsviews_backupAccountDetails" = "Реквізити облікового запису";
+"settingsviews_backupIncluded" = "В комплекті";
+"settingsviews_backupNotIncluded" = "Не включено";
+"settingsviews_backupNotEnabled" = "Не включено";
+"settingsviews_backupSummary" = "Підсумок резервного копіювання";
+"settingsviews_backupChooseFile" = "Виберіть файл резервної копії";
+"settingsviews_backupFile" = "Файл резервної копії";
+"settingsviews_backupFileCheckFooter" = "Резервна копія перевіряється перед зміною існуючих даних.";
+"settingsviews_backupSelected" = "Вибране резервне копіювання";
+"settingsviews_backupPasswordRequired" = "Обов'язковий";
+"settingsviews_backupUnlock" = "Розблокувати резервне копіювання";
+"settingsviews_backupEncryptedNotice" = "Ця резервна копія зашифрована, і її потрібно розблокувати.";
+"settingsviews_backupSettings" = "Налаштування";
+"settingsviews_backupRestoreOptions" = "Параметри відновлення";
+"settingsviews_backupDataHandling" = "Обробка даних";
+"settingsviews_backupKeepCurrentData" = "Зберігайте поточні дані";
+"settingsviews_backupFillGaps" = "Заповнити прогалини";
+"settingsviews_backupReplaceRange" = "Замінити резервний діапазон";
+"settingsviews_backupIgnoreData" = "Ігнорувати дані";
+"settingsviews_backupRestoreSettingsAndAlerts" = "Відновлення налаштувань програми та сповіщень";
+"settingsviews_backupRestoreAccounts" = "Відновити облікові записи";
+"settingsviews_backupReplaceAndRestore" = "Замінити та відновити";
+"settingsviews_backupRestoreSummary" = "Відновити резюме";
+"settingsviews_backupBgReadingsAppliedFrom" = "Показники ГК, застосовані з";
+"settingsviews_backupBgReadingsAdded" = "Показання рівня рівня глюкози в крові додано";
+"settingsviews_backupBgReadingsSkipped" = "Показники ГК пропущено";
+"settingsviews_backupTreatmentsAdded" = "Лікування додано";
+"settingsviews_backupTreatmentsSkipped" = "Лікування пропущено";
+"settingsviews_backupSettingsRestored" = "Налаштування відновлено";
+"settingsviews_backupAccountRestore" = "Відновлення облікового запису";
+"settingsviews_backupCreatingEncryptedStatus" = "Створення та надійне шифрування вашої резервної копії…\nБудь ласка, запасіться терпінням.";
+"settingsviews_backupCreatingStatus" = "Створення резервної копії…";
+"settingsviews_backupCheckingStatus" = "Перевірка резервної копії…";
+"settingsviews_backupDecryptingStatus" = "Розшифровка та перевірка резервної копії…\nБудь ласка, наберіться терпіння.";
+"settingsviews_backupRestoringEncryptedStatus" = "Відновлення зашифрованої резервної копії…\nЗапасіться терпінням.";
+"settingsviews_backupRestoringStatus" = "Відновлення резервної копії…";
+"settingsviews_backupErrorInvalidFile" = "Це недійсна резервна копія програми.";
+"settingsviews_backupErrorIncorrectPassword" = "Пароль неправильний або захищена резервна копія пошкоджена.";
+"settingsviews_backupErrorMissingPassword" = "Введіть пароль, який використовується для захисту цієї резервної копії.";
+"settingsviews_nightscoutImportQuestion" = "Імпортувати з Nightscout?";
+"settingsviews_nightscoutImportAction" = "Імпорт з Nightscout";
+"settingsviews_nightscoutImportDiscardQuestion" = "Відхилити збережений імпорт?";
+"settingsviews_nightscoutImportDiscard" = "Відмінити імпорт";
+"settingsviews_nightscoutImportDiscardSaved" = "Скасувати збережений імпорт";
+"settingsviews_nightscoutImportDiscardMessage" = "Збережений прогрес буде видалено. Імпортовані дані залишаться надійно збереженими та будуть пропущені, якщо ви почнете знову.";
+"settingsviews_nightscoutImportDataToImport" = "Дані для імпорту";
+"settingsviews_nightscoutImportPeriod" = "Період імпорту";
+"settingsviews_nightscoutImportExistingDataFooter" = "Існуючі локальні дані зберігаються. Показання рівня рівня глюкози в межах 30 секунд після поточного показника та лікування, визначене Nightscout, пропускаються.";
+"settingsviews_nightscoutImportKeepOpenFooter" = "Тримайте програму відкритою, доки не завершиться імпорт. Прогрес зберігається після кожної завершеної партії, тому перерваний імпорт можна відновити.";
+"settingsviews_nightscoutImportPeriodLabel" = "Крапка";
+"settingsviews_nightscoutImportCompletedBatches" = "Завершені партії";
+"settingsviews_nightscoutImportResume" = "Відновити імпорт";
+"settingsviews_nightscoutImportSaved" = "Збережений імпорт";
+"settingsviews_nightscoutImportUnsupportedFooter" = "Цей імпорт використовує непідтримуваний період. Відкиньте його, щоб почати знову.";
+"settingsviews_nightscoutImportExceedsRetentionFooter" = "Цей імпорт перевищує ваш поточний період зберігання. Відкиньте його, щоб почати знову.";
+"settingsviews_nightscoutImportResumeFooter" = "Попередній імпорт зупинено до завершення всіх запитаних пакетів. Відновлення триває з останньої збереженої контрольної точки.";
+"settingsviews_nightscoutImportPause" = "Призупинити імпорт";
+"settingsviews_nightscoutImportBgAndTreatments" = "Показники ГК та лікування";
+"settingsviews_nightscoutImportBgOnly" = "Показники BG";
+"settingsviews_nightscoutImportTreatmentsOnly" = "лікування";
+"settingsviews_nightscoutImportKeepAppOpen" = "Тримайте програму відкритою.";
+"settingsviews_nightscoutImportPaused" = "Імпорт призупинено";
+"settingsviews_nightscoutImportErrorNoSelection" = "Виберіть показники ГК, лікування або те й інше.";
+"settingsviews_nightscoutImportErrorUnsupportedPeriod" = "Збережений імпорт використовує період, який більше не підтримується. Відкиньте його та почніть знову.";
+"settingsviews_nightscoutImportErrorRetention" = "Вибраний період імпорту перевищує поточне налаштування збереження даних.";
+"settingsviews_nightscoutImportErrorMissingURL" = "Введіть URL-адресу Nightscout у налаштуваннях Nightscout перед початком імпорту.";
+"settingsviews_nightscoutImportErrorInvalidURL" = "Налаштована URL-адреса Nightscout недійсна. Перевірте це в налаштуваннях Nightscout і повторіть спробу.";
+"settingsviews_nightscoutImportErrorCheckpointUnavailable" = "Збережений імпорт Nightscout більше не можна відновити. Почніть новий імпорт.";
+"settingsviews_nightscoutImportErrorSiteChanged" = "Налаштований сайт Nightscout змінився після початку цього імпорту. Скасуйте збережений імпорт або відновіть попередню URL-адресу Nightscout.";
+"settingsviews_nightscoutImportErrorAuthentication" = "Nightscout заборонено у доступі. Перевірте секрет API або маркер доступу в налаштуваннях Nightscout.";
+"settingsviews_nightscoutImportErrorEndpoint" = "Кінцева точка даних Nightscout не знайдена. Перевірте налаштовану URL-адресу та версію сайту.";
+"settingsviews_nightscoutImportErrorRateLimited" = "Nightscout отримує забагато запитів. Зачекайте трохи та відновіть імпорт.";
+"settingsviews_nightscoutImportErrorInvalidResponse" = "Nightscout повернув дані, які неможливо безпечно прочитати. Дані з ураженої партії не імпортовано.";
+"settingsviews_nightscoutImportErrorResponseLimit" = "Партія Nightscout залишилася занадто великою після того, як її розділили на невеликі часові діапазони. Не було імпортовано жодних скорочених даних.";
+"settingsviews_backupCreatedWithAppVersion" = "Резервну копію створено за допомогою версії програми %@.";
+"settingsviews_backupErrorUnsupportedVersion" = "Версія формату резервної копії %d не підтримується цією версією програми.";
+"settingsviews_backupErrorFinalValueMismatch" = "Збережені значення глюкози не відтворюють резервне остаточне значення для читання %@.";
+"settingsviews_nightscoutImportBatchCount" = "%1$d з %2$d";
+"settingsviews_nightscoutImportBgAddedProgress" = "Показники ГК додано: %@";
+"settingsviews_nightscoutImportTreatmentsAddedProgress" = "Додано обробки: %@";
+"settingsviews_nightscoutImportConfirmation" = "Імпортувати %1$d днів із %2$@? Існуючі локальні записи зберігатимуться, а дублікати пропускатимуться.";
+"settingsviews_nightscoutImportBatchProgress" = "Пакет %1$d з %2$d";
+"settingsviews_nightscoutImportErrorServer" = "Nightscout повернув тимчасову помилку сервера (HTTP %d). Відновіть імпорт пізніше.";
+"settingsviews_nightscoutImportErrorUnexpectedStatus" = "Nightscout повернув неочікувану відповідь (HTTP %d).";

@@ -7,7 +7,7 @@
 "timeScheduleViewTitle" = "On/Off Time Schedule for ";
 
 /// In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row
-"volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
+"volumeTestiOSSound" = "Ko je tihi način onemogočen";
 
 /// nightscout settings, port to use
 "nightscoutPort" = "Port";
@@ -23,6 +23,9 @@
 
 /// alerting settings, row alerts
 "settingsviews_row_alerts" = "Alarms";
+"settingsviews_volume_tests_section_title" = "Preizkus glasnosti alarma";
+"settingsviews_alert_types_section_footer" = "Vrste alarmov določajo, kako se alarmi obnašajo, vključno z zvokom, vibriranjem, dremežem in preglasitvijo tihega načina.";
+"settingsviews_alerts_section_footer" = "Alarmi določajo, kdaj naj aplikacija obvesti o ravneh glukoze, manjkajočih odčitkih in drugih pogojih.";
 
 /// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test
 "volumeTestiOSSoundExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.";
@@ -213,7 +216,7 @@
 "settingsviews_masterorfollower" = "Master or Follower";
 
 /// In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row
-"volumeTestSoundPlayer" = "Test Volume (if Override Mute On)";
+"volumeTestSoundPlayer" = "Ko je tihi način omogočen";
 
 /// bluetooth settings, section title - also used in bluetooth peripheral view, eg when viewing M5Stack details. This is the title of the first section
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
@@ -525,13 +528,30 @@
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
 
 // MARK: - Automatic Housekeeping
+"settingsviews_dataManagementStorageInfo" = "Podatki o shrambi";
+"settingsviews_dataManagementManageData" = "Upravljanje podatkov";
+"settingsviews_dataManagementDataRetention" = "Hramba podatkov";
+"settingsviews_dataManagementDataDeletion" = "Brisanje podatkov";
+"settingsviews_dataManagementImportData" = "Uvoz podatkov";
+"settingsviews_dataManagementLastHousekeeping" = "Zadnje čiščenje";
+"settingsviews_storageInfoDatabase" = "Podatkovna zbirka";
+"settingsviews_storageInfoDatabaseSize" = "Velikost zbirke";
+"settingsviews_storageInfoTrackedRecords" = "Prešteti zapisi";
+"settingsviews_storageInfoDevices" = "Naprave";
+"settingsviews_storageInfoSensors" = "Senzorji";
+"settingsviews_storageInfoRetentionFooter" = "Nastavljeno obdobje hrambe podatkov je %d dni.";
+"settingsviews_storageInfoHistory" = "Shranjena zgodovina";
+"settingsviews_storageInfoEarliestRecord" = "Najstarejši zapis";
+"settingsviews_storageInfoLatestRecord" = "Najnovejši zapis";
+"settingsviews_storageInfoCheckingStatus" = "Preverjanje shrambe…";
+"settingsviews_nightscoutImportRetentionFooter" = "Uvoz je omejen na obdobje hrambe %d dni. Starejši podatki se odstranijo med čiščenjem.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Samodejno čiščenje";
 "settingsviews_cleanDataKeepHistoricalData" = "Ohrani zgodovino";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Nazadnje končano";
 "settingsviews_cleanDataLastHousekeepingResult" = "Zadnji rezultat";
 "settingsviews_cleanDataNoHousekeepingRequired" = "Čiščenje ni potrebno";
 "settingsviews_cleanDataAutomaticHousekeepingFooter" = "Izvede se največ enkrat dnevno ob odprtju aplikacije. Starejše meritve, terapije in neuporabljena umerjanja se odstranijo lokalno.";
-"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Zgodovina se odstrani le z ročnimi možnostmi spodaj.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Zgodovinski podatki se ročno odstranijo le v razdelku Brisanje podatkov.";
 "settingsviews_cleanDataOneHousekeepingRecordRemoved" = "Odstranjen %@ zapis";
 "settingsviews_cleanDataHousekeepingRecordsRemoved" = "Odstranjenih %@ zapisov";
 
@@ -542,7 +562,7 @@
 "settingsviews_cleanDataBgReadings" = "Meritve glukoze";
 "settingsviews_cleanDataTreatments" = "Terapije";
 "settingsviews_cleanDataCalibrations" = "Umerjanja";
-"settingsviews_cleanDataSelectData" = "Izberite podatke";
+"settingsviews_cleanDataSelectData" = "Podatki za brisanje";
 "settingsviews_cleanDataCleanupMethod" = "Način čiščenja";
 "settingsviews_cleanDataKeepRecent" = "Ohrani nedavne";
 "settingsviews_cleanDataDateRange" = "Datumski obseg";
@@ -550,7 +570,7 @@
 "settingsviews_cleanDataKeep" = "Ohrani";
 "settingsviews_cleanDataFrom" = "Od";
 "settingsviews_cleanDataUntil" = "Do";
-"settingsviews_cleanDataOlderDataFooter" = "Starejši podatki bodo izbrisani, nedavni pa ohranjeni.";
+"settingsviews_cleanDataOlderDataFooter" = "Starejši podatki bodo izbrisani. Nedavni podatki bodo ohranjeni.";
 "settingsviews_cleanDataInclusiveDatesFooter" = "Oba datuma sta vključena.";
 "settingsviews_cleanDataDeleteAllFooter" = "Vsi izbrani podatki bodo izbrisani.";
 "settingsviews_cleanDataContinue" = "Nadaljuj";
@@ -580,4 +600,118 @@
 "settingsviews_cleanDataChangedError" = "Podatki so se po povzetku spremenili. Preglejte jih znova.";
 "settingsviews_cleanDataDeleteFailedError" = "Izbranih podatkov ni bilo mogoče izbrisati. Čiščenje je ustavljeno.";
 "settingsviews_cleanDataDays" = "%d dni";
+"settingsviews_nightscoutImportCompleted" = "Uvoz iz Nightscouta je končan";
+"settingsviews_nightscoutImportSummary" = "Povzetek uvoza";
+"settingsviews_nightscoutImportURLMissing" = "URL za Nightscout ni nastavljen";
+"settingsviews_nightscoutImportConfigureURL" = "Pred uvozom podatkov nastavite URL za Nightscout v nastavitvah Nightscout.";
+"settingsviews_nightscoutImportDownloaded" = "Preneseno";
+"settingsviews_nightscoutImportAdded" = "Dodano";
+"settingsviews_nightscoutImportSkipped" = "Preskočeno";
+"settingsviews_nightscoutImportInvalid" = "Neveljavno";
+"settingsviews_nightscoutImportSummaryFooter" = "Zapisi, ki so že bili shranjeni lokalno, so bili preskočeni. Neveljavni dokumenti Nightscout niso bili uvoženi.";
+"settingsviews_nightscoutImportingData" = "Uvažanje podatkov";
 "settingsviews_cleanDataConfirmationCode" = "Potrditvena koda %@";
+"settingsviews_backupCreate" = "Ustvari varnostno kopijo";
+"settingsviews_backupRestore" = "Obnovi varnostno kopijo";
+"settingsviews_backupCreated" = "Varnostna kopija je uspešno ustvarjena";
+"settingsviews_backupRestored" = "Varnostna kopija je bila uspešno obnovljena";
+"settingsviews_backupReplaceQuestion" = "Zamenjati obstoječe podatke?";
+"settingsviews_backupReplaceData" = "Zamenjaj podatke";
+"settingsviews_backupReplaceWarning" = "Obstoječi odčitki GK in zdravljenja v obdobjih varnostne kopije bodo izbrisani, preden bo varnostna kopija obnovljena.";
+"settingsviews_backupAndRestore" = "Varnostno kopiranje in obnovitev";
+"settingsviews_backupAppSettingsAndAlerts" = "Nastavitve in opozorila aplikacije";
+"settingsviews_backupEncrypt" = "Šifriraj varnostno kopijo";
+"settingsviews_backupAccounts" = "Varnostni računi";
+"settingsviews_backupConfirmPassword" = "Potrdite geslo";
+"settingsviews_backupPasswordProtection" = "Zaščita z geslom";
+"settingsviews_backupPasswordProtectionFooter" = "Dodajanje zaščite z geslom omogoča tudi varnostno kopiranje računov, ki vsebujejo občutljive podatke.";
+"settingsviews_backupAccountDetailsFooter" = "Podrobnosti računa lahko vključujejo URL-je strežnika, uporabniška imena, gesla in žetone za dostop.";
+"settingsviews_backupCreateAndShare" = "Ustvarite in delite varnostno kopijo";
+"settingsviews_backupEncryptedCreationFooter" = "Ustvarjanje šifriranih varnostnih kopij traja dlje. Pustite aplikacijo odprto in bodite potrpežljivi.";
+"settingsviews_backupCreatedAt" = "Ustvarjeno";
+"settingsviews_backupEarliestData" = "Najzgodnejši podatki";
+"settingsviews_backupSettingsAndAlerts" = "Nastavitve in opozorila";
+"settingsviews_backupAccountDetails" = "Podrobnosti računa";
+"settingsviews_backupIncluded" = "Vključeno";
+"settingsviews_backupNotIncluded" = "Ni vključeno";
+"settingsviews_backupNotEnabled" = "Ni omogočeno";
+"settingsviews_backupSummary" = "Povzetek varnostne kopije";
+"settingsviews_backupChooseFile" = "Izberite datoteko varnostne kopije";
+"settingsviews_backupFile" = "Varnostna kopija datoteke";
+"settingsviews_backupFileCheckFooter" = "Varnostna kopija se preveri pred spremembo obstoječih podatkov.";
+"settingsviews_backupSelected" = "Izbrana varnostna kopija";
+"settingsviews_backupPasswordRequired" = "Obvezno";
+"settingsviews_backupUnlock" = "Odkleni varnostno kopijo";
+"settingsviews_backupEncryptedNotice" = "Ta varnostna kopija je šifrirana in jo je treba odkleniti.";
+"settingsviews_backupSettings" = "nastavitve";
+"settingsviews_backupRestoreOptions" = "Možnosti obnovitve";
+"settingsviews_backupDataHandling" = "Ravnanje s podatki";
+"settingsviews_backupKeepCurrentData" = "Ohranite trenutne podatke";
+"settingsviews_backupFillGaps" = "Zapolnite vrzeli";
+"settingsviews_backupReplaceRange" = "Zamenjajte rezervno območje";
+"settingsviews_backupIgnoreData" = "Ignoriraj podatke";
+"settingsviews_backupRestoreSettingsAndAlerts" = "Obnovi nastavitve aplikacije in opozorila";
+"settingsviews_backupRestoreAccounts" = "Obnovi račune";
+"settingsviews_backupReplaceAndRestore" = "Zamenjaj in obnovi";
+"settingsviews_backupRestoreSummary" = "Povzetek obnovitve";
+"settingsviews_backupBgReadingsAppliedFrom" = "Odčitki GK uporabljeni od";
+"settingsviews_backupBgReadingsAdded" = "Dodani odčitki GK";
+"settingsviews_backupBgReadingsSkipped" = "Odčitki GK preskočeni";
+"settingsviews_backupTreatmentsAdded" = "Dodani tretmaji";
+"settingsviews_backupTreatmentsSkipped" = "Zdravljenja preskočena";
+"settingsviews_backupSettingsRestored" = "Nastavitve obnovljene";
+"settingsviews_backupAccountRestore" = "Obnovitev računa";
+"settingsviews_backupCreatingEncryptedStatus" = "Varno ustvarjanje in šifriranje vaše varnostne kopije …\nBodite potrpežljivi.";
+"settingsviews_backupCreatingStatus" = "Ustvarjanje varnostne kopije ...";
+"settingsviews_backupCheckingStatus" = "Preverjanje varnostne kopije ...";
+"settingsviews_backupDecryptingStatus" = "Dešifriranje in preverjanje varnostne kopije …\nProsimo, bodite potrpežljivi.";
+"settingsviews_backupRestoringEncryptedStatus" = "Obnavljanje vaše šifrirane varnostne kopije …\nBodite potrpežljivi.";
+"settingsviews_backupRestoringStatus" = "Obnavljanje varnostne kopije ...";
+"settingsviews_backupErrorInvalidFile" = "To ni veljavna varnostna kopija aplikacije.";
+"settingsviews_backupErrorIncorrectPassword" = "Geslo ni pravilno ali pa je zaščitena varnostna kopija poškodovana.";
+"settingsviews_backupErrorMissingPassword" = "Vnesite geslo za zaščito te varnostne kopije.";
+"settingsviews_nightscoutImportQuestion" = "Uvoz iz Nightscout?";
+"settingsviews_nightscoutImportAction" = "Uvoz iz Nightscout";
+"settingsviews_nightscoutImportDiscardQuestion" = "Želite zavreči shranjeni uvoz?";
+"settingsviews_nightscoutImportDiscard" = "Zavrzi uvoz";
+"settingsviews_nightscoutImportDiscardSaved" = "Zavrzi shranjeni uvoz";
+"settingsviews_nightscoutImportDiscardMessage" = "Shranjen napredek bo odstranjen. Uvoženi podatki bodo ostali varno shranjeni in bodo preskočeni, če začnete znova.";
+"settingsviews_nightscoutImportDataToImport" = "Podatki za uvoz";
+"settingsviews_nightscoutImportPeriod" = "Uvozno obdobje";
+"settingsviews_nightscoutImportExistingDataFooter" = "Obstoječi lokalni podatki se hranijo. Odčitki GK v 30 sekundah od obstoječega odčitka in zdravljenja, ki jih je že identificiral Nightscout, so preskočeni.";
+"settingsviews_nightscoutImportKeepOpenFooter" = "Pustite aplikacijo odprto, dokler se uvoz ne konča. Napredek se shrani po vsakem zaključenem paketu, tako da je mogoče nadaljevati prekinjen uvoz.";
+"settingsviews_nightscoutImportPeriodLabel" = "Pika";
+"settingsviews_nightscoutImportCompletedBatches" = "Dokončane serije";
+"settingsviews_nightscoutImportResume" = "Nadaljuj uvoz";
+"settingsviews_nightscoutImportSaved" = "Shranjen uvoz";
+"settingsviews_nightscoutImportUnsupportedFooter" = "Ta uvoz uporablja nepodprto obdobje. Zavrzite ga, da začnete znova.";
+"settingsviews_nightscoutImportExceedsRetentionFooter" = "Ta uvoz presega vaše trenutno obdobje hrambe. Zavrzite ga, da začnete znova.";
+"settingsviews_nightscoutImportResumeFooter" = "Prejšnji uvoz se je ustavil, preden so bili dokončani vsi zahtevani paketi. Nadaljevanje se nadaljuje od zadnje shranjene kontrolne točke.";
+"settingsviews_nightscoutImportPause" = "Zaustavi uvoz";
+"settingsviews_nightscoutImportBgAndTreatments" = "meritve GK in zdravljenje";
+"settingsviews_nightscoutImportBgOnly" = "odčitki BG";
+"settingsviews_nightscoutImportTreatmentsOnly" = "zdravljenja";
+"settingsviews_nightscoutImportKeepAppOpen" = "Naj bo aplikacija odprta.";
+"settingsviews_nightscoutImportPaused" = "Uvoz zaustavljen";
+"settingsviews_nightscoutImportErrorNoSelection" = "Izberite odčitke GK, zdravljenje ali oboje.";
+"settingsviews_nightscoutImportErrorUnsupportedPeriod" = "Shranjeni uvoz uporablja obdobje, ki ni več podprto. Zavrzite ga in začnite znova.";
+"settingsviews_nightscoutImportErrorRetention" = "Izbrano obdobje uvoza presega trenutno nastavitev hrambe podatkov.";
+"settingsviews_nightscoutImportErrorMissingURL" = "Pred začetkom uvoza vnesite URL Nightscout v nastavitve Nightscout.";
+"settingsviews_nightscoutImportErrorInvalidURL" = "Konfigurirani URL Nightscout ni veljaven. Preverite v nastavitvah Nightscout in poskusite znova.";
+"settingsviews_nightscoutImportErrorCheckpointUnavailable" = "Shranjenega uvoza Nightscout ni več mogoče nadaljevati. Začnite nov uvoz.";
+"settingsviews_nightscoutImportErrorSiteChanged" = "Konfigurirano spletno mesto Nightscout se je spremenilo od začetka tega uvoza. Zavrzite shranjen uvoz ali obnovite prejšnji URL Nightscout.";
+"settingsviews_nightscoutImportErrorAuthentication" = "Nightscout zavrnjen dostop. Preverite skrivnost API-ja ali žeton za dostop v nastavitvah Nightscout.";
+"settingsviews_nightscoutImportErrorEndpoint" = "Podatkovne končne točke Nightscout ni bilo mogoče najti. Preverite konfigurirani URL in različico spletnega mesta.";
+"settingsviews_nightscoutImportErrorRateLimited" = "Nightscout prejema preveč prošenj. Počakajte trenutek in nadaljujte z uvozom.";
+"settingsviews_nightscoutImportErrorInvalidResponse" = "Nightscout je vrnil podatke, ki jih ni bilo mogoče varno prebrati. Iz prizadetega paketa niso bili uvoženi nobeni podatki.";
+"settingsviews_nightscoutImportErrorResponseLimit" = "Serija Nightscout je ostala prevelika, potem ko je bila razdeljena na majhna časovna obdobja. Uvoženi niso bili nobeni okrnjeni podatki.";
+"settingsviews_backupCreatedWithAppVersion" = "Varnostna kopija, ustvarjena z različico aplikacije %@.";
+"settingsviews_backupErrorUnsupportedVersion" = "Ta različica aplikacije ne podpira različice zapisa varnostne kopije %d.";
+"settingsviews_backupErrorFinalValueMismatch" = "Shranjene vrednosti glukoze ne reproducirajo varnostno kopirane končne vrednosti za branje %@.";
+"settingsviews_nightscoutImportBatchCount" = "%1$d od %2$d";
+"settingsviews_nightscoutImportBgAddedProgress" = "Dodane vrednosti GK: %@";
+"settingsviews_nightscoutImportTreatmentsAddedProgress" = "Dodane obdelave: %@";
+"settingsviews_nightscoutImportConfirmation" = "Uvoziti zadnjih %1$d dni od %2$@? Obstoječi lokalni zapisi bodo ohranjeni, dvojniki pa bodo preskočeni.";
+"settingsviews_nightscoutImportBatchProgress" = "Paket %1$d od %2$d";
+"settingsviews_nightscoutImportErrorServer" = "Nightscout je vrnil začasno napako strežnika (HTTP %d). Uvoz nadaljujte pozneje.";
+"settingsviews_nightscoutImportErrorUnexpectedStatus" = "Nightscout je vrnil nepričakovan odgovor (HTTP %d).";

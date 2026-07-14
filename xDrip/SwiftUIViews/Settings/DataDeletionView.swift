@@ -1,5 +1,5 @@
 //
-//  CleanDataView.swift
+//  DataDeletionView.swift
 //  xdrip
 //
 //  Created by Paul Plant on 13/7/26.
@@ -9,16 +9,16 @@
 import os
 import SwiftUI
 
-// MARK: - Clean Data View
+// MARK: - Data Deletion View
 
-struct CleanDataView: View {
+struct DataDeletionView: View {
     private static let successColor = Color.green
 
-    @StateObject private var viewModel: CleanDataViewModel
+    @StateObject private var viewModel: DataDeletionViewModel
     @FocusState private var confirmationCodeFieldIsFocused: Bool
 
     init(coreDataManager: CoreDataManager) {
-        _viewModel = StateObject(wrappedValue: CleanDataViewModel(coreDataManager: coreDataManager))
+        _viewModel = StateObject(wrappedValue: DataDeletionViewModel(coreDataManager: coreDataManager))
     }
 
     var body: some View {
@@ -35,14 +35,12 @@ struct CleanDataView: View {
                     deletionSummaryConfirmationSection
                 }
             } else if let inventory = viewModel.inventory {
-                housekeepingSection
-                inventorySection(inventory)
-                selectionSection(inventory)
                 dateRangeSection
+                selectionSection(inventory)
                 reviewSection
             }
         }
-        .padding(.top, viewModel.deletionPlan != nil && viewModel.deletionResult == nil ? -16 : 0)
+        .padding(.top, viewModel.deletionPlan != nil && viewModel.deletionResult == nil ? 4 : 0)
         .tint(Color(.systemBlue))
         .disabled(viewModel.isWorking)
         .overlay {
@@ -62,7 +60,7 @@ struct CleanDataView: View {
                 }
             }
         }
-        .alert(Texts_SettingsView.cleanData, isPresented: errorIsPresented) {
+        .alert(Texts_SettingsView.dataManagementDataDeletion, isPresented: errorIsPresented) {
             Button(Texts_Common.Ok) { viewModel.errorMessage = nil }
         } message: {
             Text(viewModel.errorMessage ?? "")
@@ -72,55 +70,7 @@ struct CleanDataView: View {
         }
     }
 
-    // MARK: - Inventory and Selection
-
-    private var housekeepingSection: some View {
-        Section {
-            Toggle(Texts_SettingsView.cleanDataAutomaticHousekeeping, isOn: $viewModel.automaticHousekeepingEnabled)
-                .tint(.green)
-                .onChange(of: viewModel.automaticHousekeepingEnabled) { _ in
-                    viewModel.automaticHousekeepingEnabledChanged()
-                }
-
-            Picker(Texts_SettingsView.cleanDataKeepHistoricalData, selection: $viewModel.automaticRetentionDays) {
-                ForEach(viewModel.availableAutomaticRetentionDays, id: \.self) { days in
-                    Text(Texts_SettingsView.cleanDataDays(days)).tag(days)
-                }
-            }
-            .disabled(!viewModel.automaticHousekeepingEnabled)
-            .onChange(of: viewModel.automaticRetentionDays) { _ in
-                viewModel.automaticRetentionDaysChanged()
-            }
-
-            if let lastHousekeepingDate = viewModel.lastHousekeepingDate {
-                LabeledContent(
-                    Texts_SettingsView.cleanDataLastHousekeepingCompleted,
-                    value: formattedDate(lastHousekeepingDate)
-                )
-                LabeledContent(
-                    Texts_SettingsView.cleanDataLastHousekeepingResult,
-                    value: viewModel.lastHousekeepingResultDescription
-                )
-            }
-        } header: {
-            Text(Texts_SettingsView.cleanDataAutomaticHousekeeping)
-        } footer: {
-            Text(viewModel.automaticHousekeepingEnabled
-                ? Texts_SettingsView.cleanDataAutomaticHousekeepingFooter
-                : Texts_SettingsView.cleanDataAutomaticHousekeepingDisabledFooter)
-        }
-    }
-
-    private func inventorySection(_ inventory: CleanDataInventory) -> some View {
-        Section {
-            LabeledContent(Texts_SettingsView.cleanDataStorageUsed, value: formattedByteCount(inventory.storeSizeInBytes))
-            inventoryRow(title: Texts_SettingsView.cleanDataBgReadings, inventory: inventory.bgReadings)
-            inventoryRow(title: Texts_SettingsView.cleanDataTreatments, inventory: inventory.treatments)
-            inventoryRow(title: Texts_SettingsView.cleanDataCalibrations, inventory: inventory.calibrations)
-        } header: {
-            Text(Texts_SettingsView.cleanDataStoredData)
-        }
-    }
+    // MARK: - Range and Selection
 
     private func selectionSection(_ inventory: CleanDataInventory) -> some View {
         Section {
@@ -154,7 +104,7 @@ struct CleanDataView: View {
             switch viewModel.rangeMode {
             case .keepRecent:
                 Picker(Texts_SettingsView.cleanDataKeep, selection: $viewModel.recentDataDays) {
-                    ForEach(CleanDataViewModel.availableRecentDataDays, id: \.self) { days in
+                    ForEach(DataDeletionViewModel.availableRecentDataDays, id: \.self) { days in
                         Text(Texts_SettingsView.cleanDataDays(days)).tag(days)
                     }
                 }
@@ -221,7 +171,7 @@ struct CleanDataView: View {
                         .foregroundStyle(Color(.secondaryLabel))
                 }
             }
-            .frame(maxWidth: .infinity)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 4)
             .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             .listRowBackground(ConstantsUI.warningSectionBackgroundColor)
@@ -347,10 +297,6 @@ struct CleanDataView: View {
 
     // MARK: - View Helpers
 
-    private func inventoryRow(title: String, inventory: CleanDataCategoryInventory) -> some View {
-        LabeledContent(title, value: inventory.count.formatted())
-    }
-
     private func selectionLabel(title: String, count: Int) -> some View {
         HStack {
             Text(title)
@@ -377,18 +323,12 @@ struct CleanDataView: View {
     }
 }
 
-// MARK: - Clean Data View Model
+// MARK: - Data Deletion View Model
 
 @MainActor
-final class CleanDataViewModel: ObservableObject {
+final class DataDeletionViewModel: ObservableObject {
     static let availableRecentDataDays = [30, 60, 90, 180, 365]
 
-    @Published var automaticHousekeepingEnabled = UserDefaults.standard.automaticHousekeepingEnabled
-    @Published var automaticRetentionDays = UserDefaults.standard.retentionPeriodInDays
-    @Published private(set) var lastHousekeepingDate = UserDefaults.standard.lastHousekeepingDate
-    @Published private(set) var lastHousekeepingBgReadingsDeleted = UserDefaults.standard.lastHousekeepingBgReadingsDeleted
-    @Published private(set) var lastHousekeepingTreatmentsDeleted = UserDefaults.standard.lastHousekeepingTreatmentsDeleted
-    @Published private(set) var lastHousekeepingCalibrationsDeleted = UserDefaults.standard.lastHousekeepingCalibrationsDeleted
     @Published var inventory: CleanDataInventory?
     @Published var includesBgReadings = false
     @Published var includesTreatments = false
@@ -406,11 +346,11 @@ final class CleanDataViewModel: ObservableObject {
     @Published var status = ""
     @Published var errorMessage: String?
 
-    private let service: CleanDataService
+    private let service: DataManagementService
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryDataManagement)
 
     init(coreDataManager: CoreDataManager) {
-        service = CleanDataService(coreDataManager: coreDataManager)
+        service = DataManagementService(coreDataManager: coreDataManager)
     }
 
     var canPrepareDeletionPlan: Bool {
@@ -418,27 +358,14 @@ final class CleanDataViewModel: ObservableObject {
         return hasSelection && (rangeMode != .custom || customFromDate <= customThroughDate)
     }
 
-    var availableAutomaticRetentionDays: [Int] {
-        Array(Set([90, 180, 365, automaticRetentionDays])).sorted()
-    }
-
-    var lastHousekeepingResultDescription: String {
-        let totalDeleted = lastHousekeepingBgReadingsDeleted
-            + lastHousekeepingTreatmentsDeleted
-            + lastHousekeepingCalibrationsDeleted
-        guard totalDeleted > 0 else { return Texts_SettingsView.cleanDataNoHousekeepingRequired }
-        return Texts_SettingsView.cleanDataHousekeepingRecordsRemoved(totalDeleted)
-    }
-
     var availableDateRange: ClosedRange<Date> {
-        let firstDate = selectedFirstDate ?? Date()
-        let lastDate = max(selectedLastDate ?? firstDate, firstDate)
+        let firstDate = firstStoredDate ?? Date()
+        let lastDate = max(lastStoredDate ?? firstDate, firstDate)
         return firstDate ... lastDate
     }
 
     func loadInventoryIfNeeded() async {
         guard inventory == nil, !isWorking else { return }
-        refreshHousekeepingStatus()
         start(status: Texts_SettingsView.cleanDataCheckingStatus)
         do {
             inventory = try await service.inventory()
@@ -449,31 +376,7 @@ final class CleanDataViewModel: ObservableObject {
         }
     }
 
-    func automaticHousekeepingEnabledChanged() {
-        UserDefaults.standard.automaticHousekeepingEnabled = automaticHousekeepingEnabled
-        trace(
-            "in automaticHousekeepingEnabledChanged, enabled = %{public}@",
-            log: log,
-            category: ConstantsLog.categoryDataManagement,
-            type: .info,
-            automaticHousekeepingEnabled.description
-        )
-    }
-
-    func automaticRetentionDaysChanged() {
-        UserDefaults.standard.retentionPeriodInDays = automaticRetentionDays
-        automaticRetentionDays = UserDefaults.standard.retentionPeriodInDays
-        trace(
-            "in automaticRetentionDaysChanged, retention period = %{public}@ days",
-            log: log,
-            category: ConstantsLog.categoryDataManagement,
-            type: .info,
-            automaticRetentionDays.description
-        )
-    }
-
     func selectionChanged() {
-        resetCustomDateRange()
         trace(
             "in cleanDataSelectionChanged, BG readings selected = %{public}@, treatments selected = %{public}@",
             log: log,
@@ -596,14 +499,18 @@ final class CleanDataViewModel: ObservableObject {
         return dates.min()
     }
 
-    private func refreshHousekeepingStatus() {
-        let defaults = UserDefaults.standard
-        automaticHousekeepingEnabled = defaults.automaticHousekeepingEnabled
-        automaticRetentionDays = defaults.retentionPeriodInDays
-        lastHousekeepingDate = defaults.lastHousekeepingDate
-        lastHousekeepingBgReadingsDeleted = defaults.lastHousekeepingBgReadingsDeleted
-        lastHousekeepingTreatmentsDeleted = defaults.lastHousekeepingTreatmentsDeleted
-        lastHousekeepingCalibrationsDeleted = defaults.lastHousekeepingCalibrationsDeleted
+    private var firstStoredDate: Date? {
+        guard let inventory else { return nil }
+        return [inventory.bgReadings.firstDate, inventory.treatments.firstDate]
+            .compactMap { $0 }
+            .min()
+    }
+
+    private var lastStoredDate: Date? {
+        guard let inventory else { return nil }
+        return [inventory.bgReadings.lastDate, inventory.treatments.lastDate]
+            .compactMap { $0 }
+            .max()
     }
 
     private var selectedLastDate: Date? {
@@ -615,7 +522,7 @@ final class CleanDataViewModel: ObservableObject {
     }
 
     private func resetCustomDateRange() {
-        guard let firstDate = selectedFirstDate, let lastDate = selectedLastDate else { return }
+        guard let firstDate = firstStoredDate, let lastDate = lastStoredDate else { return }
         customFromDate = firstDate
         customThroughDate = max(lastDate, firstDate)
     }

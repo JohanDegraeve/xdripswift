@@ -11,8 +11,12 @@
 		BA0000010000000000000002 /* BackupCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000012 /* BackupCrypto.swift */; };
 		BA0000010000000000000003 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000013 /* BackupService.swift */; };
 		BA0000010000000000000004 /* DataManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000014 /* DataManagementView.swift */; };
-		BA0000010000000000000005 /* CleanDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000015 /* CleanDataService.swift */; };
-		BA0000010000000000000006 /* CleanDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000016 /* CleanDataView.swift */; };
+		BA0000010000000000000005 /* DataManagementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000015 /* DataManagementService.swift */; };
+		BA0000010000000000000006 /* DataDeletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000016 /* DataDeletionView.swift */; };
+		BA0000010000000000000007 /* NightscoutImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000017 /* NightscoutImportService.swift */; };
+		BA0000010000000000000008 /* NightscoutImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000018 /* NightscoutImportView.swift */; };
+		BA0000010000000000000009 /* ManageDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000019 /* ManageDataView.swift */; };
+		BA000001000000000000000A /* ImportDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA000001000000000000001A /* ImportDataView.swift */; };
 		07ECB18D91AE096E637D1393 /* AlertsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */; };
 		16A7F56E1D1ED24F03F2070F /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
 		1E83ECCFB4B5916FC5738267 /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
@@ -781,8 +785,12 @@
 		BA0000010000000000000012 /* BackupCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupCrypto.swift; sourceTree = "<group>"; };
 		BA0000010000000000000013 /* BackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupService.swift; sourceTree = "<group>"; };
 		BA0000010000000000000014 /* DataManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagementView.swift; sourceTree = "<group>"; };
-		BA0000010000000000000015 /* CleanDataService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanDataService.swift; sourceTree = "<group>"; };
-		BA0000010000000000000016 /* CleanDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CleanDataView.swift; sourceTree = "<group>"; };
+		BA0000010000000000000015 /* DataManagementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagementService.swift; sourceTree = "<group>"; };
+		BA0000010000000000000016 /* DataDeletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataDeletionView.swift; sourceTree = "<group>"; };
+		BA0000010000000000000017 /* NightscoutImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutImportService.swift; sourceTree = "<group>"; };
+		BA0000010000000000000018 /* NightscoutImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutImportView.swift; sourceTree = "<group>"; };
+		BA0000010000000000000019 /* ManageDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageDataView.swift; sourceTree = "<group>"; };
+		BA000001000000000000001A /* ImportDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportDataView.swift; sourceTree = "<group>"; };
 		102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlertTypesSettingsView.swift; sourceTree = "<group>"; };
 		198D44C4260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Alerts.strings; sourceTree = "<group>"; };
 		198D44C5260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
@@ -2386,6 +2394,7 @@
 				F821CF65229EE68B005C1E43 /* NightscoutFollowManager.swift */,
 				476A897D2CCA7E680073ED83 /* NightscoutFollowType.swift */,
 				476A897B2CC963AF0073ED83 /* NightscoutProfileModels.swift */,
+				BA0000010000000000000017 /* NightscoutImportService.swift */,
 				F821CF60229BF4A2005C1E43 /* NightscoutSyncManager.swift */,
 			);
 			path = Nightscout;
@@ -2513,7 +2522,7 @@
 		F85FF38F25288860004E6FF1 /* HouseKeeping */ = {
 			isa = PBXGroup;
 			children = (
-				BA0000010000000000000015 /* CleanDataService.swift */,
+				BA0000010000000000000015 /* DataManagementService.swift */,
 				F85FF39025288870004E6FF1 /* HouseKeeper.swift */,
 			);
 			path = HouseKeeping;
@@ -2547,8 +2556,11 @@
 		F866974E2867A97000025441 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				BA0000010000000000000016 /* CleanDataView.swift */,
+				BA0000010000000000000016 /* DataDeletionView.swift */,
+				BA000001000000000000001A /* ImportDataView.swift */,
+				BA0000010000000000000019 /* ManageDataView.swift */,
 				BA0000010000000000000014 /* DataManagementView.swift */,
+				BA0000010000000000000018 /* NightscoutImportView.swift */,
 				763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */,
 				102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */,
 				F866974F2867AA4A00025441 /* LoopDelayScheduleView.swift */,
@@ -3869,8 +3881,12 @@
 				BA0000010000000000000002 /* BackupCrypto.swift in Sources */,
 				BA0000010000000000000003 /* BackupService.swift in Sources */,
 				BA0000010000000000000004 /* DataManagementView.swift in Sources */,
-				BA0000010000000000000005 /* CleanDataService.swift in Sources */,
-				BA0000010000000000000006 /* CleanDataView.swift in Sources */,
+				BA0000010000000000000005 /* DataManagementService.swift in Sources */,
+				BA0000010000000000000006 /* DataDeletionView.swift in Sources */,
+				BA000001000000000000000A /* ImportDataView.swift in Sources */,
+				BA0000010000000000000009 /* ManageDataView.swift in Sources */,
+				BA0000010000000000000007 /* NightscoutImportService.swift in Sources */,
+				BA0000010000000000000008 /* NightscoutImportView.swift in Sources */,
 				F8BDD450221CAA64006EAB84 /* TextsCommon.swift in Sources */,
 				47B136DD2BCA9151001E7ED3 /* ConstantsContactImage.swift in Sources */,
 				F81D6D4E22BFC762005EFAE2 /* TextsDexcomShareTestResult.swift in Sources */,

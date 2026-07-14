@@ -15,7 +15,7 @@ import CoreData
 // Changing the order will change the Int16 value
 // and may change all Treatments Type present in CoreData.
 // Add new at the end or specify each value.
-@objc public enum TreatmentType: Int16 {
+@objc public enum TreatmentType: Int16, Sendable {
 	case Insulin
 	case Carbs
 	case Exercise
@@ -219,4 +219,3 @@ public func < (lhs: TreatmentEntry, rhs: TreatmentEntry) -> Bool {
     return lhs.date < rhs.date
     
 }
-

@@ -14,25 +14,44 @@ import UniformTypeIdentifiers
 
 // Defines the root Data Management section and its native backup destinations.
 struct SettingsViewDataManagementSettingsViewModel: SettingsViewModelProtocol, SettingsNativeSectionProvider {
+    private let dataManagementService: DataManagementService?
+
+    init(coreDataManager: CoreDataManager?) {
+        dataManagementService = coreDataManager.map(DataManagementService.init)
+    }
+
     func settingsRows(sectionID _: Int) -> [SettingsRow] {
         [
             SettingsRow(
+                id: "dataManagement.storageInfo",
+                title: Texts_SettingsView.dataManagementStorageInfo,
+                detail: databaseSizeDescription,
+                accessory: .disclosure,
+                action: .dataManagement(.storageInfo)
+            ),
+            SettingsRow(
                 id: "dataManagement.createBackup",
-                title: "Create Backup",
+                title: Texts_SettingsView.backupCreate,
                 accessory: .disclosure,
                 action: .dataManagement(.create)
             ),
             SettingsRow(
                 id: "dataManagement.restoreBackup",
-                title: "Restore Backup",
+                title: Texts_SettingsView.backupRestore,
                 accessory: .disclosure,
                 action: .dataManagement(.restore)
             ),
             SettingsRow(
-                id: "dataManagement.cleanData",
-                title: Texts_SettingsView.cleanData,
+                id: "dataManagement.importData",
+                title: Texts_SettingsView.dataManagementImportData,
                 accessory: .disclosure,
-                action: .dataManagement(.clean)
+                action: .dataManagement(.importData)
+            ),
+            SettingsRow(
+                id: "dataManagement.manageData",
+                title: Texts_SettingsView.dataManagementManageData,
+                accessory: .disclosure,
+                action: .dataManagement(.manageData)
             ),
         ]
     }
@@ -40,32 +59,43 @@ struct SettingsViewDataManagementSettingsViewModel: SettingsViewModelProtocol, S
     func sectionTitle() -> String? { Texts_SettingsView.sectionTitleHousekeeper }
     func settingsRowText(index: Int) -> String {
         switch index {
-        case 0: "Create Backup"
-        case 1: "Restore Backup"
-        default: Texts_SettingsView.cleanData
+        case 0: Texts_SettingsView.dataManagementStorageInfo
+        case 1: Texts_SettingsView.backupCreate
+        case 2: Texts_SettingsView.backupRestore
+        case 3: Texts_SettingsView.dataManagementImportData
+        default: Texts_SettingsView.dataManagementManageData
         }
     }
 
     func accessoryType(index _: Int) -> SettingsAccessory { .disclosure }
     func detailedText(index _: Int) -> String? { nil }
-    func numberOfRows() -> Int { 3 }
+    func numberOfRows() -> Int { 5 }
     func onRowSelect(index _: Int) -> SettingsSelectedRowAction { .nothing }
     func isEnabled(index _: Int) -> Bool { true }
     func completeSettingsViewRefreshNeeded(index _: Int) -> Bool { false }
     func storeMessageHandler(messageHandler _: @escaping ((String, String) -> Void)) {}
     func storeRowReloadClosure(rowReloadClosure _: @escaping ((Int) -> Void)) {}
+
+    private var databaseSizeDescription: String? {
+        guard let storeSizeInBytes = dataManagementService?.currentStoreSizeInBytes() else { return nil }
+        return ByteCountFormatter.string(fromByteCount: storeSizeInBytes, countStyle: .file)
+    }
 }
 
 enum DataManagementFlow {
+    case storageInfo
+    case manageData
     case create
     case restore
-    case clean
+    case importData
 
     var navigationTitle: String {
         switch self {
-        case .create: "Create Backup"
-        case .restore: "Restore Backup"
-        case .clean: Texts_SettingsView.cleanData
+        case .storageInfo: Texts_SettingsView.dataManagementStorageInfo
+        case .manageData: Texts_SettingsView.dataManagementManageData
+        case .create: Texts_SettingsView.backupCreate
+        case .restore: Texts_SettingsView.backupRestore
+        case .importData: Texts_SettingsView.dataManagementImportData
         }
     }
 }
@@ -101,8 +131,12 @@ struct DataManagementView: View {
     @ViewBuilder
     var body: some View {
         switch flow {
-        case .clean:
-            CleanDataView(coreDataManager: coreDataManager)
+        case .storageInfo:
+            StorageInfoView(coreDataManager: coreDataManager)
+        case .manageData:
+            ManageDataView(coreDataManager: coreDataManager)
+        case .importData:
+            ImportDataView(coreDataManager: coreDataManager)
         case .create, .restore:
             backupAndRestoreView
         }
@@ -113,7 +147,7 @@ struct DataManagementView: View {
             switch flow {
             case .create:
                 if let manifest = viewModel.createdBackupManifest {
-                    successSection("Backup Successfully Created")
+                    successSection(Texts_SettingsView.backupCreated)
                     backupSummarySection(manifest)
                 } else {
                     backupSection
@@ -122,7 +156,7 @@ struct DataManagementView: View {
                 }
             case .restore:
                 if let result = viewModel.restoreResult {
-                    successSection("Backup Successfully Restored")
+                    successSection(Texts_SettingsView.backupRestored)
                     resultSection(result)
                     if result.accountsRestored > 0 {
                         accountsSummarySection(result)
@@ -136,11 +170,10 @@ struct DataManagementView: View {
                     backupContentsSection(inspection.payload)
                     restoreOptionsSection
                 }
-            case .clean:
+            case .storageInfo, .manageData, .importData:
                 EmptyView()
             }
         }
-        .tint(Color(.systemBlue))
         .disabled(viewModel.isWorking)
         .overlay {
             if viewModel.isWorking {
@@ -171,58 +204,60 @@ struct DataManagementView: View {
         ) { result in
             viewModel.open(result)
         }
-        .alert("Replace Existing Data?", isPresented: $showsReplaceConfirmation) {
-            Button("Replace Data", role: .destructive) {
+        .alert(Texts_SettingsView.backupReplaceQuestion, isPresented: $showsReplaceConfirmation) {
+            Button(Texts_SettingsView.backupReplaceData, role: .destructive) {
                 viewModel.restore()
             }
             Button(Texts_Common.Cancel, role: .cancel) {}
         } message: {
-            Text("Existing BG readings and treatments within the backup date ranges will be deleted before the backup is restored.")
+            Text(Texts_SettingsView.backupReplaceWarning)
         }
-        .alert("Backup & Restore", isPresented: errorIsPresented) {
+        .alert(Texts_SettingsView.backupAndRestore, isPresented: errorIsPresented) {
             Button(Texts_Common.Ok) { viewModel.errorMessage = nil }
         } message: {
             Text(viewModel.errorMessage ?? "")
         }
+        // Keep the system alert actions blue instead of inheriting the Settings stack's yellow tint.
+        .tint(Color(.systemBlue))
         .onAppear(perform: openInitialBackupIfNeeded)
     }
 
     // MARK: - Create Backup
 
     private var backupSection: some View {
-        Section("Create Backup") {
-            Toggle("App Settings and Alerts", isOn: $viewModel.options.includesSettings)
+        Section(Texts_SettingsView.backupCreate) {
+            Toggle(Texts_SettingsView.backupAppSettingsAndAlerts, isOn: $viewModel.options.includesSettings)
                 .tint(.green)
-            Toggle("BG Readings", isOn: $viewModel.options.includesBgReadings)
+            Toggle(Texts_SettingsView.cleanDataBgReadings, isOn: $viewModel.options.includesBgReadings)
                 .tint(.green)
-            Toggle("Treatments", isOn: $viewModel.options.includesTreatments)
+            Toggle(Texts_SettingsView.cleanDataTreatments, isOn: $viewModel.options.includesTreatments)
                 .tint(.green)
         }
     }
 
     private var passwordProtectionSection: some View {
         Section {
-            Toggle("Encrypt Backup", isOn: $viewModel.passwordProtectsBackup)
+            Toggle(Texts_SettingsView.backupEncrypt, isOn: $viewModel.passwordProtectsBackup)
                 .tint(.green)
                 .onChange(of: viewModel.passwordProtectsBackup) { enabled in
                     if !enabled { viewModel.options.includesAccounts = false }
                 }
 
             if viewModel.passwordProtectsBackup {
-                Toggle("Backup Accounts", isOn: $viewModel.options.includesAccounts)
+                Toggle(Texts_SettingsView.backupAccounts, isOn: $viewModel.options.includesAccounts)
                     .tint(.green)
-                SecureField("Password", text: $viewModel.backupPassphrase)
+                SecureField(Texts_Common.password, text: $viewModel.backupPassphrase)
                     .textContentType(.newPassword)
-                SecureField("Confirm Password", text: $viewModel.backupPassphraseConfirmation)
+                SecureField(Texts_SettingsView.backupConfirmPassword, text: $viewModel.backupPassphraseConfirmation)
                     .textContentType(.newPassword)
             }
         } header: {
-            Text("Password Protection")
+            Text(Texts_SettingsView.backupPasswordProtection)
         } footer: {
             if !viewModel.passwordProtectsBackup {
-                Text("Adding password protection will also allow you to back up accounts containing sensitive details.")
+                Text(Texts_SettingsView.backupPasswordProtectionFooter)
             } else if viewModel.options.includesAccounts {
-                Text("Account details may include server URLs, usernames, passwords, and access tokens.")
+                Text(Texts_SettingsView.backupAccountDetailsFooter)
             }
         }
     }
@@ -232,7 +267,7 @@ struct DataManagementView: View {
             Button {
                 viewModel.createBackup()
             } label: {
-                Text("Create and Share Backup")
+                Text(Texts_SettingsView.backupCreateAndShare)
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
@@ -241,24 +276,24 @@ struct DataManagementView: View {
             .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
         } footer: {
             if viewModel.passwordProtectsBackup {
-                Text("Encrypted backups take longer to create. Keep xDrip open and please be patient.")
+                Text(Texts_SettingsView.backupEncryptedCreationFooter)
             }
         }
     }
 
     private func backupSummarySection(_ manifest: BackupManifest) -> some View {
         Section {
-            LabeledContent("Created", value: manifest.createdAt.formatted(date: .abbreviated, time: .shortened))
-            LabeledContent("Earliest Data", value: earliestDataDescription(manifest))
-            LabeledContent("BG Readings", value: manifest.bgReadingCount.formatted())
-            LabeledContent("Treatments", value: manifest.treatmentCount.formatted())
-            LabeledContent("Settings and Alerts", value: manifest.includesSettings ? "Included" : "Not included")
-            LabeledContent("Account Details", value: manifest.includesAccounts ? "Included" : "Not included")
-            LabeledContent("Password Protection", value: manifest.isPasswordProtected ? "Enabled" : "Not enabled")
+            LabeledContent(Texts_SettingsView.backupCreatedAt, value: manifest.createdAt.formatted(date: .abbreviated, time: .shortened))
+            LabeledContent(Texts_SettingsView.backupEarliestData, value: earliestDataDescription(manifest))
+            LabeledContent(Texts_SettingsView.cleanDataBgReadings, value: manifest.bgReadingCount.formatted())
+            LabeledContent(Texts_SettingsView.cleanDataTreatments, value: manifest.treatmentCount.formatted())
+            LabeledContent(Texts_SettingsView.backupSettingsAndAlerts, value: manifest.includesSettings ? Texts_SettingsView.backupIncluded : Texts_SettingsView.backupNotIncluded)
+            LabeledContent(Texts_SettingsView.backupAccountDetails, value: manifest.includesAccounts ? Texts_SettingsView.backupIncluded : Texts_SettingsView.backupNotIncluded)
+            LabeledContent(Texts_SettingsView.backupPasswordProtection, value: manifest.isPasswordProtected ? Texts_Common.enabled : Texts_SettingsView.backupNotEnabled)
         } header: {
-            Text("Backup Summary")
+            Text(Texts_SettingsView.backupSummary)
         } footer: {
-            Text("Backup created with app version \(manifest.appVersion).")
+            Text(Texts_SettingsView.backupCreatedWithAppVersion(manifest.appVersion))
         }
     }
 
@@ -266,28 +301,28 @@ struct DataManagementView: View {
 
     private var restoreFileSection: some View {
         Section {
-            Button("Choose Backup File") {
+            Button(Texts_SettingsView.backupChooseFile) {
                 isImporting = true
             }
             .tint(Color(.systemBlue))
         } header: {
-            Text("Backup File")
+            Text(Texts_SettingsView.backupFile)
         } footer: {
-            Text("The backup is checked before any existing data is changed.")
+            Text(Texts_SettingsView.backupFileCheckFooter)
         }
     }
 
     private var lockedBackupSection: some View {
-        Section("Selected Backup") {
+        Section(Texts_SettingsView.backupSelected) {
             if let backupDate = viewModel.selectedBackupDate {
                 LabeledContent(
-                    "Created",
+                    Texts_SettingsView.backupCreatedAt,
                     value: backupDate.formatted(date: .abbreviated, time: .shortened)
                 )
             }
 
-            LabeledContent("Password") {
-                SecureField("Required", text: $viewModel.restorePassphrase)
+            LabeledContent(Texts_Common.password) {
+                SecureField(Texts_SettingsView.backupPasswordRequired, text: $viewModel.restorePassphrase)
                     .textContentType(.password)
                     .multilineTextAlignment(.trailing)
                     .frame(maxWidth: 180)
@@ -296,7 +331,7 @@ struct DataManagementView: View {
             Button {
                 viewModel.unlockBackup()
             } label: {
-                Text("Unlock Backup")
+                Text(Texts_SettingsView.backupUnlock)
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
@@ -310,7 +345,7 @@ struct DataManagementView: View {
             Image(systemName: "lock.fill")
                 .font(.system(size: 22, weight: .semibold))
                 .foregroundStyle(.red)
-            Text("This backup is encrypted and must be unlocked.")
+            Text(Texts_SettingsView.backupEncryptedNotice)
                 .font(.body)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -322,39 +357,39 @@ struct DataManagementView: View {
     private func backupContentsSection(_ payload: BackupPayload) -> some View {
         let manifest = payload.manifest
         return Section {
-            LabeledContent("Created", value: manifest.createdAt.formatted(date: .abbreviated, time: .shortened))
-            LabeledContent("Earliest Data", value: earliestDataDescription(payload))
-            LabeledContent("BG Readings", value: manifest.bgReadingCount.formatted())
-            LabeledContent("Treatments", value: manifest.treatmentCount.formatted())
-            LabeledContent("Settings", value: manifest.includesSettings ? "Included" : "Not included")
-            LabeledContent("Account Details") {
+            LabeledContent(Texts_SettingsView.backupCreatedAt, value: manifest.createdAt.formatted(date: .abbreviated, time: .shortened))
+            LabeledContent(Texts_SettingsView.backupEarliestData, value: earliestDataDescription(payload))
+            LabeledContent(Texts_SettingsView.cleanDataBgReadings, value: manifest.bgReadingCount.formatted())
+            LabeledContent(Texts_SettingsView.cleanDataTreatments, value: manifest.treatmentCount.formatted())
+            LabeledContent(Texts_SettingsView.backupSettings, value: manifest.includesSettings ? Texts_SettingsView.backupIncluded : Texts_SettingsView.backupNotIncluded)
+            LabeledContent(Texts_SettingsView.backupAccountDetails) {
                 HStack(spacing: 5) {
                     if manifest.includesAccounts {
                         Image(systemName: "lock.open.fill")
                             .foregroundStyle(Self.successColor)
                     }
-                    Text(manifest.includesAccounts ? "Included" : "Not included")
+                    Text(manifest.includesAccounts ? Texts_SettingsView.backupIncluded : Texts_SettingsView.backupNotIncluded)
                 }
             }
         } header: {
-            Text("Selected Backup")
+            Text(Texts_SettingsView.backupSelected)
         } footer: {
-            Text("Backup created with app version \(manifest.appVersion).")
+            Text(Texts_SettingsView.backupCreatedWithAppVersion(manifest.appVersion))
         }
     }
 
     private var restoreOptionsSection: some View {
-        Section("Restore Options") {
-            Picker("Data Handling", selection: $viewModel.mergeMode) {
-                Text("Keep Current Data").tag(BackupMergeMode.keepCurrent)
-                Text("Fill Gaps").tag(BackupMergeMode.fillGaps)
-                Text("Replace Backup Range").tag(BackupMergeMode.replaceRange)
-                Text("Ignore Data").tag(BackupMergeMode.ignore)
+        Section(Texts_SettingsView.backupRestoreOptions) {
+            Picker(Texts_SettingsView.backupDataHandling, selection: $viewModel.mergeMode) {
+                Text(Texts_SettingsView.backupKeepCurrentData).tag(BackupMergeMode.keepCurrent)
+                Text(Texts_SettingsView.backupFillGaps).tag(BackupMergeMode.fillGaps)
+                Text(Texts_SettingsView.backupReplaceRange).tag(BackupMergeMode.replaceRange)
+                Text(Texts_SettingsView.backupIgnoreData).tag(BackupMergeMode.ignore)
             }
-            Toggle("Restore App Settings and Alerts", isOn: $viewModel.restoresSettings)
+            Toggle(Texts_SettingsView.backupRestoreSettingsAndAlerts, isOn: $viewModel.restoresSettings)
                 .tint(.green)
                 .disabled(viewModel.inspection?.payload.manifest.includesSettings != true)
-            Toggle("Restore Accounts", isOn: restoreAccountsBinding)
+            Toggle(Texts_SettingsView.backupRestoreAccounts, isOn: restoreAccountsBinding)
                 .tint(.green)
                 .disabled(!viewModel.hasRestorableAccounts)
             if viewModel.restoresAccounts {
@@ -375,7 +410,7 @@ struct DataManagementView: View {
                     viewModel.restore()
                 }
             } label: {
-                Text(viewModel.mergeMode == .replaceRange ? "Replace and Restore" : "Restore Backup")
+                Text(viewModel.mergeMode == .replaceRange ? Texts_SettingsView.backupReplaceAndRestore : Texts_SettingsView.backupRestore)
                     .frame(maxWidth: .infinity)
             }
             .buttonStyle(.borderedProminent)
@@ -399,16 +434,16 @@ struct DataManagementView: View {
     }
 
     private func resultSection(_ result: BackupRestoreResult) -> some View {
-        Section("Restore Summary") {
+        Section(Texts_SettingsView.backupRestoreSummary) {
             LabeledContent(
-                "BG Readings Applied From",
-                value: result.firstBgReadingAppliedAt?.formatted(date: .abbreviated, time: .shortened) ?? "—"
+                Texts_SettingsView.backupBgReadingsAppliedFrom,
+                value: result.firstBgReadingAppliedAt?.formatted(date: .abbreviated, time: .shortened) ?? Texts_Common.notAvailable
             )
-            LabeledContent("BG Readings Added", value: result.bgReadingsAdded.formatted())
-            LabeledContent("BG Readings Skipped", value: result.bgReadingsSkipped.formatted())
-            LabeledContent("Treatments Added", value: result.treatmentsAdded.formatted())
-            LabeledContent("Treatments Skipped", value: result.treatmentsSkipped.formatted())
-            LabeledContent("Settings Restored", value: result.settingsRestored.formatted())
+            LabeledContent(Texts_SettingsView.backupBgReadingsAdded, value: result.bgReadingsAdded.formatted())
+            LabeledContent(Texts_SettingsView.backupBgReadingsSkipped, value: result.bgReadingsSkipped.formatted())
+            LabeledContent(Texts_SettingsView.backupTreatmentsAdded, value: result.treatmentsAdded.formatted())
+            LabeledContent(Texts_SettingsView.backupTreatmentsSkipped, value: result.treatmentsSkipped.formatted())
+            LabeledContent(Texts_SettingsView.backupSettingsRestored, value: result.settingsRestored.formatted())
         }
     }
 
@@ -429,13 +464,13 @@ struct DataManagementView: View {
         ]
         .compactMap { $0 }
         .min()
-        guard let earliestDate else { return "—" }
+        guard let earliestDate else { return Texts_Common.notAvailable }
         return earliestDate.toStringInUserLocale(timeStyle: .none, dateStyle: .short)
             + " (" + earliestDate.daysAndHoursAgo(showOnlyDays: true) + ")"
     }
 
     private func accountsSummarySection(_ result: BackupRestoreResult) -> some View {
-        Section("Account Restore") {
+        Section(Texts_SettingsView.backupAccountRestore) {
             ForEach(BackupAccountCategory.allCases) { category in
                 let status = result.accountStatuses[category] ?? .unavailable
                 LabeledContent {
@@ -470,9 +505,9 @@ struct DataManagementView: View {
 
     private func accountRestoreDescription(_ status: BackupAccountRestoreStatus) -> String {
         switch status {
-        case .restored: "Yes"
-        case .notRestored: "No"
-        case .unavailable: "—"
+        case .restored: Texts_Common.yes
+        case .notRestored: Texts_Common.no
+        case .unavailable: Texts_Common.notAvailable
         }
     }
 
@@ -585,8 +620,8 @@ final class DataManagementViewModel: ObservableObject {
         var selectedOptions = options
         selectedOptions.passphrase = passwordProtectsBackup ? backupPassphrase : nil
         start(status: passwordProtectsBackup
-            ? "Creating and encrypting your backup securely…\nPlease be patient."
-            : "Creating backup…")
+            ? Texts_SettingsView.backupCreatingEncryptedStatus
+            : Texts_SettingsView.backupCreatingStatus)
         let service = service
         Task {
             do {
@@ -654,7 +689,7 @@ final class DataManagementViewModel: ObservableObject {
                 restorePassphrase = ""
             } else {
                 encryptedBackupURL = nil
-                inspectBackup(at: url, passphrase: nil, status: "Checking backup…")
+                inspectBackup(at: url, passphrase: nil, status: Texts_SettingsView.backupCheckingStatus)
             }
         } catch {
             fail(error, operation: "openBackup")
@@ -676,7 +711,7 @@ final class DataManagementViewModel: ObservableObject {
         inspectBackup(
             at: encryptedBackupURL,
             passphrase: restorePassphrase,
-            status: "Decrypting and checking your backup…\nPlease be patient."
+            status: Texts_SettingsView.backupDecryptingStatus
         )
     }
 
@@ -699,8 +734,8 @@ final class DataManagementViewModel: ObservableObject {
     func restore() {
         guard let inspection else { return }
         start(status: inspection.payload.manifest.isPasswordProtected
-            ? "Restoring your encrypted backup…\nPlease be patient."
-            : "Restoring backup…")
+            ? Texts_SettingsView.backupRestoringEncryptedStatus
+            : Texts_SettingsView.backupRestoringStatus)
         let service = service
         let mode = mergeMode
         let shouldRestoreSettings = restoresSettings

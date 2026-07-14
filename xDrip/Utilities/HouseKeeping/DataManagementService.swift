@@ -1,5 +1,5 @@
 //
-//  CleanDataService.swift
+//  DataManagementService.swift
 //  xdrip
 //
 //  Created by Paul Plant on 13/7/26.
@@ -24,6 +24,8 @@ struct CleanDataInventory: Sendable {
     let bgReadings: CleanDataCategoryInventory
     let treatments: CleanDataCategoryInventory
     let calibrations: CleanDataCategoryInventory
+    let devices: Int
+    let sensors: Int
     let storeSizeInBytes: Int64
 }
 
@@ -107,7 +109,7 @@ enum CleanDataError: LocalizedError {
 // MARK: - Clean Data Service
 
 /// Counts and permanently removes selected historical data without changing settings or active device state.
-final class CleanDataService: @unchecked Sendable {
+final class DataManagementService: @unchecked Sendable {
     private let coreDataManager: CoreDataManager
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryDataManagement)
 
@@ -116,6 +118,16 @@ final class CleanDataService: @unchecked Sendable {
     }
 
     // MARK: - Inventory and Preview
+
+    /// Returns the current on-disk Core Data size for compact read-only summaries.
+    func currentStoreSizeInBytes() -> Int64 {
+        let context = coreDataManager.privateManagedObjectContext
+        var storeSizeInBytes = Int64(0)
+        context.performAndWait {
+            storeSizeInBytes = self.storeSizeInBytes(on: context)
+        }
+        return storeSizeInBytes
+    }
 
     func inventory() async throws -> CleanDataInventory {
         let startedAt = Date()
@@ -129,11 +141,13 @@ final class CleanDataService: @unchecked Sendable {
                 bgReadings: bgReadings,
                 treatments: treatments,
                 calibrations: calibrations,
+                devices: try context.count(for: BLEPeripheral.fetchRequest()),
+                sensors: try context.count(for: Sensor.fetchRequest()),
                 storeSizeInBytes: self.storeSizeInBytes(on: context)
             )
         }
         trace(
-            "in cleanDataInventory, completed. duration = %{public}@ ms, store bytes = %{public}@, BG readings = %{public}@, treatments = %{public}@, calibrations = %{public}@",
+            "in cleanDataInventory, completed. duration = %{public}@ ms, store bytes = %{public}@, BG readings = %{public}@, treatments = %{public}@, calibrations = %{public}@, devices = %{public}@, sensors = %{public}@",
             log: log,
             category: ConstantsLog.categoryDataManagement,
             type: .info,
@@ -141,7 +155,9 @@ final class CleanDataService: @unchecked Sendable {
             inventory.storeSizeInBytes.description,
             inventory.bgReadings.count.description,
             inventory.treatments.count.description,
-            inventory.calibrations.count.description
+            inventory.calibrations.count.description,
+            inventory.devices.description,
+            inventory.sensors.description
         )
         return inventory
     }

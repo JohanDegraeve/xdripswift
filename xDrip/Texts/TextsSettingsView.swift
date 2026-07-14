@@ -489,6 +489,18 @@ class Texts_SettingsView {
     static let labelAlerts: String = {
         return NSLocalizedString("settingsviews_row_alerts", tableName: filename, bundle: Bundle.main, value: "Alarms", comment: "alerting settings, row alerts")
     }()
+
+    static let volumeTestsSectionTitle: String = {
+        return NSLocalizedString("settingsviews_volume_tests_section_title", tableName: filename, bundle: Bundle.main, value: "Test Alarm Volume", comment: "alerting settings, section title for volume test rows")
+    }()
+
+    static let alertTypesSectionFooter: String = {
+        return NSLocalizedString("settingsviews_alert_types_section_footer", tableName: filename, bundle: Bundle.main, value: "Alarm Types define how alarms behave, including sound, vibration, snooze and mute override settings.", comment: "alerting settings, footer explaining alarm types")
+    }()
+
+    static let alertsSectionFooter: String = {
+        return NSLocalizedString("settingsviews_alerts_section_footer", tableName: filename, bundle: Bundle.main, value: "Alarms define when the app should notify you for glucose levels, missed readings and other conditions.", comment: "alerting settings, footer explaining alarms")
+    }()
     
     // MARK: - Section Healthkit
     
@@ -854,11 +866,11 @@ class Texts_SettingsView {
     }()
     
     static let volumeTestSoundPlayer: String = {
-        return NSLocalizedString("volumeTestSoundPlayer", tableName: filename, bundle: Bundle.main, value: "Volume Test (with Override Mute On)", comment: "In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row")
+        return NSLocalizedString("volumeTestSoundPlayer", tableName: filename, bundle: Bundle.main, value: "When Silent Mode is enabled", comment: "In Settings, Alerts section, row title for testing alarm volume when silent mode is enabled")
     }()
     
     static let volumeTestiOSSound: String = {
-        return NSLocalizedString("volumeTestiOSSound", tableName: filename, bundle: Bundle.main, value: "Volume Test (Current iPhone Volume)", comment: "In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row")
+        return NSLocalizedString("volumeTestiOSSound", tableName: filename, bundle: Bundle.main, value: "When Silent Mode is disabled", comment: "In Settings, Alerts section, row title for testing alarm volume when silent mode is disabled")
     }()
 
     static let volumeTestiOSSoundExplanation: String = {
@@ -973,22 +985,42 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_storeFrequentReadingsInHealthKitMessage", tableName: filename, bundle: Bundle.main, value: "This option will override the 5-minute write limits and allow much frequent data to be added to Apple Health. Such as for 60-second Libre 2 Direct values.\n\nPlease only enable this option if you really need/want more frequent data. Most users should leave this option disabled.", comment: "developer settings, should we allow the app to perform very frequent writes to healthkit if the CGM data is more often than every 5 minutes")
     }()
 
-    // MARK: - Clean Data
+    // MARK: - Data Management
 
-    static let cleanData = NSLocalizedString("settingsviews_cleanData", tableName: filename, bundle: Bundle.main, value: "Clean Data", comment: "data management, clean stored data screen title")
+    static let dataManagementStorageInfo = NSLocalizedString("settingsviews_dataManagementStorageInfo", tableName: filename, bundle: Bundle.main, value: "Storage Info", comment: "data management, storage information screen title")
+    static let dataManagementManageData = NSLocalizedString("settingsviews_dataManagementManageData", tableName: filename, bundle: Bundle.main, value: "Manage Data", comment: "data management, retention and deletion screen title")
+    static let dataManagementDataRetention = NSLocalizedString("settingsviews_dataManagementDataRetention", tableName: filename, bundle: Bundle.main, value: "Data Retention", comment: "data management, automatic retention screen title")
+    static let dataManagementDataDeletion = NSLocalizedString("settingsviews_dataManagementDataDeletion", tableName: filename, bundle: Bundle.main, value: "Data Deletion", comment: "data management, permanent deletion screen title")
+    static let dataManagementImportData = NSLocalizedString("settingsviews_dataManagementImportData", tableName: filename, bundle: Bundle.main, value: "Import Data", comment: "data management, import source screen title")
+    static let dataManagementLastHousekeeping = NSLocalizedString("settingsviews_dataManagementLastHousekeeping", tableName: filename, bundle: Bundle.main, value: "Last Housekeeping", comment: "data retention, last automatic housekeeping section title")
+    static let storageInfoDatabase = NSLocalizedString("settingsviews_storageInfoDatabase", tableName: filename, bundle: Bundle.main, value: "Database", comment: "storage information, database section title")
+    static let storageInfoDatabaseSize = NSLocalizedString("settingsviews_storageInfoDatabaseSize", tableName: filename, bundle: Bundle.main, value: "Database Size", comment: "storage information, Core Data store size")
+    static let storageInfoTrackedRecords = NSLocalizedString("settingsviews_storageInfoTrackedRecords", tableName: filename, bundle: Bundle.main, value: "Tracked Records", comment: "storage information, total of the listed historical record types")
+    static let storageInfoDevices = NSLocalizedString("settingsviews_storageInfoDevices", tableName: filename, bundle: Bundle.main, value: "Devices", comment: "storage information, stored Bluetooth device records")
+    static let storageInfoSensors = NSLocalizedString("settingsviews_storageInfoSensors", tableName: filename, bundle: Bundle.main, value: "Sensors", comment: "storage information, stored sensor session records")
+    static let storageInfoHistory = NSLocalizedString("settingsviews_storageInfoHistory", tableName: filename, bundle: Bundle.main, value: "Stored History", comment: "storage information, overall stored date range section title")
+    static let storageInfoEarliestRecord = NSLocalizedString("settingsviews_storageInfoEarliestRecord", tableName: filename, bundle: Bundle.main, value: "Earliest Record", comment: "storage information, earliest listed historical record")
+    static let storageInfoLatestRecord = NSLocalizedString("settingsviews_storageInfoLatestRecord", tableName: filename, bundle: Bundle.main, value: "Latest Record", comment: "storage information, latest listed historical record")
+    static let storageInfoCheckingStatus = NSLocalizedString("settingsviews_storageInfoCheckingStatus", tableName: filename, bundle: Bundle.main, value: "Checking storage…", comment: "storage information, inventory progress status")
+
+    static func storageInfoRetentionFooter(_ days: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_storageInfoRetentionFooter", tableName: filename, bundle: Bundle.main, value: "The configured data retention period is %d days.", comment: "storage information, configured retention period reminder"), days)
+    }
+
+    // MARK: - Data Deletion and Retention
     static let cleanDataAutomaticHousekeeping = NSLocalizedString("settingsviews_cleanDataAutomaticHousekeeping", tableName: filename, bundle: Bundle.main, value: "Automatic Housekeeping", comment: "clean data, automatic cleanup setting and section title")
     static let cleanDataKeepHistoricalData = NSLocalizedString("settingsviews_cleanDataKeepHistoricalData", tableName: filename, bundle: Bundle.main, value: "Keep Historical Data", comment: "clean data, automatic retention period picker")
     static let cleanDataLastHousekeepingCompleted = NSLocalizedString("settingsviews_cleanDataLastHousekeepingCompleted", tableName: filename, bundle: Bundle.main, value: "Last Completed", comment: "clean data, last successful automatic housekeeping date")
     static let cleanDataLastHousekeepingResult = NSLocalizedString("settingsviews_cleanDataLastHousekeepingResult", tableName: filename, bundle: Bundle.main, value: "Last Result", comment: "clean data, last automatic housekeeping result")
     static let cleanDataNoHousekeepingRequired = NSLocalizedString("settingsviews_cleanDataNoHousekeepingRequired", tableName: filename, bundle: Bundle.main, value: "No cleanup required", comment: "clean data, automatic housekeeping removed no records")
     static let cleanDataAutomaticHousekeepingFooter = NSLocalizedString("settingsviews_cleanDataAutomaticHousekeepingFooter", tableName: filename, bundle: Bundle.main, value: "Runs at most once per day when the app opens. BG readings, treatments and unused calibrations older than the selected period are removed locally.", comment: "clean data, automatic housekeeping explanation")
-    static let cleanDataAutomaticHousekeepingDisabledFooter = NSLocalizedString("settingsviews_cleanDataAutomaticHousekeepingDisabledFooter", tableName: filename, bundle: Bundle.main, value: "Historical data will only be removed when you use the manual cleanup options below.", comment: "clean data, disabled automatic housekeeping explanation")
+    static let cleanDataAutomaticHousekeepingDisabledFooter = NSLocalizedString("settingsviews_cleanDataAutomaticHousekeepingDisabledFooter", tableName: filename, bundle: Bundle.main, value: "Historical data will only be removed manually from Data Deletion.", comment: "data retention, disabled automatic housekeeping explanation")
     static let cleanDataStorageUsed = NSLocalizedString("settingsviews_cleanDataStorageUsed", tableName: filename, bundle: Bundle.main, value: "Storage Used", comment: "clean data, storage occupied by the database")
     static let cleanDataStoredData = NSLocalizedString("settingsviews_cleanDataStoredData", tableName: filename, bundle: Bundle.main, value: "Stored Data", comment: "clean data, stored data section title")
     static let cleanDataBgReadings = NSLocalizedString("settingsviews_cleanDataBgReadings", tableName: filename, bundle: Bundle.main, value: "BG Readings", comment: "clean data, blood glucose readings")
     static let cleanDataTreatments = NSLocalizedString("settingsviews_cleanDataTreatments", tableName: filename, bundle: Bundle.main, value: "Treatments", comment: "clean data, treatment entries")
     static let cleanDataCalibrations = NSLocalizedString("settingsviews_cleanDataCalibrations", tableName: filename, bundle: Bundle.main, value: "Calibrations", comment: "clean data, calibration entries")
-    static let cleanDataSelectData = NSLocalizedString("settingsviews_cleanDataSelectData", tableName: filename, bundle: Bundle.main, value: "Select Data to Delete", comment: "clean data, data type selection section title")
+    static let cleanDataSelectData = NSLocalizedString("settingsviews_cleanDataSelectData", tableName: filename, bundle: Bundle.main, value: "Data to Delete", comment: "data deletion, data type selection section title")
     static let cleanDataCleanupMethod = NSLocalizedString("settingsviews_cleanDataCleanupMethod", tableName: filename, bundle: Bundle.main, value: "Cleanup Method", comment: "clean data, deletion range method")
     static let cleanDataKeepRecent = NSLocalizedString("settingsviews_cleanDataKeepRecent", tableName: filename, bundle: Bundle.main, value: "Keep Recent", comment: "clean data, retain recent data option")
     static let cleanDataDateRange = NSLocalizedString("settingsviews_cleanDataDateRange", tableName: filename, bundle: Bundle.main, value: "Date Range", comment: "clean data, custom date range option and section title")
@@ -996,7 +1028,7 @@ class Texts_SettingsView {
     static let cleanDataKeep = NSLocalizedString("settingsviews_cleanDataKeep", tableName: filename, bundle: Bundle.main, value: "Keep", comment: "clean data, number of recent days to retain")
     static let cleanDataFrom = NSLocalizedString("settingsviews_cleanDataFrom", tableName: filename, bundle: Bundle.main, value: "From", comment: "clean data, inclusive start date")
     static let cleanDataUntil = NSLocalizedString("settingsviews_cleanDataUntil", tableName: filename, bundle: Bundle.main, value: "Until", comment: "clean data, inclusive end date")
-    static let cleanDataOlderDataFooter = NSLocalizedString("settingsviews_cleanDataOlderDataFooter", tableName: filename, bundle: Bundle.main, value: "Older data will be deleted; recent data will be kept.", comment: "clean data, retain recent data explanation")
+    static let cleanDataOlderDataFooter = NSLocalizedString("settingsviews_cleanDataOlderDataFooter", tableName: filename, bundle: Bundle.main, value: "Older data will be deleted. Recent data will be kept.", comment: "clean data, retain recent data explanation")
     static let cleanDataInclusiveDatesFooter = NSLocalizedString("settingsviews_cleanDataInclusiveDatesFooter", tableName: filename, bundle: Bundle.main, value: "Both dates are inclusive.", comment: "clean data, custom date range explanation")
     static let cleanDataDeleteAllFooter = NSLocalizedString("settingsviews_cleanDataDeleteAllFooter", tableName: filename, bundle: Bundle.main, value: "All selected data will be deleted.", comment: "clean data, delete all explanation")
     static let cleanDataContinue = NSLocalizedString("settingsviews_cleanDataContinue", tableName: filename, bundle: Bundle.main, value: "Continue", comment: "clean data, continue to next confirmation step")
@@ -1026,8 +1058,125 @@ class Texts_SettingsView {
     static let cleanDataChangedError = NSLocalizedString("settingsviews_cleanDataChangedError", tableName: filename, bundle: Bundle.main, value: "Stored data changed after the summary was created. Review the updated data before confirming again.", comment: "clean data, stored data changed during confirmation error")
     static let cleanDataDeleteFailedError = NSLocalizedString("settingsviews_cleanDataDeleteFailedError", tableName: filename, bundle: Bundle.main, value: "The selected data could not be deleted. No further cleanup was attempted.", comment: "clean data, deletion failed error")
 
+    // MARK: - Nightscout Import Summary
+
+    static let nightscoutImportCompleted = NSLocalizedString("settingsviews_nightscoutImportCompleted", tableName: filename, bundle: Bundle.main, value: "Nightscout Import Completed", comment: "nightscout import, completion banner")
+    static let nightscoutImportSummary = NSLocalizedString("settingsviews_nightscoutImportSummary", tableName: filename, bundle: Bundle.main, value: "Import Summary", comment: "nightscout import, summary section title")
+    static let nightscoutImportURLMissing = NSLocalizedString("settingsviews_nightscoutImportURLMissing", tableName: filename, bundle: Bundle.main, value: "No Nightscout URL configured", comment: "nightscout import, missing source URL banner title")
+    static let nightscoutImportConfigureURL = NSLocalizedString("settingsviews_nightscoutImportConfigureURL", tableName: filename, bundle: Bundle.main, value: "Configure a Nightscout URL in Nightscout Settings before importing data.", comment: "nightscout import, missing source URL banner instruction")
+    static let nightscoutImportDownloaded = NSLocalizedString("settingsviews_nightscoutImportDownloaded", tableName: filename, bundle: Bundle.main, value: "Downloaded", comment: "nightscout import, downloaded record count")
+    static let nightscoutImportAdded = NSLocalizedString("settingsviews_nightscoutImportAdded", tableName: filename, bundle: Bundle.main, value: "Added", comment: "nightscout import, added record count")
+    static let nightscoutImportSkipped = NSLocalizedString("settingsviews_nightscoutImportSkipped", tableName: filename, bundle: Bundle.main, value: "Skipped", comment: "nightscout import, duplicate record count")
+    static let nightscoutImportInvalid = NSLocalizedString("settingsviews_nightscoutImportInvalid", tableName: filename, bundle: Bundle.main, value: "Invalid", comment: "nightscout import, invalid document count")
+    static let nightscoutImportSummaryFooter = NSLocalizedString("settingsviews_nightscoutImportSummaryFooter", tableName: filename, bundle: Bundle.main, value: "Records already stored locally were skipped. Invalid Nightscout documents were not imported.", comment: "nightscout import, summary count explanation")
+    static let nightscoutImportingData = NSLocalizedString("settingsviews_nightscoutImportingData", tableName: filename, bundle: Bundle.main, value: "Importing Data", comment: "nightscout import, static progress headline")
+
+    // MARK: - Backup and Restore
+
+    static let backupCreate = NSLocalizedString("settingsviews_backupCreate", tableName: filename, bundle: Bundle.main, value: "Create Backup", comment: "backup, create backup screen title")
+    static let backupRestore = NSLocalizedString("settingsviews_backupRestore", tableName: filename, bundle: Bundle.main, value: "Restore Backup", comment: "backup, restore backup screen title and action")
+    static let backupCreated = NSLocalizedString("settingsviews_backupCreated", tableName: filename, bundle: Bundle.main, value: "Backup Successfully Created", comment: "backup, successful creation banner")
+    static let backupRestored = NSLocalizedString("settingsviews_backupRestored", tableName: filename, bundle: Bundle.main, value: "Backup Successfully Restored", comment: "backup, successful restore banner")
+    static let backupReplaceQuestion = NSLocalizedString("settingsviews_backupReplaceQuestion", tableName: filename, bundle: Bundle.main, value: "Replace Existing Data?", comment: "backup restore, destructive confirmation title")
+    static let backupReplaceData = NSLocalizedString("settingsviews_backupReplaceData", tableName: filename, bundle: Bundle.main, value: "Replace Data", comment: "backup restore, destructive confirmation action")
+    static let backupReplaceWarning = NSLocalizedString("settingsviews_backupReplaceWarning", tableName: filename, bundle: Bundle.main, value: "Existing BG readings and treatments within the backup date ranges will be deleted before the backup is restored.", comment: "backup restore, destructive confirmation explanation")
+    static let backupAndRestore = NSLocalizedString("settingsviews_backupAndRestore", tableName: filename, bundle: Bundle.main, value: "Backup & Restore", comment: "backup and restore, error alert title")
+    static let backupAppSettingsAndAlerts = NSLocalizedString("settingsviews_backupAppSettingsAndAlerts", tableName: filename, bundle: Bundle.main, value: "App Settings and Alerts", comment: "backup, app settings and alerts option")
+    static let backupEncrypt = NSLocalizedString("settingsviews_backupEncrypt", tableName: filename, bundle: Bundle.main, value: "Encrypt Backup", comment: "backup, encryption option")
+    static let backupAccounts = NSLocalizedString("settingsviews_backupAccounts", tableName: filename, bundle: Bundle.main, value: "Backup Accounts", comment: "backup, account details option")
+    static let backupConfirmPassword = NSLocalizedString("settingsviews_backupConfirmPassword", tableName: filename, bundle: Bundle.main, value: "Confirm Password", comment: "backup, password confirmation field")
+    static let backupPasswordProtection = NSLocalizedString("settingsviews_backupPasswordProtection", tableName: filename, bundle: Bundle.main, value: "Password Protection", comment: "backup, password protection section title and summary row")
+    static let backupPasswordProtectionFooter = NSLocalizedString("settingsviews_backupPasswordProtectionFooter", tableName: filename, bundle: Bundle.main, value: "Adding password protection also allows accounts containing sensitive details to be backed up.", comment: "backup, password protection explanation")
+    static let backupAccountDetailsFooter = NSLocalizedString("settingsviews_backupAccountDetailsFooter", tableName: filename, bundle: Bundle.main, value: "Account details may include server URLs, usernames, passwords and access tokens.", comment: "backup, sensitive account details explanation")
+    static let backupCreateAndShare = NSLocalizedString("settingsviews_backupCreateAndShare", tableName: filename, bundle: Bundle.main, value: "Create and Share Backup", comment: "backup, final creation action")
+    static let backupEncryptedCreationFooter = NSLocalizedString("settingsviews_backupEncryptedCreationFooter", tableName: filename, bundle: Bundle.main, value: "Encrypted backups take longer to create. Keep the app open and please be patient.", comment: "backup, encrypted creation duration warning")
+    static let backupCreatedAt = NSLocalizedString("settingsviews_backupCreatedAt", tableName: filename, bundle: Bundle.main, value: "Created", comment: "backup, creation date row")
+    static let backupEarliestData = NSLocalizedString("settingsviews_backupEarliestData", tableName: filename, bundle: Bundle.main, value: "Earliest Data", comment: "backup, earliest stored data row")
+    static let backupSettingsAndAlerts = NSLocalizedString("settingsviews_backupSettingsAndAlerts", tableName: filename, bundle: Bundle.main, value: "Settings and Alerts", comment: "backup, settings and alerts summary row")
+    static let backupAccountDetails = NSLocalizedString("settingsviews_backupAccountDetails", tableName: filename, bundle: Bundle.main, value: "Account Details", comment: "backup, account details summary row")
+    static let backupIncluded = NSLocalizedString("settingsviews_backupIncluded", tableName: filename, bundle: Bundle.main, value: "Included", comment: "backup, item is included")
+    static let backupNotIncluded = NSLocalizedString("settingsviews_backupNotIncluded", tableName: filename, bundle: Bundle.main, value: "Not included", comment: "backup, item is not included")
+    static let backupNotEnabled = NSLocalizedString("settingsviews_backupNotEnabled", tableName: filename, bundle: Bundle.main, value: "Not enabled", comment: "backup, option is not enabled")
+    static let backupSummary = NSLocalizedString("settingsviews_backupSummary", tableName: filename, bundle: Bundle.main, value: "Backup Summary", comment: "backup, completion summary section title")
+    static let backupChooseFile = NSLocalizedString("settingsviews_backupChooseFile", tableName: filename, bundle: Bundle.main, value: "Choose Backup File", comment: "backup restore, file selection action")
+    static let backupFile = NSLocalizedString("settingsviews_backupFile", tableName: filename, bundle: Bundle.main, value: "Backup File", comment: "backup restore, file selection section title")
+    static let backupFileCheckFooter = NSLocalizedString("settingsviews_backupFileCheckFooter", tableName: filename, bundle: Bundle.main, value: "The backup is checked before any existing data is changed.", comment: "backup restore, validation reassurance")
+    static let backupSelected = NSLocalizedString("settingsviews_backupSelected", tableName: filename, bundle: Bundle.main, value: "Selected Backup", comment: "backup restore, selected backup section title")
+    static let backupPasswordRequired = NSLocalizedString("settingsviews_backupPasswordRequired", tableName: filename, bundle: Bundle.main, value: "Required", comment: "backup restore, required password field placeholder")
+    static let backupUnlock = NSLocalizedString("settingsviews_backupUnlock", tableName: filename, bundle: Bundle.main, value: "Unlock Backup", comment: "backup restore, unlock encrypted backup action")
+    static let backupEncryptedNotice = NSLocalizedString("settingsviews_backupEncryptedNotice", tableName: filename, bundle: Bundle.main, value: "This backup is encrypted and must be unlocked.", comment: "backup restore, encrypted backup banner")
+    static let backupSettings = NSLocalizedString("settingsviews_backupSettings", tableName: filename, bundle: Bundle.main, value: "Settings", comment: "backup restore, settings summary row")
+    static let backupRestoreOptions = NSLocalizedString("settingsviews_backupRestoreOptions", tableName: filename, bundle: Bundle.main, value: "Restore Options", comment: "backup restore, restore options section title")
+    static let backupDataHandling = NSLocalizedString("settingsviews_backupDataHandling", tableName: filename, bundle: Bundle.main, value: "Data Handling", comment: "backup restore, merge mode picker")
+    static let backupKeepCurrentData = NSLocalizedString("settingsviews_backupKeepCurrentData", tableName: filename, bundle: Bundle.main, value: "Keep Current Data", comment: "backup restore, keep current data merge mode")
+    static let backupFillGaps = NSLocalizedString("settingsviews_backupFillGaps", tableName: filename, bundle: Bundle.main, value: "Fill Gaps", comment: "backup restore, fill missing data merge mode")
+    static let backupReplaceRange = NSLocalizedString("settingsviews_backupReplaceRange", tableName: filename, bundle: Bundle.main, value: "Replace Backup Range", comment: "backup restore, replace date range merge mode")
+    static let backupIgnoreData = NSLocalizedString("settingsviews_backupIgnoreData", tableName: filename, bundle: Bundle.main, value: "Ignore Data", comment: "backup restore, do not restore historical data merge mode")
+    static let backupRestoreSettingsAndAlerts = NSLocalizedString("settingsviews_backupRestoreSettingsAndAlerts", tableName: filename, bundle: Bundle.main, value: "Restore App Settings and Alerts", comment: "backup restore, settings restore option")
+    static let backupRestoreAccounts = NSLocalizedString("settingsviews_backupRestoreAccounts", tableName: filename, bundle: Bundle.main, value: "Restore Accounts", comment: "backup restore, accounts restore option")
+    static let backupReplaceAndRestore = NSLocalizedString("settingsviews_backupReplaceAndRestore", tableName: filename, bundle: Bundle.main, value: "Replace and Restore", comment: "backup restore, destructive restore action")
+    static let backupRestoreSummary = NSLocalizedString("settingsviews_backupRestoreSummary", tableName: filename, bundle: Bundle.main, value: "Restore Summary", comment: "backup restore, completion summary section title")
+    static let backupBgReadingsAppliedFrom = NSLocalizedString("settingsviews_backupBgReadingsAppliedFrom", tableName: filename, bundle: Bundle.main, value: "BG Readings Applied From", comment: "backup restore, first applied reading date")
+    static let backupBgReadingsAdded = NSLocalizedString("settingsviews_backupBgReadingsAdded", tableName: filename, bundle: Bundle.main, value: "BG Readings Added", comment: "backup restore, added reading count")
+    static let backupBgReadingsSkipped = NSLocalizedString("settingsviews_backupBgReadingsSkipped", tableName: filename, bundle: Bundle.main, value: "BG Readings Skipped", comment: "backup restore, skipped reading count")
+    static let backupTreatmentsAdded = NSLocalizedString("settingsviews_backupTreatmentsAdded", tableName: filename, bundle: Bundle.main, value: "Treatments Added", comment: "backup restore, added treatment count")
+    static let backupTreatmentsSkipped = NSLocalizedString("settingsviews_backupTreatmentsSkipped", tableName: filename, bundle: Bundle.main, value: "Treatments Skipped", comment: "backup restore, skipped treatment count")
+    static let backupSettingsRestored = NSLocalizedString("settingsviews_backupSettingsRestored", tableName: filename, bundle: Bundle.main, value: "Settings Restored", comment: "backup restore, restored settings count")
+    static let backupAccountRestore = NSLocalizedString("settingsviews_backupAccountRestore", tableName: filename, bundle: Bundle.main, value: "Account Restore", comment: "backup restore, account result section title")
+    static let backupCreatingEncryptedStatus = NSLocalizedString("settingsviews_backupCreatingEncryptedStatus", tableName: filename, bundle: Bundle.main, value: "Creating and encrypting your backup securely…\nPlease be patient.", comment: "backup, encrypted creation progress")
+    static let backupCreatingStatus = NSLocalizedString("settingsviews_backupCreatingStatus", tableName: filename, bundle: Bundle.main, value: "Creating backup…", comment: "backup, creation progress")
+    static let backupCheckingStatus = NSLocalizedString("settingsviews_backupCheckingStatus", tableName: filename, bundle: Bundle.main, value: "Checking backup…", comment: "backup restore, validation progress")
+    static let backupDecryptingStatus = NSLocalizedString("settingsviews_backupDecryptingStatus", tableName: filename, bundle: Bundle.main, value: "Decrypting and checking your backup…\nPlease be patient.", comment: "backup restore, decryption progress")
+    static let backupRestoringEncryptedStatus = NSLocalizedString("settingsviews_backupRestoringEncryptedStatus", tableName: filename, bundle: Bundle.main, value: "Restoring your encrypted backup…\nPlease be patient.", comment: "backup restore, encrypted restore progress")
+    static let backupRestoringStatus = NSLocalizedString("settingsviews_backupRestoringStatus", tableName: filename, bundle: Bundle.main, value: "Restoring backup…", comment: "backup restore, restore progress")
+    static let backupErrorInvalidFile = NSLocalizedString("settingsviews_backupErrorInvalidFile", tableName: filename, bundle: Bundle.main, value: "This is not a valid app backup.", comment: "backup restore, invalid file error")
+    static let backupErrorIncorrectPassword = NSLocalizedString("settingsviews_backupErrorIncorrectPassword", tableName: filename, bundle: Bundle.main, value: "The password is incorrect or the protected backup is damaged.", comment: "backup restore, incorrect password error")
+    static let backupErrorMissingPassword = NSLocalizedString("settingsviews_backupErrorMissingPassword", tableName: filename, bundle: Bundle.main, value: "Enter the password used to protect this backup.", comment: "backup restore, missing password error")
+
+    // MARK: - Nightscout Import Workflow
+
+    static let nightscoutImportQuestion = NSLocalizedString("settingsviews_nightscoutImportQuestion", tableName: filename, bundle: Bundle.main, value: "Import from Nightscout?", comment: "nightscout import, start confirmation title")
+    static let nightscoutImportAction = NSLocalizedString("settingsviews_nightscoutImportAction", tableName: filename, bundle: Bundle.main, value: "Import from Nightscout", comment: "nightscout import, screen action and alert title")
+    static let nightscoutImportDiscardQuestion = NSLocalizedString("settingsviews_nightscoutImportDiscardQuestion", tableName: filename, bundle: Bundle.main, value: "Discard Saved Import?", comment: "nightscout import, discard confirmation title")
+    static let nightscoutImportDiscard = NSLocalizedString("settingsviews_nightscoutImportDiscard", tableName: filename, bundle: Bundle.main, value: "Discard Import", comment: "nightscout import, discard confirmation action")
+    static let nightscoutImportDiscardSaved = NSLocalizedString("settingsviews_nightscoutImportDiscardSaved", tableName: filename, bundle: Bundle.main, value: "Discard Saved Import", comment: "nightscout import, discard checkpoint action")
+    static let nightscoutImportDiscardMessage = NSLocalizedString("settingsviews_nightscoutImportDiscardMessage", tableName: filename, bundle: Bundle.main, value: "Saved progress will be removed. Imported data will remain safely stored and will be skipped if you start again.", comment: "nightscout import, discard checkpoint explanation")
+    static let nightscoutImportDataToImport = NSLocalizedString("settingsviews_nightscoutImportDataToImport", tableName: filename, bundle: Bundle.main, value: "Data to Import", comment: "nightscout import, data type section title")
+    static let nightscoutImportPeriod = NSLocalizedString("settingsviews_nightscoutImportPeriod", tableName: filename, bundle: Bundle.main, value: "Import Period", comment: "nightscout import, period picker")
+    static let nightscoutImportExistingDataFooter = NSLocalizedString("settingsviews_nightscoutImportExistingDataFooter", tableName: filename, bundle: Bundle.main, value: "Existing local data is kept. BG readings within 30 seconds of an existing reading and treatments already identified by Nightscout are skipped.", comment: "nightscout import, duplicate handling explanation")
+    static let nightscoutImportKeepOpenFooter = NSLocalizedString("settingsviews_nightscoutImportKeepOpenFooter", tableName: filename, bundle: Bundle.main, value: "Keep the app open until the import finishes. Progress is saved after each completed batch, so an interrupted import can be resumed.", comment: "nightscout import, operation duration explanation")
+    static let nightscoutImportPeriodLabel = NSLocalizedString("settingsviews_nightscoutImportPeriodLabel", tableName: filename, bundle: Bundle.main, value: "Period", comment: "nightscout import, saved import period row")
+    static let nightscoutImportCompletedBatches = NSLocalizedString("settingsviews_nightscoutImportCompletedBatches", tableName: filename, bundle: Bundle.main, value: "Completed Batches", comment: "nightscout import, completed batch count")
+    static let nightscoutImportResume = NSLocalizedString("settingsviews_nightscoutImportResume", tableName: filename, bundle: Bundle.main, value: "Resume Import", comment: "nightscout import, resume action")
+    static let nightscoutImportSaved = NSLocalizedString("settingsviews_nightscoutImportSaved", tableName: filename, bundle: Bundle.main, value: "Saved Import", comment: "nightscout import, saved checkpoint section title")
+    static let nightscoutImportUnsupportedFooter = NSLocalizedString("settingsviews_nightscoutImportUnsupportedFooter", tableName: filename, bundle: Bundle.main, value: "This import uses an unsupported period. Discard it to start again.", comment: "nightscout import, unsupported checkpoint explanation")
+    static let nightscoutImportExceedsRetentionFooter = NSLocalizedString("settingsviews_nightscoutImportExceedsRetentionFooter", tableName: filename, bundle: Bundle.main, value: "This import exceeds your current retention period. Discard it to start again.", comment: "nightscout import, checkpoint retention explanation")
+    static let nightscoutImportResumeFooter = NSLocalizedString("settingsviews_nightscoutImportResumeFooter", tableName: filename, bundle: Bundle.main, value: "The previous import stopped before all requested batches completed. Resuming continues from its last saved checkpoint.", comment: "nightscout import, resume explanation")
+    static let nightscoutImportPause = NSLocalizedString("settingsviews_nightscoutImportPause", tableName: filename, bundle: Bundle.main, value: "Pause Import", comment: "nightscout import, pause action")
+    static let nightscoutImportBgAndTreatments = NSLocalizedString("settingsviews_nightscoutImportBgAndTreatments", tableName: filename, bundle: Bundle.main, value: "BG readings and treatments", comment: "nightscout import, selected data description")
+    static let nightscoutImportBgOnly = NSLocalizedString("settingsviews_nightscoutImportBgOnly", tableName: filename, bundle: Bundle.main, value: "BG readings", comment: "nightscout import, selected readings description")
+    static let nightscoutImportTreatmentsOnly = NSLocalizedString("settingsviews_nightscoutImportTreatmentsOnly", tableName: filename, bundle: Bundle.main, value: "treatments", comment: "nightscout import, selected treatments description")
+    static let nightscoutImportKeepAppOpen = NSLocalizedString("settingsviews_nightscoutImportKeepAppOpen", tableName: filename, bundle: Bundle.main, value: "Keep the app open.", comment: "nightscout import, progress reminder")
+    static let nightscoutImportPaused = NSLocalizedString("settingsviews_nightscoutImportPaused", tableName: filename, bundle: Bundle.main, value: "Import paused", comment: "nightscout import, paused progress title")
+    static let nightscoutImportErrorNoSelection = NSLocalizedString("settingsviews_nightscoutImportErrorNoSelection", tableName: filename, bundle: Bundle.main, value: "Select BG readings, treatments or both.", comment: "nightscout import, no data selected error")
+    static let nightscoutImportErrorUnsupportedPeriod = NSLocalizedString("settingsviews_nightscoutImportErrorUnsupportedPeriod", tableName: filename, bundle: Bundle.main, value: "The saved import uses a period that is no longer supported. Discard it and start again.", comment: "nightscout import, unsupported period error")
+    static let nightscoutImportErrorRetention = NSLocalizedString("settingsviews_nightscoutImportErrorRetention", tableName: filename, bundle: Bundle.main, value: "The selected import period exceeds the current data retention setting.", comment: "nightscout import, retention period error")
+    static let nightscoutImportErrorMissingURL = NSLocalizedString("settingsviews_nightscoutImportErrorMissingURL", tableName: filename, bundle: Bundle.main, value: "Enter a Nightscout URL in Nightscout Settings before starting an import.", comment: "nightscout import, missing URL error")
+    static let nightscoutImportErrorInvalidURL = NSLocalizedString("settingsviews_nightscoutImportErrorInvalidURL", tableName: filename, bundle: Bundle.main, value: "The configured Nightscout URL is not valid. Check it in Nightscout Settings and try again.", comment: "nightscout import, invalid URL error")
+    static let nightscoutImportErrorCheckpointUnavailable = NSLocalizedString("settingsviews_nightscoutImportErrorCheckpointUnavailable", tableName: filename, bundle: Bundle.main, value: "The saved Nightscout import can no longer be resumed. Start a new import.", comment: "nightscout import, unavailable checkpoint error")
+    static let nightscoutImportErrorSiteChanged = NSLocalizedString("settingsviews_nightscoutImportErrorSiteChanged", tableName: filename, bundle: Bundle.main, value: "The configured Nightscout site has changed since this import started. Discard the saved import or restore the previous Nightscout URL.", comment: "nightscout import, changed site error")
+    static let nightscoutImportErrorAuthentication = NSLocalizedString("settingsviews_nightscoutImportErrorAuthentication", tableName: filename, bundle: Bundle.main, value: "Nightscout denied access. Check the API secret or access token in Nightscout Settings.", comment: "nightscout import, authentication error")
+    static let nightscoutImportErrorEndpoint = NSLocalizedString("settingsviews_nightscoutImportErrorEndpoint", tableName: filename, bundle: Bundle.main, value: "The Nightscout data endpoint was not found. Check the configured URL and site version.", comment: "nightscout import, endpoint error")
+    static let nightscoutImportErrorRateLimited = NSLocalizedString("settingsviews_nightscoutImportErrorRateLimited", tableName: filename, bundle: Bundle.main, value: "Nightscout is receiving too many requests. Wait a moment and resume the import.", comment: "nightscout import, rate limit error")
+    static let nightscoutImportErrorInvalidResponse = NSLocalizedString("settingsviews_nightscoutImportErrorInvalidResponse", tableName: filename, bundle: Bundle.main, value: "Nightscout returned data that could not be read safely. No data from the affected batch was imported.", comment: "nightscout import, invalid response error")
+    static let nightscoutImportErrorResponseLimit = NSLocalizedString("settingsviews_nightscoutImportErrorResponseLimit", tableName: filename, bundle: Bundle.main, value: "A Nightscout batch remained too large after being divided into small time ranges. No truncated data was imported.", comment: "nightscout import, response limit error")
+
     static func cleanDataDays(_ days: Int) -> String {
         return String(format: NSLocalizedString("settingsviews_cleanDataDays", tableName: filename, bundle: Bundle.main, value: "%d days", comment: "clean data, number of days to retain"), days)
+    }
+
+    static func nightscoutImportRetentionFooter(_ days: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_nightscoutImportRetentionFooter", tableName: filename, bundle: Bundle.main, value: "Limited to your %d-day retention period. Older data is removed by housekeeping.", comment: "nightscout import, retention limit explanation"), days)
     }
 
     static func cleanDataHousekeepingRecordsRemoved(_ count: Int) -> String {
@@ -1038,6 +1187,46 @@ class Texts_SettingsView {
 
     static func cleanDataConfirmationCode(_ code: String) -> String {
         return String(format: NSLocalizedString("settingsviews_cleanDataConfirmationCode", tableName: filename, bundle: Bundle.main, value: "Confirmation code %@", comment: "clean data, accessibility label for captcha code"), code)
+    }
+
+    static func backupCreatedWithAppVersion(_ appVersion: String) -> String {
+        return String(format: NSLocalizedString("settingsviews_backupCreatedWithAppVersion", tableName: filename, bundle: Bundle.main, value: "Backup created with app version %@.", comment: "backup, creating app version footer"), appVersion)
+    }
+
+    static func backupErrorUnsupportedVersion(_ version: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_backupErrorUnsupportedVersion", tableName: filename, bundle: Bundle.main, value: "Backup format version %d is not supported by this version of the app.", comment: "backup restore, unsupported format error"), version)
+    }
+
+    static func backupErrorFinalValueMismatch(_ identifier: String) -> String {
+        return String(format: NSLocalizedString("settingsviews_backupErrorFinalValueMismatch", tableName: filename, bundle: Bundle.main, value: "Stored glucose values do not reproduce the backed-up final value for reading %@.", comment: "backup restore, reading validation error"), identifier)
+    }
+
+    static func nightscoutImportBatchCount(_ completed: Int, _ total: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_nightscoutImportBatchCount", tableName: filename, bundle: Bundle.main, value: "%1$d of %2$d", comment: "nightscout import, completed batches out of total batches"), completed, total)
+    }
+
+    static func nightscoutImportBgAddedProgress(_ count: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_nightscoutImportBgAddedProgress", tableName: filename, bundle: Bundle.main, value: "BG readings added: %@", comment: "nightscout import, live added reading count"), count.formatted())
+    }
+
+    static func nightscoutImportTreatmentsAddedProgress(_ count: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_nightscoutImportTreatmentsAddedProgress", tableName: filename, bundle: Bundle.main, value: "Treatments added: %@", comment: "nightscout import, live added treatment count"), count.formatted())
+    }
+
+    static func nightscoutImportConfirmation(_ days: Int, _ selectedData: String) -> String {
+        return String(format: NSLocalizedString("settingsviews_nightscoutImportConfirmation", tableName: filename, bundle: Bundle.main, value: "Import the last %1$d days of %2$@? Existing local records will be kept and duplicates will be skipped.", comment: "nightscout import, start confirmation message"), days, selectedData)
+    }
+
+    static func nightscoutImportBatchProgress(_ current: Int, _ total: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_nightscoutImportBatchProgress", tableName: filename, bundle: Bundle.main, value: "Batch %1$d of %2$d", comment: "nightscout import, current batch progress"), current, total)
+    }
+
+    static func nightscoutImportErrorServer(_ status: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_nightscoutImportErrorServer", tableName: filename, bundle: Bundle.main, value: "Nightscout returned a temporary server error (HTTP %d). Resume the import later.", comment: "nightscout import, temporary server error"), status)
+    }
+
+    static func nightscoutImportErrorUnexpectedStatus(_ status: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_nightscoutImportErrorUnexpectedStatus", tableName: filename, bundle: Bundle.main, value: "Nightscout returned an unexpected response (HTTP %d).", comment: "nightscout import, unexpected HTTP status error"), status)
     }
     
 }

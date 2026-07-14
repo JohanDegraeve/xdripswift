@@ -95,6 +95,11 @@ struct SettingsNavigationView: View {
         .onChange(of: incomingBackupRequest?.id) { _ in
             openIncomingBackupIfNeeded()
         }
+        .onChange(of: router.path) { path in
+            if path.isEmpty {
+                listModel.reload(.all)
+            }
+        }
     }
 
     /// Replaces any existing Settings path with the restore screen requested by iOS.
@@ -171,7 +176,7 @@ struct SettingsNavigationView: View {
         case let .dataManagement(flow):
             DataManagementView(coreDataManager: coreDataManager, flow: flow)
                 .navigationTitle(flow.navigationTitle)
-                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarTitleDisplayMode(.large)
 
         case let .incomingBackup(request):
             DataManagementView(
@@ -181,7 +186,7 @@ struct SettingsNavigationView: View {
                 initialBackupDidOpen: { consumeIncomingBackup(request.id) }
             )
                 .navigationTitle(DataManagementFlow.restore.navigationTitle)
-                .navigationBarTitleDisplayMode(.inline)
+                .navigationBarTitleDisplayMode(.large)
 
         case let .custom(title, content):
             content(router.closeCurrentView)
@@ -211,7 +216,7 @@ private struct SettingsScreenDestinationView: View {
             presenter: presenter,
             title: title,
             titleDisplayMode: .large,
-            showsSectionHeaders: false
+            showsSectionHeaders: true
         )
         .onAppear {
             listModel.reload(.all)
@@ -437,7 +442,7 @@ enum SettingsRootSection: Int, CaseIterable, SettingsProtocol {
         case .sharingAndServices:
             return SettingsViewGroupedSettingsViewModel.sharingAndServices()
         case .dataManagement:
-            return SettingsViewDataManagementSettingsViewModel()
+            return SettingsViewDataManagementSettingsViewModel(coreDataManager: coreDataManager)
         case .about:
             return SettingsViewInfoViewModel()
         case .advanced:
@@ -531,7 +536,13 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleAlerting,
-                            providers: { [SettingsViewAlertSettingsViewModel()] }
+                            providers: {
+                                [
+                                    SettingsViewAlertSettingsViewModel(rowGroup: .alertTypes),
+                                    SettingsViewAlertSettingsViewModel(rowGroup: .alerts),
+                                    SettingsViewAlertSettingsViewModel(rowGroup: .volumeTests)
+                                ]
+                            }
                         )
                     }
                 )

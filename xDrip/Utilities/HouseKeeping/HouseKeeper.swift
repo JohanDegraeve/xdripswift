@@ -5,11 +5,11 @@ import os
 final class HouseKeeper {
     private static let minimumRunInterval: TimeInterval = 24 * 60 * 60
 
-    private let service: CleanDataService
+    private let service: DataManagementService
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryHouseKeeper)
 
     init(coreDataManager: CoreDataManager) {
-        service = CleanDataService(coreDataManager: coreDataManager)
+        service = DataManagementService(coreDataManager: coreDataManager)
     }
 
     /// Starts housekeeping when it is enabled and has not already been attempted in the last day.

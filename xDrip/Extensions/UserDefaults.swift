@@ -1635,23 +1635,18 @@ extension UserDefaults {
 
     // MARK: Housekeeper Settings
 
-    /// For how many days should data be stored. Should always be <= maximumRetentionPeriodInDays and >= minimumRetentionPeriodInDays.
+    /// For how many days data should be stored, normalized to a supported housekeeping block.
     @objc dynamic var retentionPeriodInDays: Int {
         get {
-            var returnValue = integer(forKey: Key.retentionPeriodInDays.rawValue)
-            // if 0 set to defaultvalue
-            if returnValue == 0 {
-                returnValue = ConstantsHousekeeping.minimumRetentionPeriodInDays
-            }
-
-            return returnValue
+            ConstantsHousekeeping.normalizedRetentionPeriodInDays(
+                integer(forKey: Key.retentionPeriodInDays.rawValue)
+            )
         }
         set {
-            // Constrains the newValue to be <= than maximumRetentionPeriodInDays and >= than minimumRetentionPeriodInDays.
-            var value = min(newValue, ConstantsHousekeeping.maximumRetentionPeriodInDays)
-            value = max(value, ConstantsHousekeeping.minimumRetentionPeriodInDays)
-
-            set(value, forKey: Key.retentionPeriodInDays.rawValue)
+            set(
+                ConstantsHousekeeping.normalizedRetentionPeriodInDays(newValue),
+                forKey: Key.retentionPeriodInDays.rawValue
+            )
         }
     }
 

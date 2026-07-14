@@ -269,15 +269,15 @@ enum BackupError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .invalidFile:
-            "This is not a valid xDrip backup."
+            Texts_SettingsView.backupErrorInvalidFile
         case let .unsupportedVersion(version):
-            "Backup format version \(version) is not supported by this version of xDrip."
+            Texts_SettingsView.backupErrorUnsupportedVersion(version)
         case .incorrectPassphrase:
-            "The password is incorrect or the protected backup is damaged."
+            Texts_SettingsView.backupErrorIncorrectPassword
         case .missingPassphrase:
-            "Enter the password used to protect this backup."
+            Texts_SettingsView.backupErrorMissingPassword
         case let .finalValueMismatch(id):
-            "The stored glucose values do not reproduce the backed-up final value for reading \(id)."
+            Texts_SettingsView.backupErrorFinalValueMismatch(id)
         }
     }
 

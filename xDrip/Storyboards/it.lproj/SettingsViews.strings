@@ -7,7 +7,7 @@
 "timeScheduleViewTitle" = "On/Off Time Schedule for ";
 
 /// In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row
-"volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
+"volumeTestiOSSound" = "Quando la modalità silenziosa è disattiva";
 
 /// nightscout settings, port to use
 "nightscoutPort" = "Port";
@@ -23,6 +23,9 @@
 
 /// alerting settings, row alerts
 "settingsviews_row_alerts" = "Alarms";
+"settingsviews_volume_tests_section_title" = "Test volume allarme";
+"settingsviews_alert_types_section_footer" = "I tipi di allarme definiscono il comportamento degli allarmi, inclusi suono, vibrazione, snooze e override della modalità silenziosa.";
+"settingsviews_alerts_section_footer" = "Gli allarmi definiscono quando l'app deve avvisarti per livelli di glucosio, letture mancanti e altre condizioni.";
 
 /// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test
 "volumeTestiOSSoundExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.";
@@ -213,7 +216,7 @@
 "settingsviews_masterorfollower" = "Master or Follower";
 
 /// In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row
-"volumeTestSoundPlayer" = "Test Volume (if Override Mute On)";
+"volumeTestSoundPlayer" = "Quando la modalità silenziosa è attiva";
 
 /// bluetooth settings, section title - also used in bluetooth peripheral view, eg when viewing M5Stack details. This is the title of the first section
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
@@ -526,13 +529,30 @@
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
 
 // MARK: - Automatic Housekeeping
+"settingsviews_dataManagementStorageInfo" = "Info archiviazione";
+"settingsviews_dataManagementManageData" = "Gestisci dati";
+"settingsviews_dataManagementDataRetention" = "Conservazione dati";
+"settingsviews_dataManagementDataDeletion" = "Eliminazione dati";
+"settingsviews_dataManagementImportData" = "Importa dati";
+"settingsviews_dataManagementLastHousekeeping" = "Ultima pulizia";
+"settingsviews_storageInfoDatabase" = "Database";
+"settingsviews_storageInfoDatabaseSize" = "Dimensione database";
+"settingsviews_storageInfoTrackedRecords" = "Record conteggiati";
+"settingsviews_storageInfoDevices" = "Dispositivi";
+"settingsviews_storageInfoSensors" = "Sensori";
+"settingsviews_storageInfoRetentionFooter" = "Il periodo di conservazione dei dati configurato è di %d giorni.";
+"settingsviews_storageInfoHistory" = "Cronologia archiviata";
+"settingsviews_storageInfoEarliestRecord" = "Record meno recente";
+"settingsviews_storageInfoLatestRecord" = "Record più recente";
+"settingsviews_storageInfoCheckingStatus" = "Controllo archiviazione…";
+"settingsviews_nightscoutImportRetentionFooter" = "L’importazione è limitata al periodo di conservazione di %d giorni. I dati più vecchi vengono rimossi dalla pulizia.";
 "settingsviews_cleanDataAutomaticHousekeeping" = "Pulizia automatica";
 "settingsviews_cleanDataKeepHistoricalData" = "Conserva dati storici";
 "settingsviews_cleanDataLastHousekeepingCompleted" = "Ultima esecuzione";
 "settingsviews_cleanDataLastHousekeepingResult" = "Ultimo risultato";
 "settingsviews_cleanDataNoHousekeepingRequired" = "Nessuna pulizia necessaria";
 "settingsviews_cleanDataAutomaticHousekeepingFooter" = "Viene eseguita al massimo una volta al giorno all’apertura dell’app. Letture, trattamenti e calibrazioni inutilizzate meno recenti vengono eliminati localmente.";
-"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "I dati storici saranno eliminati solo con le opzioni manuali qui sotto.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "I dati storici saranno eliminati solo manualmente da Eliminazione dati.";
 "settingsviews_cleanDataOneHousekeepingRecordRemoved" = "%@ record eliminato";
 "settingsviews_cleanDataHousekeepingRecordsRemoved" = "%@ record eliminati";
 
@@ -543,7 +563,7 @@
 "settingsviews_cleanDataBgReadings" = "Letture glicemia";
 "settingsviews_cleanDataTreatments" = "Trattamenti";
 "settingsviews_cleanDataCalibrations" = "Calibrazioni";
-"settingsviews_cleanDataSelectData" = "Seleziona dati da eliminare";
+"settingsviews_cleanDataSelectData" = "Dati da eliminare";
 "settingsviews_cleanDataCleanupMethod" = "Metodo di pulizia";
 "settingsviews_cleanDataKeepRecent" = "Mantieni recenti";
 "settingsviews_cleanDataDateRange" = "Intervallo date";
@@ -551,7 +571,7 @@
 "settingsviews_cleanDataKeep" = "Mantieni";
 "settingsviews_cleanDataFrom" = "Da";
 "settingsviews_cleanDataUntil" = "Fino a";
-"settingsviews_cleanDataOlderDataFooter" = "I dati meno recenti saranno eliminati; quelli recenti resteranno.";
+"settingsviews_cleanDataOlderDataFooter" = "I dati meno recenti saranno eliminati. Quelli recenti resteranno.";
 "settingsviews_cleanDataInclusiveDatesFooter" = "Entrambe le date sono incluse.";
 "settingsviews_cleanDataDeleteAllFooter" = "Tutti i dati selezionati saranno eliminati.";
 "settingsviews_cleanDataContinue" = "Continua";
@@ -581,4 +601,118 @@
 "settingsviews_cleanDataChangedError" = "I dati sono cambiati dopo il riepilogo. Controllali prima di confermare.";
 "settingsviews_cleanDataDeleteFailedError" = "Impossibile eliminare i dati selezionati. La pulizia è stata interrotta.";
 "settingsviews_cleanDataDays" = "%d giorni";
+"settingsviews_nightscoutImportCompleted" = "Importazione da Nightscout completata";
+"settingsviews_nightscoutImportSummary" = "Riepilogo importazione";
+"settingsviews_nightscoutImportURLMissing" = "Nessun URL Nightscout configurato";
+"settingsviews_nightscoutImportConfigureURL" = "Configura un URL Nightscout nelle impostazioni Nightscout prima di importare i dati.";
+"settingsviews_nightscoutImportDownloaded" = "Scaricati";
+"settingsviews_nightscoutImportAdded" = "Aggiunti";
+"settingsviews_nightscoutImportSkipped" = "Ignorati";
+"settingsviews_nightscoutImportInvalid" = "Non validi";
+"settingsviews_nightscoutImportSummaryFooter" = "I record già archiviati localmente sono stati ignorati. I documenti Nightscout non validi non sono stati importati.";
+"settingsviews_nightscoutImportingData" = "Importazione dati";
 "settingsviews_cleanDataConfirmationCode" = "Codice di conferma %@";
+"settingsviews_backupCreate" = "Crea backup";
+"settingsviews_backupRestore" = "Ripristina backup";
+"settingsviews_backupCreated" = "Backup creato con successo";
+"settingsviews_backupRestored" = "Backup ripristinato correttamente";
+"settingsviews_backupReplaceQuestion" = "Sostituire i dati esistenti?";
+"settingsviews_backupReplaceData" = "Sostituisci dati";
+"settingsviews_backupReplaceWarning" = "I valori glicemici e i trattamenti esistenti negli intervalli di date del backup verranno eliminati prima che il backup venga ripristinato.";
+"settingsviews_backupAndRestore" = "Backup e ripristino";
+"settingsviews_backupAppSettingsAndAlerts" = "Impostazioni e avvisi dell'app";
+"settingsviews_backupEncrypt" = "Crittografa il backup";
+"settingsviews_backupAccounts" = "Account di backup";
+"settingsviews_backupConfirmPassword" = "Conferma password";
+"settingsviews_backupPasswordProtection" = "Protezione con password";
+"settingsviews_backupPasswordProtectionFooter" = "L'aggiunta della protezione tramite password consente inoltre di eseguire il backup degli account contenenti dettagli sensibili.";
+"settingsviews_backupAccountDetailsFooter" = "I dettagli dell'account possono includere URL del server, nomi utente, password e token di accesso.";
+"settingsviews_backupCreateAndShare" = "Crea e condividi il backup";
+"settingsviews_backupEncryptedCreationFooter" = "La creazione dei backup crittografati richiede più tempo. Tieni l'app aperta e sii paziente.";
+"settingsviews_backupCreatedAt" = "Creato";
+"settingsviews_backupEarliestData" = "Primi dati";
+"settingsviews_backupSettingsAndAlerts" = "Impostazioni e avvisi";
+"settingsviews_backupAccountDetails" = "Dettagli dell'account";
+"settingsviews_backupIncluded" = "Incluso";
+"settingsviews_backupNotIncluded" = "Non incluso";
+"settingsviews_backupNotEnabled" = "Non abilitato";
+"settingsviews_backupSummary" = "Riepilogo del backup";
+"settingsviews_backupChooseFile" = "Scegli File di backup";
+"settingsviews_backupFile" = "File di backup";
+"settingsviews_backupFileCheckFooter" = "Il backup viene controllato prima che i dati esistenti vengano modificati.";
+"settingsviews_backupSelected" = "Backup selezionato";
+"settingsviews_backupPasswordRequired" = "Obbligatorio";
+"settingsviews_backupUnlock" = "Sblocca il backup";
+"settingsviews_backupEncryptedNotice" = "Questo backup è crittografato e deve essere sbloccato.";
+"settingsviews_backupSettings" = "Impostazioni";
+"settingsviews_backupRestoreOptions" = "Opzioni di ripristino";
+"settingsviews_backupDataHandling" = "Gestione dei dati";
+"settingsviews_backupKeepCurrentData" = "Mantieni i dati correnti";
+"settingsviews_backupFillGaps" = "Riempire le lacune";
+"settingsviews_backupReplaceRange" = "Sostituisci intervallo di backup";
+"settingsviews_backupIgnoreData" = "Ignora dati";
+"settingsviews_backupRestoreSettingsAndAlerts" = "Ripristina le impostazioni e gli avvisi dell'app";
+"settingsviews_backupRestoreAccounts" = "Ripristina account";
+"settingsviews_backupReplaceAndRestore" = "Sostituisci e ripristina";
+"settingsviews_backupRestoreSummary" = "Ripristina riepilogo";
+"settingsviews_backupBgReadingsAppliedFrom" = "Letture glicemiche applicate da";
+"settingsviews_backupBgReadingsAdded" = "Aggiunti valori glicemici";
+"settingsviews_backupBgReadingsSkipped" = "Letture glicemiche saltate";
+"settingsviews_backupTreatmentsAdded" = "Trattamenti aggiunti";
+"settingsviews_backupTreatmentsSkipped" = "Trattamenti saltati";
+"settingsviews_backupSettingsRestored" = "Impostazioni ripristinate";
+"settingsviews_backupAccountRestore" = "Ripristino dell'account";
+"settingsviews_backupCreatingEncryptedStatus" = "Creazione e crittografia sicura del backup...\nSii paziente.";
+"settingsviews_backupCreatingStatus" = "Creazione del backup…";
+"settingsviews_backupCheckingStatus" = "Controllo del backup…";
+"settingsviews_backupDecryptingStatus" = "Decifratura e controllo del backup…\nSii paziente.";
+"settingsviews_backupRestoringEncryptedStatus" = "Ripristino del backup crittografato…\nSii paziente.";
+"settingsviews_backupRestoringStatus" = "Ripristino del backup…";
+"settingsviews_backupErrorInvalidFile" = "Questo non è un backup dell'app valido.";
+"settingsviews_backupErrorIncorrectPassword" = "La password non è corretta oppure il backup protetto è danneggiato.";
+"settingsviews_backupErrorMissingPassword" = "Inserisci la password utilizzata per proteggere questo backup.";
+"settingsviews_nightscoutImportQuestion" = "Importare da Nightscout?";
+"settingsviews_nightscoutImportAction" = "Importa da Nightscout";
+"settingsviews_nightscoutImportDiscardQuestion" = "Eliminare l'importazione salvata?";
+"settingsviews_nightscoutImportDiscard" = "Elimina importazione";
+"settingsviews_nightscoutImportDiscardSaved" = "Elimina l'importazione salvata";
+"settingsviews_nightscoutImportDiscardMessage" = "I progressi salvati verranno rimossi. I dati importati rimarranno archiviati in modo sicuro e verranno saltati se si ricomincia.";
+"settingsviews_nightscoutImportDataToImport" = "Dati da importare";
+"settingsviews_nightscoutImportPeriod" = "Periodo di importazione";
+"settingsviews_nightscoutImportExistingDataFooter" = "I dati locali esistenti vengono mantenuti. Le letture della glicemia entro 30 secondi da una lettura esistente e i trattamenti già identificati da Nightscout vengono saltati.";
+"settingsviews_nightscoutImportKeepOpenFooter" = "Mantieni l'app aperta fino al termine dell'importazione. L'avanzamento viene salvato dopo ogni batch completato, quindi è possibile riprendere un'importazione interrotta.";
+"settingsviews_nightscoutImportPeriodLabel" = "Periodo";
+"settingsviews_nightscoutImportCompletedBatches" = "Lotti completati";
+"settingsviews_nightscoutImportResume" = "Riprendi l'importazione";
+"settingsviews_nightscoutImportSaved" = "Importazione salvata";
+"settingsviews_nightscoutImportUnsupportedFooter" = "Questa importazione utilizza un periodo non supportato. Scartarlo per ricominciare.";
+"settingsviews_nightscoutImportExceedsRetentionFooter" = "Questa importazione supera il periodo di conservazione corrente. Scartarlo per ricominciare.";
+"settingsviews_nightscoutImportResumeFooter" = "L'importazione precedente è stata interrotta prima del completamento di tutti i batch richiesti. La ripresa continua dall'ultimo checkpoint salvato.";
+"settingsviews_nightscoutImportPause" = "Sospendi l'importazione";
+"settingsviews_nightscoutImportBgAndTreatments" = "Letture e trattamenti della glicemia";
+"settingsviews_nightscoutImportBgOnly" = "Letture della glicemia";
+"settingsviews_nightscoutImportTreatmentsOnly" = "trattamenti";
+"settingsviews_nightscoutImportKeepAppOpen" = "Tieni l'app aperta.";
+"settingsviews_nightscoutImportPaused" = "Importazione sospesa";
+"settingsviews_nightscoutImportErrorNoSelection" = "Selezionare i valori glicemici, i trattamenti o entrambi.";
+"settingsviews_nightscoutImportErrorUnsupportedPeriod" = "L'importazione salvata utilizza un periodo che non è più supportato. Scartarlo e ricominciare da capo.";
+"settingsviews_nightscoutImportErrorRetention" = "Il periodo di importazione selezionato supera l'impostazione corrente di conservazione dei dati.";
+"settingsviews_nightscoutImportErrorMissingURL" = "Inserisci un URL Nightscout nelle Impostazioni Nightscout prima di avviare un'importazione.";
+"settingsviews_nightscoutImportErrorInvalidURL" = "L'URL Nightscout configurato non è valido. Controllalo nelle Impostazioni di Nightscout e riprova.";
+"settingsviews_nightscoutImportErrorCheckpointUnavailable" = "L'importazione salvata di Nightscout non può più essere ripresa. Avvia una nuova importazione.";
+"settingsviews_nightscoutImportErrorSiteChanged" = "Il sito Nightscout configurato è cambiato da quando è iniziata questa importazione. Elimina l'importazione salvata o ripristina l'URL Nightscout precedente.";
+"settingsviews_nightscoutImportErrorAuthentication" = "Nightscout ha negato l'accesso. Controlla il segreto API o il token di accesso nelle Impostazioni Nightscout.";
+"settingsviews_nightscoutImportErrorEndpoint" = "Impossibile trovare l'endpoint dati Nightscout. Controlla l'URL configurato e la versione del sito.";
+"settingsviews_nightscoutImportErrorRateLimited" = "Nightscout sta ricevendo troppe richieste. Attendi un attimo e riprendi l'importazione.";
+"settingsviews_nightscoutImportErrorInvalidResponse" = "Nightscout ha restituito dati che non è stato possibile leggere in modo sicuro. Nessun dato dal batch interessato è stato importato.";
+"settingsviews_nightscoutImportErrorResponseLimit" = "Un batch di Nightscout è rimasto troppo grande dopo essere stato suddiviso in intervalli di tempo ridotti. Non sono stati importati dati troncati.";
+"settingsviews_backupCreatedWithAppVersion" = "Backup creato con la versione dell'app %@.";
+"settingsviews_backupErrorUnsupportedVersion" = "Versione del formato di backup %d non è supportato da questa versione dell'app.";
+"settingsviews_backupErrorFinalValueMismatch" = "I valori glicemici memorizzati non riproducono il valore finale del backup per la lettura %@.";
+"settingsviews_nightscoutImportBatchCount" = "%1$d di %2$d";
+"settingsviews_nightscoutImportBgAddedProgress" = "Aggiunti valori glicemici: %@";
+"settingsviews_nightscoutImportTreatmentsAddedProgress" = "Trattamenti aggiunti: %@";
+"settingsviews_nightscoutImportConfirmation" = "Importare gli ultimi %1$d giorni di %2$@? I registri locali esistenti verranno conservati e i duplicati verranno saltati.";
+"settingsviews_nightscoutImportBatchProgress" = "Batch %1$d di %2$d";
+"settingsviews_nightscoutImportErrorServer" = "Nightscout ha restituito un errore temporaneo del server (HTTP %d). Riprendi l'importazione più tardi.";
+"settingsviews_nightscoutImportErrorUnexpectedStatus" = "Nightscout ha restituito una risposta inaspettata (HTTP %d).";

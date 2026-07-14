@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import os
 
 
 /// Enum used for each row of HousekeeperSettings.
@@ -24,9 +25,14 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 
 	// MARK: - Native SwiftUI rows
 
-	func settingsRows(sectionID: Int) -> [SettingsRow] {
+	func settingsRows(sectionID _: Int) -> [SettingsRow] {
 		[
-			nativeSettingsRow(id: "housekeeper.retentionPeriod", index: Setting.housekeeperRetentionPeriod.rawValue, sectionID: sectionID)
+			SettingsRow(
+                id: "housekeeper.retentionPeriod",
+                title: Texts_SettingsView.settingsviews_housekeeperRetentionPeriod,
+                detail: UserDefaults.standard.retentionPeriodInDays.description + " " + Texts_Common.days,
+                action: .selectionList(retentionSelectionList)
+            )
 		]
 	}
 
@@ -74,18 +80,35 @@ struct SettingsViewHousekeeperSettingsViewModel: SettingsViewModelProtocol {
 		return Setting.allCases.count
 	}
 
-	func onRowSelect(index: Int) -> SettingsSelectedRowAction {
-		guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
-		
-		switch setting {
-		
-		// When housekeeperRetentionPeriod is selected, display a popup asking for the new retention period.
-		case .housekeeperRetentionPeriod:
-			return SettingsSelectedRowAction.askText(title: Texts_SettingsView.settingsviews_housekeeperRetentionPeriod, message: Texts_SettingsView.settingsviews_housekeeperRetentionPeriodMessage, keyboardType: .numberPad, text: UserDefaults.standard.retentionPeriodInDays.description, placeHolder: "90", fieldTitle: Texts_Common.enterValue, unitText: Texts_Common.days, actionTitle: nil, cancelTitle: nil, actionHandler: {
-				(retention:String) in if let retentionInt = Int(retention) {UserDefaults.standard.retentionPeriodInDays = retentionInt}}, cancelHandler: nil, inputValidator: nil)
-		
-		}
+	func onRowSelect(index _: Int) -> SettingsSelectedRowAction {
+		SettingsSelectedRowAction.nothing
 	}
+
+    /// Uses the same fixed blocks as automatic housekeeping and Nightscout import.
+    private func retentionSelectionList() -> SettingsSelectionListContent {
+        let periods = ConstantsHousekeeping.retentionPeriodsInDays
+        let current = UserDefaults.standard.retentionPeriodInDays
+        return SettingsSelectionListContent(
+            title: Texts_SettingsView.settingsviews_housekeeperRetentionPeriod,
+            data: periods.map { $0.description + " " + Texts_Common.days },
+            selectedRow: periods.firstIndex(of: current),
+            actionTitle: Texts_Common.Ok,
+            cancelTitle: Texts_Common.Cancel,
+            action: { index in
+                guard periods.indices.contains(index) else { return }
+                UserDefaults.standard.retentionPeriodInDays = periods[index]
+                trace(
+                    "in housekeeper retention selection, retention period = %{public}@ days",
+                    log: OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryDataManagement),
+                    category: ConstantsLog.categoryDataManagement,
+                    type: .info,
+                    periods[index].description
+                )
+            },
+            cancel: nil,
+            didSelectRow: nil
+        )
+    }
 	
 	func isEnabled(index: Int) -> Bool {
 		return true

@@ -17,18 +17,69 @@ fileprivate enum Setting:Int, CaseIterable {
     
 }
 
+enum AlertSettingsRowGroup {
+    case alertTypes
+    case alerts
+    case volumeTests
+}
+
 /// conforms to SettingsViewModelProtocol for all alert settings in the first sections screen
 struct SettingsViewAlertSettingsViewModel:SettingsViewModelProtocol {
+
+    private let rowGroup: AlertSettingsRowGroup
+
+    init(rowGroup: AlertSettingsRowGroup = .alertTypes) {
+        self.rowGroup = rowGroup
+    }
     
     // MARK: - Native SwiftUI rows
 
+    func settingsSectionTitle() -> String? {
+        switch rowGroup {
+        case .alertTypes, .alerts:
+            return nil
+        case .volumeTests:
+            return Texts_SettingsView.volumeTestsSectionTitle
+        }
+    }
+
+    func settingsSectionFooter() -> String? {
+        switch rowGroup {
+        case .alertTypes:
+            return Texts_SettingsView.alertTypesSectionFooter
+        case .alerts:
+            return Texts_SettingsView.alertsSectionFooter
+        case .volumeTests:
+            return nil
+        }
+    }
+
     func settingsRows(sectionID: Int) -> [SettingsRow] {
-        [
-            nativeSettingsRow(id: "alerts.alertTypes", index: Setting.alertTypes.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "alerts.alerts", index: Setting.alerts.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "alerts.volumeTestSoundPlayer", index: Setting.volumeTestSoundPlayer.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "alerts.volumeTestiOSSound", index: Setting.volumeTestiOSSound.rawValue, sectionID: sectionID)
-        ]
+        switch rowGroup {
+        case .alertTypes:
+            return [
+                nativeSettingsRow(id: "alerts.alertTypes", index: Setting.alertTypes.rawValue, sectionID: sectionID)
+            ]
+        case .alerts:
+            return [
+                nativeSettingsRow(id: "alerts.alerts", index: Setting.alerts.rawValue, sectionID: sectionID)
+            ]
+        case .volumeTests:
+            return [
+                volumeTestRow(id: "alerts.volumeTestiOSSound", index: Setting.volumeTestiOSSound.rawValue, sectionID: sectionID, symbolName: "bell"),
+                volumeTestRow(id: "alerts.volumeTestSoundPlayer", index: Setting.volumeTestSoundPlayer.rawValue, sectionID: sectionID, symbolName: "bell.slash")
+            ]
+        }
+    }
+
+    /// Builds the volume-test rows as visible action rows while keeping the original
+    /// selection logic below. These rows play a sound immediately, so they should
+    /// look tappable instead of reading like passive settings values.
+    private func volumeTestRow(id: String, index: Int, sectionID: Int, symbolName: String) -> SettingsRow {
+        var row = nativeSettingsRow(id: id, index: index, sectionID: sectionID)
+        row.icon = SettingsIcon(symbolName: symbolName, color: .accentColor)
+        row.titleColor = .accentColor
+        return row
     }
 
 
