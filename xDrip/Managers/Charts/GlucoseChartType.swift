@@ -245,7 +245,7 @@ public enum GlucoseChartType: CaseIterable {
         case .siriGlucoseIntent:
             return ConstantsGlucoseChartSwiftUI.cornerRadiusSiriGlucoseIntent
         case .miniChart:
-            return ConstantsGlucoseChartSwiftUI.miniChartCornerRadius
+            return ConstantsHomeView.standardCornerRadius
         default:
             return ConstantsGlucoseChartSwiftUI.cornerRadius
         }

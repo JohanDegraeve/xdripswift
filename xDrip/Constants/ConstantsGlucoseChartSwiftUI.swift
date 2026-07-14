@@ -30,8 +30,10 @@ enum ConstantsGlucoseChartSwiftUI {
     static let xAxisGridLineColor = Color(white: 0.4)
     static let xAxisLabelColor = Color(.colorSecondary)
     // separate midnight styling keeps day-boundary markers visible without changing normal gridlines
-    static let xAxisMidnightGridLineColor = Color(white: 0.4)
+    static let xAxisMidnightGridLineColor = Color(white: 0.35)
     static let xAxisMidnightGridLineSize: Double = 1.25
+    static let chartPlotBorderColor = Color(white: 0.5)
+    static let chartPlotBorderLineWidth: Double = 1.0
     // x-axis labels use a fixed width, so the negative offset visually centers the hour over its gridline
     static let xAxisLabelOffsetX: CGFloat = -25
     static let xAxisLabelOffsetY: CGFloat = -2
@@ -45,8 +47,8 @@ enum ConstantsGlucoseChartSwiftUI {
     
     // Swift Charts `symbolSize` is area-based, so small changes here make a visible but controlled
     // difference to point diameter without changing every chart type's base size.
-    static let glucosePointSymbolSizeMultiplier: Double = 1.16
-    static let carbTreatmentSymbolSizeMultiplier: Double = 1.14
+    static let glucosePointSymbolSizeMultiplier: Double = 1.2
+    static let carbTreatmentSymbolSizeMultiplier: Double = 2.0
     
     
     // ------------------------------------------
@@ -77,9 +79,8 @@ enum ConstantsGlucoseChartSwiftUI {
     static let miniChartHoursToShow: Double = 24
     static let miniChartGlucoseCircleDiameter: Double = 3
     static let miniChartBackgroundColor: Color = .black
-    static let miniChartCornerRadius: CGFloat = 10
     static let miniChartYAxisLineSize: Double = 0.5
-    static let miniChartXAxisMidnightLineColor = Color(white: 0.35)
+    static let miniChartXAxisMidnightLineColor = Color(white: 0.3)
     static let miniChartXAxisMidnightLineSize: Double = 1.25
 
     // optional overview window, used by the home mini-chart to provide
@@ -89,9 +90,9 @@ enum ConstantsGlucoseChartSwiftUI {
     // that window and draws visible edge bars. Normal charts will never render this unless the
     // optional state values are present.
     static let overlayWindowShadeColor = Color.black.opacity(0.4)
-    static let overlayWindowTintColor = Color(white: 0.35).opacity(0.4)
-    static let overlayWindowEdgeColor = Color(white: 0.5).opacity(0.5)
-    static let overlayWindowEdgeLineWidth: CGFloat = 2.5
+    static let overlayWindowTintColor = Color(white: 0.3).opacity(0.4)
+    static let overlayWindowEdgeColor = Color.blue.opacity(0.6)
+    static let overlayWindowEdgeLineWidth: CGFloat = 2.0
     static let overlayWindowCurrentTimeEdgeTolerance: TimeInterval = 5 * 60
     
     

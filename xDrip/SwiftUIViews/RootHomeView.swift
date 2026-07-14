@@ -24,7 +24,7 @@ struct RootHomeView: View {
     /// The main chart is the flexible row and expands to consume the remaining vertical space.
     fileprivate enum Layout {
         static let sectionSpacing: CGFloat = 10
-        static let rowSpacing: CGFloat = 8
+        static let rowSpacing: CGFloat = 9
         static let screenHorizontalMargin: CGFloat = 8
         static let horizontalMargin: CGFloat = 8
         static let toolbarMinimumHeight: CGFloat = 44
@@ -35,15 +35,12 @@ struct RootHomeView: View {
         static let loopTopPadding: CGFloat = 2
         static let loopBottomPadding: CGFloat = 2
         static let loopStatusSymbolSize: CGFloat = 18
-        static let mainChartLeadingSpacer: CGFloat = 10
-        static let miniChartHeight: CGFloat = 58
-        static let selectorHeight: CGFloat = 28
+        static let miniChartHeight: CGFloat = 60
         static let statisticsHeight: CGFloat = 90
         static let sensorProgressHeight: CGFloat = 10
         static let dataSourceHeight: CGFloat = 30
         static let bottomStatusSpacing: CGFloat = 2
         static let clockHeight: CGFloat = 140
-        static let statusCornerRadius: CGFloat = 10
     }
 
     // MARK: - Chart Range
@@ -53,6 +50,7 @@ struct RootHomeView: View {
         case fiveHours = 5
         case eightHours = 8
         case twelveHours = 12
+        case twentyFourHours = 24
 
         var id: Double {
             rawValue
@@ -77,6 +75,8 @@ struct RootHomeView: View {
                 return 6.0
             case .twelveHours:
                 return 7.2
+            case .twentyFourHours:
+                return 9.6
             }
         }
 
@@ -233,50 +233,44 @@ struct RootHomeView: View {
                         .padding(.bottom, Layout.loopBottomPadding)
                 }
 
-                HStack(spacing: 0) {
-                    Color.clear
-                        .frame(width: Layout.mainChartLeadingSpacer)
-
-                    RootHomeMainChartView(
-                        selectedRange: selectedRange,
-                        chartState: visibleChartState,
-                        isLoading: isLoadingChart,
-                        scrollCoordinator: scrollCoordinator,
-                        updateChartStateIfNeeded: requestChartStateIfNeeded,
-                        finishChartScroll: { forceReset, showsLoading in
-                            requestChartState(forceReset: forceReset, showsLoading: showsLoading)
-                        }
-                    )
-                }
+                RootHomeMainChartView(
+                    selectedRange: $selectedRange,
+                    showsRangeMenu: state.visibility.showsControls,
+                    chartState: visibleChartState,
+                    isLoading: isLoadingChart,
+                    scrollCoordinator: scrollCoordinator,
+                    updateChartStateIfNeeded: requestChartStateIfNeeded,
+                    finishChartScroll: { forceReset, showsLoading in
+                        requestChartState(forceReset: forceReset, showsLoading: showsLoading)
+                    }
+                )
                 .frame(maxHeight: .infinity)
                 .layoutPriority(1)
 
                 if state.visibility.showsMiniChart {
                     RootHomeMiniChartView(
                         miniChartHoursToShow: miniChartHoursToShowForChart,
+                        showsRangeMenu: state.visibility.showsControls,
                         chartState: miniChartState,
                         scrollCoordinator: scrollCoordinator,
                         updateChartStateIfNeeded: requestChartStateIfNeeded,
                         finishChartScroll: {
                             requestChartState(forceReset: false, showsLoading: false)
                         },
+                        setMiniChartHoursToShow: { miniChartHoursToShow = $0 },
                         cycleMiniChartHoursToShow: cycleMiniChartHoursToShow
                     )
                     .frame(height: Layout.miniChartHeight)
                 }
 
-                if state.visibility.showsControls {
-                    RootHomeSelectorView(
-                        selectedRange: $selectedRange,
-                        statisticsDays: state.controls.statisticsDays,
-                        showsStatistics: state.visibility.showsStatistics,
-                        onStatisticsDaysChanged: updateStatisticsDays
-                    )
-                    .frame(height: Layout.selectorHeight)
-                }
-
                 if state.visibility.showsStatistics {
-                    RootHomeStatisticsView(state: state.statistics, action: actions.cycleStatisticsType)
+                    RootHomeStatisticsView(
+                        state: state.statistics,
+                        statisticsDays: state.controls.statisticsDays,
+                        showsPeriodMenu: state.visibility.showsControls,
+                        onStatisticsDaysChanged: updateStatisticsDays,
+                        action: actions.cycleStatisticsType
+                    )
                         .frame(height: Layout.statisticsHeight)
                 }
 
@@ -537,6 +531,7 @@ private struct RootHomeToolbarView: View {
         }
         .padding(.horizontal, 8)
         .frame(maxWidth: .infinity)
+        .frame(height: RootHomeView.Layout.toolbarMinimumHeight)
     }
 
     private func postProcessingToolbarButton() -> some View {
@@ -615,7 +610,7 @@ private struct RootHomePumpView: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
         .background(ConstantsAppColors.homePanelBackground)
-        .clipShape(RoundedRectangle(cornerRadius: RootHomeView.Layout.statusCornerRadius, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))
     }
 }
 
@@ -671,7 +666,7 @@ private struct RootHomeLoopView: View {
             .padding(.horizontal, 10)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(ConstantsAppColors.homePanelBackground)
-            .clipShape(RoundedRectangle(cornerRadius: RootHomeView.Layout.statusCornerRadius, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))
         }
         .buttonStyle(.plain)
         .transaction { transaction in
@@ -761,16 +756,20 @@ private struct RootHomeGlucoseReadingView: View {
                         .foregroundStyle(ConstantsAppColors.secondaryText)
                 }
             }
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .allowsTightening(true)
             .frame(height: RootHomeView.Layout.glucoseInfoRowHeight)
             .padding(.horizontal, RootHomeView.Layout.horizontalMargin)
 
             Text(state.valueText)
-                .font(.system(size: isScreenLocked ? 120 : 65, weight: .medium))
+                .font(.system(size: isScreenLocked ? 120 : 78, weight: .medium))
                 .foregroundStyle(state.valueColor)
                 .strikethrough(state.valueHasStrikethrough, color: state.valueColor)
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.2)
+                .allowsTightening(true)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .onTapGesture(perform: actions.toggleExpandedAIDInfo)
                 .onLongPressGesture(minimumDuration: 0.5, perform: actions.keepScreenAwake)
@@ -784,7 +783,8 @@ private struct RootHomeGlucoseReadingView: View {
 
 /// Main interactive chart with loading state and the reading shown at the panned end date.
 private struct RootHomeMainChartView: View {
-    let selectedRange: RootHomeView.ChartRange
+    @Binding var selectedRange: RootHomeView.ChartRange
+    let showsRangeMenu: Bool
     let chartState: GlucoseChartState
     let isLoading: Bool
     let scrollCoordinator: GlucoseChartScrollCoordinator
@@ -793,7 +793,7 @@ private struct RootHomeMainChartView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            ZStack(alignment: .topTrailing) {
+            ZStack(alignment: .topLeading) {
                 GlucoseChartView(
                     glucoseChartType: .widgetSystemLarge,
                     bgReadingValues: nil,
@@ -833,86 +833,160 @@ private struct RootHomeMainChartView: View {
                 })
                 .clipped()
 
+                if showsRangeMenu {
+                    Menu {
+                        Picker(Texts_Common.hours, selection: $selectedRange) {
+                            ForEach(RootHomeView.ChartRange.allCases) { range in
+                                Text(range.title)
+                                    .tag(range)
+                            }
+                        }
+                        .labelsHidden()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(selectedRange.title)
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(ConstantsHomeView.PickerMenu.indicatorFont)
+                        }
+                        .font(ConstantsHomeView.PickerMenu.textFont)
+                        .foregroundStyle(ConstantsHomeView.PickerMenu.tintColor)
+                        .padding(.horizontal, ConstantsHomeView.PickerMenu.horizontalPadding)
+                        .frame(height: ConstantsHomeView.PickerMenu.height)
+                        .background(
+                            ConstantsHomeView.PickerMenu.backgroundColor,
+                            in: RoundedRectangle(cornerRadius: ConstantsHomeView.PickerMenu.cornerRadius)
+                        )
+                    }
+                    .fixedSize()
+                    .padding([.top, .leading], ConstantsHomeView.PickerMenu.chartInset)
+                }
+
                 if isLoading {
                     ProgressView()
                         .padding(8)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
+                        .allowsHitTesting(false)
                 }
             }
+            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .topLeading)
         }
     }
 }
 
-/// Twenty-four hour overview chart and the active main-chart window.
+/// Historical overview chart and the active main-chart window.
 private struct RootHomeMiniChartView: View {
     let miniChartHoursToShow: Double
+    let showsRangeMenu: Bool
     let chartState: GlucoseChartState
     let scrollCoordinator: GlucoseChartScrollCoordinator
     let updateChartStateIfNeeded: () -> Void
     let finishChartScroll: () -> Void
+    let setMiniChartHoursToShow: (Double) -> Void
     let cycleMiniChartHoursToShow: () -> Void
+
+    // SwiftUI presents this compact chart menu from the chart edge. Keep the visible rows ordered
+    // from the smallest window at the top to the largest window at the bottom.
+    private let miniChartRangeOptions = [
+        ConstantsGlucoseChart.miniChartHoursToShow4,
+        ConstantsGlucoseChart.miniChartHoursToShow3,
+        ConstantsGlucoseChart.miniChartHoursToShow2,
+        ConstantsGlucoseChart.miniChartHoursToShow1
+    ]
+
     /// `nil` until a new drag is classified. The result is then held for the whole gesture because
     /// the active window moves away from its original touch point during a valid drag.
     @State private var activeWindowDragIsEnabled: Bool?
 
     var body: some View {
         GeometryReader { geometry in
-            GlucoseChartView(
-                glucoseChartType: .miniChart,
-                bgReadingValues: nil,
-                bgReadingDates: nil,
-                isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl,
-                urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue,
-                lowLimitInMgDl: UserDefaults.standard.lowMarkValue,
-                highLimitInMgDl: UserDefaults.standard.highMarkValue,
-                urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue,
-                liveActivityType: nil,
-                hoursToShowScalingHours: miniChartHoursToShow,
-                glucoseCircleDiameterScalingHours: miniChartHoursToShow,
-                overrideChartHeight: geometry.size.height,
-                overrideChartWidth: geometry.size.width,
-                highContrast: nil,
-                chartState: chartState
-            )
-            .transaction { transaction in
-                transaction.animation = nil
-            }
-            .contentShape(Rectangle())
-            // Treat the fixed mini-chart as a scrubber: moving its active window updates the shared
-            // coordinator and therefore the main chart, while the overview data stays stationary.
-            .gesture(
-                DragGesture(minimumDistance: 5)
-                    .onChanged { value in
-                        if activeWindowDragIsEnabled == nil {
-                            activeWindowDragIsEnabled = activeWindowContains(xPosition: value.startLocation.x, chartWidth: geometry.size.width)
+            ZStack(alignment: .leading) {
+                GlucoseChartView(
+                    glucoseChartType: .miniChart,
+                    bgReadingValues: nil,
+                    bgReadingDates: nil,
+                    isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl,
+                    urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue,
+                    lowLimitInMgDl: UserDefaults.standard.lowMarkValue,
+                    highLimitInMgDl: UserDefaults.standard.highMarkValue,
+                    urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue,
+                    liveActivityType: nil,
+                    hoursToShowScalingHours: miniChartHoursToShow,
+                    glucoseCircleDiameterScalingHours: miniChartHoursToShow,
+                    overrideChartHeight: geometry.size.height,
+                    overrideChartWidth: geometry.size.width,
+                    highContrast: nil,
+                    chartState: chartState
+                )
+                .transaction { transaction in
+                    transaction.animation = nil
+                }
+                .contentShape(Rectangle())
+                // Treat the fixed mini-chart as a scrubber: moving its active window updates the shared
+                // coordinator and therefore the main chart, while the overview data stays stationary.
+                .gesture(
+                    DragGesture(minimumDistance: 5)
+                        .onChanged { value in
+                            if activeWindowDragIsEnabled == nil {
+                                activeWindowDragIsEnabled = activeWindowContains(xPosition: value.startLocation.x, chartWidth: geometry.size.width)
+                            }
+
+                            guard activeWindowDragIsEnabled == true else { return }
+
+                            scrollCoordinator.updateVisibleRangeFromOverview(
+                                value: value,
+                                overviewStartDate: chartState.startDate,
+                                overviewEndDate: chartState.endDate,
+                                chartWidth: geometry.size.width
+                            )
+                            updateChartStateIfNeeded()
                         }
+                        .onEnded { value in
+                            let shouldFinishDrag = activeWindowDragIsEnabled ?? activeWindowContains(xPosition: value.startLocation.x, chartWidth: geometry.size.width)
+                            activeWindowDragIsEnabled = nil
 
-                        guard activeWindowDragIsEnabled == true else { return }
+                            guard shouldFinishDrag else { return }
 
-                        scrollCoordinator.updateVisibleRangeFromOverview(
-                            value: value,
-                            overviewStartDate: chartState.startDate,
-                            overviewEndDate: chartState.endDate,
-                            chartWidth: geometry.size.width
+                            scrollCoordinator.finishUpdatingVisibleRangeFromOverview(
+                                value: value,
+                                overviewStartDate: chartState.startDate,
+                                overviewEndDate: chartState.endDate,
+                                chartWidth: geometry.size.width
+                            )
+                            finishChartScroll()
+                        }
+                )
+                .simultaneousGesture(TapGesture(count: 2).onEnded(cycleMiniChartHoursToShow))
+                .clipped()
+
+                if showsRangeMenu {
+                    Menu {
+                        Picker(Texts_Common.days, selection: Binding(get: { miniChartHoursToShow }, set: setMiniChartHoursToShow)) {
+                            ForEach(miniChartRangeOptions, id: \.self) { hours in
+                                Text(title(forHours: hours))
+                                    .tag(hours)
+                            }
+                        }
+                        .labelsHidden()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(title(forHours: miniChartHoursToShow))
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(ConstantsHomeView.PickerMenu.indicatorFont)
+                        }
+                        .font(ConstantsHomeView.PickerMenu.textFont)
+                        .foregroundStyle(ConstantsHomeView.PickerMenu.tintColor)
+                        .padding(.horizontal, ConstantsHomeView.PickerMenu.horizontalPadding)
+                        .frame(height: ConstantsHomeView.PickerMenu.height)
+                        .background(
+                            ConstantsHomeView.PickerMenu.backgroundColor,
+                            in: RoundedRectangle(cornerRadius: ConstantsHomeView.PickerMenu.cornerRadius)
                         )
-                        updateChartStateIfNeeded()
                     }
-                    .onEnded { value in
-                        let shouldFinishDrag = activeWindowDragIsEnabled ?? activeWindowContains(xPosition: value.startLocation.x, chartWidth: geometry.size.width)
-                        activeWindowDragIsEnabled = nil
-
-                        guard shouldFinishDrag else { return }
-
-                        scrollCoordinator.finishUpdatingVisibleRangeFromOverview(
-                            value: value,
-                            overviewStartDate: chartState.startDate,
-                            overviewEndDate: chartState.endDate,
-                            chartWidth: geometry.size.width
-                        )
-                        finishChartScroll()
-                    }
-            )
-            .simultaneousGesture(TapGesture(count: 2).onEnded(cycleMiniChartHoursToShow))
-            .clipped()
+                    .fixedSize()
+                    .padding(.leading, ConstantsHomeView.PickerMenu.chartInset)
+                }
+            }
+            .frame(width: geometry.size.width, height: geometry.size.height, alignment: .leading)
         }
     }
 
@@ -938,72 +1012,10 @@ private struct RootHomeMiniChartView: View {
 
         return xPosition >= activeStartX && xPosition <= activeEndX
     }
-}
 
-// MARK: - Controls
-
-// MARK: - Statistics
-
-/// Native controls for selecting the statistics period and main-chart width.
-private struct RootHomeSelectorView: View {
-    @Binding var selectedRange: RootHomeView.ChartRange
-    let statisticsDays: Int
-    let showsStatistics: Bool
-    let onStatisticsDaysChanged: (Int) -> Void
-
-    private let statisticsOptions = [0, 1, 7, 30, 90]
-
-    var body: some View {
-        GeometryReader { geometry in
-            let horizontalPadding: CGFloat = 6
-            let controlSpacing: CGFloat = showsStatistics ? 4 : 0
-            let availableWidth = max(0, geometry.size.width - (horizontalPadding * 2) - controlSpacing)
-            let statisticsWidth = availableWidth * 0.68
-            let chartWidth = showsStatistics ? availableWidth * 0.32 : availableWidth
-
-            HStack(spacing: controlSpacing) {
-                if showsStatistics {
-                    Picker("", selection: Binding(get: { statisticsDays }, set: onStatisticsDaysChanged)) {
-                        ForEach(statisticsOptions, id: \.self) { days in
-                            Text(title(for: days))
-                                .lineLimit(1)
-                                .tag(days)
-                        }
-                    }
-                    .pickerStyle(.segmented)
-                    .labelsHidden()
-                    .font(.system(size: 10))
-                    .controlSize(.small)
-                    .frame(width: statisticsWidth)
-                }
-
-                Picker("", selection: $selectedRange) {
-                    ForEach(RootHomeView.ChartRange.allCases) { range in
-                        Text(range.title)
-                            .lineLimit(1)
-                            .tag(range)
-                    }
-                }
-                .pickerStyle(.segmented)
-                .labelsHidden()
-                .font(.system(size: 10))
-                .controlSize(.small)
-                .frame(width: chartWidth)
-            }
-            .padding(.horizontal, horizontalPadding)
-            .frame(maxHeight: .infinity, alignment: .center)
-        }
-    }
-
-    private func title(for days: Int) -> String {
-        switch days {
-        case 0:
-            return Texts_Common.todayshort
-        case 1:
-            return "24\(Texts_Common.hourshort)"
-        default:
-            return "\(days)\(Texts_Common.dayshort)"
-        }
+    private func title(forHours hours: Double) -> String {
+        let days = Int(hours / 24)
+        return "\(days) \(days == 1 ? Texts_Common.day : Texts_Common.days)"
     }
 }
 
@@ -1012,7 +1024,13 @@ private struct RootHomeSelectorView: View {
 /// Statistics values and time-in-range pie chart for the selected period.
 private struct RootHomeStatisticsView: View {
     let state: RootHomeStatisticsState
+    let statisticsDays: Int
+    let showsPeriodMenu: Bool
+    let onStatisticsDaysChanged: (Int) -> Void
     let action: () -> Void
+
+    // Menu pickers present these rows in reverse visual order.
+    private let statisticsOptions = [90, 30, 7, 1, 0]
 
     var body: some View {
         HStack(spacing: 0) {
@@ -1035,21 +1053,60 @@ private struct RootHomeStatisticsView: View {
                 }
                 .frame(height: 52)
 
-                Text(state.timePeriodText)
-                    .font(.system(size: 12))
-                    .foregroundStyle(ConstantsAppColors.tertiaryText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                if showsPeriodMenu {
+                    Menu {
+                        Picker(Texts_SettingsView.sectionTitleStatistics, selection: Binding(get: { statisticsDays }, set: onStatisticsDaysChanged)) {
+                            ForEach(statisticsOptions, id: \.self) { days in
+                                Text(title(for: days))
+                                    .tag(days)
+                            }
+                        }
+                        .labelsHidden()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text(title(for: statisticsDays))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.7)
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(ConstantsHomeView.PickerMenu.indicatorFont)
+                        }
+                        .font(ConstantsHomeView.PickerMenu.textFont)
+                        .foregroundStyle(ConstantsHomeView.PickerMenu.tintColor)
+                        .padding(.horizontal, ConstantsHomeView.PickerMenu.horizontalPadding)
+                        .frame(height: ConstantsHomeView.PickerMenu.height)
+                        .background(
+                            ConstantsHomeView.PickerMenu.backgroundColor,
+                            in: RoundedRectangle(cornerRadius: ConstantsHomeView.PickerMenu.cornerRadius)
+                        )
+                    }
+                } else {
+                    Text(state.timePeriodText)
+                        .font(.caption2)
+                        .foregroundStyle(ConstantsAppColors.tertiaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
             }
             .frame(maxWidth: .infinity)
         }
-        .padding(.horizontal, RootHomeView.Layout.horizontalMargin)
+        .frame(maxWidth: .infinity)
         .padding(.vertical, 9)
         .contentShape(Rectangle())
         .onTapGesture(count: 2, perform: action)
         .transaction { transaction in
             // Calculation updates replace label text immediately. Threshold colors animate separately.
             transaction.animation = nil
+        }
+    }
+
+    private func title(for days: Int) -> String {
+        switch days {
+        case 0:
+            return Texts_Common.today
+        case 1:
+            return "1 \(Texts_Common.day)"
+        default:
+            return "\(days) \(Texts_Common.days)"
         }
     }
 }
@@ -1247,7 +1304,7 @@ private struct RootHomeDataSourceView: View {
                 }
             }
         }
-        .padding(.horizontal, 10)
+        .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
         .onTapGesture(count: 2, perform: action)
     }

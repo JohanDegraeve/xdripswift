@@ -456,7 +456,8 @@ struct GlucoseChartView: View {
         let xAxisLabelEveryHours = xAxisLabelEveryHours()
         let xAxisLabelDates = xAxisLabelDates(everyHours: xAxisLabelEveryHours)
         let xAxisMidnightDates = xAxisMidnightDates()
-        let xScaleDomain = visibleStartDate ... visibleEndDate.addingTimeInterval(5 * 60)
+        let xScaleEndDate = usesMainChartYAxisContext ? visibleEndDate : visibleEndDate.addingTimeInterval(5 * 60)
+        let xScaleDomain = visibleStartDate ... xScaleEndDate
         let overlayWindow = overlayWindowClampedToVisibleRange()
         let overlayWindowDimsWholeVisibleRange = overlayWindowDimsWholeVisibleRange()
         let overlayWindowStartRuleDate = overlayWindowStartEdgeDate()
@@ -783,6 +784,19 @@ struct GlucoseChartView: View {
         .chartYAxis(chartType.yAxisShowLabels())
         .chartXScale(domain: xScaleDomain)
         .chartYScale(domain: domain)
+        .chartOverlay { chartProxy in
+            GeometryReader { geometryProxy in
+                if usesMainChartYAxisContext {
+                    if #available(iOS 17.0, watchOS 10.0, *) {
+                        if let plotFrame = chartProxy.plotFrame {
+                            mainChartPlotBorder(plotRect: geometryProxy[plotFrame], overlaySize: geometryProxy.size)
+                        }
+                    } else {
+                        mainChartPlotBorder(plotRect: geometryProxy[chartProxy.plotAreaFrame], overlaySize: geometryProxy.size)
+                    }
+                }
+            }
+        }
         .modifier(ChartBackgroundModifier(chartType: chartType))
         .clipShape(RoundedRectangle(cornerRadius: chartType.cornerRadius()))
     }
@@ -791,6 +805,26 @@ struct GlucoseChartView: View {
 
     private func glucosePointSymbolSize(scale: Double = 1.0) -> Double {
         glucoseCircleDiameter * scale * ConstantsGlucoseChartSwiftUI.glucosePointSymbolSizeMultiplier
+    }
+
+    private func mainChartPlotBorder(plotRect: CGRect, overlaySize: CGSize) -> some View {
+        let lineInset = ConstantsGlucoseChartSwiftUI.chartPlotBorderLineWidth / 2
+        let trailingXPosition = plotRect.maxX - lineInset
+        let bottomYPosition = plotRect.maxY - lineInset
+
+        return ZStack(alignment: .topLeading) {
+            Rectangle()
+                .fill(ConstantsGlucoseChartSwiftUI.chartPlotBorderColor)
+                .frame(width: ConstantsGlucoseChartSwiftUI.chartPlotBorderLineWidth, height: plotRect.height)
+                .offset(x: trailingXPosition, y: plotRect.minY)
+
+            Rectangle()
+                .fill(ConstantsGlucoseChartSwiftUI.chartPlotBorderColor)
+                .frame(width: plotRect.width, height: ConstantsGlucoseChartSwiftUI.chartPlotBorderLineWidth)
+                .offset(x: plotRect.minX, y: bottomYPosition)
+        }
+        .frame(width: overlaySize.width, height: overlaySize.height, alignment: .topLeading)
+        .allowsHitTesting(false)
     }
 
     private func treatmentCircleMarks(points: [GlucoseChartTreatmentPoint], color: Color, scale: Double, symbolSizeMultiplier: Double = 1.0, labelPosition: AnnotationPosition?) -> some ChartContent {

@@ -93,7 +93,8 @@ struct AIDStatusView: View {
                         }
                     }
                     .padding(EdgeInsets(top: 10, leading: 15, bottom: 10, trailing: 15))
-                    .background(deviceStatus.deviceStatusBannerBackgroundColor()).clipShape(RoundedRectangle(cornerRadius: 10))
+                    .background(deviceStatus.deviceStatusBannerBackgroundColor())
+                    .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius))
                 }
                 .padding(EdgeInsets(top: 8, leading: 18, bottom: 10, trailing: 18))
                 

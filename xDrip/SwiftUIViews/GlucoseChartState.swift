@@ -192,8 +192,8 @@ enum GlucoseChartTreatmentStyle {
 
     // MARK: - Labels
 
-    static let treatmentLabelFontSize = 12.0
+    static let treatmentLabelFontSize = 11.0
     static let treatmentLabelBackgroundColor = Color.black.opacity(0.4)
-    static let treatmentLabelFontColor = Color.white
+    static let treatmentLabelFontColor = Color.white.opacity(0.85)
 
 }
