@@ -584,6 +584,8 @@ import AppIntents
         guard let coreDataManager = coreDataManager else {
             fatalError("in setupApplicationData, coreDataManager == nil")
         }
+
+        migrateStoredAlertSnoozePeriodsToReducedOptionsIfNeeded(coreDataManager: coreDataManager)
         
         // get currently active sensor
         activeSensor = SensorsAccessor.init(coreDataManager: coreDataManager).fetchActiveSensor()
@@ -725,6 +727,65 @@ import AppIntents
         // initialize watchManager
         watchManager = WatchManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager!)
         
+    }
+
+    /// TEMPORARY MIGRATION: remove this function and its UserDefaults flag after the reduced
+    /// snooze-duration options have shipped for a couple of versions.
+    ///
+    /// Existing AlertType records may contain a duration that the consolidated picker no longer
+    /// offers. Each unsupported value is rounded down to the nearest supported duration so an
+    /// upgrade never silently lengthens an alarm's configured snooze. Values below the new
+    /// 15-minute minimum are clamped to 15 minutes because no lower supported option exists.
+    private func migrateStoredAlertSnoozePeriodsToReducedOptionsIfNeeded(coreDataManager: CoreDataManager) {
+        let userDefaults = UserDefaults.standard
+        guard !userDefaults.didMigrateAlertSnoozePeriodsToReducedOptions else { return }
+
+        let supportedDurations = ConstantsAlerts.snoozeValueMinutes
+        guard let minimumDuration = supportedDurations.first else { return }
+
+        let context = coreDataManager.mainManagedObjectContext
+        var migrationSucceeded = false
+        var migratedCount = 0
+
+        context.performAndWait {
+            do {
+                let alertTypes: [AlertType] = try context.fetch(AlertType.fetchRequest())
+
+                for alertType in alertTypes {
+                    let storedDuration = Int(alertType.snoozeperiod)
+                    guard !supportedDurations.contains(storedDuration) else { continue }
+
+                    let migratedDuration = supportedDurations.last(where: { $0 <= storedDuration }) ?? minimumDuration
+                    alertType.snoozeperiod = Int16(migratedDuration)
+                    migratedCount += 1
+                }
+
+                if context.hasChanges {
+                    try context.save()
+                }
+
+                migrationSucceeded = true
+            } catch {
+                trace(
+                    "in migrateStoredAlertSnoozePeriodsToReducedOptionsIfNeeded, migration failed: %{public}@",
+                    log: log,
+                    category: ConstantsLog.categoryRootView,
+                    type: .error,
+                    error.localizedDescription
+                )
+            }
+        }
+
+        guard migrationSucceeded else { return }
+
+        userDefaults.didMigrateAlertSnoozePeriodsToReducedOptions = true
+        trace(
+            "in migrateStoredAlertSnoozePeriodsToReducedOptionsIfNeeded, migrated %{public}d alert snooze periods",
+            log: log,
+            category: ConstantsLog.categoryRootView,
+            type: .info,
+            migratedCount
+        )
     }
     
     /// process new glucose data received from transmitter.

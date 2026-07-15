@@ -222,24 +222,7 @@ final class AlertTypeEditorViewModel: ObservableObject {
             )
 
         case .defaultSnoozePeriod:
-            textEntry = SettingsTextEntryContent(
-                title: Texts_AlertTypeSettingsView.alertTypeDefaultSnoozePeriod,
-                message: Texts_AlertTypeSettingsView.alertTypeGiveSnoozePeriod,
-                keyboardType: .numberPad,
-                text: snoozePeriod.description,
-                placeholder: ConstantsDefaultAlertTypeSettings.snoozePeriod.description,
-                fieldTitle: Texts_Common.enterValue,
-                unitText: Texts_Common.minutes,
-                actionTitle: Texts_Common.Ok,
-                cancelTitle: Texts_Common.Cancel,
-                action: { [weak self] text in
-                    guard let value = text.toDouble() else { return }
-
-                    self?.snoozePeriod = Int16(value)
-                },
-                cancel: nil,
-                validator: nil
-            )
+            showSnoozePeriodSelection()
 
         case .soundName:
             showSoundSelection()
@@ -285,7 +268,7 @@ final class AlertTypeEditorViewModel: ObservableObject {
 
             return Texts_AlertTypeSettingsView.alertTypeDefaultIOSSound
         case .defaultSnoozePeriod:
-            return snoozePeriod.description + " " + Texts_Common.minutes
+            return snoozePeriodLabel
         case .vibrate, .overrideMute, .snoozeViaNotification:
             return nil
         }
@@ -339,6 +322,52 @@ final class AlertTypeEditorViewModel: ObservableObject {
                 }
             }
         )
+    }
+
+    /// Opens the fixed snooze-duration picker. Snooze periods must always come
+    /// from ConstantsAlerts so alert types cannot store unsupported free-entry
+    /// values.
+    private func showSnoozePeriodSelection() {
+        let selectedRow = snoozePeriodSelectedRow
+
+        selectionList = SettingsSelectionListContent(
+            title: Texts_AlertTypeSettingsView.alertTypeDefaultSnoozePeriod,
+            data: ConstantsAlerts.snoozeValueStrings,
+            selectedRow: selectedRow,
+            actionTitle: Texts_Common.Ok,
+            cancelTitle: Texts_Common.Cancel,
+            action: { [weak self] index in
+                guard ConstantsAlerts.snoozeValueMinutes.indices.contains(index) else { return }
+
+                self?.snoozePeriod = Int16(ConstantsAlerts.snoozeValueMinutes[index])
+            },
+            cancel: nil,
+            didSelectRow: nil
+        )
+    }
+
+    /// Shows the same localized text in the detail row as the picker uses in its
+    /// option list. If an older unsupported value is still present, display the
+    /// nearest supported value that will be selected when the picker opens.
+    private var snoozePeriodLabel: String {
+        ConstantsAlerts.snoozeValueStrings[snoozePeriodSelectedRow]
+    }
+
+    /// Maps the stored snooze period onto the reduced supported list. This mirrors
+    /// the Core Data migration rule: round down to the nearest supported duration,
+    /// except values below the minimum are clamped to the first option.
+    private var snoozePeriodSelectedRow: Int {
+        let currentValue = Int(snoozePeriod)
+
+        if let exactIndex = ConstantsAlerts.snoozeValueMinutes.firstIndex(of: currentValue) {
+            return exactIndex
+        }
+
+        if let lowerIndex = ConstantsAlerts.snoozeValueMinutes.lastIndex(where: { $0 <= currentValue }) {
+            return lowerIndex
+        }
+
+        return 0
     }
 
     /// Stops a preview sound before another sound is played or the picker closes.

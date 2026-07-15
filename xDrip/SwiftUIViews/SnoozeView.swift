@@ -238,11 +238,11 @@ struct SnoozeView: View {
         // Reused from snoozeAllUISwitchAction(_:) in SnoozeViewController:
         // default to the closest configured Snooze All duration.
         let defaultSnoozeAllPeriodInMinutes = ConstantsAlerts.defaultSnoozeAllPeriodInMinutes
-        let snoozeAllValueMinutes = ConstantsAlerts.snoozeAllValueMinutes
+        let snoozeValueMinutes = ConstantsAlerts.snoozeValueMinutes
         var defaultRow = 0
         
-        for (index, _) in snoozeAllValueMinutes.enumerated() {
-            if snoozeAllValueMinutes[index] > defaultSnoozeAllPeriodInMinutes {
+        for (index, _) in snoozeValueMinutes.enumerated() {
+            if snoozeValueMinutes[index] > defaultSnoozeAllPeriodInMinutes {
                 break
             } else {
                 defaultRow = index
@@ -252,15 +252,15 @@ struct SnoozeView: View {
         pickerData = SnoozePickerData(PickerViewData(
             withMainTitle: Texts_HomeView.snoozeAllTitle,
             withSubTitle: Texts_Alerts.selectSnoozeTime,
-            withData: ConstantsAlerts.snoozeAllValueStrings,
+            withData: ConstantsAlerts.snoozeValueStrings,
             selectedRow: defaultRow,
             withPriority: .high,
-            actionButtonText: Texts_Common.Ok,
+            actionButtonText: Texts_Alerts.snooze,
             cancelButtonText: Texts_Common.Cancel,
             isFullScreen: true,
             onActionClick: { snoozeIndex in
                 // Get the snooze period and apply both timestamps.
-                let snoozePeriod = snoozeAllValueMinutes[snoozeIndex]
+                let snoozePeriod = snoozeValueMinutes[snoozeIndex]
                 
                 UserDefaults.standard.snoozeAllAlertsFromDate = Date()
                 UserDefaults.standard.snoozeAllAlertsUntilDate = Date().addingTimeInterval(Double(snoozePeriod) * 60)
@@ -302,6 +302,97 @@ struct SnoozePickerData: Identifiable {
     }
 }
 
+/// Dark, compact layout used only by the modal snooze picker.
+private struct SnoozePickerSheetLayout<Content: View>: View {
+    let title: String?
+    let subtitle: String?
+    let accentColor: Color
+    let cancelTitle: String
+    let confirmationTitle: String
+    let onCancel: () -> Void
+    let onConfirm: () -> Void
+    let content: Content
+
+    init(
+        title: String?,
+        subtitle: String?,
+        accentColor: Color,
+        cancelTitle: String,
+        confirmationTitle: String,
+        onCancel: @escaping () -> Void,
+        onConfirm: @escaping () -> Void,
+        @ViewBuilder content: @escaping () -> Content
+    ) {
+        self.title = title
+        self.subtitle = subtitle
+        self.accentColor = accentColor
+        self.cancelTitle = cancelTitle
+        self.confirmationTitle = confirmationTitle
+        self.onCancel = onCancel
+        self.onConfirm = onConfirm
+        self.content = content()
+    }
+
+    var body: some View {
+        ZStack {
+            ConstantsAppColors.homePanelBackground
+                .ignoresSafeArea()
+
+            VStack(spacing: 4) {
+                HStack(spacing: 14) {
+                    Image(systemName: "speaker.wave.2")
+                        .font(.system(size: 28, weight: .semibold))
+                        .foregroundStyle(accentColor)
+                        .frame(width: 40)
+
+                    VStack(alignment: .leading, spacing: 3) {
+                        if let title, !title.isEmpty {
+                            Text(title)
+                                .font(.title2.weight(.bold))
+                                .foregroundStyle(ConstantsAppColors.primaryText)
+                        }
+
+                        if let subtitle, !subtitle.isEmpty {
+                            Text(subtitle)
+                                .font(.body)
+                                .foregroundStyle(ConstantsAppColors.secondaryText)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+
+                    Spacer(minLength: 0)
+                }
+                .padding(.top, 8)
+
+                content
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+
+                HStack(spacing: 0) {
+                    Button(cancelTitle, action: onCancel)
+                        .font(.title3.weight(.bold))
+                        .buttonStyle(.borderedProminent)
+                        .tint(ConstantsAppColors.urgent)
+                        .foregroundStyle(.white)
+
+                    Spacer(minLength: 24)
+
+                    Button(confirmationTitle, action: onConfirm)
+                        .font(.title3.weight(.bold))
+                        .buttonStyle(.borderedProminent)
+                        .tint(ConstantsAppColors.normal)
+                        .foregroundStyle(.white)
+                }
+                .controlSize(.large)
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 18)
+            .padding(.bottom, 12)
+        }
+        .colorScheme(.dark)
+        .presentationDragIndicator(.visible)
+    }
+}
+
 /// Native wheel picker for one alert snooze duration.
 struct SnoozePickerView: View {
     @Environment(\.dismiss) private var dismiss
@@ -315,45 +406,38 @@ struct SnoozePickerView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 8) {
-                if let subTitle = pickerData.pickerViewData.subTitle {
-                    Text(subTitle)
-                        .font(.headline)
-                }
-
-                Picker("", selection: $selectedRow) {
-                    ForEach(pickerData.pickerViewData.data.indices, id: \.self) { index in
-                        Text(pickerData.pickerViewData.data[index])
-                            .tag(index)
-                    }
-                }
-                .pickerStyle(.wheel)
-                .onChange(of: selectedRow) { selectedRow in
-                    pickerData.pickerViewData.didSelectRowHandler?(selectedRow)
+        SnoozePickerSheetLayout(
+            title: pickerData.pickerViewData.mainTitle,
+            subtitle: pickerData.pickerViewData.subTitle,
+            accentColor: pickerData.pickerViewData.priority == .high ? ConstantsAppColors.urgent : ConstantsAppColors.accent,
+            cancelTitle: pickerData.pickerViewData.cancelTitle ?? Texts_Common.Cancel,
+            confirmationTitle: pickerData.pickerViewData.actionTitle ?? Texts_Alerts.snooze,
+            onCancel: cancel,
+            onConfirm: confirm
+        ) {
+            Picker("", selection: $selectedRow) {
+                ForEach(pickerData.pickerViewData.data.indices, id: \.self) { index in
+                    Text(pickerData.pickerViewData.data[index])
+                        .tag(index)
                 }
             }
-            .padding(.horizontal)
-            .navigationTitle(pickerData.pickerViewData.mainTitle ?? "")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(pickerData.pickerViewData.cancelTitle ?? Texts_Common.Cancel) {
-                        pickerData.pickerViewData.cancelHandler?()
-                        finish()
-                    }
-                }
-
-                ToolbarItem(placement: .confirmationAction) {
-                    Button(pickerData.pickerViewData.actionTitle ?? Texts_Common.Ok) {
-                        pickerData.pickerViewData.actionHandler(selectedRow)
-                        finish()
-                    }
-                }
+            .pickerStyle(.wheel)
+            .onChange(of: selectedRow) { selectedRow in
+                pickerData.pickerViewData.didSelectRowHandler?(selectedRow)
             }
         }
-        .presentationDetents([.medium])
+        .presentationDetents([.height(390)])
         .interactiveDismissDisabled()
+    }
+
+    private func cancel() {
+        pickerData.pickerViewData.cancelHandler?()
+        finish()
+    }
+
+    private func confirm() {
+        pickerData.pickerViewData.actionHandler(selectedRow)
+        finish()
     }
 
     private func finish() {

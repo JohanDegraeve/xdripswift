@@ -506,6 +506,8 @@ extension UserDefaults {
         // snooze
         /// used by the observer in RVC to update the UI for the snooze status
         case updateSnoozeStatus = "updateSnoozeStatus"
+        /// one-time migration marker for the reduced alert snooze-duration options
+        case didMigrateAlertSnoozePeriodsToReducedOptions = "didMigrateAlertSnoozePeriodsToReducedOptions"
 
         /// should the app allow a high contrast mode for the .systemSmall widget when shown in StandBy mode at night?
         case allowStandByHighContrast = "allowStandByHighContrast"
@@ -2862,6 +2864,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.updateSnoozeStatus.rawValue)
+        }
+    }
+
+    /// Defaults to false when absent and is set after the temporary snooze-period migration succeeds.
+    var didMigrateAlertSnoozePeriodsToReducedOptions: Bool {
+        get {
+            return bool(forKey: Key.didMigrateAlertSnoozePeriodsToReducedOptions.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.didMigrateAlertSnoozePeriodsToReducedOptions.rawValue)
         }
     }
 }
