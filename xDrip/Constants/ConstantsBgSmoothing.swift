@@ -1,3 +1,11 @@
+//
+//  ConstantsBgSmoothing.swift
+//  xdrip
+//
+//  Created by Paul Plant on 1/6/26.
+//  Copyright © 2026 Johan Degraeve. All rights reserved.
+//
+
 import Foundation
 
 enum BgSmoothingAlgorithm: String, CaseIterable {

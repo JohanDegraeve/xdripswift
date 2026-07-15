@@ -1,3 +1,11 @@
+//
+//  SettingsViewTraceSettingsViewModel.swift
+//  xdrip
+//
+//  Created by Johan Degraeve on 2/5/20.
+//  Copyright © 2020 Johan Degraeve. All rights reserved.
+//
+
 import Foundation
 
 fileprivate enum Setting:Int, CaseIterable {
