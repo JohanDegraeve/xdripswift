@@ -96,6 +96,7 @@ class CGMMedtrumTouchCareNanoTransmitter: BluetoothTransmitter, CGMTransmitter {
     override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
 
+        guard error == nil else { return }
         guard let value = characteristic.value else { return }
         guard characteristic.uuid == CBUUID(string: CBUUID_ReceiveCharacteristic_MedtrumNano) else { return }
 
@@ -106,8 +107,8 @@ class CGMMedtrumTouchCareNanoTransmitter: BluetoothTransmitter, CGMTransmitter {
 
     private func processGlucosePacket(_ data: Data) {
         // CGM notifications are 20 bytes. Ignore other shapes that may appear on this characteristic.
-        guard data.count >= 20 else {
-            trace("packet too short (len=%{public}d), ignoring", log: log, category: ConstantsLog.categoryCGMMedtrumTouchCareNano, type: .debug, data.count)
+        guard data.count == 20 else {
+            trace("unexpected packet length (len=%{public}d), ignoring", log: log, category: ConstantsLog.categoryCGMMedtrumTouchCareNano, type: .debug, data.count)
             return
         }
         // Single fingerprint byte: byte 1 (0x02) is the packet-type marker that distinguishes CGM
