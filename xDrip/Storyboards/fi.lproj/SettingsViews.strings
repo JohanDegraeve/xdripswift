@@ -44,6 +44,7 @@
 "settingsviews_giveDexcomSharePassword" = "Anna Dexcom Sharen salasana";
 "settingsviews_givedexcomShareUploadSerialNumber" = "Anna Dexcom vastaanottimen sarjanumero";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Lähetysasetukset";
 "settingsviews_nightscoutEnabled" = "Ota Nightscout käyttöön";
 "settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Käytä lähetysaikataulua";

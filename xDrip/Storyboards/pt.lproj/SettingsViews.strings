@@ -58,6 +58,7 @@
 "settingsviews_giveDexcomSharePassword" = "Introduzir Senha Dexcom Shared";
 "settingsviews_givedexcomShareUploadSerialNumber" = "Introduzir nº. de série do Receptor Dexcom";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Opções de envio";
 "settingsviews_nightscoutEnabled" = "Activar Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Utilizar Agendamento de Envio";

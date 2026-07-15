@@ -61,6 +61,7 @@
 "settingsviews_giveDexcomSharePassword" = "Ange Dexcom Share lösenord";
 "settingsviews_givedexcomShareUploadSerialNumber" = "Ange Dexcom mottagares serienummer";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Uppladdningsalternativ";
 "settingsviews_nightscoutEnabled" = "Slå på Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Använd schemalagd uppladdning";

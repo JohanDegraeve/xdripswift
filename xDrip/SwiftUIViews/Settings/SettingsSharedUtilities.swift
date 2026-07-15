@@ -984,7 +984,7 @@ struct SettingsRowTextView: View {
 
             Spacer(minLength: 8)
 
-            if let detail, !detail.isEmpty {
+            if let detail {
                 HStack(spacing: 5) {
                     if let detailIndicator {
                         Image(systemName: detailIndicator.symbolName)

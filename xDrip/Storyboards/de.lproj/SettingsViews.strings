@@ -71,6 +71,7 @@
 
 /// nightscout settings, section title
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Upload-Optionen";
 
 /// Apple Watch Settings - text in row where user needs to say if delta should be displayed or not
 "displayDeltaInCalendarEvent" = "Delta";

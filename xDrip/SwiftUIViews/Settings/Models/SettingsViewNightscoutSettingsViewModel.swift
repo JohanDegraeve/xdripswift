@@ -1,6 +1,6 @@
 import Foundation
 import os
-import Foundation
+import SwiftUI
 
 fileprivate enum Setting:Int, CaseIterable {
     
@@ -39,9 +39,18 @@ fileprivate enum Setting:Int, CaseIterable {
     
 }
 
+enum NightscoutSettingsRowGroup {
+    case nightscout
+    case connectionSettings
+    case actions
+    case uploadSchedule
+}
+
 class SettingsViewNightscoutSettingsViewModel {
     
     // MARK: - properties
+
+    private let rowGroup: NightscoutSettingsRowGroup
     
     /// in case info message or errors occur like credential check error, then this closure will be called with title and message
     /// - parameters:
@@ -50,37 +59,147 @@ class SettingsViewNightscoutSettingsViewModel {
     ///
     /// the viewcontroller sets it by calling storeMessageHandler
     private var messageHandler: ((String, String) -> Void)?
+
+    /// used to refresh the action rows when the Nightscout connection timestamp changes
+    private var sectionReloadClosure: (() -> Void)?
+
+    /// refreshes the relative connection timestamp while the Nightscout actions section is visible
+    private var connectionTimestampRefreshTimer: Timer?
     
     /// path to test API Secret
     private let nightscoutAuthTestPath = "/api/v1/experiments/test"
     
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryCGMG5)
+
+    init(rowGroup: NightscoutSettingsRowGroup = .nightscout) {
+        self.rowGroup = rowGroup
+    }
+
+    deinit {
+        connectionTimestampRefreshTimer?.invalidate()
+    }
     
     // MARK: - Native SwiftUI rows
+
+    func settingsSectionTitle() -> String? {
+        switch rowGroup {
+        case .nightscout:
+            return Texts_SettingsView.sectionTitleNightscout
+        case .connectionSettings:
+            return Texts_SettingsView.screenTitle
+        case .actions:
+            return nil
+        case .uploadSchedule:
+            return Texts_SettingsView.nightscoutUploadOptionsSectionTitle
+        }
+    }
 
     func settingsRows(sectionID: Int) -> [SettingsRow] {
         let nightscoutEnabled = UserDefaults.standard.nightscoutEnabled
         let masterModeRowsVisible = nightscoutEnabled && UserDefaults.standard.isMaster
 
-        return [
-            nativeSettingsRow(id: "nightscout.enabled", index: Setting.nightscoutEnabled.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "nightscout.openNightscout", index: Setting.openNightscout.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
-            nativeSettingsRow(id: "nightscout.followType", index: Setting.nightscoutFollowType.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
-            nativeSettingsRow(id: "nightscout.url", index: Setting.nightscoutUrl.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
-            nativeSettingsRow(id: "nightscout.apiKey", index: Setting.nightscoutAPIKey.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
-            nativeSettingsRow(id: "nightscout.token", index: Setting.token.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
-            nativeSettingsRow(id: "nightscout.port", index: Setting.port.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
-            nativeSettingsRow(id: "nightscout.testUrlAndAPIKey", index: Setting.testUrlAndAPIKey.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
-            nativeSettingsRow(id: "nightscout.uploadSensorStartTime", index: Setting.uploadSensorStartTime.rawValue, sectionID: sectionID, isVisible: masterModeRowsVisible),
-            nativeSettingsRow(id: "nightscout.useSchedule", index: Setting.useSchedule.rawValue, sectionID: sectionID, isVisible: masterModeRowsVisible),
-            nativeSettingsRow(
-                id: "nightscout.schedule",
-                index: Setting.schedule.rawValue,
-                sectionID: sectionID,
-                isVisible: masterModeRowsVisible && UserDefaults.standard.nightscoutUseSchedule
-            )
-        ]
+        switch rowGroup {
+        case .nightscout:
+            return [
+                nativeSettingsRow(id: "nightscout.enabled", index: Setting.nightscoutEnabled.rawValue, sectionID: sectionID),
+                nativeSettingsRow(id: "nightscout.followType", index: Setting.nightscoutFollowType.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled)
+            ]
+        case .connectionSettings:
+            return [
+                nativeSettingsRow(id: "nightscout.url", index: Setting.nightscoutUrl.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
+                nativeSettingsRow(id: "nightscout.apiKey", index: Setting.nightscoutAPIKey.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
+                nativeSettingsRow(id: "nightscout.token", index: Setting.token.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled),
+                nativeSettingsRow(id: "nightscout.port", index: Setting.port.rawValue, sectionID: sectionID, isVisible: nightscoutEnabled)
+            ]
+        case .actions:
+            return [
+                actionRow(
+                    id: "nightscout.openNightscout",
+                    index: Setting.openNightscout.rawValue,
+                    sectionID: sectionID,
+                    symbolName: "safari",
+                    isVisible: nightscoutEnabled,
+                    isAvailable: UserDefaults.standard.nightscoutUrl != nil
+                ),
+                // The Test Connection row also shows the last known good Nightscout
+                // connection. This is deliberately based on the stored timestamp,
+                // not the latest failed check, so the user can see when the last
+                // working connection happened and when it has become stale.
+                actionRow(
+                    id: "nightscout.testUrlAndAPIKey",
+                    index: Setting.testUrlAndAPIKey.rawValue,
+                    sectionID: sectionID,
+                    symbolName: "link.icloud",
+                    isVisible: nightscoutEnabled,
+                    detail: nightscoutLastConnectionText,
+                    detailIndicator: nightscoutLastConnectionIndicator
+                )
+            ]
+        case .uploadSchedule:
+            return [
+                nativeSettingsRow(id: "nightscout.uploadSensorStartTime", index: Setting.uploadSensorStartTime.rawValue, sectionID: sectionID, isVisible: masterModeRowsVisible),
+                nativeSettingsRow(id: "nightscout.useSchedule", index: Setting.useSchedule.rawValue, sectionID: sectionID, isVisible: masterModeRowsVisible),
+                nativeSettingsRow(
+                    id: "nightscout.schedule",
+                    index: Setting.schedule.rawValue,
+                    sectionID: sectionID,
+                    isVisible: masterModeRowsVisible && UserDefaults.standard.nightscoutUseSchedule
+                )
+            ]
+        }
+    }
+
+    /// Builds the Nightscout utility rows as link-style actions while still using
+    /// the original selection logic below for the actual work.
+    private func actionRow(
+        id: String,
+        index: Int,
+        sectionID: Int,
+        symbolName: String,
+        isVisible: Bool,
+        isAvailable: Bool = true,
+        detail: String? = nil,
+        detailIndicator: SettingsIndicator? = nil
+    ) -> SettingsRow {
+        var row = nativeSettingsRow(id: id, index: index, sectionID: sectionID, isVisible: isVisible)
+        row.detail = detail ?? row.detail
+        row.detailIndicator = detailIndicator
+        row.icon = SettingsIcon(symbolName: symbolName, color: isAvailable ? .accentColor : Color(.colorTertiary))
+        row.titleColor = isAvailable ? .accentColor : nil
+        row.accessory = .none
+        row.isEnabled = isAvailable
+        return row
+    }
+
+    /// Shows how long ago Nightscout last had a known good connection. This uses
+    /// the same timestamp as the root-view follower connection indicator. The
+    /// current formatter is minute-based, so very recent checks appear as 0m ago.
+    private var nightscoutLastConnectionText: String? {
+        guard let lastConnection = UserDefaults.standard.timeStampOfLastFollowerConnection else {
+            return nil
+        }
+
+        guard lastConnection > .distantPast else {
+            return ""
+        }
+
+        return lastConnection.daysAndHoursAgo(appendAgo: true)
+    }
+
+    /// Matches the root-view connection logic: green while the last Nightscout
+    /// connection is recent, red once it is older than the warning interval.
+    private var nightscoutLastConnectionIndicator: SettingsIndicator? {
+        guard let lastConnection = UserDefaults.standard.timeStampOfLastFollowerConnection else {
+            return nil
+        }
+
+        guard lastConnection > .distantPast else {
+            return SettingsIndicator(color: ConstantsAppColors.urgent)
+        }
+
+        let connectionIsRecent = lastConnection > Date().addingTimeInterval(-Double(ConstantsFollower.secondsUntilFollowerDisconnectWarningNightscout))
+        return SettingsIndicator(color: connectionIsRecent ? ConstantsAppColors.normal : ConstantsAppColors.urgent)
     }
 
     // MARK: - private functions
@@ -151,6 +270,13 @@ class SettingsViewNightscoutSettingsViewModel {
                     case (200...299):
                         
                         trace("in testNightscoutCredentials, successful", log: self.log, category: ConstantsLog.categoryNightscoutSettingsViewModel, type: .info)
+
+                        // A successful manual check proves that the current
+                        // Nightscout URL/authentication settings are valid, so
+                        // we can use the shared follower connection timestamp as
+                        // the row's last-known-good connection value.
+                        UserDefaults.standard.timeStampOfLastFollowerConnection = Date()
+                        self.callSectionReloadClosureInMainThread()
                         
                         self.callMessageHandlerInMainThread(title: TextsNightscout.verificationSuccessfulAlertTitle, message: TextsNightscout.verificationSuccessfulAlertBody)
                         
@@ -221,6 +347,35 @@ class SettingsViewNightscoutSettingsViewModel {
         }
         
     }
+
+    private func callSectionReloadClosureInMainThread() {
+        guard let sectionReloadClosure = sectionReloadClosure else { return }
+
+        // Settings callbacks can be triggered from URLSession or timer work, so
+        // keep the SwiftUI refresh safely on the main thread.
+        DispatchQueue.main.async {
+            sectionReloadClosure()
+        }
+    }
+
+    /// Starts a small UI-only refresh timer so the connection age and status dot
+    /// keep ageing while the Nightscout settings screen remains open.
+    private func startConnectionTimestampRefreshTimer() {
+        guard rowGroup == .actions else { return }
+
+        connectionTimestampRefreshTimer?.invalidate()
+        connectionTimestampRefreshTimer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+            self?.sectionReloadClosure?()
+        }
+    }
+
+    /// Clears the last known good connection when the Nightscout connection
+    /// settings change, because the previous success no longer proves that the
+    /// new URL, secret, token, port or enabled state can connect.
+    private func resetLastConnectionTimestamp() {
+        UserDefaults.standard.timeStampOfLastFollowerConnection = .distantPast
+        callSectionReloadClosureInMainThread()
+    }
     
 }
 
@@ -228,6 +383,11 @@ class SettingsViewNightscoutSettingsViewModel {
 extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
 
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
+
+    func storeSectionReloadClosure(sectionReloadClosure: @escaping (() -> Void)) {
+        self.sectionReloadClosure = sectionReloadClosure
+        startConnectionTimestampRefreshTimer()
+    }
     
 
     func storeMessageHandler(messageHandler: @escaping ((String, String) -> Void)) {
@@ -341,19 +501,32 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
                     UserDefaults.standard.nightscoutUrl = nil
                     
                 }
+
+                self.resetLastConnectionTimestamp()
                 
             }, cancelHandler: nil, inputValidator: nil)
 
         case .nightscoutAPIKey:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.labelNightscoutAPIKey, message:  Texts_SettingsView.giveNightscoutAPIKey, keyboardType: .default, text: UserDefaults.standard.nightscoutAPIKey, placeHolder: "MyAPISecret123", actionTitle: nil, cancelTitle: nil, actionHandler: {(apiKey: String) in
-                UserDefaults.standard.nightscoutAPIKey = apiKey.trimmingCharacters(in: .whitespaces).toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
+                UserDefaults.standard.nightscoutAPIKey = apiKey.trimmingCharacters(in: .whitespaces).toNilIfLength0()
+                self.resetLastConnectionTimestamp()
+            }, cancelHandler: nil, inputValidator: nil)
 
         case .port:
-            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.nightscoutPort, message: nil, keyboardType: .numberPad, text: UserDefaults.standard.nightscoutPort != 0 ? UserDefaults.standard.nightscoutPort.description : nil, placeHolder: "1337", fieldTitle: Texts_SettingsView.enterNightscoutPortNumber, actionTitle: nil, cancelTitle: nil, actionHandler: {(port: String) in if let port = port.trimmingCharacters(in: .whitespaces).toNilIfLength0() { UserDefaults.standard.nightscoutPort = Int(port) ?? 0 } else {UserDefaults.standard.nightscoutPort = 0}}, cancelHandler: nil, inputValidator: nil)
+            return SettingsSelectedRowAction.askText(title: Texts_SettingsView.nightscoutPort, message: nil, keyboardType: .numberPad, text: UserDefaults.standard.nightscoutPort != 0 ? UserDefaults.standard.nightscoutPort.description : nil, placeHolder: "1337", fieldTitle: Texts_SettingsView.enterNightscoutPortNumber, actionTitle: nil, cancelTitle: nil, actionHandler: {(port: String) in
+                if let port = port.trimmingCharacters(in: .whitespaces).toNilIfLength0() {
+                    UserDefaults.standard.nightscoutPort = Int(port) ?? 0
+                } else {
+                    UserDefaults.standard.nightscoutPort = 0
+                }
+                self.resetLastConnectionTimestamp()
+            }, cancelHandler: nil, inputValidator: nil)
         
         case .token:
             return SettingsSelectedRowAction.askText(title: Texts_SettingsView.nightscoutToken, message: Texts_SettingsView.giveNightscoutToken, keyboardType: .default, text: UserDefaults.standard.nightscoutToken, placeHolder: "readable-3f033c4515e623c2", actionTitle: nil, cancelTitle: nil, actionHandler: {(token: String) in
-                UserDefaults.standard.nightscoutToken = token.trimmingCharacters(in: .whitespaces).toNilIfLength0()}, cancelHandler: nil, inputValidator: nil)
+                UserDefaults.standard.nightscoutToken = token.trimmingCharacters(in: .whitespaces).toNilIfLength0()
+                self.resetLastConnectionTimestamp()
+            }, cancelHandler: nil, inputValidator: nil)
             
         case .testUrlAndAPIKey:
             return .callFunction { [weak self] in
@@ -497,6 +670,7 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
                     guard let self else { return }
                     trace("nightscoutEnabled changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNightscoutSettingsViewModel, type: .info, isOn.description)
                     UserDefaults.standard.nightscoutEnabled = isOn
+                    self.resetLastConnectionTimestamp()
                 }
             )
         case .useSchedule:

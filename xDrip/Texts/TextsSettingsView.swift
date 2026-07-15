@@ -555,6 +555,10 @@ class Texts_SettingsView {
     static let sectionTitleNightscout: String = {
         return NSLocalizedString("settingsviews_sectiontitlenightscout", tableName: filename, bundle: Bundle.main, value: "Nightscout", comment: "nightscout settings, section title")
     }()
+
+    static let nightscoutUploadOptionsSectionTitle: String = {
+        return NSLocalizedString("settingsviews_nightscoutUploadOptionsSectionTitle", tableName: filename, bundle: Bundle.main, value: "Upload Options", comment: "nightscout settings, section title for upload options")
+    }()
     
     static let labelNightscoutEnabled = {
         return NSLocalizedString("settingsviews_nightscoutEnabled", tableName: filename, bundle: Bundle.main, value: "Enable Nightscout", comment: "nightscout settings, where user can enable or disable nightscout")
@@ -617,7 +621,7 @@ class Texts_SettingsView {
     }()
     
     static let timeScheduleViewTitle: String = {
-        return NSLocalizedString("timeScheduleViewTitle", tableName: filename, bundle: Bundle.main, value: "On/Off Time Schedule for ", comment: "When creating schedule for Nightscout or Dexcom Share upload, this is the top label text")
+        return NSLocalizedString("timeScheduleViewTitle", tableName: filename, bundle: Bundle.main, value: "On/Off Time Schedule", comment: "When creating schedule for Nightscout or Dexcom Share upload, this is the top label text")
     }()
     
     static let uploadSensorStartTime: String = {

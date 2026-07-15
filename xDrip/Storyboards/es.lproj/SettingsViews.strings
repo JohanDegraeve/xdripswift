@@ -99,6 +99,7 @@
 "settingsviews_giveDexcomSharePassword" = "Entrar la  Contraseña para tu Cuenta Dexcom Share";
 "settingsviews_givedexcomShareUploadSerialNumber" = "Entrar el número de serie del receptor Dexcom";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Opciones de subida";
 "settingsviews_nightscoutEnabled" = "Habilitar Nightscout";
 "settingsviews_useSchedule" = "Fijar Horario de Subida de Datos";
 "schedule" = "Horario";
