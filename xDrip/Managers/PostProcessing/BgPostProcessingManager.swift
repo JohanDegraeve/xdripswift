@@ -17,15 +17,11 @@ class BgPostProcessingManager {
 
     private struct BgReadingStateBeforeProcessing {
         let finalValue: Double
-        let slopeName: String
-        let hideSlope: Bool
         let isSuppressedByFiveMinuteCadence: Bool
     }
 
     private struct BgReadingDownstreamChange {
         let finalValueChanged: Bool
-        let slopeNameChanged: Bool
-        let hideSlopeChanged: Bool
         let suppressionChanged: Bool
 
         var affectsOlderDownstreamHistory: Bool {
@@ -45,14 +41,6 @@ class BgPostProcessingManager {
 
     private weak var nightscoutSyncManager: NightscoutSyncManager?
     private weak var healthKitManager: HealthKitManager?
-
-    // DEBUG START: removable post-processing diagnostics for background load investigation.
-    private enum DebugPostProcessing {
-        static let enabled = false
-        static let tracePrefix = "[DBG_POSTPROC]"
-    }
-    private var debugProcessingRunSequence = 0
-    // DEBUG END: removable post-processing diagnostics for background load investigation.
 
     // MARK: - initializer
 
@@ -118,15 +106,6 @@ class BgPostProcessingManager {
     /// into a full selected-window rewrite.
     @discardableResult
     func processBgReadings(processingStartDateOverride: Date?, fiveMinuteReadingsStartTimeStampOverride: Date? = nil, forceFullDownstreamRewrite: Bool = false, allowHistoricalDownstreamRewrite: Bool = false) -> Bool {
-        // DEBUG START: removable post-processing diagnostics for background load investigation.
-        let startedAt = Date()
-        var debugProcessingRunID: Int?
-        if DebugPostProcessing.enabled {
-            debugProcessingRunSequence += 1
-            debugProcessingRunID = debugProcessingRunSequence
-        }
-        // DEBUG END: removable post-processing diagnostics for background load investigation.
-
         refreshSourceContext()
 
         guard let sourceContextIdentifier = currentSourceContextIdentifier() else {
@@ -141,20 +120,11 @@ class BgPostProcessingManager {
         // through the readings without needing to constantly look backwards.
         let bgReadings = Array(bgReadingsAccessor.getLatestBgReadings(limit: nil, fromDate: fromDate, forSensor: currentSensor, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: true).reversed())
 
-        guard bgReadings.count > 0 else {
-            // DEBUG START: removable post-processing diagnostics for background load investigation.
-            if DebugPostProcessing.enabled {
-                trace("%{public}@ no readings found, run=%{public}@, fromDate=%{public}@, forceFullDownstreamRewrite=%{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .debug, DebugPostProcessing.tracePrefix, debugProcessingRunID?.description ?? "nil", String(describing: fromDate), forceFullDownstreamRewrite.description)
-            }
-            // DEBUG END: removable post-processing diagnostics for background load investigation.
-            return false
-        }
-
-        let visibleReadingsBeforeProcessingCount = bgReadings.filter { !$0.isSuppressedByFiveMinuteCadence }.count
+        guard bgReadings.count > 0 else { return false }
 
         var statesBeforeProcessing = [NSManagedObjectID: BgReadingStateBeforeProcessing]()
         for bgReading in bgReadings {
-            statesBeforeProcessing[bgReading.objectID] = BgReadingStateBeforeProcessing(finalValue: bgReading.finalValue, slopeName: bgReading.slopeName, hideSlope: bgReading.hideSlope, isSuppressedByFiveMinuteCadence: bgReading.isSuppressedByFiveMinuteCadence)
+            statesBeforeProcessing[bgReading.objectID] = BgReadingStateBeforeProcessing(finalValue: bgReading.finalValue, isSuppressedByFiveMinuteCadence: bgReading.isSuppressedByFiveMinuteCadence)
         }
 
         recomputeAdjustedValues(bgReadings: bgReadings, sourceContextIdentifier: sourceContextIdentifier)
@@ -168,35 +138,16 @@ class BgPostProcessingManager {
             let stateBeforeProcessing = statesBeforeProcessing[bgReading.objectID]
             let change = BgReadingDownstreamChange(
                 finalValueChanged: stateBeforeProcessing == nil ? true : abs(stateBeforeProcessing!.finalValue - bgReading.finalValue) > 0.001,
-                slopeNameChanged: stateBeforeProcessing == nil ? true : stateBeforeProcessing!.slopeName != bgReading.slopeName,
-                hideSlopeChanged: stateBeforeProcessing == nil ? true : stateBeforeProcessing!.hideSlope != bgReading.hideSlope,
                 suppressionChanged: stateBeforeProcessing == nil ? true : stateBeforeProcessing!.isSuppressedByFiveMinuteCadence != bgReading.isSuppressedByFiveMinuteCadence
             )
             return (bgReading.objectID, change)
         })
 
-        let changedBgReadings = bgReadings.filter { bgReading in
-            guard let change = downstreamChangesByObjectID[bgReading.objectID] else { return true }
-            return change.finalValueChanged || change.slopeNameChanged || change.hideSlopeChanged || change.suppressionChanged
-        }
-
         // Manual historical apply rewrites the full selected window.
         // Automatic live processing rewrites only the changed visible readings
         // inside the bounded recent processing window.
         let shouldRewriteFullDownstreamWindow = allowHistoricalDownstreamRewrite && (processingStartDateOverride != nil || forceFullDownstreamRewrite)
-        // DEBUG START: removable post-processing diagnostics for background load investigation.
-        let processingDurationMilliseconds = Int((Date().timeIntervalSince(startedAt) * 1000.0).rounded())
-        let changedVisibleReadingsCount = changedBgReadings.filter { !$0.isSuppressedByFiveMinuteCadence }.count
-        // DEBUG END: removable post-processing diagnostics for background load investigation.
-
-        guard allowHistoricalDownstreamRewrite else {
-            // DEBUG START: removable post-processing diagnostics for background load investigation.
-            if DebugPostProcessing.enabled {
-                trace("%{public}@ finished without downstream rewrite, run=%{public}@, duration=%{public}@ ms, fetched=%{public}@, visibleBefore=%{public}@, changed=%{public}@, changedVisible=%{public}@, sourceContext=%{public}@, fromDate=%{public}@, effectiveAdjustment=%{public}@, smoothing=%{public}@, fiveMinute=%{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, DebugPostProcessing.tracePrefix, debugProcessingRunID?.description ?? "nil", processingDurationMilliseconds.description, bgReadings.count.description, visibleReadingsBeforeProcessingCount.description, changedBgReadings.count.description, changedVisibleReadingsCount.description, sourceContextIdentifier, String(describing: fromDate), hasEffectiveAdjustmentForCurrentSource().description, UserDefaults.standard.enableSmoothing.description, (UserDefaults.standard.useFiveMinuteReadings && currentSourceCanUseFiveMinuteReadings()).description)
-            }
-            // DEBUG END: removable post-processing diagnostics for background load investigation.
-            return false
-        }
+        guard allowHistoricalDownstreamRewrite else { return false }
 
         let bgReadingsToReplaceDownstream: [BgReading]
         if shouldRewriteFullDownstreamWindow {
@@ -228,27 +179,15 @@ class BgPostProcessingManager {
         let downstreamReadingsToReplace = bgReadingsToReplaceDownstream
 
         if downstreamReadingsToReplace.count > 0 {
-            let earliestReplacementDate = downstreamReadingsToReplace.map(\.timeStamp).min()
-            let latestReplacementDate = downstreamReadingsToReplace.map(\.timeStamp).max()
             if shouldRewriteFullDownstreamWindow, let earliestBgReading = bgReadings.first, let latestBgReading = bgReadings.last {
                 nightscoutSyncManager?.replaceBgReadingsInNightscout(bgReadings: downstreamReadingsToReplace, deleteFromTimeStamp: earliestBgReading.timeStamp, deleteToTimeStamp: latestBgReading.timeStamp)
             } else {
                 nightscoutSyncManager?.replaceBgReadingsInNightscout(bgReadings: downstreamReadingsToReplace)
             }
             healthKitManager?.replaceBgReadingsInHealthKit(bgReadings: downstreamReadingsToReplace)
-            // DEBUG START: removable post-processing diagnostics for background load investigation.
-            if DebugPostProcessing.enabled {
-                trace("%{public}@ queued downstream rewrite, run=%{public}@, duration=%{public}@ ms, fetched=%{public}@, visibleBefore=%{public}@, changed=%{public}@, changedVisible=%{public}@, rewriteCount=%{public}@, fullWindow=%{public}@, sourceContext=%{public}@, replacementStart=%{public}@, replacementEnd=%{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, DebugPostProcessing.tracePrefix, debugProcessingRunID?.description ?? "nil", processingDurationMilliseconds.description, bgReadings.count.description, visibleReadingsBeforeProcessingCount.description, changedBgReadings.count.description, changedVisibleReadingsCount.description, downstreamReadingsToReplace.count.description, shouldRewriteFullDownstreamWindow.description, sourceContextIdentifier, String(describing: earliestReplacementDate), String(describing: latestReplacementDate))
-            }
-            // DEBUG END: removable post-processing diagnostics for background load investigation.
             return true
         }
 
-        // DEBUG START: removable post-processing diagnostics for background load investigation.
-        if DebugPostProcessing.enabled {
-            trace("%{public}@ downstream rewrite eligible but nothing visible changed, run=%{public}@, duration=%{public}@ ms, fetched=%{public}@, visibleBefore=%{public}@, changed=%{public}@, sourceContext=%{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, DebugPostProcessing.tracePrefix, debugProcessingRunID?.description ?? "nil", processingDurationMilliseconds.description, bgReadings.count.description, visibleReadingsBeforeProcessingCount.description, changedBgReadings.count.description, sourceContextIdentifier)
-        }
-        // DEBUG END: removable post-processing diagnostics for background load investigation.
         return false
     }
 
