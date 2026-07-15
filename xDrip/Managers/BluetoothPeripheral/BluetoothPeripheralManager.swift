@@ -345,7 +345,7 @@ class BluetoothPeripheralManager: NSObject {
 
                         if let cgmTransmitterDelegate = cgmTransmitterDelegate {
 
-                            newTransmitter = CGMMedtrumTouchCareNanoTransmitter(address: medtrumNano.blePeripheral.address, name: medtrumNano.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMMedtrumTouchCareNanoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+                            newTransmitter = CGMMedtrumTouchCareNanoTransmitter(address: medtrumNano.blePeripheral.address, name: medtrumNano.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
 
                         } else {
 
@@ -513,7 +513,7 @@ class BluetoothPeripheralManager: NSObject {
                 fatalError("in createNewTransmitter, MedtrumTouchCareNanoType, cgmTransmitterDelegate is nil")
             }
 
-            return CGMMedtrumTouchCareNanoTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMMedtrumTouchCareNanoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+            return CGMMedtrumTouchCareNanoTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMTransmitterDelegate: cgmTransmitterDelegate)
             
         }
         
@@ -961,7 +961,7 @@ class BluetoothPeripheralManager: NSObject {
 
                         if medtrumNano.blePeripheral.shouldconnect {
 
-                            bluetoothTransmitters.insert(CGMMedtrumTouchCareNanoTransmitter(address: medtrumNano.blePeripheral.address, name: medtrumNano.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMMedtrumTouchCareNanoTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
+                            bluetoothTransmitters.insert(CGMMedtrumTouchCareNanoTransmitter(address: medtrumNano.blePeripheral.address, name: medtrumNano.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
 
                             if bluetoothPeripheralType.category() == .CGM {
                                 currentCgmTransmitterAddress = blePeripheral.address

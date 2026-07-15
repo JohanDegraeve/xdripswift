@@ -2227,8 +2227,6 @@ private extension BluetoothPeripheralDetailState {
             cGMMiaoMiaoTransmitter.cGMMiaoMiaoTransmitterDelegate = self
         } else if let cGMBubbleTransmitter = bluetoothTransmitter as? CGMBubbleTransmitter {
             cGMBubbleTransmitter.cGMBubbleTransmitterDelegate = self
-        } else if let cGMMedtrumTouchCareNanoTransmitter = bluetoothTransmitter as? CGMMedtrumTouchCareNanoTransmitter {
-            cGMMedtrumTouchCareNanoTransmitter.cGMMedtrumTouchCareNanoTransmitterDelegate = self
         }
     }
 
@@ -2254,8 +2252,6 @@ private extension BluetoothPeripheralDetailState {
             cGMMiaoMiaoTransmitter.cGMMiaoMiaoTransmitterDelegate = bluetoothPeripheralManager as? CGMMiaoMiaoTransmitterDelegate
         } else if let cGMBubbleTransmitter = bluetoothTransmitter as? CGMBubbleTransmitter {
             cGMBubbleTransmitter.cGMBubbleTransmitterDelegate = bluetoothPeripheralManager as? CGMBubbleTransmitterDelegate
-        } else if let cGMMedtrumTouchCareNanoTransmitter = bluetoothTransmitter as? CGMMedtrumTouchCareNanoTransmitter {
-            cGMMedtrumTouchCareNanoTransmitter.cGMMedtrumTouchCareNanoTransmitterDelegate = bluetoothPeripheralManager as? CGMMedtrumTouchCareNanoTransmitterDelegate
         }
     }
 
@@ -2509,13 +2505,6 @@ extension BluetoothPeripheralDetailState: CGMBubbleTransmitterDelegate {
 
     func received(libreSensorType: LibreSensorType, from cGMBubbleTransmitter: CGMBubbleTransmitter) {
         (bluetoothPeripheralManager as? CGMBubbleTransmitterDelegate)?.received(libreSensorType: libreSensorType, from: cGMBubbleTransmitter)
-        refreshOnMain()
-    }
-}
-
-extension BluetoothPeripheralDetailState: CGMMedtrumTouchCareNanoTransmitterDelegate {
-    func received(firmware: String, from cGMMedtrumTouchCareNanoTransmitter: CGMMedtrumTouchCareNanoTransmitter) {
-        (bluetoothPeripheralManager as? CGMMedtrumTouchCareNanoTransmitterDelegate)?.received(firmware: firmware, from: cGMMedtrumTouchCareNanoTransmitter)
         refreshOnMain()
     }
 }
