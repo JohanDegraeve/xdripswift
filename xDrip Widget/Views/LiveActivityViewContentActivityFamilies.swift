@@ -1,5 +1,5 @@
 //
-//  LiveActivityContentActivityFamiliesView.swift
+//  LiveActivityViewContentActivityFamilies.swift
 //  xdrip
 //
 //  Created by Paul Plant on 29/7/25.
