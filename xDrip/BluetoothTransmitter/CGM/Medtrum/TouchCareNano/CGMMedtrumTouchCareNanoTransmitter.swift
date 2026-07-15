@@ -58,9 +58,6 @@ class CGMMedtrumTouchCareNanoTransmitter: BluetoothTransmitter, CGMTransmitter {
     /// CGM delegate (xDrip pipeline)
     private(set) weak var cgmTransmitterDelegate: CGMTransmitterDelegate?
 
-    /// transmitter-specific delegate (settings UI)
-    public weak var cGMMedtrumTouchCareNanoTransmitterDelegate: CGMMedtrumTouchCareNanoTransmitterDelegate?
-
     /// last reading counter we have already emitted — used to skip duplicates within one app run
     private var lastEmittedCounter: Int = -1
 
@@ -68,7 +65,7 @@ class CGMMedtrumTouchCareNanoTransmitter: BluetoothTransmitter, CGMTransmitter {
 
     // MARK: - Initialization
 
-    init(address: String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMMedtrumTouchCareNanoTransmitterDelegate: CGMMedtrumTouchCareNanoTransmitterDelegate, cGMTransmitterDelegate: CGMTransmitterDelegate) {
+    init(address: String?, name: String?, bluetoothTransmitterDelegate: BluetoothTransmitterDelegate, cGMTransmitterDelegate: CGMTransmitterDelegate) {
 
         var newAddressAndName: BluetoothTransmitter.DeviceAddressAndName = .notYetConnected(expectedName: expectedDeviceNameMedtrum)
         if let address = address {
@@ -76,7 +73,6 @@ class CGMMedtrumTouchCareNanoTransmitter: BluetoothTransmitter, CGMTransmitter {
         }
 
         self.cgmTransmitterDelegate = cGMTransmitterDelegate
-        self.cGMMedtrumTouchCareNanoTransmitterDelegate = cGMMedtrumTouchCareNanoTransmitterDelegate
 
         super.init(addressAndName: newAddressAndName, CBUUID_Advertisement: nil, servicesCBUUIDs: [CBUUID(string: CBUUID_Service_MedtrumNano)], CBUUID_ReceiveCharacteristic: CBUUID_ReceiveCharacteristic_MedtrumNano, CBUUID_WriteCharacteristic: CBUUID_WriteCharacteristic_MedtrumNano, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate)
     }
