@@ -282,6 +282,7 @@
 /// Advanced Settings, section title
 "developerSettings" = "Erweiterte Einstellungen";
 "showDeveloperSettings" = "Erweiterte Einstellungen anzeigen";
+"preferSensorCountdown" = "Sensor-Countdown bevorzugen";
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Home Screen";

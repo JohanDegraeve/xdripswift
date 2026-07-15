@@ -108,6 +108,7 @@
 "nightscoutPort" = "Port";
 "developerSettings" = "Gelişmiş Ayarlar";
 "showDeveloperSettings" = "Gelişmiş Ayarları Göster";
+"preferSensorCountdown" = "Sensör geri sayımını tercih et";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Ana Ekran";

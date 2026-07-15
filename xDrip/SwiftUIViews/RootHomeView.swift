@@ -1242,8 +1242,8 @@ private struct RootHomeSensorLifetimeView: View {
                 .tint(state.progressColor)
                 .frame(height: 5)
                 .overlay {
-                    Image(systemName: "arrowtriangle.right.fill")
-                        .font(.system(size: 14, weight: .semibold))
+                    Image(systemName: state.countsDown ? "arrowtriangle.left.fill" : "arrowtriangle.right.fill")
+                        .font(.system(size: 15, weight: .semibold))
                         .scaleEffect(x: 0.75, y: 0.95)
                         .foregroundStyle(state.progressColor)
                         .opacity(0.85)
@@ -1314,7 +1314,7 @@ private struct RootHomeDataSourceView: View {
     }
 
     private var maxAgeText: String? {
-        sensorState.currentAge.isEmpty || sensorState.maxAge.isEmpty ? nil : sensorState.maxAge
+        sensorState.currentAge.isEmpty || sensorState.maxAge.isEmpty || sensorState.countsDown ? nil : sensorState.maxAge
     }
 
     private var dataSourceDetailColor: Color {

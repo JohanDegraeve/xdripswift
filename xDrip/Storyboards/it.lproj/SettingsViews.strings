@@ -286,6 +286,7 @@
 /// Advanced Settings, section title
 "developerSettings" = "Impostazioni avanzate";
 "showDeveloperSettings" = "Mostra impostazioni avanzate";
+"preferSensorCountdown" = "Preferisci conto alla rovescia del sensore";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

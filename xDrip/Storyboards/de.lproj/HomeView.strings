@@ -151,4 +151,5 @@
 
 "postProcessingFiveMinuteReadings" = "5-minute readings";
 "postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "%@ verbleibend";
 "postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";

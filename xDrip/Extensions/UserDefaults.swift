@@ -449,6 +449,8 @@ extension UserDefaults {
 
         /// show Developer Settings
         case showDeveloperSettings = "showDeveloperSettings"
+        /// show the active sensor lifetime as time remaining instead of time elapsed
+        case preferSensorCountdown = "preferSensorCountdown"
         /// G6 factor1 - for testing G6 scaling
         case G6v2ScalingFactor1 = "G6v2ScalingFactor1"
         /// G6 factor2 - for testing G6 scaling
@@ -2466,6 +2468,16 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.showDeveloperSettings.rawValue)
+        }
+    }
+
+    /// preferSensorCountdown - default false
+    var preferSensorCountdown: Bool {
+        get {
+            return bool(forKey: Key.preferSensorCountdown.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.preferSensorCountdown.rawValue)
         }
     }
 

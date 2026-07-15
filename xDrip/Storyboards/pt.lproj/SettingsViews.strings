@@ -110,6 +110,7 @@
 "nslog" = "NSLog";
 "developerSettings" = "Definições avançadas";
 "showDeveloperSettings" = "Mostrar definições avançadas";
+"preferSensorCountdown" = "Preferir contagem decrescente do sensor";
 "settingsviews_sectiontitlehomescreen" = "Ecrã Inicial";
 "settingsviews_showClockWhenScreenIsLocked" = "Relógio no ecrã bloqueado";
 

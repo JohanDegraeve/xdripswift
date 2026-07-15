@@ -101,6 +101,7 @@
 "nightscoutPort" = "المنفذ (اختياري)";
 "developerSettings" = "الإعدادات المتقدمة";
 "showDeveloperSettings" = "إظهار الإعدادات المتقدمة";
+"preferSensorCountdown" = "تفضيل العد التنازلي لعمر المستشعر";
 "nslog" = "NSتقرير";
 "oslog" = "OSتقرير";
 "settingsviews_sectiontitlehomescreen" = "الشاشة الرئيسية";

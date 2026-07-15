@@ -111,6 +111,7 @@
 "nightscoutPort" = "Port";
 "developerSettings" = "Avancerade inställningar";
 "showDeveloperSettings" = "Visa avancerade inställningar";
+"preferSensorCountdown" = "Föredra nedräkning för sensor";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Hemskärm";

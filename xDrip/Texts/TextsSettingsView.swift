@@ -935,6 +935,10 @@ class Texts_SettingsView {
         return NSLocalizedString("showDeveloperSettings", tableName: filename, bundle: Bundle.main, value: "Show Advanced Settings", comment: "advanced settings, show them or hide them")
     }()
 
+    static let preferSensorCountdown: String = {
+        return NSLocalizedString("preferSensorCountdown", tableName: filename, bundle: Bundle.main, value: "Prefer Sensor Countdown", comment: "advanced settings, show remaining sensor lifetime instead of elapsed lifetime")
+    }()
+
     static let nsLog: String = {
         return NSLocalizedString("nslog", tableName: filename, bundle: Bundle.main, value: "NSLog", comment: "developer settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog")
     }()
