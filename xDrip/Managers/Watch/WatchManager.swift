@@ -208,6 +208,14 @@ final class WatchManager: NSObject, ObservableObject {
     }
 
     private func sendUpdateToWatch(updateTypes: Set<WatchUpdateType>, forceComplicationUpdate: Bool) {
+        // Pairing and installation state are only valid after WatchConnectivity has activated
+        guard session.activationState == .activated else {
+            let activationStateString = "\(session.activationState)"
+            trace("watch session activationState = %{public}@. Reactivating", log: log, category: ConstantsLog.categoryWatchManager, type: .debug, activationStateString)
+            session.activate()
+            return
+        }
+
         guard session.isPaired else {
             trace("no Watch is paired", log: log, category: ConstantsLog.categoryWatchManager, type: .debug)
             return
@@ -215,13 +223,6 @@ final class WatchManager: NSObject, ObservableObject {
 
         guard session.isWatchAppInstalled else {
             trace("watch app is not installed", log: log, category: ConstantsLog.categoryWatchManager, type: .debug)
-            return
-        }
-
-        guard session.activationState == .activated else {
-            let activationStateString = "\(session.activationState)"
-            trace("watch session activationState = %{public}@. Reactivating", log: log, category: ConstantsLog.categoryWatchManager, type: .debug, activationStateString)
-            session.activate()
             return
         }
 
@@ -274,7 +275,19 @@ extension WatchManager: WCSessionDelegate {
         session.activate()
     }
 
-    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {}
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        if let error {
+            trace("watch session activation failed, error = %{public}@", log: log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)
+            return
+        }
+
+        guard activationState == .activated else { return }
+
+        // send the update that was deferred while the session was activating
+        DispatchQueue.main.async { [weak self] in
+            self?.processWatchUpdate(updateTypes: [.status, .bgReadings], forceComplicationUpdate: false)
+        }
+    }
 
     // process any received messages from the watch app
     func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
