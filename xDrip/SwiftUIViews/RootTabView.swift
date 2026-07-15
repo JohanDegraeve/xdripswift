@@ -82,11 +82,14 @@ struct RootTabDependencies {
     @Published private(set) var snoozeDismissalRequest = 0
     @Published private(set) var incomingBackupRequest: IncomingBackupRequest?
     @Published private(set) var isPreparingIncomingBackup = false
-    @Published var alertRequest: RootAlertRequest?
+    @Published private(set) var alertRequest: RootAlertRequest?
     @Published var textInputRequest: RootTextInputRequest?
     @Published var textInput = ""
     @Published var pickerData: SnoozePickerData?
     weak var sensorProvider: ActiveSensorProviding?
+    private var pendingAlertRequests: [RootAlertRequest] = []
+    private var isAdvancingAlertQueue = false
+    private var isAlertDismissalPending = false
     private let dataManagementLog = OSLog(
         subsystem: ConstantsLog.subSystem,
         category: ConstantsLog.categoryDataManagement
@@ -106,7 +109,7 @@ struct RootTabDependencies {
         action: @escaping () -> Void = {},
         cancel: @escaping () -> Void = {}
     ) {
-        alertRequest = RootAlertRequest(
+        let request = RootAlertRequest(
             title: title,
             message: message,
             actionTitle: actionTitle,
@@ -114,6 +117,38 @@ struct RootTabDependencies {
             action: action,
             cancel: cancel
         )
+
+        // SwiftUI cannot replace an alert while the previous UIKit presentation is still dismissing
+        guard alertRequest == nil, !isAdvancingAlertQueue else {
+            pendingAlertRequests.append(request)
+            return
+        }
+
+        alertRequest = request
+    }
+
+    /// Clears a dismissed alert and presents the next request after UIKit has finished its dismissal.
+    func updatePresentedAlert(_ request: RootAlertRequest?) {
+        guard request == nil, !isAlertDismissalPending else { return }
+        isAlertDismissalPending = true
+
+        Task { @MainActor in
+            // defer publication until SwiftUI has completed the current alert update
+            await Task.yield()
+            alertRequest = nil
+            isAlertDismissalPending = false
+
+            guard !pendingAlertRequests.isEmpty else {
+                isAdvancingAlertQueue = false
+                return
+            }
+
+            isAdvancingAlertQueue = true
+            let nextRequest = pendingAlertRequests.removeFirst()
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            alertRequest = nextRequest
+            isAdvancingAlertQueue = false
+        }
     }
 
     func presentTextInput(
@@ -345,7 +380,12 @@ struct RootTabView: View {
                 selectedTab = .settings
             }
         }
-        .alert(item: $stateModel.alertRequest) { request in
+        .alert(
+            item: Binding(
+                get: { stateModel.alertRequest },
+                set: { stateModel.updatePresentedAlert($0) }
+            )
+        ) { request in
             if let cancelTitle = request.cancelTitle {
                 return Alert(
                     title: Text(request.title),
