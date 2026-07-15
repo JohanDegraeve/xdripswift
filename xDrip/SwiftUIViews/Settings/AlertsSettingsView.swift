@@ -7,6 +7,7 @@
 //
 
 import CoreData
+import os
 import SwiftUI
 
 // Rules for which alarms and rows are shown are kept with the list model.
@@ -201,6 +202,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
     private let original: AlertEntrySnapshot
     private let coreDataManager: CoreDataManager
     private let close: () -> Void
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataAlertEntries)
 
     init(
         mode: AlertEntryEditorMode,
@@ -508,7 +510,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
                 entry.isDisabled = isDisabled
             }
         } catch {
-            print("Failed to fetch AlertEntries for bulk isDisabled update: \(error)")
+            trace("in updateAllEntriesForCurrentKindDisabledState, failed to fetch AlertEntries: %{public}@", log: log, category: ConstantsLog.categoryApplicationDataAlertEntries, type: .error, error.localizedDescription)
         }
     }
 

@@ -8,6 +8,7 @@
 
 import Combine
 import Foundation
+import os
 import SwiftUI
 import WatchConnectivity
 import WidgetKit
@@ -15,6 +16,8 @@ import WidgetKit
 /// holds, the watch state and allows updates and computed properties/variables to be generated for the different views that use it
 /// also used to update the ComplicationSharedUserDefaultsModel in the app group so that the complication can access the data
 final class WatchStateModel: NSObject, ObservableObject {
+    private let log = Logger(subsystem: "xDrip", category: "WatchStateModel")
+
     /// the Watch Connectivity session
     var session: WCSession
 
@@ -402,8 +405,8 @@ final class WatchStateModel: NSObject, ObservableObject {
     }
 
     private func requestWatchUpdate(updateType: String) {
-        session.sendMessage(["requestWatchUpdate": updateType], replyHandler: nil) { error in
-            print("WatchStateModel error requesting \(updateType): " + error.localizedDescription)
+        session.sendMessage(["requestWatchUpdate": updateType], replyHandler: nil) { [log] error in
+            log.error("Error requesting \(updateType, privacy: .public): \(error.localizedDescription, privacy: .public)")
         }
     }
 
