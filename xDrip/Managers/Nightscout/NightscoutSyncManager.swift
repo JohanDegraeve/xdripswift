@@ -1166,6 +1166,9 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             throw NSError(domain: "Nightscout", code: 1, userInfo: [NSLocalizedDescriptionKey: "Nightscout URL not set"])
         }
         var urlComponents = URLComponents(string: baseUrl + path)
+        if UserDefaults.standard.nightscoutPort != 0 {
+            urlComponents?.port = UserDefaults.standard.nightscoutPort
+        }
         if let queryItems = queryItems {
             urlComponents?.queryItems = queryItems
         }
@@ -1193,6 +1196,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         guard let httpResponse = response as? HTTPURLResponse, (200 ... 299).contains(httpResponse.statusCode) else {
             throw NSError(domain: "Nightscout", code: 3, userInfo: [NSLocalizedDescriptionKey: "Nightscout request failed"])
         }
+        markNightscoutConnectionSucceeded()
         
         if let responseType = responseType {
             // Special case: if T is Data, just return the raw data
@@ -1515,6 +1519,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                                                     if code == 66 {
                                                         trace("in uploadDataAndGetResponse, found code = 66, considering the upload as successful", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error)
                                                         
+                                                        self.markNightscoutConnectionSucceeded()
                                                         nightscoutResult = NightscoutResult.success(0)
                                                         
                                                         return
@@ -1545,6 +1550,7 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                         }
                         
                         // successful cases
+                        self.markNightscoutConnectionSucceeded()
                         nightscoutResult = NightscoutResult.success(0)
                     })
                     
@@ -1566,6 +1572,14 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
             
             completionHandler(nil, NightscoutResult.failed)
         }
+    }
+
+    /// Stores the time of the last confirmed Nightscout server response. The
+    /// Settings UI uses this same timestamp for the connection indicator, so
+    /// master-mode uploads/downloads should update it just like follower-mode
+    /// downloads and the manual Test Connection action do.
+    private func markNightscoutConnectionSucceeded() {
+        UserDefaults.standard.timeStampOfLastFollowerConnection = Date()
     }
     
     /// Upload treatments to nightscout, receives the JSON response with the asigned id's and sets the id's in Coredata.

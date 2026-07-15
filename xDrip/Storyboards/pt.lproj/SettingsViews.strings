@@ -58,6 +58,7 @@
 "settingsviews_giveDexcomSharePassword" = "Introduzir Senha Dexcom Shared";
 "settingsviews_givedexcomShareUploadSerialNumber" = "Introduzir nº. de série do Receptor Dexcom";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Opções de envio";
 "settingsviews_nightscoutEnabled" = "Activar Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Utilizar Agendamento de Envio";
@@ -68,7 +69,7 @@
 "editScheduleTimePickerSubtitle" = "Mudar: ";
 "timeScheduleViewTitle" = "Lig./Desl. Hora Agendamento por ";
 "uploadSensorStartTime" = "Enviar Hora de Início de Sensor";
-"testUrlAndAPIKey" = "Verificar Ligação";
+"testUrlAndAPIKey" = "Verificar ligação";
 "settingsviews_speakBgReadings" = "Falar glicose";
 "settingsviews_speakBgReadingslanguage" = "Idioma";
 "settingsviews_speakreadingslanguageselection" = "Escolher Idioma";

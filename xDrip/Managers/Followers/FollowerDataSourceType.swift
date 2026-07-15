@@ -155,11 +155,20 @@ public enum FollowerDataSourceType: Int, CaseIterable {
     }
     
     // as an enum should be a simple value type without access to UserDefaults or app data,
-    // we use a workaround to pass the Nightscout URL to the function and then return it
-    func serviceStatusBaseUrlString(nightscoutUrl: String? = "") -> String {
+    // we pass the Nightscout URL and port in from the settings/view model layer.
+    func serviceStatusBaseUrlString(nightscoutUrl: String? = "", nightscoutPort: Int = 0) -> String {
         switch self {
         case .nightscout:
-            return nightscoutUrl ?? ""
+            guard let nightscoutUrl,
+                  var components = URLComponents(string: nightscoutUrl) else {
+                return nightscoutUrl ?? ""
+            }
+
+            if (1...65_535).contains(nightscoutPort) {
+                components.port = nightscoutPort
+            }
+
+            return components.string ?? nightscoutUrl
         case .dexcomShare:
             return ConstantsFollower.followerStatusDexcomBaseUrl
         case .libreLinkUp, .libreLinkUpRussia:

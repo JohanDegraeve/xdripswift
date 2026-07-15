@@ -51,6 +51,7 @@
 "settingsviews_giveDexcomSharePassword" = "أعط ديكسكوم شير كلمة مرور";
 "settingsviews_givedexcomShareUploadSerialNumber" = "أدخل الرقم التسلسلي لجهاز استقبال ديكسكوم";
 "settingsviews_sectiontitlenightscout" = "نايتسكاوت";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "خيارات الرفع";
 "settingsviews_nightscoutEnabled" = "تفعيل نايتسكاوت؟";
 "settingsviews_nightscoutUrl" = "الرابط";
 "settingsviews_useSchedule" = "استخدام جدولة التحميل؟";
@@ -61,7 +62,7 @@
 "editScheduleTimePickerSubtitle" = "تغيير: ";
 "timeScheduleViewTitle" = "جدولة وقت تفعيل/إغلاق لـ";
 "uploadSensorStartTime" = "تحميل بداية وقت الحساس؟";
-"testUrlAndAPIKey" = "اختبر الاتصال؟";
+"testUrlAndAPIKey" = "اختبار الاتصال";
 "settingsviews_speakBgReadings" = "نطق الغلوكوز";
 "settingsviews_speakBgReadingslanguage" = "اللغة";
 "settingsviews_speakreadingslanguageselection" = "اختر اللغة";

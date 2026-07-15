@@ -62,6 +62,7 @@
 "settingsviews_giveDexcomSharePassword" = "Κοινοποίηση κωδικού πρόσβασης για κοινή χρήση Dexcom";
 "settingsviews_givedexcomShareUploadSerialNumber" = "Εισαγάγετε τον σειριακό αριθμό του δέκτη Dexcom";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Επιλογές μεταφόρτωσης";
 "settingsviews_nightscoutEnabled" = "Ενεργοποίηση του Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Μεταφόρτωση με χρονοδιάγραμμα;";
@@ -72,7 +73,7 @@
 "editScheduleTimePickerSubtitle" = "Αλλαγή: ";
 "timeScheduleViewTitle" = "Χρονοδιάγραμμα On/Off για ";
 "uploadSensorStartTime" = "Μεταφόρτωση ώρα έναρξης αισθητήρα;";
-"testUrlAndAPIKey" = "Δοκιμή σύνδεσης;";
+"testUrlAndAPIKey" = "Δοκιμή σύνδεσης";
 "settingsviews_speakBgReadings" = "Εκφώνηση γλυκόζης";
 "settingsviews_speakBgReadingslanguage" = "Γλώσσα";
 "settingsviews_speakreadingslanguageselection" = "Επιλέξτε γλώσσα";

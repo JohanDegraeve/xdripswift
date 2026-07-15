@@ -470,6 +470,7 @@ struct SettingsGroupedRow {
     let title: String
     var detail: (() -> String?)? = nil
     var detailColor: (() -> Color?)? = nil
+    var detailIndicator: (() -> SettingsIndicator?)? = nil
     let settingsScreen: () -> SettingsScreen
 }
 
@@ -560,10 +561,20 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     detail: {
                         groupedStatusDetail(isEnabled: UserDefaults.standard.nightscoutEnabled)
                     },
+                    detailIndicator: {
+                        nightscoutConnectionIndicator()
+                    },
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleNightscout,
-                            providers: { [SettingsViewNightscoutSettingsViewModel()] }
+                            providers: {
+                                [
+                                    SettingsViewNightscoutSettingsViewModel(rowGroup: .nightscout),
+                                    SettingsViewNightscoutSettingsViewModel(rowGroup: .connectionSettings),
+                                    SettingsViewNightscoutSettingsViewModel(rowGroup: .actions),
+                                    SettingsViewNightscoutSettingsViewModel(rowGroup: .uploadSchedule)
+                                ]
+                            }
                         )
                     }
                 ),
@@ -664,6 +675,22 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
         isEnabled ? Texts_Common.enabled : nil
     }
 
+    /// Adds the same last-known-good Nightscout connection marker used in the
+    /// Nightscout child screen, but only when the parent row is showing Enabled.
+    private static func nightscoutConnectionIndicator() -> SettingsIndicator? {
+        guard UserDefaults.standard.nightscoutEnabled,
+              let lastConnection = UserDefaults.standard.timeStampOfLastFollowerConnection else {
+            return nil
+        }
+
+        guard lastConnection > .distantPast else {
+            return SettingsIndicator(color: ConstantsAppColors.urgent)
+        }
+
+        let connectionIsRecent = lastConnection > Date().addingTimeInterval(-Double(ConstantsFollower.secondsUntilFollowerDisconnectWarningNightscout))
+        return SettingsIndicator(color: connectionIsRecent ? ConstantsAppColors.normal : ConstantsAppColors.urgent)
+    }
+
     func sectionTitle() -> String? {
         title
     }
@@ -675,6 +702,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                 title: row.title,
                 detail: row.detail?(),
                 detailColor: row.detailColor?(),
+                detailIndicator: row.detailIndicator?(),
                 accessory: .disclosure,
                 action: .settingsScreen(row.settingsScreen)
             )

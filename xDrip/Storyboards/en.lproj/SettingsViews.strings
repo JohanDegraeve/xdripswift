@@ -110,6 +110,7 @@
 "settingsviews_giveDexcomSharePassword" = "Give Dexcom Share Password";
 "settingsviews_givedexcomShareUploadSerialNumber" = "Enter the Dexcom Receiver Serial Number";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Upload Options";
 "settingsviews_nightscoutEnabled" = "Enable Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Use Upload Schedule";
@@ -118,7 +119,7 @@
 "settingsviews_nightscoutAPIKey" = "API_SECRET";
 "settingsviews_giveNightscoutAPIKey" = "Enter API_SECRET";
 "editScheduleTimePickerSubtitle" = "Change: ";
-"timeScheduleViewTitle" = "On/Off Time Schedule for ";
+"timeScheduleViewTitle" = "On/Off Time Schedule";
 "uploadSensorStartTime" = "Upload Sensor Start Time";
 "testUrlAndAPIKey" = "Test Connection";
 "settingsviews_speakBgReadings" = "Speak Glucose";

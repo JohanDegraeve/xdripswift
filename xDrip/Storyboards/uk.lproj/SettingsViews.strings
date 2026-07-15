@@ -226,7 +226,7 @@
 "settingsviews_sectiontitletreatments" = "Treatments";
 
 /// nightscout settings, when clicking the cell, test the url and api key
-"testUrlAndAPIKey" = "Test Connection";
+"testUrlAndAPIKey" = "Перевірити з’єднання";
 
 /// in Settings, to enable debug level in trace file
 "debugLevel" = "Include Debug Level";
@@ -235,6 +235,7 @@
 
 /// nightscout settings, section title
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Параметри завантаження";
 
 /// used in settings, section Info, title of the build setting
 
@@ -331,7 +332,7 @@
 "settingsviews_giveDexcomShareAccountName" = "Enter Dexcom Share Account Name";
 
 /// When creating schedule for Nightscout or Dexcom Share upload, this is the top label text
-"timeScheduleViewTitle" = "On/Off Time Schedule for ";
+"timeScheduleViewTitle" = "On/Off Time Schedule";
 
 /// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";

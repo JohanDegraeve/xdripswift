@@ -57,6 +57,7 @@
 "settingsviews_giveDexcomSharePassword" = "Voer Dexcom Share Wachtwoord In";
 "settingsviews_givedexcomShareUploadSerialNumber" = "Voer het Dexcom Ontvanger Serie Nummer In";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Uploadopties";
 "settingsviews_nightscoutEnabled" = "Nightscout Inschakelen";
 "settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Gebruik Upload Schema";
@@ -67,7 +68,7 @@
 "editScheduleTimePickerSubtitle" = "Wijzig: ";
 "timeScheduleViewTitle" = "Aan/Uit Tijdschema Voor ";
 "uploadSensorStartTime" = "Upload Sensor Start Tijd";
-"testUrlAndAPIKey" = "Test Verbinding";
+"testUrlAndAPIKey" = "Test verbinding";
 "settingsviews_speakBgReadings" = "Spreek glucose";
 "settingsviews_speakBgReadingslanguage" = "Taal";
 "settingsviews_speakreadingslanguageselection" = "Selecteer Taal";

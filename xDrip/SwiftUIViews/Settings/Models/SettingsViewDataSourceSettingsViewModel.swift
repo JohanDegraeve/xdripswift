@@ -352,7 +352,11 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             }, cancelHandler: nil, didSelectRowHandler: nil)
             
         case .followerExtraRow5:
-            if let url = URL(string: UserDefaults.standard.followerDataSourceType.serviceStatusBaseUrlString(nightscoutUrl: UserDefaults.standard.nightscoutUrl)), (UserDefaults.standard.followerDataSourceType.hasServiceStatus() && followerServiceStatusResult.status != .notAvailable) {
+            let statusBaseURL = UserDefaults.standard.followerDataSourceType.serviceStatusBaseUrlString(
+                nightscoutUrl: UserDefaults.standard.nightscoutUrl,
+                nightscoutPort: UserDefaults.standard.nightscoutPort
+            )
+            if let url = URL(string: statusBaseURL), (UserDefaults.standard.followerDataSourceType.hasServiceStatus() && followerServiceStatusResult.status != .notAvailable) {
                 return .openURL(url)
             }
             return .nothing
@@ -1097,7 +1101,11 @@ extension SettingsViewDataSourceSettingsViewModel {
             return FollowerServiceStatusResult(status: .notAvailable)
         }
         
-        guard let url = URL(string: followerDataSourceType.serviceStatusBaseUrlString(nightscoutUrl: UserDefaults.standard.nightscoutUrl).appending(followerDataSourceType.serviceStatusApiPathString())) else {
+        let statusBaseURL = followerDataSourceType.serviceStatusBaseUrlString(
+            nightscoutUrl: UserDefaults.standard.nightscoutUrl,
+            nightscoutPort: UserDefaults.standard.nightscoutPort
+        )
+        guard let url = URL(string: statusBaseURL.appending(followerDataSourceType.serviceStatusApiPathString())) else {
             return nil
         }
         

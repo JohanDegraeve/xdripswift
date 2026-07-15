@@ -859,6 +859,7 @@ final class NightscoutImportService: @unchecked Sendable {
                 }
                 switch httpResponse.statusCode {
                 case 200...299:
+                    markNightscoutConnectionSucceeded()
                     return data
                 case 401, 403:
                     throw NightscoutImportError.authenticationFailed
@@ -896,6 +897,12 @@ final class NightscoutImportService: @unchecked Sendable {
             }
         }
         throw lastError ?? NightscoutImportError.invalidResponse
+    }
+
+    /// Keep the shared Nightscout connection indicator current when the import
+    /// service gets a valid response from the configured server.
+    private func markNightscoutConnectionSucceeded() {
+        UserDefaults.standard.timeStampOfLastFollowerConnection = Date()
     }
 
     private func makeRequest(

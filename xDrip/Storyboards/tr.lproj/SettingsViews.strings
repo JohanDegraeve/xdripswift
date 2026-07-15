@@ -57,6 +57,7 @@
 "settingsviews_giveDexcomSharePassword" = "Dexcom Share Parolasını Girin";
 "settingsviews_givedexcomShareUploadSerialNumber" = "Dexcom Alıcı Seri Numarasını girin";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Yükleme Seçenekleri";
 "settingsviews_nightscoutEnabled" = "Nightscout etkinleştirilsin mi";
 "settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Yükleme Takvimi Kullanılsın mı";
@@ -67,7 +68,7 @@
 "editScheduleTimePickerSubtitle" = "Değiştir: ";
 "timeScheduleViewTitle" = "Açık/Kapalı Zaman Çizelgesi için ";
 "uploadSensorStartTime" = "Sensör Başlangıç Zamanı Yüklensin mi";
-"testUrlAndAPIKey" = "Bağlantıyı Test etsin mi";
+"testUrlAndAPIKey" = "Bağlantıyı test et";
 "settingsviews_speakBgReadings" = "Glikozu seslendir";
 "settingsviews_speakBgReadingslanguage" = "Dil";
 "settingsviews_speakreadingslanguageselection" = "Dil Seçin";

@@ -49,6 +49,7 @@
 "settingsviews_giveDexcomSharePassword" = "Entrer le mot de passe Dexcom Share";
 "settingsviews_givedexcomShareUploadSerialNumber" = "Entrer le numéro de série Dexcom Receiver";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Options d'envoi";
 "settingsviews_nightscoutEnabled" = "Connecter à Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Mettre à jour à heure fixe";
@@ -59,7 +60,7 @@
 "editScheduleTimePickerSubtitle" = "Changer";
 "timeScheduleViewTitle" = "On/Off Time Schedule pour";
 "uploadSensorStartTime" = "Charger heure démarrage capteur";
-"testUrlAndAPIKey" = "Tester l'URL et API_SECRET de Nightscout";
+"testUrlAndAPIKey" = "Tester la connexion";
 "settingsviews_speakBgReadings" = "Lire la glycémie";
 "settingsviews_speakBgReadingslanguage" = "Langue";
 "settingsviews_speakreadingslanguageselection" = "Sélectionner la langue";

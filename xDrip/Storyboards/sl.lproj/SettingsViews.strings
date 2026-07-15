@@ -4,7 +4,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// When creating schedule for Nightscout or Dexcom Share upload, this is the top label text
-"timeScheduleViewTitle" = "On/Off Time Schedule for ";
+"timeScheduleViewTitle" = "On/Off Time Schedule";
 
 /// In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row
 "volumeTestiOSSound" = "Ko je tihi način onemogočen";
@@ -183,7 +183,7 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "Enter the Dexcom Receiver Serial Number";
 
 /// nightscout settings, when clicking the cell, test the url and api key
-"testUrlAndAPIKey" = "Test Connection";
+"testUrlAndAPIKey" = "Preizkusi povezavo";
 
 /// If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown
 "infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
@@ -239,6 +239,7 @@
 
 /// nightscout settings, section title
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Možnosti nalaganja";
 
 /// dexcom share settings, where user can choose to use US url or not
 "settingsviews_useUSDexcomShareurl" = "US-strežniki";

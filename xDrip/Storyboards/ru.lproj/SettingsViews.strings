@@ -62,6 +62,7 @@
 "settingsviews_giveDexcomSharePassword" = "Введите Dexcom Share пароль";
 "settingsviews_givedexcomShareUploadSerialNumber" = "Введите Dexcom приемника серийный номер";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Параметры загрузки";
 "settingsviews_nightscoutEnabled" = "Интеграция Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Использовать расписание загрузки";
@@ -72,7 +73,7 @@
 "editScheduleTimePickerSubtitle" = "Изменить: ";
 "timeScheduleViewTitle" = "Вкл/выкл расписание для ";
 "uploadSensorStartTime" = "Время начала загрузки сенсора";
-"testUrlAndAPIKey" = "Протестировать соединение";
+"testUrlAndAPIKey" = "Проверить соединение";
 "settingsviews_speakBgReadings" = "Проговаривать глюкозу";
 "settingsviews_speakBgReadingslanguage" = "Язык";
 "settingsviews_speakreadingslanguageselection" = "Выберите язык";

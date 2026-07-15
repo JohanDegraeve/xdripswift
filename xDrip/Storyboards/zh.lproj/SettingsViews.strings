@@ -32,6 +32,7 @@
 "settingsviews_giveDexcomShareAccountName" = "输入Dexcom APP用户名";
 "settingsviews_giveDexcomSharePassword" = "输入Dexcom APP密码";
 "settingsviews_sectiontitlenightscout" = "Nightscout远程监控";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "上传选项";
 "settingsviews_nightscoutEnabled" = "Nightscout 已启用";
 "settingsviews_nightscoutUrl" = "Url(网址)";
 "settingsviews_giveNightscoutUrl" = "输入 Nightscout 网址";
@@ -50,7 +51,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// When creating schedule for Nightscout or Dexcom Share upload, this is the top label text
-"timeScheduleViewTitle" = "On/Off Time Schedule for ";
+"timeScheduleViewTitle" = "On/Off Time Schedule";
 
 /// In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row
 "volumeTestiOSSound" = "静音模式关闭时";
@@ -147,7 +148,7 @@
 "settingsviews_labelNonFixed" = "Multi-point Calibration";
 
 /// nightscout settings, when clicking the cell, test the url and api key
-"testUrlAndAPIKey" = "Test Connection";
+"testUrlAndAPIKey" = "测试连接";
 
 /// If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown
 "infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
