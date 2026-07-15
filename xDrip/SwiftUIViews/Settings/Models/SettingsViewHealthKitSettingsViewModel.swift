@@ -1,3 +1,11 @@
+//
+//  SettingsViewHealthKitSettingsViewModel.swift
+//  xdrip
+//
+//  Created by Johan Degraeve on 23/2/19.
+//  Copyright © 2019 Johan Degraeve. All rights reserved.
+//
+
 import Foundation
 import HealthKit
 import os

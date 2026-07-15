@@ -1,3 +1,11 @@
+//
+//  SettingsViewCalendarEventsSettingsViewModel.swift
+//  xdrip
+//
+//  Created by Paul Plant on 24/10/23.
+//  Copyright © 2023 Johan Degraeve. All rights reserved.
+//
+
 import Foundation
 import EventKit
 import os
