@@ -523,7 +523,7 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
     
     /// Abandons a connect attempt that has not completed quickly enough and
     /// returns to scanning for a fresh peripheral session.
-    fileprivate func stopConnectAndRestartScanning(forgetDeviceOnTimeout: Bool) {
+    func stopConnectAndRestartScanning(forgetDeviceOnTimeout: Bool) {
         
         trace("in stopConnectAndRestartScanning, disconnecting due to timeout, will restart scanning", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
         
