@@ -17,6 +17,10 @@ final class WatchManager: NSObject, ObservableObject {
     /// a watch connectivity session instance
     private var session: WCSession
 
+    /// prevents duplicate activate calls while WatchConnectivity is already processing one
+    private let sessionActivationLock = NSLock()
+    private var sessionActivationRequested = false
+
     /// a BgReadingsAccessor instance
     private var bgReadingsAccessor: BgReadingsAccessor
 
@@ -52,7 +56,7 @@ final class WatchManager: NSObject, ObservableObject {
 
         if WCSession.isSupported() {
             session.delegate = self
-            session.activate()
+            activateSessionIfNeeded()
         }
 
         // add observer to sync to the watch once the device status was updated
@@ -89,6 +93,23 @@ final class WatchManager: NSObject, ObservableObject {
     private enum WatchUpdateType: Hashable {
         case status
         case bgReadings
+    }
+
+    private func activateSessionIfNeeded() {
+        sessionActivationLock.lock()
+        let shouldActivate = !sessionActivationRequested
+        sessionActivationRequested = true
+        sessionActivationLock.unlock()
+
+        if shouldActivate {
+            session.activate()
+        }
+    }
+
+    private func completeSessionActivationRequest() {
+        sessionActivationLock.lock()
+        sessionActivationRequested = false
+        sessionActivationLock.unlock()
     }
 
     private func processWatchUpdate(updateTypes: Set<WatchUpdateType>, forceComplicationUpdate: Bool) {
@@ -212,7 +233,7 @@ final class WatchManager: NSObject, ObservableObject {
         guard session.activationState == .activated else {
             let activationStateString = "\(session.activationState)"
             trace("watch session activationState = %{public}@. Reactivating", log: log, category: ConstantsLog.categoryWatchManager, type: .debug, activationStateString)
-            session.activate()
+            activateSessionIfNeeded()
             return
         }
 
@@ -272,10 +293,12 @@ extension WatchManager: WCSessionDelegate {
     func sessionDidDeactivate(_: WCSession) {
         session = WCSession.default
         session.delegate = self
-        session.activate()
+        activateSessionIfNeeded()
     }
 
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        completeSessionActivationRequest()
+
         if let error {
             trace("watch session activation failed, error = %{public}@", log: log, category: ConstantsLog.categoryWatchManager, type: .error, error.localizedDescription)
             return
