@@ -127,7 +127,7 @@ private enum MainViewFixedRow: Hashable {
 }
 
 private struct MainViewFixedRowHeightPreferenceKey: PreferenceKey {
-    static var defaultValue: [MainViewFixedRow: CGFloat] = [:]
+    static let defaultValue: [MainViewFixedRow: CGFloat] = [:]
 
     static func reduce(value: inout [MainViewFixedRow: CGFloat], nextValue: () -> [MainViewFixedRow: CGFloat]) {
         value.merge(nextValue(), uniquingKeysWith: { _, newValue in newValue })
