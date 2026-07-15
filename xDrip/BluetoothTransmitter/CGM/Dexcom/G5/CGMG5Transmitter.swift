@@ -393,7 +393,8 @@ class CGMG5Transmitter:BluetoothTransmitter, CGMTransmitter {
                 trace("in didFailToConnect, coexistence failed to connect, will restart scan after passive-mode delay", log: log, category: ConstantsLog.categoryCGMG5, type: .error)
             }
 
-            reconnectAfterDisconnect(central)
+            Thread.sleep(forTimeInterval: 2.0)
+            stopConnectAndRestartScanning(forgetDeviceOnTimeout: false)
             return
         }
 
