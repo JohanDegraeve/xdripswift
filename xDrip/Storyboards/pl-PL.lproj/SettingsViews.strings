@@ -286,6 +286,7 @@
 /// Advanced Settings, section title
 "developerSettings" = "Ustawienia zaawansowane";
 "showDeveloperSettings" = "Pokaż ustawienia zaawansowane";
+"preferSensorCountdown" = "Preferuj odliczanie czasu sensora";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

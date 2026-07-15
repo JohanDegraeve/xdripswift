@@ -216,6 +216,11 @@ enum Texts_HomeView {
         return NSLocalizedString("remaining", tableName: filename, bundle: Bundle.main, value: "remaining", comment: "for home view, where it say how old much time is left, literaly translation of 'remaining'")
     }()
 
+    // make sure any translations are short enough to display nicely in the Home view
+    static func sensorLifetimeRemaining(_ duration: String) -> String {
+        return String(format: NSLocalizedString("sensorLifetimeRemainingFormat", tableName: filename, bundle: Bundle.main, value: "%@ remaining", comment: "for home view, where it says how much sensor lifetime is left, %@ will be replaced by the remaining days and hours"), duration)
+    }
+
     static let licenseInfo:String = {
         return String(format: NSLocalizedString("licenseinfo", tableName: filename, bundle: Bundle.main, value: "This program is free software distributed under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or any later version.\r\n\nThis program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY.\r\n\nSee http://www.gnu.org/licenses/gpl.txt for more details.\r\n\r\nInfo: ", comment: "for home view, license info"), ConstantsHomeView.applicationName, ConstantsHomeView.applicationName)
     }()

@@ -259,6 +259,7 @@
 /// Advanced Settings, section title
 "developerSettings" = "Розширені налаштування";
 "showDeveloperSettings" = "Показати розширені налаштування";
+"preferSensorCountdown" = "Надавати перевагу зворотному відліку сенсора";
 
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
 "settingsviews_nonfixedtransmitter" = "Багатоточкова калібровка";

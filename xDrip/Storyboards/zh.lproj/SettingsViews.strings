@@ -217,6 +217,7 @@
 /// Advanced Settings, section title
 "developerSettings" = "高级设置";
 "showDeveloperSettings" = "显示高级设置";
+"preferSensorCountdown" = "优先显示传感器倒计时";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

@@ -89,6 +89,7 @@ struct RootHomeSensorState {
     var currentAgeColor = ConstantsAppColors.primaryText
     var progressColor = ConstantsAppColors.disabledText
     var progress: Double = 0
+    var countsDown = false
 }
 
 /// Current data-source description and connection indicators.
@@ -467,12 +468,15 @@ final class RootHomeStateModel: ObservableObject {
 
         let currentAge: String
         let maximumAge: String
+        let countsDown = UserDefaults.standard.preferSensorCountdown
         if let warmUpMinutes {
             currentAge = ""
             let readyDate = sensorStartDate.addingTimeInterval(warmUpMinutes * 60)
             maximumAge = "\(Texts_BluetoothPeripheralView.warmingUpUntil) \(readyDate.toStringInUserLocale(timeStyle: .short, dateStyle: .none))"
         } else {
-            currentAge = sensorStartDate.daysAndHoursAgo()
+            currentAge = countsDown
+                ? Texts_HomeView.sensorLifetimeRemaining(max(timeLeftInMinutes, 0).minutesToDaysAndHours())
+                : sensorStartDate.daysAndHoursAgo()
             maximumAge = " / \(maximumAgeInMinutes.minutesToDaysAndHours())"
         }
 
@@ -482,7 +486,8 @@ final class RootHomeStateModel: ObservableObject {
             maxAge: maximumAge,
             currentAgeColor: sensorAgeColor(timeLeftInMinutes: timeLeftInMinutes),
             progressColor: ConstantsAppColors.sensorProgress,
-            progress: min(max(1 - (timeLeftInMinutes / maximumAgeInMinutes), 0), 1)
+            progress: min(max(countsDown ? timeLeftInMinutes / maximumAgeInMinutes : 1 - (timeLeftInMinutes / maximumAgeInMinutes), 0), 1),
+            countsDown: countsDown
         )
     }
 

@@ -123,6 +123,7 @@
 /// Advanced Settings, section title
 "developerSettings" = "Geavanceerde instellingen";
 "showDeveloperSettings" = "Geavanceerde instellingen tonen";
+"preferSensorCountdown" = "Voorkeur voor aftellen sensor";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

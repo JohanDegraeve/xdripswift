@@ -142,6 +142,7 @@
 /// Advanced Settings, section title
 "developerSettings" = "Paramètres avancés";
 "showDeveloperSettings" = "Afficher les paramètres avancés";
+"preferSensorCountdown" = "Préférer le compte à rebours du capteur";
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Ecran d'accueil";

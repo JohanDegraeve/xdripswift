@@ -113,6 +113,7 @@
 "nightscoutPort" = "Порт";
 "developerSettings" = "Расширенные настройки";
 "showDeveloperSettings" = "Показать расширенные настройки";
+"preferSensorCountdown" = "Предпочитать обратный отсчёт датчика";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Домашний экран";

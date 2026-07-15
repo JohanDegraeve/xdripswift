@@ -107,6 +107,7 @@
 /// Advanced Settings, section title
 "developerSettings" = "Lisäasetukset";
 "showDeveloperSettings" = "Näytä lisäasetukset";
+"preferSensorCountdown" = "Suosi sensorin lähtölaskentaa";
 
 /// statistics settings, how many days to use for calculations
 "settingsviews_daysToUseStatisticsMessage" = "Enimmäispäivät tilastojen laskemiseen?\n\n(0 laskeaksesi tänään keskiyöstä lähtien)    ";
