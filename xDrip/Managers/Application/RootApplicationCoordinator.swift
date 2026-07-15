@@ -1494,18 +1494,6 @@ import AppIntents
         return calibrator
     }
     
-    /// for debug purposes
-    private func logAllBgReadings() {
-        if let bgReadingsAccessor = bgReadingsAccessor {
-            let readings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: nil, forSensor: nil, ignoreRawData: false, ignoreCalculatedValue: true, includingSuppressed: true)
-            for (index,reading) in readings.enumerated() {
-                if reading.sensor?.id == activeSensor?.id {
-                    trace("readings %{public}d timestamp = %{public}@, calculatedValue = %{public}f", log: log, category: ConstantsLog.categoryRootView, type: .info, index, reading.timeStamp.description, reading.calculatedValue)
-                }
-            }
-        }
-    }
-    
     /// creates initial calibration request notification
     private func createInitialCalibrationRequest() {
         // first remove existing notification if any
