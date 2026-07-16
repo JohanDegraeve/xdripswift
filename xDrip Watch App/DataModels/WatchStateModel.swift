@@ -41,6 +41,7 @@ final class WatchStateModel: NSObject, ObservableObject {
     @Published var activeSensorDescription: String = ""
     @Published var sensorAgeInMinutes: Double = 0
     @Published var sensorMaxAgeInMinutes: Double = 14400
+    @Published var preferSensorCountdown: Bool = false
     @Published var timeStampOfLastFollowerConnection: Date = .now
     @Published var secondsUntilFollowerDisconnectWarning: Int = 60 * 6
     @Published var timeStampOfLastHeartBeat: Date = .now
@@ -233,13 +234,13 @@ final class WatchStateModel: NSObject, ObservableObject {
     /// function to calculate the sensor progress value and return a text color to be used by the view
     /// - Returns: progress: the % progress between 0 and 1, textColor:
     func activeSensorProgress() -> (progress: Float, textColor: Color) {
-        if sensorAgeInMinutes > 0 {
+        if sensorAgeInMinutes > 0, sensorMaxAgeInMinutes > 0 {
             let sensorTimeLeftInMinutes = sensorMaxAgeInMinutes - sensorAgeInMinutes
-            let progress = Float(1 - (sensorTimeLeftInMinutes / sensorMaxAgeInMinutes))
+            let progress = Float(min(max(preferSensorCountdown ? sensorTimeLeftInMinutes / sensorMaxAgeInMinutes : sensorAgeInMinutes / sensorMaxAgeInMinutes, 0), 1))
 
             // irrespective of all the above, if the current sensor age is over the max age, then just set everything to the expired colour to make it clear
             if sensorTimeLeftInMinutes < 0 {
-                return (1.0, ConstantsHomeView.sensorProgressExpiredSwiftUI)
+                return (preferSensorCountdown ? 0 : 1, ConstantsHomeView.sensorProgressExpiredSwiftUI)
             } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewUrgentInMinutes {
                 return (progress, ConstantsHomeView.sensorProgressViewProgressColorUrgentSwiftUI)
             } else if sensorTimeLeftInMinutes <= ConstantsHomeView.sensorProgressViewWarningInMinutes {
@@ -250,6 +251,13 @@ final class WatchStateModel: NSObject, ObservableObject {
         } else {
             return (0, ConstantsHomeView.sensorProgressNormalTextColorSwiftUI)
         }
+    }
+
+    /// returns either the elapsed or remaining sensor lifetime based upon the user's preference
+    /// - Returns: string representation of the sensor lifetime as days and hours
+    func activeSensorLifetimeText() -> String {
+        let lifetimeInMinutes = preferSensorCountdown ? max(sensorMaxAgeInMinutes - sensorAgeInMinutes, 0) : sensorAgeInMinutes
+        return lifetimeInMinutes.minutesToDaysAndHours()
     }
 
     /// check when the last follower connection was and compare that to the actual time
@@ -474,6 +482,7 @@ final class WatchStateModel: NSObject, ObservableObject {
         activeSensorDescription = dictionary["activeSensorDescription"] as? String ?? ""
         sensorAgeInMinutes = dictionary["sensorAgeInMinutes"] as? Double ?? 0
         sensorMaxAgeInMinutes = dictionary["sensorMaxAgeInMinutes"] as? Double ?? 0
+        preferSensorCountdown = dictionary["preferSensorCountdown"] as? Bool ?? false
         isMaster = dictionary["isMaster"] as? Bool ?? true
         followerDataSourceType = FollowerDataSourceType(rawValue: dictionary["followerDataSourceTypeRawValue"] as? Int ?? 0) ?? .nightscout
         followerBackgroundKeepAliveType = FollowerBackgroundKeepAliveType(rawValue: dictionary["followerBackgroundKeepAliveTypeRawValue"] as? Int ?? 0) ?? .normal

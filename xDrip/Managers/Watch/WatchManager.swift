@@ -174,6 +174,7 @@ final class WatchManager: NSObject, ObservableObject {
         status.highLimitInMgDl = UserDefaults.standard.highMarkValue
         status.urgentHighLimitInMgDl = UserDefaults.standard.urgentHighMarkValue
         status.activeSensorDescription = UserDefaults.standard.activeSensorDescription
+        status.preferSensorCountdown = UserDefaults.standard.preferSensorCountdown
         status.isMaster = UserDefaults.standard.isMaster
         status.followerDataSourceTypeRawValue = UserDefaults.standard.followerDataSourceType.rawValue
         status.followerBackgroundKeepAliveTypeRawValue = UserDefaults.standard.followerBackgroundKeepAliveType.rawValue

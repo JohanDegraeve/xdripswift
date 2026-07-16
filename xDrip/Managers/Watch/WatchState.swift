@@ -30,6 +30,7 @@ struct WatchStatus: WatchPayload {
     var activeSensorDescription: String?
     var sensorAgeInMinutes: Double = 0
     var sensorMaxAgeInMinutes: Double = 0
+    var preferSensorCountdown: Bool = false
     var isMaster: Bool = true
     var followerDataSourceTypeRawValue: Int = 0
     var followerBackgroundKeepAliveTypeRawValue: Int = 0

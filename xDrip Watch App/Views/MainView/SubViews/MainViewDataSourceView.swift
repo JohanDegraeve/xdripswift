@@ -33,9 +33,7 @@ struct MainViewDataSourceView: View {
             let textSize: CGFloat = isSmallScreen ? 12 : 14
             
             if (watchState.activeSensorDescription != "" || watchState.sensorAgeInMinutes > 0) || !watchState.isMaster {
-                ProgressView(value: Float(watchState.activeSensorProgress().progress))
-                    .tint(ConstantsHomeView.sensorProgressViewNormalColorSwiftUI)
-                    .scaleEffect(x: 1, y: 0.3, anchor: .center)
+                sensorLifetimeProgressView
                 
                 HStack(alignment: .center) {
                     if !watchState.isMaster {
@@ -60,7 +58,7 @@ struct MainViewDataSourceView: View {
                     Spacer()
                     
                     if watchState.sensorAgeInMinutes > 0 {
-                        Text(watchState.sensorAgeInMinutes.minutesToDaysAndHours())
+                        Text(watchState.activeSensorLifetimeText())
                             .font(.system(size: textSize))
                             .foregroundStyle(watchState.activeSensorProgress().textColor)
                     }
@@ -80,6 +78,29 @@ struct MainViewDataSourceView: View {
                 .padding([.leading, .trailing], 10)
             }
         }
+    }
+
+    private var sensorLifetimeProgressView: some View {
+        GeometryReader { geometry in
+            let progress = min(max(CGFloat(watchState.activeSensorProgress().progress), 0), 1)
+            let arrowPosition = min(max(progress * geometry.size.width, 7), geometry.size.width - 7)
+
+            ProgressView(value: progress)
+                .progressViewStyle(.linear)
+                .tint(ConstantsHomeView.sensorProgressViewNormalColorSwiftUI)
+                .frame(height: 5)
+                .scaleEffect(x: 1, y: 0.3, anchor: .center)
+                .overlay {
+                    Image(systemName: watchState.preferSensorCountdown ? "arrowtriangle.left.fill" : "arrowtriangle.right.fill")
+                        .font(.system(size: 15, weight: .semibold))
+                        .scaleEffect(x: 0.75, y: 0.95)
+                        .foregroundStyle(ConstantsHomeView.sensorProgressViewNormalColorSwiftUI)
+                        .opacity(0.85)
+                        .position(x: arrowPosition, y: 2.5)
+                }
+        }
+        .frame(height: 5)
+        .padding(.horizontal, 10)
     }
 }
 
