@@ -452,6 +452,22 @@ enum Texts_HomeView {
         return NSLocalizedString("postProcessingAlgorithmKalmanDescription", tableName: filename, bundle: Bundle.main, value: "Kalman smoothing models glucose as a noisy live signal and updates a running estimate, usually producing a steadier curve with more obvious filtering than the default shape-preserving smoother.", comment: "post processing footer text explaining the selected Kalman smoothing algorithm")
     }()
 
+    static let postProcessingAlgorithmLoess: String = {
+        return NSLocalizedString("postProcessingAlgorithmLoess", tableName: filename, bundle: Bundle.main, value: "LOESS", comment: "post processing LOESS smoothing algorithm")
+    }()
+
+    static let postProcessingAlgorithmLoessDescription: String = {
+        return NSLocalizedString("postProcessingAlgorithmLoessDescription", tableName: filename, bundle: Bundle.main, value: "LOESS fits a small weighted regression around each reading, usually preserving ramps and bends while looking smoother and less rigid than a simple filter pass.", comment: "post processing footer text explaining the selected LOESS smoothing algorithm")
+    }()
+
+    static let postProcessingAlgorithmHampelSavitzkyGolay: String = {
+        return NSLocalizedString("postProcessingAlgorithmHampelSavitzkyGolay", tableName: filename, bundle: Bundle.main, value: "Hampel + Savitzky-Golay", comment: "post processing Hampel plus Savitzky-Golay smoothing algorithm")
+    }()
+
+    static let postProcessingAlgorithmHampelSavitzkyGolayDescription: String = {
+        return NSLocalizedString("postProcessingAlgorithmHampelSavitzkyGolayDescription", tableName: filename, bundle: Bundle.main, value: "This hybrid first suppresses isolated spike-like outliers with a Hampel pass, then applies Savitzky-Golay smoothing to keep the broader glucose curve natural.", comment: "post processing footer text explaining the selected Hampel plus Savitzky-Golay smoothing algorithm")
+    }()
+
     static let postProcessingLight: String = {
         return NSLocalizedString("postProcessingLight", tableName: filename, bundle: Bundle.main, value: "Light", comment: "post processing smoothing light option")
     }()

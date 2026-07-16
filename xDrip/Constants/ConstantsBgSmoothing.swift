@@ -12,6 +12,8 @@ enum BgSmoothingAlgorithm: String, CaseIterable {
     case savitzkyGolay = "savitzkyGolay"
     case exponential = "exponential"
     case kalman = "kalman"
+    case loess = "loess"
+    case hampelSavitzkyGolay = "hampelSavitzkyGolay"
 
     var description: String {
         switch self {
@@ -21,6 +23,10 @@ enum BgSmoothingAlgorithm: String, CaseIterable {
             return Texts_HomeView.postProcessingAlgorithmExponential
         case .kalman:
             return Texts_HomeView.postProcessingAlgorithmKalman
+        case .loess:
+            return Texts_HomeView.postProcessingAlgorithmLoess
+        case .hampelSavitzkyGolay:
+            return Texts_HomeView.postProcessingAlgorithmHampelSavitzkyGolay
         }
     }
 
@@ -32,6 +38,10 @@ enum BgSmoothingAlgorithm: String, CaseIterable {
             return Texts_HomeView.postProcessingAlgorithmExponentialDescription
         case .kalman:
             return Texts_HomeView.postProcessingAlgorithmKalmanDescription
+        case .loess:
+            return Texts_HomeView.postProcessingAlgorithmLoessDescription
+        case .hampelSavitzkyGolay:
+            return Texts_HomeView.postProcessingAlgorithmHampelSavitzkyGolayDescription
         }
     }
 
@@ -43,6 +53,10 @@ enum BgSmoothingAlgorithm: String, CaseIterable {
             return ExponentialBgSmoothing()
         case .kalman:
             return KalmanBgSmoothing()
+        case .loess:
+            return LoessBgSmoothing()
+        case .hampelSavitzkyGolay:
+            return HampelSavitzkyGolayBgSmoothing()
         }
     }
 }
@@ -220,5 +234,54 @@ enum ConstantsBgSmoothing {
         }
 
         return isFastCadence ? baseScale * 0.85 : baseScale
+    }
+
+    static func loessSpan(forSmoothingStrength smoothingStrength: Int, isFastCadence: Bool, sampleCount: Int) -> Int {
+        let baseSpan: Int
+
+        switch smoothingStrength {
+        case 0:
+            baseSpan = isFastCadence ? 7 : 5
+        case 2:
+            baseSpan = isFastCadence ? 11 : 9
+        default:
+            baseSpan = isFastCadence ? 9 : 7
+        }
+
+        let cappedSpan = min(baseSpan, sampleCount)
+        return cappedSpan.isMultiple(of: 2) ? max(3, cappedSpan - 1) : max(3, cappedSpan)
+    }
+
+    static func loessRobustnessIterations(forSmoothingStrength smoothingStrength: Int) -> Int {
+        switch smoothingStrength {
+        case 0:
+            return 0
+        case 2:
+            return 2
+        default:
+            return 1
+        }
+    }
+
+    static func hampelWindowRadius(forSmoothingStrength smoothingStrength: Int, isFastCadence: Bool) -> Int {
+        switch smoothingStrength {
+        case 0:
+            return isFastCadence ? 3 : 2
+        case 2:
+            return isFastCadence ? 5 : 4
+        default:
+            return isFastCadence ? 4 : 3
+        }
+    }
+
+    static func hampelThresholdScale(forSmoothingStrength smoothingStrength: Int) -> Double {
+        switch smoothingStrength {
+        case 0:
+            return 3.4
+        case 2:
+            return 2.8
+        default:
+            return 3.1
+        }
     }
 }

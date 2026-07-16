@@ -244,6 +244,8 @@
 		4A9B10092F0A000100000001 /* SavitzkyGolayBgSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10192F0A000100000001 /* SavitzkyGolayBgSmoothing.swift */; };
 		4A9B100A2F0A000100000001 /* ExponentialBgSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B101A2F0A000100000001 /* ExponentialBgSmoothing.swift */; };
 		4A9B100B2F0A000100000001 /* KalmanBgSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B101B2F0A000100000001 /* KalmanBgSmoothing.swift */; };
+		4A9B100C2F0A000100000001 /* LoessBgSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B101C2F0A000100000001 /* LoessBgSmoothing.swift */; };
+		4A9B100D2F0A000100000001 /* HampelSavitzkyGolayBgSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B101D2F0A000100000001 /* HampelSavitzkyGolayBgSmoothing.swift */; };
 		4AC0D0012F1D000100000001 /* SnoozeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AC0D0022F1D000100000001 /* SnoozeView.swift */; };
 		4B0C00022F3B000100000001 /* SensorManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0C00012F3B000100000001 /* SensorManagementView.swift */; };
 		4C1000012F64000100000001 /* TreatmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1000022F64000100000001 /* TreatmentsView.swift */; };
@@ -1025,6 +1027,8 @@
 		4A9B10192F0A000100000001 /* SavitzkyGolayBgSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavitzkyGolayBgSmoothing.swift; sourceTree = "<group>"; };
 		4A9B101A2F0A000100000001 /* ExponentialBgSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExponentialBgSmoothing.swift; sourceTree = "<group>"; };
 		4A9B101B2F0A000100000001 /* KalmanBgSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KalmanBgSmoothing.swift; sourceTree = "<group>"; };
+		4A9B101C2F0A000100000001 /* LoessBgSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoessBgSmoothing.swift; sourceTree = "<group>"; };
+		4A9B101D2F0A000100000001 /* HampelSavitzkyGolayBgSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HampelSavitzkyGolayBgSmoothing.swift; sourceTree = "<group>"; };
 		4AC0D0022F1D000100000001 /* SnoozeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeView.swift; sourceTree = "<group>"; };
 		4B0C00012F3B000100000001 /* SensorManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorManagementView.swift; sourceTree = "<group>"; };
 		4C1000022F64000100000001 /* TreatmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsView.swift; sourceTree = "<group>"; };
@@ -2143,6 +2147,8 @@
 				4A9B101A2F0A000100000001 /* ExponentialBgSmoothing.swift */,
 				4A9B10192F0A000100000001 /* SavitzkyGolayBgSmoothing.swift */,
 				4A9B101B2F0A000100000001 /* KalmanBgSmoothing.swift */,
+				4A9B101C2F0A000100000001 /* LoessBgSmoothing.swift */,
+				4A9B101D2F0A000100000001 /* HampelSavitzkyGolayBgSmoothing.swift */,
 			);
 			path = PostProcessing;
 			sourceTree = "<group>";
@@ -4008,6 +4014,8 @@
 				4A9B100A2F0A000100000001 /* ExponentialBgSmoothing.swift in Sources */,
 				4A9B10092F0A000100000001 /* SavitzkyGolayBgSmoothing.swift in Sources */,
 				4A9B100B2F0A000100000001 /* KalmanBgSmoothing.swift in Sources */,
+				4A9B100C2F0A000100000001 /* LoessBgSmoothing.swift in Sources */,
+				4A9B100D2F0A000100000001 /* HampelSavitzkyGolayBgSmoothing.swift in Sources */,
 				F8F9721023A5915900C3F17D /* TransmitterVersionRxMessage.swift in Sources */,
 				F8A1587122EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift in Sources */,
 				4D7180072FE8000100000001 /* MedtrumTouchCareNano+CoreDataClass.swift in Sources */,
