@@ -81,6 +81,13 @@ struct RootHomeStatisticsState {
     var showsActivityIndicator = false
 }
 
+/// Shared compact label for the selected statistics calculation period.
+enum RootHomeStatisticsPeriodText {
+    static func title(for days: Int) -> String {
+        days == 0 ? Texts_Common.todayshort : "\(days)\(Texts_Common.dayshort)"
+    }
+}
+
 /// Active sensor lifetime presentation.
 struct RootHomeSensorState {
     var title = ""
@@ -243,15 +250,7 @@ final class RootHomeStateModel: ObservableObject {
             a1cValue = "\(statistics.a1CStatisticValue.round(toDecimalPlaces: 1))%"
         }
 
-        let timePeriodText: String
-        switch days {
-        case 0:
-            timePeriodText = Texts_Common.today
-        case 1:
-            timePeriodText = "24 \(Texts_Common.hours)"
-        default:
-            timePeriodText = "\(statistics.numberOfDaysUsed) \(statistics.numberOfDaysUsed == 1 ? Texts_Common.day : Texts_Common.days)"
-        }
+        let timePeriodText = RootHomeStatisticsPeriodText.title(for: days)
 
         updateState { state in
             state.statistics = RootHomeStatisticsState(

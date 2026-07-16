@@ -971,6 +971,7 @@ private struct RootHomeSelectorView: View {
                             title: statisticsTitle(for: days),
                             accessibilityLabel: Texts_SettingsView.labelDaysToUseStatisticsTitle,
                             accessibilityValue: statisticsAccessibilityValue(for: days),
+                            indicatorDirection: .down,
                             isSelected: statisticsDays == days,
                             action: { onStatisticsDaysChanged(days) }
                         )
@@ -979,10 +980,8 @@ private struct RootHomeSelectorView: View {
                 .fixedSize(horizontal: true, vertical: false)
                 .frame(maxWidth: .infinity, alignment: .leading)
 
-                Rectangle()
-                    .fill(ConstantsAppColors.tertiaryText.opacity(0.3))
-                    .frame(width: 1, height: 14)
-                    .padding(.horizontal, 4)
+                Color.clear
+                    .frame(width: 9, height: 14)
                     .accessibilityHidden(true)
             }
 
@@ -992,6 +991,7 @@ private struct RootHomeSelectorView: View {
                         title: range.title,
                         accessibilityLabel: Texts_HomeView.showHideGlucoseChartTitle,
                         accessibilityValue: "\(Int(range.rawValue)) \(Texts_Common.hours)",
+                        indicatorDirection: .up,
                         isSelected: selectedRange == range,
                         action: { selectedRange = range }
                     )
@@ -1005,7 +1005,7 @@ private struct RootHomeSelectorView: View {
     }
 
     private func statisticsTitle(for days: Int) -> String {
-        days == 0 ? Texts_Common.todayshort : "\(days)\(Texts_Common.dayshort)"
+        RootHomeStatisticsPeriodText.title(for: days)
     }
 
     private func statisticsAccessibilityValue(for days: Int) -> String {
@@ -1020,11 +1020,12 @@ private struct RootHomeSelectorView: View {
     }
 }
 
-/// One label-only selector item. Only the selected item receives a small accent underline.
+/// One label-only selector item. Its indicator points toward the content controlled by the group.
 private struct RootHomeSelectorButton: View {
     let title: String
     let accessibilityLabel: String
     let accessibilityValue: String
+    let indicatorDirection: RootHomeSelectorIndicator.Direction
     let isSelected: Bool
     let action: () -> Void
 
@@ -1037,10 +1038,10 @@ private struct RootHomeSelectorButton: View {
                 .minimumScaleFactor(0.75)
                 .allowsTightening(true)
                 .frame(minWidth: 32, maxHeight: .infinity)
-                .overlay(alignment: .bottom) {
-                    Capsule()
+                .overlay(alignment: indicatorDirection == .up ? .top : .bottom) {
+                    RootHomeSelectorIndicator(direction: indicatorDirection)
                         .fill(ConstantsGlucoseChartSwiftUI.overlayWindowEdgeColor)
-                        .frame(width: 14, height: 1.5)
+                        .frame(width: 16, height: 6)
                         .opacity(isSelected ? 1 : 0)
                 }
                 .contentShape(Rectangle())
@@ -1049,6 +1050,34 @@ private struct RootHomeSelectorButton: View {
         .accessibilityLabel(accessibilityLabel)
         .accessibilityValue(accessibilityValue)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+}
+
+/// A shallow directional marker linking a selector group to the content above or below it.
+private struct RootHomeSelectorIndicator: Shape {
+    enum Direction {
+        case up
+        case down
+    }
+
+    let direction: Direction
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+
+        switch direction {
+        case .up:
+            path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+            path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+        case .down:
+            path.move(to: CGPoint(x: rect.minX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.maxX, y: rect.minY))
+            path.addLine(to: CGPoint(x: rect.midX, y: rect.maxY))
+        }
+
+        path.closeSubpath()
+        return path
     }
 }
 
