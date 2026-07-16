@@ -32,6 +32,7 @@ struct RootHomeView: View {
         static let glucoseInfoRowHeight: CGFloat = 24
         static let pumpWidth: CGFloat = 158
         static let loopHeight: CGFloat = 35
+        static let sensorNoiseWarningHeight: CGFloat = 40
         static let loopTopPadding: CGFloat = 2
         static let loopBottomPadding: CGFloat = 2
         static let loopStatusSymbolSize: CGFloat = 18
@@ -223,6 +224,11 @@ struct RootHomeView: View {
                         .frame(maxWidth: .infinity)
                 }
                 .frame(height: Layout.glucoseRowHeight)
+
+                if state.sensorNoise.showsWarning {
+                    RootHomeSensorNoiseWarningView(state: state.sensorNoise, action: actions.showSensorManagement)
+                        .frame(height: Layout.sensorNoiseWarningHeight)
+                }
 
                 if state.visibility.showsLoop {
                     RootHomeLoopView(state: state.loop, actions: actions)
@@ -1245,6 +1251,46 @@ private extension RootHomeMetricState {
 // MARK: - Sensor and Data Source
 
 // MARK: - Footer Status
+
+/// Tappable home warning that opens the persisted sensor-noise details.
+private struct RootHomeSensorNoiseWarningView: View {
+    let state: RootHomeSensorNoiseState
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 8) {
+                Image(systemName: "waveform.path.ecg.rectangle.fill")
+                    .font(.system(size: 18, weight: .semibold))
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(state.title)
+                        .font(.system(size: 14, weight: .semibold))
+                    Text(state.detail)
+                        .font(.system(size: 11))
+                        .opacity(0.85)
+                }
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+
+                Spacer(minLength: 4)
+
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 12, weight: .bold))
+            }
+            .foregroundStyle(state.color)
+            .padding(.horizontal, 10)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(state.color.opacity(0.14))
+            .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous)
+                    .stroke(state.color.opacity(0.7), lineWidth: 1)
+            }
+        }
+        .buttonStyle(.plain)
+    }
+}
 
 /// Sensor age and directional lifetime progress indicator.
 private struct RootHomeSensorLifetimeView: View {

@@ -20,6 +20,7 @@ struct SensorManagementView: View {
     let transmitterProvider: () -> CGMTransmitter?
     let calibrationsAccessor: CalibrationsAccessor
     let bgReadingsAccessor: BgReadingsAccessor
+    let sensorNoiseManager: SensorNoiseManager
     let onStartSensor: (Date, String?) -> Void
     let onStopSensor: () -> Void
     let onSubmitCalibration: (Double) -> String?
@@ -74,6 +75,28 @@ struct SensorManagementView: View {
                         row(title: state.secondarySessionTitle, data: state.secondarySessionValue, dataColor: state.secondarySessionColor)
                         if state.showsRemainingRow {
                             row(title: Texts_HomeView.sensorManagementRemaining, data: state.remainingString, dataColor: state.remainingColor)
+                        }
+                    }
+
+                    if state.showsNoise {
+                        Section(header: Text(Texts_HomeView.sensorManagementNoiseTitle), footer: Text(Texts_HomeView.sensorManagementNoiseFooter)) {
+                            if let sensorID = state.sensorID {
+                                NavigationLink {
+                                    SensorNoiseHistoryView(
+                                        sensorID: sensorID,
+                                        sensorNoiseManager: sensorNoiseManager,
+                                        isMgDl: isMgDl,
+                                        currentMeasurementsDetail: state.noiseMeasurementsDetail
+                                    )
+                                } label: {
+                                    SensorNoiseSummaryRow(
+                                        shortTermNoise: state.shortTermNoise,
+                                        longTermNoise: state.longTermNoise,
+                                        state: state.noiseState,
+                                        isMgDl: isMgDl
+                                    )
+                                }
+                            }
                         }
                     }
 
@@ -678,6 +701,13 @@ struct SensorManagementView: View {
             remainingColor = Color(.colorSecondary)
         }
 
+        let noiseMeasurementsDetail: String?
+        if let startDate {
+            noiseMeasurementsDetail = sensorDescription + " (" + startDate.daysAndHoursAgo() + ")"
+        } else {
+            noiseMeasurementsDetail = nil
+        }
+
         let canManageSensor = UserDefaults.standard.isMaster && (transmitter?.cgmTransmitterType().allowManualSensorStart() ?? false)
         let sensorActionNote: String?
         if !UserDefaults.standard.isMaster {
@@ -735,6 +765,8 @@ struct SensorManagementView: View {
 
         return SensorManagementState(
             hasTransmitter: transmitter != nil,
+            showsNoise: UserDefaults.standard.isMaster && activeSensor != nil,
+            sensorID: activeSensor?.id,
             bannerTitle: sensorDescription,
             statusTitle: statusTitle,
             statusColor: statusColor,
@@ -744,6 +776,7 @@ struct SensorManagementView: View {
             secondarySessionColor: secondarySessionColor,
             remainingString: remainingMinutes.map { $0 < 0 ? "-" + abs($0).minutesToDaysAndHours() : $0.minutesToDaysAndHours() } ?? nilString,
             remainingColor: remainingColor,
+            noiseMeasurementsDetail: noiseMeasurementsDetail,
             expiryFooter: expiryFooter,
             showsRemainingRow: showsRemainingRow,
             canStartSensor: canManageSensor && activeSensor == nil,
@@ -755,6 +788,9 @@ struct SensorManagementView: View {
             canCalibrate: canCalibrate,
             showCalibrationUnavailableRow: showCalibrationUnavailableRow,
             calibrationNote: calibrationNote,
+            shortTermNoise: activeSensor?.shortTermNoise?.doubleValue,
+            longTermNoise: activeSensor?.longTermNoise?.doubleValue,
+            noiseState: activeSensor.flatMap { SensorNoiseState(rawValue: $0.noiseStateRaw) } ?? .collecting,
             currentBgDisplay: activeSensor.flatMap { bgReadingsAccessor.last(forSensor: $0) }.map {
                 SensorManagementEnteredBgValue(rawValue: displayEditableBgValue($0.finalValue), valueInMgDl: $0.finalValue)
             },
@@ -767,6 +803,8 @@ struct SensorManagementView: View {
 /// Complete value presentation derived from the current sensor and transmitter.
 private struct SensorManagementState {
     let hasTransmitter: Bool
+    let showsNoise: Bool
+    let sensorID: String?
     let bannerTitle: String
     let statusTitle: String
     let statusColor: Color
@@ -776,6 +814,7 @@ private struct SensorManagementState {
     let secondarySessionColor: Color
     let remainingString: String
     let remainingColor: Color
+    let noiseMeasurementsDetail: String?
     let expiryFooter: String?
     let showsRemainingRow: Bool
     let canStartSensor: Bool
@@ -787,6 +826,9 @@ private struct SensorManagementState {
     let canCalibrate: Bool
     let showCalibrationUnavailableRow: Bool
     let calibrationNote: String?
+    let shortTermNoise: Double?
+    let longTermNoise: Double?
+    let noiseState: SensorNoiseState
     let currentBgDisplay: SensorManagementEnteredBgValue?
     let currentCalibration: SensorManagementCalibrationDisplay?
     let calibrationHistory: [SensorManagementCalibrationDisplay]

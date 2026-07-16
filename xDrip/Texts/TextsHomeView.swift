@@ -44,6 +44,118 @@ enum Texts_HomeView {
         return NSLocalizedString("sensorManagementSummaryTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Session", comment: "section title for sensor information")
     }()
 
+    static let sensorManagementNoiseTitle:String = {
+        return NSLocalizedString("sensorManagementNoiseTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Noise", comment: "section title for sensor signal noise information")
+    }()
+
+    static let sensorManagementNoiseShortTerm:String = {
+        return NSLocalizedString("sensorManagementNoiseShortTerm", tableName: filename, bundle: Bundle.main, value: "Last 30 Minutes", comment: "title for the short-term sensor noise measurement")
+    }()
+
+    static let sensorManagementNoiseLongTerm:String = {
+        return NSLocalizedString("sensorManagementNoiseLongTerm", tableName: filename, bundle: Bundle.main, value: "Last 4 Hours", comment: "title for the long-term sensor noise measurement")
+    }()
+
+    static let sensorManagementNoiseCollecting:String = {
+        return NSLocalizedString("sensorManagementNoiseCollecting", tableName: filename, bundle: Bundle.main, value: "Collecting data", comment: "sensor noise state while there are not enough readings")
+    }()
+
+    static let sensorManagementNoiseLow:String = {
+        return NSLocalizedString("sensorManagementNoiseLow", tableName: filename, bundle: Bundle.main, value: "Low", comment: "low sensor noise state")
+    }()
+
+    static let sensorManagementNoiseElevated:String = {
+        return NSLocalizedString("sensorManagementNoiseElevated", tableName: filename, bundle: Bundle.main, value: "Elevated", comment: "elevated sensor noise state")
+    }()
+
+    static let sensorManagementNoiseVeryHigh:String = {
+        return NSLocalizedString("sensorManagementNoiseVeryHigh", tableName: filename, bundle: Bundle.main, value: "Very High", comment: "very high sensor noise state")
+    }()
+
+    static let sensorManagementNoiseExtreme:String = {
+        return NSLocalizedString("sensorManagementNoiseExtreme", tableName: filename, bundle: Bundle.main, value: "Extreme", comment: "extreme sensor noise state")
+    }()
+
+    static let sensorManagementNoiseFlatline:String = {
+        return NSLocalizedString("sensorManagementNoiseFlatline", tableName: filename, bundle: Bundle.main, value: "Sensor signal may be stuck.", comment: "warning that repeated identical sensor readings may indicate a fault")
+    }()
+
+    static let sensorManagementNoiseFooter:String = {
+        return NSLocalizedString("sensorManagementNoiseFooter", tableName: filename, bundle: Bundle.main, value: "Lower values mean a smoother sensor signal.", comment: "explanation below the sensor noise gauges")
+    }()
+
+    static let sensorNoiseHistoryTitle:String = {
+        return NSLocalizedString("sensorNoiseHistoryTitle", tableName: filename, bundle: Bundle.main, value: "Noise History", comment: "navigation title for sensor noise history")
+    }()
+
+    static let sensorNoiseHistoryCurrentTitle:String = {
+        return NSLocalizedString("sensorNoiseHistoryCurrentTitle", tableName: filename, bundle: Bundle.main, value: "Current Measurements", comment: "section title for current sensor noise measurements")
+    }()
+
+    static let sensorNoiseHistoryChartTitle:String = {
+        return NSLocalizedString("sensorNoiseHistoryChartTitle", tableName: filename, bundle: Bundle.main, value: "Noise Over Time", comment: "title for the sensor noise history chart")
+    }()
+
+    static let sensorNoiseHistoryRangeTitle:String = {
+        return NSLocalizedString("sensorNoiseHistoryRangeTitle", tableName: filename, bundle: Bundle.main, value: "Time Range", comment: "accessibility title for the sensor noise chart range picker")
+    }()
+
+    static let sensorNoiseHistoryDayRange:String = {
+        return NSLocalizedString("sensorNoiseHistoryDayRange", tableName: filename, bundle: Bundle.main, value: "24 h", comment: "one day sensor noise chart range")
+    }()
+
+    static let sensorNoiseHistoryThreeDayRange:String = {
+        return NSLocalizedString("sensorNoiseHistoryThreeDayRange", tableName: filename, bundle: Bundle.main, value: "3 d", comment: "three day sensor noise chart range")
+    }()
+
+    static let sensorNoiseHistoryWeekRange:String = {
+        return NSLocalizedString("sensorNoiseHistoryWeekRange", tableName: filename, bundle: Bundle.main, value: "7 d", comment: "one week sensor noise chart range")
+    }()
+
+    static let sensorNoiseHistoryAllRange:String = {
+        return NSLocalizedString("sensorNoiseHistoryAllRange", tableName: filename, bundle: Bundle.main, value: "All", comment: "complete sensor session noise chart range")
+    }()
+
+    static let sensorNoiseHistoryShortCompact:String = {
+        return NSLocalizedString("sensorNoiseHistoryShortCompact", tableName: filename, bundle: Bundle.main, value: "30 min", comment: "compact label for short-term sensor noise")
+    }()
+
+    static let sensorNoiseHistoryLongCompact:String = {
+        return NSLocalizedString("sensorNoiseHistoryLongCompact", tableName: filename, bundle: Bundle.main, value: "4 h", comment: "compact label for long-term sensor noise")
+    }()
+
+    static let sensorNoiseHistoryLoading:String = {
+        return NSLocalizedString("sensorNoiseHistoryLoading", tableName: filename, bundle: Bundle.main, value: "Building sensor history", comment: "message while historic sensor noise is calculated")
+    }()
+
+    static let sensorNoiseHistoryNoDataTitle:String = {
+        return NSLocalizedString("sensorNoiseHistoryNoDataTitle", tableName: filename, bundle: Bundle.main, value: "Not enough noise data yet", comment: "title when the sensor noise chart has no measurements")
+    }()
+
+    static let sensorNoiseHistoryNoDataMessage:String = {
+        return NSLocalizedString("sensorNoiseHistoryNoDataMessage", tableName: filename, bundle: Bundle.main, value: "The chart will appear after enough sensor readings have been collected.", comment: "explanation when the sensor noise chart has no measurements")
+    }()
+
+    static let sensorNoiseHistoryFooter:String = {
+        return NSLocalizedString("sensorNoiseHistoryFooter", tableName: filename, bundle: Bundle.main, value: "The chart shows residual sensor jitter across this sensor session. Lower values are smoother. It does not measure glucose accuracy.", comment: "explanation below the sensor noise history chart")
+    }()
+
+    static let sensorNoiseHistoryChartAccessibility:String = {
+        return NSLocalizedString("sensorNoiseHistoryChartAccessibility", tableName: filename, bundle: Bundle.main, value: "Sensor noise history chart", comment: "accessibility label for the sensor noise history chart")
+    }()
+
+    static let sensorNoiseWarningExtremeTitle:String = {
+        return NSLocalizedString("sensorNoiseWarningExtremeTitle", tableName: filename, bundle: Bundle.main, value: "Extreme Sensor Noise", comment: "home screen warning title for extreme short-term sensor noise")
+    }()
+
+    static let sensorNoiseWarningPersistentTitle:String = {
+        return NSLocalizedString("sensorNoiseWarningPersistentTitle", tableName: filename, bundle: Bundle.main, value: "Persistent Sensor Noise", comment: "home screen warning title for high long-term sensor noise")
+    }()
+
+    static let sensorNoiseWarningFlatlineTitle:String = {
+        return NSLocalizedString("sensorNoiseWarningFlatlineTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Signal May Be Stuck", comment: "home screen warning title for repeated identical sensor values")
+    }()
+
     static let sensorManagementActionsTitle:String = {
         return NSLocalizedString("sensorManagementActionsTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Actions", comment: "section title for sensor management actions")
     }()

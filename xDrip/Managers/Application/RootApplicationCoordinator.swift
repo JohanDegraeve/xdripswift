@@ -119,6 +119,9 @@ import AppIntents
     
     /// BG post processing manager instance
     private var bgPostProcessingManager: BgPostProcessingManager?
+
+    /// SensorNoiseManager instance
+    private var sensorNoiseManager: SensorNoiseManager?
     
     /// reference to activeSensor
     private(set) var activeSensor:Sensor?
@@ -292,6 +295,7 @@ import AppIntents
                let treatmentEntryAccessor = self.treatmentEntryAccessor,
                let alertManager = self.alertManager,
                let bgPostProcessingManager = self.bgPostProcessingManager,
+               let sensorNoiseManager = self.sensorNoiseManager,
                let bluetoothPeripheralManager = self.bluetoothPeripheralManager,
                let soundPlayer = self.soundPlayer,
                let nightscoutSyncManager = self.nightscoutSyncManager {
@@ -311,6 +315,7 @@ import AppIntents
                     treatmentEntryAccessor: treatmentEntryAccessor,
                     alertManager: alertManager,
                     bgPostProcessingManager: bgPostProcessingManager,
+                    sensorNoiseManager: sensorNoiseManager,
                     bluetoothPeripheralManager: bluetoothPeripheralManager,
                     soundPlayer: soundPlayer,
                     nightscoutSyncManager: nightscoutSyncManager,
@@ -636,6 +641,10 @@ import AppIntents
         
         // setup bgPostProcessingManager
         bgPostProcessingManager = BgPostProcessingManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager, healthKitManager: healthKitManager)
+
+        // setup sensor noise manager and refresh persisted values for the current algorithm version
+        sensorNoiseManager = SensorNoiseManager(coreDataManager: coreDataManager, bgReadingsAccessor: bgReadingsAccessor)
+        sensorNoiseManager?.update(activeSensor: activeSensor)
         
         // setup bgReadingSpeaker
         bgReadingSpeaker = BGReadingSpeaker(sharedSoundPlayer: soundPlayer, coreDataManager: coreDataManager)
@@ -920,6 +929,7 @@ import AppIntents
             // if a new reading is created, create either initial calibration request or bgreading notification - upload to nightscout and check alerts
             if newReadingCreated {
                 _ = bgPostProcessingManager?.processLatestReadings()
+                sensorNoiseManager?.update(activeSensor: activeSensor)
 
                 // Publish the final stored value before optional downstream consumers perform their work.
                 updateLiveActivityAndWidgets(forceRestart: false)
@@ -1427,6 +1437,7 @@ import AppIntents
         }
 
         coreDataManager.saveChanges()
+        sensorNoiseManager?.update(activeSensor: activeSensor)
 
         if let nightscoutSyncManager = self.nightscoutSyncManager {
             nightscoutSyncManager.uploadLatestBgReadings(lastConnectionStatusChangeTimeStamp: self.lastConnectionStatusChangeTimeStamp())
@@ -1925,6 +1936,7 @@ import AppIntents
         
         // assign activeSensor to newSensor
         activeSensor = newSensor
+        sensorNoiseManager?.update(activeSensor: newSensor)
     }
     
     private func stopSensor(cGMTransmitter: CGMTransmitter?, sendToTransmitter: Bool) {

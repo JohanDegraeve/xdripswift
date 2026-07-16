@@ -258,6 +258,11 @@
 		4C2000072F65000100000001 /* BluetoothPeripheralDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2000082F65000100000001 /* BluetoothPeripheralDetailView.swift */; };
 		4C2000092F65000100000001 /* BluetoothPeripheralSettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C20000A2F65000100000001 /* BluetoothPeripheralSettingsRow.swift */; };
 		4D10C0042FEF000100000001 /* GlucoseChartScrollCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D10C0032FEF000100000001 /* GlucoseChartScrollCoordinator.swift */; };
+		4E6000012FF2000100000001 /* SensorNoiseCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6000112FF2000100000001 /* SensorNoiseCalculator.swift */; };
+		4E6000022FF2000100000001 /* SensorNoiseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6000122FF2000100000001 /* SensorNoiseManager.swift */; };
+		4E6100012FF3000100000001 /* SensorNoiseSample+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6100112FF3000100000001 /* SensorNoiseSample+CoreDataClass.swift */; };
+		4E6100022FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6100122FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift */; };
+		4E6100032FF3000100000001 /* SensorNoiseHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6100132FF3000100000001 /* SensorNoiseHistoryView.swift */; };
 		4D20C0022FF1000100000001 /* RootHomeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0012FF1000100000001 /* RootHomeState.swift */; };
 		4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0032FF1000100000001 /* RootHomeView.swift */; };
 		4D20C0062FF1000100000001 /* ConstantsAppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0052FF1000100000001 /* ConstantsAppColors.swift */; };
@@ -1050,6 +1055,13 @@
 		4D7180082FE8000100000001 /* MedtrumTouchCareNano+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MedtrumTouchCareNano+CoreDataClass.swift"; sourceTree = "<group>"; };
 		4D71800A2FE8000100000001 /* MedtrumTouchCareNano+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MedtrumTouchCareNano+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		4D71800D2FE8000100000001 /* xdrip v21.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v21.xcdatamodel"; sourceTree = "<group>"; };
+		4E6000112FF2000100000001 /* SensorNoiseCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorNoiseCalculator.swift; sourceTree = "<group>"; };
+		4E6000122FF2000100000001 /* SensorNoiseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorNoiseManager.swift; sourceTree = "<group>"; };
+		4E6000312FF2000100000001 /* xdrip v22.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v22.xcdatamodel"; sourceTree = "<group>"; };
+		4E6100112FF3000100000001 /* SensorNoiseSample+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SensorNoiseSample+CoreDataClass.swift"; sourceTree = "<group>"; };
+		4E6100122FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "SensorNoiseSample+CoreDataProperties.swift"; path = "xDrip/Core Data/Extensions/SensorNoiseSample+CoreDataProperties.swift"; sourceTree = SOURCE_ROOT; };
+		4E6100132FF3000100000001 /* SensorNoiseHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorNoiseHistoryView.swift; sourceTree = "<group>"; };
+		4E6100312FF3000100000001 /* xdrip v23.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "xdrip v23.xcdatamodel"; sourceTree = "<group>"; };
 		666E283826F7E54C00ACE4DF /* xDrip.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = xDrip.xcconfig; path = xDrip/xDrip.xcconfig; sourceTree = "<group>"; };
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xDrip/Version.xcconfig; sourceTree = "<group>"; };
 		685B5F8D633F5492574F0567 /* GlucoseChartStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseChartStateManager.swift; sourceTree = "<group>"; };
@@ -2462,6 +2474,15 @@
 			name = "Recovered References";
 			sourceTree = "<group>";
 		};
+		4E6000212FF2000100000001 /* SensorNoise */ = {
+			isa = PBXGroup;
+			children = (
+				4E6000112FF2000100000001 /* SensorNoiseCalculator.swift */,
+				4E6000122FF2000100000001 /* SensorNoiseManager.swift */,
+			);
+			path = SensorNoise;
+			sourceTree = "<group>";
+		};
 		F85DC2F621D25E3A00B9F74A /* Managers */ = {
 			isa = PBXGroup;
 			children = (
@@ -2483,6 +2504,7 @@
 				F821CF4F229BF43A005C1E43 /* Nightscout */,
 				4A9B10212F0A000100000001 /* PostProcessing */,
 				F64039AE281C3F8D0051EFFE /* QuickActions */,
+				4E6000212FF2000100000001 /* SensorNoise */,
 				F821CF9922AEF2DF005C1E43 /* Speak */,
 				47FB28052636AFE700042FFB /* Statistics */,
 				47244D642E8318B9007357C3 /* TransmitterReadSuccess */,
@@ -2557,6 +2579,7 @@
 				4D20C0032FF1000100000001 /* RootHomeView.swift */,
 				4D20C0092FF1000100000001 /* RootTabView.swift */,
 				4B0C00012F3B000100000001 /* SensorManagementView.swift */,
+				4E6100132FF3000100000001 /* SensorNoiseHistoryView.swift */,
 				475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */,
 				4AC0D0022F1D000100000001 /* SnoozeView.swift */,
 				4C20000B2F65000100000001 /* BluetoothPeripherals */,
@@ -3020,6 +3043,8 @@
 				F85542332B7574330058CE09 /* OmniPodHeartBeat+CoreDataProperties.swift */,
 				F85DC2F121CFE3D400B9F74A /* Sensor+CoreDataClass.swift */,
 				F85DC2E921CFE2F500B9F74A /* Sensor+CoreDataProperties.swift */,
+				4E6100112FF3000100000001 /* SensorNoiseSample+CoreDataClass.swift */,
+				4E6100122FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift */,
 				F85FF3D0252F9FF9004E6FF1 /* SnoozeParameters+CoreDataClass.swift */,
 				F85FF3CC252F9FD7004E6FF1 /* SnoozeParameters+CoreDataProperties.swift */,
 				D40C3DA3277542C400111B73 /* TreatmentEntry+CoreDataClass.swift */,
@@ -4136,6 +4161,7 @@
 				4C1000062F64000100000001 /* TreatmentsViewModel.swift in Sources */,
 				4C1000012F64000100000001 /* TreatmentsView.swift in Sources */,
 				4B0C00022F3B000100000001 /* SensorManagementView.swift in Sources */,
+				4E6100032FF3000100000001 /* SensorNoiseHistoryView.swift in Sources */,
 				F8252867243E50FE0067AF77 /* ConstantsLibre.swift in Sources */,
 				F8F9720923A5915900C3F17D /* AESCrypt.m in Sources */,
 				F8CB59D3274D94AF00BA199E /* DexcomSessionStartTxMessage.swift in Sources */,
@@ -4247,6 +4273,10 @@
 				473D9ECE2C2DC53A00364060 /* LoopShareType.swift in Sources */,
 				F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */,
 				F8297F5A238EE14E00D74D66 /* TextsBluetoothPeripheralView.swift in Sources */,
+				4E6000012FF2000100000001 /* SensorNoiseCalculator.swift in Sources */,
+				4E6000022FF2000100000001 /* SensorNoiseManager.swift in Sources */,
+				4E6100012FF3000100000001 /* SensorNoiseSample+CoreDataClass.swift in Sources */,
+				4E6100022FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift in Sources */,
 				47D2DB3B2B14F6D000C8EE6B /* ScreenLockDimmingType.swift in Sources */,
 				F8A1584D22ECA445007F5B5D /* SettingsViewDevelopmentSettingsViewModel.swift in Sources */,
 				F8A2BC3525DB0D6D001D1E78 /* BluetoothPeripheralManager+BluetoothTransmitterDelegate.swift in Sources */,
@@ -5472,6 +5502,8 @@
 		F85FF3C2252D0C32004E6FF1 /* xdrip.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				4E6100312FF3000100000001 /* xdrip v23.xcdatamodel */,
+				4E6000312FF2000100000001 /* xdrip v22.xcdatamodel */,
 				4D71800D2FE8000100000001 /* xdrip v21.xcdatamodel */,
 				47D0F0012FE21A4B00B4712A /* xdrip v20.xcdatamodel */,
 				47BFA1232FD6A00100B4712A /* xdrip v19.xcdatamodel */,
@@ -5483,7 +5515,7 @@
 				F85FF3CB252F9C9A004E6FF1 /* xdrip v13.xcdatamodel */,
 				F85FF3C3252D0C32004E6FF1 /* xdrip v12.xcdatamodel */,
 			);
-			currentVersion = 4D71800D2FE8000100000001 /* xdrip v21.xcdatamodel */;
+			currentVersion = 4E6100312FF3000100000001 /* xdrip v23.xcdatamodel */;
 			path = xdrip.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

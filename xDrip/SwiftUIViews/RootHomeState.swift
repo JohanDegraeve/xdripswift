@@ -21,6 +21,7 @@ struct RootHomeState {
     var loop = RootHomeLoopState()
     var statistics = RootHomeStatisticsState()
     var sensor = RootHomeSensorState()
+    var sensorNoise = RootHomeSensorNoiseState()
     var dataSource = RootHomeDataSourceState()
     var visibility = RootHomeVisibilityState()
     var controls = RootHomeControlsState()
@@ -97,6 +98,14 @@ struct RootHomeSensorState {
     var progressColor = ConstantsAppColors.disabledText
     var progress: Double = 0
     var countsDown = false
+}
+
+/// Actionable sensor-noise warning shown only for fresh master-mode readings.
+struct RootHomeSensorNoiseState {
+    var showsWarning = false
+    var title = ""
+    var detail = ""
+    var color = ConstantsAppColors.urgent
 }
 
 /// Current data-source description and connection indicators.
@@ -211,6 +220,7 @@ final class RootHomeStateModel: ObservableObject {
         newState.pump = pumpState(deviceStatus: deviceStatus, latestSiteChangeDate: latestSiteChangeDate)
         newState.loop = loopState(deviceStatus: deviceStatus)
         newState.sensor = sensorState(activeSensor: activeSensor, cgmTransmitter: cgmTransmitter)
+        newState.sensorNoise = sensorNoiseState(activeSensor: activeSensor)
         newState.dataSource = dataSourceState(sensorState: newState.sensor, activeSensor: activeSensor, cgmTransmitter: cgmTransmitter)
         newState.visibility = visibilityState(sensorState: newState.sensor, usesScreenLockNightLayout: usesScreenLockNightLayout)
         newState.controls = controlsState(alertManager: alertManager, bgPostProcessingManager: bgPostProcessingManager)
@@ -235,7 +245,8 @@ final class RootHomeStateModel: ObservableObject {
 
     func updateStatistics(_ statistics: StatisticsManager.Statistics, days: Int) {
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-        let averageValue = statistics.averageStatisticValue.value > 0
+        let hasData = statistics.averageStatisticValue.value > 0
+        let averageValue = hasData
             ? (isMgDl
                ? "\(Int(statistics.averageStatisticValue.round(toDecimalPlaces: 0))) mg/dl"
                : "\(statistics.averageStatisticValue.round(toDecimalPlaces: 1)) mmol/l")
@@ -250,7 +261,7 @@ final class RootHomeStateModel: ObservableObject {
             a1cValue = "\(statistics.a1CStatisticValue.round(toDecimalPlaces: 1))%"
         }
 
-        let timePeriodText = RootHomeStatisticsPeriodText.title(for: days)
+        let timePeriodText = hasData ? RootHomeStatisticsPeriodText.title(for: days) : "-"
 
         updateState { state in
             state.statistics = RootHomeStatisticsState(
@@ -583,6 +594,65 @@ final class RootHomeStateModel: ObservableObject {
         }
 
         return ConstantsAppColors.sensorText
+    }
+
+    private func sensorNoiseState(activeSensor: Sensor?) -> RootHomeSensorNoiseState {
+        guard UserDefaults.standard.isMaster,
+              let activeSensor,
+              activeSensor.noiseAlgorithmVersion == ConstantsSensorNoise.algorithmVersion,
+              let latestReadingAt = activeSensor.noiseLatestReadingAt
+        else {
+            return RootHomeSensorNoiseState()
+        }
+
+        let readingAge = Date().timeIntervalSince(latestReadingAt)
+        guard readingAge >= -TimeInterval(minutes: 5),
+              readingAge <= ConstantsSensorNoise.rootWarningFreshness else {
+            return RootHomeSensorNoiseState()
+        }
+
+        let persistedState = SensorNoiseState(rawValue: activeSensor.noiseStateRaw) ?? .collecting
+        if persistedState == .flatlineSuspected {
+            return RootHomeSensorNoiseState(
+                showsWarning: true,
+                title: Texts_HomeView.sensorNoiseWarningFlatlineTitle,
+                detail: Texts_HomeView.sensorManagementNoiseFlatline,
+                color: ConstantsAppColors.urgent
+            )
+        }
+
+        if let shortTermNoise = activeSensor.shortTermNoise?.doubleValue,
+           shortTermNoise > ConstantsSensorNoise.extremeNoiseStandardDeviation {
+            return RootHomeSensorNoiseState(
+                showsWarning: true,
+                title: Texts_HomeView.sensorNoiseWarningExtremeTitle,
+                detail: formattedNoise(shortTermNoise, windowTitle: Texts_HomeView.sensorManagementNoiseShortTerm),
+                color: ConstantsAppColors.urgent
+            )
+        }
+
+        if let longTermNoise = activeSensor.longTermNoise?.doubleValue,
+           longTermNoise > ConstantsSensorNoise.veryHighNoiseStandardDeviation {
+            return RootHomeSensorNoiseState(
+                showsWarning: true,
+                title: Texts_HomeView.sensorNoiseWarningPersistentTitle,
+                detail: formattedNoise(longTermNoise, windowTitle: Texts_HomeView.sensorManagementNoiseLongTerm),
+                color: longTermNoise > ConstantsSensorNoise.extremeNoiseStandardDeviation
+                    ? ConstantsAppColors.urgent
+                    : ConstantsAppColors.caution
+            )
+        }
+
+        return RootHomeSensorNoiseState()
+    }
+
+    private func formattedNoise(_ noiseInMgDl: Double, windowTitle: String) -> String {
+        let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        let displayNoise = noiseInMgDl.mgDlToMmol(mgDl: isMgDl)
+        let value = isMgDl
+            ? displayNoise.formatted(.number.precision(.fractionLength(1)))
+            : displayNoise.formatted(.number.precision(.fractionLength(2)))
+        return windowTitle + ": " + value + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
     }
 
     private var followerConnectionIsRecent: Bool {

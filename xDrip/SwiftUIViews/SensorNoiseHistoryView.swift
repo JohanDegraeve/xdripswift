@@ -1,0 +1,827 @@
+//
+//  SensorNoiseHistoryView.swift
+//  xdrip
+//
+//  Created by Paul Plant on 16/7/26.
+//  Copyright © 2026 Johan Degraeve. All rights reserved.
+//
+
+import Charts
+import SwiftUI
+
+/// Detailed sensor-session noise history opened from sensor management.
+///
+/// The view shows the latest persisted measurements and a selectable chart built from the current
+/// sensor session. It defaults to the newest visible chart point and returns there whenever the
+/// user changes the displayed time range.
+struct SensorNoiseHistoryView: View {
+    @StateObject private var viewModel: SensorNoiseHistoryViewModel
+    @State private var selectedRange = SensorNoiseHistoryRange.day
+    @State private var selectedPoint: SensorNoiseHistoryPoint?
+
+    private let sensorID: String
+    private let isMgDl: Bool
+    private let currentMeasurementsDetail: String?
+
+    init(
+        sensorID: String,
+        sensorNoiseManager: SensorNoiseManager,
+        isMgDl: Bool,
+        currentMeasurementsDetail: String? = nil
+    ) {
+        self.sensorID = sensorID
+        self.isMgDl = isMgDl
+        self.currentMeasurementsDetail = currentMeasurementsDetail
+        _viewModel = StateObject(
+            wrappedValue: SensorNoiseHistoryViewModel(
+                sensorID: sensorID,
+                sensorNoiseManager: sensorNoiseManager
+            )
+        )
+    }
+
+    // MARK: - view
+
+    var body: some View {
+        GeometryReader { geometry in
+            List {
+                if let snapshot = viewModel.snapshot {
+                    Section(header: Text(Texts_HomeView.sensorNoiseHistoryCurrentTitle)) {
+                        currentStateRow(snapshot: snapshot)
+
+                        SensorNoiseGaugeRow(
+                            title: Texts_HomeView.sensorManagementNoiseShortTerm,
+                            noiseInMgDl: snapshot.shortTermNoise,
+                            coverage: snapshot.shortTermCoverage,
+                            isMgDl: isMgDl
+                        )
+
+                        SensorNoiseGaugeRow(
+                            title: Texts_HomeView.sensorManagementNoiseLongTerm,
+                            noiseInMgDl: snapshot.longTermNoise,
+                            coverage: snapshot.longTermCoverage,
+                            isMgDl: isMgDl
+                        )
+                    }
+
+                    Section {
+                        noiseHistoryChart(
+                            snapshot: snapshot,
+                            chartHeight: max(130, (geometry.size.height - 400) * 0.7)
+                        )
+                        .listRowInsets(EdgeInsets(top: 14, leading: 12, bottom: 16, trailing: 12))
+                    } header: {
+                        Text(Texts_HomeView.sensorNoiseHistoryChartTitle)
+                    } footer: {
+                        Text(Texts_HomeView.sensorNoiseHistoryFooter)
+                    }
+                } else {
+                    Section {
+                        ProgressView(Texts_HomeView.sensorNoiseHistoryLoading)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.vertical, 28)
+                    }
+                }
+            }
+        }
+        .navigationTitle(Texts_HomeView.sensorNoiseHistoryTitle)
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear(perform: viewModel.load)
+        .onReceive(NotificationCenter.default.publisher(for: .sensorNoiseHistoryDidChange)) { notification in
+            guard notification.object as? String == sensorID else { return }
+            viewModel.reloadCachedHistory()
+        }
+        .onChange(of: selectedRange) { _ in
+            selectedPoint = nil
+        }
+    }
+
+    // MARK: - current measurements
+
+    private func currentStateRow(snapshot: SensorNoiseHistorySnapshot) -> some View {
+        HStack(spacing: 10) {
+            Circle()
+                .fill(snapshot.state.displayColor)
+                .frame(width: 11, height: 11)
+                .overlay {
+                    Circle()
+                        .stroke(snapshot.state.displayColor.opacity(0.35), lineWidth: 5)
+                }
+
+            Text(snapshot.state.localizedTitle)
+                .font(.body)
+                .foregroundStyle(snapshot.state.displayColor)
+
+            Spacer()
+
+            if let currentMeasurementsDetail {
+                Text(currentMeasurementsDetail)
+                    .foregroundStyle(Color(.colorSecondary))
+            }
+        }
+        .padding(.vertical, 2)
+    }
+
+    // MARK: - history chart
+
+    /// Builds the selected range and falls back to its newest point until the user touches the chart.
+    private func noiseHistoryChart(snapshot: SensorNoiseHistorySnapshot, chartHeight: CGFloat) -> some View {
+        let chartData = SensorNoiseChartData(
+            snapshot: snapshot,
+            range: selectedRange,
+            isMgDl: isMgDl
+        )
+        let displayedPoint = selectedPoint ?? chartData.points.last
+
+        return VStack(alignment: .leading, spacing: 14) {
+            if let displayedPoint {
+                HStack(spacing: 8) {
+                    Text(displayedPoint.timeStamp.toStringInUserLocale(timeStyle: .short, dateStyle: .short))
+                        .font(.footnote.monospacedDigit())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.75)
+                        .allowsTightening(true)
+
+                    Spacer()
+
+                    noiseValuePill(
+                        label: Texts_HomeView.sensorNoiseHistoryShortCompact,
+                        value: displayedPoint.shortTermNoise
+                    )
+                    noiseValuePill(
+                        label: Texts_HomeView.sensorNoiseHistoryLongCompact,
+                        value: displayedPoint.longTermNoise
+                    )
+                }
+            }
+
+            Group {
+                if chartData.points.isEmpty {
+                    VStack(spacing: 9) {
+                        if viewModel.isBuildingHistory {
+                            ProgressView()
+                        } else {
+                            Image(systemName: "waveform.path.ecg.rectangle")
+                                .font(.system(size: 26, weight: .medium))
+                                .foregroundStyle(Color(.systemGray))
+                        }
+
+                        Text(
+                            viewModel.isBuildingHistory
+                                ? Texts_HomeView.sensorNoiseHistoryLoading
+                                : Texts_HomeView.sensorNoiseHistoryNoDataTitle
+                        )
+                        .font(.subheadline)
+                        .fontWeight(.semibold)
+
+                        Text(Texts_HomeView.sensorNoiseHistoryNoDataMessage)
+                            .font(.caption)
+                            .foregroundStyle(Color(.colorSecondary))
+                            .multilineTextAlignment(.center)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .frame(height: chartHeight)
+                } else {
+                    chart(
+                        chartData: chartData,
+                        displayedPoint: displayedPoint,
+                        chartHeight: chartHeight
+                    )
+                }
+            }
+
+            Picker(Texts_HomeView.sensorNoiseHistoryRangeTitle, selection: $selectedRange) {
+                ForEach(SensorNoiseHistoryRange.allCases) { range in
+                    Text(range.localizedTitle).tag(range)
+                }
+            }
+            .pickerStyle(.segmented)
+        }
+    }
+
+    private func noiseValuePill(label: String, value: Double?) -> some View {
+        HStack(spacing: 4) {
+            Text(label + ":")
+                .foregroundStyle(Color(.colorSecondary))
+            Text(value.map(displayNoiseValue) ?? "-")
+                .foregroundStyle(
+                    value.map { ConstantsSensorNoise.state(for: $0).displayColor }
+                        ?? Color(.colorSecondary)
+                )
+        }
+        .font(.subheadline.monospacedDigit())
+        .padding(.horizontal, 7)
+        .padding(.vertical, 4)
+        .background(Color(.systemGray6), in: Capsule())
+        .accessibilityLabel(label + " " + (value.map(displayNoiseValue) ?? Texts_Common.notAvailable))
+    }
+
+    /// Draws both noise windows, threshold bands and the currently selected reading.
+    private func chart(
+        chartData: SensorNoiseChartData,
+        displayedPoint: SensorNoiseHistoryPoint?,
+        chartHeight: CGFloat
+    ) -> some View {
+        Chart {
+            RectangleMark(
+                xStart: .value("Start", chartData.domain.lowerBound),
+                xEnd: .value("End", chartData.domain.upperBound),
+                yStart: .value("Low start", 0),
+                yEnd: .value("Low end", chartData.elevatedThreshold)
+            )
+            .foregroundStyle(ConstantsAppColors.normal.opacity(0.055))
+
+            RectangleMark(
+                xStart: .value("Start", chartData.domain.lowerBound),
+                xEnd: .value("End", chartData.domain.upperBound),
+                yStart: .value("Elevated start", chartData.elevatedThreshold),
+                yEnd: .value("Elevated end", chartData.veryHighThreshold)
+            )
+            .foregroundStyle(ConstantsAppColors.warning.opacity(0.07))
+
+            RectangleMark(
+                xStart: .value("Start", chartData.domain.lowerBound),
+                xEnd: .value("End", chartData.domain.upperBound),
+                yStart: .value("Very high start", chartData.veryHighThreshold),
+                yEnd: .value("Very high end", chartData.extremeThreshold)
+            )
+            .foregroundStyle(ConstantsAppColors.caution.opacity(0.075))
+
+            RectangleMark(
+                xStart: .value("Start", chartData.domain.lowerBound),
+                xEnd: .value("End", chartData.domain.upperBound),
+                yStart: .value("Extreme start", chartData.extremeThreshold),
+                yEnd: .value("Extreme end", chartData.yMaximum)
+            )
+            .foregroundStyle(ConstantsAppColors.urgent.opacity(0.075))
+
+            ForEach(chartData.thresholds, id: \.self) { threshold in
+                RuleMark(y: .value("Noise threshold", threshold))
+                    .lineStyle(StrokeStyle(lineWidth: 0.7, dash: [3, 4]))
+                    .foregroundStyle(Color(.systemGray2).opacity(0.35))
+            }
+
+            ForEach(chartData.shortSegments) { segment in
+                LineMark(
+                    x: .value("Time", segment.startDate),
+                    y: .value("Noise", segment.startValue),
+                    series: .value("Segment", segment.id)
+                )
+                .lineStyle(StrokeStyle(lineWidth: 1, lineCap: .round, lineJoin: .round))
+                .foregroundStyle(segment.color.opacity(0.32))
+
+                LineMark(
+                    x: .value("Time", segment.endDate),
+                    y: .value("Noise", segment.endValue),
+                    series: .value("Segment", segment.id)
+                )
+                .lineStyle(StrokeStyle(lineWidth: 1, lineCap: .round, lineJoin: .round))
+                .foregroundStyle(segment.color.opacity(0.32))
+            }
+
+            ForEach(chartData.longSegments) { segment in
+                LineMark(
+                    x: .value("Time", segment.startDate),
+                    y: .value("Noise", segment.startValue),
+                    series: .value("Segment", segment.id)
+                )
+                .lineStyle(StrokeStyle(lineWidth: 2.75, lineCap: .round, lineJoin: .round, dash: [7, 4]))
+                .foregroundStyle(segment.color)
+
+                LineMark(
+                    x: .value("Time", segment.endDate),
+                    y: .value("Noise", segment.endValue),
+                    series: .value("Segment", segment.id)
+                )
+                .lineStyle(StrokeStyle(lineWidth: 2.75, lineCap: .round, lineJoin: .round, dash: [7, 4]))
+                .foregroundStyle(segment.color)
+            }
+
+            if let displayedPoint {
+                RuleMark(x: .value("Selected time", displayedPoint.timeStamp))
+                    .lineStyle(StrokeStyle(lineWidth: 1))
+                    .foregroundStyle(Color.white.opacity(0.65))
+
+                if let shortTermNoise = displayedPoint.shortTermNoise {
+                    PointMark(
+                        x: .value("Selected time", displayedPoint.timeStamp),
+                        y: .value("Short noise", chartData.displayValue(shortTermNoise))
+                    )
+                    .symbolSize(48)
+                    .foregroundStyle(ConstantsSensorNoise.state(for: shortTermNoise).displayColor)
+                }
+
+                if let longTermNoise = displayedPoint.longTermNoise {
+                    PointMark(
+                        x: .value("Selected time", displayedPoint.timeStamp),
+                        y: .value("Long noise", chartData.displayValue(longTermNoise))
+                    )
+                    .symbolSize(35)
+                    .foregroundStyle(ConstantsSensorNoise.state(for: longTermNoise).displayColor)
+                }
+            }
+        }
+        .chartXAxis {
+            if let xAxisDates = chartData.xAxisDates {
+                AxisMarks(values: xAxisDates) { value in
+                    AxisGridLine()
+                        .foregroundStyle(Color(.systemGray3).opacity(0.18))
+                    AxisTick()
+                        .foregroundStyle(Color(.systemGray2))
+                    AxisValueLabel {
+                        if let date = value.as(Date.self) {
+                            Text(chartData.xAxisLabel(for: date))
+                                .font(.caption2.monospacedDigit())
+                                .foregroundStyle(Color(.colorSecondary))
+                        }
+                    }
+                }
+            } else {
+                AxisMarks(values: .automatic(desiredCount: chartData.xAxisMarkCount)) { value in
+                    AxisGridLine()
+                        .foregroundStyle(Color(.systemGray3).opacity(0.18))
+                    AxisTick()
+                        .foregroundStyle(Color(.systemGray2))
+                    AxisValueLabel {
+                        if let date = value.as(Date.self) {
+                            Text(chartData.xAxisLabel(for: date))
+                                .font(.caption2.monospacedDigit())
+                                .foregroundStyle(Color(.colorSecondary))
+                        }
+                    }
+                }
+            }
+        }
+        .chartYAxis {
+            AxisMarks(position: .leading, values: .automatic(desiredCount: 5)) { value in
+                AxisGridLine()
+                    .foregroundStyle(Color(.systemGray3).opacity(0.16))
+                AxisValueLabel {
+                    if let noise = value.as(Double.self) {
+                        Text(chartData.yAxisLabel(for: noise))
+                            .font(.caption2.monospacedDigit())
+                            .foregroundStyle(Color(.colorSecondary))
+                    }
+                }
+            }
+        }
+        .chartXScale(domain: chartData.domain)
+        .chartYScale(domain: 0 ... chartData.yMaximum)
+        .chartOverlay { chartProxy in
+            GeometryReader { geometryProxy in
+                Rectangle()
+                    .fill(Color.clear)
+                    .contentShape(Rectangle())
+                    .gesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged { gesture in
+                                let plotFrame = geometryProxy[chartProxy.plotAreaFrame]
+                                let xPosition = gesture.location.x - plotFrame.origin.x
+
+                                guard xPosition >= 0,
+                                      xPosition <= plotFrame.width,
+                                      let date: Date = chartProxy.value(atX: xPosition) else { return }
+
+                                selectedPoint = chartData.nearestPoint(to: date)
+                            }
+                    )
+            }
+        }
+        .frame(height: chartHeight)
+        .padding(.top, 2)
+        .accessibilityLabel(Texts_HomeView.sensorNoiseHistoryChartAccessibility)
+    }
+
+    private func displayNoiseValue(_ noiseInMgDl: Double) -> String {
+        let value = noiseInMgDl.mgDlToMmol(mgDl: isMgDl)
+        return isMgDl
+            ? value.formatted(.number.precision(.fractionLength(1)))
+            : value.formatted(.number.precision(.fractionLength(2)))
+    }
+}
+
+// MARK: - view model
+
+@MainActor private final class SensorNoiseHistoryViewModel: ObservableObject {
+    @Published private(set) var snapshot: SensorNoiseHistorySnapshot?
+    @Published private(set) var isBuildingHistory = false
+
+    private let sensorID: String
+    private let sensorNoiseManager: SensorNoiseManager
+    private var hasLoaded = false
+
+    init(sensorID: String, sensorNoiseManager: SensorNoiseManager) {
+        self.sensorID = sensorID
+        self.sensorNoiseManager = sensorNoiseManager
+    }
+
+    /// Loads cached points immediately and starts the one-time session rebuild when required.
+    func load() {
+        guard !hasLoaded else { return }
+        hasLoaded = true
+        snapshot = sensorNoiseManager.historySnapshot(sensorID: sensorID)
+        isBuildingHistory = sensorNoiseManager.rebuildHistoryIfNeeded(sensorID: sensorID) { [weak self] in
+            guard let self else { return }
+            self.snapshot = self.sensorNoiseManager.historySnapshot(sensorID: self.sensorID)
+            self.isBuildingHistory = false
+        }
+    }
+
+    /// Refreshes the detached snapshot after the manager stores or rebuilds history.
+    func reloadCachedHistory() {
+        snapshot = sensorNoiseManager.historySnapshot(sensorID: sensorID)
+    }
+}
+
+// MARK: - sensor management summary
+
+/// Compact current noise indicator used by the parent sensor management screen.
+struct SensorNoiseSummaryRow: View {
+    let shortTermNoise: Double?
+    let longTermNoise: Double?
+    let state: SensorNoiseState
+    let isMgDl: Bool
+
+    var body: some View {
+        HStack(spacing: 11) {
+            Circle()
+                .fill(state.displayColor)
+                .frame(width: 12, height: 12)
+                .overlay {
+                    Circle()
+                        .stroke(state.displayColor.opacity(0.3), lineWidth: 5)
+                }
+
+            Text(state.localizedTitle)
+                .font(.body)
+                .foregroundStyle(state.displayColor)
+
+            Spacer()
+
+            compactNoiseValues
+        }
+        .padding(.vertical, 3)
+    }
+
+    private var compactNoiseValues: some View {
+        HStack(spacing: 5) {
+            Text(displayValue(shortTermNoise))
+                .foregroundStyle(
+                    shortTermNoise.map { ConstantsSensorNoise.state(for: $0).displayColor }
+                        ?? Color(.colorSecondary)
+                )
+            Text("/")
+                .foregroundStyle(Color(.colorSecondary))
+            Text(displayValue(longTermNoise))
+                .foregroundStyle(
+                    longTermNoise.map { ConstantsSensorNoise.state(for: $0).displayColor }
+                        ?? Color(.colorSecondary)
+                )
+        }
+        .font(.body.monospacedDigit())
+    }
+
+    private func displayValue(_ value: Double?) -> String {
+        value.map(displayValue) ?? "-"
+    }
+
+    private func displayValue(_ value: Double) -> String {
+        let displayValue = value.mgDlToMmol(mgDl: isMgDl)
+        return isMgDl
+            ? displayValue.formatted(.number.precision(.fractionLength(1)))
+            : displayValue.formatted(.number.precision(.fractionLength(2)))
+    }
+}
+
+/// Lower-is-better gauge for one persisted noise window.
+private struct SensorNoiseGaugeRow: View {
+    let title: String
+    let noiseInMgDl: Double?
+    let coverage: Double
+    let isMgDl: Bool
+
+    private var maximumGaugeValue: Double {
+        ConstantsSensorNoise.extremeNoiseStandardDeviation * 1.25
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            HStack {
+                Text(title)
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+
+                Spacer()
+
+                if let noiseInMgDl {
+                    Text(displayValue(noiseInMgDl))
+                        .font(.subheadline.monospacedDigit())
+                        .foregroundStyle(ConstantsSensorNoise.state(for: noiseInMgDl).displayColor)
+                } else {
+                    Text(Texts_HomeView.sensorManagementNoiseCollecting)
+                        .font(.caption)
+                        .foregroundStyle(Color(.colorSecondary))
+                }
+            }
+
+            if let noiseInMgDl {
+                Gauge(value: min(max(noiseInMgDl, 0), maximumGaugeValue), in: 0 ... maximumGaugeValue) {
+                    EmptyView()
+                }
+                .gaugeStyle(.accessoryLinear)
+                .tint(ConstantsSensorNoise.state(for: noiseInMgDl).displayColor)
+            } else {
+                ProgressView(value: min(max(coverage, 0), 1))
+                    .tint(Color(.systemGray))
+            }
+        }
+        .padding(.vertical, 3)
+    }
+
+    private func displayValue(_ noiseInMgDl: Double) -> String {
+        let displayNoise = noiseInMgDl.mgDlToMmol(mgDl: isMgDl)
+        let value = isMgDl
+            ? displayNoise.formatted(.number.precision(.fractionLength(1)))
+            : displayNoise.formatted(.number.precision(.fractionLength(2)))
+        return value + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+    }
+}
+
+// MARK: - chart models
+
+private enum SensorNoiseHistoryRange: String, CaseIterable, Identifiable {
+    case day
+    case threeDays
+    case week
+    case all
+
+    var id: String { rawValue }
+
+    var duration: TimeInterval? {
+        switch self {
+        case .day:
+            return 24 * 60 * 60
+        case .threeDays:
+            return 3 * 24 * 60 * 60
+        case .week:
+            return 7 * 24 * 60 * 60
+        case .all:
+            return nil
+        }
+    }
+
+    var localizedTitle: String {
+        switch self {
+        case .day:
+            return Texts_HomeView.sensorNoiseHistoryDayRange
+        case .threeDays:
+            return Texts_HomeView.sensorNoiseHistoryThreeDayRange
+        case .week:
+            return Texts_HomeView.sensorNoiseHistoryWeekRange
+        case .all:
+            return Texts_HomeView.sensorNoiseHistoryAllRange
+        }
+    }
+}
+
+private struct SensorNoiseChartSegment: Identifiable {
+    let id: String
+    let startDate: Date
+    let endDate: Date
+    let startValue: Double
+    let endValue: Double
+    let color: Color
+}
+
+private struct SensorNoiseChartData {
+    let points: [SensorNoiseHistoryPoint]
+    let domain: ClosedRange<Date>
+    let yMaximum: Double
+    let elevatedThreshold: Double
+    let veryHighThreshold: Double
+    let extremeThreshold: Double
+    let isMgDl: Bool
+    let shortSegments: [SensorNoiseChartSegment]
+    let longSegments: [SensorNoiseChartSegment]
+    let xAxisDates: [Date]?
+
+    /// Prepares only the selected time range and reduces its render cost without bridging data gaps.
+    init(snapshot: SensorNoiseHistorySnapshot, range: SensorNoiseHistoryRange, isMgDl: Bool) {
+        self.isMgDl = isMgDl
+
+        let latestPointDate = snapshot.points.last?.timeStamp ?? snapshot.sensorStartDate
+        let proposedEndDate = snapshot.sensorEndDate ?? max(Date(), latestPointDate)
+        let endDate = max(proposedEndDate, snapshot.sensorStartDate.addingTimeInterval(60))
+        let proposedStartDate = range.duration.map { endDate.addingTimeInterval(-$0) } ?? snapshot.sensorStartDate
+        let startDate = max(snapshot.sensorStartDate, proposedStartDate)
+        domain = startDate ... endDate
+        xAxisDates = range == .day ? Self.hourlyXAxisDates(from: startDate, to: endDate) : nil
+
+        let visiblePoints = snapshot.points.filter { $0.timeStamp >= startDate && $0.timeStamp <= endDate }
+        let contiguousGroups = Self.contiguousGroups(visiblePoints)
+        let bucketsPerGroup = max(12, 180 / max(contiguousGroups.count, 1))
+        let displayGroups = contiguousGroups.map { Self.downsample($0, maximumBuckets: bucketsPerGroup) }
+        points = displayGroups.flatMap { $0 }
+
+        elevatedThreshold = ConstantsSensorNoise.elevatedNoiseStandardDeviation.mgDlToMmol(mgDl: isMgDl)
+        veryHighThreshold = ConstantsSensorNoise.veryHighNoiseStandardDeviation.mgDlToMmol(mgDl: isMgDl)
+        extremeThreshold = ConstantsSensorNoise.extremeNoiseStandardDeviation.mgDlToMmol(mgDl: isMgDl)
+
+        let largestObservedValue = points.flatMap { point in
+            [point.shortTermNoise, point.longTermNoise].compactMap { $0 }
+        }
+        .max()?
+        .mgDlToMmol(mgDl: isMgDl) ?? 0
+        yMaximum = max(extremeThreshold * 1.16, largestObservedValue * 1.12)
+
+        shortSegments = Self.segments(pointGroups: displayGroups, isLongTerm: false, isMgDl: isMgDl)
+        longSegments = Self.segments(pointGroups: displayGroups, isLongTerm: true, isMgDl: isMgDl)
+    }
+
+    var thresholds: [Double] {
+        [elevatedThreshold, veryHighThreshold, extremeThreshold]
+    }
+
+    var xAxisMarkCount: Int {
+        domain.upperBound.timeIntervalSince(domain.lowerBound) > 3 * 24 * 60 * 60 ? 4 : 5
+    }
+
+    func displayValue(_ noiseInMgDl: Double) -> Double {
+        noiseInMgDl.mgDlToMmol(mgDl: isMgDl)
+    }
+
+    func nearestPoint(to date: Date) -> SensorNoiseHistoryPoint? {
+        points.min { first, second in
+            abs(first.timeStamp.timeIntervalSince(date)) < abs(second.timeStamp.timeIntervalSince(date))
+        }
+    }
+
+    /// Uses hour labels for short ranges and compact calendar dates for longer ranges.
+    func xAxisLabel(for date: Date) -> String {
+        if domain.upperBound.timeIntervalSince(domain.lowerBound) <= 24 * 60 * 60 {
+            return date.formatted(.dateTime.hour())
+        }
+
+        if domain.upperBound.timeIntervalSince(domain.lowerBound) >= 2 * 24 * 60 * 60 {
+            return date.formatted(.dateTime.day().month(.abbreviated))
+        }
+
+        return date.formatted(.dateTime.hour().minute())
+    }
+
+    func yAxisLabel(for value: Double) -> String {
+        isMgDl
+            ? value.formatted(.number.precision(.fractionLength(0)))
+            : value.formatted(.number.precision(.fractionLength(1)))
+    }
+
+    /// Returns stable four-hour marks for the 24-hour view instead of shifting automatic labels.
+    private static func hourlyXAxisDates(from startDate: Date, to endDate: Date) -> [Date] {
+        let calendar = Calendar.current
+        let startComponents = calendar.dateComponents([.year, .month, .day, .hour], from: startDate)
+
+        guard var date = calendar.date(from: startComponents) else { return [] }
+
+        if date <= startDate, let nextHour = calendar.date(byAdding: .hour, value: 1, to: date) {
+            date = nextHour
+        }
+
+        var dates = [Date]()
+
+        while date < endDate {
+            if calendar.component(.hour, from: date) % 4 == 0 {
+                dates.append(date)
+            }
+
+            guard let nextHour = calendar.date(byAdding: .hour, value: 1, to: date), nextHour > date else {
+                break
+            }
+
+            date = nextHour
+        }
+
+        return dates
+    }
+
+    /// Builds independently colored line segments for one measurement window.
+    private static func segments(
+        pointGroups: [[SensorNoiseHistoryPoint]],
+        isLongTerm: Bool,
+        isMgDl: Bool
+    ) -> [SensorNoiseChartSegment] {
+        var segmentIndex = 0
+        var result = [SensorNoiseChartSegment]()
+
+        for points in pointGroups where points.count > 1 {
+            for pair in zip(points, points.dropFirst()) {
+                defer { segmentIndex += 1 }
+
+                let startNoise = isLongTerm ? pair.0.longTermNoise : pair.0.shortTermNoise
+                let endNoise = isLongTerm ? pair.1.longTermNoise : pair.1.shortTermNoise
+                guard let startNoise, let endNoise else { continue }
+
+                let state: SensorNoiseState
+                if pair.0.state == .flatlineSuspected || pair.1.state == .flatlineSuspected {
+                    state = .flatlineSuspected
+                } else {
+                    state = ConstantsSensorNoise.state(for: max(startNoise, endNoise))
+                }
+
+                result.append(
+                    SensorNoiseChartSegment(
+                        id: (isLongTerm ? "long-" : "short-") + String(segmentIndex),
+                        startDate: pair.0.timeStamp,
+                        endDate: pair.1.timeStamp,
+                        startValue: startNoise.mgDlToMmol(mgDl: isMgDl),
+                        endValue: endNoise.mgDlToMmol(mgDl: isMgDl),
+                        color: state.displayColor
+                    )
+                )
+            }
+        }
+
+        return result
+    }
+
+    /// Splits points at missing-reading gaps so the chart never draws a misleading connecting line.
+    private static func contiguousGroups(_ points: [SensorNoiseHistoryPoint]) -> [[SensorNoiseHistoryPoint]] {
+        guard let firstPoint = points.first else { return [] }
+
+        var groups = [[firstPoint]]
+
+        for point in points.dropFirst() {
+            guard let previousPoint = groups.last?.last else { continue }
+
+            if point.timeStamp.timeIntervalSince(previousPoint.timeStamp) > ConstantsSensorNoise.maximumGap {
+                groups.append([point])
+            } else {
+                groups[groups.count - 1].append(point)
+            }
+        }
+
+        return groups
+    }
+
+    /// Reduces rendering cost while preserving endpoints and the largest values in each bucket.
+    private static func downsample(
+        _ points: [SensorNoiseHistoryPoint],
+        maximumBuckets: Int
+    ) -> [SensorNoiseHistoryPoint] {
+        guard points.count > maximumBuckets * 4 else { return points }
+
+        let bucketSize = Int(ceil(Double(points.count) / Double(maximumBuckets)))
+        var reduced = [SensorNoiseHistoryPoint]()
+        reduced.reserveCapacity(maximumBuckets * 4)
+
+        for bucketStart in stride(from: 0, to: points.count, by: bucketSize) {
+            let bucketEnd = min(bucketStart + bucketSize, points.count)
+            let bucket = Array(points[bucketStart ..< bucketEnd])
+            var candidates = [bucket.first, bucket.last]
+            candidates.append(bucket.max { ($0.shortTermNoise ?? -1) < ($1.shortTermNoise ?? -1) })
+            candidates.append(bucket.max { ($0.longTermNoise ?? -1) < ($1.longTermNoise ?? -1) })
+
+            let uniqueCandidates = candidates.compactMap { $0 }.reduce(into: [String: SensorNoiseHistoryPoint]()) {
+                $0[$1.id] = $1
+            }
+            reduced.append(contentsOf: uniqueCandidates.values.sorted { $0.timeStamp < $1.timeStamp })
+        }
+
+        return reduced.sorted { $0.timeStamp < $1.timeStamp }
+    }
+}
+
+// MARK: - display helpers
+
+extension SensorNoiseState {
+    var localizedTitle: String {
+        switch self {
+        case .collecting:
+            return Texts_HomeView.sensorManagementNoiseCollecting
+        case .low:
+            return Texts_HomeView.sensorManagementNoiseLow
+        case .elevated:
+            return Texts_HomeView.sensorManagementNoiseElevated
+        case .veryHigh:
+            return Texts_HomeView.sensorManagementNoiseVeryHigh
+        case .extreme:
+            return Texts_HomeView.sensorManagementNoiseExtreme
+        case .flatlineSuspected:
+            return Texts_HomeView.sensorNoiseWarningFlatlineTitle
+        }
+    }
+
+    var displayColor: Color {
+        switch self {
+        case .collecting:
+            return Color(.systemGray)
+        case .low:
+            return ConstantsAppColors.normal
+        case .elevated:
+            return ConstantsAppColors.warning
+        case .veryHigh:
+            return ConstantsAppColors.caution
+        case .extreme, .flatlineSuspected:
+            return ConstantsAppColors.urgent
+        }
+    }
+}

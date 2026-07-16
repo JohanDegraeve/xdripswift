@@ -58,6 +58,7 @@ struct RootTabDependencies {
     let treatmentEntryAccessor: TreatmentEntryAccessor
     let alertManager: AlertManager
     let bgPostProcessingManager: BgPostProcessingManager
+    let sensorNoiseManager: SensorNoiseManager
     let bluetoothPeripheralManager: BluetoothPeripheralManaging
     let soundPlayer: SoundPlayer
     let nightscoutSyncManager: NightscoutSyncManager
@@ -230,6 +231,7 @@ struct RootTabDependencies {
         treatmentEntryAccessor: TreatmentEntryAccessor,
         alertManager: AlertManager,
         bgPostProcessingManager: BgPostProcessingManager,
+        sensorNoiseManager: SensorNoiseManager,
         bluetoothPeripheralManager: BluetoothPeripheralManaging,
         soundPlayer: SoundPlayer,
         nightscoutSyncManager: NightscoutSyncManager,
@@ -251,6 +253,7 @@ struct RootTabDependencies {
             treatmentEntryAccessor: treatmentEntryAccessor,
             alertManager: alertManager,
             bgPostProcessingManager: bgPostProcessingManager,
+            sensorNoiseManager: sensorNoiseManager,
             bluetoothPeripheralManager: bluetoothPeripheralManager,
             soundPlayer: soundPlayer,
             nightscoutSyncManager: nightscoutSyncManager,
@@ -591,6 +594,7 @@ private struct RootHomeTabView: View {
                     transmitterProvider: dependencies.transmitterProvider,
                     calibrationsAccessor: dependencies.calibrationsAccessor,
                     bgReadingsAccessor: dependencies.bgReadingsAccessor,
+                    sensorNoiseManager: dependencies.sensorNoiseManager,
                     onStartSensor: dependencies.startSensor,
                     onStopSensor: dependencies.stopSensor,
                     onSubmitCalibration: dependencies.submitCalibration
