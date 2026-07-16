@@ -172,6 +172,10 @@ struct RootTabDependencies {
 
     /// Copies a document supplied by iOS before handing it to the restore workflow.
     func receiveIncomingBackup(_ sourceURL: URL) {
+        // The Live Activity uses xdripswift://open only to bring the app to the foreground.
+        guard sourceURL.isFileURL,
+              sourceURL.pathExtension.caseInsensitiveCompare("xdripbackup") == .orderedSame else { return }
+
         guard !isPreparingIncomingBackup else { return }
 
         isPreparingIncomingBackup = true
