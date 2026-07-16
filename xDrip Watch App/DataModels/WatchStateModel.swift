@@ -13,6 +13,48 @@ import SwiftUI
 import WatchConnectivity
 import WidgetKit
 
+/// sensor noise states received from the paired iPhone
+private enum WatchSensorNoiseState: Int {
+    case collecting = 0
+    case low = 1
+    case elevated = 2
+    case veryHigh = 3
+    case extreme = 4
+    case flatlineSuspected = 5
+
+    var color: Color {
+        switch self {
+        case .collecting:
+            return .gray
+        case .low:
+            return .green
+        case .elevated:
+            return .yellow
+        case .veryHigh:
+            return .orange
+        case .extreme, .flatlineSuspected:
+            return .red
+        }
+    }
+
+    var localizedTitle: String {
+        switch self {
+        case .collecting:
+            return Texts_HomeView.sensorManagementNoiseCollecting
+        case .low:
+            return Texts_HomeView.sensorManagementNoiseLow
+        case .elevated:
+            return Texts_HomeView.sensorManagementNoiseElevated
+        case .veryHigh:
+            return Texts_HomeView.sensorManagementNoiseVeryHigh
+        case .extreme:
+            return Texts_HomeView.sensorManagementNoiseExtreme
+        case .flatlineSuspected:
+            return Texts_HomeView.sensorNoiseWarningFlatlineTitle
+        }
+    }
+}
+
 /// holds, the watch state and allows updates and computed properties/variables to be generated for the different views that use it
 /// also used to update the ComplicationSharedUserDefaultsModel in the app group so that the complication can access the data
 final class WatchStateModel: NSObject, ObservableObject {
@@ -42,6 +84,7 @@ final class WatchStateModel: NSObject, ObservableObject {
     @Published var sensorAgeInMinutes: Double = 0
     @Published var sensorMaxAgeInMinutes: Double = 14400
     @Published var preferSensorCountdown: Bool = false
+    @Published var sensorNoiseStateRawValue: Int?
     @Published var timeStampOfLastFollowerConnection: Date = .now
     @Published var secondsUntilFollowerDisconnectWarning: Int = 60 * 6
     @Published var timeStampOfLastHeartBeat: Date = .now
@@ -258,6 +301,24 @@ final class WatchStateModel: NSObject, ObservableObject {
     func activeSensorLifetimeText() -> String {
         let lifetimeInMinutes = preferSensorCountdown ? max(sensorMaxAgeInMinutes - sensorAgeInMinutes, 0) : sensorAgeInMinutes
         return lifetimeInMinutes.minutesToDaysAndHours()
+    }
+
+    /// returns the sensor noise indicator color supplied by the paired iPhone
+    func sensorNoiseIndicatorColor() -> Color? {
+        sensorNoiseState()?.color
+    }
+
+    /// returns an accessible description of the current sensor noise state
+    func sensorNoiseIndicatorAccessibilityLabel() -> String {
+        guard let sensorNoiseState = sensorNoiseState() else { return "" }
+
+        return Texts_HomeView.sensorManagementNoiseTitle + ": " + sensorNoiseState.localizedTitle
+    }
+
+    private func sensorNoiseState() -> WatchSensorNoiseState? {
+        guard isMaster, let sensorNoiseStateRawValue else { return nil }
+
+        return WatchSensorNoiseState(rawValue: sensorNoiseStateRawValue)
     }
 
     /// check when the last follower connection was and compare that to the actual time
@@ -483,6 +544,7 @@ final class WatchStateModel: NSObject, ObservableObject {
         sensorAgeInMinutes = dictionary["sensorAgeInMinutes"] as? Double ?? 0
         sensorMaxAgeInMinutes = dictionary["sensorMaxAgeInMinutes"] as? Double ?? 0
         preferSensorCountdown = dictionary["preferSensorCountdown"] as? Bool ?? false
+        sensorNoiseStateRawValue = dictionary["sensorNoiseStateRawValue"] as? Int
         isMaster = dictionary["isMaster"] as? Bool ?? true
         followerDataSourceType = FollowerDataSourceType(rawValue: dictionary["followerDataSourceTypeRawValue"] as? Int ?? 0) ?? .nightscout
         followerBackgroundKeepAliveType = FollowerBackgroundKeepAliveType(rawValue: dictionary["followerBackgroundKeepAliveTypeRawValue"] as? Int ?? 0) ?? .normal

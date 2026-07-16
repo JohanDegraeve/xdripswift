@@ -51,8 +51,21 @@ struct MainViewDataSourceView: View {
                                 .minimumScaleFactor(0.2)
                         }
                     } else {
-                        Text(watchState.activeSensorDescription)
-                            .font(.system(size: textSize)).fontWeight(.semibold)
+                        HStack(alignment: .center, spacing: isSmallScreen ? 2 : 4) {
+                            if let sensorNoiseIndicatorColor = watchState.sensorNoiseIndicatorColor() {
+                                Circle()
+                                    .fill(sensorNoiseIndicatorColor)
+                                    .frame(width: 8, height: 8)
+                                    .overlay {
+                                        Circle()
+                                            .stroke(sensorNoiseIndicatorColor.opacity(0.35), lineWidth: 3)
+                                    }
+                                    .accessibilityLabel(watchState.sensorNoiseIndicatorAccessibilityLabel())
+                            }
+
+                            Text(watchState.activeSensorDescription)
+                                .font(.system(size: textSize)).fontWeight(.semibold)
+                        }
                     }
                     
                     Spacer()

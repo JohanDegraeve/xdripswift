@@ -24,6 +24,9 @@ final class WatchManager: NSObject, ObservableObject {
     /// a BgReadingsAccessor instance
     private var bgReadingsAccessor: BgReadingsAccessor
 
+    /// a SensorsAccessor instance
+    private var sensorsAccessor: SensorsAccessor
+
     /// a coreDataManager instance (must be passed from RVC in the initializer)
     private var coreDataManager: CoreDataManager
 
@@ -48,6 +51,7 @@ final class WatchManager: NSObject, ObservableObject {
         // set coreDataManager and bgReadingsAccessor
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
+        self.sensorsAccessor = SensorsAccessor(coreDataManager: coreDataManager)
         self.nightscoutSyncManager = nightscoutSyncManager
 
         self.session = session
@@ -188,6 +192,19 @@ final class WatchManager: NSObject, ObservableObject {
         }
 
         status.sensorMaxAgeInMinutes = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
+
+        if status.isMaster,
+           let activeSensor = sensorsAccessor.fetchActiveSensor(),
+           activeSensor.noiseAlgorithmVersion == ConstantsSensorNoise.algorithmVersion,
+           let latestReadingAt = activeSensor.noiseLatestReadingAt {
+            let readingAge = Date().timeIntervalSince(latestReadingAt)
+
+            if readingAge >= -TimeInterval(minutes: 5),
+               readingAge <= ConstantsSensorNoise.rootWarningFreshness {
+                let sensorNoiseState = SensorNoiseState(rawValue: activeSensor.noiseStateRaw) ?? .collecting
+                status.sensorNoiseStateRawValue = Int(sensorNoiseState.rawValue)
+            }
+        }
 
         // let's set the state values if we're using a heartbeat
         if let timeStampOfLastHeartBeat = UserDefaults.standard.timeStampOfLastHeartBeat?.timeIntervalSince1970, let secondsUntilHeartBeatDisconnectWarning = UserDefaults.standard.secondsUntilHeartBeatDisconnectWarning {
