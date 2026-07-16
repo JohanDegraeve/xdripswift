@@ -295,7 +295,12 @@ struct RootHomeView: View {
                         }
 
                         if state.visibility.showsDataSource {
-                            RootHomeDataSourceView(state: state.dataSource, sensorState: state.sensor, action: actions.hideFollowerUrl)
+                            RootHomeDataSourceView(
+                                state: state.dataSource,
+                                sensorState: state.sensor,
+                                sensorNoiseState: state.sensorNoise,
+                                action: actions.hideFollowerUrl
+                            )
                                 .frame(height: Layout.dataSourceHeight)
                         }
                     }
@@ -1323,6 +1328,7 @@ private struct RootHomeSensorLifetimeView: View {
 private struct RootHomeDataSourceView: View {
     let state: RootHomeDataSourceState
     let sensorState: RootHomeSensorState
+    let sensorNoiseState: RootHomeSensorNoiseState
     let action: () -> Void
 
     var body: some View {
@@ -1333,6 +1339,17 @@ private struct RootHomeDataSourceView: View {
 //                        .font(.system(size: 15))
 //                        .foregroundStyle(state.keepAliveColor)
 //                }
+
+                if sensorNoiseState.showsIndicator {
+                    Circle()
+                        .fill(sensorNoiseState.indicatorColor)
+                        .frame(width: 8, height: 8)
+                        .overlay {
+                            Circle()
+                                .stroke(sensorNoiseState.indicatorColor.opacity(0.35), lineWidth: 3)
+                        }
+                        .accessibilityLabel(sensorNoiseState.indicatorAccessibilityLabel)
+                }
 
                 if state.showsConnectionIcon {
                     Circle()

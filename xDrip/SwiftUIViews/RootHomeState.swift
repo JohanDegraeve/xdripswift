@@ -100,8 +100,11 @@ struct RootHomeSensorState {
     var countsDown = false
 }
 
-/// Actionable sensor-noise warning shown only for fresh master-mode readings.
+/// Current sensor-noise indicator and actionable warning for fresh master-mode readings.
 struct RootHomeSensorNoiseState {
+    var showsIndicator = false
+    var indicatorColor = ConstantsAppColors.secondaryText
+    var indicatorAccessibilityLabel = ""
     var showsWarning = false
     var title = ""
     var detail = ""
@@ -612,38 +615,41 @@ final class RootHomeStateModel: ObservableObject {
         }
 
         let persistedState = SensorNoiseState(rawValue: activeSensor.noiseStateRaw) ?? .collecting
+        var state = RootHomeSensorNoiseState(
+            showsIndicator: true,
+            indicatorColor: persistedState.displayColor,
+            indicatorAccessibilityLabel: Texts_HomeView.sensorManagementNoiseTitle + ": " + persistedState.localizedTitle
+        )
+
         if persistedState == .flatlineSuspected {
-            return RootHomeSensorNoiseState(
-                showsWarning: true,
-                title: Texts_HomeView.sensorNoiseWarningFlatlineTitle,
-                detail: Texts_HomeView.sensorManagementNoiseFlatline,
-                color: ConstantsAppColors.urgent
-            )
+            state.showsWarning = true
+            state.title = Texts_HomeView.sensorNoiseWarningFlatlineTitle
+            state.detail = Texts_HomeView.sensorManagementNoiseFlatline
+            state.color = ConstantsAppColors.urgent
+            return state
         }
 
         if let shortTermNoise = activeSensor.shortTermNoise?.doubleValue,
            shortTermNoise > ConstantsSensorNoise.extremeNoiseStandardDeviation {
-            return RootHomeSensorNoiseState(
-                showsWarning: true,
-                title: Texts_HomeView.sensorNoiseWarningExtremeTitle,
-                detail: formattedNoise(shortTermNoise, windowTitle: Texts_HomeView.sensorManagementNoiseShortTerm),
-                color: ConstantsAppColors.urgent
-            )
+            state.showsWarning = true
+            state.title = Texts_HomeView.sensorNoiseWarningExtremeTitle
+            state.detail = formattedNoise(shortTermNoise, windowTitle: Texts_HomeView.sensorManagementNoiseShortTerm)
+            state.color = ConstantsAppColors.urgent
+            return state
         }
 
         if let longTermNoise = activeSensor.longTermNoise?.doubleValue,
            longTermNoise > ConstantsSensorNoise.veryHighNoiseStandardDeviation {
-            return RootHomeSensorNoiseState(
-                showsWarning: true,
-                title: Texts_HomeView.sensorNoiseWarningPersistentTitle,
-                detail: formattedNoise(longTermNoise, windowTitle: Texts_HomeView.sensorManagementNoiseLongTerm),
-                color: longTermNoise > ConstantsSensorNoise.extremeNoiseStandardDeviation
-                    ? ConstantsAppColors.urgent
-                    : ConstantsAppColors.caution
-            )
+            state.showsWarning = true
+            state.title = Texts_HomeView.sensorNoiseWarningPersistentTitle
+            state.detail = formattedNoise(longTermNoise, windowTitle: Texts_HomeView.sensorManagementNoiseLongTerm)
+            state.color = longTermNoise > ConstantsSensorNoise.extremeNoiseStandardDeviation
+                ? ConstantsAppColors.urgent
+                : ConstantsAppColors.caution
+            return state
         }
 
-        return RootHomeSensorNoiseState()
+        return state
     }
 
     private func formattedNoise(_ noiseInMgDl: Double, windowTitle: String) -> String {
