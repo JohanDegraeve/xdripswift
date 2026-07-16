@@ -389,8 +389,22 @@ public enum AlertKind: Int, CaseIterable {
             if !currentAlertEntry.alertType.enabled { return (false, nil, nil, nil) }
             
             // Create battery info similar to transmitter battery info
-            UIDevice.current.isBatteryMonitoringEnabled = true
-            let phoneBatteryLevel = Int(UIDevice.current.batteryLevel * 100)
+            let device = UIDevice.current
+            device.isBatteryMonitoringEnabled = true
+
+            // The user has already taken the required action when the phone is connected to power,
+            // so don't raise a low phone battery alert while it is charging or fully charged.
+            // https://developer.apple.com/documentation/uikit/uidevice/batterystate-swift.enum
+            if device.batteryState == .charging || device.batteryState == .full {
+                return (false, nil, nil, nil)
+            }
+
+            // Apple returns a negative battery level when the value is unavailable. Ignore it to
+            // avoid incorrectly treating an unknown level as an extremely low battery.
+            let batteryLevel = device.batteryLevel
+            guard batteryLevel >= 0 else { return (false, nil, nil, nil) }
+
+            let phoneBatteryLevel = Int(batteryLevel * 100)
             
             // Check if battery level is below threshold, similar to transmitter check
             if currentAlertEntry.value > phoneBatteryLevel {
