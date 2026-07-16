@@ -138,7 +138,7 @@ enum ConstantsBgSmoothing {
         case 2:
             baseAlpha = 0.2
         default:
-            baseAlpha = 0.28
+            baseAlpha = 0.34
         }
 
         return isFastCadence ? baseAlpha * 0.85 : baseAlpha
@@ -151,7 +151,7 @@ enum ConstantsBgSmoothing {
         case 2:
             return isFastCadence ? 3 : 2
         default:
-            return 2
+            return isFastCadence ? 2 : 1
         }
     }
 
