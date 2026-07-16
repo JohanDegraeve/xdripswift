@@ -169,11 +169,14 @@ class NightscoutFollowManager: NSObject {
             return
         }
         
-        // calculate count, which is a parameter in the nightscout API - divide by 300, we're assuming readings every 5 minutes = 300 seconds
-        let count = Int(-timeStampOfFirstBgReadingToDowload.timeIntervalSinceNow / 300 + 1)
+        // use the fastest supported Nightscout upload cadence for the count upper bound so frequent Libre readings cannot be truncated
+        // also use the last local timestamp as a server-side lower bound because the follower and uploader frequency settings may differ
+        let minimumTimeBetweenTwoReadingsInSeconds = ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutesFrequentUploads * 60.0
+        let backfillTimeInterval = max(0.0, -timeStampOfFirstBgReadingToDowload.timeIntervalSinceNow)
+        let count = Int(ceil(backfillTimeInterval / minimumTimeBetweenTwoReadingsInSeconds)) + 1
         
         // ceate endpoint to get latest entries
-        let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightscoutUrl, count: count, token: UserDefaults.standard.nightscoutToken)
+        let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightscoutUrl, count: count, minimumTimeStamp: timeStampOfFirstBgReadingToDowload, token: UserDefaults.standard.nightscoutToken)
         
         // create downloadTask and start download
         if let url = latestEntriesEndpoint.url {
