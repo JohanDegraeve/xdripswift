@@ -334,7 +334,6 @@ final class RootHomeStateModel: ObservableObject {
 
         let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
         let isStale = latestReading.timeStamp < Date(timeIntervalSinceNow: -60 * 11)
-        let value = latestReading.finalValue.bgValueRounded(mgDl: isMgDl)
         var valueText = latestReading.unitizedString(unitIsMgDl: isMgDl)
 
         if !isStale && !latestReading.hideSlope {
@@ -344,12 +343,17 @@ final class RootHomeStateModel: ObservableObject {
         let valueColor: Color
         if isStale {
             valueColor = ConstantsAppColors.disabledText
-        } else if value >= UserDefaults.standard.urgentHighMarkValueInUserChosenUnit || value <= UserDefaults.standard.urgentLowMarkValueInUserChosenUnit {
-            valueColor = ConstantsAppColors.urgent
-        } else if value >= UserDefaults.standard.highMarkValueInUserChosenUnit || value <= UserDefaults.standard.lowMarkValueInUserChosenUnit {
-            valueColor = ConstantsAppColors.warning
         } else {
-            valueColor = ConstantsAppColors.normal
+            // Keep range classification in one place so the reading and thresholds are always
+            // compared in the same unit before the Home view maps the result to presentation colors.
+            switch latestReading.bgRangeDescription() {
+            case .urgent:
+                valueColor = ConstantsAppColors.urgent
+            case .notUrgent:
+                valueColor = ConstantsAppColors.warning
+            case .inRange:
+                valueColor = ConstantsAppColors.normal
+            }
         }
 
         let minutesAgo = max(0, -Int(latestReading.timeStamp.timeIntervalSinceNow) / 60)
