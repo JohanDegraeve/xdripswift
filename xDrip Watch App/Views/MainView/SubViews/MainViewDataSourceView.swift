@@ -100,7 +100,7 @@ struct MainViewDataSourceView: View {
                 }
         }
         .frame(height: 5)
-        .padding(.horizontal, 10)
+        .padding(.vertical, 2)
     }
 }
 

@@ -1320,7 +1320,6 @@ private struct RootHomeSensorLifetimeView: View {
                 }
                 .frame(maxHeight: .infinity, alignment: .center)
         }
-        .padding(.horizontal, 10)
     }
 }
 
