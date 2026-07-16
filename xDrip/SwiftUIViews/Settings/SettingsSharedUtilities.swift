@@ -706,33 +706,36 @@ private struct SettingsNativeSectionView: View {
         section.rows.filter(\.isVisible)
     }
 
+    @ViewBuilder
     var body: some View {
-        Section {
-            ForEach(visibleRows) { row in
-                SettingsNativeRowView(
-                    sectionID: sectionID,
-                    row: row,
-                    presenter: presenter,
-                    reload: reload
-                )
-            }
-        } header: {
-            if showsSectionHeader, let title = section.title {
-                HStack(spacing: 6) {
-                    if let iconSymbolName = section.iconSymbolName {
-                        Image(systemName: iconSymbolName)
-                            .foregroundStyle(ConstantsUI.settingsSectionHeaderIconColor)
-                    }
-
-                    Text(title)
-                        .foregroundStyle(ConstantsUI.tableViewHeaderTextColor)
+        if !visibleRows.isEmpty {
+            Section {
+                ForEach(visibleRows) { row in
+                    SettingsNativeRowView(
+                        sectionID: sectionID,
+                        row: row,
+                        presenter: presenter,
+                        reload: reload
+                    )
                 }
-            }
-        } footer: {
-            if let footer = section.footer {
-                Text(footer)
-                    .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
-                    .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
+            } header: {
+                if showsSectionHeader, let title = section.title {
+                    HStack(spacing: 6) {
+                        if let iconSymbolName = section.iconSymbolName {
+                            Image(systemName: iconSymbolName)
+                                .foregroundStyle(ConstantsUI.settingsSectionHeaderIconColor)
+                        }
+
+                        Text(title)
+                            .foregroundStyle(ConstantsUI.tableViewHeaderTextColor)
+                    }
+                }
+            } footer: {
+                if let footer = section.footer {
+                    Text(footer)
+                        .foregroundStyle(ConstantsUI.listSectionFooterTextColor)
+                        .padding(.bottom, ConstantsUI.listSectionFooterBottomPadding)
+                }
             }
         }
     }
