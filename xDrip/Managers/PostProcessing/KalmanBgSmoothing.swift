@@ -2,7 +2,7 @@
 //  KalmanBgSmoothing.swift
 //  xdrip
 //
-//  Created by Codex on 16/7/26.
+//  Created by Paul Plant on 16/7/26.
 //  Copyright © 2026 Johan Degraeve. All rights reserved.
 //
 
@@ -17,6 +17,14 @@ import Foundation
 /// - It is intentionally not labeled as an AAPS or Trio port, because the code
 ///   here was written to fit xDrip's current post-processing contract rather
 ///   than copied from those projects.
+///
+/// Algorithm references:
+/// - Original paper:
+///   Kalman, "A New Approach to Linear Filtering and Prediction Problems"
+///   (recursive state estimate plus covariance update).
+///   http://www.cs.unc.edu/~welch/kalman/media/pdf/Kalman1960.pdf
+/// - General overview:
+///   https://en.wikipedia.org/wiki/Kalman_filter
 struct KalmanBgSmoothing: BgSmoothingAlgorithmPlugin {
     func smoothedValues(values: [Double], readingDates: [Date], smoothingStrength: Int, support: BgSmoothingSupport) -> [Double] {
         guard values.count >= ConstantsBgSmoothing.minimumReadingsForSmoothing else { return values }

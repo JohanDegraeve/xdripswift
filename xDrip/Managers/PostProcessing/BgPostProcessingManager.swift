@@ -31,6 +31,8 @@ class BgPostProcessingManager {
 
     /// for logging
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataBgReadings)
+    private var lastAutomaticSmoothingTraceAt: Date?
+    private var lastAutomaticSmoothingTraceSignature: String?
 
     private let coreDataManager: CoreDataManager
     private let bgReadingsAccessor: BgReadingsAccessor
@@ -38,6 +40,8 @@ class BgPostProcessingManager {
     private let treatmentEntryAccessor: TreatmentEntryAccessor
     private let bLEPeripheralAccessor: BLEPeripheralAccessor
     private let sensorsAccessor: SensorsAccessor
+
+    private static let automaticSmoothingTraceInterval: TimeInterval = .minutes(30)
 
     private weak var nightscoutSyncManager: NightscoutSyncManager?
     private weak var healthKitManager: HealthKitManager?
@@ -620,6 +624,8 @@ class BgPostProcessingManager {
             bgReading.smoothedValue = nil
         }
 
+        traceAutomaticSmoothingConfigurationIfNeeded(bgReadings: readingsToSmooth)
+
         let inputValues = readingsToSmooth.map { valueToSmooth(bgReading: $0) }
         let smoothedValues = smoothedValuesSeparatedByReadingGap(values: inputValues, readingDates: readingsToSmooth.map { $0.timeStamp }, smoothingStrength: UserDefaults.standard.bgSmoothingStrength)
 
@@ -777,6 +783,42 @@ class BgPostProcessingManager {
         }
 
         return groupedSmoothedValues
+    }
+
+    private func traceAutomaticSmoothingConfigurationIfNeeded(bgReadings: [BgReading]) {
+        guard bgReadings.count >= ConstantsBgSmoothing.minimumReadingsForSmoothing else { return }
+
+        let smoothingAlgorithm = UserDefaults.standard.bgSmoothingAlgorithm
+        let smoothingStrength = UserDefaults.standard.bgSmoothingStrength
+        let isFastCadence = sourceCanUseFiveMinuteReadings(readingDates: bgReadings.map { $0.timeStamp })
+        let traceSignature = [
+            smoothingAlgorithm.rawValue,
+            String(smoothingStrength),
+            isFastCadence.description,
+            UserDefaults.standard.useFiveMinuteReadings.description
+        ].joined(separator: "|")
+        let now = Date()
+        let shouldTraceBecauseConfigurationChanged = traceSignature != lastAutomaticSmoothingTraceSignature
+        let shouldTraceBecauseIntervalElapsed = lastAutomaticSmoothingTraceAt.map {
+            now.timeIntervalSince($0) >= Self.automaticSmoothingTraceInterval
+        } ?? true
+
+        guard shouldTraceBecauseConfigurationChanged || shouldTraceBecauseIntervalElapsed else { return }
+
+        trace(
+            "in recomputeSmoothedValues, automatic smoothing active. algorithm = %{public}@, strength = %{public}@, fast cadence = %{public}@, 5-minute readings = %{public}@, readings = %{public}@",
+            log: log,
+            category: ConstantsLog.categoryApplicationDataBgReadings,
+            type: .info,
+            smoothingAlgorithm.description,
+            smoothingStrengthDescription(smoothingStrength),
+            isFastCadence.description,
+            UserDefaults.standard.useFiveMinuteReadings.description,
+            bgReadings.count.description
+        )
+
+        lastAutomaticSmoothingTraceAt = now
+        lastAutomaticSmoothingTraceSignature = traceSignature
     }
 
     private func fastCadenceSmoothedValues(values: [Double], readingDates: [Date], smoothingStrength: Int) -> [Double] {

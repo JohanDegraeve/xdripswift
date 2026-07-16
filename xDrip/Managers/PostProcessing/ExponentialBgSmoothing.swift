@@ -2,7 +2,7 @@
 //  ExponentialBgSmoothing.swift
 //  xdrip
 //
-//  Created by Codex on 16/7/26.
+//  Created by Paul Plant on 16/7/26.
 //  Copyright © 2026 Johan Degraeve. All rights reserved.
 //
 
@@ -16,6 +16,14 @@ import Foundation
 /// - It is intentionally not labeled as an AAPS or Trio port, because the code
 ///   here was written to fit xDrip's current post-processing contract rather
 ///   than copied from those projects.
+///
+/// Algorithm references:
+/// - Background:
+///   Brown's simple exponential smoothing recursively applies
+///   s_t = alpha * x_t + (1 - alpha) * s_{t-1}.
+///   https://www.itl.nist.gov/div898/handbook/pmc/section4/pmc431.htm
+/// - General overview:
+///   https://en.wikipedia.org/wiki/Exponential_smoothing
 struct ExponentialBgSmoothing: BgSmoothingAlgorithmPlugin {
     func smoothedValues(values: [Double], readingDates: [Date], smoothingStrength: Int, support: BgSmoothingSupport) -> [Double] {
         guard values.count >= ConstantsBgSmoothing.minimumReadingsForSmoothing else { return values }
