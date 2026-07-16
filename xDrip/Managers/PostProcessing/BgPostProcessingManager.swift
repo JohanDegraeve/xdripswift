@@ -236,7 +236,7 @@ class BgPostProcessingManager {
     }
 
     func applyPostProcessing(enableAdjustment: Bool, slope: Double?, intercept: Double?, adjustmentShapeType: BgAdjustmentShapeType, applyFromTimeStamp: Date, isBasicAdjustment: Bool, enteredBgValue: Double?, sourceCalculatedValue: Double?, enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingPeriodInMinutes: Int, smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm = UserDefaults.standard.bgSmoothingAlgorithm, processingStartDateOverride: Date? = nil) {
-        trace("%{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, applyPostProcessingDescription(enableAdjustment: enableAdjustment, slope: slope, intercept: intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: applyFromTimeStamp, enteredBgValue: enteredBgValue, sourceCalculatedValue: sourceCalculatedValue, enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingStrength: smoothingStrength, processingStartDateOverride: processingStartDateOverride))
+        trace("%{public}@", log: log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .info, applyPostProcessingDescription(enableAdjustment: enableAdjustment, slope: slope, intercept: intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: applyFromTimeStamp, enteredBgValue: enteredBgValue, sourceCalculatedValue: sourceCalculatedValue, enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm, processingStartDateOverride: processingStartDateOverride))
 
         if enableAdjustment, let slope = slope, let intercept = intercept {
             createAdjustment(slope: slope, intercept: intercept, adjustmentShapeType: adjustmentShapeType, applyFromTimeStamp: applyFromTimeStamp, isBasicAdjustment: isBasicAdjustment, enteredBgValue: enteredBgValue, sourceCalculatedValue: sourceCalculatedValue)
@@ -315,7 +315,7 @@ class BgPostProcessingManager {
                 existingNote.uploaded = false
             }
 
-            let noteBody = postProcessingNoteText(enableAdjustment: enableAdjustment, slope: slope, intercept: intercept, adjustmentShapeType: adjustmentShapeType, appliedAtTimeStamp: appliedAtTimeStamp, enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingStrength: smoothingStrength)
+            let noteBody = postProcessingNoteText(enableAdjustment: enableAdjustment, slope: slope, intercept: intercept, adjustmentShapeType: adjustmentShapeType, appliedAtTimeStamp: appliedAtTimeStamp, enableSmoothing: enableSmoothing, useFiveMinuteReadings: useFiveMinuteReadings, smoothingStrength: smoothingStrength, smoothingAlgorithm: UserDefaults.standard.bgSmoothingAlgorithm)
             let newNote = TreatmentEntry(date: applyFromTimeStamp, value: 0, treatmentType: .Note, nightscoutEventType: ConstantsNightscout.noteEventType, enteredBy: appName, notes: noteBody, nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
 
             notesToDelete = existingNotes
@@ -329,15 +329,15 @@ class BgPostProcessingManager {
         }
     }
 
-    private func postProcessingNoteText(enableAdjustment: Bool, slope: Double?, intercept: Double?, adjustmentShapeType: BgAdjustmentShapeType, appliedAtTimeStamp: Date, enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingStrength: Int) -> String {
+    private func postProcessingNoteText(enableAdjustment: Bool, slope: Double?, intercept: Double?, adjustmentShapeType: BgAdjustmentShapeType, appliedAtTimeStamp: Date, enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm) -> String {
         var noteComponents = [String]()
 
         noteComponents.append(ConstantsNightscout.postProcessingNotePrefix)
 
         if enableAdjustment, let slope = slope, let intercept = intercept {
-            noteComponents.append("Adjustment: offset \(intercept.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes), scale \(slope.round(toDecimalPlaces: 2).stringWithoutTrailingZeroes), emphasis \(adjustmentShapeType.description). " + smoothingNoteText(enableSmoothing: enableSmoothing, smoothingStrength: smoothingStrength, useFiveMinuteReadings: useFiveMinuteReadings))
+            noteComponents.append("Adjustment: offset \(intercept.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes), scale \(slope.round(toDecimalPlaces: 2).stringWithoutTrailingZeroes), emphasis \(adjustmentShapeType.description). " + smoothingNoteText(enableSmoothing: enableSmoothing, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm, useFiveMinuteReadings: useFiveMinuteReadings))
         } else {
-            noteComponents.append("Adjustment: disabled. " + smoothingNoteText(enableSmoothing: enableSmoothing, smoothingStrength: smoothingStrength, useFiveMinuteReadings: useFiveMinuteReadings))
+            noteComponents.append("Adjustment: disabled. " + smoothingNoteText(enableSmoothing: enableSmoothing, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm, useFiveMinuteReadings: useFiveMinuteReadings))
         }
 
         noteComponents.append("Applied at \(appliedAtTimeStamp.toStringInUserLocale(timeStyle: .short, dateStyle: .short)).")
@@ -345,8 +345,8 @@ class BgPostProcessingManager {
         return noteComponents.joined(separator: "\n")
     }
 
-    private func smoothingNoteText(enableSmoothing: Bool, smoothingStrength: Int, useFiveMinuteReadings: Bool) -> String {
-        var noteText = enableSmoothing ? "Smoothing: \(smoothingStrengthDescription(smoothingStrength))." : "Smoothing: disabled."
+    private func smoothingNoteText(enableSmoothing: Bool, smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm, useFiveMinuteReadings: Bool) -> String {
+        var noteText = enableSmoothing ? "Smoothing: \(smoothingAlgorithm.description), \(smoothingStrengthDescription(smoothingStrength))." : "Smoothing: disabled."
 
         if useFiveMinuteReadings {
             noteText += " 5-minute readings: enabled."
@@ -415,7 +415,7 @@ class BgPostProcessingManager {
 
     // MARK: - private functions
 
-    private func applyPostProcessingDescription(enableAdjustment: Bool, slope: Double?, intercept: Double?, adjustmentShapeType: BgAdjustmentShapeType, applyFromTimeStamp: Date, enteredBgValue: Double?, sourceCalculatedValue: Double?, enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingStrength: Int, processingStartDateOverride: Date?) -> String {
+    private func applyPostProcessingDescription(enableAdjustment: Bool, slope: Double?, intercept: Double?, adjustmentShapeType: BgAdjustmentShapeType, applyFromTimeStamp: Date, enteredBgValue: Double?, sourceCalculatedValue: Double?, enableSmoothing: Bool, useFiveMinuteReadings: Bool, smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm, processingStartDateOverride: Date?) -> String {
         var description = "in applyPostProcessing, user has chosen to apply from " + applyFromDescription(applyFromTimeStamp: applyFromTimeStamp, processingStartDateOverride: processingStartDateOverride) + "."
 
         if enableAdjustment, let intercept = intercept {
@@ -438,7 +438,7 @@ class BgPostProcessingManager {
         }
 
         if enableSmoothing {
-            description += " Smoothing applied with " + smoothingStrengthDescription(smoothingStrength).lowercased() + " strength."
+            description += " Smoothing applied with " + smoothingAlgorithm.description + " using " + smoothingStrengthDescription(smoothingStrength).lowercased() + " strength."
         } else {
             description += " Smoothing is not enabled."
         }
@@ -769,7 +769,7 @@ class BgPostProcessingManager {
 
             let contiguousValues = contiguousReadingIndexes.map { values[$0] }
             let contiguousReadingDates = contiguousReadingIndexes.map { readingDates[$0] }
-            let smoothedValues = cadenceAwareSmoothedValues(values: contiguousValues, readingDates: contiguousReadingDates, smoothingStrength: smoothingStrength, smoothingAlgorithm: smoothingAlgorithm)
+            let smoothedValues = smoothingAlgorithm.plugin.smoothedValues(values: contiguousValues, readingDates: contiguousReadingDates, smoothingStrength: smoothingStrength, support: smoothingSupport())
 
             for (segmentIndex, readingIndex) in contiguousReadingIndexes.enumerated() {
                 groupedSmoothedValues[readingIndex] = smoothedValues[segmentIndex]
@@ -777,19 +777,6 @@ class BgPostProcessingManager {
         }
 
         return groupedSmoothedValues
-    }
-
-    private func cadenceAwareSmoothedValues(values: [Double], readingDates: [Date], smoothingStrength: Int, smoothingAlgorithm: BgSmoothingAlgorithm) -> [Double] {
-        guard values.count == readingDates.count else { return values }
-
-        switch smoothingAlgorithm {
-        case .savitzkyGolay:
-            if sourceCanUseFiveMinuteReadings(readingDates: readingDates) {
-                return fastCadenceSmoothedValues(values: values, readingDates: readingDates, smoothingStrength: smoothingStrength)
-            }
-
-            return savitzkyGolaySmoothedValues(values: values, smoothingStrength: smoothingStrength)
-        }
     }
 
     private func fastCadenceSmoothedValues(values: [Double], readingDates: [Date], smoothingStrength: Int) -> [Double] {
@@ -822,6 +809,14 @@ class BgPostProcessingManager {
         let smoothedValues = savitzkyGolayFilteredValues(values: values, filterWidth: ConstantsBgSmoothing.filterWidth(forSmoothingStrength: smoothingStrength))
 
         return clampedMostRecentSmoothedValues(inputValues: values, smoothedValues: smoothedValues, smoothingStrength: smoothingStrength)
+    }
+
+    private func savitzkyGolayStyleSmoothedValues(values: [Double], readingDates: [Date], smoothingStrength: Int) -> [Double] {
+        if sourceCanUseFiveMinuteReadings(readingDates: readingDates) {
+            return fastCadenceSmoothedValues(values: values, readingDates: readingDates, smoothingStrength: smoothingStrength)
+        }
+
+        return savitzkyGolaySmoothedValues(values: values, smoothingStrength: smoothingStrength)
     }
 
     private func savitzkyGolayFilteredValues(values: [Double], filterWidth: Int) -> [Double] {
@@ -921,6 +916,26 @@ class BgPostProcessingManager {
     /// prefer adjusted values when they exist
     private func valueToSmooth(bgReading: BgReading) -> Double {
         return bgReading.adjustedValue?.doubleValue ?? bgReading.calculatedValue
+    }
+
+    private func smoothingSupport() -> BgSmoothingSupport {
+        return BgSmoothingSupport(
+            canUseFiveMinuteReadings: { [weak self] readingDates in
+                return self?.sourceCanUseFiveMinuteReadings(readingDates: readingDates) ?? false
+            },
+            medianReadingGapInMinutes: { [weak self] readingDates in
+                return self?.medianReadingGapInMinutes(readingDates: readingDates)
+            },
+            savitzkyGolayStyleSmoothedValues: { [weak self] values, readingDates, smoothingStrength in
+                return self?.savitzkyGolayStyleSmoothedValues(values: values, readingDates: readingDates, smoothingStrength: smoothingStrength) ?? values
+            },
+            sparseCadenceSmoothedValues: { [weak self] values, readingsPerVisibleStep, filterWidth, iterations in
+                return self?.sparseCadenceSmoothedValues(values: values, readingsPerVisibleStep: readingsPerVisibleStep, filterWidth: filterWidth, iterations: iterations) ?? values
+            },
+            clampedMostRecentSmoothedValues: { [weak self] inputValues, smoothedValues, smoothingStrength in
+                return self?.clampedMostRecentSmoothedValues(inputValues: inputValues, smoothedValues: smoothedValues, smoothingStrength: smoothingStrength) ?? smoothedValues
+            }
+        )
     }
 
     private func latestBgReadingForCurrentSourceContext() -> BgReading? {

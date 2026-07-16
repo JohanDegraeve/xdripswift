@@ -436,6 +436,22 @@ enum Texts_HomeView {
         return NSLocalizedString("postProcessingAlgorithmSavitzkyGolayDescription", tableName: filename, bundle: Bundle.main, value: "Savitzky-Golay smooths the glucose curve by fitting short local windows while preserving the general shape of peaks and troughs.", comment: "post processing footer text explaining the selected Savitzky-Golay smoothing algorithm")
     }()
 
+    static let postProcessingAlgorithmExponential: String = {
+        return NSLocalizedString("postProcessingAlgorithmExponential", tableName: filename, bundle: Bundle.main, value: "Exponential", comment: "post processing exponential smoothing algorithm")
+    }()
+
+    static let postProcessingAlgorithmExponentialDescription: String = {
+        return NSLocalizedString("postProcessingAlgorithmExponentialDescription", tableName: filename, bundle: Bundle.main, value: "Exponential smoothing uses low-lag forward and backward weighted passes, making recent glucose moves look calmer without flattening them as aggressively.", comment: "post processing footer text explaining the selected exponential smoothing algorithm")
+    }()
+
+    static let postProcessingAlgorithmKalman: String = {
+        return NSLocalizedString("postProcessingAlgorithmKalman", tableName: filename, bundle: Bundle.main, value: "Kalman", comment: "post processing Kalman smoothing algorithm")
+    }()
+
+    static let postProcessingAlgorithmKalmanDescription: String = {
+        return NSLocalizedString("postProcessingAlgorithmKalmanDescription", tableName: filename, bundle: Bundle.main, value: "Kalman smoothing models glucose as a noisy live signal and updates a running estimate, usually producing a steadier curve with more obvious filtering than the default shape-preserving smoother.", comment: "post processing footer text explaining the selected Kalman smoothing algorithm")
+    }()
+
     static let postProcessingLight: String = {
         return NSLocalizedString("postProcessingLight", tableName: filename, bundle: Bundle.main, value: "Light", comment: "post processing smoothing light option")
     }()

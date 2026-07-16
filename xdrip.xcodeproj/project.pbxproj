@@ -240,6 +240,10 @@
 		4A9B10052F0A000100000001 /* BgPostProcessingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10152F0A000100000001 /* BgPostProcessingManager.swift */; };
 		4A9B10062F0A000100000001 /* BgAdjustmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10162F0A000100000001 /* BgAdjustmentsView.swift */; };
 		4A9B10072F0A000100000001 /* ConstantsBgAdjustment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10172F0A000100000001 /* ConstantsBgAdjustment.swift */; };
+		4A9B10082F0A000100000001 /* BgSmoothingAlgorithmPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10182F0A000100000001 /* BgSmoothingAlgorithmPlugin.swift */; };
+		4A9B10092F0A000100000001 /* SavitzkyGolayBgSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B10192F0A000100000001 /* SavitzkyGolayBgSmoothing.swift */; };
+		4A9B100A2F0A000100000001 /* ExponentialBgSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B101A2F0A000100000001 /* ExponentialBgSmoothing.swift */; };
+		4A9B100B2F0A000100000001 /* KalmanBgSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B101B2F0A000100000001 /* KalmanBgSmoothing.swift */; };
 		4AC0D0012F1D000100000001 /* SnoozeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AC0D0022F1D000100000001 /* SnoozeView.swift */; };
 		4B0C00022F3B000100000001 /* SensorManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0C00012F3B000100000001 /* SensorManagementView.swift */; };
 		4C1000012F64000100000001 /* TreatmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1000022F64000100000001 /* TreatmentsView.swift */; };
@@ -1017,6 +1021,10 @@
 		4A9B10152F0A000100000001 /* BgPostProcessingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgPostProcessingManager.swift; sourceTree = "<group>"; };
 		4A9B10162F0A000100000001 /* BgAdjustmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgAdjustmentsView.swift; sourceTree = "<group>"; };
 		4A9B10172F0A000100000001 /* ConstantsBgAdjustment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsBgAdjustment.swift; sourceTree = "<group>"; };
+		4A9B10182F0A000100000001 /* BgSmoothingAlgorithmPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BgSmoothingAlgorithmPlugin.swift; sourceTree = "<group>"; };
+		4A9B10192F0A000100000001 /* SavitzkyGolayBgSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavitzkyGolayBgSmoothing.swift; sourceTree = "<group>"; };
+		4A9B101A2F0A000100000001 /* ExponentialBgSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExponentialBgSmoothing.swift; sourceTree = "<group>"; };
+		4A9B101B2F0A000100000001 /* KalmanBgSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KalmanBgSmoothing.swift; sourceTree = "<group>"; };
 		4AC0D0022F1D000100000001 /* SnoozeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeView.swift; sourceTree = "<group>"; };
 		4B0C00012F3B000100000001 /* SensorManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorManagementView.swift; sourceTree = "<group>"; };
 		4C1000022F64000100000001 /* TreatmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsView.swift; sourceTree = "<group>"; };
@@ -2130,7 +2138,11 @@
 		4A9B10212F0A000100000001 /* PostProcessing */ = {
 			isa = PBXGroup;
 			children = (
+				4A9B10182F0A000100000001 /* BgSmoothingAlgorithmPlugin.swift */,
 				4A9B10152F0A000100000001 /* BgPostProcessingManager.swift */,
+				4A9B101A2F0A000100000001 /* ExponentialBgSmoothing.swift */,
+				4A9B10192F0A000100000001 /* SavitzkyGolayBgSmoothing.swift */,
+				4A9B101B2F0A000100000001 /* KalmanBgSmoothing.swift */,
 			);
 			path = PostProcessing;
 			sourceTree = "<group>";
@@ -3992,6 +4004,10 @@
 				F8E51D612448E695001C9E5A /* Bundle.swift in Sources */,
 				F821CF61229BF4A2005C1E43 /* NightscoutSyncManager.swift in Sources */,
 				4A9B10052F0A000100000001 /* BgPostProcessingManager.swift in Sources */,
+				4A9B10082F0A000100000001 /* BgSmoothingAlgorithmPlugin.swift in Sources */,
+				4A9B100A2F0A000100000001 /* ExponentialBgSmoothing.swift in Sources */,
+				4A9B10092F0A000100000001 /* SavitzkyGolayBgSmoothing.swift in Sources */,
+				4A9B100B2F0A000100000001 /* KalmanBgSmoothing.swift in Sources */,
 				F8F9721023A5915900C3F17D /* TransmitterVersionRxMessage.swift in Sources */,
 				F8A1587122EDC865007F5B5D /* ConstantsSpeakReadingLanguages.swift in Sources */,
 				4D7180072FE8000100000001 /* MedtrumTouchCareNano+CoreDataClass.swift in Sources */,

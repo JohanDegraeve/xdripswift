@@ -10,11 +10,17 @@ import Foundation
 
 enum BgSmoothingAlgorithm: String, CaseIterable {
     case savitzkyGolay = "savitzkyGolay"
+    case exponential = "exponential"
+    case kalman = "kalman"
 
     var description: String {
         switch self {
         case .savitzkyGolay:
             return Texts_HomeView.postProcessingAlgorithmSavitzkyGolay
+        case .exponential:
+            return Texts_HomeView.postProcessingAlgorithmExponential
+        case .kalman:
+            return Texts_HomeView.postProcessingAlgorithmKalman
         }
     }
 
@@ -22,6 +28,21 @@ enum BgSmoothingAlgorithm: String, CaseIterable {
         switch self {
         case .savitzkyGolay:
             return Texts_HomeView.postProcessingAlgorithmSavitzkyGolayDescription
+        case .exponential:
+            return Texts_HomeView.postProcessingAlgorithmExponentialDescription
+        case .kalman:
+            return Texts_HomeView.postProcessingAlgorithmKalmanDescription
+        }
+    }
+
+    var plugin: BgSmoothingAlgorithmPlugin {
+        switch self {
+        case .savitzkyGolay:
+            return SavitzkyGolayBgSmoothing()
+        case .exponential:
+            return ExponentialBgSmoothing()
+        case .kalman:
+            return KalmanBgSmoothing()
         }
     }
 }
@@ -106,5 +127,98 @@ enum ConstantsBgSmoothing {
         default:
             return 0.7
         }
+    }
+
+    static func exponentialAlpha(forSmoothingStrength smoothingStrength: Int, isFastCadence: Bool) -> Double {
+        let baseAlpha: Double
+
+        switch smoothingStrength {
+        case 0:
+            baseAlpha = 0.4
+        case 2:
+            baseAlpha = 0.2
+        default:
+            baseAlpha = 0.28
+        }
+
+        return isFastCadence ? baseAlpha * 0.85 : baseAlpha
+    }
+
+    static func exponentialPassCount(forSmoothingStrength smoothingStrength: Int, isFastCadence: Bool) -> Int {
+        switch smoothingStrength {
+        case 0:
+            return 1
+        case 2:
+            return isFastCadence ? 3 : 2
+        default:
+            return 2
+        }
+    }
+
+    static func exponentialFastCadenceFilterWidth(forSmoothingStrength smoothingStrength: Int) -> Int {
+        switch smoothingStrength {
+        case 0:
+            return 2
+        case 2:
+            return 3
+        default:
+            return 2
+        }
+    }
+
+    static func exponentialFastCadenceRepeatCount(forSmoothingStrength smoothingStrength: Int) -> Int {
+        switch smoothingStrength {
+        case 0:
+            return 1
+        case 2:
+            return 2
+        default:
+            return 1
+        }
+    }
+
+    static func kalmanMeasurementNoise(forSmoothingStrength smoothingStrength: Int, isFastCadence: Bool) -> Double {
+        let baseNoise: Double
+
+        switch smoothingStrength {
+        case 0:
+            baseNoise = 20.0
+        case 2:
+            baseNoise = 42.0
+        default:
+            baseNoise = 30.0
+        }
+
+        return isFastCadence ? baseNoise * 0.8 : baseNoise
+    }
+
+    static func kalmanBaseProcessNoise(forSmoothingStrength smoothingStrength: Int, isFastCadence: Bool) -> Double {
+        let baseNoise: Double
+
+        switch smoothingStrength {
+        case 0:
+            baseNoise = 4.0
+        case 2:
+            baseNoise = 1.2
+        default:
+            baseNoise = 2.2
+        }
+
+        return isFastCadence ? baseNoise * 0.8 : baseNoise
+    }
+
+    static func kalmanSlopeProcessScale(forSmoothingStrength smoothingStrength: Int, isFastCadence: Bool) -> Double {
+        let baseScale: Double
+
+        switch smoothingStrength {
+        case 0:
+            baseScale = 0.7
+        case 2:
+            baseScale = 0.28
+        default:
+            baseScale = 0.45
+        }
+
+        return isFastCadence ? baseScale * 0.85 : baseScale
     }
 }
