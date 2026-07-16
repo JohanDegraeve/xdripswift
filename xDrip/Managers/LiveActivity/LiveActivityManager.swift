@@ -25,6 +25,7 @@ public final class LiveActivityManager {
     private var isUpdating = false
     private var shouldRun = false
     private var commandRevision = 0
+    private var backgroundUpdateTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
     
     // initialize an "empty" contentState and use this to hold the current context state of the live activity after each start/update
     // this makes it much easier to restart from an App Intent without needing to generate a new context to send
@@ -69,6 +70,7 @@ extension LiveActivityManager {
         let shouldForceRestart = forceRestart || pendingUpdate?.forceRestart == true
         pendingUpdate = (contentState, shouldForceRestart)
 
+        beginBackgroundUpdateTaskIfNeeded()
         startProcessingIfNeeded()
     }
 
@@ -84,12 +86,47 @@ extension LiveActivityManager {
 
     @MainActor
     private func processPendingUpdates() async {
-        defer { isUpdating = false }
+        defer {
+            isUpdating = false
+            endBackgroundUpdateTaskIfNeeded()
+        }
 
         while let update = pendingUpdate {
             pendingUpdate = nil
             await ensureActivity(contentState: update.contentState, forceRestart: update.forceRestart)
         }
+    }
+
+    @MainActor
+    private func beginBackgroundUpdateTaskIfNeeded() {
+        guard backgroundUpdateTaskIdentifier == .invalid else { return }
+
+        // ActivityKit permits background updates, but the app still needs execution time to finish
+        // the asynchronous update. Request that time before queuing the processor, as recommended by:
+        // https://developer.apple.com/documentation/activitykit/activity/update(_:)
+        // https://developer.apple.com/documentation/uikit/uiapplication/beginbackgroundtask(withname:expirationhandler:)
+        backgroundUpdateTaskIdentifier = UIApplication.shared.beginBackgroundTask(
+            withName: "Live Activity Update",
+            expirationHandler: { [weak self] in
+                guard let self else { return }
+
+                trace("in LiveActivityManager, background update task expired", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .error)
+                self.endBackgroundUpdateTaskIfNeeded()
+            }
+        )
+
+        if backgroundUpdateTaskIdentifier == .invalid {
+            trace("in LiveActivityManager, could not begin background update task", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .error)
+        }
+    }
+
+    @MainActor
+    private func endBackgroundUpdateTaskIfNeeded() {
+        guard backgroundUpdateTaskIdentifier != .invalid else { return }
+
+        let identifier = backgroundUpdateTaskIdentifier
+        backgroundUpdateTaskIdentifier = .invalid
+        UIApplication.shared.endBackgroundTask(identifier)
     }
 
     /// Public API: End all activities
