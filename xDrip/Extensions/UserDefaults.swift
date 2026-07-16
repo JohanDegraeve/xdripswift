@@ -257,6 +257,8 @@ extension UserDefaults {
         case nightscoutAPIKey = "nightscoutAPIKey"
         /// send sensor start time to nightscout ?
         case uploadSensorStartTimeToNS = "uploadSensorStartTimeToNS"
+        /// LibreLinkUp sensor start time most recently uploaded to Nightscout
+        case libreLinkUpSensorStartDateUploadedToNS = "libreLinkUpSensorStartDateUploadedToNS"
         /// port number to use, 0 means not set
         case nightscoutPort = "nightscoutPort"
         /// token to use for authentication, 0 means not set
@@ -1788,6 +1790,20 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.uploadSensorStartTimeToNS.rawValue)
+        }
+    }
+
+    /// LibreLinkUp sensor start time most recently uploaded to Nightscout.
+    ///
+    /// Unlike a locally managed sensor, a follower sensor has no Core Data object whose
+    /// `uploadedToNS` flag can be set. Keeping its exact server-provided timestamp here
+    /// prevents the same sensor start being uploaded after every follower refresh.
+    var libreLinkUpSensorStartDateUploadedToNS: Date? {
+        get {
+            return object(forKey: Key.libreLinkUpSensorStartDateUploadedToNS.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.libreLinkUpSensorStartDateUploadedToNS.rawValue)
         }
     }
 

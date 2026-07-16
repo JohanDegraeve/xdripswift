@@ -98,6 +98,7 @@ class SettingsViewNightscoutSettingsViewModel {
     func settingsRows(sectionID: Int) -> [SettingsRow] {
         let nightscoutEnabled = UserDefaults.standard.nightscoutEnabled
         let masterModeRowsVisible = nightscoutEnabled && UserDefaults.standard.isMaster
+        let sensorStartTimeRowVisible = masterModeRowsVisible || (nightscoutEnabled && isLibreLinkUpFollower)
 
         switch rowGroup {
         case .nightscout:
@@ -138,7 +139,7 @@ class SettingsViewNightscoutSettingsViewModel {
             ]
         case .uploadSchedule:
             return [
-                nativeSettingsRow(id: "nightscout.uploadSensorStartTime", index: Setting.uploadSensorStartTime.rawValue, sectionID: sectionID, isVisible: masterModeRowsVisible),
+                nativeSettingsRow(id: "nightscout.uploadSensorStartTime", index: Setting.uploadSensorStartTime.rawValue, sectionID: sectionID, isVisible: sensorStartTimeRowVisible),
                 nativeSettingsRow(id: "nightscout.useSchedule", index: Setting.useSchedule.rawValue, sectionID: sectionID, isVisible: masterModeRowsVisible),
                 nativeSettingsRow(
                     id: "nightscout.schedule",
@@ -579,9 +580,10 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
         // if nightscout upload not enabled then only first row is shown
         if UserDefaults.standard.nightscoutEnabled {
             
-            // in follower mode, only 6 first rows to be shown : nightscout enabled button, follow type, url, port number, token, api key, option to test and open Nightscout
+            // Follower mode normally shows only the connection and action rows.
+            // LibreLinkUp also exposes the sensor-start option because it supplies the timestamp.
             if !UserDefaults.standard.isMaster {
-                return 8
+                return isLibreLinkUpFollower ? 9 : 8
             }
             
             // if schedule not enabled then show all rows except the last which is to edit the schedule
@@ -594,6 +596,14 @@ extension SettingsViewNightscoutSettingsViewModel: SettingsViewModelProtocol {
         } else {
             return 1
         }
+    }
+
+    /// LibreLinkUp is currently the only follower service that supplies an authoritative
+    /// sensor start timestamp, so the Nightscout option must remain hidden for other sources.
+    private var isLibreLinkUpFollower: Bool {
+        guard !UserDefaults.standard.isMaster else { return false }
+
+        return UserDefaults.standard.followerDataSourceType == .libreLinkUp || UserDefaults.standard.followerDataSourceType == .libreLinkUpRussia
     }
 
     func settingsRowText(index: Int) -> String {

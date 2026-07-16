@@ -107,6 +107,10 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
     private var bgReadingsReplacementBlocksDirectLiveUpload = false
     private var pendingDirectBgUploadAfterReplacement = false
     private var pendingDirectBgUploadLastConnectionStatusChangeTimeStamp: Date?
+
+    /// The LibreLinkUp sensor start currently being posted to Nightscout.
+    /// This closes the short window between starting the request and persisting its success.
+    private var libreLinkUpSensorStartUploadInFlight: Date?
     
     /// - when was the sync of treatments with Nightscout started.
     /// - if nil then there's no sync running
@@ -342,12 +346,20 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
         // upload calibrations
         uploadCalibrationsToNightscout()
         
-        // upload activeSensor if needed
-        if UserDefaults.standard.uploadSensorStartTimeToNS, let activeSensor = sensorsAccessor.fetchActiveSensor() {
-            if !activeSensor.uploadedToNS {
-                trace("n uploadLatestBgReadings, activeSensor not yet uploaded to NS", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
-                
+        // upload the active sensor if needed
+        if UserDefaults.standard.uploadSensorStartTimeToNS {
+            if UserDefaults.standard.isMaster,
+               let activeSensor = sensorsAccessor.fetchActiveSensor(),
+               !activeSensor.uploadedToNS {
+                trace("in uploadLatestBgReadings, activeSensor not yet uploaded to NS", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+
                 uploadActiveSensorToNightscout(sensor: activeSensor)
+            } else if !UserDefaults.standard.isMaster,
+                      UserDefaults.standard.followerDataSourceType == .libreLinkUp || UserDefaults.standard.followerDataSourceType == .libreLinkUpRussia,
+                      let sensorStartDate = UserDefaults.standard.activeSensorStartDate,
+                      UserDefaults.standard.libreLinkUpSensorStartDateUploadedToNS != sensorStartDate,
+                      libreLinkUpSensorStartUploadInFlight != sensorStartDate {
+                uploadLibreLinkUpSensorStartToNightscout(startDate: sensorStartDate)
             }
         }
         
@@ -1300,6 +1312,49 @@ public class NightscoutSyncManager: NSObject, ObservableObject {
                 self.coreDataManager.saveChanges()
             }
         })
+    }
+
+    /// Upload the server-provided LibreLinkUp sensor start to Nightscout.
+    ///
+    /// Follower readings deliberately have no local `Sensor` object, so this mirrors the
+    /// master-mode upload while using the LibreLinkUp timestamp held in UserDefaults.
+    private func uploadLibreLinkUpSensorStartToNightscout(startDate: Date) {
+        trace("in uploadLibreLinkUpSensorStartToNightscout, preparing to upload follower sensor start", log: oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+
+        libreLinkUpSensorStartUploadInFlight = startDate
+
+        let dataToUpload = [
+            // A deterministic identifier makes a retry idempotent if Nightscout accepted the
+            // request but its response was lost before the local success marker was stored.
+            "_id": libreLinkUpSensorStartNightscoutIdentifier(startDate: startDate),
+            "eventType": "Sensor Start",
+            "created_at": startDate.ISOStringFromDate(),
+            "enteredBy": ConstantsHomeView.applicationName
+        ]
+
+        uploadDataAndGetResponse(dataToUpload: dataToUpload, httpMethod: nil, path: nightscoutTreatmentPath) { _, nightscoutResult in
+            DispatchQueue.main.async {
+                self.libreLinkUpSensorStartUploadInFlight = nil
+
+                guard nightscoutResult.successFull() else {
+                    trace("in uploadLibreLinkUpSensorStartToNightscout, follower sensor start upload failed", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .error)
+                    return
+                }
+
+                UserDefaults.standard.libreLinkUpSensorStartDateUploadedToNS = startDate
+                trace("in uploadLibreLinkUpSensorStartToNightscout, follower sensor start uploaded to NS", log: self.oslog, category: ConstantsLog.categoryNightscoutSyncManager, type: .info)
+            }
+        }
+    }
+
+    /// Build a stable 24-character identifier in the same shape as locally created
+    /// Nightscout object identifiers. The prefix namespaces the millisecond timestamp
+    /// to LibreLinkUp sensor starts without including the sensor serial number.
+    private func libreLinkUpSensorStartNightscoutIdentifier(startDate: Date) -> String {
+        let timestampInMilliseconds = Int64(startDate.timeIntervalSince1970 * 1000)
+        let timestampComponent = UInt64(bitPattern: timestampInMilliseconds) & 0x0000FFFFFFFFFFFF
+
+        return String(format: "6c6c75000000%012llx", timestampComponent)
     }
     
     /// upload latest readings to nightscout
