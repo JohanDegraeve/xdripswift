@@ -25,7 +25,7 @@ struct RootHomeView: View {
     fileprivate enum Layout {
         static let sectionSpacing: CGFloat = 10
         static let rowSpacing: CGFloat = 9
-        static let screenHorizontalMargin: CGFloat = 8
+        static let screenHorizontalMargin: CGFloat = 12
         static let horizontalMargin: CGFloat = 8
         static let toolbarMinimumHeight: CGFloat = 44
         static let glucoseRowHeight: CGFloat = 120
