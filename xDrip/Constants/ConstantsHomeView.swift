@@ -6,33 +6,6 @@ enum ConstantsHomeView {
 
     /// Standard corner radius for Home panels and compact status views.
     static let standardCornerRadius: CGFloat = 10
-
-    enum PickerMenu {
-
-        /// background for compact Home picker menus
-        static let backgroundColor = Color(white: 0.15).opacity(0.8)
-
-        /// text and menu indicator colour for compact Home picker menus
-        static let tintColor = Color.blue
-
-        /// text style for compact Home picker menus
-        static let textFont: Font = .subheadline
-
-        /// system image style for the menu indicator
-        static let indicatorFont: Font = .system(size: 10, weight: .semibold)
-
-        /// horizontal padding inside compact Home picker menus
-        static let horizontalPadding: CGFloat = 8
-
-        /// fixed height for compact Home picker menus
-        static let height: CGFloat = 24
-
-        /// corner radius for compact Home picker menus
-        static let cornerRadius: CGFloat = 6
-
-        /// standard leading/top inset when a picker menu is overlaid on a chart
-        static let chartInset: CGFloat = 6
-    }
     
     /// how often to update the labels in the homeview (ie label with latest reading, minutes ago, etc..)
     static let updateHomeViewIntervalInSeconds = 15.0

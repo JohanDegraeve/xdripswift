@@ -36,6 +36,7 @@ struct RootHomeView: View {
         static let loopBottomPadding: CGFloat = 2
         static let loopStatusSymbolSize: CGFloat = 18
         static let miniChartHeight: CGFloat = 60
+        static let selectorHeight: CGFloat = 30
         static let statisticsHeight: CGFloat = 90
         static let sensorProgressHeight: CGFloat = 10
         static let dataSourceHeight: CGFloat = 30
@@ -50,7 +51,6 @@ struct RootHomeView: View {
         case fiveHours = 5
         case eightHours = 8
         case twelveHours = 12
-        case twentyFourHours = 24
 
         var id: Double {
             rawValue
@@ -75,8 +75,6 @@ struct RootHomeView: View {
                 return 6.0
             case .twelveHours:
                 return 7.2
-            case .twentyFourHours:
-                return 9.6
             }
         }
 
@@ -234,8 +232,7 @@ struct RootHomeView: View {
                 }
 
                 RootHomeMainChartView(
-                    selectedRange: $selectedRange,
-                    showsRangeMenu: state.visibility.showsControls,
+                    selectedRange: selectedRange,
                     chartState: visibleChartState,
                     isLoading: isLoadingChart,
                     scrollCoordinator: scrollCoordinator,
@@ -250,25 +247,30 @@ struct RootHomeView: View {
                 if state.visibility.showsMiniChart {
                     RootHomeMiniChartView(
                         miniChartHoursToShow: miniChartHoursToShowForChart,
-                        showsRangeMenu: state.visibility.showsControls,
                         chartState: miniChartState,
                         scrollCoordinator: scrollCoordinator,
                         updateChartStateIfNeeded: requestChartStateIfNeeded,
                         finishChartScroll: {
                             requestChartState(forceReset: false, showsLoading: false)
                         },
-                        setMiniChartHoursToShow: { miniChartHoursToShow = $0 },
                         cycleMiniChartHoursToShow: cycleMiniChartHoursToShow
                     )
                     .frame(height: Layout.miniChartHeight)
                 }
 
+                if state.visibility.showsControls {
+                    RootHomeSelectorView(
+                        selectedRange: $selectedRange,
+                        statisticsDays: state.controls.statisticsDays,
+                        showsStatistics: state.visibility.showsStatistics,
+                        onStatisticsDaysChanged: updateStatisticsDays
+                    )
+                    .frame(height: Layout.selectorHeight)
+                }
+
                 if state.visibility.showsStatistics {
                     RootHomeStatisticsView(
                         state: state.statistics,
-                        statisticsDays: state.controls.statisticsDays,
-                        showsPeriodMenu: state.visibility.showsControls,
-                        onStatisticsDaysChanged: updateStatisticsDays,
                         action: actions.cycleStatisticsType
                     )
                         .frame(height: Layout.statisticsHeight)
@@ -401,6 +403,11 @@ struct RootHomeView: View {
 
     private func refreshChartRangeFromStoredSettings() {
         let range = ChartRange.closest(to: chartWidthInHours == 0 ? ConstantsGlucoseChart.defaultChartWidthInHours : chartWidthInHours)
+
+        if chartWidthInHours != range.rawValue {
+            chartWidthInHours = range.rawValue
+        }
+
         if range != selectedRange {
             selectedRange = range
         }
@@ -779,12 +786,9 @@ private struct RootHomeGlucoseReadingView: View {
 
 // MARK: - Charts
 
-// MARK: - Charts
-
 /// Main interactive chart with loading state and the reading shown at the panned end date.
 private struct RootHomeMainChartView: View {
-    @Binding var selectedRange: RootHomeView.ChartRange
-    let showsRangeMenu: Bool
+    let selectedRange: RootHomeView.ChartRange
     let chartState: GlucoseChartState
     let isLoading: Bool
     let scrollCoordinator: GlucoseChartScrollCoordinator
@@ -833,34 +837,6 @@ private struct RootHomeMainChartView: View {
                 })
                 .clipped()
 
-                if showsRangeMenu {
-                    Menu {
-                        Picker(Texts_Common.hours, selection: $selectedRange) {
-                            ForEach(RootHomeView.ChartRange.allCases) { range in
-                                Text(range.title)
-                                    .tag(range)
-                            }
-                        }
-                        .labelsHidden()
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text(selectedRange.title)
-                            Image(systemName: "chevron.up.chevron.down")
-                                .font(ConstantsHomeView.PickerMenu.indicatorFont)
-                        }
-                        .font(ConstantsHomeView.PickerMenu.textFont)
-                        .foregroundStyle(ConstantsHomeView.PickerMenu.tintColor)
-                        .padding(.horizontal, ConstantsHomeView.PickerMenu.horizontalPadding)
-                        .frame(height: ConstantsHomeView.PickerMenu.height)
-                        .background(
-                            ConstantsHomeView.PickerMenu.backgroundColor,
-                            in: RoundedRectangle(cornerRadius: ConstantsHomeView.PickerMenu.cornerRadius)
-                        )
-                    }
-                    .fixedSize()
-                    .padding([.top, .leading], ConstantsHomeView.PickerMenu.chartInset)
-                }
-
                 if isLoading {
                     ProgressView()
                         .padding(8)
@@ -876,22 +852,11 @@ private struct RootHomeMainChartView: View {
 /// Historical overview chart and the active main-chart window.
 private struct RootHomeMiniChartView: View {
     let miniChartHoursToShow: Double
-    let showsRangeMenu: Bool
     let chartState: GlucoseChartState
     let scrollCoordinator: GlucoseChartScrollCoordinator
     let updateChartStateIfNeeded: () -> Void
     let finishChartScroll: () -> Void
-    let setMiniChartHoursToShow: (Double) -> Void
     let cycleMiniChartHoursToShow: () -> Void
-
-    // SwiftUI presents this compact chart menu from the chart edge. Keep the visible rows ordered
-    // from the smallest window at the top to the largest window at the bottom.
-    private let miniChartRangeOptions = [
-        ConstantsGlucoseChart.miniChartHoursToShow4,
-        ConstantsGlucoseChart.miniChartHoursToShow3,
-        ConstantsGlucoseChart.miniChartHoursToShow2,
-        ConstantsGlucoseChart.miniChartHoursToShow1
-    ]
 
     /// `nil` until a new drag is classified. The result is then held for the whole gesture because
     /// the active window moves away from its original touch point during a valid drag.
@@ -957,34 +922,6 @@ private struct RootHomeMiniChartView: View {
                 )
                 .simultaneousGesture(TapGesture(count: 2).onEnded(cycleMiniChartHoursToShow))
                 .clipped()
-
-                if showsRangeMenu {
-                    Menu {
-                        Picker(Texts_Common.days, selection: Binding(get: { miniChartHoursToShow }, set: setMiniChartHoursToShow)) {
-                            ForEach(miniChartRangeOptions, id: \.self) { hours in
-                                Text(title(forHours: hours))
-                                    .tag(hours)
-                            }
-                        }
-                        .labelsHidden()
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text(title(forHours: miniChartHoursToShow))
-                            Image(systemName: "chevron.up.chevron.down")
-                                .font(ConstantsHomeView.PickerMenu.indicatorFont)
-                        }
-                        .font(ConstantsHomeView.PickerMenu.textFont)
-                        .foregroundStyle(ConstantsHomeView.PickerMenu.tintColor)
-                        .padding(.horizontal, ConstantsHomeView.PickerMenu.horizontalPadding)
-                        .frame(height: ConstantsHomeView.PickerMenu.height)
-                        .background(
-                            ConstantsHomeView.PickerMenu.backgroundColor,
-                            in: RoundedRectangle(cornerRadius: ConstantsHomeView.PickerMenu.cornerRadius)
-                        )
-                    }
-                    .fixedSize()
-                    .padding(.leading, ConstantsHomeView.PickerMenu.chartInset)
-                }
             }
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .leading)
         }
@@ -1012,10 +949,106 @@ private struct RootHomeMiniChartView: View {
 
         return xPosition >= activeStartX && xPosition <= activeEndX
     }
+}
 
-    private func title(forHours hours: Double) -> String {
-        let days = Int(hours / 24)
-        return "\(days) \(days == 1 ? Texts_Common.day : Texts_Common.days)"
+// MARK: - Controls
+
+/// Quiet, direct controls for the statistics calculation period and main-chart width.
+private struct RootHomeSelectorView: View {
+    @Binding var selectedRange: RootHomeView.ChartRange
+    let statisticsDays: Int
+    let showsStatistics: Bool
+    let onStatisticsDaysChanged: (Int) -> Void
+
+    private let statisticsOptions = [0, 1, 7, 30, 90]
+
+    var body: some View {
+        HStack(spacing: 4) {
+            if showsStatistics {
+                HStack(spacing: 2) {
+                    ForEach(statisticsOptions, id: \.self) { days in
+                        RootHomeSelectorButton(
+                            title: statisticsTitle(for: days),
+                            accessibilityLabel: Texts_SettingsView.labelDaysToUseStatisticsTitle,
+                            accessibilityValue: statisticsAccessibilityValue(for: days),
+                            isSelected: statisticsDays == days,
+                            action: { onStatisticsDaysChanged(days) }
+                        )
+                    }
+                }
+                .fixedSize(horizontal: true, vertical: false)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+                Rectangle()
+                    .fill(ConstantsAppColors.tertiaryText.opacity(0.3))
+                    .frame(width: 1, height: 14)
+                    .padding(.horizontal, 4)
+                    .accessibilityHidden(true)
+            }
+
+            HStack(spacing: 2) {
+                ForEach(RootHomeView.ChartRange.allCases) { range in
+                    RootHomeSelectorButton(
+                        title: range.title,
+                        accessibilityLabel: Texts_HomeView.showHideGlucoseChartTitle,
+                        accessibilityValue: "\(Int(range.rawValue)) \(Texts_Common.hours)",
+                        isSelected: selectedRange == range,
+                        action: { selectedRange = range }
+                    )
+                }
+            }
+            .fixedSize(horizontal: true, vertical: false)
+            .frame(maxWidth: .infinity, alignment: showsStatistics ? .trailing : .center)
+        }
+        .padding(.horizontal, 8)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private func statisticsTitle(for days: Int) -> String {
+        days == 0 ? Texts_Common.todayshort : "\(days)\(Texts_Common.dayshort)"
+    }
+
+    private func statisticsAccessibilityValue(for days: Int) -> String {
+        switch days {
+        case 0:
+            return Texts_Common.today
+        case 1:
+            return "1 \(Texts_Common.day)"
+        default:
+            return "\(days) \(Texts_Common.days)"
+        }
+    }
+}
+
+/// One label-only selector item. Only the selected item receives a small accent underline.
+private struct RootHomeSelectorButton: View {
+    let title: String
+    let accessibilityLabel: String
+    let accessibilityValue: String
+    let isSelected: Bool
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text(title)
+                .font(.system(size: 11, weight: isSelected ? .semibold : .regular))
+                .foregroundStyle(isSelected ? ConstantsAppColors.primaryText : ConstantsAppColors.tertiaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+                .allowsTightening(true)
+                .frame(minWidth: 32, maxHeight: .infinity)
+                .overlay(alignment: .bottom) {
+                    Capsule()
+                        .fill(ConstantsGlucoseChartSwiftUI.overlayWindowEdgeColor)
+                        .frame(width: 14, height: 1.5)
+                        .opacity(isSelected ? 1 : 0)
+                }
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
+        .accessibilityValue(accessibilityValue)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
@@ -1024,13 +1057,7 @@ private struct RootHomeMiniChartView: View {
 /// Statistics values and time-in-range pie chart for the selected period.
 private struct RootHomeStatisticsView: View {
     let state: RootHomeStatisticsState
-    let statisticsDays: Int
-    let showsPeriodMenu: Bool
-    let onStatisticsDaysChanged: (Int) -> Void
     let action: () -> Void
-
-    // Menu pickers present these rows in reverse visual order.
-    private let statisticsOptions = [90, 30, 7, 1, 0]
 
     var body: some View {
         HStack(spacing: 0) {
@@ -1053,39 +1080,11 @@ private struct RootHomeStatisticsView: View {
                 }
                 .frame(height: 52)
 
-                if showsPeriodMenu {
-                    Menu {
-                        Picker(Texts_SettingsView.sectionTitleStatistics, selection: Binding(get: { statisticsDays }, set: onStatisticsDaysChanged)) {
-                            ForEach(statisticsOptions, id: \.self) { days in
-                                Text(title(for: days))
-                                    .tag(days)
-                            }
-                        }
-                        .labelsHidden()
-                    } label: {
-                        HStack(spacing: 4) {
-                            Text(title(for: statisticsDays))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.7)
-                            Image(systemName: "chevron.up.chevron.down")
-                                .font(ConstantsHomeView.PickerMenu.indicatorFont)
-                        }
-                        .font(ConstantsHomeView.PickerMenu.textFont)
-                        .foregroundStyle(ConstantsHomeView.PickerMenu.tintColor)
-                        .padding(.horizontal, ConstantsHomeView.PickerMenu.horizontalPadding)
-                        .frame(height: ConstantsHomeView.PickerMenu.height)
-                        .background(
-                            ConstantsHomeView.PickerMenu.backgroundColor,
-                            in: RoundedRectangle(cornerRadius: ConstantsHomeView.PickerMenu.cornerRadius)
-                        )
-                    }
-                } else {
-                    Text(state.timePeriodText)
-                        .font(.caption2)
-                        .foregroundStyle(ConstantsAppColors.tertiaryText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.7)
-                }
+                Text(state.timePeriodText)
+                    .font(.caption2)
+                    .foregroundStyle(ConstantsAppColors.tertiaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
             }
             .frame(maxWidth: .infinity)
         }
@@ -1099,16 +1098,6 @@ private struct RootHomeStatisticsView: View {
         }
     }
 
-    private func title(for days: Int) -> String {
-        switch days {
-        case 0:
-            return Texts_Common.today
-        case 1:
-            return "1 \(Texts_Common.day)"
-        default:
-            return "\(days) \(Texts_Common.days)"
-        }
-    }
 }
 
 /// Vertical group of statistics with matching column alignment.
