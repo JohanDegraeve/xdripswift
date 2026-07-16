@@ -60,6 +60,10 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
     
     /// sensor type
     private var libreSensorType: LibreSensorType?
+
+    /// Bluetooth name selected from the NFC result. Newer 7F sensors advertise the returned
+    /// MAC-derived name instead of the legacy "ABBOTT" + sensor serial number.
+    private var expectedBluetoothNameFromNFC: String?
     
     // MARK: - Initialization
 
@@ -147,10 +151,10 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
             // set to nil so we don't send it again to the delegate when there's a new connect
             tempSensorSerialNumber = nil
             
-            // for Libre 2, the device name includes the sensor id
-            // if tempSensorSerialNumber != deviceName, then it means the user has connected to another (older?) Libre 2 with bluetooth than the one for which NFC scan was done, in that case, inform user
-            // compare only the last 10 characters. Normally it should be 10, but for some reason, xDrip4iOS does not correctly decode the sensor uid, the first character is not correct
-            if let deviceName = deviceName, sensorSerialNumber.serialNumber.suffix(9).uppercased() != deviceName.suffix(9) {
+            // Validate using the identity advertised by this sensor generation. Older Libre 2
+            // sensors include their serial number in the Bluetooth name, while 7F sensors use
+            // the MAC-derived name returned by the NFC enable-streaming command.
+            if connectedDeviceMatchesScannedSensor(serialNumber: sensorSerialNumber) == false {
                 DispatchQueue.main.async { [weak self] in
                     self?.bluetoothTransmitterDelegate?.error(message: TextsLibreNFC.connectedLibre2DoesNotMatchScannedLibre2)
                 }
@@ -225,6 +229,7 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
             self.tempSensorSerialNumber = nil
             self.libreNFC = nil
             self.libreSensorType = nil
+            self.expectedBluetoothNameFromNFC = nil
         }
         if Thread.isMainThread {
             tearDown()
@@ -244,6 +249,23 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
     private func resetRxBuffer() {
         rxBuffer = Data()
         startDate = Date()
+    }
+
+    /// Returns nil when the connected peripheral cannot be validated. A missing identifier must
+    /// not be reported as a wrong sensor because connection and payload authentication still
+    /// provide their own checks.
+    private func connectedDeviceMatchesScannedSensor(serialNumber: LibreSensorSerialNumber) -> Bool? {
+        guard let deviceName = deviceName else { return nil }
+
+        if libreSensorType?.usesMacAddressAsBluetoothName == true {
+            guard let expectedBluetoothNameFromNFC = expectedBluetoothNameFromNFC else { return nil }
+
+            return deviceName.caseInsensitiveCompare(expectedBluetoothNameFromNFC) == .orderedSame
+        }
+
+        // Preserve the legacy comparison: historically the first decoded serial character was
+        // unreliable, so only the final nine characters were used to identify ABBOTT-named sensors.
+        return serialNumber.serialNumber.suffix(9).uppercased() == deviceName.suffix(9).uppercased()
     }
     
     /// process value received from transmitter
@@ -445,10 +467,11 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
     }
     
     func nfcScanExpectedDevice(serialNumber: String, macAddress: String) {
-        if libreSensorType?.usesMacAddressAsBluetoothName == true {
-            updateExpectedDeviceName(name: macAddress)
-        } else {
-            updateExpectedDeviceName(name: "ABBOTT" + serialNumber)
-        }
+        let expectedBluetoothName = libreSensorType?.usesMacAddressAsBluetoothName == true
+            ? macAddress
+            : "ABBOTT" + serialNumber
+
+        expectedBluetoothNameFromNFC = expectedBluetoothName
+        updateExpectedDeviceName(name: expectedBluetoothName)
     }
 }
