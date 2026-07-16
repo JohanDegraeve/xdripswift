@@ -527,7 +527,13 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleNotifications,
-                            providers: { [SettingsViewNotificationsSettingsViewModel()] }
+                            providers: {
+                                [
+                                    SettingsViewNotificationsSettingsViewModel(),
+                                    SettingsViewNotificationsSettingsViewModel(rowGroup: .appBadge),
+                                    SettingsViewNotificationsSettingsViewModel(rowGroup: .liveActivities)
+                                ]
+                            }
                         )
                     }
                 ),

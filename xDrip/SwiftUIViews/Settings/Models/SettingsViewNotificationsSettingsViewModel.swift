@@ -22,69 +22,102 @@ fileprivate enum Setting:Int, CaseIterable {
     
 }
 
+enum NotificationSettingsRowGroup {
+    case notifications
+    case appBadge
+    case liveActivities
+}
+
 /// conforms to SettingsViewModelProtocol for all general settings in the first sections screen
 class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelProtocol, SettingsNativeSectionProvider {
     
     /// for trace
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categorySettingsViewDataSourceSettingsViewModel)
+
+    private let rowGroup: NotificationSettingsRowGroup
     
     // MARK: - Native SwiftUI rows
 
+    func settingsSectionTitle() -> String? {
+        switch rowGroup {
+        case .notifications:
+            return Texts_SettingsView.sectionTitleNotifications
+        case .appBadge, .liveActivities:
+            return nil
+        }
+    }
+
     func settingsRows(sectionID: Int) -> [SettingsRow] {
-        [
-            SettingsRow(
-                id: "notifications.showReadingInNotification",
-                title: Texts_SettingsView.showReadingInNotification,
-                control: .toggle(
-                    isOn: { UserDefaults.standard.showReadingInNotification },
-                    setIsOn: { isOn in
-                        trace("showReadingInNotification changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
-                        UserDefaults.standard.showReadingInNotification = isOn
-                    }
-                )
-            ),
-            SettingsRow(
-                id: "notifications.notificationInterval",
-                title: Texts_SettingsView.settingsviews_IntervalTitle,
-                detail: notificationIntervalDetailText,
-                action: .textEntry(notificationIntervalTextEntry)
-            ),
-            SettingsRow(
-                id: "notifications.liveActivityType",
-                title: Texts_SettingsView.labelLiveActivityType,
-                detail: UserDefaults.standard.liveActivityType.description,
-                isVisible: liveActivitiesAvailable,
-                action: .selectionList(liveActivitySelectionList)
-            ),
-            SettingsRow(
-                id: "notifications.showReadingInAppBadge",
-                title: Texts_SettingsView.labelShowReadingInAppBadge,
-                control: .toggle(
-                    isOn: { UserDefaults.standard.showReadingInAppBadge },
-                    setIsOn: { isOn in
-                        trace("showReadingInAppBadge changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
-                        UserDefaults.standard.showReadingInAppBadge = isOn
-                    }
-                )
-            ),
-            SettingsRow(
-                id: "notifications.multipleAppBadgeValueWith10",
-                title: Texts_SettingsView.multipleAppBadgeValueWith10,
-                control: .toggle(
-                    isOn: { UserDefaults.standard.multipleAppBadgeValueWith10 },
-                    setIsOn: { isOn in
-                        trace("multipleAppBadgeValueWith10 changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
-                        UserDefaults.standard.multipleAppBadgeValueWith10 = isOn
-                    }
+        switch rowGroup {
+        case .notifications:
+            return [
+                SettingsRow(
+                    id: "notifications.showReadingInNotification",
+                    title: Texts_SettingsView.showReadingInNotification,
+                    control: .toggle(
+                        isOn: { UserDefaults.standard.showReadingInNotification },
+                        setIsOn: { isOn in
+                            trace("showReadingInNotification changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
+                            UserDefaults.standard.showReadingInNotification = isOn
+                        }
+                    )
                 ),
-                isVisible: !UserDefaults.standard.bloodGlucoseUnitIsMgDl && UserDefaults.standard.showReadingInAppBadge
-            )
-        ]
+                SettingsRow(
+                    id: "notifications.notificationInterval",
+                    title: Texts_SettingsView.settingsviews_IntervalTitle,
+                    detail: notificationIntervalDetailText,
+                    action: .textEntry(notificationIntervalTextEntry)
+                )
+            ]
+        case .appBadge:
+            return [
+                SettingsRow(
+                    id: "notifications.showReadingInAppBadge",
+                    title: Texts_SettingsView.labelShowReadingInAppBadge,
+                    control: .toggle(
+                        isOn: { UserDefaults.standard.showReadingInAppBadge },
+                        setIsOn: { isOn in
+                            trace("showReadingInAppBadge changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
+                            UserDefaults.standard.showReadingInAppBadge = isOn
+                        }
+                    )
+                ),
+                SettingsRow(
+                    id: "notifications.multipleAppBadgeValueWith10",
+                    title: Texts_SettingsView.multipleAppBadgeValueWith10,
+                    control: .toggle(
+                        isOn: { UserDefaults.standard.multipleAppBadgeValueWith10 },
+                        setIsOn: { isOn in
+                            trace("multipleAppBadgeValueWith10 changed by user to %{public}@", log: self.log, category: ConstantsLog.categorySettingsViewNotificationsSettingsViewModel, type: .info, isOn.description)
+                            UserDefaults.standard.multipleAppBadgeValueWith10 = isOn
+                        }
+                    ),
+                    isVisible: !UserDefaults.standard.bloodGlucoseUnitIsMgDl && UserDefaults.standard.showReadingInAppBadge
+                )
+            ]
+        case .liveActivities:
+            return [
+                SettingsRow(
+                    id: "notifications.liveActivityType",
+                    title: Texts_SettingsView.labelLiveActivityType,
+                    detail: UserDefaults.standard.liveActivityType.description,
+                    isVisible: liveActivitiesAvailable,
+                    action: .selectionList(liveActivitySelectionList)
+                )
+            ]
+        }
     }
 
     // MARK: - Initialization
 
+    init(rowGroup: NotificationSettingsRowGroup) {
+        self.rowGroup = rowGroup
+        super.init()
+        addObservers()
+    }
+
     override init() {
+        self.rowGroup = .notifications
         super.init()
         addObservers()
     }
@@ -284,7 +317,7 @@ class SettingsViewNotificationsSettingsViewModel: NSObject, SettingsViewModelPro
     
 
     func settingsSectionFooter() -> String? {
-        liveActivitiesAvailable ? nil : Texts_SettingsView.liveActivityDisabledInFollowerModeMessage
+        rowGroup == .liveActivities && !liveActivitiesAvailable ? Texts_SettingsView.liveActivityDisabledInFollowerModeMessage : nil
     }
 
     private var notificationIntervalDetailText: String {
