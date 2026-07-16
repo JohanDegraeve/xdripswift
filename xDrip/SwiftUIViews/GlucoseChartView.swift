@@ -333,6 +333,7 @@ struct GlucoseChartView: View {
             .foregroundStyle(yAxisLabelColor(style: style))
             .font(yAxisLabelFont(style: style))
             .monospacedDigit()
+            .lineLimit(1)
             .frame(width: yAxisLabelWidth(), alignment: yAxisLabelAlignment())
             .offset(x: yAxisLabelOffsetX(), y: chartType.yAxisLabelOffsetY())
     }
@@ -373,7 +374,13 @@ struct GlucoseChartView: View {
     }
 
     private func yAxisLabelWidth() -> CGFloat {
-        usesMainChartYAxisContext ? ConstantsGlucoseChartSwiftUI.yAxisMainChartLabelWidth : ConstantsGlucoseChartSwiftUI.yAxisLabelWidth
+        guard usesMainChartYAxisContext else {
+            return ConstantsGlucoseChartSwiftUI.yAxisLabelWidth
+        }
+
+        return isMgDl
+            ? ConstantsGlucoseChartSwiftUI.yAxisMainChartLabelWidthInMgDl
+            : ConstantsGlucoseChartSwiftUI.yAxisMainChartLabelWidthInMmol
     }
 
     private func yAxisLabelAlignment() -> Alignment {
