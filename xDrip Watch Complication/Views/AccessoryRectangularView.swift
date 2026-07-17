@@ -36,19 +36,6 @@ extension XDripWatchComplication.EntryView {
             .padding(0)
 
             GlucoseChartCompactView(glucoseChartType: .watchAccessoryRectangular, bgReadingValues: entry.widgetState.bgReadingValues, bgReadingDates: entry.widgetState.bgReadingDates, isMgDl: entry.widgetState.isMgDl, urgentLowLimitInMgDl: entry.widgetState.urgentLowLimitInMgDl, lowLimitInMgDl: entry.widgetState.lowLimitInMgDl, highLimitInMgDl: entry.widgetState.highLimitInMgDl, urgentHighLimitInMgDl: entry.widgetState.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: entry.widgetState.overrideChartHeight(), overrideChartWidth: entry.widgetState.overrideChartWidth(), highContrast: nil)
-
-            if entry.widgetState.keepAliveIsDisabled {
-                HStack(alignment: .center, spacing: 4) {
-                    Image(systemName: "exclamationmark.triangle")
-                        .font(.system(size: entry.widgetState.isSmallScreen() ? 12 : 14))
-
-                    Text(Texts_WatchComplication.keepAliveDisabled)
-                        .font(.system(size: entry.widgetState.isSmallScreen() ? 12 : 14))
-                        .multilineTextAlignment(.leading)
-                }
-                .foregroundStyle(.teal)
-                .padding(0)
-            }
         }
         .widgetBackground(backgroundView: Color.clear)
     }

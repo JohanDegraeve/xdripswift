@@ -38,18 +38,25 @@ struct MainViewDataSourceView: View {
                 HStack(alignment: .center) {
                     if !watchState.isMaster {
                         HStack(alignment: .center, spacing: isSmallScreen ? 2 : 4) {
-                            watchState.getFollowerConnectionNetworkStatus().image
-                                .font(.system(size: textSize))
-                                .foregroundStyle(watchState.getFollowerConnectionNetworkStatus().color)
+                            Circle()
+                                .fill(watchState.followerConnectionIndicatorColor())
+                                .frame(width: 8, height: 8)
+                                .overlay {
+                                    Circle()
+                                        .stroke(watchState.followerConnectionIndicatorColor().opacity(0.35), lineWidth: 3)
+                                }
                             
                             watchState.followerBackgroundKeepAliveType.keepAliveImage
                                 .font(.system(size: textSize))
                                 .foregroundStyle(watchState.getFollowerBackgroundKeepAliveColor())
                             
-                            Text(watchState.followerDataSourceType.fullDescription)
+                            Text(watchState.followerDataSourceType.shortDescription)
                                 .font(.system(size: textSize)).fontWeight(.semibold)
                                 .minimumScaleFactor(0.2)
+                                .allowsTightening(true)
+                                .lineLimit(1)
                         }
+                        .layoutPriority(1)
                     } else {
                         HStack(alignment: .center, spacing: isSmallScreen ? 2 : 4) {
                             if let sensorNoiseIndicatorColor = watchState.sensorNoiseIndicatorColor() {
@@ -65,7 +72,11 @@ struct MainViewDataSourceView: View {
 
                             Text(watchState.activeSensorDescription)
                                 .font(.system(size: textSize)).fontWeight(.semibold)
+                                .minimumScaleFactor(0.2)
+                                .allowsTightening(true)
+                                .lineLimit(1)
                         }
+                        .layoutPriority(1)
                     }
                     
                     Spacer()

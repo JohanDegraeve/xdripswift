@@ -322,17 +322,17 @@ final class WatchStateModel: NSObject, ObservableObject {
     }
 
     /// check when the last follower connection was and compare that to the actual time
-    /// - Returns: image and color of the correct follower connection status
-    func getFollowerConnectionNetworkStatus() -> (image: Image, color: Color) {
+    /// - Returns: color of the follower connection status indicator
+    func followerConnectionIndicatorColor() -> Color {
         if timeStampOfLastFollowerConnection > Date().addingTimeInterval(-Double(secondsUntilFollowerDisconnectWarning)) {
-            return (Image(systemName: "network"), .green)
+            return .green
         } else {
             if followerBackgroundKeepAliveType != .disabled {
-                return (Image(systemName: "network.slash"), .red)
+                return .red
             } else {
                 // if keep-alive is disabled, then this will never show a constant server connection so just "disable"
-                // the icon when not recent. It would be incorrect to show a red error.
-                return (Image(systemName: "network.slash"), .gray)
+                // the indicator when not recent. It would be incorrect to show a red error.
+                return .gray
             }
         }
     }
@@ -581,11 +581,16 @@ final class WatchStateModel: NSObject, ObservableObject {
     private func updateComplicationData() {
         guard let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) else { return }
 
-        let bgReadingDatesAsDouble = bgReadingDates.map { date in
+        let complicationBgReadingValues = keepAliveIsDisabled ? [] : bgReadingValues
+        let complicationBgReadingDates = keepAliveIsDisabled ? [] : bgReadingDates
+        let complicationSlopeOrdinal = keepAliveIsDisabled ? 0 : slopeOrdinal
+        let complicationDeltaValueInUserUnit = keepAliveIsDisabled ? 0 : deltaValueInUserUnit
+
+        let bgReadingDatesAsDouble = complicationBgReadingDates.map { date in
             date.timeIntervalSince1970
         }
 
-        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: bgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl, keepAliveIsDisabled: keepAliveIsDisabled)
+        let complicationSharedUserDefaultsModel = ComplicationSharedUserDefaultsModel(bgReadingValues: complicationBgReadingValues, bgReadingDatesAsDouble: bgReadingDatesAsDouble, isMgDl: isMgDl, slopeOrdinal: complicationSlopeOrdinal, deltaValueInUserUnit: complicationDeltaValueInUserUnit, urgentLowLimitInMgDl: urgentLowLimitInMgDl, lowLimitInMgDl: lowLimitInMgDl, highLimitInMgDl: highLimitInMgDl, urgentHighLimitInMgDl: urgentHighLimitInMgDl, keepAliveIsDisabled: keepAliveIsDisabled)
 
         // store the model in the shared user defaults using a name that is uniquely specific to this copy of the app as installed on
         // the user's device - this allows several copies of the app to be installed without cross-contamination of widget/complication data

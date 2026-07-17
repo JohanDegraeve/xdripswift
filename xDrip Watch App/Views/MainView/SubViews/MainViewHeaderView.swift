@@ -47,6 +47,8 @@ struct MainViewHeaderView: View {
                     .font(.system(size: isSmallScreen ? 12 : 14))
                     .foregroundStyle(.gray)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.5)
+                    .allowsTightening(true)
             }
         }
         .padding(.trailing, 10)

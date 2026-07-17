@@ -328,7 +328,7 @@ public struct BgReadingSnapshot: Sendable, Hashable {
     }
 
     public func slopeOrdinal() -> Int {
-        var ordinal = 7
+        var ordinal = 0
         let slopeByMinute = calculatedValueSlope * 60000
 
         if !hideSlope {

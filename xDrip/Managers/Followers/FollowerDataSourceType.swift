@@ -92,6 +92,20 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return "Medtrum EasyView"
         }
     }
+
+    // shorter description for compact UI surfaces like the Watch app
+    var shortDescription: String {
+        switch self {
+        case .nightscout:
+            return "Nightscout"
+        case .libreLinkUp, .libreLinkUpRussia:
+            return "LibreLinkUp"
+        case .dexcomShare:
+            return "Dex Share"
+        case .medtrumEasyView:
+            return "Medtrum"
+        }
+    }
     
     var abbreviation: String {
         switch self {
