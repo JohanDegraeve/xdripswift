@@ -29,7 +29,7 @@ Sensor support depends on the exact model, region, transmitter firmware and whet
 
 ### App features
 
-- Configurable glucose charts, reading history, treatments, statistics and time-in-range views
+- Configurable glucose charts with optional sensor-noise bands, reading history, treatments, statistics and time-in-range views
 - Custom glucose, missed-reading, device and battery alerts, with spoken readings and trends
 - Nightscout upload and synchronization, Dexcom Share upload and Apple Health integration
 - Apple Watch app and complications
