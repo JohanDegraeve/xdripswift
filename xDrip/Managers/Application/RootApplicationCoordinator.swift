@@ -2078,6 +2078,27 @@ import AppIntents
                 }
                 
                 let dataSourceDescription = UserDefaults.standard.isMaster ? UserDefaults.standard.activeSensorDescription ?? "" : UserDefaults.standard.followerDataSourceType.fullDescription
+                var sensorNoiseStateRawValue: Int?
+
+                if UserDefaults.standard.isMaster,
+                   let activeSensor,
+                   activeSensor.noiseAlgorithmVersion == ConstantsSensorNoise.algorithmVersion,
+                   let latestReadingAt = activeSensor.noiseLatestReadingAt {
+                    let readingAge = Date().timeIntervalSince(latestReadingAt)
+
+                    if readingAge >= -TimeInterval(minutes: 5),
+                       readingAge <= ConstantsSensorNoise.rootWarningFreshness {
+                        let rawSensorNoiseState = SensorNoiseState(rawValue: activeSensor.noiseStateRaw) ?? .collecting
+                        sensorNoiseStateRawValue = Int(
+                            ConstantsSensorNoise.displayState(
+                                rawState: rawSensorNoiseState,
+                                shortTermNoise: activeSensor.shortTermNoise?.doubleValue,
+                                longTermNoise: activeSensor.longTermNoise?.doubleValue,
+                                sensitivity: UserDefaults.standard.sensorNoiseSensitivity
+                            ).rawValue
+                        )
+                    }
+                }
                 
                 // set up the AID status values if applicable. If not needed, then we'll send nil dates which will then be ignored by the Live Activity
                 var deviceStatusCreatedAt: Date?
@@ -2092,7 +2113,7 @@ import AppIntents
                 // if we should show it, then let's continue processing the lastReading array to create a valid contentState
                 if (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)) && UserDefaults.standard.liveActivityType != .disabled {
                     // create the contentState that will update the dynamic attributes of the Live Activity Widget
-                    let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: UserDefaults.standard.liveActivityType, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, deviceStatusCreatedAt: deviceStatusCreatedAt, deviceStatusLastLoopDate: deviceStatusLastLoopDate)
+                    let contentState = XDripWidgetAttributes.ContentState( bgReadingValues: bgReadingValues, bgReadingDates: bgReadingDates, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeOrdinal: slopeOrdinal, deltaValueInUserUnit: deltaValueInUserUnit, urgentLowLimitInMgDl: UserDefaults.standard.urgentLowMarkValue, lowLimitInMgDl: UserDefaults.standard.lowMarkValue, highLimitInMgDl: UserDefaults.standard.highMarkValue, urgentHighLimitInMgDl: UserDefaults.standard.urgentHighMarkValue, liveActivityType: UserDefaults.standard.liveActivityType, dataSourceDescription: dataSourceDescription, followerPatientName: !UserDefaults.standard.isMaster ? UserDefaults.standard.followerPatientName : nil, sensorNoiseStateRawValue: sensorNoiseStateRawValue, deviceStatusCreatedAt: deviceStatusCreatedAt, deviceStatusLastLoopDate: deviceStatusLastLoopDate)
                     
                     LiveActivityManager.shared.update(contentState: contentState, forceRestart: forceRestart)
                 } else {

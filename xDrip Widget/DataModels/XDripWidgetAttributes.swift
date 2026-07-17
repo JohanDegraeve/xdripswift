@@ -54,6 +54,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var liveActivityType: LiveActivityType
         var dataSourceDescription: String
         var followerPatientName: String?
+        var sensorNoiseStateRawValue: Int?
         
         var deviceStatusCreatedAt: Date?
         var deviceStatusLastLoopDate: Date?
@@ -70,7 +71,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             bgReadingDates.first
         }
 
-        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, dataSourceDescription: String? = "", followerPatientName: String? = nil, deviceStatusCreatedAt: Date?, deviceStatusLastLoopDate: Date?) {
+        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, dataSourceDescription: String? = "", followerPatientName: String? = nil, sensorNoiseStateRawValue: Int? = nil, deviceStatusCreatedAt: Date?, deviceStatusLastLoopDate: Date?) {
             let readings = Array(zip(bgReadingValues, bgReadingDates))
             self.bgReadingFloats = readings.map { Float16($0.0) }
 
@@ -88,6 +89,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
             self.liveActivityType = liveActivityType
             self.dataSourceDescription = dataSourceDescription ?? ""
             self.followerPatientName = followerPatientName
+            self.sensorNoiseStateRawValue = sensorNoiseStateRawValue
             
             self.deviceStatusCreatedAt = deviceStatusCreatedAt
             self.deviceStatusLastLoopDate = deviceStatusLastLoopDate
@@ -229,6 +231,23 @@ struct XDripWidgetAttributes: ActivityAttributes {
                 }
             } else {
                 return ""
+            }
+        }
+
+        func sensorNoiseIndicatorColor() -> Color? {
+            switch sensorNoiseStateRawValue {
+            case 0:
+                return Color(.systemGray)
+            case 1:
+                return .green
+            case 2:
+                return .yellow
+            case 3:
+                return .orange
+            case 4, 5:
+                return .red
+            default:
+                return nil
             }
         }
                 
