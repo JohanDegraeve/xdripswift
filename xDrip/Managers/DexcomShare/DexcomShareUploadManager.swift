@@ -537,114 +537,140 @@ class DexcomShareUploadManager:NSObject {
             
         }
             
-        // create url
-        let testURL = url.appendingPathComponent(ConstantsDexcomShare.dexcomShareUploadLoginPath)
-        
-        // create the request
-        var request = URLRequest(url: testURL)
-        request.httpMethod = "POST"
-        request.setValue("application/json", forHTTPHeaderField:"Content-Type")
-        request.setValue("application/json", forHTTPHeaderField:"Accept")
-        
         do {
+            // Step 1/2 - AUTH: Authenticate to get accountId
+            let authURL = url.appendingPathComponent(ConstantsDexcomShare.dexcomShareFollowAuthPath)
+            var authRequest = URLRequest(url: authURL)
+            authRequest.httpMethod = "POST"
+            authRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            authRequest.setValue("Dexcom%20Share/3.0.2.11 CFNetwork/1390 Darwin/22.0.0", forHTTPHeaderField: "User-Agent")
             
-            // create authParameters in json format
-            let uploadData = try JSONSerialization.data(withJSONObject: [
+            let authBody = try JSONSerialization.data(withJSONObject: [
                 "accountName": dexcomShareAccountName,
                 "password": dexcomSharePassword,
                 "applicationId": ConstantsDexcomShare.applicationId
-                ], options: [])
+            ], options: [])
             
-            // get shared URLSession
-            let sharedSession = URLSession.shared
-            
-            // Create upload Task
-            let task = sharedSession.uploadTask(with: request, from: uploadData, completionHandler: { [weak self] (data, response, error) -> Void in
+            let authTask = URLSession.shared.uploadTask(with: authRequest, from: authBody) { [weak self] data, response, error in
                 guard let self = self else { return }
                 
-                trace("in loginAndStoreSessionId, finished task", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+                trace("in loginAndStoreSessionId, finished auth task", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
                 
-                // error cases
                 if let error = error {
-                    trace("    failed to login, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, error.localizedDescription)
+                    trace("    failed to authenticate, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, error.localizedDescription)
                     completion(false, error)
                     return
                 }
                 
-                // check that response is HTTPURLResponse
-                if let response = response as? HTTPURLResponse {
-                    
-                    if let data = data {
-                        
-                        // data has sessionid (if success) or error details (if failure) which can be logged and shown to the user
-                        guard let decoded = try? JSONSerialization.jsonObject(with: data, options: .allowFragments)
-                            else {
-                                
-                                trace("    failed to login, JSONSerialization failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                                completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "Could not do JSONSerialization of data"]))
-                                return
-                        }
-                        
-                        guard (200...299).contains(response.statusCode) else {
-                            
-                            trace("    failed to login, statuscode = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, response.statusCode.description)
-                            
-                            // failure should be a JSON object containing the error reason, if not use "unknown" as error code
-                            let errorCode = (decoded as? [String: String])?["Code"] ?? "unknown"
-                            
-                            completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: errorCode]))
-                            
-                            return
-                        }
-                        
-                        //there's no error, means decoded should now have the value of the new sessionid
-                        if let dexcomShareSessionId = decoded as? String {
-
-                            // when giving random username/password, there's no error but dexcomShareSessionId equals "00000000-0000-0000-0000-000000000000", in that case create errorCode "SSO_AuthenticatePasswordInvalid"
-                            guard dexcomShareSessionId != ConstantsDexcomShare.failedSessionId else {
-                                
-                                completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "SSO_AuthenticatePasswordInvalid"]))
-                                
-                                return
-                                
-                            }
-
-                            // success is a JSON-encoded string containing the dexcomShareSessionId
-                            trace("    successful login", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-                            self.dexcomShareSessionId = dexcomShareSessionId
-                            
-                            completion(true, nil)
-                            
-                            return
-                            
-                        } else {
-                            
-                            // failure
-                            trace("    failed to login, failed to get dexcomShareSessionId, decoded is not a string", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                            
-                            completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "decoded is not a string"]))
-                            
-                            return
-                        }
-                        
-                        
-                    } else {
-                        trace("    failed to login, no date received", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
-                        completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "no data received"]))
-                        return
-                    }
-                    
-                } else {
-                    trace("    response is not HTTPURLResponse", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
+                guard let response = response as? HTTPURLResponse else {
+                    trace("    auth response is not HTTPURLResponse", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
                     completion(false, NSError(domain: "", code: 500, userInfo: [NSLocalizedDescriptionKey: "response is not HTTPURLResponse"]))
                     return
                 }
                 
-            })
+                guard let data = data else {
+                    trace("    failed to authenticate, no data received", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
+                    completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "no data received"]))
+                    return
+                }
+                
+                guard let decoded = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) else {
+                    trace("    failed to authenticate, JSONSerialization failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
+                    completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "Could not do JSONSerialization of data"]))
+                    return
+                }
+                
+                guard (200...299).contains(response.statusCode) else {
+                    trace("    failed to authenticate, statuscode = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, response.statusCode.description)
+                    let errorCode = (decoded as? [String: String])?["Code"] ?? "unknown"
+                    completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: errorCode]))
+                    return
+                }
+                
+                let accountId = (String(data: data, encoding: .utf8) ?? "").trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+                guard !accountId.isEmpty else {
+                    trace("    failed to authenticate, failed to get accountId, decoded is not a string", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
+                    completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "decoded is not a string"]))
+                    return
+                }
+                
+                // Step 2/2 - LOGIN: Login by accountId
+                let loginURL = url.appendingPathComponent(ConstantsDexcomShare.dexcomShareFollowLoginPath)
+                var loginRequest = URLRequest(url: loginURL)
+                loginRequest.httpMethod = "POST"
+                loginRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                loginRequest.setValue("Dexcom%20Share/3.0.2.11 CFNetwork/1390 Darwin/22.0.0", forHTTPHeaderField: "User-Agent")
+                
+                do {
+                    let loginBody = try JSONSerialization.data(withJSONObject: [
+                        "accountId": accountId,
+                        "password": dexcomSharePassword,
+                        "applicationId": ConstantsDexcomShare.applicationId
+                    ], options: [])
+                    
+                    let loginTask = URLSession.shared.uploadTask(with: loginRequest, from: loginBody) { [weak self] data, response, error in
+                        guard let self = self else { return }
+                        
+                        trace("in loginAndStoreSessionId, finished login task", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+                        
+                        if let error = error {
+                            trace("    failed to login, error = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, error.localizedDescription)
+                            completion(false, error)
+                            return
+                        }
+                        
+                        guard let response = response as? HTTPURLResponse else {
+                            trace("    response is not HTTPURLResponse", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
+                            completion(false, NSError(domain: "", code: 500, userInfo: [NSLocalizedDescriptionKey: "response is not HTTPURLResponse"]))
+                            return
+                        }
+                        
+                        guard let data = data else {
+                            trace("    failed to login, no date received", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
+                            completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "no data received"]))
+                            return
+                        }
+                        
+                        guard let decoded = try? JSONSerialization.jsonObject(with: data, options: .allowFragments) else {
+                            trace("    failed to login, JSONSerialization failed", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
+                            completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "Could not do JSONSerialization of data"]))
+                            return
+                        }
+                        
+                        guard (200...299).contains(response.statusCode) else {
+                            trace("    failed to login, statuscode = %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error, response.statusCode.description)
+                            let errorCode = (decoded as? [String: String])?["Code"] ?? "unknown"
+                            completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: errorCode]))
+                            return
+                        }
+                        
+                        let dexcomShareSessionId = (String(data: data, encoding: .utf8) ?? "").trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+                        guard !dexcomShareSessionId.isEmpty else {
+                            trace("    failed to login, failed to get dexcomShareSessionId, decoded is not a string", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .error)
+                            completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "decoded is not a string"]))
+                            return
+                        }
+                        
+                        guard dexcomShareSessionId != ConstantsDexcomShare.failedSessionId else {
+                            completion(false, NSError(domain: "", code: response.statusCode, userInfo: [NSLocalizedDescriptionKey: "SSO_AuthenticatePasswordInvalid"]))
+                            return
+                        }
+                        
+                        trace("    successful login", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+                        self.dexcomShareSessionId = dexcomShareSessionId
+                        completion(true, nil)
+                    }
+                    
+                    trace("in loginAndStoreSessionId, calling loginTask.resume", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+                    loginTask.resume()
+                } catch let error {
+                    trace("     %{public}@", log: self.log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, error.localizedDescription)
+                    completion(false, NSError(domain: "", code: 500, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]))
+                }
+            }
             
-            trace("in loginAndStoreSessionId, calling task.resume", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
-            task.resume()
-
+            trace("in loginAndStoreSessionId, calling authTask.resume", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info)
+            authTask.resume()
         } catch let error {
             trace("     %{public}@", log: log, category: ConstantsLog.categoryDexcomShareUploadManager, type: .info, error.localizedDescription)
             completion(false, NSError(domain: "", code: 500, userInfo: [NSLocalizedDescriptionKey: error.localizedDescription]))
