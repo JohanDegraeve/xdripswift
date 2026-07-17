@@ -705,7 +705,14 @@ private struct SensorNoiseChartData {
         let proposedStartDate = range.duration.map { endDate.addingTimeInterval(-$0) } ?? snapshot.sensorStartDate
         let startDate = max(snapshot.sensorStartDate, proposedStartDate)
         domain = startDate ... endDate
-        xAxisDates = range == .day ? Self.hourlyXAxisDates(from: startDate, to: endDate) : nil
+        switch range {
+        case .day:
+            xAxisDates = Self.hourlyXAxisDates(from: startDate, to: endDate)
+        case .threeDays:
+            xAxisDates = Self.dailyXAxisDates(from: startDate, to: endDate)
+        case .week, .all:
+            xAxisDates = nil
+        }
         let sensitivity = UserDefaults.standard.sensorNoiseSensitivity
 
         let visiblePoints = snapshot.points.filter { $0.timeStamp >= startDate && $0.timeStamp <= endDate }
@@ -789,6 +796,26 @@ private struct SensorNoiseChartData {
             }
 
             date = nextHour
+        }
+
+        return dates
+    }
+
+    /// Returns one midnight marker per calendar day for the 3-day view.
+    private static func dailyXAxisDates(from startDate: Date, to endDate: Date) -> [Date] {
+        let calendar = Calendar.current
+        guard var date = calendar.date(byAdding: .day, value: 1, to: calendar.startOfDay(for: startDate)) else { return [] }
+
+        var dates = [Date]()
+
+        while date < endDate {
+            dates.append(date)
+
+            guard let nextDate = calendar.date(byAdding: .day, value: 1, to: date), nextDate > date else {
+                break
+            }
+
+            date = nextDate
         }
 
         return dates
