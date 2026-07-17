@@ -19,6 +19,7 @@
 "settingsviews_multipleAppBadgeValueWith10" = "Бейдж приложения x10";
 "settingsviews_allowScreenRotation" = "Поворот графика";
 "settingsviews_showMiniChart" = "Показать мини-диаграмму";
+"settingsviews_showSensorNoiseOnChart" = "Показывать шум сенсора";
 "settingsviews_showClockWhenScreenIsLocked" = "Часы на экране блокировки";
 "settingsviews_urgentHighValue" = "Очень высокий уровень";
 "settingsviews_highValue" = "Высокий уровень";
@@ -432,3 +433,7 @@
 "settingsviews_nightscoutImportBatchProgress" = "Пакетный %1$d из %2$d";
 "settingsviews_nightscoutImportErrorServer" = "Nightscout вернул временную ошибку сервера (HTTP %d). Возобновите импорт позже.";
 "settingsviews_nightscoutImportErrorUnexpectedStatus" = "Nightscout вернул неожиданный ответ (HTTP %d).";
+"sensorNoiseSensitivity" = "Sensor Sensitivity";
+"sensorNoiseSensitivitySensitive" = "Чувствительно";
+"sensorNoiseSensitivityNormal" = "Нормально";
+"sensorNoiseSensitivityPermissive" = "Допустимо";

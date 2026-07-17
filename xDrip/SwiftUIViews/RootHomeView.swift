@@ -134,7 +134,9 @@ struct RootHomeView: View {
         self.stateModel = stateModel
         self.actions = actions
         self.nightscoutSyncManager = nightscoutSyncManager
-        _glucoseChartStateManager = StateObject(wrappedValue: GlucoseChartStateManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager))
+        // only the main chart can show sensor noise background bands. The mini-chart keeps the
+        // same clean overview behaviour and does not need the extra Core Data fetch.
+        _glucoseChartStateManager = StateObject(wrappedValue: GlucoseChartStateManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager, showsSensorNoiseBands: true))
         _miniChartStateManager = StateObject(wrappedValue: GlucoseChartStateManager(coreDataManager: coreDataManager, nightscoutSyncManager: nightscoutSyncManager))
         _scrollCoordinator = StateObject(wrappedValue: GlucoseChartScrollCoordinator(visibleTimeInterval: initialRange.timeInterval))
         _selectedRange = State(initialValue: initialRange)
@@ -372,6 +374,7 @@ struct RootHomeView: View {
             calibrationPoints: [],
             treatmentPoints: GlucoseChartTreatmentPoints(),
             minimumChartValueInMgDl: ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl,
+            backgroundBands: nil,
             overlayWindowStartDate: startDate,
             overlayWindowEndDate: endDate
         )

@@ -211,6 +211,7 @@
 
 /// home screen settings, should the mini-chart be shown
 "settingsviews_showMiniChart" = "Show Mini-Chart";
+"settingsviews_showSensorNoiseOnChart" = "Show Sensor Noise";
 
 /// When clicking the threshold setting, a pop up asks for the number of units under which a bolus should be considered a micro-bolus
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
@@ -460,3 +461,7 @@
 "settingsviews_nightscoutImportBatchProgress" = "%1$d toplu %2$d";
 "settingsviews_nightscoutImportErrorServer" = "Nightscout geçici bir sunucu hatası verdi (HTTP %d). İçe aktarmaya daha sonra devam edin.";
 "settingsviews_nightscoutImportErrorUnexpectedStatus" = "Nightscout beklenmedik bir yanıt verdi (HTTP %d).";
+"sensorNoiseSensitivity" = "Sensor Sensitivity";
+"sensorNoiseSensitivitySensitive" = "Sensitive";
+"sensorNoiseSensitivityNormal" = "Normal";
+"sensorNoiseSensitivityPermissive" = "Permissive";

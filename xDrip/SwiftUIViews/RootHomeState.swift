@@ -614,14 +614,21 @@ final class RootHomeStateModel: ObservableObject {
             return RootHomeSensorNoiseState()
         }
 
-        let persistedState = SensorNoiseState(rawValue: activeSensor.noiseStateRaw) ?? .collecting
+        let rawState = SensorNoiseState(rawValue: activeSensor.noiseStateRaw) ?? .collecting
+        let sensitivity = UserDefaults.standard.sensorNoiseSensitivity
+        let persistedState = ConstantsSensorNoise.displayState(
+            rawState: rawState,
+            shortTermNoise: activeSensor.shortTermNoise?.doubleValue,
+            longTermNoise: activeSensor.longTermNoise?.doubleValue,
+            sensitivity: sensitivity
+        )
         var state = RootHomeSensorNoiseState(
             showsIndicator: true,
             indicatorColor: persistedState.displayColor,
             indicatorAccessibilityLabel: Texts_HomeView.sensorManagementNoiseTitle + ": " + persistedState.localizedTitle
         )
 
-        if persistedState == .flatlineSuspected {
+        if rawState == .flatlineSuspected {
             state.showsWarning = true
             state.title = Texts_HomeView.sensorNoiseWarningFlatlineTitle
             state.detail = Texts_HomeView.sensorManagementNoiseFlatline
@@ -630,7 +637,7 @@ final class RootHomeStateModel: ObservableObject {
         }
 
         if let shortTermNoise = activeSensor.shortTermNoise?.doubleValue,
-           shortTermNoise > ConstantsSensorNoise.extremeNoiseStandardDeviation {
+           ConstantsSensorNoise.state(for: shortTermNoise, sensitivity: sensitivity) == .extreme {
             state.showsWarning = true
             state.title = Texts_HomeView.sensorNoiseWarningExtremeTitle
             state.detail = formattedNoise(shortTermNoise, windowTitle: Texts_HomeView.sensorManagementNoiseShortTerm)
@@ -638,12 +645,14 @@ final class RootHomeStateModel: ObservableObject {
             return state
         }
 
-        if let longTermNoise = activeSensor.longTermNoise?.doubleValue,
-           longTermNoise > ConstantsSensorNoise.veryHighNoiseStandardDeviation {
+        if let longTermNoise = activeSensor.longTermNoise?.doubleValue {
+            let longTermState = ConstantsSensorNoise.state(for: longTermNoise, sensitivity: sensitivity)
+            guard longTermState.rawValue >= SensorNoiseState.veryHigh.rawValue else { return state }
+
             state.showsWarning = true
             state.title = Texts_HomeView.sensorNoiseWarningPersistentTitle
             state.detail = formattedNoise(longTermNoise, windowTitle: Texts_HomeView.sensorManagementNoiseLongTerm)
-            state.color = longTermNoise > ConstantsSensorNoise.extremeNoiseStandardDeviation
+            state.color = longTermState == .extreme
                 ? ConstantsAppColors.urgent
                 : ConstantsAppColors.caution
             return state

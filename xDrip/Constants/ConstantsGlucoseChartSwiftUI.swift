@@ -96,6 +96,9 @@ enum ConstantsGlucoseChartSwiftUI {
     static let overlayWindowEdgeColor = Color.blue.opacity(0.6)
     static let overlayWindowEdgeLineWidth: CGFloat = 2.0
     static let overlayWindowCurrentTimeEdgeTolerance: TimeInterval = 5 * 60
+    // muted enough to stay behind glucose points, but visible enough during chart scrolling
+    static let sensorNoiseWarningBandColor = Color.yellow.opacity(0.20)
+    static let sensorNoiseUrgentBandColor = Color.red.opacity(0.22)
     
     
     // ------------------------------------------

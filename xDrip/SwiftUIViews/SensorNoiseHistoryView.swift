@@ -18,6 +18,7 @@ struct SensorNoiseHistoryView: View {
     @StateObject private var viewModel: SensorNoiseHistoryViewModel
     @State private var selectedRange = SensorNoiseHistoryRange.day
     @State private var selectedPoint: SensorNoiseHistoryPoint?
+    @State private var sensorNoiseSensitivity = UserDefaults.standard.sensorNoiseSensitivity
 
     private let sensorID: String
     private let isMgDl: Bool
@@ -46,28 +47,34 @@ struct SensorNoiseHistoryView: View {
         GeometryReader { geometry in
             List {
                 if let snapshot = viewModel.snapshot {
-                    Section(header: Text(Texts_HomeView.sensorNoiseHistoryCurrentTitle)) {
+                    Section {
                         currentStateRow(snapshot: snapshot)
+
+                        sensorNoiseSensitivityRow()
 
                         SensorNoiseGaugeRow(
                             title: Texts_HomeView.sensorManagementNoiseShortTerm,
                             noiseInMgDl: snapshot.shortTermNoise,
                             coverage: snapshot.shortTermCoverage,
-                            isMgDl: isMgDl
+                            isMgDl: isMgDl,
+                            sensitivity: sensorNoiseSensitivity
                         )
 
                         SensorNoiseGaugeRow(
                             title: Texts_HomeView.sensorManagementNoiseLongTerm,
                             noiseInMgDl: snapshot.longTermNoise,
                             coverage: snapshot.longTermCoverage,
-                            isMgDl: isMgDl
+                            isMgDl: isMgDl,
+                            sensitivity: sensorNoiseSensitivity
                         )
+                    } header: {
+                        Text(Texts_HomeView.sensorNoiseHistoryCurrentTitle)
                     }
 
                     Section {
                         noiseHistoryChart(
                             snapshot: snapshot,
-                            chartHeight: max(130, (geometry.size.height - 400) * 0.7)
+                            chartHeight: max(110, (geometry.size.height - 430) * 0.62)
                         )
                         .listRowInsets(EdgeInsets(top: 14, leading: 12, bottom: 16, trailing: 12))
                     } header: {
@@ -99,18 +106,20 @@ struct SensorNoiseHistoryView: View {
     // MARK: - current measurements
 
     private func currentStateRow(snapshot: SensorNoiseHistorySnapshot) -> some View {
-        HStack(spacing: 10) {
+        let state = displayState(snapshot: snapshot)
+
+        return HStack(spacing: 10) {
             Circle()
-                .fill(snapshot.state.displayColor)
+                .fill(state.displayColor)
                 .frame(width: 11, height: 11)
                 .overlay {
                     Circle()
-                        .stroke(snapshot.state.displayColor.opacity(0.35), lineWidth: 5)
+                        .stroke(state.displayColor.opacity(0.35), lineWidth: 5)
                 }
 
-            Text(snapshot.state.localizedTitle)
+            Text(state.localizedTitle)
                 .font(.body)
-                .foregroundStyle(snapshot.state.displayColor)
+                .foregroundStyle(state.displayColor)
 
             Spacer()
 
@@ -120,6 +129,30 @@ struct SensorNoiseHistoryView: View {
             }
         }
         .padding(.vertical, 2)
+    }
+
+    private func sensorNoiseSensitivityRow() -> some View {
+        NavigationLink {
+            SensorNoiseSensitivitySelectionView(selectedSensitivity: $sensorNoiseSensitivity)
+        } label: {
+            HStack {
+                Text(Texts_SettingsView.sensorNoiseSensitivity)
+
+                Spacer()
+
+                Text(sensorNoiseSensitivity.description)
+                    .foregroundStyle(Color(.colorSecondary))
+            }
+        }
+    }
+
+    private func displayState(snapshot: SensorNoiseHistorySnapshot) -> SensorNoiseState {
+        ConstantsSensorNoise.displayState(
+            rawState: snapshot.state,
+            shortTermNoise: snapshot.shortTermNoise,
+            longTermNoise: snapshot.longTermNoise,
+            sensitivity: sensorNoiseSensitivity
+        )
     }
 
     // MARK: - history chart
@@ -205,7 +238,7 @@ struct SensorNoiseHistoryView: View {
                 .foregroundStyle(Color(.colorSecondary))
             Text(value.map(displayNoiseValue) ?? "-")
                 .foregroundStyle(
-                    value.map { ConstantsSensorNoise.state(for: $0).displayColor }
+                    value.map { ConstantsSensorNoise.state(for: $0, sensitivity: sensorNoiseSensitivity).displayColor }
                         ?? Color(.colorSecondary)
                 )
         }
@@ -308,7 +341,7 @@ struct SensorNoiseHistoryView: View {
                         y: .value("Short noise", chartData.displayValue(shortTermNoise))
                     )
                     .symbolSize(48)
-                    .foregroundStyle(ConstantsSensorNoise.state(for: shortTermNoise).displayColor)
+                    .foregroundStyle(ConstantsSensorNoise.state(for: shortTermNoise, sensitivity: sensorNoiseSensitivity).displayColor)
                 }
 
                 if let longTermNoise = displayedPoint.longTermNoise {
@@ -317,7 +350,7 @@ struct SensorNoiseHistoryView: View {
                         y: .value("Long noise", chartData.displayValue(longTermNoise))
                     )
                     .symbolSize(35)
-                    .foregroundStyle(ConstantsSensorNoise.state(for: longTermNoise).displayColor)
+                    .foregroundStyle(ConstantsSensorNoise.state(for: longTermNoise, sensitivity: sensorNoiseSensitivity).displayColor)
                 }
             }
         }
@@ -400,6 +433,45 @@ struct SensorNoiseHistoryView: View {
     }
 }
 
+// MARK: - sensitivity picker
+
+private struct SensorNoiseSensitivitySelectionView: View {
+    @Binding var selectedSensitivity: SensorNoiseSensitivity
+    @Environment(\.dismiss) private var dismiss
+
+    var body: some View {
+        List {
+            Section {
+                ForEach(SensorNoiseSensitivity.allCases, id: \.self) { sensitivity in
+                    Button {
+                        selectedSensitivity = sensitivity
+                        UserDefaults.standard.sensorNoiseSensitivity = sensitivity
+                        dismiss()
+                    } label: {
+                        HStack {
+                            Text(sensitivity.description)
+                                .foregroundStyle(Color(.colorPrimary))
+
+                            Spacer()
+
+                            if selectedSensitivity == sensitivity {
+                                Image(systemName: "checkmark")
+                                    .foregroundStyle(.green)
+                            }
+                        }
+                        .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
+            } footer: {
+                Text(Texts_SettingsView.sensorNoiseSensitivityFooter)
+            }
+        }
+        .navigationTitle(Texts_SettingsView.sensorNoiseSensitivity)
+        .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
 // MARK: - view model
 
 @MainActor private final class SensorNoiseHistoryViewModel: ObservableObject {
@@ -467,14 +539,14 @@ struct SensorNoiseSummaryRow: View {
         HStack(spacing: 5) {
             Text(displayValue(shortTermNoise))
                 .foregroundStyle(
-                    shortTermNoise.map { ConstantsSensorNoise.state(for: $0).displayColor }
+                    shortTermNoise.map { ConstantsSensorNoise.state(for: $0, sensitivity: UserDefaults.standard.sensorNoiseSensitivity).displayColor }
                         ?? Color(.colorSecondary)
                 )
             Text("/")
                 .foregroundStyle(Color(.colorSecondary))
             Text(displayValue(longTermNoise))
                 .foregroundStyle(
-                    longTermNoise.map { ConstantsSensorNoise.state(for: $0).displayColor }
+                    longTermNoise.map { ConstantsSensorNoise.state(for: $0, sensitivity: UserDefaults.standard.sensorNoiseSensitivity).displayColor }
                         ?? Color(.colorSecondary)
                 )
         }
@@ -499,6 +571,7 @@ private struct SensorNoiseGaugeRow: View {
     let noiseInMgDl: Double?
     let coverage: Double
     let isMgDl: Bool
+    let sensitivity: SensorNoiseSensitivity
 
     private var maximumGaugeValue: Double {
         ConstantsSensorNoise.extremeNoiseStandardDeviation * 1.25
@@ -516,7 +589,7 @@ private struct SensorNoiseGaugeRow: View {
                 if let noiseInMgDl {
                     Text(displayValue(noiseInMgDl))
                         .font(.subheadline.monospacedDigit())
-                        .foregroundStyle(ConstantsSensorNoise.state(for: noiseInMgDl).displayColor)
+                        .foregroundStyle(ConstantsSensorNoise.state(for: noiseInMgDl, sensitivity: sensitivity).displayColor)
                 } else {
                     Text(Texts_HomeView.sensorManagementNoiseCollecting)
                         .font(.caption)
@@ -529,7 +602,7 @@ private struct SensorNoiseGaugeRow: View {
                     EmptyView()
                 }
                 .gaugeStyle(.accessoryLinear)
-                .tint(ConstantsSensorNoise.state(for: noiseInMgDl).displayColor)
+                .tint(ConstantsSensorNoise.state(for: noiseInMgDl, sensitivity: sensitivity).displayColor)
             } else {
                 ProgressView(value: min(max(coverage, 0), 1))
                     .tint(Color(.systemGray))
@@ -616,6 +689,7 @@ private struct SensorNoiseChartData {
         let startDate = max(snapshot.sensorStartDate, proposedStartDate)
         domain = startDate ... endDate
         xAxisDates = range == .day ? Self.hourlyXAxisDates(from: startDate, to: endDate) : nil
+        let sensitivity = UserDefaults.standard.sensorNoiseSensitivity
 
         let visiblePoints = snapshot.points.filter { $0.timeStamp >= startDate && $0.timeStamp <= endDate }
         let contiguousGroups = Self.contiguousGroups(visiblePoints)
@@ -623,9 +697,9 @@ private struct SensorNoiseChartData {
         let displayGroups = contiguousGroups.map { Self.downsample($0, maximumBuckets: bucketsPerGroup) }
         points = displayGroups.flatMap { $0 }
 
-        elevatedThreshold = ConstantsSensorNoise.elevatedNoiseStandardDeviation.mgDlToMmol(mgDl: isMgDl)
-        veryHighThreshold = ConstantsSensorNoise.veryHighNoiseStandardDeviation.mgDlToMmol(mgDl: isMgDl)
-        extremeThreshold = ConstantsSensorNoise.extremeNoiseStandardDeviation.mgDlToMmol(mgDl: isMgDl)
+        elevatedThreshold = ConstantsSensorNoise.threshold(ConstantsSensorNoise.elevatedNoiseStandardDeviation, sensitivity: sensitivity).mgDlToMmol(mgDl: isMgDl)
+        veryHighThreshold = ConstantsSensorNoise.threshold(ConstantsSensorNoise.veryHighNoiseStandardDeviation, sensitivity: sensitivity).mgDlToMmol(mgDl: isMgDl)
+        extremeThreshold = ConstantsSensorNoise.threshold(ConstantsSensorNoise.extremeNoiseStandardDeviation, sensitivity: sensitivity).mgDlToMmol(mgDl: isMgDl)
 
         let largestObservedValue = points.flatMap { point in
             [point.shortTermNoise, point.longTermNoise].compactMap { $0 }
@@ -634,8 +708,8 @@ private struct SensorNoiseChartData {
         .mgDlToMmol(mgDl: isMgDl) ?? 0
         yMaximum = max(extremeThreshold * 1.16, largestObservedValue * 1.12)
 
-        shortSegments = Self.segments(pointGroups: displayGroups, isLongTerm: false, isMgDl: isMgDl)
-        longSegments = Self.segments(pointGroups: displayGroups, isLongTerm: true, isMgDl: isMgDl)
+        shortSegments = Self.segments(pointGroups: displayGroups, isLongTerm: false, isMgDl: isMgDl, sensitivity: sensitivity)
+        longSegments = Self.segments(pointGroups: displayGroups, isLongTerm: true, isMgDl: isMgDl, sensitivity: sensitivity)
     }
 
     var thresholds: [Double] {
@@ -707,7 +781,8 @@ private struct SensorNoiseChartData {
     private static func segments(
         pointGroups: [[SensorNoiseHistoryPoint]],
         isLongTerm: Bool,
-        isMgDl: Bool
+        isMgDl: Bool,
+        sensitivity: SensorNoiseSensitivity
     ) -> [SensorNoiseChartSegment] {
         var segmentIndex = 0
         var result = [SensorNoiseChartSegment]()
@@ -724,7 +799,7 @@ private struct SensorNoiseChartData {
                 if pair.0.state == .flatlineSuspected || pair.1.state == .flatlineSuspected {
                     state = .flatlineSuspected
                 } else {
-                    state = ConstantsSensorNoise.state(for: max(startNoise, endNoise))
+                    state = ConstantsSensorNoise.state(for: max(startNoise, endNoise), sensitivity: sensitivity)
                 }
 
                 result.append(

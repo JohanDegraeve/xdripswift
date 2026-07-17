@@ -260,6 +260,7 @@
 
 /// home screen settings, should the mini-chart be shown
 "settingsviews_showMiniChart" = "Show Mini-Chart";
+"settingsviews_showSensorNoiseOnChart" = "Show Sensor Noise";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Patient Name";
@@ -499,3 +500,7 @@
 "settingsviews_nightscoutImportBatchProgress" = "Erä %1$d/%2$d";
 "settingsviews_nightscoutImportErrorServer" = "Nightscout palautti väliaikaisen palvelinvirheen (HTTP %d). Jatka tuontia myöhemmin.";
 "settingsviews_nightscoutImportErrorUnexpectedStatus" = "Nightscout palautti odottamattoman vastauksen (HTTP %d).";
+"sensorNoiseSensitivity" = "Sensor Sensitivity";
+"sensorNoiseSensitivitySensitive" = "Sensitive";
+"sensorNoiseSensitivityNormal" = "Normal";
+"sensorNoiseSensitivityPermissive" = "Permissive";

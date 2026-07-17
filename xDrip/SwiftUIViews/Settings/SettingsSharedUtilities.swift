@@ -1315,7 +1315,7 @@ struct SettingsSelectionListView: View {
                 .buttonStyle(.plain)
             }
         }
-        .settingsListStyle(title: selectionList.title ?? "", titleDisplayMode: .inline)
+        .settingsListStyle(title: selectionList.title ?? "")
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button(selectionList.actionTitle) {

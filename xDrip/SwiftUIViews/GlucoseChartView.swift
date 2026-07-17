@@ -24,6 +24,7 @@ struct GlucoseChartView: View {
     var bgReadingValues: [Double]
     var bgReadingDates: [Date]
     var additionalBgReadingDataSets: [GlucoseChartDataSet]
+    var backgroundBands: [GlucoseChartBackgroundBand]
     /// Full cached/renderable chart state.
     ///
     /// When present, this overrides the direct BG arrays and enables the complete chart surface.
@@ -78,7 +79,7 @@ struct GlucoseChartView: View {
     ///   - overrideChartWidth: Optional explicit chart width.
     ///   - highContrast: Optional high-contrast override for StandBy charts.
     ///   - chartState: Full SwiftUI chart state containing the visible range and all renderable chart series.
-    init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double]?, bgReadingDates: [Date]?, additionalBgReadingDataSets: [GlucoseChartDataSet]? = nil, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType?, hoursToShowScalingHours: Double?, glucoseCircleDiameterScalingHours: Double?, overrideChartHeight: Double?, overrideChartWidth: Double?, highContrast: Bool?, chartState: GlucoseChartState? = nil) {
+    init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double]?, bgReadingDates: [Date]?, additionalBgReadingDataSets: [GlucoseChartDataSet]? = nil, backgroundBands: [GlucoseChartBackgroundBand]? = nil, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType?, hoursToShowScalingHours: Double?, glucoseCircleDiameterScalingHours: Double?, overrideChartHeight: Double?, overrideChartWidth: Double?, highContrast: Bool?, chartState: GlucoseChartState? = nil) {
 
         self.chartType = glucoseChartType
         self.isMgDl = isMgDl
@@ -111,6 +112,7 @@ struct GlucoseChartView: View {
         self.bgReadingValues = []
         self.bgReadingDates = []
         self.additionalBgReadingDataSets = []
+        self.backgroundBands = []
 
         let sourceBgReadingValues = chartState?.bgReadingValues ?? bgReadingValues
         let sourceBgReadingDates = chartState?.bgReadingDates ?? bgReadingDates
@@ -138,6 +140,10 @@ struct GlucoseChartView: View {
 
                 return GlucoseChartDataSet(bgReadingValues: filteredBgReadingValues, bgReadingDates: filteredBgReadingDates, seriesIdentifier: dataSet.seriesIdentifier, lineColor: dataSet.lineColor, pointColor: dataSet.pointColor, lineWidth: dataSet.lineWidth, dash: dataSet.dash, showLine: dataSet.showLine, showPoints: dataSet.showPoints, pointSizeMultiplier: dataSet.pointSizeMultiplier, pointBorderColor: dataSet.pointBorderColor, pointBorderSizeMultiplier: dataSet.pointBorderSizeMultiplier)
             }
+        }
+
+        if let backgroundBands = chartState?.backgroundBands ?? backgroundBands {
+            self.backgroundBands = backgroundBands.filter { $0.endDate > startDate && $0.startDate < endDate }
         }
     }
 
@@ -476,6 +482,16 @@ struct GlucoseChartView: View {
         // Swift Charts renders marks in declaration order: guides first, basal and treatments below
         // glucose, then calibration and overlay marks above the plot.
         Chart {
+            ForEach(backgroundBands) { backgroundBand in
+                RectangleMark(
+                    xStart: .value("Sensor noise start", backgroundBand.startDate),
+                    xEnd: .value("Sensor noise end", backgroundBand.endDate),
+                    yStart: .value("Sensor noise minimum", domain.lowerBound),
+                    yEnd: .value("Sensor noise maximum", domain.upperBound)
+                )
+                .foregroundStyle(backgroundBand.style.color)
+            }
+
             if chartType != .miniChart {
                 ForEach(xAxisMidnightDates, id: \.self) { xAxisMidnightDate in
                     RuleMark(x: .value("Midnight", xAxisMidnightDate))

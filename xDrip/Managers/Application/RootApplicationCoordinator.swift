@@ -398,6 +398,12 @@ import AppIntents
 
         // showing or hiding the original BG readings on the chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showOriginalBGReadings.rawValue, options: .new, context: nil)
+
+        // showing or hiding the sensor noise bands on the main chart
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showSensorNoiseOnChart.rawValue, options: .new, context: nil)
+
+        // changing how strictly stored sensor noise values are interpreted
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.sensorNoiseSensitivity.rawValue, options: .new, context: nil)
         
         // see if the user has changed the statistic days to use
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.daysToUseStatistics.rawValue, options: .new, context: nil)
@@ -1103,7 +1109,14 @@ import AppIntents
 
         case UserDefaults.Key.showOriginalBGReadings:
             rootHomeStateModel.invalidateCharts()
-            
+
+        case UserDefaults.Key.showSensorNoiseOnChart:
+            updateChartWithResetEndDate()
+
+        case UserDefaults.Key.sensorNoiseSensitivity:
+            publishRootHomeState()
+            updateChartWithResetEndDate()
+
         case UserDefaults.Key.showClockWhenScreenIsLocked:
             // refresh screenLock function if it is currently activated in order to show/hide the clock as requested
             if screenIsLocked {

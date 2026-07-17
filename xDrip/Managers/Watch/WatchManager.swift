@@ -201,8 +201,15 @@ final class WatchManager: NSObject, ObservableObject {
 
             if readingAge >= -TimeInterval(minutes: 5),
                readingAge <= ConstantsSensorNoise.rootWarningFreshness {
-                let sensorNoiseState = SensorNoiseState(rawValue: activeSensor.noiseStateRaw) ?? .collecting
-                status.sensorNoiseStateRawValue = Int(sensorNoiseState.rawValue)
+                let rawSensorNoiseState = SensorNoiseState(rawValue: activeSensor.noiseStateRaw) ?? .collecting
+                status.sensorNoiseStateRawValue = Int(
+                    ConstantsSensorNoise.displayState(
+                        rawState: rawSensorNoiseState,
+                        shortTermNoise: activeSensor.shortTermNoise?.doubleValue,
+                        longTermNoise: activeSensor.longTermNoise?.doubleValue,
+                        sensitivity: UserDefaults.standard.sensorNoiseSensitivity
+                    ).rawValue
+                )
             }
         }
 

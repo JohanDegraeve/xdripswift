@@ -438,6 +438,7 @@
 
 /// home screen settings, should the mini-chart be shown
 "settingsviews_showMiniChart" = "Show Mini-Chart";
+"settingsviews_showSensorNoiseOnChart" = "Show Sensor Noise";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Patient Name";
@@ -677,3 +678,7 @@
 "settingsviews_nightscoutImportBatchProgress" = "Пакет %1$d з %2$d";
 "settingsviews_nightscoutImportErrorServer" = "Nightscout повернув тимчасову помилку сервера (HTTP %d). Відновіть імпорт пізніше.";
 "settingsviews_nightscoutImportErrorUnexpectedStatus" = "Nightscout повернув неочікувану відповідь (HTTP %d).";
+"sensorNoiseSensitivity" = "Sensor Sensitivity";
+"sensorNoiseSensitivitySensitive" = "Чутливо";
+"sensorNoiseSensitivityNormal" = "Нормально";
+"sensorNoiseSensitivityPermissive" = "Допустимо";

@@ -260,6 +260,22 @@ class Texts_SettingsView {
     static let sectionTitleHomeScreen: String = {
         return NSLocalizedString("settingsviews_sectiontitlehomescreen", tableName: filename, bundle: Bundle.main, value: "Home Screen", comment: "home screen settings, section title")
     }()
+
+    static let homeScreenChartDisplaySectionTitle: String = {
+        return NSLocalizedString("settingsviews_homeScreenChartDisplaySectionTitle", tableName: filename, bundle: Bundle.main, value: "Chart Display", comment: "home screen settings, section title for main chart display options")
+    }()
+
+    static let homeScreenMainChartSectionFooter: String = {
+        return NSLocalizedString("settingsviews_homeScreenMainChartSectionFooter", tableName: filename, bundle: Bundle.main, value: "These options control how glucose data is displayed on the main chart.", comment: "home screen settings, footer explaining main chart display options")
+    }()
+
+    static let homeScreenScreenLockSectionTitle: String = {
+        return NSLocalizedString("settingsviews_homeScreenScreenLockSectionTitle", tableName: filename, bundle: Bundle.main, value: "Screen Lock", comment: "home screen settings, section title for screen lock options")
+    }()
+
+    static let homeScreenScreenLockSectionFooter: String = {
+        return NSLocalizedString("settingsviews_homeScreenScreenLockSectionFooter", tableName: filename, bundle: Bundle.main, value: "These options control how the Home screen behaves when the app is left open or locked.", comment: "home screen settings, footer explaining screen lock and rotation options")
+    }()
     
     static let showClockWhenScreenIsLocked: String = {
         return NSLocalizedString("settingsviews_showClockWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Lock Screen Clock", comment: "home screen settings, should the clock also be displayed when the screen is locked")
@@ -299,6 +315,10 @@ class Texts_SettingsView {
     
     static let showOriginalBGReadings: String = {
         return NSLocalizedString("settingsviews_showOriginalBGReadings", tableName: filename, bundle: Bundle.main, value: "Original Values", comment: "home screen settings, should the original glucose values be shown on the main chart when post processing is enabled")
+    }()
+
+    static let showSensorNoiseOnChart: String = {
+        return NSLocalizedString("settingsviews_showSensorNoiseOnChart", tableName: filename, bundle: Bundle.main, value: "Show Sensor Noise", comment: "home screen settings, should short-term sensor noise be shown as background bands on the main chart")
     }()
 
     static let labelUrgentHighValue: String = {
@@ -937,6 +957,26 @@ class Texts_SettingsView {
 
     static let preferSensorCountdown: String = {
         return NSLocalizedString("preferSensorCountdown", tableName: filename, bundle: Bundle.main, value: "Prefer Sensor Countdown", comment: "advanced settings, show remaining sensor lifetime instead of elapsed lifetime")
+    }()
+
+    static let sensorNoiseSensitivity: String = {
+        return NSLocalizedString("sensorNoiseSensitivity", tableName: filename, bundle: Bundle.main, value: "Sensor Sensitivity", comment: "sensor noise picker, how strictly stored sensor noise values should be interpreted")
+    }()
+
+    static let sensorNoiseSensitivityFooter: String = {
+        return NSLocalizedString("sensorNoiseSensitivityFooter", tableName: filename, bundle: Bundle.main, value: "Sensor Sensitivity adjusts how strictly sensor noise is classified. Use Sensitive to warn earlier, Normal for standard limits, or Permissive for naturally jumpier sensors. Stored noise values are not changed.", comment: "sensor noise picker footer explaining sensor sensitivity")
+    }()
+
+    static let sensorNoiseSensitivitySensitive: String = {
+        return NSLocalizedString("sensorNoiseSensitivitySensitive", tableName: filename, bundle: Bundle.main, value: "Sensitive", comment: "sensor noise sensitivity option that warns earlier")
+    }()
+
+    static let sensorNoiseSensitivityNormal: String = {
+        return NSLocalizedString("sensorNoiseSensitivityNormal", tableName: filename, bundle: Bundle.main, value: "Normal", comment: "default sensor noise sensitivity option")
+    }()
+
+    static let sensorNoiseSensitivityPermissive: String = {
+        return NSLocalizedString("sensorNoiseSensitivityPermissive", tableName: filename, bundle: Bundle.main, value: "Permissive", comment: "sensor noise sensitivity option that allows more sensor jumpiness")
     }()
 
     static let nsLog: String = {

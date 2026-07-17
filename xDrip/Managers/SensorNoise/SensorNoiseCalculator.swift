@@ -18,9 +18,54 @@ enum SensorNoiseState: Int16 {
     case flatlineSuspected = 5
 }
 
+/// user-facing tolerance used when interpreting stored sensor noise values
+enum SensorNoiseSensitivity: Int, CaseIterable {
+    case sensitive = 0
+    case normal = 1
+    case permissive = 2
+
+    var description: String {
+        switch self {
+        case .sensitive:
+            return Texts_SettingsView.sensorNoiseSensitivitySensitive
+        case .normal:
+            return Texts_SettingsView.sensorNoiseSensitivityNormal
+        case .permissive:
+            return Texts_SettingsView.sensorNoiseSensitivityPermissive
+        }
+    }
+
+    /// multiplier applied only when classifying noise for display and warnings
+    var classificationMultiplier: Double {
+        switch self {
+        case .sensitive:
+            return ConstantsSensorNoise.sensitiveNoiseClassificationMultiplier
+        case .normal:
+            return ConstantsSensorNoise.normalNoiseClassificationMultiplier
+        case .permissive:
+            return ConstantsSensorNoise.permissiveNoiseClassificationMultiplier
+        }
+    }
+}
+
 /// sensor noise calculation and warning limits
 enum ConstantsSensorNoise {
     static let algorithmVersion: Int16 = 1
+
+    /// Interprets stored noise values more strictly by classifying them 15% higher than measured.
+    ///
+    /// This affects display and warning limits only. It does not change stored noise values, the
+    /// calculated algorithm state or flatline detection.
+    static let sensitiveNoiseClassificationMultiplier = 1.15
+
+    /// Uses the stored noise value directly when classifying display and warning state.
+    static let normalNoiseClassificationMultiplier = 1.0
+
+    /// Interprets stored noise values more gently by classifying them 15% lower than measured.
+    ///
+    /// This can help naturally jumpier sensors remain in a lower warning state, without changing
+    /// the stored noise history or bypassing flatline detection.
+    static let permissiveNoiseClassificationMultiplier = 0.85
 
     static let shortTermWindow: TimeInterval = 30 * 60
     static let longTermWindow: TimeInterval = 4 * 60 * 60
@@ -49,6 +94,33 @@ enum ConstantsSensorNoise {
 
     /// Maps a standard-deviation value to the matching display and warning state.
     static func state(for noise: Double) -> SensorNoiseState {
+        state(forAdjustedNoise: noise)
+    }
+
+    /// Maps a stored standard-deviation value through the selected user tolerance.
+    ///
+    /// The raw stored noise values are unchanged. Only the display and warning classification moves.
+    static func state(for noise: Double, sensitivity: SensorNoiseSensitivity) -> SensorNoiseState {
+        state(forAdjustedNoise: noise * sensitivity.classificationMultiplier)
+    }
+
+    /// returns the raw noise value that matches a threshold under the selected user tolerance
+    static func threshold(_ threshold: Double, sensitivity: SensorNoiseSensitivity) -> Double {
+        threshold / sensitivity.classificationMultiplier
+    }
+
+    /// combines short and long-term values into the user-facing state without changing stored data
+    static func displayState(rawState: SensorNoiseState, shortTermNoise: Double?, longTermNoise: Double?, sensitivity: SensorNoiseSensitivity) -> SensorNoiseState {
+        if rawState == .flatlineSuspected { return .flatlineSuspected }
+
+        let states = [shortTermNoise, longTermNoise]
+            .compactMap { $0 }
+            .map { state(for: $0, sensitivity: sensitivity) }
+
+        return states.max(by: { $0.rawValue < $1.rawValue }) ?? .collecting
+    }
+
+    private static func state(forAdjustedNoise noise: Double) -> SensorNoiseState {
         if noise > extremeNoiseStandardDeviation {
             return .extreme
         } else if noise > veryHighNoiseStandardDeviation {

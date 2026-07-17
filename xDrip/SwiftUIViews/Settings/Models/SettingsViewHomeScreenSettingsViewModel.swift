@@ -27,27 +27,33 @@ fileprivate enum Setting:Int, CaseIterable {
 
     // show the original glucose readings on the main chart when post processing is enabled?
     case showOriginalBGReadings = 5
+
+    // show short-term sensor noise as background bands on the main chart?
+    case showSensorNoiseOnChart = 6
     
     //urgent high value
-    case urgentHighMarkValue = 6
+    case urgentHighMarkValue = 7
     
     //high value
-    case highMarkValue = 7
+    case highMarkValue = 8
     
     //target value
-    case targetMarkValue = 8
+    case targetMarkValue = 9
     
     //low value
-    case lowMarkValue = 9
+    case lowMarkValue = 10
     
     //urgent low value
-    case urgentLowMarkValue = 10
+    case urgentLowMarkValue = 11
     
 }
 
 enum SettingsViewHomeScreenSettingsRowGroup {
     case all
     case homeScreen
+    case mainChart
+    case miniChart
+    case screenLock
     case glucoseRanges
 }
 
@@ -67,13 +73,20 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
     // MARK: - Native SwiftUI rows
 
     func settingsRows(sectionID: Int) -> [SettingsRow] {
-        let homeScreenRows = [
+        let mainChartRows = [
+            nativeSettingsRow(id: "homeScreen.showOriginalBGReadings", index: Setting.showOriginalBGReadings.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "homeScreen.showSensorNoiseOnChart", index: Setting.showSensorNoiseOnChart.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "homeScreen.allowMainChartAutoReset", index: Setting.allowMainChartAutoReset.rawValue, sectionID: sectionID)
+        ]
+
+        let miniChartRows = [
+            nativeSettingsRow(id: "homeScreen.showMiniChart", index: Setting.showMiniChart.rawValue, sectionID: sectionID)
+        ]
+
+        let screenLockRows = [
             nativeSettingsRow(id: "homeScreen.allowScreenRotation", index: Setting.allowScreenRotation.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "homeScreen.showClockWhenScreenIsLocked", index: Setting.showClockWhenScreenIsLocked.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "homeScreen.screenLockDimmingType", index: Setting.screenLockDimmingType.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "homeScreen.showMiniChart", index: Setting.showMiniChart.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "homeScreen.allowMainChartAutoReset", index: Setting.allowMainChartAutoReset.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "homeScreen.showOriginalBGReadings", index: Setting.showOriginalBGReadings.rawValue, sectionID: sectionID)
+            nativeSettingsRow(id: "homeScreen.screenLockDimmingType", index: Setting.screenLockDimmingType.rawValue, sectionID: sectionID)
         ]
 
         let glucoseRangeRows = [
@@ -86,9 +99,15 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
 
         switch rowGroup {
         case .all:
-            return homeScreenRows + glucoseRangeRows
+            return mainChartRows + miniChartRows + screenLockRows + glucoseRangeRows
         case .homeScreen:
-            return homeScreenRows
+            return mainChartRows + miniChartRows + screenLockRows
+        case .mainChart:
+            return mainChartRows
+        case .miniChart:
+            return miniChartRows
+        case .screenLock:
+            return screenLockRows
         case .glucoseRanges:
             return glucoseRangeRows
         }
@@ -124,6 +143,11 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
             return SettingsToggleControl(
                 isOn: { UserDefaults.standard.showOriginalBGReadings },
                 setIsOn: { UserDefaults.standard.showOriginalBGReadings = $0 }
+            )
+        case .showSensorNoiseOnChart:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.showSensorNoiseOnChart },
+                setIsOn: { UserDefaults.standard.showSensorNoiseOnChart = $0 }
             )
         case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .targetMarkValue, .lowMarkValue, .urgentLowMarkValue:
             return nil
@@ -249,23 +273,54 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
                     UserDefaults.standard.showOriginalBGReadings = true
                 }
             })
+
+        case .showSensorNoiseOnChart:
+            return SettingsSelectedRowAction.callFunction(function: {
+                if UserDefaults.standard.showSensorNoiseOnChart {
+                    UserDefaults.standard.showSensorNoiseOnChart = false
+                } else {
+                    UserDefaults.standard.showSensorNoiseOnChart = true
+                }
+            })
         }
     }
     
     func sectionTitle() -> String? {
-        if rowGroup == .glucoseRanges {
-            return Texts_SettingsView.glucoseRangesSectionTitle
-        }
+        switch rowGroup {
+        case .mainChart:
+            return Texts_SettingsView.homeScreenChartDisplaySectionTitle
 
-        return Texts_SettingsView.sectionTitleHomeScreen
+        case .miniChart:
+            return nil
+
+        case .screenLock:
+            return Texts_SettingsView.homeScreenScreenLockSectionTitle
+
+        case .glucoseRanges:
+            return Texts_SettingsView.glucoseRangesSectionTitle
+
+        case .all, .homeScreen:
+            return Texts_SettingsView.sectionTitleHomeScreen
+        }
     }
 
     func settingsSectionFooter() -> String? {
-        if rowGroup == .glucoseRanges {
-            return Texts_SettingsView.glucoseRangesSectionFooter
-        }
+        switch rowGroup {
+        case .mainChart:
+            return Texts_SettingsView.homeScreenMainChartSectionFooter
 
-        return nil
+        case .miniChart:
+            return nil
+
+        case .screenLock:
+            return Texts_SettingsView.homeScreenScreenLockSectionFooter
+
+        case .glucoseRanges:
+            return Texts_SettingsView.glucoseRangesSectionFooter
+
+        case .all, .homeScreen:
+            return nil
+        }
     }
     
     func numberOfRows() -> Int {
@@ -294,7 +349,10 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
 
         case .showOriginalBGReadings:
             return Texts_SettingsView.showOriginalBGReadings
-            
+
+        case .showSensorNoiseOnChart:
+            return Texts_SettingsView.showSensorNoiseOnChart
+
         case .urgentHighMarkValue:
             return Texts_SettingsView.labelUrgentHighValue
             
@@ -341,7 +399,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .lowMarkValue, .urgentLowMarkValue, .targetMarkValue:
             return SettingsAccessory.disclosure
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings, .showSensorNoiseOnChart:
             return SettingsAccessory.none
             
         }
@@ -370,7 +428,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .screenLockDimmingType:
             return UserDefaults.standard.screenLockDimmingType.description
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings, .showSensorNoiseOnChart:
             return nil
             
         }
@@ -398,6 +456,9 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         // Listen for changes in the showOriginalBGReadings to trigger the UI to be updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showOriginalBGReadings.rawValue, options: .new, context: nil)
 
+        // Listen for changes in the showSensorNoiseOnChart to trigger the UI to be updated
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showSensorNoiseOnChart.rawValue, options: .new, context: nil)
+
     }
 
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
@@ -407,7 +468,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         else { return }
 
         switch keyPathEnum {
-        case UserDefaults.Key.showMiniChart, UserDefaults.Key.showOriginalBGReadings:
+        case UserDefaults.Key.showMiniChart, UserDefaults.Key.showOriginalBGReadings, UserDefaults.Key.showSensorNoiseOnChart:
 
             // we have to run this in the main thread to avoid access errors
             DispatchQueue.main.async {

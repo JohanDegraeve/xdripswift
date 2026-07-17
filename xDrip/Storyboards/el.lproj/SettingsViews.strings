@@ -19,6 +19,7 @@
 "settingsviews_multipleAppBadgeValueWith10" = "Σήμα εφαρμογής x10";
 "settingsviews_allowScreenRotation" = "Περιστροφή γραφήματος";
 "settingsviews_showMiniChart" = "Εμφάνιση μίνι-γραφήματος;";
+"settingsviews_showSensorNoiseOnChart" = "Εμφάνιση θορύβου αισθητήρα";
 "settingsviews_showClockWhenScreenIsLocked" = "Ρολόι οθόνης κλειδώματος";
 "settingsviews_urgentHighValue" = "Επείγον Υψηλή γλυκόζη";
 "settingsviews_highValue" = "Υψηλή γλυκόζη";
@@ -432,3 +433,7 @@
 "settingsviews_nightscoutImportBatchProgress" = "Παρτίδα %1$d του %2$d";
 "settingsviews_nightscoutImportErrorServer" = "Το Nightscout επέστρεψε ένα προσωρινό σφάλμα διακομιστή (HTTP %d). Συνεχίστε την εισαγωγή αργότερα.";
 "settingsviews_nightscoutImportErrorUnexpectedStatus" = "Το Nightscout επέστρεψε μια απροσδόκητη απόκριση (HTTP %d).";
+"sensorNoiseSensitivity" = "Sensor Sensitivity";
+"sensorNoiseSensitivitySensitive" = "Sensitive";
+"sensorNoiseSensitivityNormal" = "Normal";
+"sensorNoiseSensitivityPermissive" = "Permissive";

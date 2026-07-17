@@ -30,6 +30,36 @@ struct GlucoseChartDataSet {
 
 }
 
+/// Background interval rendered behind chart data to annotate a time-based chart state.
+struct GlucoseChartBackgroundBand: Identifiable, Hashable {
+
+    enum Style: Hashable {
+        case sensorNoiseWarning
+        case sensorNoiseUrgent
+
+        var color: Color {
+            switch self {
+            case .sensorNoiseWarning:
+                return ConstantsGlucoseChartSwiftUI.sensorNoiseWarningBandColor
+            case .sensorNoiseUrgent:
+                return ConstantsGlucoseChartSwiftUI.sensorNoiseUrgentBandColor
+            }
+        }
+    }
+
+    let id: String
+    let startDate: Date
+    let endDate: Date
+    let style: Style
+
+    init(startDate: Date, endDate: Date, style: Style) {
+        self.startDate = startDate
+        self.endDate = endDate
+        self.style = style
+        self.id = "\(startDate.timeIntervalSince1970)-\(endDate.timeIntervalSince1970)-\(String(describing: style))"
+    }
+}
+
 /// Complete renderable state for `GlucoseChartView`.
 ///
 /// `startDate`/`endDate` define the currently visible chart window. `dataStartDate`/`dataEndDate`
@@ -52,6 +82,8 @@ struct GlucoseChartState {
     var calibrationPoints: [GlucoseChartPoint]
     var treatmentPoints: GlucoseChartTreatmentPoints
     var minimumChartValueInMgDl: Double
+    /// Optional background periods, rendered behind glucose and guide marks.
+    var backgroundBands: [GlucoseChartBackgroundBand]? = nil
     var overlayWindowStartDate: Date? = nil
     var overlayWindowEndDate: Date? = nil
 
@@ -67,6 +99,7 @@ struct GlucoseChartState {
             calibrationPoints: [],
             treatmentPoints: GlucoseChartTreatmentPoints(),
             minimumChartValueInMgDl: 38,
+            backgroundBands: nil,
             overlayWindowStartDate: nil,
             overlayWindowEndDate: nil
         )

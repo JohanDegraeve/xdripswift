@@ -48,6 +48,10 @@
 "settingsviews_IntervalMessage" = "Minimum interval between two notifications";
 "settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for background keep-alive.";
 "settingsviews_allowScreenRotation" = "Chart Rotation";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "Chart Display";
+"settingsviews_homeScreenMainChartSectionFooter" = "These options control how glucose data is displayed on the main chart.";
+"settingsviews_homeScreenScreenLockSectionTitle" = "Screen Lock";
+"settingsviews_homeScreenScreenLockSectionFooter" = "These options control how the Home screen behaves when the app is left open or locked.";
 "settingsviews_showClockWhenScreenIsLocked" = "Lock Screen Clock";
 "settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Lock Screen Dimming";
 "settingsviews_screenLockDimmingTypeDisabled" = "Disabled";
@@ -56,6 +60,7 @@
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
 "settingsviews_allowMainChartAutoReset" = "Auto Reset Chart";
 "settingsviews_showOriginalBGReadings" = "Original Values";
+"settingsviews_showSensorNoiseOnChart" = "Show Sensor Noise";
 "settingsviews_urgentHighValue" = "Urgent High Value";
 "settingsviews_urgentHighValueMessage" = "Enter the glucose value for the urgent high threshold.";
 "settingsviews_highValue" = "High Value";
@@ -379,3 +384,7 @@
 "settingsviews_nightscoutImportBatchProgress" = "Batch %1$d of %2$d";
 "settingsviews_nightscoutImportErrorServer" = "Nightscout returned a temporary server error (HTTP %d). Resume the import later.";
 "settingsviews_nightscoutImportErrorUnexpectedStatus" = "Nightscout returned an unexpected response (HTTP %d).";
+"sensorNoiseSensitivity" = "Sensor Sensitivity";
+"sensorNoiseSensitivitySensitive" = "Sensitive";
+"sensorNoiseSensitivityNormal" = "Normal";
+"sensorNoiseSensitivityPermissive" = "Permissive";

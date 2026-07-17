@@ -763,6 +763,14 @@ struct SensorManagementView: View {
             calibrationNote = nil
         }
 
+        let rawNoiseState = activeSensor.flatMap { SensorNoiseState(rawValue: $0.noiseStateRaw) } ?? .collecting
+        let noiseState = ConstantsSensorNoise.displayState(
+            rawState: rawNoiseState,
+            shortTermNoise: activeSensor?.shortTermNoise?.doubleValue,
+            longTermNoise: activeSensor?.longTermNoise?.doubleValue,
+            sensitivity: UserDefaults.standard.sensorNoiseSensitivity
+        )
+
         return SensorManagementState(
             hasTransmitter: transmitter != nil,
             showsNoise: UserDefaults.standard.isMaster && activeSensor != nil,
@@ -790,7 +798,7 @@ struct SensorManagementView: View {
             calibrationNote: calibrationNote,
             shortTermNoise: activeSensor?.shortTermNoise?.doubleValue,
             longTermNoise: activeSensor?.longTermNoise?.doubleValue,
-            noiseState: activeSensor.flatMap { SensorNoiseState(rawValue: $0.noiseStateRaw) } ?? .collecting,
+            noiseState: noiseState,
             currentBgDisplay: activeSensor.flatMap { bgReadingsAccessor.last(forSensor: $0) }.map {
                 SensorManagementEnteredBgValue(rawValue: displayEditableBgValue($0.finalValue), valueInMgDl: $0.finalValue)
             },

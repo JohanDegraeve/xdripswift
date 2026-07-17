@@ -117,7 +117,12 @@
 "settingsviews_IntervalTitle" = "Intervalo entre notificaciones";
 "settingsviews_IntervalMessage" = "Intervalo mínimo entre dos notificaciones";
 "settingsviews_allowScreenRotation" = "Rotación del gráfico";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "Visualización del gráfico";
+"settingsviews_homeScreenMainChartSectionFooter" = "Estas opciones controlan cómo se muestran los datos de glucosa en el gráfico principal.";
+"settingsviews_homeScreenScreenLockSectionTitle" = "Bloqueo de pantalla";
+"settingsviews_homeScreenScreenLockSectionFooter" = "Estas opciones controlan cómo se comporta la pantalla de Inicio cuando la app queda abierta o bloqueada.";
 "settingsviews_showMiniChart" = "Mostrar la mini-gráfica";
+"settingsviews_showSensorNoiseOnChart" = "Mostrar ruido del sensor";
 "settingsviews_Version" = "Versión";
 "settingsviews_license" = "Licencia";
 "m5stack_settingsviews_settingstitle" = "Configuración M5 Stack";
@@ -427,3 +432,7 @@
 "settingsviews_nightscoutImportBatchProgress" = "Lote %1$d de %2$d";
 "settingsviews_nightscoutImportErrorServer" = "Nightscout devolvió un error temporal del servidor (HTTP %d). Reanude la importación más tarde.";
 "settingsviews_nightscoutImportErrorUnexpectedStatus" = "Nightscout devolvió una respuesta inesperada (HTTP %d).";
+"sensorNoiseSensitivity" = "Sensor Sensitivity";
+"sensorNoiseSensitivitySensitive" = "Sensible";
+"sensorNoiseSensitivityNormal" = "Normal";
+"sensorNoiseSensitivityPermissive" = "Permisivo";

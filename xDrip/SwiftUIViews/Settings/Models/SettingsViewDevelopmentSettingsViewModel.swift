@@ -45,7 +45,7 @@ fileprivate enum Setting:Int, CaseIterable {
 
     /// should the active sensor lifetime show time remaining instead of time elapsed?
     case preferSensorCountdown = 13
-    
+
 }
 
 enum SettingsViewDevelopmentSettingsRowGroup {
@@ -127,6 +127,10 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
 
         return Texts_SettingsView.developerSettings
     }
+
+    func sectionFooter() -> String? {
+        return nil
+    }
     
     func settingsRowText(index: Int) -> String {
         
@@ -139,7 +143,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
 
         case .preferSensorCountdown:
             return Texts_SettingsView.preferSensorCountdown
-            
+
         case .NSLogEnabled:
             return Texts_SettingsView.nsLog
             
@@ -204,7 +208,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             
         case .showDeveloperSettings, .preferSensorCountdown, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .loopDelay, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp:
             return nil
-            
+
         case .loopShareType:
             // if using Medtrum Follower mode, then show disabled text as we have disabled loop share feature due to
             // concerns over Medtrum CGM values producing incorrect insulin dosing
@@ -371,7 +375,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                     }
                 }
             }, cancelHandler: nil, inputValidator: nil)
-            
+
         case .storeFrequentReadingsInHealthKit:
             // unfortunately this won't do anything when the use enables the option, but
             // it will show if the tap the row itself. Not perfect, but better than nothing.

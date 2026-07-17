@@ -478,6 +478,7 @@
 
 /// home screen settings, should the mini-chart be shown
 "settingsviews_showMiniChart" = "Show Mini-Chart";
+"settingsviews_showSensorNoiseOnChart" = "Show Sensor Noise";
 
 /// data source settings, the name of the person we are following
 "settingsviews_followerPatientName" = "Patient Name";
@@ -717,3 +718,7 @@
 "settingsviews_nightscoutImportBatchProgress" = "Paket %1$d od %2$d";
 "settingsviews_nightscoutImportErrorServer" = "Nightscout je vrnil začasno napako strežnika (HTTP %d). Uvoz nadaljujte pozneje.";
 "settingsviews_nightscoutImportErrorUnexpectedStatus" = "Nightscout je vrnil nepričakovan odgovor (HTTP %d).";
+"sensorNoiseSensitivity" = "Sensor Sensitivity";
+"sensorNoiseSensitivitySensitive" = "Sensitive";
+"sensorNoiseSensitivityNormal" = "Normal";
+"sensorNoiseSensitivityPermissive" = "Permissive";

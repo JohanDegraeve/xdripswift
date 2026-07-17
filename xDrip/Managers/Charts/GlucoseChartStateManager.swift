@@ -46,6 +46,11 @@ final class GlucoseChartStateManager: ObservableObject {
     private var cachedOriginalReadings = [CachedBgReading]()
     private var cachedCalibrations = [CachedCalibration]()
     private var cachedTreatments = [CachedTreatment]()
+    /// Sensor noise snapshots are cached with the same wider date range as glucose.
+    ///
+    /// This keeps chart scrolling smooth because the background bands can be rebuilt from memory
+    /// while Swift Charts is changing the visible window.
+    private var cachedNoiseSamples = [CachedSensorNoiseSample]()
     /// Derived treatment chart points created from `cachedTreatments`.
     ///
     /// Bolus/carbs/bg-check/note points can be appended and prepended just like glucose. Basal points
@@ -57,6 +62,7 @@ final class GlucoseChartStateManager: ObservableObject {
     private var treatmentPointsStartDate: Date?
     private var treatmentPointsEndDate: Date?
     private var treatmentPointsMinimumChartValue: Double?
+    private let showsSensorNoiseBands: Bool
 
     // MARK: - Basal State
 
@@ -73,15 +79,21 @@ final class GlucoseChartStateManager: ObservableObject {
     private static let cacheRefreshLookbackTimeInterval: TimeInterval = .hours(6)
     private static let minimumScrollCacheBufferTimeInterval: TimeInterval = .hours(6)
     private static let maximumScrollCacheBufferTimeInterval: TimeInterval = .hours(24)
+    /// Moves short-term noise bands back onto the glucose readings that created the noise score.
+    ///
+    /// A sample written at the end of a 30 minute noise window describes the previous 30 minutes,
+    /// not just the moment when the sample was stored.
+    private static let sensorNoiseChartBandTimeOffset = ConstantsSensorNoise.shortTermWindow
 
     // MARK: - Initialisation
 
-    init(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager) {
+    init(coreDataManager: CoreDataManager, nightscoutSyncManager: NightscoutSyncManager, showsSensorNoiseBands: Bool = false) {
         self.coreDataManager = coreDataManager
         self.nightscoutSyncManager = nightscoutSyncManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
         self.treatmentEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
+        self.showsSensorNoiseBands = showsSensorNoiseBands
 
         let endDate = Date()
         let startDate = endDate.addingTimeInterval(.hours(-UserDefaults.standard.chartWidthInHours))
@@ -155,6 +167,7 @@ final class GlucoseChartStateManager: ObservableObject {
         cachedOriginalReadings.removeAll()
         cachedCalibrations.removeAll()
         cachedTreatments.removeAll()
+        cachedNoiseSamples.removeAll()
         cachedTreatmentPoints = GlucoseChartTreatmentPoints()
         cacheStartDate = nil
         cacheEndDate = nil
@@ -234,6 +247,10 @@ final class GlucoseChartStateManager: ObservableObject {
             )
         )
 
+        if showsSensorNoiseBands {
+            cachedNoiseSamples.merge(loadNoiseSamples(from: startDate, to: endDate, on: managedObjectContext))
+        }
+
         cachedTreatments.merge(
             mapTreatments(
                 treatmentEntryAccessor.getTreatments(fromDate: startDate, toDate: endDate, on: managedObjectContext),
@@ -259,6 +276,7 @@ final class GlucoseChartStateManager: ObservableObject {
         cachedOriginalReadings.removeAll { $0.date >= refreshStartDate && $0.date <= refreshEndDate }
         cachedCalibrations.removeAll { $0.date >= refreshStartDate && $0.date <= refreshEndDate }
         cachedTreatments.removeAll { $0.date >= refreshStartDate && $0.date <= refreshEndDate }
+        cachedNoiseSamples.removeAll { $0.date >= refreshStartDate && $0.date <= refreshEndDate }
 
         loadRange(startDate: refreshStartDate, endDate: refreshEndDate)
 
@@ -285,6 +303,7 @@ final class GlucoseChartStateManager: ObservableObject {
         cachedOriginalReadings.removeAll { $0.date < keepStartDate || $0.date > keepEndDate }
         cachedCalibrations.removeAll { $0.date < keepStartDate || $0.date > keepEndDate }
         cachedTreatments.removeAll { $0.date < keepStartDate || $0.date > keepEndDate }
+        cachedNoiseSamples.removeAll { $0.date < keepStartDate || $0.date > keepEndDate }
         cachedTreatmentPoints.trim(from: keepStartDate, to: keepEndDate)
 
         if let cacheStartDate = cacheStartDate {
@@ -355,12 +374,17 @@ final class GlucoseChartStateManager: ObservableObject {
             additionalBgReadingDataSets: additionalDataSets,
             calibrationPoints: cachedCalibrationsToRender.map { GlucoseChartPoint(date: $0.date, value: $0.value, idPrefix: "calibration") },
             treatmentPoints: showTreatments ? cachedTreatmentPoints : GlucoseChartTreatmentPoints(),
-            minimumChartValueInMgDl: minimumChartValue
+            minimumChartValueInMgDl: minimumChartValue,
+            backgroundBands: chartBackgroundBands(startDate: dataStartDate, endDate: dataEndDate)
         )
     }
 
     private var shouldShowOriginalReadings: Bool {
         UserDefaults.standard.showOriginalBGReadings && (UserDefaults.standard.enableAdjustment || UserDefaults.standard.enableSmoothing)
+    }
+
+    private var shouldShowSensorNoiseBands: Bool {
+        showsSensorNoiseBands && UserDefaults.standard.isMaster && UserDefaults.standard.showSensorNoiseOnChart
     }
 
     private func minimumChartValue(startDate: Date, endDate: Date, showTreatments: Bool) -> Double {
@@ -373,6 +397,115 @@ final class GlucoseChartStateManager: ObservableObject {
         }
 
         return ConstantsGlucoseChart.minimumChartValueInMgdlWithBasal
+    }
+
+    private func chartBackgroundBands(startDate: Date, endDate: Date) -> [GlucoseChartBackgroundBand]? {
+        guard shouldShowSensorNoiseBands, startDate < endDate else { return nil }
+
+        let visibleNoiseSamples = cachedNoiseSamples
+            .filter { $0.date >= startDate && $0.date <= endDate }
+            .sorted { $0.date < $1.date }
+
+        guard !visibleNoiseSamples.isEmpty else { return nil }
+
+        var bands = [GlucoseChartBackgroundBand]()
+
+        for (index, sample) in visibleNoiseSamples.enumerated() {
+            guard let style = sample.bandStyle else { continue }
+
+            let nextDate = index + 1 < visibleNoiseSamples.count
+                ? visibleNoiseSamples[index + 1].date
+                : sample.date.addingTimeInterval(ConstantsSensorNoise.historyMinimumInterval)
+            // shift each stored noise sample back by the short-term window so the band follows the
+            // glucose values being assessed instead of lagging behind them on the chart.
+            let offsetStartDate = sample.date.addingTimeInterval(-Self.sensorNoiseChartBandTimeOffset)
+            let offsetEndDate = nextDate.addingTimeInterval(-Self.sensorNoiseChartBandTimeOffset)
+            let clippedStartDate = max(offsetStartDate, startDate)
+            let clippedEndDate = min(offsetEndDate, sample.date, endDate)
+
+            guard clippedStartDate < clippedEndDate else { continue }
+
+            if let lastBand = bands.last,
+               lastBand.style == style,
+               abs(lastBand.endDate.timeIntervalSince(clippedStartDate)) < 1 {
+                bands[bands.count - 1] = GlucoseChartBackgroundBand(
+                    startDate: lastBand.startDate,
+                    endDate: clippedEndDate,
+                    style: style
+                )
+            } else {
+                bands.append(
+                    GlucoseChartBackgroundBand(
+                        startDate: clippedStartDate,
+                        endDate: clippedEndDate,
+                        style: style
+                    )
+                )
+            }
+        }
+
+        return bands.isEmpty ? nil : bands
+    }
+
+    private func loadNoiseSamples(from startDate: Date, to endDate: Date, on managedObjectContext: NSManagedObjectContext) -> [CachedSensorNoiseSample] {
+        var cachedSamples = [CachedSensorNoiseSample]()
+
+        managedObjectContext.performAndWait {
+            guard let activeSensorSnapshot = activeSensorSnapshot(on: managedObjectContext),
+                  activeSensorSnapshot.noiseAlgorithmVersion == ConstantsSensorNoise.algorithmVersion
+            else {
+                return
+            }
+
+            let request: NSFetchRequest<SensorNoiseSample> = SensorNoiseSample.fetchRequest()
+            request.predicate = NSPredicate(
+                format: "%K == %@ AND %K >= %@ AND %K <= %@",
+                #keyPath(SensorNoiseSample.sensorID),
+                activeSensorSnapshot.id,
+                #keyPath(SensorNoiseSample.timeStamp),
+                startDate as NSDate,
+                #keyPath(SensorNoiseSample.timeStamp),
+                endDate as NSDate
+            )
+            request.sortDescriptors = [NSSortDescriptor(key: #keyPath(SensorNoiseSample.timeStamp), ascending: true)]
+            request.returnsObjectsAsFaults = false
+
+            do {
+                cachedSamples = try managedObjectContext.fetch(request).compactMap {
+                    CachedSensorNoiseSample(
+                        date: $0.timeStamp,
+                        shortTermNoise: $0.shortTermNoise?.doubleValue
+                    )
+                }
+            } catch {
+                os_log("Failed to fetch sensor noise samples for chart range: %{public}@", log: log, type: .error, error.localizedDescription)
+            }
+        }
+
+        return cachedSamples
+    }
+
+    private func activeSensorSnapshot(on managedObjectContext: NSManagedObjectContext) -> (id: String, noiseAlgorithmVersion: Int16)? {
+        let request: NSFetchRequest<Sensor> = Sensor.fetchRequest()
+        request.sortDescriptors = [NSSortDescriptor(key: #keyPath(Sensor.startDate), ascending: false)]
+        request.fetchLimit = 1
+        request.returnsObjectsAsFaults = false
+        request.includesPropertyValues = true
+        request.predicate = NSPredicate(format: "%K == nil", #keyPath(Sensor.endDate))
+
+        do {
+            guard let activeSensor = try managedObjectContext.fetch(request).first else {
+                return nil
+            }
+
+            return (
+                id: activeSensor.id,
+                noiseAlgorithmVersion: activeSensor.noiseAlgorithmVersion
+            )
+        } catch {
+            os_log("Failed to fetch active sensor for chart range: %{public}@", log: log, type: .error, error.localizedDescription)
+            return nil
+        }
     }
 
     // MARK: - Treatment Points
@@ -906,6 +1039,24 @@ private struct CachedTreatment: Hashable {
     let notes: String?
 }
 
+private struct CachedSensorNoiseSample: Hashable {
+    let date: Date
+    let shortTermNoise: Double?
+
+    var bandStyle: GlucoseChartBackgroundBand.Style? {
+        guard let shortTermNoise else { return nil }
+
+        switch ConstantsSensorNoise.state(for: shortTermNoise, sensitivity: UserDefaults.standard.sensorNoiseSensitivity) {
+        case .veryHigh:
+            return .sensorNoiseWarning
+        case .extreme:
+            return .sensorNoiseUrgent
+        case .collecting, .low, .elevated, .flatlineSuspected:
+            return nil
+        }
+    }
+}
+
 // MARK: - Cache Merge Helpers
 
 private extension Array where Element == CachedBgReading {
@@ -924,6 +1075,12 @@ private extension Array where Element == CachedCalibration {
 
 private extension Array where Element == CachedTreatment {
     mutating func merge(_ elements: [CachedTreatment]) {
+        self = Array(Set(self).union(elements)).sorted { $0.date < $1.date }
+    }
+}
+
+private extension Array where Element == CachedSensorNoiseSample {
+    mutating func merge(_ elements: [CachedSensorNoiseSample]) {
         self = Array(Set(self).union(elements)).sorted { $0.date < $1.date }
     }
 }

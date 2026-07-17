@@ -489,7 +489,13 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.sectionTitleHomeScreen,
-                            providers: { [SettingsViewHomeScreenSettingsViewModel(rowGroup: .homeScreen)] }
+                            providers: {
+                                [
+                                    SettingsViewHomeScreenSettingsViewModel(rowGroup: .mainChart),
+                                    SettingsViewHomeScreenSettingsViewModel(rowGroup: .miniChart),
+                                    SettingsViewHomeScreenSettingsViewModel(rowGroup: .screenLock)
+                                ]
+                            }
                         )
                     }
                 ),
