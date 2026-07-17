@@ -84,7 +84,7 @@
 "sensorManagementNoiseVeryHigh" = "Meget høj";
 "sensorManagementNoiseExtreme" = "Ekstrem";
 "sensorManagementNoiseFlatline" = "Sensorsignalet kan være fastlåst.";
-"sensorManagementNoiseFooter" = "Lavere værdier betyder et mere jævnt sensorsignal.";
+"sensorManagementNoiseFooter" = "Valgt følsomhed: %@";
 "sensorNoiseWarningExtremeTitle" = "Ekstrem sensorstøj";
 "sensorNoiseWarningPersistentTitle" = "Vedvarende sensorstøj";
 "sensorNoiseWarningFlatlineTitle" = "Sensorsignalet kan være fastlåst";

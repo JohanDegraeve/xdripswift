@@ -84,7 +84,7 @@
 "sensorManagementNoiseVeryHigh" = "Çok yüksek";
 "sensorManagementNoiseExtreme" = "Aşırı";
 "sensorManagementNoiseFlatline" = "Sensör sinyali takılmış olabilir.";
-"sensorManagementNoiseFooter" = "Daha düşük değerler daha düzgün bir sensör sinyali anlamına gelir.";
+"sensorManagementNoiseFooter" = "Seçilen hassasiyet: %@";
 "sensorNoiseWarningExtremeTitle" = "Aşırı sensör gürültüsü";
 "sensorNoiseWarningPersistentTitle" = "Kalıcı sensör gürültüsü";
 "sensorNoiseWarningFlatlineTitle" = "Sensör sinyali takılmış olabilir";

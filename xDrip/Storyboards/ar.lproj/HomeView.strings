@@ -86,7 +86,7 @@
 "sensorManagementNoiseVeryHigh" = "مرتفعة جدًا";
 "sensorManagementNoiseExtreme" = "شديدة";
 "sensorManagementNoiseFlatline" = "قد تكون إشارة المستشعر عالقة.";
-"sensorManagementNoiseFooter" = "تعني القيم المنخفضة أن إشارة المستشعر أكثر سلاسة.";
+"sensorManagementNoiseFooter" = "الحساسية المحددة: %@";
 "sensorNoiseWarningExtremeTitle" = "ضوضاء شديدة في المستشعر";
 "sensorNoiseWarningPersistentTitle" = "ضوضاء مستمرة في المستشعر";
 "sensorNoiseWarningFlatlineTitle" = "قد تكون إشارة المستشعر عالقة";

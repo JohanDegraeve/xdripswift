@@ -180,7 +180,7 @@
 "sensorManagementNoiseVeryHigh" = "Bardzo wysoki";
 "sensorManagementNoiseExtreme" = "Ekstremalny";
 "sensorManagementNoiseFlatline" = "Sygnał sensora może być zablokowany.";
-"sensorManagementNoiseFooter" = "Niższe wartości oznaczają płynniejszy sygnał sensora.";
+"sensorManagementNoiseFooter" = "Wybrana czułość: %@";
 "sensorNoiseWarningExtremeTitle" = "Ekstremalny szum sensora";
 "sensorNoiseWarningPersistentTitle" = "Utrzymujący się szum sensora";
 "sensorNoiseWarningFlatlineTitle" = "Sygnał sensora może być zablokowany";

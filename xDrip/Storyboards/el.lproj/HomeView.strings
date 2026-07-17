@@ -84,7 +84,7 @@
 "sensorManagementNoiseVeryHigh" = "Πολύ υψηλός";
 "sensorManagementNoiseExtreme" = "Ακραίος";
 "sensorManagementNoiseFlatline" = "Το σήμα του αισθητήρα ενδέχεται να έχει κολλήσει.";
-"sensorManagementNoiseFooter" = "Οι χαμηλότερες τιμές σημαίνουν πιο ομαλό σήμα αισθητήρα.";
+"sensorManagementNoiseFooter" = "Επιλεγμένη ευαισθησία: %@";
 "sensorNoiseWarningExtremeTitle" = "Ακραίος θόρυβος αισθητήρα";
 "sensorNoiseWarningPersistentTitle" = "Επίμονος θόρυβος αισθητήρα";
 "sensorNoiseWarningFlatlineTitle" = "Το σήμα του αισθητήρα ενδέχεται να έχει κολλήσει";

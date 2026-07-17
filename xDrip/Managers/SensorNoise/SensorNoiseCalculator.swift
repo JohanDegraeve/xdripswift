@@ -52,20 +52,30 @@ enum SensorNoiseSensitivity: Int, CaseIterable {
 enum ConstantsSensorNoise {
     static let algorithmVersion: Int16 = 1
 
-    /// Interprets stored noise values more strictly by classifying them 15% higher than measured.
+    /// Base multiplier used to tune all user-facing sensor noise classifications together.
     ///
-    /// This affects display and warning limits only. It does not change stored noise values, the
-    /// calculated algorithm state or flatline detection.
-    static let sensitiveNoiseClassificationMultiplier = 1.15
+    /// Lower this value to make every sensitivity level more permissive, or raise it to make every
+    /// sensitivity level stricter. This affects display and warning limits only. It does not change
+    /// stored noise values, the calculated algorithm state or flatline detection.
+    ///
+    /// For example, if the default would usually be 1.0. Adjust upwards to 1.2 to make the UI
+    /// more sensitive when showing noise
+    static let baseNoiseClassificationMultiplier = 1.3
 
-    /// Uses the stored noise value directly when classifying display and warning state.
-    static let normalNoiseClassificationMultiplier = 1.0
+    /// Interprets stored noise values more strictly by classifying them x% higher than measured.
+    ///
+    /// This can help naturally stable sensors produce warnings more easily, without changing
+    /// the stored noise history or bypassing flatline detection.
+    static let sensitiveNoiseClassificationMultiplier = baseNoiseClassificationMultiplier * 1.3
 
-    /// Interprets stored noise values more gently by classifying them 15% lower than measured.
+    /// Uses the base noise classification level when classifying display and warning state.
+    static let normalNoiseClassificationMultiplier = baseNoiseClassificationMultiplier
+
+    /// Interprets stored noise values more gently by classifying them x% lower than measured.
     ///
     /// This can help naturally jumpier sensors remain in a lower warning state, without changing
     /// the stored noise history or bypassing flatline detection.
-    static let permissiveNoiseClassificationMultiplier = 0.85
+    static let permissiveNoiseClassificationMultiplier = baseNoiseClassificationMultiplier * 0.85
 
     static let shortTermWindow: TimeInterval = 30 * 60
     static let longTermWindow: TimeInterval = 4 * 60 * 60

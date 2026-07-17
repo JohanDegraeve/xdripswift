@@ -32,6 +32,7 @@ struct SensorManagementView: View {
     @State private var showingCalibrationSheet = false
     @State private var showingLargeCalibrationDifferenceConfirmation = false
     @State private var transientMessage: SensorManagementMessage?
+    @State private var sensorNoiseSensitivity = UserDefaults.standard.sensorNoiseSensitivity
     @State private var selectedStartDate = Date()
     @State private var sensorCode = "0000"
     @State private var calibrationValue = ""
@@ -79,7 +80,10 @@ struct SensorManagementView: View {
                     }
 
                     if state.showsNoise {
-                        Section(header: Text(Texts_HomeView.sensorManagementNoiseTitle), footer: Text(Texts_HomeView.sensorManagementNoiseFooter)) {
+                        Section(
+                            header: Text(Texts_HomeView.sensorManagementNoiseTitle),
+                            footer: Text(String(format: Texts_HomeView.sensorManagementNoiseFooter, sensorNoiseSensitivity.description))
+                        ) {
                             if let sensorID = state.sensorID {
                                 NavigationLink {
                                     SensorNoiseHistoryView(
@@ -177,6 +181,9 @@ struct SensorManagementView: View {
             }
         }
         .colorScheme(.dark)
+        .onAppear {
+            refreshSensorNoiseSensitivity()
+        }
         .onReceive(timer) { _ in
             refreshView.toggle()
         }
@@ -209,6 +216,11 @@ struct SensorManagementView: View {
         .sheet(isPresented: $showingCalibrationSheet) {
             calibrationSheet(state: state)
         }
+    }
+
+    /// Keeps the parent Sensor Noise footer aligned with the selected sensitivity.
+    private func refreshSensorNoiseSensitivity() {
+        sensorNoiseSensitivity = UserDefaults.standard.sensorNoiseSensitivity
     }
 
     private var startDateSheet: some View {

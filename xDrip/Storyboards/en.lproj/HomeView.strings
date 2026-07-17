@@ -122,7 +122,7 @@
 "sensorManagementNoiseVeryHigh" = "Very High";
 "sensorManagementNoiseExtreme" = "Extreme";
 "sensorManagementNoiseFlatline" = "Sensor signal may be stuck.";
-"sensorManagementNoiseFooter" = "Lower values mean a smoother sensor signal.";
+"sensorManagementNoiseFooter" = "Sensitivity selected: %@";
 "sensorNoiseWarningExtremeTitle" = "Extreme Sensor Noise";
 "sensorNoiseWarningPersistentTitle" = "Persistent Sensor Noise";
 "sensorNoiseWarningFlatlineTitle" = "Sensor Signal May Be Stuck";

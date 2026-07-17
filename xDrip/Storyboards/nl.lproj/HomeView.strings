@@ -99,7 +99,7 @@
 "sensorManagementNoiseVeryHigh" = "Zeer hoog";
 "sensorManagementNoiseExtreme" = "Extreem";
 "sensorManagementNoiseFlatline" = "Het sensorsignaal zit mogelijk vast.";
-"sensorManagementNoiseFooter" = "Een lagere waarde betekent een gelijkmatiger sensorsignaal.";
+"sensorManagementNoiseFooter" = "Geselecteerde gevoeligheid: %@";
 "sensorNoiseWarningExtremeTitle" = "Extreme sensorruis";
 "sensorNoiseWarningPersistentTitle" = "Aanhoudende sensorruis";
 "sensorNoiseWarningFlatlineTitle" = "Het sensorsignaal zit mogelijk vast";

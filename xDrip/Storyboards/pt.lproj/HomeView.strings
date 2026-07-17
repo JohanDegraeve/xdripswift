@@ -97,7 +97,7 @@
 "sensorManagementNoiseVeryHigh" = "Muito elevado";
 "sensorManagementNoiseExtreme" = "Extremo";
 "sensorManagementNoiseFlatline" = "O sinal do sensor pode estar bloqueado.";
-"sensorManagementNoiseFooter" = "Valores mais baixos indicam um sinal do sensor mais estável.";
+"sensorManagementNoiseFooter" = "Sensibilidade selecionada: %@";
 "sensorNoiseWarningExtremeTitle" = "Ruído extremo do sensor";
 "sensorNoiseWarningPersistentTitle" = "Ruído persistente do sensor";
 "sensorNoiseWarningFlatlineTitle" = "O sinal do sensor pode estar bloqueado";

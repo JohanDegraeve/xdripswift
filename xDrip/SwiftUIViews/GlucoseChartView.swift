@@ -143,7 +143,18 @@ struct GlucoseChartView: View {
         }
 
         if let backgroundBands = chartState?.backgroundBands ?? backgroundBands {
-            self.backgroundBands = backgroundBands.filter { $0.endDate > startDate && $0.startDate < endDate }
+            self.backgroundBands = backgroundBands.compactMap { backgroundBand in
+                let clippedStartDate = max(backgroundBand.startDate, startDate)
+                let clippedEndDate = min(backgroundBand.endDate, endDate)
+
+                guard clippedStartDate < clippedEndDate else { return nil }
+
+                return GlucoseChartBackgroundBand(
+                    startDate: clippedStartDate,
+                    endDate: clippedEndDate,
+                    style: backgroundBand.style
+                )
+            }
         }
     }
 

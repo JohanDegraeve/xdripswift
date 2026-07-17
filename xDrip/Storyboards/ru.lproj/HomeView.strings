@@ -84,7 +84,7 @@
 "sensorManagementNoiseVeryHigh" = "Очень высокий";
 "sensorManagementNoiseExtreme" = "Экстремальный";
 "sensorManagementNoiseFlatline" = "Сигнал сенсора мог зависнуть.";
-"sensorManagementNoiseFooter" = "Более низкие значения означают более плавный сигнал сенсора.";
+"sensorManagementNoiseFooter" = "Выбранная чувствительность: %@";
 "sensorNoiseWarningExtremeTitle" = "Экстремальный шум сенсора";
 "sensorNoiseWarningPersistentTitle" = "Постоянный шум сенсора";
 "sensorNoiseWarningFlatlineTitle" = "Сигнал сенсора мог зависнуть";

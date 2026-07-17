@@ -180,7 +180,7 @@
 "sensorManagementNoiseVeryHigh" = "Zelo visok";
 "sensorManagementNoiseExtreme" = "Ekstremen";
 "sensorManagementNoiseFlatline" = "Signal senzorja je morda obstal.";
-"sensorManagementNoiseFooter" = "Nižje vrednosti pomenijo bolj gladek signal senzorja.";
+"sensorManagementNoiseFooter" = "Izbrana občutljivost: %@";
 "sensorNoiseWarningExtremeTitle" = "Ekstremen šum senzorja";
 "sensorNoiseWarningPersistentTitle" = "Vztrajen šum senzorja";
 "sensorNoiseWarningFlatlineTitle" = "Signal senzorja je morda obstal";

@@ -163,7 +163,7 @@
 "sensorManagementNoiseVeryHigh" = "Sehr hoch";
 "sensorManagementNoiseExtreme" = "Extrem";
 "sensorManagementNoiseFlatline" = "Das Sensorsignal könnte festhängen.";
-"sensorManagementNoiseFooter" = "Je niedriger der Wert, desto gleichmäßiger ist das Sensorsignal.";
+"sensorManagementNoiseFooter" = "Ausgewählte Empfindlichkeit: %@";
 "sensorNoiseWarningExtremeTitle" = "Extremes Sensorrauschen";
 "sensorNoiseWarningPersistentTitle" = "Anhaltendes Sensorrauschen";
 "sensorNoiseWarningFlatlineTitle" = "Das Sensorsignal könnte festhängen";

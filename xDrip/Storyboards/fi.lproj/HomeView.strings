@@ -100,7 +100,7 @@
 "sensorManagementNoiseVeryHigh" = "Erittäin korkea";
 "sensorManagementNoiseExtreme" = "Äärimmäinen";
 "sensorManagementNoiseFlatline" = "Sensorin signaali saattaa olla juuttunut.";
-"sensorManagementNoiseFooter" = "Alhaisempi arvo tarkoittaa tasaisempaa sensorisignaalia.";
+"sensorManagementNoiseFooter" = "Valittu herkkyys: %@";
 "sensorNoiseWarningExtremeTitle" = "Äärimmäinen sensorin kohina";
 "sensorNoiseWarningPersistentTitle" = "Jatkuva sensorin kohina";
 "sensorNoiseWarningFlatlineTitle" = "Sensorin signaali saattaa olla juuttunut";

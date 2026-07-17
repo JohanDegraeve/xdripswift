@@ -97,7 +97,7 @@
 "sensorManagementNoiseVeryHigh" = "Mycket högt";
 "sensorManagementNoiseExtreme" = "Extremt";
 "sensorManagementNoiseFlatline" = "Sensorsignalen kan ha fastnat.";
-"sensorManagementNoiseFooter" = "Lägre värden betyder en jämnare sensorsignal.";
+"sensorManagementNoiseFooter" = "Vald känslighet: %@";
 "sensorNoiseWarningExtremeTitle" = "Extremt sensorbrus";
 "sensorNoiseWarningPersistentTitle" = "Ihållande sensorbrus";
 "sensorNoiseWarningFlatlineTitle" = "Sensorsignalen kan ha fastnat";

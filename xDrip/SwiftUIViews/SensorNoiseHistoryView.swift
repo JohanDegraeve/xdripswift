@@ -93,7 +93,10 @@ struct SensorNoiseHistoryView: View {
         }
         .navigationTitle(Texts_HomeView.sensorNoiseHistoryTitle)
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear(perform: viewModel.load)
+        .onAppear {
+            viewModel.load()
+            refreshSensorNoiseSensitivity()
+        }
         .onReceive(NotificationCenter.default.publisher(for: .sensorNoiseHistoryDidChange)) { notification in
             guard notification.object as? String == sensorID else { return }
             viewModel.reloadCachedHistory()
@@ -133,7 +136,10 @@ struct SensorNoiseHistoryView: View {
 
     private func sensorNoiseSensitivityRow() -> some View {
         NavigationLink {
-            SensorNoiseSensitivitySelectionView(selectedSensitivity: $sensorNoiseSensitivity)
+            SensorNoiseSensitivitySelectionView(
+                selectedSensitivity: sensorNoiseSensitivity,
+                onSelect: updateSensorNoiseSensitivity
+            )
         } label: {
             HStack {
                 Text(Texts_SettingsView.sensorNoiseSensitivity)
@@ -144,6 +150,17 @@ struct SensorNoiseHistoryView: View {
                     .foregroundStyle(Color(.colorSecondary))
             }
         }
+    }
+
+    /// Keeps the local display state aligned with the persisted app-wide setting.
+    private func refreshSensorNoiseSensitivity() {
+        sensorNoiseSensitivity = UserDefaults.standard.sensorNoiseSensitivity
+    }
+
+    /// Stores the new sensitivity and refreshes this view immediately.
+    private func updateSensorNoiseSensitivity(_ sensitivity: SensorNoiseSensitivity) {
+        UserDefaults.standard.sensorNoiseSensitivity = sensitivity
+        sensorNoiseSensitivity = sensitivity
     }
 
     private func displayState(snapshot: SensorNoiseHistorySnapshot) -> SensorNoiseState {
@@ -436,7 +453,8 @@ struct SensorNoiseHistoryView: View {
 // MARK: - sensitivity picker
 
 private struct SensorNoiseSensitivitySelectionView: View {
-    @Binding var selectedSensitivity: SensorNoiseSensitivity
+    let selectedSensitivity: SensorNoiseSensitivity
+    let onSelect: (SensorNoiseSensitivity) -> Void
     @Environment(\.dismiss) private var dismiss
 
     var body: some View {
@@ -444,8 +462,7 @@ private struct SensorNoiseSensitivitySelectionView: View {
             Section {
                 ForEach(SensorNoiseSensitivity.allCases, id: \.self) { sensitivity in
                     Button {
-                        selectedSensitivity = sensitivity
-                        UserDefaults.standard.sensorNoiseSensitivity = sensitivity
+                        onSelect(sensitivity)
                         dismiss()
                     } label: {
                         HStack {

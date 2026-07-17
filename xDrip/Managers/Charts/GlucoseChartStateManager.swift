@@ -46,11 +46,13 @@ final class GlucoseChartStateManager: ObservableObject {
     private var cachedOriginalReadings = [CachedBgReading]()
     private var cachedCalibrations = [CachedCalibration]()
     private var cachedTreatments = [CachedTreatment]()
+
     /// Sensor noise snapshots are cached with the same wider date range as glucose.
     ///
     /// This keeps chart scrolling smooth because the background bands can be rebuilt from memory
     /// while Swift Charts is changing the visible window.
     private var cachedNoiseSamples = [CachedSensorNoiseSample]()
+
     /// Derived treatment chart points created from `cachedTreatments`.
     ///
     /// Bolus/carbs/bg-check/note points can be appended and prepended just like glucose. Basal points
@@ -79,11 +81,13 @@ final class GlucoseChartStateManager: ObservableObject {
     private static let cacheRefreshLookbackTimeInterval: TimeInterval = .hours(6)
     private static let minimumScrollCacheBufferTimeInterval: TimeInterval = .hours(6)
     private static let maximumScrollCacheBufferTimeInterval: TimeInterval = .hours(24)
+
     /// Moves short-term noise bands back onto the glucose readings that created the noise score.
     ///
     /// A sample written at the end of a 30 minute noise window describes the previous 30 minutes,
-    /// not just the moment when the sample was stored.
-    private static let sensorNoiseChartBandTimeOffset = ConstantsSensorNoise.shortTermWindow
+    /// not just the moment when the sample was stored. A partial offset keeps the bands closer to
+    /// the glucose movement that caused them without making current noise look too far in the past.
+    private static let sensorNoiseChartBandTimeOffset: TimeInterval = 15 * 60
 
     // MARK: - Initialisation
 

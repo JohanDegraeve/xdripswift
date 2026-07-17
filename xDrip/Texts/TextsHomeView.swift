@@ -81,7 +81,7 @@ enum Texts_HomeView {
     }()
 
     static let sensorManagementNoiseFooter:String = {
-        return NSLocalizedString("sensorManagementNoiseFooter", tableName: filename, bundle: Bundle.main, value: "Lower values mean a smoother sensor signal.", comment: "explanation below the sensor noise gauges")
+        return NSLocalizedString("sensorManagementNoiseFooter", tableName: filename, bundle: Bundle.main, value: "Sensitivity selected: %@", comment: "sensor management noise section footer, parameter is the selected sensitivity level")
     }()
 
     static let sensorNoiseHistoryTitle:String = {
