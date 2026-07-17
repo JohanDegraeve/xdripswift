@@ -91,7 +91,7 @@ struct TreatmentEditorView: View {
     // MARK: - SwiftUI views
 
     var body: some View {
-        List {
+        Form {
             Section(footer: editorFooterView()) {
                 if viewModel.isAddMode {
                     Picker(Texts_TreatmentsView.type, selection: $viewModel.selectedType) {
@@ -114,20 +114,19 @@ struct TreatmentEditorView: View {
                 }
 
                 if viewModel.showsNumericValueEditor {
-                    HStack {
-                        Text(Texts_TreatmentsView.value)
-                        Spacer()
-                        TextField(viewModel.valuePlaceholder, text: $viewModel.enteredValue)
-                            .keyboardType(.decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .padding(.vertical, 7)
-                            .padding(.horizontal, 10)
-                            .background(ConstantsAppColors.groupedBackground)
-                            .clipShape(RoundedRectangle(cornerRadius: 8))
-                            .foregroundStyle(Color(.colorPrimary))
-                            .frame(minWidth: 72, maxWidth: 96, alignment: .trailing)
-                        Text(viewModel.unitText)
-                            .foregroundStyle(Color(.colorSecondary))
+                    LabeledContent(Texts_TreatmentsView.value) {
+                        HStack(spacing: 6) {
+                            TextField(viewModel.valuePlaceholder, text: $viewModel.enteredValue)
+                                .keyboardType(.decimalPad)
+                                .multilineTextAlignment(.trailing)
+                                .textFieldStyle(.plain)
+                                .foregroundStyle(Color(.colorPrimary))
+                                .frame(minWidth: 72, maxWidth: 96, alignment: .trailing)
+
+                            Text(viewModel.unitText)
+                                .foregroundStyle(Color(.colorSecondary))
+                        }
+                        .fixedSize(horizontal: true, vertical: false)
                     }
                 }
 
@@ -153,15 +152,10 @@ struct TreatmentEditorView: View {
             }
 
             Section {
-                HStack {
-                    Text(Texts_TreatmentsView.enteredBy)
-                    Spacer()
+                LabeledContent(Texts_TreatmentsView.enteredBy) {
                     TextField(Texts_Common.unknown, text: $viewModel.enteredByValue)
                         .multilineTextAlignment(.trailing)
-                        .padding(.vertical, 7)
-                        .padding(.horizontal, 10)
-                        .background(ConstantsAppColors.groupedBackground)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
+                        .textFieldStyle(.plain)
                         .foregroundStyle(Color(.colorPrimary))
                         .frame(minWidth: 120, maxWidth: 220, alignment: .trailing)
                 }
