@@ -537,6 +537,9 @@ private struct RootHomeTabView: View {
             destinationView(presentedView)
                 .colorScheme(.dark)
         }
+        .onChange(of: presentedView?.id) { _ in
+            updatePresentedViewOrientationLock()
+        }
         .onChange(of: snoozeDismissalRequest) { _ in
             dismissSnoozeIfNeeded()
         }
@@ -617,6 +620,35 @@ private struct RootHomeTabView: View {
     private func dismissSnoozeIfNeeded() {
         if presentedView == .snooze {
             presentedView = nil
+        }
+    }
+
+    /// Home can rotate into the dedicated landscape chart, but the toolbar sheets are portrait-only
+    /// workflows. While one is open, temporarily tighten the app delegate orientation mask and then
+    /// restore the Home policy when it closes.
+    private func updatePresentedViewOrientationLock() {
+        let supportedOrientations: UIInterfaceOrientationMask
+
+        if presentedView == nil && UserDefaults.standard.allowScreenRotation {
+            supportedOrientations = .allButUpsideDown
+        } else {
+            supportedOrientations = .portrait
+        }
+
+        AppDelegate.supportedOrientations = supportedOrientations
+
+        guard let windowScene = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first(where: { $0.activationState == .foregroundActive }),
+              let rootController = windowScene.keyWindow?.rootViewController
+        else {
+            return
+        }
+
+        rootController.setNeedsUpdateOfSupportedInterfaceOrientations()
+
+        if presentedView != nil {
+            windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
         }
     }
 
