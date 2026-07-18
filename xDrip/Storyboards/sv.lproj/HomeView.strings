@@ -96,11 +96,11 @@
 "sensorManagementNoiseElevated" = "Förhöjt";
 "sensorManagementNoiseVeryHigh" = "Mycket högt";
 "sensorManagementNoiseExtreme" = "Extremt";
-"sensorManagementNoiseFlatline" = "Sensorsignalen kan ha fastnat.";
+"sensorManagementNoiseFlatline" = "Sensorn har troligen slutat fungera.";
 "sensorManagementNoiseFooter" = "Vald känslighet: %@";
 "sensorNoiseWarningExtremeTitle" = "Extremt sensorbrus";
 "sensorNoiseWarningPersistentTitle" = "Ihållande sensorbrus";
-"sensorNoiseWarningFlatlineTitle" = "Sensorsignalen kan ha fastnat";
+"sensorNoiseWarningFlatlineTitle" = "Sensorsignalen är platt";
 "sensorNoiseHistoryTitle" = "Brushistorik";
 "sensorNoiseHistoryCurrentTitle" = "Aktuella mätningar";
 "sensorNoiseHistoryChartTitle" = "Brus över tid";

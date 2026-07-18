@@ -83,11 +83,11 @@
 "sensorManagementNoiseElevated" = "Forhøjet";
 "sensorManagementNoiseVeryHigh" = "Meget høj";
 "sensorManagementNoiseExtreme" = "Ekstrem";
-"sensorManagementNoiseFlatline" = "Sensorsignalet kan være fastlåst.";
+"sensorManagementNoiseFlatline" = "Sensoren er sandsynligvis svigtet.";
 "sensorManagementNoiseFooter" = "Valgt følsomhed: %@";
 "sensorNoiseWarningExtremeTitle" = "Ekstrem sensorstøj";
 "sensorNoiseWarningPersistentTitle" = "Vedvarende sensorstøj";
-"sensorNoiseWarningFlatlineTitle" = "Sensorsignalet kan være fastlåst";
+"sensorNoiseWarningFlatlineTitle" = "Sensorsignalet er fladt";
 "sensorNoiseHistoryTitle" = "Støjhistorik";
 "sensorNoiseHistoryCurrentTitle" = "Aktuelle målinger";
 "sensorNoiseHistoryChartTitle" = "Støj over tid";

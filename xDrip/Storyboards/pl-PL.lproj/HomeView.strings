@@ -179,11 +179,11 @@
 "sensorManagementNoiseElevated" = "Podwyższony";
 "sensorManagementNoiseVeryHigh" = "Bardzo wysoki";
 "sensorManagementNoiseExtreme" = "Ekstremalny";
-"sensorManagementNoiseFlatline" = "Sygnał sensora może być zablokowany.";
+"sensorManagementNoiseFlatline" = "Sensor prawdopodobnie uległ awarii.";
 "sensorManagementNoiseFooter" = "Wybrana czułość: %@";
 "sensorNoiseWarningExtremeTitle" = "Ekstremalny szum sensora";
 "sensorNoiseWarningPersistentTitle" = "Utrzymujący się szum sensora";
-"sensorNoiseWarningFlatlineTitle" = "Sygnał sensora może być zablokowany";
+"sensorNoiseWarningFlatlineTitle" = "Sygnał sensora jest płaski";
 "sensorNoiseHistoryTitle" = "Historia szumu";
 "sensorNoiseHistoryCurrentTitle" = "Bieżące pomiary";
 "sensorNoiseHistoryChartTitle" = "Szum w czasie";

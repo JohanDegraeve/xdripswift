@@ -179,11 +179,11 @@
 "sensorManagementNoiseElevated" = "Elevato";
 "sensorManagementNoiseVeryHigh" = "Molto alto";
 "sensorManagementNoiseExtreme" = "Estremo";
-"sensorManagementNoiseFlatline" = "Il segnale del sensore potrebbe essere bloccato.";
+"sensorManagementNoiseFlatline" = "Il sensore probabilmente ha smesso di funzionare.";
 "sensorManagementNoiseFooter" = "Sensibilità selezionata: %@";
 "sensorNoiseWarningExtremeTitle" = "Rumore estremo del sensore";
 "sensorNoiseWarningPersistentTitle" = "Rumore persistente del sensore";
-"sensorNoiseWarningFlatlineTitle" = "Il segnale del sensore potrebbe essere bloccato";
+"sensorNoiseWarningFlatlineTitle" = "Il segnale del sensore è piatto";
 "sensorNoiseHistoryTitle" = "Cronologia del rumore";
 "sensorNoiseHistoryCurrentTitle" = "Misurazioni attuali";
 "sensorNoiseHistoryChartTitle" = "Rumore nel tempo";

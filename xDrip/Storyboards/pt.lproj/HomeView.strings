@@ -96,11 +96,11 @@
 "sensorManagementNoiseElevated" = "Elevado";
 "sensorManagementNoiseVeryHigh" = "Muito elevado";
 "sensorManagementNoiseExtreme" = "Extremo";
-"sensorManagementNoiseFlatline" = "O sinal do sensor pode estar bloqueado.";
+"sensorManagementNoiseFlatline" = "O sensor provavelmente falhou.";
 "sensorManagementNoiseFooter" = "Sensibilidade selecionada: %@";
 "sensorNoiseWarningExtremeTitle" = "Ruído extremo do sensor";
 "sensorNoiseWarningPersistentTitle" = "Ruído persistente do sensor";
-"sensorNoiseWarningFlatlineTitle" = "O sinal do sensor pode estar bloqueado";
+"sensorNoiseWarningFlatlineTitle" = "O sinal do sensor está plano";
 "sensorNoiseHistoryTitle" = "Histórico de ruído";
 "sensorNoiseHistoryCurrentTitle" = "Medições atuais";
 "sensorNoiseHistoryChartTitle" = "Ruído ao longo do tempo";

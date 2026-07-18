@@ -121,11 +121,11 @@
 "sensorManagementNoiseElevated" = "Elevated";
 "sensorManagementNoiseVeryHigh" = "Very High";
 "sensorManagementNoiseExtreme" = "Extreme";
-"sensorManagementNoiseFlatline" = "Sensor signal may be stuck.";
+"sensorManagementNoiseFlatline" = "The sensor has likely failed.";
 "sensorManagementNoiseFooter" = "Sensitivity selected: %@";
 "sensorNoiseWarningExtremeTitle" = "Extreme Sensor Noise";
 "sensorNoiseWarningPersistentTitle" = "Persistent Sensor Noise";
-"sensorNoiseWarningFlatlineTitle" = "Sensor Signal May Be Stuck";
+"sensorNoiseWarningFlatlineTitle" = "Sensor Signal Is Flat";
 "sensorNoiseHistoryTitle" = "Noise History";
 "sensorNoiseHistoryCurrentTitle" = "Current Measurements";
 "sensorNoiseHistoryChartTitle" = "Noise Over Time";

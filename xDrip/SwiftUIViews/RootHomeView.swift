@@ -227,16 +227,16 @@ struct RootHomeView: View {
                 }
                 .frame(height: Layout.glucoseRowHeight)
 
-                if state.sensorNoise.showsWarning {
-                    RootHomeSensorNoiseWarningView(state: state.sensorNoise, action: actions.showSensorManagement)
-                        .frame(height: Layout.sensorNoiseWarningHeight)
-                }
-
                 if state.visibility.showsLoop {
                     RootHomeLoopView(state: state.loop, actions: actions)
                         .frame(height: Layout.loopHeight)
                         .padding(.top, Layout.loopTopPadding)
                         .padding(.bottom, Layout.loopBottomPadding)
+                }
+
+                if state.sensorNoise.showsWarning {
+                    RootHomeSensorNoiseWarningView(state: state.sensorNoise, action: actions.showSensorManagement)
+                        .frame(height: Layout.sensorNoiseWarningHeight)
                 }
 
                 RootHomeMainChartView(
@@ -1268,15 +1268,17 @@ private struct RootHomeSensorNoiseWarningView: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 8) {
-                Image(systemName: "waveform.path.ecg.rectangle.fill")
+                Image(systemName: "exclamationmark.triangle.fill")
                     .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(ConstantsAppColors.warning)
 
                 VStack(alignment: .leading, spacing: 1) {
                     Text(state.title)
                         .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(ConstantsAppColors.primaryText)
                     Text(state.detail)
                         .font(.system(size: 11))
-                        .opacity(0.85)
+                        .foregroundStyle(ConstantsAppColors.secondaryText)
                 }
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
@@ -1285,8 +1287,8 @@ private struct RootHomeSensorNoiseWarningView: View {
 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 12, weight: .bold))
+                    .foregroundStyle(ConstantsAppColors.secondaryText)
             }
-            .foregroundStyle(state.color)
             .padding(.horizontal, 10)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background(state.color.opacity(0.14))

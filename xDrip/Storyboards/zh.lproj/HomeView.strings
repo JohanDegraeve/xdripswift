@@ -136,11 +136,11 @@
 "sensorManagementNoiseElevated" = "偏高";
 "sensorManagementNoiseVeryHigh" = "非常高";
 "sensorManagementNoiseExtreme" = "极高";
-"sensorManagementNoiseFlatline" = "传感器信号可能已卡住。";
+"sensorManagementNoiseFlatline" = "传感器可能已经失效。";
 "sensorManagementNoiseFooter" = "已选择灵敏度：%@";
 "sensorNoiseWarningExtremeTitle" = "传感器噪声极高";
 "sensorNoiseWarningPersistentTitle" = "传感器持续噪声";
-"sensorNoiseWarningFlatlineTitle" = "传感器信号可能已卡住";
+"sensorNoiseWarningFlatlineTitle" = "传感器信号持平";
 "sensorNoiseHistoryTitle" = "噪声历史";
 "sensorNoiseHistoryCurrentTitle" = "当前测量";
 "sensorNoiseHistoryChartTitle" = "噪声变化";

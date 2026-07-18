@@ -162,11 +162,11 @@
 "sensorManagementNoiseElevated" = "Erhöht";
 "sensorManagementNoiseVeryHigh" = "Sehr hoch";
 "sensorManagementNoiseExtreme" = "Extrem";
-"sensorManagementNoiseFlatline" = "Das Sensorsignal könnte festhängen.";
+"sensorManagementNoiseFlatline" = "Der Sensor ist wahrscheinlich ausgefallen.";
 "sensorManagementNoiseFooter" = "Ausgewählte Empfindlichkeit: %@";
 "sensorNoiseWarningExtremeTitle" = "Extremes Sensorrauschen";
 "sensorNoiseWarningPersistentTitle" = "Anhaltendes Sensorrauschen";
-"sensorNoiseWarningFlatlineTitle" = "Das Sensorsignal könnte festhängen";
+"sensorNoiseWarningFlatlineTitle" = "Das Sensorsignal ist flach";
 "sensorNoiseHistoryTitle" = "Rauschverlauf";
 "sensorNoiseHistoryCurrentTitle" = "Aktuelle Messungen";
 "sensorNoiseHistoryChartTitle" = "Rauschen im Zeitverlauf";

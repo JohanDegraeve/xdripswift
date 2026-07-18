@@ -85,11 +85,11 @@
 "sensorManagementNoiseElevated" = "مرتفعة";
 "sensorManagementNoiseVeryHigh" = "مرتفعة جدًا";
 "sensorManagementNoiseExtreme" = "شديدة";
-"sensorManagementNoiseFlatline" = "قد تكون إشارة المستشعر عالقة.";
+"sensorManagementNoiseFlatline" = "من المحتمل أن المستشعر قد فشل.";
 "sensorManagementNoiseFooter" = "الحساسية المحددة: %@";
 "sensorNoiseWarningExtremeTitle" = "ضوضاء شديدة في المستشعر";
 "sensorNoiseWarningPersistentTitle" = "ضوضاء مستمرة في المستشعر";
-"sensorNoiseWarningFlatlineTitle" = "قد تكون إشارة المستشعر عالقة";
+"sensorNoiseWarningFlatlineTitle" = "إشارة المستشعر ثابتة";
 "sensorNoiseHistoryTitle" = "سجل ضوضاء المستشعر";
 "sensorNoiseHistoryCurrentTitle" = "القياسات الحالية";
 "sensorNoiseHistoryChartTitle" = "الضوضاء بمرور الوقت";

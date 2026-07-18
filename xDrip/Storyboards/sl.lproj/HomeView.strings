@@ -179,11 +179,11 @@
 "sensorManagementNoiseElevated" = "Povišan";
 "sensorManagementNoiseVeryHigh" = "Zelo visok";
 "sensorManagementNoiseExtreme" = "Ekstremen";
-"sensorManagementNoiseFlatline" = "Signal senzorja je morda obstal.";
+"sensorManagementNoiseFlatline" = "Senzor je verjetno odpovedal.";
 "sensorManagementNoiseFooter" = "Izbrana občutljivost: %@";
 "sensorNoiseWarningExtremeTitle" = "Ekstremen šum senzorja";
 "sensorNoiseWarningPersistentTitle" = "Vztrajen šum senzorja";
-"sensorNoiseWarningFlatlineTitle" = "Signal senzorja je morda obstal";
+"sensorNoiseWarningFlatlineTitle" = "Signal senzorja je raven";
 "sensorNoiseHistoryTitle" = "Zgodovina šuma";
 "sensorNoiseHistoryCurrentTitle" = "Trenutne meritve";
 "sensorNoiseHistoryChartTitle" = "Šum skozi čas";

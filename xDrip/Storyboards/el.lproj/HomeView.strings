@@ -83,11 +83,11 @@
 "sensorManagementNoiseElevated" = "Αυξημένος";
 "sensorManagementNoiseVeryHigh" = "Πολύ υψηλός";
 "sensorManagementNoiseExtreme" = "Ακραίος";
-"sensorManagementNoiseFlatline" = "Το σήμα του αισθητήρα ενδέχεται να έχει κολλήσει.";
+"sensorManagementNoiseFlatline" = "Ο αισθητήρας πιθανότατα απέτυχε.";
 "sensorManagementNoiseFooter" = "Επιλεγμένη ευαισθησία: %@";
 "sensorNoiseWarningExtremeTitle" = "Ακραίος θόρυβος αισθητήρα";
 "sensorNoiseWarningPersistentTitle" = "Επίμονος θόρυβος αισθητήρα";
-"sensorNoiseWarningFlatlineTitle" = "Το σήμα του αισθητήρα ενδέχεται να έχει κολλήσει";
+"sensorNoiseWarningFlatlineTitle" = "Το σήμα του αισθητήρα είναι επίπεδο";
 "sensorNoiseHistoryTitle" = "Ιστορικό θορύβου";
 "sensorNoiseHistoryCurrentTitle" = "Τρέχουσες μετρήσεις";
 "sensorNoiseHistoryChartTitle" = "Θόρυβος με την πάροδο του χρόνου";

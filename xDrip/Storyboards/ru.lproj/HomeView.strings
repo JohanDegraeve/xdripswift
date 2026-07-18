@@ -83,11 +83,11 @@
 "sensorManagementNoiseElevated" = "Повышенный";
 "sensorManagementNoiseVeryHigh" = "Очень высокий";
 "sensorManagementNoiseExtreme" = "Экстремальный";
-"sensorManagementNoiseFlatline" = "Сигнал сенсора мог зависнуть.";
+"sensorManagementNoiseFlatline" = "Сенсор, вероятно, вышел из строя.";
 "sensorManagementNoiseFooter" = "Выбранная чувствительность: %@";
 "sensorNoiseWarningExtremeTitle" = "Экстремальный шум сенсора";
 "sensorNoiseWarningPersistentTitle" = "Постоянный шум сенсора";
-"sensorNoiseWarningFlatlineTitle" = "Сигнал сенсора мог зависнуть";
+"sensorNoiseWarningFlatlineTitle" = "Сигнал сенсора плоский";
 "sensorNoiseHistoryTitle" = "История шума";
 "sensorNoiseHistoryCurrentTitle" = "Текущие измерения";
 "sensorNoiseHistoryChartTitle" = "Шум во времени";

@@ -167,11 +167,11 @@
 "sensorManagementNoiseElevated" = "Підвищений";
 "sensorManagementNoiseVeryHigh" = "Дуже високий";
 "sensorManagementNoiseExtreme" = "Екстремальний";
-"sensorManagementNoiseFlatline" = "Сигнал сенсора міг зависнути.";
+"sensorManagementNoiseFlatline" = "Сенсор, імовірно, вийшов з ладу.";
 "sensorManagementNoiseFooter" = "Вибрана чутливість: %@";
 "sensorNoiseWarningExtremeTitle" = "Екстремальний шум сенсора";
 "sensorNoiseWarningPersistentTitle" = "Постійний шум сенсора";
-"sensorNoiseWarningFlatlineTitle" = "Сигнал сенсора міг зависнути";
+"sensorNoiseWarningFlatlineTitle" = "Сигнал сенсора плаский";
 "sensorNoiseHistoryTitle" = "Історія шуму";
 "sensorNoiseHistoryCurrentTitle" = "Поточні вимірювання";
 "sensorNoiseHistoryChartTitle" = "Шум у часі";

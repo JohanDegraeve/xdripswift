@@ -83,11 +83,11 @@
 "sensorManagementNoiseElevated" = "Artmış";
 "sensorManagementNoiseVeryHigh" = "Çok yüksek";
 "sensorManagementNoiseExtreme" = "Aşırı";
-"sensorManagementNoiseFlatline" = "Sensör sinyali takılmış olabilir.";
+"sensorManagementNoiseFlatline" = "Sensör büyük olasılıkla arızalandı.";
 "sensorManagementNoiseFooter" = "Seçilen hassasiyet: %@";
 "sensorNoiseWarningExtremeTitle" = "Aşırı sensör gürültüsü";
 "sensorNoiseWarningPersistentTitle" = "Kalıcı sensör gürültüsü";
-"sensorNoiseWarningFlatlineTitle" = "Sensör sinyali takılmış olabilir";
+"sensorNoiseWarningFlatlineTitle" = "Sensör sinyali düz";
 "sensorNoiseHistoryTitle" = "Gürültü geçmişi";
 "sensorNoiseHistoryCurrentTitle" = "Mevcut ölçümler";
 "sensorNoiseHistoryChartTitle" = "Zaman içinde gürültü";

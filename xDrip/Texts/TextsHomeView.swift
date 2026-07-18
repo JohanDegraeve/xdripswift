@@ -77,7 +77,7 @@ enum Texts_HomeView {
     }()
 
     static let sensorManagementNoiseFlatline:String = {
-        return NSLocalizedString("sensorManagementNoiseFlatline", tableName: filename, bundle: Bundle.main, value: "Sensor signal may be stuck.", comment: "warning that repeated identical sensor readings may indicate a fault")
+        return NSLocalizedString("sensorManagementNoiseFlatline", tableName: filename, bundle: Bundle.main, value: "The sensor has likely failed.", comment: "warning that repeated identical sensor readings probably indicate sensor failure")
     }()
 
     static let sensorManagementNoiseFooter:String = {
@@ -153,7 +153,7 @@ enum Texts_HomeView {
     }()
 
     static let sensorNoiseWarningFlatlineTitle:String = {
-        return NSLocalizedString("sensorNoiseWarningFlatlineTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Signal May Be Stuck", comment: "home screen warning title for repeated identical sensor values")
+        return NSLocalizedString("sensorNoiseWarningFlatlineTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Signal Is Flat", comment: "home screen warning title for repeated identical sensor values")
     }()
 
     static let sensorManagementActionsTitle:String = {

@@ -98,11 +98,11 @@
 "sensorManagementNoiseElevated" = "Verhoogd";
 "sensorManagementNoiseVeryHigh" = "Zeer hoog";
 "sensorManagementNoiseExtreme" = "Extreem";
-"sensorManagementNoiseFlatline" = "Het sensorsignaal zit mogelijk vast.";
+"sensorManagementNoiseFlatline" = "De sensor is waarschijnlijk defect.";
 "sensorManagementNoiseFooter" = "Geselecteerde gevoeligheid: %@";
 "sensorNoiseWarningExtremeTitle" = "Extreme sensorruis";
 "sensorNoiseWarningPersistentTitle" = "Aanhoudende sensorruis";
-"sensorNoiseWarningFlatlineTitle" = "Het sensorsignaal zit mogelijk vast";
+"sensorNoiseWarningFlatlineTitle" = "Het sensorsignaal is vlak";
 "sensorNoiseHistoryTitle" = "Ruisgeschiedenis";
 "sensorNoiseHistoryCurrentTitle" = "Huidige metingen";
 "sensorNoiseHistoryChartTitle" = "Ruis in de tijd";

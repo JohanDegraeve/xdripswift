@@ -99,11 +99,11 @@
 "sensorManagementNoiseElevated" = "Kohonnut";
 "sensorManagementNoiseVeryHigh" = "Erittäin korkea";
 "sensorManagementNoiseExtreme" = "Äärimmäinen";
-"sensorManagementNoiseFlatline" = "Sensorin signaali saattaa olla juuttunut.";
+"sensorManagementNoiseFlatline" = "Sensori on todennäköisesti vikaantunut.";
 "sensorManagementNoiseFooter" = "Valittu herkkyys: %@";
 "sensorNoiseWarningExtremeTitle" = "Äärimmäinen sensorin kohina";
 "sensorNoiseWarningPersistentTitle" = "Jatkuva sensorin kohina";
-"sensorNoiseWarningFlatlineTitle" = "Sensorin signaali saattaa olla juuttunut";
+"sensorNoiseWarningFlatlineTitle" = "Sensorin signaali on tasainen";
 "sensorNoiseHistoryTitle" = "Kohinahistoria";
 "sensorNoiseHistoryCurrentTitle" = "Nykyiset mittaukset";
 "sensorNoiseHistoryChartTitle" = "Kohina ajan kuluessa";
