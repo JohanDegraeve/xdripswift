@@ -56,6 +56,9 @@ struct TreatmentsListView: View {
     // MARK: - private properties
 
     @ObservedObject var viewModel: TreatmentsViewModel
+    @State private var showScrollToTopButton = false
+    private let topScrollAnchorID = "treatmentsTop"
+    private let scrollToTopButtonThresholdIndex = 4
 
     let onAddTreatment: () -> Void
     let onSelectTreatment: (TreatmentSnapshot) -> Void
@@ -63,119 +66,83 @@ struct TreatmentsListView: View {
     // MARK: - SwiftUI views
 
     var body: some View {
-        List {
-            Section {
-                DatePicker(selection: Binding(get: {
-                    viewModel.selectedDate
-                }, set: { newDate in
-                    viewModel.selectedDateChanged(newDate)
-                }), in: viewModel.datePickerRange(), displayedComponents: .date) {
-                    HStack {
-                        Text(Texts_BgReadings.date)
-                        Spacer()
-                        Text(viewModel.selectedDateDayName)
+        ScrollViewReader { scrollProxy in
+            ZStack(alignment: .bottomTrailing) {
+                List {
+                    Section {
+                        TreatmentsControlsCard(viewModel: viewModel)
+                            .id(topScrollAnchorID)
+                            .onAppear { showScrollToTopButton = false }
+                            .onDisappear { showScrollToTopButton = true }
+                            .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 0))
+                            .listRowBackground(Color.clear)
+                            .listRowSeparator(.hidden)
+                    }
+
+                    if !viewModel.filteredTreatments.isEmpty {
+                        ForEach(Array(viewModel.filteredTreatments.enumerated()), id: \.element.objectID) { index, treatment in
+                            treatmentRow(for: treatment)
+                                .onAppear {
+                                    if index >= scrollToTopButtonThresholdIndex {
+                                        showScrollToTopButton = true
+                                    }
+                                }
+                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                    Button(role: .destructive) {
+                                        viewModel.deleteTreatment(treatment)
+                                    } label: {
+                                        Label(Texts_Common.delete, systemImage: "trash")
+                                    }
+                                }
+                        }
+                    } else {
+                        Text(Texts_TreatmentsView.noTreatmentsToShow)
                             .foregroundStyle(Color(.colorSecondary))
+                            .listRowSeparator(.hidden)
+                            .listRowBackground(Color.clear)
                     }
                 }
-                .id(viewModel.datePickerReset)
-            }
+                .listStyle(.insetGrouped)
 
-            Section(header: Text(Texts_TreatmentsView.filterTreatmentsLabel)) {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 10) {
-                        TreatmentFilterChip(
-                            systemImage: "arrowtriangle.down.fill",
-                            tintColor: ConstantsGlucoseChart.bolusTreatmentColor,
-                            isSelected: viewModel.showBolusTreatments
-                        ) {
-                            viewModel.toggleBolusFilter()
+                if showScrollToTopButton {
+                    Button {
+                        withAnimation {
+                            scrollProxy.scrollTo(topScrollAnchorID, anchor: .top)
                         }
-
-                        TreatmentFilterChip(
-                            systemImage: "arrowtriangle.down.fill",
-                            tintColor: ConstantsGlucoseChart.bolusTreatmentColor,
-                            isSelected: viewModel.showSmallBolusTreatments,
-                            isEnabled: viewModel.showBolusTreatments,
-                            symbolScale: .medium,
-                            symbolFont: .system(size: 11, weight: .regular)
-                        ) {
-                            viewModel.toggleSmallBolusFilter()
-                        }
-
-                        TreatmentFilterChip(
-                            systemImage: "circle.fill",
-                            tintColor: ConstantsGlucoseChart.carbsTreatmentColor,
-                            isSelected: viewModel.showCarbsTreatments
-                        ) {
-                            viewModel.toggleCarbsFilter()
-                        }
-
-                        TreatmentFilterChip(
-                            systemImage: "drop.fill",
-                            tintColor: ConstantsGlucoseChart.bgCheckTreatmentColorInner,
-                            isSelected: viewModel.showBgCheckTreatments
-                        ) {
-                            viewModel.toggleBgCheckFilter()
-                        }
-
-                        TreatmentFilterChip(
-                            systemImage: "note.text",
-                            tintColor: ConstantsGlucoseChart.noteTreatmentColor,
-                            isSelected: viewModel.showNoteTreatments
-                        ) {
-                            viewModel.toggleNoteFilter()
-                        }
-
-                        if viewModel.showBasalFilter {
-                            TreatmentFilterChip(
-                                systemImage: "chart.bar.fill",
-                                tintColor: ConstantsGlucoseChart.basalTreatmentColor,
-                                isSelected: viewModel.showBasalTreatments
-                            ) {
-                                viewModel.toggleBasalFilter()
-                            }
-                        }
+                    } label: {
+                        Image(systemName: "arrow.up")
+                            .font(.title3.weight(.bold))
+                            .foregroundStyle(.yellow)
+                            .frame(width: 48, height: 48)
+                            .background(Color(.secondarySystemGroupedBackground), in: Circle())
                     }
-                    .padding(.vertical, 4)
+                    .buttonStyle(.plain)
+                    .shadow(color: .black.opacity(0.25), radius: 10, x: 0, y: 4)
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 20)
+                    .transition(.scale.combined(with: .opacity))
                 }
-                .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
             }
-
-            if !viewModel.filteredTreatments.isEmpty {
-                ForEach(viewModel.filteredTreatments, id: \.objectID) { treatment in
-                    treatmentRow(for: treatment)
-                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                            Button(role: .destructive) {
-                                viewModel.deleteTreatment(treatment)
-                            } label: {
-                                Label(Texts_Common.delete, systemImage: "trash")
-                            }
-                        }
+            .animation(.easeInOut(duration: 0.2), value: showScrollToTopButton)
+            .navigationTitle(Texts_TreatmentsView.treatmentsTitle)
+            .navigationBarTitleDisplayMode(.large)
+            .colorScheme(.dark)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: onAddTreatment) {
+                        Image(systemName: "plus")
+                    }
+                    .tint(.yellow)
                 }
-            } else {
-                Text(Texts_TreatmentsView.noTreatmentsToShow)
-                    .foregroundStyle(Color(.colorSecondary))
             }
-        }
-        .listStyle(.insetGrouped)
-        .navigationTitle(Texts_TreatmentsView.treatmentsTitle)
-        .navigationBarTitleDisplayMode(.large)
-        .colorScheme(.dark)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: onAddTreatment) {
-                    Image(systemName: "plus")
-                }
-                .tint(.yellow)
+            .onAppear {
+                viewModel.initializeViewIfNeeded()
             }
-        }
-        .onAppear {
-            viewModel.initializeViewIfNeeded()
-        }
-        .onReceive(
-            NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification).receive(on: RunLoop.main)
-        ) { _ in
-            viewModel.handleUserDefaultsDidChange()
+            .onReceive(
+                NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification).receive(on: RunLoop.main)
+            ) { _ in
+                viewModel.handleUserDefaultsDidChange()
+            }
         }
     }
 
@@ -190,6 +157,107 @@ struct TreatmentsListView: View {
         } else {
             TreatmentRowView(treatment: treatment)
         }
+    }
+}
+
+/// Persistent top controls for date selection and treatment filters.
+private struct TreatmentsControlsCard: View {
+    @ObservedObject var viewModel: TreatmentsViewModel
+
+    var body: some View {
+        VStack(spacing: 0) {
+            DatePicker(selection: Binding(get: {
+                viewModel.selectedDate
+            }, set: { newDate in
+                viewModel.selectedDateChanged(newDate)
+            }), in: ...latestSelectableDate, displayedComponents: .date) {
+                HStack {
+                    Text(Texts_BgReadings.date)
+                    Spacer()
+                    Text(viewModel.selectedDateDayName)
+                        .foregroundStyle(Color(.colorSecondary))
+                }
+            }
+            .id(viewModel.datePickerReset)
+            .tint(Color(.colorSecondary))
+            .padding(.horizontal, 16)
+            .padding(.vertical, 14)
+
+            Divider()
+                .overlay(Color(.separator))
+                .padding(.horizontal, 16)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    TreatmentFilterChip(
+                        systemImage: "arrowtriangle.down.fill",
+                        tintColor: ConstantsGlucoseChart.bolusTreatmentColor,
+                        isSelected: viewModel.showBolusTreatments
+                    ) {
+                        viewModel.toggleBolusFilter()
+                    }
+
+                    TreatmentFilterChip(
+                        systemImage: "arrowtriangle.down.fill",
+                        tintColor: ConstantsGlucoseChart.bolusTreatmentColor,
+                        isSelected: viewModel.showSmallBolusTreatments,
+                        isEnabled: viewModel.showBolusTreatments,
+                        symbolScale: .medium,
+                        symbolFont: .system(size: 11, weight: .regular)
+                    ) {
+                        viewModel.toggleSmallBolusFilter()
+                    }
+
+                    TreatmentFilterChip(
+                        systemImage: "circle.fill",
+                        tintColor: ConstantsGlucoseChart.carbsTreatmentColor,
+                        isSelected: viewModel.showCarbsTreatments
+                    ) {
+                        viewModel.toggleCarbsFilter()
+                    }
+
+                    TreatmentFilterChip(
+                        systemImage: "drop.fill",
+                        tintColor: ConstantsGlucoseChart.bgCheckTreatmentColorInner,
+                        isSelected: viewModel.showBgCheckTreatments
+                    ) {
+                        viewModel.toggleBgCheckFilter()
+                    }
+
+                    TreatmentFilterChip(
+                        systemImage: "note.text",
+                        tintColor: ConstantsGlucoseChart.noteTreatmentColor,
+                        isSelected: viewModel.showNoteTreatments
+                    ) {
+                        viewModel.toggleNoteFilter()
+                    }
+
+                    if viewModel.showBasalFilter {
+                        TreatmentFilterChip(
+                            systemImage: "chart.bar.fill",
+                            tintColor: ConstantsGlucoseChart.basalTreatmentColor,
+                            isSelected: viewModel.showBasalTreatments
+                        ) {
+                            viewModel.toggleBasalFilter()
+                        }
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 12)
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .fill(Color(.secondarySystemGroupedBackground))
+        )
+    }
+
+    /// Last selectable timestamp for the date-only picker.
+    /// This keeps tomorrow disabled without making today's selected value invalid by a few milliseconds.
+    private var latestSelectableDate: Date {
+        Calendar.current.date(byAdding: DateComponents(day: 1, second: -1), to: Date().toMidnight()) ?? Date()
     }
 }
 
@@ -281,19 +349,29 @@ private struct TreatmentFilterChip: View {
 
     var body: some View {
         Button(action: action) {
-            Image(systemName: systemImage)
-                .font(symbolFont)
-                .imageScale(symbolScale)
-                .frame(width: 20, height: 20)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 7)
-                .background(chipBackgroundColor)
-                .foregroundStyle(chipForegroundColor)
-                .clipShape(Capsule())
-                .overlay(
-                    Capsule()
-                        .stroke(chipBorderColor.opacity(isEnabled || isSelected ? 1.0 : 0.6), lineWidth: 1)
-                )
+            ZStack(alignment: .bottomTrailing) {
+                Image(systemName: systemImage)
+                    .font(symbolFont)
+                    .imageScale(symbolScale)
+                    .frame(width: 20, height: 20)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 7)
+                    .background(chipBackgroundColor)
+                    .foregroundStyle(chipForegroundColor)
+                    .clipShape(Capsule())
+                    .overlay(
+                        Capsule()
+                            .stroke(chipBorderColor.opacity(isEnabled || isSelected ? 1.0 : 0.6), lineWidth: 1)
+                    )
+
+                if displayAsSelected {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.system(size: 11, weight: .semibold))
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(.black, .green)
+                        .offset(x: 4, y: 4)
+                }
+            }
         }
         .buttonStyle(.plain)
         .disabled(!isEnabled)

@@ -35,7 +35,6 @@ import OSLog
 
     let coreDataManager: CoreDataManager
     private let treatmentEntryAccessor: TreatmentEntryAccessor
-    private let numberOfDaysOfTreatmentsToShow = 7
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataTreatments)
 
     private var allTreatments: [TreatmentSnapshot] = []
@@ -63,12 +62,12 @@ import OSLog
         reloadTreatments()
     }
 
-    /// Reloads the bounded treatment history and reapplies the current filters.
+    /// Reloads the treatment history and reapplies the current filters.
     func reloadTreatments() {
         syncFilterSettingsFromUserDefaults()
 
         allTreatments = treatmentEntryAccessor
-            .getLatestTreatments(howOld: TimeInterval(days: Double(numberOfDaysOfTreatmentsToShow)))
+            .getLatestTreatments(howOld: nil)
             .filter { !$0.treatmentdeleted }
             .sorted(by: { $0.date > $1.date })
             .map { TreatmentSnapshot(treatmentEntry: $0) }
@@ -81,7 +80,7 @@ import OSLog
     }
 
     func selectedDateChanged(_ newDate: Date) {
-        selectedDate = newDate.toMidnight()
+        selectedDate = min(newDate, Date()).toMidnight()
         updateDayName()
         applyFilters()
         datePickerReset = UUID()
@@ -147,18 +146,6 @@ import OSLog
         coreDataManager.saveChanges()
         setNightscoutSyncRequiredToTrue()
         reloadTreatments()
-    }
-
-    func datePickerRange() -> ClosedRange<Date> {
-        let minimumDate = Calendar.current.date(
-            byAdding: .day,
-            value: -numberOfDaysOfTreatmentsToShow,
-            to: Date().toMidnight()
-        ) ?? Date().toMidnight()
-        let maximumTreatmentDate = allTreatments.map { $0.date.toMidnight() }.max() ?? Date().toMidnight()
-        let maximumDate = max(Date().toMidnight(), maximumTreatmentDate)
-
-        return minimumDate...maximumDate
     }
 
     // MARK: - private functions
