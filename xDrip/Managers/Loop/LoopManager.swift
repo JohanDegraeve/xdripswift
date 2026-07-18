@@ -52,6 +52,21 @@ public class LoopManager: NSObject {
     /// share latest readings with Loop
     public func share() {
 
+        // App Store releasers who cannot support the shared app group used by Loop/iAPS/Trio
+        // should add this line to xDripConfigOverride.xcconfig:
+        //
+        // DISABLE_LOOP_SHARE = YES
+        //
+        // When enabled, the OS-AID Share row is hidden from Sharing and Services, the
+        // stored Loop share setting is forced back to disabled, LoopManager is not started,
+        // and this defensive runtime guard prevents Loop share writes from running.
+        //
+        // This does not affect OS-AID Follower behaviour.
+        guard !Bundle.main.disableLoopShare else {
+            UserDefaults.standard.loopShareType = .disabled
+            return
+        }
+
         // will return if loop share is disabled
         guard UserDefaults.standard.loopShareType != .disabled else { return }
 

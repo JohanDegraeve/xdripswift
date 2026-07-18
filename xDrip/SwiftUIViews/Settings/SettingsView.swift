@@ -468,6 +468,7 @@ private enum SettingsOnlineHelp {
 struct SettingsGroupedRow {
     let id: String
     let title: String
+    var isVisible: Bool = true
     var detail: (() -> String?)? = nil
     var detailColor: (() -> Color?)? = nil
     var detailIndicator: (() -> SettingsIndicator?)? = nil
@@ -478,6 +479,11 @@ struct SettingsGroupedRow {
 struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, SettingsNativeSectionProvider {
     private let title: String
     private let rows: [SettingsGroupedRow]
+
+    init(title: String, rows: [SettingsGroupedRow]) {
+        self.title = title
+        self.rows = rows.filter(\.isVisible)
+    }
 
     static func glucoseDisplay() -> SettingsViewGroupedSettingsViewModel {
         SettingsViewGroupedSettingsViewModel(
@@ -646,6 +652,8 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                 SettingsGroupedRow(
                     id: "sharingServices.osAidLoopShare",
                     title: Texts_SettingsView.osAidLoopShareSectionTitle,
+                    // Releaser builds with Loop share disabled should not show this feature at all.
+                    isVisible: !Bundle.main.disableLoopShare,
                     detail: {
                         let shareType = UserDefaults.standard.loopShareType
                         return shareType == .disabled ? nil : shareType.description

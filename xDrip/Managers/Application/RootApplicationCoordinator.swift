@@ -655,13 +655,19 @@ import AppIntents
         // setup bgReadingSpeaker
         bgReadingSpeaker = BGReadingSpeaker(sharedSoundPlayer: soundPlayer, coreDataManager: coreDataManager)
         
-        // setup loopManager
-        loopManager = LoopManager(
-            coreDataManager: coreDataManager,
-            activeSensorIsAnubisProvider: { [weak self] in
-                self?.bluetoothPeripheralManager?.getCGMTransmitter()?.isAnubisG6() ?? false
-            }
-        )
+        // Some App Store builds cannot support the OS-AID shared app group, so do not start
+        // LoopManager and reset any persisted selection from an earlier build.
+        if Bundle.main.disableLoopShare {
+            UserDefaults.standard.loopShareType = .disabled
+        } else {
+            // setup loopManager
+            loopManager = LoopManager(
+                coreDataManager: coreDataManager,
+                activeSensorIsAnubisProvider: { [weak self] in
+                    self?.bluetoothPeripheralManager?.getCGMTransmitter()?.isAnubisG6() ?? false
+                }
+            )
+        }
         
         // setup dexcomShareUploadManager
         dexcomShareUploadManager = DexcomShareUploadManager(bgReadingsAccessor: bgReadingsAccessor, messageHandler: { (title:String, message:String) in
@@ -864,7 +870,9 @@ import AppIntents
             /// in case loopdelay > 0, this will be used to share with Loop
             /// - it will contain the full range off per minute readings (in stead of filtered by 5 minutes
             /// - reset to empty array
-            loopManager?.glucoseData = [GlucoseData]()
+            if let loopManager = loopManager {
+                loopManager.glucoseData = [GlucoseData]()
+            }
             
             // initialize latest3BgReadings
             var latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false, includingSuppressed: true)
@@ -918,19 +926,19 @@ import AppIntents
                         // reset latest3BgReadings
                         latest3BgReadings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: nil, forSensor: activeSensor, ignoreRawData: false, ignoreCalculatedValue: false, includingSuppressed: true)
                         
-                        if LoopManager.loopDelay() > 0 && abs(Date().timeIntervalSince(timeStampLastCalibrationForActiveSensor)) > LoopManager.loopDelay() + TimeInterval(minutes: 5.5) {
-                            loopManager?.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.finalValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
+                        if let loopManager = loopManager, LoopManager.loopDelay() > 0 && abs(Date().timeIntervalSince(timeStampLastCalibrationForActiveSensor)) > LoopManager.loopDelay() + TimeInterval(minutes: 5.5) {
+                            loopManager.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.finalValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
                         }
                     } else {
                         trace("in processNewGlucoseData, reading skipped, rawValue <= 0, looks like a faulty sensor", log: self.log, category: ConstantsLog.categoryRootView, type: .info)
                     }
-                } else if LoopManager.loopDelay() > 0 && glucose.glucoseLevelRaw > 0 && abs(Date().timeIntervalSince(timeStampLastCalibrationForActiveSensor)) >  LoopManager.loopDelay() + TimeInterval(minutes: 5.5) {
+                } else if let loopManager = loopManager, LoopManager.loopDelay() > 0 && glucose.glucoseLevelRaw > 0 && abs(Date().timeIntervalSince(timeStampLastCalibrationForActiveSensor)) >  LoopManager.loopDelay() + TimeInterval(minutes: 5.5) {
                     // loopdelay > 0, LoopManager will use loopShareGoucoseData
                     // create a reading just to be able to fill up loopShareGoucoseData, to have them per minute
                     
                     let newReading = calibrator.createNewBgReading(rawData: glucose.glucoseLevelRaw, timeStamp: glucose.timeStamp, sensor: activeSensor, last3Readings: &latest3BgReadings, lastCalibrationsForActiveSensorInLastXDays: &lastCalibrationsForActiveSensorInLastXDays, firstCalibration: firstCalibrationForActiveSensor, lastCalibration: lastCalibrationForActiveSensor, deviceName: self.getCGMTransmitterDeviceName(for: cgmTransmitter), nsManagedObjectContext: coreDataManager.mainManagedObjectContext)
                     
-                    loopManager?.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.finalValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
+                    loopManager.glucoseData.insert(GlucoseData(timeStamp: newReading.timeStamp, glucoseLevelRaw: round(newReading.finalValue), slopeOrdinal: newReading.slopeOrdinal(), slopeName: newReading.slopeName), at: 0)
                     
                     // delete the newReading, otherwise it stays in coredata and we would end up with per minute readings
                     coreDataManager.mainManagedObjectContext.delete(newReading)

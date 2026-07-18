@@ -67,6 +67,8 @@
 	<false/>
 	<key>IgnoreFollowerTypes</key>
 	<string>$(IGNORE_FOLLOWER_TYPES)</string>
+	<key>DisableLoopShare</key>
+	<string>$(DISABLE_LOOP_SHARE)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
