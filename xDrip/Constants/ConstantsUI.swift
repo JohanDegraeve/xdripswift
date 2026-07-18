@@ -39,6 +39,15 @@ enum ConstantsUI {
 
     /// dark red tint used for warning-style SwiftUI sections
     static let warningSectionBackgroundColor = Color(red: 0.20, green: 0.12, blue: 0.12)
+
+    /// yellow-orange used for caution indicators that should be softer than urgent red
+    static let cautionIndicatorColor = Color(red: 1.00, green: 0.68, blue: 0.08)
+
+    /// common warning triangle color used inside warning/caution Settings banners
+    static let warningBannerIndicatorColor = Color.yellow
+
+    /// dark yellow-orange tint used for caution-style SwiftUI sections
+    static let cautionSectionBackgroundColor = Color(red: 0.24, green: 0.18, blue: 0.05)
     
     static let plusButtonColor = Color.yellow
     

@@ -17,7 +17,7 @@ fileprivate enum Setting:Int, CaseIterable {
     /// should the BG values be written to a shared app group?
     case loopShareType = 4
     
-    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
+    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes.
     ///
     /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
     case loopDelay = 5
@@ -43,11 +43,18 @@ fileprivate enum Setting:Int, CaseIterable {
     /// should the online help be automatically translated?
     case translateOnlineHelp = 12
 
+    /// allow OS-AID sharing to use smoothed/final glucose values
+    case loopShareSmoothedData = 13
+
+    /// allow OS-AID sharing to use Medtrum Nano glucose values
+    case loopShareMedtrumNano = 14
+
 }
 
 enum SettingsViewDevelopmentSettingsRowGroup {
     case advanced
     case osAidLoopShare
+    case osAidLoopShareWarning
 }
 
 class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProtocol {
@@ -94,14 +101,20 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
 
         let osAidLoopShareRows = [
             nativeSettingsRow(id: "developer.loopShareType", index: Setting.loopShareType.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "developer.loopDelay", index: Setting.loopDelay.rawValue, sectionID: sectionID, isVisible: UserDefaults.standard.loopShareType != .disabled)
+            nativeSettingsRow(id: "developer.loopDelay", index: Setting.loopDelay.rawValue, sectionID: sectionID, isVisible: UserDefaults.standard.loopShareType != .disabled),
+            nativeSettingsRow(id: "developer.loopShareMedtrumNano", index: Setting.loopShareMedtrumNano.rawValue, sectionID: sectionID, isVisible: UserDefaults.standard.loopShareMedtrumNanoAvailable),
+            nativeSettingsRow(id: "developer.loopShareSmoothedData", index: Setting.loopShareSmoothedData.rawValue, sectionID: sectionID, isVisible: showLoopShareSmoothedDataRow)
         ]
+
+        let osAidLoopShareWarningRows = loopShareWarningBanners()
 
         switch rowGroup {
         case .advanced:
             return advancedRows
         case .osAidLoopShare:
             return osAidLoopShareRows
+        case .osAidLoopShareWarning:
+            return osAidLoopShareWarningRows
         }
     }
 
@@ -117,8 +130,8 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
     }
 
     func sectionTitle() -> String? {
-        if rowGroup == .osAidLoopShare {
-            return Texts_SettingsView.osAidLoopShareSectionTitle
+        if rowGroup == .osAidLoopShare || rowGroup == .osAidLoopShareWarning {
+            return nil
         }
 
         return Texts_SettingsView.developerSettings
@@ -148,6 +161,12 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             
         case .loopShareType:
             return Texts_SettingsView.loopShare
+
+        case .loopShareSmoothedData:
+            return Texts_SettingsView.loopShareSmoothedData
+
+        case .loopShareMedtrumNano:
+            return Texts_SettingsView.loopShareMedtrumNano
             
         case .loopDelay:
             return Texts_SettingsView.loopDelaysScreenTitle
@@ -181,14 +200,14 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp, .loopShareSmoothedData, .loopShareMedtrumNano:
             return .none
             
         case .loopDelay, .libreLinkUpVersion, .CAGEMaxHours:
             return .disclosure
             
         case .loopShareType:
-            return (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .medtrumEasyView) ? .none : .disclosure
+            return .disclosure
             
         }
     }
@@ -199,14 +218,11 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .loopDelay, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .loopDelay, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp, .loopShareSmoothedData, .loopShareMedtrumNano:
             return nil
 
         case .loopShareType:
-            // if using Medtrum Follower mode, then show disabled text as we have disabled loop share feature due to
-            // concerns over Medtrum CGM values producing incorrect insulin dosing
-            // if not, then all good, just show the share type description
-            return (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .medtrumEasyView) ? "⚠️ " + Texts_Common.notAvailable : UserDefaults.standard.loopShareType.description
+            return UserDefaults.standard.loopShareType.description
             
         case .libreLinkUpVersion:
             return UserDefaults.standard.libreLinkUpVersion
@@ -215,6 +231,29 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             return "\(UserDefaults.standard.CAGEMaxHours.description) \(Texts_Common.hours)"
         }
         
+    }
+
+    func rowIndicator(index: Int) -> SettingsIndicator? {
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .loopShareMedtrumNano:
+            return SettingsIndicator(
+                color: ConstantsUI.warningBannerIndicatorColor,
+                symbolName: "exclamationmark.triangle.fill",
+                accessibilityLabel: Texts_SettingsView.loopShareMedtrumNanoTitle
+            )
+
+        case .loopShareSmoothedData:
+            return SettingsIndicator(
+                color: ConstantsUI.warningBannerIndicatorColor,
+                symbolName: "exclamationmark.triangle.fill",
+                accessibilityLabel: Texts_SettingsView.loopShareSmoothedDataEnabledTitle
+            )
+
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .loopShareType, .loopDelay, .libreLinkUpVersion, .CAGEMaxHours, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp:
+            return nil
+        }
     }
 
     func settingsToggle(index: Int) -> SettingsToggleControl? {
@@ -277,6 +316,41 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                 isOn: { UserDefaults.standard.translateOnlineHelp },
                 setIsOn: { UserDefaults.standard.translateOnlineHelp = $0 }
             )
+        case .loopShareSmoothedData:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.loopShareSmoothedData },
+                setIsOn: { UserDefaults.standard.loopShareSmoothedData = $0 },
+                confirmation: { isOn in
+                    guard isOn else { return nil }
+
+                    return SettingsToggleConfirmationContent(
+                        title: Texts_Common.warning,
+                        message: Texts_SettingsView.loopShareSmoothedDataWarning,
+                        actionTitle: Texts_SettingsView.loopShareSmoothedDataConfirm,
+                        cancelTitle: Texts_Common.Cancel
+                    )
+                }
+            )
+        case .loopShareMedtrumNano:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.loopShareMedtrumNano },
+                setIsOn: { isOn in
+                    UserDefaults.standard.loopShareMedtrumNano = isOn
+                    if isOn {
+                        UserDefaults.standard.loopShareSmoothedData = false
+                    }
+                },
+                confirmation: { isOn in
+                    guard isOn else { return nil }
+
+                    return SettingsToggleConfirmationContent(
+                        title: Texts_Common.warning,
+                        message: Texts_SettingsView.loopShareMedtrumNanoWarning,
+                        actionTitle: Texts_SettingsView.loopShareMedtrumNanoConfirm,
+                        cancelTitle: Texts_Common.Cancel
+                    )
+                }
+            )
         case .loopShareType, .loopDelay, .libreLinkUpVersion, .CAGEMaxHours:
             return nil
         }
@@ -293,17 +367,10 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .translateOnlineHelp:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .translateOnlineHelp, .loopShareSmoothedData, .loopShareMedtrumNano:
             return .nothing
             
         case .loopShareType:
-            // if using Medtrum Follower mode, then disable loop share feature due to concerns over Medtrum CGM values
-            // producing incorrect insulin dosing
-            // SPANISH: https://www.aemps.gob.es/informa/la-aemps-informa-del-cese-de-comercializacion-y-retirada-del-mercado-del-sensor-y-transmisor-del-sistema-de-monitorizacion-continua-de-glucosa-a8-touchcare/
-            if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .medtrumEasyView {
-                return .showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.loopShareMedtrumFollowerDisabled)
-            }
-            
             // data to be displayed in list from which user needs to pick a loop share type
             var data = [String]()
             
@@ -379,9 +446,50 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
     func isEnabled(index: Int) -> Bool {
         return true
     }
+
+    private func loopShareWarningBanners() -> [SettingsRow] {
+        var rows = [SettingsRow]()
+
+        if UserDefaults.standard.loopShareMedtrumNanoAvailable {
+            rows.append(SettingsRow(
+                id: "developer.loopShareMedtrumNanoWarning",
+                title: Texts_SettingsView.loopShareMedtrumNanoTitle,
+                control: .warningBanner(
+                    message: UserDefaults.standard.loopShareMedtrumNano ? Texts_SettingsView.loopShareMedtrumNanoEnabledMessage : Texts_SettingsView.loopShareMedtrumNanoBlockedMessage,
+                    severity: UserDefaults.standard.loopShareMedtrumNano ? .warning : .caution
+                )
+            ))
+        }
+
+        guard showLoopShareSmoothedDataRow else { return rows }
+
+        if UserDefaults.standard.loopShareSmoothedData {
+            rows.append(SettingsRow(
+                id: "developer.loopShareSmoothedDataEnabledWarning",
+                title: Texts_SettingsView.loopShareSmoothedDataEnabledTitle,
+                control: .warningBanner(message: Texts_SettingsView.loopShareSmoothedDataEnabledMessage, severity: .warning)
+            ))
+
+            return rows
+        }
+
+        rows.append(SettingsRow(
+            id: "developer.loopShareSmoothedDataDifferenceWarning",
+            title: Texts_SettingsView.loopShareSmoothedDataDifferenceTitle,
+            control: .warningBanner(message: Texts_SettingsView.loopShareSmoothedDataDifferenceMessage, severity: .caution)
+        ))
+
+        return rows
+    }
+
+    private var showLoopShareSmoothedDataRow: Bool {
+        return UserDefaults.standard.loopShareType != .disabled
+            && UserDefaults.standard.enableSmoothing
+            && !LoopManager.medtrumNanoShareBlocked
+    }
     
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
-        if rowGroup == .osAidLoopShare && index == Setting.loopShareType.rawValue {
+        if rowGroup == .osAidLoopShare && (index == Setting.loopShareType.rawValue || index == Setting.loopShareSmoothedData.rawValue || index == Setting.loopShareMedtrumNano.rawValue) {
             return true
         }
 

@@ -619,6 +619,7 @@
 		F8DF766223E390D100063910 /* BLEPeripheral+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF766123E390D100063910 /* BLEPeripheral+CoreDataProperties.swift */; };
 		F8DF766423E781C100063910 /* BLEPeripheralAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF766323E781C100063910 /* BLEPeripheralAccessor.swift */; };
 		F8E0475E28CC8E330049D8C9 /* GlucoseData+LoopShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */; };
+		F8A8F0022FF4000100000001 /* BgReading+LoopShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A8F0012FF4000100000001 /* BgReading+LoopShare.swift */; };
 		F8E3A2A323D4E7E200E5E98A /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */; };
 		F8E3A2A923D906C200E5E98A /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2A823D906C200E5E98A /* CalendarManager.swift */; };
 		F8E3A2AB23DA520B00E5E98A /* ConstantsCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2AA23DA520B00E5E98A /* ConstantsCalendar.swift */; };
@@ -1673,6 +1674,7 @@
 		F8DF766123E390D100063910 /* BLEPeripheral+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BLEPeripheral+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F8DF766323E781C100063910 /* BLEPeripheralAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEPeripheralAccessor.swift; sourceTree = "<group>"; };
 		F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GlucoseData+LoopShare.swift"; sourceTree = "<group>"; };
+		F8A8F0012FF4000100000001 /* BgReading+LoopShare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BgReading+LoopShare.swift"; sourceTree = "<group>"; };
 		F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		F8E3A2A823D906C200E5E98A /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarManager.swift; sourceTree = "<group>"; };
 		F8E3A2AA23DA520B00E5E98A /* ConstantsCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsCalendar.swift; sourceTree = "<group>"; };
@@ -2928,10 +2930,11 @@
 		};
 		F8E51D5B2448D8A3001C9E5A /* Loop */ = {
 			isa = PBXGroup;
-			children = (
-				F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */,
-				F855422A2B7182C60058CE09 /* LoopFollowManager.swift */,
-				F8E51D5C2448D8B5001C9E5A /* LoopManager.swift */,
+				children = (
+					F8A8F0012FF4000100000001 /* BgReading+LoopShare.swift */,
+					F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */,
+					F855422A2B7182C60058CE09 /* LoopFollowManager.swift */,
+					F8E51D5C2448D8B5001C9E5A /* LoopManager.swift */,
 				473D9ECD2C2DC53A00364060 /* LoopShareType.swift */,
 			);
 			path = Loop;
@@ -4266,11 +4269,12 @@
 				4D10C0042FEF000100000001 /* GlucoseChartScrollCoordinator.swift in Sources */,
 				C8BA6BBA5746888144511D55 /* GlucoseChartStateManager.swift in Sources */,
 				4D20C0022FF1000100000001 /* RootHomeState.swift in Sources */,
-				4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */,
-				4D20C00A2FF1000100000001 /* RootTabView.swift in Sources */,
-				D4E499AD277B4CE7000F8CBA /* DateOnly.swift in Sources */,
-				F8E51D5D2448D8B5001C9E5A /* LoopManager.swift in Sources */,
-				473D9ECE2C2DC53A00364060 /* LoopShareType.swift in Sources */,
+					4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */,
+					4D20C00A2FF1000100000001 /* RootTabView.swift in Sources */,
+					D4E499AD277B4CE7000F8CBA /* DateOnly.swift in Sources */,
+					F8A8F0022FF4000100000001 /* BgReading+LoopShare.swift in Sources */,
+					F8E51D5D2448D8B5001C9E5A /* LoopManager.swift in Sources */,
+					473D9ECE2C2DC53A00364060 /* LoopShareType.swift in Sources */,
 				F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */,
 				F8297F5A238EE14E00D74D66 /* TextsBluetoothPeripheralView.swift in Sources */,
 				4E6000012FF2000100000001 /* SensorNoiseCalculator.swift in Sources */,

@@ -1,6 +1,20 @@
 struct SettingsToggleControl {
     let isOn: () -> Bool
     let setIsOn: (Bool) -> Void
+    var confirmation: ((Bool) -> SettingsToggleConfirmationContent?)? = nil
+
+    init(isOn: @escaping () -> Bool, setIsOn: @escaping (Bool) -> Void, confirmation: ((Bool) -> SettingsToggleConfirmationContent?)? = nil) {
+        self.isOn = isOn
+        self.setIsOn = setIsOn
+        self.confirmation = confirmation
+    }
+}
+
+struct SettingsToggleConfirmationContent {
+    let title: String?
+    let message: String?
+    let actionTitle: String
+    let cancelTitle: String
 }
 
 /// functions that define the contents of a Section
@@ -37,6 +51,9 @@ protocol SettingsViewModelProtocol {
     
     /// Native toggle state and action for SwiftUI Settings rows.
     func settingsToggle(index: Int) -> SettingsToggleControl?
+
+    /// Optional marker shown before the row title.
+    func rowIndicator(index: Int) -> SettingsIndicator?
     
     /// what's the number of rows in the section
     /// - returns:
@@ -84,6 +101,10 @@ extension SettingsViewModelProtocol {
     func storeSectionReloadClosure(sectionReloadClosure: @escaping (() -> Void)) {}
 
     func settingsToggle(index: Int) -> SettingsToggleControl? {
+        nil
+    }
+
+    func rowIndicator(index: Int) -> SettingsIndicator? {
         nil
     }
     

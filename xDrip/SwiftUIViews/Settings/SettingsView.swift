@@ -658,10 +658,18 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                         let shareType = UserDefaults.standard.loopShareType
                         return shareType == .disabled ? nil : shareType.description
                     },
+                    detailIndicator: {
+                        osAidLoopShareWarningIndicator()
+                    },
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.osAidLoopShareSectionTitle,
-                            providers: { [SettingsViewDevelopmentSettingsViewModel(rowGroup: .osAidLoopShare)] }
+                            providers: {
+                                [
+                                    SettingsViewDevelopmentSettingsViewModel(rowGroup: .osAidLoopShare),
+                                    SettingsViewDevelopmentSettingsViewModel(rowGroup: .osAidLoopShareWarning)
+                                ]
+                            }
                         )
                     }
                 ),
@@ -710,6 +718,40 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
 
         let connectionIsRecent = lastConnection > Date().addingTimeInterval(-Double(ConstantsFollower.secondsUntilFollowerDisconnectWarningNightscout))
         return SettingsIndicator(color: connectionIsRecent ? ConstantsAppColors.normal : ConstantsAppColors.urgent)
+    }
+
+    /// Mirrors the child OS-AID warning banners so the parent row also shows
+    /// when the selected sharing path needs attention.
+    private static func osAidLoopShareWarningIndicator() -> SettingsIndicator? {
+        guard UserDefaults.standard.loopShareType != .disabled else {
+            return nil
+        }
+
+        if UserDefaults.standard.loopShareMedtrumNanoAvailable {
+            return SettingsIndicator(
+                color: ConstantsUI.warningBannerIndicatorColor,
+                symbolName: "exclamationmark.triangle.fill",
+                accessibilityLabel: Texts_SettingsView.loopShareMedtrumNanoTitle
+            )
+        }
+
+        if UserDefaults.standard.enableSmoothing && UserDefaults.standard.loopShareSmoothedData {
+            return SettingsIndicator(
+                color: ConstantsUI.warningBannerIndicatorColor,
+                symbolName: "exclamationmark.triangle.fill",
+                accessibilityLabel: Texts_SettingsView.loopShareSmoothedDataEnabledTitle
+            )
+        }
+
+        guard UserDefaults.standard.enableSmoothing else {
+            return nil
+        }
+
+        return SettingsIndicator(
+            color: ConstantsUI.warningBannerIndicatorColor,
+            symbolName: "exclamationmark.triangle.fill",
+            accessibilityLabel: Texts_SettingsView.loopShareSmoothedDataDifferenceTitle
+        )
     }
 
     func sectionTitle() -> String? {

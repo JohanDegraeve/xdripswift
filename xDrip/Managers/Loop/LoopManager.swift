@@ -30,7 +30,7 @@ public class LoopManager: NSObject {
     /// latest glucose data values - to be used only if using loopDelay
     /// - first is the youngest
     ///
-    /// actually there's redundancy in data. Readings are normally read from coredata here in this module, and stored in lastReadings - disadvantage is that BgReadings in coredata only contain readings per 5 minutes + the latest reading (which can be less than 5 minutes later than latest but one reading. But when using loopdelay, we omit the most recent values, and end up with an array of readings, 5 minutes apart from each other, as a result Loop would receive a reading only every 5 minutes. For that reason, this second array glucoseData is introduced (later in the project). This array has readings per minute, smoothed. Ideally, glucoseData could be used no matter of loopDelay is used or not, but to avoid uncatched coding errors, I kept both
+    /// actually there's redundancy in data. Readings are normally read from coredata here in this module, and stored in lastReadings - disadvantage is that BgReadings in coredata only contain readings per 5 minutes + the latest reading (which can be less than 5 minutes later than latest but one reading. But when using loopdelay, we omit the most recent values, and end up with an array of readings, 5 minutes apart from each other, as a result Loop would receive a reading only every 5 minutes. For that reason, this second array glucoseData is introduced (later in the project). This array has readings per minute. Ideally, glucoseData could be used no matter of loopDelay is used or not, but to avoid uncatched coding errors, I kept both
     public var glucoseData = [GlucoseData]()
 
     // MARK: - initializer
@@ -70,12 +70,11 @@ public class LoopManager: NSObject {
         // will return if loop share is disabled
         guard UserDefaults.standard.loopShareType != .disabled else { return }
 
-        // will return if loop share is enabled but the user is receiving BG values from Medtrum Follower Mode
-        // this is due to this sensor being pulled by European Health Agencies (March/April 2026) due to inaccurate results
+        // Medtrum Nano CGM data is not shared with OS-AID apps unless the user explicitly opts in.
+        // This is due to the sensor being pulled by European Health Agencies (March/April 2026) due to inaccurate results
         // and fears over inaccurate dosing by AID systems.
         // SPANISH: https://www.aemps.gob.es/informa/la-aemps-informa-del-cese-de-comercializacion-y-retirada-del-mercado-del-sensor-y-transmisor-del-sistema-de-monitorizacion-continua-de-glucosa-a8-touchcare/
-        // basically guard to ensure "master" or "follower mode except Medtrum" to allow to proceed
-        guard UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType != .medtrumEasyView) else {
+        guard !Self.medtrumNanoShareBlocked else {
             clearSharedLoopReadings()
             return
         }
@@ -157,13 +156,14 @@ public class LoopManager: NSObject {
 
             for reading in lastReadings {
 
-                // Loop should always receive the final post processed value shown in the app
+                // OS-AID targets should receive adjusted values, or calculated values if no adjustment exists.
+                // Smoothed/final values are only shared when the user explicitly enables the warned override.
                 let date = "/Date(" + Int64(floor(reading.timeStamp.toMillisecondsAsDouble() / 1000) * 1000).description + ")/"
                 var representation: [String : Any] = [
                     "Trend" : reading.slopeOrdinal(),
                     "ST" : date,
                     "DT" : date,
-                    "Value" : round(reading.finalValue),
+                    "Value" : round(reading.loopShareValue),
                     "direction" : reading.slopeName
                 ]
 
@@ -527,6 +527,10 @@ public class LoopManager: NSObject {
             return Date(timeIntervalSince1970: epoch)
         }
         return nil
+    }
+
+    public static var medtrumNanoShareBlocked: Bool {
+        return UserDefaults.standard.loopShareMedtrumNanoAvailable && !UserDefaults.standard.loopShareMedtrumNano
     }
 
 }

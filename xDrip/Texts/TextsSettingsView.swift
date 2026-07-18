@@ -931,8 +931,56 @@ class Texts_SettingsView {
         return NSLocalizedString("loopShareToTrio", tableName: filename, bundle: Bundle.main, value: "Trio", comment: "text for Trio")
     }()
     
-    static let loopShareMedtrumFollowerDisabled: String = {
-        return NSLocalizedString("settingsviews_loopShareMedtrumFollowerDisabled", tableName: filename, bundle: Bundle.main, value: "OS-AID Share is disabled in Medtrum Follower Mode due to safety concerns over sensor accuracy.", comment: "developer settings, Medtrum follower is disabled to share values to shared app group")
+    static let loopShareMedtrumNano: String = {
+        return NSLocalizedString("settingsviews_loopShareMedtrumNano", tableName: filename, bundle: Bundle.main, value: "Share Medtrum Nano", comment: "Settings row title to allow Medtrum Nano glucose data to be shared with OS-AID apps")
+    }()
+
+    static let loopShareMedtrumNanoTitle: String = {
+        return NSLocalizedString("settingsviews_loopShareMedtrumNanoTitle", tableName: filename, bundle: Bundle.main, value: "Medtrum Nano sharing is not recommended", comment: "Warning banner title shown when Medtrum Nano is the OS-AID glucose source")
+    }()
+
+    static let loopShareMedtrumNanoBlockedMessage: String = {
+        return NSLocalizedString("settingsviews_loopShareMedtrumNanoBlockedMessage", tableName: filename, bundle: Bundle.main, value: "Due to accuracy concerns, sharing Medtrum Nano CGM data to OS-AID apps is strongly not recommended.\n\nMedtrum Nano data is not being shared unless you specifically enable the above option.", comment: "Warning banner text shown when Medtrum Nano OS-AID sharing is blocked")
+    }()
+
+    static let loopShareMedtrumNanoEnabledMessage: String = {
+        return NSLocalizedString("settingsviews_loopShareMedtrumNanoEnabledMessage", tableName: filename, bundle: Bundle.main, value: "Due to accuracy concerns, sharing Medtrum Nano CGM data to OS-AID apps is strongly not recommended.\n\nMedtrum Nano data is being shared because you specifically requested it by enabling the above option and accepting the risk.", comment: "Warning banner text shown when Medtrum Nano OS-AID sharing is enabled")
+    }()
+
+    static let loopShareMedtrumNanoWarning: String = {
+        return NSLocalizedString("settingsviews_loopShareMedtrumNanoWarning", tableName: filename, bundle: Bundle.main, value: "Due to accuracy concerns, sharing Medtrum Nano CGM data to OS-AID apps is strongly not recommended. OS-AID apps may use this data for insulin dosing decisions and inaccurate CGM data could interfere with normal operation.\n\nThe recommended setting is Off. Only enable this if you understand the risk and specifically want Medtrum Nano data to be shared.", comment: "Warning shown before allowing Medtrum Nano glucose data to be shared with OS-AID apps")
+    }()
+
+    static let loopShareMedtrumNanoConfirm: String = {
+        return NSLocalizedString("settingsviews_loopShareMedtrumNanoConfirm", tableName: filename, bundle: Bundle.main, value: "I understand - share Medtrum Nano", comment: "Confirmation button title for enabling Medtrum Nano glucose data sharing with OS-AID apps")
+    }()
+
+    static let loopShareSmoothedData: String = {
+        return NSLocalizedString("settingsviews_loopShareSmoothedData", tableName: filename, bundle: Bundle.main, value: "Share Smoothed Data", comment: "Settings row title to allow smoothed glucose data to be shared with OS-AID apps")
+    }()
+
+    static let loopShareSmoothedDataDifferenceTitle: String = {
+        return NSLocalizedString("settingsviews_loopShareSmoothedDataDifferenceTitle", tableName: filename, bundle: Bundle.main, value: "Shared values may be different", comment: "Warning banner title shown when Glucose smoothing is enabled but smoothed OS-AID sharing is off")
+    }()
+
+    static let loopShareSmoothedDataDifferenceMessage: String = {
+        return String(format: NSLocalizedString("settingsviews_loopShareSmoothedDataDifferenceMessage", tableName: filename, bundle: Bundle.main, value: "Glucose smoothing is enabled, but OS-AID Share is sending unsmoothed data as preferred by OS-AID apps.\n\nThe glucose values shown in %@ may differ from those received by the OS-AID app.\n\nConsider disabling smoothing in the Adjustments screen when sharing data with OS-AID apps.", comment: "Warning banner text shown when Glucose smoothing is enabled but smoothed OS-AID sharing is off"), ConstantsHomeView.applicationName)
+    }()
+
+    static let loopShareSmoothedDataEnabledTitle: String = {
+        return NSLocalizedString("settingsviews_loopShareSmoothedDataEnabledTitle", tableName: filename, bundle: Bundle.main, value: "Smoothed data is being shared", comment: "Warning banner title shown when smoothed OS-AID sharing is enabled")
+    }()
+
+    static let loopShareSmoothedDataEnabledMessage: String = {
+        return NSLocalizedString("settingsviews_loopShareSmoothedDataEnabledMessage", tableName: filename, bundle: Bundle.main, value: "Sharing smoothed data is not recommended and it may interfere with normal OS-AID operation.\n\nSmoothed data is being shared because you specifically requested it by enabling the above option and accepting the risk.", comment: "Warning banner text shown when smoothed OS-AID sharing is enabled")
+    }()
+
+    static let loopShareSmoothedDataWarning: String = {
+        return String(format: NSLocalizedString("settingsviews_loopShareSmoothedDataWarning", tableName: filename, bundle: Bundle.main, value: "OS-AID apps such as Trio expect unsmoothed glucose data from the shared app group. Sharing smoothed data may change how the AID app interprets CGM data and could interfere with normal operation.\n\nThe recommended setting is Off. Only enable this if you understand the risk and specifically want %@ to share smoothed data.", comment: "Warning shown before allowing smoothed glucose data to be shared with OS-AID apps"), ConstantsHomeView.applicationName)
+    }()
+
+    static let loopShareSmoothedDataConfirm: String = {
+        return NSLocalizedString("settingsviews_loopShareSmoothedDataConfirm", tableName: filename, bundle: Bundle.main, value: "I understand - share smoothed data", comment: "Confirmation button title for enabling smoothed glucose data sharing with OS-AID apps")
     }()
     
     static let selectTime: String = {

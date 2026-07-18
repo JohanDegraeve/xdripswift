@@ -469,11 +469,15 @@ extension UserDefaults {
         case suppressUnLockPayLoad = "suppressUnLockPayLoad"
         /// should the BG values be written to a shared app group?
         case loopShareType = "loopShareType"
+        /// should smoothed/final values be shared with OS-AID apps instead of adjusted/calculated values?
+        case loopShareSmoothedData = "loopShareSmoothedData"
+        /// should Medtrum Nano values be shared with OS-AID apps despite accuracy concerns?
+        case loopShareMedtrumNano = "loopShareMedtrumNano"
         /// did user authorize the storage of "frequent" writes to Nightscout or not (i.e. every 60 seconds instead of every 5 minutes)
         case storeFrequentReadingsInNightscout = "storeFrequentReadingsInNightscout"
         /// did user authorize the storage of "frequent" readings in healthkit or not (i.e. every 60 seconds instead of every 5 minutes)
         case storeFrequentReadingsInHealthKit = "storeFrequentReadingsInHealthKit"
-        /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
+        /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes.
         /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
         case loopDelaySchedule = "loopDelaySchedule"
         case loopDelayValueInMinutes = "loopDelayValueInMinutes"
@@ -869,6 +873,9 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.enableSmoothing.rawValue)
+            if !newValue {
+                loopShareSmoothedData = false
+            }
         }
     }
 
@@ -2545,7 +2552,7 @@ extension UserDefaults {
         }
     }
 
-    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
+    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes.
     ///
     /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
     @objc dynamic var loopDelaySchedule: String? {
@@ -2565,6 +2572,36 @@ extension UserDefaults {
         }
         set {
             set(newValue.rawValue, forKey: Key.loopShareType.rawValue)
+            loopShareSmoothedData = false
+            loopShareMedtrumNano = false
+        }
+    }
+
+    /// Share smoothed/final glucose values with OS-AID app groups.
+    /// Default false. Reset to false when OS-AID target or Glucose smoothing is changed.
+    var loopShareSmoothedData: Bool {
+        get {
+            return bool(forKey: Key.loopShareSmoothedData.rawValue) && loopShareType != .disabled && enableSmoothing
+        }
+        set {
+            set(newValue && loopShareType != .disabled && enableSmoothing, forKey: Key.loopShareSmoothedData.rawValue)
+        }
+    }
+
+    /// True when OS-AID Share is enabled and the current CGM source is Medtrum Nano.
+    var loopShareMedtrumNanoAvailable: Bool {
+        return loopShareType != .disabled
+            && ((isMaster && cgmTransmitterType == .medtrumTouchCareNano) || (!isMaster && followerDataSourceType == .medtrumEasyView))
+    }
+
+    /// Share Medtrum Nano glucose values with OS-AID app groups.
+    /// Default false. Reset to false when the OS-AID target is changed.
+    var loopShareMedtrumNano: Bool {
+        get {
+            return bool(forKey: Key.loopShareMedtrumNano.rawValue) && loopShareMedtrumNanoAvailable
+        }
+        set {
+            set(newValue && loopShareMedtrumNanoAvailable, forKey: Key.loopShareMedtrumNano.rawValue)
         }
     }
 
@@ -2578,7 +2615,7 @@ extension UserDefaults {
         }
     }
 
-    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
+    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes.
     ///
     /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
     @objc dynamic var loopDelayValueInMinutes: String? {

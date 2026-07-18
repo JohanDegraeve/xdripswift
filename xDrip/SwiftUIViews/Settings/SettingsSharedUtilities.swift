@@ -221,7 +221,26 @@ enum SettingsAccessory {
 }
 
 enum SettingsControl {
-    case toggle(isOn: () -> Bool, setIsOn: (Bool) -> Void)
+    case toggle(isOn: () -> Bool, setIsOn: (Bool) -> Void, confirmation: ((Bool) -> SettingsToggleConfirmationContent?)? = nil)
+    case warningBanner(message: String, severity: SettingsWarningBannerSeverity = .warning)
+}
+
+enum SettingsWarningBannerSeverity {
+    case caution
+    case warning
+
+    var backgroundColor: Color {
+        switch self {
+        case .caution:
+            return ConstantsUI.cautionSectionBackgroundColor
+        case .warning:
+            return ConstantsUI.warningSectionBackgroundColor
+        }
+    }
+
+    var indicatorColor: Color {
+        return ConstantsUI.warningBannerIndicatorColor
+    }
 }
 
 struct SettingsAccessibility {
@@ -539,6 +558,8 @@ struct SettingsConfirmationContent: Identifiable {
     let message: String?
     let action: () -> Void
     let cancel: (() -> Void)?
+    var actionTitle: String = Texts_Common.Ok
+    var cancelTitle: String = Texts_Common.Cancel
 }
 
 struct SettingsSelectionListContent: Identifiable {
@@ -749,12 +770,35 @@ private struct SettingsNativeRowView: View {
 
     var body: some View {
         switch row.control {
-        case let .some(.toggle(isOn, setIsOn)):
+        case let .some(.warningBanner(message, severity)):
+            SettingsWarningBannerView(title: row.title, message: message, indicatorColor: severity.indicatorColor)
+                .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                .listRowBackground(severity.backgroundColor)
+
+        case let .some(.toggle(isOn, setIsOn, confirmation)):
             Toggle(isOn: Binding(
                 get: isOn,
-                set: {
-                    setIsOn($0)
-                    reload(row.reloadScope ?? .section(sectionID))
+                set: { newValue in
+                    if let confirmationContent = confirmation?(newValue) {
+                        presenter.confirmation = SettingsConfirmationContent(
+                            title: confirmationContent.title,
+                            message: confirmationContent.message,
+                            action: {
+                                presenter.confirmation = nil
+                                setIsOn(newValue)
+                                reload(row.reloadScope ?? .section(sectionID))
+                            },
+                            cancel: {
+                                presenter.confirmation = nil
+                                reload(row.reloadScope ?? .section(sectionID))
+                            },
+                            actionTitle: confirmationContent.actionTitle,
+                            cancelTitle: confirmationContent.cancelTitle
+                        )
+                    } else {
+                        setIsOn(newValue)
+                        reload(row.reloadScope ?? .section(sectionID))
+                    }
                 }
             )) {
                 rowText
@@ -854,6 +898,33 @@ private struct SettingsNativeRowView: View {
     }
 }
 
+private struct SettingsWarningBannerView: View {
+    let title: String
+    let message: String
+    let indicatorColor: Color
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .font(.title2)
+                .foregroundStyle(indicatorColor)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.headline)
+                    .foregroundStyle(.red)
+
+                Text(message)
+                    .font(.caption)
+                    .foregroundStyle(.primary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.vertical, 4)
+    }
+}
+
 extension SettingsViewModelProtocol {
     /// Builds a row from indexed view-model logic with explicit identity and visibility.
     func nativeSettingsRow(
@@ -886,7 +957,8 @@ extension SettingsViewModelProtocol {
                 accessory: accessoryType,
                 control: .toggle(
                     isOn: toggle.isOn,
-                    setIsOn: toggle.setIsOn
+                    setIsOn: toggle.setIsOn,
+                    confirmation: toggle.confirmation
                 ),
                 isEnabled: isEnabled,
                 isVisible: isVisible,
@@ -910,6 +982,10 @@ extension SettingsViewModelProtocol {
 
     /// Returns the optional colored marker shown before the title.
     private func nativeIndicator(index: Int) -> SettingsIndicator? {
+        if let indicator = rowIndicator(index: index) {
+            return indicator
+        }
+
         guard let homeScreenViewModel = self as? SettingsViewHomeScreenSettingsViewModel,
               let color = homeScreenViewModel.rowIndicatorColor(index: index) else {
             return nil
@@ -965,7 +1041,7 @@ struct SettingsRowTextView: View {
 
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 12) {
-            HStack(alignment: .firstTextBaseline, spacing: 7) {
+            HStack(alignment: .center, spacing: 7) {
                 if let icon {
                     SettingsRowIconView(icon: icon, isEnabled: isEnabled)
                 }
@@ -1101,8 +1177,8 @@ private struct SettingsPresentationModifier: ViewModifier {
                     return Alert(
                         title: Text(confirmation.title ?? ""),
                         message: confirmation.message.map { Text($0) },
-                        primaryButton: .default(Text(Texts_Common.Ok), action: confirmation.action),
-                        secondaryButton: .cancel(Text(Texts_Common.Cancel)) {
+                        primaryButton: .default(Text(confirmation.actionTitle), action: confirmation.action),
+                        secondaryButton: .cancel(Text(confirmation.cancelTitle)) {
                             confirmation.cancel?()
                         }
                     )
