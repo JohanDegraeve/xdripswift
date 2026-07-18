@@ -40,6 +40,12 @@ struct BgReadingsView: View {
     
     /// selection set for multi-select delete in the List
     @State private var selectedBgReadings: Set<BgReadingSnapshot> = []
+    
+    /// controls the visibility of the scroll-to-top button
+    @State private var showScrollToTopButton = false
+    
+    /// used to rebuild the list at the top without wrapping it in a ScrollViewReader
+    @State private var listReset = UUID()
 
     /// edit mode binding to enable multi-select in the List
     @Environment(\.editMode) private var editMode
@@ -56,13 +62,16 @@ struct BgReadingsView: View {
     /// is true if the user is using mg/dL units (pulled from UserDefaults)
     private let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
     
+    /// row index that needs to appear before the scroll-to-top button is shown
+    private let scrollToTopButtonThresholdIndex = 20
+    
     // MARK: - SwiftUI views
     
     var body: some View {
         NavigationView {
             List(selection: $selectedBgReadings) {
-                Section(footer: Text(selectedDateFooterText())) {
-                    DatePicker(selection: $dateSelected, in: Date().addingTimeInterval(-(Double(numberOfDaysOfBgReadingsToShow) * 24 * 3600))...Date(), displayedComponents: .date) {
+                Section {
+                    DatePicker(selection: $dateSelected, in: Date.distantPast...latestSelectableDate, displayedComponents: .date) {
                         HStack {
                             Text(Texts_BgReadings.date)
                             Spacer()
@@ -71,6 +80,7 @@ struct BgReadingsView: View {
                         }
                     }
                     .id(self.datePickerReset)
+                    .onAppear { showScrollToTopButton = false }
                 }
 
                 if !filteredBgReadings.isEmpty {
@@ -102,15 +112,42 @@ struct BgReadingsView: View {
                             }
                             .foregroundColor(.white)
                         }
+                        .onAppear {
+                            if let index = filteredBgReadings.firstIndex(of: bgReading), index >= scrollToTopButtonThresholdIndex {
+                                showScrollToTopButton = true
+                            }
+                        }
                     }
                     .onDelete(perform: deleteBgReading)
                 } else {
                     Text(Texts_BgReadings.noReadingsToShow)
                 }
             }
+            .id(listReset)
+            .overlay(alignment: .bottomTrailing) {
+                if showScrollToTopButton {
+                    Button {
+                        showScrollToTopButton = false
+                        listReset = UUID()
+                    } label: {
+                        Image(systemName: "arrow.up")
+                            .font(.title3.weight(.bold))
+                            .foregroundStyle(.yellow)
+                            .frame(width: 48, height: 48)
+                            .background(Color(.secondarySystemGroupedBackground), in: Circle())
+                    }
+                    .buttonStyle(.plain)
+                    .shadow(color: .black.opacity(0.25), radius: 10, x: 0, y: 4)
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 20)
+                }
+            }
+            .animation(.easeInOut(duration: 0.2), value: showScrollToTopButton)
             .listStyle(.insetGrouped)
             .navigationTitle(Texts_BgReadings.glucoseReadingsTitle)
             .onChange(of: dateSelected, perform: { value in
+                showScrollToTopButton = false
+
                 // update the filtered array with the newly selected date
                 filteredBgReadings = bgReadings.filter { Calendar.current.compare($0.timeStamp, to: dateSelected, toGranularity: .day) == .orderedSame}
                 
@@ -255,8 +292,10 @@ struct BgReadingsView: View {
         dateSelectedDayName = dateFormatter.string(from: date).capitalized
     }
 
-    private func selectedDateFooterText() -> String {
-        String(format: Texts_BgReadings.selectedDateFooterFormat, numberOfDaysOfBgReadingsToShow.description)
+    /// Last selectable timestamp for the date-only picker.
+    /// This keeps tomorrow disabled without making today's selected value invalid by a few milliseconds.
+    private var latestSelectableDate: Date {
+        Calendar.current.date(byAdding: DateComponents(day: 1, second: -1), to: Date().toMidnight()) ?? Date()
     }
 }
 
