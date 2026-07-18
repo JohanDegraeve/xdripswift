@@ -19,6 +19,9 @@ public class LoopManager: NSObject {
     /// a BgReadingsAccessor
     private var bgReadingsAccessor:BgReadingsAccessor
 
+    /// Whether the active Dexcom G6 transmitter is an Anubis.
+    private let activeSensorIsAnubisProvider: () -> Bool
+
     // for trace,
     private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryLoopManager)
 
@@ -32,11 +35,12 @@ public class LoopManager: NSObject {
 
     // MARK: - initializer
 
-    init(coreDataManager:CoreDataManager) {
+    init(coreDataManager: CoreDataManager, activeSensorIsAnubisProvider: @escaping () -> Bool) {
 
         // initialize non optional private properties
         self.coreDataManager = coreDataManager
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
+        self.activeSensorIsAnubisProvider = activeSensorIsAnubisProvider
 
         // call super.init
         super.init()
@@ -493,7 +497,9 @@ public class LoopManager: NSObject {
         let description = UserDefaults.standard.activeSensorDescription?.lowercased() ?? ""
 
         if description.contains("dexcom") {
-            return ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6
+            return activeSensorIsAnubisProvider()
+                ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis
+                : ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6
         }
 
         return ConstantsMaster.minimumSensorWarmUpRequiredInMinutes

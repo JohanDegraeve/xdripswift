@@ -656,7 +656,12 @@ import AppIntents
         bgReadingSpeaker = BGReadingSpeaker(sharedSoundPlayer: soundPlayer, coreDataManager: coreDataManager)
         
         // setup loopManager
-        loopManager = LoopManager(coreDataManager: coreDataManager)
+        loopManager = LoopManager(
+            coreDataManager: coreDataManager,
+            activeSensorIsAnubisProvider: { [weak self] in
+                self?.bluetoothPeripheralManager?.getCGMTransmitter()?.isAnubisG6() ?? false
+            }
+        )
         
         // setup dexcomShareUploadManager
         dexcomShareUploadManager = DexcomShareUploadManager(bgReadingsAccessor: bgReadingsAccessor, messageHandler: { (title:String, message:String) in
