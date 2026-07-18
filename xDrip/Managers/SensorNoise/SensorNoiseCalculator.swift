@@ -85,15 +85,37 @@ enum ConstantsSensorNoise {
     static let maximumGap: TimeInterval = 12 * 60
 
     static let minimumReadingsForQuadraticFit = 6
+    static let minimumReadingsForNeighbourJitter = 6
     static let minimumLongTermEstimates = 12
     static let minimumLongTermCoverage = 0.70
     static let historyMinimumInterval: TimeInterval = ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutes * 60
+
+    /// Point-to-point changes smaller than this are ignored when deciding if a segment is directional.
+    static let smoothTrendDeltaDeadbandInMgDl = 1.0
+
+    /// Required share of movement in one direction before a segment can be treated as a smooth trend.
+    static let smoothTrendDirectionalConsistency = 0.92
+
+    /// Maximum total movement against the main direction still allowed inside a smooth trend.
+    static let smoothTrendMaximumOppositeMovementInMgDl = 3.0
+
+    /// Maximum single movement against the main direction still allowed inside a smooth trend.
+    static let smoothTrendMaximumOppositeDeltaInMgDl = 2.5
+
+    /// Neighbour residuals smaller than this are ignored when counting local shape changes.
+    static let smoothTrendResidualDeadbandInMgDl = 2.0
+
+    /// Smooth curved rises and falls should not repeatedly alternate above and below their neighbours.
+    static let smoothTrendMaximumResidualSignChanges = 1
 
     /// xDrip Android uses error-variance boundaries 10, 60 and 200. The persisted
     /// values here are standard deviations, so use the square roots of those values.
     static let elevatedNoiseStandardDeviation = sqrt(10.0)
     static let veryHighNoiseStandardDeviation = sqrt(60.0)
     static let extremeNoiseStandardDeviation = sqrt(200.0)
+
+    /// Smooth directional rises and falls can have large quadratic residuals but should remain low.
+    static let smoothTrendNoiseCapStandardDeviation = elevatedNoiseStandardDeviation * 0.75
 
     static let maximumGlucoseValueInMgDl = 600.0
     static let flatlineLookback: TimeInterval = 60 * 60
@@ -203,7 +225,7 @@ struct SensorNoiseCalculator {
             readings: shortSegment,
             window: ConstantsSensorNoise.shortTermWindow
         )
-        let shortTermNoise = quadraticNoiseStandardDeviation(readings: shortSegment)
+        let shortTermNoise = jitterAwareNoiseStandardDeviation(readings: shortSegment)
 
         let longTermStart = latestReading.timeStamp.addingTimeInterval(-ConstantsSensorNoise.longTermWindow)
         let longTermReadings = contextualReadings.filter { $0.timeStamp >= longTermStart }
@@ -229,7 +251,7 @@ struct SensorNoiseCalculator {
                 window: ConstantsSensorNoise.shortTermWindow
             )
 
-            if let noise = quadraticNoiseStandardDeviation(readings: segment) {
+            if let noise = jitterAwareNoiseStandardDeviation(readings: segment) {
                 rollingNoiseValues.append(noise)
             }
         }
@@ -351,6 +373,18 @@ struct SensorNoiseCalculator {
             && (older.calibrationID != nil || newer.calibrationID != nil)
     }
 
+    /// Combines trend residuals with local neighbour jitter so smooth rises and falls stay low.
+    private func jitterAwareNoiseStandardDeviation(readings: [SensorNoiseReading]) -> Double? {
+        guard let quadraticNoise = quadraticNoiseStandardDeviation(readings: readings) else { return nil }
+        guard let neighbourJitter = neighbourJitterStandardDeviation(readings: readings) else { return quadraticNoise }
+
+        if isSmoothDirectionalTrend(readings: readings) {
+            return min(quadraticNoise, neighbourJitter, ConstantsSensorNoise.smoothTrendNoiseCapStandardDeviation)
+        }
+
+        return max(quadraticNoise, neighbourJitter)
+    }
+
     /// Removes a local quadratic glucose trend and returns the residual standard deviation.
     private func quadraticNoiseStandardDeviation(readings: [SensorNoiseReading]) -> Double? {
         guard readings.count >= ConstantsSensorNoise.minimumReadingsForQuadraticFit,
@@ -392,6 +426,86 @@ struct SensorNoiseCalculator {
         guard degreesOfFreedom > 0 else { return nil }
 
         return sqrt(max(squaredError / degreesOfFreedom, 0))
+    }
+
+    /// Measures how far each reading jumps away from the line between its neighbours.
+    private func neighbourJitterStandardDeviation(readings: [SensorNoiseReading]) -> Double? {
+        guard readings.count >= ConstantsSensorNoise.minimumReadingsForNeighbourJitter,
+              let firstDate = readings.first?.timeStamp,
+              let lastDate = readings.last?.timeStamp,
+              lastDate.timeIntervalSince(firstDate) >= ConstantsSensorNoise.minimumShortTermSpan else {
+            return nil
+        }
+
+        let residuals = neighbourResiduals(readings: readings)
+        guard !residuals.isEmpty else { return nil }
+
+        let squaredError = residuals.reduce(0.0) { $0 + ($1 * $1) }
+
+        return sqrt(max(squaredError / Double(residuals.count), 0))
+    }
+
+    /// Returns the local residuals used to detect point-to-point jitter.
+    private func neighbourResiduals(readings: [SensorNoiseReading]) -> [Double] {
+        var residuals = [Double]()
+
+        for index in readings.indices.dropFirst().dropLast() {
+            let olderReading = readings[index - 1]
+            let reading = readings[index]
+            let newerReading = readings[index + 1]
+            let neighbourSpan = newerReading.timeStamp.timeIntervalSince(olderReading.timeStamp)
+
+            guard neighbourSpan > 0 else { continue }
+
+            let readingPosition = reading.timeStamp.timeIntervalSince(olderReading.timeStamp) / neighbourSpan
+            let expectedValue = olderReading.calculatedValue + ((newerReading.calculatedValue - olderReading.calculatedValue) * readingPosition)
+            let residual = reading.calculatedValue - expectedValue
+            residuals.append(residual)
+        }
+
+        return residuals
+    }
+
+    /// Returns true when the segment mainly rises or falls without meaningful opposite movement.
+    private func isSmoothDirectionalTrend(readings: [SensorNoiseReading]) -> Bool {
+        let deltas = zip(readings, readings.dropFirst())
+            .map { $1.calculatedValue - $0.calculatedValue }
+            .filter { abs($0) >= ConstantsSensorNoise.smoothTrendDeltaDeadbandInMgDl }
+
+        guard !deltas.isEmpty else { return true }
+
+        let positiveMovement = deltas
+            .filter { $0 > 0 }
+            .reduce(0.0, +)
+        let negativeMovement = deltas
+            .filter { $0 < 0 }
+            .reduce(0.0) { $0 + abs($1) }
+        let mainDirectionIsRising = positiveMovement >= negativeMovement
+        let mainMovement = max(positiveMovement, negativeMovement)
+        let oppositeMovement = min(positiveMovement, negativeMovement)
+        let totalMovement = mainMovement + oppositeMovement
+        let largestOppositeDelta = deltas
+            .filter { ($0 > 0) != mainDirectionIsRising }
+            .map { abs($0) }
+            .max() ?? 0
+
+        guard totalMovement > 0 else { return true }
+
+        return mainMovement / totalMovement >= ConstantsSensorNoise.smoothTrendDirectionalConsistency
+            && oppositeMovement <= ConstantsSensorNoise.smoothTrendMaximumOppositeMovementInMgDl
+            && largestOppositeDelta <= ConstantsSensorNoise.smoothTrendMaximumOppositeDeltaInMgDl
+            && neighbourResidualSignChanges(readings: readings) <= ConstantsSensorNoise.smoothTrendMaximumResidualSignChanges
+    }
+
+    /// Counts repeated local shape reversals after ignoring very small neighbour residuals.
+    private func neighbourResidualSignChanges(readings: [SensorNoiseReading]) -> Int {
+        let signs = neighbourResiduals(readings: readings)
+            .filter { abs($0) >= ConstantsSensorNoise.smoothTrendResidualDeadbandInMgDl }
+            .map { $0 > 0 ? 1 : -1 }
+
+        return zip(signs, signs.dropFirst())
+            .filter { $0.0 != $0.1 }
+            .count
     }
 
     /// Solves the quadratic fit's three normal equations using pivoted elimination.

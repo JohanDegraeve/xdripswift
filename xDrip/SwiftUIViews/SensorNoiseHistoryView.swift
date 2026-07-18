@@ -318,7 +318,7 @@ struct SensorNoiseHistoryView: View {
                     series: .value("Segment", segment.id)
                 )
                 .lineStyle(StrokeStyle(lineWidth: 1, lineCap: .round, lineJoin: .round))
-                .foregroundStyle(segment.color.opacity(0.32))
+                .foregroundStyle(segment.color.opacity(chartData.shortLineOpacity))
 
                 LineMark(
                     x: .value("Time", segment.endDate),
@@ -326,7 +326,7 @@ struct SensorNoiseHistoryView: View {
                     series: .value("Segment", segment.id)
                 )
                 .lineStyle(StrokeStyle(lineWidth: 1, lineCap: .round, lineJoin: .round))
-                .foregroundStyle(segment.color.opacity(0.32))
+                .foregroundStyle(segment.color.opacity(chartData.shortLineOpacity))
             }
 
             ForEach(chartData.longSegments) { segment in
@@ -336,7 +336,7 @@ struct SensorNoiseHistoryView: View {
                     series: .value("Segment", segment.id)
                 )
                 .lineStyle(StrokeStyle(lineWidth: 2.75, lineCap: .round, lineJoin: .round, dash: [7, 4]))
-                .foregroundStyle(segment.color)
+                .foregroundStyle(segment.color.opacity(chartData.longLineOpacity))
 
                 LineMark(
                     x: .value("Time", segment.endDate),
@@ -344,7 +344,16 @@ struct SensorNoiseHistoryView: View {
                     series: .value("Segment", segment.id)
                 )
                 .lineStyle(StrokeStyle(lineWidth: 2.75, lineCap: .round, lineJoin: .round, dash: [7, 4]))
-                .foregroundStyle(segment.color)
+                .foregroundStyle(segment.color.opacity(chartData.longLineOpacity))
+            }
+
+            ForEach(chartData.trendPoints) { point in
+                LineMark(
+                    x: .value("Time", point.date),
+                    y: .value("Trend", point.value)
+                )
+                .lineStyle(StrokeStyle(lineWidth: 3.25, lineCap: .round, lineJoin: .round))
+                .foregroundStyle(Color.white.opacity(0.82))
             }
 
             if let displayedPoint {
@@ -647,6 +656,19 @@ private enum SensorNoiseHistoryRange: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
+    var chartOrder: Int {
+        switch self {
+        case .day:
+            return 0
+        case .threeDays:
+            return 1
+        case .week:
+            return 2
+        case .all:
+            return 3
+        }
+    }
+
     var duration: TimeInterval? {
         switch self {
         case .day:
@@ -683,8 +705,27 @@ private struct SensorNoiseChartSegment: Identifiable {
     let color: Color
 }
 
+private struct SensorNoiseChartTrendPoint: Identifiable {
+    let date: Date
+    let value: Double
+
+    var id: TimeInterval { date.timeIntervalSince1970 }
+}
+
 private struct SensorNoiseChartData {
+    private static let trendMinimumRange: SensorNoiseHistoryRange = .threeDays
+    private static let threeDayTrendRollingWindow: TimeInterval = 48 * 60 * 60
+    private static let wideTrendRollingWindow: TimeInterval = 96 * 60 * 60
+    private static let trendMaximumPointCount = 80
+    private static let shortLineStandardOpacity = 0.32
+    private static let shortLineTrendOpacity = 0.10
+    private static let shortLineWideTrendOpacity = 0.055
+    private static let longLineStandardOpacity = 1.0
+    private static let longLineTrendOpacity = 0.30
+    private static let longLineWideTrendOpacity = 0.16
+
     let points: [SensorNoiseHistoryPoint]
+    let range: SensorNoiseHistoryRange
     let domain: ClosedRange<Date>
     let yMaximum: Double
     let elevatedThreshold: Double
@@ -694,10 +735,12 @@ private struct SensorNoiseChartData {
     let shortSegments: [SensorNoiseChartSegment]
     let longSegments: [SensorNoiseChartSegment]
     let xAxisDates: [Date]?
+    let trendPoints: [SensorNoiseChartTrendPoint]
 
     /// Prepares only the selected time range and reduces its render cost without bridging data gaps.
     init(snapshot: SensorNoiseHistorySnapshot, range: SensorNoiseHistoryRange, isMgDl: Bool) {
         self.isMgDl = isMgDl
+        self.range = range
 
         let latestPointDate = snapshot.points.last?.timeStamp ?? snapshot.sensorStartDate
         let proposedEndDate = snapshot.sensorEndDate ?? max(Date(), latestPointDate)
@@ -725,15 +768,17 @@ private struct SensorNoiseChartData {
         veryHighThreshold = ConstantsSensorNoise.threshold(ConstantsSensorNoise.veryHighNoiseStandardDeviation, sensitivity: sensitivity).mgDlToMmol(mgDl: isMgDl)
         extremeThreshold = ConstantsSensorNoise.threshold(ConstantsSensorNoise.extremeNoiseStandardDeviation, sensitivity: sensitivity).mgDlToMmol(mgDl: isMgDl)
 
+        shortSegments = Self.segments(pointGroups: displayGroups, isLongTerm: false, isMgDl: isMgDl, sensitivity: sensitivity)
+        longSegments = Self.segments(pointGroups: displayGroups, isLongTerm: true, isMgDl: isMgDl, sensitivity: sensitivity)
+        trendPoints = Self.trendPoints(points: visiblePoints, range: range, isMgDl: isMgDl)
+
         let largestObservedValue = points.flatMap { point in
             [point.shortTermNoise, point.longTermNoise].compactMap { $0 }
         }
         .max()?
         .mgDlToMmol(mgDl: isMgDl) ?? 0
-        yMaximum = max(extremeThreshold * 1.16, largestObservedValue * 1.12)
-
-        shortSegments = Self.segments(pointGroups: displayGroups, isLongTerm: false, isMgDl: isMgDl, sensitivity: sensitivity)
-        longSegments = Self.segments(pointGroups: displayGroups, isLongTerm: true, isMgDl: isMgDl, sensitivity: sensitivity)
+        let largestTrendValue = trendPoints.map(\.value).max() ?? 0
+        yMaximum = max(extremeThreshold * 1.16, largestObservedValue * 1.12, largestTrendValue * 1.12)
     }
 
     var thresholds: [Double] {
@@ -742,6 +787,22 @@ private struct SensorNoiseChartData {
 
     var xAxisMarkCount: Int {
         domain.upperBound.timeIntervalSince(domain.lowerBound) > 3 * 24 * 60 * 60 ? 4 : 5
+    }
+
+    var shortLineOpacity: Double {
+        guard !trendPoints.isEmpty else { return Self.shortLineStandardOpacity }
+
+        return range.chartOrder >= SensorNoiseHistoryRange.week.chartOrder
+            ? Self.shortLineWideTrendOpacity
+            : Self.shortLineTrendOpacity
+    }
+
+    var longLineOpacity: Double {
+        guard !trendPoints.isEmpty else { return Self.longLineStandardOpacity }
+
+        return range.chartOrder >= SensorNoiseHistoryRange.week.chartOrder
+            ? Self.longLineWideTrendOpacity
+            : Self.longLineTrendOpacity
     }
 
     func displayValue(_ noiseInMgDl: Double) -> Double {
@@ -860,6 +921,70 @@ private struct SensorNoiseChartData {
         }
 
         return result
+    }
+
+    /// Builds a slow rolling average so wider charts show the session's overall noise direction.
+    private static func trendPoints(points: [SensorNoiseHistoryPoint], range: SensorNoiseHistoryRange, isMgDl: Bool) -> [SensorNoiseChartTrendPoint] {
+        guard range.chartOrder >= Self.trendMinimumRange.chartOrder else { return [] }
+
+        let sourcePoints = points.compactMap { point -> (date: Date, value: Double)? in
+            let noise = point.longTermNoise ?? point.shortTermNoise
+            guard let noise else { return nil }
+
+            return (point.timeStamp, noise)
+        }
+
+        guard sourcePoints.count >= 3 else { return [] }
+
+        var rollingPoints = [SensorNoiseChartTrendPoint]()
+        rollingPoints.reserveCapacity(sourcePoints.count)
+        let rollingWindow = trendRollingWindow(for: range)
+
+        for point in sourcePoints {
+            let windowStart = point.date.addingTimeInterval(-rollingWindow)
+            let windowValues = sourcePoints
+                .filter { $0.date >= windowStart && $0.date <= point.date }
+                .map(\.value)
+
+            guard windowValues.count >= 3 else { continue }
+
+            let average = windowValues.reduce(0, +) / Double(windowValues.count)
+            rollingPoints.append(
+                SensorNoiseChartTrendPoint(
+                    date: point.date,
+                    value: average.mgDlToMmol(mgDl: isMgDl)
+                )
+            )
+        }
+
+        return downsampleTrend(rollingPoints)
+    }
+
+    /// Uses a longer rolling average for wider ranges so the trend stays calm and readable.
+    private static func trendRollingWindow(for range: SensorNoiseHistoryRange) -> TimeInterval {
+        range.chartOrder >= SensorNoiseHistoryRange.week.chartOrder
+            ? wideTrendRollingWindow
+            : threeDayTrendRollingWindow
+    }
+
+    /// Limits trend rendering cost while preserving its start, end and general shape.
+    private static func downsampleTrend(_ points: [SensorNoiseChartTrendPoint]) -> [SensorNoiseChartTrendPoint] {
+        guard points.count > trendMaximumPointCount else { return points }
+
+        let bucketSize = Int(ceil(Double(points.count) / Double(trendMaximumPointCount)))
+        var reduced = [SensorNoiseChartTrendPoint]()
+        reduced.reserveCapacity(trendMaximumPointCount)
+
+        for bucketStart in stride(from: 0, to: points.count, by: bucketSize) {
+            let bucketEnd = min(bucketStart + bucketSize, points.count)
+            let bucket = points[bucketStart ..< bucketEnd]
+            let averageValue = bucket.reduce(0.0) { $0 + $1.value } / Double(bucket.count)
+            let middleIndex = bucket.index(bucket.startIndex, offsetBy: bucket.count / 2)
+
+            reduced.append(SensorNoiseChartTrendPoint(date: bucket[middleIndex].date, value: averageValue))
+        }
+
+        return reduced
     }
 
     /// Splits points at missing-reading gaps so the chart never draws a misleading connecting line.
