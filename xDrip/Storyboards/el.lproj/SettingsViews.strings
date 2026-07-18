@@ -115,6 +115,8 @@
 "developerSettings" = "Ρυθμίσεις για προχωρημένους";
 "showDeveloperSettings" = "Εμφάνιση ρυθμίσεων για προχωρημένους";
 "preferSensorCountdown" = "Προτίμηση αντίστροφης μέτρησης αισθητήρα";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Διάρκεια ζωής αισθητήρα";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Ελέγχει αν η διάρκεια ζωής του αισθητήρα εμφανίζεται ως χρόνος που έχει παρέλθει ή ως αντίστροφη μέτρηση σε iPhone και Apple Watch.";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Αρχική οθόνη";

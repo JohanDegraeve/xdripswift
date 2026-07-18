@@ -180,6 +180,8 @@
 "developerSettings" = "Advanced Settings";
 "showDeveloperSettings" = "Show Advanced Settings";
 "preferSensorCountdown" = "Prefer Sensor Countdown";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Sensor Lifetime";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Controls whether sensor lifetime is shown as elapsed time or as a countdown on iPhone and Apple Watch.";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Home Screen";

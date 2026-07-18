@@ -124,6 +124,8 @@
 "developerSettings" = "Geavanceerde instellingen";
 "showDeveloperSettings" = "Geavanceerde instellingen tonen";
 "preferSensorCountdown" = "Voorkeur voor aftellen sensor";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Levensduur sensor";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Bepaalt of de levensduur van de sensor als verstreken tijd of als aftelling wordt weergegeven op iPhone en Apple Watch.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

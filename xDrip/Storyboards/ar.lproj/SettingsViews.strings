@@ -102,6 +102,8 @@
 "developerSettings" = "الإعدادات المتقدمة";
 "showDeveloperSettings" = "إظهار الإعدادات المتقدمة";
 "preferSensorCountdown" = "تفضيل العد التنازلي لعمر المستشعر";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "عمر المستشعر";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "يتحكم في عرض عمر المستشعر كوقت منقضٍ أو كعد تنازلي على iPhone وApple Watch.";
 "nslog" = "NSتقرير";
 "oslog" = "OSتقرير";
 "settingsviews_sectiontitlehomescreen" = "الشاشة الرئيسية";

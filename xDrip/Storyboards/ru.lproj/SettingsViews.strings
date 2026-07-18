@@ -115,6 +115,8 @@
 "developerSettings" = "Расширенные настройки";
 "showDeveloperSettings" = "Показать расширенные настройки";
 "preferSensorCountdown" = "Предпочитать обратный отсчёт датчика";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Срок службы датчика";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Определяет, показывать срок службы датчика как прошедшее время или как обратный отсчёт на iPhone и Apple Watch.";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Домашний экран";

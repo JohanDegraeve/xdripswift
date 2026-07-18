@@ -162,6 +162,8 @@
 "developerSettings" = "Opciones avanzadas";
 "showDeveloperSettings" = "Mostrar opciones avanzadas";
 "preferSensorCountdown" = "Preferir cuenta atrás del sensor";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Vida útil del sensor";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Controla si la vida útil del sensor se muestra como tiempo transcurrido o como cuenta atrás en el iPhone y el Apple Watch.";
 "settingsviews_sectiontitlehomescreen" = "Inicio";
 "settingsviews_infoContactsAccessRestricted" = "No has podido dar permiso a %@ para accesar a tus contactos. Esto es probablemente debido a restriciones como el control parental o similar.";
 "settingsviews_contactImageSectionTitle" = "Imagen de Contacto";

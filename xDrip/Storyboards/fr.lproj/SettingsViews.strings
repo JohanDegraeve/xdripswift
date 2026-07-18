@@ -143,6 +143,8 @@
 "developerSettings" = "Paramètres avancés";
 "showDeveloperSettings" = "Afficher les paramètres avancés";
 "preferSensorCountdown" = "Préférer le compte à rebours du capteur";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Durée de vie du capteur";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Détermine si la durée de vie du capteur est affichée sous forme de temps écoulé ou de compte à rebours sur l’iPhone et l’Apple Watch.";
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Ecran d'accueil";

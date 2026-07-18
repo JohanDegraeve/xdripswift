@@ -287,6 +287,8 @@
 "developerSettings" = "Ustawienia zaawansowane";
 "showDeveloperSettings" = "Pokaż ustawienia zaawansowane";
 "preferSensorCountdown" = "Preferuj odliczanie czasu sensora";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Czas działania sensora";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Określa, czy czas działania sensora jest wyświetlany jako czas, który upłynął, czy jako odliczanie na iPhonie i Apple Watch.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

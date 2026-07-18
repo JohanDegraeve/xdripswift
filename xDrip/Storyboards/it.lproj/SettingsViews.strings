@@ -287,6 +287,8 @@
 "developerSettings" = "Impostazioni avanzate";
 "showDeveloperSettings" = "Mostra impostazioni avanzate";
 "preferSensorCountdown" = "Preferisci conto alla rovescia del sensore";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Durata del sensore";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Consente di mostrare la durata del sensore come tempo trascorso o come conto alla rovescia su iPhone e Apple Watch.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

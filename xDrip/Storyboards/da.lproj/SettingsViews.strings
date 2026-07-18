@@ -112,6 +112,8 @@
 "developerSettings" = "Avancerede indstillinger";
 "showDeveloperSettings" = "Vis avancerede indstillinger";
 "preferSensorCountdown" = "Foretræk nedtælling for sensor";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Sensorlevetid";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Styrer, om sensorens levetid vises som forløbet tid eller som en nedtælling på iPhone og Apple Watch.";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Home Screen";

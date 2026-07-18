@@ -109,6 +109,8 @@
 "developerSettings" = "Gelişmiş Ayarlar";
 "showDeveloperSettings" = "Gelişmiş Ayarları Göster";
 "preferSensorCountdown" = "Sensör geri sayımını tercih et";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Sensör kullanım süresi";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Sensör kullanım süresinin iPhone ve Apple Watch'ta geçen süre veya geri sayım olarak gösterilmesini belirler.";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Ana Ekran";

@@ -283,6 +283,8 @@
 "developerSettings" = "Erweiterte Einstellungen";
 "showDeveloperSettings" = "Erweiterte Einstellungen anzeigen";
 "preferSensorCountdown" = "Sensor-Countdown bevorzugen";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Sensorlaufzeit";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Legt fest, ob die Sensorlaufzeit auf iPhone und Apple Watch als verstrichene Zeit oder als Countdown angezeigt wird.";
 
 /// home screen settings, section title
 "settingsviews_sectiontitlehomescreen" = "Home Screen";

@@ -493,6 +493,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                                 [
                                     SettingsViewHomeScreenSettingsViewModel(rowGroup: .mainChart),
                                     SettingsViewHomeScreenSettingsViewModel(rowGroup: .miniChart),
+                                    SettingsViewHomeScreenSettingsViewModel(rowGroup: .sensorLifetime),
                                     SettingsViewHomeScreenSettingsViewModel(rowGroup: .screenLock)
                                 ]
                             }

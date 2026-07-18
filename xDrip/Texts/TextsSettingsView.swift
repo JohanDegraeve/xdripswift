@@ -269,6 +269,14 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_homeScreenMainChartSectionFooter", tableName: filename, bundle: Bundle.main, value: "These options control how glucose data is displayed on the main chart.", comment: "home screen settings, footer explaining main chart display options")
     }()
 
+    static let homeScreenSensorLifetimeSectionTitle: String = {
+        return NSLocalizedString("settingsviews_homeScreenSensorLifetimeSectionTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Lifetime", comment: "home screen settings, section title for sensor lifetime display options")
+    }()
+
+    static let homeScreenSensorLifetimeSectionFooter: String = {
+        return NSLocalizedString("settingsviews_homeScreenSensorLifetimeSectionFooter", tableName: filename, bundle: Bundle.main, value: "Controls whether sensor lifetime is shown as elapsed time or as a countdown on iPhone and Apple Watch.", comment: "home screen settings, footer explaining the sensor lifetime display preference")
+    }()
+
     static let homeScreenScreenLockSectionTitle: String = {
         return NSLocalizedString("settingsviews_homeScreenScreenLockSectionTitle", tableName: filename, bundle: Bundle.main, value: "Screen Lock", comment: "home screen settings, section title for screen lock options")
     }()
@@ -956,7 +964,7 @@ class Texts_SettingsView {
     }()
 
     static let preferSensorCountdown: String = {
-        return NSLocalizedString("preferSensorCountdown", tableName: filename, bundle: Bundle.main, value: "Prefer Sensor Countdown", comment: "advanced settings, show remaining sensor lifetime instead of elapsed lifetime")
+        return NSLocalizedString("preferSensorCountdown", tableName: filename, bundle: Bundle.main, value: "Prefer Sensor Countdown", comment: "home screen settings, show remaining sensor lifetime instead of elapsed lifetime")
     }()
 
     static let sensorNoiseSensitivity: String = {

@@ -287,6 +287,8 @@
 "developerSettings" = "Napredne nastavitve";
 "showDeveloperSettings" = "Prikaži napredne nastavitve";
 "preferSensorCountdown" = "Prednostno odštevanje senzorja";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Življenjska doba senzorja";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Določa, ali je življenjska doba senzorja v napravah iPhone in Apple Watch prikazana kot pretečeni čas ali kot odštevanje.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

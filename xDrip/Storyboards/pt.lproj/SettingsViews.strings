@@ -111,6 +111,8 @@
 "developerSettings" = "Definições avançadas";
 "showDeveloperSettings" = "Mostrar definições avançadas";
 "preferSensorCountdown" = "Preferir contagem decrescente do sensor";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Vida útil do sensor";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Controla se a vida útil do sensor é apresentada como tempo decorrido ou como contagem decrescente no iPhone e Apple Watch.";
 "settingsviews_sectiontitlehomescreen" = "Ecrã Inicial";
 "settingsviews_showClockWhenScreenIsLocked" = "Relógio no ecrã bloqueado";
 

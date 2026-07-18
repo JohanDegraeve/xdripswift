@@ -108,6 +108,8 @@
 "developerSettings" = "Lisäasetukset";
 "showDeveloperSettings" = "Näytä lisäasetukset";
 "preferSensorCountdown" = "Suosi sensorin lähtölaskentaa";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Sensorin käyttöaika";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Määrittää, näytetäänkö sensorin käyttöaika kuluneena aikana vai lähtölaskentana iPhonessa ja Apple Watchissa.";
 
 /// statistics settings, how many days to use for calculations
 "settingsviews_daysToUseStatisticsMessage" = "Enimmäispäivät tilastojen laskemiseen?\n\n(0 laskeaksesi tänään keskiyöstä lähtien)    ";

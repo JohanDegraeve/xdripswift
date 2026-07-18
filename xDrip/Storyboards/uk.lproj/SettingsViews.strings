@@ -260,6 +260,8 @@
 "developerSettings" = "Розширені налаштування";
 "showDeveloperSettings" = "Показати розширені налаштування";
 "preferSensorCountdown" = "Надавати перевагу зворотному відліку сенсора";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Термін служби сенсора";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Визначає, чи показувати термін служби сенсора як минулий час або як зворотний відлік на iPhone та Apple Watch.";
 
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
 "settingsviews_nonfixedtransmitter" = "Багатоточкова калібровка";

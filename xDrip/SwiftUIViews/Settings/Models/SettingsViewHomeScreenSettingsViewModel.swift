@@ -45,6 +45,9 @@ fileprivate enum Setting:Int, CaseIterable {
     
     //urgent low value
     case urgentLowMarkValue = 11
+
+    // show the active sensor lifetime as time remaining instead of time elapsed?
+    case preferSensorCountdown = 12
     
 }
 
@@ -53,6 +56,7 @@ enum SettingsViewHomeScreenSettingsRowGroup {
     case homeScreen
     case mainChart
     case miniChart
+    case sensorLifetime
     case screenLock
     case glucoseRanges
 }
@@ -89,6 +93,10 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
             nativeSettingsRow(id: "homeScreen.screenLockDimmingType", index: Setting.screenLockDimmingType.rawValue, sectionID: sectionID)
         ]
 
+        let sensorLifetimeRows = [
+            nativeSettingsRow(id: "homeScreen.preferSensorCountdown", index: Setting.preferSensorCountdown.rawValue, sectionID: sectionID)
+        ]
+
         let glucoseRangeRows = [
             nativeSettingsRow(id: "homeScreen.urgentHighMarkValue", index: Setting.urgentHighMarkValue.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "homeScreen.highMarkValue", index: Setting.highMarkValue.rawValue, sectionID: sectionID),
@@ -99,13 +107,15 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
 
         switch rowGroup {
         case .all:
-            return mainChartRows + miniChartRows + screenLockRows + glucoseRangeRows
+            return mainChartRows + miniChartRows + sensorLifetimeRows + screenLockRows + glucoseRangeRows
         case .homeScreen:
-            return mainChartRows + miniChartRows + screenLockRows
+            return mainChartRows + miniChartRows + sensorLifetimeRows + screenLockRows
         case .mainChart:
             return mainChartRows
         case .miniChart:
             return miniChartRows
+        case .sensorLifetime:
+            return sensorLifetimeRows
         case .screenLock:
             return screenLockRows
         case .glucoseRanges:
@@ -148,6 +158,11 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
             return SettingsToggleControl(
                 isOn: { UserDefaults.standard.showSensorNoiseOnChart },
                 setIsOn: { UserDefaults.standard.showSensorNoiseOnChart = $0 }
+            )
+        case .preferSensorCountdown:
+            return SettingsToggleControl(
+                isOn: { UserDefaults.standard.preferSensorCountdown },
+                setIsOn: { UserDefaults.standard.preferSensorCountdown = $0 }
             )
         case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .targetMarkValue, .lowMarkValue, .urgentLowMarkValue:
             return nil
@@ -282,6 +297,11 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
                     UserDefaults.standard.showSensorNoiseOnChart = true
                 }
             })
+
+        case .preferSensorCountdown:
+            return SettingsSelectedRowAction.callFunction(function: {
+                UserDefaults.standard.preferSensorCountdown.toggle()
+            })
         }
     }
     
@@ -292,6 +312,9 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
 
         case .miniChart:
             return nil
+
+        case .sensorLifetime:
+            return Texts_SettingsView.homeScreenSensorLifetimeSectionTitle
 
         case .screenLock:
             return Texts_SettingsView.homeScreenScreenLockSectionTitle
@@ -311,6 +334,9 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
 
         case .miniChart:
             return nil
+
+        case .sensorLifetime:
+            return Texts_SettingsView.homeScreenSensorLifetimeSectionFooter
 
         case .screenLock:
             return Texts_SettingsView.homeScreenScreenLockSectionFooter
@@ -352,6 +378,9 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
 
         case .showSensorNoiseOnChart:
             return Texts_SettingsView.showSensorNoiseOnChart
+
+        case .preferSensorCountdown:
+            return Texts_SettingsView.preferSensorCountdown
 
         case .urgentHighMarkValue:
             return Texts_SettingsView.labelUrgentHighValue
@@ -399,7 +428,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .lowMarkValue, .urgentLowMarkValue, .targetMarkValue:
             return SettingsAccessory.disclosure
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings, .showSensorNoiseOnChart:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings, .showSensorNoiseOnChart, .preferSensorCountdown:
             return SettingsAccessory.none
             
         }
@@ -428,7 +457,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .screenLockDimmingType:
             return UserDefaults.standard.screenLockDimmingType.description
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings, .showSensorNoiseOnChart:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings, .showSensorNoiseOnChart, .preferSensorCountdown:
             return nil
             
         }

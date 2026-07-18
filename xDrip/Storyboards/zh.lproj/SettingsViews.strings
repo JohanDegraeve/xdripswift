@@ -218,6 +218,8 @@
 "developerSettings" = "高级设置";
 "showDeveloperSettings" = "显示高级设置";
 "preferSensorCountdown" = "优先显示传感器倒计时";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "传感器使用寿命";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "控制在 iPhone 和 Apple Watch 上将传感器使用寿命显示为已用时间还是倒计时。";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

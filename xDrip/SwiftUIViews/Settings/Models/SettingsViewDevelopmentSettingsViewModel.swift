@@ -43,9 +43,6 @@ fileprivate enum Setting:Int, CaseIterable {
     /// should the online help be automatically translated?
     case translateOnlineHelp = 12
 
-    /// should the active sensor lifetime show time remaining instead of time elapsed?
-    case preferSensorCountdown = 13
-
 }
 
 enum SettingsViewDevelopmentSettingsRowGroup {
@@ -84,7 +81,6 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             ),
             nativeSettingsRow(id: "developer.showDeveloperSettings", index: Setting.showDeveloperSettings.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "developer.translateOnlineHelp", index: Setting.translateOnlineHelp.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
-            nativeSettingsRow(id: "developer.preferSensorCountdown", index: Setting.preferSensorCountdown.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.storeFrequentReadingsInNightscout", index: Setting.storeFrequentReadingsInNightscout.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.storeFrequentReadingsInHealthKit", index: Setting.storeFrequentReadingsInHealthKit.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
             nativeSettingsRow(id: "developer.suppressUnLockPayLoad", index: Setting.suppressUnLockPayLoad.rawValue, sectionID: sectionID, isVisible: developerRowsVisible),
@@ -141,9 +137,6 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         case .showDeveloperSettings:
             return Texts_SettingsView.showDeveloperSettings
 
-        case .preferSensorCountdown:
-            return Texts_SettingsView.preferSensorCountdown
-
         case .NSLogEnabled:
             return Texts_SettingsView.nsLog
             
@@ -188,7 +181,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .preferSensorCountdown, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp:
             return .none
             
         case .loopDelay, .libreLinkUpVersion, .CAGEMaxHours:
@@ -206,7 +199,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .preferSensorCountdown, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .loopDelay, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .loopDelay, .allowStandByHighContrast, .forceStandByBigNumbers, .storeFrequentReadingsInNightscout, .storeFrequentReadingsInHealthKit, .translateOnlineHelp:
             return nil
 
         case .loopShareType:
@@ -243,11 +236,6 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                         }
                     }
                 }
-            )
-        case .preferSensorCountdown:
-            return SettingsToggleControl(
-                isOn: { UserDefaults.standard.preferSensorCountdown },
-                setIsOn: { UserDefaults.standard.preferSensorCountdown = $0 }
             )
         case .NSLogEnabled:
             return SettingsToggleControl(
@@ -305,7 +293,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         
         switch setting {
             
-        case .showDeveloperSettings, .preferSensorCountdown, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .translateOnlineHelp:
+        case .showDeveloperSettings, .NSLogEnabled, .OSLogEnabled, .suppressUnLockPayLoad, .allowStandByHighContrast, .forceStandByBigNumbers, .translateOnlineHelp:
             return .nothing
             
         case .loopShareType:
