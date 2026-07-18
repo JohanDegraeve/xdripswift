@@ -714,9 +714,6 @@ private struct SensorNoiseChartTrendPoint: Identifiable {
 
 private struct SensorNoiseChartData {
     private static let trendMinimumRange: SensorNoiseHistoryRange = .threeDays
-    private static let threeDayTrendRollingWindow: TimeInterval = 48 * 60 * 60
-    private static let wideTrendRollingWindow: TimeInterval = 96 * 60 * 60
-    private static let trendMaximumPointCount = 80
     private static let shortLineStandardOpacity = 0.32
     private static let shortLineTrendOpacity = 0.10
     private static let shortLineWideTrendOpacity = 0.055
@@ -923,7 +920,7 @@ private struct SensorNoiseChartData {
         return result
     }
 
-    /// Builds a slow rolling average so wider charts show the session's overall noise direction.
+    /// Builds one straight best-fit line so wider charts show the session's overall noise direction.
     private static func trendPoints(points: [SensorNoiseHistoryPoint], range: SensorNoiseHistoryRange, isMgDl: Bool) -> [SensorNoiseChartTrendPoint] {
         guard range.chartOrder >= Self.trendMinimumRange.chartOrder else { return [] }
 
@@ -934,57 +931,32 @@ private struct SensorNoiseChartData {
             return (point.timeStamp, noise)
         }
 
-        guard sourcePoints.count >= 3 else { return [] }
-
-        var rollingPoints = [SensorNoiseChartTrendPoint]()
-        rollingPoints.reserveCapacity(sourcePoints.count)
-        let rollingWindow = trendRollingWindow(for: range)
-
-        for point in sourcePoints {
-            let windowStart = point.date.addingTimeInterval(-rollingWindow)
-            let windowValues = sourcePoints
-                .filter { $0.date >= windowStart && $0.date <= point.date }
-                .map(\.value)
-
-            guard windowValues.count >= 3 else { continue }
-
-            let average = windowValues.reduce(0, +) / Double(windowValues.count)
-            rollingPoints.append(
-                SensorNoiseChartTrendPoint(
-                    date: point.date,
-                    value: average.mgDlToMmol(mgDl: isMgDl)
-                )
-            )
+        guard sourcePoints.count >= 3,
+              let firstDate = sourcePoints.first?.date,
+              let lastDate = sourcePoints.last?.date,
+              lastDate > firstDate else {
+            return []
         }
 
-        return downsampleTrend(rollingPoints)
-    }
+        let xValues = sourcePoints.map { $0.date.timeIntervalSince(firstDate) }
+        let yValues = sourcePoints.map(\.value)
+        let meanX = xValues.reduce(0, +) / Double(xValues.count)
+        let meanY = yValues.reduce(0, +) / Double(yValues.count)
+        let covariance = zip(xValues, yValues).reduce(0.0) { $0 + (($1.0 - meanX) * ($1.1 - meanY)) }
+        let variance = xValues.reduce(0.0) { $0 + (($1 - meanX) * ($1 - meanX)) }
 
-    /// Uses a longer rolling average for wider ranges so the trend stays calm and readable.
-    private static func trendRollingWindow(for range: SensorNoiseHistoryRange) -> TimeInterval {
-        range.chartOrder >= SensorNoiseHistoryRange.week.chartOrder
-            ? wideTrendRollingWindow
-            : threeDayTrendRollingWindow
-    }
+        guard variance > 0 else { return [] }
 
-    /// Limits trend rendering cost while preserving its start, end and general shape.
-    private static func downsampleTrend(_ points: [SensorNoiseChartTrendPoint]) -> [SensorNoiseChartTrendPoint] {
-        guard points.count > trendMaximumPointCount else { return points }
+        let slope = covariance / variance
+        let intercept = meanY - (slope * meanX)
+        let startValue = max(intercept, 0)
+        let endX = lastDate.timeIntervalSince(firstDate)
+        let endValue = max(intercept + (slope * endX), 0)
 
-        let bucketSize = Int(ceil(Double(points.count) / Double(trendMaximumPointCount)))
-        var reduced = [SensorNoiseChartTrendPoint]()
-        reduced.reserveCapacity(trendMaximumPointCount)
-
-        for bucketStart in stride(from: 0, to: points.count, by: bucketSize) {
-            let bucketEnd = min(bucketStart + bucketSize, points.count)
-            let bucket = points[bucketStart ..< bucketEnd]
-            let averageValue = bucket.reduce(0.0) { $0 + $1.value } / Double(bucket.count)
-            let middleIndex = bucket.index(bucket.startIndex, offsetBy: bucket.count / 2)
-
-            reduced.append(SensorNoiseChartTrendPoint(date: bucket[middleIndex].date, value: averageValue))
-        }
-
-        return reduced
+        return [
+            SensorNoiseChartTrendPoint(date: firstDate, value: startValue.mgDlToMmol(mgDl: isMgDl)),
+            SensorNoiseChartTrendPoint(date: lastDate, value: endValue.mgDlToMmol(mgDl: isMgDl))
+        ]
     }
 
     /// Splits points at missing-reading gaps so the chart never draws a misleading connecting line.
