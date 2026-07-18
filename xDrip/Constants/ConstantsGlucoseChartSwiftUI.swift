@@ -60,7 +60,7 @@ enum ConstantsGlucoseChartSwiftUI {
     // treatment values are clustered into a smaller range. Compact charts remain data-driven.
     static let yAxisLowContextGridLineInMgDl: Double = 40
     static let yAxisLowContextMinimumUrgentLowInMgDl: Double = 50
-    static let yAxisMainChartContextTopPaddingInMgDl: Double = 6
+    static let yAxisMainChartContextTopPaddingInMgDl: Double = 8
     static let yAxisUpperContextGridLinesInMgDl = [150.0, 200.0, 250.0, 300.0, 350.0, 400.0]
     static let yAxisMainChartObjectiveLabelFontSize: CGFloat = 15
     static let yAxisMainChartSecondaryLabelFontSize: CGFloat = 14

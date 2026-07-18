@@ -475,7 +475,7 @@ struct GlucoseChartView: View {
         let yAxisContextValues = yAxisContextMarks.labeledValues + yAxisContextMarks.gridOnlyValues
         let maximumContextValue = yAxisContextValues.max() ?? maximumRenderableValue
         let maximumDomainValue = max(maximumRenderableValue, maximumContextValue)
-        let upperDomainPadding = usesMainChartYAxisContext && maximumContextValue >= maximumRenderableValue ? ConstantsGlucoseChartSwiftUI.yAxisMainChartContextTopPaddingInMgDl : ConstantsGlucoseChartSwiftUI.yAxisDomainPaddingInMgDl
+        let upperDomainPadding = usesMainChartYAxisContext ? ConstantsGlucoseChartSwiftUI.yAxisMainChartContextTopPaddingInMgDl : ConstantsGlucoseChartSwiftUI.yAxisDomainPaddingInMgDl
         let domain = (minimumDomainValue - lowerDomainPadding) ... (maximumDomainValue + upperDomainPadding)
         let xAxisLabelEveryHours = xAxisLabelEveryHours()
         let xAxisLabelDates = xAxisLabelDates(everyHours: xAxisLabelEveryHours)
