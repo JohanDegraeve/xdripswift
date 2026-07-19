@@ -998,7 +998,7 @@ private extension BluetoothPeripheralDetailState {
         }
 
         switch expectedBluetoothPeripheralType {
-        case .DexcomType, .DexcomG7Type:
+        case .DexcomType:
             actionIsEnabled = { transmitterId in
                 transmitterId.count == 6
             }
