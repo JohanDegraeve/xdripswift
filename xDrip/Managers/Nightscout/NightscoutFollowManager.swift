@@ -169,8 +169,10 @@ class NightscoutFollowManager: NSObject {
             return
         }
         
-        // calculate count, which is a parameter in the nightscout API - divide by 300, we're assuming readings every 5 minutes = 300 seconds
-        let count = Int(-timeStampOfFirstBgReadingToDowload.timeIntervalSinceNow / 300 + 1)
+        // calculate count, which is a parameter in the nightscout API - use the same reading interval as uploads
+        let minimiumTimeBetweenTwoReadingsInMinutes = UserDefaults.standard.storeFrequentReadingsInNightscout ? ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutesFrequentUploads : ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutes
+        let secondsBetweenReadings = minimiumTimeBetweenTwoReadingsInMinutes * 60.0
+        let count = Int(-timeStampOfFirstBgReadingToDowload.timeIntervalSinceNow / secondsBetweenReadings + 1)
         
         // ceate endpoint to get latest entries
         let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightscoutUrl, count: count, token: UserDefaults.standard.nightscoutToken)
