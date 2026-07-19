@@ -12,6 +12,9 @@ enum ConstantsMaster {
     
     /// warm-up time enfoced by the Dexcom G6 transmitter. In this case, this will actually only be used for the UI to show when the sensor is reading.
     static let minimumSensorWarmUpRequiredInMinutesDexcomG5G6: Double = 120
+
+    /// warm-up time enforced by Dexcom G7/ONE+/Stelo sensors
+    static let minimumSensorWarmUpRequiredInMinutesDexcomG7: Double = 30
     
     /// warm-up time enfoced by an Anubis Dexcom G6 transmitter
     static let minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis: Double = 50

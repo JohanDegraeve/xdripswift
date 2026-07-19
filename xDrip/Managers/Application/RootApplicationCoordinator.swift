@@ -813,6 +813,39 @@ import AppIntents
             migratedCount
         )
     }
+
+    private func synchronizeDetectedSensorStartDate(sensorAge: TimeInterval?, glucoseData: [GlucoseData], cgmTransmitter: CGMTransmitter, coreDataManager: CoreDataManager) {
+        guard let sensorAge = sensorAge, cgmTransmitter.cgmTransmitterType().canDetectNewSensor() else { return }
+
+        let referenceDate = glucoseData.map { $0.timeStamp }.max() ?? Date()
+        let detectedStartDate = referenceDate.addingTimeInterval(-sensorAge)
+
+        guard let activeSensor = activeSensor else {
+            // no need to send to transmitter, because we received glucose data, so transmitter knows the sensor already
+            startSensor(cGMTransmitter: cgmTransmitter, sensorStarDate: detectedStartDate, sensorCode: nil, coreDataManager: coreDataManager, sendToTransmitter: false)
+            return
+        }
+
+        guard cgmTransmitter.cgmTransmitterType() == .dexcomG7 else { return }
+
+        let sensorStartDateTolerance = TimeInterval(minutes: 5)
+        guard abs(activeSensor.startDate.timeIntervalSince(detectedStartDate)) > sensorStartDateTolerance else { return }
+
+        trace(
+            "in synchronizeDetectedSensorStartDate, correcting Dexcom G7/ONE+/Stelo active sensor start date from %{public}@ to %{public}@ using transmitter sensor age",
+            log: log,
+            category: ConstantsLog.categoryRootView,
+            type: .info,
+            activeSensor.startDate.description(with: .current),
+            detectedStartDate.description(with: .current)
+        )
+
+        activeSensor.startDate = detectedStartDate
+        UserDefaults.standard.activeSensorStartDate = detectedStartDate
+        coreDataManager.saveChanges()
+        bgPostProcessingManager?.handleSourceContextChanged()
+        sensorNoiseManager?.update(activeSensor: activeSensor)
+    }
     
     /// process new glucose data received from transmitter.
     /// - parameters:
@@ -825,12 +858,7 @@ import AppIntents
             return
         }
         
-        if activeSensor == nil {
-            if let sensorAge = sensorAge, cgmTransmitter.cgmTransmitterType().canDetectNewSensor() {
-                // no need to send to transmitter, because we received processNewGlucoseData, so transmitter knows the sensor already
-                self.startSensor(cGMTransmitter: cgmTransmitter, sensorStarDate: Date(timeIntervalSinceNow: -sensorAge), sensorCode: nil, coreDataManager: coreDataManager, sendToTransmitter: false)
-            }
-        }
+        synchronizeDetectedSensorStartDate(sensorAge: sensorAge, glucoseData: glucoseData, cgmTransmitter: cgmTransmitter, coreDataManager: coreDataManager)
         
         guard glucoseData.count > 0 else {
             trace("in processNewGlucoseData, glucoseData.count = 0", log: log, category: ConstantsLog.categoryRootView, type: .info)
@@ -2266,12 +2294,15 @@ extension RootApplicationCoordinator: @preconcurrency CGMTransmitterDelegate {
         var supressReadingIfSensorIsWarmingUp: Bool = false
         
         if let sensorAgeInSeconds = sensorAge {
-            let secondsUntilWarmUpComplete = (ConstantsMaster.minimumSensorWarmUpRequiredInMinutes * 60) - sensorAgeInSeconds
+            let cgmTransmitterType = bluetoothPeripheralManager?.getCGMTransmitter()?.cgmTransmitterType()
+            let minimumWarmUpRequiredInMinutes = cgmTransmitterType == .dexcomG7 ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG7 : ConstantsMaster.minimumSensorWarmUpRequiredInMinutes
+            let secondsUntilWarmUpComplete = (minimumWarmUpRequiredInMinutes * 60) - sensorAgeInSeconds
+            let isDexcomG7WithReceivedGlucose = cgmTransmitterType == .dexcomG7 && glucoseData.contains { $0.glucoseLevelRaw > 0 }
             
-            if secondsUntilWarmUpComplete > 0 {
+            if secondsUntilWarmUpComplete > 0 && !isDexcomG7WithReceivedGlucose {
                 supressReadingIfSensorIsWarmingUp = true
                 
-                trace("in cgmTransmitterInfoReceived, sensor is still warming up. BG reading processing will remain suppressed for another %{public}@ minutes. (%{public}@ minutes warm-up required).", log: log, category: ConstantsLog.categoryRootView, type: .info, Int(secondsUntilWarmUpComplete/60).description, ConstantsMaster.minimumSensorWarmUpRequiredInMinutes.description)
+                trace("in cgmTransmitterInfoReceived, sensor is still warming up. BG reading processing will remain suppressed for another %{public}@ minutes. (%{public}@ minutes warm-up required).", log: log, category: ConstantsLog.categoryRootView, type: .info, Int(secondsUntilWarmUpComplete/60).description, minimumWarmUpRequiredInMinutes.description)
             }
         }
         

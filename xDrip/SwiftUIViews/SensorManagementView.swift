@@ -635,7 +635,11 @@ struct SensorManagementView: View {
         case .Libre:
             warmupMinutes = ConstantsMaster.minimumSensorWarmUpRequiredInMinutes
         case .Dexcom:
-            warmupMinutes = isAnubis ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis : ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6
+            if transmitter?.cgmTransmitterType() == .dexcomG7 {
+                warmupMinutes = ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG7
+            } else {
+                warmupMinutes = isAnubis ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis : ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG5G6
+            }
         case .Medtrum:
             warmupMinutes = nil
         case .none:

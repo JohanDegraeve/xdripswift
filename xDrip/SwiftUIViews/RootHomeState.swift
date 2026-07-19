@@ -474,6 +474,10 @@ final class RootHomeStateModel: ObservableObject {
                   sensorType == .Libre,
                   sensorAgeInMinutes < ConstantsMaster.minimumSensorWarmUpRequiredInMinutes {
             warmUpMinutes = ConstantsMaster.minimumSensorWarmUpRequiredInMinutes
+        } else if UserDefaults.standard.isMaster,
+                  cgmTransmitter?.cgmTransmitterType() == .dexcomG7 {
+            let requiredMinutes = ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG7
+            warmUpMinutes = sensorAgeInMinutes < requiredMinutes ? requiredMinutes : nil
         } else if UserDefaults.standard.isMaster, sensorType == .Dexcom {
             let requiredMinutes = cgmTransmitter?.isAnubisG6() == true
                 ? ConstantsMaster.minimumSensorWarmUpRequiredInMinutesDexcomG6Anubis
