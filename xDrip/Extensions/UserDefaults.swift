@@ -368,12 +368,12 @@ extension UserDefaults {
         /// how often to request a complication update while the Watch app is in the background
         case forceComplicationUpdateInMinutes = "forceComplicationUpdateInMinutes"
 
-        // Calendar Events
+        // Calendar Share
 
-        /// create calendar event yes or no
+        /// create Calendar Share event yes or no
         case createCalendarEvent = "createCalendarEvent"
 
-        /// selected calender id (name of the calendar) in which the event should be created
+        /// selected calender id (name of the calendar) in which the Calendar Share event should be created
         case calenderId = "calenderId"
 
         /// should trend be displayed yes or no
@@ -386,8 +386,31 @@ extension UserDefaults {
         /// calendar interval
         case calendarInterval = "calendarInterval"
 
+        /// Calendar Share history window in minutes
+        case calendarShareHistoryInMinutes = "calendarShareHistoryInMinutes"
+
         /// should a visual coloured indicator be shown in the calendar title yes or no
         case displayVisualIndicatorInCalendarEvent = "displayVisualIndicator"
+
+        // Calendar Share
+
+        /// alias sent to Calendar Follow devices
+        case calendarShareAlias = "calendarShareAlias"
+
+        /// last Calendar Share write status
+        case calendarShareStatus = "calendarShareStatus"
+
+        /// last Calendar Share write timestamp
+        case calendarShareLastUpload = "calendarShareLastUpload"
+
+        /// selected shared calendar name used by Calendar Follow
+        case calendarFollowCalendarId = "calendarFollowCalendarId"
+
+        /// last Calendar Follow read status
+        case calendarFollowStatus = "calendarFollowStatus"
+
+        /// last Calendar Follow read timestamp
+        case calendarFollowLastRead = "calendarFollowLastRead"
 
         // Contact image
 
@@ -2268,9 +2291,9 @@ extension UserDefaults {
         }
     }
 
-    // MARK: - Calendar Events
+    // MARK: - Calendar Share
 
-    /// create calendar event yes or no, default false
+    /// create Calendar Share event yes or no, default false
     @objc dynamic var createCalendarEvent: Bool {
         get {
             return bool(forKey: Key.createCalendarEvent.rawValue)
@@ -2280,7 +2303,7 @@ extension UserDefaults {
         }
     }
 
-    /// this is for showing readings on watch via the calendar. Selected calender id (name of the calendar) in which the event should be created
+    /// selected calender id (name of the calendar) in which the Calendar Share event should be created
     @objc dynamic var calenderId: String? {
         get {
             return string(forKey: Key.calenderId.rawValue)
@@ -2330,6 +2353,19 @@ extension UserDefaults {
         }
     }
 
+    /// Calendar Share history window in minutes, default 60
+    @objc dynamic var calendarShareHistoryInMinutes: Int {
+        get {
+            guard object(forKey: Key.calendarShareHistoryInMinutes.rawValue) != nil else {
+                return 60
+            }
+            return integer(forKey: Key.calendarShareHistoryInMinutes.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.calendarShareHistoryInMinutes.rawValue)
+        }
+    }
+
     /// should a visual coloured indicator be shown in the calendar title,  yes or no, default no
     @objc dynamic var displayVisualIndicatorInCalendarEvent: Bool {
         get {
@@ -2337,6 +2373,73 @@ extension UserDefaults {
         }
         set {
             set(newValue, forKey: Key.displayVisualIndicatorInCalendarEvent.rawValue)
+        }
+    }
+
+    // MARK: - Calendar Share
+
+    /// alias sent to Calendar Follow devices
+    @objc dynamic var calendarShareAlias: String {
+        get {
+            if let value = string(forKey: Key.calendarShareAlias.rawValue), !value.isEmpty {
+                return value
+            }
+            return Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
+                Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ??
+                "Calendar Share"
+        }
+        set {
+            set(newValue, forKey: Key.calendarShareAlias.rawValue)
+        }
+    }
+
+    /// last Calendar Share write status
+    @objc dynamic var calendarShareStatus: String {
+        get {
+            return string(forKey: Key.calendarShareStatus.rawValue) ?? CalendarShareStatus.notConfigured.rawValue
+        }
+        set {
+            set(newValue, forKey: Key.calendarShareStatus.rawValue)
+        }
+    }
+
+    /// last Calendar Share write timestamp
+    @objc dynamic var calendarShareLastUpload: Date? {
+        get {
+            return object(forKey: Key.calendarShareLastUpload.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.calendarShareLastUpload.rawValue)
+        }
+    }
+
+    /// selected shared calendar name used by Calendar Follow
+    @objc dynamic var calendarFollowCalendarId: String? {
+        get {
+            return string(forKey: Key.calendarFollowCalendarId.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.calendarFollowCalendarId.rawValue)
+        }
+    }
+
+    /// last Calendar Follow read status
+    @objc dynamic var calendarFollowStatus: String {
+        get {
+            return string(forKey: Key.calendarFollowStatus.rawValue) ?? CalendarShareStatus.notConfigured.rawValue
+        }
+        set {
+            set(newValue, forKey: Key.calendarFollowStatus.rawValue)
+        }
+    }
+
+    /// last Calendar Follow read timestamp
+    @objc dynamic var calendarFollowLastRead: Date? {
+        get {
+            return object(forKey: Key.calendarFollowLastRead.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.calendarFollowLastRead.rawValue)
         }
     }
 

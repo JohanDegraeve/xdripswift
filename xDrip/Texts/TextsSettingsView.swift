@@ -775,38 +775,102 @@ class Texts_SettingsView {
         return NSLocalizedString("forceStandByBigNumbers", tableName: filename, bundle: Bundle.main, value: "StandBy Big Numbers", comment: "should we force the StandBy mode to show big numbers only")
     }()
     
-    // MARK: - Calendar Events
-    
+    // MARK: - Calendar Share
+
     static let calendarEventsSectionTitle: String = {
-        return NSLocalizedString("calendarEventsSectionTitle", tableName: filename, bundle: Bundle.main, value: "Calendar Events", comment: "Calendar Events Settings - section title")
+        return NSLocalizedString("calendarEventsSectionTitle", tableName: filename, bundle: Bundle.main, value: "Calendar Share", comment: "Calendar Share Settings - section title")
     }()
     
     static let createCalendarEvent: String = {
-        return NSLocalizedString("createCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Create Calendar Events", comment: "Calendar Events Settings - text in row where create event is enabled or disabled ")
+        return NSLocalizedString("createCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Calendar Share", comment: "Calendar Share Settings - text in row where calendar sharing is enabled or disabled")
     }()
 
     static let calenderId: String = {
-        return NSLocalizedString("calenderId", tableName: filename, bundle: Bundle.main, value: "Calendar To Use", comment: "Calendar Events Settings - text in row where user needs to select a calendar")
+        return NSLocalizedString("calenderId", tableName: filename, bundle: Bundle.main, value: "Calendar To Use", comment: "Calendar Share Settings - text in row where user needs to select a calendar")
+    }()
+
+    static let calendarShareAlias: String = {
+        return NSLocalizedString("calendarShareAlias", tableName: filename, bundle: Bundle.main, value: "Alias", comment: "Calendar Share Settings - alias row title")
+    }()
+
+    static let calendarShareAliasMessage: String = {
+        return NSLocalizedString("calendarShareAliasMessage", tableName: filename, bundle: Bundle.main, value: "This name is sent to follower devices.", comment: "Calendar Share Settings - alias editor description")
+    }()
+
+    static let calendarShareConnectionFooter: String = {
+        return NSLocalizedString("calendarShareConnectionFooter", tableName: filename, bundle: Bundle.main, value: "Select a shared calendar that follower devices can also access. An iCloud shared calendar is recommended for best operation.", comment: "Calendar Share Settings - connection section footer")
+    }()
+
+    static let calendarShareStatus: String = {
+        return NSLocalizedString("calendarShareStatus", tableName: filename, bundle: Bundle.main, value: "Share Status", comment: "Calendar Share Settings - share status section and row title")
+    }()
+
+    static let calendarShareStatusFooter: String = {
+        return NSLocalizedString("calendarShareStatusFooter", tableName: filename, bundle: Bundle.main, value: "Include History adds recent 5-minute readings to each payload so followers can fill missed values. To help reliability, choose the lowest history amount that works well.", comment: "Calendar Share Settings - share status section footer")
+    }()
+
+    static let calendarEventPreview: String = {
+        return NSLocalizedString("calendarEventPreview", tableName: filename, bundle: Bundle.main, value: "Calendar Event", comment: "Calendar Share Settings - calendar event preview section title")
+    }()
+
+    static let calendarEventSettingsFooter: String = {
+        return NSLocalizedString("calendarEventSettingsFooter", tableName: filename, bundle: Bundle.main, value: "These options only change the visible calendar event title.", comment: "Calendar Share Settings - calendar event display/settings section footer")
+    }()
+
+    static let calendarShareIncludeHistory: String = {
+        return NSLocalizedString("calendarShareIncludeHistory", tableName: filename, bundle: Bundle.main, value: "Include History", comment: "Calendar Share Settings - history window row title")
+    }()
+
+    static let calendarShareLastValue: String = {
+        return NSLocalizedString("calendarShareLastValue", tableName: filename, bundle: Bundle.main, value: "Last Value", comment: "Calendar Share and Shared Calendar Settings - last shared value row title")
+    }()
+
+    static let calendarFollowHistoricalReadings: String = {
+        return NSLocalizedString("calendarFollowHistoricalReadings", tableName: filename, bundle: Bundle.main, value: "Historical Readings", comment: "Shared Calendar Settings - historical readings section title")
+    }()
+
+    static let calendarFollowHistoricalCount: String = {
+        return NSLocalizedString("calendarFollowHistoricalCount", tableName: filename, bundle: Bundle.main, value: "Count", comment: "Shared Calendar Settings - historical readings count row title")
+    }()
+
+    static let calendarFollowFirstHistoricalReading: String = {
+        return NSLocalizedString("calendarFollowFirstHistoricalReading", tableName: filename, bundle: Bundle.main, value: "First Reading", comment: "Shared Calendar Settings - first historical reading row title")
+    }()
+
+    static let calendarFollowNoHistoricalData: String = {
+        return NSLocalizedString("calendarFollowNoHistoricalData", tableName: filename, bundle: Bundle.main, value: "No historical data found", comment: "Shared Calendar Settings - shown when latest payload has no historical readings")
+    }()
+
+    static let calendarFollowCalendarFooter: String = {
+        return NSLocalizedString("calendarFollowCalendarFooter", tableName: filename, bundle: Bundle.main, value: "Select the calendar shared by the master iPhone. For best results, use a shared iCloud calendar.", comment: "Shared Calendar Settings - calendar selection section footer")
+    }()
+
+    static let calendarFollowStatusFooter: String = {
+        return NSLocalizedString("calendarFollowStatusFooter", tableName: filename, bundle: Bundle.main, value: "Shared Calendar reads the latest encoded event notes from the selected calendar during background updates.", comment: "Shared Calendar Settings - status section footer")
+    }()
+
+    static let calendarFollowHistoricalReadingsFooter: String = {
+        return NSLocalizedString("calendarFollowHistoricalReadingsFooter", tableName: filename, bundle: Bundle.main, value: "Historical readings from the latest payload are imported only when they are missing locally.", comment: "Shared Calendar Settings - historical readings section footer")
     }()
 
     static let displayTrendInCalendarEvent: String = {
-        return NSLocalizedString("settingsviews_displayTrendInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Trend", comment: "Calendar Events Settings - text in row where user needs to say if trend should be displayed or not")
+        return NSLocalizedString("settingsviews_displayTrendInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Trend", comment: "Calendar Share Settings - text in row where user needs to say if trend should be displayed or not")
     }()
     
     static let displayUnitInCalendarEvent: String = {
-        return NSLocalizedString("displayUnitInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Unit", comment: "Calendar Events Settings - text in row where user needs to say if unit should be displayed or not")
+        return NSLocalizedString("displayUnitInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Unit", comment: "Calendar Share Settings - text in row where user needs to say if unit should be displayed or not")
     }()
     
     static let displayDeltaInCalendarEvent: String = {
-        return NSLocalizedString("displayDeltaInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Delta", comment: "Calendar Events Settings - text in row where user needs to say if delta should be displayed or not")
+        return NSLocalizedString("displayDeltaInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Delta", comment: "Calendar Share Settings - text in row where user needs to say if delta should be displayed or not")
     }()
     
     static let infoCalendarAccessDeniedByUser: String = {
-        return String(format: NSLocalizedString("infoCalendarAccessDeniedByUser", tableName: filename, bundle: Bundle.main, value: "Full Access is required to your contacts.\n\nGo to iPhone Settings > Apps > %@ > Contacts and enable Full Access.", comment: "If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown"), ConstantsHomeView.applicationName)
+        return String(format: NSLocalizedString("infoCalendarAccessDeniedByUser", tableName: filename, bundle: Bundle.main, value: "Full Access is required to your calendars.\n\nGo to iPhone Settings > Apps > %@ > Calendars and enable Full Access.", comment: "If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown"), ConstantsHomeView.applicationName)
     }()
     
     static let infoCalendarAccessWriteOnly: String = {
-        return String(format: NSLocalizedString("infoCalendarAccessWriteOnly", tableName: filename, bundle: Bundle.main, value: "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.", comment: "The user needs to update their calendar permissions"), ConstantsHomeView.applicationName)
+        return String(format: NSLocalizedString("infoCalendarAccessWriteOnly", tableName: filename, bundle: Bundle.main, value: "You cannot use Calendar Share until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.", comment: "The user needs to update their calendar permissions"), ConstantsHomeView.applicationName)
     }()
     
     static let infoCalendarAccessRestricted: String = {
@@ -814,7 +878,7 @@ class Texts_SettingsView {
     }()
 
     static let displayVisualIndicatorInCalendar: String = {
-        return NSLocalizedString("settingsviews_displayVisualIndicatorInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Visual Indicator", comment: "Calendar Events Settings - text in row where user needs to say if the visual target indicator should be displayed or not")
+        return NSLocalizedString("settingsviews_displayVisualIndicatorInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Visual Indicator", comment: "Calendar Share Settings - text in row where user needs to say if the visual target indicator should be displayed or not")
     }()
     
     static let settingsviews_CalenderIntervalTitle = {

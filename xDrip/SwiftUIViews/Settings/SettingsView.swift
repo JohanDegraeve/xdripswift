@@ -469,6 +469,7 @@ struct SettingsGroupedRow {
     let id: String
     let title: String
     var isVisible: Bool = true
+    var isEnabled: (() -> Bool)? = nil
     var detail: (() -> String?)? = nil
     var detailColor: (() -> Color?)? = nil
     var detailIndicator: (() -> SettingsIndicator?)? = nil
@@ -626,13 +627,26 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                 SettingsGroupedRow(
                     id: "sharingServices.calendarEvents",
                     title: Texts_SettingsView.calendarEventsSectionTitle,
+                    isEnabled: {
+                        calendarShareRowIsEnabled()
+                    },
                     detail: {
-                        groupedStatusDetail(isEnabled: UserDefaults.standard.createCalendarEvent)
+                        calendarShareStatusDetail()
+                    },
+                    detailIndicator: {
+                        calendarShareStatusIndicator()
                     },
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.calendarEventsSectionTitle,
-                            providers: { [SettingsViewCalendarEventsSettingsViewModel()] }
+                            providers: {
+                                [
+                                    SettingsViewCalendarEventsSettingsViewModel(rowGroup: .connection),
+                                    SettingsViewCalendarEventsSettingsViewModel(rowGroup: .status),
+                                    SettingsViewCalendarEventsSettingsViewModel(rowGroup: .preview),
+                                    SettingsViewCalendarEventsSettingsViewModel(rowGroup: .settings)
+                                ]
+                            }
                         )
                     }
                 ),
@@ -720,6 +734,43 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
         return SettingsIndicator(color: connectionIsRecent ? ConstantsAppColors.normal : ConstantsAppColors.urgent)
     }
 
+    /// Shows why Calendar Share is unavailable in Calendar Follow mode, otherwise the share status.
+    private static func calendarShareStatusDetail() -> String? {
+        guard calendarShareRowIsEnabled() else { return Texts_Common.disabled }
+        guard UserDefaults.standard.createCalendarEvent else { return nil }
+        return calendarShareStatus().description
+    }
+
+    /// Adds the same status dot used by the Calendar Share child status row.
+    private static func calendarShareStatusIndicator() -> SettingsIndicator? {
+        guard calendarShareRowIsEnabled() else { return nil }
+        guard UserDefaults.standard.createCalendarEvent else { return nil }
+
+        switch calendarShareStatus() {
+        case .active:
+            return SettingsIndicator(color: .green)
+        case .waiting:
+            return SettingsIndicator(color: .yellow)
+        case .noData:
+            return SettingsIndicator(color: .gray)
+        case .stale:
+            return SettingsIndicator(color: .orange)
+        case .error:
+            return SettingsIndicator(color: .red)
+        case .notConfigured:
+            return SettingsIndicator(color: .gray)
+        }
+    }
+
+    private static func calendarShareRowIsEnabled() -> Bool {
+        !(UserDefaults.standard.followerDataSourceType == .calendar && !UserDefaults.standard.isMaster)
+    }
+
+    private static func calendarShareStatus() -> CalendarShareStatus {
+        guard UserDefaults.standard.calenderId != nil else { return .notConfigured }
+        return CalendarShareStatus(rawValue: UserDefaults.standard.calendarShareStatus) ?? .notConfigured
+    }
+
     /// Mirrors the child OS-AID warning banners so the parent row also shows
     /// when the selected sharing path needs attention.
     private static func osAidLoopShareWarningIndicator() -> SettingsIndicator? {
@@ -767,6 +818,7 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                 detailColor: row.detailColor?(),
                 detailIndicator: row.detailIndicator?(),
                 accessory: .disclosure,
+                isEnabled: row.isEnabled?() ?? true,
                 action: .settingsScreen(row.settingsScreen)
             )
         }

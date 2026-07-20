@@ -188,6 +188,7 @@ struct SettingsRow: Identifiable {
     var icon: SettingsIcon? = nil
     var titleColor: Color? = nil
     var detailColor: Color? = nil
+    var centerTitle: Bool = false
     var indicator: SettingsIndicator? = nil
     var detailIndicator: SettingsIndicator? = nil
     var accessory: SettingsAccessory = .automatic
@@ -628,6 +629,7 @@ struct SettingsStaticRowView: View {
     let showsInfoButton: Bool
     let titleColor: Color?
     let detailColor: Color?
+    let centerTitle: Bool
     let icon: SettingsIcon?
     /// Adds a small colored SF Symbol dot before the row title.
     let indicator: SettingsIndicator?
@@ -645,6 +647,7 @@ struct SettingsStaticRowView: View {
         showsInfoButton: Bool = false,
         titleColor: Color? = nil,
         detailColor: Color? = nil,
+        centerTitle: Bool = false,
         icon: SettingsIcon? = nil,
         indicator: SettingsIndicator? = nil,
         detailIndicator: SettingsIndicator? = nil,
@@ -659,6 +662,7 @@ struct SettingsStaticRowView: View {
         self.showsInfoButton = showsInfoButton
         self.titleColor = titleColor
         self.detailColor = detailColor
+        self.centerTitle = centerTitle
         self.icon = icon
         self.indicator = indicator ?? indicatorColor.map { SettingsIndicator(color: $0) }
         self.detailIndicator = detailIndicator ?? detailIndicatorColor.map { SettingsIndicator(color: $0) }
@@ -674,6 +678,7 @@ struct SettingsStaticRowView: View {
                     isEnabled: isEnabled,
                     titleColor: titleColor,
                     detailColor: detailColor,
+                    centerTitle: centerTitle,
                     icon: icon,
                     indicator: indicator,
                     detailIndicator: detailIndicator
@@ -815,6 +820,7 @@ private struct SettingsNativeRowView: View {
                 showsInfoButton: showsInfoButton,
                 titleColor: row.titleColor,
                 detailColor: row.detailColor,
+                centerTitle: row.centerTitle,
                 icon: row.icon,
                 indicator: row.indicator,
                 detailIndicator: row.detailIndicator,
@@ -830,6 +836,7 @@ private struct SettingsNativeRowView: View {
             isEnabled: row.isEnabled,
             titleColor: row.titleColor,
             detailColor: row.detailColor,
+            centerTitle: row.centerTitle,
             icon: row.icon,
             indicator: row.indicator,
             detailIndicator: row.detailIndicator
@@ -1011,6 +1018,7 @@ struct SettingsRowTextView: View {
     let isEnabled: Bool
     let titleColor: Color?
     let detailColor: Color?
+    let centerTitle: Bool
     let icon: SettingsIcon?
     /// Draws a small dot before the title when a row needs a visual range/status marker.
     let indicator: SettingsIndicator?
@@ -1023,6 +1031,7 @@ struct SettingsRowTextView: View {
         isEnabled: Bool,
         titleColor: Color? = nil,
         detailColor: Color? = nil,
+        centerTitle: Bool = false,
         icon: SettingsIcon? = nil,
         indicator: SettingsIndicator? = nil,
         detailIndicator: SettingsIndicator? = nil,
@@ -1034,54 +1043,64 @@ struct SettingsRowTextView: View {
         self.isEnabled = isEnabled
         self.titleColor = titleColor
         self.detailColor = detailColor
+        self.centerTitle = centerTitle
         self.icon = icon
         self.indicator = indicator ?? indicatorColor.map { SettingsIndicator(color: $0) }
         self.detailIndicator = detailIndicator ?? detailIndicatorColor.map { SettingsIndicator(color: $0) }
     }
 
     var body: some View {
-        HStack(alignment: .firstTextBaseline, spacing: 12) {
-            HStack(alignment: .center, spacing: 7) {
-                if let icon {
-                    SettingsRowIconView(icon: icon, isEnabled: isEnabled)
-                }
-
-                if let indicator {
-                    Image(systemName: indicator.symbolName)
-                        .font(.caption2)
-                        .foregroundStyle(isEnabled ? indicator.color : .gray)
-                        .accessibilityLabel(indicator.accessibilityLabel ?? "")
-                }
-
-                Text(title)
-                    .foregroundStyle(titleColor ?? (isEnabled ? Color(.colorPrimary) : .gray))
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.75)
-                    .frame(alignment: .leading)
-            }
-            .layoutPriority(1)
-
-            Spacer(minLength: 8)
-
-            if let detail {
-                HStack(spacing: 5) {
-                    if let detailIndicator {
-                        Image(systemName: detailIndicator.symbolName)
-                            .font(.caption2)
-                            .foregroundStyle(isEnabled ? detailIndicator.color : .gray)
-                            .accessibilityLabel(detailIndicator.accessibilityLabel ?? "")
+        if centerTitle {
+            Text(title)
+                .foregroundStyle(titleColor ?? (isEnabled ? Color(.colorPrimary) : .gray))
+                .lineLimit(2)
+                .minimumScaleFactor(0.75)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity, alignment: .center)
+        } else {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                HStack(alignment: .center, spacing: 7) {
+                    if let icon {
+                        SettingsRowIconView(icon: icon, isEnabled: isEnabled)
                     }
 
-                    Text(detail)
-                        .foregroundStyle(isEnabled ? (detailColor ?? Color(.colorTertiary)) : .gray)
-                        .lineLimit(1)
-                        .truncationMode(.tail)
-                        .multilineTextAlignment(.trailing)
-                        .frame(alignment: .trailing)
+                    if let indicator {
+                        Image(systemName: indicator.symbolName)
+                            .font(.caption2)
+                            .foregroundStyle(isEnabled ? indicator.color : .gray)
+                            .accessibilityLabel(indicator.accessibilityLabel ?? "")
+                    }
+
+                    Text(title)
+                        .foregroundStyle(titleColor ?? (isEnabled ? Color(.colorPrimary) : .gray))
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.75)
+                        .frame(alignment: .leading)
+                }
+                .layoutPriority(1)
+
+                Spacer(minLength: 8)
+
+                if let detail {
+                    HStack(spacing: 5) {
+                        if let detailIndicator {
+                            Image(systemName: detailIndicator.symbolName)
+                                .font(.caption2)
+                                .foregroundStyle(isEnabled ? detailIndicator.color : .gray)
+                                .accessibilityLabel(detailIndicator.accessibilityLabel ?? "")
+                        }
+
+                        Text(detail)
+                            .foregroundStyle(isEnabled ? (detailColor ?? Color(.colorTertiary)) : .gray)
+                            .lineLimit(1)
+                            .truncationMode(.tail)
+                            .multilineTextAlignment(.trailing)
+                            .frame(alignment: .trailing)
+                    }
                 }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

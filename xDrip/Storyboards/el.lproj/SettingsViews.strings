@@ -91,8 +91,6 @@
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 "m5stack_settingsviews_giveBluetoothPassword" = "Εισαγάγετε τον κωδικό για Bluetooth";
 "m5stack_settingsviews_brightness" = "Φωτεινότητα οθόνης";
-"calendarEventsSectionTitle" = "Ημερολογιακά γεγονότα";
-"createCalendarEvent" = "Προσθήκη στο ημερολόγιο;";
 "calenderId" = "Ημερολόγιο για χρήση;";
 "settingsviews_displayTrendInCalendarEvent" = "Τάση";
 "displayUnitInCalendarEvent" = "Μονάδα";
@@ -171,7 +169,6 @@
 /// treatments settings, offset the carb treatments on main chart
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
-"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calendar events";
 
 /// statistics settings, prefer user-defined range
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
@@ -189,7 +186,6 @@
 "settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Background keep-alive is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
 
 /// When clicking the event interval setting, a pop up asks for minimum number of minutes between two events, this is the pop up message - this is used for setting the interval between two calendar events
-"settingsviews_CalenderIntervalTitle" = "Event Interval";
 
 /// data source settings, enable Nightscout in the Nightscout section
 "settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
@@ -234,7 +230,6 @@
 "settingsviews_enterPassword" = "Enter your password";
 
 /// The user needs to update their calendar permissions
-"infoCalendarAccessWriteOnly" = "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.";
 
 /// data source settings, keep-alive mode is set to normal
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";

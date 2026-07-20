@@ -57,7 +57,6 @@
 "settingsviews_IntervalMessage" = "Minimum interval between two notifications";
 
 /// Apple Watch Settings - text in row where create event is enabled or disabled 
-"createCalendarEvent" = "Create Calendar Events";
 
 /// Apple Watch Settings - text in row where user needs to say if unit should be displayed or not
 "displayUnitInCalendarEvent" = "Jednostka";
@@ -186,7 +185,6 @@
 "testUrlAndAPIKey" = "Test połączenia";
 
 /// If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown
-"infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
 
 /// default text in email body, when user wants to send trace file.
 "emailbodyText" = "Problem Description: ";
@@ -248,13 +246,11 @@
 "editScheduleTimePickerSubtitle" = "Change: ";
 
 /// Apple Watch Settings - text in row where user needs to select a calendar
-"calenderId" = "Calendar To Use";
 
 /// name of setting for back ground color
 "m5stack_settingsviews_backGroundColor" = "Background Color";
 
 /// If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown
-"infoCalendarAccessDeniedByUser" = "You previously denied access to your Calendar.\n\nTo enable it go to your device settings, privacy, calendars and enable it.";
 
 /// healthkit settings, section title
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
@@ -342,8 +338,6 @@
 
 /// help settings, section title
 
-/// Calendar Events Settings - section title
-"calendarEventsSectionTitle" = "Calendar Events";
 
 /// help settings, open the online help
 "settingsviews_showOnlineHelp" = "Open Online Help";
@@ -437,7 +431,6 @@
 /// treatments settings, offset the carb treatments on main chart
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
-"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calendar events";
 
 /// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
 "warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
@@ -461,7 +454,6 @@
 "suppressLoopShare" = "Suppress Loop Share";
 
 /// When clicking the event interval setting, a pop up asks for minimum number of minutes between two events, this is the pop up message - this is used for setting the interval between two calendar events
-"settingsviews_CalenderIntervalTitle" = "Event Interval";
 
 /// data source settings, enable Nightscout in the Nightscout section
 "settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
@@ -519,7 +511,6 @@
 "settingsviews_enterPassword" = "Enter your password";
 
 /// The user needs to update their calendar permissions
-"infoCalendarAccessWriteOnly" = "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.";
 
 /// data source settings, keep-alive mode is set to normal
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";

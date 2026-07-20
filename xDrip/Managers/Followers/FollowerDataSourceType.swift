@@ -41,10 +41,26 @@ public enum FollowerDataSourceType: Int, CaseIterable {
     case libreLinkUpRussia = 2
     case dexcomShare = 3
     case medtrumEasyView = 4
+    case calendar = 5
 
-    /// All cases filtered to those currently enabled. Prefer this over 'allCases' when populating UI.
+    /// UI display order for the follower source picker.
+    ///
+    /// Keep the enum cases and raw values stable because they are stored.
+    /// Change this list only when the visible picker order needs to change.
+    static var allCasesForList: [FollowerDataSourceType] {
+        [
+            .nightscout,
+            .dexcomShare,
+            .calendar,
+            .libreLinkUp,
+            .libreLinkUpRussia,
+            .medtrumEasyView
+        ]
+    }
+
+    /// All display-ordered cases filtered to those currently enabled. Prefer this over 'allCases' when populating UI.
     static var allEnabledCases: [FollowerDataSourceType] {
-        Self.allCases.filter { $0.isEnabled }
+        Self.allCasesForList.filter { $0.isEnabled }
     }
     
     /// Validate a stored selection against current enabled cases. If invalid, return the first enabled case
@@ -73,6 +89,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return "Dexcom Share"
         case .medtrumEasyView:
             return "Medtrum EasyView"
+        case .calendar:
+            return "Shared Calendar"
         }
     }
     
@@ -90,6 +108,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return "Dexcom Share"
         case .medtrumEasyView:
             return "Medtrum EasyView"
+        case .calendar:
+            return "Shared Calendar"
         }
     }
 
@@ -104,6 +124,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return "Dex Share"
         case .medtrumEasyView:
             return "Medtrum"
+        case .calendar:
+            return "Calendar"
         }
     }
     
@@ -117,6 +139,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return "DS"
         case .medtrumEasyView:
             return "ME"
+        case .calendar:
+            return "CAL"
         }
     }
     
@@ -130,6 +154,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return ConstantsFollower.secondsUntilFollowerDisconnectWarningDexcomShare
         case .medtrumEasyView:
             return ConstantsFollower.secondsUntilFollowerDisconnectWarningMedtrumEasyView
+        case .calendar:
+            return ConstantsFollower.secondsUntilFollowerDisconnectWarningNightscout
         }
     }
 
@@ -140,6 +166,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return false
         case .libreLinkUp, .libreLinkUpRussia, .dexcomShare, .medtrumEasyView:
             return true
+        case .calendar:
+            return false
         }
     }
     
@@ -156,6 +184,8 @@ public enum FollowerDataSourceType: Int, CaseIterable {
             return "Dexcom Share Follower"
         case .medtrumEasyView:
             return "Medtrum EasyView Follower"
+        case .calendar:
+            return "Shared Calendar Follower"
         }
     }
     

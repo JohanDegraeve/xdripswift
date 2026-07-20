@@ -1338,11 +1338,11 @@ private struct RootHomeDataSourceView: View {
     var body: some View {
         HStack(spacing: 5) {
             HStack(spacing: 5) {
-//                if state.showsKeepAliveIcon {
-//                    Image(systemName: state.keepAliveSystemImage)
-//                        .font(.system(size: 15))
-//                        .foregroundStyle(state.keepAliveColor)
-//                }
+                if state.showsKeepAliveIcon {
+                    Image(systemName: state.keepAliveSystemImage)
+                        .font(.system(size: 15))
+                        .foregroundStyle(state.keepAliveColor)
+                }
 
                 if sensorNoiseState.showsIndicator {
                     Circle()

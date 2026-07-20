@@ -9,6 +9,7 @@
 import Foundation
 import EventKit
 import os
+import SwiftUI
 
 fileprivate enum Setting:Int, CaseIterable {
     
@@ -17,22 +18,44 @@ fileprivate enum Setting:Int, CaseIterable {
     
     /// selected calender id (name of the calendar) in which the event should be created
     case calenderId = 1
+
+    /// alias sent to Calendar Follow devices
+    case alias = 2
+
+    /// last Calendar Share write status
+    case status = 3
+
+    /// last Calendar Share payload value
+    case lastValue = 4
+
+    /// last Calendar Share payload timestamp
+    case timestamp = 5
     
     /// should trend be displayed yes or no
-    case displayTrend = 2
+    case displayTrend = 6
     
     /// should delta be displayed yes or no
-    case displayDelta = 3
+    case displayDelta = 7
     
     /// should units be displayed yes or no
-    case displayUnits = 4
+    case displayUnits = 8
     
     /// should a visual indicator be shown on the calendar title
-    case displayVisualIndicator = 5
+    case displayVisualIndicator = 9
+
+    /// history window included in the Calendar Share payload
+    case includeHistory = 10
     
     /// minimum time between two readings, for which event should be created (in minutes)
-    case calendarInterval = 6
+    case calendarInterval = 11
 
+}
+
+enum CalendarEventsRowGroup {
+    case connection
+    case status
+    case preview
+    case settings
 }
 
 class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
@@ -41,33 +64,92 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel)
     
     /// used for requesting authorization to access calendar
-    let eventStore = EKEventStore()
+    private let eventStore = EKEventStore()
+
+    private let rowGroup: CalendarEventsRowGroup
+
+    init(rowGroup: CalendarEventsRowGroup = .connection) {
+        self.rowGroup = rowGroup
+    }
     
     // MARK: - Native SwiftUI rows
 
     func settingsRows(sectionID: Int) -> [SettingsRow] {
         let calendarRowsVisible = calendarEventRowsVisible
 
-        return [
-            nativeSettingsRow(id: "calendarEvents.createCalendarEvent", index: Setting.createCalendarEvent.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "calendarEvents.calendarId", index: Setting.calenderId.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
-            nativeSettingsRow(id: "calendarEvents.displayTrend", index: Setting.displayTrend.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
-            nativeSettingsRow(id: "calendarEvents.displayDelta", index: Setting.displayDelta.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
-            nativeSettingsRow(id: "calendarEvents.displayUnits", index: Setting.displayUnits.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
-            nativeSettingsRow(id: "calendarEvents.displayVisualIndicator", index: Setting.displayVisualIndicator.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
-            nativeSettingsRow(id: "calendarEvents.calendarInterval", index: Setting.calendarInterval.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible)
-        ]
+        switch rowGroup {
+        case .connection:
+            return [
+                nativeSettingsRow(id: "calendarEvents.createCalendarEvent", index: Setting.createCalendarEvent.rawValue, sectionID: sectionID, isVisible: calendarShareIsAvailable),
+                nativeSettingsRow(id: "calendarEvents.calendarId", index: Setting.calenderId.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
+                nativeSettingsRow(id: "calendarEvents.alias", index: Setting.alias.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible)
+            ]
+        case .status:
+            return [
+                SettingsRow(
+                    id: "calendarEvents.status",
+                    title: settingsRowText(index: Setting.status.rawValue),
+                    detail: calendarShareStatus.description,
+                    detailIndicator: SettingsIndicator(color: calendarShareStatusIndicatorColor),
+                    accessory: .none,
+                    isVisible: calendarRowsVisible
+                ),
+                nativeSettingsRow(id: "calendarEvents.lastValue", index: Setting.lastValue.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
+                nativeSettingsRow(id: "calendarEvents.timestamp", index: Setting.timestamp.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
+                nativeSettingsRow(id: "calendarEvents.includeHistory", index: Setting.includeHistory.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible)
+            ]
+        case .preview:
+            return [
+                SettingsRow(
+                    id: "calendarEvents.preview",
+                    title: calendarEventPreviewTitle,
+                    centerTitle: true,
+                    accessory: .none,
+                    isVisible: calendarRowsVisible
+                )
+            ]
+        case .settings:
+            return [
+                nativeSettingsRow(id: "calendarEvents.displayTrend", index: Setting.displayTrend.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
+                nativeSettingsRow(id: "calendarEvents.displayDelta", index: Setting.displayDelta.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
+                nativeSettingsRow(id: "calendarEvents.displayUnits", index: Setting.displayUnits.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
+                nativeSettingsRow(id: "calendarEvents.displayVisualIndicator", index: Setting.displayVisualIndicator.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible),
+                nativeSettingsRow(id: "calendarEvents.calendarInterval", index: Setting.calendarInterval.rawValue, sectionID: sectionID, isVisible: calendarRowsVisible)
+            ]
+        }
     }
 
     
     func storeMessageHandler(messageHandler: ((String, String) -> Void)) {
-        // this ViewModel does need to send back messages to the viewcontroller asynchronously
+        // this ViewModel does not need to send back messages to the viewcontroller asynchronously
     }
 
     func storeRowReloadClosure(rowReloadClosure: ((Int) -> Void)) {}
     
     func sectionTitle() -> String? {
-        return Texts_SettingsView.calendarEventsSectionTitle
+        switch rowGroup {
+        case .connection:
+            return nil
+        case .status:
+            return Texts_SettingsView.calendarShareStatus
+        case .preview:
+            return Texts_SettingsView.calendarEventPreview
+        case .settings:
+            return nil
+        }
+    }
+
+    func sectionFooter() -> String? {
+        switch rowGroup {
+        case .connection:
+            return Texts_SettingsView.calendarShareConnectionFooter
+        case .status:
+            return Texts_SettingsView.calendarShareStatusFooter
+        case .preview:
+            return nil
+        case .settings:
+            return Texts_SettingsView.calendarEventSettingsFooter
+        }
     }
     
     func settingsRowText(index: Int) -> String {
@@ -77,10 +159,22 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
         switch setting {
             
         case .createCalendarEvent:
-            return Texts_SettingsView.createCalendarEvent
+            return "Enable"
             
         case .calenderId:
             return Texts_SettingsView.calenderId
+
+        case .alias:
+            return Texts_SettingsView.calendarShareAlias
+
+        case .status:
+            return Texts_SettingsView.calendarShareStatus
+
+        case .lastValue:
+            return Texts_SettingsView.calendarShareLastValue
+
+        case .timestamp:
+            return Texts_BgReadings.timestamp
             
         case .displayTrend:
             return Texts_SettingsView.displayTrendInCalendarEvent
@@ -93,6 +187,9 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
             
         case .displayVisualIndicator:
             return Texts_SettingsView.displayVisualIndicatorInCalendar
+
+        case .includeHistory:
+            return Texts_SettingsView.calendarShareIncludeHistory
             
         case .calendarInterval:
             return Texts_SettingsView.settingsviews_CalenderIntervalTitle
@@ -141,13 +238,13 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
                 
             }
             
-        case .calenderId:
+        case .calenderId, .alias:
             return SettingsAccessory.disclosure
             
-        case .displayTrend, .displayDelta, .displayUnits, .displayVisualIndicator:
+        case .displayTrend, .displayDelta, .displayUnits, .displayVisualIndicator, .status, .lastValue, .timestamp:
             return SettingsAccessory.none
             
-        case .calendarInterval:
+        case .includeHistory, .calendarInterval:
             return SettingsAccessory.disclosure
             
         }
@@ -161,10 +258,25 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
             
         case .calenderId:
             return UserDefaults.standard.calenderId
+
+        case .alias:
+            return UserDefaults.standard.calendarShareAlias
+
+        case .status:
+            return calendarShareStatus.description
+
+        case .lastValue:
+            return lastPayloadValueDetail
+
+        case .timestamp:
+            return lastPayloadTimeDetail
             
         case .createCalendarEvent, .displayTrend, .displayDelta, .displayUnits, .displayVisualIndicator:
             return nil
             
+        case .includeHistory:
+            return UserDefaults.standard.calendarShareHistoryInMinutes.description + " " + Texts_Common.minutes
+
         case .calendarInterval:
             return UserDefaults.standard.calendarInterval.description + " " + Texts_Common.minutes
 
@@ -221,8 +333,33 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
                     UserDefaults.standard.displayVisualIndicatorInCalendarEvent = isOn
                 }
             )
-        case .calenderId, .calendarInterval:
+        case .calenderId, .alias, .status, .lastValue, .timestamp, .includeHistory, .calendarInterval:
             return nil
+        }
+    }
+
+    private var calendarShareStatus: CalendarShareStatus {
+        if !UserDefaults.standard.createCalendarEvent || UserDefaults.standard.calenderId == nil {
+            return .notConfigured
+        }
+
+        return CalendarShareStatus(rawValue: UserDefaults.standard.calendarShareStatus) ?? .notConfigured
+    }
+
+    private var calendarShareStatusIndicatorColor: Color {
+        switch calendarShareStatus {
+        case .active:
+            return .green
+        case .waiting:
+            return .yellow
+        case .noData:
+            return .gray
+        case .stale:
+            return .orange
+        case .error:
+            return .red
+        case .notConfigured:
+            return .gray
         }
     }
 
@@ -230,9 +367,16 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
     private func setCreateCalendarEvent(_ isOn: Bool) {
         trace("createCalendarEvent changed by user to %{public}@", log: log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info, isOn.description)
 
+        guard calendarShareIsAvailable else {
+            UserDefaults.standard.createCalendarEvent = false
+            UserDefaults.standard.calendarShareStatus = CalendarShareStatus.notConfigured.rawValue
+            return
+        }
+
         // if setting to false, then no need to check authorization status
         if !isOn {
             UserDefaults.standard.createCalendarEvent = false
+            UserDefaults.standard.calendarShareStatus = CalendarShareStatus.notConfigured.rawValue
             return
         }
 
@@ -248,9 +392,11 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
                     if !granted {
                         trace("EKEventStore access not granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
                         UserDefaults.standard.createCalendarEvent = false
+                        UserDefaults.standard.calendarShareStatus = CalendarShareStatus.error.rawValue
                     } else {
                         trace("EKEventStore access granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info)
                         UserDefaults.standard.createCalendarEvent = true
+                        UserDefaults.standard.calendarShareStatus = CalendarShareStatus.waiting.rawValue
                     }
                 })
             } else {
@@ -259,9 +405,11 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
                     if !granted {
                         trace("EKEventStore access not granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
                         UserDefaults.standard.createCalendarEvent = false
+                        UserDefaults.standard.calendarShareStatus = CalendarShareStatus.error.rawValue
                     } else {
                         trace("EKEventStore access granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info)
                         UserDefaults.standard.createCalendarEvent = true
+                        UserDefaults.standard.calendarShareStatus = CalendarShareStatus.waiting.rawValue
                     }
                 })
             }
@@ -271,9 +419,11 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
                 if !granted {
                     trace("EKEventStore access not granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
                     UserDefaults.standard.createCalendarEvent = false
+                    UserDefaults.standard.calendarShareStatus = CalendarShareStatus.error.rawValue
                 } else {
                     trace("EKEventStore access granted", log: self.log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .info)
                     UserDefaults.standard.createCalendarEvent = true
+                    UserDefaults.standard.calendarShareStatus = CalendarShareStatus.waiting.rawValue
                 }
             })
 #endif
@@ -283,17 +433,20 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
             // we will probably never come here because if it's restricted, the uiview is not shown
             trace("EKEventStore access restricted, according to apple doc 'possibly due to active restrictions such as parental controls being in place'", log: log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
             UserDefaults.standard.createCalendarEvent = false
+            UserDefaults.standard.calendarShareStatus = CalendarShareStatus.error.rawValue
 
 #if swift(>=5.9)
         case .writeOnly:
             // Full Access permission has not been granted to the app so we won't be able to delete old BG events, no need to change value of UserDefaults.standard.createCalendarEvent
             trace("EKEventStore access is 'Write Only', the user must update this to 'Full Access'", log: log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
             UserDefaults.standard.createCalendarEvent = false
+            UserDefaults.standard.calendarShareStatus = CalendarShareStatus.error.rawValue
 
         case .fullAccess:
             // fullAccess is granted, no need to change value of UserDefaults.standard.createCalendarEvent
             trace("EKEventStore access authorized", log: log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
             UserDefaults.standard.createCalendarEvent = true
+            UserDefaults.standard.calendarShareStatus = CalendarShareStatus.waiting.rawValue
 #endif
 
         case .denied:
@@ -301,11 +454,13 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
             // we will probably never come here because if it's denied, the uiview is not shown
             trace("EKEventStore access denied by user", log: log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
             UserDefaults.standard.createCalendarEvent = false
+            UserDefaults.standard.calendarShareStatus = CalendarShareStatus.error.rawValue
 
         case .authorized:
             // authorize successful, no need to change value of UserDefaults.standard.createCalendarEvent
             trace("EKEventStore access authorized", log: log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
             UserDefaults.standard.createCalendarEvent = true
+            UserDefaults.standard.calendarShareStatus = CalendarShareStatus.waiting.rawValue
 
         @unknown default:
             trace("unknown case returned when authorizing EKEventStore ", log: log, category: ConstantsLog.categorySettingsViewCalendarEventsSettingsViewModel, type: .error)
@@ -313,38 +468,94 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
     }
     
     func numberOfRows() -> Int {
-        
-        // if create calendar event not enabled, then all other settings can be hidden
-        if UserDefaults.standard.createCalendarEvent {
-            
-            // user may have removed the authorization, in that case set setting to false and return 1 row
-            if EKEventStore.authorizationStatus(for:.event) != .authorized {
-                
+        guard calendarShareIsAvailable else {
+            if UserDefaults.standard.createCalendarEvent {
                 UserDefaults.standard.createCalendarEvent = false
-                
-                return 1
-                
+                UserDefaults.standard.calendarShareStatus = CalendarShareStatus.notConfigured.rawValue
             }
-            
-            return Setting.allCases.count
-            
-        } else {
-            
-            return 1
-            
+            return 0
         }
-        
+
+        switch rowGroup {
+        case .connection:
+            return UserDefaults.standard.createCalendarEvent ? 3 : 1
+        case .status:
+            return UserDefaults.standard.createCalendarEvent && calendarAccessIsAuthorized ? 4 : 0
+        case .preview:
+            return UserDefaults.standard.createCalendarEvent && calendarAccessIsAuthorized ? 1 : 0
+        case .settings:
+            return UserDefaults.standard.createCalendarEvent && calendarAccessIsAuthorized ? 5 : 0
+        }
     }
 
     private var calendarEventRowsVisible: Bool {
+        guard calendarShareIsAvailable else { return false }
         guard UserDefaults.standard.createCalendarEvent else { return false }
 
-        if EKEventStore.authorizationStatus(for: .event) != .authorized {
+        if !calendarAccessIsAuthorized {
             UserDefaults.standard.createCalendarEvent = false
+            UserDefaults.standard.calendarShareStatus = CalendarShareStatus.error.rawValue
             return false
         }
 
         return true
+    }
+
+    private var calendarShareIsAvailable: Bool {
+        UserDefaults.standard.isMaster || UserDefaults.standard.followerDataSourceType != .calendar
+    }
+
+    private var calendarEventPreviewTitle: String {
+        CalendarShareEventTitleFormatter.previewTitle()
+    }
+
+    private var lastPayloadTimeDetail: String? {
+        guard let payload = latestPayload else {
+            return "-"
+        }
+
+        return payload.followerBgReading.timeStamp.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
+    }
+
+    private var lastPayloadValueDetail: String? {
+        guard let payload = latestPayload else {
+            return "-"
+        }
+
+        let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        return payload.bgMgDl.mgDlToMmolAndToString(mgDl: isMgDl) + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+    }
+
+    private var latestPayload: CalendarSharePayload? {
+        guard calendarAccessIsAuthorized,
+              let selectedCalendarTitle = UserDefaults.standard.calenderId,
+              let calendar = eventStore.calendars(for: .event).first(where: { $0.title == selectedCalendarTitle }) else {
+            return nil
+        }
+
+        let predicate = eventStore.predicateForEvents(
+            withStart: Date(timeIntervalSinceNow: -24 * 3600),
+            end: Date(timeIntervalSinceNow: 30 * 60),
+            calendars: [calendar]
+        )
+
+        return eventStore.events(matching: predicate)
+            .compactMap { CalendarSharePayload.decode(from: $0.notes) }
+            .sorted { $0.timestampMillis > $1.timestampMillis }
+            .first
+    }
+
+    private var calendarAccessIsAuthorized: Bool {
+        switch EKEventStore.authorizationStatus(for: .event) {
+        case .authorized:
+            return true
+#if swift(>=5.9)
+        case .fullAccess:
+            return true
+#endif
+        default:
+            return false
+        }
     }
     
     func onRowSelect(index: Int) -> SettingsSelectedRowAction {
@@ -387,6 +598,9 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
             }
 
             return SettingsSelectedRowAction.nothing
+
+        case .status, .lastValue, .timestamp:
+            return SettingsSelectedRowAction.nothing
         
         case .calenderId:
             
@@ -416,7 +630,28 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
             return SettingsSelectedRowAction.selectFromList(title: Texts_SettingsView.calenderId, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: {(index:Int) in
                 if index != selectedRow {
                     UserDefaults.standard.calenderId = data[index]
+                    UserDefaults.standard.calendarShareStatus = CalendarShareStatus.waiting.rawValue
                 }
+            }, cancelHandler: nil, didSelectRowHandler: nil)
+
+        case .alias:
+            return .askText(title: Texts_SettingsView.calendarShareAlias, message: Texts_SettingsView.calendarShareAliasMessage, keyboardType: .default, text: UserDefaults.standard.calendarShareAlias, placeHolder: nil, actionTitle: nil, cancelTitle: nil, actionHandler: { alias in
+                let trimmedAlias = alias.trimmingCharacters(in: .whitespacesAndNewlines)
+                if !trimmedAlias.isEmpty {
+                    UserDefaults.standard.calendarShareAlias = trimmedAlias
+                    UserDefaults.standard.calendarShareStatus = CalendarShareStatus.waiting.rawValue
+                }
+            }, cancelHandler: nil, inputValidator: nil)
+
+        case .includeHistory:
+            let options = [0, 30, 60, 120, 240]
+            let data = options.map { $0.description + " " + Texts_Common.minutes }
+            let selectedRow = options.firstIndex(of: UserDefaults.standard.calendarShareHistoryInMinutes)
+
+            return .selectFromList(title: Texts_SettingsView.calendarShareIncludeHistory, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: { index in
+                guard index >= 0, index < options.count else { return }
+                UserDefaults.standard.calendarShareHistoryInMinutes = options[index]
+                UserDefaults.standard.calendarShareStatus = CalendarShareStatus.waiting.rawValue
             }, cancelHandler: nil, didSelectRowHandler: nil)
 
         case .calendarInterval:
@@ -432,7 +667,14 @@ class SettingsViewCalendarEventsSettingsViewModel: SettingsViewModelProtocol {
     }
     
     func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
-        return false
+        guard let setting = Setting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .displayTrend, .displayDelta, .displayUnits, .displayVisualIndicator, .calendarInterval:
+            return true
+        case .createCalendarEvent, .calenderId, .alias, .status, .lastValue, .timestamp, .includeHistory:
+            return false
+        }
     }
     
 }

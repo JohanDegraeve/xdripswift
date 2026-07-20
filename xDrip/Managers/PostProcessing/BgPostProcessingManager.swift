@@ -1017,6 +1017,8 @@ class BgPostProcessingManager {
             return "dexcomshare|\(UserDefaults.standard.dexcomShareAccountName ?? "unknown")"
         case .medtrumEasyView:
             return "medtrumeasyview|\(UserDefaults.standard.medtrumEasyViewEmail ?? "unknown")|\(UserDefaults.standard.medtrumEasyViewSelectedPatientUid)"
+        case .calendar:
+            return "calendar|\(UserDefaults.standard.calendarFollowCalendarId ?? "unknown")|\(UserDefaults.standard.followerPatientName ?? "unknown")"
         }
     }
 

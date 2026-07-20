@@ -88,14 +88,9 @@
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 "m5stack_settingsviews_giveBluetoothPassword" = "Enter Bluetooth Password";
 "m5stack_settingsviews_brightness" = "Screen Brightness";
-"calendarEventsSectionTitle" = "Calendar Events";
-"createCalendarEvent" = "Create Calendar Events";
-"calenderId" = "Calendar To Use";
 "settingsviews_displayTrendInCalendarEvent" = "Trend";
 "displayUnitInCalendarEvent" = "Enhed";
 "displayDeltaInCalendarEvent" = "Delta";
-"infoCalendarAccessDeniedByUser" = "You previously denied access to your Calendar.\n\nTo enable it go to your device settings, privacy, calendars and enable it.";
-"infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
 "sectionTitleTrace" = "Issue Reporting";
 "sendTraceFile" = "Send problemrapport";
 "describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";
@@ -179,7 +174,6 @@
 /// treatments settings, offset the carb treatments on main chart
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
-"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calendar events";
 
 /// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
 "warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
@@ -203,7 +197,6 @@
 "suppressLoopShare" = "Suppress Loop Share";
 
 /// When clicking the event interval setting, a pop up asks for minimum number of minutes between two events, this is the pop up message - this is used for setting the interval between two calendar events
-"settingsviews_CalenderIntervalTitle" = "Event Interval";
 
 /// data source settings, enable Nightscout in the Nightscout section
 "settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
@@ -261,7 +254,6 @@
 "settingsviews_enterPassword" = "Enter your password";
 
 /// The user needs to update their calendar permissions
-"infoCalendarAccessWriteOnly" = "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.";
 
 /// data source settings, keep-alive mode is set to normal
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";

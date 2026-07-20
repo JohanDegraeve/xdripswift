@@ -21,8 +21,6 @@
 /// home screen settings, high value
 "settingsviews_highValue" = "High Value";
 
-/// Calendar Events Settings - text in row where create event is enabled or disabled 
-"createCalendarEvent" = "Create Calendar Events";
 
 /// general settings, when switching from master to follower, if confirmation is asked, this message will be shown.
 "warningChangeFromMasterToFollower" = "Switching from Master to Follower will stop your current sensor. Do you want to continue?";
@@ -33,7 +31,6 @@
 /// M5 stack setting, brightness
 "m5stack_settingsviews_brightness" = "Screen Brightness";
 
-/// Calendar Events Settings - text in row where user needs to say if unit should be displayed or not
 "displayUnitInCalendarEvent" = "Одиниця";
 
 /// name of setting for text color
@@ -85,7 +82,6 @@
 "settingsviews_sectiontitlehomescreen" = "Home Screen";
 
 /// If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown
-"infoCalendarAccessDeniedByUser" = "You previously denied access to your Calendar.\n\nTo enable it go to your device settings, privacy, calendars and enable it.";
 
 /// When clicking the retention setting, a pop up asks for how many days should data be stored
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
@@ -153,14 +149,11 @@
 /// home screen settings, should the main glucose chart screen be allowed?
 "settingsviews_allowScreenRotation" = "Обертання графіка";
 
-/// Calendar Events Settings - section title
-"calendarEventsSectionTitle" = "Calendar Events";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
 "settingsviews_IntervalTitle" = "Notification Interval";
 
 /// If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown
-"infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
 
 /// transmitter settings, just the words that explain that the settings is about transmitter id
 "settingsviews_transmitterid" = "Transmitter ID";
@@ -219,8 +212,6 @@
 /// nightscout settings, pop up that asks user to enter nightscout api key
 "settingsviews_giveNightscoutAPIKey" = "Enter your API_SECRET";
 
-/// Calendar Events Settings - text in row where user needs to select a calendar
-"calenderId" = "Calendar To Use";
 
 /// treatments settings, section title
 "settingsviews_sectiontitletreatments" = "Treatments";
@@ -293,7 +284,6 @@
 /// nightscout  settings, pop up that asks user to enter nightscout url
 "settingsviews_giveNightscoutUrl" = "Enter your Nightscout URL";
 
-/// Calendar Events Settings - text in row where user needs to say if delta should be displayed or not
 "displayDeltaInCalendarEvent" = "Дельта";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
@@ -319,7 +309,6 @@
 /// statistics settings, how many days to use for calculations
 "settingsviews_daysToUseStatisticsTitle" = "Days to Calculate";
 
-/// Calendar Events Settings - text in row where user needs to say if trend should be displayed or not
 "settingsviews_displayTrendInCalendarEvent" = "Тренд";
 
 /// In case user tries to send trace file via email but error occurs.
@@ -397,7 +386,6 @@
 /// treatments settings, offset the carb treatments on main chart
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
-"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calendar events";
 
 /// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
 "warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
@@ -421,7 +409,6 @@
 "suppressLoopShare" = "Suppress Loop Share";
 
 /// When clicking the event interval setting, a pop up asks for minimum number of minutes between two events, this is the pop up message - this is used for setting the interval between two calendar events
-"settingsviews_CalenderIntervalTitle" = "Event Interval";
 
 /// data source settings, enable Nightscout in the Nightscout section
 "settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
@@ -479,7 +466,6 @@
 "settingsviews_enterPassword" = "Enter your password";
 
 /// The user needs to update their calendar permissions
-"infoCalendarAccessWriteOnly" = "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.";
 
 /// data source settings, keep-alive mode is set to normal
 "settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";

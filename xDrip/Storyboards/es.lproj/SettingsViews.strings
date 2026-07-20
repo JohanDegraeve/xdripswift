@@ -131,7 +131,6 @@
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 "m5stack_settingsviews_giveBluetoothPassword" = "Entrar Contraseña Bluetooth";
 "m5stack_settingsviews_brightness" = "Brillo de Pantalla Brightness";
-"createCalendarEvent" = "Crear Eventos en el Calendario";
 "calenderId" = "Qué calendario se debe usar";
 "settingsviews_displayTrendInCalendarEvent" = "Tendencia";
 "displayUnitInCalendarEvent" = "Unidad";
@@ -181,8 +180,6 @@
 
 /// help settings, section title
 
-/// Calendar Events Settings - section title
-"calendarEventsSectionTitle" = "Calendar Events";
 
 /// help settings, open the online help
 "settingsviews_showOnlineHelp" = "Open Online Help";
@@ -212,7 +209,6 @@
 "expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
-"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calendar events";
 
 /// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
 "warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
@@ -224,7 +220,6 @@
 "suppressLoopShare" = "Suppress Loop Share";
 
 /// When clicking the event interval setting, a pop up asks for minimum number of minutes between two events, this is the pop up message - this is used for setting the interval between two calendar events
-"settingsviews_CalenderIntervalTitle" = "Event Interval";
 
 /// When clicking the speak interval setting, a pop up asks for minimum number of minutes between two speech events, this is the pop up message - this is used for setting the interval between two spoken bg announcements
 "settingsviews_SpeakIntervalTitle" = "Speak Interval";

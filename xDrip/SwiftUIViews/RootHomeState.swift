@@ -576,6 +576,13 @@ final class RootHomeStateModel: ObservableObject {
                 } else {
                     detail = UserDefaults.standard.followerPatientName ?? ""
                 }
+            case .calendar:
+                if UserDefaults.standard.calendarFollowCalendarId == nil {
+                    detail = Texts_SettingsView.valueIsRequired
+                    detailColor = ConstantsAppColors.urgent
+                } else {
+                    detail = UserDefaults.standard.followerPatientName ?? UserDefaults.standard.calendarFollowCalendarId ?? ""
+                }
             }
         }
 

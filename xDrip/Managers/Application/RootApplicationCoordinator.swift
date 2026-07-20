@@ -102,6 +102,9 @@ import AppIntents
     /// MedtrumEasyViewFollowManager instance
     private var medtrumEasyViewFollowManager: MedtrumEasyViewFollowManager?
 
+    /// CalendarFollowManager instance
+    private var calendarFollowManager: CalendarFollowManager?
+
     /// LoopFollowManager instance
     private var loopFollowManager: LoopFollowManager?
     
@@ -639,6 +642,9 @@ import AppIntents
         // setup medtrumEasyViewFollowManager
         medtrumEasyViewFollowManager = MedtrumEasyViewFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
 
+        // setup calendarFollowManager
+        calendarFollowManager = CalendarFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
+
         // setup loop follow manager
         loopFollowManager = LoopFollowManager(coreDataManager: coreDataManager, followerDelegate: self)
         
@@ -733,6 +739,7 @@ import AppIntents
             self.libreLinkUpFollowManager?.download()
             self.dexcomShareFollowManager?.download()
             self.medtrumEasyViewFollowManager?.download()
+            self.calendarFollowManager?.download()
         }, cgmTransmitterInfoChanged: cgmTransmitterInfoChanged)
         
         // to initialize UserDefaults.standard.transmitterTypeAsString
@@ -2434,42 +2441,74 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
             let previousTimeStampLastBgReading = timeStampLastBgReading
             
             var firstCreatedBgReadingTimeStamp: Date?
+
+            let duplicateReadingWindow = TimeInterval(minutes: 2.5)
+            let oldestIncomingTimeStamp = followGlucoseDataArray.map { $0.timeStamp }.min()
+            let newestIncomingTimeStamp = followGlucoseDataArray.map { $0.timeStamp }.max()
+            var existingBgReadingsInIncomingRange = [BgReading]()
+
+            if let oldestIncomingTimeStamp = oldestIncomingTimeStamp, let newestIncomingTimeStamp = newestIncomingTimeStamp {
+                existingBgReadingsInIncomingRange = bgReadingsAccessor.getBgReadings(from: oldestIncomingTimeStamp.addingTimeInterval(-duplicateReadingWindow), to: newestIncomingTimeStamp.addingTimeInterval(duplicateReadingWindow), on: coreDataManager.mainManagedObjectContext, includingSuppressed: true)
+            }
             
             // iterate through array, elements are ordered by timestamp, first is the youngest, let's create first the oldest, although it shouldn't matter in what order the readings are created
             for (_, followGlucoseData) in followGlucoseDataArray.enumerated().reversed() {
-                if followGlucoseData.timeStamp > timeStampLastBgReading {
+                let checktimestamp = Date(timeInterval: 5.0 * 60.0 - 10.0, since: timeStampLastBgReading)
+                let existingReadingInSameSlot = existingBgReadingsInIncomingRange.contains { abs($0.timeStamp.timeIntervalSince(followGlucoseData.timeStamp)) <= duplicateReadingWindow }
+
+                // Calendar Follow payloads carry a small history window so the follower can recover
+                // missed calendar syncs. Keep the older-than-latest gap-fill rule scoped to Calendar
+                // Follow so the behaviour of the other follower sources remains unchanged.
+                let isHistoricalGapFill = UserDefaults.standard.followerDataSourceType == .calendar && followGlucoseData.timeStamp <= checktimestamp && !existingReadingInSameSlot
+
+                if followGlucoseData.timeStamp > timeStampLastBgReading || isHistoricalGapFill {
                     trace("in followerInfoReceived, creating new bgreading: value = %{public}@ %{public}@, timestamp =  %{public}@", log: self.log, category: ConstantsLog.categoryRootView, type: .info,  followGlucoseData.sgv.mgDlToMmol(mgDl: isMgDl).bgValueToString(mgDl: isMgDl), isMgDl ? Texts_Common.mgdl : Texts_Common.mmol, followGlucoseData.timeStamp.toStringForTrace(timeStyle: .long, dateStyle: .long))
                     
+                    var newReading: BgReading?
+
                     // create a new reading
                     // we'll need to check which should be the active followerManager to know where to call the function
                     switch UserDefaults.standard.followerDataSourceType {
                     case .nightscout:
                         if let followManager = nightscoutFollowManager {
-                            _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
+                            newReading = followManager.createBgReading(followGlucoseData: followGlucoseData)
                         }
 
                     case .libreLinkUp, .libreLinkUpRussia:
                         if let followManager = libreLinkUpFollowManager {
-                            _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
+                            newReading = followManager.createBgReading(followGlucoseData: followGlucoseData)
                         }
 
                     case .dexcomShare:
                         if let followManager = dexcomShareFollowManager {
-                            _ = followManager.createBgReading(followGlucoseData: followGlucoseData)
+                            newReading = followManager.createBgReading(followGlucoseData: followGlucoseData)
                         }
 
                     case .medtrumEasyView:
                         if let followerManager = medtrumEasyViewFollowManager {
-                            _ = followerManager.createBgReading(followGlucoseData: followGlucoseData)
+                            newReading = followerManager.createBgReading(followGlucoseData: followGlucoseData)
+                        }
+
+                    case .calendar:
+                        if let followManager = calendarFollowManager {
+                            newReading = followManager.createBgReading(followGlucoseData: followGlucoseData)
                         }
 
                     }
+
+                    if let newReading = newReading {
+                        existingBgReadingsInIncomingRange.append(newReading)
+                        existingBgReadingsInIncomingRange.sort { $0.timeStamp < $1.timeStamp }
+                    }
+
                     if firstCreatedBgReadingTimeStamp == nil {
                         firstCreatedBgReadingTimeStamp = followGlucoseData.timeStamp
                     }
                     
                     // set timeStampLastBgReading to new timestamp
-                    timeStampLastBgReading = followGlucoseData.timeStamp
+                    if followGlucoseData.timeStamp > timeStampLastBgReading {
+                        timeStampLastBgReading = followGlucoseData.timeStamp
+                    }
                 }
             }
             
@@ -2480,7 +2519,7 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                 coreDataManager.saveChanges()
                 
                 if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled, let firstCreatedBgReadingTimeStamp = firstCreatedBgReadingTimeStamp {
-                    let processingStartDateOverride = previousTimeStampLastBgReading.timeIntervalSince1970 > 0 ? previousTimeStampLastBgReading.addingTimeInterval(-1.0) : firstCreatedBgReadingTimeStamp
+                    let processingStartDateOverride = previousTimeStampLastBgReading.timeIntervalSince1970 > 0 ? min(previousTimeStampLastBgReading.addingTimeInterval(-1.0), firstCreatedBgReadingTimeStamp) : firstCreatedBgReadingTimeStamp
                     if let bgPostProcessingManager = bgPostProcessingManager {
                         _ = bgPostProcessingManager.processBgReadings(
                             processingStartDateOverride: processingStartDateOverride,

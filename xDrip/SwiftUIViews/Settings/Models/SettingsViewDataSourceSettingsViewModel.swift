@@ -8,6 +8,7 @@
 
 import os
 import SwiftUI
+import EventKit
 
 fileprivate enum Setting: Int, CaseIterable {
     /// blood glucose  unit
@@ -29,12 +30,13 @@ fileprivate enum Setting: Int, CaseIterable {
     /// - Follower
     ///  - LibreLinkUp: service status
     ///  - Dexcom Share: service status
+    ///  - Calendar Follow: status row opening the Calendar Follow child settings screen
     case followerExtraRow5 = 5
     
     /// - Follower: if follower data source is not Nightscout, should we upload the BG values to Nightscout?
     case followerExtraRow6 = 6
     
-    /// - Follower: web follower username
+    /// - Follower: web follower username or Calendar Follow calendar
     case followerExtraRow7 = 7
     
     /// - Follower: web follower password
@@ -80,7 +82,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
     
     /// warning symbol to be prefixed to a user-facing string where there is an error or further action needed
     private let warningPrefix = "⚠️ "
-    
+
     // MARK: - Native SwiftUI rows
 
     func settingsRows(sectionID: Int) -> [SettingsRow] {
@@ -92,7 +94,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             nativeSettingsRow(id: "dataSource.followerExtraRow2", index: Setting.followerExtraRow2.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow2.rawValue < visibleRowCount),
             nativeSettingsRow(id: "dataSource.followerExtraRow3", index: Setting.followerExtraRow3.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow3.rawValue < visibleRowCount),
             nativeSettingsRow(id: "dataSource.followerExtraRow4", index: Setting.followerExtraRow4.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow4.rawValue < visibleRowCount),
-            nativeSettingsRow(id: "dataSource.followerExtraRow5", index: Setting.followerExtraRow5.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow5.rawValue < visibleRowCount),
+            followerStatusRow(sectionID: sectionID, isVisible: Setting.followerExtraRow5.rawValue < visibleRowCount),
             nativeSettingsRow(id: "dataSource.followerExtraRow6", index: Setting.followerExtraRow6.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow6.rawValue < visibleRowCount),
             nativeSettingsRow(id: "dataSource.followerExtraRow7", index: Setting.followerExtraRow7.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow7.rawValue < visibleRowCount),
             nativeSettingsRow(id: "dataSource.followerExtraRow8", index: Setting.followerExtraRow8.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow8.rawValue < visibleRowCount),
@@ -101,6 +103,40 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             nativeSettingsRow(id: "dataSource.followerExtraRow11", index: Setting.followerExtraRow11.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow11.rawValue < visibleRowCount),
             nativeSettingsRow(id: "dataSource.followerExtraRow12", index: Setting.followerExtraRow12.rawValue, sectionID: sectionID, isVisible: Setting.followerExtraRow12.rawValue < visibleRowCount)
         ]
+    }
+
+    private func followerStatusRow(sectionID: Int, isVisible: Bool) -> SettingsRow {
+        let settingIndex = Setting.followerExtraRow5.rawValue
+
+        guard UserDefaults.standard.followerDataSourceType == .calendar else {
+            return nativeSettingsRow(
+                id: "dataSource.followerExtraRow5",
+                index: settingIndex,
+                sectionID: sectionID,
+                isVisible: isVisible
+            )
+        }
+
+        return SettingsRow(
+            id: "dataSource.followerExtraRow5",
+            title: settingsRowText(index: settingIndex),
+            detail: detailedText(index: settingIndex),
+            detailIndicator: followerServiceStatusIndicatorColor(index: settingIndex).map { SettingsIndicator(color: $0) },
+            accessory: .disclosure,
+            isVisible: isVisible,
+            action: .settingsScreen {
+                SettingsScreen(
+                    title: UserDefaults.standard.followerDataSourceType.fullDescription,
+                    providers: {
+                        [
+                            CalendarFollowCalendarSettingsViewModel(),
+                            CalendarFollowStatusSettingsViewModel(),
+                            CalendarFollowHistoricalReadingsSettingsViewModel()
+                        ]
+                    }
+                )
+            }
+        )
     }
 
     // MARK: - Initialization / Deinitialization
@@ -348,6 +384,10 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                         self.callMessageHandlerInMainThread(title: FollowerDataSourceType.dexcomShare.fullDescription, message: Texts_SettingsView.warningChangeToFollowerDexcomShare)
                         UserDefaults.standard.uploadReadingstoDexcomShare = false
                     }
+
+                    if newFollowerDataSourceType == .calendar && UserDefaults.standard.followerBackgroundKeepAliveType == .disabled {
+                        UserDefaults.standard.followerBackgroundKeepAliveType = .normal
+                    }
                 }
             }, cancelHandler: nil, didSelectRowHandler: nil)
             
@@ -399,6 +439,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                     self.resetMedtrumEasyViewData()
 
                 }, cancelHandler: nil, inputValidator: nil)
+
+            case .calendar:
+                return .nothing
 
             default:
                 return .nothing
@@ -553,6 +596,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 // Caregiver account adds row 9: patient selection
                 let isCaregiverAccount = UserDefaults.standard.medtrumEasyViewUserType == "M"
                 return isCaregiverAccount ? 10 : 9
+
+            case .calendar:
+                return 7
             }
         }
     }
@@ -576,6 +622,8 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
 
         case .medtrumEasyView:
             return UserDefaults.standard.medtrumEasyViewUserType == "M" ? 10 : 9
+        case .calendar:
+            return 7
         }
     }
 
@@ -605,6 +653,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             return Texts_SettingsView.labelUploadDataToNightscout
             
         case .followerExtraRow7:
+            if UserDefaults.standard.followerDataSourceType == .calendar {
+                return Texts_SettingsView.calenderId
+            }
             return Texts_Common.username
             
         case .followerExtraRow8:
@@ -685,6 +736,9 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
             return UserDefaults.standard.followerDataSourceType.description
             
         case .followerExtraRow5:
+            if UserDefaults.standard.followerDataSourceType == .calendar {
+                return CalendarShareStatus(rawValue: UserDefaults.standard.calendarFollowStatus)?.description ?? CalendarShareStatus.notConfigured.description
+            }
             return followerServiceStatusResult.description
             
         case .followerExtraRow6:
@@ -706,6 +760,8 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
                 } else {
                     return Texts_SettingsView.valueIsRequired
                 }
+            case .calendar:
+                return UserDefaults.standard.calendarFollowCalendarId ?? Texts_SettingsView.valueIsRequired
             default:
                 return nil
             }
@@ -851,6 +907,23 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
     func followerServiceStatusIndicatorColor(index: Int) -> Color? {
         guard let setting = Setting(rawValue: index), setting == .followerExtraRow5 else { return nil }
 
+        if UserDefaults.standard.followerDataSourceType == .calendar {
+            switch CalendarShareStatus(rawValue: UserDefaults.standard.calendarFollowStatus) ?? .notConfigured {
+            case .active:
+                return .green
+            case .waiting:
+                return .yellow
+            case .noData:
+                return .gray
+            case .stale:
+                return .orange
+            case .error:
+                return .red
+            case .notConfigured:
+                return .gray
+            }
+        }
+
         return followerServiceStatusResult.status.indicatorColor
     }
 
@@ -931,6 +1004,8 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutToken.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutPort.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.nightscoutEnabled.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.calendarFollowCalendarId.rawValue, options: .new, context: nil)
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.calendarFollowStatus.rawValue, options: .new, context: nil)
     }
     
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey: Any]?, context: UnsafeMutableRawPointer?) {
@@ -940,7 +1015,7 @@ class SettingsViewDataSourceSettingsViewModel: NSObject, SettingsViewModelProtoc
         
         switch keyPathEnum {
 
-        case UserDefaults.Key.followerPatientName, UserDefaults.Key.activeSensorSerialNumber, UserDefaults.Key.dexcomShareRegion, UserDefaults.Key.dexcomShareLoginFailedTimestamp, UserDefaults.Key.medtrumEasyViewUserType, UserDefaults.Key.medtrumEasyViewSelectedPatientUid:
+        case UserDefaults.Key.followerPatientName, UserDefaults.Key.activeSensorSerialNumber, UserDefaults.Key.dexcomShareRegion, UserDefaults.Key.dexcomShareLoginFailedTimestamp, UserDefaults.Key.medtrumEasyViewUserType, UserDefaults.Key.medtrumEasyViewSelectedPatientUid, UserDefaults.Key.calendarFollowCalendarId, UserDefaults.Key.calendarFollowStatus:
             // run this in the main thread to avoid access errors
             DispatchQueue.main.async {
                 self.sectionReloadClosure?()
@@ -1123,8 +1198,8 @@ extension SettingsViewDataSourceSettingsViewModel {
                 let summary = try JSONDecoder().decode(StatusPageSummaryModel.self, from: data)
                 status = FollowerServiceStatus(indicator: summary.status.indicator)
                 description = summary.status.description
-            case .medtrumEasyView:
-                // Medtrum doesn't have a service status, this case should never be reached
+            case .medtrumEasyView, .calendar:
+                // these modes don't have a remote service status, this case should never be reached
                 break
             }
             if status != .ok && status != .unknown {
@@ -1150,5 +1225,404 @@ extension SettingsViewDataSourceSettingsViewModel {
             self.followerServiceStatusResult = result
             self.sectionReloadClosure?()
         }
+    }
+}
+
+private enum CalendarFollowCalendarSetting: Int, CaseIterable {
+    case calendar = 0
+}
+
+/// Calendar Follow child section where the user selects the shared calendar.
+private final class CalendarFollowCalendarSettingsViewModel: SettingsNativeSectionProvider {
+    private let eventStore = EKEventStore()
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        [
+            nativeSettingsRow(
+                id: "calendarFollow.calendar",
+                index: CalendarFollowCalendarSetting.calendar.rawValue,
+                sectionID: sectionID
+            )
+        ]
+    }
+
+    func sectionTitle() -> String? {
+        Texts_SettingsView.calenderId
+    }
+
+    func sectionFooter() -> String? {
+        Texts_SettingsView.calendarFollowCalendarFooter
+    }
+
+    func settingsRowText(index: Int) -> String {
+        guard CalendarFollowCalendarSetting(rawValue: index) != nil else { fatalError("Unexpected Section") }
+        return Texts_SettingsView.calenderId
+    }
+
+    func accessoryType(index: Int) -> SettingsAccessory {
+        guard CalendarFollowCalendarSetting(rawValue: index) != nil else { fatalError("Unexpected Section") }
+        return .disclosure
+    }
+
+    func detailedText(index: Int) -> String? {
+        guard CalendarFollowCalendarSetting(rawValue: index) != nil else { fatalError("Unexpected Section") }
+        return UserDefaults.standard.calendarFollowCalendarId ?? Texts_SettingsView.valueIsRequired
+    }
+
+    func numberOfRows() -> Int {
+        CalendarFollowCalendarSetting.allCases.count
+    }
+
+    func onRowSelect(index: Int) -> SettingsSelectedRowAction {
+        guard CalendarFollowCalendarSetting(rawValue: index) != nil else { fatalError("Unexpected Section") }
+        return calendarSelectionAction(title: Texts_SettingsView.calenderId)
+    }
+
+    func isEnabled(index: Int) -> Bool {
+        true
+    }
+
+    func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
+        false
+    }
+
+    func storeMessageHandler(messageHandler: @escaping ((String, String) -> Void)) {}
+
+    func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {}
+
+    private func calendarSelectionAction(title: String) -> SettingsSelectedRowAction {
+        switch EKEventStore.authorizationStatus(for: .event) {
+        case .notDetermined:
+            requestCalendarAccess { _ in }
+            return .nothing
+        case .denied:
+            return .showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.infoCalendarAccessDeniedByUser)
+        case .restricted:
+            return .showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.infoCalendarAccessRestricted)
+#if swift(>=5.9)
+        case .writeOnly:
+            return .showInfoText(title: Texts_Common.warning, message: Texts_SettingsView.infoCalendarAccessWriteOnly)
+        case .fullAccess:
+            break
+#endif
+        case .authorized:
+            break
+        @unknown default:
+            return .nothing
+        }
+
+        let data = eventStore.calendars(for: .event).map { $0.title }
+        let selectedRow = data.firstIndex(of: UserDefaults.standard.calendarFollowCalendarId ?? "")
+
+        return .selectFromList(title: title, data: data, selectedRow: selectedRow, actionTitle: nil, cancelTitle: nil, actionHandler: { index in
+            guard index >= 0, index < data.count else { return }
+            UserDefaults.standard.calendarFollowCalendarId = data[index]
+            UserDefaults.standard.calendarFollowStatus = CalendarShareStatus.noData.rawValue
+        }, cancelHandler: nil, didSelectRowHandler: nil)
+    }
+
+    private func requestCalendarAccess(completion: @escaping (Bool) -> Void) {
+#if swift(>=5.9)
+        if #available(iOS 17.0, *) {
+            eventStore.requestFullAccessToEvents { granted, _ in completion(granted) }
+        } else {
+            eventStore.requestAccess(to: .event) { granted, _ in completion(granted) }
+        }
+#else
+        eventStore.requestAccess(to: .event) { granted, _ in completion(granted) }
+#endif
+    }
+}
+
+private enum CalendarFollowStatusSetting: Int, CaseIterable {
+    case status = 0
+    case lastValue = 1
+    case timestamp = 2
+}
+
+/// Calendar Follow child status section.
+///
+/// This mirrors the master Calendar Share status details and reads the latest
+/// payload directly from the selected calendar for the preview rows.
+private final class CalendarFollowStatusSettingsViewModel: SettingsNativeSectionProvider {
+    private let eventStore = EKEventStore()
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        [
+            SettingsRow(
+                id: "calendarFollow.status",
+                title: settingsRowText(index: CalendarFollowStatusSetting.status.rawValue),
+                detail: detailedText(index: CalendarFollowStatusSetting.status.rawValue),
+                detailIndicator: SettingsIndicator(color: calendarFollowStatusIndicatorColor),
+                accessory: .none
+            ),
+            nativeSettingsRow(
+                id: "calendarFollow.lastValue",
+                index: CalendarFollowStatusSetting.lastValue.rawValue,
+                sectionID: sectionID
+            ),
+            nativeSettingsRow(
+                id: "calendarFollow.timestamp",
+                index: CalendarFollowStatusSetting.timestamp.rawValue,
+                sectionID: sectionID
+            )
+        ]
+    }
+
+    func sectionTitle() -> String? {
+        Texts_SettingsView.followerServiceStatus
+    }
+
+    func sectionFooter() -> String? {
+        Texts_SettingsView.calendarFollowStatusFooter
+    }
+
+    func settingsRowText(index: Int) -> String {
+        guard let setting = CalendarFollowStatusSetting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .status:
+            return Texts_SettingsView.followerServiceStatus
+        case .timestamp:
+            return Texts_BgReadings.timestamp
+        case .lastValue:
+            return Texts_SettingsView.calendarShareLastValue
+        }
+    }
+
+    func accessoryType(index: Int) -> SettingsAccessory {
+        guard let setting = CalendarFollowStatusSetting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .status, .timestamp, .lastValue:
+            return .none
+        }
+    }
+
+    func detailedText(index: Int) -> String? {
+        guard let setting = CalendarFollowStatusSetting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .status:
+            return calendarFollowStatus.description
+        case .timestamp:
+            return lastPayloadTimeDetail
+        case .lastValue:
+            return lastPayloadValueDetail
+        }
+    }
+
+    func numberOfRows() -> Int {
+        CalendarFollowStatusSetting.allCases.count
+    }
+
+    func onRowSelect(index: Int) -> SettingsSelectedRowAction {
+        guard let setting = CalendarFollowStatusSetting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .status, .timestamp, .lastValue:
+            return .nothing
+        }
+    }
+
+    func isEnabled(index: Int) -> Bool {
+        true
+    }
+
+    func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
+        false
+    }
+
+    func storeMessageHandler(messageHandler: @escaping ((String, String) -> Void)) {}
+
+    func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {}
+
+    private var calendarFollowStatus: CalendarShareStatus {
+        if UserDefaults.standard.calendarFollowCalendarId == nil {
+            return persistedCalendarFollowStatus(.notConfigured)
+        }
+
+        guard let payload = latestPayload else {
+            return persistedCalendarFollowStatus(.noData)
+        }
+
+        return persistedCalendarFollowStatus(abs(payload.followerBgReading.timeStamp.timeIntervalSinceNow) < 7 * 60 ? .active : .stale)
+    }
+
+    private func persistedCalendarFollowStatus(_ status: CalendarShareStatus) -> CalendarShareStatus {
+        if UserDefaults.standard.calendarFollowStatus != status.rawValue {
+            UserDefaults.standard.calendarFollowStatus = status.rawValue
+        }
+        return status
+    }
+
+    private var calendarFollowStatusIndicatorColor: Color {
+        switch calendarFollowStatus {
+        case .active:
+            return .green
+        case .waiting:
+            return .yellow
+        case .noData:
+            return .gray
+        case .stale:
+            return .orange
+        case .error:
+            return .red
+        case .notConfigured:
+            return .gray
+        }
+    }
+
+    private var lastPayloadTimeDetail: String? {
+        guard let payload = latestPayload else {
+            return "-"
+        }
+
+        return payload.followerBgReading.timeStamp.toStringInUserLocale(timeStyle: .short, dateStyle: .short)
+    }
+
+    private var lastPayloadValueDetail: String? {
+        guard let payload = latestPayload else {
+            return "-"
+        }
+
+        let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        return payload.bgMgDl.mgDlToMmolAndToString(mgDl: isMgDl) + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+    }
+
+    private lazy var latestPayload: CalendarSharePayload? = latestCalendarFollowPayload(eventStore: eventStore)
+}
+
+private enum CalendarFollowHistoricalReadingsSetting: Int, CaseIterable {
+    case count = 0
+    case firstReading = 1
+}
+
+/// Shows the historical readings included in the latest Calendar Follow payload.
+private final class CalendarFollowHistoricalReadingsSettingsViewModel: SettingsNativeSectionProvider {
+    private let eventStore = EKEventStore()
+
+    func settingsRows(sectionID: Int) -> [SettingsRow] {
+        if historicalReadings.isEmpty {
+            return [
+                nativeSettingsRow(
+                    id: "calendarFollow.historical.noData",
+                    index: CalendarFollowHistoricalReadingsSetting.count.rawValue,
+                    sectionID: sectionID
+                )
+            ]
+        }
+
+        return [
+            nativeSettingsRow(
+                id: "calendarFollow.historical.count",
+                index: CalendarFollowHistoricalReadingsSetting.count.rawValue,
+                sectionID: sectionID
+            ),
+            nativeSettingsRow(
+                id: "calendarFollow.historical.firstReading",
+                index: CalendarFollowHistoricalReadingsSetting.firstReading.rawValue,
+                sectionID: sectionID
+            )
+        ]
+    }
+
+    func sectionTitle() -> String? {
+        Texts_SettingsView.calendarFollowHistoricalReadings
+    }
+
+    func sectionFooter() -> String? {
+        Texts_SettingsView.calendarFollowHistoricalReadingsFooter
+    }
+
+    func settingsRowText(index: Int) -> String {
+        if historicalReadings.isEmpty {
+            return Texts_SettingsView.calendarFollowNoHistoricalData
+        }
+
+        guard let setting = CalendarFollowHistoricalReadingsSetting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .count:
+            return Texts_SettingsView.calendarFollowHistoricalCount
+        case .firstReading:
+            return Texts_SettingsView.calendarFollowFirstHistoricalReading
+        }
+    }
+
+    func accessoryType(index: Int) -> SettingsAccessory {
+        .none
+    }
+
+    func detailedText(index: Int) -> String? {
+        if historicalReadings.isEmpty {
+            return nil
+        }
+
+        guard let setting = CalendarFollowHistoricalReadingsSetting(rawValue: index) else { fatalError("Unexpected Section") }
+
+        switch setting {
+        case .count:
+            return historicalReadings.count.description
+        case .firstReading:
+            guard let firstHistoricalReading = historicalReadings.last else { return "-" }
+
+            return firstHistoricalReading.timeStamp.toStringInUserLocale(timeStyle: .short, dateStyle: .short) + " (" + firstHistoricalReading.timeStamp.daysAndHoursAgo() + ")"
+        }
+    }
+
+    func numberOfRows() -> Int {
+        historicalReadings.isEmpty ? 1 : 2
+    }
+
+    func onRowSelect(index: Int) -> SettingsSelectedRowAction {
+        .nothing
+    }
+
+    func isEnabled(index: Int) -> Bool {
+        true
+    }
+
+    func completeSettingsViewRefreshNeeded(index: Int) -> Bool {
+        false
+    }
+
+    func storeMessageHandler(messageHandler: @escaping ((String, String) -> Void)) {}
+
+    func storeRowReloadClosure(rowReloadClosure: @escaping ((Int) -> Void)) {}
+
+    private lazy var historicalReadings: [FollowerBgReading] = latestCalendarFollowPayload(eventStore: eventStore)?.historicalFollowerBgReadings ?? []
+}
+
+/// Reads the newest Calendar Share payload from the selected follower calendar.
+private func latestCalendarFollowPayload(eventStore: EKEventStore) -> CalendarSharePayload? {
+    guard calendarFollowAccessIsAuthorized(),
+          let selectedCalendarTitle = UserDefaults.standard.calendarFollowCalendarId,
+          let calendar = eventStore.calendars(for: .event).first(where: { $0.title == selectedCalendarTitle }) else {
+        return nil
+    }
+
+    let predicate = eventStore.predicateForEvents(
+        withStart: Date(timeIntervalSinceNow: -24 * 3600),
+        end: Date(timeIntervalSinceNow: 30 * 60),
+        calendars: [calendar]
+    )
+
+    return eventStore.events(matching: predicate)
+        .compactMap { CalendarSharePayload.decode(from: $0.notes) }
+        .sorted { $0.timestampMillis > $1.timestampMillis }
+        .first
+}
+
+private func calendarFollowAccessIsAuthorized() -> Bool {
+    switch EKEventStore.authorizationStatus(for: .event) {
+    case .authorized:
+        return true
+#if swift(>=5.9)
+    case .fullAccess:
+        return true
+#endif
+    default:
+        return false
     }
 }

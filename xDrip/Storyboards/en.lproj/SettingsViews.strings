@@ -143,14 +143,14 @@
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 "m5stack_settingsviews_giveBluetoothPassword" = "Enter Bluetooth Password";
 "m5stack_settingsviews_brightness" = "Screen Brightness";
-"calendarEventsSectionTitle" = "Calendar Events";
-"createCalendarEvent" = "Create Calendar Events";
+"calendarEventsSectionTitle" = "Calendar Share";
+"createCalendarEvent" = "Calendar Share";
 "calenderId" = "Calendar To Use";
 "settingsviews_displayTrendInCalendarEvent" = "Trend";
 "displayUnitInCalendarEvent" = "Unit";
 "displayDeltaInCalendarEvent" = "Delta";
-"infoCalendarAccessDeniedByUser" = "Full Access is required to your contacts.\n\nGo to iPhone Settings > Apps > %@ > Contacts and enable Full Access.";
-"infoCalendarAccessWriteOnly" = "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.";
+"infoCalendarAccessDeniedByUser" = "Full Access is required to your calendars.\n\nGo to iPhone Settings > Apps > %@ > Calendars and enable Full Access.";
+"infoCalendarAccessWriteOnly" = "You cannot use Calendar Share until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.";
 "infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
 "settingsviews_CalenderIntervalTitle" = "Event Interval";
 "settingsviews_CalenderIntervalMessage" = "Minimum interval between two calendar events";
@@ -390,3 +390,38 @@
 "sensorNoiseSensitivitySensitive" = "Sensitive";
 "sensorNoiseSensitivityNormal" = "Normal";
 "sensorNoiseSensitivityPermissive" = "Permissive";
+
+/// Calendar Share Settings - alias row title
+"calendarShareAlias" = "Alias";
+/// Calendar Share Settings - alias editor description
+"calendarShareAliasMessage" = "This name is sent to follower devices.";
+/// Calendar Share Settings - connection section footer
+"calendarShareConnectionFooter" = "Select a shared calendar that follower devices can also access. An iCloud shared calendar is recommended for best operation.";
+/// Calendar Share Settings - share status section and row title
+"calendarShareStatus" = "Share Status";
+/// Calendar Share Settings - share status section footer
+"calendarShareStatusFooter" = "Include History adds recent 5-minute readings to each payload so followers can fill missed values. To help reliability, choose the lowest history amount that works well.";
+/// Calendar Share Settings - calendar event preview section title
+"calendarEventPreview" = "Calendar Event";
+/// Calendar Share Settings - calendar event display/settings section footer
+"calendarEventSettingsFooter" = "These options only change the visible calendar event title.";
+/// Calendar Share Settings - history window row title
+"calendarShareIncludeHistory" = "Include History";
+/// Calendar Share Settings - text in row where user needs to say if the visual target indicator should be displayed or not
+"settingsviews_displayVisualIndicatorInCalendarEvent" = "Visual Indicator";
+/// Calendar Share and Shared Calendar Settings - last shared value row title
+"calendarShareLastValue" = "Last Value";
+/// Shared Calendar Settings - historical readings section title
+"calendarFollowHistoricalReadings" = "Historical Readings";
+/// Shared Calendar Settings - historical readings count row title
+"calendarFollowHistoricalCount" = "Count";
+/// Shared Calendar Settings - first historical reading row title
+"calendarFollowFirstHistoricalReading" = "First Reading";
+/// Shared Calendar Settings - shown when latest payload has no historical readings
+"calendarFollowNoHistoricalData" = "No historical data found";
+/// Shared Calendar Settings - calendar selection section footer
+"calendarFollowCalendarFooter" = "Select the calendar shared by the master iPhone. For best results, use a shared iCloud calendar.";
+/// Shared Calendar Settings - status section footer
+"calendarFollowStatusFooter" = "Shared Calendar reads the latest encoded event notes from the selected calendar during background updates.";
+/// Shared Calendar Settings - historical readings section footer
+"calendarFollowHistoricalReadingsFooter" = "Historical readings from the latest payload are imported only when they are missing locally.";

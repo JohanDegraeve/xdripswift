@@ -7,16 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		BA0000010000000000000001 /* BackupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000011 /* BackupModels.swift */; };
-		BA0000010000000000000002 /* BackupCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000012 /* BackupCrypto.swift */; };
-		BA0000010000000000000003 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000013 /* BackupService.swift */; };
-		BA0000010000000000000004 /* DataManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000014 /* DataManagementView.swift */; };
-		BA0000010000000000000005 /* DataManagementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000015 /* DataManagementService.swift */; };
-		BA0000010000000000000006 /* DataDeletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000016 /* DataDeletionView.swift */; };
-		BA0000010000000000000007 /* NightscoutImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000017 /* NightscoutImportService.swift */; };
-		BA0000010000000000000008 /* NightscoutImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000018 /* NightscoutImportView.swift */; };
-		BA0000010000000000000009 /* ManageDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000019 /* ManageDataView.swift */; };
-		BA000001000000000000000A /* ImportDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA000001000000000000001A /* ImportDataView.swift */; };
 		07ECB18D91AE096E637D1393 /* AlertsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */; };
 		16A7F56E1D1ED24F03F2070F /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
 		1E83ECCFB4B5916FC5738267 /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
@@ -54,6 +44,7 @@
 		472596052B76301F00459D12 /* WatchManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 472596042B76301F00459D12 /* WatchManager.swift */; };
 		4733B93E2AD17C99001D609D /* FollowerBgReading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4733B93D2AD17C99001D609D /* FollowerBgReading.swift */; };
 		4733B9402AD17D15001D609D /* FollowerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4733B93F2AD17D15001D609D /* FollowerDelegate.swift */; };
+		4733B9422FF4C100001D609D /* CalendarFollowManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4733B9412FF4C100001D609D /* CalendarFollowManager.swift */; };
 		4734FF552BEFE3F200C7115A /* AlertNotificationDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4734FF542BEFE3F200C7115A /* AlertNotificationDictionary.swift */; };
 		4734FF562BEFE3F200C7115A /* AlertNotificationDictionary.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4734FF542BEFE3F200C7115A /* AlertNotificationDictionary.swift */; };
 		4734FF572BF13B9C00C7115A /* TextsCommon.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8BDD44F221CAA64006EAB84 /* TextsCommon.swift */; };
@@ -258,11 +249,6 @@
 		4C2000072F65000100000001 /* BluetoothPeripheralDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2000082F65000100000001 /* BluetoothPeripheralDetailView.swift */; };
 		4C2000092F65000100000001 /* BluetoothPeripheralSettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C20000A2F65000100000001 /* BluetoothPeripheralSettingsRow.swift */; };
 		4D10C0042FEF000100000001 /* GlucoseChartScrollCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D10C0032FEF000100000001 /* GlucoseChartScrollCoordinator.swift */; };
-		4E6000012FF2000100000001 /* SensorNoiseCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6000112FF2000100000001 /* SensorNoiseCalculator.swift */; };
-		4E6000022FF2000100000001 /* SensorNoiseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6000122FF2000100000001 /* SensorNoiseManager.swift */; };
-		4E6100012FF3000100000001 /* SensorNoiseSample+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6100112FF3000100000001 /* SensorNoiseSample+CoreDataClass.swift */; };
-		4E6100022FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6100122FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift */; };
-		4E6100032FF3000100000001 /* SensorNoiseHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6100132FF3000100000001 /* SensorNoiseHistoryView.swift */; };
 		4D20C0022FF1000100000001 /* RootHomeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0012FF1000100000001 /* RootHomeState.swift */; };
 		4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0032FF1000100000001 /* RootHomeView.swift */; };
 		4D20C0062FF1000100000001 /* ConstantsAppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0052FF1000100000001 /* ConstantsAppColors.swift */; };
@@ -271,8 +257,23 @@
 		4D7180032FE8000100000001 /* CGMMedtrumTouchCareNanoTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7180042FE8000100000001 /* CGMMedtrumTouchCareNanoTransmitter.swift */; };
 		4D7180072FE8000100000001 /* MedtrumTouchCareNano+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7180082FE8000100000001 /* MedtrumTouchCareNano+CoreDataClass.swift */; };
 		4D7180092FE8000100000001 /* MedtrumTouchCareNano+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D71800A2FE8000100000001 /* MedtrumTouchCareNano+CoreDataProperties.swift */; };
+		4E6000012FF2000100000001 /* SensorNoiseCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6000112FF2000100000001 /* SensorNoiseCalculator.swift */; };
+		4E6000022FF2000100000001 /* SensorNoiseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6000122FF2000100000001 /* SensorNoiseManager.swift */; };
+		4E6100012FF3000100000001 /* SensorNoiseSample+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6100112FF3000100000001 /* SensorNoiseSample+CoreDataClass.swift */; };
+		4E6100022FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6100122FF3000100000001 /* SensorNoiseSample+CoreDataProperties.swift */; };
+		4E6100032FF3000100000001 /* SensorNoiseHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E6100132FF3000100000001 /* SensorNoiseHistoryView.swift */; };
 		745981A52E1F1B0F85780B06 /* GlucoseChartState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */; };
 		7DDD89BD4ECFCE7BDA8D3AE2 /* SettingsSharedUtilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */; };
+		BA0000010000000000000001 /* BackupModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000011 /* BackupModels.swift */; };
+		BA0000010000000000000002 /* BackupCrypto.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000012 /* BackupCrypto.swift */; };
+		BA0000010000000000000003 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000013 /* BackupService.swift */; };
+		BA0000010000000000000004 /* DataManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000014 /* DataManagementView.swift */; };
+		BA0000010000000000000005 /* DataManagementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000015 /* DataManagementService.swift */; };
+		BA0000010000000000000006 /* DataDeletionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000016 /* DataDeletionView.swift */; };
+		BA0000010000000000000007 /* NightscoutImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000017 /* NightscoutImportService.swift */; };
+		BA0000010000000000000008 /* NightscoutImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000018 /* NightscoutImportView.swift */; };
+		BA0000010000000000000009 /* ManageDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA0000010000000000000019 /* ManageDataView.swift */; };
+		BA000001000000000000000A /* ImportDataView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA000001000000000000001A /* ImportDataView.swift */; };
 		C2385D0CA6579919114B060A /* AlertTypesSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */; };
 		C8BA6BBA5746888144511D55 /* GlucoseChartStateManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 685B5F8D633F5492574F0567 /* GlucoseChartStateManager.swift */; };
 		CE1B2FE025D0264B00F642F5 /* LaunchScreen.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE1B2FD125D0264900F642F5 /* LaunchScreen.strings */; };
@@ -526,6 +527,7 @@
 		F8A5EEB2257CEC290085E660 /* LibreNFC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEB1257CEC290085E660 /* LibreNFC.swift */; };
 		F8A5EEB8257CF2940085E660 /* TextsLibreNFC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEB7257CF2940085E660 /* TextsLibreNFC.swift */; };
 		F8A5EEC2257D18DC0085E660 /* LibreNFCDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A5EEC1257D18DC0085E660 /* LibreNFCDelegate.swift */; };
+		F8A8F0022FF4000100000001 /* BgReading+LoopShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A8F0012FF4000100000001 /* BgReading+LoopShare.swift */; };
 		F8AC425E21ADEBD60078C348 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425D21ADEBD60078C348 /* AppDelegate.swift */; };
 		F8AC426021ADEBD60078C348 /* RootApplicationCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8AC425F21ADEBD60078C348 /* RootApplicationCoordinator.swift */; };
 		F8AC426521ADEBD60078C348 /* RootTab.strings in Resources */ = {isa = PBXBuildFile; fileRef = F8AC426321ADEBD60078C348 /* RootTab.strings */; };
@@ -619,7 +621,6 @@
 		F8DF766223E390D100063910 /* BLEPeripheral+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF766123E390D100063910 /* BLEPeripheral+CoreDataProperties.swift */; };
 		F8DF766423E781C100063910 /* BLEPeripheralAccessor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8DF766323E781C100063910 /* BLEPeripheralAccessor.swift */; };
 		F8E0475E28CC8E330049D8C9 /* GlucoseData+LoopShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */; };
-		F8A8F0022FF4000100000001 /* BgReading+LoopShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8A8F0012FF4000100000001 /* BgReading+LoopShare.swift */; };
 		F8E3A2A323D4E7E200E5E98A /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */; };
 		F8E3A2A923D906C200E5E98A /* CalendarManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2A823D906C200E5E98A /* CalendarManager.swift */; };
 		F8E3A2AB23DA520B00E5E98A /* ConstantsCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8E3A2AA23DA520B00E5E98A /* ConstantsCalendar.swift */; };
@@ -791,16 +792,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		BA0000010000000000000011 /* BackupModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupModels.swift; sourceTree = "<group>"; };
-		BA0000010000000000000012 /* BackupCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupCrypto.swift; sourceTree = "<group>"; };
-		BA0000010000000000000013 /* BackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupService.swift; sourceTree = "<group>"; };
-		BA0000010000000000000014 /* DataManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagementView.swift; sourceTree = "<group>"; };
-		BA0000010000000000000015 /* DataManagementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagementService.swift; sourceTree = "<group>"; };
-		BA0000010000000000000016 /* DataDeletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataDeletionView.swift; sourceTree = "<group>"; };
-		BA0000010000000000000017 /* NightscoutImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutImportService.swift; sourceTree = "<group>"; };
-		BA0000010000000000000018 /* NightscoutImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutImportView.swift; sourceTree = "<group>"; };
-		BA0000010000000000000019 /* ManageDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageDataView.swift; sourceTree = "<group>"; };
-		BA000001000000000000001A /* ImportDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportDataView.swift; sourceTree = "<group>"; };
 		102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlertTypesSettingsView.swift; sourceTree = "<group>"; };
 		198D44C4260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Alerts.strings; sourceTree = "<group>"; };
 		198D44C5260A3A3300A2B4A2 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
@@ -887,6 +878,7 @@
 		472596042B76301F00459D12 /* WatchManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchManager.swift; sourceTree = "<group>"; };
 		4733B93D2AD17C99001D609D /* FollowerBgReading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerBgReading.swift; sourceTree = "<group>"; };
 		4733B93F2AD17D15001D609D /* FollowerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FollowerDelegate.swift; sourceTree = "<group>"; };
+		4733B9412FF4C100001D609D /* CalendarFollowManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarFollowManager.swift; sourceTree = "<group>"; };
 		4734FF542BEFE3F200C7115A /* AlertNotificationDictionary.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertNotificationDictionary.swift; sourceTree = "<group>"; };
 		473775812C14D8C100525B90 /* NotificationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationView.swift; sourceTree = "<group>"; };
 		473D9ECD2C2DC53A00364060 /* LoopShareType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopShareType.swift; sourceTree = "<group>"; };
@@ -1067,6 +1059,16 @@
 		666E283926F7E54C00ACE4DF /* Version.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = xDrip/Version.xcconfig; sourceTree = "<group>"; };
 		685B5F8D633F5492574F0567 /* GlucoseChartStateManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseChartStateManager.swift; sourceTree = "<group>"; };
 		763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AlertsSettingsView.swift; sourceTree = "<group>"; };
+		BA0000010000000000000011 /* BackupModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupModels.swift; sourceTree = "<group>"; };
+		BA0000010000000000000012 /* BackupCrypto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupCrypto.swift; sourceTree = "<group>"; };
+		BA0000010000000000000013 /* BackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupService.swift; sourceTree = "<group>"; };
+		BA0000010000000000000014 /* DataManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagementView.swift; sourceTree = "<group>"; };
+		BA0000010000000000000015 /* DataManagementService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagementService.swift; sourceTree = "<group>"; };
+		BA0000010000000000000016 /* DataDeletionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataDeletionView.swift; sourceTree = "<group>"; };
+		BA0000010000000000000017 /* NightscoutImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutImportService.swift; sourceTree = "<group>"; };
+		BA0000010000000000000018 /* NightscoutImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NightscoutImportView.swift; sourceTree = "<group>"; };
+		BA0000010000000000000019 /* ManageDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManageDataView.swift; sourceTree = "<group>"; };
+		BA000001000000000000001A /* ImportDataView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportDataView.swift; sourceTree = "<group>"; };
 		CD00FB5270FD0E5E2F710BE6 /* TimeScheduleView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TimeScheduleView.swift; sourceTree = "<group>"; };
 		CE1B2FC825D0261500F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Alerts.strings; sourceTree = "<group>"; };
 		CE1B2FCD25D0264900F642F5 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/AlertTypesSettingsView.strings; sourceTree = "<group>"; };
@@ -1521,6 +1523,7 @@
 		F8A5EEB7257CF2940085E660 /* TextsLibreNFC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextsLibreNFC.swift; sourceTree = "<group>"; };
 		F8A5EEC1257D18DC0085E660 /* LibreNFCDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibreNFCDelegate.swift; sourceTree = "<group>"; };
 		F8A5EEC5257EDC910085E660 /* xdripDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = xdripDebug.entitlements; sourceTree = "<group>"; };
+		F8A8F0012FF4000100000001 /* BgReading+LoopShare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BgReading+LoopShare.swift"; sourceTree = "<group>"; };
 		F8AC425A21ADEBD60078C348 /* xdrip.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = xdrip.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8AC425D21ADEBD60078C348 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F8AC425F21ADEBD60078C348 /* RootApplicationCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootApplicationCoordinator.swift; sourceTree = "<group>"; };
@@ -1674,7 +1677,6 @@
 		F8DF766123E390D100063910 /* BLEPeripheral+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "BLEPeripheral+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		F8DF766323E781C100063910 /* BLEPeripheralAccessor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEPeripheralAccessor.swift; sourceTree = "<group>"; };
 		F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GlucoseData+LoopShare.swift"; sourceTree = "<group>"; };
-		F8A8F0012FF4000100000001 /* BgReading+LoopShare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "BgReading+LoopShare.swift"; sourceTree = "<group>"; };
 		F8E3A2A223D4E7E200E5E98A /* Default-568h@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-568h@2x.png"; sourceTree = "<group>"; };
 		F8E3A2A823D906C200E5E98A /* CalendarManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalendarManager.swift; sourceTree = "<group>"; };
 		F8E3A2AA23DA520B00E5E98A /* ConstantsCalendar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsCalendar.swift; sourceTree = "<group>"; };
@@ -1843,16 +1845,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		BA0000010000000000000020 /* Backup */ = {
-			isa = PBXGroup;
-			children = (
-				BA0000010000000000000011 /* BackupModels.swift */,
-				BA0000010000000000000012 /* BackupCrypto.swift */,
-				BA0000010000000000000013 /* BackupService.swift */,
-			);
-			path = Backup;
-			sourceTree = "<group>";
-		};
 		4716A4F22B406C3D00419052 /* xDrip Widget */ = {
 			isa = PBXGroup;
 			children = (
@@ -2062,6 +2054,7 @@
 			children = (
 				47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */,
 				4733B93D2AD17C99001D609D /* FollowerBgReading.swift */,
+				4733B9412FF4C100001D609D /* CalendarFollowManager.swift */,
 				47DB06CF2A70141E00267BE3 /* FollowerDataSourceType.swift */,
 				4733B93F2AD17D15001D609D /* FollowerDelegate.swift */,
 			);
@@ -2222,6 +2215,15 @@
 			path = TouchCareNano;
 			sourceTree = "<group>";
 		};
+		4E6000212FF2000100000001 /* SensorNoise */ = {
+			isa = PBXGroup;
+			children = (
+				4E6000112FF2000100000001 /* SensorNoiseCalculator.swift */,
+				4E6000122FF2000100000001 /* SensorNoiseManager.swift */,
+			);
+			path = SensorNoise;
+			sourceTree = "<group>";
+		};
 		6E033988052CBCF93DBE169B /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -2248,6 +2250,16 @@
 				F8E51D6824549E2C001C9E5A /* SettingsViewTraceSettingsViewModel.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		BA0000010000000000000020 /* Backup */ = {
+			isa = PBXGroup;
+			children = (
+				BA0000010000000000000011 /* BackupModels.swift */,
+				BA0000010000000000000012 /* BackupCrypto.swift */,
+				BA0000010000000000000013 /* BackupService.swift */,
+			);
+			path = Backup;
 			sourceTree = "<group>";
 		};
 		D4E499A9277B4363000F8CBA /* Treatments */ = {
@@ -2474,15 +2486,6 @@
 			children = (
 			);
 			name = "Recovered References";
-			sourceTree = "<group>";
-		};
-		4E6000212FF2000100000001 /* SensorNoise */ = {
-			isa = PBXGroup;
-			children = (
-				4E6000112FF2000100000001 /* SensorNoiseCalculator.swift */,
-				4E6000122FF2000100000001 /* SensorNoiseManager.swift */,
-			);
-			path = SensorNoise;
 			sourceTree = "<group>";
 		};
 		F85DC2F621D25E3A00B9F74A /* Managers */ = {
@@ -2930,11 +2933,11 @@
 		};
 		F8E51D5B2448D8A3001C9E5A /* Loop */ = {
 			isa = PBXGroup;
-				children = (
-					F8A8F0012FF4000100000001 /* BgReading+LoopShare.swift */,
-					F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */,
-					F855422A2B7182C60058CE09 /* LoopFollowManager.swift */,
-					F8E51D5C2448D8B5001C9E5A /* LoopManager.swift */,
+			children = (
+				F8A8F0012FF4000100000001 /* BgReading+LoopShare.swift */,
+				F8E0475D28CC8E330049D8C9 /* GlucoseData+LoopShare.swift */,
+				F855422A2B7182C60058CE09 /* LoopFollowManager.swift */,
+				F8E51D5C2448D8B5001C9E5A /* LoopManager.swift */,
 				473D9ECD2C2DC53A00364060 /* LoopShareType.swift */,
 			);
 			path = Loop;
@@ -4269,12 +4272,12 @@
 				4D10C0042FEF000100000001 /* GlucoseChartScrollCoordinator.swift in Sources */,
 				C8BA6BBA5746888144511D55 /* GlucoseChartStateManager.swift in Sources */,
 				4D20C0022FF1000100000001 /* RootHomeState.swift in Sources */,
-					4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */,
-					4D20C00A2FF1000100000001 /* RootTabView.swift in Sources */,
-					D4E499AD277B4CE7000F8CBA /* DateOnly.swift in Sources */,
-					F8A8F0022FF4000100000001 /* BgReading+LoopShare.swift in Sources */,
-					F8E51D5D2448D8B5001C9E5A /* LoopManager.swift in Sources */,
-					473D9ECE2C2DC53A00364060 /* LoopShareType.swift in Sources */,
+				4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */,
+				4D20C00A2FF1000100000001 /* RootTabView.swift in Sources */,
+				D4E499AD277B4CE7000F8CBA /* DateOnly.swift in Sources */,
+				F8A8F0022FF4000100000001 /* BgReading+LoopShare.swift in Sources */,
+				F8E51D5D2448D8B5001C9E5A /* LoopManager.swift in Sources */,
+				473D9ECE2C2DC53A00364060 /* LoopShareType.swift in Sources */,
 				F85DC2EF21CFE2F500B9F74A /* Sensor+CoreDataProperties.swift in Sources */,
 				F8297F5A238EE14E00D74D66 /* TextsBluetoothPeripheralView.swift in Sources */,
 				4E6000012FF2000100000001 /* SensorNoiseCalculator.swift in Sources */,
@@ -4286,6 +4289,7 @@
 				F8A2BC3525DB0D6D001D1E78 /* BluetoothPeripheralManager+BluetoothTransmitterDelegate.swift in Sources */,
 				F8F9722323A5915900C3F17D /* LibreDataParser.swift in Sources */,
 				F8E51D5F2448E2E8001C9E5A /* ConstantsShareWithLoop.swift in Sources */,
+				4733B9422FF4C100001D609D /* CalendarFollowManager.swift in Sources */,
 				F8F9722923A5915900C3F17D /* CGMTransmitter.swift in Sources */,
 				474606822B96358E00AC9214 /* WidgetSharedUserDefaultsModel.swift in Sources */,
 				F8A389ED23342EB10010F405 /* ConstantsNightscout.swift in Sources */,
