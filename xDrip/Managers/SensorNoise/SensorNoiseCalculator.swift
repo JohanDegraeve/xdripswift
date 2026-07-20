@@ -60,7 +60,7 @@ enum ConstantsSensorNoise {
     ///
     /// For example, if the default would usually be 1.0. Adjust upwards to 1.2 to make the UI
     /// more sensitive when showing noise
-    static let baseNoiseClassificationMultiplier = 1.3
+    static let baseNoiseClassificationMultiplier = 1.0
 
     /// Interprets stored noise values more strictly by classifying them x% higher than measured.
     ///
