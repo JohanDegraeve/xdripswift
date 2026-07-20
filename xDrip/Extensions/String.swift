@@ -1,4 +1,4 @@
-import CryptoSwift
+import CryptoKit
 import Foundation
 
 extension String {
@@ -58,13 +58,13 @@ extension String {
     }
     
     func sha1() -> String {
-        // sha1() here is a function in CryptoSwift Library
-        return Data(self.utf8).sha1().hexEncodedString()
+        // CryptoKit returns a digest sequence; keep the previous lowercase hex string format.
+        return Insecure.SHA1.hash(data: Data(self.utf8)).map { String(format: "%02x", $0) }.joined()
     }
         
     func sha256() -> String {
-        // sha256() here is a function in CryptoSwift Library
-        return Data(self.utf8).sha256().hexEncodedString()
+        // CryptoKit returns a digest sequence; keep the previous lowercase hex string format.
+        return SHA256.hash(data: Data(self.utf8)).map { String(format: "%02x", $0) }.joined()
     }
     
     /// checks if string length is > 0 and if so returns self, otherwise returns nil

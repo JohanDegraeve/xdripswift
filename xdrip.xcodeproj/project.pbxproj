@@ -103,9 +103,6 @@
 		476FA90C2BDC1EBA0091866C /* WatchComplication.strings in Resources */ = {isa = PBXBuildFile; fileRef = 476FA90A2BDC1EBA0091866C /* WatchComplication.strings */; };
 		476FA90E2BDC1EF80091866C /* TextsWatchComplication.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476FA90D2BDC1EF80091866C /* TextsWatchComplication.swift */; };
 		476FE8FF2B2F1D1700537E0A /* ConstantsFollower.swift in Sources */ = {isa = PBXBuildFile; fileRef = 476FE8FE2B2F1D1700537E0A /* ConstantsFollower.swift */; };
-		4779BCEE2974306300515714 /* ActionClosurable in Frameworks */ = {isa = PBXBuildFile; productRef = 4779BCED2974306300515714 /* ActionClosurable */; };
-		4779BCF12974307700515714 /* CryptoSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4779BCF02974307700515714 /* CryptoSwift */; };
-		4779BCF42974308F00515714 /* PieCharts in Frameworks */ = {isa = PBXBuildFile; productRef = 4779BCF32974308F00515714 /* PieCharts */; };
 		477B2C7E2B432775002F64A4 /* LiveActivityType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 477B2C7D2B432775002F64A4 /* LiveActivityType.swift */; };
 		4787058E2C4D76FE001C3170 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4787058D2C4D76FE001C3170 /* RootView.swift */; };
 		478705932C4D7B90001C3170 /* BigNumberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 478705922C4D7B90001C3170 /* BigNumberView.swift */; };
@@ -301,7 +298,6 @@
 		F8025E5421EE8D2100ECF0C0 /* Libre1Calibrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F8025E5321EE8D2100ECF0C0 /* Libre1Calibrator.swift */; };
 		F804870C2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = F804870A2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift */; };
 		F804870D2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = F804870B2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift */; };
-		F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */; };
 		F80859272364355F00F3829D /* ConstantsGlucoseChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80859262364355F00F3829D /* ConstantsGlucoseChart.swift */; };
 		F80859292364D61B00F3829D /* UserDefaults+charts.swift in Sources */ = {isa = PBXBuildFile; fileRef = F80859282364D61B00F3829D /* UserDefaults+charts.swift */; };
 		F808D2CA240325E40084B5DB /* CGMBubbleTransmitterDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F808D2C9240325E40084B5DB /* CGMBubbleTransmitterDelegate.swift */; };
@@ -1126,7 +1122,6 @@
 		F8025E5321EE8D2100ECF0C0 /* Libre1Calibrator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Libre1Calibrator.swift; sourceTree = "<group>"; };
 		F804870A2336D90200EBDDB7 /* M5Stack+CoreDataClass.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "M5Stack+CoreDataClass.swift"; sourceTree = "<group>"; };
 		F804870B2336D90200EBDDB7 /* M5Stack+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "M5Stack+CoreDataProperties.swift"; sourceTree = "<group>"; };
-		F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ActionClosureable-extension.swift"; sourceTree = "<group>"; };
 		F80859262364355F00F3829D /* ConstantsGlucoseChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsGlucoseChart.swift; sourceTree = "<group>"; };
 		F80859282364D61B00F3829D /* UserDefaults+charts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+charts.swift"; sourceTree = "<group>"; };
 		F808D2C9240325E40084B5DB /* CGMBubbleTransmitterDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMBubbleTransmitterDelegate.swift; sourceTree = "<group>"; };
@@ -1834,11 +1829,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				F81F3C4225D1D91300520946 /* CoreNFC.framework in Frameworks */,
-				4779BCEE2974306300515714 /* ActionClosurable in Frameworks */,
 				F821CF9722AE589E005C1E43 /* HealthKit.framework in Frameworks */,
 				47DE41AA2B860DF00041DA19 /* WatchConnectivity.framework in Frameworks */,
-				4779BCF42974308F00515714 /* PieCharts in Frameworks */,
-				4779BCF12974307700515714 /* CryptoSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2302,7 +2294,6 @@
 		F8025C0B21D9513400ECF0C0 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				F80610C3222D4E4D00D8F236 /* ActionClosureable-extension.swift */,
 				F8FDD6CA2553385000625B49 /* Array.swift */,
 				F8E51D602448E695001C9E5A /* Bundle.swift */,
 				F8025C0921D94FD700ECF0C0 /* CBManagerState.swift */,
@@ -3469,9 +3460,6 @@
 			);
 			name = xdrip;
 			packageProductDependencies = (
-				4779BCED2974306300515714 /* ActionClosurable */,
-				4779BCF02974307700515714 /* CryptoSwift */,
-				4779BCF32974308F00515714 /* PieCharts */,
 			);
 			productName = xdrip;
 			productReference = F8AC425A21ADEBD60078C348 /* xdrip.app */;
@@ -3542,9 +3530,6 @@
 			);
 			mainGroup = F8AC425121ADEBD60078C348;
 			packageReferences = (
-				4779BCEC2974306300515714 /* XCRemoteSwiftPackageReference "ActionClosurable" */,
-				4779BCEF2974307700515714 /* XCRemoteSwiftPackageReference "CryptoSwift" */,
-				4779BCF22974308F00515714 /* XCRemoteSwiftPackageReference "PieCharts" */,
 			);
 			productRefGroup = F8AC425B21ADEBD60078C348 /* Products */;
 			projectDirPath = "";
@@ -4064,7 +4049,6 @@
 				F8AF36152455C6F700B5977B /* ConstantsTrace.swift in Sources */,
 				F8F971B723A5914D00C3F17D /* BluetoothPeripheralType.swift in Sources */,
 				4734FF552BEFE3F200C7115A /* AlertNotificationDictionary.swift in Sources */,
-				F80610C4222D4E4D00D8F236 /* ActionClosureable-extension.swift in Sources */,
 				F8F1670E27273EA7001AA3D8 /* GlucoseDataRxMessage.swift in Sources */,
 				F821CF9522ADB0D7005C1E43 /* HealthKitManager.swift in Sources */,
 				F8CB59CE27444D6300BA199E /* DexcomSessionStopResponse.swift in Sources */,
@@ -5462,48 +5446,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		4779BCEC2974306300515714 /* XCRemoteSwiftPackageReference "ActionClosurable" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/takasek/ActionClosurable.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
-		4779BCEF2974307700515714 /* XCRemoteSwiftPackageReference "CryptoSwift" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/krzyzanowskim/CryptoSwift.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.4.0;
-			};
-		};
-		4779BCF22974308F00515714 /* XCRemoteSwiftPackageReference "PieCharts" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/paulplant/PieCharts";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		4779BCED2974306300515714 /* ActionClosurable */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4779BCEC2974306300515714 /* XCRemoteSwiftPackageReference "ActionClosurable" */;
-			productName = ActionClosurable;
-		};
-		4779BCF02974307700515714 /* CryptoSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4779BCEF2974307700515714 /* XCRemoteSwiftPackageReference "CryptoSwift" */;
-			productName = CryptoSwift;
-		};
-		4779BCF32974308F00515714 /* PieCharts */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4779BCF22974308F00515714 /* XCRemoteSwiftPackageReference "PieCharts" */;
-			productName = PieCharts;
-		};
 /* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */

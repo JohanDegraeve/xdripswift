@@ -206,11 +206,11 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
         if error == nil && characteristic.isNotifying {
             UserDefaults.standard.libreActiveSensorUnlockCount += 1
             
-            trace("sensorid as data =  %{public}@, patchinfo = %{public}@, unlockcode = %{public}@, unlockcount = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, libreSensorUID.toHexString(), librePatchInfo.toHexString(), UserDefaults.standard.libreActiveSensorUnlockCode.description, UserDefaults.standard.libreActiveSensorUnlockCount.description)
+            trace("sensorid as data =  %{public}@, patchinfo = %{public}@, unlockcode = %{public}@, unlockcount = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, libreSensorUID.hexEncodedString(), librePatchInfo.hexEncodedString(), UserDefaults.standard.libreActiveSensorUnlockCode.description, UserDefaults.standard.libreActiveSensorUnlockCount.description)
             
             let unLockPayLoad = Data(Libre2BLEUtilities.streamingUnlockPayload(sensorUID: libreSensorUID, info: librePatchInfo, enableTime: UserDefaults.standard.libreActiveSensorUnlockCode, unlockCount: UserDefaults.standard.libreActiveSensorUnlockCount))
             
-            trace("in peripheral didUpdateNotificationStateFor, writing streaming unlock payload: %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, unLockPayLoad.toHexString())
+            trace("in peripheral didUpdateNotificationStateFor, writing streaming unlock payload: %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, unLockPayLoad.hexEncodedString())
                 
             // user may have chosen to run xDrip4iOS in parallel with other apps, in this case suppress sending unlockpayload
             if !UserDefaults.standard.suppressUnLockPayLoad {
@@ -290,7 +290,7 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
                 } else {
                     libre1DerivedAlgorithmParametersAsString = "unknown"
                 }
-                trace("in peripheral didUpdateValueFor libreSensorUID = %{public}@, libre1DerivedAlgorithmParameters = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .debug, sensorUID.toHexString(), libre1DerivedAlgorithmParametersAsString)
+                trace("in peripheral didUpdateValueFor libreSensorUID = %{public}@, libre1DerivedAlgorithmParameters = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .debug, sensorUID.hexEncodedString(), libre1DerivedAlgorithmParametersAsString)
             }
             
             do {
@@ -379,7 +379,7 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {}
 
 extension CGMLibre2Transmitter: LibreNFCDelegate {
     func received(fram: Data) {
-        trace("received fram :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, fram.toHexString())
+        trace("received fram :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, fram.hexEncodedString())
         
         // if we already know the patchinfo (which we should because normally received(sensorUID: Data, patchInfo: Data) gets called before received(fram: Data), then patchInfo should not be nil
         // same for sensorUID
@@ -400,7 +400,7 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
         UserDefaults.standard.libreSensorUID = sensorUID
         
         // store the sensorUID as tempSensorSerialNumber (as LibreSensorSerialNumber)
-        let receivedSensorSerialNumber = LibreSensorSerialNumber(withUID: sensorUID, with: LibreSensorType.type(patchInfo: patchInfo.toHexString()))
+        let receivedSensorSerialNumber = LibreSensorSerialNumber(withUID: sensorUID, with: LibreSensorType.type(patchInfo: patchInfo.hexEncodedString()))
         if let receivedSensorSerialNumber = receivedSensorSerialNumber {
             tempSensorSerialNumber = receivedSensorSerialNumber
         }
@@ -424,10 +424,10 @@ extension CGMLibre2Transmitter: LibreNFCDelegate {
             }
             
         } else {
-            trace("could not created sensor serial number from received sensorUID, sensorUID = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, sensorUID.toHexString())
+            trace("could not created sensor serial number from received sensorUID, sensorUID = %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, sensorUID.hexEncodedString())
         }
         
-        trace("patchInfo received :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, patchInfo.toHexString())
+        trace("patchInfo received :  %{public}@", log: log, category: ConstantsLog.categoryCGMLibre2, type: .info, patchInfo.hexEncodedString())
         
         UserDefaults.standard.librePatchInfo = patchInfo
     }

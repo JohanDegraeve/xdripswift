@@ -336,16 +336,16 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
             // Enable streaming
             let subCmd: Subcommand = .enableStreaming
             let cmd = self.nfcCommand(subCmd, unlockCode: self.unlockCode, patchInfo: patchInfo, sensorUID: sensorUID)
-            let info = "NFC: sending Libre 2 command to " + subCmd.description + " : code: 0x" + String(format: "%0X", cmd.code) + ", parameters: 0x" + cmd.parameters.toHexString() + "unlock code: " + self.unlockCode.description
+            let info = "NFC: sending Libre 2 command to " + subCmd.description + " : code: 0x" + String(format: "%0X", cmd.code) + ", parameters: 0x" + cmd.parameters.hexEncodedString() + "unlock code: " + self.unlockCode.description
             xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, info)
 
             do {
                 let response = try await customCommandAsync(tag: tag, code: Int(cmd.code), params: cmd.parameters)
-                let respLog = "NFC: '" + subCmd.description + " command response " + response.count.description + " bytes : 0x" + response.toHexString() + ", error: nil"
+                let respLog = "NFC: '" + subCmd.description + " command response " + response.count.description + " bytes : 0x" + response.hexEncodedString() + ", error: nil"
                 xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, respLog)
 
                 if subCmd == .enableStreaming && response.count == 6 {
-                    self.serialNumber = LibreSensorSerialNumber(withUID: sensorUID, with: LibreSensorType.type(patchInfo: patchInfo.toHexString()))?.serialNumber ?? "unknown"
+                    self.serialNumber = LibreSensorSerialNumber(withUID: sensorUID, with: LibreSensorType.type(patchInfo: patchInfo.hexEncodedString()))?.serialNumber ?? "unknown"
                     self.macAddress = Data(response.reversed()).hexEncodedString().uppercased()
 
                     let ok = "NFC: successfully enabled BLE streaming on Libre 2 " + self.serialNumber + " unlock code: " + self.unlockCode.description + " MAC address: " + self.macAddress
@@ -385,7 +385,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
         let readRawCommand = NFCCommand(code: 0xB3, parameters: Data([UInt8(addressToRead & 0x00FF), UInt8(addressToRead >> 8), wordsToRead]))
         
         if buffer.count == 0 {
-            xdrip.trace("NFC: sending 0x%{public}@ 0x07 0x%{public}@ command (%{public}@ read raw)", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, readRawCommand.code.description, readRawCommand.parameters.toHexString(), "libre 2")
+            xdrip.trace("NFC: sending 0x%{public}@ 0x07 0x%{public}@ command (%{public}@ read raw)", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, readRawCommand.code.description, readRawCommand.parameters.hexEncodedString(), "libre 2")
         }
 
         tagWrapper.tag.customCommand(requestFlags: .highDataRate, customCommandCode: Int(readRawCommand.code), customRequestParameters: readRawCommand.parameters) {
@@ -419,12 +419,12 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
         let backdoor = [UInt8]([0xDE, 0xAD, 0xBE, 0xEF]) // "deadbeef".bytes
         
         // Unlock
-        xdrip.trace("NFC: sending 0xa4 0x07 0x%{public}@ command (%{public}@ unlock)", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, Data(backdoor).toHexString(), "libre 2")
+        xdrip.trace("NFC: sending 0xa4 0x07 0x%{public}@ command (%{public}@ unlock)", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, Data(backdoor).hexEncodedString(), "libre 2")
 
         tagWrapper.tag.customCommand(requestFlags: .highDataRate, customCommandCode: 0xA4, customRequestParameters: Data(backdoor)) {
             response, error in
             
-            xdrip.trace("NFC: unlock command response: 0x%{public}@, error: %{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, response.toHexString(), error?.localizedDescription ?? "none")
+            xdrip.trace("NFC: unlock command response: 0x%{public}@, error: %{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, response.hexEncodedString(), error?.localizedDescription ?? "none")
             
             let addressToRead = (address / 8) * 8
             let startOffset = Int(address % 8)
@@ -456,7 +456,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                         // FIXME: doesn't work as the custom commands C1 or A5 for other chips
                         tagWrapper.tag.extendedWriteSingleBlock(requestFlags: .highDataRate, blockNumber: startBlock + i, dataBlock: blockToWrite) { error in
 
-                            var debugInfo = String(format: "%X", startBlock + i) + " " + Int(i + 1).description + " of " + blocks.description + " " + blockToWrite.toHexString() + " at 0x" + String(format: "%X", Int((startBlock + i) * 8))
+                            var debugInfo = String(format: "%X", startBlock + i) + " " + Int(i + 1).description + " of " + blocks.description + " " + blockToWrite.hexEncodedString() + " at 0x" + String(format: "%X", Int((startBlock + i) * 8))
                             
                             if let error = error {
                                 debugInfo = "NFC: error while writing block 0x" + debugInfo + " : " + error.localizedDescription
@@ -475,7 +475,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                 // Lock
                                 tagWrapper.tag.customCommand(requestFlags: .highDataRate, customCommandCode: 0xA2, customRequestParameters: Data(backdoor)) { response, error in
                                     
-                                    xdrip.trace("NFC: lock command response: 0x%{public}@, error: %{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, response.toHexString(), error?.localizedDescription ?? "none")
+                                    xdrip.trace("NFC: lock command response: 0x%{public}@, error: %{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, response.hexEncodedString(), error?.localizedDescription ?? "none")
                                     
                                     handler(address, data, error)
                                 }
@@ -511,7 +511,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                         tagWrapper.tag.writeMultipleBlocks(requestFlags: [.highDataRate, .address], blockRange: blockRange, dataBlocks: dataBlocksSnapshot) {
                             error in // TEST
 
-                            var debugInfo = String(format: "%X", startIndex) + " - 0x" + String(format: "%X", endIndex) + dataBlocksSnapshot.reduce("") { $0 + $1.toHexString() } + " at 0x" + String(format: "%X", (startBlock + i * requestBlocks) * 8)
+                            var debugInfo = String(format: "%X", startIndex) + " - 0x" + String(format: "%X", endIndex) + dataBlocksSnapshot.reduce("") { $0 + $1.hexEncodedString() } + " at 0x" + String(format: "%X", (startBlock + i * requestBlocks) * 8)
 
                             if error != nil {
                                 debugInfo = "NFC: error while writing multiple blocks 0x" + debugInfo + " : " + error!.localizedDescription
@@ -531,7 +531,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
                                 tagWrapper.tag.customCommand(requestFlags: .highDataRate, customCommandCode: 0xA2, customRequestParameters: Data(backdoor)) {
                                     response, error in
                                     
-                                    let debugInfo = "NFC: lock command response: 0x" + response.toHexString() + "error: " + (error?.localizedDescription ?? "none")
+                                    let debugInfo = "NFC: lock command response: 0x" + response.hexEncodedString() + "error: " + (error?.localizedDescription ?? "none")
                                     
                                     xdrip.trace("%{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, debugInfo)
                                     
@@ -552,7 +552,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
     }
     
     private func traceICIdentifier(tag: NFCISO15693Tag) {
-        xdrip.trace("NFC: IC identifier: %{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, tag.identifier.toHexString())
+        xdrip.trace("NFC: IC identifier: %{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, tag.identifier.hexEncodedString())
     }
    
     private func traceICManufacturer(tag: NFCISO15693Tag) {
@@ -567,7 +567,7 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
     }
     
     private func traceICSerialNumber(tag: NFCISO15693Tag) {
-        xdrip.trace("NFC: IC serial number: %{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, tag.icSerialNumber.toHexString())
+        xdrip.trace("NFC: IC serial number: %{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, tag.icSerialNumber.hexEncodedString())
     }
 
     private func traceROM(tag: NFCISO15693Tag) {
@@ -606,11 +606,11 @@ class LibreNFC: NSObject, NFCTagReaderSessionDelegate {
     }
     
     private func traceSensorUID(sensorUID: Data) {
-        xdrip.trace("NFC: sensorUID: %{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, sensorUID.toHexString())
+        xdrip.trace("NFC: sensorUID: %{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, sensorUID.hexEncodedString())
     }
     
     private func tracePatchInfo(patchInfo: Data) {
-        xdrip.trace("NFC: patchInfo: %{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, patchInfo.toHexString())
+        xdrip.trace("NFC: patchInfo: %{public}@", log: self.log, category: ConstantsLog.categoryLibreNFC, type: .info, patchInfo.hexEncodedString())
     }
     
     private func nfcCommand(_ code: Subcommand, unlockCode: UInt32, patchInfo: Data, sensorUID: Data) -> NFCCommand {
