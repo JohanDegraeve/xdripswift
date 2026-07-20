@@ -1337,13 +1337,7 @@ private struct RootHomeDataSourceView: View {
 
     var body: some View {
         HStack(spacing: 5) {
-            HStack(spacing: 5) {
-                if state.showsKeepAliveIcon {
-                    Image(systemName: state.keepAliveSystemImage)
-                        .font(.system(size: 15))
-                        .foregroundStyle(state.keepAliveColor)
-                }
-
+            HStack(spacing: 6) {
                 if sensorNoiseState.showsIndicator {
                     Circle()
                         .fill(sensorNoiseState.indicatorColor)
@@ -1360,9 +1354,15 @@ private struct RootHomeDataSourceView: View {
                         .fill(state.connectionColor)
                         .frame(width: 8, height: 8)
                 }
+                
+                if state.showsKeepAliveIcon {
+                    Image(systemName: state.keepAliveSystemImage)
+                        .font(.system(size: 15))
+                        .foregroundStyle(state.keepAliveColor)
+                }
 
                 Text(state.title)
-                    .font(.system(size: 13, weight: .bold))
+                    .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(ConstantsAppColors.dataSourceText)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
@@ -1373,7 +1373,7 @@ private struct RootHomeDataSourceView: View {
 
             HStack(spacing: 0) {
                 Text(dataSourceDetailText)
-                    .font(.system(size: 13))
+                    .font(.system(size: 14))
                     .foregroundStyle(dataSourceDetailColor)
                     .monospacedDigit()
                     .lineLimit(1)
@@ -1381,7 +1381,7 @@ private struct RootHomeDataSourceView: View {
 
                 if let maxAgeText {
                     Text(maxAgeText)
-                        .font(.system(size: 13))
+                        .font(.system(size: 14))
                         .foregroundStyle(ConstantsAppColors.dataSourceText)
                         .monospacedDigit()
                         .lineLimit(1)

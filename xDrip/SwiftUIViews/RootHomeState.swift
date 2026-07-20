@@ -692,7 +692,7 @@ final class RootHomeStateModel: ObservableObject {
               let lastHeartbeat = UserDefaults.standard.timeStampOfLastHeartBeat,
               let warningInterval = UserDefaults.standard.secondsUntilHeartBeatDisconnectWarning
         else {
-            return ConstantsAppColors.tertiaryText
+            return ConstantsAppColors.secondaryText
         }
 
         return lastHeartbeat > Date().addingTimeInterval(-warningInterval) ? ConstantsAppColors.normal : ConstantsAppColors.urgent
