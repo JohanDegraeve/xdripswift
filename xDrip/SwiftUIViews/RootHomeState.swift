@@ -591,7 +591,7 @@ final class RootHomeStateModel: ObservableObject {
             detail: detail,
             detailColor: detailColor,
             showsConnectionIcon: !isMaster,
-            connectionColor: followerConnectionIsRecent ? ConstantsAppColors.normal : ConstantsAppColors.urgent,
+            connectionColor: followerConnectionColor,
             showsKeepAliveIcon: !isMaster,
             keepAliveSystemImage: UserDefaults.standard.followerBackgroundKeepAliveType.keepAliveImageString,
             keepAliveColor: followerKeepAliveColor
@@ -685,6 +685,27 @@ final class RootHomeStateModel: ObservableObject {
         guard let lastConnection = UserDefaults.standard.timeStampOfLastFollowerConnection else { return false }
 
         return lastConnection > Date().addingTimeInterval(-Double(UserDefaults.standard.followerDataSourceType.secondsUntilFollowerDisconnectWarning))
+    }
+
+    private var followerConnectionColor: Color {
+        // Calendar Follow has its own payload status. Use this instead of the
+        // generic follower connection timestamp so the Home dot matches Settings.
+        if UserDefaults.standard.followerDataSourceType == .calendar {
+            switch CalendarShareStatus(rawValue: UserDefaults.standard.calendarFollowStatus) ?? .notConfigured {
+            case .active:
+                return ConstantsAppColors.normal
+            case .waiting:
+                return .yellow
+            case .noData, .notConfigured:
+                return .gray
+            case .stale:
+                return .orange
+            case .error:
+                return ConstantsAppColors.urgent
+            }
+        }
+
+        return followerConnectionIsRecent ? ConstantsAppColors.normal : ConstantsAppColors.urgent
     }
 
     private var followerKeepAliveColor: Color {
