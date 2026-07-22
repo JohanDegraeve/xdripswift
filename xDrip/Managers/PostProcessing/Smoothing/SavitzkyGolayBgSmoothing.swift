@@ -13,7 +13,7 @@ import Foundation
 /// Provenance:
 /// - This is not a new external port.
 /// - It reuses the existing open-source Savitzky-Golay utility already shipped in
-///   this repository under `xDrip/Utilities/SavitzkyGolayFilter`.
+///   this repository and kept beside the smoothing algorithm plugins.
 ///
 /// Algorithm references:
 /// - Original paper:

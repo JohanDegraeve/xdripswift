@@ -250,6 +250,16 @@
 		4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0032FF1000100000001 /* RootHomeView.swift */; };
 		4D20C0062FF1000100000001 /* ConstantsAppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0052FF1000100000001 /* ConstantsAppColors.swift */; };
 		4D20C00A2FF1000100000001 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0092FF1000100000001 /* RootTabView.swift */; };
+		4D21B0012FF8000100000001 /* RootHomeLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0012FF8000100000001 /* RootHomeLayout.swift */; };
+		4D21B0022FF8000100000001 /* RootHomeChartRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0022FF8000100000001 /* RootHomeChartRange.swift */; };
+		4D21B0032FF8000100000001 /* RootHomeToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0032FF8000100000001 /* RootHomeToolbarView.swift */; };
+		4D21B0042FF8000100000001 /* RootHomeStatusViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0042FF8000100000001 /* RootHomeStatusViews.swift */; };
+		4D21B0052FF8000100000001 /* RootHomeGlucoseReadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0052FF8000100000001 /* RootHomeGlucoseReadingView.swift */; };
+		4D21B0062FF8000100000001 /* RootHomeChartViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0062FF8000100000001 /* RootHomeChartViews.swift */; };
+		4D21B0072FF8000100000001 /* RootHomeSelectorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0072FF8000100000001 /* RootHomeSelectorView.swift */; };
+		4D21B0082FF8000100000001 /* RootHomeStatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0082FF8000100000001 /* RootHomeStatisticsView.swift */; };
+		4D21B0092FF8000100000001 /* RootHomeFooterViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0092FF8000100000001 /* RootHomeFooterViews.swift */; };
+		4D21B00A2FF8000100000001 /* RootHomeClockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A00A2FF8000100000001 /* RootHomeClockView.swift */; };
 		4D31C0012FF5000100000001 /* GenerateReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0012FF5000100000001 /* GenerateReportView.swift */; };
 		4D31C0022FF5000100000001 /* GenerateReportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0022FF5000100000001 /* GenerateReportViewModel.swift */; };
 		4D31C0032FF5000100000001 /* ReportAGPChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0032FF5000100000001 /* ReportAGPChartView.swift */; };
@@ -1053,6 +1063,16 @@
 		4D20C0032FF1000100000001 /* RootHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeView.swift; sourceTree = "<group>"; };
 		4D20C0052FF1000100000001 /* ConstantsAppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsAppColors.swift; sourceTree = "<group>"; };
 		4D20C0092FF1000100000001 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		4D21A0012FF8000100000001 /* RootHomeLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeLayout.swift; sourceTree = "<group>"; };
+		4D21A0022FF8000100000001 /* RootHomeChartRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeChartRange.swift; sourceTree = "<group>"; };
+		4D21A0032FF8000100000001 /* RootHomeToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeToolbarView.swift; sourceTree = "<group>"; };
+		4D21A0042FF8000100000001 /* RootHomeStatusViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeStatusViews.swift; sourceTree = "<group>"; };
+		4D21A0052FF8000100000001 /* RootHomeGlucoseReadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeGlucoseReadingView.swift; sourceTree = "<group>"; };
+		4D21A0062FF8000100000001 /* RootHomeChartViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeChartViews.swift; sourceTree = "<group>"; };
+		4D21A0072FF8000100000001 /* RootHomeSelectorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeSelectorView.swift; sourceTree = "<group>"; };
+		4D21A0082FF8000100000001 /* RootHomeStatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeStatisticsView.swift; sourceTree = "<group>"; };
+		4D21A0092FF8000100000001 /* RootHomeFooterViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeFooterViews.swift; sourceTree = "<group>"; };
+		4D21A00A2FF8000100000001 /* RootHomeClockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeClockView.swift; sourceTree = "<group>"; };
 		4D30C0012FF5000100000001 /* GenerateReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateReportView.swift; sourceTree = "<group>"; };
 		4D30C0022FF5000100000001 /* GenerateReportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateReportViewModel.swift; sourceTree = "<group>"; };
 		4D30C0032FF5000100000001 /* ReportAGPChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportAGPChartView.swift; sourceTree = "<group>"; };
@@ -2074,7 +2094,6 @@
 			children = (
 				47B7FC712B00CF4B004C872B /* FollowerBackgroundKeepAliveType.swift */,
 				4733B93D2AD17C99001D609D /* FollowerBgReading.swift */,
-				4733B9412FF4C100001D609D /* CalendarFollowManager.swift */,
 				47DB06CF2A70141E00267BE3 /* FollowerDataSourceType.swift */,
 				4733B93F2AD17D15001D609D /* FollowerDelegate.swift */,
 			);
@@ -2142,6 +2161,56 @@
 			path = Constants;
 			sourceTree = "<group>";
 		};
+		47EEC2C830112D990061FC8D /* Sensor */ = {
+			isa = PBXGroup;
+			children = (
+				4B0C00012F3B000100000001 /* SensorManagementView.swift */,
+				4E6100132FF3000100000001 /* SensorNoiseHistoryView.swift */,
+			);
+			path = Sensor;
+			sourceTree = "<group>";
+		};
+		47EEC2C930112DAC0061FC8D /* GlucoseChart */ = {
+			isa = PBXGroup;
+			children = (
+				474606932B963EA100AC9214 /* GlucoseChartCompactView.swift */,
+				F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */,
+				47C210EF2B52A05B00005711 /* GlucoseChartView.swift */,
+			);
+			path = GlucoseChart;
+			sourceTree = "<group>";
+		};
+		47EEC2CA30112DBA0061FC8D /* BgReadings */ = {
+			isa = PBXGroup;
+			children = (
+				47D9BC942A78498500AB85B2 /* BgReadingsDetailView.swift */,
+				47228B142996BDD2008725DB /* BgReadingsView.swift */,
+			);
+			path = BgReadings;
+			sourceTree = "<group>";
+		};
+		47EEC2CB30112DCE0061FC8D /* Landscape */ = {
+			isa = PBXGroup;
+			children = (
+				47B60F3626F389E2003198D3 /* LandscapeChartView.swift */,
+				F8CCBB4E2D1B6DF900F14867 /* LandscapeValueView.swift */,
+			);
+			path = Landscape;
+			sourceTree = "<group>";
+		};
+		47EEC2CC301136C10061FC8D /* Smoothing */ = {
+			isa = PBXGroup;
+			children = (
+				4A9B101A2F0A000100000001 /* ExponentialBgSmoothing.swift */,
+				4A9B101D2F0A000100000001 /* HampelSavitzkyGolayBgSmoothing.swift */,
+				4A9B101B2F0A000100000001 /* KalmanBgSmoothing.swift */,
+				4A9B101C2F0A000100000001 /* LoessBgSmoothing.swift */,
+				4A9B10192F0A000100000001 /* SavitzkyGolayBgSmoothing.swift */,
+				F8F7B8EA259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift */,
+			);
+			path = Smoothing;
+			sourceTree = "<group>";
+		};
 		47FB28052636AFE700042FFB /* Statistics */ = {
 			isa = PBXGroup;
 			children = (
@@ -2169,13 +2238,9 @@
 		4A9B10212F0A000100000001 /* PostProcessing */ = {
 			isa = PBXGroup;
 			children = (
-				4A9B10182F0A000100000001 /* BgSmoothingAlgorithmPlugin.swift */,
 				4A9B10152F0A000100000001 /* BgPostProcessingManager.swift */,
-				4A9B101A2F0A000100000001 /* ExponentialBgSmoothing.swift */,
-				4A9B10192F0A000100000001 /* SavitzkyGolayBgSmoothing.swift */,
-				4A9B101B2F0A000100000001 /* KalmanBgSmoothing.swift */,
-				4A9B101C2F0A000100000001 /* LoessBgSmoothing.swift */,
-				4A9B101D2F0A000100000001 /* HampelSavitzkyGolayBgSmoothing.swift */,
+				4A9B10182F0A000100000001 /* BgSmoothingAlgorithmPlugin.swift */,
+				47EEC2CC301136C10061FC8D /* Smoothing */,
 			);
 			path = PostProcessing;
 			sourceTree = "<group>";
@@ -2201,6 +2266,23 @@
 				4C2000022F65000100000001 /* BluetoothPeripheralsViewModel.swift */,
 			);
 			path = BluetoothPeripherals;
+			sourceTree = "<group>";
+		};
+		4D21A1002FF8000100000001 /* RootHome */ = {
+			isa = PBXGroup;
+			children = (
+				4D21A0022FF8000100000001 /* RootHomeChartRange.swift */,
+				4D21A0062FF8000100000001 /* RootHomeChartViews.swift */,
+				4D21A00A2FF8000100000001 /* RootHomeClockView.swift */,
+				4D21A0092FF8000100000001 /* RootHomeFooterViews.swift */,
+				4D21A0052FF8000100000001 /* RootHomeGlucoseReadingView.swift */,
+				4D21A0012FF8000100000001 /* RootHomeLayout.swift */,
+				4D21A0072FF8000100000001 /* RootHomeSelectorView.swift */,
+				4D21A0082FF8000100000001 /* RootHomeStatisticsView.swift */,
+				4D21A0042FF8000100000001 /* RootHomeStatusViews.swift */,
+				4D21A0032FF8000100000001 /* RootHomeToolbarView.swift */,
+			);
+			path = RootHome;
 			sourceTree = "<group>";
 		};
 		4D30C0002FF5000100000001 /* Reports */ = {
@@ -2303,8 +2385,8 @@
 		BA0000010000000000000020 /* Backup */ = {
 			isa = PBXGroup;
 			children = (
-				BA0000010000000000000011 /* BackupModels.swift */,
 				BA0000010000000000000012 /* BackupCrypto.swift */,
+				BA0000010000000000000011 /* BackupModels.swift */,
 				BA0000010000000000000013 /* BackupService.swift */,
 			);
 			path = Backup;
@@ -2620,22 +2702,18 @@
 			children = (
 				47E3BEC62CD780D900B794A0 /* AIDStatusView.swift */,
 				4A9B10162F0A000100000001 /* BgAdjustmentsView.swift */,
-				47D9BC942A78498500AB85B2 /* BgReadingsDetailView.swift */,
-				47228B142996BDD2008725DB /* BgReadingsView.swift */,
-				474606932B963EA100AC9214 /* GlucoseChartCompactView.swift */,
-				F76EA0FD5578C19B4A5176D5 /* GlucoseChartState.swift */,
-				47C210EF2B52A05B00005711 /* GlucoseChartView.swift */,
-				47B60F3626F389E2003198D3 /* LandscapeChartView.swift */,
-				F8CCBB4E2D1B6DF900F14867 /* LandscapeValueView.swift */,
 				4D20C0012FF1000100000001 /* RootHomeState.swift */,
 				4D20C0032FF1000100000001 /* RootHomeView.swift */,
 				4D20C0092FF1000100000001 /* RootTabView.swift */,
-				4B0C00012F3B000100000001 /* SensorManagementView.swift */,
-				4E6100132FF3000100000001 /* SensorNoiseHistoryView.swift */,
 				475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */,
 				4AC0D0022F1D000100000001 /* SnoozeView.swift */,
+				47EEC2CA30112DBA0061FC8D /* BgReadings */,
 				4C20000B2F65000100000001 /* BluetoothPeripherals */,
+				47EEC2C930112DAC0061FC8D /* GlucoseChart */,
+				47EEC2CB30112DCE0061FC8D /* Landscape */,
 				4D30C0002FF5000100000001 /* Reports */,
+				4D21A1002FF8000100000001 /* RootHome */,
+				47EEC2C830112D990061FC8D /* Sensor */,
 				F866974E2867A97000025441 /* Settings */,
 				4D40C0002FF6000100000001 /* Statistics */,
 				4C1000052F64000100000001 /* Treatments */,
@@ -2646,14 +2724,14 @@
 		F866974E2867A97000025441 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
-				BA0000010000000000000016 /* DataDeletionView.swift */,
-				BA000001000000000000001A /* ImportDataView.swift */,
-				BA0000010000000000000019 /* ManageDataView.swift */,
-				BA0000010000000000000014 /* DataManagementView.swift */,
-				BA0000010000000000000018 /* NightscoutImportView.swift */,
 				763EFF5D128BB4E856D0EB5A /* AlertsSettingsView.swift */,
 				102D337E1C2160C7B03D5184 /* AlertTypesSettingsView.swift */,
+				BA0000010000000000000016 /* DataDeletionView.swift */,
+				BA0000010000000000000014 /* DataManagementView.swift */,
+				BA000001000000000000001A /* ImportDataView.swift */,
 				F866974F2867AA4A00025441 /* LoopDelayScheduleView.swift */,
+				BA0000010000000000000019 /* ManageDataView.swift */,
+				BA0000010000000000000018 /* NightscoutImportView.swift */,
 				E64C4CC1DCC94C18B184021D /* SettingsSharedUtilities.swift */,
 				D9C75EA5D78E3497AC44D3C8 /* SettingsView.swift */,
 				CD00FB5270FD0E5E2F710BE6 /* TimeScheduleView.swift */,
@@ -2975,6 +3053,7 @@
 		F8E3A2A723D906B600E5E98A /* Calendar */ = {
 			isa = PBXGroup;
 			children = (
+				4733B9412FF4C100001D609D /* CalendarFollowManager.swift */,
 				F8E3A2A823D906C200E5E98A /* CalendarManager.swift */,
 			);
 			path = Calendar;
@@ -3055,7 +3134,6 @@
 				F8AF11F624B1E6D700AE5BA2 /* Errors */,
 				F85FF38F25288860004E6FF1 /* HouseKeeping */,
 				F821CF69229FC22D005C1E43 /* Network */,
-				F8F7B8E9259A7A9400C47B04 /* SavitzkyGolayFilter */,
 				F8B3A7DD226E48C1004BA588 /* SoundPlayer */,
 			);
 			path = Utilities;
@@ -3204,14 +3282,6 @@
 				F8F71D852B7EC1AD005076E8 /* DexcomG7+BluetoothPeripheral.swift */,
 			);
 			path = G7;
-			sourceTree = "<group>";
-		};
-		F8F7B8E9259A7A9400C47B04 /* SavitzkyGolayFilter */ = {
-			isa = PBXGroup;
-			children = (
-				F8F7B8EA259A7B1C00C47B04 /* SavitzkyGolaySmoothableArray.swift */,
-			);
-			path = SavitzkyGolayFilter;
 			sourceTree = "<group>";
 		};
 		F8F971AD23A5914C00C3F17D /* BluetoothPeripheral */ = {
@@ -4315,6 +4385,16 @@
 				C8BA6BBA5746888144511D55 /* GlucoseChartStateManager.swift in Sources */,
 				4D20C0022FF1000100000001 /* RootHomeState.swift in Sources */,
 				4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */,
+				4D21B0012FF8000100000001 /* RootHomeLayout.swift in Sources */,
+				4D21B0022FF8000100000001 /* RootHomeChartRange.swift in Sources */,
+				4D21B0032FF8000100000001 /* RootHomeToolbarView.swift in Sources */,
+				4D21B0042FF8000100000001 /* RootHomeStatusViews.swift in Sources */,
+				4D21B0052FF8000100000001 /* RootHomeGlucoseReadingView.swift in Sources */,
+				4D21B0062FF8000100000001 /* RootHomeChartViews.swift in Sources */,
+				4D21B0072FF8000100000001 /* RootHomeSelectorView.swift in Sources */,
+				4D21B0082FF8000100000001 /* RootHomeStatisticsView.swift in Sources */,
+				4D21B0092FF8000100000001 /* RootHomeFooterViews.swift in Sources */,
+				4D21B00A2FF8000100000001 /* RootHomeClockView.swift in Sources */,
 				4D20C00A2FF1000100000001 /* RootTabView.swift in Sources */,
 				4D31C0012FF5000100000001 /* GenerateReportView.swift in Sources */,
 				4D31C0022FF5000100000001 /* GenerateReportViewModel.swift in Sources */,
