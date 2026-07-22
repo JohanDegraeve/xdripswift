@@ -51,7 +51,7 @@ struct GlucoseReportTimeInRangeBarView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             }
-            .frame(height: 22)
+            .frame(height: 17)
             .background(GlucoseReportColors.rule)
             .clipShape(RoundedRectangle(cornerRadius: 4))
 

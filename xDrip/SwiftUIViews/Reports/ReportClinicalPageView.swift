@@ -85,13 +85,10 @@ struct GlucoseReportClinicalPageView: View {
                 }
             }
 
-            Divider()
-                .overlay(GlucoseReportColors.rule)
-
             HStack(spacing: 12) {
-                headerItem(configuration.text(.patient), configuration.patientName.isEmpty ? configuration.text(.notSpecified) : configuration.patientName)
+                headerItem(configuration.text(.patient), configuration.patientName.isEmpty ? "-" : configuration.patientName)
                     .frame(width: headerPanelContentWidth * 0.24, alignment: .leading)
-                headerItem(configuration.text(.patientID), configuration.patientID.isEmpty ? configuration.text(.notSpecified) : configuration.patientID)
+                headerItem(configuration.text(.patientID), configuration.patientID.isEmpty ? "-" : configuration.patientID)
                     .frame(width: headerPanelContentWidth * 0.18, alignment: .leading)
                 headerItem(configuration.text(.dateRange), "\(GlucoseReportFormatting.date(analytics.periodStart, language: configuration.language)) - \(GlucoseReportFormatting.date(analytics.periodEnd, language: configuration.language))", lineLimit: 1)
                     .frame(width: headerPanelContentWidth * 0.40, alignment: .leading)
@@ -158,11 +155,6 @@ struct GlucoseReportClinicalPageView: View {
                 .font(.system(size: 8))
                 .foregroundStyle(GlucoseReportColors.secondaryText)
 
-            Text(configuration.text(.projectURLFormat, ConstantsHomeView.gitHubURL))
-                .font(.system(size: 8))
-                .foregroundStyle(GlucoseReportColors.tertiaryText)
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
         }
     }
 

@@ -23,10 +23,18 @@ struct GlucoseReportPreviewView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .principal) {
-                    Text(navigationTitle)
-                        .font(.headline)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.65)
+                    HStack(spacing: 5) {
+                        if report.passwordToOpen != nil {
+                            Image(systemName: "lock.fill")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundStyle(.green)
+                        }
+
+                        Text(navigationTitle)
+                            .font(.headline)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.65)
+                    }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -51,7 +59,7 @@ struct GlucoseReportPreviewView: View {
                     }
                 }
             }
-            .alert("Unable to prepare report", isPresented: Binding(
+            .alert(Texts_Common.reportUnableToPrepareTitle, isPresented: Binding(
                 get: { shareErrorMessage != nil },
                 set: { if !$0 { shareErrorMessage = nil } }
             )) {
@@ -65,23 +73,9 @@ struct GlucoseReportPreviewView: View {
     }
 
     private var shareButtonIcon: some View {
-        ZStack(alignment: .bottomTrailing) {
-            Image(systemName: "square.and.arrow.up")
-                .font(.title3)
-
-            if report.passwordToOpen != nil {
-                Image(systemName: "lock.circle.fill")
-                    .font(.system(size: 15, weight: .bold))
-                    .foregroundStyle(.green)
-                    .background(
-                        Circle()
-                            .fill(Color(.systemBackground))
-                            .frame(width: 16, height: 16)
-                    )
-                    .offset(x: 8, y: 5)
-            }
-        }
-        .accessibilityLabel("Share Report")
+        Image(systemName: "square.and.arrow.up")
+            .font(.title3)
+            .accessibilityLabel(Texts_Common.reportShareAccessibility)
     }
 
     private func prepareShare() {
@@ -108,13 +102,13 @@ struct GlucoseReportPreviewView: View {
     }
 
     private var navigationTitle: String {
-        let periodTitle = "\(report.configuration.period.rawValue) day Report"
+        let periodTitle = String(format: Texts_Common.reportPeriodTitleFormat, report.configuration.period.rawValue)
         let patientName = report.configuration.patientName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !patientName.isEmpty else {
             return periodTitle
         }
 
-        return "\(patientName)'s \(periodTitle)"
+        return String(format: Texts_Common.reportPatientPeriodTitleFormat, patientName, periodTitle)
     }
 }
 
@@ -161,9 +155,9 @@ private enum ReportPDFProtectionError: LocalizedError {
     var errorDescription: String? {
         switch self {
         case .unableToOpenPDF:
-            return "The report PDF could not be opened for password protection."
+            return Texts_Common.reportPasswordProtectionOpenError
         case .unableToWriteProtectedPDF:
-            return "The password-protected report PDF could not be created."
+            return Texts_Common.reportPasswordProtectionWriteError
         }
     }
 }

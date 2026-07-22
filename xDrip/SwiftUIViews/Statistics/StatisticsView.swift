@@ -50,7 +50,7 @@ struct StatisticsView: View {
             }
         }
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
-        .navigationTitle("Statistics")
+        .navigationTitle(Texts_Common.statisticsTitle)
         .task {
             viewModel.load()
         }
@@ -62,12 +62,12 @@ struct StatisticsView: View {
             VStack(spacing: 10) {
                 StatisticsSummaryView(analytics: analytics)
                 StatisticsRangeCard(
-                    title: "Time in Range",
+                    title: Texts_Common.statisticsTimeInRange,
                     abbreviation: "TIR",
                     buckets: analytics.rangeDistribution.timeInRangeBuckets(usesMgDl: analytics.usesMgDl)
                 )
                 StatisticsRangeCard(
-                    title: "Time in Tight Range",
+                    title: Texts_Common.statisticsTimeInTightRange,
                     abbreviation: "TITR",
                     buckets: analytics.tightRangeDistribution.tightRangeBuckets(usesMgDl: analytics.usesMgDl)
                 )
@@ -86,7 +86,7 @@ struct StatisticsView: View {
     }
 
     private var periodPicker: some View {
-        Picker("Period", selection: $viewModel.selectedPeriod) {
+        Picker(Texts_Common.statisticsPeriod, selection: $viewModel.selectedPeriod) {
             ForEach(viewModel.selectablePeriods.isEmpty ? [viewModel.selectedPeriod] : viewModel.selectablePeriods) { period in
                 Text(period.title)
                     .tag(period)
@@ -105,8 +105,10 @@ struct StatisticsView: View {
             textSize: 16,
             selectedTextWeight: .bold,
             unselectedTextWeight: .semibold,
-            selectedColor: { $0 == .report ? Color(.systemYellow) : Color(.colorPrimary) },
-            unselectedColor: { $0 == .report ? Color(.systemYellow).opacity(0.58) : Color(.colorTertiary) }
+            selectedColor: { $0 == .report ? Color(.systemYellow).opacity(0.95) : Color(.colorPrimary) },
+            unselectedColor: { $0 == .report ? Color(.systemYellow).opacity(0.58) : Color(.colorTertiary) },
+            selectedBackgroundColor: { $0 == .report ? Color(.systemYellow).opacity(0.24) : Color.clear },
+            unselectedBackgroundColor: { $0 == .report ? Color(.systemYellow).opacity(0.08) : Color.clear }
         )
     }
 }
@@ -122,13 +124,13 @@ private enum StatisticsSection: String, CaseIterable, Identifiable {
     var title: String {
         switch self {
         case .summary:
-            return "Summary"
+            return Texts_Common.statisticsSummary
         case .agp:
-            return "Trends"
+            return Texts_Common.statisticsTrends
         case .daily:
-            return "Daily"
+            return Texts_Common.statisticsDaily
         case .report:
-            return "Report"
+            return Texts_Common.statisticsReport
         }
     }
 
@@ -156,6 +158,8 @@ private struct StatisticsSelectorControl<Item: Identifiable & Hashable>: View {
     var unselectedTextWeight: Font.Weight = .regular
     var selectedColor: (Item) -> Color = { _ in Color(.colorPrimary) }
     var unselectedColor: (Item) -> Color = { _ in Color(.colorTertiary) }
+    var selectedBackgroundColor: (Item) -> Color = { _ in Color.clear }
+    var unselectedBackgroundColor: (Item) -> Color = { _ in Color.clear }
 
     var body: some View {
         HStack(spacing: 0) {
@@ -168,7 +172,9 @@ private struct StatisticsSelectorControl<Item: Identifiable & Hashable>: View {
                     selectedTextWeight: selectedTextWeight,
                     unselectedTextWeight: unselectedTextWeight,
                     selectedColor: selectedColor(item),
-                    unselectedColor: unselectedColor(item)
+                    unselectedColor: unselectedColor(item),
+                    selectedBackgroundColor: selectedBackgroundColor(item),
+                    unselectedBackgroundColor: unselectedBackgroundColor(item)
                 ) {
                     selection = item
                 }
@@ -188,6 +194,8 @@ private struct StatisticsSelectorButton: View {
     let unselectedTextWeight: Font.Weight
     let selectedColor: Color
     let unselectedColor: Color
+    let selectedBackgroundColor: Color
+    let unselectedBackgroundColor: Color
     let action: () -> Void
 
     var body: some View {
@@ -205,6 +213,9 @@ private struct StatisticsSelectorButton: View {
             }
             .foregroundStyle(isSelected ? selectedColor : unselectedColor)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(
+                isSelected ? selectedBackgroundColor : unselectedBackgroundColor
+            )
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
@@ -219,12 +230,12 @@ private struct StatisticsSummaryView: View {
 
     var body: some View {
         LazyVGrid(columns: columns, spacing: 7) {
-            tile("Average", GlucoseReportFormatting.glucose(analytics.averageMgDl, usesMgDl: analytics.usesMgDl), "Mean glucose")
-            tile("GMI", "\(analytics.gmiPercentage.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes)%", "CGM estimate")
+            tile(Texts_Common.averageStatistics, GlucoseReportFormatting.glucose(analytics.averageMgDl, usesMgDl: analytics.usesMgDl), Texts_Common.statisticsMeanGlucose)
+            tile(Texts_Common.statisticsGMI, "\(analytics.gmiPercentage.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes)%", Texts_Common.statisticsCGMEstimate)
             tile(
-                "CV",
+                Texts_Common.cvStatistics,
                 GlucoseReportFormatting.percentage(analytics.coefficientOfVariation),
-                "Target <=\(GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.coefficientOfVariationTargetPercentage))",
+                String(format: Texts_Common.statisticsTargetLessThanOrEqual, GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.coefficientOfVariationTargetPercentage)),
                 gauge: StatisticsGauge(
                     value: analytics.coefficientOfVariation,
                     target: GlucoseReportClinicalConstants.coefficientOfVariationTargetPercentage,
@@ -233,9 +244,9 @@ private struct StatisticsSummaryView: View {
                 )
             )
             tile(
-                "Data Capture",
+                Texts_Common.statisticsDataCapture,
                 GlucoseReportFormatting.percentage(analytics.dataCapturePercentage),
-                "Target >=\(GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.minimumDataCapturePercentage))",
+                String(format: Texts_Common.statisticsTargetGreaterThanOrEqual, GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.minimumDataCapturePercentage)),
                 gauge: StatisticsGauge(
                     value: analytics.dataCapturePercentage,
                     target: GlucoseReportClinicalConstants.minimumDataCapturePercentage,
@@ -410,7 +421,7 @@ private struct StatisticsAGPCard: View {
     let analytics: GlucoseReportAnalytics
 
     var body: some View {
-        StatisticsCard(title: "Ambulatory Glucose Profile") {
+        StatisticsCard(title: Texts_Common.statisticsAmbulatoryGlucoseProfile) {
             StatisticsAGPChart(points: analytics.agpPoints, usesMgDl: analytics.usesMgDl)
         }
     }
@@ -512,7 +523,7 @@ private struct StatisticsAGPChart: View {
         }
         .overlay {
             if points.isEmpty {
-                Text("Insufficient data for AGP percentile chart")
+                Text(Texts_Common.statisticsInsufficientAGPData)
                     .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Color(.colorSecondary))
             }
@@ -582,7 +593,7 @@ private struct StatisticsTrendCard: View {
         StatisticsCard {
             VStack(spacing: 8) {
                 trendChart(
-                    title: "Estimated HbA1c trend",
+                    title: Texts_Common.statisticsEstimatedA1cTrend,
                     targetLabel: "",
                     yDomain: gmiDomain,
                     target: nil,
@@ -591,8 +602,8 @@ private struct StatisticsTrendCard: View {
                 )
 
                 trendChart(
-                    title: "CV trend",
-                    targetLabel: "Target <=\(GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.coefficientOfVariationTargetPercentage))",
+                    title: Texts_Common.statisticsCVTrend,
+                    targetLabel: String(format: Texts_Common.statisticsTargetLessThanOrEqual, GlucoseReportFormatting.percentage(GlucoseReportClinicalConstants.coefficientOfVariationTargetPercentage)),
                     yDomain: 0 ... 60,
                     target: GlucoseReportClinicalConstants.coefficientOfVariationTargetPercentage,
                     showsXAxisLabels: true,
@@ -682,7 +693,7 @@ private struct StatisticsTrendCard: View {
             .frame(height: 76)
             .overlay {
                 if trendPoints.isEmpty {
-                    Text("Insufficient data")
+                    Text(Texts_Common.statisticsInsufficientData)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Color(.colorSecondary))
                 }
@@ -737,11 +748,11 @@ private struct StatisticsDailyPatternCard: View {
         VStack(alignment: .leading, spacing: 4) {
             StatisticsCard {
                 HStack(alignment: .firstTextBaseline) {
-                    Text("Daily Pattern")
+                    Text(Texts_Common.statisticsDailyPattern)
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Color(.colorPrimary))
                     Spacer()
-                    Text("Average \(GlucoseReportFormatting.percentage(averageInRangePercentage))")
+                    Text(String(format: Texts_Common.statisticsAverageFormat, GlucoseReportFormatting.percentage(averageInRangePercentage)))
                         .font(.caption.weight(.bold))
                         .foregroundStyle(Color(.colorTertiary))
                         .monospacedDigit()
@@ -782,7 +793,7 @@ private struct StatisticsDailyPatternCard: View {
                 .frame(height: 175)
             }
 
-            Text("Bars show daily percentage in 70-180 mg/dL range. The dashed line marks the 70% clinical target.")
+            Text(Texts_Common.statisticsDailyPatternFooter)
                 .font(.caption2)
                 .foregroundStyle(Color(.colorTertiary))
                 .padding(.horizontal, 12)
@@ -833,11 +844,11 @@ private struct StatisticsDailyHighlightsCard: View {
     let period: GlucoseReportPeriod
 
     var body: some View {
-        StatisticsCard(title: "Daily Summary") {
+        StatisticsCard(title: Texts_Common.statisticsDailySummary) {
             HStack(spacing: 8) {
-                contextTile(title: "Best Day", value: bestDayText)
-                contextTile(title: "Most Low", value: mostLowDayText)
-                contextTile(title: "Most High", value: mostHighDayText)
+                contextTile(title: Texts_Common.statisticsBestDay, value: bestDayText)
+                contextTile(title: Texts_Common.statisticsMostLow, value: mostLowDayText)
+                contextTile(title: Texts_Common.statisticsMostHigh, value: mostHighDayText)
             }
         }
     }
@@ -914,10 +925,10 @@ private struct StatisticsEmptyStateView: View {
             Image(systemName: "chart.xyaxis.line")
                 .font(.system(size: 36, weight: .semibold))
                 .foregroundStyle(Color(.colorTertiary))
-            Text("No Statistics Available")
+            Text(Texts_Common.statisticsNoDataTitle)
                 .font(.headline)
                 .foregroundStyle(Color(.colorPrimary))
-            Text("There is not enough stored CGM data for this period.")
+            Text(Texts_Common.statisticsNoDataMessage)
                 .font(.subheadline)
                 .foregroundStyle(Color(.colorSecondary))
                 .multilineTextAlignment(.center)

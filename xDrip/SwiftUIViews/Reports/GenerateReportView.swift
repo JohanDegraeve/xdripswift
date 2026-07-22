@@ -28,7 +28,7 @@ struct GenerateReportView: View {
         case .modal:
             NavigationStack {
                 reportForm
-                    .navigationTitle("Generate Report")
+                    .navigationTitle(Texts_Common.reportGenerateTitle)
                     .navigationBarTitleDisplayMode(.inline)
                     .toolbar {
                         ToolbarItem(placement: .cancellationAction) {
@@ -59,7 +59,7 @@ struct GenerateReportView: View {
                     VStack(spacing: 12) {
                         ProgressView()
                             .controlSize(.large)
-                        Text("Generating clinical report...")
+                        Text(Texts_Common.reportGeneratingStatus)
                             .font(.headline)
                     }
                     .padding(20)
@@ -71,7 +71,7 @@ struct GenerateReportView: View {
         .task {
             viewModel.loadAvailability()
         }
-        .alert("Report generation failed", isPresented: Binding(
+        .alert(Texts_Common.reportGenerationFailedTitle, isPresented: Binding(
             get: { viewModel.errorMessage != nil },
             set: { if !$0 { viewModel.errorMessage = nil } }
         )) {
@@ -90,29 +90,29 @@ struct GenerateReportView: View {
         Section {
             NavigationLink {
                 ReportTextFieldEditView(
-                    title: "Patient Name",
-                    placeholder: "Patient name",
+                    title: Texts_Common.reportPatientName,
+                    placeholder: Texts_Common.reportPatientNamePlaceholder,
                     text: $viewModel.patientName,
                     capitalization: .words
                 )
             } label: {
-                ReportSettingRow(title: "Patient Name", value: viewModel.patientName, placeholder: "Not Set")
+                ReportSettingRow(title: Texts_Common.reportPatientName, value: viewModel.patientName, placeholder: Texts_Common.reportNotSet)
             }
 
             NavigationLink {
                 ReportTextFieldEditView(
-                    title: "Patient ID",
-                    placeholder: "Medical record / patient ID",
+                    title: Texts_Common.reportPatientID,
+                    placeholder: Texts_Common.reportPatientIDPlaceholder,
                     text: $viewModel.patientID,
                     capitalization: .characters
                 )
             } label: {
-                ReportSettingRow(title: "Patient ID", value: viewModel.patientID, placeholder: "Not Set")
+                ReportSettingRow(title: Texts_Common.reportPatientID, value: viewModel.patientID, placeholder: Texts_Common.reportNotSet)
             }
         } header: {
-            Text("Patient")
+            Text(Texts_Common.reportPatientSection)
         } footer: {
-            Text("Patient details are stored locally on this device and printed in the report header.")
+            Text(Texts_Common.reportPatientFooter)
         }
     }
 
@@ -124,42 +124,39 @@ struct GenerateReportView: View {
                     isPeriodAvailable: viewModel.isPeriodAvailable
                 )
             } label: {
-                ReportSettingRow(title: "Report Period", value: viewModel.selectedPeriod.clinicalTitle)
+                ReportSettingRow(title: Texts_Common.reportPeriod, value: viewModel.selectedPeriod.optionTitle)
             }
             .disabled(viewModel.isLoadingAvailability)
 
             NavigationLink {
                 ReportPaperSizePickerView(paperSize: $viewModel.paperSize)
             } label: {
-                ReportSettingRow(title: "Paper Size", value: viewModel.paperSize.title)
+                ReportSettingRow(title: Texts_Common.reportPaperSize, value: viewModel.paperSize.title)
             }
 
             NavigationLink {
                 ReportLanguagePickerView(language: $viewModel.language)
             } label: {
-                ReportSettingRow(title: "Language", value: viewModel.language.title)
+                ReportSettingRow(title: Texts_Common.reportLanguage, value: viewModel.language.title)
             }
 
             NavigationLink {
                 ReportPasswordEditView(password: $viewModel.passwordToOpen)
             } label: {
-                ReportSettingRow(title: "Password to Open", value: viewModel.passwordToOpen, placeholder: "None", isPassword: true)
+                ReportSettingRow(title: Texts_Common.reportPasswordToOpen, value: viewModel.passwordToOpen, placeholder: Texts_Common.reportNone, isPassword: true)
             }
         } header: {
-            Text("Report Options")
+            Text(Texts_Common.reportOptions)
         } footer: {
-            VStack(alignment: .leading, spacing: 10) {
-                if viewModel.hasPasswordToOpen {
-                    HStack(spacing: 6) {
-                        Image(systemName: "lock.circle.fill")
-                            .foregroundStyle(.green)
-                        Text("Report will be password protected")
-                    }
+            VStack(alignment: .leading, spacing: 15) {
+                HStack(spacing: 6) {
+                    passwordStatusIcon
+                    Text(viewModel.hasPasswordToOpen ? Texts_Common.reportWillBePasswordProtected : Texts_Common.reportWillNotBePasswordProtected)
                 }
 
                 generateButton
             }
-            .padding(.top, 6)
+            .padding(.top, 0)
         }
     }
 
@@ -167,13 +164,23 @@ struct GenerateReportView: View {
         Button {
             viewModel.generateReport()
         } label: {
-            Text("Generate Report")
+            Text(Texts_Common.reportGenerateTitle)
                 .font(.headline)
                 .frame(maxWidth: .infinity)
         }
         .buttonStyle(.borderedProminent)
         .tint(Color(.systemBlue))
         .disabled(!viewModel.isPeriodAvailable(viewModel.selectedPeriod) || viewModel.isLoadingAvailability)
+    }
+
+    private var passwordStatusIcon: some View {
+        if viewModel.hasPasswordToOpen {
+            Image(systemName: "lock.fill")
+                .foregroundStyle(.green)
+        } else {
+            Image(systemName: "lock.slash")
+                .foregroundStyle(Color(.colorTertiary))
+        }
     }
 }
 
@@ -243,18 +250,18 @@ private struct ReportPasswordEditView: View {
     var body: some View {
         Form {
             Section {
-                SecureField("Password to open PDF", text: $passwordEntry)
+                SecureField(Texts_Common.reportPasswordFieldPlaceholder, text: $passwordEntry)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
 
-                SecureField("Enter password again", text: $confirmationEntry)
+                SecureField(Texts_Common.reportPasswordConfirmationPlaceholder, text: $confirmationEntry)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
             } footer: {
-                Text("This password is only used for the next generated PDF and is not stored.")
+                Text(Texts_Common.reportPasswordFooter)
             }
         }
-        .navigationTitle("Password to Open")
+        .navigationTitle(Texts_Common.reportPasswordToOpen)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
@@ -291,16 +298,29 @@ private struct ReportPeriodPickerView: View {
                     selectedPeriod = period
                 } label: {
                     HStack {
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(period.clinicalTitle)
-                                .foregroundStyle(Color(.colorPrimary))
+                        VStack(alignment: .leading, spacing: 4) {
+                            HStack(alignment: .firstTextBaseline, spacing: 10) {
+                                Text(period.optionTitle)
+                                    .foregroundStyle(Color(.colorPrimary))
 
-                            Text(periodSubtitle(for: period))
-                                .font(.caption)
-                                .foregroundStyle(Color(.colorTertiary))
+                                if isPeriodAvailable(period) {
+                                    Text("(\(dateRangeText(for: period)))")
+                                        .font(.system(size: 15))
+                                        .foregroundStyle(Color(.colorSecondary))
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.7)
+                                } else {
+                                    Text("(\(Texts_Common.reportNotEnoughData))")
+                                        .font(.system(size: 15))
+                                        .foregroundStyle(Color(.colorSecondary))
+                                        .lineLimit(1)
+                                        .minimumScaleFactor(0.7)
+                                }
+                            }
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.75)
                         }
-
-                        Spacer()
+                        .frame(maxWidth: .infinity, alignment: .leading)
 
                         if selectedPeriod == period {
                             Image(systemName: "checkmark")
@@ -314,7 +334,7 @@ private struct ReportPeriodPickerView: View {
                 .buttonStyle(.plain)
             }
         }
-        .navigationTitle("Report Period")
+        .navigationTitle(Texts_Common.reportPeriod)
         .navigationBarTitleDisplayMode(.inline)
     }
 
@@ -324,9 +344,6 @@ private struct ReportPeriodPickerView: View {
         return "\(dateRangeFormatter.string(from: startDate)) - \(dateRangeFormatter.string(from: endDate))"
     }
 
-    private func periodSubtitle(for period: GlucoseReportPeriod) -> String {
-        isPeriodAvailable(period) ? dateRangeText(for: period) : "Not enough data"
-    }
 }
 
 private struct ReportPaperSizePickerView: View {
@@ -344,7 +361,7 @@ private struct ReportPaperSizePickerView: View {
                 .buttonStyle(.plain)
             }
         }
-        .navigationTitle("Paper Size")
+        .navigationTitle(Texts_Common.reportPaperSize)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
@@ -364,7 +381,7 @@ private struct ReportLanguagePickerView: View {
                 .buttonStyle(.plain)
             }
         }
-        .navigationTitle("Language")
+        .navigationTitle(Texts_Common.reportLanguage)
         .navigationBarTitleDisplayMode(.inline)
     }
 }
