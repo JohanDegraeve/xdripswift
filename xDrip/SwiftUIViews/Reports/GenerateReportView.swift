@@ -8,65 +8,80 @@
 
 import SwiftUI
 
+enum GenerateReportPresentation {
+    case modal
+    case embedded
+}
+
 struct GenerateReportView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: GenerateReportViewModel
+    private let presentation: GenerateReportPresentation
 
-    init(statisticsManager: StatisticsManager) {
+    init(statisticsManager: StatisticsManager, presentation: GenerateReportPresentation = .modal) {
+        self.presentation = presentation
         _viewModel = StateObject(wrappedValue: GenerateReportViewModel(statisticsManager: statisticsManager))
     }
 
-    var body: some View {
-        NavigationStack {
-            Form {
-                patientSection
-                optionsSection
-                generateSection
-            }
-            .navigationTitle("Generate Report")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button(Texts_Common.Cancel) {
-                        dismiss()
-                    }
-                    .foregroundStyle(.primary)
-                    .disabled(viewModel.isGenerating)
-                }
-            }
-            .disabled(viewModel.isGenerating)
-            .overlay {
-                if viewModel.isGenerating {
-                    ZStack {
-                        Color.black.opacity(0.35)
-                            .ignoresSafeArea()
-                        VStack(spacing: 12) {
-                            ProgressView()
-                                .controlSize(.large)
-                            Text("Generating clinical report...")
-                                .font(.headline)
+    @ViewBuilder var body: some View {
+        switch presentation {
+        case .modal:
+            NavigationStack {
+                reportForm
+                    .navigationTitle("Generate Report")
+                    .navigationBarTitleDisplayMode(.inline)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button(Texts_Common.Cancel) {
+                                dismiss()
+                            }
+                            .foregroundStyle(.primary)
+                            .disabled(viewModel.isGenerating)
                         }
-                        .padding(20)
-                        .background(.ultraThinMaterial)
-                        .clipShape(RoundedRectangle(cornerRadius: 10))
                     }
+            }
+        case .embedded:
+            reportForm
+        }
+    }
+
+    private var reportForm: some View {
+        Form {
+            patientSection
+            optionsSection
+        }
+        .disabled(viewModel.isGenerating)
+        .overlay {
+            if viewModel.isGenerating {
+                ZStack {
+                    Color.black.opacity(0.35)
+                        .ignoresSafeArea()
+                    VStack(spacing: 12) {
+                        ProgressView()
+                            .controlSize(.large)
+                        Text("Generating clinical report...")
+                            .font(.headline)
+                    }
+                    .padding(20)
+                    .background(.ultraThinMaterial)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
             }
-            .task {
-                viewModel.loadAvailability()
-            }
-            .alert("Report generation failed", isPresented: Binding(
-                get: { viewModel.errorMessage != nil },
-                set: { if !$0 { viewModel.errorMessage = nil } }
-            )) {
-                Button(Texts_Common.Ok, role: .cancel) {}
-            } message: {
-                Text(viewModel.errorMessage ?? "")
-            }
-            .sheet(item: $viewModel.generatedReport) { report in
-                NavigationStack {
-                    GlucoseReportPreviewView(report: report)
-                }
+        }
+        .task {
+            viewModel.loadAvailability()
+        }
+        .alert("Report generation failed", isPresented: Binding(
+            get: { viewModel.errorMessage != nil },
+            set: { if !$0 { viewModel.errorMessage = nil } }
+        )) {
+            Button(Texts_Common.Ok, role: .cancel) {}
+        } message: {
+            Text(viewModel.errorMessage ?? "")
+        }
+        .sheet(item: $viewModel.generatedReport) { report in
+            NavigationStack {
+                GlucoseReportPreviewView(report: report)
             }
         }
     }
@@ -133,17 +148,22 @@ struct GenerateReportView: View {
         } header: {
             Text("Report Options")
         } footer: {
-            if viewModel.hasPasswordToOpen {
-                HStack(spacing: 6) {
-                    Image(systemName: "lock.circle.fill")
-                        .foregroundStyle(.green)
-                    Text("Report will be password protected")
+            VStack(alignment: .leading, spacing: 10) {
+                if viewModel.hasPasswordToOpen {
+                    HStack(spacing: 6) {
+                        Image(systemName: "lock.circle.fill")
+                            .foregroundStyle(.green)
+                        Text("Report will be password protected")
+                    }
                 }
+
+                generateButton
             }
+            .padding(.top, 6)
         }
     }
 
-    private var generateSection: some View {
+    private var generateButton: some View {
         Button {
             viewModel.generateReport()
         } label: {
@@ -154,8 +174,6 @@ struct GenerateReportView: View {
         .buttonStyle(.borderedProminent)
         .tint(Color(.systemBlue))
         .disabled(!viewModel.isPeriodAvailable(viewModel.selectedPeriod) || viewModel.isLoadingAvailability)
-        .listRowInsets(EdgeInsets(top: 16, leading: 16, bottom: 16, trailing: 16))
-        .listRowBackground(Color.clear)
     }
 }
 

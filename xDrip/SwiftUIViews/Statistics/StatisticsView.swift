@@ -12,7 +12,6 @@ import SwiftUI
 struct StatisticsView: View {
     @StateObject private var viewModel: StatisticsViewModel
     @State private var selectedSection = StatisticsSection.summary
-    @State private var showsGenerateReport = false
     private let statisticsManager: StatisticsManager
 
     init(statisticsManager: StatisticsManager) {
@@ -21,44 +20,37 @@ struct StatisticsView: View {
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 14) {
-                periodPicker
-                sectionPicker
+        Group {
+            if selectedSection == .report {
+                VStack(spacing: 12) {
+                    sectionPicker
+                        .padding(.horizontal, 16)
+                    GenerateReportView(statisticsManager: statisticsManager, presentation: .embedded)
+                }
+                .padding(.top, 12)
+            } else {
+                ScrollView {
+                    VStack(spacing: 12) {
+                        sectionPicker
+                        periodPicker
 
-                if viewModel.isLoading && viewModel.analytics == nil {
-                    ProgressView()
-                        .controlSize(.large)
-                        .frame(maxWidth: .infinity, minHeight: 220)
-                } else if let analytics = viewModel.analytics, analytics.hasData {
-                    content(for: analytics)
-                } else {
-                    StatisticsEmptyStateView()
+                        if viewModel.isLoading && viewModel.analytics == nil {
+                            ProgressView()
+                                .controlSize(.large)
+                                .frame(maxWidth: .infinity, minHeight: 220)
+                        } else if let analytics = viewModel.analytics, analytics.hasData {
+                            content(for: analytics)
+                        } else {
+                            StatisticsEmptyStateView()
+                        }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 12)
                 }
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 14)
         }
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationTitle("Statistics")
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    showsGenerateReport = true
-                } label: {
-                    HStack(spacing: 5) {
-                        Image(systemName: "chart.line.text.clipboard")
-                        Text("Generate Report")
-                    }
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.yellow)
-                }
-            }
-        }
-        .sheet(isPresented: $showsGenerateReport) {
-            GenerateReportView(statisticsManager: statisticsManager)
-                .colorScheme(.dark)
-        }
         .task {
             viewModel.load()
         }
@@ -88,6 +80,8 @@ struct StatisticsView: View {
                 StatisticsDailyPatternCard(analytics: analytics, period: viewModel.selectedPeriod)
                 StatisticsDailyHighlightsCard(analytics: analytics, period: viewModel.selectedPeriod)
             }
+        case .report:
+            EmptyView()
         }
     }
 
@@ -99,15 +93,21 @@ struct StatisticsView: View {
             }
         }
         .pickerStyle(.segmented)
+        .padding(.top, 12)
     }
 
     private var sectionPicker: some View {
-        Picker("View", selection: $selectedSection) {
-            ForEach(StatisticsSection.allCases) { section in
-                Text(section.title).tag(section)
-            }
-        }
-        .pickerStyle(.segmented)
+        StatisticsSelectorControl(
+            items: StatisticsSection.allCases,
+            selection: $selectedSection,
+            title: { $0.title },
+            systemImage: { $0.systemImage },
+            textSize: 16,
+            selectedTextWeight: .bold,
+            unselectedTextWeight: .semibold,
+            selectedColor: { $0 == .report ? Color(.systemYellow) : Color(.colorPrimary) },
+            unselectedColor: { $0 == .report ? Color(.systemYellow).opacity(0.58) : Color(.colorTertiary) }
+        )
     }
 }
 
@@ -115,6 +115,7 @@ private enum StatisticsSection: String, CaseIterable, Identifiable {
     case summary
     case agp
     case daily
+    case report
 
     var id: String { rawValue }
 
@@ -126,7 +127,88 @@ private enum StatisticsSection: String, CaseIterable, Identifiable {
             return "Trends"
         case .daily:
             return "Daily"
+        case .report:
+            return "Report"
         }
+    }
+
+    var systemImage: String? {
+        switch self {
+        case .report:
+            return "chart.line.text.clipboard"
+        default:
+            return nil
+        }
+    }
+}
+
+private enum StatisticsSelectorLayout {
+    static let controlHeight: CGFloat = 40
+}
+
+private struct StatisticsSelectorControl<Item: Identifiable & Hashable>: View {
+    let items: [Item]
+    @Binding var selection: Item
+    let title: (Item) -> String
+    var systemImage: (Item) -> String? = { _ in nil }
+    var textSize: CGFloat = 14
+    var selectedTextWeight: Font.Weight = .semibold
+    var unselectedTextWeight: Font.Weight = .regular
+    var selectedColor: (Item) -> Color = { _ in Color(.colorPrimary) }
+    var unselectedColor: (Item) -> Color = { _ in Color(.colorTertiary) }
+
+    var body: some View {
+        HStack(spacing: 0) {
+            ForEach(items) { item in
+                StatisticsSelectorButton(
+                    title: title(item),
+                    systemImage: systemImage(item),
+                    isSelected: selection == item,
+                    textSize: textSize,
+                    selectedTextWeight: selectedTextWeight,
+                    unselectedTextWeight: unselectedTextWeight,
+                    selectedColor: selectedColor(item),
+                    unselectedColor: unselectedColor(item)
+                ) {
+                    selection = item
+                }
+            }
+        }
+        .frame(height: StatisticsSelectorLayout.controlHeight)
+        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
+    }
+}
+
+private struct StatisticsSelectorButton: View {
+    let title: String
+    var systemImage: String?
+    let isSelected: Bool
+    let textSize: CGFloat
+    let selectedTextWeight: Font.Weight
+    let unselectedTextWeight: Font.Weight
+    let selectedColor: Color
+    let unselectedColor: Color
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            HStack(spacing: 4) {
+                if let systemImage {
+                    Image(systemName: systemImage)
+                        .font(.system(size: max(10, textSize - 4), weight: isSelected ? selectedTextWeight : unselectedTextWeight))
+                }
+
+                Text(title)
+                    .font(.system(size: textSize, weight: isSelected ? selectedTextWeight : unselectedTextWeight))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .foregroundStyle(isSelected ? selectedColor : unselectedColor)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
@@ -136,7 +218,7 @@ private struct StatisticsSummaryView: View {
     private let columns = [GridItem(.flexible()), GridItem(.flexible())]
 
     var body: some View {
-        LazyVGrid(columns: columns, spacing: 8) {
+        LazyVGrid(columns: columns, spacing: 7) {
             tile("Average", GlucoseReportFormatting.glucose(analytics.averageMgDl, usesMgDl: analytics.usesMgDl), "Mean glucose")
             tile("GMI", "\(analytics.gmiPercentage.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes)%", "CGM estimate")
             tile(
@@ -165,7 +247,7 @@ private struct StatisticsSummaryView: View {
     }
 
     private func tile(_ title: String, _ value: String, _ detail: String, gauge: StatisticsGauge? = nil) -> some View {
-        VStack(alignment: .leading, spacing: 5) {
+        VStack(alignment: .leading, spacing: 4) {
             Text(title.uppercased())
                 .font(.caption2.weight(.semibold))
                 .foregroundStyle(Color(.colorSecondary))
@@ -180,7 +262,7 @@ private struct StatisticsSummaryView: View {
                 StatisticsTargetGauge(gauge: gauge)
             }
         }
-        .padding(12)
+        .padding(10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
     }
@@ -227,16 +309,16 @@ private struct StatisticsTargetGauge: View {
                     .fill(Color(.tertiarySystemFill))
 
                 Capsule()
-                    .fill(gauge.color.opacity(0.82))
+                    .fill(gauge.color.opacity(0.58))
                     .frame(width: max(height, geometry.size.width * gauge.valueFraction))
 
                 Rectangle()
-                    .fill(Color(.colorPrimary).opacity(0.75))
-                    .frame(width: 1.5, height: height + 4)
+                    .fill(Color(.colorPrimary).opacity(0.62))
+                    .frame(width: 1.2, height: height + 3)
                     .offset(x: min(max(targetX - 0.75, 0), geometry.size.width - 1.5), y: -2)
             }
         }
-        .frame(height: 5)
+        .frame(height: 3)
         .padding(.top, 2)
     }
 }
@@ -250,11 +332,11 @@ private struct StatisticsRangeCard: View {
         StatisticsCard {
             HStack(alignment: .firstTextBaseline) {
                 Text(title)
-                    .font(.headline)
+                    .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Color(.colorPrimary))
                 Spacer()
                 Text(abbreviation)
-                    .font(.headline.weight(.bold))
+                    .font(.subheadline.weight(.bold))
                     .foregroundStyle(Color(.colorTertiary))
             }
 
@@ -267,8 +349,8 @@ private struct StatisticsRangeCard: View {
                     }
                 }
             }
-            .frame(height: 20)
-            .clipShape(RoundedRectangle(cornerRadius: 5))
+            .frame(height: 14)
+            .clipShape(RoundedRectangle(cornerRadius: 4))
 
             HStack(alignment: .top, spacing: 6) {
                 ForEach(buckets) { bucket in
@@ -577,7 +659,7 @@ private struct StatisticsTrendCard: View {
                     AxisValueLabel {
                         if let axisValue = value.as(Double.self) {
                             Text(axisValue.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes)
-                                .font(.system(size: 9))
+                                .font(.system(size: 10))
                                 .foregroundStyle(Color(.colorTertiary))
                                 .monospacedDigit()
                         }
@@ -656,11 +738,11 @@ private struct StatisticsDailyPatternCard: View {
             StatisticsCard {
                 HStack(alignment: .firstTextBaseline) {
                     Text("Daily Pattern")
-                        .font(.headline)
+                        .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Color(.colorPrimary))
                     Spacer()
                     Text("Average \(GlucoseReportFormatting.percentage(averageInRangePercentage))")
-                        .font(.headline.weight(.bold))
+                        .font(.caption.weight(.bold))
                         .foregroundStyle(Color(.colorTertiary))
                         .monospacedDigit()
                 }
@@ -815,7 +897,7 @@ private struct StatisticsCard<Content: View>: View {
         VStack(alignment: .leading, spacing: 12) {
             if let title {
                 Text(title)
-                    .font(.headline)
+                    .font(.subheadline.weight(.semibold))
                     .foregroundStyle(Color(.colorPrimary))
             }
             content
