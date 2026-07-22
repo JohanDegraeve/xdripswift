@@ -253,7 +253,6 @@
 		4D31C0012FF5000100000001 /* GenerateReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0012FF5000100000001 /* GenerateReportView.swift */; };
 		4D31C0022FF5000100000001 /* GenerateReportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0022FF5000100000001 /* GenerateReportViewModel.swift */; };
 		4D31C0032FF5000100000001 /* ReportAGPChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0032FF5000100000001 /* ReportAGPChartView.swift */; };
-		4D31C0042FF5000100000001 /* ReportAnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0042FF5000100000001 /* ReportAnalyticsService.swift */; };
 		4D31C0052FF5000100000001 /* ReportClinicalPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0052FF5000100000001 /* ReportClinicalPageView.swift */; };
 		4D31C0062FF5000100000001 /* ReportDailySummarySectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0062FF5000100000001 /* ReportDailySummarySectionView.swift */; };
 		4D31C0072FF5000100000001 /* ReportFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0072FF5000100000001 /* ReportFormatting.swift */; };
@@ -1057,7 +1056,6 @@
 		4D30C0012FF5000100000001 /* GenerateReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateReportView.swift; sourceTree = "<group>"; };
 		4D30C0022FF5000100000001 /* GenerateReportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateReportViewModel.swift; sourceTree = "<group>"; };
 		4D30C0032FF5000100000001 /* ReportAGPChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportAGPChartView.swift; sourceTree = "<group>"; };
-		4D30C0042FF5000100000001 /* ReportAnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportAnalyticsService.swift; sourceTree = "<group>"; };
 		4D30C0052FF5000100000001 /* ReportClinicalPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportClinicalPageView.swift; sourceTree = "<group>"; };
 		4D30C0062FF5000100000001 /* ReportDailySummarySectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportDailySummarySectionView.swift; sourceTree = "<group>"; };
 		4D30C0072FF5000100000001 /* ReportFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFormatting.swift; sourceTree = "<group>"; };
@@ -2205,6 +2203,34 @@
 			path = BluetoothPeripherals;
 			sourceTree = "<group>";
 		};
+		4D30C0002FF5000100000001 /* Reports */ = {
+			isa = PBXGroup;
+			children = (
+				4D30C0012FF5000100000001 /* GenerateReportView.swift */,
+				4D30C0022FF5000100000001 /* GenerateReportViewModel.swift */,
+				4D30C0032FF5000100000001 /* ReportAGPChartView.swift */,
+				4D30C0052FF5000100000001 /* ReportClinicalPageView.swift */,
+				4D30C0062FF5000100000001 /* ReportDailySummarySectionView.swift */,
+				4D30C0072FF5000100000001 /* ReportFormatting.swift */,
+				4D30C0082FF5000100000001 /* ReportMetricGridView.swift */,
+				4D30C0092FF5000100000001 /* ReportModels.swift */,
+				4D30C00A2FF5000100000001 /* ReportPDFGenerator.swift */,
+				4D30C00B2FF5000100000001 /* ReportPreviewView.swift */,
+				4D30C00C2FF5000100000001 /* ReportTimeInRangeBarView.swift */,
+				4D30C00D2FF5000100000001 /* ReportUserDefaults.swift */,
+			);
+			path = Reports;
+			sourceTree = "<group>";
+		};
+		4D40C0002FF6000100000001 /* Statistics */ = {
+			isa = PBXGroup;
+			children = (
+				4D40C0012FF6000100000001 /* StatisticsView.swift */,
+				4D40C0022FF6000100000001 /* StatisticsViewModel.swift */,
+			);
+			path = Statistics;
+			sourceTree = "<group>";
+		};
 		4D7180102FE8000100000001 /* Medtrum */ = {
 			isa = PBXGroup;
 			children = (
@@ -2604,46 +2630,17 @@
 				4D20C0012FF1000100000001 /* RootHomeState.swift */,
 				4D20C0032FF1000100000001 /* RootHomeView.swift */,
 				4D20C0092FF1000100000001 /* RootTabView.swift */,
-				4D30C0002FF5000100000001 /* Reports */,
-				4D40C0002FF6000100000001 /* Statistics */,
 				4B0C00012F3B000100000001 /* SensorManagementView.swift */,
 				4E6100132FF3000100000001 /* SensorNoiseHistoryView.swift */,
 				475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */,
 				4AC0D0022F1D000100000001 /* SnoozeView.swift */,
 				4C20000B2F65000100000001 /* BluetoothPeripherals */,
+				4D30C0002FF5000100000001 /* Reports */,
 				F866974E2867A97000025441 /* Settings */,
+				4D40C0002FF6000100000001 /* Statistics */,
 				4C1000052F64000100000001 /* Treatments */,
 			);
 			path = SwiftUIViews;
-			sourceTree = "<group>";
-		};
-		4D30C0002FF5000100000001 /* Reports */ = {
-			isa = PBXGroup;
-			children = (
-				4D30C0012FF5000100000001 /* GenerateReportView.swift */,
-				4D30C0022FF5000100000001 /* GenerateReportViewModel.swift */,
-				4D30C0032FF5000100000001 /* ReportAGPChartView.swift */,
-				4D30C0042FF5000100000001 /* ReportAnalyticsService.swift */,
-				4D30C0052FF5000100000001 /* ReportClinicalPageView.swift */,
-				4D30C0062FF5000100000001 /* ReportDailySummarySectionView.swift */,
-				4D30C0072FF5000100000001 /* ReportFormatting.swift */,
-				4D30C0082FF5000100000001 /* ReportMetricGridView.swift */,
-				4D30C0092FF5000100000001 /* ReportModels.swift */,
-				4D30C00A2FF5000100000001 /* ReportPDFGenerator.swift */,
-				4D30C00B2FF5000100000001 /* ReportPreviewView.swift */,
-				4D30C00C2FF5000100000001 /* ReportTimeInRangeBarView.swift */,
-				4D30C00D2FF5000100000001 /* ReportUserDefaults.swift */,
-			);
-			path = Reports;
-			sourceTree = "<group>";
-		};
-		4D40C0002FF6000100000001 /* Statistics */ = {
-			isa = PBXGroup;
-			children = (
-				4D40C0012FF6000100000001 /* StatisticsView.swift */,
-				4D40C0022FF6000100000001 /* StatisticsViewModel.swift */,
-			);
-			path = Statistics;
 			sourceTree = "<group>";
 		};
 		F866974E2867A97000025441 /* Settings */ = {
@@ -4322,7 +4319,6 @@
 				4D31C0012FF5000100000001 /* GenerateReportView.swift in Sources */,
 				4D31C0022FF5000100000001 /* GenerateReportViewModel.swift in Sources */,
 				4D31C0032FF5000100000001 /* ReportAGPChartView.swift in Sources */,
-				4D31C0042FF5000100000001 /* ReportAnalyticsService.swift in Sources */,
 				4D31C0052FF5000100000001 /* ReportClinicalPageView.swift in Sources */,
 				4D31C0062FF5000100000001 /* ReportDailySummarySectionView.swift in Sources */,
 				4D31C0072FF5000100000001 /* ReportFormatting.swift in Sources */,
@@ -5520,12 +5516,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		F85FF3C2252D0C32004E6FF1 /* xdrip.xcdatamodeld */ = {

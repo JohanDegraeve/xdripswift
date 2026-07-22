@@ -8,300 +8,617 @@
 
 import CoreData
 import Foundation
+import os
 
-public final class StatisticsManager {
-    // MARK: - private properties
-    
-    /// BgReadingsAccessor instance
-    private var bgReadingsAccessor: BgReadingsAccessor
-    
-    /// used for calculating statistics on a background thread
+/// Central statistics service for app views and generated reports.
+///
+/// This class was re-written when the standalone Statistics tab and PDF reporting were added.
+/// The previous implementation only served the compact root view statistics, while the report
+/// feature temporarily introduced its own analytics service for AGP, trend, daily pattern and
+/// report-period calculations. Keeping those paths separate would make the same clinical metrics
+/// easy to calculate differently in different parts of the app.
+///
+/// `StatisticsManager` is now the single owner for CGM-derived statistics used by the home screen,
+/// Statistics tab and PDF reports. It deliberately returns small value types instead of managed
+/// objects. All Core Data work is serialized through `operationQueue` and fetched on the private
+/// context so heavyweight report/statistics requests cannot block the main context used by the
+/// home chart. Report analytics are cached and invalidated when stored CGM readings change.
+///
+/// The manager is marked `@unchecked Sendable` because callers may request async analytics from
+/// SwiftUI tasks, but all internal mutable state is isolated manually on the serial operation queue.
+public final class StatisticsManager: @unchecked Sendable {
+    private struct CGMSample {
+        let date: Date
+        let valueMgDl: Double
+        let deviceName: String?
+        let sensorID: String?
+        let hasCalibration: Bool
+    }
+
+    private struct CGMWindowCache {
+        let startDate: Date
+        let endDate: Date
+        let samples: [CGMSample]
+    }
+
+    private struct ReportAnalyticsCacheKey: Hashable {
+        let period: GlucoseReportPeriod
+        let usesMgDl: Bool
+    }
+
     private let operationQueue: OperationQueue
-    
-    /// a coreDataManager
-    private var coreDataManager: CoreDataManager
-    
-    // MARK: - intializer
-    
-    init(coreDataManager: CoreDataManager) {
-        // set coreDataManager and bgReadingsAccessor
-        self.coreDataManager = coreDataManager
-        bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
+    private let coreDataManager: CoreDataManager
+    private let calendar = Calendar.current
 
-        // initialize operationQueue
+    private var sampleCache: CGMWindowCache?
+    private var availableReportPeriodsCache: [GlucoseReportPeriod: Bool]?
+    private var reportAnalyticsCache: [ReportAnalyticsCacheKey: GlucoseReportAnalytics] = [:]
+
+    init(coreDataManager: CoreDataManager) {
+        self.coreDataManager = coreDataManager
+
         operationQueue = OperationQueue()
-        
-        // operationQueue will be queue of blocks that gets readings and updates glucoseChartPoints, startDate and endDate. To avoid race condition, the operations should be one after the other
+        operationQueue.name = "xDrip StatisticsManager"
         operationQueue.maxConcurrentOperationCount = 1
     }
-    
-    // MARK: - public functions
-    
-    /// calculates statistics, will execute in background.
-    /// - parameters:
-    ///     - callback : will be called with result of calculations in UI thread
-    public func calculateStatistics(fromDate: Date, toDate: Date? = Date(), callback: @escaping (Statistics) -> Void) {
-        // create a new operation
-        let operation = BlockOperation(block: {
-            // declare variables/constants
-            let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-            var glucoseValues: [Double] = []
-            
-            // declare return variables
-            var lowStatisticValue: Double = 0
-            var highStatisticValue: Double = 0
-            var inRangeStatisticValue: Double = 0
-            var averageStatisticValue: Double = 0
-            var a1CStatisticValue: Double = 0
-            var cVStatisticValue: Double = 0
-            var lowLimitForTIR: Double = 0
-            var highLimitForTIR: Double = 0
-            var numberOfDaysUsed = 0
-            
-            self.coreDataManager.privateManagedObjectContext.performAndWait {
-                // lets get the readings from the bgReadingsAccessor
-                let readings = self.bgReadingsAccessor.getBgReadings(from: fromDate, to: toDate, on: self.coreDataManager.privateManagedObjectContext)
-                
-                // if there are no available readings, return without doing anything
-                if readings.count == 0 {
-                    DispatchQueue.main.async {
-                        callback(Statistics(lowStatisticValue: 0, highStatisticValue: 0, inRangeStatisticValue: 0, averageStatisticValue: 0, a1CStatisticValue: 0, cVStatisticValue: 0, lowLimitForTIR: UserDefaults.standard.timeInRangeType.lowerLimit, highLimitForTIR: UserDefaults.standard.timeInRangeType.higherLimit, numberOfDaysUsed: 0))
-                    }
-                    return
-                }
-                
-                // let's calculate the actual first day of readings in bgReadings. Although the user wants to use 60 days to calculate, maybe we only have 4 days of data. This will be returned from the method and used in the UI. To ensure we calculate the whole days used, we should subtract 5 minutes from the fromDate
-                numberOfDaysUsed = Calendar.current.dateComponents([.day], from: readings.first!.timeStamp - 5 * 60, to: Date()).day!
-                
-                // when requesting the full 90 days and to avoid a date calculation bug caused by the last retrieved date not quite adding to a full 90 days, we'll just add 1 to the total
-                // it's a bit of a rough fix, but effective
-                numberOfDaysUsed += (numberOfDaysUsed == 89 ? 1 : 0)
-                
-                // get the minimum time between readings (convert to seconds). This is to avoid getting too many extra 60-second readings from the Libre 2 Direct - they will take up a lot more processing time and don't add anything to the accuracy of the results so we'll just filter them out if they exist.
-                let minimumSecondsBetweenReadings: Double = ConstantsStatistics.minimumFilterTimeBetweenReadings * 60
-                
-                // get the timestamp of the first reading
-                let firstValueTimeStamp = readings.first?.timeStamp
-                var previousValueTimeStamp = firstValueTimeStamp
-                
-                // add filter values to ensure that any clearly invalid glucose data is not included into the array and used in the calculations
-                let minValidReading: Double = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
-                let maxValidReading: Double = 450
-                
-                // step though all values, check them for validity, convert if necessary and append them to the glucoseValues array
-                for reading in readings {
-                    // declare and initialise the date variables needed
-                    var calculatedValue = reading.finalValue
-                    let currentTimeStamp = reading.timeStamp
-                    
-                    if calculatedValue != 0.0, calculatedValue >= minValidReading, calculatedValue <= maxValidReading {
-                        // get the difference between the previous value's timestamp and the new one
-                        let secondsDifference = Calendar.current.dateComponents([.second], from: previousValueTimeStamp!, to: currentTimeStamp)
-                        
-                        // if the current values timestamp is more than the minimum filter time, then add it to the glucoseValues array. Include a check to ensure that the first reading is added despite there not being any difference to itself
-                        if (Double(secondsDifference.second!) >= minimumSecondsBetweenReadings) || (previousValueTimeStamp == firstValueTimeStamp) {
-                            if !isMgDl {
-                                calculatedValue = calculatedValue * ConstantsBloodGlucose.mgDlToMmoll
-                            }
-                            
-                            glucoseValues.append(calculatedValue)
-                            
-                            // update the timestamp for the next loop
-                            previousValueTimeStamp = currentTimeStamp
-                        }
-                    }
-                }
-                
-                lowLimitForTIR = UserDefaults.standard.timeInRangeType.lowerLimit
-                highLimitForTIR = UserDefaults.standard.timeInRangeType.higherLimit
-                
-                // make sure that there exist elements in the glucoseValue array before trying to process statistics calculations or we could get a fatal divide by zero error/crash
-                if glucoseValues.count > 0 {
-                    // calculate low %
-                    lowStatisticValue = Double((glucoseValues.lazy.filter { $0 < lowLimitForTIR }.count * 200) / (glucoseValues.count * 2))
-                
-                    // calculate high %
-                    highStatisticValue = Double((glucoseValues.lazy.filter { $0 > highLimitForTIR }.count * 200) / (glucoseValues.count * 2))
-                    
-                    // calculate TIR % (let's be lazy and just subtract the other two values from 100)
-                    inRangeStatisticValue = 100 - lowStatisticValue - highStatisticValue
-                    
-                    // calculate average glucose value
-                    averageStatisticValue = Double(glucoseValues.reduce(0, +)) / Double(glucoseValues.count)
-                
-                    // calculate an estimated HbA1C value using either IFCC (e.g 49 mmol/mol) or NGSP (e.g 5.8%) methods: http://www.ngsp.org/ifccngsp.asp
-                    if UserDefaults.standard.useIFCCA1C {
-                        a1CStatisticValue = (((46.7 + Double(isMgDl ? averageStatisticValue : (averageStatisticValue / ConstantsBloodGlucose.mgDlToMmoll))) / 28.7) - 2.152) / 0.09148
-                    } else {
-                        a1CStatisticValue = (46.7 + Double(isMgDl ? averageStatisticValue : (averageStatisticValue / ConstantsBloodGlucose.mgDlToMmoll))) / 28.7
-                    }
-                    
-                    // calculate standard deviation (we won't show this but we need it to calculate CV)
-                    var sum: Double = 0
-                    
-                    for glucoseValue in glucoseValues {
-                        sum += (Double(glucoseValue.value) - averageStatisticValue) * (Double(glucoseValue.value) - averageStatisticValue)
-                    }
-                    
-                    let stdDeviationStatisticValue: Double = sqrt(sum / Double(glucoseValues.count))
-                    
-                    // calculate Coeffecient of Variation
-                    cVStatisticValue = (stdDeviationStatisticValue / averageStatisticValue) * 100
-                
-                } else {
-                    // just assign a zero value to all statistics variables
-                    lowStatisticValue = 0
-                    highStatisticValue = 0
-                    inRangeStatisticValue = 0
-                    averageStatisticValue = 0
-                    cVStatisticValue = 0
-                    a1CStatisticValue = 0
-                }
-            }
-            
-            // call callback in main thread,
-            DispatchQueue.main.async {
-                callback(Statistics(lowStatisticValue: lowStatisticValue, highStatisticValue: highStatisticValue, inRangeStatisticValue: inRangeStatisticValue, averageStatisticValue: averageStatisticValue, a1CStatisticValue: a1CStatisticValue, cVStatisticValue: cVStatisticValue, lowLimitForTIR: lowLimitForTIR, highLimitForTIR: highLimitForTIR, numberOfDaysUsed: numberOfDaysUsed))
-            }
 
-        })
-        
-        // add the operation to the queue and start it. As maxConcurrentOperationCount = 1, it may be kept until a previous operation has finished
-        operationQueue.addOperation {
-            operation.start()
+    /// Clears cached sample windows and derived analytics.
+    ///
+    /// Call this after importing, deleting, or receiving CGM data. Existing root statistics APIs
+    /// still compute through the same serialized queue, so invalidation never races active work.
+    public func invalidate() {
+        operationQueue.addOperation { [weak self] in
+            self?.sampleCache = nil
+            self?.availableReportPeriodsCache = nil
+            self?.reportAnalyticsCache.removeAll()
         }
     }
-    
-    /// Calculates per-day TIR statistics in a single batched Core Data fetch.
+
+    /// Calculates the compact statistics used by the home screen.
     /// - Parameters:
-    ///   - fromDate: Start of the range (inclusive)
-    ///   - toDate: End of the range (inclusive if same day; defaults to now)
-    ///   - callback: Called on the main thread with a dictionary keyed by each day's start-of-day `Date`
+    ///   - fromDate: Start of the statistics window.
+    ///   - toDate: Optional end of the statistics window.
+    ///   - callback: Called on the main thread with the calculated values.
+    public func calculateStatistics(fromDate: Date, toDate: Date? = Date(), callback: @escaping (Statistics) -> Void) {
+        operationQueue.addOperation { [weak self] in
+            guard let self else { return }
+
+            let statistics = self.makeRootStatistics(fromDate: fromDate, toDate: toDate)
+            DispatchQueue.main.async {
+                callback(statistics)
+            }
+        }
+    }
+
+    /// Calculates per-day TIR statistics in a single serialized Core Data fetch.
+    /// - Parameters:
+    ///   - fromDate: Start of the range.
+    ///   - toDate: End of the range.
+    ///   - callback: Called on the main thread with one statistics value per day.
     public func calculateDailyTIR(fromDate: Date, toDate: Date? = Date(), callback: @escaping ([Date: Statistics]) -> Void) {
-        // create a new operation
-        let operation = BlockOperation(block: {
-            // declare variables/constants
-            let isMgDl: Bool = UserDefaults.standard.bloodGlucoseUnitIsMgDl
-            let lowLimitForTIRLocal: Double = UserDefaults.standard.timeInRangeType.lowerLimit
-            let highLimitForTIRLocal: Double = UserDefaults.standard.timeInRangeType.higherLimit
-            let minimumSecondsBetweenReadings: Double = ConstantsStatistics.minimumFilterTimeBetweenReadings * 60
-            let minValidReading: Double = ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl
-            let maxValidReading: Double = 450
+        operationQueue.addOperation { [weak self] in
+            guard let self else { return }
 
-            var statisticsByDay: [Date: Statistics] = [:]
-
-            // Build the list of calendar days we want to cover (inclusive)
-            let calendar = Calendar.current
-            let startDay = calendar.startOfDay(for: fromDate)
-            let endDay = calendar.startOfDay(for: toDate ?? Date())
-            var dayIterator = startDay
-            var allDays: [Date] = []
-            
-            while dayIterator <= endDay {
-                allDays.append(dayIterator)
-                guard let next = calendar.date(byAdding: .day, value: 1, to: dayIterator) else { break }
-                dayIterator = next
-            }
-
-            self.coreDataManager.privateManagedObjectContext.performAndWait {
-                // Single fetch for the entire window
-                let readings = self.bgReadingsAccessor.getBgReadings(from: fromDate, to: toDate, on: self.coreDataManager.privateManagedObjectContext)
-
-                // Group filtered, unit-corrected values by calendar day, with minimal Libre 2 60s sampling noise
-                var glucoseValuesByDay: [Date: [Double]] = [:]
-                var previousTimeStampByDay: [Date: Date] = [:]
-
-                for reading in readings {
-                    var calculatedValue = reading.finalValue
-                    let currentTimeStamp = reading.timeStamp
-
-                    // Basic validity filter first
-                    if calculatedValue != 0.0, calculatedValue >= minValidReading, calculatedValue <= maxValidReading {
-                        let dayKey = calendar.startOfDay(for: currentTimeStamp)
-                        let previousTimeStamp = previousTimeStampByDay[dayKey]
-
-                        // Respect the minimum spacing per day-bucket
-                        var allowAppend = false
-                        if previousTimeStamp == nil {
-                            allowAppend = true
-                        } else {
-                            let secondsDifference = calendar.dateComponents([.second], from: previousTimeStamp!, to: currentTimeStamp).second ?? 0
-                            allowAppend = Double(secondsDifference) >= minimumSecondsBetweenReadings
-                        }
-
-                        if allowAppend {
-                            if !isMgDl {
-                                calculatedValue = calculatedValue * ConstantsBloodGlucose.mgDlToMmoll
-                            }
-                            var dayArray = glucoseValuesByDay[dayKey] ?? []
-                            dayArray.append(calculatedValue)
-                            glucoseValuesByDay[dayKey] = dayArray
-                            previousTimeStampByDay[dayKey] = currentTimeStamp
-                        }
-                    }
-                }
-
-                // Produce a Statistics value for every requested day (including empty days)
-                for dayKey in allDays {
-                    let glucoseValues = glucoseValuesByDay[dayKey] ?? []
-
-                    if glucoseValues.isEmpty {
-                        statisticsByDay[dayKey] = Statistics(
-                            lowStatisticValue: 0,
-                            highStatisticValue: 0,
-                            inRangeStatisticValue: 0,
-                            averageStatisticValue: 0,
-                            a1CStatisticValue: 0,
-                            cVStatisticValue: 0,
-                            lowLimitForTIR: lowLimitForTIRLocal,
-                            highLimitForTIR: highLimitForTIRLocal,
-                            numberOfDaysUsed: 0
-                        )
-                    } else {
-                        let count = glucoseValues.count
-                        let lowCount = glucoseValues.lazy.filter { $0 < lowLimitForTIRLocal }.count
-                        let highCount = glucoseValues.lazy.filter { $0 > highLimitForTIRLocal }.count
-
-                        // Keep the same integer-percent arithmetic style used elsewhere
-                        let lowStatisticValue = Double((lowCount * 200) / (count * 2))
-                        let highStatisticValue = Double((highCount * 200) / (count * 2))
-                        let inRangeStatisticValue = 100 - lowStatisticValue - highStatisticValue
-
-                        let sum = glucoseValues.reduce(0, +)
-                        let averageStatisticValue = sum / Double(count)
-
-                        let a1CStatisticValue: Double
-                        if UserDefaults.standard.useIFCCA1C {
-                            a1CStatisticValue = (((46.7 + Double(isMgDl ? averageStatisticValue : (averageStatisticValue / ConstantsBloodGlucose.mgDlToMmoll))) / 28.7) - 2.152) / 0.09148
-                        } else {
-                            a1CStatisticValue = (46.7 + Double(isMgDl ? averageStatisticValue : (averageStatisticValue / ConstantsBloodGlucose.mgDlToMmoll))) / 28.7
-                        }
-
-                        var sumOfSquares: Double = 0
-                        for value in glucoseValues {
-                            sumOfSquares += (value - averageStatisticValue) * (value - averageStatisticValue)
-                        }
-                        let standardDeviationStatisticValue = sqrt(sumOfSquares / Double(count))
-                        let cVStatisticValue = (standardDeviationStatisticValue / averageStatisticValue) * 100
-
-                        statisticsByDay[dayKey] = Statistics(lowStatisticValue: lowStatisticValue, highStatisticValue: highStatisticValue, inRangeStatisticValue: inRangeStatisticValue, averageStatisticValue: averageStatisticValue, a1CStatisticValue: a1CStatisticValue, cVStatisticValue: cVStatisticValue, lowLimitForTIR: lowLimitForTIRLocal, highLimitForTIR: highLimitForTIRLocal, numberOfDaysUsed: 1)
-                    }
-                }
-            }
-
-            // Always callback - the queue is already serialized
+            let statisticsByDay = self.makeDailyTIRStatistics(fromDate: fromDate, toDate: toDate)
             DispatchQueue.main.async {
                 callback(statisticsByDay)
             }
-        })
-
-        // Serialize via the same queue as the single-day calculator
-        operationQueue.addOperation {
-            operation.start()
         }
     }
-    
-    /// can store result of calculations in calculateStatistics, to be used in UI
+
+    /// Returns available report periods based on CGM coverage.
+    ///
+    /// The 70% coverage threshold follows the same consensus target used by the report:
+    /// https://doi.org/10.2337/dci19-0028
+    func availableReportPeriods() async -> [GlucoseReportPeriod: Bool] {
+        await withCheckedContinuation { continuation in
+            operationQueue.addOperation { [weak self] in
+                guard let self else {
+                    continuation.resume(returning: [:])
+                    return
+                }
+
+                if let cached = self.availableReportPeriodsCache {
+                    continuation.resume(returning: cached)
+                    return
+                }
+
+                let endDate = Date()
+                let samples = self.cachedSamples(
+                    fromDate: endDate.addingTimeInterval(-Double(GlucoseReportPeriod.oneYear.rawValue + 1) * 24 * 60 * 60),
+                    toDate: endDate
+                )
+
+                let availability = Dictionary(uniqueKeysWithValues: GlucoseReportPeriod.allCases.map { period in
+                    let requiredStart = endDate.addingTimeInterval(-Double(period.rawValue) * 24 * 60 * 60)
+                    let sampleCount = samples.filter { $0.date >= requiredStart }.count
+                    return (period, Self.hasEnoughCoverage(sampleCount: sampleCount, period: period))
+                })
+
+                self.availableReportPeriodsCache = availability
+                continuation.resume(returning: availability)
+            }
+        }
+    }
+
+    /// Returns full CGM analytics for the Statistics tab and PDF reports.
+    ///
+    /// This is intentionally separate from `calculateStatistics` so the home screen never needs to
+    /// build AGP percentiles, daily bars, trend points, or device metadata.
+    func reportAnalytics(for configuration: GlucoseReportConfiguration) async -> GlucoseReportAnalytics {
+        await withCheckedContinuation { continuation in
+            operationQueue.addOperation { [weak self] in
+                guard let self else {
+                    continuation.resume(returning: StatisticsManager.emptyReportAnalytics(for: configuration, periodEnd: Date()))
+                    return
+                }
+
+                let cacheKey = ReportAnalyticsCacheKey(
+                    period: configuration.period,
+                    usesMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl
+                )
+
+                if let cached = self.reportAnalyticsCache[cacheKey] {
+                    continuation.resume(returning: cached)
+                    return
+                }
+
+                let analytics = self.makeReportAnalytics(for: configuration)
+                self.reportAnalyticsCache[cacheKey] = analytics
+                continuation.resume(returning: analytics)
+            }
+        }
+    }
+
+    private func makeRootStatistics(fromDate: Date, toDate: Date?) -> Statistics {
+        let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        let lowLimitForTIR = UserDefaults.standard.timeInRangeType.lowerLimit
+        let highLimitForTIR = UserDefaults.standard.timeInRangeType.higherLimit
+        let samples = fetchSamples(fromDate: fromDate, toDate: toDate ?? Date())
+
+        guard !samples.isEmpty else {
+            return Statistics(
+                lowStatisticValue: 0,
+                highStatisticValue: 0,
+                inRangeStatisticValue: 0,
+                averageStatisticValue: 0,
+                a1CStatisticValue: 0,
+                cVStatisticValue: 0,
+                lowLimitForTIR: lowLimitForTIR,
+                highLimitForTIR: highLimitForTIR,
+                numberOfDaysUsed: 0
+            )
+        }
+
+        let filteredValues = filteredRootStatisticValues(samples: samples, isMgDl: isMgDl)
+        guard !filteredValues.isEmpty else {
+            return Statistics(
+                lowStatisticValue: 0,
+                highStatisticValue: 0,
+                inRangeStatisticValue: 0,
+                averageStatisticValue: 0,
+                a1CStatisticValue: 0,
+                cVStatisticValue: 0,
+                lowLimitForTIR: lowLimitForTIR,
+                highLimitForTIR: highLimitForTIR,
+                numberOfDaysUsed: 0
+            )
+        }
+
+        let lowCount = filteredValues.lazy.filter { $0 < lowLimitForTIR }.count
+        let highCount = filteredValues.lazy.filter { $0 > highLimitForTIR }.count
+        let lowStatisticValue = Double((lowCount * 200) / (filteredValues.count * 2))
+        let highStatisticValue = Double((highCount * 200) / (filteredValues.count * 2))
+        let averageStatisticValue = filteredValues.reduce(0, +) / Double(filteredValues.count)
+        let a1CStatisticValue = Self.a1cValue(forAverage: averageStatisticValue, isMgDl: isMgDl)
+        let cVStatisticValue = Self.coefficientOfVariation(values: filteredValues, average: averageStatisticValue)
+        let firstDate = samples.first?.date ?? Date()
+        var numberOfDaysUsed = calendar.dateComponents([.day], from: firstDate - 5 * 60, to: Date()).day ?? 0
+
+        // Keep the existing root-view 90-day display behavior.
+        numberOfDaysUsed += (numberOfDaysUsed == 89 ? 1 : 0)
+
+        return Statistics(
+            lowStatisticValue: lowStatisticValue,
+            highStatisticValue: highStatisticValue,
+            inRangeStatisticValue: 100 - lowStatisticValue - highStatisticValue,
+            averageStatisticValue: averageStatisticValue,
+            a1CStatisticValue: a1CStatisticValue,
+            cVStatisticValue: cVStatisticValue,
+            lowLimitForTIR: lowLimitForTIR,
+            highLimitForTIR: highLimitForTIR,
+            numberOfDaysUsed: numberOfDaysUsed
+        )
+    }
+
+    private func makeDailyTIRStatistics(fromDate: Date, toDate: Date?) -> [Date: Statistics] {
+        let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
+        let lowLimitForTIR = UserDefaults.standard.timeInRangeType.lowerLimit
+        let highLimitForTIR = UserDefaults.standard.timeInRangeType.higherLimit
+        let startDay = calendar.startOfDay(for: fromDate)
+        let endDate = toDate ?? Date()
+        let endDay = calendar.startOfDay(for: endDate)
+        let samples = fetchSamples(fromDate: fromDate, toDate: endDate)
+        let grouped = Dictionary(grouping: samples) { calendar.startOfDay(for: $0.date) }
+        var statisticsByDay: [Date: Statistics] = [:]
+        var day = startDay
+
+        while day <= endDay {
+            let daySamples = grouped[day] ?? []
+            let values = filteredRootStatisticValues(samples: daySamples, isMgDl: isMgDl)
+            statisticsByDay[day] = makeStatisticsForDay(
+                values: values,
+                lowLimitForTIR: lowLimitForTIR,
+                highLimitForTIR: highLimitForTIR,
+                isMgDl: isMgDl
+            )
+
+            guard let nextDay = calendar.date(byAdding: .day, value: 1, to: day) else { break }
+            day = nextDay
+        }
+
+        return statisticsByDay
+    }
+
+    private func makeStatisticsForDay(values: [Double], lowLimitForTIR: Double, highLimitForTIR: Double, isMgDl: Bool) -> Statistics {
+        guard !values.isEmpty else {
+            return Statistics(
+                lowStatisticValue: 0,
+                highStatisticValue: 0,
+                inRangeStatisticValue: 0,
+                averageStatisticValue: 0,
+                a1CStatisticValue: 0,
+                cVStatisticValue: 0,
+                lowLimitForTIR: lowLimitForTIR,
+                highLimitForTIR: highLimitForTIR,
+                numberOfDaysUsed: 0
+            )
+        }
+
+        let lowCount = values.lazy.filter { $0 < lowLimitForTIR }.count
+        let highCount = values.lazy.filter { $0 > highLimitForTIR }.count
+        let lowStatisticValue = Double((lowCount * 200) / (values.count * 2))
+        let highStatisticValue = Double((highCount * 200) / (values.count * 2))
+        let averageStatisticValue = values.reduce(0, +) / Double(values.count)
+
+        return Statistics(
+            lowStatisticValue: lowStatisticValue,
+            highStatisticValue: highStatisticValue,
+            inRangeStatisticValue: 100 - lowStatisticValue - highStatisticValue,
+            averageStatisticValue: averageStatisticValue,
+            a1CStatisticValue: Self.a1cValue(forAverage: averageStatisticValue, isMgDl: isMgDl),
+            cVStatisticValue: Self.coefficientOfVariation(values: values, average: averageStatisticValue),
+            lowLimitForTIR: lowLimitForTIR,
+            highLimitForTIR: highLimitForTIR,
+            numberOfDaysUsed: 1
+        )
+    }
+
+    private func makeReportAnalytics(for configuration: GlucoseReportConfiguration) -> GlucoseReportAnalytics {
+        let periodEnd = Date()
+        let periodStart = periodEnd.addingTimeInterval(-Double(configuration.period.rawValue) * 24 * 60 * 60)
+        let samples = cachedSamples(fromDate: periodStart, toDate: periodEnd)
+            .filter { Self.isValidGlucoseMgDl($0.valueMgDl) }
+            .sorted { $0.date < $1.date }
+
+        guard !samples.isEmpty else {
+            return Self.emptyReportAnalytics(for: configuration, periodEnd: periodEnd)
+        }
+
+        let values = samples.map(\.valueMgDl)
+        let average = values.reduce(0, +) / Double(values.count)
+        let standardDeviation = Self.standardDeviation(values: values, average: average)
+        let expectedSamples = Double(Self.expectedSamples(for: configuration.period))
+        let deviceNames = Array(
+            Set(samples.compactMap { sample in
+                let name = sample.deviceName?.trimmingCharacters(in: .whitespacesAndNewlines)
+                return name?.isEmpty == false ? name : nil
+            })
+        ).sorted()
+
+        return GlucoseReportAnalytics(
+            periodStart: periodStart,
+            periodEnd: periodEnd,
+            firstReading: samples.first?.date,
+            lastReading: samples.last?.date,
+            sampleCount: samples.count,
+            dataCapturePercentage: min(100, Double(samples.count) / expectedSamples * 100),
+            readingsPerDay: Double(samples.count) / Double(configuration.period.rawValue),
+            usesMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl,
+            averageMgDl: average,
+            standardDeviationMgDl: standardDeviation,
+            coefficientOfVariation: average > 0 ? standardDeviation / average * 100 : 0,
+            gmiPercentage: GlucoseReportClinicalMath.gmiPercentage(forAverageMgDl: average),
+            rangeDistribution: makeRangeDistribution(samples: samples),
+            tightRangeDistribution: makeTightRangeDistribution(samples: samples),
+            agpPoints: makeAGPPoints(samples: samples),
+            dailySummaries: makeDailySummaries(samples: samples, periodEnd: periodEnd, periodDays: configuration.period.rawValue),
+            trendPoints: makeTrendPoints(samples: samples),
+            deviceNames: deviceNames,
+            sensorCount: Set(samples.compactMap(\.sensorID)).count,
+            calibrationCount: samples.filter(\.hasCalibration).count,
+            lowEventCount: countEvents(samples: samples, threshold: GlucoseReportClinicalConstants.timeInRangeLowMgDl, isBelow: true),
+            veryLowEventCount: countEvents(samples: samples, threshold: GlucoseReportClinicalConstants.veryLowMgDl, isBelow: true),
+            highEventCount: countEvents(samples: samples, threshold: GlucoseReportClinicalConstants.timeInRangeHighMgDl, isBelow: false),
+            veryHighEventCount: countEvents(samples: samples, threshold: GlucoseReportClinicalConstants.veryHighMgDl, isBelow: false)
+        )
+    }
+
+    private func cachedSamples(fromDate: Date, toDate: Date) -> [CGMSample] {
+        if let sampleCache,
+           sampleCache.startDate <= fromDate,
+           sampleCache.endDate >= toDate {
+            return sampleCache.samples.filter { $0.date >= fromDate && $0.date <= toDate }
+        }
+
+        let samples = fetchSamples(fromDate: fromDate, toDate: toDate)
+        sampleCache = CGMWindowCache(startDate: fromDate, endDate: toDate, samples: samples)
+        availableReportPeriodsCache = nil
+        reportAnalyticsCache.removeAll()
+        return samples
+    }
+
+    private func fetchSamples(fromDate: Date, toDate: Date) -> [CGMSample] {
+        let context = coreDataManager.privateManagedObjectContext
+        var samples: [CGMSample] = []
+
+        context.performAndWait {
+            let fetchRequest: NSFetchRequest<BgReading> = BgReading.fetchRequest()
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BgReading.timeStamp), ascending: true)]
+            fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
+                NSPredicate(format: "timeStamp > %@ AND timeStamp < %@", fromDate as NSDate, toDate as NSDate),
+                NSPredicate(format: "isSuppressedByFiveMinuteCadence == NO")
+            ])
+            fetchRequest.returnsObjectsAsFaults = false
+            fetchRequest.includesPropertyValues = true
+            fetchRequest.relationshipKeyPathsForPrefetching = ["sensor", "calibration"]
+
+            do {
+                let readings = try context.fetch(fetchRequest)
+                samples = readings.compactMap { reading in
+                    guard reading.finalValue != 0,
+                          Self.isValidGlucoseMgDl(reading.finalValue) else {
+                        return nil
+                    }
+
+                    return CGMSample(
+                        date: reading.timeStamp,
+                        valueMgDl: reading.finalValue,
+                        deviceName: reading.deviceName,
+                        sensorID: reading.sensor?.id,
+                        hasCalibration: reading.calibration != nil
+                    )
+                }
+            } catch {
+                trace("in StatisticsManager.fetchSamples, Unable to execute BgReading fetch request: %{public}@", log: OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataBgReadings), category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, error.localizedDescription)
+            }
+        }
+
+        return samples
+    }
+
+    private func filteredRootStatisticValues(samples: [CGMSample], isMgDl: Bool) -> [Double] {
+        let minimumSecondsBetweenReadings = Double(ConstantsStatistics.minimumFilterTimeBetweenReadings) * 60
+        var values: [Double] = []
+        var previousDate: Date?
+
+        for sample in samples {
+            let shouldAppend = previousDate.map { sample.date.timeIntervalSince($0) >= minimumSecondsBetweenReadings } ?? true
+            guard shouldAppend else { continue }
+
+            values.append(isMgDl ? sample.valueMgDl : sample.valueMgDl * ConstantsBloodGlucose.mgDlToMmoll)
+            previousDate = sample.date
+        }
+
+        return values
+    }
+
+    private func makeRangeDistribution(samples: [CGMSample]) -> GlucoseReportRangeDistribution {
+        let total = Double(samples.count)
+        func percentage(_ predicate: (Double) -> Bool) -> Double {
+            Double(samples.filter { predicate($0.valueMgDl) }.count) / total * 100
+        }
+
+        return GlucoseReportRangeDistribution(
+            veryLow: percentage { $0 < GlucoseReportClinicalConstants.veryLowMgDl },
+            low: percentage { $0 >= GlucoseReportClinicalConstants.veryLowMgDl && $0 < GlucoseReportClinicalConstants.timeInRangeLowMgDl },
+            target: percentage { $0 >= GlucoseReportClinicalConstants.timeInRangeLowMgDl && $0 <= GlucoseReportClinicalConstants.timeInRangeHighMgDl },
+            high: percentage { $0 > GlucoseReportClinicalConstants.timeInRangeHighMgDl && $0 <= GlucoseReportClinicalConstants.veryHighMgDl },
+            veryHigh: percentage { $0 > GlucoseReportClinicalConstants.veryHighMgDl }
+        )
+    }
+
+    private func makeTightRangeDistribution(samples: [CGMSample]) -> GlucoseReportRangeDistribution {
+        let total = Double(samples.count)
+        func percentage(_ predicate: (Double) -> Bool) -> Double {
+            Double(samples.filter { predicate($0.valueMgDl) }.count) / total * 100
+        }
+
+        return .tightRange(
+            below: percentage { $0 < GlucoseReportClinicalConstants.timeInTightRangeLowMgDl },
+            target: percentage { $0 >= GlucoseReportClinicalConstants.timeInTightRangeLowMgDl && $0 <= GlucoseReportClinicalConstants.timeInTightRangeHighMgDl },
+            above: percentage { $0 > GlucoseReportClinicalConstants.timeInTightRangeHighMgDl }
+        )
+    }
+
+    private func makeAGPPoints(samples: [CGMSample]) -> [GlucoseReportAGPPoint] {
+        let bucketSize = 30
+        let grouped = Dictionary(grouping: samples) { sample in
+            let components = calendar.dateComponents([.hour, .minute], from: sample.date)
+            let minuteOfDay = (components.hour ?? 0) * 60 + (components.minute ?? 0)
+            return minuteOfDay / bucketSize
+        }
+
+        return grouped.keys.sorted().compactMap { bucket -> GlucoseReportAGPPoint? in
+            let values = grouped[bucket]?.map(\.valueMgDl).sorted() ?? []
+            guard values.count >= 3 else { return nil }
+
+            return GlucoseReportAGPPoint(
+                minuteOfDay: bucket * bucketSize,
+                p5MgDl: Self.percentile(0.05, values: values),
+                p25MgDl: Self.percentile(0.25, values: values),
+                medianMgDl: Self.percentile(0.50, values: values),
+                p75MgDl: Self.percentile(0.75, values: values),
+                p95MgDl: Self.percentile(0.95, values: values)
+            )
+        }
+    }
+
+    private func makeDailySummaries(samples: [CGMSample], periodEnd: Date, periodDays: Int) -> [GlucoseReportDailySummary] {
+        let grouped = Dictionary(grouping: samples) { calendar.startOfDay(for: $0.date) }
+        let endDay = calendar.startOfDay(for: periodEnd)
+        let startDay = calendar.date(byAdding: .day, value: -(periodDays - 1), to: endDay) ?? endDay
+        var summaries: [GlucoseReportDailySummary] = []
+        var day = startDay
+
+        while day <= endDay {
+            if let daySamples = grouped[day], !daySamples.isEmpty {
+                let values = daySamples.map(\.valueMgDl)
+                let average = values.reduce(0, +) / Double(values.count)
+                let total = Double(values.count)
+                summaries.append(GlucoseReportDailySummary(
+                    date: day,
+                    averageMgDl: average,
+                    targetPercentage: Double(daySamples.filter { $0.valueMgDl >= GlucoseReportClinicalConstants.timeInRangeLowMgDl && $0.valueMgDl <= GlucoseReportClinicalConstants.timeInRangeHighMgDl }.count) / total * 100,
+                    lowPercentage: Double(daySamples.filter { $0.valueMgDl < GlucoseReportClinicalConstants.timeInRangeLowMgDl }.count) / total * 100,
+                    highPercentage: Double(daySamples.filter { $0.valueMgDl > GlucoseReportClinicalConstants.timeInRangeHighMgDl }.count) / total * 100,
+                    sampleCount: daySamples.count
+                ))
+            } else {
+                summaries.append(GlucoseReportDailySummary(date: day, averageMgDl: 0, targetPercentage: 0, lowPercentage: 0, highPercentage: 0, sampleCount: 0))
+            }
+
+            guard let nextDay = calendar.date(byAdding: .day, value: 1, to: day) else { break }
+            day = nextDay
+        }
+
+        return summaries
+    }
+
+    private func makeTrendPoints(samples: [CGMSample]) -> [GlucoseReportTrendPoint] {
+        let grouped = Dictionary(grouping: samples) { sample in
+            calendar.date(from: calendar.dateComponents([.yearForWeekOfYear, .weekOfYear], from: sample.date)) ?? calendar.startOfDay(for: sample.date)
+        }
+
+        return grouped.keys.sorted().compactMap { date -> GlucoseReportTrendPoint? in
+            guard let bucketSamples = grouped[date], bucketSamples.count >= 12 else { return nil }
+            let values = bucketSamples.map(\.valueMgDl)
+            let average = values.reduce(0, +) / Double(values.count)
+            let standardDeviation = Self.standardDeviation(values: values, average: average)
+
+            return GlucoseReportTrendPoint(
+                date: date,
+                interval: .weekly,
+                averageMgDl: average,
+                coefficientOfVariation: average > 0 ? standardDeviation / average * 100 : 0,
+                sampleCount: bucketSamples.count
+            )
+        }
+    }
+
+    private func countEvents(samples: [CGMSample], threshold: Double, isBelow: Bool) -> Int {
+        var eventCount = 0
+        var isInsideEvent = false
+        var previousEventSampleDate: Date?
+
+        for sample in samples {
+            let matches = isBelow ? sample.valueMgDl < threshold : sample.valueMgDl > threshold
+            let continuesPreviousEvent = previousEventSampleDate.map { sample.date.timeIntervalSince($0) <= 15 * 60 } ?? false
+
+            if matches {
+                if !isInsideEvent || !continuesPreviousEvent {
+                    eventCount += 1
+                }
+                isInsideEvent = true
+                previousEventSampleDate = sample.date
+            } else if !continuesPreviousEvent {
+                isInsideEvent = false
+                previousEventSampleDate = nil
+            }
+        }
+
+        return eventCount
+    }
+
+    private static func a1cValue(forAverage average: Double, isMgDl: Bool) -> Double {
+        let averageMgDl = isMgDl ? average : average / ConstantsBloodGlucose.mgDlToMmoll
+
+        // NGSP/DCCT and IFCC conversion equations: http://www.ngsp.org/ifccngsp.asp
+        if UserDefaults.standard.useIFCCA1C {
+            return (((46.7 + averageMgDl) / 28.7) - 2.152) / 0.09148
+        } else {
+            return (46.7 + averageMgDl) / 28.7
+        }
+    }
+
+    private static func coefficientOfVariation(values: [Double], average: Double) -> Double {
+        guard average > 0 else { return 0 }
+        return standardDeviation(values: values, average: average) / average * 100
+    }
+
+    private static func standardDeviation(values: [Double], average: Double) -> Double {
+        guard !values.isEmpty else { return 0 }
+        let sumOfSquares = values.reduce(0) { partialResult, value in
+            partialResult + pow(value - average, 2)
+        }
+        return sqrt(sumOfSquares / Double(values.count))
+    }
+
+    private static func percentile(_ percentile: Double, values: [Double]) -> Double {
+        guard !values.isEmpty else { return 0 }
+        let position = percentile * Double(values.count - 1)
+        let lower = Int(floor(position))
+        let upper = Int(ceil(position))
+        guard lower != upper else { return values[lower] }
+
+        let weight = position - Double(lower)
+        return values[lower] * (1 - weight) + values[upper] * weight
+    }
+
+    private static func isValidGlucoseMgDl(_ value: Double) -> Bool {
+        value >= ConstantsGlucoseChart.absoluteMinimumChartValueInMgdl && value <= 450
+    }
+
+    private static func hasEnoughCoverage(sampleCount: Int, period: GlucoseReportPeriod) -> Bool {
+        Double(sampleCount) >= Double(expectedSamples(for: period)) * GlucoseReportClinicalConstants.minimumDataCapturePercentage / 100
+    }
+
+    private static func expectedSamples(for period: GlucoseReportPeriod) -> Int {
+        period.rawValue * GlucoseReportClinicalConstants.expectedReadingsPerDay
+    }
+
+    private static func emptyReportAnalytics(for configuration: GlucoseReportConfiguration, periodEnd: Date) -> GlucoseReportAnalytics {
+        let periodStart = periodEnd.addingTimeInterval(-Double(configuration.period.rawValue) * 24 * 60 * 60)
+
+        return GlucoseReportAnalytics(
+            periodStart: periodStart,
+            periodEnd: periodEnd,
+            firstReading: nil,
+            lastReading: nil,
+            sampleCount: 0,
+            dataCapturePercentage: 0,
+            readingsPerDay: 0,
+            usesMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl,
+            averageMgDl: 0,
+            standardDeviationMgDl: 0,
+            coefficientOfVariation: 0,
+            gmiPercentage: 0,
+            rangeDistribution: GlucoseReportRangeDistribution(veryLow: 0, low: 0, target: 0, high: 0, veryHigh: 0),
+            tightRangeDistribution: .tightRange(below: 0, target: 0, above: 0),
+            agpPoints: [],
+            dailySummaries: [],
+            trendPoints: [],
+            deviceNames: [],
+            sensorCount: 0,
+            calibrationCount: 0,
+            lowEventCount: 0,
+            veryLowEventCount: 0,
+            highEventCount: 0,
+            veryHighEventCount: 0
+        )
+    }
+
+    /// Result model used by existing root/landscape statistics views.
     public struct Statistics {
         var lowStatisticValue: Double
         var highStatisticValue: Double

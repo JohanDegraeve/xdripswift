@@ -301,7 +301,7 @@ struct GlucoseReportTrendPoint: Identifiable {
 }
 
 enum GlucoseReportClinicalConstants {
-    // International Consensus on Time in Range: Diabetes Care 2019;42(8):1593-1603.
+    // International Consensus on Time in Range: Diabetes Care 2019, 42(8), 1593-1603.
     // Source: https://doi.org/10.2337/dci19-0028
     static let veryLowMgDl = 54.0
     static let timeInRangeLowMgDl = 70.0
@@ -320,6 +320,7 @@ enum GlucoseReportClinicalConstants {
     static let dailyHighTargetPercentage = 25.0
 
     // CGM coefficient of variation <=36% is the usual threshold for acceptable glycaemic variability.
+    // Source: https://doi.org/10.2337/dci19-0028
     static let coefficientOfVariationTargetPercentage = 36.0
 
     // Most supported CGM systems produce one reading every 5 minutes.
@@ -327,7 +328,7 @@ enum GlucoseReportClinicalConstants {
 }
 
 enum GlucoseReportClinicalMath {
-    // GMI formula from Bergenstal et al., Diabetes Care 2018;41(11):2275-2280.
+    // GMI formula from Bergenstal et al., Diabetes Care 2018, 41(11), 2275-2280.
     // Source: https://doi.org/10.2337/dc18-1581
     static func gmiPercentage(forAverageMgDl averageMgDl: Double) -> Double {
         3.31 + 0.02392 * averageMgDl

@@ -12,8 +12,8 @@ struct GenerateReportView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: GenerateReportViewModel
 
-    init(coreDataManager: CoreDataManager) {
-        _viewModel = StateObject(wrappedValue: GenerateReportViewModel(coreDataManager: coreDataManager))
+    init(statisticsManager: StatisticsManager) {
+        _viewModel = StateObject(wrappedValue: GenerateReportViewModel(statisticsManager: statisticsManager))
     }
 
     var body: some View {

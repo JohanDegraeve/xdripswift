@@ -20,16 +20,16 @@ final class StatisticsViewModel: ObservableObject {
     @Published private(set) var availablePeriods: [GlucoseReportPeriod: Bool] = [:]
     @Published private(set) var isLoading = true
 
-    private let analyticsService: GlucoseReportAnalyticsService
+    private let statisticsManager: StatisticsManager
 
-    init(coreDataManager: CoreDataManager) {
-        analyticsService = GlucoseReportAnalyticsService(coreDataManager: coreDataManager)
+    init(statisticsManager: StatisticsManager) {
+        self.statisticsManager = statisticsManager
     }
 
     func load() {
         Task {
             isLoading = true
-            let availability = await analyticsService.availablePeriods()
+            let availability = await statisticsManager.availableReportPeriods()
             availablePeriods = availability
             if availability[selectedPeriod] != true {
                 selectedPeriod = defaultPeriod(from: availability)
@@ -58,7 +58,7 @@ final class StatisticsViewModel: ObservableObject {
 
         Task {
             isLoading = true
-            analytics = await analyticsService.analytics(for: configuration)
+            analytics = await statisticsManager.reportAnalytics(for: configuration)
             isLoading = false
         }
     }

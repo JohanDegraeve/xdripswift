@@ -13,11 +13,11 @@ struct StatisticsView: View {
     @StateObject private var viewModel: StatisticsViewModel
     @State private var selectedSection = StatisticsSection.summary
     @State private var showsGenerateReport = false
-    private let coreDataManager: CoreDataManager
+    private let statisticsManager: StatisticsManager
 
-    init(coreDataManager: CoreDataManager) {
-        self.coreDataManager = coreDataManager
-        _viewModel = StateObject(wrappedValue: StatisticsViewModel(coreDataManager: coreDataManager))
+    init(statisticsManager: StatisticsManager) {
+        self.statisticsManager = statisticsManager
+        _viewModel = StateObject(wrappedValue: StatisticsViewModel(statisticsManager: statisticsManager))
     }
 
     var body: some View {
@@ -56,7 +56,7 @@ struct StatisticsView: View {
             }
         }
         .sheet(isPresented: $showsGenerateReport) {
-            GenerateReportView(coreDataManager: coreDataManager)
+            GenerateReportView(statisticsManager: statisticsManager)
                 .colorScheme(.dark)
         }
         .task {

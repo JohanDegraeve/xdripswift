@@ -293,6 +293,7 @@ import AppIntents
             self.setupApplicationData()
 
             if let coreDataManager = self.coreDataManager,
+               let statisticsManager = self.statisticsManager,
                let bgReadingsAccessor = self.bgReadingsAccessor,
                let calibrationsAccessor = self.calibrationsAccessor,
                let treatmentEntryAccessor = self.treatmentEntryAccessor,
@@ -313,6 +314,7 @@ import AppIntents
 
                 self.rootTabStateModel?.configure(
                     coreDataManager: coreDataManager,
+                    statisticsManager: statisticsManager,
                     bgReadingsAccessor: bgReadingsAccessor,
                     calibrationsAccessor: calibrationsAccessor,
                     treatmentEntryAccessor: treatmentEntryAccessor,
@@ -946,6 +948,7 @@ import AppIntents
                         
                         // save the newly created bgreading permenantly in coredata
                         coreDataManager.saveChanges()
+                        statisticsManager?.invalidate()
                         
                         // a new reading was created
                         newReadingCreated = true
@@ -2517,6 +2520,7 @@ extension RootApplicationCoordinator: @preconcurrency FollowerDelegate {
                 
                 // save in core data
                 coreDataManager.saveChanges()
+                statisticsManager?.invalidate()
                 
                 if UserDefaults.standard.followerBackgroundKeepAliveType == .disabled, let firstCreatedBgReadingTimeStamp = firstCreatedBgReadingTimeStamp {
                     let processingStartDateOverride = previousTimeStampLastBgReading.timeIntervalSince1970 > 0 ? min(previousTimeStampLastBgReading.addingTimeInterval(-1.0), firstCreatedBgReadingTimeStamp) : firstCreatedBgReadingTimeStamp

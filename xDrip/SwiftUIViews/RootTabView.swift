@@ -53,6 +53,7 @@ struct IncomingBackupRequest: Identifiable {
 /// from creating duplicate managers as the user changes tabs.
 struct RootTabDependencies {
     let coreDataManager: CoreDataManager
+    let statisticsManager: StatisticsManager
     let bgReadingsAccessor: BgReadingsAccessor
     let calibrationsAccessor: CalibrationsAccessor
     let treatmentEntryAccessor: TreatmentEntryAccessor
@@ -75,7 +76,7 @@ struct RootTabDependencies {
 /// Publishes existing application services to the SwiftUI tab hierarchy.
 ///
 /// `RootApplicationCoordinator` owns the services. This state model publishes their references once
-/// asynchronous Core Data setup has completed; it never creates a second manager or mirrors data.
+/// asynchronous Core Data setup has completed. It never creates a second manager or mirrors data.
 @MainActor final class RootTabStateModel: ObservableObject {
     // MARK: - Published State
 
@@ -226,6 +227,7 @@ struct RootTabDependencies {
     /// Publishes the application services after asynchronous startup has completed.
     func configure(
         coreDataManager: CoreDataManager,
+        statisticsManager: StatisticsManager,
         bgReadingsAccessor: BgReadingsAccessor,
         calibrationsAccessor: CalibrationsAccessor,
         treatmentEntryAccessor: TreatmentEntryAccessor,
@@ -248,6 +250,7 @@ struct RootTabDependencies {
         self.sensorProvider = sensorProvider
         dependencies = RootTabDependencies(
             coreDataManager: coreDataManager,
+            statisticsManager: statisticsManager,
             bgReadingsAccessor: bgReadingsAccessor,
             calibrationsAccessor: calibrationsAccessor,
             treatmentEntryAccessor: treatmentEntryAccessor,
@@ -326,7 +329,7 @@ struct RootTabView: View {
 
                 tabContent { dependencies in
                     NavigationStack {
-                        StatisticsView(coreDataManager: dependencies.coreDataManager)
+                        StatisticsView(statisticsManager: dependencies.statisticsManager)
                     }
                     .tint(.yellow)
                 }

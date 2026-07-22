@@ -42,11 +42,11 @@ final class GenerateReportViewModel: ObservableObject {
     @Published var generatedReport: GlucoseReport?
     @Published var errorMessage: String?
 
-    private let analyticsService: GlucoseReportAnalyticsService
+    private let statisticsManager: StatisticsManager
     private let pdfGenerator = GlucoseReportPDFGenerator()
 
-    init(coreDataManager: CoreDataManager) {
-        analyticsService = GlucoseReportAnalyticsService(coreDataManager: coreDataManager)
+    init(statisticsManager: StatisticsManager) {
+        self.statisticsManager = statisticsManager
         patientName = UserDefaults.standard.reportPatientName
         patientID = UserDefaults.standard.reportPatientID
         selectedPeriod = UserDefaults.standard.reportPeriod
@@ -57,7 +57,7 @@ final class GenerateReportViewModel: ObservableObject {
     func loadAvailability() {
         Task {
             isLoadingAvailability = true
-            let availability = await analyticsService.availablePeriods()
+            let availability = await statisticsManager.availableReportPeriods()
             availablePeriods = availability
             if availability[selectedPeriod] != true {
                 selectedPeriod = defaultPeriod(from: availability)
@@ -87,7 +87,7 @@ final class GenerateReportViewModel: ObservableObject {
             UserDefaults.standard.reportPaperSize = configuration.paperSize
             UserDefaults.standard.reportLanguage = configuration.language
 
-            let analytics = await analyticsService.analytics(for: configuration)
+            let analytics = await statisticsManager.reportAnalytics(for: configuration)
             let generatedAt = Date()
 
             do {
