@@ -16,7 +16,9 @@ public enum LibreSensorType: String {
     
     case libre2C6 = "C6" // EU Libre 2 Plus (May 2024)
     
-    case libre27F = "7F" // EU Libre 2 Plus (May 2025)
+    case libre27FPlus = "7F" // EU Libre 2 Plus (May 2025)
+    
+    case libre27F = "7FEU" // EU Libre 2 (Early 2026) - 7F0E3001
     
     case libreUS = "E5"
     
@@ -43,8 +45,11 @@ public enum LibreSensorType: String {
         case .libre2C6:
             return "Libre 2 Plus EU C6"
             
-        case .libre27F:
+        case .libre27FPlus:
             return "Libre 2 Plus EU 7F"
+            
+        case .libre27F:
+            return "Libre 2 EU 7F"
             
         case .libreUS:
             return "Libre US"
@@ -71,7 +76,7 @@ public enum LibreSensorType: String {
         }
         
         // decrypt if libre2 or libreUS
-        if self == .libre2 || self == .libre2C5 || self == .libre2C6 || self == .libre27F || self == .libreUS || self == .libreUSE6 {
+        if self == .libre2 || self == .libre2C5 || self == .libre2C6 || self == .libre27FPlus || self == .libre27F || self == .libreUS || self == .libreUSE6 {
             
             var libreData = rxBuffer.subdata(in: headerLength..<(rxBufferEnd + 1))
 
@@ -145,7 +150,19 @@ public enum LibreSensorType: String {
             return .libre2C6 // new Libre 2 Plus EU type (May 2024)
             
         case "7F":
-            return .libre27F // new Libre 2 Plus EU type (May 2025)
+            // Determine the specific type based on patchInfo
+            if patchInfo.count >= 8 {
+                let fullPatchInfo = patchInfo[0..<8].uppercased()
+                switch fullPatchInfo {
+                case "7F0E3001":
+                    return .libre27F // Libre 2 EU type (Early 2026)
+                case "7F0E3101":
+                    return .libre27FPlus // Libre 2+ EU type (May 2025)
+                default:
+                    return .libre27FPlus // Default to Libre 2+ EU for other 7F variants
+                }
+            }
+            return .libre27FPlus
             
         case "E5":
             return .libreUS
@@ -174,10 +191,10 @@ public enum LibreSensorType: String {
         case .libre1A2:
             return 14.5
 
-        case .libre2, .libre2C5:
+        case .libre2, .libre2C5, .libre27F:
             return 14.5
             
-        case .libre2C6, .libre27F:
+        case .libre2C6, .libre27FPlus:
             return 15.5
 
         case .libreUS, .libreUSE6:
