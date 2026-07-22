@@ -189,6 +189,19 @@ extension UserDefaults {
         /// use the newer TITR of 70-140mg/dL to calculate the statistics? If false, we will use the conventional TIR of 70-180mg/dL
         case useTITRStatisticsRange = "useTITRStatisticsRange"
 
+        // Report settings
+
+        /// patient name printed on generated CGM reports
+        case reportPatientName = "reportPatientName"
+        /// patient identifier printed on generated CGM reports
+        case reportPatientID = "reportPatientID"
+        /// preferred PDF paper size for generated CGM reports
+        case reportPaperSize = "reportPaperSize"
+        /// preferred analysis period for generated CGM reports
+        case reportPeriod = "reportPeriod"
+        /// preferred language for generated CGM reports
+        case reportLanguage = "reportLanguage"
+
         // Alert settings
 
         /// when did the user snooze all alarms

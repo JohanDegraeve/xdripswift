@@ -250,6 +250,21 @@
 		4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0032FF1000100000001 /* RootHomeView.swift */; };
 		4D20C0062FF1000100000001 /* ConstantsAppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0052FF1000100000001 /* ConstantsAppColors.swift */; };
 		4D20C00A2FF1000100000001 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0092FF1000100000001 /* RootTabView.swift */; };
+		4D31C0012FF5000100000001 /* GenerateReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0012FF5000100000001 /* GenerateReportView.swift */; };
+		4D31C0022FF5000100000001 /* GenerateReportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0022FF5000100000001 /* GenerateReportViewModel.swift */; };
+		4D31C0032FF5000100000001 /* ReportAGPChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0032FF5000100000001 /* ReportAGPChartView.swift */; };
+		4D31C0042FF5000100000001 /* ReportAnalyticsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0042FF5000100000001 /* ReportAnalyticsService.swift */; };
+		4D31C0052FF5000100000001 /* ReportClinicalPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0052FF5000100000001 /* ReportClinicalPageView.swift */; };
+		4D31C0062FF5000100000001 /* ReportDailySummarySectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0062FF5000100000001 /* ReportDailySummarySectionView.swift */; };
+		4D31C0072FF5000100000001 /* ReportFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0072FF5000100000001 /* ReportFormatting.swift */; };
+		4D31C0082FF5000100000001 /* ReportMetricGridView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0082FF5000100000001 /* ReportMetricGridView.swift */; };
+		4D31C0092FF5000100000001 /* ReportModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0092FF5000100000001 /* ReportModels.swift */; };
+		4D31C00A2FF5000100000001 /* ReportPDFGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C00A2FF5000100000001 /* ReportPDFGenerator.swift */; };
+		4D31C00B2FF5000100000001 /* ReportPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C00B2FF5000100000001 /* ReportPreviewView.swift */; };
+		4D31C00C2FF5000100000001 /* ReportTimeInRangeBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C00C2FF5000100000001 /* ReportTimeInRangeBarView.swift */; };
+		4D31C00D2FF5000100000001 /* ReportUserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C00D2FF5000100000001 /* ReportUserDefaults.swift */; };
+		4D41C0012FF6000100000001 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D40C0012FF6000100000001 /* StatisticsView.swift */; };
+		4D41C0022FF6000100000001 /* StatisticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D40C0022FF6000100000001 /* StatisticsViewModel.swift */; };
 		4D7180012FE8000100000001 /* MedtrumTouchCareNano+BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7180022FE8000100000001 /* MedtrumTouchCareNano+BluetoothPeripheral.swift */; };
 		4D7180032FE8000100000001 /* CGMMedtrumTouchCareNanoTransmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7180042FE8000100000001 /* CGMMedtrumTouchCareNanoTransmitter.swift */; };
 		4D7180072FE8000100000001 /* MedtrumTouchCareNano+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7180082FE8000100000001 /* MedtrumTouchCareNano+CoreDataClass.swift */; };
@@ -1039,6 +1054,21 @@
 		4D20C0032FF1000100000001 /* RootHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeView.swift; sourceTree = "<group>"; };
 		4D20C0052FF1000100000001 /* ConstantsAppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsAppColors.swift; sourceTree = "<group>"; };
 		4D20C0092FF1000100000001 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
+		4D30C0012FF5000100000001 /* GenerateReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateReportView.swift; sourceTree = "<group>"; };
+		4D30C0022FF5000100000001 /* GenerateReportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateReportViewModel.swift; sourceTree = "<group>"; };
+		4D30C0032FF5000100000001 /* ReportAGPChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportAGPChartView.swift; sourceTree = "<group>"; };
+		4D30C0042FF5000100000001 /* ReportAnalyticsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportAnalyticsService.swift; sourceTree = "<group>"; };
+		4D30C0052FF5000100000001 /* ReportClinicalPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportClinicalPageView.swift; sourceTree = "<group>"; };
+		4D30C0062FF5000100000001 /* ReportDailySummarySectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportDailySummarySectionView.swift; sourceTree = "<group>"; };
+		4D30C0072FF5000100000001 /* ReportFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFormatting.swift; sourceTree = "<group>"; };
+		4D30C0082FF5000100000001 /* ReportMetricGridView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportMetricGridView.swift; sourceTree = "<group>"; };
+		4D30C0092FF5000100000001 /* ReportModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportModels.swift; sourceTree = "<group>"; };
+		4D30C00A2FF5000100000001 /* ReportPDFGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportPDFGenerator.swift; sourceTree = "<group>"; };
+		4D30C00B2FF5000100000001 /* ReportPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportPreviewView.swift; sourceTree = "<group>"; };
+		4D30C00C2FF5000100000001 /* ReportTimeInRangeBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportTimeInRangeBarView.swift; sourceTree = "<group>"; };
+		4D30C00D2FF5000100000001 /* ReportUserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportUserDefaults.swift; sourceTree = "<group>"; };
+		4D40C0012FF6000100000001 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
+		4D40C0022FF6000100000001 /* StatisticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewModel.swift; sourceTree = "<group>"; };
 		4D7180022FE8000100000001 /* MedtrumTouchCareNano+BluetoothPeripheral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MedtrumTouchCareNano+BluetoothPeripheral.swift"; sourceTree = "<group>"; };
 		4D7180042FE8000100000001 /* CGMMedtrumTouchCareNanoTransmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CGMMedtrumTouchCareNanoTransmitter.swift; sourceTree = "<group>"; };
 		4D7180082FE8000100000001 /* MedtrumTouchCareNano+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MedtrumTouchCareNano+CoreDataClass.swift"; sourceTree = "<group>"; };
@@ -2574,6 +2604,8 @@
 				4D20C0012FF1000100000001 /* RootHomeState.swift */,
 				4D20C0032FF1000100000001 /* RootHomeView.swift */,
 				4D20C0092FF1000100000001 /* RootTabView.swift */,
+				4D30C0002FF5000100000001 /* Reports */,
+				4D40C0002FF6000100000001 /* Statistics */,
 				4B0C00012F3B000100000001 /* SensorManagementView.swift */,
 				4E6100132FF3000100000001 /* SensorNoiseHistoryView.swift */,
 				475F2A862D0DA80E00DE6019 /* ShowHideItemsView.swift */,
@@ -2583,6 +2615,35 @@
 				4C1000052F64000100000001 /* Treatments */,
 			);
 			path = SwiftUIViews;
+			sourceTree = "<group>";
+		};
+		4D30C0002FF5000100000001 /* Reports */ = {
+			isa = PBXGroup;
+			children = (
+				4D30C0012FF5000100000001 /* GenerateReportView.swift */,
+				4D30C0022FF5000100000001 /* GenerateReportViewModel.swift */,
+				4D30C0032FF5000100000001 /* ReportAGPChartView.swift */,
+				4D30C0042FF5000100000001 /* ReportAnalyticsService.swift */,
+				4D30C0052FF5000100000001 /* ReportClinicalPageView.swift */,
+				4D30C0062FF5000100000001 /* ReportDailySummarySectionView.swift */,
+				4D30C0072FF5000100000001 /* ReportFormatting.swift */,
+				4D30C0082FF5000100000001 /* ReportMetricGridView.swift */,
+				4D30C0092FF5000100000001 /* ReportModels.swift */,
+				4D30C00A2FF5000100000001 /* ReportPDFGenerator.swift */,
+				4D30C00B2FF5000100000001 /* ReportPreviewView.swift */,
+				4D30C00C2FF5000100000001 /* ReportTimeInRangeBarView.swift */,
+				4D30C00D2FF5000100000001 /* ReportUserDefaults.swift */,
+			);
+			path = Reports;
+			sourceTree = "<group>";
+		};
+		4D40C0002FF6000100000001 /* Statistics */ = {
+			isa = PBXGroup;
+			children = (
+				4D40C0012FF6000100000001 /* StatisticsView.swift */,
+				4D40C0022FF6000100000001 /* StatisticsViewModel.swift */,
+			);
+			path = Statistics;
 			sourceTree = "<group>";
 		};
 		F866974E2867A97000025441 /* Settings */ = {
@@ -4258,6 +4319,21 @@
 				4D20C0022FF1000100000001 /* RootHomeState.swift in Sources */,
 				4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */,
 				4D20C00A2FF1000100000001 /* RootTabView.swift in Sources */,
+				4D31C0012FF5000100000001 /* GenerateReportView.swift in Sources */,
+				4D31C0022FF5000100000001 /* GenerateReportViewModel.swift in Sources */,
+				4D31C0032FF5000100000001 /* ReportAGPChartView.swift in Sources */,
+				4D31C0042FF5000100000001 /* ReportAnalyticsService.swift in Sources */,
+				4D31C0052FF5000100000001 /* ReportClinicalPageView.swift in Sources */,
+				4D31C0062FF5000100000001 /* ReportDailySummarySectionView.swift in Sources */,
+				4D31C0072FF5000100000001 /* ReportFormatting.swift in Sources */,
+				4D31C0082FF5000100000001 /* ReportMetricGridView.swift in Sources */,
+				4D31C0092FF5000100000001 /* ReportModels.swift in Sources */,
+				4D31C00A2FF5000100000001 /* ReportPDFGenerator.swift in Sources */,
+				4D31C00B2FF5000100000001 /* ReportPreviewView.swift in Sources */,
+				4D31C00C2FF5000100000001 /* ReportTimeInRangeBarView.swift in Sources */,
+				4D31C00D2FF5000100000001 /* ReportUserDefaults.swift in Sources */,
+				4D41C0012FF6000100000001 /* StatisticsView.swift in Sources */,
+				4D41C0022FF6000100000001 /* StatisticsViewModel.swift in Sources */,
 				D4E499AD277B4CE7000F8CBA /* DateOnly.swift in Sources */,
 				F8A8F0022FF4000100000001 /* BgReading+LoopShare.swift in Sources */,
 				F8E51D5D2448D8B5001C9E5A /* LoopManager.swift in Sources */,

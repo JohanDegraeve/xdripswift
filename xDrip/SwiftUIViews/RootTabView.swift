@@ -276,6 +276,7 @@ struct RootTabView: View {
     private enum Tab: Hashable {
         case home
         case treatments
+        case statistics
         case bluetooth
         case settings
     }
@@ -321,6 +322,17 @@ struct RootTabView: View {
                 .tag(Tab.treatments)
                 .tabItem {
                     tabLabel(title: tabTitles.treatments, systemImage: "list.clipboard.fill")
+                }
+
+                tabContent { dependencies in
+                    NavigationStack {
+                        StatisticsView(coreDataManager: dependencies.coreDataManager)
+                    }
+                    .tint(.yellow)
+                }
+                .tag(Tab.statistics)
+                .tabItem {
+                    tabLabel(title: tabTitles.statistics, systemImage: "chart.bar.xaxis")
                 }
 
                 tabContent { dependencies in
@@ -740,6 +752,7 @@ private struct RootHomeLandscapeValueView: View {
 struct RootTabTitles {
     let home: String
     let treatments: String
+    let statistics: String
     let devices: String
     let settings: String
 }
