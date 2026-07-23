@@ -135,7 +135,11 @@ struct TreatmentsListView: View {
                     .tint(.yellow)
                 }
             }
-            .onAppear {
+            .task {
+                // Give the tab transition a few frames before loading Core Data rows.
+                _ = try? await Task.sleep(nanoseconds: 200_000_000)
+                guard !Task.isCancelled else { return }
+
                 viewModel.initializeViewIfNeeded()
             }
             .onReceive(

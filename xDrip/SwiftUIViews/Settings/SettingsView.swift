@@ -60,10 +60,6 @@ struct SettingsNavigationView: View {
     ) {
         let router = SettingsRouter()
         let presenter = SettingsActionPresenter(router: router)
-        let sections = SettingsListFactory.makeRootSections(
-            coreDataManager: coreDataManager,
-            presenter: presenter
-        )
 
         self.coreDataManager = coreDataManager
         self.soundPlayer = soundPlayer
@@ -71,7 +67,12 @@ struct SettingsNavigationView: View {
         self.consumeIncomingBackup = consumeIncomingBackup
         _router = StateObject(wrappedValue: router)
         _presenter = StateObject(wrappedValue: presenter)
-        _listModel = StateObject(wrappedValue: SettingsListModel(sections: sections))
+        _listModel = StateObject(wrappedValue: SettingsListModel(
+            sections: SettingsListFactory.makeRootSections(
+                coreDataManager: coreDataManager,
+                presenter: presenter
+            )
+        ))
     }
 
     var body: some View {
@@ -87,7 +88,11 @@ struct SettingsNavigationView: View {
         }
         .tint(.yellow)
         .colorScheme(.dark)
-        .onAppear {
+        .task {
+            // Give the tab transition a few frames before rebuilding Settings row details.
+            _ = try? await Task.sleep(nanoseconds: 200_000_000)
+            guard !Task.isCancelled else { return }
+
             UserDefaults.standard.showDeveloperSettings = false
             listModel.reload(.all)
             openIncomingBackupIfNeeded()

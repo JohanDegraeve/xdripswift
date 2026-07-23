@@ -110,6 +110,7 @@ private struct BluetoothPeripheralDetailContainerView: View {
 struct BluetoothPeripheralsView: View {
     @ObservedObject var viewModel: BluetoothPeripheralsViewModel
     @ObservedObject var router: BluetoothPeripheralsRouter
+    @State private var isVisible = false
 
     var body: some View {
         List {
@@ -156,7 +157,9 @@ struct BluetoothPeripheralsView: View {
                 dismissButton: .default(Text(Texts_Common.Ok))
             )
         }
-        .onAppear(perform: startStatusUpdates)
+        .task {
+            await startStatusUpdates()
+        }
         .onDisappear(perform: stopStatusUpdates)
     }
 
@@ -168,11 +171,18 @@ struct BluetoothPeripheralsView: View {
         router.openPeripheral(row.bluetoothPeripheral, type: row.bluetoothPeripheral.bluetoothPeripheralType())
     }
 
-    private func startStatusUpdates() {
+    private func startStatusUpdates() async {
+        isVisible = true
+
+        // Give the tab transition a few frames before rebuilding Bluetooth status rows.
+        _ = try? await Task.sleep(nanoseconds: 200_000_000)
+        guard !Task.isCancelled, isVisible else { return }
+
         viewModel.startStatusUpdates()
     }
 
     private func stopStatusUpdates() {
+        isVisible = false
         viewModel.stopStatusUpdates()
     }
 }

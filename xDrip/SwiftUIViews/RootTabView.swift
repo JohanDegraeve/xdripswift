@@ -481,6 +481,7 @@ struct RootTabView: View {
             supportedOrientations = .portrait
         }
 
+        let orientationPolicyChanged = AppDelegate.supportedOrientations != supportedOrientations
         AppDelegate.supportedOrientations = supportedOrientations
 
         guard let windowScene = UIApplication.shared.connectedScenes
@@ -491,9 +492,11 @@ struct RootTabView: View {
             return
         }
 
-        rootController.setNeedsUpdateOfSupportedInterfaceOrientations()
+        if orientationPolicyChanged {
+            rootController.setNeedsUpdateOfSupportedInterfaceOrientations()
+        }
 
-        if tab != .home {
+        if tab != .home && windowScene.interfaceOrientation.isLandscape {
             windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
         }
     }
@@ -545,7 +548,11 @@ private struct RootHomeTabView: View {
             verticalSizeClass == .compact ? 0 : RootTabLayout.contentBottomPadding
         )
         .toolbar(verticalSizeClass == .compact ? .hidden : .automatic, for: .tabBar)
-        .onAppear {
+        .task {
+            // Give the tab transition a few frames before running Home catch-up work.
+            _ = try? await Task.sleep(nanoseconds: 200_000_000)
+            guard !Task.isCancelled else { return }
+
             applicationCoordinator.homeDidBecomeVisible()
         }
         .sheet(item: $presentedView) { presentedView in

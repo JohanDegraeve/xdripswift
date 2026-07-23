@@ -191,29 +191,10 @@ import AppIntents
         // check if allowed to rotate to landscape view
         updateScreenRotationSettings()
         
-        // viewWillAppear when user switches eg from Settings Tab to Home Tab - latest reading value
-        // needs to be shown on the view, and the live chart should be returned to the real current time.
-        updateLabelsAndChart(overrideApplicationState: true, forceReset: true)
-        
-        updatePumpAndAIDStatusViews()
+        // Keep tab selection responsive. The Home tab already has the last published state; any
+        // data refresh can wait for the delayed catch-up below.
 
-        // display the data source info view if applicable
-        updateDataSourceInfo()
-        
-        // update statistics related outlets
-        updateStatistics(animate: true, overrideApplicationState: true)
-        
-        watchManager?.updateWatchApp(forceComplicationUpdate: false)
-        
-        // update the UI (chart + pump status) as soon as the app appears. We'll update it again in a couple of seconds
-        // in case more data arrives in the meantime (i.e. follower/NS data etc)
-        // we used to just wait two seconds, but some users thought that the app didn't work and then "caught up"
-        // so it makes more sense to just update immediately.
-        self.updateLabelsAndChart(overrideApplicationState: true)
-        
-        self.updatePumpAndAIDStatusViews()
-        
-        // let's run the data source info and chart update 1 second after the root view appears. This should give time for the follower modes to download and populate the info needed.
+        // let's run the data source info and chart update after the root view appears. This should give time for the follower modes to download and populate the info needed.
         // no animation is needed as in most cases, we're just refreshing and displaying what is already shown on screen so we want to keep this refresh invisible.
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             
@@ -226,11 +207,6 @@ import AppIntents
             
             self.updatePumpAndAIDStatusViews()
         }
-        
-        self.updateSnoozeStatus()
-        self.updatePostProcessingStatus()
-        
-        IntentDonationManager.shared.donate(intent: GlucoseIntent())
     }
 
     /// Starts application services once the SwiftUI root state is available.
