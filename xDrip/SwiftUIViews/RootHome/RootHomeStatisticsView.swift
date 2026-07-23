@@ -13,6 +13,12 @@ struct RootHomeStatisticsView: View {
     let state: RootHomeStatisticsState
     let action: () -> Void
 
+    private enum Layout {
+        static let rowHeight: CGFloat = 80
+        static let verticalPadding: CGFloat = 5
+        static let pieSize: CGFloat = 48
+    }
+
     var body: some View {
         HStack(spacing: 0) {
             RootHomeStatisticsColumn(top: state.low, bottom: state.average, limitText: state.lowLimitText)
@@ -32,7 +38,7 @@ struct RootHomeStatisticsView: View {
                             .tint(ConstantsAppColors.primaryText)
                     }
                 }
-                .frame(height: 52)
+                .frame(height: Layout.pieSize)
 
                 Text(state.timePeriodText)
                     .font(.caption2)
@@ -43,7 +49,8 @@ struct RootHomeStatisticsView: View {
             .frame(maxWidth: .infinity)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 9)
+        .padding(.vertical, Layout.verticalPadding)
+        .frame(height: Layout.rowHeight)
         .contentShape(Rectangle())
         .onTapGesture(count: 2, perform: action)
         .transaction { transaction in

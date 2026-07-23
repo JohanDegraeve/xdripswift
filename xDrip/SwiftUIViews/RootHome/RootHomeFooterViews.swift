@@ -38,7 +38,8 @@ struct RootHomeSensorNoiseWarningView: View {
                     .foregroundStyle(ConstantsAppColors.secondaryText)
             }
             .padding(.horizontal, 10)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.vertical, 5)
+            .frame(maxWidth: .infinity)
             .background(state.color.opacity(0.14))
             .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))
             .overlay {
@@ -53,6 +54,10 @@ struct RootHomeSensorNoiseWarningView: View {
 /// Sensor age and directional lifetime progress indicator.
 struct RootHomeSensorLifetimeView: View {
     let state: RootHomeSensorState
+
+    private enum Layout {
+        static let height: CGFloat = 10
+    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -73,6 +78,7 @@ struct RootHomeSensorLifetimeView: View {
                 }
                 .frame(maxHeight: .infinity, alignment: .center)
         }
+        .frame(height: Layout.height)
     }
 }
 
@@ -82,6 +88,10 @@ struct RootHomeDataSourceView: View {
     let sensorState: RootHomeSensorState
     let sensorNoiseState: RootHomeSensorNoiseState
     let action: () -> Void
+
+    private enum Layout {
+        static let height: CGFloat = 30
+    }
 
     var body: some View {
         HStack(spacing: 5) {
@@ -138,6 +148,7 @@ struct RootHomeDataSourceView: View {
             }
         }
         .frame(maxWidth: .infinity)
+        .frame(height: Layout.height)
         .contentShape(Rectangle())
         .onTapGesture(count: 2, perform: action)
     }

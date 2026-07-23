@@ -17,6 +17,10 @@ struct RootHomeSelectorView: View {
 
     private let statisticsOptions = [0, 1, 7, 30, 90]
 
+    private enum Layout {
+        static let controlHeight: CGFloat = 30
+    }
+
     var body: some View {
         HStack(spacing: 4) {
             if showsStatistics {
@@ -56,7 +60,8 @@ struct RootHomeSelectorView: View {
             .frame(maxWidth: .infinity, alignment: showsStatistics ? .trailing : .center)
         }
         .padding(.horizontal, 8)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(maxWidth: .infinity)
+        .frame(height: Layout.controlHeight)
     }
 
     private func statisticsTitle(for days: Int) -> String {

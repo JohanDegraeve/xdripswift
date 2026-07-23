@@ -250,7 +250,6 @@
 		4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0032FF1000100000001 /* RootHomeView.swift */; };
 		4D20C0062FF1000100000001 /* ConstantsAppColors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0052FF1000100000001 /* ConstantsAppColors.swift */; };
 		4D20C00A2FF1000100000001 /* RootTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0092FF1000100000001 /* RootTabView.swift */; };
-		4D21B0012FF8000100000001 /* RootHomeLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0012FF8000100000001 /* RootHomeLayout.swift */; };
 		4D21B0022FF8000100000001 /* RootHomeChartRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0022FF8000100000001 /* RootHomeChartRange.swift */; };
 		4D21B0032FF8000100000001 /* RootHomeToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0032FF8000100000001 /* RootHomeToolbarView.swift */; };
 		4D21B0042FF8000100000001 /* RootHomeStatusViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D21A0042FF8000100000001 /* RootHomeStatusViews.swift */; };
@@ -1063,7 +1062,6 @@
 		4D20C0032FF1000100000001 /* RootHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeView.swift; sourceTree = "<group>"; };
 		4D20C0052FF1000100000001 /* ConstantsAppColors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConstantsAppColors.swift; sourceTree = "<group>"; };
 		4D20C0092FF1000100000001 /* RootTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootTabView.swift; sourceTree = "<group>"; };
-		4D21A0012FF8000100000001 /* RootHomeLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeLayout.swift; sourceTree = "<group>"; };
 		4D21A0022FF8000100000001 /* RootHomeChartRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeChartRange.swift; sourceTree = "<group>"; };
 		4D21A0032FF8000100000001 /* RootHomeToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeToolbarView.swift; sourceTree = "<group>"; };
 		4D21A0042FF8000100000001 /* RootHomeStatusViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeStatusViews.swift; sourceTree = "<group>"; };
@@ -2276,7 +2274,6 @@
 				4D21A00A2FF8000100000001 /* RootHomeClockView.swift */,
 				4D21A0092FF8000100000001 /* RootHomeFooterViews.swift */,
 				4D21A0052FF8000100000001 /* RootHomeGlucoseReadingView.swift */,
-				4D21A0012FF8000100000001 /* RootHomeLayout.swift */,
 				4D21A0072FF8000100000001 /* RootHomeSelectorView.swift */,
 				4D21A0082FF8000100000001 /* RootHomeStatisticsView.swift */,
 				4D21A0042FF8000100000001 /* RootHomeStatusViews.swift */,
@@ -4385,7 +4382,6 @@
 				C8BA6BBA5746888144511D55 /* GlucoseChartStateManager.swift in Sources */,
 				4D20C0022FF1000100000001 /* RootHomeState.swift in Sources */,
 				4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */,
-				4D21B0012FF8000100000001 /* RootHomeLayout.swift in Sources */,
 				4D21B0022FF8000100000001 /* RootHomeChartRange.swift in Sources */,
 				4D21B0032FF8000100000001 /* RootHomeToolbarView.swift in Sources */,
 				4D21B0042FF8000100000001 /* RootHomeStatusViews.swift in Sources */,

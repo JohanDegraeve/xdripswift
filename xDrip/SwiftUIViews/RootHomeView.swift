@@ -16,6 +16,14 @@ import SwiftUI
 /// notifications and application service lifecycle work.
 struct RootHomeView: View {
 
+    private enum Layout {
+        static let sectionSpacing: CGFloat = 10
+        static let rowSpacing: CGFloat = 9
+        static let bottomRowSpacing: CGFloat = 3
+        static let screenHorizontalMargin: CGFloat = 12
+        static let glucoseStatusRowHeight: CGFloat = 120
+    }
+
     /// Settings that affect which cached chart series are included in the main chart state.
     ///
     /// The stored UserDefaults values are observed with `@AppStorage`, but the chart only needs a
@@ -138,37 +146,32 @@ struct RootHomeView: View {
     }
 
     private func rootContent() -> some View {
-        VStack(spacing: RootHomeLayout.sectionSpacing) {
+        VStack(spacing: Layout.sectionSpacing) {
             RootHomeToolbarView(
                 state: state,
                 actions: actions,
                 beginOriginalGlucosePeek: beginOriginalGlucosePeek,
                 endOriginalGlucosePeek: endOriginalGlucosePeek
             )
-                .frame(minHeight: RootHomeLayout.toolbarMinimumHeight)
 
-            VStack(spacing: RootHomeLayout.rowSpacing) {
+            VStack(spacing: Layout.rowSpacing) {
                 HStack(spacing: 0) {
                     if state.visibility.showsPump {
                         RootHomePumpView(state: state.pump)
-                            .frame(width: RootHomeLayout.pumpWidth, height: RootHomeLayout.glucoseRowHeight)
+                            .frame(maxHeight: .infinity)
                     }
 
                     RootHomeGlucoseReadingView(state: glucoseDisplayState, isScreenLocked: state.isScreenLocked, actions: actions)
                         .frame(maxWidth: .infinity)
                 }
-                .frame(height: RootHomeLayout.glucoseRowHeight)
+                .frame(height: Layout.glucoseStatusRowHeight)
 
                 if state.visibility.showsLoop {
                     RootHomeLoopView(state: state.loop, actions: actions)
-                        .frame(height: RootHomeLayout.loopHeight)
-                        .padding(.top, RootHomeLayout.loopTopPadding)
-                        .padding(.bottom, RootHomeLayout.loopBottomPadding)
                 }
 
                 if state.sensorNoise.showsWarning {
                     RootHomeSensorNoiseWarningView(state: state.sensorNoise, action: actions.showSensorManagement)
-                        .frame(height: RootHomeLayout.sensorNoiseWarningHeight)
                 }
 
                 RootHomeMainChartView(
@@ -195,55 +198,55 @@ struct RootHomeView: View {
                         },
                         cycleMiniChartHoursToShow: cycleMiniChartHoursToShow
                     )
-                    .frame(height: RootHomeLayout.miniChartHeight)
                 }
 
-                if state.visibility.showsControls {
-                    RootHomeSelectorView(
-                        selectedRange: $selectedRange,
-                        statisticsDays: state.controls.statisticsDays,
-                        showsStatistics: state.visibility.showsStatistics,
-                        onStatisticsDaysChanged: updateStatisticsDays
-                    )
-                    .frame(height: RootHomeLayout.selectorHeight)
-                }
-
-                if state.visibility.showsStatistics {
-                    RootHomeStatisticsView(
-                        state: state.statistics,
-                        action: actions.cycleStatisticsType
-                    )
-                        .frame(height: RootHomeLayout.statisticsHeight)
-                }
-
-                if state.visibility.showsClock {
-                    RootHomeClockView(text: state.controls.clockText)
-                        .frame(height: RootHomeLayout.clockHeight)
-                }
-
-                if state.visibility.showsSensor || state.visibility.showsDataSource {
-                    VStack(spacing: RootHomeLayout.bottomStatusSpacing) {
-                        if state.visibility.showsSensor {
-                            RootHomeSensorLifetimeView(state: state.sensor)
-                                .frame(height: RootHomeLayout.sensorProgressHeight)
-                        }
-
-                        if state.visibility.showsDataSource {
-                            RootHomeDataSourceView(
-                                state: state.dataSource,
-                                sensorState: state.sensor,
-                                sensorNoiseState: state.sensorNoise,
-                                action: actions.hideFollowerUrl
-                            )
-                                .frame(height: RootHomeLayout.dataSourceHeight)
-                        }
-                    }
-                }
+                lowerStatusContent()
             }
             .frame(maxHeight: .infinity, alignment: .top)
         }
-        .padding(.horizontal, RootHomeLayout.screenHorizontalMargin)
+        .padding(.horizontal, Layout.screenHorizontalMargin)
         .frame(maxHeight: .infinity, alignment: .top)
+    }
+
+    @ViewBuilder private func lowerStatusContent() -> some View {
+        VStack(spacing: Layout.bottomRowSpacing) {
+            if state.visibility.showsControls {
+                RootHomeSelectorView(
+                    selectedRange: $selectedRange,
+                    statisticsDays: state.controls.statisticsDays,
+                    showsStatistics: state.visibility.showsStatistics,
+                    onStatisticsDaysChanged: updateStatisticsDays
+                )
+            }
+
+            if state.visibility.showsStatistics {
+                RootHomeStatisticsView(
+                    state: state.statistics,
+                    action: actions.cycleStatisticsType
+                )
+            }
+
+            if state.visibility.showsClock {
+                RootHomeClockView(text: state.controls.clockText)
+            }
+
+            if state.visibility.showsSensor || state.visibility.showsDataSource {
+                VStack(spacing: 0) {
+                    if state.visibility.showsSensor {
+                        RootHomeSensorLifetimeView(state: state.sensor)
+                    }
+
+                    if state.visibility.showsDataSource {
+                        RootHomeDataSourceView(
+                            state: state.dataSource,
+                            sensorState: state.sensor,
+                            sensorNoiseState: state.sensorNoise,
+                            action: actions.hideFollowerUrl
+                        )
+                    }
+                }
+            }
+        }
     }
 
     // MARK: - Derived State

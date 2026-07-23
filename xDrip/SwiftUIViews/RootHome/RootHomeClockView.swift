@@ -20,5 +20,6 @@ struct RootHomeClockView: View {
             .lineLimit(1)
             .minimumScaleFactor(0.2)
             .frame(maxWidth: .infinity)
+            .padding(.vertical, 4)
     }
 }

@@ -84,6 +84,10 @@ struct RootHomeMiniChartView: View {
     /// the active window moves away from its original touch point during a valid drag.
     @State private var activeWindowDragIsEnabled: Bool?
 
+    private enum Layout {
+        static let chartHeight: CGFloat = 60
+    }
+
     var body: some View {
         GeometryReader { geometry in
             ZStack(alignment: .leading) {
@@ -147,6 +151,7 @@ struct RootHomeMiniChartView: View {
             }
             .frame(width: geometry.size.width, height: geometry.size.height, alignment: .leading)
         }
+        .frame(height: Layout.chartHeight)
     }
 
     /// Converts the active window's dates into the fixed mini-chart's horizontal coordinate space.

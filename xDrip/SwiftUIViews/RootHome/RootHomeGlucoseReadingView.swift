@@ -14,6 +14,10 @@ struct RootHomeGlucoseReadingView: View {
     let isScreenLocked: Bool
     let actions: RootHomeActions
 
+    private enum Layout {
+        static let infoHorizontalPadding: CGFloat = 8
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             HStack(alignment: .firstTextBaseline, spacing: 10) {
@@ -44,8 +48,7 @@ struct RootHomeGlucoseReadingView: View {
             .lineLimit(1)
             .minimumScaleFactor(0.5)
             .allowsTightening(true)
-            .frame(height: RootHomeLayout.glucoseInfoRowHeight)
-            .padding(.horizontal, RootHomeLayout.horizontalMargin)
+            .padding(.horizontal, Layout.infoHorizontalPadding)
 
             Text(state.valueText)
                 .font(.system(size: isScreenLocked ? 120 : 78, weight: .medium))
@@ -55,7 +58,7 @@ struct RootHomeGlucoseReadingView: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.2)
                 .allowsTightening(true)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .frame(maxWidth: .infinity)
                 .onTapGesture(perform: actions.toggleExpandedAIDInfo)
                 .onLongPressGesture(minimumDuration: 0.5, perform: actions.keepScreenAwake)
         }

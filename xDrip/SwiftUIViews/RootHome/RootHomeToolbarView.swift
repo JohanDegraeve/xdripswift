@@ -15,6 +15,13 @@ struct RootHomeToolbarView: View {
     let beginOriginalGlucosePeek: () -> Void
     let endOriginalGlucosePeek: () -> Void
 
+    private enum Layout {
+        static let buttonSize: CGFloat = 38
+        static let iconSize: CGFloat = 23
+        static let horizontalPadding: CGFloat = 8
+        static let verticalPadding: CGFloat = 3
+    }
+
     @State private var originalGlucosePeekIsActive = false
     @State private var shouldIgnoreNextPostProcessingTap = false
 
@@ -30,15 +37,15 @@ struct RootHomeToolbarView: View {
             toolbarButton(systemImage: state.isScreenLocked ? "lock.fill" : "lock", label: Texts_HomeView.lockButton, action: actions.toggleScreenLock)
                 .foregroundStyle(state.isScreenLocked ? ConstantsAppColors.toolbarLockedIcon : ConstantsAppColors.toolbarIcon)
         }
-        .padding(.horizontal, 8)
+        .padding(.horizontal, Layout.horizontalPadding)
+        .padding(.vertical, Layout.verticalPadding)
         .frame(maxWidth: .infinity)
-        .frame(height: RootHomeLayout.toolbarMinimumHeight)
     }
 
     private func postProcessingToolbarButton() -> some View {
         Image(systemName: state.controls.postProcessingSystemImage)
-            .font(.system(size: 23, weight: .regular))
-            .frame(width: 38, height: 38)
+            .font(.system(size: Layout.iconSize, weight: .regular))
+            .frame(width: Layout.buttonSize, height: Layout.buttonSize)
             .contentShape(Rectangle())
             .onTapGesture {
                 guard !shouldIgnoreNextPostProcessingTap else {
@@ -83,8 +90,8 @@ struct RootHomeToolbarView: View {
     private func toolbarButton(systemImage: String, label: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: systemImage)
-                .font(.system(size: 23, weight: .regular))
-                .frame(width: 38, height: 38)
+                .font(.system(size: Layout.iconSize, weight: .regular))
+                .frame(width: Layout.buttonSize, height: Layout.buttonSize)
         }
         .buttonStyle(.plain)
         .foregroundStyle(ConstantsAppColors.toolbarIcon)

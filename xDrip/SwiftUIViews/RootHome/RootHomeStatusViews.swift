@@ -12,6 +12,10 @@ import SwiftUI
 struct RootHomePumpView: View {
     let state: RootHomePumpState
 
+    private enum Layout {
+        static let width: CGFloat = 158
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             RootHomeHorizontalMetricView(metric: state.basal)
@@ -21,6 +25,8 @@ struct RootHomePumpView: View {
         }
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
+        .frame(width: Layout.width)
+        .frame(maxHeight: .infinity)
         .background(ConstantsAppColors.homePanelBackground)
         .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))
     }
@@ -30,6 +36,10 @@ struct RootHomePumpView: View {
 struct RootHomeLoopView: View {
     let state: RootHomeLoopState
     let actions: RootHomeActions
+
+    private enum Layout {
+        static let statusSymbolSize: CGFloat = 18
+    }
 
     var body: some View {
         Button(action: actions.showAIDStatus) {
@@ -54,7 +64,7 @@ struct RootHomeLoopView: View {
 
                     if let statusSystemImage = state.statusSystemImage {
                         Image(systemName: statusSystemImage)
-                            .font(.system(size: RootHomeLayout.loopStatusSymbolSize, weight: .black))
+                            .font(.system(size: Layout.statusSymbolSize, weight: .black))
                             .symbolRenderingMode(.monochrome)
                             .foregroundStyle(state.statusColor)
                     }
@@ -76,7 +86,8 @@ struct RootHomeLoopView: View {
                 }
             }
             .padding(.horizontal, 10)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .padding(.vertical, 6)
+            .frame(maxWidth: .infinity)
             .background(ConstantsAppColors.homePanelBackground)
             .clipShape(RoundedRectangle(cornerRadius: ConstantsHomeView.standardCornerRadius, style: .continuous))
         }
@@ -85,6 +96,7 @@ struct RootHomeLoopView: View {
             // Calculation updates replace label text immediately. Threshold colors animate separately.
             transaction.animation = nil
         }
+        .frame(maxHeight: .infinity)
     }
 }
 
