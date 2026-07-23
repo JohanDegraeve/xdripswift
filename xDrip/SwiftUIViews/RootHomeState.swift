@@ -48,8 +48,8 @@ struct RootHomeGlucoseState {
 /// Pump metrics displayed beside the current glucose reading.
 struct RootHomePumpState {
     var basal = RootHomeMetricState(title: "Basal", value: "-")
-    var reservoir = RootHomeMetricState(title: "Reservoir", value: "-")
-    var battery = RootHomeMetricState(title: "Battery", value: "-")
+    var reservoir = RootHomeMetricState(title: Texts_HomeView.pumpReservoir, value: "-")
+    var battery = RootHomeMetricState(title: Texts_HomeView.pumpBattery, value: "-")
     var cage = RootHomeMetricState(title: "CAGE", value: "-")
 }
 
@@ -404,8 +404,8 @@ final class RootHomeStateModel: ObservableObject {
 
         return RootHomePumpState(
             basal: RootHomeMetricState(title: "Basal", value: basal.map { "\($0) U/hr" } ?? "? U/hr"),
-            reservoir: RootHomeMetricState(title: "Reservoir", value: reservoirText, valueColor: hasRecentData ? deviceStatus?.pumpReservoirColor() ?? ConstantsAppColors.primaryText : ConstantsAppColors.primaryText),
-            battery: RootHomeMetricState(title: "Battery", value: batteryText, valueColor: hasRecentData ? deviceStatus?.pumpBatteryPercentColor() ?? ConstantsAppColors.primaryText : ConstantsAppColors.primaryText),
+            reservoir: RootHomeMetricState(title: Texts_HomeView.pumpReservoir, value: reservoirText, valueColor: hasRecentData ? deviceStatus?.pumpReservoirColor() ?? ConstantsAppColors.primaryText : ConstantsAppColors.primaryText),
+            battery: RootHomeMetricState(title: Texts_HomeView.pumpBattery, value: batteryText, valueColor: hasRecentData ? deviceStatus?.pumpBatteryPercentColor() ?? ConstantsAppColors.primaryText : ConstantsAppColors.primaryText),
             cage: RootHomeMetricState(title: "CAGE", value: latestSiteChangeDate?.daysAndHoursAgo() ?? "-", valueColor: cageColor(latestSiteChangeDate))
         )
     }

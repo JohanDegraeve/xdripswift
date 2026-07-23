@@ -5,6 +5,7 @@
 
 /// title of the cell where transmitter battery level is shown in detailed screen
 "batteryLevel" = "Battery Level";
+"noBluetoothPeripheralsConfigured" = "Немає налаштованих Bluetooth-пристроїв";
 
 /// when Bluetooth Peripheral list is shown, title of the view
 "screenTitle" = "Пристрої";

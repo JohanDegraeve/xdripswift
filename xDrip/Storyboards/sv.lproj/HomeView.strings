@@ -116,3 +116,5 @@
 "sensorNoiseHistoryNoDataMessage" = "Diagrammet visas när tillräckligt många sensorvärden har samlats in.";
 "sensorNoiseHistoryFooter" = "Diagrammet visar kvarvarande sensorvariation under den här sensorsessionen. Lägre värden innebär en jämnare signal. Det mäter inte glukosnoggrannhet.";
 "sensorNoiseHistoryChartAccessibility" = "Diagram över sensorbrusets historik";
+"pumpBattery" = "Batteri";
+"pumpReservoir" = "Reservoar";

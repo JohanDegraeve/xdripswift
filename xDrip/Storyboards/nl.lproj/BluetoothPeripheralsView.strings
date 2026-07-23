@@ -4,5 +4,6 @@
 "batteryLevel" = "Batterij Niveau";
 "heartbeatDeviceFooter" = "Een heartbeat-apparaat levert geen glucosemetingen. Het gebruikt Bluetooth-activiteit om de app op de achtergrond te wekken, zodat volger-updates, alarmen, badges en meldingen kunnen blijven werken.";
 "m5StackDeviceFooter" = "M5Stack-apparaten zijn kleine ESP32-gebaseerde externe schermen. Ze kunnen glucosewaarden tonen die xDrip4iOS via Bluetooth verstuurt.";
+"noBluetoothPeripheralsConfigured" = "Geen Bluetooth-apparaten ingesteld";
 "noMultipleActiveCGMsAllowed" = "Je kunt niet meer dan één CGM Transmitter verbinden.\nVerifieer je andere CGM Transmitters en klik 'Stop Scannen', 'Loskoppelen' of verwijder deze";
 "noMultipleActiveCGMsAllowedFooter" = "Je hebt al een CGM verbonden.";

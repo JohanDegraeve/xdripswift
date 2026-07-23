@@ -103,3 +103,5 @@
 "sensorNoiseHistoryNoDataMessage" = "Diagrammet vises, når der er indsamlet nok sensormålinger.";
 "sensorNoiseHistoryFooter" = "Diagrammet viser resterende sensorudsving gennem denne sensorsession. Lavere værdier betyder et mere stabilt signal. Det måler ikke glukosenøjagtighed.";
 "sensorNoiseHistoryChartAccessibility" = "Diagram over sensorens støjhistorik";
+"pumpBattery" = "Batteri";
+"pumpReservoir" = "Reservoir";

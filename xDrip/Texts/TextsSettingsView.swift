@@ -77,7 +77,7 @@ class Texts_SettingsView {
     }()
     
     static let liveActivityDisabledInFollowerModeMessage: String = {
-        return NSLocalizedString("settingsviews_liveActivityDisabledInFollowerModeMessage", tableName: filename, bundle: Bundle.main, value: "Live Activities are disabled in Follower Mode unless an external heartbeat is used for background keep-alive.", comment: "notification settings, live activities are not available in follower mode")
+        return NSLocalizedString("settingsviews_liveActivityDisabledInFollowerModeMessage", tableName: filename, bundle: Bundle.main, value: "Live Activities are disabled in Follower Mode unless an external heartbeat is used for keep-alive.", comment: "notification settings, live activities are not available in follower mode")
     }()
     
     static let liveActivityTypeMinimal: String = {
@@ -124,7 +124,7 @@ class Texts_SettingsView {
     }()
     
     static let labelfollowerKeepAliveType: String = {
-        return NSLocalizedString("settingsviews_labelfollowerKeepAliveType", tableName: filename, bundle: Bundle.main, value: "Background Keep-alive", comment: "data source settings, enable background keep alive")
+        return NSLocalizedString("settingsviews_labelfollowerKeepAliveType", tableName: filename, bundle: Bundle.main, value: "Keep-alive", comment: "data source settings, keep-alive mode")
     }()
     
     static let followerKeepAliveTypeDisabled: String = {
@@ -144,27 +144,27 @@ class Texts_SettingsView {
     }()
     
     static let followerKeepAliveTypeDisabledMessage: String = {
-        return NSLocalizedString("settingsviews_followerKeepAliveTypeDisabledMessage", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.", comment: "data source settings, keep-alive mode is set to disabled")
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeDisabledMessage", tableName: filename, bundle: Bundle.main, value: "Keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.", comment: "data source settings, keep-alive mode is set to disabled")
     }()
     
     static let followerKeepAliveTypeNormalMessage: String = {
-        return NSLocalizedString("settingsviews_followerKeepAliveTypeNormalMessage", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.", comment: "data source settings, keep-alive mode is set to normal")
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeNormalMessage", tableName: filename, bundle: Bundle.main, value: "Keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.", comment: "data source settings, keep-alive mode is set to normal")
     }()
     
     static let followerKeepAliveTypeAggressiveMessage: String = {
-        return NSLocalizedString("settingsviews_followerKeepAliveTypeAggressiveMessage", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.", comment: "data source settings, keep-alive mode is set to aggressive")
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeAggressiveMessage", tableName: filename, bundle: Bundle.main, value: "Keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.", comment: "data source settings, keep-alive mode is set to aggressive")
     }()
     
     static let followerKeepAliveTypeHeartbeatMessage: String = {
-        return NSLocalizedString("settingsviews_followerKeepAliveTypeHeartbeatMessage", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.", comment: "data source settings, keep-alive mode is set to use an external heartbeat")
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeHeartbeatMessage", tableName: filename, bundle: Bundle.main, value: "Keep-alive is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.", comment: "data source settings, keep-alive mode is set to use an external heartbeat")
     }()
     
     static let followerPatientName: String = {
-        return NSLocalizedString("settingsviews_followerPatientName", tableName: filename, bundle: Bundle.main, value: "Patient Name", comment: "data source settings, the name of the person we are following")
+        return NSLocalizedString("settingsviews_followerPatientName", tableName: filename, bundle: Bundle.main, value: "Alias", comment: "data source settings, optional alias for the person we are following")
     }()
     
     static let followerPatientNameMessage: String = {
-        return NSLocalizedString("settingsviews_followerPatientNameMessage", tableName: filename, bundle: Bundle.main, value: "Here you can optionally write the name of the person you are following.", comment: "data source settings, ask the user to enter the name of the person we are following if they want to")
+        return NSLocalizedString("settingsviews_followerPatientNameMessage", tableName: filename, bundle: Bundle.main, value: "Here you can optionally write an alias for the person you are following.", comment: "data source settings, ask the user to enter an alias for the person we are following if they want to")
     }()
     
     static let followerServiceStatus: String = {
@@ -892,7 +892,7 @@ class Texts_SettingsView {
     // MARK: - Contact image
     
     static let infoContactsKeepAliveDisabled: String = {
-        return String(format: NSLocalizedString("settingsviews_infoContactsKeepAliveDisabled", tableName: filename, bundle: Bundle.main, value: "You are using Follower mode with background keep-alive disabled.\n\nContact Image function cannot work without a background keep-alive.", comment: "If user is in follower mode with background keep-alive disabled, show this message when they tap the row"), ConstantsHomeView.applicationName)
+        return String(format: NSLocalizedString("settingsviews_infoContactsKeepAliveDisabled", tableName: filename, bundle: Bundle.main, value: "You are using Follower mode with keep-alive disabled.\n\nContact Image function cannot work without keep-alive.", comment: "If user is in follower mode with keep-alive disabled, show this message when they tap the row"), ConstantsHomeView.applicationName)
     }()
     
     static let infoContactsAccessDeniedByUser: String = {
@@ -1072,7 +1072,7 @@ class Texts_SettingsView {
     }()
     
     static let showDeveloperSettings: String = {
-        return NSLocalizedString("showDeveloperSettings", tableName: filename, bundle: Bundle.main, value: "Show Advanced Settings", comment: "advanced settings, show them or hide them")
+        return NSLocalizedString("showDeveloperSettings", tableName: filename, bundle: Bundle.main, value: "Show", comment: "advanced settings, show them or hide them")
     }()
 
     static let preferSensorCountdown: String = {

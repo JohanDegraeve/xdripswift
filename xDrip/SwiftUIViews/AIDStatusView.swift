@@ -228,7 +228,7 @@ struct AIDStatusView: View {
                             }
                             
                             HStack {
-                                Text("Battery")
+                                Text(Texts_HomeView.pumpBattery)
                                 
                                 Spacer()
                                 
@@ -242,14 +242,14 @@ struct AIDStatusView: View {
                             }
                             
                             if let pumpReservoir = deviceStatus.pumpReservoir, pumpReservoir == ConstantsNightscout.omniPodReservoirFlagNumber {
-                                row(title: "Reservoir", data: "50+ U")
+                                row(title: Texts_HomeView.pumpReservoir, data: "50+ U")
                                 
                             } else {
                                 if let pumpReservoir = deviceStatus.pumpReservoir {
                                     // show one decimal place if available when less than 10 units
-                                    row(title: "Reservoir", data: (pumpReservoir.round(toDecimalPlaces: pumpReservoir < ConstantsHomeView.pumpReservoirUrgent ? 1 : 0).stringWithoutTrailingZeroes) + " U")
+                                    row(title: Texts_HomeView.pumpReservoir, data: (pumpReservoir.round(toDecimalPlaces: pumpReservoir < ConstantsHomeView.pumpReservoirUrgent ? 1 : 0).stringWithoutTrailingZeroes) + " U")
                                 } else {
-                                    row(title: "Reservoir", data: nilString + " U")
+                                    row(title: Texts_HomeView.pumpReservoir, data: nilString + " U")
                                 }
                             }
                             

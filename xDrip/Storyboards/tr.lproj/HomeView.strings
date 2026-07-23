@@ -103,3 +103,5 @@
 "sensorNoiseHistoryNoDataMessage" = "Yeterli sensör okuması toplandıktan sonra grafik görünecektir.";
 "sensorNoiseHistoryFooter" = "Grafik, bu sensör oturumu boyunca kalan sensör dalgalanmasını gösterir. Daha düşük değerler daha düzgün bir sinyal anlamına gelir. Glikoz doğruluğunu ölçmez.";
 "sensorNoiseHistoryChartAccessibility" = "Sensör gürültüsü geçmişi grafiği";
+"pumpBattery" = "Pil";
+"pumpReservoir" = "Rezervuar";

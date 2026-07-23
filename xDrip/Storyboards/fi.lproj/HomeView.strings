@@ -119,3 +119,5 @@
 "sensorNoiseHistoryNoDataMessage" = "Kaavio tulee näkyviin, kun sensorilukemia on kerätty riittävästi.";
 "sensorNoiseHistoryFooter" = "Kaavio näyttää sensorin jäännösvaihtelun tämän sensorijakson aikana. Pienemmät arvot tarkoittavat tasaisempaa signaalia. Se ei mittaa glukoosin tarkkuutta.";
 "sensorNoiseHistoryChartAccessibility" = "Sensorin kohinahistorian kaavio";
+"pumpBattery" = "Akku";
+"pumpReservoir" = "Säiliö";

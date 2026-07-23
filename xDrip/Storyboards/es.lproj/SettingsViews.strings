@@ -17,17 +17,17 @@
 "settingsviews_follower" = "Seguidor";
 
 "settingsviews_sectionTitleDataSource" = "Fuente de datos";
-"settingsviews_labelFollowerDataSourceType" = "Fuente de datos de seguidor";
+"settingsviews_labelFollowerDataSourceType" = "Fuente de datos";
 "settingsviews_labelUploadDataToNightscout" = "Subir a Nightscout";
-"settingsviews_labelfollowerKeepAliveType" = "Mantener en segundo plano";
+"settingsviews_labelfollowerKeepAliveType" = "Mantener activo";
 "settingsviews_followerKeepAliveTypeDisabled" = "Deshabilitado";
 "settingsviews_followerKeepAliveTypeNormal" = "Normal";
 "settingsviews_followerKeepAliveTypeAggressive" = "Agresivo";
-"settingsviews_followerKeepAliveTypeDisabledMessage" = "Mantener en segundo plan está deshabilitado.\n\nCuando la aplicación no está en primer plano, no habrá notificaciones, alarmas, valores de glucosa en el icono de la app ni habrá actualizaciones de los valores de glucosa.\n\nLa aplicación permanecerá durmiendo hasta que la abras de nuevo.\n\nEste modo tiene un impacto mínimo en la batería de tu dispositivo.";
-"settingsviews_followerKeepAliveTypeNormalMessage" = "Mantener en segundo plan está en modo normal.\n\nCuando la app está en segundo plano, intentaremos mantenerla funcionando para que reciba actualizaciones de los valores de glucosa y que sea posible saltar alarmas y notificaciones.\n\nEste modo consume bastante batería.";
-"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Mantener en segundo plan está en modo agresivo.\n\nCuando la app está en segundo plano, intentaremos, de forma agresiva, mantenerla funcionando para que reciba actualizaciones de los valores de glucosa y que sea posible saltar alarmas y notificaciones.\n\nEste modo consume mucha batería.";
-"settingsviews_followerPatientName" = "Nombre del paciente";
-"settingsviews_followerPatientNameMessage" = "Aquí puedes escribir el nombre de la persona que estás seguiendo.";
+"settingsviews_followerKeepAliveTypeDisabledMessage" = "Mantener activo is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeNormalMessage" = "Mantener activo is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Mantener activo is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
+"settingsviews_followerPatientName" = "Alias";
+"settingsviews_followerPatientNameMessage" = "Here you can optionally write an alias for the person you are following.";
 "settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
 "settingsviews_nightscoutNotEnabledRowText" = "Deshabilitado";
 "settingsviews_labelFollowerDataSourceRegion" = "Servidor (País)";
@@ -159,7 +159,7 @@
 "oslog" = "OSLog";
 "nslog" = "NSLog";
 "developerSettings" = "Opciones avanzadas";
-"showDeveloperSettings" = "Mostrar opciones avanzadas";
+"showDeveloperSettings" = "Mostrar";
 "preferSensorCountdown" = "Preferir cuenta atrás del sensor";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Vida útil del sensor";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Controla si la vida útil del sensor se muestra como tiempo transcurrido o como cuenta atrás en el iPhone y el Apple Watch.";
@@ -214,7 +214,7 @@
 "warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
 
 /// data source settings, keep-alive mode is set to use an external heartbeat
-"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Background keep-alive is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
+"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Mantener activo is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
 
 /// When enabled, readings will not be reading to shared user defaults (for loop)
 "suppressLoopShare" = "Suppress Loop Share";
@@ -433,3 +433,6 @@
 "sensorNoiseSensitivitySensitive" = "Sensible";
 "sensorNoiseSensitivityNormal" = "Normal";
 "sensorNoiseSensitivityPermissive" = "Permisivo";
+"settingsviews_followerServiceStatus" = "Estado";
+"settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Mantener activo.";
+"settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Mantener activo disabled.\n\nContact Image function cannot work without Mantener activo.";

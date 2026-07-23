@@ -116,3 +116,5 @@
 "sensorNoiseHistoryNoDataMessage" = "Le graphique apparaîtra après la collecte d’un nombre suffisant de mesures du capteur.";
 "sensorNoiseHistoryFooter" = "Le graphique montre l’instabilité résiduelle du capteur pendant cette session. Les valeurs basses indiquent un signal plus régulier. Il ne mesure pas la précision du glucose.";
 "sensorNoiseHistoryChartAccessibility" = "Graphique de l’historique du bruit du capteur";
+"pumpBattery" = "Batterie";
+"pumpReservoir" = "Réservoir";

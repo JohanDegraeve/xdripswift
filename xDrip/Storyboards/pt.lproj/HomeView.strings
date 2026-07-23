@@ -116,3 +116,5 @@
 "sensorNoiseHistoryNoDataMessage" = "O gráfico aparecerá depois de serem recolhidas leituras suficientes do sensor.";
 "sensorNoiseHistoryFooter" = "O gráfico mostra a oscilação residual do sensor durante esta sessão. Valores mais baixos indicam um sinal mais estável. Não mede a precisão da glicose.";
 "sensorNoiseHistoryChartAccessibility" = "Gráfico do histórico de ruído do sensor";
+"pumpBattery" = "Bateria";
+"pumpReservoir" = "Reservatório";

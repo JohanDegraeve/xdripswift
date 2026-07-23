@@ -20,16 +20,16 @@
 "settingsviews_sectionTitleDataSource" = "Data Source";
 "settingsviews_labelFollowerDataSourceType" = "Data Source";
 "settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
-"settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
+"settingsviews_labelfollowerKeepAliveType" = "Keep-alive";
 "settingsviews_followerKeepAliveTypeDisabled" = "Disabled";
 "settingsviews_followerKeepAliveTypeNormal" = "Normal";
 "settingsviews_followerKeepAliveTypeAggressive" = "Aggressive";
-"settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
-"settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
-"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
-"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Background keep-alive is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
-"settingsviews_followerPatientName" = "Patient Name";
-"settingsviews_followerPatientNameMessage" = "Here you can optionally write the name of the person you are following.";
+"settingsviews_followerKeepAliveTypeDisabledMessage" = "Keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeNormalMessage" = "Keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
+"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Keep-alive is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
+"settingsviews_followerPatientName" = "Alias";
+"settingsviews_followerPatientNameMessage" = "Here you can optionally write an alias for the person you are following.";
 "settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
 "settingsviews_nightscoutNotEnabledRowText" = "Disabled";
 "settingsviews_labelFollowerDataSourceRegion" = "Region";
@@ -46,7 +46,7 @@
 "settingsviews_multipleAppBadgeValueWith10" = "App Badge x10";
 "settingsviews_IntervalTitle" = "Notification Interval";
 "settingsviews_IntervalMessage" = "Minimum interval between two notifications";
-"settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for background keep-alive.";
+"settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Keep-alive.";
 "settingsviews_allowScreenRotation" = "Chart Rotation";
 "settingsviews_homeScreenChartDisplaySectionTitle" = "Chart Display";
 "settingsviews_homeScreenMainChartSectionFooter" = "These options control how glucose data is displayed on the main chart.";
@@ -178,7 +178,7 @@
 "nightscoutToken" = "Token";
 "giveNightscoutToken" = "Enter Token";
 "developerSettings" = "Advanced Settings";
-"showDeveloperSettings" = "Show Advanced Settings";
+"showDeveloperSettings" = "Show";
 "preferSensorCountdown" = "Prefer Sensor Countdown";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Sensor Lifetime";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Controls whether sensor lifetime is shown as elapsed time or as a countdown on iPhone and Apple Watch.";
@@ -425,3 +425,5 @@
 "calendarFollowStatusFooter" = "Shared Calendar reads the latest encoded event notes from the selected calendar during background updates.";
 /// Shared Calendar Settings - historical readings section footer
 "calendarFollowHistoricalReadingsFooter" = "Historical readings from the latest payload are imported only when they are missing locally.";
+"settingsviews_followerServiceStatus" = "Status";
+"settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Keep-alive disabled.\n\nContact Image function cannot work without Keep-alive.";

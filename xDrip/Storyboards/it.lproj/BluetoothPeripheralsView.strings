@@ -14,6 +14,7 @@
 
 "heartbeatDeviceFooter" = "Un dispositivo heartbeat non fornisce letture della glicemia. Usa l’attività Bluetooth per riattivare l’app in background, così aggiornamenti follower, allarmi, badge e notifiche possono continuare a funzionare.";
 "m5StackDeviceFooter" = "I dispositivi M5Stack sono piccoli display esterni basati su ESP32. Possono mostrare i valori glicemici inviati da xDrip4iOS tramite Bluetooth.";
+"noBluetoothPeripheralsConfigured" = "Nessun dispositivo Bluetooth configurato";
 
 /// when clicking add button in screen with list of bluetoothperipherals, after having selected the category, a new pop up appears, this is the title of pop up where user  needs to select bluetooth peripheral type
 "selectType" = "Select Transmitter Type";

@@ -156,3 +156,5 @@
 "sensorNoiseHistoryNoDataMessage" = "收集到足够的传感器读数后将显示图表。";
 "sensorNoiseHistoryFooter" = "图表显示本次传感器会话中的残余抖动。数值越低，信号越平稳。它不衡量葡萄糖准确性。";
 "sensorNoiseHistoryChartAccessibility" = "传感器噪声历史图表";
+"pumpBattery" = "电池";
+"pumpReservoir" = "储药器";

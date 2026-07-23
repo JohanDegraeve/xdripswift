@@ -4,5 +4,6 @@
 "batteryLevel" = "Nivel de Batería";
 "heartbeatDeviceFooter" = "Un dispositivo de latido no proporciona lecturas de glucosa. Usa la actividad Bluetooth para despertar la app en segundo plano y mantener funcionando las actualizaciones de seguidor, alarmas, insignias y notificaciones.";
 "m5StackDeviceFooter" = "Los dispositivos M5Stack son pequeñas pantallas externas basadas en ESP32. Pueden mostrar valores de glucosa enviados desde xDrip4iOS por Bluetooth.";
+"noBluetoothPeripheralsConfigured" = "No hay dispositivos Bluetooth configurados";
 "noMultipleActiveCGMsAllowed" = "Ya tienes conectado un transmisor MGC.\n\nVerificar los demás transmisores y haz click en 'Detener Escaneao', 'Disconectar' or simplemente eliminarlos";
 "noMultipleActiveCGMsAllowedFooter" = "Ya tienes un MGC conectado.";

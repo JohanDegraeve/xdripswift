@@ -141,3 +141,5 @@
 "sensorNoiseHistoryNoDataMessage" = "The chart will appear after enough sensor readings have been collected.";
 "sensorNoiseHistoryFooter" = "The chart shows residual sensor jitter across this sensor session. Lower values are smoother. It does not measure glucose accuracy.";
 "sensorNoiseHistoryChartAccessibility" = "Sensor noise history chart";
+"pumpBattery" = "Battery";
+"pumpReservoir" = "Reservoir";

@@ -111,7 +111,7 @@
 "warningChangeFromMasterToFollower" = "Переключение с главного на подписчика удалит ваш текущий сенсор. Вы хотите продолжить?";
 "nightscoutPort" = "Порт";
 "developerSettings" = "Расширенные настройки";
-"showDeveloperSettings" = "Показать расширенные настройки";
+"showDeveloperSettings" = "Показать";
 "preferSensorCountdown" = "Предпочитать обратный отсчёт датчика";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Срок службы датчика";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Определяет, показывать срок службы датчика как прошедшее время или как обратный отсчёт на iPhone и Apple Watch.";
@@ -137,13 +137,13 @@
 "settingsviews_resetDexcomTransmitterMessage" = "This option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
 
 /// data source settings, keep-alive mode is set to aggressive
-"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
+"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Поддержание активности is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
 "settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
-"settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeDisabledMessage" = "Поддержание активности is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
 
 /// statistics settings, prefer time in tight range
 "settingsviews_timeInRangeTypeTightRange" = "Tight Range";
@@ -161,7 +161,7 @@
 "settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
-"settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
+"settingsviews_labelfollowerKeepAliveType" = "Поддержание активности";
 
 /// this setting is required
 "settingsviews_valueIsRequired" = "⚠️ Required";
@@ -183,7 +183,7 @@
 "settingsviews_nightscoutNotEnabledRowText" = "Disabled";
 
 /// data source settings, keep-alive mode is set to use an external heartbeat
-"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Background keep-alive is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
+"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Поддержание активности is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
 
 /// When clicking the event interval setting, a pop up asks for minimum number of minutes between two events, this is the pop up message - this is used for setting the interval between two calendar events
 
@@ -203,7 +203,7 @@
 "settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// data source settings, the name of the person we are following
-"settingsviews_followerPatientName" = "Patient Name";
+"settingsviews_followerPatientName" = "Псевдоним";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabled" = "Disabled";
@@ -218,13 +218,13 @@
 "settingsviews_labelFollowerDataSourceRegion" = "Region";
 
 /// data source settings, data source
-"settingsviews_labelFollowerDataSourceType" = "Data Source";
+"settingsviews_labelFollowerDataSourceType" = "Источник данных";
 
 /// data source settings, enable Nightscout upload
 "settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
 
 /// data source settings, ask the user to enter the name of the person we are following if they want to - it's optional
-"settingsviews_followerPatientNameMessage" = "Here you can optionally write the name of the person you are following.";
+"settingsviews_followerPatientNameMessage" = "Here you can optionally write an alias for the person you are following.";
 
 /// follower settings, pop up that asks user to enter their password
 "settingsviews_enterPassword" = "Enter your password";
@@ -232,7 +232,7 @@
 /// The user needs to update their calendar permissions
 
 /// data source settings, keep-alive mode is set to normal
-"settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeNormalMessage" = "Поддержание активности is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
 "settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Затемнение экрана блокировки";
@@ -434,3 +434,6 @@
 "sensorNoiseSensitivitySensitive" = "Чувствительно";
 "sensorNoiseSensitivityNormal" = "Нормально";
 "sensorNoiseSensitivityPermissive" = "Допустимо";
+"settingsviews_followerServiceStatus" = "Статус";
+"settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Поддержание активности.";
+"settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Поддержание активности disabled.\n\nContact Image function cannot work without Поддержание активности.";

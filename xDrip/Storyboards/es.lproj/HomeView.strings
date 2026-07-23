@@ -89,3 +89,5 @@
 "sensorNoiseHistoryNoDataMessage" = "El gráfico aparecerá cuando se hayan recopilado suficientes lecturas del sensor.";
 "sensorNoiseHistoryFooter" = "El gráfico muestra la variación residual del sensor durante esta sesión. Los valores más bajos indican una señal más estable. No mide la precisión de la glucosa.";
 "sensorNoiseHistoryChartAccessibility" = "Gráfico del historial de ruido del sensor";
+"pumpBattery" = "Batería";
+"pumpReservoir" = "Depósito";

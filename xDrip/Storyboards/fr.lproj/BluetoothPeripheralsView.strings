@@ -4,5 +4,6 @@
 "batteryLevel" = "Niveau de batterie";
 "heartbeatDeviceFooter" = "Un appareil heartbeat ne fournit pas de mesures de glucose. Il utilise l’activité Bluetooth pour réveiller l’app en arrière-plan afin que les mises à jour suiveur, les alarmes, les badges et les notifications puissent continuer.";
 "m5StackDeviceFooter" = "Les appareils M5Stack sont de petits écrans externes basés sur ESP32. Ils peuvent afficher les valeurs de glucose envoyées par xDrip4iOS via Bluetooth.";
+"noBluetoothPeripheralsConfigured" = "Aucun appareil Bluetooth configuré";
 "noMultipleActiveCGMsAllowed" = "Vous avez déjà un émetteur CGM connecté.\n\nVerifiez vos autres émetteurs CGM et cliquez 'Stopper Scan', 'Déconnecter' ou effacez-les si nécessaire.";
 "noMultipleActiveCGMsAllowedFooter" = "Vous avez déjà un CGM connecté.";

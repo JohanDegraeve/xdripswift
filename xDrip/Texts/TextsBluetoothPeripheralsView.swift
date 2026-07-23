@@ -17,7 +17,7 @@ class Texts_BluetoothPeripheralsView {
     }()
 
     static let noBluetoothPeripheralsConfigured: String = {
-        return NSLocalizedString("noBluetoothPeripheralsConfigured", tableName: filename, bundle: Bundle.main, value: "No Bluetooth peripherals configured", comment: "Shown when the Bluetooth peripherals list is empty")
+        return NSLocalizedString("noBluetoothPeripheralsConfigured", tableName: filename, bundle: Bundle.main, value: "No Bluetooth devices configured", comment: "Shown when the Bluetooth devices list is empty")
     }()
 
     static let heartbeatDeviceFooter: String = {

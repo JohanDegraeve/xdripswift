@@ -105,7 +105,7 @@
 "warningChangeFromMasterToFollower" = "Sahip'ten Takipciye geçmek mevcut sensörünüzü durduracaktır. Devam etmek istiyor musun?";
 "nightscoutPort" = "Port";
 "developerSettings" = "Gelişmiş Ayarlar";
-"showDeveloperSettings" = "Gelişmiş Ayarları Göster";
+"showDeveloperSettings" = "Göster";
 "preferSensorCountdown" = "Sensör geri sayımını tercih et";
 "settingsviews_homeScreenSensorLifetimeSectionTitle" = "Sensör kullanım süresi";
 "settingsviews_homeScreenSensorLifetimeSectionFooter" = "Sensör kullanım süresinin iPhone ve Apple Watch'ta geçen süre veya geri sayım olarak gösterilmesini belirler.";
@@ -124,13 +124,13 @@
 "settingsviews_resetDexcomTransmitterMessage" = "This option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
 
 /// data source settings, keep-alive mode is set to aggressive
-"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
+"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Canlı tut is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
 "settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
-"settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeDisabledMessage" = "Canlı tut is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
 
 /// Settings screen for loop delay, explanatory text for value
 "expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
@@ -151,7 +151,7 @@
 "settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
-"settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
+"settingsviews_labelfollowerKeepAliveType" = "Canlı tut";
 
 /// this setting is required
 "settingsviews_valueIsRequired" = "⚠️ Required";
@@ -176,7 +176,7 @@
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "Veri Kaynağı";
+"settingsviews_sectionTitleDataSource" = "Veri kaynağı";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";
@@ -185,7 +185,7 @@
 "settingsviews_nightscoutNotEnabledRowText" = "Disabled";
 
 /// data source settings, keep-alive mode is set to use an external heartbeat
-"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Background keep-alive is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
+"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Canlı tut is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
 
 /// When enabled, readings will not be reading to shared user defaults (for loop)
 "suppressLoopShare" = "Suppress Loop Share";
@@ -215,7 +215,7 @@
 "settingsviews_smallBolusTreatmentThresholdMessage" = "Below how many units should we consider a bolus as a micro-bolus?\n\n(Recommended value: 1.0U)";
 
 /// data source settings, the name of the person we are following
-"settingsviews_followerPatientName" = "Patient Name";
+"settingsviews_followerPatientName" = "Takma ad";
 
 /// Housekeeper retention period, for how long to store data
 "settingsviews_housekeeperRetentionPeriod" = "Retention Period";
@@ -246,13 +246,13 @@
 "settingsviews_labelFollowerDataSourceRegion" = "Region";
 
 /// data source settings, data source
-"settingsviews_labelFollowerDataSourceType" = "Data Source";
+"settingsviews_labelFollowerDataSourceType" = "Veri kaynağı";
 
 /// data source settings, enable Nightscout upload
 "settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
 
 /// data source settings, ask the user to enter the name of the person we are following if they want to - it's optional
-"settingsviews_followerPatientNameMessage" = "Here you can optionally write the name of the person you are following.";
+"settingsviews_followerPatientNameMessage" = "Here you can optionally write an alias for the person you are following.";
 
 /// follower settings, pop up that asks user to enter their password
 "settingsviews_enterPassword" = "Enter your password";
@@ -260,7 +260,7 @@
 /// The user needs to update their calendar permissions
 
 /// data source settings, keep-alive mode is set to normal
-"settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeNormalMessage" = "Canlı tut is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
 "settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Kilit ekranı karartma";
@@ -462,3 +462,6 @@
 "sensorNoiseSensitivitySensitive" = "Sensitive";
 "sensorNoiseSensitivityNormal" = "Normal";
 "sensorNoiseSensitivityPermissive" = "Permissive";
+"settingsviews_followerServiceStatus" = "Durum";
+"settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Canlı tut.";
+"settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Canlı tut disabled.\n\nContact Image function cannot work without Canlı tut.";

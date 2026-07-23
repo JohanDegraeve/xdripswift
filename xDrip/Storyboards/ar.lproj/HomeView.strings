@@ -105,3 +105,5 @@
 "sensorNoiseHistoryNoDataMessage" = "سيظهر المخطط بعد جمع عدد كافٍ من قراءات المستشعر.";
 "sensorNoiseHistoryFooter" = "يعرض المخطط اهتزاز المستشعر المتبقي خلال هذه الجلسة. القيم الأقل تعني إشارة أكثر سلاسة. وهو لا يقيس دقة الجلوكوز.";
 "sensorNoiseHistoryChartAccessibility" = "مخطط سجل ضوضاء المستشعر";
+"pumpBattery" = "البطارية";
+"pumpReservoir" = "الخزان";

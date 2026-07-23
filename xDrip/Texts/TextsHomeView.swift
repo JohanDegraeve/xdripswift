@@ -7,11 +7,11 @@ enum Texts_HomeView {
     static let snoozeButton:String = {
         return NSLocalizedString("presnooze", tableName: filename, bundle: Bundle.main, value: "Snooze", comment: "Text in button on home screen")
     }()
-    
+
     static let snoozeAllTitle:String = {
         return NSLocalizedString("snoozeAllTitle", tableName: filename, bundle: Bundle.main, value: "Snooze All Alarms", comment: "snooze all text in snooze screen")
     }()
-    
+
     static let snoozeAllDisabled:String = {
         return NSLocalizedString("snoozeAllDisabled", tableName: filename, bundle: Bundle.main, value: "No urgent alarms are snoozed", comment: "no urgent alarms are snoozed text in snooze screen")
     }()
@@ -222,6 +222,14 @@ enum Texts_HomeView {
 
     static let sensorManagementHistoricCalibration:String = {
         return NSLocalizedString("sensorManagementHistoricCalibration", tableName: filename, bundle: Bundle.main, value: "Historic", comment: "label for a historic or unused calibration")
+    }()
+
+    static let pumpBattery:String = {
+        return NSLocalizedString("pumpBattery", tableName: filename, bundle: Bundle.main, value: "Battery", comment: "pump status view, insulin pump battery level label")
+    }()
+
+    static let pumpReservoir:String = {
+        return NSLocalizedString("pumpReservoir", tableName: filename, bundle: Bundle.main, value: "Reservoir", comment: "pump status view, insulin pump reservoir amount label")
     }()
 
     static let sensorManagementCalibrationSafetyFooter:String = {

@@ -182,3 +182,5 @@
 "sensorNoiseHistoryNoDataMessage" = "Das Diagramm erscheint, sobald genügend Sensorwerte erfasst wurden.";
 "sensorNoiseHistoryFooter" = "Das Diagramm zeigt die verbleibende Sensorunruhe während dieser Sensorsitzung. Niedrigere Werte bedeuten ein ruhigeres Signal. Es misst nicht die Glukosegenauigkeit.";
 "sensorNoiseHistoryChartAccessibility" = "Diagramm des Sensorrauschverlaufs";
+"pumpBattery" = "Batterie";
+"pumpReservoir" = "Reservoir";

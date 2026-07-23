@@ -118,3 +118,5 @@
 "sensorNoiseHistoryNoDataMessage" = "De grafiek verschijnt nadat voldoende sensormetingen zijn verzameld.";
 "sensorNoiseHistoryFooter" = "De grafiek toont resterende sensorfluctuatie tijdens deze sensorsessie. Lagere waarden betekenen een rustiger signaal. De grafiek meet niet de nauwkeurigheid van glucosewaarden.";
 "sensorNoiseHistoryChartAccessibility" = "Grafiek met de sensorruisgeschiedenis";
+"pumpBattery" = "Batterij";
+"pumpReservoir" = "Reservoir";

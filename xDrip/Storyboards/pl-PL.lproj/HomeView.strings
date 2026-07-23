@@ -199,3 +199,5 @@
 "sensorNoiseHistoryNoDataMessage" = "Wykres pojawi się po zebraniu wystarczającej liczby odczytów sensora.";
 "sensorNoiseHistoryFooter" = "Wykres przedstawia resztkowe wahania sensora w trakcie tej sesji. Niższe wartości oznaczają stabilniejszy sygnał. Nie mierzy dokładności glukozy.";
 "sensorNoiseHistoryChartAccessibility" = "Wykres historii szumu sensora";
+"pumpBattery" = "Bateria";
+"pumpReservoir" = "Zbiornik";

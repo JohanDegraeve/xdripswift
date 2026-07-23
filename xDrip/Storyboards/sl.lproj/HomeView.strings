@@ -199,3 +199,5 @@
 "sensorNoiseHistoryNoDataMessage" = "Graf se bo prikazal, ko bo zbranih dovolj odčitkov senzorja.";
 "sensorNoiseHistoryFooter" = "Graf prikazuje preostalo nihanje senzorja v tej seji. Nižje vrednosti pomenijo bolj gladek signal. Ne meri natančnosti glukoze.";
 "sensorNoiseHistoryChartAccessibility" = "Graf zgodovine šuma senzorja";
+"pumpBattery" = "Baterija";
+"pumpReservoir" = "Rezervoar";
