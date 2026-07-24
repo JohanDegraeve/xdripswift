@@ -31,7 +31,11 @@
 "confirmDisconnectMessage" = "Нажмите 'Отключить', чтобы подтвердить, что вы действительно хотите отключиться от передатчика.";
 "transmitterStartDate" = "Запуск передатчика";
 "sensorStartDate" = "Запуск датчика";
-"useOtherDexcomApp" = "Подписаться на Dexcom-приложение";
+"useOtherDexcomApp" = "Режим совместной работы";
+"useOtherDexcomAppCoexistenceFooter" = "Режим совместной работы позволяет нам работать с другим приложением, например Dexcom или CamAPS. Это приложение должно продолжать работать в фоновом режиме.";
+"useOtherDexcomAppPrimaryFooter" = "Основной режим подключается как главное приложение и управляет соединением.";
+"runningInCoexistenceMode" = "Работает в режиме совместной работы";
+"runningInPrimaryMode" = "Работает в основном режиме";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

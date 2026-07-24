@@ -1,26 +1,33 @@
 "settingsviews_settingstitle" = "Ρυθμίσεις";
-"settingsviews_sectiontitlehelp" = "Βοήθεια & Τεκμηρίωση";
+"settingsviews_glucoseDisplaySectionTitle" = "Εμφάνιση γλυκόζης";
+"settingsviews_glucoseRangesSectionTitle" = "Εύρη γλυκόζης";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Συναγερμοί και ειδοποιήσεις";
+"settingsviews_sharingAndServicesSectionTitle" = "Κοινή χρήση και υπηρεσίες";
+"settingsviews_osAidLoopShareSectionTitle" = "Κοινή χρήση OS-AID";
+"settingsviews_issueReportSectionTitle" = "Αναφορά προβλήματος";
+"settingsviews_appBannerVersion" = "Έκδοση %@";
+"settingsviews_appInstalledSince" = "Εγκαταστάθηκε";
 "settingsviews_showOnlineHelp" = "Ανοίξτε τη Ηλεκτρονική Βοήθεια;";
-"settingsviews_translateOnlineHelp" = "Αυτόματη μετάφραση;";
-"settingsviews_restartNeeded" = "(Απαιτείται επανεκκίνηση)";
+"settingsviews_translateOnlineHelp" = "Μετάφραση τεκμηρίωσης";
 "settingsviews_sectiontitleNotifications" = "Γενικά";
 "settingsviews_selectbgunit" = "Μονάδες μέτρησης γλυκόζης";
 "settingsviews_masterorfollower" = "Κύριος ή ακόλουθος;";
 "settingsviews_master" = "Κύριος";
 "settingsviews_follower" = "Ακόλουθος";
-"settingsviews_showReadingInNotification" = "Εμφάνιση BG στις Ειδοποιήσεις;";
-"settingsviews_labelShowReadingInAppBadge" = "Εμφάνιση BG στη τεμπέλα εφαρμογής;";
-"settingsviews_multipleAppBadgeValueWith10" = "Πολ/σμός BG στη ταμπλέλα εφαρμογής επί 10;";
-"settingsviews_allowScreenRotation" = "Κάθετη εναλλαγή γραφήματος ενεργή;";
+"settingsviews_showReadingInNotification" = "Ειδοποιήσεις γλυκόζης";
+"settingsviews_labelShowReadingInAppBadge" = "Σήμα εφαρμογής";
+"settingsviews_multipleAppBadgeValueWith10" = "Σήμα εφαρμογής x10";
+"settingsviews_allowScreenRotation" = "Περιστροφή γραφήματος";
 "settingsviews_showMiniChart" = "Εμφάνιση μίνι-γραφήματος;";
-"settingsviews_showClockWhenScreenIsLocked" = "Εμφάνιση ρολογιού όταν κλειδωμένο;";
+"settingsviews_showSensorNoiseOnChart" = "Εμφάνιση θορύβου αισθητήρα";
+"settingsviews_showClockWhenScreenIsLocked" = "Ρολόι οθόνης κλειδώματος";
 "settingsviews_urgentHighValue" = "Επείγον Υψηλή γλυκόζη";
 "settingsviews_highValue" = "Υψηλή γλυκόζη";
 "settingsviews_targetValue" = "Τιμή στόχου";
 "settingsviews_lowValue" = "Χαμηλή γλυκόζη";
 "settingsviews_urgentLowValue" = "Επείγον Χαμηλή γλυκόζη";
-"settingsviews_showcoloredobjectives" = "Εμφάνιση έγχρωμων γραμμών;";
-"settingsviews_showtarget" = "Εμφάνιση γραμμής στόχου;";
+"settingsviews_showcoloredobjectives" = "Έγχρωμες γραμμές";
+"settingsviews_showtarget" = "Γραμμή στόχου";
 "settingsviews_sectiontitletreatments" = "Θεραπείες";
 "settingsviews_showTreatments" = "Εμφάνιση θεραπειών στο γράφημα;";
 "settingsviews_smallBolusTreatmentThreshold" = "Όριο Micro-bolus (ταχείας δράσης)";
@@ -29,30 +36,34 @@
 "settingsviews_showStatistics" = "Εμφάνιση στατιστικών;";
 "settingsviews_daysToUseStatisticsTitle" = "Μέρες για υπολογισμό;";
 "settingsviews_daysToUseStatisticsMessage" = "Μέγιστος αριθμός ημερών για στατιστικό υπολογισμό;\n\n(Εισαγάγετε 0 για υπολογισμό από σήμερα τα μεσάνυχτα)";
-"settingsviews_useIFCCA1C" = "Εμφάνιση HbA1c ως mmols/mol";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Πομπός";
 "settingsviews_transmittertype" = "Τύπος πομπού";
 "settingsviews_transmitterid" = "Αναγνωριστικό πομπού";
 "settingsviews_transmitterid_text_for_button"  = "Αναγνωριστικό πομπού";
 "settingsviews_givetransmitterid" = "Εισαγάγετε αναγνωριστικό πομπού";
-"settingsviews_webooptransmitter" = "Χρήση αλγόριθμου πομπού;";
-"settingsviews_nonfixedtransmitter" = "Ενεργοποίηση βαθμονόμησης πολλών σημείων;";
+"settingsviews_webooptransmitter" = "Αλγόριθμος πομπού";
+"settingsviews_nonfixedtransmitter" = "Βαθμονόμηση πολλών σημείων";
 "settingsviews_labelNonFixed" = "Βαθμονόμηση πολλαπλών σημείων";
 "settingsviews_labelWebOOP" = "xDrip ή αλγόριθμος πομπού";
 "settingsviews_sectiontitlealerting" = "Ειδοποιήσεις";
 "settingsviews_row_alert_types" = "Τύποι ειδοποιήσεων";
 "settingsviews_row_alerts" = "Ειδοποιήσεις";
+"settingsviews_volume_tests_section_title" = "Δοκιμή έντασης συναγερμού";
+"settingsviews_alert_types_section_footer" = "Οι Τύποι Συναγερμού ορίζουν πώς λειτουργούν οι συναγερμοί, συμπεριλαμβανομένων ήχου, δόνησης, αναβολής και παράκαμψης σίγασης.";
+"settingsviews_alerts_section_footer" = "Οι Συναγερμοί ορίζουν πότε η εφαρμογή πρέπει να σας ειδοποιεί για επίπεδα γλυκόζης, χαμένες μετρήσεις και άλλες συνθήκες.";
 "settingsviews_sectiontitlehealthkit" = "Apple Health (Υγεία)";
-"settingsviews_healthkit" = "Εγγραφή δεδομένων στο Apple Health;";
-"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
-"settingsviews_uploadReadingstoDexcomShare" = "Μεταφόρτωση σε Dexcom Share;";
+"settingsviews_healthkit" = "Εγγραφή στο Apple Health";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Μεταφόρτωση";
 "settingsviews_dexcomShareUploadSerialNumber" = "Σειριακός αριθμός δέκτη";
-"settingsviews_useUSDexcomShareurl" = "Να χρησιμοποιηθούν διακομιστές Dexcom US;";
+"settingsviews_useUSDexcomShareurl" = "Διακομιστές US";
 "settingsviews_dexcomShareAccountName" = "Όνομα λογαριασμού";
 "settingsviews_giveDexcomShareAccountName" = "Εισαγάγετε όνομα λογαριασμού Dexcom Share";
 "settingsviews_giveDexcomSharePassword" = "Κοινοποίηση κωδικού πρόσβασης για κοινή χρήση Dexcom";
 "settingsviews_givedexcomShareUploadSerialNumber" = "Εισαγάγετε τον σειριακό αριθμό του δέκτη Dexcom";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Επιλογές μεταφόρτωσης";
 "settingsviews_nightscoutEnabled" = "Ενεργοποίηση του Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Μεταφόρτωση με χρονοδιάγραμμα;";
@@ -63,32 +74,27 @@
 "editScheduleTimePickerSubtitle" = "Αλλαγή: ";
 "timeScheduleViewTitle" = "Χρονοδιάγραμμα On/Off για ";
 "uploadSensorStartTime" = "Μεταφόρτωση ώρα έναρξης αισθητήρα;";
-"testUrlAndAPIKey" = "Δοκιμή σύνδεσης;";
-"settingsviews_sectiontitlespeak" = "Ομιλία";
-"settingsviews_speakBgReadings" = "Εκφώνηση της μέτρησης;";
+"testUrlAndAPIKey" = "Δοκιμή σύνδεσης";
+"settingsviews_speakBgReadings" = "Εκφώνηση γλυκόζης";
 "settingsviews_speakBgReadingslanguage" = "Γλώσσα";
 "settingsviews_speakreadingslanguageselection" = "Επιλέξτε γλώσσα";
 "settingsviews_speakTrend" = "Εκφώνηση της τάσης;";
 "settingsviews_speakDelta" = "Εκφώνηση της διαφοράς;";
 "settingsviews_IntervalTitle" = "Συχνότητα";
-"settingsviews_IntervalMessage" = "Ελάχιστο διάστημα μεταξύ δύο μετρήσεων, σε λεπτά";
+"settingsviews_IntervalMessage" = "Ελάχιστο διάστημα μεταξύ δύο μετρήσεων";
 "settingsviews_sectiontitleAbout" = "Σχετικά με %@";
 "settingsviews_Version" = "Έκδοση";
 "settingsviews_license" = "Άδεια";
-"settingsviews_build" = "Έκδοση";
 "m5stack_settingsviews_settingstitle" = "M5 Stack Ρυθμίσεις";
 "m5stack_settingsviews_textColor" = "Χρώμα κειμένου";
 "m5stack_settingsviews_backGroundColor" = "Χρώμα φόντου";
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 "m5stack_settingsviews_giveBluetoothPassword" = "Εισαγάγετε τον κωδικό για Bluetooth";
 "m5stack_settingsviews_brightness" = "Φωτεινότητα οθόνης";
-"appleWatchSectionTitle" = "Apple Watch";
-"calendarEventsSectionTitle" = "Ημερολογιακά γεγονότα";
-"createCalendarEvent" = "Προσθήκη στο ημερολόγιο;";
 "calenderId" = "Ημερολόγιο για χρήση;";
-"settingsviews_displayTrendInCalendarEvent" = "Εμφάνιση τάσης;";
-"displayUnitInCalendarEvent" = "Εμφάνιση μονάδας γλυκόζης;";
-"displayDeltaInCalendarEvent" = "Εμφάνιση τιμής Δ;";
+"settingsviews_displayTrendInCalendarEvent" = "Τάση";
+"displayUnitInCalendarEvent" = "Μονάδα";
+"displayDeltaInCalendarEvent" = "Δέλτα";
 "infoCalendarAccessDeniedByUser" = "Προηγουμένως αρνηθήκατε την πρόσβαση στο Ημερολόγιό σας.\n\nΓια να το ενεργοποιήσετε, μεταβείτε στις ρυθμίσεις της συσκευής σας, απόρρητο, ημερολόγια και ενεργοποιήστε το.";
 "infoCalendarAccessRestricted" = "Δεν μπορείτε να δώσετε εξουσιοδότηση στο %@ για πρόσβαση στο ημερολόγιό σας. Αυτό οφείλεται πιθανώς σε ενεργούς περιορισμούς όπως γονικοί έλεγχοι που μπορεί να υπάρχουν.";
 "sectionTitleTrace" = "Αναφορά προβλημάτων";
@@ -99,19 +105,21 @@
 "failedToSendEmail" = "Αποτυχία αποστολής email";
 "volumeTestSoundPlayerExplanation" = "Ένας ήχος αφύπνισης αναπαράγεται τώρα με την ίδια ένταση που θα χρησιμοποιείται για έναν Τύπο συναγερμού με 'Παράκαμψη Σίγασης' = Ενεργό\n\n(Χρησιμοποιείται για όλους τους συναγερμούς εκτός από τις ειδοποιήσεις Ελλιπείς Μετρήσεις που χρησιμοποιούν πάντα την ένταση ήχου του iOS.)\n\nΑλλάξτε την ένταση με τα κουμπιά έντασης και πατήστε OK για αποθήκευση.";
 "volumeTestiOSSoundExplanation" = "Ένας ήχος αφύπνισης αναπαράγεται τώρα με την ίδια ένταση που θα χρησιμοποιείται για έναν Τύπο συναγερμού με 'Παράκαμψη Σίγασης' = Ανενεργό\n\n(Χρησιμοποιείται επίσης πάντα για συναγερμούς Ελλιπών Μετρήσεων που χρησιμοποιούν την ένταση ήχου του iOS.)\n\nΠατήστε ένα από τα κουμπιά έντασης για να σταματήσει ο ήχος, αλλάξτε την ένταση με τα κουμπιά έντασης στην επιθυμητή ένταση και δοκιμάστε ξανά.";
-"volumeTestSoundPlayer" = "Έλεγχος έντασης ήχου (με ενεργοποιημένη παράκαμψη σίγασης)";
-"volumeTestiOSSound" = "Έλεγχος (τρέχουσας) έντασης ήχου";
+"volumeTestSoundPlayer" = "Όταν η Αθόρυβη λειτουργία είναι ενεργή";
+"volumeTestiOSSound" = "Όταν η Αθόρυβη λειτουργία είναι ανενεργή";
 "debugLevel" = "Συμπεριλάβετε λεπτομερή διαγνωστικά";
 "warningChangeFromMasterToFollower" = "Η εναλλαγή από κύριο σε ακόλουθο θα σταματήσει τον τρέχοντα αισθητήρα σας. Θέλετε να συνεχίσετε;";
 "nightscoutPort" = "Θύρα";
-"developerSettings" = "Ρυθμίσεις προγραμματιστή";
-"smoothLibreValues" = "Ομαλοποίηση τιμών Libre;";
+"developerSettings" = "Ρυθμίσεις για προχωρημένους";
+"showDeveloperSettings" = "Εμφάνιση";
+"preferSensorCountdown" = "Προτίμηση αντίστροφης μέτρησης αισθητήρα";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Διάρκεια ζωής αισθητήρα";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Ελέγχει αν η διάρκεια ζωής του αισθητήρα εμφανίζεται ως χρόνος που έχει παρέλθει ή ως αντίστροφη μέτρηση σε iPhone και Apple Watch.";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Αρχική οθόνη";
 "settingsviews_sectionTitleHousekeeper" = "Διαχείριση δεδομένων";
-"settingsviews_housekeeperRetentionPeriod" = "Περίοδος διατήρησης (ημ.)";
-"settingsviews_housekeeperExportAllData" = "Εξαγωγή όλων των δεδομένων";
+"settingsviews_housekeeperRetentionPeriod" = "Περίοδος διατήρησης";
 "settingsviews_housekeeperRetentionPeriodMessage" = "Για πόσες ημέρες πρέπει να αποθηκεύονται τα δεδομένα; (Ελάχ. 90, μέγ. 365)\n\n(Συνιστάται: 90 ημέρες)";
 "suppressUnLockPayLoad" = "Κατάργηση αποστολής ωφέλιμου φορτίου";
 "suppressLoopShare" = "Κατάργηση Loop Share";
@@ -126,16 +134,16 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// transmitter settings, to explain that the reset option only works for certain transmitters
-"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
+"settingsviews_resetDexcomTransmitterMessage" = "This option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
 
 /// data source settings, keep-alive mode is set to aggressive
-"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
+"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
 "settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
-"settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeDisabledMessage" = "Keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
 
 /// statistics settings, prefer time in tight range
 "settingsviews_timeInRangeTypeTightRange" = "Tight Range";
@@ -150,10 +158,10 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
 
 /// statistics settings, the type of time in range selected
-"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
-"settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
+"settingsviews_labelfollowerKeepAliveType" = "Keep-alive";
 
 /// this setting is required
 "settingsviews_valueIsRequired" = "⚠️ Required";
@@ -161,13 +169,12 @@
 /// treatments settings, offset the carb treatments on main chart
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
-"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
 
 /// statistics settings, prefer user-defined range
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+"settingsviews_sectionTitleDataSource" = "Πηγή δεδομένων";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";
@@ -176,10 +183,9 @@
 "settingsviews_nightscoutNotEnabledRowText" = "Disabled";
 
 /// data source settings, keep-alive mode is set to use an external heartbeat
-"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Background keep-alive is set to use an external heartbeat. ❤️\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
+"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Keep-alive is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
 
 /// When clicking the event interval setting, a pop up asks for minimum number of minutes between two events, this is the pop up message - this is used for setting the interval between two calendar events
-"settingsviews_CalenderIntervalTitle" = "Event Interval";
 
 /// data source settings, enable Nightscout in the Nightscout section
 "settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
@@ -194,10 +200,10 @@
 "settingsviews_libreLinkUpReAcceptNeeded" = "Need to accept terms";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two bg announcements, this is the pop up message - this is used for setting the interval between two readings in BG announcements, Speak readings, Apple Watch
-"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
+"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// data source settings, the name of the person we are following
-"settingsviews_followerPatientName" = "Patient Name";
+"settingsviews_followerPatientName" = "Ψευδώνυμο";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabled" = "Disabled";
@@ -212,28 +218,222 @@
 "settingsviews_labelFollowerDataSourceRegion" = "Region";
 
 /// data source settings, data source
-"settingsviews_labelFollowerDataSourceType" = "Data Source";
+"settingsviews_labelFollowerDataSourceType" = "Πηγή δεδομένων";
 
 /// data source settings, enable Nightscout upload
 "settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
 
 /// data source settings, ask the user to enter the name of the person we are following if they want to - it's optional
-"settingsviews_followerPatientNameMessage" = "Here you can optionally write the name of the person you are following.";
+"settingsviews_followerPatientNameMessage" = "Here you can optionally write an alias for the person you are following.";
 
 /// follower settings, pop up that asks user to enter their password
 "settingsviews_enterPassword" = "Enter your password";
 
 /// The user needs to update their calendar permissions
-"infoCalendarAccessWriteOnly" = "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.";
 
 /// data source settings, keep-alive mode is set to normal
-"settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeNormalMessage" = "Keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Μείωση φωτεινότητας οθόνης κλειδώματος";
 
 /// Should loop data be shared only every 5 minutes
-"shareToLoopOnceEvery5Minutes" = "Share with OS-AID every 5 mins";
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_dataManagementStorageInfo" = "Πληροφορίες αποθήκευσης";
+"settingsviews_dataManagementManageData" = "Διαχείριση δεδομένων";
+"settingsviews_dataManagementDataRetention" = "Διατήρηση δεδομένων";
+"settingsviews_dataManagementDataDeletion" = "Διαγραφή δεδομένων";
+"settingsviews_dataManagementImportData" = "Εισαγωγή δεδομένων";
+"settingsviews_dataManagementLastHousekeeping" = "Τελευταία εκκαθάριση";
+"settingsviews_storageInfoDatabase" = "Βάση δεδομένων";
+"settingsviews_storageInfoDatabaseSize" = "Μέγεθος βάσης";
+"settingsviews_storageInfoTrackedRecords" = "Καταγεγραμμένες εγγραφές";
+"settingsviews_storageInfoDevices" = "Συσκευές";
+"settingsviews_storageInfoSensors" = "Αισθητήρες";
+"settingsviews_storageInfoRetentionFooter" = "Η διαμορφωμένη περίοδος διατήρησης δεδομένων είναι %d ημέρες.";
+"settingsviews_storageInfoHistory" = "Αποθηκευμένο ιστορικό";
+"settingsviews_storageInfoEarliestRecord" = "Παλαιότερη εγγραφή";
+"settingsviews_storageInfoLatestRecord" = "Νεότερη εγγραφή";
+"settingsviews_storageInfoCheckingStatus" = "Έλεγχος αποθήκευσης…";
+"settingsviews_nightscoutImportRetentionFooter" = "Η εισαγωγή περιορίζεται στην περίοδο διατήρησης των %d ημερών. Τα παλαιότερα δεδομένα αφαιρούνται κατά την εκκαθάριση.";
+"settingsviews_cleanDataAutomaticHousekeeping" = "Αυτόματη εκκαθάριση";
+"settingsviews_cleanDataKeepHistoricalData" = "Διατήρηση ιστορικού";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "Τελευταία ολοκλήρωση";
+"settingsviews_cleanDataLastHousekeepingResult" = "Τελευταίο αποτέλεσμα";
+"settingsviews_cleanDataNoHousekeepingRequired" = "Δεν απαιτείται εκκαθάριση";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "Εκτελείται το πολύ μία φορά την ημέρα όταν ανοίγει η εφαρμογή. Παλαιότερες μετρήσεις, θεραπείες και αχρησιμοποίητες βαθμονομήσεις αφαιρούνται τοπικά.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Το ιστορικό αφαιρείται μόνο χειροκίνητα από τη Διαγραφή δεδομένων.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "Αφαιρέθηκε %@ εγγραφή";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "Αφαιρέθηκαν %@ εγγραφές";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "Εκκαθάριση δεδομένων";
+"settingsviews_cleanDataStorageUsed" = "Χώρος σε χρήση";
+"settingsviews_cleanDataStoredData" = "Αποθηκευμένα δεδομένα";
+"settingsviews_cleanDataBgReadings" = "Μετρήσεις γλυκόζης";
+"settingsviews_cleanDataTreatments" = "Θεραπείες";
+"settingsviews_cleanDataCalibrations" = "Βαθμονομήσεις";
+"settingsviews_cleanDataSelectData" = "Δεδομένα προς διαγραφή";
+"settingsviews_cleanDataCleanupMethod" = "Μέθοδος εκκαθάρισης";
+"settingsviews_cleanDataKeepRecent" = "Διατήρηση πρόσφατων";
+"settingsviews_cleanDataDateRange" = "Εύρος ημερομηνιών";
+"settingsviews_cleanDataDeleteAll" = "Διαγραφή όλων";
+"settingsviews_cleanDataKeep" = "Διατήρηση";
+"settingsviews_cleanDataFrom" = "Από";
+"settingsviews_cleanDataUntil" = "Έως";
+"settingsviews_cleanDataOlderDataFooter" = "Τα παλαιότερα δεδομένα θα διαγραφούν. Τα πρόσφατα θα διατηρηθούν.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "Περιλαμβάνονται και οι δύο ημερομηνίες.";
+"settingsviews_cleanDataDeleteAllFooter" = "Όλα τα επιλεγμένα δεδομένα θα διαγραφούν.";
+"settingsviews_cleanDataContinue" = "Συνέχεια";
+"settingsviews_cleanDataReviewFooter" = "Θα δείτε σύνοψη πριν από τη διαγραφή.";
+"settingsviews_cleanDataPermanentDeletion" = "Οριστική διαγραφή";
+"settingsviews_cleanDataCannotUndo" = "Αυτή η ενέργεια δεν αναιρείται.";
+"settingsviews_cleanDataUnusedCalibrations" = "Αχρησιμοποίητες βαθμονομήσεις";
+"settingsviews_cleanDataEarliestStoredData" = "Πρώτα αποθηκευμένα δεδομένα";
+"settingsviews_cleanDataDataToDelete" = "Δεδομένα προς διαγραφή";
+"settingsviews_cleanDataEnterCode" = "Εισαγάγετε αυτόν τον εξαψήφιο κωδικό";
+"settingsviews_cleanDataSixDigitCode" = "Εξαψήφιος κωδικός";
+"settingsviews_cleanDataConfirmDelete" = "ΕΠΙΒΕΒΑΙΩΣΗ ΔΙΑΓΡΑΦΗΣ";
+"settingsviews_cleanDataSuccessfullyDeleted" = "Τα δεδομένα διαγράφηκαν";
+"settingsviews_cleanDataCompleted" = "Ολοκληρώθηκε";
+"settingsviews_cleanDataBgReadingsDeleted" = "Μετρήσεις διαγράφηκαν";
+"settingsviews_cleanDataTreatmentsDeleted" = "Θεραπείες διαγράφηκαν";
+"settingsviews_cleanDataStorageBefore" = "Χώρος πριν";
+"settingsviews_cleanDataStorageAfter" = "Χώρος μετά";
+"settingsviews_cleanDataCleanupSummary" = "Σύνοψη εκκαθάρισης";
+"settingsviews_cleanDataDatabaseReuseFooter" = "Η βάση μπορεί να κρατήσει το μέγεθός της και να επαναχρησιμοποιήσει τον ελεύθερο χώρο.";
+"settingsviews_cleanDataCheckingStatus" = "Έλεγχος δεδομένων…";
+"settingsviews_cleanDataCountingStatus" = "Καταμέτρηση δεδομένων…";
+"settingsviews_cleanDataDeletingStatus" = "Οριστική διαγραφή δεδομένων…\nΚρατήστε την εφαρμογή ανοικτή.";
+"settingsviews_cleanDataInvalidDateRangeError" = "Η ημερομηνία έναρξης πρέπει να προηγείται της λήξης.";
+"settingsviews_cleanDataNoSelectionError" = "Επιλέξτε τουλάχιστον έναν τύπο δεδομένων.";
+"settingsviews_cleanDataNoMatchingDataError" = "Δεν υπάρχουν επιλεγμένα δεδομένα σε αυτό το εύρος.";
+"settingsviews_cleanDataChangedError" = "Τα δεδομένα άλλαξαν μετά τη σύνοψη. Ελέγξτε τα ξανά.";
+"settingsviews_cleanDataDeleteFailedError" = "Δεν ήταν δυνατή η διαγραφή. Η εκκαθάριση σταμάτησε.";
+"settingsviews_cleanDataDays" = "%d ημέρες";
+"settingsviews_nightscoutImportCompleted" = "Η εισαγωγή Nightscout ολοκληρώθηκε";
+"settingsviews_nightscoutImportSummary" = "Σύνοψη εισαγωγής";
+"settingsviews_nightscoutImportURLMissing" = "Δεν έχει διαμορφωθεί URL Nightscout";
+"settingsviews_nightscoutImportConfigureURL" = "Διαμορφώστε ένα URL Nightscout στις ρυθμίσεις Nightscout πριν από την εισαγωγή δεδομένων.";
+"settingsviews_nightscoutImportDownloaded" = "Λήφθηκαν";
+"settingsviews_nightscoutImportAdded" = "Προστέθηκαν";
+"settingsviews_nightscoutImportSkipped" = "Παραλείφθηκαν";
+"settingsviews_nightscoutImportInvalid" = "Μη έγκυρα";
+"settingsviews_nightscoutImportSummaryFooter" = "Οι εγγραφές που ήταν ήδη αποθηκευμένες τοπικά παραλείφθηκαν. Τα μη έγκυρα έγγραφα Nightscout δεν εισήχθησαν.";
+"settingsviews_nightscoutImportingData" = "Εισαγωγή δεδομένων";
+"settingsviews_cleanDataConfirmationCode" = "Κωδικός επιβεβαίωσης %@";
+"settingsviews_backupCreate" = "Δημιουργία αντιγράφων ασφαλείας";
+"settingsviews_backupRestore" = "Επαναφορά αντιγράφων ασφαλείας";
+"settingsviews_backupCreated" = "Δημιουργήθηκε με επιτυχία το αντίγραφο ασφαλείας";
+"settingsviews_backupRestored" = "Το αντίγραφο ασφαλείας αποκαταστάθηκε με επιτυχία";
+"settingsviews_backupReplaceQuestion" = "Αντικατάσταση υπαρχόντων δεδομένων?";
+"settingsviews_backupReplaceData" = "Αντικατάσταση δεδομένων";
+"settingsviews_backupReplaceWarning" = "Οι υπάρχουσες ενδείξεις και θεραπείες BG εντός των ορίων ημερομηνιών δημιουργίας αντιγράφων ασφαλείας θα διαγραφούν πριν αποκατασταθεί το αντίγραφο ασφαλείας.";
+"settingsviews_backupAndRestore" = "Δημιουργία αντιγράφων ασφαλείας και επαναφορά";
+"settingsviews_backupAppSettingsAndAlerts" = "Ρυθμίσεις εφαρμογής και ειδοποιήσεις";
+"settingsviews_backupEncrypt" = "Κρυπτογράφηση αντιγράφων ασφαλείας";
+"settingsviews_backupAccounts" = "Λογαριασμοί αντιγράφων ασφαλείας";
+"settingsviews_backupConfirmPassword" = "Επιβεβαίωση κωδικού πρόσβασης";
+"settingsviews_backupPasswordProtection" = "Προστασία με κωδικό πρόσβασης";
+"settingsviews_backupPasswordProtectionFooter" = "Η προσθήκη προστασίας με κωδικό πρόσβασης επιτρέπει επίσης τη δημιουργία αντιγράφων ασφαλείας λογαριασμών που περιέχουν ευαίσθητες λεπτομέρειες.";
+"settingsviews_backupAccountDetailsFooter" = "Τα στοιχεία λογαριασμού μπορεί να περιλαμβάνουν διευθύνσεις URL διακομιστή, ονόματα χρήστη, κωδικούς πρόσβασης και διακριτικά πρόσβασης.";
+"settingsviews_backupCreateAndShare" = "Δημιουργία και κοινή χρήση αντιγράφων ασφαλείας";
+"settingsviews_backupEncryptedCreationFooter" = "Τα κρυπτογραφημένα αντίγραφα ασφαλείας χρειάζονται περισσότερο χρόνο για να δημιουργηθούν. Κρατήστε την εφαρμογή ανοιχτή και κάντε υπομονή.";
+"settingsviews_backupCreatedAt" = "Δημιουργήθηκε";
+"settingsviews_backupEarliestData" = "Τα παλαιότερα δεδομένα";
+"settingsviews_backupSettingsAndAlerts" = "Ρυθμίσεις και ειδοποιήσεις";
+"settingsviews_backupAccountDetails" = "Στοιχεία λογαριασμού";
+"settingsviews_backupIncluded" = "Περιλαμβάνεται";
+"settingsviews_backupNotIncluded" = "Δεν περιλαμβάνεται";
+"settingsviews_backupNotEnabled" = "Δεν είναι ενεργοποιημένο";
+"settingsviews_backupSummary" = "Σύνοψη αντιγράφων ασφαλείας";
+"settingsviews_backupChooseFile" = "Επιλέξτε Backup File";
+"settingsviews_backupFile" = "Εφεδρικό αρχείο";
+"settingsviews_backupFileCheckFooter" = "Το αντίγραφο ασφαλείας ελέγχεται πριν αλλάξει οποιαδήποτε υπάρχοντα δεδομένα.";
+"settingsviews_backupSelected" = "Επιλέχθηκε η δημιουργία αντιγράφων ασφαλείας";
+"settingsviews_backupPasswordRequired" = "Απαιτείται";
+"settingsviews_backupUnlock" = "Ξεκλειδώστε το Backup";
+"settingsviews_backupEncryptedNotice" = "Αυτό το αντίγραφο ασφαλείας είναι κρυπτογραφημένο και πρέπει να ξεκλειδωθεί.";
+"settingsviews_backupSettings" = "Ρυθμίσεις";
+"settingsviews_backupRestoreOptions" = "Επιλογές επαναφοράς";
+"settingsviews_backupDataHandling" = "Χειρισμός Δεδομένων";
+"settingsviews_backupKeepCurrentData" = "Διατηρήστε τα τρέχοντα δεδομένα";
+"settingsviews_backupFillGaps" = "Συμπληρώστε τα κενά";
+"settingsviews_backupReplaceRange" = "Αντικαταστήστε το Backup Range";
+"settingsviews_backupIgnoreData" = "Αγνοήστε τα δεδομένα";
+"settingsviews_backupRestoreSettingsAndAlerts" = "Επαναφορά ρυθμίσεων και ειδοποιήσεων εφαρμογής";
+"settingsviews_backupRestoreAccounts" = "Επαναφορά λογαριασμών";
+"settingsviews_backupReplaceAndRestore" = "Αντικατάσταση και επαναφορά";
+"settingsviews_backupRestoreSummary" = "Επαναφορά περίληψης";
+"settingsviews_backupBgReadingsAppliedFrom" = "BG Readings Applied From";
+"settingsviews_backupBgReadingsAdded" = "Προστέθηκαν αναγνώσεις BG";
+"settingsviews_backupBgReadingsSkipped" = "Παράλειψη αναγνώσεων BG";
+"settingsviews_backupTreatmentsAdded" = "Προστέθηκαν θεραπείες";
+"settingsviews_backupTreatmentsSkipped" = "Θεραπείες που παραλείφθηκαν";
+"settingsviews_backupSettingsRestored" = "Οι ρυθμίσεις αποκαταστάθηκαν";
+"settingsviews_backupAccountRestore" = "Επαναφορά λογαριασμού";
+"settingsviews_backupCreatingEncryptedStatus" = "Δημιουργία και κρυπτογράφηση του αντιγράφου ασφαλείας σας με ασφάλεια…\nΠαρακαλούμε να είστε υπομονετικοί.";
+"settingsviews_backupCreatingStatus" = "Δημιουργία αντιγράφου ασφαλείας…";
+"settingsviews_backupCheckingStatus" = "Έλεγχος δημιουργίας αντιγράφων ασφαλείας…";
+"settingsviews_backupDecryptingStatus" = "Αποκρυπτογράφηση και έλεγχος του αντιγράφου ασφαλείας σας…\nΠαρακαλούμε να είστε υπομονετικοί.";
+"settingsviews_backupRestoringEncryptedStatus" = "Επαναφορά του κρυπτογραφημένου αντιγράφου ασφαλείας…\nΚάντε υπομονή.";
+"settingsviews_backupRestoringStatus" = "Επαναφορά αντιγράφου ασφαλείας…";
+"settingsviews_backupErrorInvalidFile" = "Αυτό δεν είναι έγκυρο αντίγραφο ασφαλείας εφαρμογής.";
+"settingsviews_backupErrorIncorrectPassword" = "Ο κωδικός πρόσβασης είναι λανθασμένος ή το προστατευμένο αντίγραφο ασφαλείας έχει καταστραφεί.";
+"settingsviews_backupErrorMissingPassword" = "Εισαγάγετε τον κωδικό πρόσβασης που χρησιμοποιείται για την προστασία αυτού του αντιγράφου ασφαλείας.";
+"settingsviews_nightscoutImportQuestion" = "Εισαγωγή από το Nightscout?";
+"settingsviews_nightscoutImportAction" = "Εισαγωγή από το Nightscout";
+"settingsviews_nightscoutImportDiscardQuestion" = "Απόρριψη αποθηκευμένης εισαγωγής?";
+"settingsviews_nightscoutImportDiscard" = "Απόρριψη εισαγωγής";
+"settingsviews_nightscoutImportDiscardSaved" = "Απόρριψη αποθηκευμένης εισαγωγής";
+"settingsviews_nightscoutImportDiscardMessage" = "Η αποθηκευμένη πρόοδος θα καταργηθεί. Τα εισαγόμενα δεδομένα θα παραμείνουν αποθηκευμένα με ασφάλεια και θα παραβλεφθούν εάν ξεκινήσετε ξανά.";
+"settingsviews_nightscoutImportDataToImport" = "Δεδομένα για εισαγωγή";
+"settingsviews_nightscoutImportPeriod" = "Περίοδος εισαγωγής";
+"settingsviews_nightscoutImportExistingDataFooter" = "Τα υπάρχοντα τοπικά δεδομένα διατηρούνται. Οι μετρήσεις BG εντός 30 δευτερολέπτων από μια υπάρχουσα ένδειξη και οι θεραπείες που έχουν ήδη εντοπιστεί από το Nightscout παραλείπονται.";
+"settingsviews_nightscoutImportKeepOpenFooter" = "Διατηρήστε την εφαρμογή ανοιχτή μέχρι να ολοκληρωθεί η εισαγωγή. Η πρόοδος αποθηκεύεται μετά από κάθε ολοκληρωμένη παρτίδα, επομένως μπορεί να συνεχιστεί μια διακοπτόμενη εισαγωγή.";
+"settingsviews_nightscoutImportPeriodLabel" = "Περίοδος";
+"settingsviews_nightscoutImportCompletedBatches" = "Ολοκληρωμένες παρτίδες";
+"settingsviews_nightscoutImportResume" = "Συνέχιση εισαγωγής";
+"settingsviews_nightscoutImportSaved" = "Αποθηκευμένη εισαγωγή";
+"settingsviews_nightscoutImportUnsupportedFooter" = "Αυτή η εισαγωγή χρησιμοποιεί μια μη υποστηριζόμενη περίοδο. Απορρίψτε το για να ξεκινήσετε ξανά.";
+"settingsviews_nightscoutImportExceedsRetentionFooter" = "Αυτή η εισαγωγή υπερβαίνει την τρέχουσα περίοδο διατήρησης. Απορρίψτε το για να ξεκινήσετε ξανά.";
+"settingsviews_nightscoutImportResumeFooter" = "Η προηγούμενη εισαγωγή σταμάτησε πριν ολοκληρωθούν όλες οι ζητούμενες παρτίδες. Η συνέχιση συνεχίζεται από το τελευταίο αποθηκευμένο σημείο ελέγχου.";
+"settingsviews_nightscoutImportPause" = "Παύση εισαγωγής";
+"settingsviews_nightscoutImportBgAndTreatments" = "Αναγνώσεις BG και θεραπείες";
+"settingsviews_nightscoutImportBgOnly" = "Αναγνώσεις BG";
+"settingsviews_nightscoutImportTreatmentsOnly" = "θεραπείες";
+"settingsviews_nightscoutImportKeepAppOpen" = "Κρατήστε την εφαρμογή ανοιχτή.";
+"settingsviews_nightscoutImportPaused" = "Η εισαγωγή τέθηκε σε παύση";
+"settingsviews_nightscoutImportErrorNoSelection" = "Επιλέξτε μετρήσεις BG, θεραπείες ή και τα δύο.";
+"settingsviews_nightscoutImportErrorUnsupportedPeriod" = "Η αποθηκευμένη εισαγωγή χρησιμοποιεί μια περίοδο που δεν υποστηρίζεται πλέον. Πετάξτε το και ξεκινήστε ξανά.";
+"settingsviews_nightscoutImportErrorRetention" = "Η επιλεγμένη περίοδος εισαγωγής υπερβαίνει την τρέχουσα ρύθμιση διατήρησης δεδομένων.";
+"settingsviews_nightscoutImportErrorMissingURL" = "Εισαγάγετε μια διεύθυνση URL Nightscout στις Ρυθμίσεις Nightscout πριν ξεκινήσετε μια εισαγωγή.";
+"settingsviews_nightscoutImportErrorInvalidURL" = "Η διαμορφωμένη διεύθυνση URL Nightscout δεν είναι έγκυρη. Ελέγξτε το στις Ρυθμίσεις Nightscout και δοκιμάστε ξανά.";
+"settingsviews_nightscoutImportErrorCheckpointUnavailable" = "Η αποθηκευμένη εισαγωγή Nightscout δεν μπορεί πλέον να συνεχιστεί. Ξεκινήστε μια νέα εισαγωγή.";
+"settingsviews_nightscoutImportErrorSiteChanged" = "Ο διαμορφωμένος ιστότοπος Nightscout έχει αλλάξει από τότε που ξεκίνησε αυτή η εισαγωγή. Απορρίψτε την αποθηκευμένη εισαγωγή ή επαναφέρετε την προηγούμενη διεύθυνση URL Nightscout.";
+"settingsviews_nightscoutImportErrorAuthentication" = "Το Nightscout αρνήθηκε την πρόσβαση. Ελέγξτε το μυστικό API ή το διακριτικό πρόσβασης στις Ρυθμίσεις Nightscout.";
+"settingsviews_nightscoutImportErrorEndpoint" = "Το τελικό σημείο δεδομένων Nightscout δεν βρέθηκε. Ελέγξτε τη διαμορφωμένη διεύθυνση URL και την έκδοση ιστότοπου.";
+"settingsviews_nightscoutImportErrorRateLimited" = "Το Nightscout δέχεται πάρα πολλά αιτήματα. Περιμένετε λίγο και συνεχίστε την εισαγωγή.";
+"settingsviews_nightscoutImportErrorInvalidResponse" = "Το Nightscout επέστρεψε δεδομένα που δεν ήταν δυνατό να διαβαστούν με ασφάλεια. Δεν έγινε εισαγωγή δεδομένων από την επηρεαζόμενη παρτίδα.";
+"settingsviews_nightscoutImportErrorResponseLimit" = "Μια παρτίδα Nightscout παρέμεινε πολύ μεγάλη αφού χωρίστηκε σε μικρές χρονικές περιοχές. Δεν έγινε εισαγωγή περικομμένων δεδομένων.";
+"settingsviews_backupCreatedWithAppVersion" = "Δημιουργήθηκε αντίγραφο ασφαλείας με την έκδοση εφαρμογής %@.";
+"settingsviews_backupErrorUnsupportedVersion" = "Η έκδοση εφεδρικής μορφής %d δεν υποστηρίζεται από αυτήν την έκδοση της εφαρμογής.";
+"settingsviews_backupErrorFinalValueMismatch" = "Οι αποθηκευμένες τιμές γλυκόζης δεν αναπαράγουν την εφεδρική τελική τιμή για την ανάγνωση %@.";
+"settingsviews_nightscoutImportBatchCount" = "%1$d του %2$d";
+"settingsviews_nightscoutImportBgAddedProgress" = "Προστέθηκαν αναγνώσεις BG: %@";
+"settingsviews_nightscoutImportTreatmentsAddedProgress" = "Θεραπείες που προστέθηκαν: %@";
+"settingsviews_nightscoutImportConfirmation" = "Εισαγωγή των τελευταίων %1$d ημερών του %2$@? Τα υπάρχοντα τοπικά αρχεία θα διατηρηθούν και τα διπλότυπα θα παραβλεφθούν.";
+"settingsviews_nightscoutImportBatchProgress" = "Παρτίδα %1$d του %2$d";
+"settingsviews_nightscoutImportErrorServer" = "Το Nightscout επέστρεψε ένα προσωρινό σφάλμα διακομιστή (HTTP %d). Συνεχίστε την εισαγωγή αργότερα.";
+"settingsviews_nightscoutImportErrorUnexpectedStatus" = "Το Nightscout επέστρεψε μια απροσδόκητη απόκριση (HTTP %d).";
+"sensorNoiseSensitivity" = "Sensor Sensitivity";
+"sensorNoiseSensitivitySensitive" = "Sensitive";
+"sensorNoiseSensitivityNormal" = "Normal";
+"sensorNoiseSensitivityPermissive" = "Permissive";
+"settingsviews_followerServiceStatus" = "Κατάσταση";
+"settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Keep-alive.";
+"settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Keep-alive disabled.\n\nContact Image function cannot work without Keep-alive.";

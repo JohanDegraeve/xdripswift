@@ -72,7 +72,7 @@
 "sensorDuration" = "Sensor Duration";
 
 /// nightscout is not enabled
-"nightscoutURLMissing" = "Nightscout URL missing";
+"nightscoutURLMissing" = "URL missing";
 
 /// ask the user to disconnect and reconnect the sensor
 "reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
@@ -82,3 +82,39 @@
 
 /// no data source is enabled or connected
 "noDataSourceConnected" = "No CGM data source connected";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "%@ kvar";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+
+"sensorManagementNoiseTitle" = "Sensorbrus";
+"sensorManagementNoiseShortTerm" = "Senaste 30 minuterna";
+"sensorManagementNoiseLongTerm" = "Senaste 4 timmarna";
+"sensorManagementNoiseCollecting" = "Samlar in data";
+"sensorManagementNoiseLow" = "Lågt";
+"sensorManagementNoiseElevated" = "Förhöjt";
+"sensorManagementNoiseVeryHigh" = "Mycket högt";
+"sensorManagementNoiseExtreme" = "Extremt";
+"sensorManagementNoiseFlatline" = "Sensorn har troligen slutat fungera.";
+"sensorManagementNoiseFooter" = "Vald känslighet: %@";
+"sensorNoiseWarningExtremeTitle" = "Extremt sensorbrus";
+"sensorNoiseWarningPersistentTitle" = "Ihållande sensorbrus";
+"sensorNoiseWarningFlatlineTitle" = "Sensorsignalen är platt";
+"sensorNoiseHistoryTitle" = "Brushistorik";
+"sensorNoiseHistoryCurrentTitle" = "Aktuella mätningar";
+"sensorNoiseHistoryChartTitle" = "Brus över tid";
+"sensorNoiseHistoryRangeTitle" = "Tidsintervall";
+"sensorNoiseHistoryDayRange" = "24 t";
+"sensorNoiseHistoryThreeDayRange" = "3 d";
+"sensorNoiseHistoryWeekRange" = "7 d";
+"sensorNoiseHistoryAllRange" = "Alla";
+"sensorNoiseHistoryShortCompact" = "30 min";
+"sensorNoiseHistoryLongCompact" = "4 t";
+"sensorNoiseHistoryLoading" = "Bygger sensorhistorik";
+"sensorNoiseHistoryNoDataTitle" = "Inte tillräckligt med brusdata än";
+"sensorNoiseHistoryNoDataMessage" = "Diagrammet visas när tillräckligt många sensorvärden har samlats in.";
+"sensorNoiseHistoryFooter" = "Diagrammet visar kvarvarande sensorvariation under den här sensorsessionen. Lägre värden innebär en jämnare signal. Det mäter inte glukosnoggrannhet.";
+"sensorNoiseHistoryChartAccessibility" = "Diagram över sensorbrusets historik";
+"pumpBattery" = "Batteri";
+"pumpReservoir" = "Reservoar";

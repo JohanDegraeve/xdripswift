@@ -1,4 +1,3 @@
-import UIKit
 import CoreBluetooth
 import AVFoundation
 import AudioToolbox
@@ -81,9 +80,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
             // if it was too long since notification was fired, then forget about it - inform user that it's too late
             if Date() > maxTimeUserCanOpenApp {
                 trace("in cgmTransmitterNeedsPairing, user opened the app too late", log: self.log, category: ConstantsLog.categoryRootView, type: .error)
-                let alert = UIAlertController(title: Texts_Common.warning, message: Texts_HomeView.transmitterPairingTooLate, actionHandler: nil)
-                
-                self.uIViewController.present(alert, animated: true, completion: nil)
+                self.messageHandler(Texts_Common.warning, Texts_HomeView.transmitterPairingTooLate)
                 
                 return
             }
@@ -109,9 +106,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
         }
         
         // inform user
-        let alert = UIAlertController(title: Texts_HomeView.info, message: Texts_HomeView.transmitterPairingSuccessful, actionHandler: nil)
-        
-        uIViewController.present(alert, animated: true, completion: nil)
+        messageHandler(Texts_HomeView.info, Texts_HomeView.transmitterPairingSuccessful)
         
     }
 
@@ -327,9 +322,7 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     // inform user that pairing request timed out
     @objc private func informUserThatPairingTimedOut() {
         
-        let alert = UIAlertController(title: Texts_Common.warning, message: "time out", actionHandler: nil)
-        
-        uIViewController.present(alert, animated: true, completion: nil)
+        messageHandler(Texts_Common.warning, "time out")
         
     }
 
@@ -343,4 +336,3 @@ extension BluetoothPeripheralManager: BluetoothTransmitterDelegate {
     }
 
 }
-

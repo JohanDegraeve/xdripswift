@@ -143,7 +143,7 @@
 "sensorDuration" = "Sensor Duration";
 
 /// nightscout is not enabled
-"nightscoutURLMissing" = "Nightscout URL missing";
+"nightscoutURLMissing" = "URL missing";
 
 /// ask the user to disconnect and reconnect the sensor
 "reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
@@ -153,3 +153,39 @@
 
 /// no data source is enabled or connected
 "noDataSourceConnected" = "No CGM data source connected";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "Залишилося %@";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+
+"sensorManagementNoiseTitle" = "Шум сенсора";
+"sensorManagementNoiseShortTerm" = "Останні 30 хвилин";
+"sensorManagementNoiseLongTerm" = "Останні 4 години";
+"sensorManagementNoiseCollecting" = "Збір даних";
+"sensorManagementNoiseLow" = "Низький";
+"sensorManagementNoiseElevated" = "Підвищений";
+"sensorManagementNoiseVeryHigh" = "Дуже високий";
+"sensorManagementNoiseExtreme" = "Екстремальний";
+"sensorManagementNoiseFlatline" = "Сенсор, імовірно, вийшов з ладу.";
+"sensorManagementNoiseFooter" = "Вибрана чутливість: %@";
+"sensorNoiseWarningExtremeTitle" = "Екстремальний шум сенсора";
+"sensorNoiseWarningPersistentTitle" = "Постійний шум сенсора";
+"sensorNoiseWarningFlatlineTitle" = "Сигнал сенсора плаский";
+"sensorNoiseHistoryTitle" = "Історія шуму";
+"sensorNoiseHistoryCurrentTitle" = "Поточні вимірювання";
+"sensorNoiseHistoryChartTitle" = "Шум у часі";
+"sensorNoiseHistoryRangeTitle" = "Період";
+"sensorNoiseHistoryDayRange" = "24 год";
+"sensorNoiseHistoryThreeDayRange" = "3 дн.";
+"sensorNoiseHistoryWeekRange" = "7 дн.";
+"sensorNoiseHistoryAllRange" = "Усе";
+"sensorNoiseHistoryShortCompact" = "30 хв";
+"sensorNoiseHistoryLongCompact" = "4 год";
+"sensorNoiseHistoryLoading" = "Створення історії сенсора";
+"sensorNoiseHistoryNoDataTitle" = "Поки недостатньо даних про шум";
+"sensorNoiseHistoryNoDataMessage" = "Графік з’явиться після накопичення достатньої кількості показань сенсора.";
+"sensorNoiseHistoryFooter" = "Графік показує залишкові коливання сенсора протягом цієї сесії. Нижчі значення означають рівніший сигнал. Він не вимірює точність глюкози.";
+"sensorNoiseHistoryChartAccessibility" = "Графік історії шуму сенсора";
+"pumpBattery" = "Батарея";
+"pumpReservoir" = "Резервуар";

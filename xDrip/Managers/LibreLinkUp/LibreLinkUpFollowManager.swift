@@ -162,7 +162,7 @@ class LibreLinkUpFollowManager: NSObject {
         var calculatedValueSlope = 0.0
         
         // get last readings
-        let last2Readings = self.bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let last2Readings = self.bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false, includingSuppressed: true)
         
         // if more thant 2 readings, calculate slope and hie
         if last2Readings.count >= 2 {

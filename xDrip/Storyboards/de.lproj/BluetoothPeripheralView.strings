@@ -94,8 +94,11 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Use With Other App";
-
+"useOtherDexcomApp" = "Koexistenzmodus";
+"useOtherDexcomAppCoexistenceFooter" = "Im Koexistenzmodus können wir mit einer anderen App wie Dexcom oder CamAPS zusammenarbeiten. Diese App muss im Hintergrund weiterlaufen.";
+"useOtherDexcomAppPrimaryFooter" = "Der Primärmodus verbindet sich als Haupt-App und steuert die Verbindung.";
+"runningInCoexistenceMode" = "Läuft im Koexistenzmodus";
+"runningInPrimaryMode" = "Läuft im Primärmodus";
 /// cell text, sensor start time
 "sensorStartDate" = "Sensor Started";
 

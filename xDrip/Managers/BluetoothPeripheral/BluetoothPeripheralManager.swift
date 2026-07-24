@@ -2,7 +2,6 @@ import Foundation
 import os
 import CoreBluetooth
 import CoreData
-import UIKit
 
 class BluetoothPeripheralManager: NSObject {
     
@@ -30,8 +29,8 @@ class BluetoothPeripheralManager: NSObject {
     /// if scan is called, and a connection is successfully made to a new device, then this function must be called
     public var callBackAfterDiscoveringDevice: ((BluetoothPeripheral) -> Void)?
 
-    /// used to present alert messages
-    public let uIViewController: UIViewController
+    /// sends user-facing Bluetooth messages to the presentation owner
+    public let messageHandler: (_ title: String, _ message: String) -> Void
     
     /// bluetoothtransmitter may need pairing, but app is in background. Notification will be sent to user, user will open the app, at that moment pairing can happen. variable bluetoothTransmitterThatNeedsPairing will temporary store the BluetoothTransmitter that needs the pairing
     public var bluetoothTransmitterThatNeedsPairing: BluetoothTransmitter?
@@ -95,8 +94,8 @@ class BluetoothPeripheralManager: NSObject {
     
     /// - parameters:
     ///     - cgmTransmitterInfoChanged : to be called when currently used cgmTransmitter changes
-    ///     - uIViewController : used to present alert messages
-    init(coreDataManager: CoreDataManager, cgmTransmitterDelegate: CGMTransmitterDelegate, uIViewController: UIViewController, heartBeatFunction: (() -> ())?, cgmTransmitterInfoChanged: @escaping () -> ()) {
+    ///     - messageHandler : sends user-facing messages without giving the manager a view controller
+    init(coreDataManager: CoreDataManager, cgmTransmitterDelegate: CGMTransmitterDelegate, messageHandler: @escaping (_ title: String, _ message: String) -> Void, heartBeatFunction: (() -> ())?, cgmTransmitterInfoChanged: @escaping () -> ()) {
         
         // initialize properties
         self.coreDataManager = coreDataManager
@@ -106,7 +105,7 @@ class BluetoothPeripheralManager: NSObject {
         self.cgmTransmitterDelegate = cgmTransmitterDelegate
         self.cgmTransmitterInfoChanged = cgmTransmitterInfoChanged
         self.bLEPeripheralAccessor = BLEPeripheralAccessor(coreDataManager: coreDataManager)
-        self.uIViewController = uIViewController
+        self.messageHandler = messageHandler
         self.heartBeatFunction = heartBeatFunction
         
         super.init()
@@ -163,7 +162,7 @@ class BluetoothPeripheralManager: NSObject {
                         _ = m5StackBluetoothTransmitter.writeBgReadingInfo(bgReading: bgReadingToSend[0])
                     }
                     
-                case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .DexcomG7Type:
+                case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .DexcomG7Type, .MedtrumTouchCareNanoType:
                     // cgm's don't receive reading, they send it
                     break
                     
@@ -340,6 +339,21 @@ class BluetoothPeripheralManager: NSObject {
 
                     }
 
+                case .MedtrumTouchCareNanoType:
+
+                    if let medtrumNano = bluetoothPeripheral as? MedtrumTouchCareNano {
+
+                        if let cgmTransmitterDelegate = cgmTransmitterDelegate {
+
+                            newTransmitter = CGMMedtrumTouchCareNanoTransmitter(address: medtrumNano.blePeripheral.address, name: medtrumNano.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+
+                        } else {
+
+                            trace("in getBluetoothTransmitter, case MedtrumTouchCareNanoType but cgmTransmitterDelegate is nil, looks like a coding error ", log: log, category: ConstantsLog.categoryBluetoothPeripheralManager, type: .error)
+
+                        }
+                    }
+
                 }
                 
                 
@@ -406,6 +420,11 @@ class BluetoothPeripheralManager: NSObject {
             case .DexcomG7Type:
                 if bluetoothTransmitter is CGMG7Transmitter {
                     return .DexcomG7Type
+                }
+
+            case .MedtrumTouchCareNanoType:
+                if bluetoothTransmitter is CGMMedtrumTouchCareNanoTransmitter {
+                    return .MedtrumTouchCareNanoType
                 }
                 
             }
@@ -487,6 +506,14 @@ class BluetoothPeripheralManager: NSObject {
             }
             
             return CGMG7Transmitter(address: nil, name: nil, transmitterID: transmitterId, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMG7TransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate)
+
+        case .MedtrumTouchCareNanoType:
+
+            guard let cgmTransmitterDelegate = cgmTransmitterDelegate else {
+                fatalError("in createNewTransmitter, MedtrumTouchCareNanoType, cgmTransmitterDelegate is nil")
+            }
+
+            return CGMMedtrumTouchCareNanoTransmitter(address: nil, name: nil, bluetoothTransmitterDelegate: bluetoothTransmitterDelegate ?? self, cGMTransmitterDelegate: cgmTransmitterDelegate)
             
         }
         
@@ -919,11 +946,35 @@ class BluetoothPeripheralManager: NSObject {
                             
                             // bluetoothTransmitters array (which shoul dhave the same number of elements as bluetoothPeripherals) needs to have an empty row for the transmitter
                             bluetoothTransmitters.insert(nil, at: index)
-                            
+
                         }
-                        
+
                     }
-                    
+
+                case .MedtrumTouchCareNanoType:
+
+                    if let medtrumNano = blePeripheral.medtrumTouchCareNano {
+
+                        blePeripheralFound = true
+
+                        let index = insertInBluetoothPeripherals(bluetoothPeripheral: medtrumNano)
+
+                        if medtrumNano.blePeripheral.shouldconnect {
+
+                            bluetoothTransmitters.insert(CGMMedtrumTouchCareNanoTransmitter(address: medtrumNano.blePeripheral.address, name: medtrumNano.blePeripheral.name, bluetoothTransmitterDelegate: self, cGMTransmitterDelegate: cgmTransmitterDelegate), at: index)
+
+                            if bluetoothPeripheralType.category() == .CGM {
+                                currentCgmTransmitterAddress = blePeripheral.address
+                            }
+
+                        } else {
+
+                            bluetoothTransmitters.insert(nil, at: index)
+
+                        }
+
+                    }
+
                 }
 
             }
@@ -1067,7 +1118,7 @@ class BluetoothPeripheralManager: NSObject {
                     bluetoothPeripheral.blePeripheral.parameterUpdateNeededAtNextConnect = true
                 }
              
-            case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType, .DexcomG7Type:
+            case .DexcomType, .BubbleType, .MiaoMiaoType, .Libre2Type, .Libre3HeartBeatType, .DexcomG7HeartBeatType, .OmniPodHeartBeatType, .DexcomG7Type, .MedtrumTouchCareNanoType:
 
                 // nothing to check
                 break
@@ -1287,5 +1338,3 @@ extension BluetoothPeripheralManager: BluetoothPeripheralManaging {
     }
     
 }
-
-

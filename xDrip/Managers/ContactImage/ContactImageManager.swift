@@ -119,7 +119,7 @@ class ContactImageManager: NSObject {
             // create a contact image view
             // get 2 last Readings, with a calculatedValue
             let lastReading = self.bgReadingsAccessor.get2LatestBgReadings(minimumTimeIntervalInMinutes: 4.0)
-            var contactImageView: ContactImageView
+            var contactImageView: ContactImageRenderer
             
             // disable the image (show "OFF") if the function is disabled or if the user is in follower mode with background keep-alive disabled
             // as otherwise it would always be out of date
@@ -128,7 +128,7 @@ class ContactImageManager: NSObject {
             if lastReading.count > 0  {
                 let valueIsUpToDate = abs(lastReading[0].timeStamp.timeIntervalSinceNow) < 7 * 60
                 
-                contactImageView = ContactImageView(bgValue: lastReading[0].calculatedValue, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: UserDefaults.standard.displayTrendInContactImage ? lastReading[0].slopeArrow() : "", bgRangeDescription: lastReading[0].bgRangeDescription(), valueIsUpToDate: valueIsUpToDate, useHighContrastContactImage: UserDefaults.standard.useHighContrastContactImage, disableContactImage:  disableContactImage)
+                contactImageView = ContactImageRenderer(bgValue: lastReading[0].finalValue, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: UserDefaults.standard.displayTrendInContactImage ? lastReading[0].slopeArrow() : "", bgRangeDescription: lastReading[0].bgRangeDescription(), valueIsUpToDate: valueIsUpToDate, useHighContrastContactImage: UserDefaults.standard.useHighContrastContactImage, disableContactImage:  disableContactImage)
                 
                 // schedule an update in 5 min 15 seconds - if no new data is received until then, the empty value will get rendered into the contact (this update will be canceled if new data is received)
                 self.workItem = DispatchWorkItem { [weak self] in
@@ -140,7 +140,12 @@ class ContactImageManager: NSObject {
                 DispatchQueue.main.asyncAfter(deadline: .now() + (5 * 60) + 15, execute: self.workItem!)
             } else {
                 // create an 'empty' image view if there is no BG data to show
-                contactImageView = ContactImageView(bgValue: 0, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: "", bgRangeDescription: .inRange, valueIsUpToDate: false, useHighContrastContactImage: false, disableContactImage:  disableContactImage)
+                contactImageView = ContactImageRenderer(bgValue: 0, isMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl, slopeArrow: "", bgRangeDescription: .inRange, valueIsUpToDate: false, useHighContrastContactImage: false, disableContactImage:  disableContactImage)
+            }
+
+            guard let contactImageData = MainActor.assumeIsolated({ contactImageView.pngData() }) else {
+                trace("in updateContact, failed to render contact image data", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .error)
+                return
             }
             
             // we're going to use the app name as the given name of the contact we want to use/create/update
@@ -160,14 +165,14 @@ class ContactImageManager: NSObject {
                     }
 
                     if lastReading.count > 0 {
-                        trace("in updateContact, contact found using stored identifier. Updating the contact image to %{public}@%{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+                        trace("in updateContact, contact found using stored identifier. Updating the contact image to %{public}@%{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, lastReading[0].finalValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
                     } else {
                         trace("in updateContact, contact found using stored identifier. Updating the contact image (no BG data)", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info)
                     }
 
                     let saveRequest = CNSaveRequest()
                     guard let mutableContact = identifierMatchedContact.mutableCopy() as? CNMutableContact else { return }
-                    mutableContact.imageData = contactImageView.getImage().pngData()
+                    mutableContact.imageData = contactImageData
                     mutableContact.organizationName = updatedString
                     saveRequest.update(mutableContact)
                     self.executeSaveRequest(saveRequest: saveRequest)
@@ -197,7 +202,7 @@ class ContactImageManager: NSObject {
                 let saveRequest = CNSaveRequest()
 
                 guard let mutableContact = nameMatchedContact.mutableCopy() as? CNMutableContact else { return }
-                mutableContact.imageData = contactImageView.getImage().pngData()
+                mutableContact.imageData = contactImageData
                 mutableContact.organizationName = updatedString
                 saveRequest.update(mutableContact)
 
@@ -211,14 +216,14 @@ class ContactImageManager: NSObject {
 
             // 3) No match by identifier or name: create a new contact
             if lastReading.count > 0 {
-                trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' and adding a contact image with %{public}@ %{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
+                trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' and adding a contact image with %{public}@ %{public}@", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName, lastReading[0].finalValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl), UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
             } else {
                 trace("in updateContact, no existing contact found. Creating a new contact called '%{public}@' with empty contact image (no BG data)", log: self.log, category: ConstantsLog.categoryContactImageManager, type: .info, ConstantsHomeView.applicationName)
             }
 
             let contactToCreate = CNMutableContact()
             contactToCreate.givenName = ConstantsHomeView.applicationName
-            contactToCreate.imageData = contactImageView.getImage().pngData()
+            contactToCreate.imageData = contactImageData
             contactToCreate.organizationName = updatedString
 
             let saveRequest = CNSaveRequest()

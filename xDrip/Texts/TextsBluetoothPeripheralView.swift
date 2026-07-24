@@ -11,6 +11,14 @@ class Texts_BluetoothPeripheralView {
     static let status: String = {
         return NSLocalizedString("status", tableName: filename, bundle: Bundle.main, value: "Status:", comment: "when Bluetooth Peripheral is shown, title of the cell with the status")
     }()
+
+    static let runningInCoexistenceMode: String = {
+        return NSLocalizedString("runningInCoexistenceMode", tableName: filename, bundle: Bundle.main, value: "Running in Coexistence mode", comment: "Dexcom bluetooth status footer. Another app authenticates with the transmitter.")
+    }()
+
+    static let runningInPrimaryMode: String = {
+        return NSLocalizedString("runningInPrimaryMode", tableName: filename, bundle: Bundle.main, value: "Running in Primary mode", comment: "Dexcom bluetooth status footer. This app controls the transmitter connection.")
+    }()
     
     static let connected: String = {
         return NSLocalizedString("connected", tableName: filename, bundle: Bundle.main, value: "Connected", comment: "when Bluetooth Peripheral is shown, connection status, connected")
@@ -49,7 +57,7 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let battery: String = {
-        return NSLocalizedString("Battery", tableName: filename, bundle: Bundle.main, value: "Battery:", comment: "BluetoothPeripheral view, section title with battery info")
+        return NSLocalizedString("battery", tableName: filename, bundle: Bundle.main, value: "Battery", comment: "BluetoothPeripheral view, section title with battery info")
     }()
     
     static let needsTransmitterId: String = {
@@ -137,7 +145,15 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let useOtherDexcomApp: String = {
-        return NSLocalizedString("useOtherDexcomApp", tableName: filename, bundle: Bundle.main, value: "Use With Other App", comment: "Dexcom bluetooth screen. Is another app used in parallel or not")
+        return NSLocalizedString("useOtherDexcomApp", tableName: filename, bundle: Bundle.main, value: "Coexistence Mode", comment: "Dexcom bluetooth screen. Toggle title. When enabled, another app such as Dexcom or CamAPS authenticates with the transmitter while this app receives alongside it.")
+    }()
+
+    static let useOtherDexcomAppCoexistenceFooter: String = {
+        return NSLocalizedString("useOtherDexcomAppCoexistenceFooter", tableName: filename, bundle: Bundle.main, value: "Coexistence mode allows us to work with another app such as the Dexcom or CamAPS apps. That app must keep running in the background.", comment: "Dexcom bluetooth screen. Footer explaining coexistence mode.")
+    }()
+
+    static let useOtherDexcomAppPrimaryFooter: String = {
+        return NSLocalizedString("useOtherDexcomAppPrimaryFooter", tableName: filename, bundle: Bundle.main, value: "Primary mode connects as the main app and controls the connection.", comment: "Dexcom bluetooth screen. Footer explaining primary mode.")
     }()
     
     static let useOtherDexcomAppMessageEnabled: String = {
@@ -197,7 +213,7 @@ class Texts_BluetoothPeripheralView {
     }()
     
     static let maxSensorAgeInDaysOverridenAnubisMessage = {
-        return String(format: NSLocalizedString("maxSensorAgeInDaysOverridenAnubisMessage", tableName: filename, bundle: Bundle.main, value: "\nIf using an Anubis transmitter, you can enter here the maximum number of days for the sensor lifetime (maximum %@)\n\nNote that this is only a visual reminder. It will not end the sensor session when reached.\n\nEnter 0 to use the default of %@ days", comment: "user can override the maximum sensor days if using an anubis transmitter"), ConstantsDexcomG5.maxSensorAgeInDaysOverridenAnubisMaximum.stringWithoutTrailingZeroes, ConstantsDexcomG5.maxSensorAgeInDays.stringWithoutTrailingZeroes)
+        return String(format: NSLocalizedString("maxSensorAgeInDaysOverridenAnubisMessage", tableName: filename, bundle: Bundle.main, value: "If using an Anubis transmitter, you can enter here the maximum number of days for the sensor lifetime (maximum %@)\n\nNote that this is only a visual reminder. It will not end the sensor session when reached.\n\nEnter 0 to use the default of %@ days", comment: "user can override the maximum sensor days if using an anubis transmitter"), ConstantsDexcomG5.maxSensorAgeInDaysOverridenAnubisMaximum.stringWithoutTrailingZeroes, ConstantsDexcomG5.maxSensorAgeInDays.stringWithoutTrailingZeroes)
     }()
     
     static let isAnubis: String = {

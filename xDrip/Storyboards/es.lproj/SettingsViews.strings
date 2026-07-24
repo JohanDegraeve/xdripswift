@@ -1,4 +1,14 @@
 "settingsviews_settingstitle" = "Configuración";
+"settingsviews_glucoseDisplaySectionTitle" = "Visualización de glucosa";
+"settingsviews_glucoseRangesSectionTitle" = "Rangos de glucosa";
+"settingsviews_glucoseRangesSectionFooter" = "Los rangos de glucosa solo afectan a los colores del gráfico principal. No están relacionados con los valores de alarma.";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Alertas y notificaciones";
+"settingsviews_sharingAndServicesSectionTitle" = "Compartir y servicios";
+"settingsviews_osAidLoopShareSectionTitle" = "Compartir con OS-AID";
+"settingsviews_issueReportSectionTitle" = "Informe de problema";
+"settingsviews_issueReportSectionFooter" = "No envíes un informe de problema a menos que te lo pida un desarrollador de xDrip4iOS o tu informe se eliminará automáticamente.";
+"settingsviews_appBannerVersion" = "Versión %@";
+"settingsviews_appInstalledSince" = "Instalado";
 "settingsviews_valueIsRequired" = "⚠️ Requerido";
 "settingsviews_sectiontitleNotifications" = "Notifications";
 "settingsviews_selectbgunit" = "Seleccionar Unidades";
@@ -6,18 +16,18 @@
 "settingsviews_master" = "Master";
 "settingsviews_follower" = "Seguidor";
 
-"settingsviews_sectionTitleDataSource" = "Fuente de datos MGC";
-"settingsviews_labelFollowerDataSourceType" = "Fuente de datos de seguidor";
+"settingsviews_sectionTitleDataSource" = "Fuente de datos";
+"settingsviews_labelFollowerDataSourceType" = "Fuente de datos";
 "settingsviews_labelUploadDataToNightscout" = "Subir a Nightscout";
-"settingsviews_labelfollowerKeepAliveType" = "Mantener en segundo plano";
+"settingsviews_labelfollowerKeepAliveType" = "Mantener activo";
 "settingsviews_followerKeepAliveTypeDisabled" = "Deshabilitado";
 "settingsviews_followerKeepAliveTypeNormal" = "Normal";
 "settingsviews_followerKeepAliveTypeAggressive" = "Agresivo";
-"settingsviews_followerKeepAliveTypeDisabledMessage" = "Mantener en segundo plan está deshabilitado.\n\nCuando la aplicación no está en primer plano, no habrá notificaciones, alarmas, valores de glucosa en el icono de la app ni habrá actualizaciones de los valores de glucosa.\n\nLa aplicación permanecerá durmiendo hasta que la abras de nuevo.\n\nEste modo tiene un impacto mínimo en la batería de tu dispositivo.";
-"settingsviews_followerKeepAliveTypeNormalMessage" = "Mantener en segundo plan está en modo normal.\n\nCuando la app está en segundo plano, intentaremos mantenerla funcionando para que reciba actualizaciones de los valores de glucosa y que sea posible saltar alarmas y notificaciones.\n\nEste modo consume bastante batería.";
-"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Mantener en segundo plan está en modo agresivo.\n\nCuando la app está en segundo plano, intentaremos, de forma agresiva, mantenerla funcionando para que reciba actualizaciones de los valores de glucosa y que sea posible saltar alarmas y notificaciones.\n\nEste modo consume mucha batería.";
-"settingsviews_followerPatientName" = "Nombre del paciente";
-"settingsviews_followerPatientNameMessage" = "Aquí puedes escribir el nombre de la persona que estás seguiendo.";
+"settingsviews_followerKeepAliveTypeDisabledMessage" = "Mantener activo is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeNormalMessage" = "Mantener activo is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Mantener activo is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
+"settingsviews_followerPatientName" = "Alias";
+"settingsviews_followerPatientNameMessage" = "Here you can optionally write an alias for the person you are following.";
 "settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
 "settingsviews_nightscoutNotEnabledRowText" = "Deshabilitado";
 "settingsviews_labelFollowerDataSourceRegion" = "Servidor (País)";
@@ -29,13 +39,12 @@
 "settingsviews_medtrumSelectPatient" = "Elige Paciente";
 "settingsviews_medtrumSelectPatientFromList" = "Elige paciente de la lista";
 
-"settingsviews_translateOnlineHelp" = "Traducir Documentación";
-"settingsviews_restartNeeded" = "(Pendiente reiniciar)";
-"settingsviews_showReadingInNotification" = "Mostrar en Notificaciones";
-"settingsviews_labelShowReadingInAppBadge" = "Mostrar en el icono de la app";
-"settingsviews_multipleAppBadgeValueWith10" = "Multiplicar valor por 10 en el icono de la app";
-"settingsviews_showClockWhenScreenIsLocked" = "Mostrar reloj al bloquear";
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Oscurecer pantalla";
+"settingsviews_translateOnlineHelp" = "Traducir documentación";
+"settingsviews_showReadingInNotification" = "Notificaciones de glucosa";
+"settingsviews_labelShowReadingInAppBadge" = "Globo de la app";
+"settingsviews_multipleAppBadgeValueWith10" = "Globo de app x10";
+"settingsviews_showClockWhenScreenIsLocked" = "Reloj en pantalla bloqueada";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Atenuación en pantalla bloqueada";
 "settingsviews_screenLockDimmingTypeDisabled" = "Deshabilitado";
 "settingsviews_screenLockDimmingTypeDimmed" = "Atenuado";
 "settingsviews_screenLockDimmingTypeDark" = "Oscuro";
@@ -46,8 +55,8 @@
 "settingsviews_targetValueMessage" = "Usar 0 para deshabilitar el valor objectivo en la gráfica";
 "settingsviews_lowValue" = "Valor de Glucemia Baja";
 "settingsviews_urgentLowValue" = "Valor de Glucemia Baja (Urgente)";
-"settingsviews_showcoloredobjectives" = "Mostrar Colores";
-"settingsviews_showtarget" = "Mostrar Línea Target";
+"settingsviews_showcoloredobjectives" = "Líneas de colores";
+"settingsviews_showtarget" = "Línea objetivo";
 "settingsviews_sectiontitletreatments" = "Tratamientos";
 "settingsviews_showTreatments" = "Mostrar Tratamientos";
 "settingsviews_smallBolusTreatmentThreshold" = "Límite Micro-bolo";
@@ -60,15 +69,15 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Rango Estándar";
 "settingsviews_timeInRangeTypeTightRange" = "Rango Estrecho";
 "settingsviews_timeInRangeTypeUserDefinedRange" = "Rango Usuario";
-"settingsviews_useIFCCA1C" = "Ver HbA1c en mmols/mol";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Transmisor";
 "settingsviews_transmittertype" = "Tipo de Transmisor";
 "settingsviews_transmitterid" = "ID del Transmisor";
 "settingsviews_transmitterid_text_for_button" = "ID del Transmisor";
 "settingsviews_givetransmitterid" = "ID del Transmisor";
 "settingsviews_resettransmitter" = "Transmisor Anubis";
-"settingsviews_resetDexcomTransmitterMessage" = "\nEsta opción intentará resetear el transmisor durante la próxima conexión.\n\nEsto solo puede funcionar con transmisores G5 y transmisores G6 Anubis.\n\nNo funciona para transmisores normales tipo G6 y One.";
-"settingsviews_nonfixedtransmitter" = "Habilitar Calibración Multi-punto";
+"settingsviews_resetDexcomTransmitterMessage" = "Esta opción intentará resetear el transmisor durante la próxima conexión.\n\nEsto solo puede funcionar con transmisores G5 y transmisores G6 Anubis.\n\nNo funciona para transmisores normales tipo G6 y One.";
+"settingsviews_nonfixedtransmitter" = "Calibración multipunto";
 "settingsviews_labelNonFixed" = "Calibración Multi-punto";
 "settingsviews_labelAlgorithmType" = "Tipo de Algoritmo";
 "settingsviews_labelCalibrationTitle" = "Calibración de Sensor";
@@ -76,17 +85,21 @@
 "settingsviews_sectiontitlealerting" = "Alarmas";
 "settingsviews_row_alert_types" = "Tipos de Alarmas";
 "settingsviews_row_alerts" = "Alarmas";
+"settingsviews_volume_tests_section_title" = "Comprobar volumen de alarma";
+"settingsviews_alert_types_section_footer" = "Los Tipos de Alarma definen cómo se comportan las alarmas, incluyendo sonido, vibración, repetición e ignorar el modo silencio.";
+"settingsviews_alerts_section_footer" = "Las Alarmas definen cuándo la app debe avisarte sobre niveles de glucosa, lecturas perdidas y otras condiciones.";
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
-"settingsviews_healthkit" = "Grabar Datos en Apple Health";
-"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
-"settingsviews_uploadReadingstoDexcomShare" = "Subir Datos a Dexcom Share";
+"settingsviews_healthkit" = "Escribir en Apple Health";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Subir";
 "settingsviews_dexcomShareUploadSerialNumber" = "Número de Serie del Receptor";
-"settingsviews_useUSDexcomShareurl" = "Usar Servidores Dexcom EEUU";
+"settingsviews_useUSDexcomShareurl" = "Servidores US";
 "settingsviews_dexcomShareAccountName" = "Nombre de Cuenta";
 "settingsviews_giveDexcomShareAccountName" = "Entrar el Nombre de tu Cuenta Dexcom Share";
 "settingsviews_giveDexcomSharePassword" = "Entrar la  Contraseña para tu Cuenta Dexcom Share";
 "settingsviews_givedexcomShareUploadSerialNumber" = "Entrar el número de serie del receptor Dexcom";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Opciones de subida";
 "settingsviews_nightscoutEnabled" = "Habilitar Nightscout";
 "settingsviews_useSchedule" = "Fijar Horario de Subida de Datos";
 "schedule" = "Horario";
@@ -95,43 +108,44 @@
 "editScheduleTimePickerSubtitle" = "Cambiar: ";
 "timeScheduleViewTitle" = "Fijar horario para ";
 "uploadSensorStartTime" = "Subir Hora de Inicio de Sensor";
-"testUrlAndAPIKey" = "Comprobar Conexión";
-"settingsviews_sectiontitlespeak" = "Voz";
-"settingsviews_speakBgReadings" = "Anunciar Lecturas Glucemia";
+"testUrlAndAPIKey" = "Comprobar conexión";
+"settingsviews_speakBgReadings" = "Anunciar glucosa";
 "settingsviews_speakBgReadingslanguage" = "Idioma";
 "settingsviews_speakreadingslanguageselection" = "Seleccionar Idioma";
 "settingsviews_speakTrend" = "Anunciar Tendencia";
 "settingsviews_speakDelta" = "Anunciar Delta";
 "settingsviews_IntervalTitle" = "Intervalo entre notificaciones";
-"settingsviews_IntervalMessage" = "Intervalo mínimo entre dos notificaciones (mins)";
-"settingsviews_allowScreenRotation" = "Permitir rotación";
+"settingsviews_IntervalMessage" = "Intervalo mínimo entre dos notificaciones";
+"settingsviews_allowScreenRotation" = "Rotación del gráfico";
+"settingsviews_homeScreenChartDisplaySectionTitle" = "Visualización del gráfico";
+"settingsviews_homeScreenMainChartSectionFooter" = "Estas opciones controlan cómo se muestran los datos de glucosa en el gráfico principal.";
+"settingsviews_homeScreenScreenLockSectionTitle" = "Bloqueo de pantalla";
+"settingsviews_homeScreenScreenLockSectionFooter" = "Estas opciones controlan cómo se comporta la pantalla de Inicio cuando la app queda abierta o bloqueada.";
 "settingsviews_showMiniChart" = "Mostrar la mini-gráfica";
+"settingsviews_showSensorNoiseOnChart" = "Mostrar ruido del sensor";
 "settingsviews_Version" = "Versión";
 "settingsviews_license" = "Licencia";
-"settingsviews_build" = "Compilación";
 "m5stack_settingsviews_settingstitle" = "Configuración M5 Stack";
 "m5stack_settingsviews_textColor" = "Color del Texto";
 "m5stack_settingsviews_backGroundColor" = "Color del Fondo";
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 "m5stack_settingsviews_giveBluetoothPassword" = "Entrar Contraseña Bluetooth";
 "m5stack_settingsviews_brightness" = "Brillo de Pantalla Brightness";
-"appleWatchSectionTitle" = "Apple Watch";
-"createCalendarEvent" = "Crear Eventos en el Calendario";
 "calenderId" = "Qué calendario se debe usar";
-"settingsviews_displayTrendInCalendarEvent" = "Mostrar Tendencia";
-"displayUnitInCalendarEvent" = "Mostrar Unidad";
-"displayDeltaInCalendarEvent" = "Mostrar Delta";
+"settingsviews_displayTrendInCalendarEvent" = "Tendencia";
+"displayUnitInCalendarEvent" = "Unidad";
+"displayDeltaInCalendarEvent" = "Delta";
 "infoCalendarAccessDeniedByUser" = "Has denegado previamente permiso para acceder al calendario.\n\nIr a Configuración iPhone > Apps > %@ > Calendarios y habilitarlo.";
 "infoCalendarAccessWriteOnly" = "No puedes usar Eventos de Calendario hasta que actualices los permisos de 'Sólo agregar eventos' a 'Acceso completo'.\n\nIr a Configuración iPhone > > Apps %@ > Calendarios y seleccionar 'Acceso completo'.";
 "infoCalendarAccessRestricted" = "No se puede autorizar a que %@ tenga acceso a tu calendario. Podría ser debido a que restricciones tipo Controles Parentales o similares lo están impidiendo.";
 "sectionTitleTrace" = "Rastrear/Issue Reporting";
-"sendTraceFile" = "Enviar Archivo de Rastreo";
+"sendTraceFile" = "Enviar informe de problema";
 "describeProblem" = "Explicar en detalle porqué es necesario enviar este archivo de rastreo. Si ya has reportando previamente este problema en el grupo de Facebook '%@', confirmar tu Nombre en Facebook dentro del cuerpo del correo";
 "emailNotConfigured" = "Deberías tener configurado una cuenta de correo antes de enviar el archivo.";
 "emailbodyText" = "Problem Description: ";
 "failedToSendEmail" = "Error al Enviar Correo";
-"volumeTestSoundPlayer" = "Comprobar Volumen (en Modo Silencio)";
-"volumeTestiOSSound" = "Comprobar Volumen (volumen actual del iPhone)";
+"volumeTestSoundPlayer" = "Con Modo Silencio activado";
+"volumeTestiOSSound" = "Con Modo Silencio desactivado";
 "debugLevel" = "Incluir Datos Nivel Debug";
 "warningChangeFromMasterToFollower" = "Si cambias el modo de Master a Seguidor se parará la sesión del sensor actual. Quieres continuar?";
 "warningChangeFromMasterToFollowerDexcomShare" = "Cambiando de modo Master a Seguidor de Dexcom Share parará la sesión del sensor actual y deshabilitará 'Subir datos a Dexcom Share'. Quieres continuar?";
@@ -142,35 +156,30 @@
 "settingsviews_nightscoutUrl" = "URL";
 "settingsviews_sectiontitleAbout" = "Sobre %@";
 "volumeTestiOSSoundExplanation" = "Se está reproduciendo una alamra con el mismo volumen que usar un Tipo de Alarma con la opción de 'Ignorar Mode Silencio?' deshabilitado\n\nCambiar el volume con los botones del iPhone y apretar OK para confirmar";
-"smoothLibreValues" = "Suavizar valores Libre";
 "oslog" = "OSLog";
 "nslog" = "NSLog";
-"developerSettings" = "Opciones de Desarrollo";
+"developerSettings" = "Opciones avanzadas";
+"showDeveloperSettings" = "Mostrar";
+"preferSensorCountdown" = "Preferir cuenta atrás del sensor";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Vida útil del sensor";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Controla si la vida útil del sensor se muestra como tiempo transcurrido o como cuenta atrás en el iPhone y el Apple Watch.";
 "settingsviews_sectiontitlehomescreen" = "Inicio";
 "settingsviews_infoContactsAccessRestricted" = "No has podido dar permiso a %@ para accesar a tus contactos. Esto es probablemente debido a restriciones como el control parental o similar.";
 "settingsviews_contactImageSectionTitle" = "Imagen de Contacto";
-"settingsviews_enableContactImage" = "Habilitar Contacto";
+"settingsviews_enableContactImage" = "Imagen de contacto";
 "settingsviews_displayTrendInContactImage" = "Mostrar Tendencia";
 "settingsviews_contactImageCreatedByString" = "Contacto creado automáticamente por";
 
-"appleWatchSectionTitle" = "Apple Watch";
-"appleWatchShowDataInComplications" = "Mostrar Complicaciones";
-"appleWatchShowDataInComplicationsMessage" = "Las complicaciones de Apple Watch no pueden actualizarse en tiempo-real. Solo se actualizarán 2-3 veces por hora.\n\nNO DEBES fiar de los valores mostrados a la hora de tomar decisiones.\n\nPara valores actuales y fiables, debes abrir la app de %@ en tu Watch.\n\nHaz click en 'OK' únicamente si lo has entendido y estás de acuerdo.";
-"appleWatchComplicationUserAgreementDate" = "Acuerdo del Usuario";
-"appleWatchRemainingComplicationUserInfoTransfers" = "Actualizaciones Disponibles Hoy";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Allow Chart Rotation";
+"settingsviews_allowScreenRotation" = "Rotación del gráfico";
 
 /// help settings, section title
-"settingsviews_sectiontitlehelp" = "Help & Documentation";
 
-/// Calendar Events Settings - section title
-"calendarEventsSectionTitle" = "Calendar Events";
 
 /// help settings, open the online help
 "settingsviews_showOnlineHelp" = "Open Online Help";
@@ -180,14 +189,13 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
+"settingsviews_webooptransmitter" = "Algoritmo del transmisor";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
 
 "settingsviews_sectionTitleHousekeeper" = "Gestión de Datos";
-"settingsviews_housekeeperRetentionPeriod" = "Periodo de Retención (días)";
-"settingsviews_housekeeperExportAllData" = "Exportar Todo";
+"settingsviews_housekeeperRetentionPeriod" = "Periodo de Retención";
 "settingsviews_housekeeperRetentionPeriodMessage" = "¿Durante cuántos días debemos guardar los datos? (Min 90, Max 365)\n\n(Recomendado: 90 días)";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -201,25 +209,23 @@
 "expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
-"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
 
 /// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
 "warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
 
 /// data source settings, keep-alive mode is set to use an external heartbeat
-"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Background keep-alive is set to use an external heartbeat. ❤️\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
+"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Mantener activo is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
 
 /// When enabled, readings will not be reading to shared user defaults (for loop)
 "suppressLoopShare" = "Suppress Loop Share";
 
 /// When clicking the event interval setting, a pop up asks for minimum number of minutes between two events, this is the pop up message - this is used for setting the interval between two calendar events
-"settingsviews_CalenderIntervalTitle" = "Event Interval";
 
 /// When clicking the speak interval setting, a pop up asks for minimum number of minutes between two speech events, this is the pop up message - this is used for setting the interval between two spoken bg announcements
 "settingsviews_SpeakIntervalTitle" = "Speak Interval";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two bg announcements, this is the pop up message - this is used for setting the interval between two readings in BG announcements, Speak readings, Apple Watch
-"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
+"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// When enabled, then it should be possible to run xDrip4iOS/Libre 2 in parallel with other app(s)
 "suppressUnLockPayLoad" = "Suppress Unlock Payload";
@@ -231,9 +237,202 @@
 "expanatoryTextSelectTime" = "As of what time should the value apply";
 
 /// Should loop data be shared only every 5 minutes
-"shareToLoopOnceEvery5Minutes" = "Share with OS-AID every 5 mins";
 
 "settingsviews_storeFrequentReadingsInNightscout" = "Subir Nightscout Frecuentamente";
 "settingsviews_storeFrequentReadingsInNightscoutMessage" = "Esta opción permitirá subir datos cada vez que entre una lectura de glucosa nueva en lugar de limitar a una vez cada 5 minutos. Solo sirve para sensors que envíen valores cada 60 segundos como Libre 2 EU con conexión directo.\n\nUtilizad esta opción con mucho cuidado y solo si lo ves realmente necesario. La mayoría de los usuarios deben dejar esta opción DESHABILITADA.";
 "settingsviews_storeFrequentReadingsInHealthKit" = "Grabar HealthKit Frecuentamente";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "Limpiar datos";
+"settingsviews_dataManagementStorageInfo" = "Información de almacenamiento";
+"settingsviews_dataManagementManageData" = "Gestionar datos";
+"settingsviews_dataManagementDataRetention" = "Retención de datos";
+"settingsviews_dataManagementDataDeletion" = "Eliminación de datos";
+"settingsviews_dataManagementImportData" = "Importar datos";
+"settingsviews_dataManagementLastHousekeeping" = "Última limpieza";
+"settingsviews_storageInfoDatabase" = "Base de datos";
+"settingsviews_storageInfoDatabaseSize" = "Tamaño de la base de datos";
+"settingsviews_storageInfoTrackedRecords" = "Registros contabilizados";
+"settingsviews_storageInfoDevices" = "Dispositivos";
+"settingsviews_storageInfoSensors" = "Sensores";
+"settingsviews_storageInfoRetentionFooter" = "El periodo de retención de datos configurado es de %d días.";
+"settingsviews_storageInfoHistory" = "Historial guardado";
+"settingsviews_storageInfoEarliestRecord" = "Registro más antiguo";
+"settingsviews_storageInfoLatestRecord" = "Registro más reciente";
+"settingsviews_storageInfoCheckingStatus" = "Comprobando almacenamiento…";
+"settingsviews_nightscoutImportRetentionFooter" = "Limitado a tu periodo de retención de %d días. La limpieza elimina los datos anteriores.";
+"settingsviews_cleanDataAutomaticHousekeeping" = "Limpieza automática";
+"settingsviews_cleanDataKeepHistoricalData" = "Conservar datos históricos";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "Última limpieza";
+"settingsviews_cleanDataLastHousekeepingResult" = "Último resultado";
+"settingsviews_cleanDataNoHousekeepingRequired" = "No fue necesario limpiar";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "Se ejecuta como máximo una vez al día al abrir la app. Las lecturas, los tratamientos y las calibraciones sin usar anteriores al periodo seleccionado se borran localmente.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Los datos históricos solo se eliminarán manualmente desde Eliminación de datos.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "%@ registro borrado";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "%@ registros borrados";
+"settingsviews_cleanDataStorageUsed" = "Espacio usado";
+"settingsviews_cleanDataStoredData" = "Datos guardados";
+"settingsviews_cleanDataBgReadings" = "Lecturas de glucosa";
+"settingsviews_cleanDataTreatments" = "Tratamientos";
+"settingsviews_cleanDataCalibrations" = "Calibraciones";
+"settingsviews_cleanDataSelectData" = "Datos para eliminar";
+"settingsviews_cleanDataCleanupMethod" = "Método de limpieza";
+"settingsviews_cleanDataKeepRecent" = "Conservar recientes";
+"settingsviews_cleanDataDateRange" = "Rango de fechas";
+"settingsviews_cleanDataDeleteAll" = "Borrar todo";
+"settingsviews_cleanDataKeep" = "Conservar";
+"settingsviews_cleanDataFrom" = "Desde";
+"settingsviews_cleanDataUntil" = "Hasta";
+"settingsviews_cleanDataOlderDataFooter" = "Se borrarán los datos antiguos. Se conservarán los recientes.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "Ambas fechas están incluidas.";
+"settingsviews_cleanDataDeleteAllFooter" = "Se borrarán todos los datos seleccionados.";
+"settingsviews_cleanDataContinue" = "Continuar";
+"settingsviews_cleanDataReviewFooter" = "Podrás revisar el borrado antes de eliminar datos.";
+"settingsviews_cleanDataPermanentDeletion" = "Borrado permanente";
+"settingsviews_cleanDataCannotUndo" = "Esta acción no se puede deshacer.";
+"settingsviews_cleanDataUnusedCalibrations" = "Calibraciones sin usar";
+"settingsviews_cleanDataEarliestStoredData" = "Primer dato guardado";
+"settingsviews_cleanDataDataToDelete" = "Datos que se borrarán";
+"settingsviews_cleanDataEnterCode" = "Introduce este código de seis dígitos";
+"settingsviews_cleanDataSixDigitCode" = "Código de seis dígitos";
+"settingsviews_cleanDataConfirmDelete" = "CONFIRMAR BORRADO";
+"settingsviews_cleanDataSuccessfullyDeleted" = "Datos borrados correctamente";
+"settingsviews_cleanDataCompleted" = "Completado";
+"settingsviews_cleanDataBgReadingsDeleted" = "Lecturas borradas";
+"settingsviews_cleanDataTreatmentsDeleted" = "Tratamientos borrados";
+"settingsviews_cleanDataStorageBefore" = "Espacio anterior";
+"settingsviews_cleanDataStorageAfter" = "Espacio posterior";
+"settingsviews_cleanDataCleanupSummary" = "Resumen de limpieza";
+"settingsviews_cleanDataDatabaseReuseFooter" = "La base de datos puede conservar su tamaño y reutilizar el espacio liberado.";
+"settingsviews_cleanDataCheckingStatus" = "Comprobando datos…";
+"settingsviews_cleanDataCountingStatus" = "Contando datos…";
+"settingsviews_cleanDataDeletingStatus" = "Borrando datos permanentemente…\nMantén la app abierta.";
+"settingsviews_cleanDataInvalidDateRangeError" = "La fecha inicial debe ser anterior a la final.";
+"settingsviews_cleanDataNoSelectionError" = "Selecciona al menos un tipo de datos.";
+"settingsviews_cleanDataNoMatchingDataError" = "No hay datos seleccionados en este rango.";
+"settingsviews_cleanDataChangedError" = "Los datos cambiaron después de crear el resumen. Revisa los datos actualizados antes de confirmar.";
+"settingsviews_cleanDataDeleteFailedError" = "No se pudieron borrar los datos seleccionados. No se intentó ninguna otra limpieza.";
+"settingsviews_cleanDataDays" = "%d días";
+"settingsviews_nightscoutImportCompleted" = "Importación de Nightscout completada";
+"settingsviews_nightscoutImportSummary" = "Resumen de importación";
+"settingsviews_nightscoutImportURLMissing" = "No hay ninguna URL de Nightscout configurada";
+"settingsviews_nightscoutImportConfigureURL" = "Configura una URL de Nightscout en los ajustes de Nightscout antes de importar datos.";
+"settingsviews_nightscoutImportDownloaded" = "Descargados";
+"settingsviews_nightscoutImportAdded" = "Añadidos";
+"settingsviews_nightscoutImportSkipped" = "Omitidos";
+"settingsviews_nightscoutImportInvalid" = "No válidos";
+"settingsviews_nightscoutImportSummaryFooter" = "Los registros ya almacenados localmente se omitieron. Los documentos de Nightscout no válidos no se importaron.";
+"settingsviews_nightscoutImportingData" = "Importando datos";
+"settingsviews_cleanDataConfirmationCode" = "Código de confirmación %@";
 "settingsviews_storeFrequentReadingsInHealthKitMessage" = "Esta opción permitirá grabar datos cada vez que entre una lectura de glucosa nueva en lugar de limitar a una vez cada 5 minutos. Solo sirve para sensors que envíen valores cada 60 segundos como Libre 2 EU con conexión directo.\n\nUtilizad esta opción con mucho cuidado y solo si lo ves realmente necesario. La mayoría de los usuarios deben dejar esta opción DESHABILITADA.";
+"settingsviews_backupCreate" = "Crear copia de seguridad";
+"settingsviews_backupRestore" = "Restaurar copia de seguridad";
+"settingsviews_backupCreated" = "Copia de seguridad creada exitosamente";
+"settingsviews_backupRestored" = "Copia de seguridad restaurada exitosamente";
+"settingsviews_backupReplaceQuestion" = "¿Reemplazar datos existentes?";
+"settingsviews_backupReplaceData" = "Reemplazar datos";
+"settingsviews_backupReplaceWarning" = "Las lecturas y tratamientos de glucemia existentes dentro de los rangos de fechas de la copia de seguridad se eliminarán antes de restaurar la copia de seguridad.";
+"settingsviews_backupAndRestore" = "Copia de seguridad y restauración";
+"settingsviews_backupAppSettingsAndAlerts" = "Configuración y alertas de la aplicación";
+"settingsviews_backupEncrypt" = "Cifrar copia de seguridad";
+"settingsviews_backupAccounts" = "Cuentas de respaldo";
+"settingsviews_backupConfirmPassword" = "Confirmar contraseña";
+"settingsviews_backupPasswordProtection" = "Protección con contraseña";
+"settingsviews_backupPasswordProtectionFooter" = "Agregar protección con contraseña también permite realizar copias de seguridad de las cuentas que contienen detalles confidenciales.";
+"settingsviews_backupAccountDetailsFooter" = "Los detalles de la cuenta pueden incluir URL del servidor, nombres de usuario, contraseñas y tokens de acceso.";
+"settingsviews_backupCreateAndShare" = "Crear y compartir copia de seguridad";
+"settingsviews_backupEncryptedCreationFooter" = "Las copias de seguridad cifradas tardan más en crearse. Mantenga la aplicación abierta y tenga paciencia.";
+"settingsviews_backupCreatedAt" = "Creado";
+"settingsviews_backupEarliestData" = "Datos más tempranos";
+"settingsviews_backupSettingsAndAlerts" = "Configuraciones y alertas";
+"settingsviews_backupAccountDetails" = "Detalles de la cuenta";
+"settingsviews_backupIncluded" = "Incluido";
+"settingsviews_backupNotIncluded" = "No incluido";
+"settingsviews_backupNotEnabled" = "No habilitado";
+"settingsviews_backupSummary" = "Resumen de copia de seguridad";
+"settingsviews_backupChooseFile" = "Elija el archivo de copia de seguridad";
+"settingsviews_backupFile" = "Archivo de copia de seguridad";
+"settingsviews_backupFileCheckFooter" = "La copia de seguridad se verifica antes de cambiar cualquier dato existente.";
+"settingsviews_backupSelected" = "Copia de seguridad seleccionada";
+"settingsviews_backupPasswordRequired" = "Requerido";
+"settingsviews_backupUnlock" = "Desbloquear copia de seguridad";
+"settingsviews_backupEncryptedNotice" = "Esta copia de seguridad está cifrada y debe desbloquearse.";
+"settingsviews_backupSettings" = "Configuración";
+"settingsviews_backupRestoreOptions" = "Opciones de restauración";
+"settingsviews_backupDataHandling" = "Manejo de datos";
+"settingsviews_backupKeepCurrentData" = "Mantener datos actualizados";
+"settingsviews_backupFillGaps" = "Llenar huecos";
+"settingsviews_backupReplaceRange" = "Reemplazar rango de respaldo";
+"settingsviews_backupIgnoreData" = "Ignorar datos";
+"settingsviews_backupRestoreSettingsAndAlerts" = "Restaurar la configuración y las alertas de la aplicación";
+"settingsviews_backupRestoreAccounts" = "Restaurar cuentas";
+"settingsviews_backupReplaceAndRestore" = "Reemplazar y restaurar";
+"settingsviews_backupRestoreSummary" = "Resumen de restauración";
+"settingsviews_backupBgReadingsAppliedFrom" = "Lecturas de glucemia aplicadas desde";
+"settingsviews_backupBgReadingsAdded" = "Lecturas de GS agregadas";
+"settingsviews_backupBgReadingsSkipped" = "Lecturas de glucosa en sangre omitidas";
+"settingsviews_backupTreatmentsAdded" = "Tratamientos agregados";
+"settingsviews_backupTreatmentsSkipped" = "Tratamientos omitidos";
+"settingsviews_backupSettingsRestored" = "Configuración restaurada";
+"settingsviews_backupAccountRestore" = "Restaurar cuenta";
+"settingsviews_backupCreatingEncryptedStatus" = "Creando y cifrando su copia de seguridad de forma segura...\nTenga paciencia.";
+"settingsviews_backupCreatingStatus" = "Creando copia de seguridad…";
+"settingsviews_backupCheckingStatus" = "Comprobando copia de seguridad…";
+"settingsviews_backupDecryptingStatus" = "Descifrando y comprobando su copia de seguridad...\nTenga paciencia.";
+"settingsviews_backupRestoringEncryptedStatus" = "Restaurando su copia de seguridad cifrada...\nTenga paciencia.";
+"settingsviews_backupRestoringStatus" = "Restaurando copia de seguridad…";
+"settingsviews_backupErrorInvalidFile" = "Esta no es una copia de seguridad válida de la aplicación.";
+"settingsviews_backupErrorIncorrectPassword" = "La contraseña es incorrecta o la copia de seguridad protegida está dañada.";
+"settingsviews_backupErrorMissingPassword" = "Ingrese la contraseña utilizada para proteger esta copia de seguridad.";
+"settingsviews_nightscoutImportQuestion" = "¿Importar desde Nightscout?";
+"settingsviews_nightscoutImportAction" = "Importar desde Nightscout";
+"settingsviews_nightscoutImportDiscardQuestion" = "¿Descartar la importación guardada?";
+"settingsviews_nightscoutImportDiscard" = "Descartar importación";
+"settingsviews_nightscoutImportDiscardSaved" = "Descartar importación guardada";
+"settingsviews_nightscoutImportDiscardMessage" = "Se eliminará el progreso guardado. Los datos importados permanecerán almacenados de forma segura y se omitirán si comienza de nuevo.";
+"settingsviews_nightscoutImportDataToImport" = "Datos para importar";
+"settingsviews_nightscoutImportPeriod" = "Período de importación";
+"settingsviews_nightscoutImportExistingDataFooter" = "Se conservan los datos locales existentes. Se omiten las lecturas de glucemia dentro de los 30 segundos posteriores a una lectura existente y los tratamientos ya identificados por Nightscout.";
+"settingsviews_nightscoutImportKeepOpenFooter" = "Mantenga la aplicación abierta hasta que finalice la importación. El progreso se guarda después de cada lote completado, por lo que se puede reanudar una importación interrumpida.";
+"settingsviews_nightscoutImportPeriodLabel" = "Periodo";
+"settingsviews_nightscoutImportCompletedBatches" = "Lotes completados";
+"settingsviews_nightscoutImportResume" = "Reanudar importación";
+"settingsviews_nightscoutImportSaved" = "Importación guardada";
+"settingsviews_nightscoutImportUnsupportedFooter" = "Esta importación utiliza un período no admitido. Deséchelo para comenzar de nuevo.";
+"settingsviews_nightscoutImportExceedsRetentionFooter" = "Esta importación excede su período de retención actual. Deséchelo para comenzar de nuevo.";
+"settingsviews_nightscoutImportResumeFooter" = "La importación anterior se detuvo antes de que se completaran todos los lotes solicitados. La reanudación continúa desde el último punto de control guardado.";
+"settingsviews_nightscoutImportPause" = "Pausar importación";
+"settingsviews_nightscoutImportBgAndTreatments" = "Lecturas y tratamientos de glucemia.";
+"settingsviews_nightscoutImportBgOnly" = "lecturas de glucemia";
+"settingsviews_nightscoutImportTreatmentsOnly" = "tratamientos";
+"settingsviews_nightscoutImportKeepAppOpen" = "Mantenga la aplicación abierta.";
+"settingsviews_nightscoutImportPaused" = "Importación pausada";
+"settingsviews_nightscoutImportErrorNoSelection" = "Seleccione lecturas de glucosa en sangre, tratamientos o ambos.";
+"settingsviews_nightscoutImportErrorUnsupportedPeriod" = "La importación guardada utiliza un período que ya no se admite. Deséchalo y comienza de nuevo.";
+"settingsviews_nightscoutImportErrorRetention" = "El período de importación seleccionado excede la configuración de retención de datos actual.";
+"settingsviews_nightscoutImportErrorMissingURL" = "Ingrese una URL de Nightscout en la configuración de Nightscout antes de iniciar una importación.";
+"settingsviews_nightscoutImportErrorInvalidURL" = "La URL de Nightscout configurada no es válida. Compruébalo en Configuración de Nightscout y vuelve a intentarlo.";
+"settingsviews_nightscoutImportErrorCheckpointUnavailable" = "La importación de Nightscout guardada ya no se puede reanudar. Inicie una nueva importación.";
+"settingsviews_nightscoutImportErrorSiteChanged" = "El sitio Nightscout configurado ha cambiado desde que comenzó esta importación. Descarte la importación guardada o restaure la URL de Nightscout anterior.";
+"settingsviews_nightscoutImportErrorAuthentication" = "Nightscout denegó el acceso. Verifique el secreto de API o el token de acceso en la configuración de Nightscout.";
+"settingsviews_nightscoutImportErrorEndpoint" = "No se encontró el punto final de datos de Nightscout. Verifique la URL configurada y la versión del sitio.";
+"settingsviews_nightscoutImportErrorRateLimited" = "Nightscout está recibiendo demasiadas solicitudes. Espere un momento y reanude la importación.";
+"settingsviews_nightscoutImportErrorInvalidResponse" = "Nightscout devolvió datos que no se pudieron leer de forma segura. No se importaron datos del lote afectado.";
+"settingsviews_nightscoutImportErrorResponseLimit" = "Un lote de Nightscout seguía siendo demasiado grande después de dividirlo en intervalos de tiempo pequeños. No se importaron datos truncados.";
+"settingsviews_backupCreatedWithAppVersion" = "Copia de seguridad creada con la versión de la aplicación %@.";
+"settingsviews_backupErrorUnsupportedVersion" = "La versión del formato de copia de seguridad %d no es compatible con esta versión de la aplicación.";
+"settingsviews_backupErrorFinalValueMismatch" = "Los valores de glucosa almacenados no reproducen el valor final respaldado para leer %@.";
+"settingsviews_nightscoutImportBatchCount" = "%1$d de %2$d";
+"settingsviews_nightscoutImportBgAddedProgress" = "Se agregaron lecturas de glucosa en sangre: %@";
+"settingsviews_nightscoutImportTreatmentsAddedProgress" = "Tratamientos agregados: %@";
+"settingsviews_nightscoutImportConfirmation" = "¿Importar los últimos días %1$d de %2$@? Se conservarán los registros locales existentes y se evitarán los duplicados.";
+"settingsviews_nightscoutImportBatchProgress" = "Lote %1$d de %2$d";
+"settingsviews_nightscoutImportErrorServer" = "Nightscout devolvió un error temporal del servidor (HTTP %d). Reanude la importación más tarde.";
+"settingsviews_nightscoutImportErrorUnexpectedStatus" = "Nightscout devolvió una respuesta inesperada (HTTP %d).";
+"sensorNoiseSensitivity" = "Sensor Sensitivity";
+"sensorNoiseSensitivitySensitive" = "Sensible";
+"sensorNoiseSensitivityNormal" = "Normal";
+"sensorNoiseSensitivityPermissive" = "Permisivo";
+"settingsviews_followerServiceStatus" = "Estado";
+"settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Mantener activo.";
+"settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Mantener activo disabled.\n\nContact Image function cannot work without Mantener activo.";

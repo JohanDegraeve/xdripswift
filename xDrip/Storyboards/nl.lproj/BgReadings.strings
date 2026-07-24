@@ -5,8 +5,13 @@
 "generalSectionHeader" = "Algemeen";
 "internalDataSectionHeader" = "Interne data";
 "timestamp" = "Tijdstip";
+"backfilledAtFooterFormat" = "Aangevuld %@";
 "calculatedValue" = "Berekende waarde";
 "slopeArrow" = "Helling arrow";
 "id" = "ID";
 "deviceName" = "Toestelnaam";
 "rawData" = "Ruwe data";
+"glucoseRange" = "Glucosebereik";
+"bgRangeUrgent" = "Urgent";
+"bgRangeNotUrgent" = "Niet urgent";
+"bgRangeInRange" = "Binnen bereik";

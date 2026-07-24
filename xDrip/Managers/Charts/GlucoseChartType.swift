@@ -7,25 +7,52 @@
 //
 
 import Foundation
-import UIKit
 import SwiftUI
 
-/// holds and returns the different parameters used for creating the newer (2024) SwiftUI glucose charts
-public enum GlucoseChartType: Int, CaseIterable {
-    case liveActivity = 0
-    case dynamicIsland = 1
-    case watchApp = 2
-    case watchAppWithAIDStatus = 3
-    case watchAccessoryRectangular = 4
-    case widgetSystemSmall = 5
-    case widgetSystemSmallStandBy = 6
-    case widgetSystemMedium = 7
-    case widgetSystemLarge = 8
-    case widgetAccessoryRectangular = 9
-    case siriGlucoseIntent = 10
-    case notificationImageThumbnail = 11
-    case notificationExpanded = 12
-    case notificationWatch = 13
+/// Holds and returns the different parameters used for creating the newer (2024) SwiftUI glucose charts.
+///
+/// Each chart type is a named rendering preset. When adding a new chart type, start by adding the
+/// enum case and then define the required options below. These are the values that every chart type
+/// should consciously own because they define the basic rendering surface.
+///
+/// Required parameters:
+/// - `description`: human readable chart type name, mainly for debugging and generated chart usage.
+/// - `viewSize(liveActivityType:)`: default chart width and height when the caller does not override them.
+/// - `hoursToShow(liveActivityType:)`: default visible time range.
+/// - `glucoseCircleDiameter(liveActivityType:)`: base glucose point size before any caller scaling.
+///
+/// Optional parameters:
+/// - `backgroundColor()`: override if the chart should not use the standard black background.
+/// - `frame()`: override if the chart should not apply a fixed frame directly.
+/// - `aspectRatio()`: override if the chart needs a SwiftUI aspect-ratio constraint.
+/// - `cornerRadius()`: override if the chart needs rounded clipping.
+/// - `padding()`: override if the chart needs internal padding.
+/// - `xAxisShowLabels()`: override if x-axis labels should be visible.
+/// - `xAxisLabelEveryHours()`: override if x-axis grid/label spacing should not be hourly.
+/// - `xAxisLabelOffsetX()` and `xAxisLabelOffsetY()`: override if visible x-axis labels need positioning.
+/// - `yAxisShowLabels()`: override if y-axis labels should be visible.
+/// - `yAxisLabelOffsetX()` and `yAxisLabelOffsetY()`: override if visible y-axis labels need positioning.
+/// - `yAxisLineSize()`: override if horizontal threshold/grid lines should be thicker or thinner.
+/// - `yAxisShowUrgentLowHighLines()`: override if urgent low/high threshold lines should be hidden.
+/// - `yAxisLowHighLineColor()`: override if low/high threshold lines need a different colour.
+/// - `yAxisUrgentLowHighLineColor()`: override if urgent low/high threshold lines need a different colour.
+/// - `filename()`: override only for chart types that generate a saved image file.
+public enum GlucoseChartType: CaseIterable {
+    case liveActivity
+    case dynamicIsland
+    case watchApp
+    case watchAppWithAIDStatus
+    case watchAccessoryRectangular
+    case widgetSystemSmall
+    case widgetSystemSmallStandBy
+    case widgetSystemMedium
+    case widgetSystemLarge
+    case widgetAccessoryRectangular
+    case siriGlucoseIntent
+    case notificationImageThumbnail
+    case notificationExpanded
+    case notificationWatch
+    case miniChart
     
     var description: String {
         switch self {
@@ -55,6 +82,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return "Notification Expanded Image Chart"
         case .notificationWatch:
             return "Notification Watch Image Chart"
+        case .miniChart:
+            return "Mini Chart"
         }
     }
     
@@ -95,6 +124,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return (ConstantsGlucoseChartSwiftUI.viewWidthNotificationExpanded, ConstantsGlucoseChartSwiftUI.viewHeightNotificationExpanded)
         case .notificationWatch:
             return (ConstantsGlucoseChartSwiftUI.viewWidthNotificationWatch, ConstantsGlucoseChartSwiftUI.viewHeightNotificationWatch)
+        case .miniChart:
+            return (ConstantsGlucoseChartSwiftUI.miniChartViewWidth, ConstantsGlucoseChartSwiftUI.miniChartViewHeight)
         }
     }
     
@@ -129,6 +160,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.hoursToShowNotificationExpanded
         case .notificationWatch:
             return ConstantsGlucoseChartSwiftUI.hoursToShowNotificationWatch
+        case .miniChart:
+            return ConstantsGlucoseChartSwiftUI.miniChartHoursToShow
         }
     }
     
@@ -169,6 +202,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterNotificationExpanded
         case .notificationWatch:
             return ConstantsGlucoseChartSwiftUI.glucoseCircleDiameterNotificationWatch
+        case .miniChart:
+            return ConstantsGlucoseChartSwiftUI.miniChartGlucoseCircleDiameter
         }
     }
     
@@ -180,6 +215,8 @@ public enum GlucoseChartType: Int, CaseIterable {
             return ConstantsGlucoseChartSwiftUI.backgroundColorWatchAccessoryRectangular
         case .notificationWatch:
             return ConstantsGlucoseChartSwiftUI.backgroundColorNotificationWatch
+        case .miniChart:
+            return ConstantsGlucoseChartSwiftUI.miniChartBackgroundColor
         default:
             return ConstantsGlucoseChartSwiftUI.backgroundColor
         }
@@ -207,6 +244,8 @@ public enum GlucoseChartType: Int, CaseIterable {
         switch self {
         case .siriGlucoseIntent:
             return ConstantsGlucoseChartSwiftUI.cornerRadiusSiriGlucoseIntent
+        case .miniChart:
+            return ConstantsHomeView.standardCornerRadius
         default:
             return ConstantsGlucoseChartSwiftUI.cornerRadius
         }
@@ -235,6 +274,8 @@ public enum GlucoseChartType: Int, CaseIterable {
     
     func xAxisLabelEveryHours() -> Int {
         switch self {
+        case .miniChart:
+            return 24
         default:
             return 1
         }
@@ -290,10 +331,21 @@ public enum GlucoseChartType: Int, CaseIterable {
     
     func yAxisLineSize() -> Double {
         switch self {
+        case .miniChart:
+            return ConstantsGlucoseChartSwiftUI.miniChartYAxisLineSize
         case .widgetSystemSmallStandBy:
             return ConstantsGlucoseChartSwiftUI.yAxisLineSizeSystemSmallStandBy
         default:
             return ConstantsGlucoseChartSwiftUI.yAxisLineSize
+        }
+    }
+
+    func yAxisShowUrgentLowHighLines() -> Bool {
+        switch self {
+        case .miniChart:
+            return false
+        default:
+            return true
         }
     }
     

@@ -31,7 +31,11 @@
 "confirmDisconnectMessage" = "Verici bağlantısını gerçekten kesmek istediğinizi onaylamak için 'Bağlantıyı Kes'i tıklayın.";
 "transmittterStartDate" = "Vericiyi Başlatın";
 "sensorStartDate" = "Sensörü Başlat";
-"useOtherDexcomApp" = "Dexcom-app uygulamasını takip et";
+"useOtherDexcomApp" = "Birlikte çalışma modu";
+"useOtherDexcomAppCoexistenceFooter" = "Birlikte çalışma modu, Dexcom veya CamAPS gibi başka bir uygulamayla çalışmamızı sağlar. Bu uygulama arka planda çalışmaya devam etmelidir.";
+"useOtherDexcomAppPrimaryFooter" = "Birincil mod ana uygulama olarak bağlanır ve bağlantıyı kontrol eder.";
+"runningInCoexistenceMode" = "Birlikte çalışma modunda çalışıyor";
+"runningInPrimaryMode" = "Birincil modda çalışıyor";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

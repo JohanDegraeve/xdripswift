@@ -44,6 +44,9 @@ enum ConstantsLog {
     
     /// core data manager
     static let categoryCoreDataManager =                    "CoreDataManager               "
+
+    /// data management, backup and restore
+    static let categoryDataManagement =                     "DataManagement                "
     
     /// application data bgreadings
     static let categoryApplicationDataBgReadings =          "ApplicationDataBgReadings     "
@@ -93,6 +96,9 @@ enum ConstantsLog {
 
     /// medtrum easyview follow
     static let categoryMedtrumEasyViewFollowManager =       "MedtrumEasyViewFollowManager  "
+
+    /// medtrum touchcare nano cgm (BLE co-listener)
+    static let categoryCGMMedtrumTouchCareNano =            "CGMMedtrumTouchCareNano       "
 
     /// alertmanager
     static let categoryAlertManager =                       "AlertManager                  "
@@ -145,10 +151,6 @@ enum ConstantsLog {
 
     /// WatchManager logging
     static let categoryWatchManager =                       "WatchManager                  "
-    
-    /// SettingsViewAppleWatchSettingsViewModel logging
-    static let categorySettingsViewAppleWatchSettingsViewModel = 
-                                                            "AppleWatchSettingsViewModel   "
 
     /// ContactImageManager logging
     static let categoryContactImageManager =                "ContactImageManager           "
@@ -180,8 +182,6 @@ enum ConstantsLog {
     /// for use in Libre2BLEUtilities
     static let categoryAppDelegate =                        "AppDelegate                   "
     
-	/// for use in DataExporter
-	static let categoryDataExporter =                       "DataExporter                  "
 
     // for use in LoopManager
     static let categoryLoopManager =                        "LoopManager                   "
@@ -213,4 +213,3 @@ enum ConstantsLog {
     /// for use in Omni¨PodHeartBeatTransmitter
     static let categoryHeartBeatOmnipod =                   "HeartBeatOmnipod              "
 }
-

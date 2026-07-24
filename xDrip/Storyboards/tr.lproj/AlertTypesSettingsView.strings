@@ -4,7 +4,7 @@
 "alerttypesettingsview_enabled" = "Etkin";
 "alerttypesettingsview_vibrate" = "Titreşim";
 "alerttypesettingsview_snoozevianotification" = "Bildirim Yoluyla Ertelemeye İzin Verilsin mi";
-"alerttypesettingsview_defaultsnoozeperiod" = "Varsayılan Erteleme Süresi (dak)";
+"alerttypesettingsview_defaultsnoozeperiod" = "Varsayılan Erteleme Süresi";
 "alerttypesettingsview_overridemute" = "Sessiz modunu geçersiz kıl";
 "alerttypesettingsview_sound" = "Ses";
 "alerttypesettingsview_defaultiossound" = "iOS Ses";

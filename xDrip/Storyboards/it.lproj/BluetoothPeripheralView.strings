@@ -95,8 +95,11 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Use With Other App";
-
+"useOtherDexcomApp" = "Modalità coesistenza";
+"useOtherDexcomAppCoexistenceFooter" = "La modalità coesistenza ci consente di funzionare con un'altra app, come Dexcom o CamAPS. L'altra app deve restare in esecuzione in background.";
+"useOtherDexcomAppPrimaryFooter" = "La modalità primaria si connette come app principale e controlla la connessione.";
+"runningInCoexistenceMode" = "In esecuzione in modalità coesistenza";
+"runningInPrimaryMode" = "In esecuzione in modalità primaria";
 /// Disconnect transmitter, title
 "confirmDisconnectTitle" = "Confirm Disconnect";
 

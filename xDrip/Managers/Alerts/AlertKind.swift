@@ -224,9 +224,9 @@ public enum AlertKind: Int, CaseIterable {
                 
             if let lastBgReading = lastBgReading {
                 // first check if lastBgReading not nil and calculatedValue > 0.0, never know that it's not been checked by caller
-                if lastBgReading.calculatedValue == 0.0 { return (false, nil, nil, nil) }
+                if lastBgReading.finalValue == 0.0 { return (false, nil, nil, nil) }
                 // now do the actual check if alert is applicable or not
-                if lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) < Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) {
+                if lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) < Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) {
                     return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
                 } else { return (false, nil, nil, nil) }
             } else { return (false, nil, nil, nil) }
@@ -237,9 +237,9 @@ public enum AlertKind: Int, CaseIterable {
                 
             if let lastBgReading = lastBgReading {
                 // first check if calculatedValue > 0.0, never know that it's not been checked by caller
-                if lastBgReading.calculatedValue == 0.0 { return (false, nil, nil, nil) }
+                if lastBgReading.finalValue == 0.0 { return (false, nil, nil, nil) }
                 // now do the actual check if alert is applicable or not
-                if lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) {
+                if lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) {
                     return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
                 } else { return (false, nil, nil, nil) }
             } else { return (false, nil, nil, nil) }
@@ -252,9 +252,9 @@ public enum AlertKind: Int, CaseIterable {
                 // lastbut one reading and last reading shoud be maximum 5 minutes apart (+10 seconds to give some margin!)
                 if (lastBgReading.timeStamp.timeIntervalSince(lastButOneBgReading.timeStamp)) < (5 * 60 + 10) {
                     // first check if calculatedValue > 0.0, never know that it's not been checked by caller
-                    if lastBgReading.calculatedValue == 0.0 || lastButOneBgReading.calculatedValue == 0.0 { return (false, nil, nil, nil) }
+                    if lastBgReading.finalValue == 0.0 || lastButOneBgReading.finalValue == 0.0 { return (false, nil, nil, nil) }
                     // now do the actual check if alert is applicable or not. As this is fast drop, we'll only fire when *under* the trigger value
-                    if (lastButOneBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) - lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl)) && (lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) < Double(currentAlertEntry.triggerValue).bgValueRounded(mgDl: isMgDl)) {
+                    if (lastButOneBgReading.finalValue.bgValueRounded(mgDl: isMgDl) - lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl)) && (lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) < Double(currentAlertEntry.triggerValue).bgValueRounded(mgDl: isMgDl)) {
                             return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
                     } else { return (false, nil, nil, nil) }
                 } else { return (false, nil, nil, nil) }
@@ -268,9 +268,9 @@ public enum AlertKind: Int, CaseIterable {
                 // lastbut one reading and last reading shoud be maximum 5 minutes apart (+10 seconds to give some margin!)
                 if (lastBgReading.timeStamp.timeIntervalSince(lastButOneBgReading.timeStamp)) < (5 * 60 + 10) {
                     // first check if calculatedValue > 0.0, never know that it's not been checked by caller
-                    if lastBgReading.calculatedValue == 0.0 || lastButOneBgReading.calculatedValue == 0.0 { return (false, nil, nil, nil) }
+                    if lastBgReading.finalValue == 0.0 || lastButOneBgReading.finalValue == 0.0 { return (false, nil, nil, nil) }
                     // now do the actual check if alert is applicable or not. As this is fast rise, we'll only fire when *over* the trigger value
-                    if lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) - lastButOneBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) && (lastBgReading.calculatedValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.triggerValue).bgValueRounded(mgDl: isMgDl)) {
+                    if lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) - lastButOneBgReading.finalValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.value).bgValueRounded(mgDl: isMgDl) && (lastBgReading.finalValue.bgValueRounded(mgDl: isMgDl) > Double(currentAlertEntry.triggerValue).bgValueRounded(mgDl: isMgDl)) {
                             return (true, createAlertBodyForBgReadingAlerts(bgReading: lastBgReading, alertKind: self), createAlertTitleForBgReadingAlerts(alertKind: self), nil)
                         } else { return (false, nil, nil, nil) }
                 } else { return (false, nil, nil, nil) }
@@ -389,8 +389,22 @@ public enum AlertKind: Int, CaseIterable {
             if !currentAlertEntry.alertType.enabled { return (false, nil, nil, nil) }
             
             // Create battery info similar to transmitter battery info
-            UIDevice.current.isBatteryMonitoringEnabled = true
-            let phoneBatteryLevel = Int(UIDevice.current.batteryLevel * 100)
+            let device = UIDevice.current
+            device.isBatteryMonitoringEnabled = true
+
+            // The user has already taken the required action when the phone is connected to power,
+            // so don't raise a low phone battery alert while it is charging or fully charged.
+            // https://developer.apple.com/documentation/uikit/uidevice/batterystate-swift.enum
+            if device.batteryState == .charging || device.batteryState == .full {
+                return (false, nil, nil, nil)
+            }
+
+            // Apple returns a negative battery level when the value is unavailable. Ignore it to
+            // avoid incorrectly treating an unknown level as an extremely low battery.
+            let batteryLevel = device.batteryLevel
+            guard batteryLevel >= 0 else { return (false, nil, nil, nil) }
+
+            let phoneBatteryLevel = Int(batteryLevel * 100)
             
             // Check if battery level is below threshold, similar to transmitter check
             if currentAlertEntry.value > phoneBatteryLevel {
@@ -514,7 +528,7 @@ private func createAlertBodyForBgReadingAlerts(bgReading: BgReading, alertKind: 
     var returnValue = ""
     
     // add unit
-    returnValue = returnValue + " " + bgReading.calculatedValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
+    returnValue = returnValue + " " + bgReading.finalValue.mgDlToMmolAndToString(mgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl)
     
     // add slopeArrow
     if !bgReading.hideSlope {

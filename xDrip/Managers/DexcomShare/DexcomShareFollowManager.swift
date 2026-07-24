@@ -146,7 +146,7 @@ class DexcomShareFollowManager: NSObject {
         var calculatedValueSlope = 0.0
         
         // get last readings
-        let last2Readings = self.bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let last2Readings = self.bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false, includingSuppressed: true)
         
         // if more thant 2 readings, calculate slope and hie
         if last2Readings.count >= 2 {
@@ -356,7 +356,10 @@ class DexcomShareFollowManager: NSObject {
         var maxCount = 1
         
         // using the snapshot method for thread-safety
-        if let lastBgReading = bgReadingsAccessor.lastSnapshot(forSensor: nil) {
+        // Dexcom Share fetch sizing must use the latest stored source reading,
+        // not the latest visible downstream reading. This keeps the backfill
+        // window stable when faster follower readings are reduced to 5 minutes.
+        if let lastBgReading = bgReadingsAccessor.lastSnapshot(forSensor: nil, includingSuppressed: true) {
             let minutesSinceLastBgReading = Int((Date().timeIntervalSince1970 - lastBgReading.timeStamp.timeIntervalSince1970) / 60)
             
             if !force {

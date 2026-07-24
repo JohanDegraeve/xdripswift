@@ -1,5 +1,4 @@
 import CoreData
-import UIKit
 import os
 
 /// development as explained in cocoacasts.com https://cocoacasts.com/bring-your-own

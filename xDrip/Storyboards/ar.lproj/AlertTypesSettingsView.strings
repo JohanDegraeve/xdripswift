@@ -4,7 +4,7 @@
 "alerttypesettingsview_enabled" = "تفعيل؟";
 "alerttypesettingsview_vibrate" = "هزاز؟";
 "alerttypesettingsview_snoozevianotification" = "السماح للغفوة عبر الإشعارات؟";
-"alerttypesettingsview_defaultsnoozeperiod" = "مدة الغفوة الإفتراض (دقائق)";
+"alerttypesettingsview_defaultsnoozeperiod" = "مدة الغفوة الإفتراض";
 "alerttypesettingsview_overridemute" = "تخطي وضع الصامت";
 "alerttypesettingsview_sound" = "النغمة";
 "alerttypesettingsview_defaultiossound" = "نغمة النظام";

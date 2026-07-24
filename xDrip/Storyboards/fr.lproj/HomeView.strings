@@ -72,7 +72,7 @@
 "sensorDuration" = "Sensor Duration";
 
 /// nightscout is not enabled
-"nightscoutURLMissing" = "Nightscout URL missing";
+"nightscoutURLMissing" = "URL missing";
 
 /// ask the user to disconnect and reconnect the sensor
 "reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
@@ -82,3 +82,39 @@
 
 /// no data source is enabled or connected
 "noDataSourceConnected" = "No CGM data source connected";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "%@ restants";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+
+"sensorManagementNoiseTitle" = "Bruit du capteur";
+"sensorManagementNoiseShortTerm" = "30 dernières minutes";
+"sensorManagementNoiseLongTerm" = "4 dernières heures";
+"sensorManagementNoiseCollecting" = "Collecte des données";
+"sensorManagementNoiseLow" = "Faible";
+"sensorManagementNoiseElevated" = "Élevé";
+"sensorManagementNoiseVeryHigh" = "Très élevé";
+"sensorManagementNoiseExtreme" = "Extrême";
+"sensorManagementNoiseFlatline" = "Le capteur est probablement défaillant.";
+"sensorManagementNoiseFooter" = "Sensibilité sélectionnée : %@";
+"sensorNoiseWarningExtremeTitle" = "Bruit extrême du capteur";
+"sensorNoiseWarningPersistentTitle" = "Bruit persistant du capteur";
+"sensorNoiseWarningFlatlineTitle" = "Le signal du capteur est plat";
+"sensorNoiseHistoryTitle" = "Historique du bruit";
+"sensorNoiseHistoryCurrentTitle" = "Mesures actuelles";
+"sensorNoiseHistoryChartTitle" = "Évolution du bruit";
+"sensorNoiseHistoryRangeTitle" = "Période";
+"sensorNoiseHistoryDayRange" = "24 h";
+"sensorNoiseHistoryThreeDayRange" = "3 j";
+"sensorNoiseHistoryWeekRange" = "7 j";
+"sensorNoiseHistoryAllRange" = "Tout";
+"sensorNoiseHistoryShortCompact" = "30 min";
+"sensorNoiseHistoryLongCompact" = "4 h";
+"sensorNoiseHistoryLoading" = "Création de l’historique du capteur";
+"sensorNoiseHistoryNoDataTitle" = "Pas encore assez de données de bruit";
+"sensorNoiseHistoryNoDataMessage" = "Le graphique apparaîtra après la collecte d’un nombre suffisant de mesures du capteur.";
+"sensorNoiseHistoryFooter" = "Le graphique montre l’instabilité résiduelle du capteur pendant cette session. Les valeurs basses indiquent un signal plus régulier. Il ne mesure pas la précision du glucose.";
+"sensorNoiseHistoryChartAccessibility" = "Graphique de l’historique du bruit du capteur";
+"pumpBattery" = "Batterie";
+"pumpReservoir" = "Réservoir";

@@ -140,6 +140,14 @@ class Texts_Common {
     static let name = {
         return NSLocalizedString("name", tableName: filename, bundle: Bundle.main, value: "Name:", comment: "name")
     }()
+
+    static let value = {
+        return NSLocalizedString("common_value", tableName: filename, bundle: Bundle.main, value: "Value", comment: "generic value label")
+    }()
+
+    static let enterValue = {
+        return NSLocalizedString("common_enterValue", tableName: filename, bundle: Bundle.main, value: "Enter Value", comment: "generic label for a row where the user enters a value")
+    }()
     
     static let WiFi = {
         return NSLocalizedString("WiFi", tableName: filename, bundle: Bundle.main, value: "WiFi", comment: "WiFi")
@@ -212,6 +220,230 @@ class Texts_Common {
     
     static let cvStatistics = {
         return NSLocalizedString("common_statistics_cv", tableName: filename, bundle: Bundle.main, value: "CV", comment: "coefficient of variation")
+    }()
+
+    static let statisticsTitle = {
+        return NSLocalizedString("common_statistics_title", tableName: filename, bundle: Bundle.main, value: "Statistics", comment: "statistics tab title")
+    }()
+
+    static let statisticsPeriod = {
+        return NSLocalizedString("common_statistics_period", tableName: filename, bundle: Bundle.main, value: "Period", comment: "statistics period picker title")
+    }()
+
+    static let statisticsSummary = {
+        return NSLocalizedString("common_statistics_summary", tableName: filename, bundle: Bundle.main, value: "Summary", comment: "statistics summary section tab")
+    }()
+
+    static let statisticsTrends = {
+        return NSLocalizedString("common_statistics_trends", tableName: filename, bundle: Bundle.main, value: "Trends", comment: "statistics trends section tab")
+    }()
+
+    static let statisticsDaily = {
+        return NSLocalizedString("common_statistics_daily", tableName: filename, bundle: Bundle.main, value: "Daily", comment: "statistics daily section tab")
+    }()
+
+    static let statisticsReport = {
+        return NSLocalizedString("common_statistics_report", tableName: filename, bundle: Bundle.main, value: "Report", comment: "statistics report section tab")
+    }()
+
+    static let statisticsTimeInRange = {
+        return NSLocalizedString("common_statistics_timeInRange", tableName: filename, bundle: Bundle.main, value: "Time in Range", comment: "statistics time in range title")
+    }()
+
+    static let statisticsTimeInTightRange = {
+        return NSLocalizedString("common_statistics_timeInTightRange", tableName: filename, bundle: Bundle.main, value: "Time in Tight Range", comment: "statistics time in tight range title")
+    }()
+
+    static let statisticsMeanGlucose = {
+        return NSLocalizedString("common_statistics_meanGlucose", tableName: filename, bundle: Bundle.main, value: "Mean glucose", comment: "statistics average glucose detail")
+    }()
+
+    static let statisticsGMI = {
+        return NSLocalizedString("common_statistics_gmi", tableName: filename, bundle: Bundle.main, value: "GMI", comment: "glucose management indicator abbreviation")
+    }()
+
+    static let statisticsCGMEstimate = {
+        return NSLocalizedString("common_statistics_cgmEstimate", tableName: filename, bundle: Bundle.main, value: "CGM estimate", comment: "statistics GMI detail")
+    }()
+
+    static let statisticsDataCapture = {
+        return NSLocalizedString("common_statistics_dataCapture", tableName: filename, bundle: Bundle.main, value: "Data Capture", comment: "statistics data capture title")
+    }()
+
+    static let statisticsTargetLessThanOrEqual = {
+        return NSLocalizedString("common_statistics_targetLessThanOrEqual", tableName: filename, bundle: Bundle.main, value: "Target <=%@", comment: "statistics target less than or equal to value")
+    }()
+
+    static let statisticsTargetGreaterThanOrEqual = {
+        return NSLocalizedString("common_statistics_targetGreaterThanOrEqual", tableName: filename, bundle: Bundle.main, value: "Target >=%@", comment: "statistics target greater than or equal to value")
+    }()
+
+    static let statisticsAmbulatoryGlucoseProfile = {
+        return NSLocalizedString("common_statistics_ambulatoryGlucoseProfile", tableName: filename, bundle: Bundle.main, value: "Ambulatory Glucose Profile", comment: "statistics AGP chart title")
+    }()
+
+    static let statisticsInsufficientAGPData = {
+        return NSLocalizedString("common_statistics_insufficientAGPData", tableName: filename, bundle: Bundle.main, value: "Insufficient data for AGP percentile chart", comment: "statistics AGP empty chart message")
+    }()
+
+    static let statisticsInsufficientData = {
+        return NSLocalizedString("common_statistics_insufficientData", tableName: filename, bundle: Bundle.main, value: "Insufficient data", comment: "statistics chart empty message")
+    }()
+
+    static let statisticsEstimatedA1cTrend = {
+        return NSLocalizedString("common_statistics_estimatedA1cTrend", tableName: filename, bundle: Bundle.main, value: "Estimated HbA1c trend", comment: "statistics estimated HbA1c trend chart title")
+    }()
+
+    static let statisticsCVTrend = {
+        return NSLocalizedString("common_statistics_cvTrend", tableName: filename, bundle: Bundle.main, value: "CV trend", comment: "statistics coefficient of variation trend chart title")
+    }()
+
+    static let statisticsDailyPattern = {
+        return NSLocalizedString("common_statistics_dailyPattern", tableName: filename, bundle: Bundle.main, value: "Daily Pattern", comment: "statistics daily pattern chart title")
+    }()
+
+    static let statisticsAverageFormat = {
+        return NSLocalizedString("common_statistics_averageFormat", tableName: filename, bundle: Bundle.main, value: "Average %@", comment: "statistics average value format")
+    }()
+
+    static let statisticsDailyPatternFooter = {
+        return NSLocalizedString("common_statistics_dailyPatternFooter", tableName: filename, bundle: Bundle.main, value: "Bars show daily percentage in 70-180 mg/dL range. The dashed line marks the 70% clinical target.", comment: "statistics daily pattern chart footer")
+    }()
+
+    static let statisticsDailySummary = {
+        return NSLocalizedString("common_statistics_dailySummary", tableName: filename, bundle: Bundle.main, value: "Daily Summary", comment: "statistics daily summary section title")
+    }()
+
+    static let statisticsBestDay = {
+        return NSLocalizedString("common_statistics_bestDay", tableName: filename, bundle: Bundle.main, value: "Best Day", comment: "statistics best day tile title")
+    }()
+
+    static let statisticsMostLow = {
+        return NSLocalizedString("common_statistics_mostLow", tableName: filename, bundle: Bundle.main, value: "Most Low", comment: "statistics most low day tile title")
+    }()
+
+    static let statisticsMostHigh = {
+        return NSLocalizedString("common_statistics_mostHigh", tableName: filename, bundle: Bundle.main, value: "Most High", comment: "statistics most high day tile title")
+    }()
+
+    static let statisticsNoDataTitle = {
+        return NSLocalizedString("common_statistics_noDataTitle", tableName: filename, bundle: Bundle.main, value: "No Statistics Available", comment: "statistics empty state title")
+    }()
+
+    static let statisticsNoDataMessage = {
+        return NSLocalizedString("common_statistics_noDataMessage", tableName: filename, bundle: Bundle.main, value: "There is not enough stored CGM data for this period.", comment: "statistics empty state message")
+    }()
+
+    static let reportGenerateTitle = {
+        return NSLocalizedString("common_report_generateTitle", tableName: filename, bundle: Bundle.main, value: "Generate Report", comment: "generate report screen title and button")
+    }()
+
+    static let reportGeneratingStatus = {
+        return NSLocalizedString("common_report_generatingStatus", tableName: filename, bundle: Bundle.main, value: "Generating clinical report...", comment: "generate report progress message")
+    }()
+
+    static let reportGenerationFailedTitle = {
+        return NSLocalizedString("common_report_generationFailedTitle", tableName: filename, bundle: Bundle.main, value: "Report generation failed", comment: "generate report failure alert title")
+    }()
+
+    static let reportPatientName = {
+        return NSLocalizedString("common_report_patientName", tableName: filename, bundle: Bundle.main, value: "Patient Name", comment: "generate report patient name row")
+    }()
+
+    static let reportPatientNamePlaceholder = {
+        return NSLocalizedString("common_report_patientNamePlaceholder", tableName: filename, bundle: Bundle.main, value: "Patient name", comment: "generate report patient name placeholder")
+    }()
+
+    static let reportPatientID = {
+        return NSLocalizedString("common_report_patientID", tableName: filename, bundle: Bundle.main, value: "Patient ID", comment: "generate report patient id row")
+    }()
+
+    static let reportPatientIDPlaceholder = {
+        return NSLocalizedString("common_report_patientIDPlaceholder", tableName: filename, bundle: Bundle.main, value: "Medical record / patient ID", comment: "generate report patient id placeholder")
+    }()
+
+    static let reportNotSet = {
+        return NSLocalizedString("common_report_notSet", tableName: filename, bundle: Bundle.main, value: "Not Set", comment: "generate report unset row placeholder")
+    }()
+
+    static let reportPatientSection = {
+        return NSLocalizedString("common_report_patientSection", tableName: filename, bundle: Bundle.main, value: "Patient", comment: "generate report patient section title")
+    }()
+
+    static let reportPatientFooter = {
+        return NSLocalizedString("common_report_patientFooter", tableName: filename, bundle: Bundle.main, value: "Patient details are stored locally on this device and printed in the report header.", comment: "generate report patient section footer")
+    }()
+
+    static let reportPeriod = {
+        return NSLocalizedString("common_report_period", tableName: filename, bundle: Bundle.main, value: "Report Period", comment: "generate report period row and screen title")
+    }()
+
+    static let reportPaperSize = {
+        return NSLocalizedString("common_report_paperSize", tableName: filename, bundle: Bundle.main, value: "Paper Size", comment: "generate report paper size row and screen title")
+    }()
+
+    static let reportLanguage = {
+        return NSLocalizedString("common_report_language", tableName: filename, bundle: Bundle.main, value: "Language", comment: "generate report language row and screen title")
+    }()
+
+    static let reportPasswordToOpen = {
+        return NSLocalizedString("common_report_passwordToOpen", tableName: filename, bundle: Bundle.main, value: "Password to Open", comment: "generate report password row and screen title")
+    }()
+
+    static let reportNone = {
+        return NSLocalizedString("common_report_none", tableName: filename, bundle: Bundle.main, value: "None", comment: "generate report none placeholder")
+    }()
+
+    static let reportOptions = {
+        return NSLocalizedString("common_report_options", tableName: filename, bundle: Bundle.main, value: "Report Options", comment: "generate report options section title")
+    }()
+
+    static let reportWillBePasswordProtected = {
+        return NSLocalizedString("common_report_willBePasswordProtected", tableName: filename, bundle: Bundle.main, value: "Report will be password protected", comment: "generate report password enabled status")
+    }()
+
+    static let reportWillNotBePasswordProtected = {
+        return NSLocalizedString("common_report_willNotBePasswordProtected", tableName: filename, bundle: Bundle.main, value: "Report will not be password protected", comment: "generate report password disabled status")
+    }()
+
+    static let reportPasswordFieldPlaceholder = {
+        return NSLocalizedString("common_report_passwordFieldPlaceholder", tableName: filename, bundle: Bundle.main, value: "Password to open PDF", comment: "generate report password field placeholder")
+    }()
+
+    static let reportPasswordConfirmationPlaceholder = {
+        return NSLocalizedString("common_report_passwordConfirmationPlaceholder", tableName: filename, bundle: Bundle.main, value: "Enter password again", comment: "generate report confirm password field placeholder")
+    }()
+
+    static let reportPasswordFooter = {
+        return NSLocalizedString("common_report_passwordFooter", tableName: filename, bundle: Bundle.main, value: "This password is only used for the next generated PDF and is not stored.", comment: "generate report password editor footer")
+    }()
+
+    static let reportNotEnoughData = {
+        return NSLocalizedString("common_report_notEnoughData", tableName: filename, bundle: Bundle.main, value: "Not enough data", comment: "generate report unavailable period message")
+    }()
+
+    static let reportUnableToPrepareTitle = {
+        return NSLocalizedString("common_report_unableToPrepareTitle", tableName: filename, bundle: Bundle.main, value: "Unable to prepare report", comment: "report preview share preparation failure title")
+    }()
+
+    static let reportShareAccessibility = {
+        return NSLocalizedString("common_report_shareAccessibility", tableName: filename, bundle: Bundle.main, value: "Share Report", comment: "report preview share button accessibility label")
+    }()
+
+    static let reportPeriodTitleFormat = {
+        return NSLocalizedString("common_report_periodTitleFormat", tableName: filename, bundle: Bundle.main, value: "%d day Report", comment: "report preview title without patient, parameter is report period days")
+    }()
+
+    static let reportPatientPeriodTitleFormat = {
+        return NSLocalizedString("common_report_patientPeriodTitleFormat", tableName: filename, bundle: Bundle.main, value: "%@'s %@", comment: "report preview title with patient and period title")
+    }()
+
+    static let reportPasswordProtectionOpenError = {
+        return NSLocalizedString("common_report_passwordProtectionOpenError", tableName: filename, bundle: Bundle.main, value: "The report PDF could not be opened for password protection.", comment: "report preview password protection source PDF open error")
+    }()
+
+    static let reportPasswordProtectionWriteError = {
+        return NSLocalizedString("common_report_passwordProtectionWriteError", tableName: filename, bundle: Bundle.main, value: "The password-protected report PDF could not be created.", comment: "report preview password protection write error")
     }()
     
     static let dontShowAgain = {

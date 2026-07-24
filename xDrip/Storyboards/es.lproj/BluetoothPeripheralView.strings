@@ -30,7 +30,11 @@
 "confirmDisconnectTitle" = "Confirmar Desconexión";
 "confirmDisconnectMessage" = "Haz click en 'Desconectar' para confirmar que deseas desconectar el transmisor.";
 "warmingUpUntil" = "Calentando hasta";
-"useOtherDexcomApp" = "Usar con otras apps";
+"useOtherDexcomApp" = "Modo de coexistencia";
+"useOtherDexcomAppCoexistenceFooter" = "El modo de coexistencia nos permite funcionar con otra app, como Dexcom o CamAPS. Esa app debe seguir ejecutándose en segundo plano.";
+"useOtherDexcomAppPrimaryFooter" = "El modo principal se conecta como app principal y controla la conexión.";
+"runningInCoexistenceMode" = "Funcionando en modo de coexistencia";
+"runningInPrimaryMode" = "Funcionando en modo principal";
 "sensorStartDate" = "Sensor iniciado";
 "transmittterStartDate" = "Transmisor iniciado";
 

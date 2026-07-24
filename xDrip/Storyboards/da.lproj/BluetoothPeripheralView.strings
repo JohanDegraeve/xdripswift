@@ -31,7 +31,11 @@
 "confirmDisconnectMessage" = "Click 'Disconnect' to confirm that you really want to disconnect from the transmitter.";
 "transmittterStartDate" = "Transmitter Started";
 "sensorStartDate" = "Sensor Started";
-"useOtherDexcomApp" = "Use With Other App";
+"useOtherDexcomApp" = "Sameksistenstilstand";
+"useOtherDexcomAppCoexistenceFooter" = "Sameksistenstilstand lader os arbejde sammen med en anden app, f.eks. Dexcom eller CamAPS. Den app skal fortsat køre i baggrunden.";
+"useOtherDexcomAppPrimaryFooter" = "Primær tilstand forbinder som hovedappen og styrer forbindelsen.";
+"runningInCoexistenceMode" = "Kører i sameksistenstilstand";
+"runningInPrimaryMode" = "Kører i primær tilstand";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////

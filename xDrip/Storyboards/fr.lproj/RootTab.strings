@@ -1,0 +1,6 @@
+/* Root tab titles. */
+"rootTab.home" = "Accueil";
+"rootTab.treatments" = "Soins";
+"rootTab.statistics" = "Stats";
+"rootTab.devices" = "Appareils";
+"rootTab.settings" = "Réglages";

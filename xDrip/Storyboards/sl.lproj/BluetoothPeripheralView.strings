@@ -95,7 +95,11 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Use With Other App";
+"useOtherDexcomApp" = "Način soobstoja";
+"useOtherDexcomAppCoexistenceFooter" = "Način soobstoja nam omogoča delovanje z drugo aplikacijo, na primer Dexcom ali CamAPS. Ta aplikacija mora še naprej delovati v ozadju.";
+"useOtherDexcomAppPrimaryFooter" = "Primarni način se poveže kot glavna aplikacija in nadzoruje povezavo.";
+"runningInCoexistenceMode" = "Deluje v načinu soobstoja";
+"runningInPrimaryMode" = "Deluje v primarnem načinu";
 
 /// Disconnect transmitter, title
 "confirmDisconnectTitle" = "Confirm Disconnect";

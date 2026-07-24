@@ -1,163 +1,116 @@
 import Foundation
 import os
-import CoreData
 
-/// housekeeping like remove old readings from coredata
-class HouseKeeper {
-    
-    // MARK: - private properties
-    
-    /// for logging
-    private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryHouseKeeper)
-    
-    /// BgReadingsAccessor instance
-    private var bgReadingsAccessor:BgReadingsAccessor
-    
-    /// CalibrationsAccessor instance
-    private var calibrationsAccessor:CalibrationsAccessor
-    
-    /// TreatmentEntryAccessor instance
-    private var treatmentsEntryAccessor: TreatmentEntryAccessor
-    
-    /// CoreDataManager instance
-    private var coreDataManager: CoreDataManager
+/// Removes historical Core Data records according to the user's automatic retention policy.
+final class HouseKeeper {
+    private static let minimumRunInterval: TimeInterval = 24 * 60 * 60
 
-    // up to which date shall we delete old calibrations
-    private var toDate: Date
+    private let service: DataManagementService
+    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryHouseKeeper)
 
-    // MARK: - intializer
-    
     init(coreDataManager: CoreDataManager) {
-        
-        self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
-        
-        self.calibrationsAccessor = CalibrationsAccessor(coreDataManager: coreDataManager)
-        
-        self.treatmentsEntryAccessor = TreatmentEntryAccessor(coreDataManager: coreDataManager)
-        
-        self.coreDataManager = coreDataManager
-        
-        self.toDate = Date(timeIntervalSinceNow: -Double(UserDefaults.standard.retentionPeriodInDays*24*3600))
-        
+        service = DataManagementService(coreDataManager: coreDataManager)
     }
-    
-    // MARK: - public functions
-    
-    /// - housekeeping activities to be done only once per app start up like delete old readings and calibrations in CoreData
-    /// - cleanups are done asynchronously (ie function returns without waiting for the actual deletions
-    public func doAppStartUpHouseKeeping() {
-        
-        // create private managed object context
-        let managedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        managedObjectContext.parent = coreDataManager.mainManagedObjectContext
 
-        // delete old readings on the private managedObjectContext, asynchronously
-        managedObjectContext.perform {
-            
-            // delete old readings
-            self.deleteOldReadings(on: managedObjectContext)
-            
+    /// Starts housekeeping when it is enabled and has not already been attempted in the last day.
+    func doAppStartUpHouseKeeping() {
+        let defaults = UserDefaults.standard
+        guard defaults.automaticHousekeepingEnabled else {
+            trace(
+                "in doAppStartUpHouseKeeping, automatic housekeeping is disabled",
+                log: log,
+                category: ConstantsLog.categoryHouseKeeper,
+                type: .info
+            )
+            return
         }
-        
-        // delete old calibrations on the private managedObjectContext, asynchronously
-        managedObjectContext.perform {
-            
-            // delete old calibrations
-            self.deleteOldCalibrations(on: managedObjectContext)
-            
-        }
-        
-        // delete delete OldTreatments on the private managedObjectContext, asynchronously
-        managedObjectContext.perform {
-            
-            // delete  delete OldTreatments
-            self.deleteOldTreatments(on: managedObjectContext)
-            
-        }
-        
-    }
-    
-    // MARK: - private functions
-    
-    /// deletes old readings. Readings older than ConstantsHousekeeping.retentionPeriodBgReadingsAndCalibrationsAndTreatmentsInDays will be deleted
-    ///     - managedObjectContext : the ManagedObjectContext to use
-    private func deleteOldReadings(on managedObjectContext: NSManagedObjectContext) {
-        
-        // get old readings to delete
-        let oldReadings = self.bgReadingsAccessor.getBgReadings(from: nil, to: self.toDate, on: managedObjectContext)
-        
-        if oldReadings.count > 0 {
-            
-            trace("in deleteOldReadings, number of bg readings to delete : %{public}@, to date = %{public}@", log: self.log, category: ConstantsLog.categoryHouseKeeper, type: .info, oldReadings.count.description, self.toDate.description(with: .current))
-            
-        }
-        
-        // delete them
-        for oldReading in oldReadings {
-            
-            bgReadingsAccessor.delete(bgReading: oldReading, on: managedObjectContext)
-            
-            coreDataManager.saveChanges()
-            
-        }
-        
-    }
-    
-    /// deletes old calibrations. Readings older than ConstantsHousekeeping.retentionPeriodBgReadingsAndCalibrationsAndTreatmentsInDays will be deleted
-    private func deleteOldCalibrations(on managedObjectContext: NSManagedObjectContext) {
-        
-        // get old calibrations to delete
-        let oldCalibrations = self.calibrationsAccessor.getCalibrations(from: nil, to: self.toDate, on: managedObjectContext)
-        
-        if oldCalibrations.count > 0 {
-            
-            trace("in deleteOldCalibrations, number of calibrations candidate for deletion : %{public}@, to date = %{public}@", log: self.log, category: ConstantsLog.categoryHouseKeeper, type: .info, oldCalibrations.count.description, self.toDate.description(with: .current))
-            
-        }
-        
-        // for each calibration that doesn't have any bg readings anymore, delete it
-        for oldCalibration in oldCalibrations {
 
-            if (oldCalibration.bgreadings.count > 0 ) {
+        let retentionPeriodInDays = defaults.retentionPeriodInDays
+        guard shouldRun(retentionPeriodInDays: retentionPeriodInDays, defaults: defaults) else { return }
 
-                trace("in deleteOldCalibrations, calibration with date %{public}@ will not be deleted beause there's still %{public}@ bgreadings", log: self.log, category: ConstantsLog.categoryHouseKeeper, type: .info, oldCalibration.timeStamp.description(with: .current), oldCalibration.bgreadings.count.description)
+        let startedAt = Date()
+        defaults.lastHousekeepingAttemptDate = startedAt
+        defaults.lastHousekeepingAttemptRetentionPeriodInDays = retentionPeriodInDays
+        let throughDate = Calendar.current.date(
+            byAdding: .day,
+            value: -retentionPeriodInDays,
+            to: startedAt
+        ) ?? startedAt
+        trace(
+            "in doAppStartUpHouseKeeping, starting. retention period = %{public}@ days",
+            log: log,
+            category: ConstantsLog.categoryHouseKeeper,
+            type: .info,
+            retentionPeriodInDays.description
+        )
 
-            } else {
+        Task(priority: .utility) {
+            do {
+                let counts: (bgReadings: Int, treatments: Int, calibrations: Int)
+                do {
+                    let plan = try await service.deletionPlan(
+                        selection: CleanDataSelection(
+                            includesBgReadings: true,
+                            includesTreatments: true
+                        ),
+                        rangeMode: .keepRecent,
+                        fromDate: nil,
+                        throughDate: throughDate
+                    )
+                    let result = try await service.delete(plan: plan)
+                    counts = (
+                        result.bgReadingCount,
+                        result.treatmentCount,
+                        result.calibrationCount
+                    )
+                } catch CleanDataError.noMatchingData {
+                    counts = (0, 0, 0)
+                }
 
-                calibrationsAccessor.delete(calibration: oldCalibration, on: managedObjectContext)
-                
-                coreDataManager.saveChanges()
-
+                storeCompletion(
+                    at: Date(),
+                    retentionPeriodInDays: retentionPeriodInDays,
+                    counts: counts,
+                    defaults: defaults
+                )
+                trace(
+                    "in doAppStartUpHouseKeeping, completed. duration = %{public}@ ms, BG readings = %{public}@, treatments = %{public}@, unused calibrations = %{public}@",
+                    log: log,
+                    category: ConstantsLog.categoryHouseKeeper,
+                    type: .info,
+                    Int(Date().timeIntervalSince(startedAt) * 1000).description,
+                    counts.bgReadings.description,
+                    counts.treatments.description,
+                    counts.calibrations.description
+                )
+            } catch {
+                trace(
+                    "in doAppStartUpHouseKeeping, failed. error = %{public}@",
+                    log: log,
+                    category: ConstantsLog.categoryHouseKeeper,
+                    type: .error,
+                    String(describing: type(of: error))
+                )
             }
-            
         }
-        
     }
-    
-    /// deletes old treatments. Treatments older than ConstantsHousekeeping.retentionPeriodBgReadingsAndCalibrationsAndTreatmentsInDays will be deleted
-    ///     - managedObjectContext : the ManagedObjectContext to use
-    private func deleteOldTreatments(on managedObjectContext: NSManagedObjectContext) {
-        
-        // get old treatments to delete
-        let oldTreatments = self.treatmentsEntryAccessor.getTreatments(fromDate: nil, toDate: Date(timeIntervalSinceNow: -Double(UserDefaults.standard.retentionPeriodInDays*24*3600)), on: managedObjectContext)
-        
-        if oldTreatments.count > 0 {
-            
-            trace("in deleteOldTreatments, number of treatments to delete : %{public}@, to date = %{public}@", log: self.log, category: ConstantsLog.categoryHouseKeeper, type: .info, oldTreatments.count.description, self.toDate.description(with: .current))
-            
-        }
-        
-        // delete them
-        for oldTreatment in oldTreatments {
-            
-            treatmentsEntryAccessor.delete(treatmentEntry: oldTreatment, on: managedObjectContext)
-            
-            coreDataManager.saveChanges()
-            
-        }
-        
+
+    private func shouldRun(retentionPeriodInDays: Int, defaults: UserDefaults) -> Bool {
+        guard let lastAttemptDate = defaults.lastHousekeepingAttemptDate else { return true }
+        guard defaults.lastHousekeepingAttemptRetentionPeriodInDays == retentionPeriodInDays else { return true }
+        return Date().timeIntervalSince(lastAttemptDate) >= Self.minimumRunInterval
     }
-    
 
-
+    private func storeCompletion(
+        at date: Date,
+        retentionPeriodInDays: Int,
+        counts: (bgReadings: Int, treatments: Int, calibrations: Int),
+        defaults: UserDefaults
+    ) {
+        defaults.lastHousekeepingDate = date
+        defaults.lastHousekeepingRetentionPeriodInDays = retentionPeriodInDays
+        defaults.lastHousekeepingBgReadingsDeleted = counts.bgReadings
+        defaults.lastHousekeepingTreatmentsDeleted = counts.treatments
+        defaults.lastHousekeepingCalibrationsDeleted = counts.calibrations
+    }
 }

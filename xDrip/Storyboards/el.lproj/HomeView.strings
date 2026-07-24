@@ -59,7 +59,7 @@
 "sensorDuration" = "Sensor Duration";
 
 /// nightscout is not enabled
-"nightscoutURLMissing" = "Nightscout URL missing";
+"nightscoutURLMissing" = "URL missing";
 
 /// ask the user to disconnect and reconnect the sensor
 "reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
@@ -69,3 +69,39 @@
 
 /// no data source is enabled or connected
 "noDataSourceConnected" = "No CGM data source connected";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "Απομένουν %@";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+
+"sensorManagementNoiseTitle" = "Θόρυβος αισθητήρα";
+"sensorManagementNoiseShortTerm" = "Τελευταία 30 λεπτά";
+"sensorManagementNoiseLongTerm" = "Τελευταίες 4 ώρες";
+"sensorManagementNoiseCollecting" = "Συλλογή δεδομένων";
+"sensorManagementNoiseLow" = "Χαμηλός";
+"sensorManagementNoiseElevated" = "Αυξημένος";
+"sensorManagementNoiseVeryHigh" = "Πολύ υψηλός";
+"sensorManagementNoiseExtreme" = "Ακραίος";
+"sensorManagementNoiseFlatline" = "Ο αισθητήρας πιθανότατα απέτυχε.";
+"sensorManagementNoiseFooter" = "Επιλεγμένη ευαισθησία: %@";
+"sensorNoiseWarningExtremeTitle" = "Ακραίος θόρυβος αισθητήρα";
+"sensorNoiseWarningPersistentTitle" = "Επίμονος θόρυβος αισθητήρα";
+"sensorNoiseWarningFlatlineTitle" = "Το σήμα του αισθητήρα είναι επίπεδο";
+"sensorNoiseHistoryTitle" = "Ιστορικό θορύβου";
+"sensorNoiseHistoryCurrentTitle" = "Τρέχουσες μετρήσεις";
+"sensorNoiseHistoryChartTitle" = "Θόρυβος με την πάροδο του χρόνου";
+"sensorNoiseHistoryRangeTitle" = "Χρονικό εύρος";
+"sensorNoiseHistoryDayRange" = "24 ώρ.";
+"sensorNoiseHistoryThreeDayRange" = "3 ημ.";
+"sensorNoiseHistoryWeekRange" = "7 ημ.";
+"sensorNoiseHistoryAllRange" = "Όλα";
+"sensorNoiseHistoryShortCompact" = "30 λεπ.";
+"sensorNoiseHistoryLongCompact" = "4 ώρ.";
+"sensorNoiseHistoryLoading" = "Δημιουργία ιστορικού αισθητήρα";
+"sensorNoiseHistoryNoDataTitle" = "Δεν υπάρχουν ακόμη αρκετά δεδομένα θορύβου";
+"sensorNoiseHistoryNoDataMessage" = "Το γράφημα θα εμφανιστεί αφού συλλεχθούν αρκετές ενδείξεις αισθητήρα.";
+"sensorNoiseHistoryFooter" = "Το γράφημα δείχνει την υπολειπόμενη διακύμανση του αισθητήρα σε αυτή τη συνεδρία. Οι χαμηλότερες τιμές σημαίνουν ομαλότερο σήμα. Δεν μετρά την ακρίβεια της γλυκόζης.";
+"sensorNoiseHistoryChartAccessibility" = "Γράφημα ιστορικού θορύβου αισθητήρα";
+"pumpBattery" = "Μπαταρία";
+"pumpReservoir" = "Δεξαμενή";

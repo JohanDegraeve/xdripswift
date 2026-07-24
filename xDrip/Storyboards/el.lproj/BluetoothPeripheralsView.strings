@@ -2,8 +2,9 @@
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-"screenTitle" = "Bluetooth";
-"selectCategory" = "Select Device Type";
+"screenTitle" = "Συσκευές";
+"selectCategory" = "Επιλέξτε τύπο";
 "selectType" = "Select Transmitter Type";
 "batteryLevel" = "Battery Level";
+"noBluetoothPeripheralsConfigured" = "Δεν έχουν ρυθμιστεί συσκευές Bluetooth";
 "noMultipleActiveCGMsAllowed" = "You already have one CGM transmitter connected.\n\nVerify your other CGM transmitters and click 'Stop Scanning', 'Disconnect' or just delete them if needed.";

@@ -74,7 +74,7 @@
 "sensorDuration" = "Sensor Duration";
 
 /// nightscout is not enabled
-"nightscoutURLMissing" = "Nightscout URL missing";
+"nightscoutURLMissing" = "URL missing";
 
 /// ask the user to disconnect and reconnect the sensor
 "reconnectLibreDataSource" = "Disconnect and reconnect Libre sensor";
@@ -84,3 +84,39 @@
 
 /// no data source is enabled or connected
 "noDataSourceConnected" = "No CGM data source connected";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "%@ resterend";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+
+"sensorManagementNoiseTitle" = "Sensorruis";
+"sensorManagementNoiseShortTerm" = "Afgelopen 30 minuten";
+"sensorManagementNoiseLongTerm" = "Afgelopen 4 uur";
+"sensorManagementNoiseCollecting" = "Gegevens verzamelen";
+"sensorManagementNoiseLow" = "Laag";
+"sensorManagementNoiseElevated" = "Verhoogd";
+"sensorManagementNoiseVeryHigh" = "Zeer hoog";
+"sensorManagementNoiseExtreme" = "Extreem";
+"sensorManagementNoiseFlatline" = "De sensor is waarschijnlijk defect.";
+"sensorManagementNoiseFooter" = "Geselecteerde gevoeligheid: %@";
+"sensorNoiseWarningExtremeTitle" = "Extreme sensorruis";
+"sensorNoiseWarningPersistentTitle" = "Aanhoudende sensorruis";
+"sensorNoiseWarningFlatlineTitle" = "Het sensorsignaal is vlak";
+"sensorNoiseHistoryTitle" = "Ruisgeschiedenis";
+"sensorNoiseHistoryCurrentTitle" = "Huidige metingen";
+"sensorNoiseHistoryChartTitle" = "Ruis in de tijd";
+"sensorNoiseHistoryRangeTitle" = "Tijdsbereik";
+"sensorNoiseHistoryDayRange" = "24 u";
+"sensorNoiseHistoryThreeDayRange" = "3 d";
+"sensorNoiseHistoryWeekRange" = "7 d";
+"sensorNoiseHistoryAllRange" = "Alles";
+"sensorNoiseHistoryShortCompact" = "30 min";
+"sensorNoiseHistoryLongCompact" = "4 u";
+"sensorNoiseHistoryLoading" = "Sensorgeschiedenis wordt opgebouwd";
+"sensorNoiseHistoryNoDataTitle" = "Nog niet genoeg ruisgegevens";
+"sensorNoiseHistoryNoDataMessage" = "De grafiek verschijnt nadat voldoende sensormetingen zijn verzameld.";
+"sensorNoiseHistoryFooter" = "De grafiek toont resterende sensorfluctuatie tijdens deze sensorsessie. Lagere waarden betekenen een rustiger signaal. De grafiek meet niet de nauwkeurigheid van glucosewaarden.";
+"sensorNoiseHistoryChartAccessibility" = "Grafiek met de sensorruisgeschiedenis";
+"pumpBattery" = "Batterij";
+"pumpReservoir" = "Reservoir";

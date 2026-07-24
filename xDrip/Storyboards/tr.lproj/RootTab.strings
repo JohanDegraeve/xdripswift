@@ -1,0 +1,5 @@
+/* Root tab titles. */
+"rootTab.home" = "Ana Ekran";
+"rootTab.treatments" = "Tedaviler";
+"rootTab.devices" = "Cihazlar";
+"rootTab.settings" = "Ayarlar";

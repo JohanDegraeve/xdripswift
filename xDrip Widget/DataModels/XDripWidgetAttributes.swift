@@ -54,6 +54,7 @@ struct XDripWidgetAttributes: ActivityAttributes {
         var liveActivityType: LiveActivityType
         var dataSourceDescription: String
         var followerPatientName: String?
+        var sensorNoiseStateRawValue: Int?
         
         var deviceStatusCreatedAt: Date?
         var deviceStatusLastLoopDate: Date?
@@ -63,20 +64,20 @@ struct XDripWidgetAttributes: ActivityAttributes {
         }
         /// the latest bg reading
         var bgValueInMgDl: Double? {
-            bgReadingValues[0]
+            bgReadingValues.first
         }
         /// the latest bg reading date
         var bgReadingDate: Date? {
-            bgReadingDates[0]
+            bgReadingDates.first
         }
 
-        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, dataSourceDescription: String? = "", followerPatientName: String? = nil, deviceStatusCreatedAt: Date?, deviceStatusLastLoopDate: Date?) {
-        
-            self.bgReadingFloats = bgReadingValues.map(Float16.init)
+        init(bgReadingValues: [Double], bgReadingDates: [Date], isMgDl: Bool, slopeOrdinal: Int, deltaValueInUserUnit: Double?, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType, dataSourceDescription: String? = "", followerPatientName: String? = nil, sensorNoiseStateRawValue: Int? = nil, deviceStatusCreatedAt: Date?, deviceStatusLastLoopDate: Date?) {
+            let readings = Array(zip(bgReadingValues, bgReadingDates))
+            self.bgReadingFloats = readings.map { Float16($0.0) }
 
-            let firstDate = bgReadingDates.last ?? .now
+            let firstDate = readings.last?.1 ?? .now
             self.firstDate = firstDate
-            self.secondsSinceFirstDate = bgReadingDates.map { UInt16(truncatingIfNeeded: Int($0.timeIntervalSince(firstDate))) }
+            self.secondsSinceFirstDate = readings.map { UInt16(truncatingIfNeeded: Int($0.1.timeIntervalSince(firstDate))) }
             
             self.isMgDl = isMgDl
             self.slopeOrdinal = slopeOrdinal
@@ -88,9 +89,37 @@ struct XDripWidgetAttributes: ActivityAttributes {
             self.liveActivityType = liveActivityType
             self.dataSourceDescription = dataSourceDescription ?? ""
             self.followerPatientName = followerPatientName
+            self.sensorNoiseStateRawValue = sensorNoiseStateRawValue
             
             self.deviceStatusCreatedAt = deviceStatusCreatedAt
             self.deviceStatusLastLoopDate = deviceStatusLastLoopDate
+        }
+
+        /// Reduces chart history until the encoded state fits safely below ActivityKit's payload limit.
+        func limitedForActivityPayload(maximumEncodedBytes: Int) -> ContentState {
+            var limitedState = self
+            let maximumDescriptionCharacters = 80
+
+            limitedState.dataSourceDescription = String(limitedState.dataSourceDescription.prefix(maximumDescriptionCharacters))
+            if let followerPatientName = limitedState.followerPatientName {
+                limitedState.followerPatientName = String(followerPatientName.prefix(maximumDescriptionCharacters))
+            }
+
+            while limitedState.bgReadingFloats.count > 2 {
+                let encodedByteCount = (try? JSONEncoder().encode(limitedState).count) ?? Int.max
+                guard encodedByteCount > maximumEncodedBytes else { break }
+
+                let sourceCount = limitedState.bgReadingFloats.count
+                let targetCount = max(2, sourceCount * 3 / 4)
+                let indexes = (0 ..< targetCount).map { index in
+                    index * (sourceCount - 1) / (targetCount - 1)
+                }
+
+                limitedState.bgReadingFloats = indexes.map { limitedState.bgReadingFloats[$0] }
+                limitedState.secondsSinceFirstDate = indexes.map { limitedState.secondsSinceFirstDate[$0] }
+            }
+
+            return limitedState
         }
         
         /// returns blood glucose value as a string in the user-defined measurement unit. Will check and display also high, low and error texts as required.
@@ -204,6 +233,23 @@ struct XDripWidgetAttributes: ActivityAttributes {
                 return ""
             }
         }
+
+        func sensorNoiseIndicatorColor() -> Color? {
+            switch sensorNoiseStateRawValue {
+            case 0:
+                return Color(.systemGray)
+            case 1:
+                return .green
+            case 2:
+                return .yellow
+            case 3:
+                return .orange
+            case 4, 5:
+                return .red
+            default:
+                return nil
+            }
+        }
                 
         func deviceStatusColor() -> Color? {
             if let lastLoopDate = deviceStatusLastLoopDate, let createdAt = deviceStatusCreatedAt {
@@ -224,13 +270,13 @@ struct XDripWidgetAttributes: ActivityAttributes {
         func deviceStatusIconImage() -> Image? {
             if let lastLoopDate = deviceStatusLastLoopDate, let createdAt = deviceStatusCreatedAt {
                 if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-                    return Image(systemName: "checkmark.circle.fill")
+                    return Image(systemName: ConstantsHomeView.loopStatusRecentSystemImage)
                 } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                    return Image(systemName: "checkmark.circle")
+                    return Image(systemName: ConstantsHomeView.loopStatusAcceptableSystemImage)
                 } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-                    return Image(systemName: "questionmark.circle")
+                    return Image(systemName: ConstantsHomeView.loopStatusNotLoopingSystemImage)
                 } else {
-                    return Image(systemName: "exclamationmark.circle")
+                    return Image(systemName: ConstantsHomeView.loopStatusNoDataSystemImage)
                 }
             } else {
                 return nil

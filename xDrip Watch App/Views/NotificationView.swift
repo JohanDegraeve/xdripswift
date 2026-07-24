@@ -29,7 +29,7 @@ struct NotificationView: View {
     var bgReadingDate: Date?
     var bgValueStringInUserChosenUnit: String?
         
-    let isSmallScreen = WKInterfaceDevice.current().screenBounds.size.width < ConstantsAppleWatch.pixelWidthLimitForSmallScreen ? true : false
+    let isSmallScreen = ConstantsAppleWatch.isSmallScreen()
     
     var body: some View {
         VStack(alignment: .center, spacing: 0) {

@@ -1,45 +1,57 @@
 "settingsviews_settingstitle" = "الإعدادات";
+"settingsviews_glucoseDisplaySectionTitle" = "عرض الجلوكوز";
+"settingsviews_glucoseRangesSectionTitle" = "نطاقات الجلوكوز";
+"settingsviews_alertsAndNotificationsSectionTitle" = "التنبيهات والإشعارات";
+"settingsviews_sharingAndServicesSectionTitle" = "المشاركة والخدمات";
+"settingsviews_osAidLoopShareSectionTitle" = "مشاركة OS-AID";
+"settingsviews_issueReportSectionTitle" = "تقرير مشكلة";
+"settingsviews_appBannerVersion" = "الإصدار %@";
+"settingsviews_appInstalledSince" = "تم التثبيت";
 "settingsviews_sectiontitleNotifications" = "عام";
 "settingsviews_selectbgunit" = "وحدة قياس السكر";
 "settingsviews_masterorfollower" = "الاستخدام كتطبيق رئيسي أو للمتابعة؟";
 "settingsviews_master" = "رئيسي";
 "settingsviews_follower" = "متابعة";
-"settingsviews_showReadingInNotification" = "عرض قراءات السكر في الإشعارات؟";
-"settingsviews_labelShowReadingInAppBadge" = "عرض قراءة السكر على أيقونة التطبيق؟";
-"settingsviews_multipleAppBadgeValueWith10" = "مضاعفة قراءة أيقونة التطبيق في 10؟";
+"settingsviews_showReadingInNotification" = "إشعارات الغلوكوز";
+"settingsviews_labelShowReadingInAppBadge" = "شارة التطبيق";
+"settingsviews_multipleAppBadgeValueWith10" = "شارة التطبيق x10";
 "settingsviews_urgentHighValue" = "قيمة الحد الأعلى الخطر";
 "settingsviews_highValue" = "القيمة العليا";
 "settingsviews_targetValue" = "قيمة الهدف";
 "settingsviews_lowValue" = "القيمة الدنيا";
 "settingsviews_urgentLowValue" = "قيمة الحد الأدنى الخطر";
-"settingsviews_showcoloredobjectives" = "عرض خطوط ملونة";
-"settingsviews_showtarget" = "عرض خط الهدف";
+"settingsviews_showcoloredobjectives" = "خطوط ملونة";
+"settingsviews_showtarget" = "خط الهدف";
 "settingsviews_sectiontitlestatistics" = "إحصائيات";
 "settingsviews_showStatistics" = "عرض الإحصائيات";
 "settingsviews_daysToUseStatisticsTitle" = "عدد الأيام للاحصائيات";
 "settingsviews_daysToUseStatisticsMessage" = "الحد الأقصى للأيام التي يجب أن نحاول استخدامها لحساب الإحصائيات?\n\n(أدخل 0 لحساب احصائيات اليوم منذ منتصف الليل)";
-"settingsviews_useIFCCA1C" = "اعرض وحدة التراكمي  mmols/mol";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "جهاز الإرسال";
 "settingsviews_transmittertype" = "نوع جهاز الإرسال";
 "settingsviews_transmitterid" = "رقم هوية جهاز الإرسال";
 "settingsviews_transmitterid_text_for_button" = "رقم هوية جهاز الإرسال";
 "settingsviews_givetransmitterid" = "أدخل رقم هوية جهاز الإرسال";
-"settingsviews_nonfixedtransmitter" = "تفعيل المعايرة متعددة النقاط ";
+"settingsviews_nonfixedtransmitter" = "معايرة متعددة النقاط";
 "settingsviews_labelNonFixed" = "المعايرة متعددة النقاط";
 "settingsviews_sectiontitlealerting" = "التنبيهات";
 "settingsviews_row_alert_types" = "أنواع التنبيهات";
 "settingsviews_row_alerts" = "التنبيهات";
+"settingsviews_volume_tests_section_title" = "اختبار صوت التنبيه";
+"settingsviews_alert_types_section_footer" = "تحدد أنواع التنبيهات كيفية عمل التنبيهات، بما في ذلك الصوت والاهتزاز والغفوة وتجاوز وضع الصامت.";
+"settingsviews_alerts_section_footer" = "تحدد التنبيهات متى يجب أن يرسل التطبيق إشعارًا بشأن مستويات الجلوكوز والقراءات المفقودة والحالات الأخرى.";
 "settingsviews_sectiontitlehealthkit" = "تطبيق صحتي";
-"settingsviews_healthkit" = "كتابة البيانات إلى تطبيق صحتي؟";
+"settingsviews_healthkit" = "الكتابة إلى Apple Health";
 "settingsviews_sectiontitledexcomshareupload" = "ديكسكوم شير";
-"settingsviews_uploadReadingstoDexcomShare" = "التحميل إلى ديكسكوم شير؟";
+"settingsviews_uploadReadingstoDexcomShare" = "تحميل";
 "settingsviews_dexcomShareUploadSerialNumber" = "الرمز التسلسلي لجهاز الإستقبال";
-"settingsviews_useUSDexcomShareurl" = "استخدم سيرفرات ديكسكوم الأمريكية؟";
+"settingsviews_useUSDexcomShareurl" = "خوادم US";
 "settingsviews_dexcomShareAccountName" = "اسم الحساب";
 "settingsviews_giveDexcomShareAccountName" = "أدخل اسم الحساب لديكسكوم شير";
 "settingsviews_giveDexcomSharePassword" = "أعط ديكسكوم شير كلمة مرور";
 "settingsviews_givedexcomShareUploadSerialNumber" = "أدخل الرقم التسلسلي لجهاز استقبال ديكسكوم";
 "settingsviews_sectiontitlenightscout" = "نايتسكاوت";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "خيارات الرفع";
 "settingsviews_nightscoutEnabled" = "تفعيل نايتسكاوت؟";
 "settingsviews_nightscoutUrl" = "الرابط";
 "settingsviews_useSchedule" = "استخدام جدولة التحميل؟";
@@ -50,31 +62,27 @@
 "editScheduleTimePickerSubtitle" = "تغيير: ";
 "timeScheduleViewTitle" = "جدولة وقت تفعيل/إغلاق لـ";
 "uploadSensorStartTime" = "تحميل بداية وقت الحساس؟";
-"testUrlAndAPIKey" = "اختبر الاتصال؟";
-"settingsviews_sectiontitlespeak" = "النطق";
-"settingsviews_speakBgReadings" = "نطق قراءات السكر؟";
+"testUrlAndAPIKey" = "اختبار الاتصال";
+"settingsviews_speakBgReadings" = "نطق الغلوكوز";
 "settingsviews_speakBgReadingslanguage" = "اللغة";
 "settingsviews_speakreadingslanguageselection" = "اختر اللغة";
 "settingsviews_speakTrend" = "نطق الاتجاه؟";
 "settingsviews_speakDelta" = "نطق الفرق؟";
 "settingsviews_IntervalTitle" = "الفاصل الزمني";
-"settingsviews_IntervalMessage" = "الفاصل الزمني الأدنى بين قراءتين بالدقائق";
+"settingsviews_IntervalMessage" = "الفاصل الزمني الأدنى بين قراءتين";
 "settingsviews_sectiontitleAbout" = "عن %@";
 "settingsviews_Version" = "الإصدار";
 "settingsviews_license" = "رخصة";
-"settingsviews_build" = "رقم الإصدار";
 "m5stack_settingsviews_settingstitle" = "إعدادات M5 Stack";
 "m5stack_settingsviews_textColor" = "لون الخط";
 "m5stack_settingsviews_backGroundColor" = "لون الخلفية";
 "m5stack_settingsviews_sectiontitlebluetooth" = "بلوتوث";
 "m5stack_settingsviews_giveBluetoothPassword" = "أدخل كلمة المرور للبلوتوث";
 "m5stack_settingsviews_brightness" = "سطوع الشاشة";
-"appleWatchSectionTitle" = "ساعة أبل";
-"createCalendarEvent" = "إنشاء أحداث التقويم؟";
 "calenderId" = "التقويم للاستخدام؟";
-"settingsviews_displayTrendInCalendarEvent" = "عرض الإتجاه؟";
-"displayUnitInCalendarEvent" = "عرض الوحدة؟";
-"displayDeltaInCalendarEvent" = "عرض الفرق؟";
+"settingsviews_displayTrendInCalendarEvent" = "الاتجاه";
+"displayUnitInCalendarEvent" = "الوحدة";
+"displayDeltaInCalendarEvent" = "الفرق";
 "infoCalendarAccessDeniedByUser" = "لقد رفضت الوصول إلى التقويم الخاص بك مسبقًا.\n\nلتمكينه ، انتقل إلى إعدادات جهازك ثم الخصوصية ثم التقويم ثم قم بتمكينه.";
 "infoCalendarAccessRestricted" = "لا يمكنك منح إذن لـ %@ للوصول إلى التقويم الخاص بك. قد يكون هذا بسبب القيود النشطة مثل وجود أدوات الرقابة الأبوية.";
 "sectionTitleTrace" = "الإبلاغ عن المشاكل";
@@ -85,25 +93,25 @@
 "failedToSendEmail" = "فشل في إرسال البريد الإلكتروني";
 "volumeTestSoundPlayerExplanation" = "يتم الآن تشغيل صوت التنبيه بنفس مستوى الصوت الذي سيتم استخدامه لنوع التنبيه مع تفعيل 'تجاوز وضع الصامت'  \ n \ n (يستخدم لجميع الإنذارات باستثناء تنبيهات القراءات المفقودة والتي دائماً تستخدم مستوى الصوت لجهاز.) \ n \ n قم بتغيير مستوى الصوت باستخدام أزرار الصوت واضغط على موافق عند الانتهاء.";
 "volumeTestiOSSoundExplanation" = "يتم الآن تشغيل صوت التنبيه بنفس الحجم الذي سيتم استخدامه لنوع التنبيه مع عدم تفعيل 'تجاوزوضع الصامت' \ n \ n (يستخدم أيضًا دائمًا لإنذارات القراءات المفقودة والتي تستخدم مستوى صوت الجهاز.) \ n \ n اضغط على واحد من أزرار الصوت لإيقاف الصوت ، ثم قم بتغيير مستوى الصوت باستخدام أزرار الصوت إلى مستوى الصوت المطلوب واختبره مرة أخرى.";
-"volumeTestSoundPlayer" = "اختبر مستوى الصوت (في حال تفعيل تجاوز وضع الصامت)";
-"volumeTestiOSSound" = "اختبر مستوى الصوت (مستوى الصوت الحالي للآيفون)";
+"volumeTestSoundPlayer" = "عند تفعيل الوضع الصامت";
+"volumeTestiOSSound" = "عند تعطيل الوضع الصامت";
 "debugLevel" = "تضمين مستوى التصحيح";
 "warningChangeFromMasterToFollower" = "سيؤدي التبديل من رئيسي إلى متابعة، إلى إيقاف الحساس الحالي. هل تريد الاستمرار ?";
 "nightscoutPort" = "المنفذ (اختياري)";
-"developerSettings" = "إعدادات المطور";
-"smoothLibreValues" = "تناسق قيم اليبري ?";
+"developerSettings" = "الإعدادات المتقدمة";
+"showDeveloperSettings" = "إظهار";
+"preferSensorCountdown" = "تفضيل العد التنازلي لعمر المستشعر";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "عمر المستشعر";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "يتحكم في عرض عمر المستشعر كوقت منقضٍ أو كعد تنازلي على iPhone وApple Watch.";
 "nslog" = "NSتقرير";
 "oslog" = "OSتقرير";
 "settingsviews_sectiontitlehomescreen" = "الشاشة الرئيسية";
-"settingsviews_showClockWhenScreenIsLocked" = "عرض الساعة عند القفل؟";
-"settingsviews_translateOnlineHelp" = "هل تريد الترجمة تلقائيًا؟";
-"settingsviews_allowScreenRotation" = "السماح بإلتفاف المخطط؟";
-"settingsviews_sectiontitlehelp" = "المساعدة والتوثيق";
-"calendarEventsSectionTitle" = "أحداث التقويم";
+"settingsviews_showClockWhenScreenIsLocked" = "ساعة شاشة القفل";
+"settingsviews_translateOnlineHelp" = "ترجمة الوثائق";
+"settingsviews_allowScreenRotation" = "تدوير المخطط";
 "settingsviews_showOnlineHelp" = "فتح المساعدة عبر الإنترنت؟";
-"settingsviews_webooptransmitter" = "استخدام خوارزمية جهاز الإرسال؟";
+"settingsviews_webooptransmitter" = "خوارزمية جهاز الإرسال";
 "settingsviews_labelWebOOP" = "خوارزمية xDrip أو جهاز الإرسال";
-"settingsviews_restartNeeded" = "(مطلوب إعادة التشغيل) ";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -122,8 +130,6 @@
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-/// Button to export all data
-"settingsviews_housekeeperExportAllData" = "Export All Data";
 
 /// Housekeeper settings, section title
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
@@ -132,7 +138,7 @@
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 
 /// Housekeeper retention period, for how long to store data
-"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days)";
+"settingsviews_housekeeperRetentionPeriod" = "Retention Period";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -142,16 +148,16 @@
 "Select Time" = "Select Time";
 
 /// transmitter settings, to explain that the reset option only works for certain transmitters
-"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
+"settingsviews_resetDexcomTransmitterMessage" = "This option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
 
 /// data source settings, keep-alive mode is set to aggressive
-"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
+"settingsviews_followerKeepAliveTypeAggressiveMessage" = "إبقاء التشغيل is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
 "settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
-"settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeDisabledMessage" = "إبقاء التشغيل is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
 
 /// Settings screen for loop delay, explanatory text for value
 "expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
@@ -169,10 +175,10 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
 
 /// statistics settings, the type of time in range selected
-"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
-"settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
+"settingsviews_labelfollowerKeepAliveType" = "إبقاء التشغيل";
 
 /// this setting is required
 "settingsviews_valueIsRequired" = "⚠️ Required";
@@ -180,7 +186,6 @@
 /// treatments settings, offset the carb treatments on main chart
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
-"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
 
 /// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
 "warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
@@ -189,7 +194,7 @@
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+"settingsviews_sectionTitleDataSource" = "مصدر البيانات";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";
@@ -198,13 +203,12 @@
 "settingsviews_nightscoutNotEnabledRowText" = "Disabled";
 
 /// data source settings, keep-alive mode is set to use an external heartbeat
-"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Background keep-alive is set to use an external heartbeat. ❤️\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
+"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "إبقاء التشغيل is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
 
 /// When enabled, readings will not be reading to shared user defaults (for loop)
 "suppressLoopShare" = "Suppress Loop Share";
 
 /// When clicking the event interval setting, a pop up asks for minimum number of minutes between two events, this is the pop up message - this is used for setting the interval between two calendar events
-"settingsviews_CalenderIntervalTitle" = "Event Interval";
 
 /// data source settings, enable Nightscout in the Nightscout section
 "settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
@@ -219,13 +223,14 @@
 "settingsviews_libreLinkUpReAcceptNeeded" = "Need to accept terms";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two bg announcements, this is the pop up message - this is used for setting the interval between two readings in BG announcements, Speak readings, Apple Watch
-"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
+"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// home screen settings, should the mini-chart be shown
 "settingsviews_showMiniChart" = "Show Mini-Chart";
+"settingsviews_showSensorNoiseOnChart" = "Show Sensor Noise";
 
 /// data source settings, the name of the person we are following
-"settingsviews_followerPatientName" = "Patient Name";
+"settingsviews_followerPatientName" = "الاسم المستعار";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabled" = "Disabled";
@@ -249,28 +254,222 @@
 "settingsviews_labelFollowerDataSourceRegion" = "Region";
 
 /// data source settings, data source
-"settingsviews_labelFollowerDataSourceType" = "Data Source";
+"settingsviews_labelFollowerDataSourceType" = "مصدر البيانات";
 
 /// data source settings, enable Nightscout upload
 "settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
 
 /// data source settings, ask the user to enter the name of the person we are following if they want to - it's optional
-"settingsviews_followerPatientNameMessage" = "Here you can optionally write the name of the person you are following.";
+"settingsviews_followerPatientNameMessage" = "Here you can optionally write an alias for the person you are following.";
 
 /// follower settings, pop up that asks user to enter their password
 "settingsviews_enterPassword" = "Enter your password";
 
 /// The user needs to update their calendar permissions
-"infoCalendarAccessWriteOnly" = "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.";
 
 /// data source settings, keep-alive mode is set to normal
-"settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeNormalMessage" = "إبقاء التشغيل is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "تعتيم شاشة القفل";
 
 /// Should loop data be shared only every 5 minutes
-"shareToLoopOnceEvery5Minutes" = "Share with OS-AID every 5 mins";
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_dataManagementStorageInfo" = "معلومات التخزين";
+"settingsviews_dataManagementManageData" = "إدارة البيانات";
+"settingsviews_dataManagementDataRetention" = "الاحتفاظ بالبيانات";
+"settingsviews_dataManagementDataDeletion" = "حذف البيانات";
+"settingsviews_dataManagementImportData" = "استيراد البيانات";
+"settingsviews_dataManagementLastHousekeeping" = "آخر تنظيف";
+"settingsviews_storageInfoDatabase" = "قاعدة البيانات";
+"settingsviews_storageInfoDatabaseSize" = "حجم قاعدة البيانات";
+"settingsviews_storageInfoTrackedRecords" = "السجلات المحسوبة";
+"settingsviews_storageInfoDevices" = "الأجهزة";
+"settingsviews_storageInfoSensors" = "المستشعرات";
+"settingsviews_storageInfoRetentionFooter" = "فترة الاحتفاظ بالبيانات المضبوطة هي %d يومًا.";
+"settingsviews_storageInfoHistory" = "السجل الزمني المخزّن";
+"settingsviews_storageInfoEarliestRecord" = "أقدم سجل";
+"settingsviews_storageInfoLatestRecord" = "أحدث سجل";
+"settingsviews_storageInfoCheckingStatus" = "جارٍ فحص التخزين…";
+"settingsviews_nightscoutImportRetentionFooter" = "يقتصر الاستيراد على فترة الاحتفاظ البالغة %d يومًا. يحذف التنظيف البيانات الأقدم.";
+"settingsviews_cleanDataAutomaticHousekeeping" = "تنظيف تلقائي";
+"settingsviews_cleanDataKeepHistoricalData" = "الاحتفاظ بالبيانات السابقة";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "آخر اكتمال";
+"settingsviews_cleanDataLastHousekeepingResult" = "النتيجة الأخيرة";
+"settingsviews_cleanDataNoHousekeepingRequired" = "لا حاجة إلى التنظيف";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "يعمل مرة واحدة يوميًا كحد أقصى عند فتح التطبيق. تُحذف محليًا القراءات والعلاجات والمعايرات غير المستخدمة الأقدم من المدة المحددة.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "لن تُحذف البيانات السابقة إلا يدويًا من حذف البيانات.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "تم حذف سجل واحد (%@)";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "تم حذف %@ سجلات";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "تنظيف البيانات";
+"settingsviews_cleanDataStorageUsed" = "المساحة المستخدمة";
+"settingsviews_cleanDataStoredData" = "البيانات المحفوظة";
+"settingsviews_cleanDataBgReadings" = "قراءات السكر";
+"settingsviews_cleanDataTreatments" = "العلاجات";
+"settingsviews_cleanDataCalibrations" = "المعايرات";
+"settingsviews_cleanDataSelectData" = "البيانات المراد حذفها";
+"settingsviews_cleanDataCleanupMethod" = "طريقة التنظيف";
+"settingsviews_cleanDataKeepRecent" = "الاحتفاظ بالحديثة";
+"settingsviews_cleanDataDateRange" = "نطاق التاريخ";
+"settingsviews_cleanDataDeleteAll" = "حذف الكل";
+"settingsviews_cleanDataKeep" = "احتفاظ";
+"settingsviews_cleanDataFrom" = "من";
+"settingsviews_cleanDataUntil" = "حتى";
+"settingsviews_cleanDataOlderDataFooter" = "ستُحذف البيانات القديمة. ستبقى البيانات الحديثة.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "التاريخان مشمولان.";
+"settingsviews_cleanDataDeleteAllFooter" = "ستُحذف كل البيانات المحددة.";
+"settingsviews_cleanDataContinue" = "متابعة";
+"settingsviews_cleanDataReviewFooter" = "ستراجع الملخص قبل حذف أي بيانات.";
+"settingsviews_cleanDataPermanentDeletion" = "حذف دائم للبيانات";
+"settingsviews_cleanDataCannotUndo" = "لا يمكن التراجع عن هذا الإجراء.";
+"settingsviews_cleanDataUnusedCalibrations" = "المعايرات غير المستخدمة";
+"settingsviews_cleanDataEarliestStoredData" = "أقدم بيانات محفوظة";
+"settingsviews_cleanDataDataToDelete" = "البيانات التي ستُحذف";
+"settingsviews_cleanDataEnterCode" = "أدخل هذا الرمز المكون من ستة أرقام";
+"settingsviews_cleanDataSixDigitCode" = "رمز من ستة أرقام";
+"settingsviews_cleanDataConfirmDelete" = "تأكيد الحذف";
+"settingsviews_cleanDataSuccessfullyDeleted" = "تم حذف البيانات";
+"settingsviews_cleanDataCompleted" = "اكتمل";
+"settingsviews_cleanDataBgReadingsDeleted" = "تم حذف قراءات السكر";
+"settingsviews_cleanDataTreatmentsDeleted" = "تم حذف العلاجات";
+"settingsviews_cleanDataStorageBefore" = "المساحة قبل";
+"settingsviews_cleanDataStorageAfter" = "المساحة بعد";
+"settingsviews_cleanDataCleanupSummary" = "ملخص التنظيف";
+"settingsviews_cleanDataDatabaseReuseFooter" = "قد تحتفظ قاعدة البيانات بحجمها وتعيد استخدام المساحة المحررة.";
+"settingsviews_cleanDataCheckingStatus" = "جارٍ فحص البيانات…";
+"settingsviews_cleanDataCountingStatus" = "جارٍ عدّ البيانات…";
+"settingsviews_cleanDataDeletingStatus" = "جارٍ حذف البيانات نهائيًا…\nأبقِ التطبيق مفتوحًا.";
+"settingsviews_cleanDataInvalidDateRangeError" = "يجب أن يسبق تاريخ البدء تاريخ الانتهاء.";
+"settingsviews_cleanDataNoSelectionError" = "اختر نوع بيانات واحدًا على الأقل.";
+"settingsviews_cleanDataNoMatchingDataError" = "لا توجد بيانات محددة في هذا النطاق.";
+"settingsviews_cleanDataChangedError" = "تغيرت البيانات بعد إنشاء الملخص. راجعها قبل التأكيد.";
+"settingsviews_cleanDataDeleteFailedError" = "تعذر حذف البيانات المحددة. تم إيقاف التنظيف.";
+"settingsviews_cleanDataDays" = "%d يوم";
+"settingsviews_nightscoutImportCompleted" = "اكتمل استيراد Nightscout";
+"settingsviews_nightscoutImportSummary" = "ملخص الاستيراد";
+"settingsviews_nightscoutImportURLMissing" = "لم يتم إعداد عنوان URL لـ Nightscout";
+"settingsviews_nightscoutImportConfigureURL" = "أعِدّ عنوان URL لـ Nightscout في إعدادات Nightscout قبل استيراد البيانات.";
+"settingsviews_nightscoutImportDownloaded" = "تم التنزيل";
+"settingsviews_nightscoutImportAdded" = "تمت الإضافة";
+"settingsviews_nightscoutImportSkipped" = "تم التخطي";
+"settingsviews_nightscoutImportInvalid" = "غير صالح";
+"settingsviews_nightscoutImportSummaryFooter" = "تم تخطي السجلات المخزنة محليًا بالفعل. لم يتم استيراد مستندات Nightscout غير الصالحة.";
+"settingsviews_nightscoutImportingData" = "جارٍ استيراد البيانات";
+"settingsviews_cleanDataConfirmationCode" = "رمز التأكيد %@";
+"settingsviews_backupCreate" = "إنشاء نسخة احتياطية";
+"settingsviews_backupRestore" = "استعادة النسخة الاحتياطية";
+"settingsviews_backupCreated" = "تم إنشاء النسخة الاحتياطية بنجاح";
+"settingsviews_backupRestored" = "تمت استعادة النسخة الاحتياطية بنجاح";
+"settingsviews_backupReplaceQuestion" = "هل تريد استبدال البيانات الموجودة؟";
+"settingsviews_backupReplaceData" = "استبدال البيانات";
+"settingsviews_backupReplaceWarning" = "سيتم حذف قراءات وعلاجات نسبة الغلوكوز في الدم الموجودة ضمن نطاقات تاريخ النسخ الاحتياطي قبل استعادة النسخة الاحتياطية.";
+"settingsviews_backupAndRestore" = "النسخ الاحتياطي والاستعادة";
+"settingsviews_backupAppSettingsAndAlerts" = "إعدادات التطبيق والتنبيهات";
+"settingsviews_backupEncrypt" = "تشفير النسخة الاحتياطية";
+"settingsviews_backupAccounts" = "حسابات النسخ الاحتياطي";
+"settingsviews_backupConfirmPassword" = "تأكيد كلمة المرور";
+"settingsviews_backupPasswordProtection" = "حماية كلمة المرور";
+"settingsviews_backupPasswordProtectionFooter" = "تتيح إضافة الحماية بكلمة المرور أيضًا إجراء نسخ احتياطي للحسابات التي تحتوي على تفاصيل حساسة.";
+"settingsviews_backupAccountDetailsFooter" = "قد تتضمن تفاصيل الحساب عناوين URL للخادم وأسماء المستخدمين وكلمات المرور ورموز الوصول.";
+"settingsviews_backupCreateAndShare" = "إنشاء ومشاركة النسخ الاحتياطي";
+"settingsviews_backupEncryptedCreationFooter" = "يستغرق إنشاء النسخ الاحتياطية المشفرة وقتًا أطول. أبقِ التطبيق مفتوحًا ويرجى التحلي بالصبر.";
+"settingsviews_backupCreatedAt" = "تم إنشاؤها";
+"settingsviews_backupEarliestData" = "أقدم البيانات";
+"settingsviews_backupSettingsAndAlerts" = "الإعدادات والتنبيهات";
+"settingsviews_backupAccountDetails" = "تفاصيل الحساب";
+"settingsviews_backupIncluded" = "متضمنة";
+"settingsviews_backupNotIncluded" = "غير متضمنة";
+"settingsviews_backupNotEnabled" = "غير ممكّن";
+"settingsviews_backupSummary" = "ملخص النسخ الاحتياطي";
+"settingsviews_backupChooseFile" = "اختر ملف النسخ الاحتياطي";
+"settingsviews_backupFile" = "ملف النسخ الاحتياطي";
+"settingsviews_backupFileCheckFooter" = "يتم فحص النسخة الاحتياطية قبل تغيير أي بيانات موجودة.";
+"settingsviews_backupSelected" = "النسخ الاحتياطي المحدد";
+"settingsviews_backupPasswordRequired" = "مطلوب";
+"settingsviews_backupUnlock" = "فتح النسخة الاحتياطية";
+"settingsviews_backupEncryptedNotice" = "هذه النسخة الاحتياطية مشفرة ويجب إلغاء قفلها.";
+"settingsviews_backupSettings" = "الإعدادات";
+"settingsviews_backupRestoreOptions" = "خيارات الاستعادة";
+"settingsviews_backupDataHandling" = "التعامل مع البيانات";
+"settingsviews_backupKeepCurrentData" = "الاحتفاظ بالبيانات الحالية";
+"settingsviews_backupFillGaps" = "ملء الفجوات";
+"settingsviews_backupReplaceRange" = "استبدال النطاق الاحتياطي";
+"settingsviews_backupIgnoreData" = "تجاهل البيانات";
+"settingsviews_backupRestoreSettingsAndAlerts" = "استعادة إعدادات التطبيق والتنبيهات";
+"settingsviews_backupRestoreAccounts" = "استعادة الحسابات";
+"settingsviews_backupReplaceAndRestore" = "استبدال واستعادة";
+"settingsviews_backupRestoreSummary" = "استعادة الملخص";
+"settingsviews_backupBgReadingsAppliedFrom" = "قراءات BG المطبقة من";
+"settingsviews_backupBgReadingsAdded" = "تمت إضافة قراءات BG";
+"settingsviews_backupBgReadingsSkipped" = "تم تخطي قراءات BG";
+"settingsviews_backupTreatmentsAdded" = "تمت إضافة العلاجات";
+"settingsviews_backupTreatmentsSkipped" = "تم تخطي العلاجات";
+"settingsviews_backupSettingsRestored" = "تمت استعادة الإعدادات";
+"settingsviews_backupAccountRestore" = "استعادة الحساب";
+"settingsviews_backupCreatingEncryptedStatus" = "إنشاء النسخة الاحتياطية وتشفيرها بشكل آمن...\nيرجى التحلي بالصبر.";
+"settingsviews_backupCreatingStatus" = "جارٍ إنشاء نسخة احتياطية…";
+"settingsviews_backupCheckingStatus" = "جارٍ التحقق من النسخة الاحتياطية…";
+"settingsviews_backupDecryptingStatus" = "جارٍ فك تشفير النسخة الاحتياطية والتحقق منها...\nيرجى التحلي بالصبر.";
+"settingsviews_backupRestoringEncryptedStatus" = "جارٍ استعادة النسخة الاحتياطية المشفرة...\nيرجى التحلي بالصبر.";
+"settingsviews_backupRestoringStatus" = "جارٍ استعادة النسخة الاحتياطية…";
+"settingsviews_backupErrorInvalidFile" = "هذه ليست نسخة احتياطية صالحة للتطبيق.";
+"settingsviews_backupErrorIncorrectPassword" = "كلمة المرور غير صحيحة أو أن النسخة الاحتياطية المحمية تالفة.";
+"settingsviews_backupErrorMissingPassword" = "أدخل كلمة المرور المستخدمة لحماية هذه النسخة الاحتياطية.";
+"settingsviews_nightscoutImportQuestion" = "الاستيراد من Nightscout؟";
+"settingsviews_nightscoutImportAction" = "استيراد من Nightscout";
+"settingsviews_nightscoutImportDiscardQuestion" = "هل تريد تجاهل الاستيراد المحفوظ؟";
+"settingsviews_nightscoutImportDiscard" = "تجاهل الاستيراد";
+"settingsviews_nightscoutImportDiscardSaved" = "تجاهل الاستيراد المحفوظ";
+"settingsviews_nightscoutImportDiscardMessage" = "ستتم إزالة التقدم المحفوظ. ستظل البيانات المستوردة مخزنة بأمان وسيتم تخطيها إذا بدأت مرة أخرى.";
+"settingsviews_nightscoutImportDataToImport" = "البيانات المراد استيرادها";
+"settingsviews_nightscoutImportPeriod" = "فترة الاستيراد";
+"settingsviews_nightscoutImportExistingDataFooter" = "يتم الاحتفاظ بالبيانات المحلية الموجودة. يتم تخطي قراءات نسبة السكر في الدم خلال 30 ثانية من القراءة الحالية والعلاجات التي تم تحديدها بالفعل بواسطة Nightscout.";
+"settingsviews_nightscoutImportKeepOpenFooter" = "أبقِ التطبيق مفتوحًا حتى تنتهي عملية الاستيراد. يتم حفظ التقدم بعد كل دفعة مكتملة، لذلك يمكن استئناف عملية الاستيراد التي تمت مقاطعتها.";
+"settingsviews_nightscoutImportPeriodLabel" = "الفترة";
+"settingsviews_nightscoutImportCompletedBatches" = "دفعات مكتملة";
+"settingsviews_nightscoutImportResume" = "استئناف الاستيراد";
+"settingsviews_nightscoutImportSaved" = "الاستيراد المحفوظ";
+"settingsviews_nightscoutImportUnsupportedFooter" = "يستخدم هذا الاستيراد فترة غير معتمدة. تجاهلها للبدء من جديد.";
+"settingsviews_nightscoutImportExceedsRetentionFooter" = "يتجاوز هذا الاستيراد فترة الاحتفاظ الحالية. تجاهلها للبدء من جديد.";
+"settingsviews_nightscoutImportResumeFooter" = "توقف الاستيراد السابق قبل اكتمال كافة الدُفعات المطلوبة. ويستمر الاستئناف من آخر نقطة تفتيش محفوظة.";
+"settingsviews_nightscoutImportPause" = "إيقاف الاستيراد مؤقتًا";
+"settingsviews_nightscoutImportBgAndTreatments" = "قراءات وعلاجات BG";
+"settingsviews_nightscoutImportBgOnly" = "قراءات بي جي";
+"settingsviews_nightscoutImportTreatmentsOnly" = "العلاجات";
+"settingsviews_nightscoutImportKeepAppOpen" = "أبقِ التطبيق مفتوحًا.";
+"settingsviews_nightscoutImportPaused" = "تم إيقاف الاستيراد مؤقتًا";
+"settingsviews_nightscoutImportErrorNoSelection" = "حدد قراءات نسبة السكر في الدم أو العلاجات أو كليهما.";
+"settingsviews_nightscoutImportErrorUnsupportedPeriod" = "يستخدم الاستيراد المحفوظ فترة لم تعد مدعومة. تجاهلها وابدأ من جديد.";
+"settingsviews_nightscoutImportErrorRetention" = "تتجاوز فترة الاستيراد المحددة الإعداد الحالي للاحتفاظ بالبيانات.";
+"settingsviews_nightscoutImportErrorMissingURL" = "أدخل عنوان URL الخاص بـ Nightscout في إعدادات Nightcout قبل بدء الاستيراد.";
+"settingsviews_nightscoutImportErrorInvalidURL" = "عنوان URL الخاص بـ Nightcout الذي تم تكوينه غير صالح. تحقق من ذلك في إعدادات Nightcout وحاول مرة أخرى.";
+"settingsviews_nightscoutImportErrorCheckpointUnavailable" = "لم يعد من الممكن استئناف استيراد Nightscout المحفوظ. بدء عملية استيراد جديدة.";
+"settingsviews_nightscoutImportErrorSiteChanged" = "لقد تغير موقع Nightscout الذي تم تكوينه منذ بدء عملية الاستيراد هذه. تجاهل الاستيراد المحفوظ أو قم باستعادة عنوان URL السابق لـ Nightcout.";
+"settingsviews_nightscoutImportErrorAuthentication" = "تم رفض الوصول إلى Nightscout. تحقق من سر واجهة برمجة التطبيقات (API) أو رمز الوصول في إعدادات Nightscout.";
+"settingsviews_nightscoutImportErrorEndpoint" = "لم يتم العثور على نقطة نهاية بيانات Nightscout. تحقق من عنوان URL الذي تم تكوينه وإصدار الموقع.";
+"settingsviews_nightscoutImportErrorRateLimited" = "يتلقى Nightscout عددًا كبيرًا جدًا من الطلبات. انتظر لحظة واستأنف الاستيراد.";
+"settingsviews_nightscoutImportErrorInvalidResponse" = "أعادت Nightscout البيانات التي لا يمكن قراءتها بأمان. لم يتم استيراد أية بيانات من الدفعة المتأثرة.";
+"settingsviews_nightscoutImportErrorResponseLimit" = "ظلت مجموعة Nightscout كبيرة جدًا بعد تقسيمها إلى نطاقات زمنية صغيرة. لم يتم استيراد أية بيانات مقطوعة.";
+"settingsviews_backupCreatedWithAppVersion" = "تم إنشاء نسخة احتياطية باستخدام إصدار التطبيق %@.";
+"settingsviews_backupErrorUnsupportedVersion" = "إصدار تنسيق النسخ الاحتياطي %d غير مدعوم في هذا الإصدار من التطبيق.";
+"settingsviews_backupErrorFinalValueMismatch" = "لا تقوم قيم الجلوكوز المخزنة بإعادة إنتاج القيمة النهائية التي تم نسخها احتياطيًا لقراءة %@.";
+"settingsviews_nightscoutImportBatchCount" = "%1$d من %2$d";
+"settingsviews_nightscoutImportBgAddedProgress" = "تمت إضافة قراءات BG: %@";
+"settingsviews_nightscoutImportTreatmentsAddedProgress" = "المعالجات المضافة: %@";
+"settingsviews_nightscoutImportConfirmation" = "هل تريد استيراد آخر أيام %1$d من %2$@؟ سيتم الاحتفاظ بالسجلات المحلية الموجودة وسيتم تخطي التكرارات.";
+"settingsviews_nightscoutImportBatchProgress" = "دفعة %1$d من %2$d";
+"settingsviews_nightscoutImportErrorServer" = "أرجع Nightscout خطأً مؤقتًا في الخادم (HTTP %d). استأنف الاستيراد لاحقًا.";
+"settingsviews_nightscoutImportErrorUnexpectedStatus" = "أعاد Nightscout استجابة غير متوقعة (HTTP %d).";
+"sensorNoiseSensitivity" = "Sensor Sensitivity";
+"sensorNoiseSensitivitySensitive" = "Sensitive";
+"sensorNoiseSensitivityNormal" = "Normal";
+"sensorNoiseSensitivityPermissive" = "Permissive";
+"settingsviews_followerServiceStatus" = "الحالة";
+"settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for إبقاء التشغيل.";
+"settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with إبقاء التشغيل disabled.\n\nContact Image function cannot work without إبقاء التشغيل.";

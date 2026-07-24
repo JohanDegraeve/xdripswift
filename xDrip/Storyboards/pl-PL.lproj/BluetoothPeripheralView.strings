@@ -95,7 +95,11 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Use With Other App";
+"useOtherDexcomApp" = "Tryb współistnienia";
+"useOtherDexcomAppCoexistenceFooter" = "Tryb współistnienia pozwala nam działać z inną aplikacją, taką jak Dexcom lub CamAPS. Ta aplikacja musi nadal działać w tle.";
+"useOtherDexcomAppPrimaryFooter" = "Tryb podstawowy łączy się jako główna aplikacja i kontroluje połączenie.";
+"runningInCoexistenceMode" = "Działa w trybie współistnienia";
+"runningInPrimaryMode" = "Działa w trybie podstawowym";
 
 /// Disconnect transmitter, title
 "confirmDisconnectTitle" = "Confirm Disconnect";

@@ -29,8 +29,11 @@
 "cannotActiveCGMInFollowerMode" = "Et voi aktivoida CGM:ää seuraaja-tilassa";
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Lue Dexcom-sovelluksesta";
-
+"useOtherDexcomApp" = "Rinnakkaiskäyttötila";
+"useOtherDexcomAppCoexistenceFooter" = "Rinnakkaiskäyttötila sallii meidän toimia toisen sovelluksen, kuten Dexcomin tai CamAPSin, kanssa. Sovelluksen on pysyttävä käynnissä taustalla.";
+"useOtherDexcomAppPrimaryFooter" = "Ensisijainen tila yhdistää pääsovelluksena ja hallitsee yhteyttä.";
+"runningInCoexistenceMode" = "Käytössä rinnakkaiskäyttötilassa";
+"runningInPrimaryMode" = "Käytössä ensisijaisessa tilassa";
 /// Disconnect transmitter, title
 "confirmDisconnectTitle" = "Vahvista yhteyden katkaisu";
 

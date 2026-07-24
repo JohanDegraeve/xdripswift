@@ -1,26 +1,33 @@
 "settingsviews_settingstitle" = "Настройки";
-"settingsviews_sectiontitlehelp" = "Помощь и документация";
+"settingsviews_glucoseDisplaySectionTitle" = "Отображение глюкозы";
+"settingsviews_glucoseRangesSectionTitle" = "Диапазоны глюкозы";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Оповещения и уведомления";
+"settingsviews_sharingAndServicesSectionTitle" = "Обмен и сервисы";
+"settingsviews_osAidLoopShareSectionTitle" = "Обмен OS-AID";
+"settingsviews_issueReportSectionTitle" = "Отчет о проблеме";
+"settingsviews_appBannerVersion" = "Версия %@";
+"settingsviews_appInstalledSince" = "Установлено";
 "settingsviews_showOnlineHelp" = "Открыть онлайн документацию";
-"settingsviews_translateOnlineHelp" = "Переводить автоматически";
-"settingsviews_restartNeeded" = "(Требуется перезагрузка)";
+"settingsviews_translateOnlineHelp" = "Переводить документацию";
 "settingsviews_sectiontitleNotifications" = "Общие";
 "settingsviews_selectbgunit" = "Единицы измерения глюкозы";
 "settingsviews_masterorfollower" = "Главный или подписчик";
 "settingsviews_master" = "Главный";
 "settingsviews_follower" = "Подписчик";
-"settingsviews_showReadingInNotification" = "Показывать ГК в уведомлениях";
-"settingsviews_labelShowReadingInAppBadge" = "Показывать ГК на иконке прил.";
-"settingsviews_multipleAppBadgeValueWith10" = "Умножить ГК на иконке на 10";
-"settingsviews_allowScreenRotation" = "Разрешить переворачивать график";
+"settingsviews_showReadingInNotification" = "Уведомления о глюкозе";
+"settingsviews_labelShowReadingInAppBadge" = "Бейдж приложения";
+"settingsviews_multipleAppBadgeValueWith10" = "Бейдж приложения x10";
+"settingsviews_allowScreenRotation" = "Поворот графика";
 "settingsviews_showMiniChart" = "Показать мини-диаграмму";
-"settingsviews_showClockWhenScreenIsLocked" = "Показывать часы при блок.";
+"settingsviews_showSensorNoiseOnChart" = "Показывать шум сенсора";
+"settingsviews_showClockWhenScreenIsLocked" = "Часы на экране блокировки";
 "settingsviews_urgentHighValue" = "Очень высокий уровень";
 "settingsviews_highValue" = "Высокий уровень";
 "settingsviews_targetValue" = "Целевое значение";
 "settingsviews_lowValue" = "Низкое значение";
 "settingsviews_urgentLowValue" = "Опасно низкое значение";
-"settingsviews_showcoloredobjectives" = "Показывать цветные линии";
-"settingsviews_showtarget" = "Показать целевую линию";
+"settingsviews_showcoloredobjectives" = "Цветные линии";
+"settingsviews_showtarget" = "Целевая линия";
 "settingsviews_sectiontitletreatments" = "Терапия";
 "settingsviews_showTreatments" = "Показать лечение на графике";
 "settingsviews_smallBolusTreatmentThreshold" = "Пороговое значение микроболюса";
@@ -29,30 +36,34 @@
 "settingsviews_showStatistics" = "Показывать статистику";
 "settingsviews_daysToUseStatisticsTitle" = "Дней для расчета";
 "settingsviews_daysToUseStatisticsMessage" = "Максимальное количество дней, которые мы должны попытаться использовать для расчета статистики?\n\n(Введите 0, чтобы рассчитать сегодня с полуночи)";
-"settingsviews_useIFCCA1C" = "Показывать HbA1c в mmols/mol";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Транисмиттер";
 "settingsviews_transmittertype" = "Тип трансмиттера";
 "settingsviews_transmitterid" = "Идентификатор трансмиттера";
 "settingsviews_transmitterid_text_for_button"  = "Идентификатор трансмиттера";
 "settingsviews_givetransmitterid" = "Введите идентификатор трансмиттера";
-"settingsviews_webooptransmitter" = "Калибровка трансмиттера";
+"settingsviews_webooptransmitter" = "Алгоритм трансмиттера";
 "settingsviews_nonfixedtransmitter" = "Многоточечная калибровка";
 "settingsviews_labelNonFixed" = "Многоточечная калибровка";
 "settingsviews_labelWebOOP" = "Калибровка xDrip или Трансмиттер";
 "settingsviews_sectiontitlealerting" = "Сигналы тревог";
 "settingsviews_row_alert_types" = "Типы сигналов тревоги";
 "settingsviews_row_alerts" = "Уведомления";
+"settingsviews_volume_tests_section_title" = "Проверить громкость сигнала";
+"settingsviews_alert_types_section_footer" = "Типы сигналов определяют поведение сигналов, включая звук, вибрацию, повтор и обход беззвучного режима.";
+"settingsviews_alerts_section_footer" = "Сигналы определяют, когда приложение должно уведомлять о уровнях глюкозы, пропущенных показаниях и других условиях.";
 "settingsviews_sectiontitlehealthkit" = "Apple Здоровье";
-"settingsviews_healthkit" = "Записывать данные в Здоровье";
-"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
-"settingsviews_uploadReadingstoDexcomShare" = "Загружать в Dexcom Share";
+"settingsviews_healthkit" = "Записывать в Здоровье";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Загружать";
 "settingsviews_dexcomShareUploadSerialNumber" = "Серийный номер приемника";
-"settingsviews_useUSDexcomShareurl" = "Использовать Dexcom US сервер";
+"settingsviews_useUSDexcomShareurl" = "Серверы US";
 "settingsviews_dexcomShareAccountName" = "Имя аккаунта";
 "settingsviews_giveDexcomShareAccountName" = "Введите Dexcom Share имя аккаунта";
 "settingsviews_giveDexcomSharePassword" = "Введите Dexcom Share пароль";
 "settingsviews_givedexcomShareUploadSerialNumber" = "Введите Dexcom приемника серийный номер";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Параметры загрузки";
 "settingsviews_nightscoutEnabled" = "Интеграция Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Использовать расписание загрузки";
@@ -63,32 +74,27 @@
 "editScheduleTimePickerSubtitle" = "Изменить: ";
 "timeScheduleViewTitle" = "Вкл/выкл расписание для ";
 "uploadSensorStartTime" = "Время начала загрузки сенсора";
-"testUrlAndAPIKey" = "Протестировать соединение";
-"settingsviews_sectiontitlespeak" = "Звук";
-"settingsviews_speakBgReadings" = "Проговаривать уровень глюкозы";
+"testUrlAndAPIKey" = "Проверить соединение";
+"settingsviews_speakBgReadings" = "Проговаривать глюкозу";
 "settingsviews_speakBgReadingslanguage" = "Язык";
 "settingsviews_speakreadingslanguageselection" = "Выберите язык";
 "settingsviews_speakTrend" = "Говорить тенденцию";
 "settingsviews_speakDelta" = "Говорить дельта";
 "settingsviews_IntervalTitle" = "Интервал";
-"settingsviews_IntervalMessage" = "Минимальный интервал между двумя показаниями, в минутах";
+"settingsviews_IntervalMessage" = "Минимальный интервал между двумя показаниями";
 "settingsviews_sectiontitleAbout" = "Об %@";
 "settingsviews_Version" = "Версия";
 "settingsviews_license" = "Лицензия";
-"settingsviews_build" = "Билд";
 "m5stack_settingsviews_settingstitle" = "M5 Stack Настройки";
 "m5stack_settingsviews_textColor" = "Цвет текста";
 "m5stack_settingsviews_backGroundColor" = "Цвет фона";
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 "m5stack_settingsviews_giveBluetoothPassword" = "Введите Bluetooth пароль";
 "m5stack_settingsviews_brightness" = "Подсветка экрана";
-"appleWatchSectionTitle" = "Apple Watch";
-"calendarEventsSectionTitle" = "События календаря";
-"createCalendarEvent" = "Создавать событие в календаре";
 "calenderId" = "Календарь для использования";
-"settingsviews_displayTrendInCalendarEvent" = "Показывать тенденцию";
-"displayUnitInCalendarEvent" = "Показывать единицы";
-"displayDeltaInCalendarEvent" = "Показывать дельту";
+"settingsviews_displayTrendInCalendarEvent" = "Тенденция";
+"displayUnitInCalendarEvent" = "Единицы";
+"displayDeltaInCalendarEvent" = "Дельта";
 "infoCalendarAccessDeniedByUser" = "Ранее вы запретили доступ к своему календарю.\n\nЧтобы включить его, перейдите в настройки устройства, конфиденциальность, календари и включите его.";
 "infoCalendarAccessRestricted" = "Вы не можете разрешить %@ доступ к вашему календарю. Возможно, это связано с активными ограничениями, такими как родительский контроль.";
 "sectionTitleTrace" = "Сообщение о проблеме";
@@ -99,19 +105,21 @@
 "failedToSendEmail" = "Не удалось отправить электронное письмо";
 "volumeTestSoundPlayerExplanation" = "Теперь звук будильника воспроизводится с той же громкостью, которая будет использоваться для типа будильника с параметром «Отменить отключение звука» = 'Вкл.'\n\n (используется для всех будильников, кроме предупреждений о пропущенном чтении, для которых всегда используется громкость iOS.)\n\ nИзмените громкость с помощью кнопок громкости и нажмите OK, когда закончите.";
 "volumeTestiOSSoundExplanation" = "Звук будильника теперь воспроизводится с той же громкостью, которая будет использоваться для типа будильника с параметром «Переопределить звук» = 'Выкл.'\n\n(Также всегда используется для сигналов о пропущенных чтениях, для которых используется громкость iOS.)\n\nНажмите один кнопок громкости, чтобы остановить звук, затем измените громкость с помощью кнопок громкости на желаемую громкость и повторите проверку.";
-"volumeTestSoundPlayer" = "Тест гром. (переопределение)";
-"volumeTestiOSSound" = "Тест гром. (текущая)";
+"volumeTestSoundPlayer" = "Когда беззвучный режим включен";
+"volumeTestiOSSound" = "Когда беззвучный режим выключен";
 "debugLevel" = "Включить режим отладки";
 "warningChangeFromMasterToFollower" = "Переключение с главного на подписчика удалит ваш текущий сенсор. Вы хотите продолжить?";
 "nightscoutPort" = "Порт";
-"developerSettings" = "Настройки разработчика";
-"smoothLibreValues" = "Сглаживать значения Libre";
+"developerSettings" = "Расширенные настройки";
+"showDeveloperSettings" = "Показать";
+"preferSensorCountdown" = "Предпочитать обратный отсчёт датчика";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Срок службы датчика";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Определяет, показывать срок службы датчика как прошедшее время или как обратный отсчёт на iPhone и Apple Watch.";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Домашний экран";
 "settingsviews_sectionTitleHousekeeper" = "Управление данными";
-"settingsviews_housekeeperRetentionPeriod" = "Срок хранения (дней)";
-"settingsviews_housekeeperExportAllData" = "Экспорт всех данных";
+"settingsviews_housekeeperRetentionPeriod" = "Срок хранения";
 "settingsviews_housekeeperRetentionPeriodMessage" = "Сколько дней должны храниться данные? (минимум 90, максимум 365)\n\n(рекомендуется: 90 дней)";
 "suppressUnLockPayLoad" = "Остановить блок. нагрузки";
 "suppressLoopShare" = "Остановить раздачу в Loop";
@@ -126,16 +134,16 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// transmitter settings, to explain that the reset option only works for certain transmitters
-"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
+"settingsviews_resetDexcomTransmitterMessage" = "This option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
 
 /// data source settings, keep-alive mode is set to aggressive
-"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
+"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Поддержание активности is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
 "settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
-"settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeDisabledMessage" = "Поддержание активности is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
 
 /// statistics settings, prefer time in tight range
 "settingsviews_timeInRangeTypeTightRange" = "Tight Range";
@@ -150,10 +158,10 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
 
 /// statistics settings, the type of time in range selected
-"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
-"settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
+"settingsviews_labelfollowerKeepAliveType" = "Поддержание активности";
 
 /// this setting is required
 "settingsviews_valueIsRequired" = "⚠️ Required";
@@ -161,13 +169,12 @@
 /// treatments settings, offset the carb treatments on main chart
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
-"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
 
 /// statistics settings, prefer user-defined range
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+"settingsviews_sectionTitleDataSource" = "Источник данных";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";
@@ -176,10 +183,9 @@
 "settingsviews_nightscoutNotEnabledRowText" = "Disabled";
 
 /// data source settings, keep-alive mode is set to use an external heartbeat
-"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Background keep-alive is set to use an external heartbeat. ❤️\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
+"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Поддержание активности is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
 
 /// When clicking the event interval setting, a pop up asks for minimum number of minutes between two events, this is the pop up message - this is used for setting the interval between two calendar events
-"settingsviews_CalenderIntervalTitle" = "Event Interval";
 
 /// data source settings, enable Nightscout in the Nightscout section
 "settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
@@ -194,10 +200,10 @@
 "settingsviews_libreLinkUpReAcceptNeeded" = "Need to accept terms";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two bg announcements, this is the pop up message - this is used for setting the interval between two readings in BG announcements, Speak readings, Apple Watch
-"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
+"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// data source settings, the name of the person we are following
-"settingsviews_followerPatientName" = "Patient Name";
+"settingsviews_followerPatientName" = "Псевдоним";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabled" = "Disabled";
@@ -212,28 +218,222 @@
 "settingsviews_labelFollowerDataSourceRegion" = "Region";
 
 /// data source settings, data source
-"settingsviews_labelFollowerDataSourceType" = "Data Source";
+"settingsviews_labelFollowerDataSourceType" = "Источник данных";
 
 /// data source settings, enable Nightscout upload
 "settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
 
 /// data source settings, ask the user to enter the name of the person we are following if they want to - it's optional
-"settingsviews_followerPatientNameMessage" = "Here you can optionally write the name of the person you are following.";
+"settingsviews_followerPatientNameMessage" = "Here you can optionally write an alias for the person you are following.";
 
 /// follower settings, pop up that asks user to enter their password
 "settingsviews_enterPassword" = "Enter your password";
 
 /// The user needs to update their calendar permissions
-"infoCalendarAccessWriteOnly" = "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.";
 
 /// data source settings, keep-alive mode is set to normal
-"settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeNormalMessage" = "Поддержание активности is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Затемнение экрана блокировки";
 
 /// Should loop data be shared only every 5 minutes
-"shareToLoopOnceEvery5Minutes" = "Share with OS-AID every 5 mins";
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_dataManagementStorageInfo" = "Хранилище";
+"settingsviews_dataManagementManageData" = "Управление данными";
+"settingsviews_dataManagementDataRetention" = "Хранение данных";
+"settingsviews_dataManagementDataDeletion" = "Удаление данных";
+"settingsviews_dataManagementImportData" = "Импорт данных";
+"settingsviews_dataManagementLastHousekeeping" = "Последняя очистка";
+"settingsviews_storageInfoDatabase" = "База данных";
+"settingsviews_storageInfoDatabaseSize" = "Размер базы";
+"settingsviews_storageInfoTrackedRecords" = "Учтённые записи";
+"settingsviews_storageInfoDevices" = "Устройства";
+"settingsviews_storageInfoSensors" = "Сенсоры";
+"settingsviews_storageInfoRetentionFooter" = "Настроенный период хранения данных составляет %d дней.";
+"settingsviews_storageInfoHistory" = "Сохранённая история";
+"settingsviews_storageInfoEarliestRecord" = "Самая ранняя запись";
+"settingsviews_storageInfoLatestRecord" = "Самая новая запись";
+"settingsviews_storageInfoCheckingStatus" = "Проверка хранилища…";
+"settingsviews_nightscoutImportRetentionFooter" = "Импорт ограничен периодом хранения в %d дней. Более старые данные удаляются при очистке.";
+"settingsviews_cleanDataAutomaticHousekeeping" = "Автоматическая очистка";
+"settingsviews_cleanDataKeepHistoricalData" = "Хранить историю";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "Последнее выполнение";
+"settingsviews_cleanDataLastHousekeepingResult" = "Последний результат";
+"settingsviews_cleanDataNoHousekeepingRequired" = "Очистка не требуется";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "Запускается не чаще раза в день при открытии приложения. Старые показания, лечение и неиспользуемые калибровки удаляются локально.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Исторические данные удаляются вручную только в разделе «Удаление данных».";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "Удалена %@ запись";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "Удалено записей: %@";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "Очистить данные";
+"settingsviews_cleanDataStorageUsed" = "Занято памяти";
+"settingsviews_cleanDataStoredData" = "Сохранённые данные";
+"settingsviews_cleanDataBgReadings" = "Показания глюкозы";
+"settingsviews_cleanDataTreatments" = "Лечение";
+"settingsviews_cleanDataCalibrations" = "Калибровки";
+"settingsviews_cleanDataSelectData" = "Данные для удаления";
+"settingsviews_cleanDataCleanupMethod" = "Способ очистки";
+"settingsviews_cleanDataKeepRecent" = "Сохранить недавние";
+"settingsviews_cleanDataDateRange" = "Диапазон дат";
+"settingsviews_cleanDataDeleteAll" = "Удалить всё";
+"settingsviews_cleanDataKeep" = "Сохранить";
+"settingsviews_cleanDataFrom" = "С";
+"settingsviews_cleanDataUntil" = "По";
+"settingsviews_cleanDataOlderDataFooter" = "Старые данные будут удалены. Недавние данные будут сохранены.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "Обе даты включены.";
+"settingsviews_cleanDataDeleteAllFooter" = "Все выбранные данные будут удалены.";
+"settingsviews_cleanDataContinue" = "Продолжить";
+"settingsviews_cleanDataReviewFooter" = "Перед удалением появится сводка.";
+"settingsviews_cleanDataPermanentDeletion" = "Безвозвратное удаление";
+"settingsviews_cleanDataCannotUndo" = "Это действие нельзя отменить.";
+"settingsviews_cleanDataUnusedCalibrations" = "Неиспользуемые калибровки";
+"settingsviews_cleanDataEarliestStoredData" = "Самые ранние данные";
+"settingsviews_cleanDataDataToDelete" = "Данные для удаления";
+"settingsviews_cleanDataEnterCode" = "Введите этот шестизначный код";
+"settingsviews_cleanDataSixDigitCode" = "Шестизначный код";
+"settingsviews_cleanDataConfirmDelete" = "ПОДТВЕРДИТЬ УДАЛЕНИЕ";
+"settingsviews_cleanDataSuccessfullyDeleted" = "Данные удалены";
+"settingsviews_cleanDataCompleted" = "Завершено";
+"settingsviews_cleanDataBgReadingsDeleted" = "Показания удалены";
+"settingsviews_cleanDataTreatmentsDeleted" = "Записи лечения удалены";
+"settingsviews_cleanDataStorageBefore" = "Память до";
+"settingsviews_cleanDataStorageAfter" = "Память после";
+"settingsviews_cleanDataCleanupSummary" = "Итоги очистки";
+"settingsviews_cleanDataDatabaseReuseFooter" = "База может сохранить размер и повторно использовать свободное место.";
+"settingsviews_cleanDataCheckingStatus" = "Проверка данных…";
+"settingsviews_cleanDataCountingStatus" = "Подсчёт данных…";
+"settingsviews_cleanDataDeletingStatus" = "Безвозвратное удаление…\nНе закрывайте приложение.";
+"settingsviews_cleanDataInvalidDateRangeError" = "Начальная дата должна быть раньше конечной.";
+"settingsviews_cleanDataNoSelectionError" = "Выберите хотя бы один тип данных.";
+"settingsviews_cleanDataNoMatchingDataError" = "В этом диапазоне нет выбранных данных.";
+"settingsviews_cleanDataChangedError" = "Данные изменились после создания сводки. Проверьте их снова.";
+"settingsviews_cleanDataDeleteFailedError" = "Не удалось удалить выбранные данные. Очистка остановлена.";
+"settingsviews_cleanDataDays" = "%d дн.";
+"settingsviews_nightscoutImportCompleted" = "Импорт из Nightscout завершён";
+"settingsviews_nightscoutImportSummary" = "Сводка импорта";
+"settingsviews_nightscoutImportURLMissing" = "URL Nightscout не настроен";
+"settingsviews_nightscoutImportConfigureURL" = "Перед импортом данных настройте URL в разделе настроек Nightscout.";
+"settingsviews_nightscoutImportDownloaded" = "Загружено";
+"settingsviews_nightscoutImportAdded" = "Добавлено";
+"settingsviews_nightscoutImportSkipped" = "Пропущено";
+"settingsviews_nightscoutImportInvalid" = "Недопустимые";
+"settingsviews_nightscoutImportSummaryFooter" = "Уже сохранённые локально записи были пропущены. Недопустимые документы Nightscout не были импортированы.";
+"settingsviews_nightscoutImportingData" = "Импорт данных";
+"settingsviews_cleanDataConfirmationCode" = "Код подтверждения %@";
+"settingsviews_backupCreate" = "Создать резервную копию";
+"settingsviews_backupRestore" = "Восстановить резервную копию";
+"settingsviews_backupCreated" = "Резервная копия успешно создана";
+"settingsviews_backupRestored" = "Резервная копия успешно восстановлена";
+"settingsviews_backupReplaceQuestion" = "Заменить существующие данные?";
+"settingsviews_backupReplaceData" = "Заменить данные";
+"settingsviews_backupReplaceWarning" = "Существующие показания ГК и методы лечения в диапазонах дат резервного копирования будут удалены до восстановления резервной копии.";
+"settingsviews_backupAndRestore" = "Резервное копирование и восстановление";
+"settingsviews_backupAppSettingsAndAlerts" = "Настройки приложения и оповещения";
+"settingsviews_backupEncrypt" = "Зашифровать резервную копию";
+"settingsviews_backupAccounts" = "Резервные учетные записи";
+"settingsviews_backupConfirmPassword" = "Подтвердите пароль";
+"settingsviews_backupPasswordProtection" = "Защита паролем";
+"settingsviews_backupPasswordProtectionFooter" = "Добавление защиты паролем также позволяет создавать резервные копии учетных записей, содержащих конфиденциальные данные.";
+"settingsviews_backupAccountDetailsFooter" = "Данные учетной записи могут включать URL-адреса серверов, имена пользователей, пароли и токены доступа.";
+"settingsviews_backupCreateAndShare" = "Создать и поделиться резервной копией";
+"settingsviews_backupEncryptedCreationFooter" = "Создание зашифрованных резервных копий занимает больше времени. Держите приложение открытым и будьте терпеливы.";
+"settingsviews_backupCreatedAt" = "Создано";
+"settingsviews_backupEarliestData" = "Самые ранние данные";
+"settingsviews_backupSettingsAndAlerts" = "Настройки и оповещения";
+"settingsviews_backupAccountDetails" = "Детали учетной записи";
+"settingsviews_backupIncluded" = "Включено";
+"settingsviews_backupNotIncluded" = "Не включено";
+"settingsviews_backupNotEnabled" = "Не включено";
+"settingsviews_backupSummary" = "Сводка резервного копирования";
+"settingsviews_backupChooseFile" = "Выберите файл резервной копии";
+"settingsviews_backupFile" = "Резервный файл";
+"settingsviews_backupFileCheckFooter" = "Резервная копия проверяется перед изменением существующих данных.";
+"settingsviews_backupSelected" = "Выбранная резервная копия";
+"settingsviews_backupPasswordRequired" = "Требуется";
+"settingsviews_backupUnlock" = "Разблокировать резервную копию";
+"settingsviews_backupEncryptedNotice" = "Эта резервная копия зашифрована и ее необходимо разблокировать.";
+"settingsviews_backupSettings" = "Настройки";
+"settingsviews_backupRestoreOptions" = "Параметры восстановления";
+"settingsviews_backupDataHandling" = "Обработка данных";
+"settingsviews_backupKeepCurrentData" = "Сохраняйте текущие данные";
+"settingsviews_backupFillGaps" = "Заполните пробелы";
+"settingsviews_backupReplaceRange" = "Заменить резервный диапазон";
+"settingsviews_backupIgnoreData" = "Игнорировать данные";
+"settingsviews_backupRestoreSettingsAndAlerts" = "Восстановить настройки приложения и оповещения";
+"settingsviews_backupRestoreAccounts" = "Восстановить аккаунты";
+"settingsviews_backupReplaceAndRestore" = "Заменить и восстановить";
+"settingsviews_backupRestoreSummary" = "Сводка восстановления";
+"settingsviews_backupBgReadingsAppliedFrom" = "Показания ГК, взятые из";
+"settingsviews_backupBgReadingsAdded" = "Добавлены показания BG";
+"settingsviews_backupBgReadingsSkipped" = "Показания ГК пропущены";
+"settingsviews_backupTreatmentsAdded" = "Добавлено лечение";
+"settingsviews_backupTreatmentsSkipped" = "Процедуры пропущены";
+"settingsviews_backupSettingsRestored" = "Настройки восстановлены";
+"settingsviews_backupAccountRestore" = "Восстановление аккаунта";
+"settingsviews_backupCreatingEncryptedStatus" = "Создание и безопасное шифрование резервной копии…\nПожалуйста, наберитесь терпения.";
+"settingsviews_backupCreatingStatus" = "Создание резервной копии…";
+"settingsviews_backupCheckingStatus" = "Проверка резервной копии…";
+"settingsviews_backupDecryptingStatus" = "Расшифровка и проверка резервной копии…\nПожалуйста, наберитесь терпения.";
+"settingsviews_backupRestoringEncryptedStatus" = "Восстановление зашифрованной резервной копии…\nПожалуйста, наберитесь терпения.";
+"settingsviews_backupRestoringStatus" = "Восстановление резервной копии…";
+"settingsviews_backupErrorInvalidFile" = "Это недействительная резервная копия приложения.";
+"settingsviews_backupErrorIncorrectPassword" = "Пароль неверен или защищенная резервная копия повреждена.";
+"settingsviews_backupErrorMissingPassword" = "Введите пароль, используемый для защиты этой резервной копии.";
+"settingsviews_nightscoutImportQuestion" = "Импортировать из Nightscout?";
+"settingsviews_nightscoutImportAction" = "Импорт из Nightscout";
+"settingsviews_nightscoutImportDiscardQuestion" = "Отменить сохраненный импорт?";
+"settingsviews_nightscoutImportDiscard" = "Отменить импорт";
+"settingsviews_nightscoutImportDiscardSaved" = "Отменить сохраненный импорт";
+"settingsviews_nightscoutImportDiscardMessage" = "Сохраненный прогресс будет удален. Импортированные данные останутся в безопасности и будут пропущены, если вы начнете снова.";
+"settingsviews_nightscoutImportDataToImport" = "Данные для импорта";
+"settingsviews_nightscoutImportPeriod" = "Период импорта";
+"settingsviews_nightscoutImportExistingDataFooter" = "Существующие локальные данные сохраняются. Показания ГК в течение 30 секунд после существующих показаний и методы лечения, уже определенные Nightscout, пропускаются.";
+"settingsviews_nightscoutImportKeepOpenFooter" = "Держите приложение открытым до завершения импорта. Прогресс сохраняется после каждой завершенной партии, поэтому прерванный импорт можно возобновить.";
+"settingsviews_nightscoutImportPeriodLabel" = "Период";
+"settingsviews_nightscoutImportCompletedBatches" = "Завершенные партии";
+"settingsviews_nightscoutImportResume" = "Возобновить импорт";
+"settingsviews_nightscoutImportSaved" = "Сохраненный импорт";
+"settingsviews_nightscoutImportUnsupportedFooter" = "Для этого импорта используется неподдерживаемый период. Отбросьте его, чтобы начать заново.";
+"settingsviews_nightscoutImportExceedsRetentionFooter" = "Этот импорт превышает текущий срок хранения. Отбросьте его, чтобы начать заново.";
+"settingsviews_nightscoutImportResumeFooter" = "Предыдущий импорт был остановлен до завершения всех запрошенных пакетов. Возобновление продолжается с последней сохраненной контрольной точки.";
+"settingsviews_nightscoutImportPause" = "Приостановить импорт";
+"settingsviews_nightscoutImportBgAndTreatments" = "Показания и лечение ГК";
+"settingsviews_nightscoutImportBgOnly" = "Показания ГГ";
+"settingsviews_nightscoutImportTreatmentsOnly" = "лечение";
+"settingsviews_nightscoutImportKeepAppOpen" = "Держите приложение открытым.";
+"settingsviews_nightscoutImportPaused" = "Импорт приостановлен";
+"settingsviews_nightscoutImportErrorNoSelection" = "Выберите показания ГК, лечение или и то, и другое.";
+"settingsviews_nightscoutImportErrorUnsupportedPeriod" = "В сохраненном импорте используется период, который больше не поддерживается. Отбросьте его и начните заново.";
+"settingsviews_nightscoutImportErrorRetention" = "Выбранный период импорта превышает текущие настройки хранения данных.";
+"settingsviews_nightscoutImportErrorMissingURL" = "Введите URL-адрес Nightscout в настройках Nightscout перед началом импорта.";
+"settingsviews_nightscoutImportErrorInvalidURL" = "Настроенный URL-адрес Nightscout недействителен. Проверьте это в настройках Nightscout и повторите попытку.";
+"settingsviews_nightscoutImportErrorCheckpointUnavailable" = "Сохраненный импорт Nightscout больше нельзя возобновить. Начать новый импорт.";
+"settingsviews_nightscoutImportErrorSiteChanged" = "Настроенный сайт Nightscout изменился с момента начала импорта. Отмените сохраненный импорт или восстановите предыдущий URL-адрес Nightscout.";
+"settingsviews_nightscoutImportErrorAuthentication" = "Nightscout запретил доступ. Проверьте секрет API или токен доступа в настройках Nightscout.";
+"settingsviews_nightscoutImportErrorEndpoint" = "Конечная точка данных Nightscout не найдена. Проверьте настроенный URL-адрес и версию сайта.";
+"settingsviews_nightscoutImportErrorRateLimited" = "Nightscout получает слишком много запросов. Подождите немного и возобновите импорт.";
+"settingsviews_nightscoutImportErrorInvalidResponse" = "Nightscout вернул данные, которые невозможно было безопасно прочитать. Никакие данные из затронутой партии не были импортированы.";
+"settingsviews_nightscoutImportErrorResponseLimit" = "Пакет Nightscout оставался слишком большим после разделения на небольшие временные диапазоны. Усеченные данные не импортировались.";
+"settingsviews_backupCreatedWithAppVersion" = "Резервная копия создана с использованием версии приложения %@.";
+"settingsviews_backupErrorUnsupportedVersion" = "Версия формата резервной копии %d не поддерживается этой версией приложения.";
+"settingsviews_backupErrorFinalValueMismatch" = "Сохраненные значения уровня глюкозы не воспроизводят резервное конечное значение для чтения %@.";
+"settingsviews_nightscoutImportBatchCount" = "%1$d из %2$d";
+"settingsviews_nightscoutImportBgAddedProgress" = "Добавлены показания BG: %@";
+"settingsviews_nightscoutImportTreatmentsAddedProgress" = "Добавлено лечение: %@.";
+"settingsviews_nightscoutImportConfirmation" = "Импортировать данные %1$d за последние дни из %2$@? Существующие локальные записи будут сохранены, а дубликаты будут пропущены.";
+"settingsviews_nightscoutImportBatchProgress" = "Пакетный %1$d из %2$d";
+"settingsviews_nightscoutImportErrorServer" = "Nightscout вернул временную ошибку сервера (HTTP %d). Возобновите импорт позже.";
+"settingsviews_nightscoutImportErrorUnexpectedStatus" = "Nightscout вернул неожиданный ответ (HTTP %d).";
+"sensorNoiseSensitivity" = "Sensor Sensitivity";
+"sensorNoiseSensitivitySensitive" = "Чувствительно";
+"sensorNoiseSensitivityNormal" = "Нормально";
+"sensorNoiseSensitivityPermissive" = "Допустимо";
+"settingsviews_followerServiceStatus" = "Статус";
+"settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Поддержание активности.";
+"settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Поддержание активности disabled.\n\nContact Image function cannot work without Поддержание активности.";

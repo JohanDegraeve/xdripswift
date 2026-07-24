@@ -16,10 +16,26 @@ struct RootView: View {
             MainView()
             BigNumberView()
         }
-        .tabViewStyle(.carousel)
+        .modifier(RootViewTabViewStyleModifier())
         .environmentObject(watchState)
     }
 }
+
+#if os(watchOS)
+struct RootViewTabViewStyleModifier: ViewModifier {
+    
+    func body(content: Content) -> some View {
+        content.tabViewStyle(.carousel)
+    }
+}
+#else
+struct RootViewTabViewStyleModifier: ViewModifier {
+    
+    func body(content: Content) -> some View {
+        content.tabViewStyle(.page)
+    }
+}
+#endif
 
 #Preview {
     RootView()

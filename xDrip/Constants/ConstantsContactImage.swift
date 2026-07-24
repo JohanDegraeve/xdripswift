@@ -11,13 +11,12 @@ import SwiftUI
 
 enum ConstantsContactImage {
     
-    // we need these colours as UIColors but we'll create them based off standard SwiftUI colors
-    // so that they match the rest of the xDrip4iOS Watch widgets
-    static let inRangeColor = UIColor(Color.green)
-    static let notUrgentColor = UIColor(Color.yellow)
-    static let urgentColor = UIColor(Color.red)
+    // Contact images use the same semantic range colors as the application interface.
+    static let inRangeColor = ConstantsAppColors.normal
+    static let notUrgentColor = ConstantsAppColors.warning
+    static let urgentColor = ConstantsAppColors.urgent
     
-    static let unknownColor = UIColor(Color.gray)
+    static let unknownColor = ConstantsAppColors.disabledText
     
     /// the vertical offset of the bg value if the slope arrow is present (bigger number is higher)
     static let bgValueVerticalOffsetIfSlopeArrow: Double = 1.5

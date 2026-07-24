@@ -4,10 +4,10 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// When creating schedule for Nightscout or Dexcom Share upload, this is the top label text
-"timeScheduleViewTitle" = "On/Off Time Schedule for ";
+"timeScheduleViewTitle" = "On/Off Time Schedule";
 
 /// In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row
-"volumeTestiOSSound" = "Test Volume (Current iPhone Volume)";
+"volumeTestiOSSound" = "Gdy tryb cichy jest wyłączony";
 
 /// nightscout settings, port to use
 "nightscoutPort" = "Port";
@@ -23,12 +23,15 @@
 
 /// alerting settings, row alerts
 "settingsviews_row_alerts" = "Alarms";
+"settingsviews_volume_tests_section_title" = "Test głośności alarmu";
+"settingsviews_alert_types_section_footer" = "Typy alarmów określają zachowanie alarmów, w tym dźwięk, wibracje, drzemkę i pomijanie trybu cichego.";
+"settingsviews_alerts_section_footer" = "Alarmy określają, kiedy aplikacja powinna powiadamiać o poziomach glukozy, brakujących odczytach i innych warunkach.";
 
 /// In Settings, Alerts section, there's an option to test the volume settings, this is text explaining the test when clicking the row - this is for ios sound volume test
 "volumeTestiOSSoundExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = Off\n\n(Also used always for Missed Reading alarms which use the iOS volume.)\n\nPress one of the volume buttons to stop the sound, then change the volume with the volume buttons to the desired volume and test again.";
 
 /// non fixed calibration slopes settings in bluetooth peripheral view : enabled or not
-"settingsviews_nonfixedtransmitter" = "Enable Multi-point Calibration";
+"settingsviews_nonfixedtransmitter" = "Kalibracja wielopunktowa";
 
 /// speak settings, where enable or disable speak trend
 "settingsviews_speakTrend" = "Speak Trend";
@@ -41,21 +44,28 @@
 
 /// shown on top of the first settings screen, literally 'Settings'
 "settingsviews_settingstitle" = "Settings";
+"settingsviews_glucoseDisplaySectionTitle" = "Wyświetlanie glukozy";
+"settingsviews_glucoseRangesSectionTitle" = "Zakresy glukozy";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Alarmy i powiadomienia";
+"settingsviews_sharingAndServicesSectionTitle" = "Udostępnianie i usługi";
+"settingsviews_osAidLoopShareSectionTitle" = "Udostępnianie OS-AID";
+"settingsviews_issueReportSectionTitle" = "Raport problemu";
+"settingsviews_appBannerVersion" = "Wersja %@";
+"settingsviews_appInstalledSince" = "Zainstalowano";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two readings, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch
-"settingsviews_IntervalMessage" = "Minimum interval between two notifications, in minutes";
+"settingsviews_IntervalMessage" = "Minimum interval between two notifications";
 
 /// Apple Watch Settings - text in row where create event is enabled or disabled 
-"createCalendarEvent" = "Create Calendar Events";
 
 /// Apple Watch Settings - text in row where user needs to say if unit should be displayed or not
-"displayUnitInCalendarEvent" = "Display Unit";
+"displayUnitInCalendarEvent" = "Jednostka";
 
 /// about settings, section title
 "settingsviews_sectiontitleAbout" = "About %@";
 
 /// Apple Watch Settings - text in row where user needs to say if delta should be displayed or not
-"displayDeltaInCalendarEvent" = "Display Delta";
+"displayDeltaInCalendarEvent" = "Delta";
 
 /// dexcom share settings, pop up that asks user to enter dexcom share account name
 "settingsviews_giveDexcomShareAccountName" = "Enter Dexcom Share Account Name";
@@ -64,10 +74,9 @@
 "settingsviews_highValue" = "High Value";
 
 /// speak settings, section title
-"settingsviews_sectiontitlespeak" = "Voice";
 
 /// general settings, should reading be shown in notification yes or no
-"settingsviews_showReadingInNotification" = "Show BG in Notifications";
+"settingsviews_showReadingInNotification" = "Powiadomienia glukozy";
 
 /// 
 "settingsviews_urgentLowValue" = "Urgent Low Value";
@@ -106,7 +115,6 @@
 "settingsviews_dexcomShareUploadSerialNumber" = "Receiver Serial Number";
 
 /// used in settings, section Info, title of the build setting
-"settingsviews_build" = "Build";
 
 /// dexcom share settings, where user can set the dexcom share account name
 "settingsviews_dexcomShareAccountName" = "Account Name";
@@ -133,7 +141,7 @@
 "settingsviews_giveNightscoutUrl" = "Enter your Nightscout URL";
 
 /// home screen settings, show target line
-"settingsviews_showtarget" = "Show Target Line";
+"settingsviews_showtarget" = "Linia celu";
 
 /// transmitter settings, just the words that explain that the settings is about transmitter id
 "settingsviews_transmitterid" = "Transmitter ID";
@@ -160,12 +168,12 @@
 "settingsviews_sectiontitleNotifications" = "Notifications";
 
 /// in Settings, row title to send settings
-"sendTraceFile" = "Send Issue Report";
+"sendTraceFile" = "Wyślij raport problemu";
 
 /// transmitter settings, to explain that settings is about resetting the transmitter
 
 /// general settings, should reading be multiplied with 10 yes or no
-"settingsviews_multipleAppBadgeValueWith10" = "Multiply App Badge Reading by 10";
+"settingsviews_multipleAppBadgeValueWith10" = "Plakietka aplikacji x10";
 
 /// non fixed settings, title of the section
 "settingsviews_labelNonFixed" = "Multi-point Calibration";
@@ -174,10 +182,9 @@
 "settingsviews_givedexcomShareUploadSerialNumber" = "Enter the Dexcom Receiver Serial Number";
 
 /// nightscout settings, when clicking the cell, test the url and api key
-"testUrlAndAPIKey" = "Test Connection";
+"testUrlAndAPIKey" = "Test połączenia";
 
 /// If user is not allowed to give any app access to the Calendar, due to restrictions. And then tries to activate creation of events in calendar, this message will be shown
-"infoCalendarAccessRestricted" = "You cannot give authorization to %@ to access your calendar. This is possibly due to active restrictions such as parental controls being in place.";
 
 /// default text in email body, when user wants to send trace file.
 "emailbodyText" = "Problem Description: ";
@@ -192,10 +199,10 @@
 "settingsviews_follower" = "Follower";
 
 /// general settings, should reading be shown in app badge yes or no
-"settingsviews_labelShowReadingInAppBadge" = "Show BG in the App Badge";
+"settingsviews_labelShowReadingInAppBadge" = "Plakietka aplikacji";
 
 /// healthkit settings, literally 'healthkit'
-"settingsviews_healthkit" = "Write Data to Apple Health";
+"settingsviews_healthkit" = "Zapisuj w Apple Health";
 
 /// general settings, literally master
 "settingsviews_master" = "Master";
@@ -207,16 +214,14 @@
 "settingsviews_masterorfollower" = "Master or Follower";
 
 /// In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row
-"volumeTestSoundPlayer" = "Test Volume (if Override Mute On)";
+"volumeTestSoundPlayer" = "Gdy tryb cichy jest włączony";
 
 /// bluetooth settings, section title - also used in bluetooth peripheral view, eg when viewing M5Stack details. This is the title of the first section
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 
-/// Apple Watch Settings - section title
-"appleWatchSectionTitle" = "Apple Watch";
 
 /// dexcom share settings, section title
-"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
 
 /// Text in pop up shown when user wants to send the trace file
 "describeProblem" = "Explain why you need to send the trace file with as much detail as possible. If you have already reported your problem in the Facebook support group '%@', then mention your facebook name in the e-mail";
@@ -228,25 +233,24 @@
 "settingsviews_selectbgunit" = "Blood Glucose Units";
 
 /// speak settings, where user can enable or disable speak readings
-"settingsviews_speakBgReadings" = "Speak BG Readings";
+"settingsviews_speakBgReadings" = "Mów glukozę";
 
 /// nightscout settings, section title
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Opcje przesyłania";
 
 /// dexcom share settings, where user can choose to use US url or not
-"settingsviews_useUSDexcomShareurl" = "Use Dexcom US Servers";
+"settingsviews_useUSDexcomShareurl" = "Serwery US";
 
 /// used for editing schedule for Nightscout upload and Dexcom Share upload
 "editScheduleTimePickerSubtitle" = "Change: ";
 
 /// Apple Watch Settings - text in row where user needs to select a calendar
-"calenderId" = "Calendar To Use";
 
 /// name of setting for back ground color
 "m5stack_settingsviews_backGroundColor" = "Background Color";
 
 /// If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown
-"infoCalendarAccessDeniedByUser" = "You previously denied access to your Calendar.\n\nTo enable it go to your device settings, privacy, calendars and enable it.";
 
 /// healthkit settings, section title
 "settingsviews_sectiontitlehealthkit" = "Apple Health";
@@ -255,20 +259,19 @@
 "volumeTestSoundPlayerExplanation" = "An alarm sound is now being played with the same volume that will be used for an Alarm Type with 'Override Mute' = On\n\n(Used for all alarms except Missed Reading alerts which always use the iOS volume.)\n\nChange the volume with the volume buttons and press OK when done.";
 
 /// dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no
-"settingsviews_uploadReadingstoDexcomShare" = "Upload to Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Prześlij";
 
 /// Apple Watch Settings - text in row where user needs to say if trend should be displayed or not
-"settingsviews_displayTrendInCalendarEvent" = "Display Trend";
+"settingsviews_displayTrendInCalendarEvent" = "Trend";
 
 /// 
-"settingsviews_showcoloredobjectives" = "Show Colored Lines";
+"settingsviews_showcoloredobjectives" = "Kolorowe linie";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// deloper settings, row title for 'Smooth Libre Values?'
-"smoothLibreValues" = "Smooth Libre Values";
 
 /// deloper settings, row title for OSLog - with OSLog enabled, a developer can view log information as explained here https://developer.apple.com/documentation/os/oslog
 "oslog" = "OSLog";
@@ -276,8 +279,12 @@
 /// deloper settings, row title for NSLog - with NSLog enabled, a developer can view log information as explained here https://github.com/JohanDegraeve/xdripswift/wiki/NSLog
 "nslog" = "NSLog";
 
-/// Developer Settings, section title
-"developerSettings" = "Developer Settings";
+/// Advanced Settings, section title
+"developerSettings" = "Ustawienia zaawansowane";
+"showDeveloperSettings" = "Pokaż";
+"preferSensorCountdown" = "Preferuj odliczanie czasu sensora";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Czas działania sensora";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Określa, czy czas działania sensora jest wyświetlany jako czas, który upłynął, czy jako odliczanie na iPhonie i Apple Watch.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -304,7 +311,7 @@
 "settingsviews_sectiontitlestatistics" = "Statistics";
 
 /// statistics settings, use IFCC method for HbA1c?
-"settingsviews_useIFCCA1C" = "Show HbA1c in mmols/mol";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 
 /// statistics settings, show statistics on home screen
 "settingsviews_showStatistics" = "Show Statistics";
@@ -317,23 +324,20 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the clock also be displayed when the screen is locked?
-"settingsviews_showClockWhenScreenIsLocked" = "Show Clock when Locked";
+"settingsviews_showClockWhenScreenIsLocked" = "Zegar ekranu blokady";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the online help be translated automatically if needed
-"settingsviews_translateOnlineHelp" = "Translate Automatically";
+"settingsviews_translateOnlineHelp" = "Przetłumacz dokumentację";
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Allow Chart Rotation";
+"settingsviews_allowScreenRotation" = "Obrót wykresu";
 
 /// help settings, section title
-"settingsviews_sectiontitlehelp" = "Help & Documentation";
 
-/// Calendar Events Settings - section title
-"calendarEventsSectionTitle" = "Calendar Events";
 
 /// help settings, open the online help
 "settingsviews_showOnlineHelp" = "Open Online Help";
@@ -343,7 +347,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
+"settingsviews_webooptransmitter" = "Algorytm nadajnika";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
@@ -353,7 +357,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// help settings, restart needed
-"settingsviews_restartNeeded" = "(Restart required)";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -372,8 +375,6 @@
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-/// Button to export all data
-"settingsviews_housekeeperExportAllData" = "Export All Data";
 
 /// Housekeeper settings, section title
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
@@ -382,7 +383,7 @@
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 
 /// Housekeeper retention period, for how long to store data
-"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days)";
+"settingsviews_housekeeperRetentionPeriod" = "Retention Period";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -392,16 +393,16 @@
 "Select Time" = "Select Time";
 
 /// transmitter settings, to explain that the reset option only works for certain transmitters
-"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
+"settingsviews_resetDexcomTransmitterMessage" = "This option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
 
 /// data source settings, keep-alive mode is set to aggressive
-"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
+"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Podtrzymanie is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
 "settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
-"settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeDisabledMessage" = "Podtrzymanie is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
 
 /// Settings screen for loop delay, explanatory text for value
 "expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
@@ -419,10 +420,10 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
 
 /// statistics settings, the type of time in range selected
-"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
-"settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
+"settingsviews_labelfollowerKeepAliveType" = "Podtrzymanie";
 
 /// this setting is required
 "settingsviews_valueIsRequired" = "⚠️ Required";
@@ -430,7 +431,6 @@
 /// treatments settings, offset the carb treatments on main chart
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
-"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
 
 /// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
 "warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
@@ -439,7 +439,7 @@
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+"settingsviews_sectionTitleDataSource" = "Źródło danych";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";
@@ -448,13 +448,12 @@
 "settingsviews_nightscoutNotEnabledRowText" = "Disabled";
 
 /// data source settings, keep-alive mode is set to use an external heartbeat
-"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Background keep-alive is set to use an external heartbeat. ❤️\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
+"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Podtrzymanie is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
 
 /// When enabled, readings will not be reading to shared user defaults (for loop)
 "suppressLoopShare" = "Suppress Loop Share";
 
 /// When clicking the event interval setting, a pop up asks for minimum number of minutes between two events, this is the pop up message - this is used for setting the interval between two calendar events
-"settingsviews_CalenderIntervalTitle" = "Event Interval";
 
 /// data source settings, enable Nightscout in the Nightscout section
 "settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
@@ -469,13 +468,14 @@
 "settingsviews_libreLinkUpReAcceptNeeded" = "Need to accept terms";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two bg announcements, this is the pop up message - this is used for setting the interval between two readings in BG announcements, Speak readings, Apple Watch
-"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
+"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// home screen settings, should the mini-chart be shown
 "settingsviews_showMiniChart" = "Show Mini-Chart";
+"settingsviews_showSensorNoiseOnChart" = "Show Sensor Noise";
 
 /// data source settings, the name of the person we are following
-"settingsviews_followerPatientName" = "Patient Name";
+"settingsviews_followerPatientName" = "Alias";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabled" = "Disabled";
@@ -499,28 +499,222 @@
 "settingsviews_labelFollowerDataSourceRegion" = "Region";
 
 /// data source settings, data source
-"settingsviews_labelFollowerDataSourceType" = "Data Source";
+"settingsviews_labelFollowerDataSourceType" = "Źródło danych";
 
 /// data source settings, enable Nightscout upload
 "settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
 
 /// data source settings, ask the user to enter the name of the person we are following if they want to - it's optional
-"settingsviews_followerPatientNameMessage" = "Here you can optionally write the name of the person you are following.";
+"settingsviews_followerPatientNameMessage" = "Here you can optionally write an alias for the person you are following.";
 
 /// follower settings, pop up that asks user to enter their password
 "settingsviews_enterPassword" = "Enter your password";
 
 /// The user needs to update their calendar permissions
-"infoCalendarAccessWriteOnly" = "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.";
 
 /// data source settings, keep-alive mode is set to normal
-"settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeNormalMessage" = "Podtrzymanie is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Przyciemnianie ekranu blokady";
 
 /// Should loop data be shared only every 5 minutes
-"shareToLoopOnceEvery5Minutes" = "Share with OS-AID every 5 mins";
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_dataManagementStorageInfo" = "Informacje o pamięci";
+"settingsviews_dataManagementManageData" = "Zarządzaj danymi";
+"settingsviews_dataManagementDataRetention" = "Przechowywanie danych";
+"settingsviews_dataManagementDataDeletion" = "Usuwanie danych";
+"settingsviews_dataManagementImportData" = "Importuj dane";
+"settingsviews_dataManagementLastHousekeeping" = "Ostatnie czyszczenie";
+"settingsviews_storageInfoDatabase" = "Baza danych";
+"settingsviews_storageInfoDatabaseSize" = "Rozmiar bazy";
+"settingsviews_storageInfoTrackedRecords" = "Zliczone rekordy";
+"settingsviews_storageInfoDevices" = "Urządzenia";
+"settingsviews_storageInfoSensors" = "Sensory";
+"settingsviews_storageInfoRetentionFooter" = "Skonfigurowany okres przechowywania danych wynosi %d dni.";
+"settingsviews_storageInfoHistory" = "Zapisana historia";
+"settingsviews_storageInfoEarliestRecord" = "Najstarszy rekord";
+"settingsviews_storageInfoLatestRecord" = "Najnowszy rekord";
+"settingsviews_storageInfoCheckingStatus" = "Sprawdzanie pamięci…";
+"settingsviews_nightscoutImportRetentionFooter" = "Import jest ograniczony do okresu przechowywania wynoszącego %d dni. Starsze dane są usuwane podczas czyszczenia.";
+"settingsviews_cleanDataAutomaticHousekeeping" = "Automatyczne czyszczenie";
+"settingsviews_cleanDataKeepHistoricalData" = "Zachowaj historię";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "Ostatnio ukończono";
+"settingsviews_cleanDataLastHousekeepingResult" = "Ostatni wynik";
+"settingsviews_cleanDataNoHousekeepingRequired" = "Czyszczenie nie jest potrzebne";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "Uruchamia się najwyżej raz dziennie przy otwarciu aplikacji. Starsze odczyty, zabiegi i nieużywane kalibracje są usuwane lokalnie.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Dane historyczne można usunąć ręcznie tylko w sekcji Usuwanie danych.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "Usunięto %@ rekord";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "Usunięto %@ rekordów";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "Wyczyść dane";
+"settingsviews_cleanDataStorageUsed" = "Użyta pamięć";
+"settingsviews_cleanDataStoredData" = "Zapisane dane";
+"settingsviews_cleanDataBgReadings" = "Odczyty glukozy";
+"settingsviews_cleanDataTreatments" = "Zabiegi";
+"settingsviews_cleanDataCalibrations" = "Kalibracje";
+"settingsviews_cleanDataSelectData" = "Dane do usunięcia";
+"settingsviews_cleanDataCleanupMethod" = "Sposób czyszczenia";
+"settingsviews_cleanDataKeepRecent" = "Zachowaj ostatnie";
+"settingsviews_cleanDataDateRange" = "Zakres dat";
+"settingsviews_cleanDataDeleteAll" = "Usuń wszystko";
+"settingsviews_cleanDataKeep" = "Zachowaj";
+"settingsviews_cleanDataFrom" = "Od";
+"settingsviews_cleanDataUntil" = "Do";
+"settingsviews_cleanDataOlderDataFooter" = "Starsze dane zostaną usunięte. Nowsze dane zostaną zachowane.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "Obie daty są uwzględnione.";
+"settingsviews_cleanDataDeleteAllFooter" = "Wszystkie wybrane dane zostaną usunięte.";
+"settingsviews_cleanDataContinue" = "Dalej";
+"settingsviews_cleanDataReviewFooter" = "Przed usunięciem zobaczysz podsumowanie.";
+"settingsviews_cleanDataPermanentDeletion" = "Trwałe usuwanie danych";
+"settingsviews_cleanDataCannotUndo" = "Tej operacji nie można cofnąć.";
+"settingsviews_cleanDataUnusedCalibrations" = "Nieużywane kalibracje";
+"settingsviews_cleanDataEarliestStoredData" = "Najstarsze zapisane dane";
+"settingsviews_cleanDataDataToDelete" = "Dane do usunięcia";
+"settingsviews_cleanDataEnterCode" = "Wpisz ten sześciocyfrowy kod";
+"settingsviews_cleanDataSixDigitCode" = "Sześciocyfrowy kod";
+"settingsviews_cleanDataConfirmDelete" = "POTWIERDŹ USUNIĘCIE";
+"settingsviews_cleanDataSuccessfullyDeleted" = "Dane zostały usunięte";
+"settingsviews_cleanDataCompleted" = "Zakończono";
+"settingsviews_cleanDataBgReadingsDeleted" = "Usunięte odczyty";
+"settingsviews_cleanDataTreatmentsDeleted" = "Usunięte zabiegi";
+"settingsviews_cleanDataStorageBefore" = "Pamięć przed";
+"settingsviews_cleanDataStorageAfter" = "Pamięć po";
+"settingsviews_cleanDataCleanupSummary" = "Podsumowanie czyszczenia";
+"settingsviews_cleanDataDatabaseReuseFooter" = "Baza może zachować rozmiar i ponownie użyć zwolnionego miejsca.";
+"settingsviews_cleanDataCheckingStatus" = "Sprawdzanie danych…";
+"settingsviews_cleanDataCountingStatus" = "Zliczanie danych…";
+"settingsviews_cleanDataDeletingStatus" = "Trwałe usuwanie danych…\nPozostaw aplikację otwartą.";
+"settingsviews_cleanDataInvalidDateRangeError" = "Data początkowa musi być wcześniejsza niż końcowa.";
+"settingsviews_cleanDataNoSelectionError" = "Wybierz co najmniej jeden typ danych.";
+"settingsviews_cleanDataNoMatchingDataError" = "Brak wybranych danych w tym zakresie.";
+"settingsviews_cleanDataChangedError" = "Dane zmieniły się po utworzeniu podsumowania. Sprawdź je ponownie.";
+"settingsviews_cleanDataDeleteFailedError" = "Nie udało się usunąć wybranych danych. Czyszczenie przerwano.";
+"settingsviews_cleanDataDays" = "%d dni";
+"settingsviews_nightscoutImportCompleted" = "Import z Nightscout zakończony";
+"settingsviews_nightscoutImportSummary" = "Podsumowanie importu";
+"settingsviews_nightscoutImportURLMissing" = "Nie skonfigurowano adresu URL Nightscout";
+"settingsviews_nightscoutImportConfigureURL" = "Przed importem danych skonfiguruj adres URL Nightscout w ustawieniach Nightscout.";
+"settingsviews_nightscoutImportDownloaded" = "Pobrano";
+"settingsviews_nightscoutImportAdded" = "Dodano";
+"settingsviews_nightscoutImportSkipped" = "Pominięto";
+"settingsviews_nightscoutImportInvalid" = "Nieprawidłowe";
+"settingsviews_nightscoutImportSummaryFooter" = "Rekordy zapisane już lokalnie zostały pominięte. Nieprawidłowe dokumenty Nightscout nie zostały zaimportowane.";
+"settingsviews_nightscoutImportingData" = "Importowanie danych";
+"settingsviews_cleanDataConfirmationCode" = "Kod potwierdzający %@";
+"settingsviews_backupCreate" = "Utwórz kopię zapasową";
+"settingsviews_backupRestore" = "Przywróć kopię zapasową";
+"settingsviews_backupCreated" = "Pomyślnie utworzono kopię zapasową";
+"settingsviews_backupRestored" = "Kopia zapasowa została pomyślnie przywrócona";
+"settingsviews_backupReplaceQuestion" = "Zastąpić istniejące dane?";
+"settingsviews_backupReplaceData" = "Zamień dane";
+"settingsviews_backupReplaceWarning" = "Istniejące odczyty poziomu glukozy we krwi i metody leczenia w zakresach dat kopii zapasowej zostaną usunięte przed przywróceniem kopii zapasowej.";
+"settingsviews_backupAndRestore" = "Kopia zapasowa i przywracanie";
+"settingsviews_backupAppSettingsAndAlerts" = "Ustawienia aplikacji i alerty";
+"settingsviews_backupEncrypt" = "Szyfruj kopię zapasową";
+"settingsviews_backupAccounts" = "Konta zapasowe";
+"settingsviews_backupConfirmPassword" = "Potwierdź hasło";
+"settingsviews_backupPasswordProtection" = "Ochrona hasłem";
+"settingsviews_backupPasswordProtectionFooter" = "Dodanie ochrony hasłem umożliwia także tworzenie kopii zapasowych kont zawierających wrażliwe dane.";
+"settingsviews_backupAccountDetailsFooter" = "Dane konta mogą obejmować adresy URL serwerów, nazwy użytkowników, hasła i tokeny dostępu.";
+"settingsviews_backupCreateAndShare" = "Twórz i udostępniaj kopie zapasowe";
+"settingsviews_backupEncryptedCreationFooter" = "Tworzenie zaszyfrowanych kopii zapasowych trwa dłużej. Pozostaw aplikację otwartą i bądź cierpliwy.";
+"settingsviews_backupCreatedAt" = "Utworzono";
+"settingsviews_backupEarliestData" = "Najwcześniejsze dane";
+"settingsviews_backupSettingsAndAlerts" = "Ustawienia i alerty";
+"settingsviews_backupAccountDetails" = "Szczegóły konta";
+"settingsviews_backupIncluded" = "Uwzględnione";
+"settingsviews_backupNotIncluded" = "Nieuwzględnione";
+"settingsviews_backupNotEnabled" = "Nie włączone";
+"settingsviews_backupSummary" = "Podsumowanie kopii zapasowej";
+"settingsviews_backupChooseFile" = "Wybierz plik kopii zapasowej";
+"settingsviews_backupFile" = "Plik kopii zapasowej";
+"settingsviews_backupFileCheckFooter" = "Kopia zapasowa jest sprawdzana przed zmianą istniejących danych.";
+"settingsviews_backupSelected" = "Wybrana kopia zapasowa";
+"settingsviews_backupPasswordRequired" = "Wymagane";
+"settingsviews_backupUnlock" = "Odblokuj kopię zapasową";
+"settingsviews_backupEncryptedNotice" = "Ta kopia zapasowa jest zaszyfrowana i musi zostać odblokowana.";
+"settingsviews_backupSettings" = "Ustawienia";
+"settingsviews_backupRestoreOptions" = "Opcje przywracania";
+"settingsviews_backupDataHandling" = "Obsługa danych";
+"settingsviews_backupKeepCurrentData" = "Zachowaj aktualne dane";
+"settingsviews_backupFillGaps" = "Wypełnij luki";
+"settingsviews_backupReplaceRange" = "Zamień zakres kopii zapasowej";
+"settingsviews_backupIgnoreData" = "Ignoruj dane";
+"settingsviews_backupRestoreSettingsAndAlerts" = "Przywróć ustawienia aplikacji i alerty";
+"settingsviews_backupRestoreAccounts" = "Przywróć konta";
+"settingsviews_backupReplaceAndRestore" = "Wymień i przywróć";
+"settingsviews_backupRestoreSummary" = "Przywróć podsumowanie";
+"settingsviews_backupBgReadingsAppliedFrom" = "Zastosowano odczyty poziomu glukozy z";
+"settingsviews_backupBgReadingsAdded" = "Dodano odczyty poziomu glukozy we krwi";
+"settingsviews_backupBgReadingsSkipped" = "Odczyty BG pominięte";
+"settingsviews_backupTreatmentsAdded" = "Dodano zabiegi";
+"settingsviews_backupTreatmentsSkipped" = "Zabiegi pominięte";
+"settingsviews_backupSettingsRestored" = "Ustawienia przywrócone";
+"settingsviews_backupAccountRestore" = "Przywrócenie konta";
+"settingsviews_backupCreatingEncryptedStatus" = "Bezpieczne tworzenie i szyfrowanie kopii zapasowej…\nProsimy o cierpliwość.";
+"settingsviews_backupCreatingStatus" = "Tworzę kopię zapasową…";
+"settingsviews_backupCheckingStatus" = "Sprawdzam kopię zapasową…";
+"settingsviews_backupDecryptingStatus" = "Odszyfrowywanie i sprawdzanie kopii zapasowej…\nProszę o cierpliwość.";
+"settingsviews_backupRestoringEncryptedStatus" = "Przywracanie zaszyfrowanej kopii zapasowej…\nProszę o cierpliwość.";
+"settingsviews_backupRestoringStatus" = "Przywracam kopię zapasową…";
+"settingsviews_backupErrorInvalidFile" = "To nie jest prawidłowa kopia zapasowa aplikacji.";
+"settingsviews_backupErrorIncorrectPassword" = "Hasło jest nieprawidłowe lub chroniona kopia zapasowa jest uszkodzona.";
+"settingsviews_backupErrorMissingPassword" = "Wprowadź hasło używane do ochrony tej kopii zapasowej.";
+"settingsviews_nightscoutImportQuestion" = "Importować z Nightscout?";
+"settingsviews_nightscoutImportAction" = "Import z Nightscout";
+"settingsviews_nightscoutImportDiscardQuestion" = "Odrzucić zapisany import?";
+"settingsviews_nightscoutImportDiscard" = "Odrzuć import";
+"settingsviews_nightscoutImportDiscardSaved" = "Odrzuć zapisany import";
+"settingsviews_nightscoutImportDiscardMessage" = "Zapisany postęp zostanie usunięty. Zaimportowane dane pozostaną bezpiecznie przechowywane i zostaną pominięte, jeśli zaczniesz od nowa.";
+"settingsviews_nightscoutImportDataToImport" = "Dane do importu";
+"settingsviews_nightscoutImportPeriod" = "Okres importu";
+"settingsviews_nightscoutImportExistingDataFooter" = "Istniejące dane lokalne zostaną zachowane. Odczyty poziomu glukozy we krwi w ciągu 30 sekund od istniejącego odczytu i zabiegi już zidentyfikowane przez Nightscout są pomijane.";
+"settingsviews_nightscoutImportKeepOpenFooter" = "Pozostaw aplikację otwartą do zakończenia importowania. Postęp jest zapisywany po każdej zakończonej partii, dzięki czemu przerwany import można wznowić.";
+"settingsviews_nightscoutImportPeriodLabel" = "Okres";
+"settingsviews_nightscoutImportCompletedBatches" = "Ukończone partie";
+"settingsviews_nightscoutImportResume" = "Wznów import";
+"settingsviews_nightscoutImportSaved" = "Zapisano import";
+"settingsviews_nightscoutImportUnsupportedFooter" = "W tym imporcie zastosowano nieobsługiwany okres. Wyrzuć go, aby zacząć od nowa.";
+"settingsviews_nightscoutImportExceedsRetentionFooter" = "Ten import przekracza bieżący okres przechowywania. Wyrzuć go, aby zacząć od nowa.";
+"settingsviews_nightscoutImportResumeFooter" = "Poprzedni import został zatrzymany przed ukończeniem wszystkich żądanych partii. Wznawianie jest kontynuowane od ostatniego zapisanego punktu kontrolnego.";
+"settingsviews_nightscoutImportPause" = "Wstrzymaj import";
+"settingsviews_nightscoutImportBgAndTreatments" = "Odczyty poziomu glukozy we krwi i leczenie";
+"settingsviews_nightscoutImportBgOnly" = "Odczyty BG";
+"settingsviews_nightscoutImportTreatmentsOnly" = "zabiegi";
+"settingsviews_nightscoutImportKeepAppOpen" = "Pozostaw aplikację otwartą.";
+"settingsviews_nightscoutImportPaused" = "Import wstrzymany";
+"settingsviews_nightscoutImportErrorNoSelection" = "Wybierz odczyty poziomu glukozy we krwi, leczenie lub jedno i drugie.";
+"settingsviews_nightscoutImportErrorUnsupportedPeriod" = "Zapisany import wykorzystuje okres, który nie jest już obsługiwany. Wyrzuć to i zacznij od nowa.";
+"settingsviews_nightscoutImportErrorRetention" = "Wybrany okres importu przekracza bieżące ustawienie przechowywania danych.";
+"settingsviews_nightscoutImportErrorMissingURL" = "Przed rozpoczęciem importu wprowadź adres URL Nightscout w Ustawieniach Nightscout.";
+"settingsviews_nightscoutImportErrorInvalidURL" = "Skonfigurowany adres URL Nightscout jest nieprawidłowy. Sprawdź to w Ustawieniach Nightscout i spróbuj ponownie.";
+"settingsviews_nightscoutImportErrorCheckpointUnavailable" = "Nie można już wznowić zapisanego importu Nightscout. Rozpocznij nowy import.";
+"settingsviews_nightscoutImportErrorSiteChanged" = "Skonfigurowana witryna Nightscout uległa zmianie od czasu rozpoczęcia importu. Odrzuć zapisany import lub przywróć poprzedni adres URL Nightscout.";
+"settingsviews_nightscoutImportErrorAuthentication" = "Nightscout odmówił dostępu. Sprawdź sekret API lub token dostępu w Ustawieniach Nightscout.";
+"settingsviews_nightscoutImportErrorEndpoint" = "Nie znaleziono punktu końcowego danych Nightscout. Sprawdź skonfigurowany adres URL i wersję witryny.";
+"settingsviews_nightscoutImportErrorRateLimited" = "Nightscout otrzymuje zbyt wiele żądań. Poczekaj chwilę i wznów import.";
+"settingsviews_nightscoutImportErrorInvalidResponse" = "Nightscout zwrócił dane, których nie można było bezpiecznie odczytać. Nie zaimportowano żadnych danych z partii, której dotyczy problem.";
+"settingsviews_nightscoutImportErrorResponseLimit" = "Partia Nightscout pozostała zbyt duża po podzieleniu na małe przedziały czasowe. Nie zaimportowano żadnych obciętych danych.";
+"settingsviews_backupCreatedWithAppVersion" = "Kopia zapasowa utworzona w wersji aplikacji %@.";
+"settingsviews_backupErrorUnsupportedVersion" = "Wersja formatu kopii zapasowej %d nie jest obsługiwana przez tę wersję aplikacji.";
+"settingsviews_backupErrorFinalValueMismatch" = "Przechowywane wartości glukozy nie odtwarzają kopii zapasowej wartości końcowej do odczytu %@.";
+"settingsviews_nightscoutImportBatchCount" = "%1$d z %2$d";
+"settingsviews_nightscoutImportBgAddedProgress" = "Dodano odczyty poziomu glukozy we krwi: %@";
+"settingsviews_nightscoutImportTreatmentsAddedProgress" = "Dodane zabiegi: %@";
+"settingsviews_nightscoutImportConfirmation" = "Zaimportować ostatnie %1$d dni %2$@? Istniejące zapisy lokalne zostaną zachowane, a duplikaty zostaną pominięte.";
+"settingsviews_nightscoutImportBatchProgress" = "Partia %1$d z %2$d";
+"settingsviews_nightscoutImportErrorServer" = "Nightscout zwrócił tymczasowy błąd serwera (HTTP %d). Wznów import później.";
+"settingsviews_nightscoutImportErrorUnexpectedStatus" = "Nightscout zwrócił nieoczekiwaną odpowiedź (HTTP %d).";
+"sensorNoiseSensitivity" = "Sensor Sensitivity";
+"sensorNoiseSensitivitySensitive" = "Sensitive";
+"sensorNoiseSensitivityNormal" = "Normal";
+"sensorNoiseSensitivityPermissive" = "Permissive";
+"settingsviews_followerServiceStatus" = "Stan";
+"settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Podtrzymanie.";
+"settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Podtrzymanie disabled.\n\nContact Image function cannot work without Podtrzymanie.";

@@ -3,31 +3,31 @@ import UIKit
 import ActivityKit
 
 extension UserDefaults {
-    
+
     /// shared user defaults
     private static let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName)
-    
+
     /// common function to be called if user default needs to be stored in shared user defaults
     public static func storeInSharedUserDefaults(value: Any, forKey key: String) {
-        
+
         // setting to be stored also in shared userdefaults because it's used by the today widget
         if let sharedUserDefaults = sharedUserDefaults {
             sharedUserDefaults.set(value, forKey: key)
         }
-        
+
     }
 
     /// keys for settings and user defaults. For reading and writing settings, the keys should not be used, the specific functions kan be used.
     public enum Key: String {
         // User configurable Settings
-        
+
         // Online Help
-        
+
         /// should the online help by automatically translated?
         case translateOnlineHelp = "translateOnlineHelp"
-        
+
         // Data Source
-        
+
         /// is master mode selected?
         case isMaster = "isMaster"
         /// should master data be uploaded to Nightscout?
@@ -42,7 +42,7 @@ extension UserDefaults {
         case followerPatientName = "followerPatientName"
         /// timestamp of last successful connection to follower service
         case timeStampOfLastFollowerConnection = "timeStampOfLastFollowerConnection"
-        
+
         // LibreLinkUp account info
         /// LibreLinkUp username
         case libreLinkUpEmail = "libreLinkUpEmail"
@@ -78,7 +78,7 @@ extension UserDefaults {
         case medtrumEasyViewConnectionsFetchFailed = "medtrumEasyViewConnectionsFetchFailed"
 
         // General
-        
+
         /// bloodglucose unit
         case bloodGlucoseUnitIsMgDl = "bloodGlucoseUnit"
         /// should notification be shown with reading yes or no
@@ -91,9 +91,31 @@ extension UserDefaults {
         case notificationInterval = "notificationInterval"
         /// which type of live activities should be shown, if any?
         case liveActivityType = "liveActivityType"
-        
+        /// should BG adjustment be enabled?
+        case enableAdjustment = "enableAdjustment"
+        /// should BG smoothing be enabled?
+        case enableSmoothing = "enableSmoothing"
+        /// BG smoothing period in minutes
+        case bgSmoothingPeriodInMinutes = "bgSmoothingPeriodInMinutes"
+        /// BG smoothing strength
+        case bgSmoothingStrength = "bgSmoothingStrength"
+        /// BG smoothing algorithm
+        case bgSmoothingAlgorithm = "bgSmoothingAlgorithm"
+        /// should faster CGM streams be reduced to visible 5 minute readings?
+        case useFiveMinuteReadings = "useFiveMinuteReadings"
+        /// timestamp from which the current 5 minute readings setting should be applied
+        case fiveMinuteReadingsStartTimeStamp = "fiveMinuteReadingsStartTimeStamp"
+        /// timestamp from which BG data exists for the current source context
+        case postProcessingStartTimeStamp = "postProcessingStartTimeStamp"
+        /// timestamp from which the current post processing settings should be applied
+        case postProcessingApplyFromTimeStamp = "postProcessingApplyFromTimeStamp"
+        /// current source context identifier used by BG post processing
+        case postProcessingSourceContextIdentifier = "postProcessingSourceContextIdentifier"
+        /// hours to show in the BG post processing preview chart
+        case postProcessingPreviewChartHoursToShow = "postProcessingPreviewChartHoursToShow"
+
         // Home Screen and main chart settings
-        
+
         /// should the screen/chart be allowed to rotate?
         case showMiniChart = "showMiniChart"
         /// hours to show on the mini-chart?
@@ -106,6 +128,12 @@ extension UserDefaults {
         case screenLockDimmingType = "screenLockDimmingType"
         /// should the main chart y-axis be automatically rescaled back down to current chart values and the end date reset when necessary?
         case allowMainChartAutoReset = "allowMainChartAutoReset"
+        /// should the original glucose values be shown on the main chart when post processing is enabled?
+        case showOriginalBGReadings = "showOriginalBGReadings"
+        /// should short-term sensor noise bands be shown on the main chart?
+        case showSensorNoiseOnChart = "showSensorNoiseOnChart"
+        /// how strictly should stored sensor noise values be interpreted?
+        case sensorNoiseSensitivity = "sensorNoiseSensitivity"
         /// show the objective lines in color or grey?
         case urgentHighMarkValue = "urgentHighMarkValue"
         /// high value
@@ -118,11 +146,11 @@ extension UserDefaults {
         case showTarget = "showTarget"
         /// target value
         case targetMarkValue = "targetMarkValue"
-        
-        
-        
+
+
+
         // Treatment settings
-        
+
         /// should the treatments be shown on the main chart?
         case showTreatmentsOnChart = "showTreatmentsOnChart"
         /// should the treatments be shown on the landscape chart?
@@ -139,11 +167,13 @@ extension UserDefaults {
         case showBasalTreatmentsInList = "showBasalTreatmentsInList"
         /// should the BG Checks be listed in the treatment list/table?
         case showBgCheckTreatmentsInList = "showBgCheckTreatmentsInList"
+        /// should the notes be listed in the treatment list/table?
+        case showNoteTreatmentsInList = "showNoteTreatmentsInList"
         /// override the default canula age value (CAGE = time since site change)?
         case CAGEMaxHours = "CAGEMaxHours"
-        
+
         // Statistics settings
-        
+
         /// show the statistics? How many days should we use for the calculations?
         case showStatistics = "showStatistics"
         /// show the objective lines in color or grey?
@@ -159,20 +189,49 @@ extension UserDefaults {
         /// use the newer TITR of 70-140mg/dL to calculate the statistics? If false, we will use the conventional TIR of 70-180mg/dL
         case useTITRStatisticsRange = "useTITRStatisticsRange"
 
+        // Report settings
+
+        /// patient name printed on generated CGM reports
+        case reportPatientName = "reportPatientName"
+        /// patient identifier printed on generated CGM reports
+        case reportPatientID = "reportPatientID"
+        /// preferred PDF paper size for generated CGM reports
+        case reportPaperSize = "reportPaperSize"
+        /// preferred analysis period for generated CGM reports
+        case reportPeriod = "reportPeriod"
+        /// preferred language for generated CGM reports
+        case reportLanguage = "reportLanguage"
+
         // Alert settings
-        
+
         /// when did the user snooze all alarms
         case snoozeAllAlertsFromDate = "snoozeAllAlertsFromDate"
         /// for how long did the user snooze all alarms
         case snoozeAllAlertsUntilDate = "snoozeAllAlertsUntilDate"
-        
+
         // Housekeeper settings
 
         /// For how many days should we keep Readings, Treatments and Calibrations?
         case retentionPeriodInDays = "retentionPeriodInDays"
-        
+        /// Should historical data be removed automatically during housekeeping?
+        case automaticHousekeepingEnabled = "automaticHousekeepingEnabled"
+        /// When did automatic housekeeping last complete successfully?
+        case lastHousekeepingDate = "lastHousekeepingDate"
+        /// When was automatic housekeeping last attempted?
+        case lastHousekeepingAttemptDate = "lastHousekeepingAttemptDate"
+        /// Which retention period was used by the last housekeeping attempt?
+        case lastHousekeepingAttemptRetentionPeriodInDays = "lastHousekeepingAttemptRetentionPeriodInDays"
+        /// Which retention period was used by the last successful housekeeping run?
+        case lastHousekeepingRetentionPeriodInDays = "lastHousekeepingRetentionPeriodInDays"
+        /// How many BG readings did the last housekeeping run remove?
+        case lastHousekeepingBgReadingsDeleted = "lastHousekeepingBgReadingsDeleted"
+        /// How many treatments did the last housekeeping run remove?
+        case lastHousekeepingTreatmentsDeleted = "lastHousekeepingTreatmentsDeleted"
+        /// How many unused calibrations did the last housekeeping run remove?
+        case lastHousekeepingCalibrationsDeleted = "lastHousekeepingCalibrationsDeleted"
+
         // Sensor Info settings
-        
+
         /// store the max sensor age in days if applicable to the active sensor type
         case maxSensorAgeInDays = "maxSensorAgeInDays"
         /// active sensor serial number
@@ -189,15 +248,15 @@ extension UserDefaults {
         case activeSensorMaxSensorAgeInDaysOverridenAnubis = "activeSensorMaxSensorAgeInDaysOverridenAnubis"
         /// should we force a 15 day sensor max days for G7 sensors?
         case is15DayDexcomG7 = "is15DayDexcomG7"
-        
-        
+
+
         // Transmitter
-        
+
         /// transmitter type
         case transmitterTypeAsString = "transmitterTypeAsString"
 
         // Nightscout
-        
+
         /// should readings be uploaded to nightscout
         case nightscoutEnabled = "nightscoutEnabled"
         /// should we try and follow any specific AID system (Loop, Trio, AAPS, OpenAPS etc)?
@@ -215,11 +274,13 @@ extension UserDefaults {
         case nightscoutAPIKey = "nightscoutAPIKey"
         /// send sensor start time to nightscout ?
         case uploadSensorStartTimeToNS = "uploadSensorStartTimeToNS"
+        /// LibreLinkUp sensor start time most recently uploaded to Nightscout
+        case libreLinkUpSensorStartDateUploadedToNS = "libreLinkUpSensorStartDateUploadedToNS"
         /// port number to use, 0 means not set
         case nightscoutPort = "nightscoutPort"
         /// token to use for authentication, 0 means not set
         case nightscoutToken = "nightscoutToken"
-        
+
         /// is a  nightscout sync of treatments required
         ///
         /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightscoutSyncManager and when set to true, the manager knows a new sync is required
@@ -229,18 +290,18 @@ extension UserDefaults {
         ///
         /// value will be increased with 1 each time there's an update
         case nightscoutTreatmentsUpdateCounter = "nightscoutTreatmentsUpdateCounter"
-        
+
         /// Nightscout profile stored as a JSON data object
         case nightscoutProfile = "nightscoutProfile"
-        
+
         /// Nightscout deviceStatus stored as a JSON data object
         case nightscoutDeviceStatus = "nightscoutDeviceStatus"
-        
+
         /// Nightscout deviceStatus update flag
         case nightscoutDeviceStatusWasUpdated = "nightscoutDeviceStatusWasUpdated"
-        
+
         // Dexcom Share
-        
+
         /// should readings be uploaded to Dexcom share
         case uploadReadingstoDexcomShare = "uploadReadingstoDexcomShare"
         /// dexcom share account name
@@ -262,18 +323,18 @@ extension UserDefaults {
         case dexcomShareUploadSchedule = "dexcomShareUploadSchedule"
 
         // Healthkit
-        
+
         /// should readings be stored in healthkit, true or false
         case storeReadingsInHealthkit = "storeReadingsInHealthkit"
-        
+
         /// did user authorize the storage of readings in healthkit or not
         case storeReadingsInHealthkitAuthorized = "storeReadingsInHealthkitAuthorized"
-        
+
         /// timestamp of last bgreading that was stored in healthkit
         case timeStampLatestHealthKitStoreBgReading = "timeStampLatestHealthKitStoreBgReading"
-        
+
         // Speak readings
-        
+
         /// speak readings
         case speakReadings = "speakReadings"
         /// speak reading language
@@ -284,18 +345,18 @@ extension UserDefaults {
         case speakTrend = "speakTrend"
         /// speak interval
         case speakInterval = "speakInterval"
-        
+
         // Settings that Keep track of alert and info messages shown to the user ======
-        
+
         /// message shown when user starts a sensor, which tells that timing should be exact, was it already shown or not
         case startSensorTimeInfoGiven = "startSensorTimeInfoGiven"
         /// license info accepted by user yes or no
         case licenseInfoAccepted = "licenseInfoAccepted"
         /// used to allow the user to dismiss the lock screen warning forever
         case lockScreenDontShowAgain = "lockScreenDontShowAgain"
-        
+
         // M5Stack
-        
+
         /// M5Stack blepassword, needed for authenticating App to M5Stack
         case m5StackBlePassword = "M5StackBlePassword"
         /// M5Stack text color
@@ -314,59 +375,74 @@ extension UserDefaults {
         case m5StackWiFiPassword2 = "m5StackWiFiPassword2"
         /// Password of wifi 3 to be configured in M5Stack
         case m5StackWiFiPassword3 = "m5StackWiFiPassword3"
-        
+
         // Apple Watch
-        
-        /// enable the Watch complications
-        case showDataInWatchComplications = "showDataInWatchComplications"
-        /// timestamp that the user acknowledged that the complications will not show in real-time
-        case watchComplicationUserAgreementDate = "watchComplicationUserAgreementDate"
-        /// how many complication updates are remaining for the current day
+
+        /// how often to request a complication update while the Watch app is in the background
         case forceComplicationUpdateInMinutes = "forceComplicationUpdateInMinutes"
-        /// how many complication updates are remaining for the current day
-        case remainingComplicationUserInfoTransfers = "remainingComplicationUserInfoTransfers"
-        /// force a complication update
-        case forceComplicationUpdate = "forceComplicationUpdate"
-        
-        // Calendar Events
-        
-        /// create calendar event yes or no
+
+        // Calendar Share
+
+        /// create Calendar Share event yes or no
         case createCalendarEvent = "createCalendarEvent"
-        
-        /// selected calender id (name of the calendar) in which the event should be created
+
+        /// selected calender id (name of the calendar) in which the Calendar Share event should be created
         case calenderId = "calenderId"
-        
+
         /// should trend be displayed yes or no
         case displayTrendInCalendarEvent = "displayTrend"
         /// should delta be displayed yes or no
         case displayDeltaInCalendarEvent = "displayDelta"
         /// should units be displayed yes or no
         case displayUnitInCalendarEvent = "displayUnits"
-        
+
         /// calendar interval
         case calendarInterval = "calendarInterval"
-        
+
+        /// Calendar Share history window in minutes
+        case calendarShareHistoryInMinutes = "calendarShareHistoryInMinutes"
+
         /// should a visual coloured indicator be shown in the calendar title yes or no
         case displayVisualIndicatorInCalendarEvent = "displayVisualIndicator"
-        
+
+        // Calendar Share
+
+        /// alias sent to Calendar Follow devices
+        case calendarShareAlias = "calendarShareAlias"
+
+        /// last Calendar Share write status
+        case calendarShareStatus = "calendarShareStatus"
+
+        /// last Calendar Share write timestamp
+        case calendarShareLastUpload = "calendarShareLastUpload"
+
+        /// selected shared calendar name used by Calendar Follow
+        case calendarFollowCalendarId = "calendarFollowCalendarId"
+
+        /// last Calendar Follow read status
+        case calendarFollowStatus = "calendarFollowStatus"
+
+        /// last Calendar Follow read timestamp
+        case calendarFollowLastRead = "calendarFollowLastRead"
+
         // Contact image
-        
+
         /// enable contact image yes or no
         case enableContactImage = "enableContactImage"
         /// should trend be displayed yes or no
         case displayTrendInContactImage = "displayTrendInContactImage"
         /// should a black/white contact image be used? Useful to display nicely in watchfaces with a colour tint (i.e. not multicolor)
         case useHighContrastContactImage = "useHighContrastContactImage"
-        
+
 
         // Other Settings (not user configurable)
-        
+
         /// - in case missed reading alert settings are changed by user, this value will be set to true
         /// - alertmanager will observe that value and when changed, verify if missed reading alert needs to be changed
         case missedReadingAlertChanged = "missedReadingAlertChanged"
         /// when was the app launched, used in trace info that is sent via email. Just to be able to see afterwards if the app ever crashed. Because sometimes users say it crashed, but maybe it just stopped receiving readings and restarted by opening the app, but didn't really crash
         case timeStampAppLaunch = "timeStampAppLaunch"
-        
+
         // Nightscout
         /// timestamp lastest reading uploaded to Nightscout
         case timeStampLatestNSUploadedBgReadingToNightscout = "timeStampLatestUploadedBgReading"
@@ -374,51 +450,49 @@ extension UserDefaults {
         case timeStampLatestNightscoutSyncRequest = "timeStampLatestNightscoutSyncRequest"
         /// timestamp latest calibration uploaded to Nightscout
         case timeStampLatestNSUploadedCalibrationToNightscout = "timeStampLatestUploadedCalibration"
-        
+
         // Transmitter
         /// Transmitter Battery Level
         case transmitterBatteryInfo = "transmitterbatteryinfo"
         /// timestamp last battery reading (will only be used for dexcom G5 where we need to explicitly ask for the battery)
         case timeStampOfLastBatteryReading = "timeStampOfLastBatteryReading"
-        
+
         // Dexcom Share
         /// timestamp of latest reading uploaded to Dexcom Share
         case timeStampLatestDexcomShareUploadedBgReading = "timeStampLatestDexcomShareUploadedBgReading"
-        
+
         // OS-AID sharing (Loop, iAPS, Trio etc)
         /// dictionary representation of readings that were shared with Loop (or another OS-AID system using the same method). This is not the json representation, it's an array of dictionary
         case readingsStoredInSharedUserDefaultsAsDictionary = "readingsStoredInSharedUserDefaultsAsDictionary"
-            
+
         /// timestamp lastest reading shared with Loop/OS-AID
         case timeStampLatestLoopSharedBgReading = "timeStampLatestLoopSharedBgReading"
-        
-        /// Loop/OS-AID sharing will be limited to just once every 5 minutes if true
-        case shareToLoopOnceEvery5Minutes = "shareToLoopOnceEvery5Minutes"
-        
 
         // Trace
         /// should debug level logs be added in trace file or not, and also in NSLog
         case addDebugLevelLogsInTraceFileAndNSLog = "addDebugLevelLogsInTraceFileAndNSLog"
-        
+
         // NFC scan handlers
         /// used to indicate that a Libre 2 NFC pairing scan has failed
         case nfcScanFailed = "nfcScanFailed"
-        
+
         /// used to indicate that a Libre 2 NFC pairing scan has been successful
         case nfcScanSuccessful = "nfcScanSuccessful"
-        
+
         /// used to stop the active sensor if an integrated transmitter/sensor is disconnected (e.g. Libre 2)
         case stopActiveSensor = "stopActiveSensor"
-        
-        
+
+
         // non fixed slope values for oop web Libre
         /// web oop parameters, only for bubble, miaomiao and Libre 2
         case libre1DerivedAlgorithmParameters = "algorithmParameters"
 
         // development settings
-        
+
         /// show Developer Settings
         case showDeveloperSettings = "showDeveloperSettings"
+        /// show the active sensor lifetime as time remaining instead of time elapsed
+        case preferSensorCountdown = "preferSensorCountdown"
         /// G6 factor1 - for testing G6 scaling
         case G6v2ScalingFactor1 = "G6v2ScalingFactor1"
         /// G6 factor2 - for testing G6 scaling
@@ -427,19 +501,19 @@ extension UserDefaults {
         case NSLogEnabled = "NSLogEnabled"
         /// OSLogEnabled enabled or not
         case OSLogEnabled = "OSLogEnabled"
-        /// case smooth libre values
-        case smoothLibreValues = "smoothLibreValues"
-        /// timestamp of when smoothLibreValues was enabled or disabled by the user
-        case smoothLibreValuesChangedAtTimeStamp = "smoothLibreValuesChangedAtTimeStamp"
         /// for Libre 2 : suppress sending unlockPayLoad, this will allow to run xDrip4iOS/Libre 2 in parallel with other app(s)
         case suppressUnLockPayLoad = "suppressUnLockPayLoad"
         /// should the BG values be written to a shared app group?
         case loopShareType = "loopShareType"
+        /// should smoothed/final values be shared with OS-AID apps instead of adjusted/calculated values?
+        case loopShareSmoothedData = "loopShareSmoothedData"
+        /// should Medtrum Nano values be shared with OS-AID apps despite accuracy concerns?
+        case loopShareMedtrumNano = "loopShareMedtrumNano"
         /// did user authorize the storage of "frequent" writes to Nightscout or not (i.e. every 60 seconds instead of every 5 minutes)
         case storeFrequentReadingsInNightscout = "storeFrequentReadingsInNightscout"
         /// did user authorize the storage of "frequent" readings in healthkit or not (i.e. every 60 seconds instead of every 5 minutes)
         case storeFrequentReadingsInHealthKit = "storeFrequentReadingsInHealthKit"
-        /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
+        /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes.
         /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
         case loopDelaySchedule = "loopDelaySchedule"
         case loopDelayValueInMinutes = "loopDelayValueInMinutes"
@@ -453,12 +527,12 @@ extension UserDefaults {
         case previousTemperatureAdjustmentValues = "previousTemperatureAdjustmentValues"
         /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
         case cgmTransmitterDeviceAddress = "cgmTransmitterDeviceAddress"
-        
+
         /// will be set to true when UIApplication.willEnterForegroundNotification is triggered. And to false when app goes back to background
         ///
         /// Can be used if status needs to be known, app in for or background. UIApplication.shared.applicationState seems to come a bit too late to active, when the app is coming to the foreground, in cases where it's needed, this UserDefaults key can be used
         case appInForeGround = "appInForeGround"
-        
+
         // Libre
         /// Libre unlock code
         case libreActiveSensorUnlockCode = "activeSensorUnlockCode"
@@ -470,32 +544,34 @@ extension UserDefaults {
         /// - Libre patch info - used in Libre 2 setup - should be read first eg via bubble or mm and then used in Libre 2 communication
         /// - stored as data as read from transmitter
         case librePatchInfo = "librePatchInfo"
-        
+
         // heartbeat
         /// the last heartbeat connection timestamp
         case timeStampOfLastHeartBeat = "timeStampOfLastHeartBeat"
         /// how many seconds since the last heartbeat before we raise a disconnection warning
         case secondsUntilHeartBeatDisconnectWarning = "secondsUntilHeartBeatDisconnectWarning"
-        
+
         // snooze
         /// used by the observer in RVC to update the UI for the snooze status
         case updateSnoozeStatus = "updateSnoozeStatus"
-        
+        /// one-time migration marker for the reduced alert snooze-duration options
+        case didMigrateAlertSnoozePeriodsToReducedOptions = "didMigrateAlertSnoozePeriodsToReducedOptions"
+
         /// should the app allow a high contrast mode for the .systemSmall widget when shown in StandBy mode at night?
         case allowStandByHighContrast = "allowStandByHighContrast"
-        
+
         /// force StandBy mode to show a big number version of the widget
         case forceStandByBigNumbers = "forceStandByBigNumbers"
-        
+
         /// should the landscape chart view show statistics info or just a large chart
         case showStatisticsOnLandscapeChart = "showStatisticsOnLandscapeChart"
     }
-    
-    
+
+
     // MARK: - =====  User Configurable Settings ======
-    
+
     // MARK: Help
-    
+
     /// should the app automatically show the translated version of the online help if English (en) is not the selected app locale?
     @objc dynamic var translateOnlineHelp: Bool {
         // default value for bool in userdefaults is false, as default we want the app to translate automatically
@@ -506,9 +582,9 @@ extension UserDefaults {
             set(!newValue, forKey: Key.translateOnlineHelp.rawValue)
         }
     }
-    
+
     // MARK: Data Source
-    
+
     /// true if device is master, false if follower
     @objc dynamic var isMaster: Bool {
         // default value for bool in userdefaults is false, false is for master, true is for follower
@@ -519,7 +595,7 @@ extension UserDefaults {
             set(!newValue, forKey: Key.isMaster.rawValue)
         }
     }
-    
+
     /// should the master CGM data be uploaded to Nightscout?
     @objc dynamic var masterUploadDataToNightscout: Bool {
         // default value for bool in userdefaults is false
@@ -530,7 +606,7 @@ extension UserDefaults {
             set(!newValue, forKey: Key.masterUploadDataToNightscout.rawValue)
         }
     }
-    
+
     /// holds the enum integer of the data source selected when in follower mode
     /// it will default to 0 which is Nightscout
     var followerDataSourceType: FollowerDataSourceType {
@@ -542,22 +618,22 @@ extension UserDefaults {
             set(newValue.rawValue, forKey: Key.followerDataSourceType.rawValue)
         }
     }
-    
+
     /// holds the enum integer of the type of follower keep-alive to be used
     /// it would default to 0 (disabled) so to avoid this, we'll manually set it to normal the first time get is called
     var followerBackgroundKeepAliveType: FollowerBackgroundKeepAliveType {
         get {
-            
+
             // check if the followerBackgroundKeepAliveType key has already been previously set. If not, then configure it as needed for first use
             guard let _ = UserDefaults.standard.object(forKey: "followerBackgroundKeepAliveType") else {
-                
+
                 // this is the first time the keep-alive key has been called, so set it to 1 (normal). Needed because otherwise it would initialize to 0 (disabled).
                 set(FollowerBackgroundKeepAliveType.normal.rawValue, forKey: Key.followerBackgroundKeepAliveType.rawValue)
-                
+
                 let followerBackgroundKeepAliveTypeAsInt = integer(forKey: Key.followerBackgroundKeepAliveType.rawValue)
                 return FollowerBackgroundKeepAliveType(rawValue: followerBackgroundKeepAliveTypeAsInt) ?? .normal
             }
-            
+
             let followerBackgroundKeepAliveTypeAsInt = integer(forKey: Key.followerBackgroundKeepAliveType.rawValue)
             return FollowerBackgroundKeepAliveType(rawValue: followerBackgroundKeepAliveTypeAsInt) ?? .normal
         }
@@ -565,7 +641,7 @@ extension UserDefaults {
             set(newValue.rawValue, forKey: Key.followerBackgroundKeepAliveType.rawValue)
         }
     }
-    
+
     /// patient name/alias (optional) - useful for users who follow various people
     var followerPatientName: String? {
         get {
@@ -575,7 +651,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.followerPatientName.rawValue)
         }
     }
-    
+
     /// should the follower CGM data be uploaded to Nightscout?
     @objc dynamic var followerUploadDataToNightscout: Bool {
         get {
@@ -585,7 +661,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.followerUploadDataToNightscout.rawValue)
         }
     }
-    
+
     /// timestamp of last successful connection to follower service
     var timeStampOfLastFollowerConnection:Date? {
         get {
@@ -595,9 +671,9 @@ extension UserDefaults {
             set(newValue, forKey: Key.timeStampOfLastFollowerConnection.rawValue)
         }
     }
-    
+
     // MARK: - LibreLinkUp Follower Settings
-    
+
     /// LibreLinkUp account username
     @objc dynamic var libreLinkUpEmail: String? {
         get {
@@ -607,7 +683,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.libreLinkUpEmail.rawValue)
         }
     }
-    
+
     /// LibreLinkUp account password
     @objc dynamic var libreLinkUpPassword: String? {
         get {
@@ -617,7 +693,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.libreLinkUpPassword.rawValue)
         }
     }
-    
+
     /// LibreLinkUp account region. Stored here so that we can show it in the UI.
     var libreLinkUpRegion: LibreLinkUpRegion? {
         get {
@@ -628,7 +704,7 @@ extension UserDefaults {
             set(newValue?.rawValue, forKey: Key.libreLinkUpRegion.rawValue)
         }
     }
-    
+
     /// LibreLinkUp country abbreviation (sent in server response)
     @objc dynamic var libreLinkUpCountry: String? {
         get {
@@ -638,7 +714,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.libreLinkUpCountry.rawValue)
         }
     }
-    
+
     /// keep track of if the terms of use must be re-accepted true or false, default false
     @objc dynamic var libreLinkUpReAcceptNeeded: Bool {
         get {
@@ -648,7 +724,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.libreLinkUpReAcceptNeeded.rawValue)
         }
     }
-    
+
     /// has the user marked their Libre sensor as the Plus version with a 15 day lifetime?
     @objc dynamic var libreLinkUpIs15DaySensor: Bool {
         get {
@@ -658,7 +734,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.libreLinkUpIs15DaySensor.rawValue)
         }
     }
-    
+
     /// Used to prevent further login attempts once a failed authentication due to bad credentials has already taken place
     /// This should be reset to false once the user has updated their account information
     @objc dynamic var libreLinkUpPreventLogin: Bool {
@@ -745,7 +821,7 @@ extension UserDefaults {
 
 
     // MARK: General
-    
+
     /// true if unit is mgdl, false if mmol is used
     @objc dynamic var bloodGlucoseUnitIsMgDl: Bool {
         //default value for bool in userdefaults is false, false is for mgdl, true is for mmol
@@ -757,10 +833,10 @@ extension UserDefaults {
 
             // setting to be stored also in shared userdefaults because it's used by the today widget
             UserDefaults.storeInSharedUserDefaults(value: !newValue, forKey: Key.bloodGlucoseUnitIsMgDl.rawValue)
-            
+
         }
     }
-    
+
     /// should notification be shown with reading yes or no
     @objc dynamic var showReadingInNotification: Bool {
         // default value for bool in userdefaults is false, as default we want readings to be shown
@@ -771,7 +847,7 @@ extension UserDefaults {
             set(!newValue, forKey: Key.showReadingInNotification.rawValue)
         }
     }
-    
+
     /// speak readings interval in minutes
     @objc dynamic var notificationInterval: Int {
         get {
@@ -792,7 +868,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.showReadingInAppBadge.rawValue)
         }
     }
-    
+
     /// should reading be multiplied by 10 or not
     @objc dynamic var multipleAppBadgeValueWith10: Bool {
         // default value for bool in userdefaults is false, as default we want readings not to be multiplied by 10
@@ -803,7 +879,7 @@ extension UserDefaults {
             set(!newValue, forKey: Key.multipleAppBadgeValueWith10.rawValue)
         }
     }
-    
+
     /// holds the enum integer of the type of live activity to be shown, if any
     /// default to 0 (disabled)
     var liveActivityType: LiveActivityType {
@@ -815,9 +891,136 @@ extension UserDefaults {
             set(newValue.rawValue, forKey: Key.liveActivityType.rawValue)
         }
     }
-    
+
+    /// should adjustment be enabled?
+    @objc dynamic var enableAdjustment: Bool {
+        get {
+            return bool(forKey: Key.enableAdjustment.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.enableAdjustment.rawValue)
+        }
+    }
+
+    /// should smoothing be enabled?
+    @objc dynamic var enableSmoothing: Bool {
+        get {
+            return bool(forKey: Key.enableSmoothing.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.enableSmoothing.rawValue)
+            if !newValue {
+                loopShareSmoothedData = false
+            }
+        }
+    }
+
+    /// smoothing period in minutes
+    @objc dynamic var bgSmoothingPeriodInMinutes: Int {
+        get {
+            let smoothingPeriodInMinutes = integer(forKey: Key.bgSmoothingPeriodInMinutes.rawValue)
+            return smoothingPeriodInMinutes > 0 ? smoothingPeriodInMinutes : ConstantsBgSmoothing.defaultSmoothingPeriodInMinutes
+        }
+        set {
+            set(newValue, forKey: Key.bgSmoothingPeriodInMinutes.rawValue)
+        }
+    }
+
+    /// smoothing strength
+    @objc dynamic var bgSmoothingStrength: Int {
+        get {
+            if object(forKey: Key.bgSmoothingStrength.rawValue) == nil {
+                return ConstantsBgSmoothing.defaultSmoothingStrength
+            }
+
+            return integer(forKey: Key.bgSmoothingStrength.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.bgSmoothingStrength.rawValue)
+        }
+    }
+
+    /// smoothing algorithm
+    var bgSmoothingAlgorithm: BgSmoothingAlgorithm {
+        get {
+            guard let smoothingAlgorithmRawValue = string(forKey: Key.bgSmoothingAlgorithm.rawValue) else {
+                return ConstantsBgSmoothing.defaultSmoothingAlgorithm
+            }
+
+            return BgSmoothingAlgorithm(rawValue: smoothingAlgorithmRawValue) ?? ConstantsBgSmoothing.defaultSmoothingAlgorithm
+        }
+        set {
+            set(newValue.rawValue, forKey: Key.bgSmoothingAlgorithm.rawValue)
+        }
+    }
+
+    /// should faster CGM streams be reduced to visible 5 minute readings?
+    @objc dynamic var useFiveMinuteReadings: Bool {
+        get {
+            if object(forKey: Key.useFiveMinuteReadings.rawValue) == nil {
+                return ConstantsBgSmoothing.defaultUseFiveMinuteReadings
+            }
+
+            return bool(forKey: Key.useFiveMinuteReadings.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.useFiveMinuteReadings.rawValue)
+        }
+    }
+
+    /// timestamp from which the current 5 minute readings setting should be applied
+    @objc dynamic var fiveMinuteReadingsStartTimeStamp: Date? {
+        get {
+            return object(forKey: Key.fiveMinuteReadingsStartTimeStamp.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.fiveMinuteReadingsStartTimeStamp.rawValue)
+        }
+    }
+
+    /// timestamp from which BG data exists for the current source context
+    @objc dynamic var postProcessingStartTimeStamp: Date? {
+        get {
+            return object(forKey: Key.postProcessingStartTimeStamp.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.postProcessingStartTimeStamp.rawValue)
+        }
+    }
+
+    /// timestamp from which the current post processing settings should be applied
+    @objc dynamic var postProcessingApplyFromTimeStamp: Date? {
+        get {
+            return object(forKey: Key.postProcessingApplyFromTimeStamp.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.postProcessingApplyFromTimeStamp.rawValue)
+        }
+    }
+
+    /// current source context identifier used by BG post processing
+    @objc dynamic var postProcessingSourceContextIdentifier: String? {
+        get {
+            return string(forKey: Key.postProcessingSourceContextIdentifier.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.postProcessingSourceContextIdentifier.rawValue)
+        }
+    }
+
+    /// hours to show in the BG post processing preview chart
+    @objc dynamic var postProcessingPreviewChartHoursToShow: Int {
+        get {
+            let hoursToShow = integer(forKey: Key.postProcessingPreviewChartHoursToShow.rawValue)
+            return hoursToShow > 0 ? hoursToShow : ConstantsBgAdjustment.defaultPreviewChartHoursToShow
+        }
+        set {
+            set(newValue, forKey: Key.postProcessingPreviewChartHoursToShow.rawValue)
+        }
+    }
+
     // MARK: Home Screen Settings
-    
+
     /// the amount of hours to show in the mini-chart. Usually 24 hours but can be set to 48 hours by the user
     @objc dynamic var miniChartHoursToShow: Double {
         get {
@@ -830,46 +1033,46 @@ extension UserDefaults {
             return returnValue
         }
         set {
-            
+
             set(newValue, forKey: Key.miniChartHoursToShow.rawValue)
         }
     }
-    
+
     /// should the mini-chart be shown on the home screen?
     @objc dynamic var showMiniChart: Bool {
-        
+
         get {
-            
+
             // check if the showMiniChart key has already been previously set. If so, then just return it
             if let _ = UserDefaults.standard.object(forKey: "showMiniChart") {
-                
+
                 return !bool(forKey: Key.showMiniChart.rawValue)
-                
+
             } else {
-                
+
                 // this means that this is the first time setting the showMiniChart key. To to avoid crowding the screen we want to only show the mini-chart by default if the user has display zoom disabled
                 if UIScreen.main.scale < UIScreen.main.nativeScale {
-                    
+
                     set(true, forKey: Key.showMiniChart.rawValue)
-                    
+
                 } else {
-                    
+
                     // if not, then hide it by default
-                    
+
                     set(false, forKey: Key.showMiniChart.rawValue)
-                    
+
                 }
-                
+
                 return !bool(forKey: Key.showMiniChart.rawValue)
-                
+
             }
         }
         set {
-            
+
             set(!newValue, forKey: Key.showMiniChart.rawValue)
         }
     }
-    
+
     /// the urgenthighmarkvalue in unit selected by user ie, mgdl or mmol
     @objc dynamic var urgentHighMarkValueInUserChosenUnit:Double {
         get {
@@ -887,13 +1090,13 @@ extension UserDefaults {
         set {
             // store in mgdl
             set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentHighMarkValue.rawValue)
-            
+
             // setting to be stored also in shared userdefaults because it's used by the today widget
             UserDefaults.storeInSharedUserDefaults(value: bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentHighMarkValue.rawValue)
 
         }
     }
-    
+
     /// the highmarkvalue in unit selected by user ie, mgdl or mmol
     @objc dynamic var highMarkValueInUserChosenUnit:Double {
         get {
@@ -911,24 +1114,24 @@ extension UserDefaults {
         set {
             // store in mgdl
             set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.highMarkValue.rawValue)
-            
+
             // setting to be stored also in shared userdefaults because it's used by the today widget
             UserDefaults.storeInSharedUserDefaults(value: bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.highMarkValue.rawValue)
 
         }
     }
-    
+
     /// the highMarkValue in mgdl
     @objc dynamic var highMarkValue: Double {
         get {
-            
+
             //read currentvalue in mgdl
             return double(forKey: Key.highMarkValue.rawValue)
-            
+
         }
-        
+
     }
-    
+
     /// the targetvalue in unit selected by user ie, mgdl or mmol
     @objc dynamic var targetMarkValueInUserChosenUnit:Double {
         get {
@@ -944,7 +1147,7 @@ extension UserDefaults {
             set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.targetMarkValue.rawValue)
         }
     }
-    
+
     /// the lowmarkvalue in unit selected by user ie, mgdl or mmol
     @objc dynamic var lowMarkValueInUserChosenUnit:Double {
         get {
@@ -962,24 +1165,24 @@ extension UserDefaults {
         set {
             // store in mgdl
             set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.lowMarkValue.rawValue)
-            
+
             // setting to be stored also in shared userdefaults because it's used by the today widget
             UserDefaults.storeInSharedUserDefaults(value: bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.lowMarkValue.rawValue)
 
         }
     }
-    
+
     /// the lowmarkvalue in mgdl
     @objc dynamic var lowMarkValue: Double {
         get {
-            
+
             //read currentvalue in mgdl
             return double(forKey: Key.lowMarkValue.rawValue)
-            
+
         }
-        
+
     }
-    
+
     /// the urgentlowmarkvalue in unit selected by user ie, mgdl or mmol
     @objc dynamic var urgentLowMarkValueInUserChosenUnit:Double {
         get {
@@ -997,22 +1200,22 @@ extension UserDefaults {
         set {
             // store in mgdl
             set(bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentLowMarkValue.rawValue)
-            
+
             // setting to be stored also in shared userdefaults because it's used by the today widget
             UserDefaults.storeInSharedUserDefaults(value: bloodGlucoseUnitIsMgDl ? newValue:newValue.mmolToMgdl(), forKey: Key.urgentLowMarkValue.rawValue)
 
         }
     }
- 
+
     /// the urgentLowMarkValue in mgdl
     @objc dynamic var urgentLowMarkValue: Double {
         get {
-            
+
             //read currentvalue in mgdl
             return double(forKey: Key.urgentLowMarkValue.rawValue)
-            
+
         }
-        
+
     }
 
     /// the urgenthighmarkvalue in unit selected by user ie, mgdl or mmol - rounded
@@ -1026,7 +1229,7 @@ extension UserDefaults {
                 value = value?.mmolToMgdl()
             }
             set(value, forKey: Key.urgentHighMarkValue.rawValue)
-            
+
             // setting to be stored also in shared userdefaults because it's used by the today widget
             if let value = value {
                 UserDefaults.storeInSharedUserDefaults(value: value, forKey: Key.urgentHighMarkValue.rawValue)
@@ -1034,16 +1237,16 @@ extension UserDefaults {
 
         }
     }
-    
+
     /// the urgentHighMarkValue in mgdl
     @objc dynamic var urgentHighMarkValue: Double {
         get {
-            
+
             //read currentvalue in mgdl
             return double(forKey: Key.urgentHighMarkValue.rawValue)
-            
+
         }
-        
+
     }
 
     /// the highmarkvalue in unit selected by user ie, mgdl or mmol - rounded
@@ -1065,7 +1268,7 @@ extension UserDefaults {
 
         }
     }
-    
+
     /// the targetmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var targetMarkValueInUserChosenUnitRounded:String {
         get {
@@ -1079,7 +1282,7 @@ extension UserDefaults {
             set(value, forKey: Key.targetMarkValue.rawValue)
         }
     }
-    
+
     /// the lowmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var lowMarkValueInUserChosenUnitRounded:String {
         get {
@@ -1091,7 +1294,7 @@ extension UserDefaults {
                 value = value?.mmolToMgdl()
             }
             set(value, forKey: Key.lowMarkValue.rawValue)
-            
+
             // setting to be stored also in shared userdefaults because it's used by the today widget
             if let value = value {
                 UserDefaults.storeInSharedUserDefaults(value: value, forKey: Key.lowMarkValue.rawValue)
@@ -1099,7 +1302,7 @@ extension UserDefaults {
 
         }
     }
-    
+
     /// the urgentlowmarkvalue in unit selected by user ie, mgdl or mmol - rounded
     @objc dynamic var urgentLowMarkValueInUserChosenUnitRounded:String {
         get {
@@ -1111,7 +1314,7 @@ extension UserDefaults {
                 value = value?.mmolToMgdl()
             }
             set(value, forKey: Key.urgentLowMarkValue.rawValue)
-            
+
             // setting to be stored also in shared userdefaults because it's used by the today widget
             if let value = value {
                 UserDefaults.storeInSharedUserDefaults(value: value, forKey: Key.urgentLowMarkValue.rawValue)
@@ -1119,7 +1322,7 @@ extension UserDefaults {
 
         }
     }
-    
+
     /// should the target line (always shown in green) be shown on the graph?
     @objc dynamic var showTarget: Bool {
         // default value for bool in userdefaults is false, by default we will hide the target line as it could confuse users
@@ -1130,7 +1333,7 @@ extension UserDefaults {
             set(!newValue, forKey: Key.showTarget.rawValue)
         }
     }
-    
+
     /// should the home screen be allowed to rotate to show a landscape glucose chart?
     @objc dynamic var allowScreenRotation: Bool {
         // default value for bool in userdefaults is false, as default we want the chart to be able to rotate and show the 24hr view
@@ -1141,7 +1344,7 @@ extension UserDefaults {
             set(!newValue, forKey: Key.allowScreenRotation.rawValue)
         }
     }
-    
+
     /// should the clock view be shown when the screen is locked?
     @objc dynamic var showClockWhenScreenIsLocked: Bool {
         // default value for bool in userdefaults is false, as default we want the clock to show when the screen is locked
@@ -1152,7 +1355,7 @@ extension UserDefaults {
             set(!newValue, forKey: Key.showClockWhenScreenIsLocked.rawValue)
         }
     }
-    
+
     /// holds the enum integer of the screen dimming type selected for the screen lock
     /// it will default to 0 which is disabled
     var screenLockDimmingType: ScreenLockDimmingType {
@@ -1164,7 +1367,7 @@ extension UserDefaults {
             set(newValue.rawValue, forKey: Key.screenLockDimmingType.rawValue)
         }
     }
-    
+
     /// should the main chart y-axis be automatically rescaled back down to current chart values and the end date reset when necessary?
     @objc dynamic var allowMainChartAutoReset: Bool {
         // default value for bool in userdefaults is false, as default we want the chart to automatically rescale
@@ -1175,10 +1378,45 @@ extension UserDefaults {
             set(!newValue, forKey: Key.allowMainChartAutoReset.rawValue)
         }
     }
-    
-    
+
+    /// should the app show the original glucose values on the main chart when post processing is enabled?
+    @objc dynamic var showOriginalBGReadings: Bool {
+        // default value for bool in userdefaults is false, as default we want the app to show the original BG readings
+        get {
+            return !bool(forKey: Key.showOriginalBGReadings.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showOriginalBGReadings.rawValue)
+        }
+    }
+
+    /// should the app show short-term sensor noise bands on the main chart?
+    @objc dynamic var showSensorNoiseOnChart: Bool {
+        // default value for bool in userdefaults is false, as default we want the app to show sensor noise bands
+        get {
+            return !bool(forKey: Key.showSensorNoiseOnChart.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showSensorNoiseOnChart.rawValue)
+        }
+    }
+
+    /// how strictly should stored sensor noise values be interpreted?
+    var sensorNoiseSensitivity: SensorNoiseSensitivity {
+        get {
+            guard object(forKey: Key.sensorNoiseSensitivity.rawValue) != nil else { return .normal }
+
+            let sensitivityAsInt = integer(forKey: Key.sensorNoiseSensitivity.rawValue)
+            return SensorNoiseSensitivity(rawValue: sensitivityAsInt) ?? .normal
+        }
+        set {
+            set(newValue.rawValue, forKey: Key.sensorNoiseSensitivity.rawValue)
+        }
+    }
+
+
     // MARK: Treatments Settings
-    
+
     /// should the app show the treatments on the main chart?
     @objc dynamic var showTreatmentsOnChart: Bool {
         // default value for bool in userdefaults is false, as default we want the app to show the treatments on the chart
@@ -1189,7 +1427,7 @@ extension UserDefaults {
             set(!newValue, forKey: Key.showTreatmentsOnChart.rawValue)
         }
     }
-    
+
     /// should the app show the treatments on the landscape chart?
     @objc dynamic var showTreatmentsOnLandscapeChart: Bool {
         // default value for bool in userdefaults is false, as default we want the app to hide the treatments
@@ -1201,7 +1439,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.showTreatmentsOnLandscapeChart.rawValue)
         }
     }
-    
+
     /// should the app show the micro-bolus treatments in the treatments list/table?
     @objc dynamic var showSmallBolusTreatmentsInList: Bool {
         // default value for bool in userdefaults is false, by default we want the app to *hide* the micro-bolus treatments in the treatments table
@@ -1212,7 +1450,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.showSmallBolusTreatmentsInList.rawValue)
         }
     }
-    
+
     /// should the app show the normal bolus treatments in the treatments list/table?
     @objc dynamic var showBolusTreatmentsInList: Bool {
         // default value for bool in userdefaults is false, by default we want the app to *show* the normal bolus treatments in the treatments table
@@ -1223,7 +1461,7 @@ extension UserDefaults {
             set(!newValue, forKey: Key.showBolusTreatmentsInList.rawValue)
         }
     }
-    
+
     /// should the app show the normal bolus treatments in the treatments list/table?
     @objc dynamic var showCarbsTreatmentsInList: Bool {
         // default value for bool in userdefaults is false, by default we want the app to *show* the normal bolus treatments in the treatments table
@@ -1234,7 +1472,7 @@ extension UserDefaults {
             set(!newValue, forKey: Key.showCarbsTreatmentsInList.rawValue)
         }
     }
-    
+
     /// should the app show the basal rate treatments in the treatments list/table?
     @objc dynamic var showBasalTreatmentsInList: Bool {
         // default value for bool in userdefaults is true, by default we want the app to *hide* the basal treatments in the treatments table
@@ -1245,7 +1483,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.showBasalTreatmentsInList.rawValue)
         }
     }
-    
+
     /// should the app show the BG Check treatments in the treatments list/table?
     @objc dynamic var showBgCheckTreatmentsInList: Bool {
         // default value for bool in userdefaults is false, by default we want the app to *show* the BG Check treatments in the treatments table
@@ -1256,7 +1494,18 @@ extension UserDefaults {
             set(!newValue, forKey: Key.showBgCheckTreatmentsInList.rawValue)
         }
     }
-    
+
+    /// should the app show the Note treatments in the treatments list/table?
+    @objc dynamic var showNoteTreatmentsInList: Bool {
+        // default value for bool in userdefaults is false, by default we want the app to *show* the Note treatments in the treatments table
+        get {
+            return !bool(forKey: Key.showNoteTreatmentsInList.rawValue)
+        }
+        set {
+            set(!newValue, forKey: Key.showNoteTreatmentsInList.rawValue)
+        }
+    }
+
     /// micro-bolus threshold level in units as a Double
     @objc dynamic var smallBolusTreatmentThreshold:Double {
         get {
@@ -1274,7 +1523,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.smallBolusTreatmentThreshold.rawValue)
         }
     }
-    
+
     /// max canula age (CAGE) as Int - if nil, return default value
     @objc dynamic var CAGEMaxHours: Int {
         get {
@@ -1286,16 +1535,16 @@ extension UserDefaults {
 
             return returnValue
         }
-        
+
         set {
             set(newValue, forKey: Key.CAGEMaxHours.rawValue)
         }
     }
-    
-    
+
+
     // MARK: Statistics Settings
-    
-    
+
+
     /// should the statistics view be shown on the home screen?
     @objc dynamic var showStatistics: Bool {
         // default value for bool in userdefaults is false, by default we want the statistics view to show (true)
@@ -1328,7 +1577,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.daysToUseStatistics.rawValue)
         }
     }
-    
+
     /// should the statistics view be shown on the home screen?
     @objc dynamic var useIFCCA1C: Bool {
         // default value for bool in userdefaults is false, by default we want the HbA1c to be calculated in "not IFCC" way (false)
@@ -1339,7 +1588,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.useIFCCA1C.rawValue)
         }
     }
-    
+
     /// holds the enum integer of the time in range calculation type
     /// it will default to 0 which is standard
     var timeInRangeType: TimeInRangeType {
@@ -1351,7 +1600,7 @@ extension UserDefaults {
             set(newValue.rawValue, forKey: Key.timeInRangeType.rawValue)
         }
     }
-    
+
     /// should the TIR chart use a dynamic Y axis? If not, then it will be fixed from 0-100%
     @objc dynamic var tirChartHasDynamicYAxis: Bool {
         // default value for bool in userdefaults is false, by default we want the the dynamic y-axis to be fixed (false)
@@ -1362,10 +1611,10 @@ extension UserDefaults {
             set(newValue, forKey: Key.tirChartHasDynamicYAxis.rawValue)
         }
     }
-    
-    
+
+
     // MARK: Alert Settings
-    
+
     /// when did the user snooze all alerts. If this is nil, then the snooze all isn't activated
     @objc dynamic var snoozeAllAlertsFromDate: Date? {
         get {
@@ -1375,7 +1624,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.snoozeAllAlertsFromDate.rawValue)
         }
     }
-    
+
     /// until when did the user snooze all alerts, can be nil until it's first set but unless snoozeAllAlertsDate != nil we'll ignore this value anyway
     @objc dynamic var snoozeAllAlertsUntilDate: Date? {
         get {
@@ -1385,10 +1634,10 @@ extension UserDefaults {
             set(newValue, forKey: Key.snoozeAllAlertsUntilDate.rawValue)
         }
     }
-    
-    
+
+
     // MARK: Sensor Info Settings
-    
+
     /// active sensor serial number. Optional as should be set to nil if no successful login has happened and/or if no active sensor is returned
     @objc dynamic var activeSensorSerialNumber: String? {
         get {
@@ -1398,7 +1647,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.activeSensorSerialNumber.rawValue)
         }
     }
-    
+
     /// active sensor description. Optional as should be set to nil if no successful login has happened and/or if no active sensor is returned
     @objc dynamic var activeSensorDescription: String? {
         get {
@@ -1408,7 +1657,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.activeSensorDescription.rawValue)
         }
     }
-    
+
     /// active transmitter ID. Optional as should be set to nil if there is no transmitter connected. Used for the UI to configure sensor type in case no sensor serial number is availabel (for example Dexcom).
     @objc dynamic var activeSensorTransmitterId: String? {
         get {
@@ -1418,7 +1667,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.activeSensorTransmitterId.rawValue)
         }
     }
-    
+
     /// active sensor start date. Optional as should be set to nil if there is no sensor connected or if no successful follower login has happened and/or if no active sensor is returned
     @objc dynamic var activeSensorStartDate: Date? {
         get {
@@ -1428,7 +1677,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.activeSensorStartDate.rawValue)
         }
     }
-    
+
     /// active sensor max sensor days. Optional as should be set to nil if no successful login has happened and/or if no active sensor is returned
     var activeSensorMaxSensorAgeInDays: Double? {
         get {
@@ -1438,7 +1687,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.activeSensorMaxSensorAgeInDays.rawValue)
         }
     }
-    
+
     /// overriden active sensor max sensor days. Optional as should be set to nil if the user isn't using a G6 and hasn't overriden manually the max days
     var activeSensorMaxSensorAgeInDaysOverridenAnubis: Double? {
         get {
@@ -1448,7 +1697,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.activeSensorMaxSensorAgeInDaysOverridenAnubis.rawValue)
         }
     }
-    
+
     /// should we force a 15 day sensor max days for G7 sensors?
     var is15DayDexcomG7: Bool {
         // default value for bool in userdefaults is false, by default we want to assume a standard (usually 10-day) sensor life (false)
@@ -1459,32 +1708,82 @@ extension UserDefaults {
             set(newValue, forKey: Key.is15DayDexcomG7.rawValue)
         }
     }
-    
+
 
     // MARK: Housekeeper Settings
 
-    /// For how many days should data be stored. Should always be <= maximumRetentionPeriodInDays and >= minimumRetentionPeriodInDays.
+    /// For how many days data should be stored, normalized to a supported housekeeping block.
     @objc dynamic var retentionPeriodInDays: Int {
         get {
-            var returnValue = integer(forKey: Key.retentionPeriodInDays.rawValue)
-            // if 0 set to defaultvalue
-            if returnValue == 0 {
-                returnValue = ConstantsHousekeeping.minimumRetentionPeriodInDays
-            }
-
-            return returnValue
+            ConstantsHousekeeping.normalizedRetentionPeriodInDays(
+                integer(forKey: Key.retentionPeriodInDays.rawValue)
+            )
         }
         set {
-            // Constrains the newValue to be <= than maximumRetentionPeriodInDays and >= than minimumRetentionPeriodInDays.
-            var value = min(newValue, ConstantsHousekeeping.maximumRetentionPeriodInDays)
-            value = max(value, ConstantsHousekeeping.minimumRetentionPeriodInDays)
-
-            set(value, forKey: Key.retentionPeriodInDays.rawValue)
+            set(
+                ConstantsHousekeeping.normalizedRetentionPeriodInDays(newValue),
+                forKey: Key.retentionPeriodInDays.rawValue
+            )
         }
     }
-    
+
+    /// Whether automatic housekeeping should remove historical data when the app starts.
+    var automaticHousekeepingEnabled: Bool {
+        get {
+            guard object(forKey: Key.automaticHousekeepingEnabled.rawValue) != nil else { return true }
+            return bool(forKey: Key.automaticHousekeepingEnabled.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.automaticHousekeepingEnabled.rawValue)
+        }
+    }
+
+    /// The most recent successful automatic housekeeping run on this device.
+    var lastHousekeepingDate: Date? {
+        get {
+            return object(forKey: Key.lastHousekeepingDate.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.lastHousekeepingDate.rawValue)
+        }
+    }
+
+    var lastHousekeepingAttemptDate: Date? {
+        get {
+            return object(forKey: Key.lastHousekeepingAttemptDate.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.lastHousekeepingAttemptDate.rawValue)
+        }
+    }
+
+    var lastHousekeepingAttemptRetentionPeriodInDays: Int {
+        get { return integer(forKey: Key.lastHousekeepingAttemptRetentionPeriodInDays.rawValue) }
+        set { set(newValue, forKey: Key.lastHousekeepingAttemptRetentionPeriodInDays.rawValue) }
+    }
+
+    var lastHousekeepingRetentionPeriodInDays: Int {
+        get { return integer(forKey: Key.lastHousekeepingRetentionPeriodInDays.rawValue) }
+        set { set(newValue, forKey: Key.lastHousekeepingRetentionPeriodInDays.rawValue) }
+    }
+
+    var lastHousekeepingBgReadingsDeleted: Int {
+        get { return integer(forKey: Key.lastHousekeepingBgReadingsDeleted.rawValue) }
+        set { set(newValue, forKey: Key.lastHousekeepingBgReadingsDeleted.rawValue) }
+    }
+
+    var lastHousekeepingTreatmentsDeleted: Int {
+        get { return integer(forKey: Key.lastHousekeepingTreatmentsDeleted.rawValue) }
+        set { set(newValue, forKey: Key.lastHousekeepingTreatmentsDeleted.rawValue) }
+    }
+
+    var lastHousekeepingCalibrationsDeleted: Int {
+        get { return integer(forKey: Key.lastHousekeepingCalibrationsDeleted.rawValue) }
+        set { set(newValue, forKey: Key.lastHousekeepingCalibrationsDeleted.rawValue) }
+    }
+
     // MARK: Transmitter Settings
-    
+
     /// cgm ransmittertype currently active
     var cgmTransmitterType:CGMTransmitterType? {
         get {
@@ -1495,7 +1794,7 @@ extension UserDefaults {
             }
         }
     }
-    
+
     /// transmittertype as String, just to be able to define dynamic dispatch and obj-c visibility
     @objc dynamic var cgmTransmitterTypeAsString:String? {
         get {
@@ -1509,9 +1808,9 @@ extension UserDefaults {
             }
         }
     }
-    
+
     // MARK: Nightscout Settings
-    
+
     /// nightscout enabled ? this impacts follower mode (download) and master mode (upload)
     @objc dynamic var nightscoutEnabled: Bool {
         get {
@@ -1521,7 +1820,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.nightscoutEnabled.rawValue)
         }
     }
-    
+
     /// holds the enum integer of the type of nightscout follower type to be shown, if any
     /// default to 0 (basic type - just standard treatments and basal from NS)
     var nightscoutFollowType: NightscoutFollowType {
@@ -1533,7 +1832,7 @@ extension UserDefaults {
             set(newValue.rawValue, forKey: Key.nightscoutFollowType.rawValue)
         }
     }
-    
+
     /// show the expanded information views for AID follow
     @objc dynamic var nightscoutFollowShowExpandedInfo: Bool {
         // default value for bool in userdefaults is false, as default we want the app to show the expanded information
@@ -1544,7 +1843,7 @@ extension UserDefaults {
             set(!newValue, forKey: Key.nightscoutFollowShowExpandedInfo.rawValue)
         }
     }
-    
+
     /// use schedule for nightscoutupload ?
     @objc dynamic var nightscoutUseSchedule: Bool {
         get {
@@ -1564,7 +1863,21 @@ extension UserDefaults {
             set(newValue, forKey: Key.uploadSensorStartTimeToNS.rawValue)
         }
     }
-    
+
+    /// LibreLinkUp sensor start time most recently uploaded to Nightscout.
+    ///
+    /// Unlike a locally managed sensor, a follower sensor has no Core Data object whose
+    /// `uploadedToNS` flag can be set. Keeping its exact server-provided timestamp here
+    /// prevents the same sensor start being uploaded after every follower refresh.
+    var libreLinkUpSensorStartDateUploadedToNS: Date? {
+        get {
+            return object(forKey: Key.libreLinkUpSensorStartDateUploadedToNS.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.libreLinkUpSensorStartDateUploadedToNS.rawValue)
+        }
+    }
+
     /// Nightscout port number, 0 means not set
     @objc dynamic var nightscoutPort: Int {
         get {
@@ -1574,7 +1887,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.nightscoutPort.rawValue)
         }
     }
-    
+
     /// Nightscout token, 0 means not set
     @objc dynamic var nightscoutToken:String? {
         get {
@@ -1596,7 +1909,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.nightscoutUrl.rawValue)
         }
     }
-    
+
     /// - schedule for nightscout use, only applicable if nightscoutUseSchedule = true
     /// - string of values, seperate by '-', values are int values and represent minutes
     var nightscoutSchedule: String? {
@@ -1607,7 +1920,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.nightscoutSchedule.rawValue)
         }
     }
-    
+
 
     /// the nightscout api key
     @objc dynamic var nightscoutAPIKey:String? {
@@ -1618,7 +1931,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.nightscoutAPIKey.rawValue)
         }
     }
-    
+
     /// is a  nightscout sync of treatments required
     ///
     /// will be set to true in viewcontroller when a treatment is created, modified or deleted. The value will be observed by NightscoutSyncManager and when set to true, the manager knows a new sync is required
@@ -1630,7 +1943,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.nightscoutSyncRequired.rawValue)
         }
     }
-    
+
     /// timestamp lastest reading uploaded to Nightscout
     var timeStampLatestNightscoutSyncRequest: Date? {
         get {
@@ -1640,7 +1953,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.timeStampLatestNightscoutSyncRequest.rawValue)
         }
     }
-    
+
     /// used to trigger view controllers that there's a change in TreatmentEntries
     ///
     /// value will be increased with 1 each time there's an update
@@ -1652,7 +1965,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.nightscoutTreatmentsUpdateCounter.rawValue)
         }
     }
-    
+
     /// Nightscout profile stored as a JSON data object
     var nightscoutProfile: Data? {
         get {
@@ -1666,7 +1979,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.nightscoutProfile.rawValue)
         }
     }
-    
+
     /// Nightscout device status stored as a JSON data object
     @objc dynamic var nightscoutDeviceStatus: Data? {
         get {
@@ -1680,7 +1993,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.nightscoutDeviceStatus.rawValue)
         }
     }
-    
+
     /// will be set to true when the nightscout device status has been updated fully
     @objc dynamic var nightscoutDeviceStatusWasUpdated: Bool {
         get {
@@ -1692,7 +2005,7 @@ extension UserDefaults {
     }
 
     // MARK: Dexcom Share Settings
-    
+
     /// should readings be uploaded to Dexcom share server, true or false
     @objc dynamic var uploadReadingstoDexcomShare:Bool {
         get {
@@ -1702,7 +2015,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.uploadReadingstoDexcomShare.rawValue)
         }
     }
-    
+
     /// dexcom share account name
     @objc dynamic var dexcomShareAccountName:String? {
         get {
@@ -1712,7 +2025,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.dexcomShareAccountName.rawValue)
         }
     }
-    
+
     /// dexcom share password
     @objc dynamic var dexcomSharePassword:String? {
         get {
@@ -1722,7 +2035,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.dexcomSharePassword.rawValue)
         }
     }
-    
+
     /// use US dexcomshare url true or false
     @objc dynamic var useUSDexcomShareurl:Bool {
         get {
@@ -1742,7 +2055,7 @@ extension UserDefaults {
         }
         set {
             set(newValue.rawValue, forKey: Key.dexcomShareRegion.rawValue)
-            
+
         }
     }
 
@@ -1765,7 +2078,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.dexcomShareUploadSerialNumber.rawValue)
         }
     }
-    
+
     /// - schedule for dexcomShare use, only applicable if dexcomShareUploadUseSchedule = true
     /// - string of values, seperate by '-', values are int values and represent minutes
     var dexcomShareUploadSchedule: String? {
@@ -1776,7 +2089,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.dexcomShareUploadSchedule.rawValue)
         }
     }
-    
+
     /// use schedule for dexcomShareupload ?
     @objc dynamic var dexcomShareUploadUseSchedule: Bool {
         get {
@@ -1800,9 +2113,9 @@ extension UserDefaults {
             set(newValue, forKey: Key.storeReadingsInHealthkit.rawValue)
         }
     }
-    
+
     // MARK: Speak Settings
-    
+
     /// should readings be spoken or not
     @objc dynamic var speakReadings: Bool {
         get {
@@ -1832,7 +2145,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.speakTrend.rawValue)
         }
     }
-    
+
     /// should delta be spoken or not
     @objc dynamic var speakDelta: Bool {
         get {
@@ -1842,7 +2155,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.speakDelta.rawValue)
         }
     }
-    
+
     /// speak readings interval in minutes
     @objc dynamic var speakInterval: Int {
         get {
@@ -1852,9 +2165,9 @@ extension UserDefaults {
             set(newValue, forKey: Key.speakInterval.rawValue)
         }
     }
-    
+
     // MARK: - Keep track of alert and info messages shown to the user
-    
+
     /// message shown when user starts a sensor, which tells that timing should be exact, was it already shown or not
     var startSensorTimeInfoGiven:Bool {
         get {
@@ -1864,7 +2177,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.startSensorTimeInfoGiven.rawValue)
         }
     }
-    
+
     /// license info accepted by user yes or no
     var licenseInfoAccepted:Bool {
         get {
@@ -1874,7 +2187,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.licenseInfoAccepted.rawValue)
         }
     }
-    
+
     /// did the user ask to not show the lock screen warning dialog again?
     var lockScreenDontShowAgain:Bool {
         get {
@@ -1884,7 +2197,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.lockScreenDontShowAgain.rawValue)
         }
     }
-    
+
     // MARK: - M5Stack
 
     /// M5StackBlePassword, used for authenticating xdrip app towards M5Stack
@@ -1896,7 +2209,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.m5StackBlePassword.rawValue)
         }
     }
-    
+
     /// M5 Stack text color, this is the default text color for new m5Stacks. Per M5Stack it is possible to change the textcolor
     var m5StackTextColor: M5StackColor? {
         get {
@@ -1912,7 +2225,7 @@ extension UserDefaults {
             set(newValueAsInt, forKey: Key.m5StackTextColor.rawValue)
         }
     }
-    
+
     /// name of wifi 1 to be configured in M5Stack
     var m5StackWiFiName1: String? {
         get {
@@ -1922,7 +2235,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.m5StackWiFiName1.rawValue)
         }
     }
-    
+
     /// name of wifi 2 to be configured in M5Stack
     var m5StackWiFiName2: String? {
         get {
@@ -1932,7 +2245,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.m5StackWiFiName2.rawValue)
         }
     }
-    
+
     /// name of wifi 3 to be configured in M5Stack
     var m5StackWiFiName3: String? {
         get {
@@ -1942,7 +2255,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.m5StackWiFiName3.rawValue)
         }
     }
-    
+
     /// Password of wifi 1 to be configured in M5Stack
     var m5StackWiFiPassword1: String? {
         get {
@@ -1952,7 +2265,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.m5StackWiFiPassword1.rawValue)
         }
     }
-    
+
     /// Password of wifi 2 to be configured in M5Stack
     var m5StackWiFiPassword2: String? {
         get {
@@ -1962,7 +2275,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.m5StackWiFiPassword2.rawValue)
         }
     }
-    
+
     /// Password of wifi 3 to be configured in M5Stack
     var m5StackWiFiPassword3: String? {
         get {
@@ -1972,30 +2285,10 @@ extension UserDefaults {
             set(newValue, forKey: Key.m5StackWiFiPassword3.rawValue)
         }
     }
-    
+
     // MARK: - Apple Watch
-    
-    /// enable the Watch complications, default false
-    @objc dynamic var showDataInWatchComplications: Bool {
-        get {
-            return bool(forKey: Key.showDataInWatchComplications.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.showDataInWatchComplications.rawValue)
-        }
-    }
-    
-    /// timestamp that the user acknowledged that the complications will not show in real-time
-    var watchComplicationUserAgreementDate: Date? {
-        get {
-            return object(forKey: Key.watchComplicationUserAgreementDate.rawValue) as? Date
-        }
-        set {
-            set(newValue, forKey: Key.watchComplicationUserAgreementDate.rawValue)
-        }
-    }
-    
-    /// every how many minutes should we force a complication update (these updates counts against the 50 times limit per day)
+
+    /// every how many minutes should we request a complication update
     var forceComplicationUpdateInMinutes: Int {
         get {
             //read currentvalue in mgdl
@@ -2010,31 +2303,10 @@ extension UserDefaults {
             set(newValue, forKey: Key.forceComplicationUpdateInMinutes.rawValue)
         }
     }
-    
-    /// how many complication updates are remaining for the current day
-    var remainingComplicationUserInfoTransfers: Int? {
-        get {
-            return integer(forKey: Key.remainingComplicationUserInfoTransfers.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.remainingComplicationUserInfoTransfers.rawValue)
-        }
-    }
-    
-    /// force a complication update
-    @objc dynamic var forceComplicationUpdate: Bool {
-        get {
-            return bool(forKey: Key.forceComplicationUpdate.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.forceComplicationUpdate.rawValue)
-        }
-    }
-    
-    
-    // MARK: - Calendar Events
-    
-    /// create calendar event yes or no, default false
+
+    // MARK: - Calendar Share
+
+    /// create Calendar Share event yes or no, default false
     @objc dynamic var createCalendarEvent: Bool {
         get {
             return bool(forKey: Key.createCalendarEvent.rawValue)
@@ -2044,7 +2316,7 @@ extension UserDefaults {
         }
     }
 
-    /// this is for showing readings on watch via the calendar. Selected calender id (name of the calendar) in which the event should be created
+    /// selected calender id (name of the calendar) in which the Calendar Share event should be created
     @objc dynamic var calenderId: String? {
         get {
             return string(forKey: Key.calenderId.rawValue)
@@ -2053,7 +2325,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.calenderId.rawValue)
         }
     }
-    
+
     /// this is for showing readings on watch via the calendar. Should trend be displayed  in calendar event, yes or no, default no
     @objc dynamic var displayTrendInCalendarEvent: Bool {
         get {
@@ -2063,7 +2335,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.displayTrendInCalendarEvent.rawValue)
         }
     }
-    
+
     /// this is for showing readings on watch via the calendar. Should delta be displayed in calendar event, yes or no, default no
     @objc dynamic var displayDeltaInCalendarEvent: Bool {
         get {
@@ -2073,7 +2345,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.displayDeltaInCalendarEvent.rawValue)
         }
     }
-    
+
     /// this is for showing readings on watch via the calendar. Should unit be displayed in calendar event,  yes or no, default no
     @objc dynamic var displayUnitInCalendarEvent: Bool {
         get {
@@ -2083,7 +2355,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.displayUnitInCalendarEvent.rawValue)
         }
     }
-    
+
     /// speak readings interval in minutes
     @objc dynamic var calendarInterval: Int {
         get {
@@ -2093,7 +2365,20 @@ extension UserDefaults {
             set(newValue, forKey: Key.calendarInterval.rawValue)
         }
     }
-    
+
+    /// Calendar Share history window in minutes, default 60
+    @objc dynamic var calendarShareHistoryInMinutes: Int {
+        get {
+            guard object(forKey: Key.calendarShareHistoryInMinutes.rawValue) != nil else {
+                return 60
+            }
+            return integer(forKey: Key.calendarShareHistoryInMinutes.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.calendarShareHistoryInMinutes.rawValue)
+        }
+    }
+
     /// should a visual coloured indicator be shown in the calendar title,  yes or no, default no
     @objc dynamic var displayVisualIndicatorInCalendarEvent: Bool {
         get {
@@ -2103,9 +2388,76 @@ extension UserDefaults {
             set(newValue, forKey: Key.displayVisualIndicatorInCalendarEvent.rawValue)
         }
     }
-    
+
+    // MARK: - Calendar Share
+
+    /// alias sent to Calendar Follow devices
+    @objc dynamic var calendarShareAlias: String {
+        get {
+            if let value = string(forKey: Key.calendarShareAlias.rawValue), !value.isEmpty {
+                return value
+            }
+            return Bundle.main.object(forInfoDictionaryKey: "CFBundleDisplayName") as? String ??
+                Bundle.main.object(forInfoDictionaryKey: "CFBundleName") as? String ??
+                "Calendar Share"
+        }
+        set {
+            set(newValue, forKey: Key.calendarShareAlias.rawValue)
+        }
+    }
+
+    /// last Calendar Share write status
+    @objc dynamic var calendarShareStatus: String {
+        get {
+            return string(forKey: Key.calendarShareStatus.rawValue) ?? CalendarShareStatus.notConfigured.rawValue
+        }
+        set {
+            set(newValue, forKey: Key.calendarShareStatus.rawValue)
+        }
+    }
+
+    /// last Calendar Share write timestamp
+    @objc dynamic var calendarShareLastUpload: Date? {
+        get {
+            return object(forKey: Key.calendarShareLastUpload.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.calendarShareLastUpload.rawValue)
+        }
+    }
+
+    /// selected shared calendar name used by Calendar Follow
+    @objc dynamic var calendarFollowCalendarId: String? {
+        get {
+            return string(forKey: Key.calendarFollowCalendarId.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.calendarFollowCalendarId.rawValue)
+        }
+    }
+
+    /// last Calendar Follow read status
+    @objc dynamic var calendarFollowStatus: String {
+        get {
+            return string(forKey: Key.calendarFollowStatus.rawValue) ?? CalendarShareStatus.notConfigured.rawValue
+        }
+        set {
+            set(newValue, forKey: Key.calendarFollowStatus.rawValue)
+        }
+    }
+
+    /// last Calendar Follow read timestamp
+    @objc dynamic var calendarFollowLastRead: Date? {
+        get {
+            return object(forKey: Key.calendarFollowLastRead.rawValue) as? Date
+        }
+        set {
+            set(newValue, forKey: Key.calendarFollowLastRead.rawValue)
+        }
+    }
+
     // MARK: - Contact image
-    
+
     /// enable the contact image yes or no, default false
     @objc dynamic var enableContactImage: Bool {
         get {
@@ -2125,7 +2477,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.displayTrendInContactImage.rawValue)
         }
     }
-    
+
     /// should a black/white contact image be used? Useful to display nicely in watchfaces with a colour tint (i.e. not multicolor), default false
     @objc dynamic var useHighContrastContactImage: Bool {
         get {
@@ -2135,9 +2487,9 @@ extension UserDefaults {
             set(newValue, forKey: Key.useHighContrastContactImage.rawValue)
         }
     }
-    
+
     // MARK: - =====  Other Settings ======
-    
+
     /// - in case missed reading alert settings are changed by user, this value will be set to true
     /// - alertmanager will observe that value and when changed, verify if missed reading alert needs to be changed
     @objc dynamic var missedReadingAlertChanged: Bool {
@@ -2158,7 +2510,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.timeStampAppLaunch.rawValue)
         }
     }
-    
+
     /// timestamp lastest reading uploaded to Nightscout
     var timeStampLatestNightscoutUploadedBgReading:Date? {
         get {
@@ -2168,7 +2520,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.timeStampLatestNSUploadedBgReadingToNightscout.rawValue)
         }
     }
-    
+
     /// timestamp latest calibration uploaded to Nightscout
     var timeStampLatestNightscoutUploadedCalibration:Date? {
         get {
@@ -2178,7 +2530,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.timeStampLatestNSUploadedCalibrationToNightscout.rawValue)
         }
     }
-    
+
     /// transmitterBatteryInfo, this should be the transmitter battery info of the latest active cgmTransmitter
     var transmitterBatteryInfo:TransmitterBatteryInfo? {
         get {
@@ -2187,7 +2539,7 @@ extension UserDefaults {
             } else {
                 return nil
             }
-            
+
         }
         set {
             if let newValue = newValue {
@@ -2198,7 +2550,7 @@ extension UserDefaults {
             timeStampOfLastBatteryReading = Date()
         }
     }
-    
+
     /// timestamp latest calibration uploaded to Nightscout
     var timeStampOfLastBatteryReading:Date? {
         get {
@@ -2208,7 +2560,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.timeStampOfLastBatteryReading.rawValue)
         }
     }
-    
+
     /// did user authorize the storage of readings in healthkit or not - this setting is actually only used to allow the HealthKitManager to listen for changes in the authorization status
     var storeReadingsInHealthkitAuthorized:Bool {
         get {
@@ -2218,7 +2570,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.storeReadingsInHealthkitAuthorized.rawValue)
         }
     }
-    
+
     /// timestamp of last bgreading that was stored in healthkit
     var timeStampLatestHealthKitStoreBgReading:Date? {
         get {
@@ -2228,7 +2580,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.timeStampLatestHealthKitStoreBgReading.rawValue)
         }
     }
-    
+
     /// timestamp lastest reading uploaded to Dexcom Share
     var timeStampLatestDexcomShareUploadedBgReading:Date? {
         get {
@@ -2238,8 +2590,8 @@ extension UserDefaults {
             set(newValue, forKey: Key.timeStampLatestDexcomShareUploadedBgReading.rawValue)
         }
     }
-    
-    
+
+
     /// store the maximum sensor life if applicable
     var maxSensorAgeInDays: Int {
         get {
@@ -2249,9 +2601,9 @@ extension UserDefaults {
             set(newValue, forKey: Key.maxSensorAgeInDays.rawValue)
         }
     }
-    
+
     // MARK: - =====  OS-AID (Loop/iAPS/Trio) App Group Share variables ======
-    
+
     /// dictionary representation of readings that were shared with a looping system. This is not the json representation, it's an array of dictionary
     var readingsStoredInSharedUserDefaultsAsDictionary: [Dictionary<String, Any>]? {
         get {
@@ -2271,10 +2623,10 @@ extension UserDefaults {
             set(newValue, forKey: Key.timeStampLatestLoopSharedBgReading.rawValue)
         }
     }
-    
-    
+
+
     // MARK: - =====  Developer Settings ======
-    
+
     /// showDeveloperSettings - default false
     /// we'll reset this to false anyway every time the app is opened
     var showDeveloperSettings: Bool {
@@ -2285,7 +2637,17 @@ extension UserDefaults {
             set(newValue, forKey: Key.showDeveloperSettings.rawValue)
         }
     }
-    
+
+    /// preferSensorCountdown - default false
+    var preferSensorCountdown: Bool {
+        get {
+            return bool(forKey: Key.preferSensorCountdown.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.preferSensorCountdown.rawValue)
+        }
+    }
+
     /// OSLogEnabled - default false
     var OSLogEnabled: Bool {
         get {
@@ -2295,7 +2657,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.OSLogEnabled.rawValue)
         }
     }
-    
+
     /// NSLogEnabled - default false
     var NSLogEnabled: Bool {
         get {
@@ -2305,29 +2667,8 @@ extension UserDefaults {
             set(newValue, forKey: Key.NSLogEnabled.rawValue)
         }
     }
-    
-    /// smoothLibreValues - default false
-    var smoothLibreValues: Bool {
-        get {
-            return bool(forKey: Key.smoothLibreValues.rawValue)
-        }
-        set {
-            set(newValue, forKey: Key.smoothLibreValues.rawValue)
-        }
-    }
-    
-    /// timestamp of when smoothLibreValues was enabled or disabled by the user
-    /// used to help calculate/inform about the transmitter Read Success
-    @objc dynamic var smoothLibreValuesChangedAtTimeStamp: Date? {
-        get {
-            return object(forKey: Key.smoothLibreValuesChangedAtTimeStamp.rawValue) as? Date
-        }
-        set {
-            set(newValue, forKey: Key.smoothLibreValuesChangedAtTimeStamp.rawValue)
-        }
-    }
-    
-    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
+
+    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes.
     ///
     /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
     @objc dynamic var loopDelaySchedule: String? {
@@ -2338,7 +2679,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.loopDelaySchedule.rawValue)
         }
     }
-    
+
     /// should the BG values be shared with a specified app group
     var loopShareType: LoopShareType {
         get {
@@ -2347,19 +2688,39 @@ extension UserDefaults {
         }
         set {
             set(newValue.rawValue, forKey: Key.loopShareType.rawValue)
+            loopShareSmoothedData = false
+            loopShareMedtrumNano = false
         }
     }
-    
-    /// Loop sharing will be limited to just once every 5 minutes if true - default false
-    var shareToLoopOnceEvery5Minutes: Bool {
+
+    /// Share smoothed/final glucose values with OS-AID app groups.
+    /// Default false. Reset to false when OS-AID target or Glucose smoothing is changed.
+    var loopShareSmoothedData: Bool {
         get {
-            return bool(forKey: Key.shareToLoopOnceEvery5Minutes.rawValue)
+            return bool(forKey: Key.loopShareSmoothedData.rawValue) && loopShareType != .disabled && enableSmoothing
         }
         set {
-            set(newValue, forKey: Key.shareToLoopOnceEvery5Minutes.rawValue)
+            set(newValue && loopShareType != .disabled && enableSmoothing, forKey: Key.loopShareSmoothedData.rawValue)
         }
     }
-    
+
+    /// True when OS-AID Share is enabled and the current CGM source is Medtrum Nano.
+    var loopShareMedtrumNanoAvailable: Bool {
+        return loopShareType != .disabled
+            && ((isMaster && cgmTransmitterType == .medtrumTouchCareNano) || (!isMaster && followerDataSourceType == .medtrumEasyView))
+    }
+
+    /// Share Medtrum Nano glucose values with OS-AID app groups.
+    /// Default false. Reset to false when the OS-AID target is changed.
+    var loopShareMedtrumNano: Bool {
+        get {
+            return bool(forKey: Key.loopShareMedtrumNano.rawValue) && loopShareMedtrumNanoAvailable
+        }
+        set {
+            set(newValue && loopShareMedtrumNanoAvailable, forKey: Key.loopShareMedtrumNano.rawValue)
+        }
+    }
+
     /// for Libre 2 : suppress sending unlockPayLoad, this will allow to run xDrip4iOS/Libre 2 in parallel with other app(s)
     var suppressUnLockPayLoad: Bool {
         get {
@@ -2369,8 +2730,8 @@ extension UserDefaults {
             set(newValue, forKey: Key.suppressUnLockPayLoad.rawValue)
         }
     }
-    
-    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes - so that Loop receives more smoothed values.
+
+    /// to create artificial delay in readings stored in sharedUserDefaults for loop. Minutes.
     ///
     /// Default value 0, if used then recommended value is multiple of 5 (eg 5 ot 10)
     @objc dynamic var loopDelayValueInMinutes: String? {
@@ -2381,19 +2742,19 @@ extension UserDefaults {
             set(newValue, forKey: Key.loopDelayValueInMinutes.rawValue)
         }
     }
-    
+
     /// LibreLinkUp version
     @objc dynamic var libreLinkUpVersion: String? {
         get {
             var returnValue = string(forKey: Key.libreLinkUpVersion.rawValue)
-            
+
             // if nil set to defaultvalue
             if returnValue == nil {
-                
+
                 set(ConstantsLibreLinkUp.libreLinkUpVersionDefault, forKey: Key.libreLinkUpVersion.rawValue)
-                
+
                 returnValue = string(forKey: Key.libreLinkUpVersion.rawValue)
-                
+
             }
 
             return returnValue
@@ -2402,7 +2763,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.libreLinkUpVersion.rawValue)
         }
     }
-    
+
     /// should the app allow a high contrast mode for the .systemSmall widget when shown in StandBy mode at night?
     var allowStandByHighContrast: Bool {
         // default value for bool in userdefaults is false, as default we want the app to allow high contrast for StandBy as needed
@@ -2413,7 +2774,7 @@ extension UserDefaults {
             set(!newValue, forKey: Key.allowStandByHighContrast.rawValue)
         }
     }
-    
+
     /// force StandBy mode to show a big number version of the widget
     var forceStandByBigNumbers: Bool {
         // default value for bool in userdefaults is false, as default we want the app to not show big numbers
@@ -2424,7 +2785,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.forceStandByBigNumbers.rawValue)
         }
     }
-    
+
     /// should the landscape chart view show statistics info or just a large chart
     var showStatisticsOnLandscapeChart: Bool {
         // default value for bool in userdefaults is false, as default we want the landscape chart view to show the statistics
@@ -2435,7 +2796,7 @@ extension UserDefaults {
             set(!newValue, forKey: Key.showStatisticsOnLandscapeChart.rawValue)
         }
     }
-    
+
     /// should readings be stored much more frequentyly in Nightscout ? true or false
     ///
     /// Only really useful for master with Libre 2 Direct connection (60 second readings). Default is false/disabled.
@@ -2447,7 +2808,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.storeFrequentReadingsInNightscout.rawValue)
         }
     }
-    
+
     /// should readings be stored much more frequentyly in healthkit ? true or false
     ///
     /// Only really useful for master with Libre 2 Direct connection (60 second readings). Default is false/disabled.
@@ -2459,10 +2820,10 @@ extension UserDefaults {
             set(newValue, forKey: Key.storeFrequentReadingsInHealthKit.rawValue)
         }
     }
-    
-    
+
+
     // MARK: - =====  technical settings for testing ======
-    
+
     /// G6 factor 1
     @objc dynamic var G6v2ScalingFactor1:String? {
         get {
@@ -2472,7 +2833,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.G6v2ScalingFactor1.rawValue)
         }
     }
-    
+
     /// G6 factor 2
     @objc dynamic var G6v2ScalingFactor2:String? {
         get {
@@ -2491,13 +2852,13 @@ extension UserDefaults {
             } else {
                 return [Double]()
             }
-            
+
         }
         set {
             set(newValue, forKey: Key.previousRawLibreValues.rawValue)
         }
     }
-    
+
     /// used for storing data read with Libre 2 direct
     var previousRawGlucoseValues: [Int]? {
         get {
@@ -2506,13 +2867,13 @@ extension UserDefaults {
             } else {
                 return nil
             }
-            
+
         }
         set {
             set(newValue, forKey: Key.previousRawGlucoseValues.rawValue)
         }
     }
-    
+
     /// used for storing data read with Libre 2 direct
     var previousRawTemperatureValues: [Int]? {
         get {
@@ -2521,13 +2882,13 @@ extension UserDefaults {
             } else {
                 return nil
             }
-            
+
         }
         set {
             set(newValue, forKey: Key.previousRawTemperatureValues.rawValue)
         }
     }
-    
+
     /// used for storing data read with Libre 2 direct
     var previousTemperatureAdjustmentValues: [Int]? {
         get {
@@ -2536,13 +2897,13 @@ extension UserDefaults {
             } else {
                 return nil
             }
-            
+
         }
         set {
             set(newValue, forKey: Key.previousTemperatureAdjustmentValues.rawValue)
         }
     }
-    
+
     /// addDebugLevelLogsInTraceFileAndNSLog - default false
     var addDebugLevelLogsInTraceFileAndNSLog: Bool {
         get {
@@ -2552,7 +2913,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.addDebugLevelLogsInTraceFileAndNSLog.rawValue)
         }
     }
-    
+
     /// will be set to true when UIApplication.willEnterForegroundNotification is triggered. And to false when app goes back to background
     ///
     /// Can be used if status needs to be known, app in for or background. UIApplication.shared.applicationState seems to come a bit too late to active, when the app is coming to the foreground, in cases where it's needed, this UserDefaults key can be used. Default false
@@ -2564,7 +2925,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.appInForeGround.rawValue)
         }
     }
-    
+
     /// to merge from 3.x to 4.x, can be deleted once 3.x is not used anymore
     var cgmTransmitterDeviceAddress: String? {
         get {
@@ -2574,7 +2935,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.cgmTransmitterDeviceAddress.rawValue)
         }
     }
-    
+
     /// web oop parameters, only for bubble, miaomiao and Libre 2
     var libre1DerivedAlgorithmParameters: Libre1DerivedAlgorithmParameters? {
         get {
@@ -2590,19 +2951,19 @@ extension UserDefaults {
             set(jsonString, forKey: Key.libre1DerivedAlgorithmParameters.rawValue)
         }
     }
-    
+
     /// Libre Unlock code
     var libreActiveSensorUnlockCode: UInt32 {
         get {
-            
+
             let value = UInt32(integer(forKey: Key.libreActiveSensorUnlockCode.rawValue))
-            
+
             if value == 0 {
                 return 42
             }
-            
+
             return UInt32(integer(forKey: Key.libreActiveSensorUnlockCode.rawValue))
-            
+
         }
         set {
             set(newValue, forKey: Key.libreActiveSensorUnlockCode.rawValue)
@@ -2618,7 +2979,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.libreActiveSensorUnlockCount.rawValue)
         }
     }
-    
+
     /// Libre sensor id
     var libreSensorUID: Data? {
         get {
@@ -2632,7 +2993,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.libreSensorUID.rawValue)
         }
     }
-    
+
     /// Libre librePatchInfo
     var librePatchInfo: Data? {
         get {
@@ -2646,7 +3007,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.librePatchInfo.rawValue)
         }
     }
-    
+
     /// in case an NFC scan fails, this value will be set to true.
     /// bluetoothPeripheralViewController will observe this value and if it becomes set to true, it should disconnect the transmitter and offer to scan again
     @objc dynamic var nfcScanFailed: Bool {
@@ -2657,7 +3018,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.nfcScanFailed.rawValue)
         }
     }
-    
+
     /// in case an NFC completes successfuly, this value will be set to true.
     /// bluetoothPeripheralViewController will observe this value and if it becomes set to true, it will advise the user and launch BLE scanning from the superclass
     @objc dynamic var nfcScanSuccessful: Bool {
@@ -2668,7 +3029,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.nfcScanSuccessful.rawValue)
         }
     }
-    
+
     /// in case the user disconnects a transmitter with integrated sensor (e.g. Libre 2), this value will be set to true.
     /// RootViewController will observe this value and if it becomes set to true, it will stop the active sensor session
     @objc dynamic var stopActiveSensor: Bool {
@@ -2679,10 +3040,10 @@ extension UserDefaults {
             set(newValue, forKey: Key.stopActiveSensor.rawValue)
         }
     }
-    
-    
+
+
     // MARK: - Heartbeat
-    
+
     /// timestamp of last successful connection to follower service
     @objc dynamic var timeStampOfLastHeartBeat: Date? {
         get {
@@ -2692,7 +3053,7 @@ extension UserDefaults {
             set(newValue, forKey: Key.timeStampOfLastHeartBeat.rawValue)
         }
     }
-    
+
     /// how many seconds should be considered as the maximum since the last heartbeat before we show a warning/error?
     var secondsUntilHeartBeatDisconnectWarning: Double? {
         get {
@@ -2702,9 +3063,9 @@ extension UserDefaults {
             set(newValue, forKey: Key.secondsUntilHeartBeatDisconnectWarning.rawValue)
         }
     }
-    
+
     // MARK: - Snooze
-    
+
     /// used by the observer in RVC to update the UI for the snooze status
     @objc dynamic var updateSnoozeStatus: Bool {
         get {
@@ -2714,6 +3075,14 @@ extension UserDefaults {
             set(newValue, forKey: Key.updateSnoozeStatus.rawValue)
         }
     }
+
+    /// Defaults to false when absent and is set after the temporary snooze-period migration succeeds.
+    var didMigrateAlertSnoozePeriodsToReducedOptions: Bool {
+        get {
+            return bool(forKey: Key.didMigrateAlertSnoozePeriodsToReducedOptions.rawValue)
+        }
+        set {
+            set(newValue, forKey: Key.didMigrateAlertSnoozePeriodsToReducedOptions.rawValue)
+        }
+    }
 }
-
-

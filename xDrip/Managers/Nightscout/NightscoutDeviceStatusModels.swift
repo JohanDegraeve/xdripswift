@@ -190,6 +190,28 @@ struct NightscoutDeviceStatus: Codable {
         }
         return nil
     }
+
+    /// SwiftUI style for the low uploader-battery warning shown on compact status views.
+    func uploaderBatteryStatusStyle() -> (systemImage: String, color: Color)? {
+        guard let uploaderBatteryPercent, uploaderIsCharging == false else { return nil }
+
+        switch uploaderBatteryPercent {
+        case 0...10:
+            if #available(iOS 17.0, *) {
+                return ("battery.0percent", ConstantsAppColors.urgent)
+            } else {
+                return ("minus.plus.batteryblock.slash", ConstantsAppColors.urgent)
+            }
+        case 11...25:
+            if #available(iOS 17.0, *) {
+                return ("battery.25percent", ConstantsAppColors.warning)
+            } else {
+                return ("minus.plus.batteryblock", ConstantsAppColors.warning)
+            }
+        default:
+            return nil
+        }
+    }
     
     func uploaderBatteryChargingImage() -> (image: Image, color: Color)? {
         if let uploaderIsCharging {
@@ -206,7 +228,7 @@ struct NightscoutDeviceStatus: Codable {
         if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
             return .green
         } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return .green
+            return .yellow
         } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
             return .yellow
         } else {
@@ -218,7 +240,7 @@ struct NightscoutDeviceStatus: Codable {
         if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
             return Color(red: 0, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
         } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return Color(red: 0, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
+            return Color(red: 1, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
         } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
             return Color(red: 1, green: 1, blue: 0).opacity(ConstantsHomeView.AIDStatusBannerBackgroundOpacity)
         } else {
@@ -230,7 +252,7 @@ struct NightscoutDeviceStatus: Codable {
         if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
             return .systemGreen
         } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return .systemGreen
+            return .systemYellow
         } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
             return .systemYellow
         } else {
@@ -249,28 +271,24 @@ struct NightscoutDeviceStatus: Codable {
             return "Error/No data"
         }
     }
-    
+
     func deviceStatusIconImage() -> Image {
-        if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-            return Image(systemName: "checkmark.circle.fill")
-        } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return Image(systemName: "checkmark.circle")
-        } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return Image(systemName: "questionmark.circle")
-        } else {
-            return Image(systemName: "exclamationmark.circle")
-        }
+        Image(systemName: deviceStatusIconSystemName())
     }
-    
+
     func deviceStatusIconUIImage() -> UIImage {
+        UIImage(systemName: deviceStatusIconSystemName()) ?? UIImage()
+    }
+
+    func deviceStatusIconSystemName() -> String {
         if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowWarningAfterMinutes) {
-            return UIImage(systemName: "checkmark.circle.fill") ?? UIImage()
+            return ConstantsHomeView.loopStatusRecentSystemImage
         } else if lastLoopDate > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return UIImage(systemName: "checkmark.circle") ?? UIImage()
+            return ConstantsHomeView.loopStatusAcceptableSystemImage
         } else if createdAt > .now.addingTimeInterval(-ConstantsHomeView.loopShowNoDataAfterMinutes) {
-            return UIImage(systemName: "questionmark.circle") ?? UIImage()
+            return ConstantsHomeView.loopStatusNotLoopingSystemImage
         } else {
-            return UIImage(systemName: "exclamationmark.circle") ?? UIImage()
+            return ConstantsHomeView.loopStatusNoDataSystemImage
         }
     }
     
@@ -322,6 +340,58 @@ struct NightscoutDeviceStatus: Codable {
 // MARK: Internal NightscoutDeviceStatus initializer
 
 extension NightscoutDeviceStatus {
+    /// Fill missing display values from another device status response.
+    ///
+    /// Nightscout can return a newest devicestatus document that is more like a heartbeat than a
+    /// complete AID/pump status payload. The old root view effectively tolerated this because it
+    /// refreshed from a long-lived manager object. SwiftUI observes full value publishes, so a
+    /// partial response must not wipe values that are still valid in a nearby response.
+    mutating func fillMissingDisplayValues(from fallback: NightscoutDeviceStatus) {
+        if device == nil { device = fallback.device }
+        if appVersion == nil { appVersion = fallback.appVersion }
+        
+        if activeProfile == nil { activeProfile = fallback.activeProfile }
+        if baseBasalRate == nil { baseBasalRate = fallback.baseBasalRate }
+        if bolusVolume == nil { bolusVolume = fallback.bolusVolume }
+        if cob == nil { cob = fallback.cob }
+        if currentTarget == nil { currentTarget = fallback.currentTarget }
+        if duration == nil { duration = fallback.duration }
+        if eventualBG == nil { eventualBG = fallback.eventualBG }
+        if iob == nil { iob = fallback.iob }
+        if isf == nil { isf = fallback.isf }
+        if insulinReq == nil { insulinReq = fallback.insulinReq }
+        if rate == nil { rate = fallback.rate }
+        if reason == nil { reason = fallback.reason }
+        if sensitivityRatio == nil { sensitivityRatio = fallback.sensitivityRatio }
+        if tdd == nil { tdd = fallback.tdd }
+        if timestamp == nil { timestamp = fallback.timestamp }
+        if error == nil { error = fallback.error }
+        
+        if overrideActive == nil { overrideActive = fallback.overrideActive }
+        if overrideName == nil { overrideName = fallback.overrideName }
+        if overrideMaxValue == nil { overrideMaxValue = fallback.overrideMaxValue }
+        if overrideMinValue == nil { overrideMinValue = fallback.overrideMinValue }
+        if overrideMultiplier == nil { overrideMultiplier = fallback.overrideMultiplier }
+        
+        if pumpBatteryPercent == nil { pumpBatteryPercent = fallback.pumpBatteryPercent }
+        if pumpClock == nil { pumpClock = fallback.pumpClock }
+        if pumpID == nil { pumpID = fallback.pumpID }
+        if pumpIsBolusing == nil { pumpIsBolusing = fallback.pumpIsBolusing }
+        if pumpIsSuspended == nil { pumpIsSuspended = fallback.pumpIsSuspended }
+        if pumpStatus == nil { pumpStatus = fallback.pumpStatus }
+        if pumpStatusTimestamp == nil { pumpStatusTimestamp = fallback.pumpStatusTimestamp }
+        if pumpManufacturer == nil { pumpManufacturer = fallback.pumpManufacturer }
+        if pumpModel == nil { pumpModel = fallback.pumpModel }
+        if pumpReservoir == nil { pumpReservoir = fallback.pumpReservoir }
+        
+        if uploaderBatteryPercent == nil { uploaderBatteryPercent = fallback.uploaderBatteryPercent }
+        if uploaderIsCharging == nil { uploaderIsCharging = fallback.uploaderIsCharging }
+        
+        if lastLoopDate == .distantPast {
+            lastLoopDate = fallback.lastLoopDate
+        }
+    }
+    
     /// Initialize from a unified NightscoutDeviceStatusResponse
     init(from unified: NightscoutDeviceStatusResponse) {
         self.init()

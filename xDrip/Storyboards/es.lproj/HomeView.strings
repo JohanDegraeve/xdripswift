@@ -55,3 +55,39 @@
 
 /// Literally 'Sensor', used as name in the button in the home screen, but also in text in pop ups
 "sensor" = "Sensor";
+
+"postProcessingFiveMinuteReadings" = "5-minute readings";
+"postProcessingAlgorithm" = "Algorithm";
+"sensorLifetimeRemainingFormat" = "%@ restante";
+"postProcessingAlgorithmSavitzkyGolay" = "Savitzky-Golay";
+
+"sensorManagementNoiseTitle" = "Ruido del sensor";
+"sensorManagementNoiseShortTerm" = "Últimos 30 minutos";
+"sensorManagementNoiseLongTerm" = "Últimas 4 horas";
+"sensorManagementNoiseCollecting" = "Recopilando datos";
+"sensorManagementNoiseLow" = "Bajo";
+"sensorManagementNoiseElevated" = "Elevado";
+"sensorManagementNoiseVeryHigh" = "Muy alto";
+"sensorManagementNoiseExtreme" = "Extremo";
+"sensorManagementNoiseFlatline" = "Es probable que el sensor haya fallado.";
+"sensorManagementNoiseFooter" = "Sensibilidad seleccionada: %@";
+"sensorNoiseWarningExtremeTitle" = "Ruido extremo del sensor";
+"sensorNoiseWarningPersistentTitle" = "Ruido persistente del sensor";
+"sensorNoiseWarningFlatlineTitle" = "La señal del sensor está plana";
+"sensorNoiseHistoryTitle" = "Historial de ruido";
+"sensorNoiseHistoryCurrentTitle" = "Mediciones actuales";
+"sensorNoiseHistoryChartTitle" = "Ruido a lo largo del tiempo";
+"sensorNoiseHistoryRangeTitle" = "Intervalo de tiempo";
+"sensorNoiseHistoryDayRange" = "24 h";
+"sensorNoiseHistoryThreeDayRange" = "3 d";
+"sensorNoiseHistoryWeekRange" = "7 d";
+"sensorNoiseHistoryAllRange" = "Todo";
+"sensorNoiseHistoryShortCompact" = "30 min";
+"sensorNoiseHistoryLongCompact" = "4 h";
+"sensorNoiseHistoryLoading" = "Creando el historial del sensor";
+"sensorNoiseHistoryNoDataTitle" = "Aún no hay suficientes datos de ruido";
+"sensorNoiseHistoryNoDataMessage" = "El gráfico aparecerá cuando se hayan recopilado suficientes lecturas del sensor.";
+"sensorNoiseHistoryFooter" = "El gráfico muestra la variación residual del sensor durante esta sesión. Los valores más bajos indican una señal más estable. No mide la precisión de la glucosa.";
+"sensorNoiseHistoryChartAccessibility" = "Gráfico del historial de ruido del sensor";
+"pumpBattery" = "Batería";
+"pumpReservoir" = "Depósito";

@@ -15,7 +15,7 @@ import CoreData
 // Changing the order will change the Int16 value
 // and may change all Treatments Type present in CoreData.
 // Add new at the end or specify each value.
-@objc public enum TreatmentType: Int16 {
+@objc public enum TreatmentType: Int16, Sendable {
 	case Insulin
 	case Carbs
 	case Exercise
@@ -24,6 +24,7 @@ import CoreData
     case SiteChange
     case SensorStart
     case PumpBatteryChange
+    case Note
 	
 	/// String representation.
 	public func asString() -> String {
@@ -44,6 +45,8 @@ import CoreData
             return Texts_TreatmentsView.sensorStart
         case .PumpBatteryChange:
             return Texts_TreatmentsView.pumpBatteryChange
+        case .Note:
+            return Texts_TreatmentsView.note
 		default:
 			return Texts_TreatmentsView.questionMark
 		}
@@ -62,7 +65,7 @@ import CoreData
             return Texts_TreatmentsView.basalRateUnit
         case .BgCheck:
             return UserDefaults.standard.bloodGlucoseUnitIsMgDl ? Texts_Common.mgdl : Texts_Common.mmol
-        case .SiteChange, .SensorStart, .PumpBatteryChange:
+        case .SiteChange, .SensorStart, .PumpBatteryChange, .Note:
             return ""
 		default:
 			return Texts_TreatmentsView.questionMark
@@ -89,6 +92,8 @@ import CoreData
             return "glucose"
         case .Basal:
             return "rate"
+        case .Note:
+            return "note"
         default:
             return ""
         }
@@ -108,23 +113,23 @@ public class TreatmentEntry: NSManagedObject, Comparable {
     /// initializer with id default empty, uploaded default false
     /// - parameters:
     ///     -     nightscoutEventType : if it's a treatmentEntry that was downloaded from Nightscout, then this is the eventType as it was received form Nightscout. nil if not known or if it's a treatmentType that was not downloaded from Nightscout
-    convenience init(date: Date, value: Double, valueSecondary: Double? = 0.0, treatmentType: TreatmentType, nightscoutEventType: String?, enteredBy: String?, nsManagedObjectContext:NSManagedObjectContext) {
+    convenience init(date: Date, value: Double, valueSecondary: Double? = 0.0, treatmentType: TreatmentType, nightscoutEventType: String?, enteredBy: String?, notes: String? = nil, nsManagedObjectContext:NSManagedObjectContext) {
         
 		// Id defaults to Empty
-        self.init(id: TreatmentEntry.EmptyId, date: date, value: value, valueSecondary: valueSecondary, treatmentType: treatmentType, uploaded: false, nightscoutEventType: nightscoutEventType, enteredBy: enteredBy, nsManagedObjectContext: nsManagedObjectContext)
+        self.init(id: TreatmentEntry.EmptyId, date: date, value: value, valueSecondary: valueSecondary, treatmentType: treatmentType, uploaded: false, nightscoutEventType: nightscoutEventType, enteredBy: enteredBy, notes: notes, nsManagedObjectContext: nsManagedObjectContext)
         
 	}
 	
     /// if id = TreatmentEntry.EmptyId then uploaded will get default value false
-	convenience init(id: String, date: Date, value: Double, valueSecondary: Double? = 0.0, treatmentType: TreatmentType, nightscoutEventType: String?, enteredBy: String?, nsManagedObjectContext:NSManagedObjectContext) {
+	convenience init(id: String, date: Date, value: Double, valueSecondary: Double? = 0.0, treatmentType: TreatmentType, nightscoutEventType: String?, enteredBy: String?, notes: String? = nil, nsManagedObjectContext:NSManagedObjectContext) {
 		
 		let uploaded = id != TreatmentEntry.EmptyId
 		
-        self.init(id: id, date: date, value: value, valueSecondary: valueSecondary, treatmentType: treatmentType, uploaded: uploaded, nightscoutEventType: nightscoutEventType, enteredBy: enteredBy, nsManagedObjectContext: nsManagedObjectContext)
+        self.init(id: id, date: date, value: value, valueSecondary: valueSecondary, treatmentType: treatmentType, uploaded: uploaded, nightscoutEventType: nightscoutEventType, enteredBy: enteredBy, notes: notes, nsManagedObjectContext: nsManagedObjectContext)
         
 	}
 	
-    init(id: String, date: Date, value: Double, valueSecondary: Double? = 0.0, treatmentType: TreatmentType, uploaded: Bool, nightscoutEventType: String?, enteredBy: String?, nsManagedObjectContext:NSManagedObjectContext) {
+    init(id: String, date: Date, value: Double, valueSecondary: Double? = 0.0, treatmentType: TreatmentType, uploaded: Bool, nightscoutEventType: String?, enteredBy: String?, notes: String? = nil, nsManagedObjectContext:NSManagedObjectContext) {
 		
 		let entity = NSEntityDescription.entity(forEntityName: "TreatmentEntry", in: nsManagedObjectContext)!
 		super.init(entity: entity, insertInto: nsManagedObjectContext)
@@ -137,6 +142,7 @@ public class TreatmentEntry: NSManagedObject, Comparable {
 		self.uploaded = uploaded  // tracks upload to nightscout
         self.nightscoutEventType = nightscoutEventType
         self.enteredBy = enteredBy
+        self.notes = notes
 
     }
 
@@ -148,7 +154,7 @@ public class TreatmentEntry: NSManagedObject, Comparable {
     /// - splits of "-carbs" "-insulin" or "-exercise" from the id
 	func dictionaryRepresentationForNightscoutUpload(reuseDateFormatter: DateFormatter? = nil) -> [String: Any] {
         
-        let enteredByString = enteredBy ?? "xDrip4iOS"
+        let enteredByString = enteredBy ?? ConstantsHomeView.applicationName
         
 		// Universal fields.
 		var dict: [String: Any] = [
@@ -189,6 +195,9 @@ public class TreatmentEntry: NSManagedObject, Comparable {
             dict["eventType"] = "Sensor Start" // maybe overwritten in next statement
         case .PumpBatteryChange:
             dict["eventType"] = "Pump Battery Change" // maybe overwritten in next statement
+        case .Note:
+            dict["eventType"] = ConstantsNightscout.noteEventType
+            dict["notes"] = notes ?? ""
 		default:
 			break
 		}
@@ -210,5 +219,3 @@ public func < (lhs: TreatmentEntry, rhs: TreatmentEntry) -> Bool {
     return lhs.date < rhs.date
     
 }
-
-

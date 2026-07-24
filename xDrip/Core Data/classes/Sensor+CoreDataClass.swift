@@ -1,9 +1,7 @@
 import Foundation
 import CoreData
 
-/// Protocol to allow any controller to provide the current active Sensor.
-/// Used so that child view controllers (e.g. BluetoothPeripheralViewController)
-/// can query the active sensor without holding a direct reference to RootViewController.
+/// Protocol to allow hosted views to query the active sensor without holding a direct reference to RootViewController.
 protocol ActiveSensorProviding: AnyObject {
     var activeSensor: Sensor? { get }
 }

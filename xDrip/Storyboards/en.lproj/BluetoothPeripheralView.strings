@@ -31,7 +31,11 @@
 "confirmDisconnectMessage" = "Click 'Disconnect' to confirm that you really want to disconnect from the transmitter.";
 "transmittterStartDate" = "Transmitter Started";
 "sensorStartDate" = "Sensor Started";
-"useOtherDexcomApp" = "Use With Other App";
+"useOtherDexcomApp" = "Coexistence Mode";
+"useOtherDexcomAppCoexistenceFooter" = "Coexistence mode allows us to work with another app such as the Dexcom or CamAPS apps. That app must keep running in the background.";
+"useOtherDexcomAppPrimaryFooter" = "Primary mode connects as the main app and controls the connection.";
+"runningInCoexistenceMode" = "Running in Coexistence mode";
+"runningInPrimaryMode" = "Running in Primary mode";
 "nfcScanNeeded" = "NFC scan needed";
 "nfcScanFailedTitle" = "⚠️ Sensor Scan Failed";
 "nfcScanFailedMessage" = "Please scan again";

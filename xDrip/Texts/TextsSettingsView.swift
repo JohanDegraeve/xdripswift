@@ -15,25 +15,52 @@ class Texts_SettingsView {
     static let screenTitle: String = {
         return NSLocalizedString("settingsviews_settingstitle", tableName: filename, bundle: Bundle.main, value: "Settings", comment: "shown on top of the first settings screen, literally 'Settings'")
     }()
-    
-    // MARK: - Section Help
-    
-    static let sectionTitleHelp: String = {
-        return NSLocalizedString("settingsviews_sectiontitlehelp", tableName: filename, bundle: Bundle.main, value: "Help & Documentation", comment: "help settings, section title")
+
+    static let glucoseDisplaySectionTitle: String = {
+        return NSLocalizedString("settingsviews_glucoseDisplaySectionTitle", tableName: filename, bundle: Bundle.main, value: "Glucose Display", comment: "settings group title for glucose display options")
     }()
+
+    static let glucoseRangesSectionTitle: String = {
+        return NSLocalizedString("settingsviews_glucoseRangesSectionTitle", tableName: filename, bundle: Bundle.main, value: "Glucose Ranges", comment: "settings section title for glucose range threshold values")
+    }()
+
+    static let glucoseRangesSectionFooter: String = {
+        return NSLocalizedString("settingsviews_glucoseRangesSectionFooter", tableName: filename, bundle: Bundle.main, value: "Glucose Ranges only affect the main chart display colours. They are not related to Alarm values.", comment: "settings footer explaining what glucose ranges affect")
+    }()
+
+    static let alertsAndNotificationsSectionTitle: String = {
+        return NSLocalizedString("settingsviews_alertsAndNotificationsSectionTitle", tableName: filename, bundle: Bundle.main, value: "Alerts and Notifications", comment: "settings group title for alerts and notifications")
+    }()
+
+    static let sharingAndServicesSectionTitle: String = {
+        return NSLocalizedString("settingsviews_sharingAndServicesSectionTitle", tableName: filename, bundle: Bundle.main, value: "Sharing and Services", comment: "settings group title for sharing and external services")
+    }()
+
+    static let osAidLoopShareSectionTitle: String = {
+        return NSLocalizedString("settingsviews_osAidLoopShareSectionTitle", tableName: filename, bundle: Bundle.main, value: "OS-AID Share", comment: "settings section title for OS-AID sharing")
+    }()
+
+    static let issueReportSectionTitle: String = {
+        return NSLocalizedString("settingsviews_issueReportSectionTitle", tableName: filename, bundle: Bundle.main, value: "Issue Report", comment: "settings section title for sending issue report logs")
+    }()
+
+    static let issueReportSectionFooter: String = {
+        return NSLocalizedString("settingsviews_issueReportSectionFooter", tableName: filename, bundle: Bundle.main, value: "Do not send an Issue Report unless requested by an xDrip4iOS developer or your report will be automatically deleted.", comment: "settings footer warning users not to send issue reports unless requested")
+    }()
+
+    static func appBannerVersion(_ version: String) -> String {
+        return String(format: NSLocalizedString("settingsviews_appBannerVersion", tableName: filename, bundle: Bundle.main, value: "Version %@", comment: "settings banner, app version label"), version)
+    }
+
+    // MARK: - Online Help
     
     static let showOnlineHelp: String = {
         return NSLocalizedString("settingsviews_showOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Open Online Help", comment: "help settings, open the online help")
     }()
     
     static let translateOnlineHelp: String = {
-        return NSLocalizedString("settingsviews_translateOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Translate Automatically", comment: "help settings, should the online help be translated automatically if needed")
+        return NSLocalizedString("settingsviews_translateOnlineHelp", tableName: filename, bundle: Bundle.main, value: "Translate Documentation", comment: "help settings, should the online documentation be translated automatically if needed")
     }()
-    
-    static let restartNeeded: String = {
-        return NSLocalizedString("settingsviews_restartNeeded", tableName: filename, bundle: Bundle.main, value: "(Restart required)", comment: "help settings, restart needed")
-    }()
-    
     
     // MARK: - Notifications
         
@@ -50,7 +77,7 @@ class Texts_SettingsView {
     }()
     
     static let liveActivityDisabledInFollowerModeMessage: String = {
-        return NSLocalizedString("settingsviews_liveActivityDisabledInFollowerModeMessage", tableName: filename, bundle: Bundle.main, value: "\nLive activities can only be used in Follower mode when a valid heartbeat is enabled.", comment: "notification settings, live activities are not available in follower mode")
+        return NSLocalizedString("settingsviews_liveActivityDisabledInFollowerModeMessage", tableName: filename, bundle: Bundle.main, value: "Live Activities are disabled in Follower Mode unless an external heartbeat is used for keep-alive.", comment: "notification settings, live activities are not available in follower mode")
     }()
     
     static let liveActivityTypeMinimal: String = {
@@ -67,9 +94,9 @@ class Texts_SettingsView {
     
     
     // MARK: - Section Data Source
-    
+
     static let sectionTitleDataSource: String = {
-        return NSLocalizedString("settingsviews_sectionTitleDataSource", tableName: filename, bundle: Bundle.main, value: "CGM Data Source", comment: "CGM data source settings, section title")
+        return NSLocalizedString("settingsviews_sectionTitleDataSource", tableName: filename, bundle: Bundle.main, value: "Data Source", comment: "data source settings, section title")
     }()
     
     static let labelMasterOrFollower: String = {
@@ -97,7 +124,7 @@ class Texts_SettingsView {
     }()
     
     static let labelfollowerKeepAliveType: String = {
-        return NSLocalizedString("settingsviews_labelfollowerKeepAliveType", tableName: filename, bundle: Bundle.main, value: "Background Keep-alive", comment: "data source settings, enable background keep alive")
+        return NSLocalizedString("settingsviews_labelfollowerKeepAliveType", tableName: filename, bundle: Bundle.main, value: "Keep-alive", comment: "data source settings, keep-alive mode")
     }()
     
     static let followerKeepAliveTypeDisabled: String = {
@@ -113,31 +140,31 @@ class Texts_SettingsView {
     }()
     
     static let followerKeepAliveTypeHeartbeat: String = {
-        return NSLocalizedString("settingsviews_followerKeepAliveTypeHeartbeat", tableName: filename, bundle: Bundle.main, value: "Heartbeat ♥", comment: "data source settings, keep-alive mode is set to use an external heartbeat")
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeHeartbeat", tableName: filename, bundle: Bundle.main, value: "Heartbeat", comment: "data source settings, keep-alive mode is set to use an external heartbeat")
     }()
     
     static let followerKeepAliveTypeDisabledMessage: String = {
-        return NSLocalizedString("settingsviews_followerKeepAliveTypeDisabledMessage", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.", comment: "data source settings, keep-alive mode is set to disabled")
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeDisabledMessage", tableName: filename, bundle: Bundle.main, value: "Keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.", comment: "data source settings, keep-alive mode is set to disabled")
     }()
     
     static let followerKeepAliveTypeNormalMessage: String = {
-        return NSLocalizedString("settingsviews_followerKeepAliveTypeNormalMessage", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.", comment: "data source settings, keep-alive mode is set to normal")
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeNormalMessage", tableName: filename, bundle: Bundle.main, value: "Keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.", comment: "data source settings, keep-alive mode is set to normal")
     }()
     
     static let followerKeepAliveTypeAggressiveMessage: String = {
-        return NSLocalizedString("settingsviews_followerKeepAliveTypeAggressiveMessage", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.", comment: "data source settings, keep-alive mode is set to aggressive")
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeAggressiveMessage", tableName: filename, bundle: Bundle.main, value: "Keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.", comment: "data source settings, keep-alive mode is set to aggressive")
     }()
     
     static let followerKeepAliveTypeHeartbeatMessage: String = {
-        return NSLocalizedString("settingsviews_followerKeepAliveTypeHeartbeatMessage", tableName: filename, bundle: Bundle.main, value: "Background keep-alive is set to use an external heartbeat. ❤️\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.", comment: "data source settings, keep-alive mode is set to use an external heartbeat")
+        return NSLocalizedString("settingsviews_followerKeepAliveTypeHeartbeatMessage", tableName: filename, bundle: Bundle.main, value: "Keep-alive is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.", comment: "data source settings, keep-alive mode is set to use an external heartbeat")
     }()
     
     static let followerPatientName: String = {
-        return NSLocalizedString("settingsviews_followerPatientName", tableName: filename, bundle: Bundle.main, value: "Patient Name", comment: "data source settings, the name of the person we are following")
+        return NSLocalizedString("settingsviews_followerPatientName", tableName: filename, bundle: Bundle.main, value: "Alias", comment: "data source settings, optional alias for the person we are following")
     }()
     
     static let followerPatientNameMessage: String = {
-        return NSLocalizedString("settingsviews_followerPatientNameMessage", tableName: filename, bundle: Bundle.main, value: "Here you can optionally write the name of the person you are following.", comment: "data source settings, ask the user to enter the name of the person we are following if they want to")
+        return NSLocalizedString("settingsviews_followerPatientNameMessage", tableName: filename, bundle: Bundle.main, value: "Here you can optionally write an alias for the person you are following.", comment: "data source settings, ask the user to enter an alias for the person we are following if they want to")
     }()
     
     static let followerServiceStatus: String = {
@@ -209,15 +236,15 @@ class Texts_SettingsView {
     }()
     
     static let showReadingInNotification: String = {
-        return NSLocalizedString("settingsviews_showReadingInNotification", tableName: filename, bundle: Bundle.main, value: "Show BG in Notifications", comment: "general settings, should reading be shown in notification yes or no")
+        return NSLocalizedString("settingsviews_showReadingInNotification", tableName: filename, bundle: Bundle.main, value: "Glucose Notifications", comment: "general settings, should reading be shown in notification yes or no")
     }()
     
     static let labelShowReadingInAppBadge: String = {
-        return NSLocalizedString("settingsviews_labelShowReadingInAppBadge", tableName: filename, bundle: Bundle.main, value: "Show BG in the App Badge", comment: "general settings, should reading be shown in app badge yes or no")
+        return NSLocalizedString("settingsviews_labelShowReadingInAppBadge", tableName: filename, bundle: Bundle.main, value: "App Badge", comment: "general settings, should reading be shown in app badge yes or no")
     }()
     
     static let multipleAppBadgeValueWith10: String = {
-        return NSLocalizedString("settingsviews_multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "Multiply App Badge Reading by 10", comment: "general settings, should reading be multiplied with 10 yes or no")
+        return NSLocalizedString("settingsviews_multipleAppBadgeValueWith10", tableName: filename, bundle: Bundle.main, value: "App Badge x10", comment: "general settings, should reading be multiplied with 10 yes or no")
     }()
     
     static let settingsviews_IntervalTitle = {
@@ -225,7 +252,7 @@ class Texts_SettingsView {
     }()
     
     static let settingsviews_IntervalMessage = {
-        return NSLocalizedString("settingsviews_IntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two notifications (mins)", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two notifications, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch")
+        return NSLocalizedString("settingsviews_IntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two notifications", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two notifications, this is the pop up message - this is used for setting the interval between two readings in BG notifications, Speak readings, Apple Watch")
     }()
     
     // MARK: - Section Home Screen
@@ -233,13 +260,37 @@ class Texts_SettingsView {
     static let sectionTitleHomeScreen: String = {
         return NSLocalizedString("settingsviews_sectiontitlehomescreen", tableName: filename, bundle: Bundle.main, value: "Home Screen", comment: "home screen settings, section title")
     }()
+
+    static let homeScreenChartDisplaySectionTitle: String = {
+        return NSLocalizedString("settingsviews_homeScreenChartDisplaySectionTitle", tableName: filename, bundle: Bundle.main, value: "Chart Display", comment: "home screen settings, section title for main chart display options")
+    }()
+
+    static let homeScreenMainChartSectionFooter: String = {
+        return NSLocalizedString("settingsviews_homeScreenMainChartSectionFooter", tableName: filename, bundle: Bundle.main, value: "These options control how glucose data is displayed on the main chart.", comment: "home screen settings, footer explaining main chart display options")
+    }()
+
+    static let homeScreenSensorLifetimeSectionTitle: String = {
+        return NSLocalizedString("settingsviews_homeScreenSensorLifetimeSectionTitle", tableName: filename, bundle: Bundle.main, value: "Sensor Lifetime", comment: "home screen settings, section title for sensor lifetime display options")
+    }()
+
+    static let homeScreenSensorLifetimeSectionFooter: String = {
+        return NSLocalizedString("settingsviews_homeScreenSensorLifetimeSectionFooter", tableName: filename, bundle: Bundle.main, value: "Controls whether sensor lifetime is shown as elapsed time or as a countdown on iPhone and Apple Watch.", comment: "home screen settings, footer explaining the sensor lifetime display preference")
+    }()
+
+    static let homeScreenScreenLockSectionTitle: String = {
+        return NSLocalizedString("settingsviews_homeScreenScreenLockSectionTitle", tableName: filename, bundle: Bundle.main, value: "Screen Lock", comment: "home screen settings, section title for screen lock options")
+    }()
+
+    static let homeScreenScreenLockSectionFooter: String = {
+        return NSLocalizedString("settingsviews_homeScreenScreenLockSectionFooter", tableName: filename, bundle: Bundle.main, value: "These options control how the Home screen behaves when the app is left open or locked.", comment: "home screen settings, footer explaining screen lock and rotation options")
+    }()
     
     static let showClockWhenScreenIsLocked: String = {
-        return NSLocalizedString("settingsviews_showClockWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Show Clock when Locked", comment: "home screen settings, should the clock also be displayed when the screen is locked")
+        return NSLocalizedString("settingsviews_showClockWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Lock Screen Clock", comment: "home screen settings, should the clock also be displayed when the screen is locked")
     }()
     
     static let screenLockDimmingTypeWhenScreenIsLocked: String = {
-        return NSLocalizedString("settingsviews_screenLockDimmingTypeWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Dim Screen when Locked", comment: "home screen settings, should the screen be dimmed when the screen is locked")
+        return NSLocalizedString("settingsviews_screenLockDimmingTypeWhenScreenIsLocked", tableName: filename, bundle: Bundle.main, value: "Lock Screen Dimming", comment: "home screen settings, should the screen be dimmed when the screen is locked")
     }()
     
     static let screenLockDimmingTypeDisabled: String = {
@@ -259,7 +310,7 @@ class Texts_SettingsView {
     }()
     
     static let allowScreenRotation: String = {
-        return NSLocalizedString("settingsviews_allowScreenRotation", tableName: filename, bundle: Bundle.main, value: "Allow Chart Rotation", comment: "home screen settings, should the main glucose chart screen be allowed")
+        return NSLocalizedString("settingsviews_allowScreenRotation", tableName: filename, bundle: Bundle.main, value: "Chart Rotation", comment: "home screen settings, should the main glucose chart screen be allowed")
     }()
     
     static let showMiniChart: String = {
@@ -267,15 +318,31 @@ class Texts_SettingsView {
     }()
     
     static let allowMainChartAutoReset: String = {
-        return NSLocalizedString("settingsviews_allowMainChartAutoReset", tableName: filename, bundle: Bundle.main, value: "Auto Reset Main Chart", comment: "home screen settings, should the main chart automatically reset the y-axis and date to current values every 15 seconds")
+        return NSLocalizedString("settingsviews_allowMainChartAutoReset", tableName: filename, bundle: Bundle.main, value: "Auto Reset Chart", comment: "home screen settings, should the main chart automatically reset the y-axis and date to current values every 15 seconds")
+    }()
+    
+    static let showOriginalBGReadings: String = {
+        return NSLocalizedString("settingsviews_showOriginalBGReadings", tableName: filename, bundle: Bundle.main, value: "Original Values", comment: "home screen settings, should the original glucose values be shown on the main chart when post processing is enabled")
+    }()
+
+    static let showSensorNoiseOnChart: String = {
+        return NSLocalizedString("settingsviews_showSensorNoiseOnChart", tableName: filename, bundle: Bundle.main, value: "Show Sensor Noise", comment: "home screen settings, should short-term sensor noise be shown as background bands on the main chart")
     }()
 
     static let labelUrgentHighValue: String = {
         return NSLocalizedString("settingsviews_urgentHighValue", tableName: filename, bundle: Bundle.main, value: "Urgent High Value", comment: "home screen settings, urgent high value")
     }()
+
+    static let urgentHighValueMessage: String = {
+        return NSLocalizedString("settingsviews_urgentHighValueMessage", tableName: filename, bundle: Bundle.main, value: "Enter the glucose value for the urgent high threshold.", comment: "home screen settings, ask the user to enter the urgent high glucose value")
+    }()
     
     static let labelHighValue: String = {
         return NSLocalizedString("settingsviews_highValue", tableName: filename, bundle: Bundle.main, value: "High Value", comment: "home screen settings, high value")
+    }()
+
+    static let highValueMessage: String = {
+        return NSLocalizedString("settingsviews_highValueMessage", tableName: filename, bundle: Bundle.main, value: "Enter the glucose value for the high threshold.", comment: "home screen settings, ask the user to enter the high glucose value")
     }()
     
     static let labelTargetValue: String = {
@@ -289,13 +356,21 @@ class Texts_SettingsView {
     static let labelLowValue: String = {
         return NSLocalizedString("settingsviews_lowValue", tableName: filename, bundle: Bundle.main, value: "Low Value", comment: "home screen settings, low value")
     }()
+
+    static let lowValueMessage: String = {
+        return NSLocalizedString("settingsviews_lowValueMessage", tableName: filename, bundle: Bundle.main, value: "Enter the glucose value for the low threshold.", comment: "home screen settings, ask the user to enter the low glucose value")
+    }()
     
     static let labelUrgentLowValue: String = {
         return NSLocalizedString("settingsviews_urgentLowValue", tableName: filename, bundle: Bundle.main, value: "Urgent Low Value", comment: "home screen settings, urgent low value")
     }()
+
+    static let urgentLowValueMessage: String = {
+        return NSLocalizedString("settingsviews_urgentLowValueMessage", tableName: filename, bundle: Bundle.main, value: "Enter the glucose value for the urgent low threshold.", comment: "home screen settings, ask the user to enter the urgent low glucose value")
+    }()
     
     static let labelShowTarget: String = {
-        return NSLocalizedString("settingsviews_showtarget", tableName: filename, bundle: Bundle.main, value: "Show Target Line", comment: "home screen settings, show target line")
+        return NSLocalizedString("settingsviews_showtarget", tableName: filename, bundle: Bundle.main, value: "Target Line", comment: "home screen settings, show target line")
     }()
     
     // MARK: - Section Treatments
@@ -335,7 +410,7 @@ class Texts_SettingsView {
     }()
     
     static let labelTimeInRangeType: String = {
-        return NSLocalizedString("settingsviews_labelTimeInRangeType", tableName: filename, bundle: Bundle.main, value: "Time In Range Type", comment: "statistics settings, the type of time in range selected")
+        return NSLocalizedString("settingsviews_labelTimeInRangeType", tableName: filename, bundle: Bundle.main, value: "Time In Range", comment: "statistics settings, the type of time in range selected")
     }()
     
     static let timeInRangeTypeStandardRange: String = {
@@ -351,7 +426,7 @@ class Texts_SettingsView {
     }()
     
     static let labelUseIFFCA1C: String = {
-        return NSLocalizedString("settingsviews_useIFCCA1C", tableName: filename, bundle: Bundle.main, value: "Show HbA1c in mmols/mol", comment: "statistics settings, use IFCC method for HbA1c")
+        return NSLocalizedString("settingsviews_useIFCCA1C", tableName: filename, bundle: Bundle.main, value: "HbA1c in mmols/mol", comment: "statistics settings, use IFCC method for HbA1c")
     }()
     
     
@@ -398,11 +473,11 @@ class Texts_SettingsView {
     }()
     
     static let resetDexcomTransmitterMessage: String = {
-        return NSLocalizedString("settingsviews_resetDexcomTransmitterMessage", tableName: filename, bundle: Bundle.main, value: "\nThis option will attempt to reset your Anubis transmitter on the next connection.", comment: "transmitter settings, to explain that the reset option only works for certain transmitters")
+        return NSLocalizedString("settingsviews_resetDexcomTransmitterMessage", tableName: filename, bundle: Bundle.main, value: "This option will attempt to reset your Anubis transmitter on the next connection.", comment: "transmitter settings, to explain that the reset option only works for certain transmitters")
     }()
     
     static let labelWebOOPTransmitter:String = {
-        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Use Transmitter Algorithm", comment: "web oop settings in bluetooth peripheral view : enabled or not")
+        return NSLocalizedString("settingsviews_webooptransmitter", tableName: filename, bundle: Bundle.main, value: "Transmitter Algorithm", comment: "web oop settings in bluetooth peripheral view : enabled or not")
     }()
     
     static let labelWebOOP:String = {
@@ -410,7 +485,7 @@ class Texts_SettingsView {
     }()
     
     static let labelNonFixedTransmitter:String = {
-        return NSLocalizedString("settingsviews_nonfixedtransmitter", tableName: filename, bundle: Bundle.main, value: "Enable Multi-point Calibration", comment: "non fixed calibration slopes settings in bluetooth peripheral view : enabled or not")
+        return NSLocalizedString("settingsviews_nonfixedtransmitter", tableName: filename, bundle: Bundle.main, value: "Multi-point Calibration", comment: "non fixed calibration slopes settings in bluetooth peripheral view : enabled or not")
     }()
     
     static let labelNonFixed:String = {
@@ -442,6 +517,18 @@ class Texts_SettingsView {
     static let labelAlerts: String = {
         return NSLocalizedString("settingsviews_row_alerts", tableName: filename, bundle: Bundle.main, value: "Alarms", comment: "alerting settings, row alerts")
     }()
+
+    static let volumeTestsSectionTitle: String = {
+        return NSLocalizedString("settingsviews_volume_tests_section_title", tableName: filename, bundle: Bundle.main, value: "Test Alarm Volume", comment: "alerting settings, section title for volume test rows")
+    }()
+
+    static let alertTypesSectionFooter: String = {
+        return NSLocalizedString("settingsviews_alert_types_section_footer", tableName: filename, bundle: Bundle.main, value: "Alarm Types define how alarms behave, including sound, vibration, snooze and mute override settings.", comment: "alerting settings, footer explaining alarm types")
+    }()
+
+    static let alertsSectionFooter: String = {
+        return NSLocalizedString("settingsviews_alerts_section_footer", tableName: filename, bundle: Bundle.main, value: "Alarms define when the app should notify you for glucose levels, missed readings and other conditions.", comment: "alerting settings, footer explaining alarms")
+    }()
     
     // MARK: - Section Healthkit
     
@@ -450,17 +537,17 @@ class Texts_SettingsView {
     }()
     
     static let labelHealthKit: String = {
-        return NSLocalizedString("settingsviews_healthkit", tableName: filename, bundle: Bundle.main, value: "Write Data to Apple Health", comment: "healthkit settings, literally 'healthkit'")
+        return NSLocalizedString("settingsviews_healthkit", tableName: filename, bundle: Bundle.main, value: "Write to Apple Health", comment: "healthkit settings, literally 'healthkit'")
     }()
     
-    // MARK: - Section Dexcom Share Upload (including Share Follower)
+    // MARK: - Section Dexcom Share (including Share Follower)
     
     static let sectionTitleDexcomShareUpload: String = {
-        return NSLocalizedString("settingsviews_sectiontitledexcomshareupload", tableName: filename, bundle: Bundle.main, value: "Dexcom Share Upload", comment: "dexcom share upload settings, section title")
+        return NSLocalizedString("settingsviews_sectiontitledexcomshareupload", tableName: filename, bundle: Bundle.main, value: "Dexcom Share", comment: "dexcom share upload settings, section title")
     }()
     
     static let labelUploadReadingstoDexcomShare = {
-        return NSLocalizedString("settingsviews_uploadReadingstoDexcomShare", tableName: filename, bundle: Bundle.main, value: "Upload to Dexcom Share", comment: "dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no")
+        return NSLocalizedString("settingsviews_uploadReadingstoDexcomShare", tableName: filename, bundle: Bundle.main, value: "Upload", comment: "dexcom share settings, where user can select if readings should be uploaded to dexcom share yes or no")
     }()
     
     static let labelUploadReadingstoDexcomShareDisabledMessage = {
@@ -472,7 +559,7 @@ class Texts_SettingsView {
     }()
     
     static let labelUseUSDexcomShareurl = {
-        return NSLocalizedString("settingsviews_useUSDexcomShareurl", tableName: filename, bundle: Bundle.main, value: "Use Dexcom US Servers", comment: "dexcom share settings, where user can choose to use US url or not")
+        return NSLocalizedString("settingsviews_useUSDexcomShareurl", tableName: filename, bundle: Bundle.main, value: "US Servers", comment: "dexcom share settings, where user can choose to use US url or not")
     }()
     
     static let labelDexcomShareAccountName = {
@@ -496,6 +583,10 @@ class Texts_SettingsView {
     static let sectionTitleNightscout: String = {
         return NSLocalizedString("settingsviews_sectiontitlenightscout", tableName: filename, bundle: Bundle.main, value: "Nightscout", comment: "nightscout settings, section title")
     }()
+
+    static let nightscoutUploadOptionsSectionTitle: String = {
+        return NSLocalizedString("settingsviews_nightscoutUploadOptionsSectionTitle", tableName: filename, bundle: Bundle.main, value: "Upload Options", comment: "nightscout settings, section title for upload options")
+    }()
     
     static let labelNightscoutEnabled = {
         return NSLocalizedString("settingsviews_nightscoutEnabled", tableName: filename, bundle: Bundle.main, value: "Enable Nightscout", comment: "nightscout settings, where user can enable or disable nightscout")
@@ -506,7 +597,7 @@ class Texts_SettingsView {
     }()
     
     static let labelNightscoutFollowType = {
-        return NSLocalizedString("settingsviews_nightscoutFollowType", tableName: filename, bundle: Bundle.main, value: "AID Follower type", comment: "nightscout settings, select the type of follower to use")
+        return NSLocalizedString("settingsviews_nightscoutFollowType", tableName: filename, bundle: Bundle.main, value: "AID Type", comment: "nightscout settings, select the type of follower to use")
     }()
     
     static let nightscoutFollowTypeNone = {
@@ -550,7 +641,7 @@ class Texts_SettingsView {
     }()
     
     static let giveNightscoutAPIKey = {
-        return NSLocalizedString("settingsviews_giveNightscoutAPIKey", tableName: filename, bundle: Bundle.main, value: "Enter your API_SECRET", comment: "nightscout settings, pop up that asks user to enter nightscout api key")
+        return NSLocalizedString("settingsviews_giveNightscoutAPIKey", tableName: filename, bundle: Bundle.main, value: "Enter API_SECRET", comment: "nightscout settings, pop up that asks user to enter nightscout api key")
     }()
     
     static let editScheduleTimePickerSubtitle: String = {
@@ -558,7 +649,7 @@ class Texts_SettingsView {
     }()
     
     static let timeScheduleViewTitle: String = {
-        return NSLocalizedString("timeScheduleViewTitle", tableName: filename, bundle: Bundle.main, value: "On/Off Time Schedule for ", comment: "When creating schedule for Nightscout or Dexcom Share upload, this is the top label text")
+        return NSLocalizedString("timeScheduleViewTitle", tableName: filename, bundle: Bundle.main, value: "On/Off Time Schedule", comment: "When creating schedule for Nightscout or Dexcom Share upload, this is the top label text")
     }()
     
     static let uploadSensorStartTime: String = {
@@ -572,9 +663,17 @@ class Texts_SettingsView {
     static let nightscoutPort: String = {
         return NSLocalizedString("nightscoutPort", tableName: filename, bundle: Bundle.main, value: "Port:", comment: "nightscout settings, port to use")
     }()
+
+    static let enterNightscoutPortNumber: String = {
+        return NSLocalizedString("enterNightscoutPortNumber", tableName: filename, bundle: Bundle.main, value: "Enter Port Number", comment: "nightscout settings, row label when entering the port number")
+    }()
     
     static let nightscoutToken: String = {
         return NSLocalizedString("nightscoutToken", tableName: filename, bundle: Bundle.main, value: "Token", comment: "nightscout settings, token to use")
+    }()
+
+    static let giveNightscoutToken: String = {
+        return NSLocalizedString("giveNightscoutToken", tableName: filename, bundle: Bundle.main, value: "Enter Token", comment: "nightscout settings, pop up that asks user to enter token")
     }()
     
     static let openNightscout: String = {
@@ -584,11 +683,11 @@ class Texts_SettingsView {
     // MARK: - Section Speak
     
     static let sectionTitleSpeak: String = {
-        return NSLocalizedString("settingsviews_sectiontitlespeak", tableName: filename, bundle: Bundle.main, value: "Voice", comment: "speak settings, section title")
+        return NSLocalizedString("settingsviews_speakBgReadings", tableName: filename, bundle: Bundle.main, value: "Speak Glucose", comment: "speak settings, where user can enable or disable speak readings")
     }()
 
     static let labelSpeakBgReadings = {
-        return NSLocalizedString("settingsviews_speakBgReadings", tableName: filename, bundle: Bundle.main, value: "Speak BG Readings", comment: "speak settings, where user can enable or disable speak readings")
+        return NSLocalizedString("settingsviews_speakBgReadings", tableName: filename, bundle: Bundle.main, value: "Speak Glucose", comment: "speak settings, where user can enable or disable speak readings")
     }()
     
     static let labelSpeakLanguage = {
@@ -612,7 +711,7 @@ class Texts_SettingsView {
     }()
     
     static let settingsviews_SpeakIntervalMessage = {
-        return NSLocalizedString("settingsviews_SpeakIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two voice announcements (mins)", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two bg announcements, this is the pop up message - this is used for setting the interval between two readings in BG announcements, Speak readings, Apple Watch")
+        return NSLocalizedString("settingsviews_SpeakIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two voice announcements", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two bg announcements, this is the pop up message - this is used for setting the interval between two readings in BG announcements, Speak readings, Apple Watch")
     }()
     
     
@@ -626,10 +725,10 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_Version", tableName: filename, bundle: Bundle.main, value: "Version:", comment: "used in settings, section Info, title of the version setting")
     }()
 
-    static let build = {
-        return NSLocalizedString("settingsviews_build", tableName: filename, bundle: Bundle.main, value: "Build:", comment: "used in settings, section Info, title of the build setting")
+    static let installedSince = {
+        return NSLocalizedString("settingsviews_appInstalledSince", tableName: filename, bundle: Bundle.main, value: "Installed", comment: "used in settings, section Info, title of the app install date setting")
     }()
-    
+
     static let license = {
         return NSLocalizedString("settingsviews_license", tableName: filename, bundle: Bundle.main, value: "License", comment: "used in settings, section Info, title of the license setting")
     }()
@@ -668,36 +767,6 @@ class Texts_SettingsView {
         return NSLocalizedString("m5stack_settingsviews_brightness", tableName: filename, bundle: Bundle.main, value: "Screen Brightness", comment: "M5 stack setting, brightness")
     }()
     
-    // MARK: - Section Apple Watch
-    
-    static let appleWatchSectionTitle: String = {
-        return NSLocalizedString("appleWatchSectionTitle", tableName: filename, bundle: Bundle.main, value: "Apple Watch", comment: "Apple Watch Settings - section title")
-    }()
-    
-    static let appleWatchShowDataInComplications: String = {
-        return NSLocalizedString("appleWatchShowDataInComplications", tableName: filename, bundle: Bundle.main, value: "Show Values in Complications", comment: "Apple Watch Settings - show values in the complications")
-    }()
-    
-    static let appleWatchShowDataInComplicationsMessage: String = {
-        return String(format: NSLocalizedString("appleWatchShowDataInComplicationsMessage", tableName: filename, bundle: Bundle.main, value: "Please note that Apple Watch complications will not update in real-time. They will only update 2-3 times per hour.\n\nDO NOT rely on values in the complication for treatment decisions.\n\nFor real-time values, open the %@ Watch app.\n\nOnly click 'OK' if you understand and agree.", comment: "Apple Watch Settings - explain why the user needs to confirm that complications will not always show real-time values"), ConstantsHomeView.applicationName)
-    }()
-    
-    static let appleWatchComplicationUserAgreementDate: String = {
-        return NSLocalizedString("appleWatchComplicationUserAgreementDate", tableName: filename, bundle: Bundle.main, value: "User Agreement", comment: "Apple Watch Settings - the date when the user agreed that the complications will not always display real-time values")
-    }()
-    
-    static let appleWatchRemainingComplicationUserInfoTransfers: String = {
-        return NSLocalizedString("appleWatchRemainingComplicationUserInfoTransfers", tableName: filename, bundle: Bundle.main, value: "Remaining Complication Updates", comment: "Apple Watch Developer Settings - amount of forced complication updates still available today")
-    }()
-    
-    static let appleWatchForceManualComplicationUpdate: String = {
-        return NSLocalizedString("appleWatchForceManualComplicationUpdate", tableName: filename, bundle: Bundle.main, value: "Force Complication Update", comment: "Apple Watch Developer Settings - manually force a complication update")
-    }()
-    
-    static let appleWatchForceManualComplicationUpdateMessage: String = {
-        return NSLocalizedString("appleWatchForceManualComplicationUpdateMessage", tableName: filename, bundle: Bundle.main, value: "This will manually force an update of the Apple Watch complications.\n\nIt will use up one of the remaining transfers available for today", comment: "Apple Watch Developer Settings - message explaining how to manually force a complication update")
-    }()
-    
     static let allowStandByHighContrast: String = {
         return NSLocalizedString("allowStandByHighContrast", tableName: filename, bundle: Bundle.main, value: "StandBy Night Mode", comment: "should we allow the StandBy mode to show a specific high contrast view at night")
     }()
@@ -706,38 +775,102 @@ class Texts_SettingsView {
         return NSLocalizedString("forceStandByBigNumbers", tableName: filename, bundle: Bundle.main, value: "StandBy Big Numbers", comment: "should we force the StandBy mode to show big numbers only")
     }()
     
-    // MARK: - Calendar Events
-    
+    // MARK: - Calendar Share
+
     static let calendarEventsSectionTitle: String = {
-        return NSLocalizedString("calendarEventsSectionTitle", tableName: filename, bundle: Bundle.main, value: "Calendar Events", comment: "Calendar Events Settings - section title")
+        return NSLocalizedString("calendarEventsSectionTitle", tableName: filename, bundle: Bundle.main, value: "Calendar Share", comment: "Calendar Share Settings - section title")
     }()
     
     static let createCalendarEvent: String = {
-        return NSLocalizedString("createCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Create Calendar Events", comment: "Calendar Events Settings - text in row where create event is enabled or disabled ")
+        return NSLocalizedString("createCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Calendar Share", comment: "Calendar Share Settings - text in row where calendar sharing is enabled or disabled")
     }()
 
     static let calenderId: String = {
-        return NSLocalizedString("calenderId", tableName: filename, bundle: Bundle.main, value: "Calendar To Use", comment: "Calendar Events Settings - text in row where user needs to select a calendar")
+        return NSLocalizedString("calenderId", tableName: filename, bundle: Bundle.main, value: "Calendar To Use", comment: "Calendar Share Settings - text in row where user needs to select a calendar")
+    }()
+
+    static let calendarShareAlias: String = {
+        return NSLocalizedString("calendarShareAlias", tableName: filename, bundle: Bundle.main, value: "Alias", comment: "Calendar Share Settings - alias row title")
+    }()
+
+    static let calendarShareAliasMessage: String = {
+        return NSLocalizedString("calendarShareAliasMessage", tableName: filename, bundle: Bundle.main, value: "This name is sent to follower devices.", comment: "Calendar Share Settings - alias editor description")
+    }()
+
+    static let calendarShareConnectionFooter: String = {
+        return NSLocalizedString("calendarShareConnectionFooter", tableName: filename, bundle: Bundle.main, value: "Select a shared calendar that follower devices can also access. An iCloud shared calendar is recommended for best operation.", comment: "Calendar Share Settings - connection section footer")
+    }()
+
+    static let calendarShareStatus: String = {
+        return NSLocalizedString("calendarShareStatus", tableName: filename, bundle: Bundle.main, value: "Share Status", comment: "Calendar Share Settings - share status section and row title")
+    }()
+
+    static let calendarShareStatusFooter: String = {
+        return NSLocalizedString("calendarShareStatusFooter", tableName: filename, bundle: Bundle.main, value: "Include History adds recent 5-minute readings to each payload so followers can fill missed values. To help reliability, choose the lowest history amount that works well.", comment: "Calendar Share Settings - share status section footer")
+    }()
+
+    static let calendarEventPreview: String = {
+        return NSLocalizedString("calendarEventPreview", tableName: filename, bundle: Bundle.main, value: "Calendar Event", comment: "Calendar Share Settings - calendar event preview section title")
+    }()
+
+    static let calendarEventSettingsFooter: String = {
+        return NSLocalizedString("calendarEventSettingsFooter", tableName: filename, bundle: Bundle.main, value: "These options only change the visible calendar event title.", comment: "Calendar Share Settings - calendar event display/settings section footer")
+    }()
+
+    static let calendarShareIncludeHistory: String = {
+        return NSLocalizedString("calendarShareIncludeHistory", tableName: filename, bundle: Bundle.main, value: "Include History", comment: "Calendar Share Settings - history window row title")
+    }()
+
+    static let calendarShareLastValue: String = {
+        return NSLocalizedString("calendarShareLastValue", tableName: filename, bundle: Bundle.main, value: "Last Value", comment: "Calendar Share and Shared Calendar Settings - last shared value row title")
+    }()
+
+    static let calendarFollowHistoricalReadings: String = {
+        return NSLocalizedString("calendarFollowHistoricalReadings", tableName: filename, bundle: Bundle.main, value: "Historical Readings", comment: "Shared Calendar Settings - historical readings section title")
+    }()
+
+    static let calendarFollowHistoricalCount: String = {
+        return NSLocalizedString("calendarFollowHistoricalCount", tableName: filename, bundle: Bundle.main, value: "Count", comment: "Shared Calendar Settings - historical readings count row title")
+    }()
+
+    static let calendarFollowFirstHistoricalReading: String = {
+        return NSLocalizedString("calendarFollowFirstHistoricalReading", tableName: filename, bundle: Bundle.main, value: "First Reading", comment: "Shared Calendar Settings - first historical reading row title")
+    }()
+
+    static let calendarFollowNoHistoricalData: String = {
+        return NSLocalizedString("calendarFollowNoHistoricalData", tableName: filename, bundle: Bundle.main, value: "No historical data found", comment: "Shared Calendar Settings - shown when latest payload has no historical readings")
+    }()
+
+    static let calendarFollowCalendarFooter: String = {
+        return NSLocalizedString("calendarFollowCalendarFooter", tableName: filename, bundle: Bundle.main, value: "Select the calendar shared by the master iPhone. For best results, use a shared iCloud calendar.", comment: "Shared Calendar Settings - calendar selection section footer")
+    }()
+
+    static let calendarFollowStatusFooter: String = {
+        return NSLocalizedString("calendarFollowStatusFooter", tableName: filename, bundle: Bundle.main, value: "Shared Calendar reads the latest encoded event notes from the selected calendar during background updates.", comment: "Shared Calendar Settings - status section footer")
+    }()
+
+    static let calendarFollowHistoricalReadingsFooter: String = {
+        return NSLocalizedString("calendarFollowHistoricalReadingsFooter", tableName: filename, bundle: Bundle.main, value: "Historical readings from the latest payload are imported only when they are missing locally.", comment: "Shared Calendar Settings - historical readings section footer")
     }()
 
     static let displayTrendInCalendarEvent: String = {
-        return NSLocalizedString("settingsviews_displayTrendInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Trend", comment: "Calendar Events Settings - text in row where user needs to say if trend should be displayed or not")
+        return NSLocalizedString("settingsviews_displayTrendInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Trend", comment: "Calendar Share Settings - text in row where user needs to say if trend should be displayed or not")
     }()
     
     static let displayUnitInCalendarEvent: String = {
-        return NSLocalizedString("displayUnitInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Unit", comment: "Calendar Events Settings - text in row where user needs to say if unit should be displayed or not")
+        return NSLocalizedString("displayUnitInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Unit", comment: "Calendar Share Settings - text in row where user needs to say if unit should be displayed or not")
     }()
     
     static let displayDeltaInCalendarEvent: String = {
-        return NSLocalizedString("displayDeltaInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Delta", comment: "Calendar Events Settings - text in row where user needs to say if delta should be displayed or not")
+        return NSLocalizedString("displayDeltaInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Delta", comment: "Calendar Share Settings - text in row where user needs to say if delta should be displayed or not")
     }()
     
     static let infoCalendarAccessDeniedByUser: String = {
-        return String(format: NSLocalizedString("infoCalendarAccessDeniedByUser", tableName: filename, bundle: Bundle.main, value: "Full Access is required to your contacts.\n\nGo to iPhone Settings > Apps > %@ > Contacts and enable Full Access.", comment: "If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown"), ConstantsHomeView.applicationName)
+        return String(format: NSLocalizedString("infoCalendarAccessDeniedByUser", tableName: filename, bundle: Bundle.main, value: "Full Access is required to your calendars.\n\nGo to iPhone Settings > Apps > %@ > Calendars and enable Full Access.", comment: "If user has earlier denied access to calendar, and then tries to activate creation of events in calendar, this message will be shown"), ConstantsHomeView.applicationName)
     }()
     
     static let infoCalendarAccessWriteOnly: String = {
-        return String(format: NSLocalizedString("infoCalendarAccessWriteOnly", tableName: filename, bundle: Bundle.main, value: "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.", comment: "The user needs to update their calendar permissions"), ConstantsHomeView.applicationName)
+        return String(format: NSLocalizedString("infoCalendarAccessWriteOnly", tableName: filename, bundle: Bundle.main, value: "You cannot use Calendar Share until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.", comment: "The user needs to update their calendar permissions"), ConstantsHomeView.applicationName)
     }()
     
     static let infoCalendarAccessRestricted: String = {
@@ -745,7 +878,7 @@ class Texts_SettingsView {
     }()
 
     static let displayVisualIndicatorInCalendar: String = {
-        return NSLocalizedString("settingsviews_displayVisualIndicatorInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Display Visual Indicator", comment: "Calendar Events Settings - text in row where user needs to say if the visual target indicator should be displayed or not")
+        return NSLocalizedString("settingsviews_displayVisualIndicatorInCalendarEvent", tableName: filename, bundle: Bundle.main, value: "Visual Indicator", comment: "Calendar Share Settings - text in row where user needs to say if the visual target indicator should be displayed or not")
     }()
     
     static let settingsviews_CalenderIntervalTitle = {
@@ -753,13 +886,13 @@ class Texts_SettingsView {
     }()
     
     static let settingsviews_CalenderIntervalMessage = {
-        return NSLocalizedString("settingsviews_CalenderIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two calender events (mins)", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch")
+        return NSLocalizedString("settingsviews_CalenderIntervalMessage", tableName: filename, bundle: Bundle.main, value: "Minimum interval between two calendar events", comment: "When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch")
     }()
         
     // MARK: - Contact image
     
     static let infoContactsKeepAliveDisabled: String = {
-        return String(format: NSLocalizedString("settingsviews_infoContactsKeepAliveDisabled", tableName: filename, bundle: Bundle.main, value: "You are using Follower mode with background keep-alive disabled.\n\nContact Image function cannot work without a background keep-alive.", comment: "If user is in follower mode with background keep-alive disabled, show this message when they tap the row"), ConstantsHomeView.applicationName)
+        return String(format: NSLocalizedString("settingsviews_infoContactsKeepAliveDisabled", tableName: filename, bundle: Bundle.main, value: "You are using Follower mode with keep-alive disabled.\n\nContact Image function cannot work without keep-alive.", comment: "If user is in follower mode with keep-alive disabled, show this message when they tap the row"), ConstantsHomeView.applicationName)
     }()
     
     static let infoContactsAccessDeniedByUser: String = {
@@ -779,7 +912,7 @@ class Texts_SettingsView {
     }()
     
     static let enableContactImage: String = {
-        return NSLocalizedString("settingsviews_enableContactImage", tableName: filename, bundle: Bundle.main, value: "Enable Contact Image", comment: "Contact Image Settings - text in row where contact image is enabled or disabled ")
+        return NSLocalizedString("settingsviews_enableContactImage", tableName: filename, bundle: Bundle.main, value: "Contact Image", comment: "Contact Image Settings - text in row where contact image is enabled or disabled ")
     }()
     
     static let displayTrendInContactImage: String = {
@@ -787,7 +920,7 @@ class Texts_SettingsView {
     }()
     
     static let useHighContrastContactImage: String = {
-        return NSLocalizedString("settingsviews_useHighContrastContactImage", tableName: filename, bundle: Bundle.main, value: "Use High Contrast Image", comment: "Contact Image Settings - text in row where user needs to say if they prefer to use a high contrast contact image or not")
+        return NSLocalizedString("settingsviews_useHighContrastContactImage", tableName: filename, bundle: Bundle.main, value: "High Contrast", comment: "Contact Image Settings - text in row where user needs to say if they prefer to use a high contrast contact image or not")
     }()
     
     static let contactImageCreatedByString: String = {
@@ -829,11 +962,11 @@ class Texts_SettingsView {
     }()
     
     static let volumeTestSoundPlayer: String = {
-        return NSLocalizedString("volumeTestSoundPlayer", tableName: filename, bundle: Bundle.main, value: "Volume Test (with Override Mute On)", comment: "In Settings, Alerts section, there's an option to test the volume of the sound player, this is the title of the row")
+        return NSLocalizedString("volumeTestSoundPlayer", tableName: filename, bundle: Bundle.main, value: "When Silent Mode is enabled", comment: "In Settings, Alerts section, row title for testing alarm volume when silent mode is enabled")
     }()
     
     static let volumeTestiOSSound: String = {
-        return NSLocalizedString("volumeTestiOSSound", tableName: filename, bundle: Bundle.main, value: "Volume Test (Current iPhone Volume)", comment: "In Settings, Alerts section, there's an option to test the volume of ios sound, this is the title of the row")
+        return NSLocalizedString("volumeTestiOSSound", tableName: filename, bundle: Bundle.main, value: "When Silent Mode is disabled", comment: "In Settings, Alerts section, row title for testing alarm volume when silent mode is disabled")
     }()
 
     static let volumeTestiOSSoundExplanation: String = {
@@ -843,11 +976,7 @@ class Texts_SettingsView {
     // MARK: - Section Developer
     
     static let developerSettings: String = {
-        return NSLocalizedString("developerSettings", tableName: filename, bundle: Bundle.main, value: "Developer Settings", comment: "Developer Settings, section title")
-    }()
-    
-    static let smoothLibreValues: String = {
-        return NSLocalizedString("smoothLibreValues", tableName: filename, bundle: Bundle.main, value: "Smooth Libre Values", comment: "deloper settings, row title for 'Smooth Libre Values?'")
+        return NSLocalizedString("developerSettings", tableName: filename, bundle: Bundle.main, value: "Advanced Settings", comment: "Advanced Settings, section title")
     }()
     
     static let suppressUnLockPayLoad: String = {
@@ -866,8 +995,56 @@ class Texts_SettingsView {
         return NSLocalizedString("loopShareToTrio", tableName: filename, bundle: Bundle.main, value: "Trio", comment: "text for Trio")
     }()
     
-    static let loopShareMedtrumFollowerDisabled: String = {
-        return NSLocalizedString("settingsviews_loopShareMedtrumFollowerDisabled", tableName: filename, bundle: Bundle.main, value: "OS-AID Share is disabled in Medtrum Follower Mode due to safety concerns over sensor accuracy.", comment: "developer settings, Medtrum follower is disabled to share values to shared app group")
+    static let loopShareMedtrumNano: String = {
+        return NSLocalizedString("settingsviews_loopShareMedtrumNano", tableName: filename, bundle: Bundle.main, value: "Share Medtrum Nano", comment: "Settings row title to allow Medtrum Nano glucose data to be shared with OS-AID apps")
+    }()
+
+    static let loopShareMedtrumNanoTitle: String = {
+        return NSLocalizedString("settingsviews_loopShareMedtrumNanoTitle", tableName: filename, bundle: Bundle.main, value: "Medtrum Nano sharing is not recommended", comment: "Warning banner title shown when Medtrum Nano is the OS-AID glucose source")
+    }()
+
+    static let loopShareMedtrumNanoBlockedMessage: String = {
+        return NSLocalizedString("settingsviews_loopShareMedtrumNanoBlockedMessage", tableName: filename, bundle: Bundle.main, value: "Due to accuracy concerns, sharing Medtrum Nano CGM data to OS-AID apps is strongly not recommended.\n\nMedtrum Nano data is not being shared unless you specifically enable the above option.", comment: "Warning banner text shown when Medtrum Nano OS-AID sharing is blocked")
+    }()
+
+    static let loopShareMedtrumNanoEnabledMessage: String = {
+        return NSLocalizedString("settingsviews_loopShareMedtrumNanoEnabledMessage", tableName: filename, bundle: Bundle.main, value: "Due to accuracy concerns, sharing Medtrum Nano CGM data to OS-AID apps is strongly not recommended.\n\nMedtrum Nano data is being shared because you specifically requested it by enabling the above option and accepting the risk.", comment: "Warning banner text shown when Medtrum Nano OS-AID sharing is enabled")
+    }()
+
+    static let loopShareMedtrumNanoWarning: String = {
+        return NSLocalizedString("settingsviews_loopShareMedtrumNanoWarning", tableName: filename, bundle: Bundle.main, value: "Due to accuracy concerns, sharing Medtrum Nano CGM data to OS-AID apps is strongly not recommended. OS-AID apps may use this data for insulin dosing decisions and inaccurate CGM data could interfere with normal operation.\n\nThe recommended setting is Off. Only enable this if you understand the risk and specifically want Medtrum Nano data to be shared.", comment: "Warning shown before allowing Medtrum Nano glucose data to be shared with OS-AID apps")
+    }()
+
+    static let loopShareMedtrumNanoConfirm: String = {
+        return NSLocalizedString("settingsviews_loopShareMedtrumNanoConfirm", tableName: filename, bundle: Bundle.main, value: "I understand - share Medtrum Nano", comment: "Confirmation button title for enabling Medtrum Nano glucose data sharing with OS-AID apps")
+    }()
+
+    static let loopShareSmoothedData: String = {
+        return NSLocalizedString("settingsviews_loopShareSmoothedData", tableName: filename, bundle: Bundle.main, value: "Share Smoothed Data", comment: "Settings row title to allow smoothed glucose data to be shared with OS-AID apps")
+    }()
+
+    static let loopShareSmoothedDataDifferenceTitle: String = {
+        return NSLocalizedString("settingsviews_loopShareSmoothedDataDifferenceTitle", tableName: filename, bundle: Bundle.main, value: "Shared values may be different", comment: "Warning banner title shown when Glucose smoothing is enabled but smoothed OS-AID sharing is off")
+    }()
+
+    static let loopShareSmoothedDataDifferenceMessage: String = {
+        return String(format: NSLocalizedString("settingsviews_loopShareSmoothedDataDifferenceMessage", tableName: filename, bundle: Bundle.main, value: "Glucose smoothing is enabled, but OS-AID Share is sending unsmoothed data as preferred by OS-AID apps.\n\nThe glucose values shown in %@ may differ from those received by the OS-AID app.\n\nConsider disabling smoothing in the Adjustments screen when sharing data with OS-AID apps.", comment: "Warning banner text shown when Glucose smoothing is enabled but smoothed OS-AID sharing is off"), ConstantsHomeView.applicationName)
+    }()
+
+    static let loopShareSmoothedDataEnabledTitle: String = {
+        return NSLocalizedString("settingsviews_loopShareSmoothedDataEnabledTitle", tableName: filename, bundle: Bundle.main, value: "Smoothed data is being shared", comment: "Warning banner title shown when smoothed OS-AID sharing is enabled")
+    }()
+
+    static let loopShareSmoothedDataEnabledMessage: String = {
+        return NSLocalizedString("settingsviews_loopShareSmoothedDataEnabledMessage", tableName: filename, bundle: Bundle.main, value: "Sharing smoothed data is not recommended and it may interfere with normal OS-AID operation.\n\nSmoothed data is being shared because you specifically requested it by enabling the above option and accepting the risk.", comment: "Warning banner text shown when smoothed OS-AID sharing is enabled")
+    }()
+
+    static let loopShareSmoothedDataWarning: String = {
+        return String(format: NSLocalizedString("settingsviews_loopShareSmoothedDataWarning", tableName: filename, bundle: Bundle.main, value: "OS-AID apps such as Trio expect unsmoothed glucose data from the shared app group. Sharing smoothed data may change how the AID app interprets CGM data and could interfere with normal operation.\n\nThe recommended setting is Off. Only enable this if you understand the risk and specifically want %@ to share smoothed data.", comment: "Warning shown before allowing smoothed glucose data to be shared with OS-AID apps"), ConstantsHomeView.applicationName)
+    }()
+
+    static let loopShareSmoothedDataConfirm: String = {
+        return NSLocalizedString("settingsviews_loopShareSmoothedDataConfirm", tableName: filename, bundle: Bundle.main, value: "I understand - share smoothed data", comment: "Confirmation button title for enabling smoothed glucose data sharing with OS-AID apps")
     }()
     
     static let selectTime: String = {
@@ -894,12 +1071,32 @@ class Texts_SettingsView {
         return NSLocalizedString("warningLoopDelayAlreadyExists", tableName: filename, bundle: Bundle.main, value: "There is already a loopDelay for this time.", comment: "When user creates new loopdelay, with a timestamp that already exists - this is the warning text")
     }()
     
-    static let shareToLoopOnceEvery5Minutes: String = {
-        return NSLocalizedString("shareToLoopOnceEvery5Minutes", tableName: filename, bundle: Bundle.main, value: "Share with OS-AID every 5 mins", comment: "Should loop data be shared only every 5 minutes")
-    }()
-    
     static let showDeveloperSettings: String = {
-        return NSLocalizedString("showDeveloperSettings", tableName: filename, bundle: Bundle.main, value: "Show Developer Settings", comment: "developer settings, show them or hide them")
+        return NSLocalizedString("showDeveloperSettings", tableName: filename, bundle: Bundle.main, value: "Show", comment: "advanced settings, show them or hide them")
+    }()
+
+    static let preferSensorCountdown: String = {
+        return NSLocalizedString("preferSensorCountdown", tableName: filename, bundle: Bundle.main, value: "Prefer Sensor Countdown", comment: "home screen settings, show remaining sensor lifetime instead of elapsed lifetime")
+    }()
+
+    static let sensorNoiseSensitivity: String = {
+        return NSLocalizedString("sensorNoiseSensitivity", tableName: filename, bundle: Bundle.main, value: "Sensor Sensitivity", comment: "sensor noise picker, how strictly stored sensor noise values should be interpreted")
+    }()
+
+    static let sensorNoiseSensitivityFooter: String = {
+        return NSLocalizedString("sensorNoiseSensitivityFooter", tableName: filename, bundle: Bundle.main, value: "Sensor Sensitivity adjusts how strictly sensor noise is classified. Use Sensitive to warn earlier, Normal for standard limits, or Permissive for naturally jumpier sensors. Stored noise values are not changed.", comment: "sensor noise picker footer explaining sensor sensitivity")
+    }()
+
+    static let sensorNoiseSensitivitySensitive: String = {
+        return NSLocalizedString("sensorNoiseSensitivitySensitive", tableName: filename, bundle: Bundle.main, value: "Sensitive", comment: "sensor noise sensitivity option that warns earlier")
+    }()
+
+    static let sensorNoiseSensitivityNormal: String = {
+        return NSLocalizedString("sensorNoiseSensitivityNormal", tableName: filename, bundle: Bundle.main, value: "Normal", comment: "default sensor noise sensitivity option")
+    }()
+
+    static let sensorNoiseSensitivityPermissive: String = {
+        return NSLocalizedString("sensorNoiseSensitivityPermissive", tableName: filename, bundle: Bundle.main, value: "Permissive", comment: "sensor noise sensitivity option that allows more sensor jumpiness")
     }()
 
     static let nsLog: String = {
@@ -915,7 +1112,7 @@ class Texts_SettingsView {
     }()
     
     static let libreLinkUpVersionMessage = {
-        return String(format: NSLocalizedString("libreLinkUpVersionMessage", tableName: filename, bundle: Bundle.main, value: "\nSetting this value incorrectly could result in your LibreLinkUp account being locked.\n\nDo not touch this setting unless instructed by an xDrip4iOS developer.\n\nThe default version is: %@", comment: "developer settings, ask the user for the libre link up version"), ConstantsLibreLinkUp.libreLinkUpVersionDefault)        
+        return String(format: NSLocalizedString("libreLinkUpVersionMessage", tableName: filename, bundle: Bundle.main, value: "Setting this value incorrectly could result in your LibreLinkUp account being locked.\n\nDo not touch this setting unless instructed by an xDrip4iOS developer.\n\nThe default version is: %@", comment: "developer settings, ask the user for the libre link up version"), ConstantsLibreLinkUp.libreLinkUpVersionDefault)
     }()
     
     static let CAGEMaxHours: String = {
@@ -923,7 +1120,7 @@ class Texts_SettingsView {
     }()
     
     static let CAGEMaxHoursMessage = {
-        return String(format: NSLocalizedString("CAGEMaxHoursMessage", tableName: filename, bundle: Bundle.main, value: "\nHow many hours until the canula should be considered as expired\n\nEnter 0 to set it back to the default value of %@ hours", comment: "developer settings, message asking the user to enter the number of hours until the canula should be considered as expired"), ConstantsHomeView.CAGEDefaultMaxHours.description)
+        return String(format: NSLocalizedString("CAGEMaxHoursMessage", tableName: filename, bundle: Bundle.main, value: "How many hours until the canula should be considered as expired\n\nEnter 0 to set it back to the default value of %@ hours", comment: "developer settings, message asking the user to enter the number of hours until the canula should be considered as expired"), ConstantsHomeView.CAGEDefaultMaxHours.description)
     }()
     
     // MARK: - Section Housekeeper
@@ -933,13 +1130,9 @@ class Texts_SettingsView {
     }()
 
     static let settingsviews_housekeeperRetentionPeriod: String = {
-        return NSLocalizedString("settingsviews_housekeeperRetentionPeriod", tableName: filename, bundle: Bundle.main, value: "Retention Period (days):", comment: "Housekeeper retention period, for how long to store data")
+        return NSLocalizedString("settingsviews_housekeeperRetentionPeriod", tableName: filename, bundle: Bundle.main, value: "Retention Period", comment: "Housekeeper retention period, for how long to store data")
     }()
 
-    static let settingsviews_housekeeperExportAllData: String = {
-        return NSLocalizedString("settingsviews_housekeeperExportAllData", tableName: filename, bundle: Bundle.main, value: "Export All Data", comment: "Button to export all data")
-    }()
-    
     static let settingsviews_housekeeperRetentionPeriodMessage = {
         return NSLocalizedString("settingsviews_housekeeperRetentionPeriodMessage", tableName: filename, bundle: Bundle.main, value: "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)", comment: "When clicking the retention setting, a pop up asks for how many days should data be stored")
     }()
@@ -959,6 +1152,249 @@ class Texts_SettingsView {
     static let labelStoreFrequentReadingsInHealthKitMessage: String = {
         return NSLocalizedString("settingsviews_storeFrequentReadingsInHealthKitMessage", tableName: filename, bundle: Bundle.main, value: "This option will override the 5-minute write limits and allow much frequent data to be added to Apple Health. Such as for 60-second Libre 2 Direct values.\n\nPlease only enable this option if you really need/want more frequent data. Most users should leave this option disabled.", comment: "developer settings, should we allow the app to perform very frequent writes to healthkit if the CGM data is more often than every 5 minutes")
     }()
+
+    // MARK: - Data Management
+
+    static let dataManagementStorageInfo = NSLocalizedString("settingsviews_dataManagementStorageInfo", tableName: filename, bundle: Bundle.main, value: "Storage Info", comment: "data management, storage information screen title")
+    static let dataManagementManageData = NSLocalizedString("settingsviews_dataManagementManageData", tableName: filename, bundle: Bundle.main, value: "Manage Data", comment: "data management, retention and deletion screen title")
+    static let dataManagementDataRetention = NSLocalizedString("settingsviews_dataManagementDataRetention", tableName: filename, bundle: Bundle.main, value: "Data Retention", comment: "data management, automatic retention screen title")
+    static let dataManagementDataDeletion = NSLocalizedString("settingsviews_dataManagementDataDeletion", tableName: filename, bundle: Bundle.main, value: "Data Deletion", comment: "data management, permanent deletion screen title")
+    static let dataManagementImportData = NSLocalizedString("settingsviews_dataManagementImportData", tableName: filename, bundle: Bundle.main, value: "Import Data", comment: "data management, import source screen title")
+    static let dataManagementLastHousekeeping = NSLocalizedString("settingsviews_dataManagementLastHousekeeping", tableName: filename, bundle: Bundle.main, value: "Last Housekeeping", comment: "data retention, last automatic housekeeping section title")
+    static let storageInfoDatabase = NSLocalizedString("settingsviews_storageInfoDatabase", tableName: filename, bundle: Bundle.main, value: "Database", comment: "storage information, database section title")
+    static let storageInfoDatabaseSize = NSLocalizedString("settingsviews_storageInfoDatabaseSize", tableName: filename, bundle: Bundle.main, value: "Database Size", comment: "storage information, Core Data store size")
+    static let storageInfoTrackedRecords = NSLocalizedString("settingsviews_storageInfoTrackedRecords", tableName: filename, bundle: Bundle.main, value: "Tracked Records", comment: "storage information, total of the listed historical record types")
+    static let storageInfoDevices = NSLocalizedString("settingsviews_storageInfoDevices", tableName: filename, bundle: Bundle.main, value: "Devices", comment: "storage information, stored Bluetooth device records")
+    static let storageInfoSensors = NSLocalizedString("settingsviews_storageInfoSensors", tableName: filename, bundle: Bundle.main, value: "Sensors", comment: "storage information, stored sensor session records")
+    static let storageInfoHistory = NSLocalizedString("settingsviews_storageInfoHistory", tableName: filename, bundle: Bundle.main, value: "Stored History", comment: "storage information, overall stored date range section title")
+    static let storageInfoEarliestRecord = NSLocalizedString("settingsviews_storageInfoEarliestRecord", tableName: filename, bundle: Bundle.main, value: "Earliest Record", comment: "storage information, earliest listed historical record")
+    static let storageInfoLatestRecord = NSLocalizedString("settingsviews_storageInfoLatestRecord", tableName: filename, bundle: Bundle.main, value: "Latest Record", comment: "storage information, latest listed historical record")
+    static let storageInfoCheckingStatus = NSLocalizedString("settingsviews_storageInfoCheckingStatus", tableName: filename, bundle: Bundle.main, value: "Checking storage…", comment: "storage information, inventory progress status")
+
+    static func storageInfoRetentionFooter(_ days: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_storageInfoRetentionFooter", tableName: filename, bundle: Bundle.main, value: "The configured data retention period is %d days.", comment: "storage information, configured retention period reminder"), days)
+    }
+
+    // MARK: - Data Deletion and Retention
+    static let cleanDataAutomaticHousekeeping = NSLocalizedString("settingsviews_cleanDataAutomaticHousekeeping", tableName: filename, bundle: Bundle.main, value: "Automatic Housekeeping", comment: "clean data, automatic cleanup setting and section title")
+    static let cleanDataKeepHistoricalData = NSLocalizedString("settingsviews_cleanDataKeepHistoricalData", tableName: filename, bundle: Bundle.main, value: "Keep Historical Data", comment: "clean data, automatic retention period picker")
+    static let cleanDataLastHousekeepingCompleted = NSLocalizedString("settingsviews_cleanDataLastHousekeepingCompleted", tableName: filename, bundle: Bundle.main, value: "Last Completed", comment: "clean data, last successful automatic housekeeping date")
+    static let cleanDataLastHousekeepingResult = NSLocalizedString("settingsviews_cleanDataLastHousekeepingResult", tableName: filename, bundle: Bundle.main, value: "Last Result", comment: "clean data, last automatic housekeeping result")
+    static let cleanDataNoHousekeepingRequired = NSLocalizedString("settingsviews_cleanDataNoHousekeepingRequired", tableName: filename, bundle: Bundle.main, value: "No cleanup required", comment: "clean data, automatic housekeeping removed no records")
+    static let cleanDataAutomaticHousekeepingFooter = NSLocalizedString("settingsviews_cleanDataAutomaticHousekeepingFooter", tableName: filename, bundle: Bundle.main, value: "Runs at most once per day when the app opens. BG readings, treatments and unused calibrations older than the selected period are removed locally.", comment: "clean data, automatic housekeeping explanation")
+    static let cleanDataAutomaticHousekeepingDisabledFooter = NSLocalizedString("settingsviews_cleanDataAutomaticHousekeepingDisabledFooter", tableName: filename, bundle: Bundle.main, value: "Historical data will only be removed manually from Data Deletion.", comment: "data retention, disabled automatic housekeeping explanation")
+    static let cleanDataStorageUsed = NSLocalizedString("settingsviews_cleanDataStorageUsed", tableName: filename, bundle: Bundle.main, value: "Storage Used", comment: "clean data, storage occupied by the database")
+    static let cleanDataStoredData = NSLocalizedString("settingsviews_cleanDataStoredData", tableName: filename, bundle: Bundle.main, value: "Stored Data", comment: "clean data, stored data section title")
+    static let cleanDataBgReadings = NSLocalizedString("settingsviews_cleanDataBgReadings", tableName: filename, bundle: Bundle.main, value: "BG Readings", comment: "clean data, blood glucose readings")
+    static let cleanDataTreatments = NSLocalizedString("settingsviews_cleanDataTreatments", tableName: filename, bundle: Bundle.main, value: "Treatments", comment: "clean data, treatment entries")
+    static let cleanDataCalibrations = NSLocalizedString("settingsviews_cleanDataCalibrations", tableName: filename, bundle: Bundle.main, value: "Calibrations", comment: "clean data, calibration entries")
+    static let cleanDataSelectData = NSLocalizedString("settingsviews_cleanDataSelectData", tableName: filename, bundle: Bundle.main, value: "Data to Delete", comment: "data deletion, data type selection section title")
+    static let cleanDataCleanupMethod = NSLocalizedString("settingsviews_cleanDataCleanupMethod", tableName: filename, bundle: Bundle.main, value: "Cleanup Method", comment: "clean data, deletion range method")
+    static let cleanDataKeepRecent = NSLocalizedString("settingsviews_cleanDataKeepRecent", tableName: filename, bundle: Bundle.main, value: "Keep Recent", comment: "clean data, retain recent data option")
+    static let cleanDataDateRange = NSLocalizedString("settingsviews_cleanDataDateRange", tableName: filename, bundle: Bundle.main, value: "Date Range", comment: "clean data, custom date range option and section title")
+    static let cleanDataDeleteAll = NSLocalizedString("settingsviews_cleanDataDeleteAll", tableName: filename, bundle: Bundle.main, value: "Delete All", comment: "clean data, delete all selected data option")
+    static let cleanDataKeep = NSLocalizedString("settingsviews_cleanDataKeep", tableName: filename, bundle: Bundle.main, value: "Keep", comment: "clean data, number of recent days to retain")
+    static let cleanDataFrom = NSLocalizedString("settingsviews_cleanDataFrom", tableName: filename, bundle: Bundle.main, value: "From", comment: "clean data, inclusive start date")
+    static let cleanDataUntil = NSLocalizedString("settingsviews_cleanDataUntil", tableName: filename, bundle: Bundle.main, value: "Until", comment: "clean data, inclusive end date")
+    static let cleanDataOlderDataFooter = NSLocalizedString("settingsviews_cleanDataOlderDataFooter", tableName: filename, bundle: Bundle.main, value: "Older data will be deleted. Recent data will be kept.", comment: "clean data, retain recent data explanation")
+    static let cleanDataInclusiveDatesFooter = NSLocalizedString("settingsviews_cleanDataInclusiveDatesFooter", tableName: filename, bundle: Bundle.main, value: "Both dates are inclusive.", comment: "clean data, custom date range explanation")
+    static let cleanDataDeleteAllFooter = NSLocalizedString("settingsviews_cleanDataDeleteAllFooter", tableName: filename, bundle: Bundle.main, value: "All selected data will be deleted.", comment: "clean data, delete all explanation")
+    static let cleanDataContinue = NSLocalizedString("settingsviews_cleanDataContinue", tableName: filename, bundle: Bundle.main, value: "Continue", comment: "clean data, continue to next confirmation step")
+    static let cleanDataReviewFooter = NSLocalizedString("settingsviews_cleanDataReviewFooter", tableName: filename, bundle: Bundle.main, value: "You will review the deletion before anything is removed.", comment: "clean data, preview reassurance")
+    static let cleanDataPermanentDeletion = NSLocalizedString("settingsviews_cleanDataPermanentDeletion", tableName: filename, bundle: Bundle.main, value: "Permanent Data Deletion", comment: "clean data, destructive action warning title")
+    static let cleanDataCannotUndo = NSLocalizedString("settingsviews_cleanDataCannotUndo", tableName: filename, bundle: Bundle.main, value: "This cannot be undone.", comment: "clean data, destructive action warning")
+    static let cleanDataUnusedCalibrations = NSLocalizedString("settingsviews_cleanDataUnusedCalibrations", tableName: filename, bundle: Bundle.main, value: "Unused Calibrations", comment: "clean data, unused calibrations included in deletion")
+    static let cleanDataEarliestStoredData = NSLocalizedString("settingsviews_cleanDataEarliestStoredData", tableName: filename, bundle: Bundle.main, value: "Earliest stored data", comment: "clean data, beginning of all stored data")
+    static let cleanDataDataToDelete = NSLocalizedString("settingsviews_cleanDataDataToDelete", tableName: filename, bundle: Bundle.main, value: "Data to Be Deleted", comment: "clean data, deletion summary section title")
+    static let cleanDataEnterCode = NSLocalizedString("settingsviews_cleanDataEnterCode", tableName: filename, bundle: Bundle.main, value: "Enter this six-digit code to confirm", comment: "clean data, captcha instruction")
+    static let cleanDataSixDigitCode = NSLocalizedString("settingsviews_cleanDataSixDigitCode", tableName: filename, bundle: Bundle.main, value: "Six-digit code", comment: "clean data, captcha entry field accessibility label")
+    static let cleanDataConfirmDelete = NSLocalizedString("settingsviews_cleanDataConfirmDelete", tableName: filename, bundle: Bundle.main, value: "CONFIRM DELETE", comment: "clean data, final destructive confirmation button")
+    static let cleanDataSuccessfullyDeleted = NSLocalizedString("settingsviews_cleanDataSuccessfullyDeleted", tableName: filename, bundle: Bundle.main, value: "Data Successfully Deleted", comment: "clean data, deletion success banner")
+    static let cleanDataCompleted = NSLocalizedString("settingsviews_cleanDataCompleted", tableName: filename, bundle: Bundle.main, value: "Completed", comment: "clean data, deletion completion date")
+    static let cleanDataBgReadingsDeleted = NSLocalizedString("settingsviews_cleanDataBgReadingsDeleted", tableName: filename, bundle: Bundle.main, value: "BG Readings Deleted", comment: "clean data, deleted blood glucose reading count")
+    static let cleanDataTreatmentsDeleted = NSLocalizedString("settingsviews_cleanDataTreatmentsDeleted", tableName: filename, bundle: Bundle.main, value: "Treatments Deleted", comment: "clean data, deleted treatment count")
+    static let cleanDataStorageBefore = NSLocalizedString("settingsviews_cleanDataStorageBefore", tableName: filename, bundle: Bundle.main, value: "Storage Before", comment: "clean data, database storage before deletion")
+    static let cleanDataStorageAfter = NSLocalizedString("settingsviews_cleanDataStorageAfter", tableName: filename, bundle: Bundle.main, value: "Storage After", comment: "clean data, database storage after deletion")
+    static let cleanDataCleanupSummary = NSLocalizedString("settingsviews_cleanDataCleanupSummary", tableName: filename, bundle: Bundle.main, value: "Cleanup Summary", comment: "clean data, completion summary section title")
+    static let cleanDataDatabaseReuseFooter = NSLocalizedString("settingsviews_cleanDataDatabaseReuseFooter", tableName: filename, bundle: Bundle.main, value: "The database may keep its current size and reuse the freed space.", comment: "clean data, database file size explanation")
+    static let cleanDataCheckingStatus = NSLocalizedString("settingsviews_cleanDataCheckingStatus", tableName: filename, bundle: Bundle.main, value: "Checking stored data…", comment: "clean data, inventory progress status")
+    static let cleanDataCountingStatus = NSLocalizedString("settingsviews_cleanDataCountingStatus", tableName: filename, bundle: Bundle.main, value: "Counting data to delete…", comment: "clean data, deletion preview progress status")
+    static let cleanDataDeletingStatus = NSLocalizedString("settingsviews_cleanDataDeletingStatus", tableName: filename, bundle: Bundle.main, value: "Permanently deleting data…\nPlease keep the app open.", comment: "clean data, deletion progress status")
+    static let cleanDataInvalidDateRangeError = NSLocalizedString("settingsviews_cleanDataInvalidDateRangeError", tableName: filename, bundle: Bundle.main, value: "The start date must be before the end date.", comment: "clean data, invalid date range error")
+    static let cleanDataNoSelectionError = NSLocalizedString("settingsviews_cleanDataNoSelectionError", tableName: filename, bundle: Bundle.main, value: "Select at least one type of data to delete.", comment: "clean data, no data type selected error")
+    static let cleanDataNoMatchingDataError = NSLocalizedString("settingsviews_cleanDataNoMatchingDataError", tableName: filename, bundle: Bundle.main, value: "There is no selected data in this date range.", comment: "clean data, no data in selected range error")
+    static let cleanDataChangedError = NSLocalizedString("settingsviews_cleanDataChangedError", tableName: filename, bundle: Bundle.main, value: "Stored data changed after the summary was created. Review the updated data before confirming again.", comment: "clean data, stored data changed during confirmation error")
+    static let cleanDataDeleteFailedError = NSLocalizedString("settingsviews_cleanDataDeleteFailedError", tableName: filename, bundle: Bundle.main, value: "The selected data could not be deleted. No further cleanup was attempted.", comment: "clean data, deletion failed error")
+
+    // MARK: - Nightscout Import Summary
+
+    static let nightscoutImportCompleted = NSLocalizedString("settingsviews_nightscoutImportCompleted", tableName: filename, bundle: Bundle.main, value: "Nightscout Import Completed", comment: "nightscout import, completion banner")
+    static let nightscoutImportSummary = NSLocalizedString("settingsviews_nightscoutImportSummary", tableName: filename, bundle: Bundle.main, value: "Import Summary", comment: "nightscout import, summary section title")
+    static let nightscoutImportURLMissing = NSLocalizedString("settingsviews_nightscoutImportURLMissing", tableName: filename, bundle: Bundle.main, value: "No Nightscout URL configured", comment: "nightscout import, missing source URL banner title")
+    static let nightscoutImportConfigureURL = NSLocalizedString("settingsviews_nightscoutImportConfigureURL", tableName: filename, bundle: Bundle.main, value: "Configure a Nightscout URL in Nightscout Settings before importing data.", comment: "nightscout import, missing source URL banner instruction")
+    static let nightscoutImportDownloaded = NSLocalizedString("settingsviews_nightscoutImportDownloaded", tableName: filename, bundle: Bundle.main, value: "Downloaded", comment: "nightscout import, downloaded record count")
+    static let nightscoutImportAdded = NSLocalizedString("settingsviews_nightscoutImportAdded", tableName: filename, bundle: Bundle.main, value: "Added", comment: "nightscout import, added record count")
+    static let nightscoutImportSkipped = NSLocalizedString("settingsviews_nightscoutImportSkipped", tableName: filename, bundle: Bundle.main, value: "Skipped", comment: "nightscout import, duplicate record count")
+    static let nightscoutImportInvalid = NSLocalizedString("settingsviews_nightscoutImportInvalid", tableName: filename, bundle: Bundle.main, value: "Invalid", comment: "nightscout import, invalid document count")
+    static let nightscoutImportSummaryFooter = NSLocalizedString("settingsviews_nightscoutImportSummaryFooter", tableName: filename, bundle: Bundle.main, value: "Records already stored locally were skipped. Invalid Nightscout documents were not imported.", comment: "nightscout import, summary count explanation")
+    static let nightscoutImportingData = NSLocalizedString("settingsviews_nightscoutImportingData", tableName: filename, bundle: Bundle.main, value: "Importing Data", comment: "nightscout import, static progress headline")
+
+    // MARK: - Backup and Restore
+
+    static let backupCreate = NSLocalizedString("settingsviews_backupCreate", tableName: filename, bundle: Bundle.main, value: "Create Backup", comment: "backup, create backup screen title")
+    static let backupRestore = NSLocalizedString("settingsviews_backupRestore", tableName: filename, bundle: Bundle.main, value: "Restore Backup", comment: "backup, restore backup screen title and action")
+    static let backupCreated = NSLocalizedString("settingsviews_backupCreated", tableName: filename, bundle: Bundle.main, value: "Backup Successfully Created", comment: "backup, successful creation banner")
+    static let backupRestored = NSLocalizedString("settingsviews_backupRestored", tableName: filename, bundle: Bundle.main, value: "Backup Successfully Restored", comment: "backup, successful restore banner")
+    static let backupReplaceQuestion = NSLocalizedString("settingsviews_backupReplaceQuestion", tableName: filename, bundle: Bundle.main, value: "Replace Existing Data?", comment: "backup restore, destructive confirmation title")
+    static let backupReplaceData = NSLocalizedString("settingsviews_backupReplaceData", tableName: filename, bundle: Bundle.main, value: "Replace Data", comment: "backup restore, destructive confirmation action")
+    static let backupReplaceWarning = NSLocalizedString("settingsviews_backupReplaceWarning", tableName: filename, bundle: Bundle.main, value: "Existing BG readings and treatments within the backup date ranges will be deleted before the backup is restored.", comment: "backup restore, destructive confirmation explanation")
+    static let backupAndRestore = NSLocalizedString("settingsviews_backupAndRestore", tableName: filename, bundle: Bundle.main, value: "Backup & Restore", comment: "backup and restore, error alert title")
+    static let backupAppSettingsAndAlerts = NSLocalizedString("settingsviews_backupAppSettingsAndAlerts", tableName: filename, bundle: Bundle.main, value: "App Settings and Alerts", comment: "backup, app settings and alerts option")
+    static let backupEncrypt = NSLocalizedString("settingsviews_backupEncrypt", tableName: filename, bundle: Bundle.main, value: "Encrypt Backup", comment: "backup, encryption option")
+    static let backupAccounts = NSLocalizedString("settingsviews_backupAccounts", tableName: filename, bundle: Bundle.main, value: "Backup Accounts", comment: "backup, account details option")
+    static let backupConfirmPassword = NSLocalizedString("settingsviews_backupConfirmPassword", tableName: filename, bundle: Bundle.main, value: "Confirm Password", comment: "backup, password confirmation field")
+    static let backupPasswordProtection = NSLocalizedString("settingsviews_backupPasswordProtection", tableName: filename, bundle: Bundle.main, value: "Password Protection", comment: "backup, password protection section title and summary row")
+    static let backupPasswordProtectionFooter = NSLocalizedString("settingsviews_backupPasswordProtectionFooter", tableName: filename, bundle: Bundle.main, value: "Adding password protection also allows accounts containing sensitive details to be backed up.", comment: "backup, password protection explanation")
+    static let backupAccountDetailsFooter = NSLocalizedString("settingsviews_backupAccountDetailsFooter", tableName: filename, bundle: Bundle.main, value: "Account details may include server URLs, usernames, passwords and access tokens.", comment: "backup, sensitive account details explanation")
+    static let backupCreateAndShare = NSLocalizedString("settingsviews_backupCreateAndShare", tableName: filename, bundle: Bundle.main, value: "Create and Share Backup", comment: "backup, final creation action")
+    static let backupEncryptedCreationFooter = NSLocalizedString("settingsviews_backupEncryptedCreationFooter", tableName: filename, bundle: Bundle.main, value: "Encrypted backups take longer to create. Keep the app open and please be patient.", comment: "backup, encrypted creation duration warning")
+    static let backupCreatedAt = NSLocalizedString("settingsviews_backupCreatedAt", tableName: filename, bundle: Bundle.main, value: "Created", comment: "backup, creation date row")
+    static let backupEarliestData = NSLocalizedString("settingsviews_backupEarliestData", tableName: filename, bundle: Bundle.main, value: "Earliest Data", comment: "backup, earliest stored data row")
+    static let backupSettingsAndAlerts = NSLocalizedString("settingsviews_backupSettingsAndAlerts", tableName: filename, bundle: Bundle.main, value: "Settings and Alerts", comment: "backup, settings and alerts summary row")
+    static let backupAccountDetails = NSLocalizedString("settingsviews_backupAccountDetails", tableName: filename, bundle: Bundle.main, value: "Account Details", comment: "backup, account details summary row")
+    static let backupIncluded = NSLocalizedString("settingsviews_backupIncluded", tableName: filename, bundle: Bundle.main, value: "Included", comment: "backup, item is included")
+    static let backupNotIncluded = NSLocalizedString("settingsviews_backupNotIncluded", tableName: filename, bundle: Bundle.main, value: "Not included", comment: "backup, item is not included")
+    static let backupNotEnabled = NSLocalizedString("settingsviews_backupNotEnabled", tableName: filename, bundle: Bundle.main, value: "Not enabled", comment: "backup, option is not enabled")
+    static let backupSummary = NSLocalizedString("settingsviews_backupSummary", tableName: filename, bundle: Bundle.main, value: "Backup Summary", comment: "backup, completion summary section title")
+    static let backupChooseFile = NSLocalizedString("settingsviews_backupChooseFile", tableName: filename, bundle: Bundle.main, value: "Choose Backup File", comment: "backup restore, file selection action")
+    static let backupFile = NSLocalizedString("settingsviews_backupFile", tableName: filename, bundle: Bundle.main, value: "Backup File", comment: "backup restore, file selection section title")
+    static let backupFileCheckFooter = NSLocalizedString("settingsviews_backupFileCheckFooter", tableName: filename, bundle: Bundle.main, value: "The backup is checked before any existing data is changed.", comment: "backup restore, validation reassurance")
+    static let backupSelected = NSLocalizedString("settingsviews_backupSelected", tableName: filename, bundle: Bundle.main, value: "Selected Backup", comment: "backup restore, selected backup section title")
+    static let backupPasswordRequired = NSLocalizedString("settingsviews_backupPasswordRequired", tableName: filename, bundle: Bundle.main, value: "Required", comment: "backup restore, required password field placeholder")
+    static let backupUnlock = NSLocalizedString("settingsviews_backupUnlock", tableName: filename, bundle: Bundle.main, value: "Unlock Backup", comment: "backup restore, unlock encrypted backup action")
+    static let backupEncryptedNotice = NSLocalizedString("settingsviews_backupEncryptedNotice", tableName: filename, bundle: Bundle.main, value: "This backup is encrypted and must be unlocked.", comment: "backup restore, encrypted backup banner")
+    static let backupSettings = NSLocalizedString("settingsviews_backupSettings", tableName: filename, bundle: Bundle.main, value: "Settings", comment: "backup restore, settings summary row")
+    static let backupRestoreOptions = NSLocalizedString("settingsviews_backupRestoreOptions", tableName: filename, bundle: Bundle.main, value: "Restore Options", comment: "backup restore, restore options section title")
+    static let backupDataHandling = NSLocalizedString("settingsviews_backupDataHandling", tableName: filename, bundle: Bundle.main, value: "Data Handling", comment: "backup restore, merge mode picker")
+    static let backupKeepCurrentData = NSLocalizedString("settingsviews_backupKeepCurrentData", tableName: filename, bundle: Bundle.main, value: "Keep Current Data", comment: "backup restore, keep current data merge mode")
+    static let backupFillGaps = NSLocalizedString("settingsviews_backupFillGaps", tableName: filename, bundle: Bundle.main, value: "Fill Gaps", comment: "backup restore, fill missing data merge mode")
+    static let backupReplaceRange = NSLocalizedString("settingsviews_backupReplaceRange", tableName: filename, bundle: Bundle.main, value: "Replace Backup Range", comment: "backup restore, replace date range merge mode")
+    static let backupIgnoreData = NSLocalizedString("settingsviews_backupIgnoreData", tableName: filename, bundle: Bundle.main, value: "Ignore Data", comment: "backup restore, do not restore historical data merge mode")
+    static let backupRestoreSettingsAndAlerts = NSLocalizedString("settingsviews_backupRestoreSettingsAndAlerts", tableName: filename, bundle: Bundle.main, value: "Restore App Settings and Alerts", comment: "backup restore, settings restore option")
+    static let backupRestoreAccounts = NSLocalizedString("settingsviews_backupRestoreAccounts", tableName: filename, bundle: Bundle.main, value: "Restore Accounts", comment: "backup restore, accounts restore option")
+    static let backupReplaceAndRestore = NSLocalizedString("settingsviews_backupReplaceAndRestore", tableName: filename, bundle: Bundle.main, value: "Replace and Restore", comment: "backup restore, destructive restore action")
+    static let backupRestoreSummary = NSLocalizedString("settingsviews_backupRestoreSummary", tableName: filename, bundle: Bundle.main, value: "Restore Summary", comment: "backup restore, completion summary section title")
+    static let backupBgReadingsAppliedFrom = NSLocalizedString("settingsviews_backupBgReadingsAppliedFrom", tableName: filename, bundle: Bundle.main, value: "BG Readings Applied From", comment: "backup restore, first applied reading date")
+    static let backupBgReadingsAdded = NSLocalizedString("settingsviews_backupBgReadingsAdded", tableName: filename, bundle: Bundle.main, value: "BG Readings Added", comment: "backup restore, added reading count")
+    static let backupBgReadingsSkipped = NSLocalizedString("settingsviews_backupBgReadingsSkipped", tableName: filename, bundle: Bundle.main, value: "BG Readings Skipped", comment: "backup restore, skipped reading count")
+    static let backupTreatmentsAdded = NSLocalizedString("settingsviews_backupTreatmentsAdded", tableName: filename, bundle: Bundle.main, value: "Treatments Added", comment: "backup restore, added treatment count")
+    static let backupTreatmentsSkipped = NSLocalizedString("settingsviews_backupTreatmentsSkipped", tableName: filename, bundle: Bundle.main, value: "Treatments Skipped", comment: "backup restore, skipped treatment count")
+    static let backupSettingsRestored = NSLocalizedString("settingsviews_backupSettingsRestored", tableName: filename, bundle: Bundle.main, value: "Settings Restored", comment: "backup restore, restored settings count")
+    static let backupAccountRestore = NSLocalizedString("settingsviews_backupAccountRestore", tableName: filename, bundle: Bundle.main, value: "Account Restore", comment: "backup restore, account result section title")
+    static let backupCreatingEncryptedStatus = NSLocalizedString("settingsviews_backupCreatingEncryptedStatus", tableName: filename, bundle: Bundle.main, value: "Creating and encrypting your backup securely…\nPlease be patient.", comment: "backup, encrypted creation progress")
+    static let backupCreatingStatus = NSLocalizedString("settingsviews_backupCreatingStatus", tableName: filename, bundle: Bundle.main, value: "Creating backup…", comment: "backup, creation progress")
+    static let backupCheckingStatus = NSLocalizedString("settingsviews_backupCheckingStatus", tableName: filename, bundle: Bundle.main, value: "Checking backup…", comment: "backup restore, validation progress")
+    static let backupDecryptingStatus = NSLocalizedString("settingsviews_backupDecryptingStatus", tableName: filename, bundle: Bundle.main, value: "Decrypting and checking your backup…\nPlease be patient.", comment: "backup restore, decryption progress")
+    static let backupRestoringEncryptedStatus = NSLocalizedString("settingsviews_backupRestoringEncryptedStatus", tableName: filename, bundle: Bundle.main, value: "Restoring your encrypted backup…\nPlease be patient.", comment: "backup restore, encrypted restore progress")
+    static let backupRestoringStatus = NSLocalizedString("settingsviews_backupRestoringStatus", tableName: filename, bundle: Bundle.main, value: "Restoring backup…", comment: "backup restore, restore progress")
+    static let backupErrorInvalidFile = NSLocalizedString("settingsviews_backupErrorInvalidFile", tableName: filename, bundle: Bundle.main, value: "This is not a valid app backup.", comment: "backup restore, invalid file error")
+    static let backupErrorIncorrectPassword = NSLocalizedString("settingsviews_backupErrorIncorrectPassword", tableName: filename, bundle: Bundle.main, value: "The password is incorrect or the protected backup is damaged.", comment: "backup restore, incorrect password error")
+    static let backupErrorMissingPassword = NSLocalizedString("settingsviews_backupErrorMissingPassword", tableName: filename, bundle: Bundle.main, value: "Enter the password used to protect this backup.", comment: "backup restore, missing password error")
+
+    // MARK: - Nightscout Import Workflow
+
+    static let nightscoutImportQuestion = NSLocalizedString("settingsviews_nightscoutImportQuestion", tableName: filename, bundle: Bundle.main, value: "Import from Nightscout?", comment: "nightscout import, start confirmation title")
+    static let nightscoutImportAction = NSLocalizedString("settingsviews_nightscoutImportAction", tableName: filename, bundle: Bundle.main, value: "Import from Nightscout", comment: "nightscout import, screen action and alert title")
+    static let nightscoutImportDiscardQuestion = NSLocalizedString("settingsviews_nightscoutImportDiscardQuestion", tableName: filename, bundle: Bundle.main, value: "Discard Saved Import?", comment: "nightscout import, discard confirmation title")
+    static let nightscoutImportDiscard = NSLocalizedString("settingsviews_nightscoutImportDiscard", tableName: filename, bundle: Bundle.main, value: "Discard Import", comment: "nightscout import, discard confirmation action")
+    static let nightscoutImportDiscardSaved = NSLocalizedString("settingsviews_nightscoutImportDiscardSaved", tableName: filename, bundle: Bundle.main, value: "Discard Saved Import", comment: "nightscout import, discard checkpoint action")
+    static let nightscoutImportDiscardMessage = NSLocalizedString("settingsviews_nightscoutImportDiscardMessage", tableName: filename, bundle: Bundle.main, value: "Saved progress will be removed. Imported data will remain safely stored and will be skipped if you start again.", comment: "nightscout import, discard checkpoint explanation")
+    static let nightscoutImportDataToImport = NSLocalizedString("settingsviews_nightscoutImportDataToImport", tableName: filename, bundle: Bundle.main, value: "Data to Import", comment: "nightscout import, data type section title")
+    static let nightscoutImportPeriod = NSLocalizedString("settingsviews_nightscoutImportPeriod", tableName: filename, bundle: Bundle.main, value: "Import Period", comment: "nightscout import, period picker")
+    static let nightscoutImportExistingDataFooter = NSLocalizedString("settingsviews_nightscoutImportExistingDataFooter", tableName: filename, bundle: Bundle.main, value: "Existing local data is kept. BG readings within 30 seconds of an existing reading and treatments already identified by Nightscout are skipped.", comment: "nightscout import, duplicate handling explanation")
+    static let nightscoutImportKeepOpenFooter = NSLocalizedString("settingsviews_nightscoutImportKeepOpenFooter", tableName: filename, bundle: Bundle.main, value: "Keep the app open until the import finishes. Progress is saved after each completed batch, so an interrupted import can be resumed.", comment: "nightscout import, operation duration explanation")
+    static let nightscoutImportPeriodLabel = NSLocalizedString("settingsviews_nightscoutImportPeriodLabel", tableName: filename, bundle: Bundle.main, value: "Period", comment: "nightscout import, saved import period row")
+    static let nightscoutImportCompletedBatches = NSLocalizedString("settingsviews_nightscoutImportCompletedBatches", tableName: filename, bundle: Bundle.main, value: "Completed Batches", comment: "nightscout import, completed batch count")
+    static let nightscoutImportResume = NSLocalizedString("settingsviews_nightscoutImportResume", tableName: filename, bundle: Bundle.main, value: "Resume Import", comment: "nightscout import, resume action")
+    static let nightscoutImportSaved = NSLocalizedString("settingsviews_nightscoutImportSaved", tableName: filename, bundle: Bundle.main, value: "Saved Import", comment: "nightscout import, saved checkpoint section title")
+    static let nightscoutImportUnsupportedFooter = NSLocalizedString("settingsviews_nightscoutImportUnsupportedFooter", tableName: filename, bundle: Bundle.main, value: "This import uses an unsupported period. Discard it to start again.", comment: "nightscout import, unsupported checkpoint explanation")
+    static let nightscoutImportExceedsRetentionFooter = NSLocalizedString("settingsviews_nightscoutImportExceedsRetentionFooter", tableName: filename, bundle: Bundle.main, value: "This import exceeds your current retention period. Discard it to start again.", comment: "nightscout import, checkpoint retention explanation")
+    static let nightscoutImportResumeFooter = NSLocalizedString("settingsviews_nightscoutImportResumeFooter", tableName: filename, bundle: Bundle.main, value: "The previous import stopped before all requested batches completed. Resuming continues from its last saved checkpoint.", comment: "nightscout import, resume explanation")
+    static let nightscoutImportPause = NSLocalizedString("settingsviews_nightscoutImportPause", tableName: filename, bundle: Bundle.main, value: "Pause Import", comment: "nightscout import, pause action")
+    static let nightscoutImportBgAndTreatments = NSLocalizedString("settingsviews_nightscoutImportBgAndTreatments", tableName: filename, bundle: Bundle.main, value: "BG readings and treatments", comment: "nightscout import, selected data description")
+    static let nightscoutImportBgOnly = NSLocalizedString("settingsviews_nightscoutImportBgOnly", tableName: filename, bundle: Bundle.main, value: "BG readings", comment: "nightscout import, selected readings description")
+    static let nightscoutImportTreatmentsOnly = NSLocalizedString("settingsviews_nightscoutImportTreatmentsOnly", tableName: filename, bundle: Bundle.main, value: "treatments", comment: "nightscout import, selected treatments description")
+    static let nightscoutImportKeepAppOpen = NSLocalizedString("settingsviews_nightscoutImportKeepAppOpen", tableName: filename, bundle: Bundle.main, value: "Keep the app open.", comment: "nightscout import, progress reminder")
+    static let nightscoutImportPaused = NSLocalizedString("settingsviews_nightscoutImportPaused", tableName: filename, bundle: Bundle.main, value: "Import paused", comment: "nightscout import, paused progress title")
+    static let nightscoutImportErrorNoSelection = NSLocalizedString("settingsviews_nightscoutImportErrorNoSelection", tableName: filename, bundle: Bundle.main, value: "Select BG readings, treatments or both.", comment: "nightscout import, no data selected error")
+    static let nightscoutImportErrorUnsupportedPeriod = NSLocalizedString("settingsviews_nightscoutImportErrorUnsupportedPeriod", tableName: filename, bundle: Bundle.main, value: "The saved import uses a period that is no longer supported. Discard it and start again.", comment: "nightscout import, unsupported period error")
+    static let nightscoutImportErrorRetention = NSLocalizedString("settingsviews_nightscoutImportErrorRetention", tableName: filename, bundle: Bundle.main, value: "The selected import period exceeds the current data retention setting.", comment: "nightscout import, retention period error")
+    static let nightscoutImportErrorMissingURL = NSLocalizedString("settingsviews_nightscoutImportErrorMissingURL", tableName: filename, bundle: Bundle.main, value: "Enter a Nightscout URL in Nightscout Settings before starting an import.", comment: "nightscout import, missing URL error")
+    static let nightscoutImportErrorInvalidURL = NSLocalizedString("settingsviews_nightscoutImportErrorInvalidURL", tableName: filename, bundle: Bundle.main, value: "The configured Nightscout URL is not valid. Check it in Nightscout Settings and try again.", comment: "nightscout import, invalid URL error")
+    static let nightscoutImportErrorCheckpointUnavailable = NSLocalizedString("settingsviews_nightscoutImportErrorCheckpointUnavailable", tableName: filename, bundle: Bundle.main, value: "The saved Nightscout import can no longer be resumed. Start a new import.", comment: "nightscout import, unavailable checkpoint error")
+    static let nightscoutImportErrorSiteChanged = NSLocalizedString("settingsviews_nightscoutImportErrorSiteChanged", tableName: filename, bundle: Bundle.main, value: "The configured Nightscout site has changed since this import started. Discard the saved import or restore the previous Nightscout URL.", comment: "nightscout import, changed site error")
+    static let nightscoutImportErrorAuthentication = NSLocalizedString("settingsviews_nightscoutImportErrorAuthentication", tableName: filename, bundle: Bundle.main, value: "Nightscout denied access. Check the API secret or access token in Nightscout Settings.", comment: "nightscout import, authentication error")
+    static let nightscoutImportErrorEndpoint = NSLocalizedString("settingsviews_nightscoutImportErrorEndpoint", tableName: filename, bundle: Bundle.main, value: "The Nightscout data endpoint was not found. Check the configured URL and site version.", comment: "nightscout import, endpoint error")
+    static let nightscoutImportErrorRateLimited = NSLocalizedString("settingsviews_nightscoutImportErrorRateLimited", tableName: filename, bundle: Bundle.main, value: "Nightscout is receiving too many requests. Wait a moment and resume the import.", comment: "nightscout import, rate limit error")
+    static let nightscoutImportErrorInvalidResponse = NSLocalizedString("settingsviews_nightscoutImportErrorInvalidResponse", tableName: filename, bundle: Bundle.main, value: "Nightscout returned data that could not be read safely. No data from the affected batch was imported.", comment: "nightscout import, invalid response error")
+    static let nightscoutImportErrorResponseLimit = NSLocalizedString("settingsviews_nightscoutImportErrorResponseLimit", tableName: filename, bundle: Bundle.main, value: "A Nightscout batch remained too large after being divided into small time ranges. No truncated data was imported.", comment: "nightscout import, response limit error")
+
+    static func cleanDataDays(_ days: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_cleanDataDays", tableName: filename, bundle: Bundle.main, value: "%d days", comment: "clean data, number of days to retain"), days)
+    }
+
+    static func nightscoutImportRetentionFooter(_ days: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_nightscoutImportRetentionFooter", tableName: filename, bundle: Bundle.main, value: "Limited to your %d-day retention period. Older data is removed by housekeeping.", comment: "nightscout import, retention limit explanation"), days)
+    }
+
+    static func cleanDataHousekeepingRecordsRemoved(_ count: Int) -> String {
+        let key = count == 1 ? "settingsviews_cleanDataOneHousekeepingRecordRemoved" : "settingsviews_cleanDataHousekeepingRecordsRemoved"
+        let value = count == 1 ? "%@ record removed" : "%@ records removed"
+        return String(format: NSLocalizedString(key, tableName: filename, bundle: Bundle.main, value: value, comment: "clean data, records removed by automatic housekeeping"), count.formatted())
+    }
+
+    static func cleanDataConfirmationCode(_ code: String) -> String {
+        return String(format: NSLocalizedString("settingsviews_cleanDataConfirmationCode", tableName: filename, bundle: Bundle.main, value: "Confirmation code %@", comment: "clean data, accessibility label for captcha code"), code)
+    }
+
+    static func backupCreatedWithAppVersion(_ appVersion: String) -> String {
+        return String(format: NSLocalizedString("settingsviews_backupCreatedWithAppVersion", tableName: filename, bundle: Bundle.main, value: "Backup created with app version %@.", comment: "backup, creating app version footer"), appVersion)
+    }
+
+    static func backupErrorUnsupportedVersion(_ version: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_backupErrorUnsupportedVersion", tableName: filename, bundle: Bundle.main, value: "Backup format version %d is not supported by this version of the app.", comment: "backup restore, unsupported format error"), version)
+    }
+
+    static func backupErrorFinalValueMismatch(_ identifier: String) -> String {
+        return String(format: NSLocalizedString("settingsviews_backupErrorFinalValueMismatch", tableName: filename, bundle: Bundle.main, value: "Stored glucose values do not reproduce the backed-up final value for reading %@.", comment: "backup restore, reading validation error"), identifier)
+    }
+
+    static func nightscoutImportBatchCount(_ completed: Int, _ total: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_nightscoutImportBatchCount", tableName: filename, bundle: Bundle.main, value: "%1$d of %2$d", comment: "nightscout import, completed batches out of total batches"), completed, total)
+    }
+
+    static func nightscoutImportBgAddedProgress(_ count: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_nightscoutImportBgAddedProgress", tableName: filename, bundle: Bundle.main, value: "BG readings added: %@", comment: "nightscout import, live added reading count"), count.formatted())
+    }
+
+    static func nightscoutImportTreatmentsAddedProgress(_ count: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_nightscoutImportTreatmentsAddedProgress", tableName: filename, bundle: Bundle.main, value: "Treatments added: %@", comment: "nightscout import, live added treatment count"), count.formatted())
+    }
+
+    static func nightscoutImportConfirmation(_ days: Int, _ selectedData: String) -> String {
+        return String(format: NSLocalizedString("settingsviews_nightscoutImportConfirmation", tableName: filename, bundle: Bundle.main, value: "Import the last %1$d days of %2$@? Existing local records will be kept and duplicates will be skipped.", comment: "nightscout import, start confirmation message"), days, selectedData)
+    }
+
+    static func nightscoutImportBatchProgress(_ current: Int, _ total: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_nightscoutImportBatchProgress", tableName: filename, bundle: Bundle.main, value: "Batch %1$d of %2$d", comment: "nightscout import, current batch progress"), current, total)
+    }
+
+    static func nightscoutImportErrorServer(_ status: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_nightscoutImportErrorServer", tableName: filename, bundle: Bundle.main, value: "Nightscout returned a temporary server error (HTTP %d). Resume the import later.", comment: "nightscout import, temporary server error"), status)
+    }
+
+    static func nightscoutImportErrorUnexpectedStatus(_ status: Int) -> String {
+        return String(format: NSLocalizedString("settingsviews_nightscoutImportErrorUnexpectedStatus", tableName: filename, bundle: Bundle.main, value: "Nightscout returned an unexpected response (HTTP %d).", comment: "nightscout import, unexpected HTTP status error"), status)
+    }
     
 }
-

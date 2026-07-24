@@ -409,7 +409,7 @@ class Trace {
         traceInfo.appendStringAndNewLine("    Show statistics: " + UserDefaults.standard.showStatistics.description)
         traceInfo.appendStringAndNewLine("    Statistics days: " + UserDefaults.standard.daysToUseStatistics.description)
         traceInfo.appendStringAndNewLine("    Time in Range type: " + UserDefaults.standard.timeInRangeType.description)
-        traceInfo.appendStringAndNewLine("    Show HbA1c in mmols/mol: " + UserDefaults.standard.useIFCCA1C.description)
+        traceInfo.appendStringAndNewLine("    HbA1c to mmols/mol: " + UserDefaults.standard.useIFCCA1C.description)
           
         traceInfo.appendStringAndNewLine("\nNightscout settings:")
         traceInfo.appendStringAndNewLine("    Nightscout enabled: " + UserDefaults.standard.nightscoutEnabled.description)
@@ -445,17 +445,6 @@ class Trace {
             traceInfo.appendStringAndNewLine("    Speak interval: " + UserDefaults.standard.speakInterval.description + " minutes")
         }
         
-        traceInfo.appendStringAndNewLine("\nApple Watch settings:")
-        traceInfo.appendStringAndNewLine("    Show values in complications: " + UserDefaults.standard.showDataInWatchComplications.description)
-        if let agreementDate = UserDefaults.standard.watchComplicationUserAgreementDate {
-            traceInfo.appendStringAndNewLine("    User agreement date: " + agreementDate.toStringForTrace(timeStyle: .short, dateStyle: .medium) + " (" + agreementDate.daysAndHoursAgo(appendAgo: true, forTrace: true) + ")")
-            if let remainingComplicationUserInfoTransfers = UserDefaults.standard.remainingComplicationUserInfoTransfers {
-                traceInfo.appendStringAndNewLine("    Remaining complication updates: " + remainingComplicationUserInfoTransfers.description + " / 50")
-            }
-        } else {
-            traceInfo.appendStringAndNewLine("    User agreement date: nil")
-        }
-                                             
         traceInfo.appendStringAndNewLine("\nCalendar events settings:")
         traceInfo.appendStringAndNewLine("    Create calendar events: " + UserDefaults.standard.createCalendarEvent.description)
         if UserDefaults.standard.createCalendarEvent {
@@ -484,7 +473,6 @@ class Trace {
         traceInfo.appendStringAndNewLine("    OS log enabled: " + UserDefaults.standard.OSLogEnabled.description)
         traceInfo.appendStringAndNewLine("    Suppress unlock payload: " + UserDefaults.standard.suppressUnLockPayLoad.description)
         traceInfo.appendStringAndNewLine("    OS-AID share type: " + UserDefaults.standard.loopShareType.description)
-        traceInfo.appendStringAndNewLine("    OS-AID share every 5 mins?: " + UserDefaults.standard.shareToLoopOnceEvery5Minutes.description)
         traceInfo.appendStringAndNewLine("    LibreLinkUp version: " + (UserDefaults.standard.libreLinkUpVersion?.description ?? "nil"))
         traceInfo.appendStringAndNewLine("    CAGE max hours: " + UserDefaults.standard.CAGEMaxHours.description + " (default: " + ConstantsHomeView.CAGEDefaultMaxHours.description + ")")
         traceInfo.appendStringAndNewLine("    StandBy night mode enabled: " + UserDefaults.standard.allowStandByHighContrast.description)
@@ -613,7 +601,6 @@ class Trace {
                         if blePeripheral.libre2 != nil {
                             
                             traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
-                            traceInfo.appendStringAndNewLine("    Smooth Libre readings: " + UserDefaults.standard.smoothLibreValues.description)
                             
                         }
                         
@@ -645,7 +632,15 @@ class Trace {
                             
                             traceInfo.appendStringAndNewLine("        15-day G7: " + (blePeripheral.name.startsWith("DXCM") ? UserDefaults.standard.is15DayDexcomG7.description : "n/a (not a G7)"))
                         }
-                        
+
+                    case .MedtrumTouchCareNanoType:
+                        if let medtrumNano = blePeripheral.medtrumTouchCareNano {
+
+                            traceInfo.appendStringAndNewLine("        Type: " + bluetoothPeripheralType.rawValue)
+                            if let firmware = medtrumNano.firmware {
+                                traceInfo.appendStringAndNewLine("        Firmware: " + firmware)
+                            }
+                        }
                     }
                 }
                 

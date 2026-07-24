@@ -153,7 +153,7 @@ class NightscoutFollowManager: NSObject {
         var timeStampOfFirstBgReadingToDowload = Date(timeIntervalSinceNow: TimeInterval(-Double(ConstantsFollower.maxiumDaysOfReadingsToDownload) * 24.0 * 3600.0))
         
         // check timestamp of lastest stored bgreading with calculated value, if more recent then use this as timeStampOfFirstBgReadingToDowload
-        let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let latestBgReadings = bgReadingsAccessor.getLatestBgReadings(limit: nil, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false, includingSuppressed: true)
         if latestBgReadings.count > 0 {
             timeStampOfFirstBgReadingToDowload = max(latestBgReadings[0].timeStamp, timeStampOfFirstBgReadingToDowload)
         }
@@ -169,11 +169,14 @@ class NightscoutFollowManager: NSObject {
             return
         }
         
-        // calculate count, which is a parameter in the nightscout API - divide by 300, we're assuming readings every 5 minutes = 300 seconds
-        let count = Int(-timeStampOfFirstBgReadingToDowload.timeIntervalSinceNow / 300 + 1)
+        // use the fastest supported Nightscout upload cadence for the count upper bound so frequent Libre readings cannot be truncated
+        // also use the last local timestamp as a server-side lower bound because the follower and uploader frequency settings may differ
+        let minimumTimeBetweenTwoReadingsInSeconds = ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutesFrequentUploads * 60.0
+        let backfillTimeInterval = max(0.0, -timeStampOfFirstBgReadingToDowload.timeIntervalSinceNow)
+        let count = Int(ceil(backfillTimeInterval / minimumTimeBetweenTwoReadingsInSeconds)) + 1
         
         // ceate endpoint to get latest entries
-        let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightscoutUrl, count: count, token: UserDefaults.standard.nightscoutToken)
+        let latestEntriesEndpoint = Endpoint.getEndpointForLatestNSEntries(hostAndScheme: nightscoutUrl, count: count, minimumTimeStamp: timeStampOfFirstBgReadingToDowload, token: UserDefaults.standard.nightscoutToken)
         
         // create downloadTask and start download
         if let url = latestEntriesEndpoint.url {
@@ -229,7 +232,7 @@ class NightscoutFollowManager: NSObject {
         var calculatedValueSlope = 0.0
 
         // get last readings
-        let last2Readings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let last2Readings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false, includingSuppressed: true)
         
         // if more thant 2 readings, calculate slope and hie
         if last2Readings.count >= 2 {

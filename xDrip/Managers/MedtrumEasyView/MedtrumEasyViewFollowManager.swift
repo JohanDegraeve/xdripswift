@@ -304,7 +304,7 @@ class MedtrumEasyViewFollowManager: NSObject {
         var hideSlope = true
         var calculatedValueSlope = 0.0
 
-        let last2Readings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
+        let last2Readings = bgReadingsAccessor.getLatestBgReadings(limit: 3, howOld: 1, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false, includingSuppressed: true)
 
         if last2Readings.count >= 2 {
             let (slope, hide) = last2Readings[0].calculateSlope(lastBgReading: last2Readings[1])

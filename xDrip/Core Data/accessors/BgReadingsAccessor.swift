@@ -4,23 +4,23 @@ import CoreData
 import os
 
 class BgReadingsAccessor: ObservableObject {
-    
+
     // MARK: - Properties
-    
+
     /// for logging
     private var log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataBgReadings)
-    
+
     /// CoreDataManager to use
     private let coreDataManager:CoreDataManager
-    
+
     // MARK: - initializer
-    
+
     init(coreDataManager:CoreDataManager) {
-        
+
         self.coreDataManager = coreDataManager
-        
+
     }
-    
+
     /// Distinct timestamp counts for rolling windows ending at a given time, plus earliest/latest in last 24h
     public struct TransmitterReadSuccessWindowCounts {
         public let earliestTimestampInLast24h: Date?
@@ -32,7 +32,7 @@ class BgReadingsAccessor: ObservableObject {
 
 
     // MARK: - public functions
-    
+
 
     /// - Gives 2 latest readings with calculatedValue != 0, minimum time between the two readings specified by minimumTimeIntervalInMinutes
     ///
@@ -41,38 +41,38 @@ class BgReadingsAccessor: ObservableObject {
     /// - returns: 0 1 or 2 readings, minimum time diff between the two readings
     ///     Order by timestamp, descending meaning the reading at index 0 is the youngest
     func get2LatestBgReadings(minimumTimeIntervalInMinutes: Double) -> [BgReading] {
-        
+
         // assuming there will be at most 1 reading per minute stored, feching minimumTimeIntervalInMinutes readings should be enough, adding 5 to be sure we fetch enough readings
         let readingsToFetch = Int(minimumTimeIntervalInMinutes) + 5
-        
+
         // to define the fromDate, assume there's one reading every 5 minutes, and multiple with readingsToFetch
         let fromDate = Date(timeIntervalSinceNow: -(Double(readingsToFetch) * 5.0 * 60.0))
-        
+
         // get latest readings
         let latestReadings = getLatestBgReadings(limit: readingsToFetch, fromDate: fromDate, forSensor: nil, ignoreRawData: true, ignoreCalculatedValue: false)
-        
+
         // if there's no readings, then return empty array
         if latestReadings.count == 0 {return [BgReading]()}
-        
+
         // if there's only one reading, then return it
         if latestReadings.count == 1 {return [latestReadings[0]]}
-    
+
         // there's more than one reading, search the first with time difference >= minimumTimeIntervalInMinutes
         var indexNextReading = 1
         while indexNextReading < latestReadings.count && (abs(latestReadings[indexNextReading].timeStamp.timeIntervalSince(latestReadings[0].timeStamp)) < minimumTimeIntervalInMinutes * 60.0 ) {
 
             indexNextReading = indexNextReading + 1
-            
+
         }
-        
+
         // if indexNextReading = size of latestReadings, then it means we didn't find a second reading with time difference >= minimumTimeIntervalInMinutes, return only the first
         if indexNextReading == latestReadings.count {return [latestReadings[0]]}
-        
+
         // return the first, and the one found matching the expected time difference
         return [latestReadings[0], latestReadings[indexNextReading]]
-        
+
     }
-    
+
     /// Gives readings for which calculatedValue != 0, rawdata != 0, matching sensorid if sensorid not nil, with maximumDays old
     ///
     /// - parameters:
@@ -83,18 +83,18 @@ class BgReadingsAccessor: ObservableObject {
     ///     - if ignoreCalculatedValue = true, then value of calculatedValue will be ignored
     /// - returns: an array with readings, can be empty array.
     ///     Order by timestamp, descending meaning the reading at index 0 is the youngest
-    func getLatestBgReadings(limit:Int?, howOld:Int?, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool) -> [BgReading] {
-        
+    func getLatestBgReadings(limit:Int?, howOld:Int?, forSensor sensor:Sensor?, ignoreRawData:Bool, ignoreCalculatedValue:Bool, includingSuppressed: Bool = false) -> [BgReading] {
+
         // if maximum age specified then create fromdate
         var fromDate:Date?
         if let howOld = howOld, howOld >= 0 {
             fromDate = Date(timeIntervalSinceNow: Double(-howOld * 60 * 60 * 24))
         }
-        
-        return getLatestBgReadings(limit: limit, fromDate: fromDate, forSensor: sensor, ignoreRawData: ignoreRawData, ignoreCalculatedValue: ignoreCalculatedValue)
-        
+
+        return getLatestBgReadings(limit: limit, fromDate: fromDate, forSensor: sensor, ignoreRawData: ignoreRawData, ignoreCalculatedValue: ignoreCalculatedValue, includingSuppressed: includingSuppressed)
+
     }
-    
+
     /// Gives readings for which calculatedValue != 0, rawdata != 0, matching sensorid if sensorid not nil, with timestamp higher than fromDate
     ///
     /// - parameters:
@@ -106,7 +106,7 @@ class BgReadingsAccessor: ObservableObject {
     /// - returns: an array with readings, can be empty array.
     ///     Order by timestamp, descending meaning the reading at index 0 is the youngest
 
-    func getLatestBgReadings(limit: Int?, fromDate: Date?, forSensor sensor: Sensor?, ignoreRawData: Bool, ignoreCalculatedValue: Bool) -> [BgReading] {
+    func getLatestBgReadings(limit: Int?, fromDate: Date?, forSensor sensor: Sensor?, ignoreRawData: Bool, ignoreCalculatedValue: Bool, includingSuppressed: Bool = false) -> [BgReading] {
 
         var returnValue: [BgReading] = []
 
@@ -119,10 +119,20 @@ class BgReadingsAccessor: ObservableObject {
             fetchRequest.includesPropertyValues = true
             fetchRequest.relationshipKeyPathsForPrefetching = ["sensor"]
 
+            var subPredicates = [NSPredicate]()
+
             if let fromDate = fromDate {
-                fetchRequest.predicate = NSPredicate(format: "timeStamp > %@", NSDate(timeIntervalSince1970: fromDate.timeIntervalSince1970))
+                subPredicates.append(NSPredicate(format: "timeStamp > %@", NSDate(timeIntervalSince1970: fromDate.timeIntervalSince1970)))
             }
-            
+
+            if !includingSuppressed {
+                subPredicates.append(NSPredicate(format: "isSuppressedByFiveMinuteCadence == NO"))
+            }
+
+            if subPredicates.count > 0 {
+                fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
+            }
+
             if let limit = limit, limit >= 0 {
                 fetchRequest.fetchLimit = limit
             }
@@ -136,7 +146,7 @@ class BgReadingsAccessor: ObservableObject {
                     if !ignoreSensorId {
                         guard let fetchedSensor = bgReading.sensor, fetchedSensor.id == sensorId else { continue }
                     }
-                    
+
                     guard (ignoreCalculatedValue || bgReading.calculatedValue != 0.0) && (ignoreRawData || bgReading.rawData != 0.0) else { continue }
 
                     returnValue.append(bgReading)
@@ -145,14 +155,14 @@ class BgReadingsAccessor: ObservableObject {
                 }
             } catch {
                 let fetchError = error as NSError
-                
+
                 trace("in getLatestBgReading, Unable to Execute BgReading Fetch Request: %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, fetchError.localizedDescription)
             }
         }
 
         return returnValue
     }
-    
+
     /// Snapshot variant that returns value types (thread-safe, no Core Data objects escape)
     ///
     /// Gives readings for which calculatedValue != 0, rawdata != 0, matching sensorid if sensorid not nil, with timestamp higher than fromDate
@@ -165,9 +175,9 @@ class BgReadingsAccessor: ObservableObject {
     ///     - if ignoreCalculatedValue = true, then value of calculatedValue will be ignored
     /// - returns: an array with 'Snapshot" readings, can be empty array.
     ///     Order by timestamp, descending meaning the reading at index 0 is the youngest
-    func getLatestBgReadingSnapshots(limit: Int?, fromDate: Date?, forSensor sensor: Sensor?, ignoreRawData: Bool, ignoreCalculatedValue: Bool) -> [BgReadingSnapshot] {
+    func getLatestBgReadingSnapshots(limit: Int?, fromDate: Date?, forSensor sensor: Sensor?, ignoreRawData: Bool, ignoreCalculatedValue: Bool, includingSuppressed: Bool = false) -> [BgReadingSnapshot] {
         var returnValue: [BgReadingSnapshot] = []
-        
+
         // Core Data contexts are not thread-safe. We must run fetches/updates inside
         // performAndWait to ensure all access happens on the context's own queue.
         coreDataManager.mainManagedObjectContext.performAndWait {
@@ -177,10 +187,20 @@ class BgReadingsAccessor: ObservableObject {
             fetchRequest.includesPropertyValues = true
             fetchRequest.relationshipKeyPathsForPrefetching = ["sensor"]
 
+            var subPredicates = [NSPredicate]()
+
             if let fromDate = fromDate {
-                fetchRequest.predicate = NSPredicate(format: "timeStamp > %@", NSDate(timeIntervalSince1970: fromDate.timeIntervalSince1970))
+                subPredicates.append(NSPredicate(format: "timeStamp > %@", NSDate(timeIntervalSince1970: fromDate.timeIntervalSince1970)))
             }
-            
+
+            if !includingSuppressed {
+                subPredicates.append(NSPredicate(format: "isSuppressedByFiveMinuteCadence == NO"))
+            }
+
+            if subPredicates.count > 0 {
+                fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
+            }
+
             if let limit = limit, limit >= 0 {
                 fetchRequest.fetchLimit = limit
             }
@@ -194,26 +214,33 @@ class BgReadingsAccessor: ObservableObject {
                     if !ignoreSensorId {
                         guard let fetchedSensor = bgReading.sensor, fetchedSensor.id == sensorId else { continue }
                     }
-                    
+
                     guard (ignoreCalculatedValue || bgReading.calculatedValue != 0.0) && (ignoreRawData || bgReading.rawData != 0.0) else { continue }
 
                     // this is the big difference here.
                     // Use snapshots instead of BgReading objects to avoid Core Data crashes.
                     // They’re plain value types, detached from the context, and safe to use on any thread.
-                    returnValue.append(BgReadingSnapshot(timeStamp: bgReading.timeStamp, calculatedValue: bgReading.calculatedValue, rawData: bgReading.rawData, sensorID: bgReading.sensor?.id, objectID: bgReading.objectID))
+                    let calibrationSnapshot: CalibrationSnapshot?
+                    if let calibration = bgReading.calibration {
+                        calibrationSnapshot = CalibrationSnapshot(id: calibration.id, timeStamp: calibration.timeStamp, slope: calibration.slope, intercept: calibration.intercept, bg: calibration.bg, rawValue: calibration.rawValue)
+                    } else {
+                        calibrationSnapshot = nil
+                    }
+
+                    returnValue.append(BgReadingSnapshot(timeStamp: bgReading.timeStamp, calculatedValue: bgReading.calculatedValue, rawData: bgReading.rawData, finalValue: bgReading.finalValue, adjustedValue: bgReading.adjustedValue?.doubleValue, smoothedValue: bgReading.smoothedValue?.doubleValue, backfilledAt: bgReading.backfilledAt, calculatedValueSlope: bgReading.calculatedValueSlope, hideSlope: bgReading.hideSlope, id: bgReading.id, deviceName: bgReading.deviceName, calibrationSnapshot: calibrationSnapshot, sensorID: bgReading.sensor?.id, objectID: bgReading.objectID))
 
                     if let limit = limit, returnValue.count == limit { break }
                 }
             } catch {
                 let fetchError = error as NSError
-                
+
                 trace("in getLatestBgReadingSnapshots, Unable to Execute BgReading Fetch Request: %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, fetchError.localizedDescription)
             }
         }
 
         return returnValue
     }
-    
+
     /// Returns plain Date timestamps for readings in the last 24 hours up to endingAt.
     /// Only readings with meaningful values are included (calculatedValue != 0.0 OR rawData != 0.0).
     /// - Parameters:
@@ -263,24 +290,24 @@ class BgReadingsAccessor: ObservableObject {
     /// gets last reading, ignores rawData and calculatedValue
     /// - parameters:
     ///     - sensor: sensor for which reading is asked, if nil then sensor value is ignored
-    func last(forSensor sensor:Sensor?) -> BgReading? {
-        let readings = getLatestBgReadings(limit: 1, howOld: nil, forSensor: sensor, ignoreRawData: true, ignoreCalculatedValue: true)
+    func last(forSensor sensor:Sensor?, includingSuppressed: Bool = false) -> BgReading? {
+        let readings = getLatestBgReadings(limit: 1, howOld: nil, forSensor: sensor, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: includingSuppressed)
         if readings.count > 0 {
             return readings.last
         } else {
             return nil
         }
     }
-    
+
     /// Convenience: last snapshot, ignoring value filters
     ///
     /// gets last reading, ignores rawData and calculatedValue
     /// - parameters:
     ///     - sensor: sensor for which reading is asked, if nil then sensor value is ignored
-    func lastSnapshot(forSensor sensor: Sensor?) -> BgReadingSnapshot? {
-        getLatestBgReadingSnapshots(limit: 1, fromDate: nil, forSensor: sensor, ignoreRawData: true, ignoreCalculatedValue: true).first
+    func lastSnapshot(forSensor sensor: Sensor?, includingSuppressed: Bool = false) -> BgReadingSnapshot? {
+        getLatestBgReadingSnapshots(limit: 1, fromDate: nil, forSensor: sensor, ignoreRawData: true, ignoreCalculatedValue: true, includingSuppressed: includingSuppressed).first
     }
-    
+
     /// gets bgReadings, synchronously, in the managedObjectContext's thread
     /// - returns:
     ///        readings sorted by timestamp, ascending (ie first is oldest)
@@ -288,25 +315,32 @@ class BgReadingsAccessor: ObservableObject {
     ///     - to : if specified, only return readings with timestamp  smaller than fromDate (not equal to)
     ///     - from : if specified, only return readings with timestamp greater than fromDate (not equal to)
     ///     - managedObjectContext : the ManagedObjectContext to use
-    func getBgReadings(from: Date?, to: Date?, on managedObjectContext: NSManagedObjectContext) -> [BgReading] {
-        
+    func getBgReadings(from: Date?, to: Date?, on managedObjectContext: NSManagedObjectContext, includingSuppressed: Bool = false) -> [BgReading] {
+
         let fetchRequest: NSFetchRequest<BgReading> = BgReading.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BgReading.timeStamp), ascending: true)]
-        
+
         // create predicate
+        var subPredicates = [NSPredicate]()
+
         if let from = from, to == nil {
-            let predicate = NSPredicate(format: "timeStamp > %@", NSDate(timeIntervalSince1970: from.timeIntervalSince1970))
-            fetchRequest.predicate = predicate
+            subPredicates.append(NSPredicate(format: "timeStamp > %@", NSDate(timeIntervalSince1970: from.timeIntervalSince1970)))
         } else if let to = to, from == nil {
-            let predicate = NSPredicate(format: "timeStamp < %@", NSDate(timeIntervalSince1970: to.timeIntervalSince1970))
-            fetchRequest.predicate = predicate
+            subPredicates.append(NSPredicate(format: "timeStamp < %@", NSDate(timeIntervalSince1970: to.timeIntervalSince1970)))
         } else if let to = to, let from = from {
-            let predicate = NSPredicate(format: "timeStamp < %@ AND timeStamp > %@", NSDate(timeIntervalSince1970: to.timeIntervalSince1970), NSDate(timeIntervalSince1970: from.timeIntervalSince1970))
-            fetchRequest.predicate = predicate
+            subPredicates.append(NSPredicate(format: "timeStamp < %@ AND timeStamp > %@", NSDate(timeIntervalSince1970: to.timeIntervalSince1970), NSDate(timeIntervalSince1970: from.timeIntervalSince1970)))
         }
-        
+
+        if !includingSuppressed {
+            subPredicates.append(NSPredicate(format: "isSuppressedByFiveMinuteCadence == NO"))
+        }
+
+        if subPredicates.count > 0 {
+            fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
+        }
+
         var bgReadings = [BgReading]()
-        
+
         managedObjectContext.performAndWait {
             do {
                 // Execute Fetch Request
@@ -316,7 +350,7 @@ class BgReadingsAccessor: ObservableObject {
                 trace("in getBgReadings, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, fetchError.localizedDescription)
             }
         }
-        
+
         return bgReadings
 
     }
@@ -402,7 +436,7 @@ class BgReadingsAccessor: ObservableObject {
 
         return TransmitterReadSuccessResult(earliestTimestamp: earliest, latestTimestamp: latest, distinctTimestampsCount: distinctCount)
     }
-    
+
     /// Computes distinct timestamp counts for 6h/12h/24h windows ending at `endDate`,
     /// plus earliest and latest timestamps within the last 24h. If `sensor` is non-nil,
     /// only readings for that sensor are considered. Only meaningful readings are included
@@ -511,58 +545,72 @@ class BgReadingsAccessor: ObservableObject {
         return TransmitterReadSuccessWindowCounts(earliestTimestampInLast24h: earliest24h, latestTimestampInLast24h: latest24h, distinctCountLast6h: count6h,
             distinctCountLast12h: count12h, distinctCountLast24h: count24h)
     }
-    
+
     /// deletes bgReading, synchronously, in the managedObjectContext's thread
     ///     - bgReading : bgReading to delete
     ///     - managedObjectContext : the ManagedObjectContext to use
     func delete(bgReading: BgReading, on managedObjectContext: NSManagedObjectContext) {
-        
+
         managedObjectContext.performAndWait {
-            
+
             managedObjectContext.delete(bgReading)
-            
+
             // save changes to coredata
             do {
-                
+
                 try managedObjectContext.save()
-                
+
             } catch {
-                
+
                 trace("in delete bgReading,  Unable to Save Changes, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, error.localizedDescription)
-                
+
             }
 
         }
-        
+
     }
-    
-    
+
+
     /// deletes bgReading
     ///     - bgReading : bgReading to delete
     func delete(bgReading: BgReading) {
-        
+
         coreDataManager.mainManagedObjectContext.performAndWait {
-            
+
             coreDataManager.mainManagedObjectContext.delete(bgReading)
-            
+
             // save changes to coredata
             do {
-                
+
                 try coreDataManager.mainManagedObjectContext.save()
-                
+
             } catch {
-                
+
                 trace("in delete bgReading,  Unable to Save Changes, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, error.localizedDescription)
-                
+
             }
 
         }
-        
+
     }
-    
-    
+
+    /// deletes a bgReading using its objectID
+    func delete(bgReadingObjectID: NSManagedObjectID) {
+        coreDataManager.mainManagedObjectContext.performAndWait {
+            do {
+                if let bgReading = try coreDataManager.mainManagedObjectContext.existingObject(with: bgReadingObjectID) as? BgReading {
+                    coreDataManager.mainManagedObjectContext.delete(bgReading)
+                    try coreDataManager.mainManagedObjectContext.save()
+                }
+            } catch {
+                trace("in delete bgReadingObjectID, Unable to Save Changes, error.localizedDescription  = %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, error.localizedDescription)
+            }
+        }
+    }
+
+
     // MARK: - private helper functions
-    
+
     /// returnvalue can be empty array
     /// - parameters:
     ///     - limit: maximum amount of readings to fetch, if 0 then no limit
@@ -572,20 +620,20 @@ class BgReadingsAccessor: ObservableObject {
     private func fetchBgReadings(limit:Int?, fromDate:Date?) -> [BgReading] {
         let fetchRequest: NSFetchRequest<BgReading> = BgReading.fetchRequest()
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BgReading.timeStamp), ascending: false)]
-        
+
         // if fromDate specified then create predicate
         if let fromDate = fromDate {
             let predicate = NSPredicate(format: "timeStamp > %@", NSDate(timeIntervalSince1970: fromDate.timeIntervalSince1970))
             fetchRequest.predicate = predicate
         }
-        
+
         // set fetchLimit
         if let limit = limit, limit >= 0 {
             fetchRequest.fetchLimit = limit
         }
-        
+
         var bgReadings = [BgReading]()
-        
+
         coreDataManager.mainManagedObjectContext.performAndWait {
             do {
                 // Execute Fetch Request
@@ -595,8 +643,8 @@ class BgReadingsAccessor: ObservableObject {
                 trace("in fetchBgReadings, Unable to Execute BgReading Fetch Request : %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, fetchError.localizedDescription)
             }
         }
-        
+
         return bgReadings
     }
-    
+
 }

@@ -27,7 +27,11 @@
 "transmitterResultResult" = "نتيجة إعادة تعيين جهاز الإرسال";
 "bootLoader" = "محمل الإقلاع";
 "cannotActiveCGMInFollowerMode" = "لا يمكنك تفعيل نظام متابعة سكر الدم المستمرة CGM في وضع المتابعة";
-"useOtherDexcomApp" = "قم بمتابعة تطبيق Dexcom";
+"useOtherDexcomApp" = "وضع التعايش";
+"useOtherDexcomAppCoexistenceFooter" = "يتيح لنا وضع التعايش العمل مع تطبيق آخر، مثل Dexcom أو CamAPS. يجب أن يظل ذلك التطبيق قيد التشغيل في الخلفية.";
+"useOtherDexcomAppPrimaryFooter" = "يتصل الوضع الأساسي كتطبيق رئيسي ويتحكم في الاتصال.";
+"runningInCoexistenceMode" = "يعمل في وضع التعايش";
+"runningInPrimaryMode" = "يعمل في الوضع الأساسي";
 "confirmDisconnectTitle" = "تأكيد قطع الاتصال";
 "confirmDisconnectMessage" = "انقر فوق \"قطع الاتصال\" لتأكيد رغبتك حقًا في قطع الاتصال بجهاز الإرسال.";
 "sensorStartDate" = "بداية الحساس";

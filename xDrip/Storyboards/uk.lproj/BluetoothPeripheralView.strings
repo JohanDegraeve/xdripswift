@@ -94,7 +94,11 @@
 "serialNumber" = "Serial Number";
 
 /// Dexcom bluetooth screen. Is another app used in parallel or not
-"useOtherDexcomApp" = "Use With Other App";
+"useOtherDexcomApp" = "Режим співіснування";
+"useOtherDexcomAppCoexistenceFooter" = "Режим співіснування дозволяє нам працювати з іншою програмою, наприклад Dexcom або CamAPS. Ця програма має продовжувати працювати у фоновому режимі.";
+"useOtherDexcomAppPrimaryFooter" = "Основний режим підключається як головна програма та керує з'єднанням.";
+"runningInCoexistenceMode" = "Працює в режимі співіснування";
+"runningInPrimaryMode" = "Працює в основному режимі";
 
 /// To give result about transitter result in notification body
 "transmitterResultResult" = "Transmitter Reset Result";

@@ -35,6 +35,11 @@ enum ConstantsNotifications {
         static let bgReadingNotificationRequest = "bgReadingNotificationRequest"
     }
     
+    enum NotificationIdentifierForBgPostProcessing {
+        /// bg post processing update notification
+        static let bgPostProcessingDidUpdate = "bgPostProcessingDidUpdate"
+    }
+    
     enum NotificationIdentifierForSensorNotDetected {
         /// sensor not detected notification
         static let sensorNotDetected = "sensorNotDetected"

@@ -19,9 +19,13 @@ public final class LiveActivityManager {
     private var eventAttributes: XDripWidgetAttributes
     private var eventActivity: Activity<XDripWidgetAttributes>?
     
-    // Debounced update task
-    private var debouncedUpdateTask: Task<Void, Never>?
-    private let debounceInterval: TimeInterval = 0.5
+    // ActivityKit updates are serialized so a second request cannot race an update already in progress.
+    // If another request arrives while ActivityKit is updating, only the newest content needs to follow it.
+    private var pendingUpdate: (contentState: XDripWidgetAttributes.ContentState, forceRestart: Bool)?
+    private var isUpdating = false
+    private var shouldRun = false
+    private var commandRevision = 0
+    private var backgroundUpdateTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
     
     // initialize an "empty" contentState and use this to hold the current context state of the live activity after each start/update
     // this makes it much easier to restart from an App Intent without needing to generate a new context to send
@@ -34,6 +38,7 @@ public final class LiveActivityManager {
     // minimum age an activity must reach before respecting forceRestart requests
     // this is done to prevent unnecessary restarts being performed one after the other
     private let minimumForceRestartAge: TimeInterval = 10
+    private let maximumContentStateEncodedBytes = 3_500
     
     // static shared singleton of LiveActivityManager
     static let shared = LiveActivityManager()
@@ -52,18 +57,97 @@ public final class LiveActivityManager {
 // MARK: - Helper Extension
 
 extension LiveActivityManager {
-    /// Public API: Debounced update entry point
+    /// Public API: serialized update entry point
+    @MainActor
     func update(contentState: XDripWidgetAttributes.ContentState, forceRestart: Bool = false) {
-        debouncedUpdateTask?.cancel()
-        debouncedUpdateTask = Task { [weak self] in
-            try? await Task.sleep(nanoseconds: UInt64(self?.debounceInterval ?? 0.5 * 1_000_000_000))
-            await self?.ensureActivity(contentState: contentState, forceRestart: forceRestart)
+        let contentState = contentState.limitedForActivityPayload(maximumEncodedBytes: maximumContentStateEncodedBytes)
+
+        commandRevision += 1
+        shouldRun = true
+        persistentContentState = contentState
+
+        // Keep the newest content, but do not lose a pending restart request when updates are coalesced.
+        let shouldForceRestart = forceRestart || pendingUpdate?.forceRestart == true
+        pendingUpdate = (contentState, shouldForceRestart)
+
+        beginBackgroundUpdateTaskIfNeeded()
+        startProcessingIfNeeded()
+    }
+
+    @MainActor
+    private func startProcessingIfNeeded() {
+        guard shouldRun, pendingUpdate != nil, !isUpdating else { return }
+
+        isUpdating = true
+        Task { @MainActor [weak self] in
+            await self?.processPendingUpdates()
         }
+    }
+
+    @MainActor
+    private func processPendingUpdates() async {
+        defer {
+            isUpdating = false
+            endBackgroundUpdateTaskIfNeeded()
+        }
+
+        while let update = pendingUpdate {
+            pendingUpdate = nil
+            await ensureActivity(contentState: update.contentState, forceRestart: update.forceRestart)
+        }
+    }
+
+    @MainActor
+    private func beginBackgroundUpdateTaskIfNeeded() {
+        guard backgroundUpdateTaskIdentifier == .invalid else { return }
+
+        // ActivityKit permits background updates, but the app still needs execution time to finish
+        // the asynchronous update. Request that time before queuing the processor, as recommended by:
+        // https://developer.apple.com/documentation/activitykit/activity/update(_:)
+        // https://developer.apple.com/documentation/uikit/uiapplication/beginbackgroundtask(withname:expirationhandler:)
+        backgroundUpdateTaskIdentifier = UIApplication.shared.beginBackgroundTask(
+            withName: "Live Activity Update",
+            expirationHandler: { [weak self] in
+                guard let self else { return }
+
+                trace("in LiveActivityManager, background update task expired", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .error)
+                self.endBackgroundUpdateTaskIfNeeded()
+            }
+        )
+
+        if backgroundUpdateTaskIdentifier == .invalid {
+            trace("in LiveActivityManager, could not begin background update task", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .error)
+        }
+    }
+
+    @MainActor
+    private func endBackgroundUpdateTaskIfNeeded() {
+        guard backgroundUpdateTaskIdentifier != .invalid else { return }
+
+        let identifier = backgroundUpdateTaskIdentifier
+        backgroundUpdateTaskIdentifier = .invalid
+        UIApplication.shared.endBackgroundTask(identifier)
     }
 
     /// Public API: End all activities
     @MainActor
     func endAll() async {
+        commandRevision += 1
+        let endRevision = commandRevision
+        shouldRun = false
+        pendingUpdate = nil
+        await endActivities()
+
+        // A newer update may arrive while ActivityKit is ending the previous activity. Requeue the
+        // latest requested state so that the newer update, rather than the older stop, wins.
+        guard shouldRun, commandRevision != endRevision else { return }
+
+        pendingUpdate = (persistentContentState, false)
+        startProcessingIfNeeded()
+    }
+
+    @MainActor
+    private func endActivities() async {
         for activity in Activity<XDripWidgetAttributes>.activities {
             trace("in endAll, ending live activity: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, String(describing: activity.id))
             await activity.end(nil, dismissalPolicy: .immediate)
@@ -77,10 +161,13 @@ extension LiveActivityManager {
         if (UserDefaults.standard.isMaster || (!UserDefaults.standard.isMaster && UserDefaults.standard.followerBackgroundKeepAliveType == .heartbeat)) && UserDefaults.standard.liveActivityType != .disabled {
             if persistentContentState.urgentLowLimitInMgDl > 0 {
                 trace("in restartFromIntent, will try and end/restart current Live Activity", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
-                Task { [weak self] in
+                Task { @MainActor [weak self] in
                     guard let self = self else { return }
-                    await self.endAll()
-                    await self.ensureActivity(contentState: self.persistentContentState, forceRestart: true)
+                    self.commandRevision += 1
+                    self.shouldRun = true
+                    await self.endActivities()
+                    guard self.shouldRun else { return }
+                    await self.startActivity(contentState: self.persistentContentState)
                 }
             } else {
                 trace("in restartFromIntent, cannot restart live activity from Intent because there is no persistentContentState available", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
@@ -93,13 +180,10 @@ extension LiveActivityManager {
     /// leaving an orphaned live activity on the lock screen
     @MainActor
     private func recoverOrphanedActivityIfNeeded() async {
-        if eventActivity == nil {
+        if shouldRun, eventActivity == nil {
             let existing = Activity<XDripWidgetAttributes>.activities.first
             if let found = existing {
                 eventActivity = found
-                if persistentContentState.urgentLowLimitInMgDl > 0 {
-                    await ensureActivity(contentState: persistentContentState)
-                }
                 trace("in recoverOrphanedActivityIfNeeded, recovered orphaned live activity: %{public}@", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info, String(describing: found.id))
             }
         }
@@ -108,6 +192,8 @@ extension LiveActivityManager {
     /// Unifies start/update logic into a single function
     @MainActor
     private func ensureActivity(contentState: XDripWidgetAttributes.ContentState, forceRestart: Bool = false) async {
+        guard shouldRun else { return }
+
         // first let's see if we can recover any orphaned live activities and bring them back into scope
         await recoverOrphanedActivityIfNeeded()
         
@@ -124,8 +210,9 @@ extension LiveActivityManager {
             let residualCount = Activity<XDripWidgetAttributes>.activities.count
             if residualCount > 0 {
                 trace("in ensureActivity, found %{public}@ residual live activities, ending them before starting a new one", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info, residualCount.description)
-                await endAll()
+                await endActivities()
             }
+            guard shouldRun else { return }
             await startActivity(contentState: contentState)
             trace("in ensureActivity, started new live activity", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
             return
@@ -135,7 +222,8 @@ extension LiveActivityManager {
         if forceRestart {
             let activityAge = Date().timeIntervalSince(eventStartDate)
             if activityAge >= minimumForceRestartAge {
-                await endAll()
+                await endActivities()
+                guard shouldRun else { return }
                 await startActivity(contentState: contentState)
                 let activityAgeString = activityAge < 3600 ? activityAge.minutes.round(toDecimalPlaces: 1).description + " minutes" : activityAge.hours.round(toDecimalPlaces: 1).description + " hours"
                 trace("in ensureActivity, forceRestart triggered (existing Live Activity age: %{public}@)", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info, activityAgeString)
@@ -151,7 +239,8 @@ extension LiveActivityManager {
             if !forceRestart && shouldDeferNewStart(contentState: contentState, context: "restart after dismissal/end") {
                 return
             }
-            await endAll()
+            await endActivities()
+            guard shouldRun else { return }
             await startActivity(contentState: contentState)
             trace("in ensureActivity, restarted live activity after dismissal/end", log: log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
             return
@@ -162,20 +251,17 @@ extension LiveActivityManager {
     }
     
     /// end all live activities that are spawned from the app
+    @MainActor
     func endAllActivities() async {
-        for activity in Activity<XDripWidgetAttributes>.activities {
-            trace("in endAllActivities, ending live activity: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, String(describing: activity.id))
-            await activity.end(nil, dismissalPolicy: .immediate)
-        }
-        
-        // reset local handle
-        eventActivity = nil
+        await endAll()
     }
     
     /// will start a new live activity event based upon the content state passed to the function
     /// - Parameter contentState: the content state of the new activity
     @MainActor
     private func startActivity(contentState: XDripWidgetAttributes.ContentState) async {
+        guard shouldRun else { return }
+
         let now = Date()
         eventStartDate = now
         lastStartAttemptDate = now
@@ -208,12 +294,15 @@ extension LiveActivityManager {
     /// - Parameter contentState: the updated context state of the activity
     @MainActor
     private func updateActivity(to contentState: XDripWidgetAttributes.ContentState) async {
+        guard shouldRun else { return }
+
         if eventActivity?.activityState == .ended {
             trace("in updateActivity, detected .ended state. Starting a new live activity", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
             if shouldDeferNewStart(contentState: contentState, context: "restart after .ended state") {
                 return
             }
-            await endAllActivities()
+            await endActivities()
+            guard shouldRun else { return }
             await startActivity(contentState: contentState)
             return
         }
@@ -224,7 +313,8 @@ extension LiveActivityManager {
             if shouldDeferNewStart(contentState: contentState, context: "restart after dismissal") {
                 return
             }
-            await endAllActivities()
+            await endActivities()
+            guard shouldRun else { return }
             await startActivity(contentState: contentState)
             trace("in updateActivity, previous live activity was dismissed by the user so it will be ended and will try to start a new one.", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info)
         } else {
@@ -241,18 +331,6 @@ extension LiveActivityManager {
         }
     }
     
-    /// end the live activity if it is being shown, do nothing if there is no eventyActivity
-    @MainActor
-    private func endActivity() async {
-        if eventActivity != nil {
-            for activity in Activity<XDripWidgetAttributes>.activities {
-                await activity.end(nil, dismissalPolicy: .immediate)
-                trace("in endActivity, ending live activity: %{public}@", log: self.log, category: ConstantsLog.categoryLiveActivityManager, type: .info, String(describing: activity.id))
-            }
-            eventActivity = nil
-        }
-    }
-
     @MainActor
     private func shouldDeferNewStart(contentState: XDripWidgetAttributes.ContentState, context: String) -> Bool {
         let restartThrottleInterval: TimeInterval = 2

@@ -9,31 +9,12 @@
 import Foundation
 
 enum ConstantsSettingsIcons {
-    
-    // Settings section title icons
-    static let alertSettingsIcon: String = "⏰ "
-    static let appleWatchSettingsIcon: String = "⌚️ "
-    static let calendarEventSettingsIcon: String = "📆 "
-    static let contactImageSettingsIcon: String = "☎️ "
-    static let dataSourceSettingsIcon: String = "➡️ "
-    static let developerSettingsIcon: String = "👨🏻‍💻 "
-    static let dexcomSettingsIcon: String = "⬆️ "
-    static let healthKitSettingsIcon: String = "❤️ "
-    static let helpSettingsIcon: String = "📖 "
-    static let homeScreenSettingsIcon: String = "📈 "
-    static let housekeeperSettingsIcon: String = "💾 "
-    static let infoSettingsIcon: String = "🩸 "
-    static let m5StackSettingsIcon: String = "📺 "
-    static let nightscoutSettingsIcon: String = "↕️ "
-    static let notificationsSettingsIcon: String = "📢 "
-    static let speakSettingsIcon: String = "🗣️ "
-    static let statisticsSettingsIcon: String = "📊 "
-    static let traceSettingsIcon: String = "📤 "
-    static let treatmentsSettingsIcon: String = "💊 "
-    
-    // Settings -> M5Stack settings section title icons
-    static let m5StackBluetoothSettingsIcon: String = "📳 "
-    static let m5StackGeneralSettingsIcon: String = "📺 "
-    static let m5StackWiFiSettingsIcon: String = "🛜 "
+    // Settings root section icons
+    static let dataSourceSettingsIcon = "square.and.arrow.down"
+    static let glucoseDisplaySettingsIcon = "chart.xyaxis.line"
+    static let notificationsSettingsIcon = "bell.badge"
+    static let sharingAndServicesSettingsIcon = "arrow.up.and.down.square"
+    static let infoSettingsIcon = "info.circle"
+    static let developerSettingsIcon = "gearshape.2"
     
 }

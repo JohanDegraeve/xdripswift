@@ -1,20 +1,28 @@
 "settingsviews_settingstitle" = "Inställningar";
+"settingsviews_glucoseDisplaySectionTitle" = "Glukosvisning";
+"settingsviews_glucoseRangesSectionTitle" = "Glukosintervall";
+"settingsviews_alertsAndNotificationsSectionTitle" = "Larm och notiser";
+"settingsviews_sharingAndServicesSectionTitle" = "Delning och tjänster";
+"settingsviews_osAidLoopShareSectionTitle" = "OS-AID-delning";
+"settingsviews_issueReportSectionTitle" = "Problemrapport";
+"settingsviews_appBannerVersion" = "Version %@";
+"settingsviews_appInstalledSince" = "Installerad";
 "settingsviews_sectiontitleNotifications" = "Allmänt";
 "settingsviews_selectbgunit" = "Blodglukosenheter";
 "settingsviews_masterorfollower" = "Användare eller Följare";
 "settingsviews_master" = "Användare";
 "settingsviews_follower" = "Följare";
-"settingsviews_showReadingInNotification" = "Visa BS som notiser";
-"settingsviews_labelShowReadingInAppBadge" = "Visa BS i appikon";
-"settingsviews_multipleAppBadgeValueWith10" = "Multiplicera BS med 10";
-"settingsviews_showClockWhenScreenIsLocked" = "Visa klocka när skärmen är låst";
+"settingsviews_showReadingInNotification" = "Glukosnotiser";
+"settingsviews_labelShowReadingInAppBadge" = "Appbricka";
+"settingsviews_multipleAppBadgeValueWith10" = "Appbricka x10";
+"settingsviews_showClockWhenScreenIsLocked" = "Klocka på låsskärm";
 "settingsviews_urgentHighValue" = "Akut högt värde";
 "settingsviews_highValue" = "Högt värde";
 "settingsviews_targetValue" = "Målvärde";
 "settingsviews_lowValue" = "Lågt värde";
 "settingsviews_urgentLowValue" = "Akut lågt värde";
-"settingsviews_showcoloredobjectives" = "Visa färgade linjer";
-"settingsviews_showtarget" = "Visa målvärdeslinje";
+"settingsviews_showcoloredobjectives" = "Färgade linjer";
+"settingsviews_showtarget" = "Mållinje";
 "settingsviews_sectiontitletreatments" = "Behandlingar";
 "settingsviews_showTreatments" = "Visa behandlingar i diagram";
 "settingsviews_smallBolusTreatmentThreshold" = "Tröskelvärde för mikrobolus";
@@ -23,13 +31,13 @@
 "settingsviews_showStatistics" = "Visa statistik";
 "settingsviews_daysToUseStatisticsTitle" = "Dagar att beräkna";
 "settingsviews_daysToUseStatisticsMessage" = "Maximalt antal dagar för beräkning av statistik?\n\n(ange 0 för beräkning sedan midnatt)";
-"settingsviews_useIFCCA1C" = "Visa HbA1c som mmol/mol (IFCC)";
+"settingsviews_useIFCCA1C" = "HbA1c in mmols/mol";
 "settingsviews_sectiontitletransmitter" = "Sändare";
 "settingsviews_transmittertype" = "Typ av sändare";
 "settingsviews_transmitterid" = "Sändar-ID";
 "settingsviews_transmitterid_text_for_button"  = "Sändar-ID";
 "settingsviews_givetransmitterid" = "Ange sändar-ID";
-"settingsviews_nonfixedtransmitter" = "Använd flerpunktskalibrering";
+"settingsviews_nonfixedtransmitter" = "Flerpunktskalibrering";
 "settingsviews_labelNonFixed" = "Flerpunktskalibrering";
 
 "settingsviews_labelAlgorithmType" = "Algoritm typ";
@@ -39,17 +47,21 @@
 "settingsviews_sectiontitlealerting" = "Larm";
 "settingsviews_row_alert_types" = "Typ av larm";
 "settingsviews_row_alerts" = "Larm";
+"settingsviews_volume_tests_section_title" = "Testa larmvolym";
+"settingsviews_alert_types_section_footer" = "Larmtyper definierar hur larm beter sig, inklusive ljud, vibration, snooze och åsidosättning av tyst läge.";
+"settingsviews_alerts_section_footer" = "Larm definierar när appen ska meddela dig om glukosnivåer, saknade avläsningar och andra tillstånd.";
 "settingsviews_sectiontitlehealthkit" = "Apple Hälsa";
-"settingsviews_healthkit" = "Skriv data till Apple Hälsa";
-"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share Upload";
-"settingsviews_uploadReadingstoDexcomShare" = "Ladda upp till Dexcom Share";
+"settingsviews_healthkit" = "Skriv till Apple Hälsa";
+"settingsviews_sectiontitledexcomshareupload" = "Dexcom Share";
+"settingsviews_uploadReadingstoDexcomShare" = "Ladda upp";
 "settingsviews_dexcomShareUploadSerialNumber" = "Sändarens serienummer";
-"settingsviews_useUSDexcomShareurl" = "Använd Dexcom-server i USA";
+"settingsviews_useUSDexcomShareurl" = "US-servrar";
 "settingsviews_dexcomShareAccountName" = "Användarnamn";
 "settingsviews_giveDexcomShareAccountName" = "Ange Dexcom Share användarnamn";
 "settingsviews_giveDexcomSharePassword" = "Ange Dexcom Share lösenord";
 "settingsviews_givedexcomShareUploadSerialNumber" = "Ange Dexcom mottagares serienummer";
 "settingsviews_sectiontitlenightscout" = "Nightscout";
+"settingsviews_nightscoutUploadOptionsSectionTitle" = "Uppladdningsalternativ";
 "settingsviews_nightscoutEnabled" = "Slå på Nightscout";
 "settingsviews_nightscoutUrl" = "URL";
 "settingsviews_useSchedule" = "Använd schemalagd uppladdning";
@@ -61,30 +73,26 @@
 "timeScheduleViewTitle" = "På/Av tidschema för ";
 "uploadSensorStartTime" = "Ladda upp sensorstarttid";
 "testUrlAndAPIKey" = "Testa anslutning";
-"settingsviews_sectiontitlespeak" = "Röst";
-"settingsviews_speakBgReadings" = "Läs upp BS-avläsningar";
+"settingsviews_speakBgReadings" = "Läs upp glukos";
 "settingsviews_speakBgReadingslanguage" = "Språk";
 "settingsviews_speakreadingslanguageselection" = "Välj språk";
 "settingsviews_speakTrend" = "Läs upp trend";
 "settingsviews_speakDelta" = "Läs upp delta";
 "settingsviews_IntervalTitle" = "“Notisintervall";
-"settingsviews_IntervalMessage" = "Minsta intervall mellan två notiser, i minuter";
+"settingsviews_IntervalMessage" = "Minsta intervall mellan två notiser";
 "settingsviews_sectiontitleAbout" = "Om %@";
 "settingsviews_Version" = "Version";
 "settingsviews_license" = "Licens";
-"settingsviews_build" = "Kompilering";
 "m5stack_settingsviews_settingstitle" = "M5 Stack-inställningar";
 "m5stack_settingsviews_textColor" = "Textfärg";
 "m5stack_settingsviews_backGroundColor" = "Bakgrundsfärg";
 "m5stack_settingsviews_sectiontitlebluetooth" = "Bluetooth";
 "m5stack_settingsviews_giveBluetoothPassword" = "Ange Bluetooth-lösenord";
 "m5stack_settingsviews_brightness" = "Ljusstyrka";
-"appleWatchSectionTitle" = "Apple Watch";
-"createCalendarEvent" = "Skapa kalenderhändelser";
 "calenderId" = "Kalender att använda";
-"settingsviews_displayTrendInCalendarEvent" = "Visa trend";
-"displayUnitInCalendarEvent" = "Visa enhet";
-"displayDeltaInCalendarEvent" = "Visa delta";
+"settingsviews_displayTrendInCalendarEvent" = "Trend";
+"displayUnitInCalendarEvent" = "Enhet";
+"displayDeltaInCalendarEvent" = "Delta";
 "infoCalendarAccessDeniedByUser" = "Du har tidigare nekat tillgång till din kalender.\n\nFör att tillåta tillgång gå till 'Inställningar', 'Integritet', 'Kalendrar' och sätt på";
 "infoCalendarAccessRestricted" = "Du kan inte ge auktorisation till %@ att få tillgång till din kalender. Detta beror möjligtvis på inställda begränsningar i Skärmtidsinställningar.";
 "sectionTitleTrace" = "Problemrapportering";
@@ -95,13 +103,16 @@
 "failedToSendEmail" = "Misslyckades att skicka mejl";
 "volumeTestSoundPlayerExplanation" = "Ett larmljud spelas nu upp med samma volym som kommer att användas för larm med 'Förbigå tyst läge' = På\n\n(Används för alla larm förutom 'Saknad avläsning' som alltid använder inställd iOS-volym.)\n\nÄndra volymen med volymknapparna och tryck 'OK' när färdig.";
 "volumeTestiOSSoundExplanation" = "Ett larmljud spelas nu upp med samma volym som kommer att användas för larm med 'Förbigå tyst läge' = På\n\n(Används för alla larm förutom 'Saknad avläsning' som alltid använder inställd iOS-volym.)\n\nTryck på en av volymknapparna för att stänga av ljudet, ändra sedan volymen med volymknapparna till önskad volym och försök igen.";
-"volumeTestSoundPlayer" = "Testa volym (om 'Förbigå tyst läge' är på)";
-"volumeTestiOSSound" = "Testa volym (nuvarande iPhone-volym)";
+"volumeTestSoundPlayer" = "När tyst läge är aktiverat";
+"volumeTestiOSSound" = "När tyst läge är avaktiverat";
 "debugLevel" = "Inkludera felsökningsnivå";
 "warningChangeFromMasterToFollower" = "Byte från användare till följare kommer att stoppa nuvarande sensor. Vill du fortsätta?";
 "nightscoutPort" = "Port";
-"developerSettings" = "Inställningar för utvecklare";
-"smoothLibreValues" = "Utjämna Libre-värden";
+"developerSettings" = "Avancerade inställningar";
+"showDeveloperSettings" = "Visa";
+"preferSensorCountdown" = "Föredra nedräkning för sensor";
+"settingsviews_homeScreenSensorLifetimeSectionTitle" = "Sensorns livslängd";
+"settingsviews_homeScreenSensorLifetimeSectionFooter" = "Styr om sensorns livslängd visas som förfluten tid eller som en nedräkning på iPhone och Apple Watch.";
 "nslog" = "NSLog";
 "oslog" = "OSLog";
 "settingsviews_sectiontitlehomescreen" = "Hemskärm";
@@ -112,17 +123,13 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// general settings, should the online help be translated automatically if needed
-"settingsviews_translateOnlineHelp" = "Translate Automatically";
-"settingsviews_restartNeeded" = "(Omstart krävs)";
+"settingsviews_translateOnlineHelp" = "Översätt dokumentation";
 
 /// home screen settings, should the main glucose chart screen be allowed?
-"settingsviews_allowScreenRotation" = "Allow Chart Rotation";
+"settingsviews_allowScreenRotation" = "Diagramrotation";
 
 /// help settings, section title
-"settingsviews_sectiontitlehelp" = "Help & Documentation";
 
-/// Calendar Events Settings - section title
-"calendarEventsSectionTitle" = "Calendar Events";
 
 /// help settings, open the online help
 "settingsviews_showOnlineHelp" = "Open Online Help";
@@ -132,7 +139,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////
 
 /// web oop settings in bluetooth peripheral view : enabled or not
-"settingsviews_webooptransmitter" = "Use Transmitter Algorithm";
+"settingsviews_webooptransmitter" = "Sändaralgoritm";
 
 /// weboop settings, title of the dialogs where user can select between xdrip or transmitter algorithm
 "settingsviews_labelWebOOP" = "xDrip or Transmitter Algorithm";
@@ -141,8 +148,6 @@
 /////   Translation needed - remove this header after translation                       /////
 /////////////////////////////////////////////////////////////////////////////////////////////
 
-/// Button to export all data
-"settingsviews_housekeeperExportAllData" = "Export All Data";
 
 /// Housekeeper settings, section title
 "settingsviews_sectionTitleHousekeeper" = "Data Management";
@@ -151,7 +156,7 @@
 "settingsviews_housekeeperRetentionPeriodMessage" = "For how many days should data be stored? (Min 90, Max 365)\n\n(Recommended: 90 days)";
 
 /// Housekeeper retention period, for how long to store data
-"settingsviews_housekeeperRetentionPeriod" = "Retention Period (days)";
+"settingsviews_housekeeperRetentionPeriod" = "Retention Period";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -161,16 +166,16 @@
 "Select Time" = "Select Time";
 
 /// transmitter settings, to explain that the reset option only works for certain transmitters
-"settingsviews_resetDexcomTransmitterMessage" = "\nThis option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
+"settingsviews_resetDexcomTransmitterMessage" = "This option will attempt to reset the transmitter on the next connection.\n\nNote that this will only work for G5 transmitters, very early G6 and all Anubis G6 transmitters.\n\nIt will NOT work for normal G6 or ONE transmitters.";
 
 /// data source settings, keep-alive mode is set to aggressive
-"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Background keep-alive is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
+"settingsviews_followerKeepAliveTypeAggressiveMessage" = "Håll aktiv is set to aggressive.\n\nWhen the app is not on screen, we will aggressively attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a very noticeable impact on the battery of your device and should only be used if absolutely necessary.";
 
 /// libre link up follower settings, no active sensor
 "settingsviews_libreLinkUpNoActiveSensor" = "No active sensor data";
 
 /// data source settings, keep-alive mode is set to disabled
-"settingsviews_followerKeepAliveTypeDisabledMessage" = "Background keep-alive is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeDisabledMessage" = "Håll aktiv is disabled.\n\nWhen the app is not on screen, no alarms, app badges, notifications or BG updates will take place.\n\nThe app will remain sleeping until you open it again.\n\nThis mode has very little impact on the battery of your device.";
 
 /// Settings screen for loop delay, explanatory text for value
 "expanatoryTextSelectValue" = "Delay in minutes, applied to readings shared with OS-AID";
@@ -188,10 +193,10 @@
 "settingsviews_timeInRangeTypeStandardRange" = "Standard Range";
 
 /// statistics settings, the type of time in range selected
-"settingsviews_labelTimeInRangeType" = "Time In Range Type";
+"settingsviews_labelTimeInRangeType" = "Time In Range";
 
 /// data source settings, enable background keep alive
-"settingsviews_labelfollowerKeepAliveType" = "Background Keep-alive";
+"settingsviews_labelfollowerKeepAliveType" = "Håll aktiv";
 
 /// this setting is required
 "settingsviews_valueIsRequired" = "⚠️ Required";
@@ -199,7 +204,6 @@
 /// treatments settings, offset the carb treatments on main chart
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two calendar events, this is the pop up message - this is used for setting the interval between two calendar events, Speak readings, Apple Watch
-"settingsviews_CalenderIntervalMessage" = "Minimum interval between two calender events (mins)";
 
 /// When user creates new loopdelay, with a timestamp that already exists - this is the warning text
 "warningLoopDelayAlreadyExists" = "There is already a loopDelay for this time.";
@@ -208,7 +212,7 @@
 "settingsviews_timeInRangeTypeUserDefinedRange" = "User Range";
 
 /// CGM data source settings, section title
-"settingsviews_sectionTitleDataSource" = "CGM Data Source";
+"settingsviews_sectionTitleDataSource" = "Datakälla";
 
 /// follower settings, pop up that asks user to enter their username
 "settingsviews_enterUsername" = "Enter your username";
@@ -217,13 +221,12 @@
 "settingsviews_nightscoutNotEnabledRowText" = "Disabled";
 
 /// data source settings, keep-alive mode is set to use an external heartbeat
-"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Background keep-alive is set to use an external heartbeat. ❤️\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
+"settingsviews_followerKeepAliveTypeHeartbeatMessage" = "Håll aktiv is set to use an external heartbeat.\n\nWhen the app is not on screen, the external heartbeat will wake it up in the background so that BG updates are received and alarms can be triggered.\n\nMake sure you add a valid heartbeat device in the Bluetooth screen.\n\nThis mode has very little impact on the battery of your device but will only work if a valid heartbeat is running.";
 
 /// When enabled, readings will not be reading to shared user defaults (for loop)
 "suppressLoopShare" = "Suppress Loop Share";
 
 /// When clicking the event interval setting, a pop up asks for minimum number of minutes between two events, this is the pop up message - this is used for setting the interval between two calendar events
-"settingsviews_CalenderIntervalTitle" = "Event Interval";
 
 /// data source settings, enable Nightscout in the Nightscout section
 "settingsviews_nightscoutNotEnabled" = "Nightscout is disabled\n\nTo upload BG values to Nightscout, you must enable it in the Nightscout section.";
@@ -238,13 +241,14 @@
 "settingsviews_libreLinkUpReAcceptNeeded" = "Need to accept terms";
 
 /// When clicking the interval setting, a pop up asks for minimum number of minutes between two bg announcements, this is the pop up message - this is used for setting the interval between two readings in BG announcements, Speak readings, Apple Watch
-"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements (mins)";
+"settingsviews_SpeakIntervalMessage" = "Minimum interval between two voice announcements";
 
 /// home screen settings, should the mini-chart be shown
 "settingsviews_showMiniChart" = "Show Mini-Chart";
+"settingsviews_showSensorNoiseOnChart" = "Show Sensor Noise";
 
 /// data source settings, the name of the person we are following
-"settingsviews_followerPatientName" = "Patient Name";
+"settingsviews_followerPatientName" = "Alias";
 
 /// data source settings, keep-alive mode is set to disabled
 "settingsviews_followerKeepAliveTypeDisabled" = "Disabled";
@@ -268,28 +272,222 @@
 "settingsviews_labelFollowerDataSourceRegion" = "Region";
 
 /// data source settings, data source
-"settingsviews_labelFollowerDataSourceType" = "Data Source";
+"settingsviews_labelFollowerDataSourceType" = "Datakälla";
 
 /// data source settings, enable Nightscout upload
 "settingsviews_labelUploadDataToNightscout" = "Upload to Nightscout";
 
 /// data source settings, ask the user to enter the name of the person we are following if they want to - it's optional
-"settingsviews_followerPatientNameMessage" = "Here you can optionally write the name of the person you are following.";
+"settingsviews_followerPatientNameMessage" = "Here you can optionally write an alias for the person you are following.";
 
 /// follower settings, pop up that asks user to enter their password
 "settingsviews_enterPassword" = "Enter your password";
 
 /// The user needs to update their calendar permissions
-"infoCalendarAccessWriteOnly" = "You cannot use Calendar Events until you update the calendar access permission from 'Add Events Only' to 'Full Access'.\n\nGo to iPhone Settings > Apps > %@ > Calendars and select 'Full Access'.";
 
 /// data source settings, keep-alive mode is set to normal
-"settingsviews_followerKeepAliveTypeNormalMessage" = "Background keep-alive is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
+"settingsviews_followerKeepAliveTypeNormalMessage" = "Håll aktiv is set to normal operation.\n\nWhen the app is not on screen, we will attempt to keep it running for you in the background so that BG updates are received and alarms can be triggered.\n\nThis mode has a noticeable impact on the battery of your device.";
 
 /// home screen settings, should the screen be dimmed when the screen is locked
-"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dim Screen when Locked";
+"settingsviews_screenLockDimmingTypeWhenScreenIsLocked" = "Dämpning på låsskärm";
 
 /// Should loop data be shared only every 5 minutes
-"shareToLoopOnceEvery5Minutes" = "Share with OS-AID every 5 mins";
 
 /// screen dimming is very dark
 "settingsviews_screenLockDimmingTypeVeryDark" = "Very Dark";
+
+// MARK: - Automatic Housekeeping
+"settingsviews_dataManagementStorageInfo" = "Lagringsinfo";
+"settingsviews_dataManagementManageData" = "Hantera data";
+"settingsviews_dataManagementDataRetention" = "Datalagring";
+"settingsviews_dataManagementDataDeletion" = "Dataradering";
+"settingsviews_dataManagementImportData" = "Importera data";
+"settingsviews_dataManagementLastHousekeeping" = "Senaste rensning";
+"settingsviews_storageInfoDatabase" = "Databas";
+"settingsviews_storageInfoDatabaseSize" = "Databasstorlek";
+"settingsviews_storageInfoTrackedRecords" = "Räknade poster";
+"settingsviews_storageInfoDevices" = "Enheter";
+"settingsviews_storageInfoSensors" = "Sensorer";
+"settingsviews_storageInfoRetentionFooter" = "Den konfigurerade lagringsperioden är %d dagar.";
+"settingsviews_storageInfoHistory" = "Sparad historik";
+"settingsviews_storageInfoEarliestRecord" = "Äldsta post";
+"settingsviews_storageInfoLatestRecord" = "Senaste post";
+"settingsviews_storageInfoCheckingStatus" = "Kontrollerar lagring…";
+"settingsviews_nightscoutImportRetentionFooter" = "Importen begränsas till lagringsperioden på %d dagar. Äldre data tas bort vid rensning.";
+"settingsviews_cleanDataAutomaticHousekeeping" = "Automatisk rensning";
+"settingsviews_cleanDataKeepHistoricalData" = "Behåll historik";
+"settingsviews_cleanDataLastHousekeepingCompleted" = "Senast slutförd";
+"settingsviews_cleanDataLastHousekeepingResult" = "Senaste resultat";
+"settingsviews_cleanDataNoHousekeepingRequired" = "Ingen rensning behövs";
+"settingsviews_cleanDataAutomaticHousekeepingFooter" = "Körs högst en gång per dag när appen öppnas. Äldre mätningar, behandlingar och oanvända kalibreringar tas bort lokalt.";
+"settingsviews_cleanDataAutomaticHousekeepingDisabledFooter" = "Historiska data tas bara bort manuellt under Dataradering.";
+"settingsviews_cleanDataOneHousekeepingRecordRemoved" = "%@ post borttagen";
+"settingsviews_cleanDataHousekeepingRecordsRemoved" = "%@ poster borttagna";
+
+// MARK: - Clean Data
+"settingsviews_cleanData" = "Rensa data";
+"settingsviews_cleanDataStorageUsed" = "Använt lagringsutrymme";
+"settingsviews_cleanDataStoredData" = "Sparade data";
+"settingsviews_cleanDataBgReadings" = "Glukosvärden";
+"settingsviews_cleanDataTreatments" = "Behandlingar";
+"settingsviews_cleanDataCalibrations" = "Kalibreringar";
+"settingsviews_cleanDataSelectData" = "Data att radera";
+"settingsviews_cleanDataCleanupMethod" = "Rensningsmetod";
+"settingsviews_cleanDataKeepRecent" = "Behåll senaste";
+"settingsviews_cleanDataDateRange" = "Datumintervall";
+"settingsviews_cleanDataDeleteAll" = "Radera allt";
+"settingsviews_cleanDataKeep" = "Behåll";
+"settingsviews_cleanDataFrom" = "Från";
+"settingsviews_cleanDataUntil" = "Till";
+"settingsviews_cleanDataOlderDataFooter" = "Äldre data raderas. Aktuella data behålls.";
+"settingsviews_cleanDataInclusiveDatesFooter" = "Båda datumen ingår.";
+"settingsviews_cleanDataDeleteAllFooter" = "Alla valda data raderas.";
+"settingsviews_cleanDataContinue" = "Fortsätt";
+"settingsviews_cleanDataReviewFooter" = "Du får granska en sammanfattning innan något raderas.";
+"settingsviews_cleanDataPermanentDeletion" = "Permanent radering";
+"settingsviews_cleanDataCannotUndo" = "Detta går inte att ångra.";
+"settingsviews_cleanDataUnusedCalibrations" = "Oanvända kalibreringar";
+"settingsviews_cleanDataEarliestStoredData" = "Tidigaste sparade data";
+"settingsviews_cleanDataDataToDelete" = "Data som ska raderas";
+"settingsviews_cleanDataEnterCode" = "Ange den här sexsiffriga koden";
+"settingsviews_cleanDataSixDigitCode" = "Sexsiffrig kod";
+"settingsviews_cleanDataConfirmDelete" = "BEKRÄFTA RADERING";
+"settingsviews_cleanDataSuccessfullyDeleted" = "Data har raderats";
+"settingsviews_cleanDataCompleted" = "Slutfört";
+"settingsviews_cleanDataBgReadingsDeleted" = "Glukosvärden raderade";
+"settingsviews_cleanDataTreatmentsDeleted" = "Behandlingar raderade";
+"settingsviews_cleanDataStorageBefore" = "Lagring före";
+"settingsviews_cleanDataStorageAfter" = "Lagring efter";
+"settingsviews_cleanDataCleanupSummary" = "Rensningssammanfattning";
+"settingsviews_cleanDataDatabaseReuseFooter" = "Databasen kan behålla sin storlek och återanvända ledigt utrymme.";
+"settingsviews_cleanDataCheckingStatus" = "Kontrollerar data…";
+"settingsviews_cleanDataCountingStatus" = "Räknar data…";
+"settingsviews_cleanDataDeletingStatus" = "Raderar data permanent…\nHåll appen öppen.";
+"settingsviews_cleanDataInvalidDateRangeError" = "Startdatumet måste vara före slutdatumet.";
+"settingsviews_cleanDataNoSelectionError" = "Välj minst en datatyp.";
+"settingsviews_cleanDataNoMatchingDataError" = "Det finns inga valda data i intervallet.";
+"settingsviews_cleanDataChangedError" = "Data ändrades efter sammanfattningen. Granska dem igen.";
+"settingsviews_cleanDataDeleteFailedError" = "Valda data kunde inte raderas. Rensningen avbröts.";
+"settingsviews_cleanDataDays" = "%d dagar";
+"settingsviews_nightscoutImportCompleted" = "Nightscout-import slutförd";
+"settingsviews_nightscoutImportSummary" = "Importsammanfattning";
+"settingsviews_nightscoutImportURLMissing" = "Ingen Nightscout-URL är konfigurerad";
+"settingsviews_nightscoutImportConfigureURL" = "Konfigurera en Nightscout-URL i Nightscout-inställningarna innan du importerar data.";
+"settingsviews_nightscoutImportDownloaded" = "Hämtade";
+"settingsviews_nightscoutImportAdded" = "Tillagda";
+"settingsviews_nightscoutImportSkipped" = "Överhoppade";
+"settingsviews_nightscoutImportInvalid" = "Ogiltiga";
+"settingsviews_nightscoutImportSummaryFooter" = "Poster som redan lagrats lokalt hoppades över. Ogiltiga Nightscout-dokument importerades inte.";
+"settingsviews_nightscoutImportingData" = "Importerar data";
+"settingsviews_cleanDataConfirmationCode" = "Bekräftelsekod %@";
+"settingsviews_backupCreate" = "Skapa säkerhetskopia";
+"settingsviews_backupRestore" = "Återställ säkerhetskopia";
+"settingsviews_backupCreated" = "Säkerhetskopieringen har skapats";
+"settingsviews_backupRestored" = "Säkerhetskopieringen har återställts";
+"settingsviews_backupReplaceQuestion" = "Ersätta befintliga data?";
+"settingsviews_backupReplaceData" = "Byt ut data";
+"settingsviews_backupReplaceWarning" = "Befintliga blodsockeravläsningar och behandlingar inom backupdatumintervallen kommer att raderas innan backupen återställs.";
+"settingsviews_backupAndRestore" = "Säkerhetskopiera och återställa";
+"settingsviews_backupAppSettingsAndAlerts" = "Appinställningar och varningar";
+"settingsviews_backupEncrypt" = "Kryptera säkerhetskopiering";
+"settingsviews_backupAccounts" = "Säkerhetskopiera konton";
+"settingsviews_backupConfirmPassword" = "Bekräfta lösenord";
+"settingsviews_backupPasswordProtection" = "Lösenordsskydd";
+"settingsviews_backupPasswordProtectionFooter" = "Genom att lägga till lösenordsskydd kan konton som innehåller känsliga detaljer säkerhetskopieras.";
+"settingsviews_backupAccountDetailsFooter" = "Kontoinformation kan inkludera server-URL:er, användarnamn, lösenord och åtkomsttokens.";
+"settingsviews_backupCreateAndShare" = "Skapa och dela säkerhetskopia";
+"settingsviews_backupEncryptedCreationFooter" = "Krypterade säkerhetskopior tar längre tid att skapa. Håll appen öppen och ha tålamod.";
+"settingsviews_backupCreatedAt" = "Skapad";
+"settingsviews_backupEarliestData" = "Tidigast data";
+"settingsviews_backupSettingsAndAlerts" = "Inställningar och varningar";
+"settingsviews_backupAccountDetails" = "Kontouppgifter";
+"settingsviews_backupIncluded" = "Ingår";
+"settingsviews_backupNotIncluded" = "Ingår ej";
+"settingsviews_backupNotEnabled" = "Inte aktiverat";
+"settingsviews_backupSummary" = "Sammanfattning av säkerhetskopiering";
+"settingsviews_backupChooseFile" = "Välj Säkerhetskopiera fil";
+"settingsviews_backupFile" = "Säkerhetskopiera fil";
+"settingsviews_backupFileCheckFooter" = "Säkerhetskopieringen kontrolleras innan befintliga data ändras.";
+"settingsviews_backupSelected" = "Vald säkerhetskopiering";
+"settingsviews_backupPasswordRequired" = "Obligatoriskt";
+"settingsviews_backupUnlock" = "Lås upp säkerhetskopiering";
+"settingsviews_backupEncryptedNotice" = "Denna säkerhetskopia är krypterad och måste låsas upp.";
+"settingsviews_backupSettings" = "Inställningar";
+"settingsviews_backupRestoreOptions" = "Återställ alternativ";
+"settingsviews_backupDataHandling" = "Datahantering";
+"settingsviews_backupKeepCurrentData" = "Behåll aktuell data";
+"settingsviews_backupFillGaps" = "Fyll luckor";
+"settingsviews_backupReplaceRange" = "Byt ut Backup Range";
+"settingsviews_backupIgnoreData" = "Ignorera data";
+"settingsviews_backupRestoreSettingsAndAlerts" = "Återställ appinställningar och varningar";
+"settingsviews_backupRestoreAccounts" = "Återställ konton";
+"settingsviews_backupReplaceAndRestore" = "Ersätt och återställ";
+"settingsviews_backupRestoreSummary" = "Återställ sammanfattning";
+"settingsviews_backupBgReadingsAppliedFrom" = "BG-avläsningar tillämpas från";
+"settingsviews_backupBgReadingsAdded" = "BG-avläsningar tillagda";
+"settingsviews_backupBgReadingsSkipped" = "BG-avläsningar hoppade över";
+"settingsviews_backupTreatmentsAdded" = "Behandlingar tillagda";
+"settingsviews_backupTreatmentsSkipped" = "Behandlingar hoppade över";
+"settingsviews_backupSettingsRestored" = "Inställningar återställda";
+"settingsviews_backupAccountRestore" = "Kontoåterställning";
+"settingsviews_backupCreatingEncryptedStatus" = "Skapa och kryptera din säkerhetskopia på ett säkert sätt...\nHa tålamod.";
+"settingsviews_backupCreatingStatus" = "Skapar säkerhetskopia...";
+"settingsviews_backupCheckingStatus" = "Kontrollerar säkerhetskopiering...";
+"settingsviews_backupDecryptingStatus" = "Dekrypterar och kontrollerar din säkerhetskopia...\nVar tålamod.";
+"settingsviews_backupRestoringEncryptedStatus" = "Återställer din krypterade säkerhetskopia...\nVar tålamod.";
+"settingsviews_backupRestoringStatus" = "Återställer säkerhetskopian...";
+"settingsviews_backupErrorInvalidFile" = "Detta är inte en giltig säkerhetskopia av appen.";
+"settingsviews_backupErrorIncorrectPassword" = "Lösenordet är felaktigt eller så är den skyddade säkerhetskopian skadad.";
+"settingsviews_backupErrorMissingPassword" = "Ange lösenordet som används för att skydda denna säkerhetskopia.";
+"settingsviews_nightscoutImportQuestion" = "Importera från Nightscout?";
+"settingsviews_nightscoutImportAction" = "Importera från Nightscout";
+"settingsviews_nightscoutImportDiscardQuestion" = "Släng sparad import?";
+"settingsviews_nightscoutImportDiscard" = "Släng import";
+"settingsviews_nightscoutImportDiscardSaved" = "Släng sparad import";
+"settingsviews_nightscoutImportDiscardMessage" = "Sparade förlopp kommer att tas bort. Importerad data förblir säkert lagrad och hoppas över om du börjar igen.";
+"settingsviews_nightscoutImportDataToImport" = "Data att importera";
+"settingsviews_nightscoutImportPeriod" = "Importperiod";
+"settingsviews_nightscoutImportExistingDataFooter" = "Befintlig lokal data bevaras. BG-avläsningar inom 30 sekunder efter en befintlig avläsning och behandlingar som redan identifierats av Nightscout hoppas över.";
+"settingsviews_nightscoutImportKeepOpenFooter" = "Håll appen öppen tills importen är klar. Förloppet sparas efter varje slutförd batch, så en avbruten import kan återupptas.";
+"settingsviews_nightscoutImportPeriodLabel" = "Period";
+"settingsviews_nightscoutImportCompletedBatches" = "Avslutade partier";
+"settingsviews_nightscoutImportResume" = "Återuppta import";
+"settingsviews_nightscoutImportSaved" = "Sparad import";
+"settingsviews_nightscoutImportUnsupportedFooter" = "Denna import använder en period som inte stöds. Släng den för att börja om.";
+"settingsviews_nightscoutImportExceedsRetentionFooter" = "Denna import överskrider din nuvarande lagringsperiod. Släng den för att börja om.";
+"settingsviews_nightscoutImportResumeFooter" = "Den tidigare importen stoppades innan alla begärda batcher slutfördes. Återuppta fortsätter från dess senast sparade kontrollpunkt.";
+"settingsviews_nightscoutImportPause" = "Pausa import";
+"settingsviews_nightscoutImportBgAndTreatments" = "BG-avläsningar och behandlingar";
+"settingsviews_nightscoutImportBgOnly" = "BG-värden";
+"settingsviews_nightscoutImportTreatmentsOnly" = "behandlingar";
+"settingsviews_nightscoutImportKeepAppOpen" = "Håll appen öppen.";
+"settingsviews_nightscoutImportPaused" = "Importen pausad";
+"settingsviews_nightscoutImportErrorNoSelection" = "Välj BG-avläsningar, behandlingar eller båda.";
+"settingsviews_nightscoutImportErrorUnsupportedPeriod" = "Den sparade importen använder en period som inte längre stöds. Släng det och börja om.";
+"settingsviews_nightscoutImportErrorRetention" = "Den valda importperioden överskrider den aktuella inställningen för datalagring.";
+"settingsviews_nightscoutImportErrorMissingURL" = "Ange en Nightscout-URL i Nightscout-inställningarna innan du startar en import.";
+"settingsviews_nightscoutImportErrorInvalidURL" = "Den konfigurerade Nightscout-URL:n är inte giltig. Kontrollera det i Nightscout-inställningarna och försök igen.";
+"settingsviews_nightscoutImportErrorCheckpointUnavailable" = "Den sparade Nightscout-importen kan inte längre återupptas. Starta en ny import.";
+"settingsviews_nightscoutImportErrorSiteChanged" = "Den konfigurerade Nightscout-webbplatsen har ändrats sedan denna import startade. Släng den sparade importen eller återställ den tidigare Nightscout-URL.";
+"settingsviews_nightscoutImportErrorAuthentication" = "Nightscout nekad tillträde. Kontrollera API-hemligheten eller åtkomsttoken i Nightscout-inställningarna.";
+"settingsviews_nightscoutImportErrorEndpoint" = "Nightscout-dataändpunkten hittades inte. Kontrollera den konfigurerade URL-adressen och webbplatsversionen.";
+"settingsviews_nightscoutImportErrorRateLimited" = "Nightscout tar emot för många förfrågningar. Vänta ett ögonblick och återuppta importen.";
+"settingsviews_nightscoutImportErrorInvalidResponse" = "Nightscout returnerade data som inte kunde läsas säkert. Inga data från den berörda batchen importerades.";
+"settingsviews_nightscoutImportErrorResponseLimit" = "En Nightscout-batch förblev för stor efter att ha delats upp i små tidsintervall. Inga trunkerade data importerades.";
+"settingsviews_backupCreatedWithAppVersion" = "Säkerhetskopiering skapad med appversion %@.";
+"settingsviews_backupErrorUnsupportedVersion" = "Backupformatversion %d stöds inte av den här versionen av appen.";
+"settingsviews_backupErrorFinalValueMismatch" = "Lagrade glukosvärden återger inte det säkerhetskopierade slutliga värdet för avläsning av %@.";
+"settingsviews_nightscoutImportBatchCount" = "%1$d av %2$d";
+"settingsviews_nightscoutImportBgAddedProgress" = "BG-värden har lagts till: %@";
+"settingsviews_nightscoutImportTreatmentsAddedProgress" = "Tillagda behandlingar: %@";
+"settingsviews_nightscoutImportConfirmation" = "Vill du importera de senaste %1$d dagarna av %2$@? Befintliga lokala register kommer att sparas och dubbletter hoppas över.";
+"settingsviews_nightscoutImportBatchProgress" = "Batch %1$d av %2$d";
+"settingsviews_nightscoutImportErrorServer" = "Nightscout returnerade ett tillfälligt serverfel (HTTP %d). Återuppta importen senare.";
+"settingsviews_nightscoutImportErrorUnexpectedStatus" = "Nightscout returnerade ett oväntat svar (HTTP %d).";
+"sensorNoiseSensitivity" = "Sensor Sensitivity";
+"sensorNoiseSensitivitySensitive" = "Sensitive";
+"sensorNoiseSensitivityNormal" = "Normal";
+"sensorNoiseSensitivityPermissive" = "Permissive";
+"settingsviews_followerServiceStatus" = "Status";
+"settingsviews_liveActivityDisabledInFollowerModeMessage" = "Live Activities are disabled in Follower Mode unless an external heartbeat is used for Håll aktiv.";
+"settingsviews_infoContactsKeepAliveDisabled" = "You are using Follower mode with Håll aktiv disabled.\n\nContact Image function cannot work without Håll aktiv.";

@@ -48,14 +48,6 @@ public class AlertManager: NSObject {
     // coredataManager instance
     private var coreDataManager: CoreDataManager
     
-    /// snooze times in minutes
-    private let snoozeValueMinutes = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 75, 90, 120, 150, 180, 240, 300, 360, 420, 480, 540, 600, 720, 1440, 10080]
-    
-    /// snooze times as shown to the user, actual strings will be replaced during init
-    private var snoozeValueStrings = ["5 minutes", "10 minutes", "15 minutes", "20 minutes", "25 minutes", "30 minutes", "35 minutes",
-                                      "40 minutes", "45 minutes", "50 minutes", "55 minutes", "1 hour", "1 hour 15 minutes", "1,5 hours", "2 hours", "2,5 hours", "3 hours", "4 hours",
-                                      "5 hours", "6 hours", "7 hours", "8 hours", "9 hours", "10 hours", "12 hours", "1 day", "1 week"]
-    
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground - for closure that will stop playing sound
     private let applicationManagerKeyStopPlayingSound = "AlertManager-stopplayingsound"
     
@@ -77,11 +69,6 @@ public class AlertManager: NSObject {
         
         // initialize snoozeparameters
         self.snoozeParameters = SnoozeParametersAccessor(coreDataManager: coreDataManager).getSnoozeParameters()
-        
-        // in snoozeValueStrings, replace all occurrences of minutes, minute, etc... by language dependent value
-        for (index, _) in ConstantsAlerts.snoozeValueStrings.enumerated() {
-            snoozeValueStrings[index] = snoozeValueStrings[index].replacingOccurrences(of: "minutes", with: Texts_Common.minutes).replacingOccurrences(of: "hours", with: Texts_Common.hours).replacingOccurrences(of: "hour", with: Texts_Common.hour).replacingOccurrences(of: "day", with: Texts_Common.day).replacingOccurrences(of: "week", with: Texts_Common.week)
-        }
         
         //  initialize array of alertNotifications
         initAlertNotificationIdentiferArray()
@@ -320,15 +307,15 @@ public class AlertManager: NSObject {
         let defaultSnoozePeriodInMinutes = Int(alertEntriesAccessor.getCurrentAndNextAlertEntry(forAlertKind: alertKind, forWhen: Date(), alertTypesAccessor: alertTypesAccessor).currentAlertEntry.alertType.snoozeperiod)
         
         var defaultRow = 0
-        for (index, _) in snoozeValueMinutes.enumerated() {
-            if snoozeValueMinutes[index] > defaultSnoozePeriodInMinutes {
+        for (index, _) in ConstantsAlerts.snoozeValueMinutes.enumerated() {
+            if ConstantsAlerts.snoozeValueMinutes[index] > defaultSnoozePeriodInMinutes {
                 break
             } else {
                 defaultRow = index
             }
         }
         
-        return PickerViewData(withMainTitle: alertKind.alertTitle(), withSubTitle: Texts_Alerts.selectSnoozeTime, withData: snoozeValueStrings, selectedRow: defaultRow, withPriority: .high, actionButtonText: Texts_Common.Ok, cancelButtonText: Texts_Common.Cancel, isFullScreen: true,
+        return PickerViewData(withMainTitle: alertKind.alertTitle(), withSubTitle: Texts_Alerts.selectSnoozeTime, withData: ConstantsAlerts.snoozeValueStrings, selectedRow: defaultRow, withPriority: .high, actionButtonText: Texts_Alerts.snooze, cancelButtonText: Texts_Common.Cancel, isFullScreen: true,
                               onActionClick: {
                                   (snoozeIndex: Int) in
             
@@ -338,7 +325,7 @@ public class AlertManager: NSObject {
                                   }
             
                                   // get snooze period
-                                  let snoozePeriod = self.snoozeValueMinutes[snoozeIndex]
+                                  let snoozePeriod = ConstantsAlerts.snoozeValueMinutes[snoozeIndex]
             
                                   // snooze
                                   trace("    snoozing alert '%{public}@' for %{public}@ minutes (1)", log: self.log, category: ConstantsLog.categoryAlertManager, type: .info, alertKind.descriptionForLogging(), snoozePeriod.description)
@@ -611,8 +598,8 @@ public class AlertManager: NSObject {
                     var previousValueInUserUnit = 0.0
                     var actualValueInUserUnit = 0.0
                     
-                    previousValueInUserUnit = bgReadings[1].calculatedValue.mgDlToMmol(mgDl: isMgDl)
-                    actualValueInUserUnit = bgReadings[0].calculatedValue.mgDlToMmol(mgDl: isMgDl)
+                    previousValueInUserUnit = bgReadings[1].finalValue.mgDlToMmol(mgDl: isMgDl)
+                    actualValueInUserUnit = bgReadings[0].finalValue.mgDlToMmol(mgDl: isMgDl)
                     
                     // if the values are in mmol/L, then round them to the nearest decimal point in order to get the same precision out of the next operation
                     if !isMgDl {
@@ -630,7 +617,7 @@ public class AlertManager: NSObject {
                 var bgReadingDatesAsDouble: [Double] = []
                 
                 for bgReading in bgReadings {
-                    bgReadingValues.append(bgReading.calculatedValue)
+                    bgReadingValues.append(bgReading.finalValue)
                     bgReadingDatesAsDouble.append(bgReading.timeStamp.timeIntervalSince1970)
                 }
                 
@@ -643,10 +630,14 @@ public class AlertManager: NSObject {
                 content.userInfo = userInfo
             }
             
-            // add a small BG chart image as an attachment to the notification content
-            let thumbnailAttachment = try! UNNotificationAttachment(identifier: "thumbnail", url: URL.documentsDirectory.appendingPathComponent("\(ConstantsGlucoseChartSwiftUI.filenameNotificationThumbnailImage).png"), options: [UNNotificationAttachmentOptionsThumbnailHiddenKey: false])
-            
-            content.attachments = [thumbnailAttachment]
+            // Add the chart thumbnail when available, but do not let a missing
+            // or invalid image crash the reading pipeline before downstream sync.
+            do {
+                let thumbnailAttachment = try UNNotificationAttachment(identifier: "thumbnail", url: URL.documentsDirectory.appendingPathComponent("\(ConstantsGlucoseChartSwiftUI.filenameNotificationThumbnailImage).png"), options: [UNNotificationAttachmentOptionsThumbnailHiddenKey: false])
+                content.attachments = [thumbnailAttachment]
+            } catch {
+                trace("in checkAlerts, failed to attach notification thumbnail: %{public}@", log: log, category: ConstantsLog.categoryAlertManager, type: .error, error.localizedDescription)
+            }
             
             // if snooze from notification in homescreen is needed then set the categoryIdentifier
             if applicableAlertType.snooze {

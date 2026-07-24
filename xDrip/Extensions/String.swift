@@ -1,5 +1,5 @@
-import CryptoSwift
-import UIKit
+import CryptoKit
+import Foundation
 
 extension String {
     // https://stackoverflow.com/questions/39677330/how-does-string-substring-work-in-swift
@@ -58,36 +58,13 @@ extension String {
     }
     
     func sha1() -> String {
-        // sha1() here is a function in CryptoSwift Library
-        return Data(self.utf8).sha1().hexEncodedString()
+        // CryptoKit returns a digest sequence; keep the previous lowercase hex string format.
+        return Insecure.SHA1.hash(data: Data(self.utf8)).map { String(format: "%02x", $0) }.joined()
     }
         
     func sha256() -> String {
-        // sha256() here is a function in CryptoSwift Library
-        return Data(self.utf8).sha256().hexEncodedString()
-    }
-    
-    /// creates uicolor interpreting hex as hex color code, example #CED430
-    func hexStringToUIColor() -> UIColor {
-        var cString: String = self.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-        
-        if cString.hasPrefix("#") {
-            cString.remove(at: cString.startIndex)
-        }
-        
-        if (cString.count) != 6 {
-            return UIColor.gray
-        }
-        
-        var rgbValue: UInt64 = 0
-        Scanner(string: cString).scanHexInt64(&rgbValue)
-        
-        return UIColor(
-            red: CGFloat((rgbValue & 0xFF0000) >> 16) / 255.0,
-            green: CGFloat((rgbValue & 0x00FF00) >> 8) / 255.0,
-            blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
-            alpha: CGFloat(1.0)
-        )
+        // CryptoKit returns a digest sequence; keep the previous lowercase hex string format.
+        return SHA256.hash(data: Data(self.utf8)).map { String(format: "%02x", $0) }.joined()
     }
     
     /// checks if string length is > 0 and if so returns self, otherwise returns nil

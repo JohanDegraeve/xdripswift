@@ -12,7 +12,7 @@ extension BgReading {
         "Trend" : slopeOrdinal(),
         "ST" : date,
         "DT" : date,
-        "Value" : round(calculatedValue),
+        "Value" : round(finalValue),
         "direction" : slopeName
         ]
     

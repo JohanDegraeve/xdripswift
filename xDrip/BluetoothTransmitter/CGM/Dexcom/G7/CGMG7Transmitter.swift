@@ -394,7 +394,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
                 if let dexcomG7BackfillMessage = DexcomG7BackfillMessage(data: value, sensorAge: sensorAge) {
                     trace("    received backfill mesage, calculatedValue = %{public}@, timeStamp = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, dexcomG7BackfillMessage.calculatedValue.description, dexcomG7BackfillMessage.timeStamp.description(with: .current))
 
-                    let newBackfillGlucoseData = GlucoseData(timeStamp: dexcomG7BackfillMessage.timeStamp, glucoseLevelRaw: dexcomG7BackfillMessage.calculatedValue)
+                    let newBackfillGlucoseData = GlucoseData(timeStamp: dexcomG7BackfillMessage.timeStamp, glucoseLevelRaw: dexcomG7BackfillMessage.calculatedValue, backfilledAt: Date())
 
                     backfill.append(newBackfillGlucoseData)
 
@@ -643,7 +643,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
         for raw in pendingBackfillRawFrames {
             if let message = DexcomG7BackfillMessage(data: raw, sensorAge: sensorAge) {
-                let glucoseDataItem = GlucoseData(timeStamp: message.timeStamp, glucoseLevelRaw: message.calculatedValue)
+                let glucoseDataItem = GlucoseData(timeStamp: message.timeStamp, glucoseLevelRaw: message.calculatedValue, backfilledAt: Date())
                 backfill.append(glucoseDataItem)
                 delivered.append(glucoseDataItem)
                 trace("    received backfill mesage (deferred parse), calculatedValue = %{public}@, timeStamp = %{public}@", log: log, category: ConstantsLog.categoryCGMG7, type: .info, message.calculatedValue.description, message.timeStamp.description(with: .current))
@@ -668,7 +668,7 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
 
         pendingBackfillRawFrames.removeAll(keepingCapacity: true)
     }
-    
+
     private func flushBackfillDeliveringToDelegate() {
         guard backfill.isEmpty == false else { return }
         // sort backfill, first element should be youngest

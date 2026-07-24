@@ -161,6 +161,16 @@ struct LiveActivityViewContent : View {
                     GlucoseChartView(glucoseChartType: .liveActivity, bgReadingValues: context.state.bgReadingValues, bgReadingDates: context.state.bgReadingDates, isMgDl: context.state.isMgDl, urgentLowLimitInMgDl: context.state.urgentLowLimitInMgDl, lowLimitInMgDl: context.state.lowLimitInMgDl, highLimitInMgDl: context.state.highLimitInMgDl, urgentHighLimitInMgDl: context.state.urgentHighLimitInMgDl, liveActivityType: .large, hoursToShowScalingHours: nil, glucoseCircleDiameterScalingHours: nil, overrideChartHeight: nil, overrideChartWidth: nil, highContrast: nil)
                     
                     HStack(alignment: .center) {
+                        if let sensorNoiseIndicatorColor = context.state.sensorNoiseIndicatorColor() {
+                            Circle()
+                                .fill(sensorNoiseIndicatorColor)
+                                .frame(width: 8, height: 8)
+                                .overlay {
+                                    Circle()
+                                        .stroke(sensorNoiseIndicatorColor.opacity(0.35), lineWidth: 3)
+                                }
+                        }
+
                         // if we're in follower mode and a patient name exists, let's use it with preference over the data source     
                         Text(context.state.followerPatientName ?? context.state.dataSourceDescription)
                             .font(.caption).bold()
@@ -197,5 +207,4 @@ struct LiveActivityViewContent : View {
         }
     }
 }
-
 

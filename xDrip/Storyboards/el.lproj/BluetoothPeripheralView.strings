@@ -31,7 +31,11 @@
 "confirmDisconnectMessage" = "Κάντε κλικ στο «Αποσύνδεση» για να επιβεβαιώσετε την αποσύνδεση από τον πομπό.";
 "transmittterStartDate" = "Έναρξη πομπού";
 "sensorStartDate" = "Έναρξη αισθητήρα";
-"useOtherDexcomApp" = "Ακόλουθος εφαρμογής Dexcom";
+"useOtherDexcomApp" = "Λειτουργία συνύπαρξης";
+"useOtherDexcomAppCoexistenceFooter" = "Η λειτουργία συνύπαρξης μας επιτρέπει να λειτουργούμε με άλλη εφαρμογή, όπως Dexcom ή CamAPS. Η εφαρμογή αυτή πρέπει να συνεχίσει να εκτελείται στο παρασκήνιο.";
+"useOtherDexcomAppPrimaryFooter" = "Η κύρια λειτουργία συνδέεται ως κύρια εφαρμογή και ελέγχει τη σύνδεση.";
+"runningInCoexistenceMode" = "Εκτελείται σε λειτουργία συνύπαρξης";
+"runningInPrimaryMode" = "Εκτελείται σε κύρια λειτουργία";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
