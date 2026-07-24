@@ -141,7 +141,11 @@ struct GlucoseReportClinicalPageView: View {
             HStack(spacing: 8) {
                 qualityRow(title: configuration.text(.cgmSource), value: cgmSourceText)
                 qualityRow(title: configuration.text(.currentSensor), value: currentSensorText)
-                qualityRow(title: configuration.text(.sensorsInPeriod), value: analytics.sensorCount > 0 ? "\(analytics.sensorCount)" : "-")
+                qualityRow(
+                    title: configuration.text(.sensorsInPeriod),
+                    value: analytics.sensorCount > 0 ? "\(analytics.sensorCount)" : "-",
+                    detail: averageSensorDurationText
+                )
                 qualityRow(title: configuration.text(.calibrations), value: "\(analytics.calibrationCount)")
             }
 
@@ -170,6 +174,12 @@ struct GlucoseReportClinicalPageView: View {
         }
 
         return description
+    }
+
+    private var averageSensorDurationText: String? {
+        guard let averageSensorDuration = analytics.averageSensorDuration else { return nil }
+
+        return "(" + configuration.text(.averageSensorDurationFormat, GlucoseReportFormatting.compactDuration(averageSensorDuration)) + ")"
     }
 
     private var footer: some View {
@@ -239,7 +249,7 @@ struct GlucoseReportClinicalPageView: View {
         .clipShape(RoundedRectangle(cornerRadius: 6))
     }
 
-    private func qualityRow(title: String, value: String) -> some View {
+    private func qualityRow(title: String, value: String, detail: String? = nil) -> some View {
         VStack(alignment: .leading, spacing: 3) {
             Text(title.uppercased())
                 .font(.system(size: 7.5, weight: .semibold))
@@ -249,6 +259,13 @@ struct GlucoseReportClinicalPageView: View {
                 .foregroundStyle(GlucoseReportColors.primaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
+            if let detail {
+                Text(detail)
+                    .font(.system(size: 6.7))
+                    .foregroundStyle(GlucoseReportColors.tertiaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.65)
+            }
         }
         .padding(8)
         .frame(maxWidth: .infinity, alignment: .leading)

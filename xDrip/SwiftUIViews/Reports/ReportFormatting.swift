@@ -76,6 +76,10 @@ enum GlucoseReportFormatting {
         return formatter.string(from: date)
     }
 
+    static func compactDuration(_ duration: TimeInterval) -> String {
+        (duration / 60).minutesToDaysAndHours()
+    }
+
     static func hoursPerDay(from percentage: Double, language: GlucoseReportLanguage) -> String {
         let totalMinutes = Int((percentage / 100 * 24 * 60).rounded())
         let hours = totalMinutes / 60
