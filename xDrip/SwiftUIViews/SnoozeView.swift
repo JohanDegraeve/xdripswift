@@ -73,18 +73,9 @@ struct SnoozeView: View {
             
             if !viewModel.showAllSnoozedImage {
                 ForEach(viewModel.rows) { row in
-                    Section(header: sectionHeader(title: row.sectionTitle)) {
-                        Toggle(isOn: Binding(
-                            get: { row.isSnoozed },
-                            set: { isOn in
-                                viewModel.handleAlertToggleChanged(alertKind: row.alertKind, isOn: isOn)
-                            }
-                        )) {
-                            Text(row.statusText)
-                                .foregroundStyle(row.statusTextColor)
-                        }
-                        .tint(.green)
-                        .listRowBackground(row.isSnoozed ? ConstantsUI.warningSectionBackgroundColor : ConstantsAppColors.groupedBackground)
+                    Section(header: alarmSectionHeader(title: row.sectionTitle)) {
+                        alarmRow(for: row)
+                            .listRowBackground(row.isSnoozed ? ConstantsUI.warningSectionBackgroundColor : Color(.secondarySystemGroupedBackground))
                     }
                 }
             }
@@ -109,8 +100,25 @@ struct SnoozeView: View {
         return viewModel.bannerBackgroundColor
     }
     
-    @ViewBuilder private func sectionHeader(title: String) -> some View {
+    @ViewBuilder private func alarmRow(for row: SnoozeViewModel.Row) -> some View {
+        // Keep the row content focused on current snooze state. The alarm name stays
+        // in the section header so the grouped layout matches the other SwiftUI screens.
+        Toggle(isOn: Binding(
+            get: { row.isSnoozed },
+            set: { isOn in
+                viewModel.handleAlertToggleChanged(alertKind: row.alertKind, isOn: isOn)
+            }
+        )) {
+            Text(row.statusText)
+                .foregroundStyle(row.statusTextColor)
+                .padding(.vertical, 6)
+        }
+        .tint(.green)
+    }
+    
+    @ViewBuilder private func alarmSectionHeader(title: String) -> some View {
         Text(title)
+            .textCase(nil)
             .foregroundStyle(ConstantsUI.sectionHeaderColor)
     }
     
