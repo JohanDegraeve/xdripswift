@@ -184,6 +184,7 @@ struct GlucoseReportAnalytics {
     let trendPoints: [GlucoseReportTrendPoint]
     let deviceNames: [String]
     let sensorCount: Int
+    let averageSensorDuration: TimeInterval?
     let calibrationCount: Int
     let lowEventCount: Int
     let veryLowEventCount: Int
@@ -439,6 +440,7 @@ enum GlucoseReportText {
     case storedCGMReadings
     case currentSensor
     case sensorsInPeriod
+    case averageSensorDurationFormat
     case calibrations
     case firstReading
     case lastReading
@@ -490,6 +492,7 @@ enum GlucoseReportText {
         case .storedCGMReadings: return "Stored CGM readings"
         case .currentSensor: return "Current Sensor"
         case .sensorsInPeriod: return "Sensors in Period"
+        case .averageSensorDurationFormat: return "average %@ per sensor"
         case .calibrations: return "Calibrations"
         case .firstReading: return "First Reading"
         case .lastReading: return "Last Reading"
@@ -543,6 +546,7 @@ enum GlucoseReportText {
         case .storedCGMReadings: return "Lecturas MCG almacenadas"
         case .currentSensor: return "Sensor Actual"
         case .sensorsInPeriod: return "Sensores en el Periodo"
+        case .averageSensorDurationFormat: return "media %@ por sensor"
         case .calibrations: return "Calibraciones"
         case .firstReading: return "Primera Lectura"
         case .lastReading: return "Última Lectura"
@@ -596,6 +600,7 @@ enum GlucoseReportText {
         case .storedCGMReadings: return "Lectures MCG stockées"
         case .currentSensor: return "Capteur Actuel"
         case .sensorsInPeriod: return "Capteurs sur la Période"
+        case .averageSensorDurationFormat: return "moyenne %@ par capteur"
         case .calibrations: return "Étalonnages"
         case .firstReading: return "Première Lecture"
         case .lastReading: return "Dernière Lecture"
@@ -649,6 +654,7 @@ enum GlucoseReportText {
         case .storedCGMReadings: return "Opgeslagen CGM-metingen"
         case .currentSensor: return "Huidige Sensor"
         case .sensorsInPeriod: return "Sensoren in Periode"
+        case .averageSensorDurationFormat: return "gemiddeld %@ per sensor"
         case .calibrations: return "Kalibraties"
         case .firstReading: return "Eerste Meting"
         case .lastReading: return "Laatste Meting"
@@ -702,6 +708,7 @@ enum GlucoseReportText {
         case .storedCGMReadings: return "Gespeicherte CGM-Messwerte"
         case .currentSensor: return "Aktueller Sensor"
         case .sensorsInPeriod: return "Sensoren im Zeitraum"
+        case .averageSensorDurationFormat: return "durchschnittlich %@ pro Sensor"
         case .calibrations: return "Kalibrierungen"
         case .firstReading: return "Erster Messwert"
         case .lastReading: return "Letzter Messwert"
@@ -755,6 +762,7 @@ enum GlucoseReportText {
         case .storedCGMReadings: return "Letture CGM memorizzate"
         case .currentSensor: return "Sensore Attuale"
         case .sensorsInPeriod: return "Sensori nel Periodo"
+        case .averageSensorDurationFormat: return "media %@ per sensore"
         case .calibrations: return "Calibrazioni"
         case .firstReading: return "Prima Lettura"
         case .lastReading: return "Ultima Lettura"
@@ -808,6 +816,7 @@ enum GlucoseReportText {
         case .storedCGMReadings: return "Leituras MCG armazenadas"
         case .currentSensor: return "Sensor Atual"
         case .sensorsInPeriod: return "Sensores no Período"
+        case .averageSensorDurationFormat: return "média %@ por sensor"
         case .calibrations: return "Calibrações"
         case .firstReading: return "Primeira Leitura"
         case .lastReading: return "Última Leitura"

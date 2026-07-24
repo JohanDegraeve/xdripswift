@@ -32,7 +32,11 @@ public final class StatisticsManager: @unchecked Sendable {
         let valueMgDl: Double
         let deviceName: String?
         let sensorID: String?
-        let hasCalibration: Bool
+    }
+
+    private struct ReportSensorSummary {
+        let count: Int
+        let averageDuration: TimeInterval?
     }
 
     private struct CGMWindowCache {
@@ -315,6 +319,7 @@ public final class StatisticsManager: @unchecked Sendable {
                 return name?.isEmpty == false ? name : nil
             })
         ).sorted()
+        let reportSensorSummary = sensorSummary(fromDate: periodStart, toDate: periodEnd)
 
         return GlucoseReportAnalytics(
             periodStart: periodStart,
@@ -335,8 +340,9 @@ public final class StatisticsManager: @unchecked Sendable {
             dailySummaries: makeDailySummaries(samples: samples, periodEnd: periodEnd, periodDays: configuration.period.rawValue),
             trendPoints: makeTrendPoints(samples: samples),
             deviceNames: deviceNames,
-            sensorCount: Set(samples.compactMap(\.sensorID)).count,
-            calibrationCount: samples.filter(\.hasCalibration).count,
+            sensorCount: reportSensorSummary.count,
+            averageSensorDuration: reportSensorSummary.averageDuration,
+            calibrationCount: calibrationCount(fromDate: periodStart, toDate: periodEnd),
             lowEventCount: countEvents(samples: samples, threshold: GlucoseReportClinicalConstants.timeInRangeLowMgDl, isBelow: true),
             veryLowEventCount: countEvents(samples: samples, threshold: GlucoseReportClinicalConstants.veryLowMgDl, isBelow: true),
             highEventCount: countEvents(samples: samples, threshold: GlucoseReportClinicalConstants.timeInRangeHighMgDl, isBelow: false),
@@ -385,8 +391,7 @@ public final class StatisticsManager: @unchecked Sendable {
                         date: reading.timeStamp,
                         valueMgDl: reading.finalValue,
                         deviceName: reading.deviceName,
-                        sensorID: reading.sensor?.id,
-                        hasCalibration: reading.calibration != nil
+                        sensorID: reading.sensor?.id
                     )
                 }
             } catch {
@@ -395,6 +400,89 @@ public final class StatisticsManager: @unchecked Sendable {
         }
 
         return samples
+    }
+
+    private func sensorSummary(fromDate: Date, toDate: Date) -> ReportSensorSummary {
+        let intervals = normalizedSensorIntervals(fromDate: fromDate, toDate: toDate)
+        guard !intervals.isEmpty else {
+            return ReportSensorSummary(count: 0, averageDuration: nil)
+        }
+
+        let totalDuration = intervals.reduce(0) { duration, interval in
+            duration + interval.end.timeIntervalSince(interval.start)
+        }
+
+        return ReportSensorSummary(
+            count: intervals.count,
+            averageDuration: totalDuration / Double(intervals.count)
+        )
+    }
+
+    private func normalizedSensorIntervals(fromDate: Date, toDate: Date) -> [(start: Date, end: Date)] {
+        let context = coreDataManager.privateManagedObjectContext
+        var intervals: [(start: Date, end: Date)] = []
+
+        context.performAndWait {
+            let fetchRequest: NSFetchRequest<Sensor> = Sensor.fetchRequest()
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Sensor.startDate), ascending: true)]
+            fetchRequest.predicate = NSPredicate(
+                format: "startDate < %@ AND (endDate == nil OR endDate > %@)",
+                toDate as NSDate,
+                fromDate as NSDate
+            )
+            fetchRequest.returnsObjectsAsFaults = false
+            fetchRequest.includesPropertyValues = true
+
+            do {
+                intervals = try context.fetch(fetchRequest).compactMap { sensor in
+                    let clippedStart = max(sensor.startDate, fromDate)
+                    let clippedEnd = min(sensor.endDate ?? toDate, toDate)
+
+                    guard clippedEnd > clippedStart else { return nil }
+
+                    return (start: clippedStart, end: clippedEnd)
+                }
+            } catch {
+                trace("in StatisticsManager.normalizedSensorIntervals, Unable to execute Sensor fetch request: %{public}@", log: OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataSensors), category: ConstantsLog.categoryApplicationDataSensors, type: .error, error.localizedDescription)
+            }
+        }
+
+        guard let firstInterval = intervals.first else { return [] }
+
+        // Sensor metadata can contain duplicate or overlapping rows after transmitter imports,
+        // Nightscout sync, or manual repair. Merge overlaps so the report describes effective
+        // sensor periods instead of raw Core Data rows.
+        let mergeTolerance: TimeInterval = .minutes(30)
+        return intervals.dropFirst().reduce(into: [firstInterval]) { merged, interval in
+            guard let last = merged.last else {
+                merged.append(interval)
+                return
+            }
+
+            if interval.start <= last.end.addingTimeInterval(mergeTolerance) {
+                merged[merged.count - 1] = (start: last.start, end: max(last.end, interval.end))
+            } else {
+                merged.append(interval)
+            }
+        }
+    }
+
+    private func calibrationCount(fromDate: Date, toDate: Date) -> Int {
+        let context = coreDataManager.privateManagedObjectContext
+        var count = 0
+
+        context.performAndWait {
+            let fetchRequest: NSFetchRequest<Calibration> = Calibration.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "timeStamp > %@ AND timeStamp < %@", fromDate as NSDate, toDate as NSDate)
+
+            do {
+                count = try context.count(for: fetchRequest)
+            } catch {
+                trace("in StatisticsManager.calibrationCount, Unable to execute Calibration count request: %{public}@", log: OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataCalibrations), category: ConstantsLog.categoryApplicationDataCalibrations, type: .error, error.localizedDescription)
+            }
+        }
+
+        return count
     }
 
     private func filteredRootStatisticValues(samples: [CGMSample], isMgDl: Bool) -> [Double] {
@@ -610,6 +698,7 @@ public final class StatisticsManager: @unchecked Sendable {
             trendPoints: [],
             deviceNames: [],
             sensorCount: 0,
+            averageSensorDuration: nil,
             calibrationCount: 0,
             lowEventCount: 0,
             veryLowEventCount: 0,

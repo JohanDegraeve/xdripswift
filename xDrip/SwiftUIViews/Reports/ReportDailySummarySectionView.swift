@@ -261,7 +261,7 @@ struct GlucoseReportMetricTrendSectionView: View {
                 }
             }
             .chartXAxis {
-                AxisMarks(values: xTickDates) { axisValue in
+                AxisMarks(values: monthTickDates) { axisValue in
                     AxisGridLine()
                         .foregroundStyle(GlucoseReportColors.rule.opacity(0.7))
                     AxisValueLabel {
@@ -308,10 +308,26 @@ struct GlucoseReportMetricTrendSectionView: View {
         return startDate ... paddedEndDate
     }
 
-    private var xTickDates: [Date] {
-        return trendPoints
-            .filter { $0.interval == .weekly }
-            .map(\.date)
+    private var monthTickDates: [Date] {
+        guard !trendPoints.isEmpty else { return [] }
+
+        let calendar = Calendar.current
+        let domain = xDomain
+        let startComponents = calendar.dateComponents([.year, .month], from: domain.lowerBound)
+        guard var month = calendar.date(from: startComponents) else { return [] }
+
+        if month < domain.lowerBound {
+            month = calendar.date(byAdding: .month, value: 1, to: month) ?? month
+        }
+
+        var ticks: [Date] = []
+        while month <= domain.upperBound {
+            ticks.append(month)
+            guard let nextMonth = calendar.date(byAdding: .month, value: 1, to: month) else { break }
+            month = nextMonth
+        }
+
+        return ticks
     }
 
     private func yAxisValues(for domain: ClosedRange<Double>) -> [Double] {
