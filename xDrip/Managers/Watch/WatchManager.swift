@@ -194,6 +194,7 @@ final class WatchManager: NSObject, ObservableObject {
         status.sensorMaxAgeInMinutes = (UserDefaults.standard.activeSensorMaxSensorAgeInDays ?? 0) * 24 * 60
 
         if status.isMaster,
+           UserDefaults.standard.showSensorNoise,
            let activeSensor = sensorsAccessor.fetchActiveSensor(),
            activeSensor.noiseAlgorithmVersion == ConstantsSensorNoise.algorithmVersion,
            let latestReadingAt = activeSensor.noiseLatestReadingAt {

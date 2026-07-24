@@ -122,7 +122,7 @@
 "settingsviews_homeScreenScreenLockSectionTitle" = "Bloqueo de pantalla";
 "settingsviews_homeScreenScreenLockSectionFooter" = "Estas opciones controlan cómo se comporta la pantalla de Inicio cuando la app queda abierta o bloqueada.";
 "settingsviews_showMiniChart" = "Mostrar la mini-gráfica";
-"settingsviews_showSensorNoiseOnChart" = "Mostrar ruido del sensor";
+"settingsviews_showSensorNoise" = "Mostrar ruido del sensor";
 "settingsviews_Version" = "Versión";
 "settingsviews_license" = "Licencia";
 "m5stack_settingsviews_settingstitle" = "Configuración M5 Stack";

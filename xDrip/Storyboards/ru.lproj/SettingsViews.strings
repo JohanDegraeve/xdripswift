@@ -19,7 +19,7 @@
 "settingsviews_multipleAppBadgeValueWith10" = "Бейдж приложения x10";
 "settingsviews_allowScreenRotation" = "Поворот графика";
 "settingsviews_showMiniChart" = "Показать мини-диаграмму";
-"settingsviews_showSensorNoiseOnChart" = "Показывать шум сенсора";
+"settingsviews_showSensorNoise" = "Показывать шум сенсора";
 "settingsviews_showClockWhenScreenIsLocked" = "Часы на экране блокировки";
 "settingsviews_urgentHighValue" = "Очень высокий уровень";
 "settingsviews_highValue" = "Высокий уровень";

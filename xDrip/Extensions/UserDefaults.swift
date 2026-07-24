@@ -130,8 +130,8 @@ extension UserDefaults {
         case allowMainChartAutoReset = "allowMainChartAutoReset"
         /// should the original glucose values be shown on the main chart when post processing is enabled?
         case showOriginalBGReadings = "showOriginalBGReadings"
-        /// should short-term sensor noise bands be shown on the main chart?
-        case showSensorNoiseOnChart = "showSensorNoiseOnChart"
+        /// should visible sensor noise UI be shown?
+        case showSensorNoise = "showSensorNoise"
         /// how strictly should stored sensor noise values be interpreted?
         case sensorNoiseSensitivity = "sensorNoiseSensitivity"
         /// show the objective lines in color or grey?
@@ -1390,14 +1390,14 @@ extension UserDefaults {
         }
     }
 
-    /// should the app show short-term sensor noise bands on the main chart?
-    @objc dynamic var showSensorNoiseOnChart: Bool {
-        // default value for bool in userdefaults is false, as default we want the app to show sensor noise bands
+    /// should the app show visible sensor noise UI?
+    @objc dynamic var showSensorNoise: Bool {
+        // default value for bool in userdefaults is false, as default we want the app to show sensor noise
         get {
-            return !bool(forKey: Key.showSensorNoiseOnChart.rawValue)
+            return !bool(forKey: Key.showSensorNoise.rawValue)
         }
         set {
-            set(!newValue, forKey: Key.showSensorNoiseOnChart.rawValue)
+            set(!newValue, forKey: Key.showSensorNoise.rawValue)
         }
     }
 

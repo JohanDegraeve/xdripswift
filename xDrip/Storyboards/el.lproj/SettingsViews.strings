@@ -19,7 +19,7 @@
 "settingsviews_multipleAppBadgeValueWith10" = "Σήμα εφαρμογής x10";
 "settingsviews_allowScreenRotation" = "Περιστροφή γραφήματος";
 "settingsviews_showMiniChart" = "Εμφάνιση μίνι-γραφήματος;";
-"settingsviews_showSensorNoiseOnChart" = "Εμφάνιση θορύβου αισθητήρα";
+"settingsviews_showSensorNoise" = "Εμφάνιση θορύβου αισθητήρα";
 "settingsviews_showClockWhenScreenIsLocked" = "Ρολόι οθόνης κλειδώματος";
 "settingsviews_urgentHighValue" = "Επείγον Υψηλή γλυκόζη";
 "settingsviews_highValue" = "Υψηλή γλυκόζη";

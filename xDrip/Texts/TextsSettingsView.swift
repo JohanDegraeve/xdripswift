@@ -325,8 +325,8 @@ class Texts_SettingsView {
         return NSLocalizedString("settingsviews_showOriginalBGReadings", tableName: filename, bundle: Bundle.main, value: "Original Values", comment: "home screen settings, should the original glucose values be shown on the main chart when post processing is enabled")
     }()
 
-    static let showSensorNoiseOnChart: String = {
-        return NSLocalizedString("settingsviews_showSensorNoiseOnChart", tableName: filename, bundle: Bundle.main, value: "Show Sensor Noise", comment: "home screen settings, should short-term sensor noise be shown as background bands on the main chart")
+    static let showSensorNoise: String = {
+        return NSLocalizedString("settingsviews_showSensorNoise", tableName: filename, bundle: Bundle.main, value: "Show Sensor Noise", comment: "home screen settings, should visible sensor noise UI be shown")
     }()
 
     static let labelUrgentHighValue: String = {

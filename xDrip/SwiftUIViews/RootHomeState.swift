@@ -612,6 +612,7 @@ final class RootHomeStateModel: ObservableObject {
 
     private func sensorNoiseState(activeSensor: Sensor?) -> RootHomeSensorNoiseState {
         guard UserDefaults.standard.isMaster,
+              UserDefaults.standard.showSensorNoise,
               let activeSensor,
               activeSensor.noiseAlgorithmVersion == ConstantsSensorNoise.algorithmVersion,
               let latestReadingAt = activeSensor.noiseLatestReadingAt

@@ -28,8 +28,8 @@ fileprivate enum Setting:Int, CaseIterable {
     // show the original glucose readings on the main chart when post processing is enabled?
     case showOriginalBGReadings = 5
 
-    // show short-term sensor noise as background bands on the main chart?
-    case showSensorNoiseOnChart = 6
+    // show visible sensor noise UI?
+    case showSensorNoise = 6
     
     //urgent high value
     case urgentHighMarkValue = 7
@@ -79,7 +79,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
     func settingsRows(sectionID: Int) -> [SettingsRow] {
         let mainChartRows = [
             nativeSettingsRow(id: "homeScreen.showOriginalBGReadings", index: Setting.showOriginalBGReadings.rawValue, sectionID: sectionID),
-            nativeSettingsRow(id: "homeScreen.showSensorNoiseOnChart", index: Setting.showSensorNoiseOnChart.rawValue, sectionID: sectionID),
+            nativeSettingsRow(id: "homeScreen.showSensorNoise", index: Setting.showSensorNoise.rawValue, sectionID: sectionID),
             nativeSettingsRow(id: "homeScreen.allowMainChartAutoReset", index: Setting.allowMainChartAutoReset.rawValue, sectionID: sectionID)
         ]
 
@@ -154,10 +154,10 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
                 isOn: { UserDefaults.standard.showOriginalBGReadings },
                 setIsOn: { UserDefaults.standard.showOriginalBGReadings = $0 }
             )
-        case .showSensorNoiseOnChart:
+        case .showSensorNoise:
             return SettingsToggleControl(
-                isOn: { UserDefaults.standard.showSensorNoiseOnChart },
-                setIsOn: { UserDefaults.standard.showSensorNoiseOnChart = $0 }
+                isOn: { UserDefaults.standard.showSensorNoise },
+                setIsOn: { UserDefaults.standard.showSensorNoise = $0 }
             )
         case .preferSensorCountdown:
             return SettingsToggleControl(
@@ -289,12 +289,12 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
                 }
             })
 
-        case .showSensorNoiseOnChart:
+        case .showSensorNoise:
             return SettingsSelectedRowAction.callFunction(function: {
-                if UserDefaults.standard.showSensorNoiseOnChart {
-                    UserDefaults.standard.showSensorNoiseOnChart = false
+                if UserDefaults.standard.showSensorNoise {
+                    UserDefaults.standard.showSensorNoise = false
                 } else {
-                    UserDefaults.standard.showSensorNoiseOnChart = true
+                    UserDefaults.standard.showSensorNoise = true
                 }
             })
 
@@ -376,8 +376,8 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .showOriginalBGReadings:
             return Texts_SettingsView.showOriginalBGReadings
 
-        case .showSensorNoiseOnChart:
-            return Texts_SettingsView.showSensorNoiseOnChart
+        case .showSensorNoise:
+            return Texts_SettingsView.showSensorNoise
 
         case .preferSensorCountdown:
             return Texts_SettingsView.preferSensorCountdown
@@ -428,7 +428,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .screenLockDimmingType, .urgentHighMarkValue, .highMarkValue, .lowMarkValue, .urgentLowMarkValue, .targetMarkValue:
             return SettingsAccessory.disclosure
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings, .showSensorNoiseOnChart, .preferSensorCountdown:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings, .showSensorNoise, .preferSensorCountdown:
             return SettingsAccessory.none
             
         }
@@ -457,7 +457,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         case .screenLockDimmingType:
             return UserDefaults.standard.screenLockDimmingType.description
             
-        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings, .showSensorNoiseOnChart, .preferSensorCountdown:
+        case .allowScreenRotation, .showClockWhenScreenIsLocked, .showMiniChart, .allowMainChartAutoReset, .showOriginalBGReadings, .showSensorNoise, .preferSensorCountdown:
             return nil
             
         }
@@ -485,8 +485,8 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         // Listen for changes in the showOriginalBGReadings to trigger the UI to be updated
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showOriginalBGReadings.rawValue, options: .new, context: nil)
 
-        // Listen for changes in the showSensorNoiseOnChart to trigger the UI to be updated
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showSensorNoiseOnChart.rawValue, options: .new, context: nil)
+        // Listen for changes in showSensorNoise to trigger the UI to be updated
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showSensorNoise.rawValue, options: .new, context: nil)
 
     }
 
@@ -497,7 +497,7 @@ class SettingsViewHomeScreenSettingsViewModel: NSObject, SettingsViewModelProtoc
         else { return }
 
         switch keyPathEnum {
-        case UserDefaults.Key.showMiniChart, UserDefaults.Key.showOriginalBGReadings, UserDefaults.Key.showSensorNoiseOnChart:
+        case UserDefaults.Key.showMiniChart, UserDefaults.Key.showOriginalBGReadings, UserDefaults.Key.showSensorNoise:
 
             // we have to run this in the main thread to avoid access errors
             DispatchQueue.main.async {

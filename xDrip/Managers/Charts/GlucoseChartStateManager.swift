@@ -388,7 +388,7 @@ final class GlucoseChartStateManager: ObservableObject {
     }
 
     private var shouldShowSensorNoiseBands: Bool {
-        showsSensorNoiseBands && UserDefaults.standard.isMaster && UserDefaults.standard.showSensorNoiseOnChart
+        showsSensorNoiseBands && UserDefaults.standard.isMaster && UserDefaults.standard.showSensorNoise
     }
 
     private func minimumChartValue(startDate: Date, endDate: Date, showTreatments: Bool) -> Double {

@@ -789,7 +789,7 @@ struct SensorManagementView: View {
 
         return SensorManagementState(
             hasTransmitter: transmitter != nil,
-            showsNoise: UserDefaults.standard.isMaster && activeSensor != nil,
+            showsNoise: UserDefaults.standard.isMaster && UserDefaults.standard.showSensorNoise && activeSensor != nil,
             sensorID: activeSensor?.id,
             bannerTitle: sensorDescription,
             statusTitle: statusTitle,

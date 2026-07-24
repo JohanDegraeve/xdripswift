@@ -20,7 +20,7 @@ struct ShowHideItemsView: View {
     @State private var showStatistics = UserDefaults.standard.showStatistics
     @State private var showOriginalBGReadings = UserDefaults.standard.showOriginalBGReadings
     @State private var showTreatmentsOnChart = UserDefaults.standard.showTreatmentsOnChart
-    @State private var showSensorNoiseOnChart = UserDefaults.standard.showSensorNoiseOnChart
+    @State private var showSensorNoise = UserDefaults.standard.showSensorNoise
     @State private var speakReadings = UserDefaults.standard.speakReadings
     @State private var allowStandByHighContrast = UserDefaults.standard.allowStandByHighContrast
     @State private var forceStandByBigNumbers = UserDefaults.standard.forceStandByBigNumbers
@@ -59,9 +59,9 @@ struct ShowHideItemsView: View {
                                 UserDefaults.standard.showTreatmentsOnChart = newValue
                             }
 
-                        Toggle(Texts_SettingsView.showSensorNoiseOnChart, isOn: $showSensorNoiseOnChart)
-                            .onChange(of: showSensorNoiseOnChart) { newValue in
-                                UserDefaults.standard.showSensorNoiseOnChart = newValue
+                        Toggle(Texts_SettingsView.showSensorNoise, isOn: $showSensorNoise)
+                            .onChange(of: showSensorNoise) { newValue in
+                                UserDefaults.standard.showSensorNoise = newValue
                             }
                     }
                     

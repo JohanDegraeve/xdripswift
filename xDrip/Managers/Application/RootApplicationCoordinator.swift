@@ -380,8 +380,8 @@ import AppIntents
         // showing or hiding the original BG readings on the chart
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showOriginalBGReadings.rawValue, options: .new, context: nil)
 
-        // showing or hiding the sensor noise bands on the main chart
-        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showSensorNoiseOnChart.rawValue, options: .new, context: nil)
+        // showing or hiding visible sensor noise UI
+        UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.showSensorNoise.rawValue, options: .new, context: nil)
 
         // changing how strictly stored sensor noise values are interpreted
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.sensorNoiseSensitivity.rawValue, options: .new, context: nil)
@@ -1137,7 +1137,10 @@ import AppIntents
         case UserDefaults.Key.showOriginalBGReadings:
             rootHomeStateModel.invalidateCharts()
 
-        case UserDefaults.Key.showSensorNoiseOnChart:
+        case UserDefaults.Key.showSensorNoise:
+            publishRootHomeState()
+            watchManager?.updateWatchApp(forceComplicationUpdate: false)
+            updateLiveActivityAndWidgets(forceRestart: false)
             updateChartWithResetEndDate()
 
         case UserDefaults.Key.sensorNoiseSensitivity:
@@ -2108,6 +2111,7 @@ import AppIntents
                 var sensorNoiseStateRawValue: Int?
 
                 if UserDefaults.standard.isMaster,
+                   UserDefaults.standard.showSensorNoise,
                    let activeSensor,
                    activeSensor.noiseAlgorithmVersion == ConstantsSensorNoise.algorithmVersion,
                    let latestReadingAt = activeSensor.noiseLatestReadingAt {
