@@ -481,6 +481,7 @@ struct RootTabView: View {
             supportedOrientations = .portrait
         }
 
+        let orientationPolicyChanged = AppDelegate.supportedOrientations != supportedOrientations
         AppDelegate.supportedOrientations = supportedOrientations
 
         guard let windowScene = UIApplication.shared.connectedScenes
@@ -491,9 +492,11 @@ struct RootTabView: View {
             return
         }
 
-        rootController.setNeedsUpdateOfSupportedInterfaceOrientations()
+        if orientationPolicyChanged {
+            rootController.setNeedsUpdateOfSupportedInterfaceOrientations()
+        }
 
-        if tab != .home {
+        if tab != .home && windowScene.interfaceOrientation.isLandscape {
             windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
         }
     }
