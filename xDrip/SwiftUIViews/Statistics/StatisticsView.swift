@@ -60,7 +60,6 @@ struct StatisticsView: View {
         switch selectedSection {
         case .summary:
             VStack(spacing: 10) {
-                StatisticsSummaryView(analytics: analytics)
                 StatisticsRangeCard(
                     title: Texts_Common.statisticsTimeInRange,
                     abbreviation: "TIR",
@@ -71,6 +70,7 @@ struct StatisticsView: View {
                     abbreviation: "TITR",
                     buckets: analytics.tightRangeDistribution.tightRangeBuckets(usesMgDl: analytics.usesMgDl)
                 )
+                StatisticsSummaryView(analytics: analytics)
             }
         case .agp:
             StatisticsAGPCard(analytics: analytics)
@@ -432,157 +432,13 @@ private struct StatisticsAGPChart: View {
     let usesMgDl: Bool
 
     var body: some View {
-        Chart {
-            RectangleMark(
-                xStart: .value("Start", 0),
-                xEnd: .value("End", 1440),
-                yStart: .value("Low target", converted(GlucoseReportClinicalConstants.timeInRangeLowMgDl)),
-                yEnd: .value("High target", converted(GlucoseReportClinicalConstants.timeInRangeHighMgDl))
-            )
-            .foregroundStyle(ConstantsAppColors.statisticsInRange.opacity(0.07))
-
-            ForEach(chartPointsForDisplay) { point in
-                AreaMark(
-                    x: .value("Time", point.minuteOfDay),
-                    yStart: .value("P5", converted(point.p5MgDl)),
-                    yEnd: .value("P95", converted(point.p95MgDl)),
-                    series: .value("Series", "5-95%")
-                )
-                .foregroundStyle(GlucoseReportColors.agpOuterBand.opacity(0.7))
-            }
-
-            ForEach(chartPointsForDisplay) { point in
-                AreaMark(
-                    x: .value("Time", point.minuteOfDay),
-                    yStart: .value("P25", converted(point.p25MgDl)),
-                    yEnd: .value("P75", converted(point.p75MgDl)),
-                    series: .value("Series", "25-75%")
-                )
-                .foregroundStyle(Color(red: 0.42, green: 0.66, blue: 0.86).opacity(0.48))
-            }
-
-            ForEach(chartPointsForDisplay) { point in
-                LineMark(
-                    x: .value("Time", point.minuteOfDay),
-                    y: .value("Median", converted(point.medianMgDl)),
-                    series: .value("Series", "Median")
-                )
-                .lineStyle(StrokeStyle(lineWidth: 2.2))
-                .foregroundStyle(Color.cyan)
-            }
-
-            RuleMark(y: .value("Low target", converted(GlucoseReportClinicalConstants.timeInRangeLowMgDl)))
-                .lineStyle(StrokeStyle(lineWidth: 1))
-                .foregroundStyle(ConstantsAppColors.statisticsInRange.opacity(0.32))
-
-            RuleMark(y: .value("High target", converted(GlucoseReportClinicalConstants.timeInRangeHighMgDl)))
-                .lineStyle(StrokeStyle(lineWidth: 1))
-                .foregroundStyle(ConstantsAppColors.statisticsInRange.opacity(0.32))
-        }
-        .chartLegend(.hidden)
-        .chartXScale(domain: 0 ... 1440)
-        .chartYScale(domain: converted(40) ... converted(dynamicUpperYMgDl))
-        .chartXAxis {
-            AxisMarks(values: [0, 360, 720, 1080, 1440]) { value in
-                AxisGridLine()
-                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.xAxisGridLineColor)
-                AxisValueLabel {
-                    if let minute = value.as(Int.self) {
-                        Text(timeLabel(minute: minute))
-                            .font(.caption2)
-                            .foregroundStyle(Color(.colorTertiary))
-                    }
-                }
-            }
-        }
-        .chartYAxis {
-            AxisMarks(position: .trailing, values: yAxisContextValues) { value in
-                AxisGridLine()
-                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.yAxisContextGridLineColor)
-                AxisValueLabel {
-                    if let glucose = value.as(Double.self) {
-                        yAxisLabel(for: glucose, isObjective: false)
-                    }
-                }
-            }
-
-            AxisMarks(position: .trailing, values: [converted(GlucoseReportClinicalConstants.timeInRangeLowMgDl), converted(GlucoseReportClinicalConstants.timeInRangeHighMgDl)]) { value in
-                AxisGridLine()
-                    .foregroundStyle(ConstantsGlucoseChartSwiftUI.yAxisLowHighLineColor)
-                AxisValueLabel {
-                    if let glucose = value.as(Double.self) {
-                        yAxisLabel(for: glucose, isObjective: true)
-                    }
-                }
-            }
-        }
+        AGPChartView(
+            points: points,
+            usesMgDl: usesMgDl,
+            presentation: .statistics,
+            emptyMessage: Texts_Common.statisticsInsufficientAGPData
+        )
         .frame(height: 165)
-        .chartPlotStyle { plotArea in
-            plotArea
-                .border(Color(.separator).opacity(0.85), width: ConstantsGlucoseChartSwiftUI.chartPlotBorderLineWidth)
-        }
-        .overlay {
-            if points.isEmpty {
-                Text(Texts_Common.statisticsInsufficientAGPData)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color(.colorSecondary))
-            }
-        }
-    }
-
-    private var chartPointsForDisplay: [GlucoseReportAGPPoint] {
-        GlucoseReportAGPDisplayPoints.smoothedDisplayPoints(from: points)
-    }
-
-    private var dynamicUpperYMgDl: Double {
-        guard let maximumP95 = chartPointsForDisplay.map(\.p95MgDl).max() else { return 250 }
-        let paddedMaximum = maximumP95 + 20
-
-        if paddedMaximum <= 250 {
-            return 250
-        }
-
-        if paddedMaximum <= 400 {
-            return ceil(paddedMaximum / 50) * 50
-        }
-
-        return min(450, ceil(paddedMaximum / 50) * 50)
-    }
-
-    private var yAxisContextValues: [Double] {
-        [40, 250, 300, 350, 400, 450]
-            .filter { $0 <= dynamicUpperYMgDl }
-            .map(converted)
-    }
-
-    private func converted(_ valueMgDl: Double) -> Double {
-        usesMgDl ? valueMgDl : valueMgDl * ConstantsBloodGlucose.mgDlToMmoll
-    }
-
-    private func yAxisLabel(for convertedValue: Double, isObjective: Bool) -> some View {
-        Text(yAxisLabelText(for: convertedValue))
-            .foregroundStyle(isObjective ? ConstantsGlucoseChartSwiftUI.yAxisMainChartObjectiveLabelColor : ConstantsGlucoseChartSwiftUI.yAxisMainChartDimmedLabelColor)
-            .font(isObjective ? .system(size: 11, weight: .bold) : .system(size: 10))
-            .monospacedDigit()
-    }
-
-    private func yAxisLabelText(for convertedValue: Double) -> String {
-        usesMgDl ? "\(Int(convertedValue.rounded()))" : convertedValue.formatted(.number.precision(.fractionLength(1)))
-    }
-
-    private func timeLabel(minute: Int) -> String {
-        switch minute {
-        case 0, 1440:
-            return "00:00"
-        case 360:
-            return "06:00"
-        case 720:
-            return "12:00"
-        case 1080:
-            return "18:00"
-        default:
-            return ""
-        }
     }
 }
 
@@ -670,7 +526,7 @@ private struct StatisticsTrendCard: View {
                     AxisValueLabel {
                         if let axisValue = value.as(Double.self) {
                             Text(axisValue.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes)
-                                .font(.system(size: 10))
+                                .font(.system(size: ConstantsStatistics.chartAxisLabelFontSize))
                                 .foregroundStyle(Color(.colorTertiary))
                                 .monospacedDigit()
                         }
@@ -684,7 +540,7 @@ private struct StatisticsTrendCard: View {
                     AxisValueLabel {
                         if showsXAxisLabels, let date = value.as(Date.self) {
                             Text(axisLabel(for: date))
-                                .font(.system(size: 9))
+                                .font(.system(size: ConstantsStatistics.chartAxisLabelFontSize))
                                 .foregroundStyle(Color(.colorTertiary))
                         }
                     }
@@ -804,10 +660,6 @@ private struct StatisticsDailyPatternCard: View {
         let validSummaries = analytics.dailySummaries.filter { $0.sampleCount > 0 }
         guard !validSummaries.isEmpty else { return 0 }
         return validSummaries.map(\.targetPercentage).reduce(0, +) / Double(validSummaries.count)
-    }
-
-    private var validSummaries: [GlucoseReportDailySummary] {
-        analytics.dailySummaries.filter { $0.sampleCount > 0 }
     }
 
     private var xAxisDates: [Date] {

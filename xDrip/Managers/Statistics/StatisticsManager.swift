@@ -27,6 +27,13 @@ import os
 /// The manager is marked `@unchecked Sendable` because callers may request async analytics from
 /// SwiftUI tasks, but all internal mutable state is isolated manually on the serial operation queue.
 public final class StatisticsManager: @unchecked Sendable {
+    /// The minimum data needed to draw a recent AGP comparison without building full report analytics.
+    struct LandscapeBaseline {
+        let dayCount: Int
+        let usesMgDl: Bool
+        let agpPoints: [GlucoseReportAGPPoint]
+    }
+
     private struct CGMSample {
         let date: Date
         let valueMgDl: Double
@@ -170,6 +177,47 @@ public final class StatisticsManager: @unchecked Sendable {
                 let analytics = self.makeReportAnalytics(for: configuration)
                 self.reportAnalyticsCache[cacheKey] = analytics
                 continuation.resume(returning: analytics)
+            }
+        }
+    }
+
+    /// Returns a compact recent AGP baseline for the landscape comparison view.
+    func landscapeBaseline(referenceDate: Date = Date(), daysBack: Int) async -> LandscapeBaseline {
+        await withCheckedContinuation { continuation in
+            operationQueue.addOperation { [weak self] in
+                guard let self else {
+                    continuation.resume(returning: StatisticsManager.emptyLandscapeBaseline())
+                    return
+                }
+
+                let periodEnd = self.calendar.startOfDay(for: referenceDate)
+                guard let periodStart = self.calendar.date(
+                    byAdding: .day,
+                    value: -max(1, daysBack),
+                    to: periodEnd
+                ) else {
+                    continuation.resume(returning: StatisticsManager.emptyLandscapeBaseline())
+                    return
+                }
+
+                // The selected day is the overlay, so the baseline ends at its midnight and only
+                // contains complete preceding calendar days.
+                let samples = self.cachedSamples(fromDate: periodStart, toDate: periodEnd)
+                    .filter { Self.isValidGlucoseMgDl($0.valueMgDl) }
+                    .sorted { $0.date < $1.date }
+
+                guard !samples.isEmpty else {
+                    continuation.resume(returning: StatisticsManager.emptyLandscapeBaseline())
+                    return
+                }
+
+                let days = Set(samples.map { self.calendar.startOfDay(for: $0.date) })
+
+                continuation.resume(returning: LandscapeBaseline(
+                    dayCount: days.count,
+                    usesMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl,
+                    agpPoints: self.makeAGPPoints(samples: samples)
+                ))
             }
         }
     }
@@ -704,6 +752,14 @@ public final class StatisticsManager: @unchecked Sendable {
             veryLowEventCount: 0,
             highEventCount: 0,
             veryHighEventCount: 0
+        )
+    }
+
+    private static func emptyLandscapeBaseline() -> LandscapeBaseline {
+        return LandscapeBaseline(
+            dayCount: 0,
+            usesMgDl: UserDefaults.standard.bloodGlucoseUnitIsMgDl,
+            agpPoints: []
         )
     }
 

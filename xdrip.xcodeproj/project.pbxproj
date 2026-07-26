@@ -262,6 +262,7 @@
 		4D31C0012FF5000100000001 /* GenerateReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0012FF5000100000001 /* GenerateReportView.swift */; };
 		4D31C0022FF5000100000001 /* GenerateReportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0022FF5000100000001 /* GenerateReportViewModel.swift */; };
 		4D31C0032FF5000100000001 /* ReportAGPChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0032FF5000100000001 /* ReportAGPChartView.swift */; };
+		4D31C00E2FF5000100000001 /* AGPChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C00E2FF5000100000001 /* AGPChartView.swift */; };
 		4D31C0052FF5000100000001 /* ReportClinicalPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0052FF5000100000001 /* ReportClinicalPageView.swift */; };
 		4D31C0062FF5000100000001 /* ReportDailySummarySectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0062FF5000100000001 /* ReportDailySummarySectionView.swift */; };
 		4D31C0072FF5000100000001 /* ReportFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0072FF5000100000001 /* ReportFormatting.swift */; };
@@ -1074,6 +1075,7 @@
 		4D30C0012FF5000100000001 /* GenerateReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateReportView.swift; sourceTree = "<group>"; };
 		4D30C0022FF5000100000001 /* GenerateReportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateReportViewModel.swift; sourceTree = "<group>"; };
 		4D30C0032FF5000100000001 /* ReportAGPChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportAGPChartView.swift; sourceTree = "<group>"; };
+		4D30C00E2FF5000100000001 /* AGPChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AGPChartView.swift; sourceTree = "<group>"; };
 		4D30C0052FF5000100000001 /* ReportClinicalPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportClinicalPageView.swift; sourceTree = "<group>"; };
 		4D30C0062FF5000100000001 /* ReportDailySummarySectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportDailySummarySectionView.swift; sourceTree = "<group>"; };
 		4D30C0072FF5000100000001 /* ReportFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFormatting.swift; sourceTree = "<group>"; };
@@ -2287,6 +2289,7 @@
 			children = (
 				4D30C0012FF5000100000001 /* GenerateReportView.swift */,
 				4D30C0022FF5000100000001 /* GenerateReportViewModel.swift */,
+				4D30C00E2FF5000100000001 /* AGPChartView.swift */,
 				4D30C0032FF5000100000001 /* ReportAGPChartView.swift */,
 				4D30C0052FF5000100000001 /* ReportClinicalPageView.swift */,
 				4D30C0062FF5000100000001 /* ReportDailySummarySectionView.swift */,
@@ -4394,6 +4397,7 @@
 				4D20C00A2FF1000100000001 /* RootTabView.swift in Sources */,
 				4D31C0012FF5000100000001 /* GenerateReportView.swift in Sources */,
 				4D31C0022FF5000100000001 /* GenerateReportViewModel.swift in Sources */,
+				4D31C00E2FF5000100000001 /* AGPChartView.swift in Sources */,
 				4D31C0032FF5000100000001 /* ReportAGPChartView.swift in Sources */,
 				4D31C0052FF5000100000001 /* ReportClinicalPageView.swift in Sources */,
 				4D31C0062FF5000100000001 /* ReportDailySummarySectionView.swift in Sources */,

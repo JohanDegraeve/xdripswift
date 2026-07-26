@@ -10,6 +10,9 @@ import Foundation
 
 /// constants for statistics view
 enum ConstantsStatistics {
+
+    /// shared axis label size for charts in the SwiftUI statistics view
+    static let chartAxisLabelFontSize: CGFloat = 12
     
     /// animation speed when drawing the pie chart
     static let pieChartAnimationSpeed = 0.3

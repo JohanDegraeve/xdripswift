@@ -51,4 +51,17 @@ enum ConstantsAppColors {
     static let statisticsInRange = Color.green
     static let statisticsHigh = Color.yellow
 
+    // MARK: - AGP
+
+    /// Shared on-screen AGP palette. Printable reports retain their separate print-optimised colours.
+    static let agpTargetFill = statisticsInRange.opacity(0.12)
+    static let agpTargetRule = statisticsInRange.opacity(0.28)
+    static let agpOuterBand = Color.cyan.opacity(0.18)
+    static let agpInnerBand = Color.cyan.opacity(0.36)
+    static let agpMedian = Color.cyan.opacity(0.85)
+    static let agpXAxisGridLine = Color(white: 0.4).opacity(0.42)
+    static let agpYAxisGridLine = Color(white: 0.3).opacity(0.42)
+    static let agpObjectiveGridLine = Color(white: 0.7).opacity(0.5)
+    static let agpPlotBorder = Color(.separator).opacity(0.45)
+
 }

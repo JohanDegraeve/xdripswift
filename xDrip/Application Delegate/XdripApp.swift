@@ -39,11 +39,18 @@ import SwiftUI
 
     var body: some Scene {
         WindowGroup {
-            RootTabView(
-                stateModel: stateModel,
-                applicationCoordinator: applicationCoordinator,
-                tabTitles: tabTitles
-            )
+            ZStack {
+                // Keep rotation resizes on the app palette instead of exposing the system window.
+                ConstantsAppColors.background
+                    .ignoresSafeArea()
+
+                RootTabView(
+                    stateModel: stateModel,
+                    applicationCoordinator: applicationCoordinator,
+                    tabTitles: tabTitles
+                )
+            }
+            .background(ConstantsAppColors.background)
             .onOpenURL(perform: stateModel.receiveIncomingBackup)
         }
     }

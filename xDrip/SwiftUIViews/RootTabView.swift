@@ -284,6 +284,7 @@ struct RootTabView: View {
         case settings
     }
 
+    @Environment(\.scenePhase) private var scenePhase
     @StateObject private var stateModel: RootTabStateModel
     @State private var selectedTab = Tab.home
 
@@ -304,85 +305,100 @@ struct RootTabView: View {
     // MARK: - View
 
     var body: some View {
-        ZStack {
-            TabView(selection: $selectedTab) {
-                RootHomeTabView(
-                    applicationCoordinator: applicationCoordinator,
-                    dependencies: stateModel.dependencies,
-                    snoozeDismissalRequest: stateModel.snoozeDismissalRequest
-                )
-                .tag(Tab.home)
-                .tabItem {
-                    tabLabel(title: tabTitles.home, systemImage: "drop.fill")
-                }
+        GeometryReader { geometry in
+            let isLandscape = geometry.size.width > geometry.size.height
 
-                tabContent { dependencies in
-                    NavigationStack {
-                        TreatmentsView(coreDataManager: dependencies.coreDataManager)
+            ZStack {
+                // Keep the TabView mounted during rotation so UIKit cannot flash its default background.
+                ConstantsAppColors.background
+                    .ignoresSafeArea()
+
+                TabView(selection: $selectedTab) {
+                    RootHomeTabView(
+                        applicationCoordinator: applicationCoordinator,
+                        dependencies: stateModel.dependencies,
+                        snoozeDismissalRequest: stateModel.snoozeDismissalRequest,
+                        isLandscape: isLandscape
+                    )
+                    .tag(Tab.home)
+                    .tabItem {
+                        tabLabel(title: tabTitles.home, systemImage: "drop.fill")
                     }
-                    .tint(.yellow)
-                }
-                .tag(Tab.treatments)
-                .tabItem {
-                    tabLabel(title: tabTitles.treatments, systemImage: "list.clipboard.fill")
-                }
 
-                tabContent { dependencies in
-                    NavigationStack {
-                        StatisticsView(statisticsManager: dependencies.statisticsManager)
+                    tabContent { dependencies in
+                        NavigationStack {
+                            TreatmentsView(coreDataManager: dependencies.coreDataManager)
+                        }
+                        .tint(.yellow)
                     }
-                    .tint(.yellow)
-                }
-                .tag(Tab.statistics)
-                .tabItem {
-                    tabLabel(title: tabTitles.statistics, systemImage: "chart.bar.xaxis")
+                    .tag(Tab.treatments)
+                    .tabItem {
+                        tabLabel(title: tabTitles.treatments, systemImage: "list.clipboard.fill")
+                    }
+
+                    Group {
+                        if let dependencies = stateModel.dependencies {
+                            RootStatisticsTabView(dependencies: dependencies)
+                        } else {
+                            ZStack {
+                                ConstantsAppColors.background
+                                    .ignoresSafeArea()
+
+                                ProgressView()
+                            }
+                        }
+                    }
+                    .tag(Tab.statistics)
+                    .tabItem {
+                        tabLabel(title: tabTitles.statistics, systemImage: "chart.bar.xaxis")
+                    }
+
+                    tabContent { dependencies in
+                        BluetoothPeripheralsNavigationView(
+                            coreDataManager: dependencies.coreDataManager,
+                            bluetoothPeripheralManager: dependencies.bluetoothPeripheralManager,
+                            sensorProvider: stateModel.sensorProvider
+                        )
+                    }
+                    .tag(Tab.bluetooth)
+                    .tabItem {
+                        tabLabel(
+                            title: tabTitles.devices,
+                            systemImage: "antenna.radiowaves.left.and.right"
+                        )
+                    }
+
+                    tabContent { dependencies in
+                        SettingsNavigationView(
+                            coreDataManager: dependencies.coreDataManager,
+                            soundPlayer: dependencies.soundPlayer,
+                            incomingBackupRequest: stateModel.incomingBackupRequest,
+                            consumeIncomingBackup: stateModel.consumeIncomingBackup
+                        )
+                    }
+                    .tag(Tab.settings)
+                    .tabItem {
+                        tabLabel(title: tabTitles.settings, systemImage: "gearshape.fill")
+                    }
                 }
 
-                tabContent { dependencies in
-                    BluetoothPeripheralsNavigationView(
-                        coreDataManager: dependencies.coreDataManager,
-                        bluetoothPeripheralManager: dependencies.bluetoothPeripheralManager,
-                        sensorProvider: stateModel.sensorProvider
+                if let dependencies = stateModel.dependencies {
+                    RootScreenLockOverlay(
+                        stateModel: dependencies.rootHomeStateModel,
+                        unlock: { _ = dependencies.updateScreenLock(false, true) }
                     )
                 }
-                .tag(Tab.bluetooth)
-                .tabItem {
-                    tabLabel(
-                        title: tabTitles.devices,
-                        systemImage: "antenna.radiowaves.left.and.right"
-                    )
-                }
 
-                tabContent { dependencies in
-                    SettingsNavigationView(
-                        coreDataManager: dependencies.coreDataManager,
-                        soundPlayer: dependencies.soundPlayer,
-                        incomingBackupRequest: stateModel.incomingBackupRequest,
-                        consumeIncomingBackup: stateModel.consumeIncomingBackup
-                    )
-                }
-                .tag(Tab.settings)
-                .tabItem {
-                    tabLabel(title: tabTitles.settings, systemImage: "gearshape.fill")
-                }
-            }
-
-            if let dependencies = stateModel.dependencies {
-                RootScreenLockOverlay(
-                    stateModel: dependencies.rootHomeStateModel,
-                    unlock: { _ = dependencies.updateScreenLock(false, true) }
-                )
-            }
-
-            if stateModel.isPreparingIncomingBackup {
-                ZStack {
-                    Color.black.opacity(0.75).ignoresSafeArea()
-                    VStack(spacing: 18) {
-                        ProgressView()
-                            .controlSize(.large)
-                            .tint(.white)
-                        Text("Opening backup…")
-                            .foregroundStyle(.white)
+                if stateModel.isPreparingIncomingBackup {
+                    ZStack {
+                        Color.black.opacity(0.75).ignoresSafeArea()
+                        VStack(spacing: 18) {
+                            ProgressView()
+                                .controlSize(.large)
+                                .tint(.white)
+                            Text("Opening backup…")
+                                .foregroundStyle(.white)
+                        }
                     }
                 }
             }
@@ -396,6 +412,11 @@ struct RootTabView: View {
         }
         .onChange(of: selectedTab) { selectedTab in
             updateSupportedOrientations(for: selectedTab)
+        }
+        .onChange(of: scenePhase) { scenePhase in
+            if scenePhase == .active {
+                updateSupportedOrientations(for: selectedTab)
+            }
         }
         .onChange(of: stateModel.incomingBackupRequest?.id) { requestID in
             if requestID != nil {
@@ -471,7 +492,7 @@ struct RootTabView: View {
         }
     }
 
-    /// Only Home supports the optional landscape chart. The remaining tabs stay portrait.
+    /// Home supports the landscape AGP comparison view. The remaining tabs stay portrait.
     private func updateSupportedOrientations(for tab: Tab) {
         let supportedOrientations: UIInterfaceOrientationMask
 
@@ -481,7 +502,6 @@ struct RootTabView: View {
             supportedOrientations = .portrait
         }
 
-        let orientationPolicyChanged = AppDelegate.supportedOrientations != supportedOrientations
         AppDelegate.supportedOrientations = supportedOrientations
 
         guard let windowScene = UIApplication.shared.connectedScenes
@@ -492,13 +512,27 @@ struct RootTabView: View {
             return
         }
 
-        if orientationPolicyChanged {
-            rootController.setNeedsUpdateOfSupportedInterfaceOrientations()
-        }
+        rootController.setNeedsUpdateOfSupportedInterfaceOrientations()
 
         if tab != .home && windowScene.interfaceOrientation.isLandscape {
             windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
         }
+    }
+}
+
+// MARK: - Statistics Tab
+
+/// Keeps the normal Statistics navigation portrait-only.
+private struct RootStatisticsTabView: View {
+
+    let dependencies: RootTabDependencies
+
+    var body: some View {
+        NavigationStack {
+            StatisticsView(statisticsManager: dependencies.statisticsManager)
+        }
+        .tint(.yellow)
+        .padding(.bottom, RootTabLayout.contentBottomPadding)
     }
 }
 
@@ -518,20 +552,20 @@ private struct RootHomeTabView: View {
         var id: String { rawValue }
     }
 
-    @Environment(\.verticalSizeClass) private var verticalSizeClass
     @State private var presentedView: PresentedView?
     @State private var showsScreenLockInformation = false
 
     let applicationCoordinator: RootApplicationCoordinator
     let dependencies: RootTabDependencies?
     let snoozeDismissalRequest: Int
+    let isLandscape: Bool
 
     // MARK: - View
 
     var body: some View {
         ZStack {
             if let dependencies {
-                if verticalSizeClass == .compact {
+                if isLandscape {
                     RootHomeLandscapeView(dependencies: dependencies)
                 } else {
                     RootHomeView(
@@ -545,11 +579,12 @@ private struct RootHomeTabView: View {
         }
         .padding(
             .bottom,
-            verticalSizeClass == .compact ? 0 : RootTabLayout.contentBottomPadding
+            isLandscape ? 0 : RootTabLayout.contentBottomPadding
         )
-        .toolbar(verticalSizeClass == .compact ? .hidden : .automatic, for: .tabBar)
+        .toolbar(isLandscape ? .hidden : .automatic, for: .tabBar)
         .onAppear {
             applicationCoordinator.homeDidBecomeVisible()
+            updatePresentedViewOrientationLock()
         }
         .sheet(item: $presentedView) { presentedView in
             destinationView(presentedView)
