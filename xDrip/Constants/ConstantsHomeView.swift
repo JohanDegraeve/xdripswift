@@ -72,6 +72,9 @@ enum ConstantsHomeView {
     /// colour for an normal text
     static let sensorProgressNormalTextColorSwiftUI: Color = .white
     static let sensorProgressViewNormalColorSwiftUI: Color = .gray
+
+    /// duration of the sensor progress entrance animation
+    static let sensorProgressEntranceAnimationDuration: TimeInterval = 0.4
     
     // MARK: - Screen lock
     

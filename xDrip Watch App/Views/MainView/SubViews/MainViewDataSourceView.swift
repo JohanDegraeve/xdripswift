@@ -105,26 +105,15 @@ struct MainViewDataSourceView: View {
     }
 
     private var sensorLifetimeProgressView: some View {
-        GeometryReader { geometry in
-            let progress = min(max(CGFloat(watchState.activeSensorProgress().progress), 0), 1)
-            let arrowPosition = min(max(progress * geometry.size.width, 7), geometry.size.width - 7)
-
-            ProgressView(value: progress)
-                .progressViewStyle(.linear)
-                .tint(ConstantsHomeView.sensorProgressViewNormalColorSwiftUI)
-                .frame(height: 5)
-                .scaleEffect(x: 1, y: 0.3, anchor: .center)
-                .overlay {
-                    Image(systemName: watchState.preferSensorCountdown ? "arrowtriangle.left.fill" : "arrowtriangle.right.fill")
-                        .font(.system(size: 15, weight: .semibold))
-                        .scaleEffect(x: 0.75, y: 0.95)
-                        .foregroundStyle(ConstantsHomeView.sensorProgressViewNormalColorSwiftUI)
-                        .opacity(0.85)
-                        .position(x: arrowPosition, y: 2.5)
-                }
-        }
-        .frame(height: 5)
-        .padding(.vertical, 2)
+        // use the latest Watch state directly so status and countdown changes
+        // update the progress bar without animation
+        ProgressView(value: watchState.activeSensorProgress().progress)
+            .progressViewStyle(.linear)
+            .tint(ConstantsHomeView.sensorProgressViewNormalColorSwiftUI)
+            .frame(maxWidth: .infinity)
+            .frame(height: 5)
+            .scaleEffect(x: 1, y: 0.3, anchor: .center)
+            .padding(.vertical, 2)
     }
 }
 

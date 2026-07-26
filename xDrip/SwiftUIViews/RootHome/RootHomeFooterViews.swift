@@ -51,34 +51,149 @@ struct RootHomeSensorNoiseWarningView: View {
     }
 }
 
-/// Sensor age and directional lifetime progress indicator.
+/// Sensor lifetime progress indicator.
 struct RootHomeSensorLifetimeView: View {
     let state: RootHomeSensorState
+
+    @Environment(\.scenePhase) private var scenePhase
+    @AppStorage(UserDefaults.Key.preferSensorCountdown.rawValue) private var preferSensorCountdown = false
+    @State private var displayedProgress: Double
+    @State private var progressAnimationTask: Task<Void, Never>?
+    @State private var isVisible = false
+    @State private var isEntranceAnimationInProgress = false
+    @State private var pendingProgress: Double?
 
     private enum Layout {
         static let height: CGFloat = 10
     }
 
-    var body: some View {
-        GeometryReader { geometry in
-            let progress = min(max(state.progress, 0), 1)
-            let arrowPosition = min(max(progress * geometry.size.width, 7), geometry.size.width - 7)
+    /// keeps the progress and its direction in the same SwiftUI update
+    private struct ProgressState: Equatable {
+        let progress: Double
+        let countsDown: Bool
+    }
 
-            ProgressView(value: progress)
-                .progressViewStyle(.linear)
-                .tint(state.progressColor)
-                .frame(height: 5)
-                .overlay {
-                    Image(systemName: state.countsDown ? "arrowtriangle.left.fill" : "arrowtriangle.right.fill")
-                        .font(.system(size: 15, weight: .semibold))
-                        .scaleEffect(x: 0.75, y: 0.95)
-                        .foregroundStyle(state.progressColor)
-                        .opacity(0.85)
-                        .position(x: arrowPosition, y: 2.5)
+    init(state: RootHomeSensorState) {
+        self.state = state
+        _displayedProgress = State(initialValue: UserDefaults.standard.preferSensorCountdown ? 1 : 0)
+    }
+
+    var body: some View {
+        ProgressView(value: displayedProgress)
+            .progressViewStyle(.linear)
+            .tint(state.progressColor)
+            .frame(height: 5)
+            .frame(maxHeight: .infinity, alignment: .center)
+            .frame(height: Layout.height)
+            .onAppear {
+                isVisible = true
+                startEntranceAnimation()
+            }
+            .onDisappear {
+                isVisible = false
+                prepareProgressForNextEntrance()
+            }
+            .onChange(of: preferSensorCountdown) { _ in
+                if isVisible, scenePhase == .active {
+                    startEntranceAnimation()
+                } else {
+                    resetProgressToEndpoint()
                 }
-                .frame(maxHeight: .infinity, alignment: .center)
+            }
+            .onChange(of: scenePhase) { newPhase in
+                if newPhase == .active, isVisible {
+                    // root home is not necessarily recreated when returning
+                    // through the app icon or Dynamic Island
+                    startEntranceAnimation()
+                } else {
+                    // reset while the scene is still becoming inactive, before
+                    // iOS snapshots and suspends the view for the background
+                    prepareProgressForNextEntrance()
+                }
+            }
+            .onChange(of: progressState) { newState in
+                guard isVisible, scenePhase == .active else {
+                    resetProgressToEndpoint()
+                    return
+                }
+
+                // keep the latest complete progress/direction pair until the
+                // entrance animation has finished
+                if isEntranceAnimationInProgress {
+                    pendingProgress = presentationProgress(newState)
+                    return
+                }
+
+                displayedProgress = presentationProgress(newState)
+            }
+    }
+
+    private var progressState: ProgressState {
+        ProgressState(progress: state.progress, countsDown: state.countsDown)
+    }
+
+    private func startEntranceAnimation() {
+        prepareProgressForNextEntrance()
+        isEntranceAnimationInProgress = true
+
+        let targetProgress = presentationProgress(progressState)
+
+        progressAnimationTask = Task { @MainActor in
+            // allow SwiftUI to render the directional 0% or 100% starting state
+            // before beginning the progress animation
+            await Task.yield()
+
+            guard !Task.isCancelled else { return }
+
+            let currentTargetProgress = pendingProgress ?? targetProgress
+            pendingProgress = nil
+
+            withAnimation(.easeOut(duration: ConstantsHomeView.sensorProgressEntranceAnimationDuration)) {
+                displayedProgress = currentTargetProgress
+            }
+
+            do {
+                try await Task.sleep(nanoseconds: UInt64(ConstantsHomeView.sensorProgressEntranceAnimationDuration * 1_000_000_000))
+            } catch {
+                return
+            }
+
+            isEntranceAnimationInProgress = false
+
+            if let pendingProgress {
+                displayedProgress = pendingProgress
+                self.pendingProgress = nil
+            }
         }
-        .frame(height: Layout.height)
+    }
+
+    /// cancels the current animation and leaves the progress ready for its next entrance
+    private func prepareProgressForNextEntrance() {
+        progressAnimationTask?.cancel()
+        isEntranceAnimationInProgress = false
+        pendingProgress = nil
+        resetProgressToEndpoint()
+    }
+
+    /// resets to 0% for elapsed mode or 100% for countdown mode without animation
+    private func resetProgressToEndpoint() {
+        var resetTransaction = Transaction()
+        resetTransaction.disablesAnimations = true
+
+        withTransaction(resetTransaction) {
+            displayedProgress = preferSensorCountdown ? 1 : 0
+        }
+    }
+
+    /// converts a progress value created with stale state into the user's current
+    /// elapsed/countdown preference while root home refreshes after a tab change
+    private func presentationProgress(_ state: ProgressState) -> Double {
+        let progress = clampedProgress(state.progress)
+        return state.countsDown == preferSensorCountdown ? progress : 1 - progress
+    }
+
+    private func clampedProgress(_ progress: Double) -> Double {
+        min(max(progress, 0), 1)
     }
 }
 
