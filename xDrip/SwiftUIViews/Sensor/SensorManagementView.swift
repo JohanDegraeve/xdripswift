@@ -7,7 +7,6 @@
 //
 
 import SwiftUI
-import os
 
 /// Sensor summary and the start, stop and calibration workflows opened from Home.
 ///
@@ -24,58 +23,95 @@ struct SensorManagementView: View {
     let onStartSensor: (Date, String?) -> Void
     let onStopSensor: () -> Void
     let onSubmitCalibration: (Double) -> String?
+    let initiallyShowsCalibration: Bool
 
     @State private var refreshView = false
     @State private var showingStartDateSheet = false
     @State private var showingStartCodeSheet = false
     @State private var showingStopConfirmation = false
     @State private var showingCalibrationSheet = false
-    @State private var showingLargeCalibrationDifferenceConfirmation = false
-    @State private var transientMessage: SensorManagementMessage?
+    @State private var showingSensorDetails = false
+    @State private var showingNoSensorCodeConfirmation = false
     @State private var sensorNoiseSensitivity = UserDefaults.standard.sensorNoiseSensitivity
-    @State private var selectedStartDate = Date()
-    @State private var sensorCode = "0000"
-    @State private var calibrationValue = ""
+    @State private var pendingStartSensorCode: String?
 
     private let isMgDl = UserDefaults.standard.bloodGlucoseUnitIsMgDl
     private let timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect()
     private let nilString = "-"
-    private let log = OSLog(subsystem: ConstantsLog.subSystem, category: ConstantsLog.categoryApplicationDataCalibrations)
 
     var body: some View {
         let state = currentState()
 
+        if initiallyShowsCalibration, state.canCalibrate, state.currentBgDisplay != nil {
+            CalibrationView(
+                canCalibrate: state.canCalibrate,
+                shouldWarnOnLargeCalibrationStep: state.shouldWarnOnLargeCalibrationStep,
+                currentBgDisplay: state.currentBgDisplay,
+                readiness: state.calibrationReadiness,
+                isMgDl: isMgDl,
+                onSubmitCalibration: onSubmitCalibration,
+                onCalibrationSaved: {}
+            )
+        } else {
+            sensorManagementView(state: state)
+        }
+    }
+
+    private func sensorManagementView(state: SensorManagementState) -> some View {
         NavigationView {
-            List {
-                Section {
-                    VStack(alignment: .leading, spacing: 12) {
-                        HStack(alignment: .center) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text(state.bannerTitle)
-                                    .font(.title3)
-                                    .fontWeight(.semibold)
-                                Text(state.statusTitle)
-                                    .font(.headline)
-                                    .foregroundStyle(state.statusColor)
+            VStack(spacing: 0) {
+                if state.hasTransmitter {
+                    HStack(spacing: 12) {
+                        if state.canStartSensor || state.canStopSensor {
+                            Button(role: state.canStopSensor ? .destructive : nil, action: {
+                                if state.canStopSensor {
+                                    showingStopConfirmation = true
+                                } else {
+                                    handleStartTap()
+                                }
+                            }) {
+                                Text(state.canStopSensor ? Texts_HomeView.stopSensorActionTitle : Texts_HomeView.startSensorActionTitle)
+                                    .frame(maxWidth: .infinity)
                             }
-
-                            Spacer()
-
-                            Image(systemName: "sensor.tag.radiowaves.forward")
-                                .font(.system(size: 28, weight: .semibold))
-                                .foregroundStyle(state.statusColor)
+                            .buttonStyle(.borderedProminent)
+                            .tint(state.canStopSensor ? .red : .green)
                         }
+
+                        Button(action: {
+                            showingCalibrationSheet = true
+                        }) {
+                            Text(Texts_HomeView.calibrationButton)
+                                .frame(maxWidth: .infinity)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(Color(.systemBlue))
+                        .disabled(!state.canCalibrate || state.currentBgDisplay == nil)
                     }
-                    .padding(.vertical, 4)
-                    .id(refreshView)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
                 }
 
-                if state.hasTransmitter {
+                List {
+                    if state.hasTransmitter {
                     Section(header: Text(Texts_HomeView.sensorManagementSummaryTitle), footer: summaryFooter(for: state)) {
-                        row(title: Texts_HomeView.sensorStart, data: state.startDateString)
-                        row(title: state.secondarySessionTitle, data: state.secondarySessionValue, dataColor: state.secondarySessionColor)
-                        if state.showsRemainingRow {
-                            row(title: Texts_HomeView.sensorManagementRemaining, data: state.remainingString, dataColor: state.remainingColor)
+                        statusRow(state: state)
+                            .id(refreshView)
+                        row(title: Texts_HomeView.sensorManagementCGMType, data: state.bannerTitle)
+
+                        Button {
+                            showingSensorDetails = true
+                        } label: {
+                            HStack {
+                                Text(Texts_HomeView.sensorManagementElapsed)
+                                    .foregroundStyle(Color(.colorPrimary))
+                                Spacer()
+                                Text(state.sessionLifetimeString)
+                                    .foregroundStyle(Color(.colorSecondary))
+                                    .multilineTextAlignment(.trailing)
+                                Image(systemName: "chevron.right")
+                                    .font(.footnote.weight(.semibold))
+                                    .foregroundStyle(Color(.tertiaryLabel))
+                            }
                         }
                     }
 
@@ -104,73 +140,37 @@ struct SensorManagementView: View {
                         }
                     }
 
-                    Section(header: Text(Texts_HomeView.sensorManagementActionsTitle), footer: actionFooter(for: state)) {
-                        Button(role: state.canStopSensor ? .destructive : nil, action: {
-                            if state.canStopSensor {
-                                showingStopConfirmation = true
-                            } else {
-                                handleStartTap()
-                            }
-                        }) {
-                            Text(state.canStopSensor ? Texts_HomeView.stopSensorActionTitle : Texts_HomeView.startSensorActionTitle)
-                                .frame(maxWidth: .infinity)
+                    Section(header: Text(Texts_HomeView.sensorManagementHistoryTitle), footer: calibrationFooter(for: state)) {
+                        NavigationLink {
+                            CalibrationHistoryView(
+                                currentCalibration: state.currentCalibration,
+                                calibrationHistory: state.calibrationHistory,
+                                isMgDl: isMgDl
+                            )
+                        } label: {
+                            row(title: Texts_HomeView.sensorManagementLastCalibration, data: state.calibrationSummary)
                         }
-                        .buttonStyle(.borderedProminent)
-                        .tint(state.canStopSensor ? .red : .green)
-                        .disabled(!state.canStartSensor && !state.canStopSensor)
-                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                        .disabled(!state.hasCalibrationHistory)
                     }
+                    } else {
+                        Section {
+                            VStack(spacing: 10) {
+                                Image(systemName: "antenna.radiowaves.left.and.right.slash")
+                                    .font(.system(size: 30, weight: .semibold))
+                                    .foregroundStyle(Color(.colorSecondary))
 
-                    Section(header: Text(Texts_HomeView.sensorManagementCalibrationTitle), footer: calibrationFooter(for: state)) {
-                        if state.showCalibrationUnavailableRow {
-                            row(title: Texts_HomeView.calibrationButton, data: Texts_Common.notAvailable)
-                        } else {
-                            Button(action: {
-                                calibrationValue = ""
-                                showingCalibrationSheet = true
-                            }) {
-                                Text(Texts_HomeView.calibrationButton)
-                                    .frame(maxWidth: .infinity)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .tint(Color(.systemBlue))
-                            .disabled(!state.canCalibrate || state.currentBgDisplay == nil)
-                        }
-
-                        if let currentCalibration = state.currentCalibration {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(Texts_HomeView.sensorManagementCurrentCalibrationTitle)
+                                Text(Texts_HomeView.sensorManagementNoTransmitterNote)
                                     .font(.headline)
-                                calibrationSummaryView(calibration: currentCalibration, isHistoric: false)
+                                    .multilineTextAlignment(.center)
+                                    .foregroundStyle(Color(.colorPrimary))
                             }
-                            .padding(.vertical, 4)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 24)
                         }
-                    }
-
-                    if !state.calibrationHistory.isEmpty {
-                        Section(header: Text(Texts_HomeView.sensorManagementHistoryTitle)) {
-                            ForEach(state.calibrationHistory, id: \.id) { calibration in
-                                calibrationSummaryView(calibration: calibration, isHistoric: !calibration.isValid)
-                            }
-                        }
-                    }
-                } else {
-                    Section {
-                        VStack(spacing: 10) {
-                            Image(systemName: "antenna.radiowaves.left.and.right.slash")
-                                .font(.system(size: 30, weight: .semibold))
-                                .foregroundStyle(Color(.colorSecondary))
-
-                            Text(Texts_HomeView.sensorManagementNoTransmitterNote)
-                                .font(.headline)
-                                .multilineTextAlignment(.center)
-                                .foregroundStyle(Color(.colorPrimary))
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 24)
                     }
                 }
             }
+            .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationTitle(Texts_HomeView.sensorManagementTitle)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
@@ -187,16 +187,10 @@ struct SensorManagementView: View {
         .onReceive(timer) { _ in
             refreshView.toggle()
         }
-        .alert(item: $transientMessage) { message in
-            Alert(title: Text(message.title), message: Text(message.message), dismissButton: .default(Text(Texts_Common.Ok)))
-        }
-        .alert(Texts_Common.warning, isPresented: $showingLargeCalibrationDifferenceConfirmation) {
-            Button(Texts_Common.Cancel, role: .cancel) {}
-            Button(Texts_HomeView.calibrationButton) {
-                confirmCalibrationAfterWarning()
-            }
+        .alert(Texts_HomeView.sensorManagementSessionDetails, isPresented: $showingSensorDetails) {
+            Button(Texts_Common.Ok, role: .cancel) {}
         } message: {
-            Text(largeCalibrationDifferenceWarning(for: currentState()) ?? "")
+            Text(state.sensorDetailsMessage)
         }
         .alert(Texts_Common.warning, isPresented: $showingStopConfirmation) {
             Button(Texts_Common.Cancel, role: .cancel) {}
@@ -207,14 +201,48 @@ struct SensorManagementView: View {
         } message: {
             Text(Texts_HomeView.stopSensorConfirmation)
         }
+        .alert(Texts_HomeView.noSensorCodeSelectedTitle, isPresented: $showingNoSensorCodeConfirmation) {
+            Button(Texts_Common.Cancel, role: .cancel) {
+                pendingStartSensorCode = nil
+            }
+            Button(Texts_HomeView.startSensorAnyway) {
+                startSensorWithPendingCode()
+            }
+        } message: {
+            Text(Texts_HomeView.noSensorCodeSelectedMessage)
+        }
         .sheet(isPresented: $showingStartDateSheet) {
-            startDateSheet
+            SensorStartDateView(
+                onCancel: {
+                    showingStartDateSheet = false
+                },
+                onStart: { startDate in
+                    showingStartDateSheet = false
+                    onStartSensor(startDate, nil)
+                    refreshView.toggle()
+                }
+            )
         }
         .sheet(isPresented: $showingStartCodeSheet) {
-            startCodeSheet
+            SensorStartCodeView(
+                onCancel: {
+                    showingStartCodeSheet = false
+                },
+                onSubmit: submitStartSensorCode
+            )
         }
         .sheet(isPresented: $showingCalibrationSheet) {
-            calibrationSheet(state: state)
+            CalibrationView(
+                canCalibrate: state.canCalibrate,
+                shouldWarnOnLargeCalibrationStep: state.shouldWarnOnLargeCalibrationStep,
+                currentBgDisplay: state.currentBgDisplay,
+                readiness: state.calibrationReadiness,
+                isMgDl: isMgDl,
+                onSubmitCalibration: onSubmitCalibration,
+                onCalibrationSaved: {
+                    refreshView.toggle()
+                }
+            )
         }
     }
 
@@ -223,86 +251,12 @@ struct SensorManagementView: View {
         sensorNoiseSensitivity = UserDefaults.standard.sensorNoiseSensitivity
     }
 
-    private var startDateSheet: some View {
-        NavigationView {
-            Form {
-                if !UserDefaults.standard.startSensorTimeInfoGiven {
-                    Section {
-                        Text(Texts_HomeView.startSensorTimeInfo)
-                            .foregroundStyle(Color(.colorSecondary))
-                    }
-                }
-
-                Section(header: Text(Texts_HomeView.startSensorActionTitle)) {
-                    DatePicker(
-                        Texts_HomeView.sensorStart,
-                        selection: $selectedStartDate,
-                        in: ...Date(),
-                        displayedComponents: [.date, .hourAndMinute]
-                    )
-                }
-            }
-            .navigationTitle(Texts_HomeView.startSensorActionTitle)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(Texts_Common.Cancel) {
-                        showingStartDateSheet = false
-                    }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(Texts_Common.Ok) {
-                        UserDefaults.standard.startSensorTimeInfoGiven = true
-                        showingStartDateSheet = false
-                        onStartSensor(selectedStartDate, nil)
-                        refreshView.toggle()
-                    }
-                }
-            }
-        }
-        .colorScheme(.dark)
-    }
-
-    private var startCodeSheet: some View {
-        NavigationView {
-            Form {
-                Section {
-                    Text(Texts_HomeView.enterSensorCode)
-                        .foregroundStyle(Color(.colorSecondary))
-                }
-
-                Section(header: Text(Texts_HomeView.startSensorActionTitle)) {
-                    TextField("0000", text: $sensorCode)
-                        .keyboardType(.numberPad)
-                }
-            }
-            .navigationTitle(Texts_HomeView.startSensorActionTitle)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(Texts_Common.Cancel) {
-                        showingStartCodeSheet = false
-                    }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(Texts_Common.Ok) {
-                        let codeToSubmit = sensorCode.trimmingCharacters(in: .whitespacesAndNewlines)
-                        showingStartCodeSheet = false
-                        onStartSensor(Date(), codeToSubmit.isEmpty ? nil : codeToSubmit)
-                        refreshView.toggle()
-                    }
-                }
-            }
-        }
-        .colorScheme(.dark)
-    }
-
     private func handleStartTap() {
         let state = currentState()
 
         if state.needsSensorStartTime {
-            selectedStartDate = Date()
             showingStartDateSheet = true
         } else if state.needsSensorStartCode {
-            sensorCode = "0000"
             showingStartCodeSheet = true
         } else {
             onStartSensor(Date(), nil)
@@ -310,66 +264,24 @@ struct SensorManagementView: View {
         }
     }
 
-    private func submitCalibration() {
-        let state = currentState()
+    private func submitStartSensorCode(_ codeToSubmit: String) {
+        let normalizedCode = codeToSubmit.isEmpty ? "0000" : codeToSubmit
 
-        guard isCalibrationValueInRange() else {
-            return
-        }
+        showingStartCodeSheet = false
 
-        guard calibrationValue.toDouble() != nil else {
-            transientMessage = SensorManagementMessage(title: Texts_Common.warning, message: Texts_Common.invalidValue)
-            return
-        }
-
-        if state.shouldWarnOnLargeCalibrationStep, largeCalibrationDifferenceWarning(for: state) != nil {
-            showingLargeCalibrationDifferenceConfirmation = true
-            return
-        }
-
-        executeCalibration(state: state)
-    }
-
-    private func confirmCalibrationAfterWarning() {
-        guard isCalibrationValueInRange() else { return }
-
-        executeCalibration(state: currentState())
-    }
-
-    private func executeCalibration(state: SensorManagementState) {
-        guard let valueAsDouble = calibrationValue.toDouble() else { return }
-
-        let currentBgValueDescription = state.currentBgDisplay?.displayValueWithUnit(isMgDl: isMgDl) ?? nilString
-        let calibrationValueDescription = displayEnteredCalibrationValueWithUnit(valueAsDouble)
-        let warningMessage = largeCalibrationDifferenceWarning(for: state)
-
-        if let warningMessage {
-            trace(
-                "in submitCalibration, user calibrating. current BG = %{public}@, calibration value = %{public}@, warning = %{public}@",
-                log: log,
-                category: ConstantsLog.categoryApplicationDataCalibrations,
-                type: .info,
-                currentBgValueDescription,
-                calibrationValueDescription,
-                warningMessage
-            )
+        if normalizedCode == "0000" {
+            pendingStartSensorCode = normalizedCode
+            showingNoSensorCodeConfirmation = true
         } else {
-            trace(
-                "in submitCalibration, user calibrating. current BG = %{public}@, calibration value = %{public}@",
-                log: log,
-                category: ConstantsLog.categoryApplicationDataCalibrations,
-                type: .info,
-                currentBgValueDescription,
-                calibrationValueDescription
-            )
-        }
-
-        if let errorMessage = onSubmitCalibration(valueAsDouble) {
-            transientMessage = SensorManagementMessage(title: Texts_Common.warning, message: errorMessage)
-        } else {
-            showingCalibrationSheet = false
+            onStartSensor(Date(), normalizedCode)
             refreshView.toggle()
         }
+    }
+
+    private func startSensorWithPendingCode() {
+        onStartSensor(Date(), pendingStartSensorCode ?? "0000")
+        pendingStartSensorCode = nil
+        refreshView.toggle()
     }
 
     private func actionFooter(for state: SensorManagementState) -> some View {
@@ -396,121 +308,19 @@ struct SensorManagementView: View {
         }
     }
 
-    private func calibrationSheet(state: SensorManagementState) -> some View {
-        NavigationView {
-            Form {
-                Section(footer: calibrationEntryFooter) {
-                    HStack {
-                        Text(Texts_HomeView.postProcessingCurrentValue)
-                        Spacer()
-                        if let currentBgDisplay = state.currentBgDisplay {
-                            Text(currentBgDisplay.rawValue)
-                                .foregroundStyle(Color(.colorSecondary))
-                            Text(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
-                                .foregroundStyle(Color(.colorTertiary))
-                        } else {
-                            Text(nilString)
-                                .foregroundStyle(Color(.colorSecondary))
-                        }
-                    }
-
-                    HStack {
-                        Text(Texts_BgReadings.calibrationValue)
-                        Spacer()
-                        TextField(isMgDl ? "---" : "-.-", text: $calibrationValue)
-                            .keyboardType(isMgDl ? .numberPad : .decimalPad)
-                            .multilineTextAlignment(.trailing)
-                            .frame(maxWidth: 96)
-                            .foregroundStyle(calibrationValue.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? Color(.colorSecondary) : Color(.colorPrimary))
-                        Text(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
-                            .foregroundStyle(Color(.colorTertiary))
-                    }
-                }
-            }
-            .navigationTitle(Texts_HomeView.calibrationButton)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button(Texts_Common.Cancel) {
-                        calibrationValue = ""
-                        showingCalibrationSheet = false
-                    }
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(Texts_HomeView.calibrationButton) {
-                        submitCalibration()
-                    }
-                    .disabled(!state.canCalibrate || !isCalibrationValueValid(for: state))
-                }
+    private func statusRow(state: SensorManagementState) -> some View {
+        HStack {
+            Text(Texts_HomeView.statusActionTitle)
+            Spacer()
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(state.statusColor)
+                    .frame(width: 10, height: 10)
+                Text(state.statusTitle)
+                    .foregroundStyle(state.usesNormalStatusTextColor ? Color(.colorSecondary) : state.statusColor)
+                    .multilineTextAlignment(.trailing)
             }
         }
-        .colorScheme(.dark)
-    }
-
-    private var calibrationEntryFooter: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            validationMessageView()
-            Text(Texts_HomeView.sensorManagementCalibrationSafetyFooter)
-            Button(action: {
-                openCalibrationHelp()
-            }) {
-                Label(Texts_HomeView.sensorManagementCalibrationHelp, systemImage: "questionmark.circle")
-            }
-            .padding(.top, 6)
-        }
-    }
-
-    private func calibrationSummaryView(calibration: SensorManagementCalibrationDisplay, isHistoric: Bool) -> some View {
-        let showsCalculatedCalibrationDetails = calibration.showsCalculatedDetails
-
-        return VStack(alignment: .leading, spacing: 6) {
-            HStack {
-                Text(calibration.timeStamp.formatted(date: .abbreviated, time: .shortened))
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(Color(.colorPrimary))
-                Spacer()
-                if isHistoric {
-                    Text(Texts_HomeView.sensorManagementHistoricCalibration)
-                        .font(.caption)
-                        .foregroundStyle(Color(.systemGray))
-                }
-            }
-
-            HStack {
-                Text("BG")
-                    .foregroundStyle(Color(.colorSecondary))
-                Spacer()
-                Text(displayBgValue(calibration.bg))
-                    .foregroundStyle(isHistoric ? Color(.systemGray) : Color(.colorSecondary))
-            }
-
-            if showsCalculatedCalibrationDetails {
-                HStack {
-                    Text("Raw")
-                        .foregroundStyle(Color(.colorSecondary))
-                    Spacer()
-                    Text(calibration.rawValue.bgValueToString(mgDl: true) + " " + Texts_Common.mgdl)
-                        .foregroundStyle(isHistoric ? Color(.systemGray) : Color(.colorSecondary))
-                }
-
-                HStack {
-                    Text("Slope")
-                        .foregroundStyle(Color(.colorSecondary))
-                    Spacer()
-                    Text(calibration.slope.formatted(.number.rounded(increment: 0.0001)))
-                        .foregroundStyle(isHistoric ? Color(.systemGray) : Color(.colorSecondary))
-                }
-
-                HStack {
-                    Text("Intercept")
-                        .foregroundStyle(Color(.colorSecondary))
-                    Spacer()
-                    Text(calibration.intercept.formatted(.number.rounded(increment: 0.0001)))
-                        .foregroundStyle(isHistoric ? Color(.systemGray) : Color(.colorSecondary))
-                }
-            }
-        }
-        .padding(.vertical, 4)
     }
 
     private func row(title: String, data: String, dataColor: Color = Color(.colorSecondary)) -> some View {
@@ -523,96 +333,31 @@ struct SensorManagementView: View {
         }
     }
 
-    private func displayBgValue(_ valueInMgDl: Double) -> String {
-        valueInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).bgValueToString(mgDl: isMgDl) + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
-    }
-
     private func displayEditableBgValue(_ valueInMgDl: Double) -> String {
         valueInMgDl.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).stringWithoutTrailingZeroes
     }
 
-    private func isCalibrationValueValid(for state: SensorManagementState) -> Bool {
-        guard let currentBgDisplay = state.currentBgDisplay else { return false }
-        guard calibrationValue.toDouble() != nil else { return false }
+    private func sensorDetailsMessage(
+        sensorDescription: String,
+        startDate: Date?,
+        expiryDate: Date?,
+        elapsedString: String,
+        remainingString: String,
+        warmupReadyTimeString: String?
+    ) -> String {
+        var detailLines = [
+            Texts_HomeView.sensor + ": " + sensorDescription,
+            Texts_HomeView.sensorManagementStarted + ": " + (startDate?.toStringInUserLocale(timeStyle: .short, dateStyle: .medium) ?? nilString),
+            Texts_HomeView.sensorManagementEnds + ": " + (expiryDate?.toStringInUserLocale(timeStyle: .short, dateStyle: .medium) ?? nilString),
+            Texts_HomeView.sensorManagementElapsed + ": " + elapsedString,
+            Texts_HomeView.sensorManagementRemaining + ": " + remainingString
+        ]
 
-        return calibrationValue.trimmingCharacters(in: .whitespacesAndNewlines) != currentBgDisplay.rawValue.trimmingCharacters(in: .whitespacesAndNewlines)
-    }
-
-    @ViewBuilder private func validationMessageView() -> some View {
-        if !calibrationValue.isEmpty, !isCalibrationValueInRange() {
-            Text(String(format: Texts_HomeView.postProcessingValidGlucoseRange, minimumGlucoseValueString(), maximumGlucoseValueString()))
-                .foregroundStyle(Color(.systemRed))
-        }
-    }
-
-    private func isCalibrationValueInRange() -> Bool {
-        guard let enteredCalibrationValueInMgDl = enteredCalibrationValueInMgDl() else { return false }
-
-        return enteredCalibrationValueInMgDl >= ConstantsCalibrationAlgorithms.minimumBgReadingCalculatedValue &&
-            enteredCalibrationValueInMgDl <= ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValue
-    }
-
-    private func enteredCalibrationValueInMgDl() -> Double? {
-        guard let enteredCalibrationValue = calibrationValue.toDouble() else { return nil }
-
-        return enteredCalibrationValue.mmolToMgdl(mgDl: isMgDl)
-    }
-
-    private func largeCalibrationDifferenceWarning(for state: SensorManagementState) -> String? {
-        guard let currentBgDisplay = state.currentBgDisplay else { return nil }
-        guard let enteredValueInMgDl = enteredCalibrationValueInMgDl() else { return nil }
-        let differenceInMgDl = abs(enteredValueInMgDl - currentBgDisplay.valueInMgDl)
-
-        // Only some transmitters want this extra guardrail. When enabled, keep
-        // large recalibrations behind an explicit confirmation.
-        guard differenceInMgDl > ConstantsCalibrationAlgorithms.maximumRecommendedCalibrationDifferenceInMgDl else { return nil }
-
-        return String(
-            format: Texts_HomeView.sensorManagementLargeCalibrationDifferenceWarningFormat,
-            displayCalibrationDifferenceLimit()
-        )
-    }
-
-    private func displayCalibrationDifferenceLimit() -> String {
-        let limitInUserUnit = ConstantsCalibrationAlgorithms.maximumRecommendedCalibrationDifferenceInMgDl
-            .mgDlToMmol(mgDl: isMgDl)
-            .bgValueRounded(mgDl: isMgDl)
-
-        return limitInUserUnit.bgValueToString(mgDl: isMgDl) + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
-    }
-
-    private func displayEnteredCalibrationValueWithUnit(_ value: Double) -> String {
-        let valueInUserUnit = value.bgValueRounded(mgDl: isMgDl)
-        return valueInUserUnit.bgValueToString(mgDl: isMgDl) + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
-    }
-
-    private func minimumGlucoseValueString() -> String {
-        let minimumValue = ConstantsCalibrationAlgorithms.minimumBgReadingCalculatedValue
-            .mgDlToMmol(mgDl: isMgDl)
-            .bgValueRounded(mgDl: isMgDl)
-        return minimumValue.bgValueToString(mgDl: isMgDl) + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
-    }
-
-    private func maximumGlucoseValueString() -> String {
-        let maximumValue = ConstantsCalibrationAlgorithms.maximumBgReadingCalculatedValue
-            .mgDlToMmol(mgDl: isMgDl)
-            .bgValueRounded(mgDl: isMgDl)
-        return maximumValue.bgValueToString(mgDl: isMgDl) + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
-    }
-
-    private func openCalibrationHelp() {
-        let urlString: String
-
-        if let languageCode = NSLocale.current.language.languageCode?.identifier,
-           languageCode != ConstantsHomeView.onlineHelpBaseLocale,
-           UserDefaults.standard.translateOnlineHelp {
-            urlString = ConstantsHomeView.calibrationHelpURLTranslated1 + languageCode + ConstantsHomeView.calibrationHelpURLTranslated2
-        } else {
-            urlString = ConstantsHomeView.calibrationHelpURL
+        if let warmupReadyTimeString {
+            detailLines.append(Texts_BluetoothPeripheralView.warmingUpUntil + ": " + warmupReadyTimeString)
         }
 
-        guard let url = URL(string: urlString) else { return }
-        UIApplication.shared.open(url)
+        return detailLines.joined(separator: "\n")
     }
 
     private func currentState() -> SensorManagementState {
@@ -674,6 +419,7 @@ struct SensorManagementView: View {
             statusTitle = Texts_HomeView.sensorManagementStatusActive
             statusColor = Color.green
         }
+        let usesNormalStatusTextColor = activeSensor != nil && warmupReadyTimeString == nil && !(remainingMinutes.map { $0 < 0 } ?? false)
 
         let expiryFooter: String?
         if activeSensor != nil, warmupReadyTimeString == nil, maxSensorAgeInDays > 0, let expiryDate {
@@ -716,6 +462,20 @@ struct SensorManagementView: View {
         } else {
             remainingColor = Color(.colorSecondary)
         }
+
+        let elapsedString = startDate?.daysAndHoursAgo() ?? nilString
+        let displayRemainingString = remainingMinutes.map { $0 < 0 ? "-" + abs($0).minutesToDaysAndHours() : $0.minutesToDaysAndHours() } ?? nilString
+        let sessionLifetimeString = elapsedString
+        let sessionLifetimeColor = Color(.colorSecondary)
+
+        let sensorDetailsMessage = sensorDetailsMessage(
+            sensorDescription: sensorDescription,
+            startDate: startDate,
+            expiryDate: expiryDate,
+            elapsedString: elapsedString,
+            remainingString: displayRemainingString,
+            warmupReadyTimeString: warmupReadyTimeString
+        )
 
         let noiseMeasurementsDetail: String?
         if let startDate {
@@ -779,6 +539,17 @@ struct SensorManagementView: View {
             calibrationNote = nil
         }
 
+        let lastCalibration = currentCalibration ?? calibrationHistory.first
+        let hasCalibrationHistory = lastCalibration != nil || !calibrationHistory.isEmpty
+        let calibrationSummary: String
+        if let lastCalibration {
+            calibrationSummary = lastCalibration.timeStamp.formatted(date: .abbreviated, time: .shortened)
+        } else if showCalibrationUnavailableRow {
+            calibrationSummary = Texts_Common.notAvailable
+        } else {
+            calibrationSummary = nilString
+        }
+
         let rawNoiseState = activeSensor.flatMap { SensorNoiseState(rawValue: $0.noiseStateRaw) } ?? .collecting
         let noiseState = ConstantsSensorNoise.displayState(
             rawState: rawNoiseState,
@@ -786,19 +557,39 @@ struct SensorManagementView: View {
             longTermNoise: activeSensor?.longTermNoise?.doubleValue,
             sensitivity: UserDefaults.standard.sensorNoiseSensitivity
         )
+        let recentReadings = activeSensor.map {
+            bgReadingsAccessor.getLatestBgReadingSnapshots(
+                limit: nil,
+                fromDate: Date().addingTimeInterval(-CalibrationReadinessConstants.trendLookback),
+                forSensor: $0,
+                ignoreRawData: true,
+                ignoreCalculatedValue: false
+            )
+        } ?? []
+        let calibrationReadiness = CalibrationReadinessEvaluator(now: Date()).evaluate(
+            hasActiveSensor: activeSensor != nil,
+            recentReadings: recentReadings.map {
+                CalibrationReadinessReading(timeStamp: $0.timeStamp, valueInMgDl: $0.finalValue)
+            },
+            noiseState: noiseState
+        )
 
         return SensorManagementState(
             hasTransmitter: transmitter != nil,
-            showsNoise: UserDefaults.standard.isMaster && UserDefaults.standard.showSensorNoise && activeSensor != nil,
+            showsNoise: UserDefaults.standard.isMaster && activeSensor != nil,
             sensorID: activeSensor?.id,
             bannerTitle: sensorDescription,
             statusTitle: statusTitle,
             statusColor: statusColor,
+            usesNormalStatusTextColor: usesNormalStatusTextColor,
+            sessionLifetimeString: sessionLifetimeString,
+            sessionLifetimeColor: sessionLifetimeColor,
+            sensorDetailsMessage: sensorDetailsMessage,
             startDateString: startDate?.toStringInUserLocale(timeStyle: .short, dateStyle: .short) ?? nilString,
             secondarySessionTitle: secondarySessionTitle,
             secondarySessionValue: secondarySessionValue,
             secondarySessionColor: secondarySessionColor,
-            remainingString: remainingMinutes.map { $0 < 0 ? "-" + abs($0).minutesToDaysAndHours() : $0.minutesToDaysAndHours() } ?? nilString,
+            remainingString: displayRemainingString,
             remainingColor: remainingColor,
             noiseMeasurementsDetail: noiseMeasurementsDetail,
             expiryFooter: expiryFooter,
@@ -812,16 +603,20 @@ struct SensorManagementView: View {
             canCalibrate: canCalibrate,
             showCalibrationUnavailableRow: showCalibrationUnavailableRow,
             calibrationNote: calibrationNote,
+            calibrationSummary: calibrationSummary,
+            hasCalibrationHistory: hasCalibrationHistory,
             shortTermNoise: activeSensor?.shortTermNoise?.doubleValue,
             longTermNoise: activeSensor?.longTermNoise?.doubleValue,
             noiseState: noiseState,
             currentBgDisplay: activeSensor.flatMap { bgReadingsAccessor.last(forSensor: $0) }.map {
                 SensorManagementEnteredBgValue(rawValue: displayEditableBgValue($0.finalValue), valueInMgDl: $0.finalValue)
             },
+            calibrationReadiness: calibrationReadiness,
             currentCalibration: currentCalibration,
             calibrationHistory: calibrationHistory
         )
     }
+
 }
 
 /// Complete value presentation derived from the current sensor and transmitter.
@@ -832,6 +627,10 @@ private struct SensorManagementState {
     let bannerTitle: String
     let statusTitle: String
     let statusColor: Color
+    let usesNormalStatusTextColor: Bool
+    let sessionLifetimeString: String
+    let sessionLifetimeColor: Color
+    let sensorDetailsMessage: String
     let startDateString: String
     let secondarySessionTitle: String
     let secondarySessionValue: String
@@ -850,52 +649,13 @@ private struct SensorManagementState {
     let canCalibrate: Bool
     let showCalibrationUnavailableRow: Bool
     let calibrationNote: String?
+    let calibrationSummary: String
+    let hasCalibrationHistory: Bool
     let shortTermNoise: Double?
     let longTermNoise: Double?
     let noiseState: SensorNoiseState
     let currentBgDisplay: SensorManagementEnteredBgValue?
+    let calibrationReadiness: CalibrationReadiness
     let currentCalibration: SensorManagementCalibrationDisplay?
     let calibrationHistory: [SensorManagementCalibrationDisplay]
-}
-
-/// Parsed calibration input in display and mg/dL units.
-private struct SensorManagementEnteredBgValue {
-    let rawValue: String
-    let valueInMgDl: Double
-
-    func displayValueWithUnit(isMgDl: Bool) -> String {
-        rawValue + " " + (isMgDl ? Texts_Common.mgdl : Texts_Common.mmol)
-    }
-}
-
-/// One previous calibration displayed in the sensor summary.
-private struct SensorManagementCalibrationDisplay {
-    let id: String
-    let timeStamp: Date
-    let slope: Double
-    let intercept: Double
-    let bg: Double
-    let rawValue: Double
-    let isValid: Bool
-
-    init(_ calibration: Calibration) {
-        id = calibration.id
-        timeStamp = calibration.timeStamp
-        slope = calibration.slope
-        intercept = calibration.intercept
-        bg = calibration.bg
-        rawValue = calibration.rawValue
-        isValid = calibration.sensorConfidence != 0 && calibration.slopeConfidence != 0
-    }
-
-    var showsCalculatedDetails: Bool {
-        abs(slope) > 0.0001 || abs(intercept) > 0.0001
-    }
-}
-
-/// Transient result or validation message shown by the sensor workflow.
-private struct SensorManagementMessage: Identifiable {
-    let id = UUID()
-    let title: String
-    let message: String
 }

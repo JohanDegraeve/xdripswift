@@ -36,7 +36,7 @@
 "success" = "Επιτυχία";
 "failed" = "Απέτυχε";
 "dexcomBatteryTooLow" = "Η μπαταρία του πομπού είναι πολύ χαμηλή!";
-"enterSensorCode" = "εάν δεν έχετε κωδικό αισθητήρα χρησιμοποιήστε 0000, αλλά να γνωρίζετε ότι δεν θα λάβετε μετρήσεις μέχρι να βαθμονομήσετε";
+"enterSensorCode" = "Αν δεν γνωρίζετε τον κωδικό του αισθητήρα, αφήστε το κενό για να χρησιμοποιηθεί το 0000. Αν πατήσετε OK χωρίς κωδικό, θα χρησιμοποιηθεί το 0000 ως κωδικός αισθητήρα ή θα καταγραφεί η τρέχουσα συνεδρία αν έχει ήδη ξεκινήσει.";
 "stopSensorConfirmation" = "Είστε βέβαιοι ότι θέλετε να σταματήσετε τον αισθητήρα;";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -105,3 +105,11 @@
 "sensorNoiseHistoryChartAccessibility" = "Γράφημα ιστορικού θορύβου αισθητήρα";
 "pumpBattery" = "Μπαταρία";
 "pumpReservoir" = "Δεξαμενή";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "Τελευταία";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";

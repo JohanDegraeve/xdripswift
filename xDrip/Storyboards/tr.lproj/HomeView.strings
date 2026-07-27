@@ -36,7 +36,7 @@
 "success" = "Başarı";
 "failed" = "Başarısız oldu";
 "dexcomBatteryTooLow" = "Verici pili çok düşük!";
-"enterSensorCode" = "sensör kodunuz yoksa 0000 kullanın, ancak kalibre edene kadar okuma almayacağınızı unutmayın.";
+"enterSensorCode" = "Sensör kodunu bilmiyorsanız 0000 kullanmak için bunu boş bırakın. Kod girmeden OK düğmesine basarsanız sensör kodu olarak 0000 kullanılır veya zaten başlamışsa mevcut oturum yakalanır.";
 "stopSensorConfirmation" = "Sensörü durdurmak istediğinizden emin misiniz?";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -105,3 +105,11 @@
 "sensorNoiseHistoryChartAccessibility" = "Sensör gürültüsü geçmişi grafiği";
 "pumpBattery" = "Pil";
 "pumpReservoir" = "Rezervuar";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "Son";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";

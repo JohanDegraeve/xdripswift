@@ -110,7 +110,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code use 0000 but be aware that you will need to manually calibrate before you get readings.";
+"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -184,3 +184,34 @@
 "sensorNoiseHistoryChartAccessibility" = "Diagramm des Sensorrauschverlaufs";
 "pumpBattery" = "Batterie";
 "pumpReservoir" = "Reservoir";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "Letzte";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";
+"sensorManagementCalibrationInRange" = "Im Zielbereich";
+"sensorManagementCalibrationStableTrend" = "Stabiler Verlauf";
+"sensorManagementCalibrationSlightlyLow" = "Leicht niedrig";
+"sensorManagementCalibrationSlightlyHigh" = "Leicht hoch";
+"sensorManagementCalibrationNoReading" = "Keine Messung";
+"sensorManagementCalibrationGood" = "Gut";
+"sensorManagementCalibrationNoTrend" = "Kein Trend";
+"sensorManagementCalibrationStale" = "Veraltet";
+"sensorManagementCalibrationStable" = "Stabil";
+"sensorManagementCalibrationFallingFast" = "Schnell fallend";
+"sensorManagementCalibrationFalling" = "Fallend";
+"sensorManagementCalibrationRisingFast" = "Schnell steigend";
+"sensorManagementCalibrationRising" = "Steigend";
+"sensorManagementCalibrationFlatline" = "Flache Linie";
+"sensorManagementCalibrationBG" = "BZ";
+"sensorManagementCalibrationRaw" = "Rohwert";
+"sensorManagementCalibrationSlope" = "Steigung";
+"sensorManagementCalibrationIntercept" = "Achsenabschnitt";
+"sensorManagementCalibrationReadinessBad" = "Die Kalibrierung ist derzeit wahrscheinlich ungenau. Bitte warten.";
+"sensorManagementCalibrationReadinessCaution" = "Die Kalibrierung ist möglicherweise weniger zuverlässig. Warten könnte besser sein.";
+"sensorManagementCalibrationReadinessGood" = "Jetzt ist ein guter Zeitpunkt zum Kalibrieren.";
+"sensorManagementCalibrationSafetyFooter" = "Kalibrieren Sie nur, wenn Sie wissen, wie es sicher durchgeführt wird.";
+"sensorManagementLargeCalibrationDifferenceWarningFormat" = "Diese Kalibrierung funktioniert möglicherweise nicht. Versuchen Sie, jede Kalibrierungsänderung auf maximal %@ zu begrenzen.";

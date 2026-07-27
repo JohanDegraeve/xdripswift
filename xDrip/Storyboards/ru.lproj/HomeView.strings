@@ -36,7 +36,7 @@
 "success" = "Успешно";
 "failed" = "Не успешно";
 "dexcomBatteryTooLow" = "Батарея трансмиттера слишком разряжена!";
-"enterSensorCode" = "если у вас нет кода датчика, используйте 0000, но имейте в виду, что вы не получите показания, пока не откалибруете";
+"enterSensorCode" = "Если вы не знаете код сенсора, оставьте поле пустым, чтобы использовать 0000. Нажатие OK без кода использует 0000 как код сенсора или просто захватит текущую сессию, если она уже начата.";
 "stopSensorConfirmation" = "Вы уверены, что хотите остановить датчик?";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -105,3 +105,11 @@
 "sensorNoiseHistoryChartAccessibility" = "График истории шума сенсора";
 "pumpBattery" = "Батарея";
 "pumpReservoir" = "Резервуар";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "Последняя";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";

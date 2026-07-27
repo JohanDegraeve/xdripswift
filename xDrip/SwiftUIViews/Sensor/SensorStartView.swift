@@ -1,0 +1,84 @@
+import SwiftUI
+
+struct SensorStartDateView: View {
+    let onCancel: () -> Void
+    let onStart: (Date) -> Void
+
+    @State private var selectedStartDate = Date()
+
+    var body: some View {
+        NavigationView {
+            Form {
+                if !UserDefaults.standard.startSensorTimeInfoGiven {
+                    Section {
+                        Text(Texts_HomeView.startSensorTimeInfo)
+                            .foregroundStyle(Color(.colorSecondary))
+                    }
+                }
+
+                Section(header: Text(Texts_HomeView.startSensorActionTitle)) {
+                    DatePicker(
+                        Texts_HomeView.sensorStart,
+                        selection: $selectedStartDate,
+                        in: ...Date(),
+                        displayedComponents: [.date, .hourAndMinute]
+                    )
+                }
+            }
+            .navigationTitle(Texts_HomeView.startSensorActionTitle)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(Texts_Common.Cancel, action: onCancel)
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(Texts_Common.Ok) {
+                        UserDefaults.standard.startSensorTimeInfoGiven = true
+                        onStart(selectedStartDate)
+                    }
+                }
+            }
+        }
+        .colorScheme(.dark)
+    }
+}
+
+struct SensorStartCodeView: View {
+    let onCancel: () -> Void
+    let onSubmit: (String) -> Void
+
+    @State private var sensorCode = ""
+
+    var body: some View {
+        NavigationView {
+            Form {
+                Section {
+                    Text(Texts_HomeView.enterSensorCode)
+                        .foregroundStyle(Color(.colorSecondary))
+                }
+
+                Section(header: Text(Texts_HomeView.startSensorActionTitle)) {
+                    TextField("0000", text: $sensorCode)
+                        .keyboardType(.numberPad)
+                }
+            }
+            .navigationTitle(Texts_HomeView.startSensorActionTitle)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(Texts_Common.Cancel, action: onCancel)
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(Texts_Common.Ok) {
+                        onSubmit(sensorCode.trimmingCharacters(in: .whitespacesAndNewlines))
+                    }
+                    .disabled(!isSensorCodeValid)
+                }
+            }
+        }
+        .colorScheme(.dark)
+    }
+
+    private var isSensorCodeValid: Bool {
+        let trimmedCode = sensorCode.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmedCode.isEmpty || (trimmedCode.count == 4 && trimmedCode.allSatisfy(\.isNumber))
+    }
+}

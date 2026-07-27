@@ -29,9 +29,7 @@ struct RootHomeToolbarView: View {
         HStack(spacing: 0) {
             toolbarButton(systemImage: state.controls.snoozeSystemImage, label: Texts_HomeView.snoozeButton, action: actions.showSnooze)
             toolbarButton(systemImage: "drop", label: "BgReadings", action: actions.showBgReadings)
-            toolbarButton(systemImage: "sensor.tag.radiowaves.forward", label: Texts_HomeView.sensor, action: actions.showSensorManagement)
-                .disabled(!state.controls.sensorButtonEnabled)
-                .opacity(state.controls.sensorButtonEnabled ? 1 : 0.35)
+            sensorToolbarButton()
             postProcessingToolbarButton()
             toolbarButton(systemImage: "rectangle.3.group", label: "Show/Hide", action: actions.showHideItems)
             toolbarButton(systemImage: state.isScreenLocked ? "lock.fill" : "lock", label: Texts_HomeView.lockButton, action: actions.toggleScreenLock)
@@ -40,6 +38,43 @@ struct RootHomeToolbarView: View {
         .padding(.horizontal, Layout.horizontalPadding)
         .padding(.vertical, Layout.verticalPadding)
         .frame(maxWidth: .infinity)
+    }
+
+    private func sensorToolbarButton() -> some View {
+        let isEnabled = state.controls.sensorButtonEnabled
+
+        return Image(systemName: "sensor.tag.radiowaves.forward")
+            .font(.system(size: Layout.iconSize, weight: .regular))
+            .frame(width: Layout.buttonSize, height: Layout.buttonSize)
+            .contentShape(Rectangle())
+            .gesture(
+                LongPressGesture(minimumDuration: 0.35)
+                    .exclusively(before: TapGesture())
+                    .onEnded { result in
+                        guard isEnabled else { return }
+
+                        switch result {
+                        case .first:
+                            actions.toolbarLongPressActivated()
+                            actions.showCalibration()
+                        case .second:
+                            actions.showSensorManagement()
+                        }
+                    }
+            )
+            .foregroundStyle(ConstantsAppColors.toolbarIcon)
+            .frame(maxWidth: .infinity)
+            .opacity(isEnabled ? 1 : 0.35)
+            .allowsHitTesting(isEnabled)
+            .accessibilityElement()
+            .accessibilityLabel(Texts_HomeView.sensor)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction {
+                actions.showSensorManagement()
+            }
+            .accessibilityAction(named: Text(Texts_HomeView.calibrationButton)) {
+                actions.showCalibration()
+            }
     }
 
     private func postProcessingToolbarButton() -> some View {
@@ -70,7 +105,7 @@ struct RootHomeToolbarView: View {
 
                 originalGlucosePeekIsActive = true
                 shouldIgnoreNextPostProcessingTap = true
-                actions.originalGlucosePeekActivated()
+                actions.toolbarLongPressActivated()
                 beginOriginalGlucosePeek()
             }
             .onEnded { _ in

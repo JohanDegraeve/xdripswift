@@ -36,7 +36,7 @@
 "screenlocktitle" = "تم تفعيل قفل الشاشة";
 "screenlockinfo" = "سيؤدي هذا إلى إبقاء الشاشة في حالة نشاط حتى تنتقل إلى تطبيق آخر أو تنقر فوق إلغاء القفل.\r\n\nيوصى بإبقاء الهاتف متصلاً بالشاحن لمنع استنزاف البطارية.";
 "stopSensorConfirmation" = "هل أنت متأكد أنك تريد إيقاف الحساس؟";
-"enterSensorCode" = "إذا لم يكن لديك رمز الحساس ، فاستخدم 0000 ولكن كن على علم بأنك لن تحصل على قراءات حتى تقوم بالمعايرة";
+"enterSensorCode" = "إذا كنت لا تعرف رمز الحساس، اتركه فارغًا لاستخدام 0000. الضغط على OK بدون رمز سيستخدم 0000 كرمز للحساس، أو سيقوم فقط بالتقاط الجلسة الحالية إذا كانت قد بدأت بالفعل.";
 
 /// status info : literally 'Sensor End'
 "sensorend" = "ينتهي الحساس";
@@ -107,3 +107,11 @@
 "sensorNoiseHistoryChartAccessibility" = "مخطط سجل ضوضاء المستشعر";
 "pumpBattery" = "البطارية";
 "pumpReservoir" = "الخزان";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "الأخيرة";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";

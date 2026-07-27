@@ -47,7 +47,7 @@
 "stopSensorConfirmation" = "Oletko varma, että haluat pysäyttää sensorin?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "jos sinulla ei ole koodia, käytä 0000, mutta muista, että et saa lukemia ennen kuin olet kalibroinut";
+"enterSensorCode" = "Jos et tiedä sensorin koodia, jätä tämä tyhjäksi käyttääksesi 0000. Jos painat OK ilman koodia, sensorikoodina käytetään 0000, tai nykyinen istunto vain otetaan käyttöön, jos se on jo alkanut.";
 
 /// status info : literally 'Sensor End'
 "sensorend" = "Sensori loppuu";
@@ -121,3 +121,11 @@
 "sensorNoiseHistoryChartAccessibility" = "Sensorin kohinahistorian kaavio";
 "pumpBattery" = "Akku";
 "pumpReservoir" = "Säiliö";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "Viimeisin";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";

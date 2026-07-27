@@ -236,6 +236,10 @@
 		4A9B100D2F0A000100000001 /* HampelSavitzkyGolayBgSmoothing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A9B101D2F0A000100000001 /* HampelSavitzkyGolayBgSmoothing.swift */; };
 		4AC0D0012F1D000100000001 /* SnoozeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AC0D0022F1D000100000001 /* SnoozeView.swift */; };
 		4B0C00022F3B000100000001 /* SensorManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0C00012F3B000100000001 /* SensorManagementView.swift */; };
+		4B0C00122F3B000100000001 /* CalibrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0C00112F3B000100000001 /* CalibrationView.swift */; };
+		4B0C00142F3B000100000001 /* CalibrationHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0C00132F3B000100000001 /* CalibrationHistoryView.swift */; };
+		4B0C00162F3B000100000001 /* CalibrationReadiness.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0C00152F3B000100000001 /* CalibrationReadiness.swift */; };
+		4B0C00182F3B000100000001 /* SensorStartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B0C00172F3B000100000001 /* SensorStartView.swift */; };
 		4C1000012F64000100000001 /* TreatmentsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1000022F64000100000001 /* TreatmentsView.swift */; };
 		4C1000032F64000100000001 /* TreatmentEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1000042F64000100000001 /* TreatmentEditorView.swift */; };
 		4C1000062F64000100000001 /* TreatmentsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C1000072F64000100000001 /* TreatmentsViewModel.swift */; };
@@ -262,7 +266,6 @@
 		4D31C0012FF5000100000001 /* GenerateReportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0012FF5000100000001 /* GenerateReportView.swift */; };
 		4D31C0022FF5000100000001 /* GenerateReportViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0022FF5000100000001 /* GenerateReportViewModel.swift */; };
 		4D31C0032FF5000100000001 /* ReportAGPChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0032FF5000100000001 /* ReportAGPChartView.swift */; };
-		4D31C00E2FF5000100000001 /* AGPChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C00E2FF5000100000001 /* AGPChartView.swift */; };
 		4D31C0052FF5000100000001 /* ReportClinicalPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0052FF5000100000001 /* ReportClinicalPageView.swift */; };
 		4D31C0062FF5000100000001 /* ReportDailySummarySectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0062FF5000100000001 /* ReportDailySummarySectionView.swift */; };
 		4D31C0072FF5000100000001 /* ReportFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C0072FF5000100000001 /* ReportFormatting.swift */; };
@@ -272,6 +275,7 @@
 		4D31C00B2FF5000100000001 /* ReportPreviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C00B2FF5000100000001 /* ReportPreviewView.swift */; };
 		4D31C00C2FF5000100000001 /* ReportTimeInRangeBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C00C2FF5000100000001 /* ReportTimeInRangeBarView.swift */; };
 		4D31C00D2FF5000100000001 /* ReportUserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C00D2FF5000100000001 /* ReportUserDefaults.swift */; };
+		4D31C00E2FF5000100000001 /* AGPChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D30C00E2FF5000100000001 /* AGPChartView.swift */; };
 		4D41C0012FF6000100000001 /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D40C0012FF6000100000001 /* StatisticsView.swift */; };
 		4D41C0022FF6000100000001 /* StatisticsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D40C0022FF6000100000001 /* StatisticsViewModel.swift */; };
 		4D7180012FE8000100000001 /* MedtrumTouchCareNano+BluetoothPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D7180022FE8000100000001 /* MedtrumTouchCareNano+BluetoothPeripheral.swift */; };
@@ -1049,6 +1053,10 @@
 		4A9B101D2F0A000100000001 /* HampelSavitzkyGolayBgSmoothing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HampelSavitzkyGolayBgSmoothing.swift; sourceTree = "<group>"; };
 		4AC0D0022F1D000100000001 /* SnoozeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnoozeView.swift; sourceTree = "<group>"; };
 		4B0C00012F3B000100000001 /* SensorManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorManagementView.swift; sourceTree = "<group>"; };
+		4B0C00112F3B000100000001 /* CalibrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibrationView.swift; sourceTree = "<group>"; };
+		4B0C00132F3B000100000001 /* CalibrationHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibrationHistoryView.swift; sourceTree = "<group>"; };
+		4B0C00152F3B000100000001 /* CalibrationReadiness.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CalibrationReadiness.swift; sourceTree = "<group>"; };
+		4B0C00172F3B000100000001 /* SensorStartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorStartView.swift; sourceTree = "<group>"; };
 		4C1000022F64000100000001 /* TreatmentsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsView.swift; sourceTree = "<group>"; };
 		4C1000042F64000100000001 /* TreatmentEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentEditorView.swift; sourceTree = "<group>"; };
 		4C1000072F64000100000001 /* TreatmentsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TreatmentsViewModel.swift; sourceTree = "<group>"; };
@@ -1075,7 +1083,6 @@
 		4D30C0012FF5000100000001 /* GenerateReportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateReportView.swift; sourceTree = "<group>"; };
 		4D30C0022FF5000100000001 /* GenerateReportViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenerateReportViewModel.swift; sourceTree = "<group>"; };
 		4D30C0032FF5000100000001 /* ReportAGPChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportAGPChartView.swift; sourceTree = "<group>"; };
-		4D30C00E2FF5000100000001 /* AGPChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AGPChartView.swift; sourceTree = "<group>"; };
 		4D30C0052FF5000100000001 /* ReportClinicalPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportClinicalPageView.swift; sourceTree = "<group>"; };
 		4D30C0062FF5000100000001 /* ReportDailySummarySectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportDailySummarySectionView.swift; sourceTree = "<group>"; };
 		4D30C0072FF5000100000001 /* ReportFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportFormatting.swift; sourceTree = "<group>"; };
@@ -1085,6 +1092,7 @@
 		4D30C00B2FF5000100000001 /* ReportPreviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportPreviewView.swift; sourceTree = "<group>"; };
 		4D30C00C2FF5000100000001 /* ReportTimeInRangeBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportTimeInRangeBarView.swift; sourceTree = "<group>"; };
 		4D30C00D2FF5000100000001 /* ReportUserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReportUserDefaults.swift; sourceTree = "<group>"; };
+		4D30C00E2FF5000100000001 /* AGPChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AGPChartView.swift; sourceTree = "<group>"; };
 		4D40C0012FF6000100000001 /* StatisticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsView.swift; sourceTree = "<group>"; };
 		4D40C0022FF6000100000001 /* StatisticsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticsViewModel.swift; sourceTree = "<group>"; };
 		4D7180022FE8000100000001 /* MedtrumTouchCareNano+BluetoothPeripheral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MedtrumTouchCareNano+BluetoothPeripheral.swift"; sourceTree = "<group>"; };
@@ -2164,8 +2172,12 @@
 		47EEC2C830112D990061FC8D /* Sensor */ = {
 			isa = PBXGroup;
 			children = (
+				4B0C00132F3B000100000001 /* CalibrationHistoryView.swift */,
+				4B0C00152F3B000100000001 /* CalibrationReadiness.swift */,
+				4B0C00112F3B000100000001 /* CalibrationView.swift */,
 				4B0C00012F3B000100000001 /* SensorManagementView.swift */,
 				4E6100132FF3000100000001 /* SensorNoiseHistoryView.swift */,
+				4B0C00172F3B000100000001 /* SensorStartView.swift */,
 			);
 			path = Sensor;
 			sourceTree = "<group>";
@@ -4279,6 +4291,10 @@
 				4C1000062F64000100000001 /* TreatmentsViewModel.swift in Sources */,
 				4C1000012F64000100000001 /* TreatmentsView.swift in Sources */,
 				4B0C00022F3B000100000001 /* SensorManagementView.swift in Sources */,
+				4B0C00122F3B000100000001 /* CalibrationView.swift in Sources */,
+				4B0C00142F3B000100000001 /* CalibrationHistoryView.swift in Sources */,
+				4B0C00162F3B000100000001 /* CalibrationReadiness.swift in Sources */,
+				4B0C00182F3B000100000001 /* SensorStartView.swift in Sources */,
 				4E6100032FF3000100000001 /* SensorNoiseHistoryView.swift in Sources */,
 				F8252867243E50FE0067AF77 /* ConstantsLibre.swift in Sources */,
 				F8F9720923A5915900C3F17D /* AESCrypt.m in Sources */,

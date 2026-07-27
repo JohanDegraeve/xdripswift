@@ -1218,7 +1218,7 @@ import AppIntents
 
     private func makeRootHomeActions() -> RootHomeActions {
         RootHomeActions(
-            originalGlucosePeekActivated: {
+            toolbarLongPressActivated: {
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             },
             toggleExpandedAIDInfo: { [weak self] in

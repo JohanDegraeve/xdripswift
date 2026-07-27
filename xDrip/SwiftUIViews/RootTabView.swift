@@ -545,6 +545,7 @@ private struct RootHomeTabView: View {
         case snooze
         case bgReadings
         case sensorManagement
+        case sensorCalibration
         case bgAdjustments
         case showHideItems
         case aidStatus
@@ -626,6 +627,7 @@ private struct RootHomeTabView: View {
         actions.showSnooze = { presentedView = .snooze }
         actions.showBgReadings = { presentedView = .bgReadings }
         actions.showSensorManagement = { presentedView = .sensorManagement }
+        actions.showCalibration = { presentedView = .sensorCalibration }
         actions.showBgAdjustments = { presentedView = .bgAdjustments }
         actions.showHideItems = { presentedView = .showHideItems }
         actions.showAIDStatus = { presentedView = .aidStatus }
@@ -644,7 +646,7 @@ private struct RootHomeTabView: View {
                 BgReadingsView()
                     .environmentObject(dependencies.bgReadingsAccessor)
                     .environmentObject(dependencies.nightscoutSyncManager)
-            case .sensorManagement:
+            case .sensorManagement, .sensorCalibration:
                 SensorManagementView(
                     activeSensorProvider: dependencies.activeSensorProvider,
                     transmitterProvider: dependencies.transmitterProvider,
@@ -653,7 +655,8 @@ private struct RootHomeTabView: View {
                     sensorNoiseManager: dependencies.sensorNoiseManager,
                     onStartSensor: dependencies.startSensor,
                     onStopSensor: dependencies.stopSensor,
-                    onSubmitCalibration: dependencies.submitCalibration
+                    onSubmitCalibration: dependencies.submitCalibration,
+                    initiallyShowsCalibration: presentedView == .sensorCalibration
                 )
             case .bgAdjustments:
                 BgAdjustmentsView(

@@ -814,8 +814,9 @@ struct RootHomeActions {
     var showSnooze: () -> Void = {}
     var showBgReadings: () -> Void = {}
     var showSensorManagement: () -> Void = {}
+    var showCalibration: () -> Void = {}
     var showBgAdjustments: () -> Void = {}
-    var originalGlucosePeekActivated: () -> Void = {}
+    var toolbarLongPressActivated: () -> Void = {}
     var showHideItems: () -> Void = {}
     var toggleScreenLock: () -> Void = {}
     var keepScreenAwake: () -> Void = {}

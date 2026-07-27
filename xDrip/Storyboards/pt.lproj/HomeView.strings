@@ -44,7 +44,7 @@
 "stopSensorConfirmation" = "Are you sure you want to stop the sensor?";
 
 /// When user needs to enter sensor code, to start firefly sensor
-"enterSensorCode" = "If you don't know the sensor code use 0000 but be aware that you will need to manually calibrate before you get readings.";
+"enterSensorCode" = "If you don't know the sensor code, leave this empty to use 0000. Pressing OK without a code will use 0000 as the sensor code, or will just capture the current session if one is already started.";
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 /////   Translation needed - remove this header after translation                       /////
@@ -118,3 +118,34 @@
 "sensorNoiseHistoryChartAccessibility" = "Gráfico do histórico de ruído do sensor";
 "pumpBattery" = "Bateria";
 "pumpReservoir" = "Reservatório";
+"sensorManagementSessionLifetime" = "Elapsed / Remaining";
+"sensorManagementSessionDetails" = "Session Details";
+"sensorManagementCalibrationOpenTitle" = "Calibration Details";
+"sensorManagementCGMType" = "CGM Type";
+"sensorManagementLastCalibration" = "Última";
+"sensorManagementStatusActive" = "Sensor Active";
+"sensorManagementStarted" = "Started";
+"sensorManagementEnds" = "Ends";
+"sensorManagementCalibrationInRange" = "Dentro do intervalo";
+"sensorManagementCalibrationStableTrend" = "Tendência estável";
+"sensorManagementCalibrationSlightlyLow" = "Ligeiramente baixo";
+"sensorManagementCalibrationSlightlyHigh" = "Ligeiramente alto";
+"sensorManagementCalibrationNoReading" = "Sem leitura";
+"sensorManagementCalibrationGood" = "Bom";
+"sensorManagementCalibrationNoTrend" = "Sem tendência";
+"sensorManagementCalibrationStale" = "Desatualizada";
+"sensorManagementCalibrationStable" = "Estável";
+"sensorManagementCalibrationFallingFast" = "A descer rapidamente";
+"sensorManagementCalibrationFalling" = "A descer";
+"sensorManagementCalibrationRisingFast" = "A subir rapidamente";
+"sensorManagementCalibrationRising" = "A subir";
+"sensorManagementCalibrationFlatline" = "Linha plana";
+"sensorManagementCalibrationBG" = "Glicemia";
+"sensorManagementCalibrationRaw" = "Bruto";
+"sensorManagementCalibrationSlope" = "Inclinação";
+"sensorManagementCalibrationIntercept" = "Interceção";
+"sensorManagementCalibrationReadinessBad" = "É pouco provável que a calibração seja precisa neste momento. Aguarde.";
+"sensorManagementCalibrationReadinessCaution" = "A calibração pode ser menos fiável. Talvez seja melhor aguardar.";
+"sensorManagementCalibrationReadinessGood" = "Agora é uma boa altura para calibrar.";
+"sensorManagementCalibrationSafetyFooter" = "Calibre apenas se souber como fazê-lo em segurança.";
+"sensorManagementLargeCalibrationDifferenceWarningFormat" = "É possível que esta calibração não funcione. Tente limitar cada alteração de calibração a um máximo de %@ de cada vez.";
