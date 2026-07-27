@@ -1871,7 +1871,7 @@ private extension BluetoothPeripheralDetailState {
         return [
             BluetoothPeripheralDetailSection(
                 id: "bubble",
-                title: BluetoothPeripheralType.BubbleType.rawValue,
+                title: BluetoothPeripheralType.BubbleType.bluetoothPeripheralDisplayTitle,
                 rows: makeLibreBridgeRows(
                     idPrefix: "bubble",
                     sensorType: bubble.blePeripheral.libreSensorType?.description,
@@ -1891,11 +1891,11 @@ private extension BluetoothPeripheralDetailState {
         return [
             BluetoothPeripheralDetailSection(
                 id: "medtrum-touchcare-nano",
-                title: BluetoothPeripheralType.MedtrumTouchCareNanoType.rawValue,
+                title: BluetoothPeripheralType.MedtrumTouchCareNanoType.bluetoothPeripheralDisplayTitle,
                 rows: [
                     row(
                         id: "medtrum-touchcare-nano-dependency",
-                        title: "Requires Medtrum EasyPatch",
+                        title: "Requires Medtrum Nano Pump",
                         detail: "EasyPatch must be installed and running for sensor data."
                     ),
                     row(

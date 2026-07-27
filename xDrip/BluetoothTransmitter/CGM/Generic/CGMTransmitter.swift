@@ -101,8 +101,8 @@ enum CGMTransmitterType:String, CaseIterable {
     /// Libre2
     case Libre2 = "Libre2"
 
-    /// Medtrum TouchCare Nano CGM (data relayed via the paired Medtrum patch pump's BLE)
-    /// Shortened to "Medtrum Nano" for display space reasons
+    /// Medtrum TouchCare Nano Pump with integrated CGM data relayed via the pump BLE session.
+    /// Keep this raw value stable because it is persisted in UserDefaults.
     case medtrumTouchCareNano = "Medtrum Nano"
 
     /// what sensorType does this CGMTransmitter type support
@@ -279,6 +279,9 @@ enum CGMTransmitterType:String, CaseIterable {
             } else {
                 return "Libre 2 EU"
             }
+
+        case .medtrumTouchCareNano:
+            return "Medtrum Nano Pump CGM"
             
         default:
             return self.rawValue

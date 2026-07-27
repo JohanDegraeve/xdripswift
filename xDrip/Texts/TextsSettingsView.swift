@@ -996,27 +996,27 @@ class Texts_SettingsView {
     }()
     
     static let loopShareMedtrumNano: String = {
-        return NSLocalizedString("settingsviews_loopShareMedtrumNano", tableName: filename, bundle: Bundle.main, value: "Share Medtrum Nano", comment: "Settings row title to allow Medtrum Nano glucose data to be shared with OS-AID apps")
+        return NSLocalizedString("settingsviews_loopShareMedtrumNano", tableName: filename, bundle: Bundle.main, value: "Share Medtrum Nano Pump CGM", comment: "Settings row title to allow Medtrum Nano Pump CGM glucose data to be shared with OS-AID apps")
     }()
 
     static let loopShareMedtrumNanoTitle: String = {
-        return NSLocalizedString("settingsviews_loopShareMedtrumNanoTitle", tableName: filename, bundle: Bundle.main, value: "Medtrum Nano sharing is not recommended", comment: "Warning banner title shown when Medtrum Nano is the OS-AID glucose source")
+        return NSLocalizedString("settingsviews_loopShareMedtrumNanoTitle", tableName: filename, bundle: Bundle.main, value: "Medtrum Nano Pump CGM sharing is not recommended", comment: "Warning banner title shown when Medtrum Nano Pump CGM is the OS-AID glucose source")
     }()
 
     static let loopShareMedtrumNanoBlockedMessage: String = {
-        return NSLocalizedString("settingsviews_loopShareMedtrumNanoBlockedMessage", tableName: filename, bundle: Bundle.main, value: "Due to accuracy concerns, sharing Medtrum Nano CGM data to OS-AID apps is strongly not recommended.\n\nMedtrum Nano data is not being shared unless you specifically enable the above option.", comment: "Warning banner text shown when Medtrum Nano OS-AID sharing is blocked")
+        return NSLocalizedString("settingsviews_loopShareMedtrumNanoBlockedMessage", tableName: filename, bundle: Bundle.main, value: "Due to accuracy concerns, sharing Medtrum Nano Pump CGM data to OS-AID apps is strongly not recommended.\n\nMedtrum Nano Pump CGM data is not being shared unless you specifically enable the above option.", comment: "Warning banner text shown when Medtrum Nano Pump CGM OS-AID sharing is blocked")
     }()
 
     static let loopShareMedtrumNanoEnabledMessage: String = {
-        return NSLocalizedString("settingsviews_loopShareMedtrumNanoEnabledMessage", tableName: filename, bundle: Bundle.main, value: "Due to accuracy concerns, sharing Medtrum Nano CGM data to OS-AID apps is strongly not recommended.\n\nMedtrum Nano data is being shared because you specifically requested it by enabling the above option and accepting the risk.", comment: "Warning banner text shown when Medtrum Nano OS-AID sharing is enabled")
+        return NSLocalizedString("settingsviews_loopShareMedtrumNanoEnabledMessage", tableName: filename, bundle: Bundle.main, value: "Due to accuracy concerns, sharing Medtrum Nano Pump CGM data to OS-AID apps is strongly not recommended.\n\nMedtrum Nano Pump CGM data is being shared because you specifically requested it by enabling the above option and accepting the risk.", comment: "Warning banner text shown when Medtrum Nano Pump CGM OS-AID sharing is enabled")
     }()
 
     static let loopShareMedtrumNanoWarning: String = {
-        return NSLocalizedString("settingsviews_loopShareMedtrumNanoWarning", tableName: filename, bundle: Bundle.main, value: "Due to accuracy concerns, sharing Medtrum Nano CGM data to OS-AID apps is strongly not recommended. OS-AID apps may use this data for insulin dosing decisions and inaccurate CGM data could interfere with normal operation.\n\nThe recommended setting is Off. Only enable this if you understand the risk and specifically want Medtrum Nano data to be shared.", comment: "Warning shown before allowing Medtrum Nano glucose data to be shared with OS-AID apps")
+        return NSLocalizedString("settingsviews_loopShareMedtrumNanoWarning", tableName: filename, bundle: Bundle.main, value: "Due to accuracy concerns, sharing Medtrum Nano Pump CGM data to OS-AID apps is strongly not recommended. OS-AID apps may use this data for insulin dosing decisions and inaccurate CGM data could interfere with normal operation.\n\nThe recommended setting is Off. Only enable this if you understand the risk and specifically want Medtrum Nano Pump CGM data to be shared.", comment: "Warning shown before allowing Medtrum Nano Pump CGM glucose data to be shared with OS-AID apps")
     }()
 
     static let loopShareMedtrumNanoConfirm: String = {
-        return NSLocalizedString("settingsviews_loopShareMedtrumNanoConfirm", tableName: filename, bundle: Bundle.main, value: "I understand - share Medtrum Nano", comment: "Confirmation button title for enabling Medtrum Nano glucose data sharing with OS-AID apps")
+        return NSLocalizedString("settingsviews_loopShareMedtrumNanoConfirm", tableName: filename, bundle: Bundle.main, value: "I understand - share Medtrum Nano Pump CGM", comment: "Confirmation button title for enabling Medtrum Nano Pump CGM glucose data sharing with OS-AID apps")
     }()
 
     static let loopShareSmoothedData: String = {

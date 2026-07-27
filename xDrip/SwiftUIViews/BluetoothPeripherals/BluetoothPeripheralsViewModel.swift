@@ -327,6 +327,10 @@ extension BluetoothPeripheralType {
         switch self {
         case .DexcomG7Type:
             return BluetoothPeripheralType.DexcomG7HeartBeatType.rawValue
+        case .BubbleType:
+            return "Bubble/Mini/Nano"
+        case .MedtrumTouchCareNanoType:
+            return "Medtrum Nano Pump"
         default:
             return rawValue
         }
@@ -337,9 +341,9 @@ extension BluetoothPeripheralType {
             .Libre2Type,
             .DexcomType,
             .DexcomG7Type,
-            .MedtrumTouchCareNanoType,
             .MiaoMiaoType,
-            .BubbleType
+            .BubbleType,
+            .MedtrumTouchCareNanoType
         ]
     ]
 }
