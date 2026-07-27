@@ -69,60 +69,76 @@ struct BgReadingsView: View {
     
     var body: some View {
         NavigationView {
-            List(selection: $selectedBgReadings) {
-                Section {
-                    DatePicker(selection: $dateSelected, in: Date.distantPast...latestSelectableDate, displayedComponents: .date) {
-                        HStack {
-                            Text(Texts_BgReadings.date)
-                            Spacer()
-                            Text(dateSelectedDayName)
-                                .foregroundStyle(Color(.colorSecondary))
-                        }
+            VStack(spacing: 8) {
+                DatePicker(selection: $dateSelected, in: Date.distantPast...latestSelectableDate, displayedComponents: .date) {
+                    HStack {
+                        Text(Texts_BgReadings.date)
+                        Spacer()
+                        Text(dateSelectedDayName)
+                            .foregroundStyle(Color(.colorSecondary))
                     }
-                    .id(self.datePickerReset)
-                    .onAppear { showScrollToTopButton = false }
                 }
+                .id(self.datePickerReset)
+                .onAppear { showScrollToTopButton = false }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 14)
+                .background(
+                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                        .fill(Color(.secondarySystemGroupedBackground))
+                )
+                .padding(.horizontal, 16)
+                .padding(.top, 8)
 
-                if !filteredBgReadings.isEmpty {
-                    ForEach(filteredBgReadings, id: \.self) { bgReading in
-                        NavigationLink(destination: BgReadingsDetailView(bgReading: bgReading)) {
-                            HStack {
-                                Image(systemName: "circle.fill")
-                                    .font(.caption2)
-                                    .foregroundStyle(bgRangeIndicatorColor(bgRangeDescription: bgReading.bgRangeDescription()))
-
-                                Text(bgReading.finalValue.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).bgValueToString(mgDl: isMgDl))
-                                    .foregroundColor(.primary)
-
-                                Text(String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
-                                    .foregroundColor(.secondary)
-
-                                Text(bgReading.slopeArrow())
-                                    .fontWeight(.bold)
-                                    .foregroundColor(.primary)
-
-                                Spacer()
-
+                List(selection: $selectedBgReadings) {
+                    if !filteredBgReadings.isEmpty {
+                        ForEach(filteredBgReadings, id: \.self) { bgReading in
+                            NavigationLink(destination: BgReadingsDetailView(bgReading: bgReading)) {
                                 HStack {
-                                    BackfilledReadingIndicatorDot(isVisible: bgReading.backfilledAt != nil)
+                                    Image(systemName: "circle.fill")
+                                        .font(.caption2)
+                                        .foregroundStyle(bgRangeIndicatorColor(bgRangeDescription: bgReading.bgRangeDescription()))
 
-                                    Text(bgReading.timeStamp.toStringInUserLocale(timeStyle: .short, dateStyle: .none))
+                                    Text(bgReading.finalValue.mgDlToMmol(mgDl: isMgDl).bgValueRounded(mgDl: isMgDl).bgValueToString(mgDl: isMgDl))
+                                        .foregroundColor(.primary)
+
+                                    Text(String(isMgDl ? Texts_Common.mgdl : Texts_Common.mmol))
                                         .foregroundColor(.secondary)
+
+                                    Text(bgReading.slopeArrow())
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.primary)
+
+                                    Spacer()
+
+                                    HStack {
+                                        BackfilledReadingIndicatorDot(isVisible: bgReading.backfilledAt != nil)
+
+                                        Text(bgReading.timeStamp.toStringInUserLocale(timeStyle: .short, dateStyle: .none))
+                                            .foregroundColor(.secondary)
+                                    }
+                                }
+                                .foregroundColor(.white)
+                            }
+                            .onAppear {
+                                if let index = filteredBgReadings.firstIndex(of: bgReading), index >= scrollToTopButtonThresholdIndex {
+                                    showScrollToTopButton = true
                                 }
                             }
-                            .foregroundColor(.white)
                         }
-                        .onAppear {
-                            if let index = filteredBgReadings.firstIndex(of: bgReading), index >= scrollToTopButtonThresholdIndex {
-                                showScrollToTopButton = true
-                            }
-                        }
+                        .onDelete(perform: deleteBgReading)
+                        .listRowBackground(Color(.secondarySystemGroupedBackground))
+                    } else {
+                        Text(Texts_BgReadings.noReadingsToShow)
+                            .listRowBackground(Color(.secondarySystemGroupedBackground))
                     }
-                    .onDelete(perform: deleteBgReading)
-                } else {
-                    Text(Texts_BgReadings.noReadingsToShow)
                 }
+                .listStyle(.plain)
+                .scrollContentBackground(.hidden)
+                .background(Color(.systemGroupedBackground))
+                .padding(.horizontal, 16)
+                .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
             }
+            .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .id(listReset)
             .overlay(alignment: .bottomTrailing) {
                 if showScrollToTopButton {
@@ -143,7 +159,6 @@ struct BgReadingsView: View {
                 }
             }
             .animation(.easeInOut(duration: 0.2), value: showScrollToTopButton)
-            .listStyle(.insetGrouped)
             .navigationTitle(Texts_BgReadings.glucoseReadingsTitle)
             .onChange(of: dateSelected, perform: { value in
                 showScrollToTopButton = false
