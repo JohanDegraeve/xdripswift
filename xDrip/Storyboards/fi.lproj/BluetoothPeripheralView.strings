@@ -13,6 +13,14 @@
 "battery" = "Akku";
 "needsTransmitterId" = "Lähettimen tunnus puuttuu";
 "scan" = "Skannaa";
+"medtrumNanoPumpScanNoticeTitle" = "Yhteys Medtrum Nano -pumppuun";
+"medtrumNanoPumpScanNoticeMessage" = "Tämä valinta muodostaa yhteyden Medtrum Nano -pumppuun, ei suoraan Nano CGM -lähettimeen.\n\nVarmista ennen skannausta, että EasyPatch on käynnissä, yhdistetty pumppuun ja vastaanottaa ajantasaisia CGM-arvoja.\n\nEasyPatchin on pysyttävä käynnissä ja vastaanotettava arvoja jatkuvasti.";
+"libre2ScanNoticeTitle" = "Libre-sovelluksen Bluetooth";
+"libre2ScanNoticeMessage" = "Poista ennen skannausta Libre-sovelluksen Bluetooth-oikeus käytöstä iPhonen asetuksissa.\n\nLibre-sovelluksen Bluetooth-oikeuden on pysyttävä aina poissa käytöstä. Muuten Libre-sovellus voi ottaa anturiyhteyden haltuunsa ja estää tätä sovellusta vastaanottamasta arvoja.";
+"dexcomG6ScanNoticeTitle" = "Dexcom-sovelluksen yhteys";
+"dexcomG6ScanNoticeMessage" = "Pakota Dexcom-sovellus sulkeutumaan ennen skannausta tai poista sen Bluetooth-oikeus käytöstä.\n\nDexcom-sovellus ei saa olla yhdistettynä lähettimeen, kun tämä sovellus skannaa tai vastaanottaa arvoja.";
+"dexcomG7ScanNoticeTitle" = "Dexcom G7 -sovellus vaaditaan";
+"dexcomG7ScanNoticeMessage" = "Varmista ennen skannausta, että Dexcom G7 -sovellus on käynnissä taustalla, yhdistetty anturiin ja vastaanottaa ajantasaisia glukoosiarvoja.\n\nDexcom G7 -sovelluksen on pysyttävä käynnissä ja vastaanotettava arvoja jatkuvasti.";
 "readyToScan" = "Valmis skannaamaan";
 "scanning" = "Skannaamassa";
 "disconnect" = "Katkaise";

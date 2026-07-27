@@ -12,6 +12,14 @@
 "battery" = "Batería";
 "needsTransmitterId" = "Falta la ID del Transmisor";
 "scan" = "Escanear";
+"medtrumNanoPumpScanNoticeTitle" = "Conexión con la bomba Medtrum Nano";
+"medtrumNanoPumpScanNoticeMessage" = "Esta opción se conecta a la bomba Medtrum Nano, no directamente al transmisor Nano CGM.\n\nAntes de escanear, asegúrate de que EasyPatch esté ejecutándose, conectado a la bomba y recibiendo valores actuales del CGM.\n\nEasyPatch debe permanecer en ejecución y seguir recibiendo valores en todo momento.";
+"libre2ScanNoticeTitle" = "Bluetooth de la app Libre";
+"libre2ScanNoticeMessage" = "Antes de escanear, desactiva el permiso de Bluetooth para la app Libre en los ajustes del iPhone.\n\nEl permiso de Bluetooth para la app Libre debe permanecer desactivado en todo momento. De lo contrario, la app Libre puede tomar el control de la conexión con el sensor e impedir que esta app reciba valores.";
+"dexcomG6ScanNoticeTitle" = "Conexión con la app Dexcom";
+"dexcomG6ScanNoticeMessage" = "Antes de escanear, fuerza el cierre de la app Dexcom o desactiva su permiso de Bluetooth.\n\nLa app Dexcom no debe estar conectada al transmisor mientras esta app escanea o recibe valores.";
+"dexcomG7ScanNoticeTitle" = "Se requiere la app Dexcom G7";
+"dexcomG7ScanNoticeMessage" = "Antes de escanear, asegúrate de que la app Dexcom G7 se esté ejecutando en segundo plano, esté conectada al sensor y reciba valores actuales de glucosa.\n\nLa app Dexcom G7 debe permanecer en ejecución y seguir recibiendo valores en todo momento.";
 "readyToScan" = "Listo para Escanear";
 "scanning" = "Escaneando";
 "disconnect" = "Desconectar";

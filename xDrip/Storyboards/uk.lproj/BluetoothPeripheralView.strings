@@ -68,6 +68,14 @@
 
 /// text in button to start scanning
 "scan" = "Scan";
+"medtrumNanoPumpScanNoticeTitle" = "Підключення до помпи Medtrum Nano";
+"medtrumNanoPumpScanNoticeMessage" = "Ця опція підключається до помпи Medtrum Nano, а не безпосередньо до передавача Nano CGM.\n\nПеред скануванням переконайтеся, що EasyPatch запущено, підключено до помпи й отримує актуальні значення CGM.\n\nEasyPatch має постійно працювати й продовжувати отримувати значення.";
+"libre2ScanNoticeTitle" = "Bluetooth застосунку Libre";
+"libre2ScanNoticeMessage" = "Перед скануванням вимкніть дозвіл Bluetooth для застосунку Libre в налаштуваннях iPhone.\n\nДозвіл Bluetooth для застосунку Libre має завжди залишатися вимкненим. Інакше застосунок Libre може перехопити підключення до сенсора й завадити цьому застосунку отримувати значення.";
+"dexcomG6ScanNoticeTitle" = "Підключення застосунку Dexcom";
+"dexcomG6ScanNoticeMessage" = "Перед скануванням примусово закрийте застосунок Dexcom або вимкніть для нього дозвіл Bluetooth.\n\nЗастосунок Dexcom не повинен бути підключений до передавача, поки цей застосунок сканує або отримує значення.";
+"dexcomG7ScanNoticeTitle" = "Потрібен застосунок Dexcom G7";
+"dexcomG7ScanNoticeMessage" = "Перед скануванням переконайтеся, що застосунок Dexcom G7 працює у фоновому режимі, підключений до сенсора й отримує актуальні значення глюкози.\n\nЗастосунок Dexcom G7 має постійно працювати й продовжувати отримувати значення.";
 
 /// cell text, where user can select to reset a transmitter at next connect. Only for Dexcom
 "resetRequired" = "Reset Transmitter";

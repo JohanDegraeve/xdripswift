@@ -74,6 +74,14 @@
 
 /// text in button to start scanning
 "scan" = "Scan";
+"medtrumNanoPumpScanNoticeTitle" = "Connessione alla pompa Medtrum Nano";
+"medtrumNanoPumpScanNoticeMessage" = "Questa opzione si connette alla pompa Medtrum Nano, non direttamente al trasmettitore Nano CGM.\n\nPrima della scansione, assicurati che EasyPatch sia in esecuzione, connessa alla pompa e stia ricevendo valori CGM aggiornati.\n\nEasyPatch deve rimanere in esecuzione e continuare a ricevere valori in ogni momento.";
+"libre2ScanNoticeTitle" = "Bluetooth dell'app Libre";
+"libre2ScanNoticeMessage" = "Prima della scansione, disabilita l'autorizzazione Bluetooth per l'app Libre nelle impostazioni dell'iPhone.\n\nL'autorizzazione Bluetooth per l'app Libre deve rimanere sempre disabilitata. In caso contrario, l'app Libre potrebbe assumere il controllo della connessione al sensore e impedire a questa app di ricevere valori.";
+"dexcomG6ScanNoticeTitle" = "Connessione dell'app Dexcom";
+"dexcomG6ScanNoticeMessage" = "Prima della scansione, forza la chiusura dell'app Dexcom o disabilita la sua autorizzazione Bluetooth.\n\nL'app Dexcom non deve essere connessa al trasmettitore mentre questa app esegue la scansione o riceve valori.";
+"dexcomG7ScanNoticeTitle" = "App Dexcom G7 necessaria";
+"dexcomG7ScanNoticeMessage" = "Prima della scansione, assicurati che l'app Dexcom G7 sia in esecuzione in background, connessa al sensore e stia ricevendo valori glicemici aggiornati.\n\nL'app Dexcom G7 deve rimanere in esecuzione e continuare a ricevere valori in ogni momento.";
 
 /// cell text, where the disconnection timestamp is shown
 "disConnectedAt" = "Disconnected At";

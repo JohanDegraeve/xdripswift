@@ -67,6 +67,62 @@ class Texts_BluetoothPeripheralView {
     static let scan: String = {
         return NSLocalizedString("scan", tableName: filename, bundle: Bundle.main, value: "Scan", comment: "text in button to start scanning")
     }()
+
+    static let medtrumNanoPumpScanNoticeTitle: String = {
+        return NSLocalizedString("medtrumNanoPumpScanNoticeTitle", tableName: filename, bundle: Bundle.main, value: "Medtrum Nano Pump Connection", comment: "title of the notice shown before scanning for a Medtrum Nano Pump")
+    }()
+
+    static let medtrumNanoPumpScanNoticeMessage: String = {
+        return NSLocalizedString(
+            "medtrumNanoPumpScanNoticeMessage",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "This option connects to the Medtrum Nano Pump, not directly to the Nano CGM transmitter.\n\nBefore scanning, make sure EasyPatch is running, connected to the pump, and receiving current CGM values.\n\nEasyPatch must remain running and continue receiving values at all times.",
+            comment: "notice shown before scanning for a Medtrum Nano Pump, explaining that the CGM connection is relayed by the pump and requires EasyPatch"
+        )
+    }()
+
+    static let libre2ScanNoticeTitle: String = {
+        return NSLocalizedString("libre2ScanNoticeTitle", tableName: filename, bundle: Bundle.main, value: "Libre App Bluetooth", comment: "title of the notice shown before scanning for a Libre 2 sensor")
+    }()
+
+    static let libre2ScanNoticeMessage: String = {
+        return NSLocalizedString(
+            "libre2ScanNoticeMessage",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Before scanning, disable Bluetooth permission for the Libre app in your iPhone settings.\n\nBluetooth permission for the Libre app must remain disabled at all times. Otherwise, the Libre app may take over the sensor connection and stop this app from receiving values.",
+            comment: "notice shown before scanning for a Libre 2 sensor, explaining that Bluetooth permission for the Libre app must remain disabled"
+        )
+    }()
+
+    static let dexcomG6ScanNoticeTitle: String = {
+        return NSLocalizedString("dexcomG6ScanNoticeTitle", tableName: filename, bundle: Bundle.main, value: "Dexcom App Connection", comment: "title of the notice shown before scanning for a Dexcom G5, G6, or ONE transmitter")
+    }()
+
+    static let dexcomG6ScanNoticeMessage: String = {
+        return NSLocalizedString(
+            "dexcomG6ScanNoticeMessage",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Before scanning, force-close the Dexcom app or disable Bluetooth permission for it.\n\nThe Dexcom app must not be connected to the transmitter while this app is scanning or receiving values.",
+            comment: "notice shown before scanning for a Dexcom G5, G6, or ONE transmitter, explaining how to avoid a competing Dexcom app connection"
+        )
+    }()
+
+    static let dexcomG7ScanNoticeTitle: String = {
+        return NSLocalizedString("dexcomG7ScanNoticeTitle", tableName: filename, bundle: Bundle.main, value: "Dexcom G7 App Required", comment: "title of the notice shown before scanning for a Dexcom G7 sensor")
+    }()
+
+    static let dexcomG7ScanNoticeMessage: String = {
+        return NSLocalizedString(
+            "dexcomG7ScanNoticeMessage",
+            tableName: filename,
+            bundle: Bundle.main,
+            value: "Before scanning, make sure the Dexcom G7 app is running in the background, connected to the sensor, and receiving current glucose values.\n\nThe Dexcom G7 app must remain running and continue receiving values at all times.",
+            comment: "notice shown before scanning for a Dexcom G7 sensor, explaining that the Dexcom G7 app must remain running and receiving values"
+        )
+    }()
     
     static let readyToScan: String = {
         return NSLocalizedString("readyToScan", tableName: filename, bundle: Bundle.main, value: "Ready to Scan", comment: "text in status row, if ready to start scanning")

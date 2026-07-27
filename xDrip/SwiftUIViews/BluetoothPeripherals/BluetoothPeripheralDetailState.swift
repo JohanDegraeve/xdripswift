@@ -636,7 +636,7 @@ private extension BluetoothPeripheralDetailState {
         } else if expectedBluetoothPeripheralType.needsTransmitterId(), transmitterIdTempValue == nil {
             requestTransmitterId()
         } else {
-            scanForBluetoothPeripheral(type: expectedBluetoothPeripheralType)
+            requestScanForBluetoothPeripheral(type: expectedBluetoothPeripheralType)
         }
 
         refresh()
@@ -811,6 +811,26 @@ private extension BluetoothPeripheralDetailState {
 // MARK: - Scanning and NFC
 
 private extension BluetoothPeripheralDetailState {
+    func requestScanForBluetoothPeripheral(type: BluetoothPeripheralType) {
+        guard let notice = type.scanPreparationNotice else {
+            scanForBluetoothPeripheral(type: type)
+            return
+        }
+
+        pendingAlert = BluetoothPeripheralDetailAlert(
+            title: notice.title,
+            message: notice.message,
+            primaryButtonTitle: Texts_BluetoothPeripheralView.scan,
+            primaryAction: { [weak self] in
+                // Let the confirmation alert dismiss before scanning can publish its result alert.
+                DispatchQueue.main.async {
+                    self?.scanForBluetoothPeripheral(type: type)
+                }
+            },
+            secondaryButtonTitle: Texts_Common.Cancel
+        )
+    }
+
     func scanForBluetoothPeripheral(type: BluetoothPeripheralType) {
         guard bluetoothPeripheral == nil, let bluetoothPeripheralManager = bluetoothPeripheralManager else { return }
         guard !type.needsTransmitterId() || transmitterIdTempValue != nil else { return }
@@ -1894,11 +1914,6 @@ private extension BluetoothPeripheralDetailState {
                 title: BluetoothPeripheralType.MedtrumTouchCareNanoType.bluetoothPeripheralDisplayTitle,
                 rows: [
                     row(
-                        id: "medtrum-touchcare-nano-dependency",
-                        title: "Requires Medtrum Nano Pump",
-                        detail: "EasyPatch must be installed and running for sensor data."
-                    ),
-                    row(
                         id: "medtrum-touchcare-nano-firmware",
                         title: Texts_Common.firmware,
                         detail: medtrumNano.firmware
@@ -1957,6 +1972,44 @@ private extension BluetoothPeripheralDetailState {
                 }
             )
         ]
+    }
+}
+
+private struct BluetoothPeripheralScanPreparationNotice {
+    let title: String
+    let message: String
+}
+
+private extension BluetoothPeripheralType {
+    var scanPreparationNotice: BluetoothPeripheralScanPreparationNotice? {
+        switch self {
+        case .Libre2Type:
+            return BluetoothPeripheralScanPreparationNotice(
+                title: Texts_BluetoothPeripheralView.libre2ScanNoticeTitle,
+                message: Texts_BluetoothPeripheralView.libre2ScanNoticeMessage
+            )
+
+        case .DexcomType:
+            return BluetoothPeripheralScanPreparationNotice(
+                title: Texts_BluetoothPeripheralView.dexcomG6ScanNoticeTitle,
+                message: Texts_BluetoothPeripheralView.dexcomG6ScanNoticeMessage
+            )
+
+        case .DexcomG7Type:
+            return BluetoothPeripheralScanPreparationNotice(
+                title: Texts_BluetoothPeripheralView.dexcomG7ScanNoticeTitle,
+                message: Texts_BluetoothPeripheralView.dexcomG7ScanNoticeMessage
+            )
+
+        case .MedtrumTouchCareNanoType:
+            return BluetoothPeripheralScanPreparationNotice(
+                title: Texts_BluetoothPeripheralView.medtrumNanoPumpScanNoticeTitle,
+                message: Texts_BluetoothPeripheralView.medtrumNanoPumpScanNoticeMessage
+            )
+
+        default:
+            return nil
+        }
     }
 }
 

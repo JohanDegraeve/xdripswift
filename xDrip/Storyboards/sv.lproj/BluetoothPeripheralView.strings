@@ -13,6 +13,14 @@
 "battery" = "Batteri";
 "needsTransmitterId" = "Saknar sändar-ID";
 "scan" = "Scanna";
+"medtrumNanoPumpScanNoticeTitle" = "Anslutning till Medtrum Nano-pump";
+"medtrumNanoPumpScanNoticeMessage" = "Det här alternativet ansluter till Medtrum Nano-pumpen, inte direkt till Nano CGM-sändaren.\n\nKontrollera före skanning att EasyPatch körs, är ansluten till pumpen och tar emot aktuella CGM-värden.\n\nEasyPatch måste alltid vara igång och fortsätta ta emot värden.";
+"libre2ScanNoticeTitle" = "Bluetooth för Libre-appen";
+"libre2ScanNoticeMessage" = "Inaktivera Bluetooth-behörigheten för Libre-appen i iPhone-inställningarna före skanning.\n\nBluetooth-behörigheten för Libre-appen måste alltid vara inaktiverad. Annars kan Libre-appen ta över sensoranslutningen och hindra den här appen från att ta emot värden.";
+"dexcomG6ScanNoticeTitle" = "Anslutning till Dexcom-appen";
+"dexcomG6ScanNoticeMessage" = "Tvångsavsluta Dexcom-appen före skanning eller inaktivera dess Bluetooth-behörighet.\n\nDexcom-appen får inte vara ansluten till sändaren medan den här appen skannar eller tar emot värden.";
+"dexcomG7ScanNoticeTitle" = "Dexcom G7-appen krävs";
+"dexcomG7ScanNoticeMessage" = "Kontrollera före skanning att Dexcom G7-appen körs i bakgrunden, är ansluten till sensorn och tar emot aktuella glukosvärden.\n\nDexcom G7-appen måste alltid vara igång och fortsätta ta emot värden.";
 "readyToScan" = "Klar att scanna";
 "scanning" = "Scannar";
 "disconnect" = "Koppla ifrån";

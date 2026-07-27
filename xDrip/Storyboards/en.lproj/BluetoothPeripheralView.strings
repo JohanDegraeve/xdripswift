@@ -13,6 +13,14 @@
 "battery" = "Battery";
 "needsTransmitterId" = "Missing Transmitter ID";
 "scan" = "Scan";
+"medtrumNanoPumpScanNoticeTitle" = "Medtrum Nano Pump Connection";
+"medtrumNanoPumpScanNoticeMessage" = "This option connects to the Medtrum Nano Pump, not directly to the Nano CGM transmitter.\n\nBefore scanning, make sure EasyPatch is running, connected to the pump, and receiving current CGM values.\n\nEasyPatch must remain running and continue receiving values at all times.";
+"libre2ScanNoticeTitle" = "Libre App Bluetooth";
+"libre2ScanNoticeMessage" = "Before scanning, disable Bluetooth permission for the Libre app in your iPhone settings.\n\nBluetooth permission for the Libre app must remain disabled at all times. Otherwise, the Libre app may take over the sensor connection and stop this app from receiving values.";
+"dexcomG6ScanNoticeTitle" = "Dexcom App Connection";
+"dexcomG6ScanNoticeMessage" = "Before scanning, force-close the Dexcom app or disable Bluetooth permission for it.\n\nThe Dexcom app must not be connected to the transmitter while this app is scanning or receiving values.";
+"dexcomG7ScanNoticeTitle" = "Dexcom G7 App Required";
+"dexcomG7ScanNoticeMessage" = "Before scanning, make sure the Dexcom G7 app is running in the background, connected to the sensor, and receiving current glucose values.\n\nThe Dexcom G7 app must remain running and continue receiving values at all times.";
 "readyToScan" = "Ready to Scan";
 "scanning" = "Scanning";
 "disconnect" = "Disconnect";

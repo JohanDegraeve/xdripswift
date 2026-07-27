@@ -74,6 +74,14 @@
 
 /// text in button to start scanning
 "scan" = "Scan";
+"medtrumNanoPumpScanNoticeTitle" = "Povezava s črpalko Medtrum Nano";
+"medtrumNanoPumpScanNoticeMessage" = "Ta možnost se poveže s črpalko Medtrum Nano in ne neposredno z oddajnikom Nano CGM.\n\nPred iskanjem se prepričajte, da EasyPatch deluje, je povezan s črpalko in prejema trenutne vrednosti CGM.\n\nEasyPatch mora ves čas delovati in še naprej prejemati vrednosti.";
+"libre2ScanNoticeTitle" = "Bluetooth aplikacije Libre";
+"libre2ScanNoticeMessage" = "Pred iskanjem v nastavitvah iPhona onemogočite dovoljenje Bluetooth za aplikacijo Libre.\n\nDovoljenje Bluetooth za aplikacijo Libre mora biti ves čas onemogočeno. V nasprotnem primeru lahko aplikacija Libre prevzame povezavo s senzorjem in tej aplikaciji prepreči prejemanje vrednosti.";
+"dexcomG6ScanNoticeTitle" = "Povezava aplikacije Dexcom";
+"dexcomG6ScanNoticeMessage" = "Pred iskanjem prisilno zaprite aplikacijo Dexcom ali onemogočite njeno dovoljenje Bluetooth.\n\nAplikacija Dexcom ne sme biti povezana z oddajnikom, medtem ko ta aplikacija išče ali prejema vrednosti.";
+"dexcomG7ScanNoticeTitle" = "Potrebna je aplikacija Dexcom G7";
+"dexcomG7ScanNoticeMessage" = "Pred iskanjem se prepričajte, da aplikacija Dexcom G7 deluje v ozadju, je povezana s senzorjem in prejema trenutne vrednosti glukoze.\n\nAplikacija Dexcom G7 mora ves čas delovati in še naprej prejemati vrednosti.";
 
 /// cell text, where the disconnection timestamp is shown
 "disConnectedAt" = "Disconnected At";

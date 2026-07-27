@@ -13,6 +13,14 @@
 "battery" = "البطارية";
 "needsTransmitterId" = "رمز الهوية لجهاز الإرسال مفقود";
 "scan" = "بدء البحث";
+"medtrumNanoPumpScanNoticeTitle" = "الاتصال بمضخة Medtrum Nano";
+"medtrumNanoPumpScanNoticeMessage" = "يتصل هذا الخيار بمضخة Medtrum Nano، وليس مباشرةً بجهاز إرسال Nano CGM.\n\nقبل بدء البحث، تأكد من أن EasyPatch قيد التشغيل ومتصل بالمضخة ويستقبل قيم CGM الحالية.\n\nيجب أن يظل EasyPatch قيد التشغيل وأن يستمر في استقبال القيم في جميع الأوقات.";
+"libre2ScanNoticeTitle" = "Bluetooth لتطبيق Libre";
+"libre2ScanNoticeMessage" = "قبل بدء البحث، عطّل إذن Bluetooth لتطبيق Libre من إعدادات iPhone.\n\nيجب أن يظل إذن Bluetooth لتطبيق Libre معطلاً في جميع الأوقات. وإلا فقد يستحوذ تطبيق Libre على اتصال المستشعر ويمنع هذا التطبيق من استقبال القيم.";
+"dexcomG6ScanNoticeTitle" = "اتصال تطبيق Dexcom";
+"dexcomG6ScanNoticeMessage" = "قبل بدء البحث، أغلق تطبيق Dexcom إغلاقًا إجباريًا أو عطّل إذن Bluetooth الخاص به.\n\nيجب ألا يكون تطبيق Dexcom متصلاً بجهاز الإرسال أثناء بحث هذا التطبيق أو استقباله للقيم.";
+"dexcomG7ScanNoticeTitle" = "تطبيق Dexcom G7 مطلوب";
+"dexcomG7ScanNoticeMessage" = "قبل بدء البحث، تأكد من أن تطبيق Dexcom G7 يعمل في الخلفية ومتصل بالمستشعر ويستقبل قيم الجلوكوز الحالية.\n\nيجب أن يظل تطبيق Dexcom G7 قيد التشغيل وأن يستمر في استقبال القيم في جميع الأوقات.";
 "readyToScan" = "جاهز للبحث";
 "scanning" = "يتم البحث";
 "disconnect" = "قطع الاتصال";
