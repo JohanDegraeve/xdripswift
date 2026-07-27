@@ -68,46 +68,57 @@ struct TreatmentsListView: View {
     var body: some View {
         ScrollViewReader { scrollProxy in
             ZStack(alignment: .bottomTrailing) {
-                List {
-                    Section {
-                        TreatmentsControlsCard(viewModel: viewModel)
-                            .id(topScrollAnchorID)
-                            .onAppear { showScrollToTopButton = false }
-                            .onDisappear { showScrollToTopButton = true }
-                            .listRowInsets(EdgeInsets(top: 8, leading: 0, bottom: 0, trailing: 0))
-                            .listRowBackground(Color.clear)
-                            .listRowSeparator(.hidden)
-                    }
+                VStack(spacing: 8) {
+                    TreatmentsControlsCard(viewModel: viewModel)
+                        .id(topScrollAnchorID)
+                        .onAppear { showScrollToTopButton = false }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 8)
 
-                    if !viewModel.filteredTreatments.isEmpty {
-                        ForEach(Array(viewModel.filteredTreatments.enumerated()), id: \.element.objectID) { index, treatment in
-                            treatmentRow(for: treatment)
-                                .onAppear {
-                                    if index >= scrollToTopButtonThresholdIndex {
-                                        showScrollToTopButton = true
+                    List {
+                        if !viewModel.filteredTreatments.isEmpty {
+                            ForEach(Array(viewModel.filteredTreatments.enumerated()), id: \.element.objectID) { index, treatment in
+                                treatmentRow(for: treatment)
+                                    .id(treatment.objectID)
+                                    .onAppear {
+                                        if index == 0 {
+                                            showScrollToTopButton = false
+                                        } else if index >= scrollToTopButtonThresholdIndex {
+                                            showScrollToTopButton = true
+                                        }
                                     }
-                                }
-                                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                                    Button(role: .destructive) {
-                                        viewModel.deleteTreatment(treatment)
-                                    } label: {
-                                        Label(Texts_Common.delete, systemImage: "trash")
+                                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                                        Button(role: .destructive) {
+                                            viewModel.deleteTreatment(treatment)
+                                        } label: {
+                                            Label(Texts_Common.delete, systemImage: "trash")
+                                        }
                                     }
-                                }
+                            }
+                            .listRowBackground(Color(.secondarySystemGroupedBackground))
+                        } else {
+                            Text(Texts_TreatmentsView.noTreatmentsToShow)
+                                .foregroundStyle(Color(.colorSecondary))
+                                .listRowSeparator(.hidden)
+                                .listRowBackground(Color.clear)
                         }
-                    } else {
-                        Text(Texts_TreatmentsView.noTreatmentsToShow)
-                            .foregroundStyle(Color(.colorSecondary))
-                            .listRowSeparator(.hidden)
-                            .listRowBackground(Color.clear)
                     }
+                    .listStyle(.plain)
+                    .scrollContentBackground(.hidden)
+                    .background(Color(.systemGroupedBackground))
+                    .padding(.horizontal, 16)
+                    .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
                 }
-                .listStyle(.insetGrouped)
+                .background(Color(.systemGroupedBackground).ignoresSafeArea())
 
                 if showScrollToTopButton {
                     Button {
                         withAnimation {
-                            scrollProxy.scrollTo(topScrollAnchorID, anchor: .top)
+                            if let firstTreatment = viewModel.filteredTreatments.first {
+                                scrollProxy.scrollTo(firstTreatment.objectID, anchor: .top)
+                            } else {
+                                scrollProxy.scrollTo(topScrollAnchorID, anchor: .top)
+                            }
                         }
                     } label: {
                         Image(systemName: "arrow.up")
