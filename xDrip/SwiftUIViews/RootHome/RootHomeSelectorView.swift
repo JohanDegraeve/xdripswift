@@ -19,12 +19,29 @@ struct RootHomeSelectorView: View {
 
     private enum Layout {
         static let controlHeight: CGFloat = 30
+        static let compactButtonSpacing: CGFloat = 2
+        static let expandedButtonSpacing: CGFloat = 6
+        static let expandedSpacingMinimumWidth: CGFloat = 390
     }
 
     var body: some View {
+        GeometryReader { proxy in
+            selectorContent(buttonSpacing: buttonSpacing(for: proxy.size.width))
+                .frame(width: proxy.size.width, height: proxy.size.height)
+        }
+        .padding(.horizontal, 8)
+        .frame(maxWidth: .infinity)
+        .frame(height: Layout.controlHeight)
+    }
+
+    private func buttonSpacing(for availableWidth: CGFloat) -> CGFloat {
+        availableWidth >= Layout.expandedSpacingMinimumWidth ? Layout.expandedButtonSpacing : Layout.compactButtonSpacing
+    }
+
+    private func selectorContent(buttonSpacing: CGFloat) -> some View {
         HStack(spacing: 4) {
             if showsStatistics {
-                HStack(spacing: 2) {
+                HStack(spacing: buttonSpacing) {
                     ForEach(statisticsOptions, id: \.self) { days in
                         RootHomeSelectorButton(
                             title: statisticsTitle(for: days),
@@ -44,7 +61,7 @@ struct RootHomeSelectorView: View {
                     .accessibilityHidden(true)
             }
 
-            HStack(spacing: 2) {
+            HStack(spacing: buttonSpacing) {
                 ForEach(RootHomeChartRange.allCases) { range in
                     RootHomeSelectorButton(
                         title: range.title,
@@ -59,9 +76,7 @@ struct RootHomeSelectorView: View {
             .fixedSize(horizontal: true, vertical: false)
             .frame(maxWidth: .infinity, alignment: showsStatistics ? .trailing : .center)
         }
-        .padding(.horizontal, 8)
         .frame(maxWidth: .infinity)
-        .frame(height: Layout.controlHeight)
     }
 
     private func statisticsTitle(for days: Int) -> String {
@@ -89,10 +104,15 @@ struct RootHomeSelectorButton: View {
     let isSelected: Bool
     let action: () -> Void
 
+    private enum Layout {
+        static let fontSize: CGFloat = 13
+        static let indicatorOutwardOffset: CGFloat = 2
+    }
+
     var body: some View {
         Button(action: action) {
             Text(title)
-                .font(.system(size: 11, weight: isSelected ? .semibold : .regular))
+                .font(.system(size: Layout.fontSize, weight: isSelected ? .semibold : .regular))
                 .foregroundStyle(isSelected ? ConstantsAppColors.primaryText : ConstantsAppColors.tertiaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.75)
@@ -102,6 +122,7 @@ struct RootHomeSelectorButton: View {
                     RootHomeSelectorIndicator(direction: indicatorDirection)
                         .fill(ConstantsGlucoseChartSwiftUI.overlayWindowEdgeColor)
                         .frame(width: 16, height: 6)
+                        .offset(y: indicatorYOffset)
                         .opacity(isSelected ? 1 : 0)
                 }
                 .contentShape(Rectangle())
@@ -110,6 +131,10 @@ struct RootHomeSelectorButton: View {
         .accessibilityLabel(accessibilityLabel)
         .accessibilityValue(accessibilityValue)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    private var indicatorYOffset: CGFloat {
+        indicatorDirection == .up ? -Layout.indicatorOutwardOffset : Layout.indicatorOutwardOffset
     }
 }
 
