@@ -49,11 +49,17 @@ class CalendarFollowManager: NSObject {
     /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground
     private let applicationManagerKeySuspendPlaySoundTimer = "CalendarFollowManager-SuspendPlaySoundTimer"
     
+    /// constant for key in ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground
+    private let applicationManagerKeyDownloadWhenAppWillEnterForeground = "CalendarFollowManager-DownloadWhenAppWillEnterForeground"
+    
     /// closure to call when downloadtimer needs to be invalidated, eg when changing from master to follower
     private var invalidateDownLoadTimerClosure: (() -> Void)?
     
     /// timer for playsound
     private var playSoundTimer: RepeatingTimer?
+    
+    /// observer for calendar changes synced by iOS
+    private var eventStoreChangedObserver: NSObjectProtocol?
     
     // MARK: - Initializer
     
@@ -72,6 +78,10 @@ class CalendarFollowManager: NSObject {
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue, options: .new, context: nil)
         UserDefaults.standard.addObserver(self, forKeyPath: UserDefaults.Key.calendarFollowCalendarId.rawValue, options: .new, context: nil)
+        
+        eventStoreChangedObserver = NotificationCenter.default.addObserver(forName: .EKEventStoreChanged, object: eventStore, queue: .main) { [weak self] _ in
+            self?.eventStoreChanged()
+        }
         
         verifyUserDefaultsAndStartOrStopFollowMode()
     }
@@ -123,6 +133,8 @@ class CalendarFollowManager: NSObject {
             return
         }
         
+        refreshEventStoreSources()
+        
         guard let calendar = getCalendar() else {
             UserDefaults.standard.calendarFollowStatus = CalendarShareStatus.notConfigured.rawValue
             trace("    no Calendar Follow calendar selected", log: log, category: ConstantsLog.categoryCalendarManager, type: .info)
@@ -163,6 +175,51 @@ class CalendarFollowManager: NSObject {
     }
     
     // MARK: - Private Functions
+    
+    /// refresh EventKit sources before querying events
+    private func refreshEventStoreSources() {
+        eventStore.refreshSourcesIfNecessary()
+    }
+    
+    /// called when EventKit reports that calendar data changed
+    private func eventStoreChanged() {
+        guard keyValueObserverTimeKeeper.verifyKey(forKey: "CalendarFollowManager-EventStoreChanged", withMinimumDelayMilliSeconds: 1000) else { return }
+        
+        trace("in eventStoreChanged", log: log, category: ConstantsLog.categoryCalendarManager, type: .info)
+        download()
+    }
+    
+    /// check the shared calendar from the keep-alive wake cycle
+    private func downloadFromKeepAliveTick() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self,
+                  !UserDefaults.standard.isMaster,
+                  UserDefaults.standard.followerDataSourceType == .calendar,
+                  self.keyValueObserverTimeKeeper.verifyKey(forKey: "CalendarFollowManager-KeepAliveDownload", withMinimumDelayMilliSeconds: 14_000) else {
+                return
+            }
+            
+            trace("in downloadFromKeepAliveTick", log: self.log, category: ConstantsLog.categoryCalendarManager, type: .info)
+            self.download()
+        }
+    }
+    
+    /// check the shared calendar when the app comes to foreground
+    private func downloadWhenAppWillEnterForeground() {
+        guard !UserDefaults.standard.isMaster,
+              UserDefaults.standard.followerDataSourceType == .calendar else {
+            return
+        }
+        
+        trace("in downloadWhenAppWillEnterForeground", log: log, category: ConstantsLog.categoryCalendarManager, type: .info)
+        download()
+    }
+    
+    /// check the shared calendar when Calendar Follow is enabled or reconfigured
+    private func downloadWhenFollowModeStarts() {
+        trace("in downloadWhenFollowModeStarts", log: log, category: ConstantsLog.categoryCalendarManager, type: .info)
+        download()
+    }
     
     private func getCalendar() -> EKCalendar? {
         guard let selectedCalendarTitle = UserDefaults.standard.calendarFollowCalendarId else { return nil }
@@ -239,6 +296,9 @@ class CalendarFollowManager: NSObject {
                 trace("playing audio every %{public}@ seconds. Calendar Follow keep-alive: %{public}@", log: self.log, category: ConstantsLog.categoryCalendarManager, type: .info, interval.description, UserDefaults.standard.followerBackgroundKeepAliveType.description)
                 audioPlayer.play()
             }
+            
+            // playing sound keeps the app awake, but the wake tick should also do the calendar check
+            self.downloadFromKeepAliveTick()
         })
         
         ApplicationManager.shared.addClosureToRunWhenAppDidEnterBackground(key: applicationManagerKeyResumePlaySoundTimer, closure: { [weak self] in
@@ -250,6 +310,9 @@ class CalendarFollowManager: NSObject {
                 if let audioPlayer = self.audioPlayer, !audioPlayer.isPlaying {
                     audioPlayer.play()
                 }
+                
+                // do one immediate read when the app enters background
+                self.downloadFromKeepAliveTick()
             }
         })
         
@@ -262,19 +325,24 @@ class CalendarFollowManager: NSObject {
     /// verifies values of applicable UserDefaults and either starts or stops follower mode
     private func verifyUserDefaultsAndStartOrStopFollowMode() {
         if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .calendar && UserDefaults.standard.calendarFollowCalendarId != nil {
+            ApplicationManager.shared.addClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyDownloadWhenAppWillEnterForeground, closure: { [weak self] in
+                self?.downloadWhenAppWillEnterForeground()
+            })
+            
             if UserDefaults.standard.followerBackgroundKeepAliveType.shouldKeepAlive {
                 enableSuspensionPrevention()
             } else {
                 disableSuspensionPrevention()
             }
             
-            download()
+            downloadWhenFollowModeStarts()
         } else {
             if !UserDefaults.standard.isMaster && UserDefaults.standard.followerDataSourceType == .calendar {
                 UserDefaults.standard.calendarFollowStatus = CalendarShareStatus.notConfigured.rawValue
             }
             
             disableSuspensionPrevention()
+            ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyDownloadWhenAppWillEnterForeground)
             invalidateDownLoadTimerClosure?()
         }
     }
@@ -302,6 +370,10 @@ class CalendarFollowManager: NSObject {
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerDataSourceType.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.followerBackgroundKeepAliveType.rawValue)
         UserDefaults.standard.removeObserver(self, forKeyPath: UserDefaults.Key.calendarFollowCalendarId.rawValue)
+        if let eventStoreChangedObserver {
+            NotificationCenter.default.removeObserver(eventStoreChangedObserver)
+        }
+        ApplicationManager.shared.removeClosureToRunWhenAppWillEnterForeground(key: applicationManagerKeyDownloadWhenAppWillEnterForeground)
         invalidateDownLoadTimerClosure?()
         playSoundTimer?.suspend()
     }
