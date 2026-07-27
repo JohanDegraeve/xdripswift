@@ -261,12 +261,13 @@ struct AGPChartView: View {
     private var dynamicUpperYMgDl: Double {
         let agpMaximum = chartPointsForDisplay.map(\.p95MgDl).max() ?? 250
         let glucoseMaximum = glucosePoints.map(\.valueMgDl).max() ?? 250
-        let paddedMaximum = max(agpMaximum, glucoseMaximum) + 20
+        let plottedMaximum = max(agpMaximum, glucoseMaximum)
 
-        if paddedMaximum <= 250 {
+        if plottedMaximum <= 250 {
             return 250
         }
 
+        let paddedMaximum = plottedMaximum + 20
         if paddedMaximum <= 400 {
             return ceil(paddedMaximum / 50) * 50
         }

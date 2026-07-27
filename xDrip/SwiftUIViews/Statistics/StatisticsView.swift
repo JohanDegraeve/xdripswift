@@ -11,7 +11,7 @@ import SwiftUI
 
 struct StatisticsView: View {
     @StateObject private var viewModel: StatisticsViewModel
-    @State private var selectedSection = StatisticsSection.summary
+    @State private var isShowingReportGenerator = false
     private let statisticsManager: StatisticsManager
 
     init(statisticsManager: StatisticsManager) {
@@ -20,20 +20,10 @@ struct StatisticsView: View {
     }
 
     var body: some View {
-        Group {
-            if selectedSection == .report {
-                VStack(spacing: 12) {
-                    sectionPicker
-                        .padding(.horizontal, 16)
-                    GenerateReportView(statisticsManager: statisticsManager, presentation: .embedded)
-                }
-                .padding(.top, 12)
-            } else {
-                ScrollView {
-                    VStack(spacing: 12) {
-                        sectionPicker
-                        periodPicker
-
+        ScrollView {
+            LazyVStack(spacing: 12, pinnedViews: [.sectionHeaders]) {
+                Section {
+                    Group {
                         if viewModel.isLoading && viewModel.analytics == nil {
                             ProgressView()
                                 .controlSize(.large)
@@ -45,43 +35,55 @@ struct StatisticsView: View {
                         }
                     }
                     .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
+                    .padding(.bottom, 12)
+                } header: {
+                    periodPicker
+                        .padding(.horizontal, 16)
+                        .padding(.top, 12)
+                        .padding(.bottom, 8)
+                        .background(Color(.systemGroupedBackground))
                 }
             }
         }
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationTitle(Texts_Common.statisticsTitle)
+        .toolbar {
+            ToolbarItem(placement: .primaryAction) {
+                Button {
+                    isShowingReportGenerator = true
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: StatisticsReportButton.systemImage)
+                        Text(Texts_Common.reportGenerateTitle)
+                    }
+                }
+                .tint(.yellow)
+            }
+        }
+        .sheet(isPresented: $isShowingReportGenerator) {
+            GenerateReportView(statisticsManager: statisticsManager)
+        }
         .task {
             viewModel.load()
         }
     }
 
     @ViewBuilder private func content(for analytics: GlucoseReportAnalytics) -> some View {
-        switch selectedSection {
-        case .summary:
-            VStack(spacing: 10) {
-                StatisticsRangeCard(
-                    title: Texts_Common.statisticsTimeInRange,
-                    abbreviation: "TIR",
-                    buckets: analytics.rangeDistribution.timeInRangeBuckets(usesMgDl: analytics.usesMgDl)
-                )
-                StatisticsRangeCard(
-                    title: Texts_Common.statisticsTimeInTightRange,
-                    abbreviation: "TITR",
-                    buckets: analytics.tightRangeDistribution.tightRangeBuckets(usesMgDl: analytics.usesMgDl)
-                )
-                StatisticsSummaryView(analytics: analytics)
-            }
-        case .agp:
+        VStack(spacing: 10) {
+            StatisticsRangeCard(
+                title: Texts_Common.statisticsTimeInRange,
+                abbreviation: "TIR",
+                buckets: analytics.rangeDistribution.timeInRangeBuckets(usesMgDl: analytics.usesMgDl)
+            )
+            StatisticsRangeCard(
+                title: Texts_Common.statisticsTimeInTightRange,
+                abbreviation: "TITR",
+                buckets: analytics.tightRangeDistribution.tightRangeBuckets(usesMgDl: analytics.usesMgDl)
+            )
+            StatisticsSummaryView(analytics: analytics)
             StatisticsAGPCard(analytics: analytics)
             StatisticsTrendCard(trendPoints: analytics.trendPoints)
-        case .daily:
-            VStack(spacing: 10) {
-                StatisticsDailyPatternCard(analytics: analytics, period: viewModel.selectedPeriod)
-                StatisticsDailyHighlightsCard(analytics: analytics, period: viewModel.selectedPeriod)
-            }
-        case .report:
-            EmptyView()
+            StatisticsDailyPatternCard(analytics: analytics, period: viewModel.selectedPeriod)
         }
     }
 
@@ -93,143 +95,24 @@ struct StatisticsView: View {
             }
         }
         .pickerStyle(.segmented)
-        .padding(.top, 12)
     }
 
-    private var sectionPicker: some View {
-        StatisticsSelectorControl(
-            items: StatisticsSection.allCases,
-            selection: $selectedSection,
-            title: { $0.title },
-            systemImage: { $0.systemImage },
-            textSize: 16,
-            selectedTextWeight: .bold,
-            unselectedTextWeight: .semibold,
-            selectedColor: { $0 == .report ? Color(.systemYellow).opacity(0.95) : Color(.colorPrimary) },
-            unselectedColor: { $0 == .report ? Color(.systemYellow).opacity(0.58) : Color(.colorTertiary) },
-            selectedBackgroundColor: { $0 == .report ? Color(.systemYellow).opacity(0.24) : Color.clear },
-            unselectedBackgroundColor: { $0 == .report ? Color(.systemYellow).opacity(0.08) : Color.clear }
-        )
-    }
 }
 
-private enum StatisticsSection: String, CaseIterable, Identifiable {
-    case summary
-    case agp
-    case daily
-    case report
-
-    var id: String { rawValue }
-
-    var title: String {
-        switch self {
-        case .summary:
-            return Texts_Common.statisticsSummary
-        case .agp:
-            return Texts_Common.statisticsTrends
-        case .daily:
-            return Texts_Common.statisticsDaily
-        case .report:
-            return Texts_Common.statisticsReport
-        }
-    }
-
-    var systemImage: String? {
-        switch self {
-        case .report:
-            return "chart.line.text.clipboard"
-        default:
-            return nil
-        }
-    }
-}
-
-private enum StatisticsSelectorLayout {
-    static let controlHeight: CGFloat = 40
-}
-
-private struct StatisticsSelectorControl<Item: Identifiable & Hashable>: View {
-    let items: [Item]
-    @Binding var selection: Item
-    let title: (Item) -> String
-    var systemImage: (Item) -> String? = { _ in nil }
-    var textSize: CGFloat = 14
-    var selectedTextWeight: Font.Weight = .semibold
-    var unselectedTextWeight: Font.Weight = .regular
-    var selectedColor: (Item) -> Color = { _ in Color(.colorPrimary) }
-    var unselectedColor: (Item) -> Color = { _ in Color(.colorTertiary) }
-    var selectedBackgroundColor: (Item) -> Color = { _ in Color.clear }
-    var unselectedBackgroundColor: (Item) -> Color = { _ in Color.clear }
-
-    var body: some View {
-        HStack(spacing: 0) {
-            ForEach(items) { item in
-                StatisticsSelectorButton(
-                    title: title(item),
-                    systemImage: systemImage(item),
-                    isSelected: selection == item,
-                    textSize: textSize,
-                    selectedTextWeight: selectedTextWeight,
-                    unselectedTextWeight: unselectedTextWeight,
-                    selectedColor: selectedColor(item),
-                    unselectedColor: unselectedColor(item),
-                    selectedBackgroundColor: selectedBackgroundColor(item),
-                    unselectedBackgroundColor: unselectedBackgroundColor(item)
-                ) {
-                    selection = item
-                }
-            }
-        }
-        .frame(height: StatisticsSelectorLayout.controlHeight)
-        .background(Color(.secondarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
-    }
-}
-
-private struct StatisticsSelectorButton: View {
-    let title: String
-    var systemImage: String?
-    let isSelected: Bool
-    let textSize: CGFloat
-    let selectedTextWeight: Font.Weight
-    let unselectedTextWeight: Font.Weight
-    let selectedColor: Color
-    let unselectedColor: Color
-    let selectedBackgroundColor: Color
-    let unselectedBackgroundColor: Color
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            HStack(spacing: 4) {
-                if let systemImage {
-                    Image(systemName: systemImage)
-                        .font(.system(size: max(10, textSize - 4), weight: isSelected ? selectedTextWeight : unselectedTextWeight))
-                }
-
-                Text(title)
-                    .font(.system(size: textSize, weight: isSelected ? selectedTextWeight : unselectedTextWeight))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
-            .foregroundStyle(isSelected ? selectedColor : unselectedColor)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(
-                isSelected ? selectedBackgroundColor : unselectedBackgroundColor
-            )
-            .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
-    }
+private enum StatisticsReportButton {
+    static let systemImage = "chart.line.text.clipboard"
 }
 
 private struct StatisticsSummaryView: View {
     let analytics: GlucoseReportAnalytics
 
-    private let columns = [GridItem(.flexible()), GridItem(.flexible())]
+    private let tileSpacing: CGFloat = 10
+    private var columns: [GridItem] {
+        [GridItem(.flexible(), spacing: tileSpacing), GridItem(.flexible(), spacing: tileSpacing)]
+    }
 
     var body: some View {
-        LazyVGrid(columns: columns, spacing: 7) {
+        LazyVGrid(columns: columns, spacing: tileSpacing) {
             tile(Texts_Common.averageStatistics, GlucoseReportFormatting.glucose(analytics.averageMgDl, usesMgDl: analytics.usesMgDl), Texts_Common.statisticsMeanGlucose)
             tile(Texts_Common.statisticsGMI, "\(analytics.gmiPercentage.round(toDecimalPlaces: 1).stringWithoutTrailingZeroes)%", Texts_Common.statisticsCGMEstimate)
             tile(
@@ -312,25 +195,31 @@ private struct StatisticsTargetGauge: View {
 
     var body: some View {
         GeometryReader { geometry in
-            let height = geometry.size.height
+            let barHeight: CGFloat = 5
             let targetX = geometry.size.width * gauge.targetFraction
+            let markerSize = CGSize(width: 9, height: 11)
 
             ZStack(alignment: .leading) {
                 Capsule()
                     .fill(Color(.tertiarySystemFill))
+                    .frame(height: barHeight)
 
                 Capsule()
-                    .fill(gauge.color.opacity(0.58))
-                    .frame(width: max(height, geometry.size.width * gauge.valueFraction))
+                    .fill(gauge.color)
+                    .frame(width: max(barHeight, geometry.size.width * gauge.valueFraction), height: barHeight)
 
-                Rectangle()
-                    .fill(Color(.colorPrimary).opacity(0.62))
-                    .frame(width: 1.2, height: height + 3)
-                    .offset(x: min(max(targetX - 0.75, 0), geometry.size.width - 1.5), y: -2)
+                Image(systemName: gauge.isLowerBetter ? "arrowtriangle.left.fill" : "arrowtriangle.right.fill")
+                    .font(.system(size: markerSize.height, weight: .bold))
+                    .foregroundStyle(Color(.colorSecondary))
+                    .scaleEffect(x: 0.72, y: 1)
+                    .frame(width: markerSize.width, height: markerSize.height)
+                    .offset(
+                        x: min(max(targetX - markerSize.width / 2, 0), geometry.size.width - markerSize.width)
+                    )
             }
         }
-        .frame(height: 3)
-        .padding(.top, 2)
+        .frame(height: 11)
+        .padding(.top, 5)
     }
 }
 
@@ -682,62 +571,6 @@ private struct StatisticsDailyPatternCard: View {
         default:
             return dates.enumerated().compactMap { index, date in index.isMultiple(of: 7) ? date : nil }
         }
-    }
-
-    private func axisLabel(for date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.setLocalizedDateFormatFromTemplate(period == .seven || period == .thirty || period == .sixty ? "d MMM" : "MMM")
-        return formatter.string(from: date)
-    }
-}
-
-private struct StatisticsDailyHighlightsCard: View {
-    let analytics: GlucoseReportAnalytics
-    let period: GlucoseReportPeriod
-
-    var body: some View {
-        StatisticsCard(title: Texts_Common.statisticsDailySummary) {
-            HStack(spacing: 8) {
-                contextTile(title: Texts_Common.statisticsBestDay, value: bestDayText)
-                contextTile(title: Texts_Common.statisticsMostLow, value: mostLowDayText)
-                contextTile(title: Texts_Common.statisticsMostHigh, value: mostHighDayText)
-            }
-        }
-    }
-
-    private var bestDayText: String {
-        guard let summary = validSummaries.max(by: { $0.targetPercentage < $1.targetPercentage }) else { return "-" }
-        return "\(axisLabel(for: summary.date)) · \(GlucoseReportFormatting.percentage(summary.targetPercentage))"
-    }
-
-    private var mostLowDayText: String {
-        guard let summary = validSummaries.max(by: { $0.lowPercentage < $1.lowPercentage }) else { return "-" }
-        return "\(axisLabel(for: summary.date)) · \(GlucoseReportFormatting.percentage(summary.lowPercentage))"
-    }
-
-    private var mostHighDayText: String {
-        guard let summary = validSummaries.max(by: { $0.highPercentage < $1.highPercentage }) else { return "-" }
-        return "\(axisLabel(for: summary.date)) · \(GlucoseReportFormatting.percentage(summary.highPercentage))"
-    }
-
-    private var validSummaries: [GlucoseReportDailySummary] {
-        analytics.dailySummaries.filter { $0.sampleCount > 0 }
-    }
-
-    private func contextTile(title: String, value: String) -> some View {
-        VStack(alignment: .leading, spacing: 3) {
-            Text(title.uppercased())
-                .font(.caption2.weight(.semibold))
-                .foregroundStyle(Color(.colorSecondary))
-            Text(value)
-                .font(.caption.weight(.bold))
-                .foregroundStyle(Color(.colorPrimary))
-                .lineLimit(1)
-                .minimumScaleFactor(0.75)
-        }
-        .padding(10)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Color(.tertiarySystemGroupedBackground), in: RoundedRectangle(cornerRadius: 8))
     }
 
     private func axisLabel(for date: Date) -> String {
