@@ -88,3 +88,27 @@
 "confirmAlgorithmChangeToxDripMessage" = "Confirmer le changement pour utiliser l'algorithme xDrip.\n\nLes lectures vont s'interrompre un moment et vous devrez insérer une valeur de calibration initiale.";
 "confirmCalibrationChangeToSinglePointMessage" = "Confirmer le changement du type de calibration à standard\n\nLes lectures vont s'interrompre un moment et vous devrez insérer une valeur de calibration initiale.";
 "confirmCalibrationChangeToMultiPointMessage" = "Confirmer le changement du type de calibration à multipoints\n\n⚠️ Notez que cette méthode est réservée aux utilisateurs expérimentés car elle peut générer des résultats dangereux en cas de calibration incorrecte.\n\nSi vous n'êtes pas sûr de savoir l'utiliser, sélectionnez Annuler.";
+
+/// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
+"readSuccessLast24Hours" = "Dernières 24 heures";
+/// Bluetooth peripheral Read Success screen. Summary of received readings out of expected readings
+"readSuccessReadingsReceived" = "%d lectures reçues sur %d";
+/// Bluetooth peripheral Read Success screen. Footer explaining how expected readings are calculated
+"readSuccessCadenceFooter" = "Les lectures attendues sont basées sur la cadence observée du transmetteur pour %@.";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for good read success
+"readSuccessLegendGood" = "Bon";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for reduced read success
+"readSuccessLegendLow" = "Faible";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for poor read success
+"readSuccessLegendPoor" = "Mauvais";
+/// Bluetooth peripheral Read Success screen. Timeline legend label when no readings are expected or available
+"readSuccessLegendNoData" = "Aucune donnée";
+/// Bluetooth peripheral Read Success screen. Accessibility label for timeline hours with no expected readings
+"readSuccessNoReadingsExpected" = "Aucune lecture attendue";
+/// Bluetooth peripheral Read Success screen. Accessibility label for an hourly timeline bucket
+"readSuccessTimelineAccessibility" = "%0.1f pour cent, %d lectures sur %d";
+
+/// Bluetooth peripheral screen. Row title and screen title for read success information
+"readSuccess" = "Réussite des lectures";
+/// Bluetooth peripheral Read Success screen. Timeline axis label for the current time
+"readSuccessNow" = "Maintenant";

@@ -88,3 +88,27 @@
 "confirmCalibrationChangeToSinglePointMessage" = "Bekräfta att du vill ändra kalibreringstypen till Standardkalibrering\n\nDetta stoppar avläsningarna under en kort tid och du kommer få ange ett initialt kalibreringsvärde.";
 "confirmCalibrationChangeToMultiPointMessage" = "Bekräfta att du vill ändra kalibreringstypen till Flerpunktskalibrering\n\n⚠️ Observera att denna metod endast är för avancerade användare och kan potentiellt ge farliga resultat om kalibreringen inte är korrekt utförd.\n\n Om du är osäker på hur man använder denna metod, vänligen tryck på avbryt.";
 "confirm" = "Bekräfta";
+
+/// Bluetooth peripheral Read Success screen. Section title for the hourly timeline
+"readSuccessLast24Hours" = "Senaste 24 timmarna";
+/// Bluetooth peripheral Read Success screen. Summary of received readings out of expected readings
+"readSuccessReadingsReceived" = "%d av %d avläsningar mottagna";
+/// Bluetooth peripheral Read Success screen. Footer explaining how expected readings are calculated
+"readSuccessCadenceFooter" = "Förväntade avläsningar baseras på den observerade sändarkadensen för %@.";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for good read success
+"readSuccessLegendGood" = "Bra";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for reduced read success
+"readSuccessLegendLow" = "Låg";
+/// Bluetooth peripheral Read Success screen. Timeline legend label for poor read success
+"readSuccessLegendPoor" = "Dålig";
+/// Bluetooth peripheral Read Success screen. Timeline legend label when no readings are expected or available
+"readSuccessLegendNoData" = "Inga data";
+/// Bluetooth peripheral Read Success screen. Accessibility label for timeline hours with no expected readings
+"readSuccessNoReadingsExpected" = "Inga avläsningar förväntade";
+/// Bluetooth peripheral Read Success screen. Accessibility label for an hourly timeline bucket
+"readSuccessTimelineAccessibility" = "%0.1f procent, %d av %d avläsningar";
+
+/// Bluetooth peripheral screen. Row title and screen title for read success information
+"readSuccess" = "Läsningsframgång";
+/// Bluetooth peripheral Read Success screen. Timeline axis label for the current time
+"readSuccessNow" = "Nu";

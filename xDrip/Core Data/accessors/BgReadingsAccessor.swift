@@ -21,16 +21,6 @@ class BgReadingsAccessor: ObservableObject {
 
     }
 
-    /// Distinct timestamp counts for rolling windows ending at a given time, plus earliest/latest in last 24h
-    public struct TransmitterReadSuccessWindowCounts {
-        public let earliestTimestampInLast24h: Date?
-        public let latestTimestampInLast24h: Date?
-        public var distinctCountLast6h: Int
-        public var distinctCountLast12h: Int
-        public var distinctCountLast24h: Int
-    }
-
-
     // MARK: - public functions
 
 
@@ -435,115 +425,6 @@ class BgReadingsAccessor: ObservableObject {
         }
 
         return TransmitterReadSuccessResult(earliestTimestamp: earliest, latestTimestamp: latest, distinctTimestampsCount: distinctCount)
-    }
-
-    /// Computes distinct timestamp counts for 6h/12h/24h windows ending at `endDate`,
-    /// plus earliest and latest timestamps within the last 24h. If `sensor` is non-nil,
-    /// only readings for that sensor are considered. Only meaningful readings are included
-    /// (calculatedValue != 0.0 OR rawData != 0.0).
-    func getTransmitterReadSuccessWindowCounts(endingAt endDate: Date, forSensor sensor: Sensor?) -> TransmitterReadSuccessWindowCounts {
-        var earliest24h: Date?
-        var latest24h: Date?
-        var count6h: Int = 0
-        var count12h: Int = 0
-        var count24h: Int = 0
-
-        let sixHoursBefore = endDate.addingTimeInterval(-6 * 3600)
-        let twelveHoursBefore = endDate.addingTimeInterval(-12 * 3600)
-        let twentyFourHoursBefore = endDate.addingTimeInterval(-24 * 3600)
-
-        // Build base predicate components
-        var baseSubpredicates: [NSPredicate] = []
-        let validValuePredicate = NSCompoundPredicate(orPredicateWithSubpredicates: [
-            NSPredicate(format: "calculatedValue != 0.0"),
-            NSPredicate(format: "rawData != 0.0")
-        ])
-        baseSubpredicates.append(validValuePredicate)
-        if let sensorId = sensor?.id {
-            baseSubpredicates.append(NSPredicate(format: "sensor.id == %@", sensorId as CVarArg))
-        }
-        let basePredicate = NSCompoundPredicate(andPredicateWithSubpredicates: baseSubpredicates)
-
-        // Helper to create slot expression description
-        func makeSlotExpressionDescription() -> NSExpressionDescription {
-            let slotExpression = NSExpression(forKeyPath: "timeStamp")
-            let slotDescription = NSExpressionDescription()
-            slotDescription.name = "timeStamp"
-            slotDescription.expression = slotExpression
-            slotDescription.expressionResultType = .dateAttributeType
-            return slotDescription
-        }
-
-        // Helper to get distinct slot count in a window
-        func distinctSlotCount(from: Date, to: Date) throws -> Int {
-            let requestFetch = NSFetchRequest<NSDictionary>(entityName: "BgReading")
-            var subPredicates: [NSPredicate] = []
-            subPredicates.append(NSCompoundPredicate(orPredicateWithSubpredicates: [
-                NSPredicate(format: "calculatedValue != 0.0"),
-                NSPredicate(format: "rawData != 0.0")
-            ]))
-            if let sensorId = sensor?.id {
-                subPredicates.append(NSPredicate(format: "sensor.id == %@", sensorId as CVarArg))
-            }
-            subPredicates.append(NSPredicate(format: "timeStamp >= %@", NSDate(timeIntervalSince1970: from.timeIntervalSince1970)))
-            subPredicates.append(NSPredicate(format: "timeStamp <= %@", NSDate(timeIntervalSince1970: to.timeIntervalSince1970)))
-            requestFetch.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: subPredicates)
-            requestFetch.resultType = .dictionaryResultType
-            requestFetch.returnsDistinctResults = true
-            requestFetch.propertiesToFetch = [makeSlotExpressionDescription()]
-            let dicts = try coreDataManager.mainManagedObjectContext.fetch(requestFetch)
-            return dicts.count
-        }
-
-        coreDataManager.mainManagedObjectContext.performAndWait {
-            do {
-                // Earliest in last 24h
-                do {
-                    let fetchRequest: NSFetchRequest<BgReading> = BgReading.fetchRequest()
-                    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                        basePredicate,
-                        NSPredicate(format: "timeStamp >= %@", NSDate(timeIntervalSince1970: twentyFourHoursBefore.timeIntervalSince1970))
-                    ])
-                    fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BgReading.timeStamp), ascending: true)]
-                    fetchRequest.fetchLimit = 1
-                    fetchRequest.includesPropertyValues = true
-                    fetchRequest.returnsObjectsAsFaults = false
-                    if let first = try fetchRequest.execute().first {
-                        earliest24h = first.timeStamp
-                    }
-                }
-
-                // Latest in last 24h (up to endDate)
-                do {
-                    let fetchRequest: NSFetchRequest<BgReading> = BgReading.fetchRequest()
-                    fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [
-                        basePredicate,
-                        NSPredicate(format: "timeStamp <= %@", NSDate(timeIntervalSince1970: endDate.timeIntervalSince1970))
-                    ])
-                    fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(BgReading.timeStamp), ascending: false)]
-                    fetchRequest.fetchLimit = 1
-                    fetchRequest.includesPropertyValues = true
-                    fetchRequest.returnsObjectsAsFaults = false
-                    if let last = try fetchRequest.execute().first {
-                        latest24h = last.timeStamp
-                    }
-                }
-
-                // 6h distinct count
-                count6h = try distinctSlotCount(from: sixHoursBefore, to: endDate)
-                // 12h distinct count
-                count12h = try distinctSlotCount(from: twelveHoursBefore, to: endDate)
-                // 24h distinct count
-                count24h = try distinctSlotCount(from: twentyFourHoursBefore, to: endDate)
-
-            } catch {
-                let fetchError = error as NSError
-                trace("in getTransmitterReadSuccessWindowCounts, fetch error: %{public}@", log: self.log, category: ConstantsLog.categoryApplicationDataBgReadings, type: .error, fetchError.localizedDescription)
-            }
-        }
-
-        return TransmitterReadSuccessWindowCounts(earliestTimestampInLast24h: earliest24h, latestTimestampInLast24h: latest24h, distinctCountLast6h: count6h,
-            distinctCountLast12h: count12h, distinctCountLast24h: count24h)
     }
 
     /// deletes bgReading, synchronously, in the managedObjectContext's thread

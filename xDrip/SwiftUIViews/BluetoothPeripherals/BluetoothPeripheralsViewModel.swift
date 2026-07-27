@@ -36,6 +36,10 @@ final class BluetoothPeripheralsRouter: ObservableObject {
         path.append(BluetoothPeripheralsRoute(.selectionList(selectionList)))
     }
 
+    func showReadSuccess(_ display: TransmitterReadSuccessDisplay, type: BluetoothPeripheralType) {
+        path.append(BluetoothPeripheralsRoute(.readSuccess(display, type)))
+    }
+
     func closeCurrentView() {
         guard !path.isEmpty else { return }
 
@@ -54,6 +58,7 @@ struct BluetoothPeripheralsRoute: Hashable {
         case peripheral(BluetoothPeripheral?, BluetoothPeripheralType)
         case textEntry(BluetoothPeripheralTextEntry)
         case selectionList(BluetoothPeripheralSelectionList)
+        case readSuccess(TransmitterReadSuccessDisplay, BluetoothPeripheralType)
     }
 
     let id = UUID()

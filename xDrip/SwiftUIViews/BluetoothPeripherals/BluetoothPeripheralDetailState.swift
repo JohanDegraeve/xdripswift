@@ -47,6 +47,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     private let closeDetailView: () -> Void
     private let presentTextEntryView: (BluetoothPeripheralTextEntry) -> Void
     private let presentSelectionListView: (BluetoothPeripheralSelectionList) -> Void
+    private let presentReadSuccessView: (TransmitterReadSuccessDisplay, BluetoothPeripheralType) -> Void
 
     // MARK: - Working State
 
@@ -55,8 +56,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
     private var nfcScanNeeded = false
     private var nfcScanSuccessful = false
     private var previousScanningResult: BluetoothTransmitter.startScanningResult?
+    private var cachedTransmitterReadSuccessDisplay: TransmitterReadSuccessDisplay?
     private var cachedTransmitterReadSuccessSummaryText: String?
-    private var cachedTransmitterReadSuccessSummaryMessage: String?
     private var cachedTransmitterReadSuccessSummaryIndicatorColor: Color?
     private var transmitterReadSuccessTimer: Timer?
     private var didAddObservers = false
@@ -78,7 +79,8 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         sensorProvider: ActiveSensorProviding?,
         closeDetailView: @escaping () -> Void,
         presentTextEntryView: @escaping (BluetoothPeripheralTextEntry) -> Void,
-        presentSelectionListView: @escaping (BluetoothPeripheralSelectionList) -> Void
+        presentSelectionListView: @escaping (BluetoothPeripheralSelectionList) -> Void,
+        presentReadSuccessView: @escaping (TransmitterReadSuccessDisplay, BluetoothPeripheralType) -> Void
     ) {
         self.bluetoothPeripheral = bluetoothPeripheral
         self.expectedBluetoothPeripheralType = expectedBluetoothPeripheralType
@@ -89,6 +91,7 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
         self.closeDetailView = closeDetailView
         self.presentTextEntryView = presentTextEntryView
         self.presentSelectionListView = presentSelectionListView
+        self.presentReadSuccessView = presentReadSuccessView
         self.transmitterIdTempValue = bluetoothPeripheral?.blePeripheral.transmitterId
 
         super.init()
@@ -275,10 +278,10 @@ final class BluetoothPeripheralDetailState: NSObject, ObservableObject {
                 title: Texts_BluetoothPeripheralView.readSuccess,
                 detail: cachedTransmitterReadSuccessSummaryText ?? "",
                 detailIndicator: transmitterReadSuccessDetailIndicator(),
-                showsDisclosure: cachedTransmitterReadSuccessSummaryMessage?.isEmpty == false,
-                isEnabled: cachedTransmitterReadSuccessSummaryMessage?.isEmpty == false,
+                showsDisclosure: cachedTransmitterReadSuccessDisplay != nil,
+                isEnabled: cachedTransmitterReadSuccessDisplay != nil,
                 action: { [weak self] in
-                    self?.showReadSuccessInfo()
+                    self?.showReadSuccessView()
                 }
             ))
         }
@@ -764,13 +767,10 @@ private extension BluetoothPeripheralDetailState {
         refresh()
     }
 
-    func showReadSuccessInfo() {
-        guard let message = cachedTransmitterReadSuccessSummaryMessage, !message.isEmpty else { return }
+    func showReadSuccessView() {
+        guard let cachedTransmitterReadSuccessDisplay else { return }
 
-        pendingAlert = BluetoothPeripheralDetailAlert(
-            title: Texts_BluetoothPeripheralView.readSuccess,
-            message: message
-        )
+        presentReadSuccessView(cachedTransmitterReadSuccessDisplay, expectedBluetoothPeripheralType)
     }
 
     func transmitterReadSuccessDetailIndicator() -> SettingsIndicator? {
@@ -1174,39 +1174,18 @@ private extension BluetoothPeripheralDetailState {
 
     func updateTransmitterReadSuccess() {
         guard expectedBluetoothPeripheralType.canShowTransmitterReadSuccess(),
-              let bluetoothPeripheralManager = bluetoothPeripheralManager,
               let bluetoothPeripheral = bluetoothPeripheral,
+              bluetoothPeripheral.blePeripheral.shouldconnect == true,
               let activeSensor = sensorProvider?.activeSensor
         else {
             cachedTransmitterReadSuccessSummaryText = "Waiting..."
-            cachedTransmitterReadSuccessSummaryMessage = ""
             cachedTransmitterReadSuccessSummaryIndicatorColor = nil
+            cachedTransmitterReadSuccessDisplay = nil
             refresh()
             return
         }
 
-        if let status = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: false)?.getConnectionStatus(),
-           status == .disconnected,
-           bluetoothPeripheral.blePeripheral.shouldconnect == false {
-            return
-        }
-
         let display = TransmitterReadSuccessManager(bgReadingsAccessor: bgReadingsAccessor).getReadSuccess(forSensor: activeSensor, now: nil, notBefore: nil)
-        let now = Date()
-        let availableHours: Double = {
-            guard let earliestTimestamp = display.earliestTimestampInLast24h else { return 0 }
-            let seconds = max(0, now.timeIntervalSince(earliestTimestamp))
-            return seconds / 3600.0
-        }()
-
-        func windowLabel(for nominalHours: Int, expected: Int, fullExpected: Int) -> String {
-            if expected >= fullExpected {
-                return Date().addingTimeInterval(-Double(nominalHours) * 60 * 60).daysAndHoursAgo(showOnlyHours: true)
-            }
-
-            let shownHours = min(availableHours, Double(nominalHours))
-            return Date().addingTimeInterval(-Double(shownHours) * 60 * 60).daysAndHoursAgo()
-        }
 
         let okSuccessPercentage = display.nominalGapInSeconds > 180 ? 95.0 : 80.0
         let warningSuccessPercentage = display.nominalGapInSeconds > 180 ? 90.0 : 70.0
@@ -1221,39 +1200,18 @@ private extension BluetoothPeripheralDetailState {
             }
         }
 
-        let gap = display.nominalGapInSeconds
-        let fullExpected6h = Int(floor((6.0 * 3600.0) / Double(gap)))
-        let fullExpected12h = Int(floor((12.0 * 3600.0) / Double(gap)))
-        let fullExpected24h = Int(floor((24.0 * 3600.0) / Double(gap)))
-
         if display.expected24h == 0 {
             cachedTransmitterReadSuccessSummaryText = "Waiting..."
-            cachedTransmitterReadSuccessSummaryMessage = ""
             cachedTransmitterReadSuccessSummaryIndicatorColor = nil
+            cachedTransmitterReadSuccessDisplay = nil
             refresh()
             return
         }
 
-        let label6h = windowLabel(for: 6, expected: display.expected6h, fullExpected: fullExpected6h)
-        let label12h = windowLabel(for: 12, expected: display.expected12h, fullExpected: fullExpected12h)
-        let label24h = windowLabel(for: 24, expected: display.expected24h, fullExpected: fullExpected24h)
-
-        cachedTransmitterReadSuccessSummaryText = "\(String(format: "%0.0f", display.success24h))% (\(label24h))"
+        cachedTransmitterReadSuccessSummaryText = "\(String(format: "%0.0f", display.success24h))%"
         cachedTransmitterReadSuccessSummaryIndicatorColor = indicatorColor(for: display.success24h)
+        cachedTransmitterReadSuccessDisplay = display
 
-        var summaryMessageLines = [String]()
-        summaryMessageLines.append("Expecting \(expectedBluetoothPeripheralType.bluetoothPeripheralDisplayTitle) readings every \(display.nominalGapInSeconds) seconds.")
-        summaryMessageLines.append("\(String(format: "%0.1f", display.success6h))% (\(label6h): \(display.expected6h - display.actual6h) dropped)")
-
-        if display.expected12h >= fullExpected6h {
-            summaryMessageLines.append("\(String(format: "%0.1f", display.success12h))% (\(label12h): \(display.expected12h - display.actual12h) dropped)")
-        }
-
-        if display.expected24h >= fullExpected12h {
-            summaryMessageLines.append("\(String(format: "%0.1f", display.success24h))% (\(label24h): \(display.expected24h - display.actual24h) dropped)")
-        }
-
-        cachedTransmitterReadSuccessSummaryMessage = summaryMessageLines.joined(separator: "\n\n")
         refresh()
     }
 }
@@ -1479,7 +1437,7 @@ private extension BluetoothPeripheralDetailState {
                 id: "dexcom-g5",
                 title: "Dexcom",
                 headerDetail: dexcomG5.isAnubis ? "Anubis" : nil,
-                headerSymbol: dexcomG5.isAnubis ? BluetoothPeripheralDetailSymbol(systemName: "checkmark.circle", color: .green) : nil,
+                headerSymbol: dexcomG5.isAnubis ? BluetoothPeripheralDetailSymbol(systemName: "checkmark.circle.fill", color: .mint) : nil,
                 rows: makeDexcomG5CommonRows(dexcomG5: dexcomG5)
             ),
             BluetoothPeripheralDetailSection(

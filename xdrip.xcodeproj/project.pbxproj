@@ -249,6 +249,7 @@
 		4C2000052F65000100000001 /* BluetoothPeripheralDetailState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2000062F65000100000001 /* BluetoothPeripheralDetailState.swift */; };
 		4C2000072F65000100000001 /* BluetoothPeripheralDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C2000082F65000100000001 /* BluetoothPeripheralDetailView.swift */; };
 		4C2000092F65000100000001 /* BluetoothPeripheralSettingsRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C20000A2F65000100000001 /* BluetoothPeripheralSettingsRow.swift */; };
+		4C20000C2F65000100000001 /* TransmitterReadSuccessView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C20000D2F65000100000001 /* TransmitterReadSuccessView.swift */; };
 		4D10C0042FEF000100000001 /* GlucoseChartScrollCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D10C0032FEF000100000001 /* GlucoseChartScrollCoordinator.swift */; };
 		4D20C0022FF1000100000001 /* RootHomeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0012FF1000100000001 /* RootHomeState.swift */; };
 		4D20C0042FF1000100000001 /* RootHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D20C0032FF1000100000001 /* RootHomeView.swift */; };
@@ -1066,6 +1067,7 @@
 		4C2000062F65000100000001 /* BluetoothPeripheralDetailState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralDetailState.swift; sourceTree = "<group>"; };
 		4C2000082F65000100000001 /* BluetoothPeripheralDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralDetailView.swift; sourceTree = "<group>"; };
 		4C20000A2F65000100000001 /* BluetoothPeripheralSettingsRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BluetoothPeripheralSettingsRow.swift; sourceTree = "<group>"; };
+		4C20000D2F65000100000001 /* TransmitterReadSuccessView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransmitterReadSuccessView.swift; sourceTree = "<group>"; };
 		4D10C0032FEF000100000001 /* GlucoseChartScrollCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseChartScrollCoordinator.swift; sourceTree = "<group>"; };
 		4D20C0012FF1000100000001 /* RootHomeState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeState.swift; sourceTree = "<group>"; };
 		4D20C0032FF1000100000001 /* RootHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootHomeView.swift; sourceTree = "<group>"; };
@@ -2276,6 +2278,7 @@
 				4C20000A2F65000100000001 /* BluetoothPeripheralSettingsRow.swift */,
 				4C2000042F65000100000001 /* BluetoothPeripheralsView.swift */,
 				4C2000022F65000100000001 /* BluetoothPeripheralsViewModel.swift */,
+				4C20000D2F65000100000001 /* TransmitterReadSuccessView.swift */,
 			);
 			path = BluetoothPeripherals;
 			sourceTree = "<group>";
@@ -4286,6 +4289,7 @@
 				4C2000092F65000100000001 /* BluetoothPeripheralSettingsRow.swift in Sources */,
 				4C2000012F65000100000001 /* BluetoothPeripheralsViewModel.swift in Sources */,
 				4C2000032F65000100000001 /* BluetoothPeripheralsView.swift in Sources */,
+				4C20000C2F65000100000001 /* TransmitterReadSuccessView.swift in Sources */,
 				4C1000082F64000100000001 /* TreatmentEditorViewModel.swift in Sources */,
 				4C1000032F64000100000001 /* TreatmentEditorView.swift in Sources */,
 				4C1000062F64000100000001 /* TreatmentsViewModel.swift in Sources */,

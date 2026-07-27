@@ -279,4 +279,44 @@ class Texts_BluetoothPeripheralView {
     static let readSuccess: String = {
         return NSLocalizedString("readSuccess", tableName: filename, bundle: Bundle.main, value: "Read Success", comment: "Bluetooth peripheral screen. row title for the read success line")
     }()
+
+    static let readSuccessLast24Hours: String = {
+        return NSLocalizedString("readSuccessLast24Hours", tableName: filename, bundle: Bundle.main, value: "Last 24 Hours", comment: "Bluetooth peripheral Read Success screen. Section title for the hourly read success timeline")
+    }()
+
+    static let readSuccessNow: String = {
+        return NSLocalizedString("readSuccessNow", tableName: filename, bundle: Bundle.main, value: "Now", comment: "Bluetooth peripheral Read Success screen. Timeline axis label for the current time")
+    }()
+
+    static func readSuccessReadingsReceived(actual: Int, expected: Int) -> String {
+        return String(format: NSLocalizedString("readSuccessReadingsReceived", tableName: filename, bundle: Bundle.main, value: "%d of %d readings received", comment: "Bluetooth peripheral Read Success screen. Summary of received readings out of expected readings"), actual, expected)
+    }
+
+    static func readSuccessCadenceFooter(bluetoothPeripheralType: String) -> String {
+        return String(format: NSLocalizedString("readSuccessCadenceFooter", tableName: filename, bundle: Bundle.main, value: "Expected readings are based on the observed transmitter cadence for %@.", comment: "Bluetooth peripheral Read Success screen. Footer explaining how expected readings are calculated. Placeholder is the transmitter type"), bluetoothPeripheralType)
+    }
+
+    static let readSuccessLegendGood: String = {
+        return NSLocalizedString("readSuccessLegendGood", tableName: filename, bundle: Bundle.main, value: "Good", comment: "Bluetooth peripheral Read Success screen. Timeline legend label for good read success")
+    }()
+
+    static let readSuccessLegendLow: String = {
+        return NSLocalizedString("readSuccessLegendLow", tableName: filename, bundle: Bundle.main, value: "Low", comment: "Bluetooth peripheral Read Success screen. Timeline legend label for reduced read success")
+    }()
+
+    static let readSuccessLegendPoor: String = {
+        return NSLocalizedString("readSuccessLegendPoor", tableName: filename, bundle: Bundle.main, value: "Poor", comment: "Bluetooth peripheral Read Success screen. Timeline legend label for poor read success")
+    }()
+
+    static let readSuccessLegendNoData: String = {
+        return NSLocalizedString("readSuccessLegendNoData", tableName: filename, bundle: Bundle.main, value: "No data", comment: "Bluetooth peripheral Read Success screen. Timeline legend label when no readings are expected or available")
+    }()
+
+    static let readSuccessNoReadingsExpected: String = {
+        return NSLocalizedString("readSuccessNoReadingsExpected", tableName: filename, bundle: Bundle.main, value: "No readings expected", comment: "Bluetooth peripheral Read Success screen. Accessibility label for timeline hours with no expected readings")
+    }()
+
+    static func readSuccessTimelineAccessibility(success: Double, actual: Int, expected: Int) -> String {
+        return String(format: NSLocalizedString("readSuccessTimelineAccessibility", tableName: filename, bundle: Bundle.main, value: "%0.1f percent, %d of %d readings", comment: "Bluetooth peripheral Read Success screen. Accessibility label for an hourly timeline bucket"), success, actual, expected)
+    }
 }

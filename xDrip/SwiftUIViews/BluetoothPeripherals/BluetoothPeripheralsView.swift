@@ -66,6 +66,9 @@ struct BluetoothPeripheralsNavigationView: View {
 
         case let .selectionList(selectionList):
             BluetoothPeripheralSelectionListView(selectionList: selectionList, close: router.closeCurrentView)
+
+        case let .readSuccess(display, type):
+            TransmitterReadSuccessView(display: display, bluetoothPeripheralType: type)
         }
     }
 }
@@ -94,7 +97,8 @@ private struct BluetoothPeripheralDetailContainerView: View {
                 viewModel.reload()
             },
             presentTextEntryView: router.showTextEntry,
-            presentSelectionListView: router.showSelectionList
+            presentSelectionListView: router.showSelectionList,
+            presentReadSuccessView: router.showReadSuccess
         ))
     }
 
