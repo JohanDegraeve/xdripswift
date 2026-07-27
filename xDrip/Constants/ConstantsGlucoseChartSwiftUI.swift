@@ -97,6 +97,26 @@ enum ConstantsGlucoseChartSwiftUI {
     static let overlayWindowEdgeLineWidth: CGFloat = 2.0
     static let overlayWindowCurrentTimeEdgeTolerance: TimeInterval = 5 * 60
 
+    /// Converts the mini-chart's desired edge clearance from points into time.
+    ///
+    /// The same interval extends the rendered x-axis after `now` and keeps overview-driven dragging
+    /// clear of the leading rounded corner. It does not extend the glucose-data range.
+    ///
+    /// For visible duration `D`, chart width `W` and desired point inset `m`, the `now` edge must
+    /// satisfy `D / (D + padding) = (W - m) / W`. Solving gives
+    /// `padding = D * m / (W - m)`.
+    static func miniChartEdgeInsetTimeInterval(
+        visibleTimeInterval: TimeInterval,
+        chartWidth: CGFloat
+    ) -> TimeInterval {
+        let edgeInsetWidth = ConstantsHomeView.standardCornerRadius
+        let widthBeforeInset = chartWidth - edgeInsetWidth
+
+        guard visibleTimeInterval > 0, widthBeforeInset > 0 else { return 0 }
+
+        return visibleTimeInterval * Double(edgeInsetWidth / widthBeforeInset)
+    }
+
     // muted enough to stay behind glucose points, but visible enough during chart scrolling
     static let sensorNoiseWarningBandColor = Color.yellow.opacity(0.22)
     static let sensorNoiseUrgentBandColor = Color.red.opacity(0.27)

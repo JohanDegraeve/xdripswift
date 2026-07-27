@@ -121,8 +121,15 @@ final class GlucoseChartScrollCoordinator: ObservableObject {
     /// Moves the visible window directly within a fixed overview chart.
     ///
     /// Unlike the main-chart gesture, the overview itself does not scroll: the drag moves its
-    /// active-window selection in the same direction as the user's finger.
-    func updateVisibleRangeFromOverview(value: DragGesture.Value, overviewStartDate: Date, overviewEndDate: Date, chartWidth: CGFloat) {
+    /// active-window selection in the same direction as the user's finger. The leading inset only
+    /// constrains this overview gesture; direct main-chart scrolling remains unrestricted.
+    func updateVisibleRangeFromOverview(
+        value: DragGesture.Value,
+        overviewStartDate: Date,
+        overviewEndDate: Date,
+        leadingEdgeInsetTimeInterval: TimeInterval,
+        chartWidth: CGFloat
+    ) {
         stopDeceleration()
 
         let baseEndDate = overviewDragStartEndDate ?? endDate
@@ -131,13 +138,30 @@ final class GlucoseChartScrollCoordinator: ObservableObject {
         let proposedEndDate = baseEndDate.addingTimeInterval(Double(value.translation.width) * secondsPerPoint)
 
         overviewDragStartEndDate = baseEndDate
-        let clampedEndDate = clampedOverviewEndDate(proposedEndDate, overviewStartDate: overviewStartDate, overviewEndDate: overviewEndDate)
+        let clampedEndDate = clampedOverviewEndDate(
+            proposedEndDate,
+            overviewStartDate: overviewStartDate,
+            overviewEndDate: overviewEndDate,
+            leadingEdgeInsetTimeInterval: leadingEdgeInsetTimeInterval
+        )
         publishEndDate(clampedEndDate, minimumTimeInterval: secondsPerPoint * Double(Self.minimumPublishDistanceWidth))
     }
 
     /// Applies the final overview translation and ends direct manipulation without inertia.
-    func finishUpdatingVisibleRangeFromOverview(value: DragGesture.Value, overviewStartDate: Date, overviewEndDate: Date, chartWidth: CGFloat) {
-        updateVisibleRangeFromOverview(value: value, overviewStartDate: overviewStartDate, overviewEndDate: overviewEndDate, chartWidth: chartWidth)
+    func finishUpdatingVisibleRangeFromOverview(
+        value: DragGesture.Value,
+        overviewStartDate: Date,
+        overviewEndDate: Date,
+        leadingEdgeInsetTimeInterval: TimeInterval,
+        chartWidth: CGFloat
+    ) {
+        updateVisibleRangeFromOverview(
+            value: value,
+            overviewStartDate: overviewStartDate,
+            overviewEndDate: overviewEndDate,
+            leadingEdgeInsetTimeInterval: leadingEdgeInsetTimeInterval,
+            chartWidth: chartWidth
+        )
         overviewDragStartEndDate = nil
     }
 
@@ -160,11 +184,18 @@ final class GlucoseChartScrollCoordinator: ObservableObject {
         publishEndDate(clampedEndDate, minimumTimeInterval: secondsPerPoint * Double(Self.minimumPublishDistanceWidth), force: forcePublish)
     }
 
-    private func clampedOverviewEndDate(_ proposedEndDate: Date, overviewStartDate: Date, overviewEndDate: Date) -> Date {
+    private func clampedOverviewEndDate(
+        _ proposedEndDate: Date,
+        overviewStartDate: Date,
+        overviewEndDate: Date,
+        leadingEdgeInsetTimeInterval: TimeInterval
+    ) -> Date {
         let latestEndDate = min(overviewEndDate, Date())
-        // The end date cannot move so far left that the main chart's fixed-width window extends
-        // beyond the overview's leading edge.
-        let earliestEndDate = overviewStartDate.addingTimeInterval(visibleTimeInterval)
+        // Add the visual inset after the active window's duration so its left vertical edge stops
+        // inside the rounded corner. Main-chart scrolling does not use this clamp.
+        let earliestEndDate = overviewStartDate.addingTimeInterval(
+            visibleTimeInterval + max(leadingEdgeInsetTimeInterval, 0)
+        )
 
         guard earliestEndDate <= latestEndDate else { return latestEndDate }
 

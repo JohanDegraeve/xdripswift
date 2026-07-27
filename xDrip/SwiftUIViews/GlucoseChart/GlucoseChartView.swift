@@ -406,7 +406,27 @@ struct GlucoseChartView: View {
         usesMainChartYAxisContext ? .leading : .trailing
     }
 
-    private func overlayWindowClampedToVisibleRange() -> (startDate: Date, endDate: Date)? {
+    /// Adds an empty trailing span only to mini-chart rendering, positioning the `now` edge clear
+    /// of the view's rounded corner without creating future glucose values.
+    private func renderedXScaleEndDate() -> Date {
+        if usesMainChartYAxisContext {
+            return visibleEndDate
+        }
+
+        guard chartType == .miniChart else {
+            return visibleEndDate.addingTimeInterval(5 * 60)
+        }
+
+        let visibleTimeInterval = visibleEndDate.timeIntervalSince(visibleStartDate)
+        let edgeInsetTimeInterval = ConstantsGlucoseChartSwiftUI.miniChartEdgeInsetTimeInterval(
+            visibleTimeInterval: visibleTimeInterval,
+            chartWidth: chartWidth
+        )
+
+        return visibleEndDate.addingTimeInterval(edgeInsetTimeInterval)
+    }
+
+    private func overlayWindowClampedToVisibleRange(visibleRangeEndDate: Date) -> (startDate: Date, endDate: Date)? {
         guard let overlayWindowStartDate = chartState?.overlayWindowStartDate, let overlayWindowEndDate = chartState?.overlayWindowEndDate, overlayWindowStartDate < overlayWindowEndDate else {
             return nil
         }
@@ -415,7 +435,7 @@ struct GlucoseChartView: View {
         // is only drawn when that boundary is actually visible, except for the current-time tolerance
         // used to keep the right edge visible when the main chart ends at "now".
         let clampedStartDate = max(overlayWindowStartDate, visibleStartDate)
-        let clampedEndDate = min(overlayWindowEndDate, visibleEndDate)
+        let clampedEndDate = min(overlayWindowEndDate, visibleRangeEndDate)
 
         guard clampedStartDate < clampedEndDate else {
             return nil
@@ -424,31 +444,28 @@ struct GlucoseChartView: View {
         return (clampedStartDate, clampedEndDate)
     }
 
-    private func overlayWindowDimsWholeVisibleRange() -> Bool {
+    private func overlayWindowIsOutsideVisibleRange(visibleRangeEndDate: Date) -> Bool {
         guard let overlayWindowStartDate = chartState?.overlayWindowStartDate, let overlayWindowEndDate = chartState?.overlayWindowEndDate, overlayWindowStartDate < overlayWindowEndDate else {
             return false
         }
 
-        let startDateIsOutsideVisibleRange = overlayWindowStartDate < visibleStartDate || overlayWindowStartDate > visibleEndDate
-        let endDateIsOutsideVisibleRange = overlayWindowEndDate < visibleStartDate || overlayWindowEndDate > visibleEndDate
-
-        return startDateIsOutsideVisibleRange && endDateIsOutsideVisibleRange
+        return overlayWindowEndDate <= visibleStartDate || overlayWindowStartDate >= visibleRangeEndDate
     }
 
-    private func overlayWindowStartEdgeDate() -> Date? {
-        guard let overlayWindowStartDate = chartState?.overlayWindowStartDate, overlayWindowStartDate >= visibleStartDate, overlayWindowStartDate <= visibleEndDate else {
+    private func overlayWindowStartEdgeDate(visibleRangeEndDate: Date) -> Date? {
+        guard let overlayWindowStartDate = chartState?.overlayWindowStartDate, overlayWindowStartDate >= visibleStartDate, overlayWindowStartDate <= visibleRangeEndDate else {
             return nil
         }
 
         return overlayWindowStartDate
     }
 
-    private func overlayWindowEndEdgeDate() -> Date? {
+    private func overlayWindowEndEdgeDate(visibleRangeEndDate: Date) -> Date? {
         guard let overlayWindowEndDate = chartState?.overlayWindowEndDate, overlayWindowEndDate >= visibleStartDate else {
             return nil
         }
 
-        if overlayWindowEndDate <= visibleEndDate {
+        if overlayWindowEndDate <= visibleRangeEndDate {
             return overlayWindowEndDate
         }
 
@@ -480,12 +497,12 @@ struct GlucoseChartView: View {
         let xAxisLabelEveryHours = xAxisLabelEveryHours()
         let xAxisLabelDates = xAxisLabelDates(everyHours: xAxisLabelEveryHours)
         let xAxisMidnightDates = xAxisMidnightDates()
-        let xScaleEndDate = usesMainChartYAxisContext ? visibleEndDate : visibleEndDate.addingTimeInterval(5 * 60)
+        let xScaleEndDate = renderedXScaleEndDate()
         let xScaleDomain = visibleStartDate ... xScaleEndDate
-        let overlayWindow = overlayWindowClampedToVisibleRange()
-        let overlayWindowDimsWholeVisibleRange = overlayWindowDimsWholeVisibleRange()
-        let overlayWindowStartRuleDate = overlayWindowStartEdgeDate()
-        let overlayWindowEndRuleDate = overlayWindowEndEdgeDate()
+        let overlayWindow = overlayWindowClampedToVisibleRange(visibleRangeEndDate: xScaleEndDate)
+        let overlayWindowIsOutsideVisibleRange = overlayWindowIsOutsideVisibleRange(visibleRangeEndDate: xScaleEndDate)
+        let overlayWindowStartRuleDate = overlayWindowStartEdgeDate(visibleRangeEndDate: xScaleEndDate)
+        let overlayWindowEndRuleDate = overlayWindowEndEdgeDate(visibleRangeEndDate: xScaleEndDate)
         let chartAspectRatio = chartType.aspectRatio()
         let chartPadding = chartType.padding()
         let yAxisLineSize = chartType.yAxisLineSize()
@@ -674,15 +691,15 @@ struct GlucoseChartView: View {
             //
             // This is intentionally data-driven from `chartState` so normal charts ignore it. If the
             // clear window is completely off-screen, the whole plot area is dimmed with no edge bars.
-            if overlayWindowDimsWholeVisibleRange {
+            if overlayWindowIsOutsideVisibleRange {
                 RectangleMark(xStart: .value("Overlay start", visibleStartDate),
-                              xEnd: .value("Overlay end", visibleEndDate),
+                              xEnd: .value("Overlay end", xScaleEndDate),
                               yStart: .value("Overlay minimum", domain.lowerBound),
                               yEnd: .value("Overlay maximum", domain.upperBound))
                     .foregroundStyle(ConstantsGlucoseChartSwiftUI.overlayWindowShadeColor)
 
                 RectangleMark(xStart: .value("Overlay start", visibleStartDate),
-                              xEnd: .value("Overlay end", visibleEndDate),
+                              xEnd: .value("Overlay end", xScaleEndDate),
                               yStart: .value("Overlay minimum", domain.lowerBound),
                               yEnd: .value("Overlay maximum", domain.upperBound))
                     .foregroundStyle(ConstantsGlucoseChartSwiftUI.overlayWindowTintColor)
@@ -701,15 +718,15 @@ struct GlucoseChartView: View {
                         .foregroundStyle(ConstantsGlucoseChartSwiftUI.overlayWindowTintColor)
                 }
 
-                if overlayWindow.endDate < visibleEndDate {
+                if overlayWindow.endDate < xScaleEndDate {
                     RectangleMark(xStart: .value("Overlay window end", overlayWindow.endDate),
-                                  xEnd: .value("Overlay end", visibleEndDate),
+                                  xEnd: .value("Overlay end", xScaleEndDate),
                                   yStart: .value("Overlay minimum", domain.lowerBound),
                                   yEnd: .value("Overlay maximum", domain.upperBound))
                         .foregroundStyle(ConstantsGlucoseChartSwiftUI.overlayWindowShadeColor)
 
                     RectangleMark(xStart: .value("Overlay window end", overlayWindow.endDate),
-                                  xEnd: .value("Overlay end", visibleEndDate),
+                                  xEnd: .value("Overlay end", xScaleEndDate),
                                   yStart: .value("Overlay minimum", domain.lowerBound),
                                   yEnd: .value("Overlay maximum", domain.upperBound))
                         .foregroundStyle(ConstantsGlucoseChartSwiftUI.overlayWindowTintColor)

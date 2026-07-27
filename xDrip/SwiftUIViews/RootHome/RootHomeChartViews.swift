@@ -90,6 +90,10 @@ struct RootHomeMiniChartView: View {
 
     var body: some View {
         GeometryReader { geometry in
+            let overviewStartDate = chartState.startDate
+            let edgeInsetTimeInterval = overviewEdgeInsetTimeInterval(chartWidth: geometry.size.width)
+            let renderedOverviewEndDate = chartState.endDate.addingTimeInterval(edgeInsetTimeInterval)
+
             ZStack(alignment: .leading) {
                 GlucoseChartView(
                     glucoseChartType: .miniChart,
@@ -118,29 +122,41 @@ struct RootHomeMiniChartView: View {
                     DragGesture(minimumDistance: 5)
                         .onChanged { value in
                             if activeWindowDragIsEnabled == nil {
-                                activeWindowDragIsEnabled = activeWindowContains(xPosition: value.startLocation.x, chartWidth: geometry.size.width)
+                                activeWindowDragIsEnabled = activeWindowContains(
+                                    xPosition: value.startLocation.x,
+                                    chartWidth: geometry.size.width,
+                                    overviewStartDate: overviewStartDate,
+                                    overviewEndDate: renderedOverviewEndDate
+                                )
                             }
 
                             guard activeWindowDragIsEnabled == true else { return }
 
                             scrollCoordinator.updateVisibleRangeFromOverview(
                                 value: value,
-                                overviewStartDate: chartState.startDate,
-                                overviewEndDate: chartState.endDate,
+                                overviewStartDate: overviewStartDate,
+                                overviewEndDate: renderedOverviewEndDate,
+                                leadingEdgeInsetTimeInterval: edgeInsetTimeInterval,
                                 chartWidth: geometry.size.width
                             )
                             updateChartStateIfNeeded()
                         }
                         .onEnded { value in
-                            let shouldFinishDrag = activeWindowDragIsEnabled ?? activeWindowContains(xPosition: value.startLocation.x, chartWidth: geometry.size.width)
+                            let shouldFinishDrag = activeWindowDragIsEnabled ?? activeWindowContains(
+                                xPosition: value.startLocation.x,
+                                chartWidth: geometry.size.width,
+                                overviewStartDate: overviewStartDate,
+                                overviewEndDate: renderedOverviewEndDate
+                            )
                             activeWindowDragIsEnabled = nil
 
                             guard shouldFinishDrag else { return }
 
                             scrollCoordinator.finishUpdatingVisibleRangeFromOverview(
                                 value: value,
-                                overviewStartDate: chartState.startDate,
-                                overviewEndDate: chartState.endDate,
+                                overviewStartDate: overviewStartDate,
+                                overviewEndDate: renderedOverviewEndDate,
+                                leadingEdgeInsetTimeInterval: edgeInsetTimeInterval,
                                 chartWidth: geometry.size.width
                             )
                             finishChartScroll()
@@ -154,8 +170,14 @@ struct RootHomeMiniChartView: View {
         .frame(height: Layout.chartHeight)
     }
 
-    /// Converts the active window's dates into the fixed mini-chart's horizontal coordinate space.
-    private func activeWindowContains(xPosition: CGFloat, chartWidth: CGFloat) -> Bool {
+    /// Converts the active window's dates into the same extended coordinate space used to render
+    /// the mini-chart, so only touches that begin within the visible window can move it.
+    private func activeWindowContains(
+        xPosition: CGFloat,
+        chartWidth: CGFloat,
+        overviewStartDate: Date,
+        overviewEndDate: Date
+    ) -> Bool {
         guard chartWidth > 0,
               let activeWindowStartDate = chartState.overlayWindowStartDate,
               let activeWindowEndDate = chartState.overlayWindowEndDate,
@@ -163,8 +185,6 @@ struct RootHomeMiniChartView: View {
             return false
         }
 
-        let overviewStartDate = chartState.startDate
-        let overviewEndDate = chartState.endDate
         let overviewTimeInterval = overviewEndDate.timeIntervalSince(overviewStartDate)
         let visibleActiveStartDate = max(activeWindowStartDate, overviewStartDate)
         let visibleActiveEndDate = min(activeWindowEndDate, overviewEndDate)
@@ -175,5 +195,15 @@ struct RootHomeMiniChartView: View {
         let activeEndX = CGFloat(visibleActiveEndDate.timeIntervalSince(overviewStartDate) / overviewTimeInterval) * chartWidth
 
         return xPosition >= activeStartX && xPosition <= activeEndX
+    }
+
+    /// Uses one time-equivalent inset for both rounded corners without changing chart data. The
+    /// trailing span protects the `now` edge; the overview-only clamp protects the leading edge.
+    private func overviewEdgeInsetTimeInterval(chartWidth: CGFloat) -> TimeInterval {
+        let visibleTimeInterval = chartState.endDate.timeIntervalSince(chartState.startDate)
+        return ConstantsGlucoseChartSwiftUI.miniChartEdgeInsetTimeInterval(
+            visibleTimeInterval: visibleTimeInterval,
+            chartWidth: chartWidth
+        )
     }
 }
