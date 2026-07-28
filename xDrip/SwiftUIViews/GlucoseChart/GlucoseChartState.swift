@@ -60,6 +60,32 @@ struct GlucoseChartBackgroundBand: Identifiable, Hashable {
     }
 }
 
+/// Date-based AGP percentile point rendered as a background layer behind glucose readings.
+///
+/// AGP itself is time-of-day based, but the chart renderer works with real dates. Callers should map
+/// the AGP values onto the visible chart dates before passing them here.
+struct GlucoseChartAGPPoint: Identifiable, Hashable {
+
+    let id: String
+    let date: Date
+    let p5MgDl: Double
+    let p25MgDl: Double
+    let medianMgDl: Double
+    let p75MgDl: Double
+    let p95MgDl: Double
+
+    init(date: Date, p5MgDl: Double, p25MgDl: Double, medianMgDl: Double, p75MgDl: Double, p95MgDl: Double) {
+        self.date = date
+        self.p5MgDl = p5MgDl
+        self.p25MgDl = p25MgDl
+        self.medianMgDl = medianMgDl
+        self.p75MgDl = p75MgDl
+        self.p95MgDl = p95MgDl
+        self.id = "\(date.timeIntervalSince1970)-\(p5MgDl)-\(p25MgDl)-\(medianMgDl)-\(p75MgDl)-\(p95MgDl)"
+    }
+
+}
+
 /// Complete renderable state for `GlucoseChartView`.
 ///
 /// `startDate`/`endDate` define the currently visible chart window. `dataStartDate`/`dataEndDate`

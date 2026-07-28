@@ -49,6 +49,20 @@ enum ConstantsGlucoseChartSwiftUI {
     // difference to point diameter without changing every chart type's base size.
     static let glucosePointSymbolSizeMultiplier: Double = 1.2
     static let carbTreatmentSymbolSizeMultiplier: Double = 2.0
+
+    // AGP background styling
+    // keep these values in the shared glucose chart constants so the same renderer can be used
+    // for normal glucose points with or without an AGP background
+    static let agpOuterBand = Color.cyan.opacity(0.32)
+    static let agpInnerBand = Color.cyan.opacity(0.36)
+    static let agpMedian = Color.cyan.opacity(0.85)
+    static let agpMedianLineWidth: Double = 1.2
+
+    // use recent history for the Watch app AGP background because it is a current-context chart
+    static let agpDaysBackWatchApp: Int = 7
+
+    // reduce the AGP background opacity on the Watch app so the glucose points stay dominant
+    static let agpOpacityMultiplierWatchApp: Double = 0.8
     
     
     // ------------------------------------------

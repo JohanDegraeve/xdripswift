@@ -58,3 +58,23 @@ struct WatchBgReadings: WatchPayload {
     var slopeOrdinal: Int = 1
     var deltaValueInUserUnit: Double = 0
 }
+
+/// Compact AGP background data for the Watch main chart.
+///
+/// AGP is generated on iOS because the phone has Core Data access. The Watch only receives
+/// minute-of-day percentile points, then maps them locally onto the current chart window.
+/// Keeping the payload independent of chart width avoids stale endpoint redraws when the user
+/// changes the visible hours.
+struct WatchAGP: WatchPayload {
+    var generatedAt: Double = Date().timeIntervalSince1970
+    var requestID: Double = 0
+    var visibleStartDateAsDouble: Double = 0
+    var visibleEndDateAsDouble: Double = 0
+    var dayCount: Int = 0
+    var minuteOfDayValues: [Int] = []
+    var p5Values: [Double] = []
+    var p25Values: [Double] = []
+    var medianValues: [Double] = []
+    var p75Values: [Double] = []
+    var p95Values: [Double] = []
+}

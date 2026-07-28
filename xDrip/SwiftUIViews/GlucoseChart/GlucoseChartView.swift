@@ -25,9 +25,16 @@ struct GlucoseChartView: View {
     var bgReadingDates: [Date]
     var additionalBgReadingDataSets: [GlucoseChartDataSet]
     var backgroundBands: [GlucoseChartBackgroundBand]
+    /// Optional AGP background, already mapped onto this chart's date axis.
+    ///
+    /// This keeps AGP inside the same chart as the glucose points. That avoids a second plot area
+    /// with slightly different scaling or padding.
+    var agpBackgroundPoints: [GlucoseChartAGPPoint]
+    /// Multiplies the AGP colour opacity constants for compact chart views.
+    let agpBackgroundOpacityMultiplier: Double
     /// Full cached/renderable chart state.
     ///
-    /// When present, this overrides the direct BG arrays and enables the complete chart surface.
+    /// When present, this overrides the direct BG arrays and enables the complete chart data set.
     var chartState: GlucoseChartState?
 
     // MARK: - Configuration
@@ -45,6 +52,7 @@ struct GlucoseChartView: View {
     let chartWidth: Double
     let showHighContrast: Bool
     let overrideChartHeightWasPassed: Bool
+    let explicitVisibleEndDate: Date?
     let visibleStartDate: Date
     let visibleEndDate: Date
     /// Opt-in fixed y-axis context for the main glucose chart.
@@ -79,7 +87,7 @@ struct GlucoseChartView: View {
     ///   - overrideChartWidth: Optional explicit chart width.
     ///   - highContrast: Optional high-contrast override for StandBy charts.
     ///   - chartState: Full SwiftUI chart state containing the visible range and all renderable chart series.
-    init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double]?, bgReadingDates: [Date]?, additionalBgReadingDataSets: [GlucoseChartDataSet]? = nil, backgroundBands: [GlucoseChartBackgroundBand]? = nil, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType?, hoursToShowScalingHours: Double?, glucoseCircleDiameterScalingHours: Double?, overrideChartHeight: Double?, overrideChartWidth: Double?, highContrast: Bool?, chartState: GlucoseChartState? = nil) {
+    init(glucoseChartType: GlucoseChartType, bgReadingValues: [Double]?, bgReadingDates: [Date]?, additionalBgReadingDataSets: [GlucoseChartDataSet]? = nil, backgroundBands: [GlucoseChartBackgroundBand]? = nil, agpBackgroundPoints: [GlucoseChartAGPPoint]? = nil, agpBackgroundOpacityMultiplier: Double? = nil, explicitVisibleEndDate: Date? = nil, isMgDl: Bool, urgentLowLimitInMgDl: Double, lowLimitInMgDl: Double, highLimitInMgDl: Double, urgentHighLimitInMgDl: Double, liveActivityType: LiveActivityType?, hoursToShowScalingHours: Double?, glucoseCircleDiameterScalingHours: Double?, overrideChartHeight: Double?, overrideChartWidth: Double?, highContrast: Bool?, chartState: GlucoseChartState? = nil) {
 
         self.chartType = glucoseChartType
         self.isMgDl = isMgDl
@@ -90,6 +98,9 @@ struct GlucoseChartView: View {
         self.liveActivityType = liveActivityType ?? .normal
         self.showHighContrast = highContrast ?? false
         self.overrideChartHeightWasPassed = overrideChartHeight != nil
+        self.explicitVisibleEndDate = explicitVisibleEndDate
+        // clamp the multiplier so callers can only reduce or keep the normal AGP opacity
+        self.agpBackgroundOpacityMultiplier = min(max(agpBackgroundOpacityMultiplier ?? 1, 0), 1)
 
         // here we want to automatically set the hoursToShow based upon the chart type, but some chart instances might need
         // this to be overriden such as for zooming in/out of the chart (i.e. the Watch App)
@@ -103,8 +114,8 @@ struct GlucoseChartView: View {
         self.glucoseCircleDiameter = chartType.glucoseCircleDiameter(liveActivityType: self.liveActivityType) * ((glucoseCircleDiameterScalingHours ?? self.hoursToShow) / self.hoursToShow)
         self.chartState = chartState
 
-        let startDate = chartState?.startDate ?? Date().addingTimeInterval(-hoursToShow * 60 * 60)
-        let endDate = chartState?.endDate ?? Date()
+        let endDate = chartState?.endDate ?? explicitVisibleEndDate ?? Date()
+        let startDate = chartState?.startDate ?? endDate.addingTimeInterval(-hoursToShow * 60 * 60)
         self.visibleStartDate = startDate
         self.visibleEndDate = endDate
 
@@ -113,6 +124,7 @@ struct GlucoseChartView: View {
         self.bgReadingDates = []
         self.additionalBgReadingDataSets = []
         self.backgroundBands = []
+        self.agpBackgroundPoints = []
 
         let sourceBgReadingValues = chartState?.bgReadingValues ?? bgReadingValues
         let sourceBgReadingDates = chartState?.bgReadingDates ?? bgReadingDates
@@ -156,13 +168,28 @@ struct GlucoseChartView: View {
                 )
             }
         }
+
+        if let agpBackgroundPoints = agpBackgroundPoints {
+            // AGP points are filtered and sanity-checked here because they may arrive over Watch
+            // Connectivity. Bad percentile ordering can make Swift Charts draw crossing bands.
+            let agpBackgroundEndDate = endDate.addingTimeInterval(5 * 60)
+
+            self.agpBackgroundPoints = agpBackgroundPoints.filter { point in
+                point.date >= startDate &&
+                    point.date <= agpBackgroundEndDate &&
+                    point.p5MgDl <= point.p25MgDl &&
+                    point.p25MgDl <= point.medianMgDl &&
+                    point.medianMgDl <= point.p75MgDl &&
+                    point.p75MgDl <= point.p95MgDl
+            }
+        }
     }
 
     // MARK: - Axis and Colour Helpers
 
     /// Opts the chart into the fixed-context y-axis used by the main glucose chart.
     ///
-    /// Compact chart surfaces intentionally stay adaptive by default so widgets, watch charts,
+    /// Compact charts intentionally stay adaptive by default so widgets, watch charts,
     /// notifications and live activities do not reserve unnecessary vertical space.
     func mainChartYAxisContext() -> Self {
         var view = self
@@ -559,6 +586,12 @@ struct GlucoseChartView: View {
                     .foregroundStyle(chartType.yAxisLowHighLineColor())
             }
 
+            // Optional AGP background. These marks deliberately do not feed the y-domain above, so
+            // the foreground glucose points stay in exactly the same positions when AGP is shown.
+            // Values outside the current chart domain are clipped by the chart instead of changing
+            // the scale.
+            agpBackgroundMarks()
+
             // add a phantom glucose point at the beginning of the timeline to fix the start point in case there are no glucose values at that time (for instances after starting a new sensor)
             PointMark(x: .value("Time", visibleStartDate),
                       y: .value("BG", 100))
@@ -923,6 +956,40 @@ struct GlucoseChartView: View {
             return GlucoseChartTreatmentStyle.bolusTriangleSize12h
         default:
             return GlucoseChartTreatmentStyle.bolusTriangleSize24h
+        }
+    }
+
+    @ChartContentBuilder private func agpBackgroundMarks() -> some ChartContent {
+        // draw the widest band first, then the inner band, then the median line
+        // the glucose points are drawn afterwards so they stay as the main foreground data
+        ForEach(agpBackgroundPoints) { point in
+            AreaMark(x: .value("Time", point.date),
+                     yStart: .value("AGP P5", point.p5MgDl),
+                     yEnd: .value("AGP P95", point.p95MgDl),
+                     series: .value("Series", "AGP 5-95%"))
+            .interpolationMethod(.linear)
+            .foregroundStyle(ConstantsGlucoseChartSwiftUI.agpOuterBand)
+            .opacity(agpBackgroundOpacityMultiplier)
+        }
+
+        ForEach(agpBackgroundPoints) { point in
+            AreaMark(x: .value("Time", point.date),
+                     yStart: .value("AGP P25", point.p25MgDl),
+                     yEnd: .value("AGP P75", point.p75MgDl),
+                     series: .value("Series", "AGP 25-75%"))
+            .interpolationMethod(.linear)
+            .foregroundStyle(ConstantsGlucoseChartSwiftUI.agpInnerBand)
+            .opacity(agpBackgroundOpacityMultiplier)
+        }
+
+        ForEach(agpBackgroundPoints) { point in
+            LineMark(x: .value("Time", point.date),
+                     y: .value("AGP median", point.medianMgDl),
+                     series: .value("Series", "AGP median"))
+            .interpolationMethod(.linear)
+            .lineStyle(StrokeStyle(lineWidth: ConstantsGlucoseChartSwiftUI.agpMedianLineWidth))
+            .foregroundStyle(ConstantsGlucoseChartSwiftUI.agpMedian)
+            .opacity(agpBackgroundOpacityMultiplier)
         }
     }
 

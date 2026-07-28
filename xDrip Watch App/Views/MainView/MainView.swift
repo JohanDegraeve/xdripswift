@@ -11,14 +11,21 @@ import SwiftUI
 struct MainView: View {
     @EnvironmentObject var watchState: WatchStateModel
 
+    // the AGP page intentionally reuses this exact view. Only the chart background changes so the
+    // layout does not move when swiping between the normal and AGP pages
+    let showsAGPBackground: Bool
+
     // get the array of different hour ranges from the constants file
     // we'll move through this array as the user swipes left/right on the chart
     let hoursToShow: [Double] = ConstantsAppleWatch.hoursToShow
 
-    @State private var hoursToShowIndex: Int = ConstantsAppleWatch.hoursToShowDefaultIndex
+    @Binding var hoursToShowIndex: Int
 
     // store a boolean flag. We'll toggle this to refresh as needed
     @State private var refreshView = false
+
+    // keep the chart range stable during each render pass so glucose and AGP use the same x-axis
+    @State private var chartRangeEndDate = Date()
 
     // store the height of the non-chart rows so we can give all remaining vertical space to the chart
     @State private var fixedRowHeights: [MainViewFixedRow: CGFloat] = [:]
@@ -36,12 +43,27 @@ struct MainView: View {
     // prevent the chart from collapsing completely if SwiftUI reports incomplete row measurements
     private let minimumChartHeight: CGFloat = 45
 
+    // GlucoseChartView adds a small trailing x-axis span so the latest point is not clipped
+    // map AGP across the same span so the background reaches the chart edge too
+    private let chartTrailingAGPExtension: TimeInterval = 5 * 60
+
+    init(showsAGPBackground: Bool = false, hoursToShowIndex: Binding<Int> = .constant(ConstantsAppleWatch.hoursToShowDefaultIndex)) {
+        self.showsAGPBackground = showsAGPBackground
+        _hoursToShowIndex = hoursToShowIndex
+    }
+
     // MARK: -  Body
     var body: some View {
         GeometryReader { container in
             // use whichever height is larger so the layout fills the watch face on different watch sizes
             let contentHeight = max(container.size.height, ConstantsAppleWatch.screenHeight() - systemReservedHeight)
             let chartHeight = chartHeight(containerHeight: contentHeight)
+            let chartStartDate = chartRangeEndDate.addingTimeInterval(-hoursToShow[hoursToShowIndex] * 60 * 60)
+            let agpEndDate = chartRangeEndDate.addingTimeInterval(chartTrailingAGPExtension)
+
+            // only the AGP page asks for AGP points. The normal page passes nil so the chart is
+            // rendered exactly as a normal glucose chart.
+            let agpBackgroundPoints = showsAGPBackground ? watchState.agpBackgroundPointsMatching(startDate: chartStartDate, endDate: agpEndDate) : nil
 
             VStack(spacing: rowSpacing) {
                 MainViewHeaderView()
@@ -66,7 +88,7 @@ struct MainView: View {
                         .measureFixedRow(.aidStatus)
                 }
 
-                GlucoseChartView(glucoseChartType: watchState.deviceStatusIconImage() == nil ? .watchApp : .watchAppWithAIDStatus, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4, overrideChartHeight: chartHeight, overrideChartWidth: container.size.width, highContrast: nil)
+                GlucoseChartView(glucoseChartType: watchState.deviceStatusIconImage() == nil ? .watchApp : .watchAppWithAIDStatus, bgReadingValues: watchState.bgReadingValues, bgReadingDates: watchState.bgReadingDates, agpBackgroundPoints: agpBackgroundPoints, agpBackgroundOpacityMultiplier: showsAGPBackground ? ConstantsGlucoseChartSwiftUI.agpOpacityMultiplierWatchApp : nil, explicitVisibleEndDate: chartRangeEndDate, isMgDl: watchState.isMgDl, urgentLowLimitInMgDl: watchState.urgentLowLimitInMgDl, lowLimitInMgDl: watchState.lowLimitInMgDl, highLimitInMgDl: watchState.highLimitInMgDl, urgentHighLimitInMgDl: watchState.urgentHighLimitInMgDl, liveActivityType: nil, hoursToShowScalingHours: hoursToShow[hoursToShowIndex], glucoseCircleDiameterScalingHours: 4, overrideChartHeight: chartHeight, overrideChartWidth: container.size.width, highContrast: nil)
                     // make the full chart rectangle respond to swipes, not only the visible chart marks
                     .contentShape(Rectangle())
                     .gesture(
@@ -75,9 +97,13 @@ struct MainView: View {
                                 if value.startLocation.x > value.location.x {
                                     if hoursToShow[hoursToShowIndex] != hoursToShow.first {
                                         hoursToShowIndex -= 1
+                                        // refresh the chart end date so both glucose and AGP use the new range immediately
+                                        chartRangeEndDate = Date()
                                     }
                                 } else if hoursToShow[hoursToShowIndex] != hoursToShow.last {
                                     hoursToShowIndex += 1
+                                    // refresh the chart end date so both glucose and AGP use the new range immediately
+                                    chartRangeEndDate = Date()
                                 }
                             })
                     )
@@ -95,12 +121,16 @@ struct MainView: View {
             .onPreferenceChange(MainViewFixedRowHeightPreferenceKey.self) { fixedRowHeights = $0 }
             .onReceive(watchState.timer) { date in
                 if watchState.updatedDate.timeIntervalSinceNow < -5 {
+                    chartRangeEndDate = date
                     watchState.timerControlDate = date
                     watchState.requestWatchStateUpdate()
                     refreshView.toggle()
                 }
             }
             .onAppear {
+                chartRangeEndDate = Date()
+                // if the Watch session is not reachable yet, the model will keep this request and retry it
+                requestAGPBackgroundIfNeeded(endDate: chartRangeEndDate)
                 watchState.requestWatchStateUpdate()
                 refreshView.toggle()
             }
@@ -116,6 +146,16 @@ struct MainView: View {
         let spacingHeight = CGFloat(max(visibleRowCount - 1, 0)) * rowSpacing
 
         return max(containerHeight - fixedHeight - spacingHeight, minimumChartHeight)
+    }
+
+    private func requestAGPBackgroundIfNeeded(endDate: Date) {
+        guard showsAGPBackground else { return }
+
+        let startDate = endDate.addingTimeInterval(-hoursToShow[hoursToShowIndex] * 60 * 60)
+        let agpEndDate = endDate.addingTimeInterval(chartTrailingAGPExtension)
+
+        // request the compact AGP profile from the iOS app. The Watch maps it onto this date range locally.
+        watchState.requestAGPBackground(startDate: startDate, endDate: agpEndDate)
     }
 }
 

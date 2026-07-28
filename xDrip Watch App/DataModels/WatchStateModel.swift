@@ -55,6 +55,17 @@ private enum WatchSensorNoiseState: Int {
     }
 }
 
+// compact AGP point as received from the iOS app
+// this stays as minute-of-day until the Watch maps it onto the visible chart range
+private struct WatchAGPProfilePoint {
+    let minuteOfDay: Int
+    let p5MgDl: Double
+    let p25MgDl: Double
+    let medianMgDl: Double
+    let p75MgDl: Double
+    let p95MgDl: Double
+}
+
 /// holds, the watch state and allows updates and computed properties/variables to be generated for the different views that use it
 /// also used to update the ComplicationSharedUserDefaultsModel in the app group so that the complication can access the data
 final class WatchStateModel: NSObject, ObservableObject {
@@ -71,6 +82,20 @@ final class WatchStateModel: NSObject, ObservableObject {
     var bgReadingValues: [Double] = []
     var bgReadingDates: [Date] = []
     var bgReadingDatesAsDouble: [Double] = []
+    // AGP points are kept separate from BG readings so the normal main page can stay glucose-only
+    // while the second main page renders the same chart with the AGP background enabled
+    @Published var agpBackgroundPoints: [GlucoseChartAGPPoint] = []
+
+    // store the compact minute-of-day AGP profile from the iOS app
+    // this lets the Watch remap AGP instantly when the chart hours change
+    private var agpProfilePoints: [WatchAGPProfilePoint] = []
+
+    // make sure late AGP replies from older requests don't replace newer chart data
+    private var latestAGPRequestID: Double = 0
+
+    // keep the latest AGP request if WatchConnectivity is not ready yet
+    // this fixes first-load cases where the AGP page appears before the session is reachable
+    private var pendingAGPRequestRange: (startDate: Date, endDate: Date)?
 
     @Published var isMgDl: Bool = true
     @Published var slopeOrdinal: Int = 2
@@ -473,6 +498,123 @@ final class WatchStateModel: NSObject, ObservableObject {
         }
     }
 
+    /// request the compact AGP profile used by the Watch main chart background
+    func requestAGPBackground(startDate: Date, endDate: Date) {
+        // always save the latest requested range first
+        // if the session isn't ready, we'll retry when activation/reachability changes
+        pendingAGPRequestRange = (startDate: startDate, endDate: endDate)
+
+        sendPendingAGPRequestIfPossible()
+    }
+
+    private func sendPendingAGPRequestIfPossible() {
+        guard let pendingAGPRequestRange else { return }
+
+        // the Watch app can appear before WCSession has finished activating
+        // keep the pending range and try again when activation completes
+        guard session.activationState == .activated else {
+            session.activate()
+            return
+        }
+
+        // if the phone isn't reachable yet, keep the pending range and retry on reachability change
+        guard session.isReachable else { return }
+
+        // tag each request so old phone replies can be ignored
+        latestAGPRequestID += 1
+
+        session.sendMessage([
+            "requestWatchUpdate": "agp",
+            "requestID": latestAGPRequestID,
+            "visibleStartDate": pendingAGPRequestRange.startDate.timeIntervalSince1970,
+            "visibleEndDate": pendingAGPRequestRange.endDate.timeIntervalSince1970
+        ], replyHandler: nil) { [log] error in
+            log.error("Error requesting agp: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    func agpBackgroundPointsMatching(startDate: Date, endDate: Date) -> [GlucoseChartAGPPoint] {
+        // convert the stored minute-of-day profile into real chart dates for this render pass
+        mapAGPProfileToVisibleRange(startDate: startDate, endDate: endDate)
+    }
+
+    private func mapAGPProfileToVisibleRange(startDate: Date, endDate: Date) -> [GlucoseChartAGPPoint] {
+        guard startDate < endDate, !agpProfilePoints.isEmpty else { return [] }
+
+        let calendar = Calendar.current
+        let sortedProfile = agpProfilePoints.sorted { $0.minuteOfDay < $1.minuteOfDay }
+        var day = calendar.startOfDay(for: startDate)
+        let finalDay = calendar.startOfDay(for: endDate)
+        var mappedPoints: [GlucoseChartAGPPoint] = []
+
+        // add interpolated edge points so the AGP bands reach the exact chart start
+        if let startBoundaryPoint = agpBoundaryPoint(for: startDate, from: sortedProfile, calendar: calendar) {
+            mappedPoints.append(startBoundaryPoint)
+        }
+
+        // add every AGP bucket that lands inside the visible chart range
+        while day <= finalDay {
+            for point in sortedProfile {
+                guard let date = calendar.date(byAdding: .minute, value: point.minuteOfDay, to: day),
+                      date > startDate,
+                      date < endDate else {
+                    continue
+                }
+
+                mappedPoints.append(GlucoseChartAGPPoint(
+                    date: date,
+                    p5MgDl: point.p5MgDl,
+                    p25MgDl: point.p25MgDl,
+                    medianMgDl: point.medianMgDl,
+                    p75MgDl: point.p75MgDl,
+                    p95MgDl: point.p95MgDl
+                ))
+            }
+
+            guard let nextDay = calendar.date(byAdding: .day, value: 1, to: day), nextDay > day else {
+                break
+            }
+
+            day = nextDay
+        }
+
+        // add an interpolated edge point so the AGP bands reach the exact chart end
+        if let endBoundaryPoint = agpBoundaryPoint(for: endDate, from: sortedProfile, calendar: calendar) {
+            mappedPoints.append(endBoundaryPoint)
+        }
+
+        return mappedPoints.sorted { $0.date < $1.date }
+    }
+
+    private func agpBoundaryPoint(for date: Date, from sortedProfile: [WatchAGPProfilePoint], calendar: Calendar) -> GlucoseChartAGPPoint? {
+        guard let firstPoint = sortedProfile.first else { return nil }
+
+        // find where this exact date sits between the surrounding AGP minute-of-day buckets
+        // this prevents small gaps at the left and right edges of the chart
+        let components = calendar.dateComponents([.hour, .minute, .second], from: date)
+        let minuteOfDay = Double((components.hour ?? 0) * 60 + (components.minute ?? 0)) + Double(components.second ?? 0) / 60
+        let lowerPoint = sortedProfile.last { Double($0.minuteOfDay) <= minuteOfDay } ?? sortedProfile.last ?? firstPoint
+        let upperPoint = sortedProfile.first { Double($0.minuteOfDay) >= minuteOfDay && $0.minuteOfDay != lowerPoint.minuteOfDay } ?? firstPoint
+        let lowerMinute = Double(lowerPoint.minuteOfDay)
+        let upperMinute = upperPoint.minuteOfDay <= lowerPoint.minuteOfDay ? Double(upperPoint.minuteOfDay + 1440) : Double(upperPoint.minuteOfDay)
+        let normalizedMinute = minuteOfDay < lowerMinute ? minuteOfDay + 1440 : minuteOfDay
+        let interpolationRange = max(upperMinute - lowerMinute, 1)
+        let progress = min(max((normalizedMinute - lowerMinute) / interpolationRange, 0), 1)
+
+        return GlucoseChartAGPPoint(
+            date: date,
+            p5MgDl: interpolatedAGPValue(from: lowerPoint.p5MgDl, to: upperPoint.p5MgDl, progress: progress),
+            p25MgDl: interpolatedAGPValue(from: lowerPoint.p25MgDl, to: upperPoint.p25MgDl, progress: progress),
+            medianMgDl: interpolatedAGPValue(from: lowerPoint.medianMgDl, to: upperPoint.medianMgDl, progress: progress),
+            p75MgDl: interpolatedAGPValue(from: lowerPoint.p75MgDl, to: upperPoint.p75MgDl, progress: progress),
+            p95MgDl: interpolatedAGPValue(from: lowerPoint.p95MgDl, to: upperPoint.p95MgDl, progress: progress)
+        )
+    }
+
+    private func interpolatedAGPValue(from lowerValue: Double, to upperValue: Double, progress: Double) -> Double {
+        lowerValue + (upperValue - lowerValue) * progress
+    }
+
     private func requestWatchUpdate(updateType: String) {
         session.sendMessage(["requestWatchUpdate": updateType], replyHandler: nil) { [log] error in
             log.error("Error requesting \(updateType, privacy: .public): \(error.localizedDescription, privacy: .public)")
@@ -491,6 +633,11 @@ final class WatchStateModel: NSObject, ObservableObject {
 
         if let bgReadingsDictionary = dictionary["bgReadings"] as? [String: Any] {
             processedUpdate = processBgReadingsFromDictionary(dictionary: bgReadingsDictionary) || processedUpdate
+        }
+
+        if let agpDictionary = dictionary["agp"] as? [String: Any] {
+            processAGPFromDictionary(dictionary: agpDictionary)
+            processedUpdate = true
         }
 
         if processedUpdate {
@@ -577,6 +724,74 @@ final class WatchStateModel: NSObject, ObservableObject {
         deviceStatusLastLoopDateTimeAgoString = deviceStatusLastLoopMinsAgoString()
     }
 
+    private func processAGPFromDictionary(dictionary: [String: Any]) {
+        // the payload is column-based because it's smaller and cheaper to decode on watchOS
+        // than sending raw glucose history or nested report objects
+        let requestID = dictionary["requestID"] as? Double ?? 0
+        let minuteOfDayValues = dictionary["minuteOfDayValues"] as? [Int] ?? []
+        let p5Values = dictionary["p5Values"] as? [Double] ?? []
+        let p25Values = dictionary["p25Values"] as? [Double] ?? []
+        let medianValues = dictionary["medianValues"] as? [Double] ?? []
+        let p75Values = dictionary["p75Values"] as? [Double] ?? []
+        let p95Values = dictionary["p95Values"] as? [Double] ?? []
+        let pointCount = [
+            minuteOfDayValues.count,
+            p5Values.count,
+            p25Values.count,
+            medianValues.count,
+            p75Values.count,
+            p95Values.count
+        ].min() ?? 0
+
+        // ignore stale replies if the user has already requested a newer AGP profile
+        guard requestID == latestAGPRequestID else {
+            return
+        }
+
+        // this request has now been answered, even if the profile itself is empty
+        pendingAGPRequestRange = nil
+
+        guard pointCount > 0 else {
+            agpProfilePoints = []
+            agpBackgroundPoints = []
+            return
+        }
+
+        // validate the percentile ordering before storing the profile
+        // bad ordering can make Swift Charts draw crossing AGP bands
+        agpProfilePoints = (0..<pointCount).compactMap { index in
+            let p5 = p5Values[index]
+            let p25 = p25Values[index]
+            let median = medianValues[index]
+            let p75 = p75Values[index]
+            let p95 = p95Values[index]
+            let minuteOfDay = minuteOfDayValues[index]
+
+            guard (0..<1440).contains(minuteOfDay), p5 <= p25, p25 <= median, median <= p75, p75 <= p95 else {
+                return nil
+            }
+
+            return WatchAGPProfilePoint(
+                minuteOfDay: minuteOfDay,
+                p5MgDl: p5,
+                p25MgDl: p25,
+                medianMgDl: median,
+                p75MgDl: p75,
+                p95MgDl: p95
+            )
+        }
+
+        let fallbackEndDate = Date()
+        let fallbackStartDate = fallbackEndDate.addingTimeInterval(-12 * 60 * 60)
+
+        // create an initial mapped set immediately so the AGP page can render as soon as the data arrives
+        // later chart renders will remap from agpProfilePoints for their own visible range
+        agpBackgroundPoints = mapAGPProfileToVisibleRange(
+            startDate: bgReadingDates.last ?? fallbackStartDate,
+            endDate: bgReadingDates.first ?? fallbackEndDate
+        )
+    }
+
     /// once we've process the state update, then save this data to the shared app group so that the complication can read it
     private func updateComplicationData() {
         guard let sharedUserDefaults = UserDefaults(suiteName: Bundle.main.appGroupSuiteName) else { return }
@@ -611,10 +826,17 @@ extension WatchStateModel: WCSessionDelegate {
     func session(_: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error _: Error?) {
         if activationState == .activated {
             requestWatchStateUpdate()
+            // if the AGP tab requested data while activation was pending, send it now
+            sendPendingAGPRequestIfPossible()
         }
     }
 
-    func sessionReachabilityDidChange(_: WCSession) {}
+    func sessionReachabilityDidChange(_: WCSession) {
+        DispatchQueue.main.async {
+            // retry AGP requests that were made before the phone became reachable
+            self.sendPendingAGPRequestIfPossible()
+        }
+    }
 
     func session(_: WCSession, didReceiveMessageData _: Data) {}
 

@@ -11,7 +11,9 @@ import OSLog
 import WatchConnectivity
 import WidgetKit
 
-final class WatchManager: NSObject, ObservableObject {
+// WatchConnectivity delegate callbacks can trigger async AGP generation
+// mutable watch payloads are still committed back on the main queue
+final class WatchManager: NSObject, ObservableObject, @unchecked Sendable {
     // MARK: - private properties
 
     /// a watch connectivity session instance
@@ -33,11 +35,17 @@ final class WatchManager: NSObject, ObservableObject {
     /// NightscoutSyncManager instance
     private var nightscoutSyncManager: NightscoutSyncManager
 
+    /// Statistics manager used to build compact AGP backgrounds for the Watch chart
+    private var statisticsManager: StatisticsManager
+
     /// hold the current watch status model
     private var status = WatchStatus()
 
     /// hold the current watch BG readings model
     private var bgReadings = WatchBgReadings()
+
+    /// hold the current AGP chart background model
+    private var agp = WatchAGP()
 
     /// keep track of when we last forced a complication update from within the code
     private var lastForcedComplicationUpdateTimeStamp: Date = .distantPast
@@ -53,6 +61,7 @@ final class WatchManager: NSObject, ObservableObject {
         self.bgReadingsAccessor = BgReadingsAccessor(coreDataManager: coreDataManager)
         self.sensorsAccessor = SensorsAccessor(coreDataManager: coreDataManager)
         self.nightscoutSyncManager = nightscoutSyncManager
+        self.statisticsManager = StatisticsManager(coreDataManager: coreDataManager)
 
         self.session = session
 
@@ -97,6 +106,7 @@ final class WatchManager: NSObject, ObservableObject {
     private enum WatchUpdateType: Hashable {
         case status
         case bgReadings
+        case agp
     }
 
     private func activateSessionIfNeeded() {
@@ -240,6 +250,32 @@ final class WatchManager: NSObject, ObservableObject {
         return status
     }
 
+    private func currentAGP(requestID: Double, visibleStartDate: Date, visibleEndDate: Date) async -> WatchAGP {
+        guard visibleStartDate < visibleEndDate else {
+            return WatchAGP(generatedAt: Date().timeIntervalSince1970, requestID: requestID, visibleStartDateAsDouble: visibleStartDate.timeIntervalSince1970, visibleEndDateAsDouble: visibleEndDate.timeIntervalSince1970)
+        }
+
+        // use the same AGP calculation as the iOS landscape comparison chart
+        // for the Watch app, keep the baseline focused on recent days and only send the compact
+        // minute-of-day profile. The Watch maps that profile onto its current chart window locally.
+        let baseline = await statisticsManager.landscapeBaseline(referenceDate: visibleEndDate, daysBack: ConstantsGlucoseChartSwiftUI.agpDaysBackWatchApp)
+        let agpPoints = GlucoseReportAGPDisplayPoints.smoothedDisplayPoints(from: baseline.agpPoints)
+
+        return WatchAGP(
+            generatedAt: Date().timeIntervalSince1970,
+            requestID: requestID,
+            visibleStartDateAsDouble: visibleStartDate.timeIntervalSince1970,
+            visibleEndDateAsDouble: visibleEndDate.timeIntervalSince1970,
+            dayCount: baseline.dayCount,
+            minuteOfDayValues: agpPoints.map(\.minuteOfDay),
+            p5Values: agpPoints.map(\.p5MgDl),
+            p25Values: agpPoints.map(\.p25MgDl),
+            medianValues: agpPoints.map(\.medianMgDl),
+            p75Values: agpPoints.map(\.p75MgDl),
+            p95Values: agpPoints.map(\.p95MgDl)
+        )
+    }
+
     private func payload(updateTypes: Set<WatchUpdateType>) -> [String: Any]? {
         var payload: [String: Any] = [:]
 
@@ -249,6 +285,10 @@ final class WatchManager: NSObject, ObservableObject {
 
         if updateTypes.contains(.bgReadings), let bgReadingsDictionary = bgReadings.asDictionary {
             payload["bgReadings"] = bgReadingsDictionary
+        }
+
+        if updateTypes.contains(.agp), let agpDictionary = agp.asDictionary {
+            payload["agp"] = agpDictionary
         }
 
         return payload.isEmpty ? nil : payload
@@ -350,6 +390,23 @@ extension WatchManager: WCSessionDelegate {
             case "bgReadings":
                 DispatchQueue.main.async {
                     self.processWatchUpdate(updateTypes: [.bgReadings], forceComplicationUpdate: false)
+                }
+            case "agp":
+                // the Watch sends the current visible range so iOS can calculate the AGP baseline
+                // with the same reference date. The reply is still a compact minute-of-day profile.
+                let requestID = message["requestID"] as? Double ?? 0
+                let visibleStartDate = Date(timeIntervalSince1970: message["visibleStartDate"] as? Double ?? Date().addingTimeInterval(-12 * 60 * 60).timeIntervalSince1970)
+                let visibleEndDate = Date(timeIntervalSince1970: message["visibleEndDate"] as? Double ?? Date().timeIntervalSince1970)
+
+                Task { [weak self] in
+                    guard let self else { return }
+
+                    let agp = await self.currentAGP(requestID: requestID, visibleStartDate: visibleStartDate, visibleEndDate: visibleEndDate)
+
+                    DispatchQueue.main.async {
+                        self.agp = agp
+                        self.sendUpdateToWatch(updateTypes: [.agp], forceComplicationUpdate: false)
+                    }
                 }
             default:
                 break
