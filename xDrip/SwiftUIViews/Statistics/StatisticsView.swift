@@ -20,9 +20,11 @@ struct StatisticsView: View {
     }
 
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 12, pinnedViews: [.sectionHeaders]) {
-                Section {
+        VStack(spacing: 0) {
+            periodHeader
+
+            ScrollView {
+                LazyVStack(spacing: 12) {
                     Group {
                         if viewModel.isLoading && viewModel.analytics == nil {
                             ProgressView()
@@ -35,18 +37,14 @@ struct StatisticsView: View {
                         }
                     }
                     .padding(.horizontal, 16)
+                    .padding(.top, 4)
                     .padding(.bottom, 12)
-                } header: {
-                    periodPicker
-                        .padding(.horizontal, 16)
-                        .padding(.top, 12)
-                        .padding(.bottom, 8)
-                        .background(Color(.systemGroupedBackground))
                 }
             }
         }
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .navigationTitle(Texts_Common.statisticsTitle)
+        .navigationBarTitleDisplayMode(.large)
         .toolbar {
             ToolbarItem(placement: .primaryAction) {
                 Button {
@@ -95,6 +93,20 @@ struct StatisticsView: View {
             }
         }
         .pickerStyle(.segmented)
+    }
+
+    private var periodHeader: some View {
+        VStack(spacing: 0) {
+            periodPicker
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+                .padding(.bottom, 8)
+
+            Divider()
+                .overlay(Color(.separator))
+        }
+        .frame(maxWidth: .infinity)
+        .background(Color(.systemGroupedBackground))
     }
 
 }
