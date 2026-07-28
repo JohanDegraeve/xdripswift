@@ -17,7 +17,6 @@ final class LandscapeChartStateModel: ObservableObject {
     @Published var displayedDate = Date().toMidnight()
     @Published var chartState = GlucoseChartState.empty(startDate: Date().toMidnight(), endDate: Date().toMidnight().addingTimeInterval(.hours(24) - 1))
     @Published var baseline = StatisticsManager.LandscapeBaseline.empty
-    @Published var isLoading = false
 
     private let coreDataManager: CoreDataManager
     private let nightscoutSyncManager: NightscoutSyncManager
@@ -107,10 +106,9 @@ final class LandscapeChartStateModel: ObservableObject {
         let startOfDay = date.toMidnight()
 
         selectedDate = startOfDay
-        isLoading = true
         UISelectionFeedbackGenerator().selectionChanged()
 
-        // Yield once so the date and activity indicator render before any cached or Core Data work.
+        // Yield once so the selected date renders before any cached or Core Data work.
         DispatchQueue.main.async { [weak self] in
             guard let self,
                   Calendar.current.isDate(self.selectedDate, inSameDayAs: startOfDay) else { return }
@@ -124,7 +122,6 @@ final class LandscapeChartStateModel: ObservableObject {
         let key = cacheKey(for: referenceDate)
 
         activeLoadID = loadID
-        isLoading = true
 
         if let snapshot = cachedSnapshots[key], !forceResetChart {
             commitSnapshot(snapshot, loadID: loadID, referenceDate: key)
@@ -184,7 +181,6 @@ final class LandscapeChartStateModel: ObservableObject {
         displayedDate = referenceDate
         chartState = snapshot.chartState
         baseline = snapshot.baseline
-        isLoading = false
         prefetchAdjacentDates(around: referenceDate)
     }
 
@@ -272,28 +268,21 @@ struct LandscapeChartView: View {
 
     private var toolbar: some View {
         HStack(spacing: 12) {
-            HStack(spacing: 8) {
-                VStack(alignment: .leading, spacing: 1) {
-                    Text(stateModel.selectedDateText)
-                        .font(.system(size: 18, weight: .heavy))
-                        .foregroundStyle(ConstantsAppColors.primaryText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.75)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(stateModel.selectedDateText)
+                    .font(.system(size: 18, weight: .heavy))
+                    .foregroundStyle(ConstantsAppColors.primaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.75)
 
-                    Text(comparisonContextText)
-                        .font(.system(size: 12, weight: .semibold))
-                        .foregroundStyle(ConstantsAppColors.secondaryText)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                }
-                .onTapGesture(count: 2) {
-                    stateModel.selectToday()
-                }
-
-                if isLoading {
-                    ProgressView()
-                        .controlSize(.regular)
-                }
+                Text(comparisonContextText)
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(ConstantsAppColors.secondaryText)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .onTapGesture(count: 2) {
+                stateModel.selectToday()
             }
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -303,10 +292,6 @@ struct LandscapeChartView: View {
             )
         }
         .frame(height: Layout.toolbarHeight)
-    }
-
-    private var isLoading: Bool {
-        stateModel.isLoading
     }
 
     private var comparisonContextText: String {
