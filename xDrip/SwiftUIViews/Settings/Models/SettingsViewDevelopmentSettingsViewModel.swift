@@ -456,7 +456,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
                 title: Texts_SettingsView.loopShareMedtrumNanoTitle,
                 control: .warningBanner(
                     message: UserDefaults.standard.loopShareMedtrumNano ? Texts_SettingsView.loopShareMedtrumNanoEnabledMessage : Texts_SettingsView.loopShareMedtrumNanoBlockedMessage,
-                    severity: UserDefaults.standard.loopShareMedtrumNano ? .warning : .caution
+                    severity: UserDefaults.standard.loopShareMedtrumNano ? .caution : .normal
                 )
             ))
         }
@@ -467,7 +467,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
             rows.append(SettingsRow(
                 id: "developer.loopShareSmoothedDataEnabledWarning",
                 title: Texts_SettingsView.loopShareSmoothedDataEnabledTitle,
-                control: .warningBanner(message: Texts_SettingsView.loopShareSmoothedDataEnabledMessage, severity: .warning)
+                control: .warningBanner(message: Texts_SettingsView.loopShareSmoothedDataEnabledMessage, severity: .caution)
             ))
 
             return rows
@@ -476,7 +476,7 @@ class SettingsViewDevelopmentSettingsViewModel: NSObject, SettingsViewModelProto
         rows.append(SettingsRow(
             id: "developer.loopShareSmoothedDataDifferenceWarning",
             title: Texts_SettingsView.loopShareSmoothedDataDifferenceTitle,
-            control: .warningBanner(message: Texts_SettingsView.loopShareSmoothedDataDifferenceMessage, severity: .caution)
+            control: .warningBanner(message: Texts_SettingsView.loopShareSmoothedDataDifferenceMessage, severity: .normal)
         ))
 
         return rows

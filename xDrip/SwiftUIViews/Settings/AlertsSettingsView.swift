@@ -454,7 +454,7 @@ final class AlertEntryEditorViewModel: ObservableObject {
     func detail(for setting: AlertEntryEditorSetting) -> String? {
         switch setting {
         case .isDisabled:
-            return isDisabled ? ConstantsAlerts.disabledAlertSymbol : nil
+            return nil
         case .start:
             return Int(start).convertMinutesToTimeAsString()
         case .alertType:

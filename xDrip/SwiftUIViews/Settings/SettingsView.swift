@@ -672,9 +672,6 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
                         let shareType = UserDefaults.standard.loopShareType
                         return shareType == .disabled ? nil : shareType.description
                     },
-                    detailIndicator: {
-                        osAidLoopShareWarningIndicator()
-                    },
                     settingsScreen: {
                         SettingsScreen(
                             title: Texts_SettingsView.osAidLoopShareSectionTitle,
@@ -769,40 +766,6 @@ struct SettingsViewGroupedSettingsViewModel: SettingsViewModelProtocol, Settings
     private static func calendarShareStatus() -> CalendarShareStatus {
         guard UserDefaults.standard.calenderId != nil else { return .notConfigured }
         return CalendarShareStatus(rawValue: UserDefaults.standard.calendarShareStatus) ?? .notConfigured
-    }
-
-    /// Mirrors the child OS-AID warning banners so the parent row also shows
-    /// when the selected sharing path needs attention.
-    private static func osAidLoopShareWarningIndicator() -> SettingsIndicator? {
-        guard UserDefaults.standard.loopShareType != .disabled else {
-            return nil
-        }
-
-        if UserDefaults.standard.loopShareMedtrumNanoAvailable {
-            return SettingsIndicator(
-                color: ConstantsUI.warningBannerIndicatorColor,
-                symbolName: "exclamationmark.triangle.fill",
-                accessibilityLabel: Texts_SettingsView.loopShareMedtrumNanoTitle
-            )
-        }
-
-        if UserDefaults.standard.enableSmoothing && UserDefaults.standard.loopShareSmoothedData {
-            return SettingsIndicator(
-                color: ConstantsUI.warningBannerIndicatorColor,
-                symbolName: "exclamationmark.triangle.fill",
-                accessibilityLabel: Texts_SettingsView.loopShareSmoothedDataEnabledTitle
-            )
-        }
-
-        guard UserDefaults.standard.enableSmoothing else {
-            return nil
-        }
-
-        return SettingsIndicator(
-            color: ConstantsUI.warningBannerIndicatorColor,
-            symbolName: "exclamationmark.triangle.fill",
-            accessibilityLabel: Texts_SettingsView.loopShareSmoothedDataDifferenceTitle
-        )
     }
 
     func sectionTitle() -> String? {

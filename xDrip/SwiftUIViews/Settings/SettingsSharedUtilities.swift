@@ -227,11 +227,14 @@ enum SettingsControl {
 }
 
 enum SettingsWarningBannerSeverity {
+    case normal
     case caution
     case warning
 
     var backgroundColor: Color {
         switch self {
+        case .normal:
+            return ConstantsUI.normalSectionBackgroundColor
         case .caution:
             return ConstantsUI.cautionSectionBackgroundColor
         case .warning:
