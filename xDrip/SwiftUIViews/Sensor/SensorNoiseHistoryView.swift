@@ -21,21 +21,33 @@ struct SensorNoiseHistoryView: View {
     @State private var sensorNoiseSensitivity = UserDefaults.standard.sensorNoiseSensitivity
 
     private let sensorID: String
+    private let sensorStartDate: Date
     private let isMgDl: Bool
     private let currentMeasurementsDetail: String?
 
     init(
         sensorID: String,
+        sensorStartDate: Date,
         sensorNoiseManager: SensorNoiseManager,
         isMgDl: Bool,
         currentMeasurementsDetail: String? = nil
     ) {
         self.sensorID = sensorID
+        self.sensorStartDate = sensorStartDate
         self.isMgDl = isMgDl
         self.currentMeasurementsDetail = currentMeasurementsDetail
+        // Open directly on the widest meaningful range so the history view immediately shows the
+        // full sensor context, while still letting the picker keep user changes during this session.
+        _selectedRange = State(
+            initialValue: SensorNoiseHistoryRange.availableRanges(
+                sensorStartDate: sensorStartDate,
+                sensorEndDate: nil
+            ).last ?? .day
+        )
         _viewModel = StateObject(
             wrappedValue: SensorNoiseHistoryViewModel(
                 sensorID: sensorID,
+                sensorStartDate: sensorStartDate,
                 sensorNoiseManager: sensorNoiseManager
             )
         )
@@ -176,9 +188,13 @@ struct SensorNoiseHistoryView: View {
 
     /// Builds the selected range and falls back to its newest point until the user touches the chart.
     private func noiseHistoryChart(snapshot: SensorNoiseHistorySnapshot, chartHeight: CGFloat) -> some View {
+        let availableRanges = SensorNoiseHistoryRange.availableRanges(sensorStartDate: snapshot.sensorStartDate, sensorEndDate: snapshot.sensorEndDate)
+        // The picker hides ranges that are not useful for the current sensor age. If the old state
+        // points at a hidden range, use the shortest visible range until the user picks another one.
+        let effectiveRange = availableRanges.contains(selectedRange) ? selectedRange : .day
         let chartData = SensorNoiseChartData(
             snapshot: snapshot,
-            range: selectedRange,
+            range: effectiveRange,
             isMgDl: isMgDl
         )
         let displayedPoint = selectedPoint ?? chartData.points.last
@@ -240,9 +256,15 @@ struct SensorNoiseHistoryView: View {
                 }
             }
 
-            Picker(Texts_HomeView.sensorNoiseHistoryRangeTitle, selection: $selectedRange) {
-                ForEach(SensorNoiseHistoryRange.allCases) { range in
-                    Text(range.localizedTitle).tag(range)
+            Picker(
+                Texts_HomeView.sensorNoiseHistoryRangeTitle,
+                selection: Binding(
+                    get: { effectiveRange },
+                    set: { selectedRange = $0 }
+                )
+            ) {
+                ForEach(availableRanges) { range in
+                    Text(range.localizedTitle(sensorStartDate: snapshot.sensorStartDate, sensorEndDate: snapshot.sensorEndDate)).tag(range)
                 }
             }
             .pickerStyle(.segmented)
@@ -353,7 +375,7 @@ struct SensorNoiseHistoryView: View {
                     y: .value("Trend", point.value)
                 )
                 .lineStyle(StrokeStyle(lineWidth: 3.25, lineCap: .round, lineJoin: .round))
-                .foregroundStyle(Color.white.opacity(0.82))
+                .foregroundStyle(Color.cyan.opacity(0.7))
             }
 
             if let displayedPoint {
@@ -505,11 +527,13 @@ private struct SensorNoiseSensitivitySelectionView: View {
     @Published private(set) var isBuildingHistory = false
 
     private let sensorID: String
+    private let sensorStartDate: Date
     private let sensorNoiseManager: SensorNoiseManager
     private var hasLoaded = false
 
-    init(sensorID: String, sensorNoiseManager: SensorNoiseManager) {
+    init(sensorID: String, sensorStartDate: Date, sensorNoiseManager: SensorNoiseManager) {
         self.sensorID = sensorID
+        self.sensorStartDate = sensorStartDate
         self.sensorNoiseManager = sensorNoiseManager
     }
 
@@ -517,17 +541,17 @@ private struct SensorNoiseSensitivitySelectionView: View {
     func load() {
         guard !hasLoaded else { return }
         hasLoaded = true
-        snapshot = sensorNoiseManager.historySnapshot(sensorID: sensorID)
-        isBuildingHistory = sensorNoiseManager.rebuildHistoryIfNeeded(sensorID: sensorID) { [weak self] in
+        snapshot = sensorNoiseManager.historySnapshot(sensorID: sensorID, sessionStartDate: sensorStartDate)
+        isBuildingHistory = sensorNoiseManager.rebuildHistoryIfNeeded(sensorID: sensorID, sessionStartDate: sensorStartDate) { [weak self] in
             guard let self else { return }
-            self.snapshot = self.sensorNoiseManager.historySnapshot(sensorID: self.sensorID)
+            self.snapshot = self.sensorNoiseManager.historySnapshot(sensorID: self.sensorID, sessionStartDate: self.sensorStartDate)
             self.isBuildingHistory = false
         }
     }
 
     /// Refreshes the detached snapshot after the manager stores or rebuilds history.
     func reloadCachedHistory() {
-        snapshot = sensorNoiseManager.historySnapshot(sensorID: sensorID)
+        snapshot = sensorNoiseManager.historySnapshot(sensorID: sensorID, sessionStartDate: sensorStartDate)
     }
 }
 
@@ -682,7 +706,29 @@ private enum SensorNoiseHistoryRange: String, CaseIterable, Identifiable {
         }
     }
 
-    var localizedTitle: String {
+    /// Only shows chart widths that add useful information for the current sensor age.
+    ///
+    /// `24h` and the full-session option are always available. Wider fixed ranges are only shown
+    /// once the sensor has enough elapsed time to make them visually different from the full range.
+    static func availableRanges(sensorStartDate: Date, sensorEndDate: Date?) -> [SensorNoiseHistoryRange] {
+        let endDate = sensorEndDate ?? Date()
+        let elapsed = max(endDate.timeIntervalSince(sensorStartDate), 0)
+        var ranges: [SensorNoiseHistoryRange] = [.day]
+
+        if elapsed >= (SensorNoiseHistoryRange.threeDays.duration ?? 0) {
+            ranges.append(.threeDays)
+        }
+
+        if elapsed >= (SensorNoiseHistoryRange.week.duration ?? 0) {
+            ranges.append(.week)
+        }
+
+        ranges.append(.all)
+
+        return ranges
+    }
+
+    func localizedTitle(sensorStartDate: Date, sensorEndDate: Date?) -> String {
         switch self {
         case .day:
             return Texts_HomeView.sensorNoiseHistoryDayRange
@@ -691,8 +737,22 @@ private enum SensorNoiseHistoryRange: String, CaseIterable, Identifiable {
         case .week:
             return Texts_HomeView.sensorNoiseHistoryWeekRange
         case .all:
-            return Texts_HomeView.sensorNoiseHistoryAllRange
+            return Self.fullSessionTitle(sensorStartDate: sensorStartDate, sensorEndDate: sensorEndDate)
         }
+    }
+
+    /// Shows the full sensor session as a compact chart-width label.
+    private static func fullSessionTitle(sensorStartDate: Date, sensorEndDate: Date?) -> String {
+        let endDate = sensorEndDate ?? Date()
+        let elapsedMinutes = max(endDate.timeIntervalSince(sensorStartDate) / 60, 0)
+
+        if elapsedMinutes >= 7 * 24 * 60 {
+            return elapsedMinutes.minutesToDaysAndHours()
+        }
+
+        let elapsedDays = max(Int(elapsedMinutes / (24 * 60)), 1)
+
+        return "\(elapsedDays)d"
     }
 }
 
@@ -713,13 +773,15 @@ private struct SensorNoiseChartTrendPoint: Identifiable {
 }
 
 private struct SensorNoiseChartData {
-    private static let trendMinimumRange: SensorNoiseHistoryRange = .threeDays
-    private static let shortLineStandardOpacity = 0.32
-    private static let shortLineTrendOpacity = 0.10
-    private static let shortLineWideTrendOpacity = 0.055
-    private static let longLineStandardOpacity = 1.0
-    private static let longLineTrendOpacity = 0.30
-    private static let longLineWideTrendOpacity = 0.16
+    private static let trendMinimumRange: SensorNoiseHistoryRange = .day
+    private static let trendBucketDuration: TimeInterval = 6 * 60 * 60
+    private static let trendRenderPointCount = 40
+    private static let shortLineStandardOpacity = 0.2
+    private static let shortLineTrendOpacity = shortLineStandardOpacity
+    private static let shortLineWideTrendOpacity = shortLineTrendOpacity
+    private static let longLineStandardOpacity = 0.5
+    private static let longLineTrendOpacity = longLineStandardOpacity
+    private static let longLineWideTrendOpacity = longLineTrendOpacity
 
     let points: [SensorNoiseHistoryPoint]
     let range: SensorNoiseHistoryRange
@@ -920,43 +982,114 @@ private struct SensorNoiseChartData {
         return result
     }
 
-    /// Builds one straight best-fit line so wider charts show the session's overall noise direction.
+    /// Builds a lifecycle trend curve from bucketed four-hour noise values.
+    ///
+    /// Six-hour median buckets avoid individual spikes controlling the fit. The quadratic fit allows
+    /// the normal sensor pattern of noisy start, quieter middle and possible noisier end, while
+    /// keeping the line too constrained to become a wavy moving average.
+    ///
+    /// NIST describes least-squares polynomial fitting as useful for estimating response shape, and
+    /// a simple ln-style response transform as a common way to reduce uneven variance before fitting:
+    /// https://www.itl.nist.gov/div898/handbook/ppc/section4/ppc431.htm
+    /// https://www.itl.nist.gov/div898/handbook/pmd/section6/pmd624.htm
     private static func trendPoints(points: [SensorNoiseHistoryPoint], range: SensorNoiseHistoryRange, isMgDl: Bool) -> [SensorNoiseChartTrendPoint] {
         guard range.chartOrder >= Self.trendMinimumRange.chartOrder else { return [] }
 
         let sourcePoints = points.compactMap { point -> (date: Date, value: Double)? in
-            let noise = point.longTermNoise ?? point.shortTermNoise
-            guard let noise else { return nil }
+            guard let noise = point.longTermNoise else { return nil }
 
             return (point.timeStamp, noise)
         }
 
-        guard sourcePoints.count >= 3,
-              let firstDate = sourcePoints.first?.date,
-              let lastDate = sourcePoints.last?.date,
+        let buckets = trendBuckets(from: sourcePoints)
+
+        guard buckets.count >= 3,
+              let firstDate = buckets.first?.date,
+              let lastDate = buckets.last?.date,
               lastDate > firstDate else {
             return []
         }
 
-        let xValues = sourcePoints.map { $0.date.timeIntervalSince(firstDate) }
-        let yValues = sourcePoints.map(\.value)
-        let meanX = xValues.reduce(0, +) / Double(xValues.count)
-        let meanY = yValues.reduce(0, +) / Double(yValues.count)
-        let covariance = zip(xValues, yValues).reduce(0.0) { $0 + (($1.0 - meanX) * ($1.1 - meanY)) }
-        let variance = xValues.reduce(0.0) { $0 + (($1 - meanX) * ($1 - meanX)) }
+        let duration = lastDate.timeIntervalSince(firstDate)
+        let samples = buckets.map { bucket in
+            let x = bucket.date.timeIntervalSince(firstDate) / duration
 
-        guard variance > 0 else { return [] }
+            return (x: x, y: log1p(max(bucket.value, 0)))
+        }
 
-        let slope = covariance / variance
-        let intercept = meanY - (slope * meanX)
-        let startValue = max(intercept, 0)
-        let endX = lastDate.timeIntervalSince(firstDate)
-        let endValue = max(intercept + (slope * endX), 0)
+        guard let coefficients = quadraticCoefficients(samples: samples) else { return [] }
+        let pointCount = max(2, min(Self.trendRenderPointCount, Int(duration / ConstantsSensorNoise.historyMinimumInterval)))
 
-        return [
-            SensorNoiseChartTrendPoint(date: firstDate, value: startValue.mgDlToMmol(mgDl: isMgDl)),
-            SensorNoiseChartTrendPoint(date: lastDate, value: endValue.mgDlToMmol(mgDl: isMgDl))
-        ]
+        return (0 ..< pointCount).map { index in
+            let ratio = Double(index) / Double(pointCount - 1)
+            let date = firstDate.addingTimeInterval(duration * ratio)
+            let fittedLogValue = coefficients.a + (coefficients.b * ratio) + (coefficients.c * ratio * ratio)
+            let fittedValue = max(expm1(fittedLogValue), 0)
+
+            return SensorNoiseChartTrendPoint(date: date, value: fittedValue.mgDlToMmol(mgDl: isMgDl))
+        }
+    }
+
+    /// Reduces raw history to one median four-hour noise value per six-hour bucket.
+    private static func trendBuckets(from points: [(date: Date, value: Double)]) -> [(date: Date, value: Double)] {
+        guard let firstDate = points.first?.date else { return [] }
+
+        let groupedValues = Dictionary(grouping: points) { point in
+            Int(point.date.timeIntervalSince(firstDate) / Self.trendBucketDuration)
+        }
+
+        return groupedValues.keys.sorted().compactMap { bucketIndex in
+            guard let bucketPoints = groupedValues[bucketIndex], !bucketPoints.isEmpty else { return nil }
+
+            let bucketDate = firstDate.addingTimeInterval((Double(bucketIndex) + 0.5) * Self.trendBucketDuration)
+            return (date: bucketDate, value: median(bucketPoints.map(\.value)))
+        }
+    }
+
+    /// Solves the normal equations for y = a + bx + cx².
+    private static func quadraticCoefficients(samples: [(x: Double, y: Double)]) -> (a: Double, b: Double, c: Double)? {
+        let count = Double(samples.count)
+        let sumX = samples.reduce(0.0) { $0 + $1.x }
+        let sumX2 = samples.reduce(0.0) { $0 + ($1.x * $1.x) }
+        let sumX3 = samples.reduce(0.0) { $0 + ($1.x * $1.x * $1.x) }
+        let sumX4 = samples.reduce(0.0) { $0 + ($1.x * $1.x * $1.x * $1.x) }
+        let sumY = samples.reduce(0.0) { $0 + $1.y }
+        let sumXY = samples.reduce(0.0) { $0 + ($1.x * $1.y) }
+        let sumX2Y = samples.reduce(0.0) { $0 + ($1.x * $1.x * $1.y) }
+
+        let determinant = count * ((sumX2 * sumX4) - (sumX3 * sumX3))
+            - sumX * ((sumX * sumX4) - (sumX3 * sumX2))
+            + sumX2 * ((sumX * sumX3) - (sumX2 * sumX2))
+
+        guard abs(determinant) > 0.000001 else { return nil }
+
+        let determinantA = sumY * ((sumX2 * sumX4) - (sumX3 * sumX3))
+            - sumX * ((sumXY * sumX4) - (sumX3 * sumX2Y))
+            + sumX2 * ((sumXY * sumX3) - (sumX2 * sumX2Y))
+        let determinantB = count * ((sumXY * sumX4) - (sumX3 * sumX2Y))
+            - sumY * ((sumX * sumX4) - (sumX3 * sumX2))
+            + sumX2 * ((sumX * sumX2Y) - (sumXY * sumX2))
+        let determinantC = count * ((sumX2 * sumX2Y) - (sumXY * sumX3))
+            - sumX * ((sumX * sumX2Y) - (sumXY * sumX2))
+            + sumY * ((sumX * sumX3) - (sumX2 * sumX2))
+
+        return (
+            a: determinantA / determinant,
+            b: determinantB / determinant,
+            c: determinantC / determinant
+        )
+    }
+
+    /// Returns the middle value, or the average of the two middle values for even-sized buckets.
+    private static func median(_ values: [Double]) -> Double {
+        let sortedValues = values.sorted()
+        let middleIndex = sortedValues.count / 2
+
+        if sortedValues.count.isMultiple(of: 2) {
+            return (sortedValues[middleIndex - 1] + sortedValues[middleIndex]) / 2
+        }
+
+        return sortedValues[middleIndex]
     }
 
     /// Splits points at missing-reading gaps so the chart never draws a misleading connecting line.

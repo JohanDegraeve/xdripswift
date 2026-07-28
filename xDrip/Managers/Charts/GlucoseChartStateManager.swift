@@ -461,13 +461,17 @@ final class GlucoseChartStateManager: ObservableObject {
                 return
             }
 
+            let noiseStartDate = max(
+                startDate,
+                activeSensorSnapshot.startDate.addingTimeInterval(-ConstantsSensorNoise.sessionStartDateReachBackTolerance)
+            )
             let request: NSFetchRequest<SensorNoiseSample> = SensorNoiseSample.fetchRequest()
+            // Match the sensor management history behavior by anchoring noise bands to the current
+            // session time window, not only to the current internal Sensor ID.
             request.predicate = NSPredicate(
-                format: "%K == %@ AND %K >= %@ AND %K <= %@",
-                #keyPath(SensorNoiseSample.sensorID),
-                activeSensorSnapshot.id,
+                format: "%K >= %@ AND %K <= %@",
                 #keyPath(SensorNoiseSample.timeStamp),
-                startDate as NSDate,
+                noiseStartDate as NSDate,
                 #keyPath(SensorNoiseSample.timeStamp),
                 endDate as NSDate
             )
@@ -475,11 +479,11 @@ final class GlucoseChartStateManager: ObservableObject {
             request.returnsObjectsAsFaults = false
 
             do {
-                cachedSamples = try managedObjectContext.fetch(request).compactMap {
-                    CachedSensorNoiseSample(
-                        date: $0.timeStamp,
-                        shortTermNoise: $0.shortTermNoise?.doubleValue
-                    )
+                cachedSamples = currentSessionNoiseSamples(
+                    from: try managedObjectContext.fetch(request),
+                    currentSensorID: activeSensorSnapshot.id
+                ).compactMap {
+                    CachedSensorNoiseSample(date: $0.timeStamp, shortTermNoise: $0.shortTermNoise?.doubleValue)
                 }
             } catch {
                 os_log("Failed to fetch sensor noise samples for chart range: %{public}@", log: log, type: .error, error.localizedDescription)
@@ -489,7 +493,7 @@ final class GlucoseChartStateManager: ObservableObject {
         return cachedSamples
     }
 
-    private func activeSensorSnapshot(on managedObjectContext: NSManagedObjectContext) -> (id: String, noiseAlgorithmVersion: Int16)? {
+    private func activeSensorSnapshot(on managedObjectContext: NSManagedObjectContext) -> (id: String, startDate: Date, noiseAlgorithmVersion: Int16)? {
         let request: NSFetchRequest<Sensor> = Sensor.fetchRequest()
         request.sortDescriptors = [NSSortDescriptor(key: #keyPath(Sensor.startDate), ascending: false)]
         request.fetchLimit = 1
@@ -504,12 +508,32 @@ final class GlucoseChartStateManager: ObservableObject {
 
             return (
                 id: activeSensor.id,
+                startDate: activeSensor.startDate,
                 noiseAlgorithmVersion: activeSensor.noiseAlgorithmVersion
             )
         } catch {
             os_log("Failed to fetch active sensor for chart range: %{public}@", log: log, type: .error, error.localizedDescription)
             return nil
         }
+    }
+
+    /// Returns one noise sample per timestamp, preferring samples linked to the active Sensor ID.
+    private func currentSessionNoiseSamples(from samples: [SensorNoiseSample], currentSensorID: String) -> [SensorNoiseSample] {
+        var samplesByTimestamp = [TimeInterval: SensorNoiseSample]()
+
+        for sample in samples {
+            let timestamp = sample.timeStamp.timeIntervalSince1970
+
+            if let existingSample = samplesByTimestamp[timestamp] {
+                if existingSample.sensorID != currentSensorID && sample.sensorID == currentSensorID {
+                    samplesByTimestamp[timestamp] = sample
+                }
+            } else {
+                samplesByTimestamp[timestamp] = sample
+            }
+        }
+
+        return samplesByTimestamp.values.sorted { $0.timeStamp < $1.timeStamp }
     }
 
     // MARK: - Treatment Points

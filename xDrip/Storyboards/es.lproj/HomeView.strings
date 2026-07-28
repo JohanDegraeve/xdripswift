@@ -78,9 +78,9 @@
 "sensorNoiseHistoryCurrentTitle" = "Mediciones actuales";
 "sensorNoiseHistoryChartTitle" = "Ruido a lo largo del tiempo";
 "sensorNoiseHistoryRangeTitle" = "Intervalo de tiempo";
-"sensorNoiseHistoryDayRange" = "24 h";
-"sensorNoiseHistoryThreeDayRange" = "3 d";
-"sensorNoiseHistoryWeekRange" = "7 d";
+"sensorNoiseHistoryDayRange" = "24h";
+"sensorNoiseHistoryThreeDayRange" = "3d";
+"sensorNoiseHistoryWeekRange" = "7d";
 "sensorNoiseHistoryAllRange" = "Todo";
 "sensorNoiseHistoryShortCompact" = "30 min";
 "sensorNoiseHistoryLongCompact" = "4 h";

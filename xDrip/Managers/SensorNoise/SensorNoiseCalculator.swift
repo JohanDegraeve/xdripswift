@@ -90,6 +90,13 @@ enum ConstantsSensorNoise {
     static let minimumLongTermCoverage = 0.70
     static let historyMinimumInterval: TimeInterval = ConstantsNightscout.minimiumTimeBetweenTwoReadingsInMinutes * 60
 
+    /// Allows history to survive small internal sensor-session start date changes.
+    ///
+    /// Some transmitters can report a slightly different sensor start date and make the app create
+    /// a fresh internal Sensor object for the same physical session. History display and rebuilds
+    /// can reach back by this amount so the current session keeps using its existing noise data.
+    static let sessionStartDateReachBackTolerance: TimeInterval = 30 * 60
+
     /// Point-to-point changes smaller than this are ignored when deciding if a segment is directional.
     static let smoothTrendDeltaDeadbandInMgDl = 1.0
 

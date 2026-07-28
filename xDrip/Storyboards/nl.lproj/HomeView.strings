@@ -108,8 +108,8 @@
 "sensorNoiseHistoryChartTitle" = "Ruis in de tijd";
 "sensorNoiseHistoryRangeTitle" = "Tijdsbereik";
 "sensorNoiseHistoryDayRange" = "24 u";
-"sensorNoiseHistoryThreeDayRange" = "3 d";
-"sensorNoiseHistoryWeekRange" = "7 d";
+"sensorNoiseHistoryThreeDayRange" = "3d";
+"sensorNoiseHistoryWeekRange" = "7d";
 "sensorNoiseHistoryAllRange" = "Alles";
 "sensorNoiseHistoryShortCompact" = "30 min";
 "sensorNoiseHistoryLongCompact" = "4 u";

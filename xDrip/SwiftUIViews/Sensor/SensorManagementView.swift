@@ -120,10 +120,11 @@ struct SensorManagementView: View {
                             header: Text(Texts_HomeView.sensorManagementNoiseTitle),
                             footer: Text(String(format: Texts_HomeView.sensorManagementNoiseFooter, sensorNoiseSensitivity.description))
                         ) {
-                            if let sensorID = state.sensorID {
+                            if let sensorID = state.sensorID, let sensorStartDate = state.sensorStartDate {
                                 NavigationLink {
                                     SensorNoiseHistoryView(
                                         sensorID: sensorID,
+                                        sensorStartDate: sensorStartDate,
                                         sensorNoiseManager: sensorNoiseManager,
                                         isMgDl: isMgDl,
                                         currentMeasurementsDetail: state.noiseMeasurementsDetail
@@ -578,6 +579,7 @@ struct SensorManagementView: View {
             hasTransmitter: transmitter != nil,
             showsNoise: UserDefaults.standard.isMaster && activeSensor != nil,
             sensorID: activeSensor?.id,
+            sensorStartDate: activeSensor?.startDate,
             bannerTitle: sensorDescription,
             statusTitle: statusTitle,
             statusColor: statusColor,
@@ -624,6 +626,7 @@ private struct SensorManagementState {
     let hasTransmitter: Bool
     let showsNoise: Bool
     let sensorID: String?
+    let sensorStartDate: Date?
     let bannerTitle: String
     let statusTitle: String
     let statusColor: Color

@@ -129,23 +129,32 @@ final class SensorNoiseManager {
         )
     }
 
-    /// returns the complete stored noise history for one sensor
-    func historySnapshot(sensorID: String) -> SensorNoiseHistorySnapshot? {
+    /// returns stored noise history for the active physical sensor session
+    ///
+    /// The current Sensor ID is still preferred, but the fetch is anchored to the current sensor
+    /// start date. This keeps the chart intact if a transmitter reports a slightly shifted start
+    /// time and the app creates a new internal Sensor object for the same physical session.
+    func historySnapshot(sensorID: String, sessionStartDate: Date) -> SensorNoiseHistorySnapshot? {
         var snapshot: SensorNoiseHistorySnapshot?
 
         coreDataManager.mainManagedObjectContext.performAndWait {
             guard let sensor = self.sensor(withID: sensorID, in: self.coreDataManager.mainManagedObjectContext) else { return }
 
+            let historyStartDate = sessionStartDate.addingTimeInterval(-ConstantsSensorNoise.sessionStartDateReachBackTolerance)
             let request: NSFetchRequest<SensorNoiseSample> = SensorNoiseSample.fetchRequest()
             request.predicate = NSPredicate(
-                format: "sensorID == %@",
-                sensorID
+                format: "%K >= %@",
+                #keyPath(SensorNoiseSample.timeStamp),
+                historyStartDate as NSDate
             )
             request.sortDescriptors = [NSSortDescriptor(key: #keyPath(SensorNoiseSample.timeStamp), ascending: true)]
             request.fetchBatchSize = 512
 
             do {
-                let points = try request.execute().map { sample in
+                let points = self.currentSessionPoints(
+                    from: try request.execute(),
+                    currentSensorID: sensorID
+                ).map { sample in
                     SensorNoiseHistoryPoint(
                         id: sample.id,
                         timeStamp: sample.timeStamp,
@@ -178,7 +187,7 @@ final class SensorNoiseManager {
     /// Multiple callers requesting the same rebuild share one operation and are all notified when
     /// its Core Data changes have been saved.
     @discardableResult
-    func rebuildHistoryIfNeeded(sensorID: String, completion: @escaping () -> Void) -> Bool {
+    func rebuildHistoryIfNeeded(sensorID: String, sessionStartDate: Date, completion: @escaping () -> Void) -> Bool {
         if var completions = historyBuildCompletions[sensorID] {
             completions.append(completion)
             historyBuildCompletions[sensorID] = completions
@@ -187,7 +196,6 @@ final class SensorNoiseManager {
 
         var sensorObjectID: NSManagedObjectID?
         var sensorStartDate: Date?
-        var sensorForReadings: Sensor?
         var historyIsComplete = false
 
         coreDataManager.mainManagedObjectContext.performAndWait {
@@ -195,8 +203,7 @@ final class SensorNoiseManager {
 
             historyIsComplete = sensor.noiseHistoryIsComplete
             sensorObjectID = sensor.objectID
-            sensorStartDate = sensor.startDate
-            sensorForReadings = sensor
+            sensorStartDate = max(sensor.startDate, sessionStartDate)
         }
 
         if historyIsComplete {
@@ -212,8 +219,10 @@ final class SensorNoiseManager {
         historyBuildCompletions[sensorID] = [completion]
         let snapshots = bgReadingsAccessor.getLatestBgReadingSnapshots(
             limit: nil,
-            fromDate: sensorStartDate.addingTimeInterval(-1),
-            forSensor: sensorForReadings,
+            fromDate: sensorStartDate.addingTimeInterval(-ConstantsSensorNoise.sessionStartDateReachBackTolerance),
+            // Rebuild from the session time window rather than the current Sensor relationship.
+            // This recovers history after harmless internal Sensor ID churn.
+            forSensor: nil,
             ignoreRawData: true,
             ignoreCalculatedValue: false,
             includingSuppressed: true
@@ -256,6 +265,25 @@ final class SensorNoiseManager {
             traceHistoryError("sensor fetch", error: error)
             return nil
         }
+    }
+
+    /// Returns one sample per reading timestamp, preferring samples already linked to this Sensor ID.
+    private func currentSessionPoints(from samples: [SensorNoiseSample], currentSensorID: String) -> [SensorNoiseSample] {
+        var pointsByTimestamp = [TimeInterval: SensorNoiseSample]()
+
+        for sample in samples {
+            let timestamp = sample.timeStamp.timeIntervalSince1970
+
+            if let existingSample = pointsByTimestamp[timestamp] {
+                if existingSample.sensorID != currentSensorID && sample.sensorID == currentSensorID {
+                    pointsByTimestamp[timestamp] = sample
+                }
+            } else {
+                pointsByTimestamp[timestamp] = sample
+            }
+        }
+
+        return pointsByTimestamp.values.sorted { $0.timeStamp < $1.timeStamp }
     }
 
     /// stores no more than one history point per normal sensor reading interval
