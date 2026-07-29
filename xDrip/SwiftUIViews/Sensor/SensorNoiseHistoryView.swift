@@ -744,15 +744,17 @@ private enum SensorNoiseHistoryRange: String, CaseIterable, Identifiable {
     /// Shows the full sensor session as a compact chart-width label.
     private static func fullSessionTitle(sensorStartDate: Date, sensorEndDate: Date?) -> String {
         let endDate = sensorEndDate ?? Date()
-        let elapsedMinutes = max(endDate.timeIntervalSince(sensorStartDate) / 60, 0)
+        let elapsedHours = max(Int(endDate.timeIntervalSince(sensorStartDate) / (60 * 60)), 0)
+        let days = elapsedHours / 24
+        let hours = elapsedHours % 24
 
-        if elapsedMinutes >= 7 * 24 * 60 {
-            return elapsedMinutes.minutesToDaysAndHours()
+        // The selector is a chart-width label, so keep it rounded to complete hours. The general
+        // Nightscout-style helper can show minutes for short durations, which is too noisy here.
+        if days > 0 {
+            return "\(days)d\(hours)h"
         }
 
-        let elapsedDays = max(Int(elapsedMinutes / (24 * 60)), 1)
-
-        return "\(elapsedDays)d"
+        return "\(max(hours, 1))h"
     }
 }
 
