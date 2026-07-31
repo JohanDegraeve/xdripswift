@@ -148,7 +148,7 @@ public struct TreatmentNSResponse {
 		for element in array {
 			if let dictionary = element as? NSDictionary {
                 
-                responses = responses + TreatmentNSResponse.fromNightscout(dictionary: dictionary)
+                responses.append(contentsOf: TreatmentNSResponse.fromNightscout(dictionary: dictionary))
                 
 			}
 		}
