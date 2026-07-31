@@ -696,18 +696,14 @@ class CGMG7Transmitter: BluetoothTransmitter, CGMTransmitter {
     }
     
     private func addGlucoseValueToUserDefaults(_ newValue: Int) {
-        // Als de array nil is, initialiseer ze
-        if UserDefaults.standard.previousRawGlucoseValues == nil {
-            UserDefaults.standard.previousRawGlucoseValues = []
+        var previousRawGlucoseValues = UserDefaults.standard.previousRawGlucoseValues ?? []
+        previousRawGlucoseValues.insert(newValue, at: 0)
+
+        if previousRawGlucoseValues.count > 6 {
+            previousRawGlucoseValues.removeLast()
         }
 
-        // Voeg de nieuwe waarde toe aan het begin van de array
-        UserDefaults.standard.previousRawGlucoseValues!.insert(newValue, at: 0)
-
-        // Als er meer dan 6 waarden zijn, verwijder de laatste
-        if UserDefaults.standard.previousRawGlucoseValues!.count > 6 {
-            UserDefaults.standard.previousRawGlucoseValues!.removeLast()
-        }
+        UserDefaults.standard.previousRawGlucoseValues = previousRawGlucoseValues
     }
 
     func hasSixIdenticalValues() -> Bool {
