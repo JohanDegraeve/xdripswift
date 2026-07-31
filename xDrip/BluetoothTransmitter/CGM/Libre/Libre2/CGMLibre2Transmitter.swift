@@ -201,6 +201,13 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
             
             return
         }
+
+        // the unlock algorithm reads 6 bytes directly, so invalid restored sensor metadata must be rejected before creating the payload
+        guard libreSensorUID.count >= 6, librePatchInfo.count >= 6 else {
+            trace("in peripheral didUpdateNotificationStateFor but the stored sensor metadata is incomplete, no further processing", log: log, category: ConstantsLog.categoryCGMLibre2, type: .error)
+
+            return
+        }
         
         if error == nil && characteristic.isNotifying {
             UserDefaults.standard.libreActiveSensorUnlockCount += 1
