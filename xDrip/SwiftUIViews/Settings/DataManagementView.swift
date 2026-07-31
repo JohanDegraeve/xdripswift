@@ -152,7 +152,7 @@ struct DataManagementView: View {
                 } else {
                     backupSection
                     passwordProtectionSection
-                    createBackupSection
+                    createBackupAction
                 }
             case .restore:
                 if let result = viewModel.restoreResult {
@@ -162,7 +162,7 @@ struct DataManagementView: View {
                         accountsSummarySection(result)
                     }
                 } else if viewModel.selectedBackupURL == nil {
-                    restoreFileSection
+                    restoreFileAction
                 } else if viewModel.isWaitingForBackupPassword {
                     encryptedBackupNotice
                     lockedBackupSection
@@ -262,8 +262,8 @@ struct DataManagementView: View {
         }
     }
 
-    private var createBackupSection: some View {
-        Section {
+    private var createBackupAction: some View {
+        VStack(alignment: .leading, spacing: 10) {
             Button {
                 viewModel.createBackup()
             } label: {
@@ -273,12 +273,16 @@ struct DataManagementView: View {
             .buttonStyle(.borderedProminent)
             .tint(Self.successColor)
             .disabled(!viewModel.canCreateBackup)
-            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-        } footer: {
+
             if viewModel.passwordProtectsBackup {
                 Text(Texts_SettingsView.backupEncryptedCreationFooter)
+                    .font(.footnote)
+                    .foregroundStyle(Color(.secondaryLabel))
             }
         }
+        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
     }
 
     private func backupSummarySection(_ manifest: BackupManifest) -> some View {
@@ -301,17 +305,20 @@ struct DataManagementView: View {
 
     // MARK: - Restore Backup
 
-    private var restoreFileSection: some View {
-        Section {
+    private var restoreFileAction: some View {
+        VStack(alignment: .leading, spacing: 10) {
             Button(Texts_SettingsView.backupChooseFile) {
                 isImporting = true
             }
             .tint(ConstantsAppColors.navigationTint)
-        } header: {
-            Text(Texts_SettingsView.backupFile)
-        } footer: {
+
             Text(Texts_SettingsView.backupFileCheckFooter)
+                .font(.footnote)
+                .foregroundStyle(Color(.secondaryLabel))
         }
+        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
     }
 
     private var lockedBackupSection: some View {

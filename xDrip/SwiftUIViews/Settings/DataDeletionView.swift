@@ -32,12 +32,12 @@ struct DataDeletionView: View {
                     confirmationSection
                 } else {
                     deletionPlanSection(deletionPlan)
-                    deletionSummaryConfirmationSection
+                    deletionSummaryConfirmationAction
                 }
             } else if let inventory = viewModel.inventory {
                 dateRangeSection
                 selectionSection(inventory)
-                reviewSection
+                reviewAction
             }
         }
         .padding(.top, viewModel.deletionPlan != nil && viewModel.deletionResult == nil ? 4 : 0)
@@ -145,8 +145,8 @@ struct DataDeletionView: View {
         }
     }
 
-    private var reviewSection: some View {
-        Section {
+    private var reviewAction: some View {
+        VStack(alignment: .leading, spacing: 10) {
             Button {
                 viewModel.prepareDeletionPlan()
             } label: {
@@ -156,10 +156,14 @@ struct DataDeletionView: View {
             .buttonStyle(.borderedProminent)
             .tint(.red)
             .disabled(!viewModel.canPrepareDeletionPlan)
-            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
-        } footer: {
+
             Text(Texts_SettingsView.cleanDataReviewFooter)
+                .font(.footnote)
+                .foregroundStyle(Color(.secondaryLabel))
         }
+        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
     }
 
     // MARK: - Confirmation
@@ -210,18 +214,18 @@ struct DataDeletionView: View {
         }
     }
 
-    private var deletionSummaryConfirmationSection: some View {
-        Section {
-            Button {
-                viewModel.confirmDeletionSummary()
-            } label: {
-                Text(Texts_SettingsView.cleanDataContinue)
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(.red)
-            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+    private var deletionSummaryConfirmationAction: some View {
+        Button {
+            viewModel.confirmDeletionSummary()
+        } label: {
+            Text(Texts_SettingsView.cleanDataContinue)
+                .frame(maxWidth: .infinity)
         }
+        .buttonStyle(.borderedProminent)
+        .tint(.red)
+        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+        .listRowBackground(Color.clear)
+        .listRowSeparator(.hidden)
     }
 
     private var confirmationSection: some View {
