@@ -344,7 +344,7 @@ public enum AlertKind: Int, CaseIterable {
                     // if start of nextAlertEntry < start of currentAlertEntry, then ad 24 hours, because it means the nextAlertEntry is actually the one of the day after
                     var nextAlertEntryStartValueToUse = nextAlertEntry.start
                     if nextAlertEntry.start < currentAlertEntry.start {
-                        nextAlertEntryStartValueToUse += nextAlertEntryStartValueToUse + 24 * 60
+                        nextAlertEntryStartValueToUse += 24 * 60
                     }
                     
                     if !nextAlertEntry.alertType.enabled {
@@ -377,7 +377,7 @@ public enum AlertKind: Int, CaseIterable {
                     // if start of nextAlertEntry < start of currentAlertEntry, then ad 24 hours, because it means the nextAlertEntry is actually the one of the day after
                     var nextAlertEntryStartValueToUse = nextAlertEntry.start
                     if nextAlertEntry.start < currentAlertEntry.start {
-                        nextAlertEntryStartValueToUse += nextAlertEntryStartValueToUse + 24 * 60
+                        nextAlertEntryStartValueToUse += 24 * 60
                     }
                     
                     // if this would be before start of nextAlertEntry then increase the delay
