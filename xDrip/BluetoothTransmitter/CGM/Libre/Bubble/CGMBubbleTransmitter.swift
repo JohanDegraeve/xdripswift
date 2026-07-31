@@ -257,7 +257,13 @@ class CGMBubbleTransmitter: BluetoothTransmitter, CGMTransmitter {
                     case .dataPacket, .dataPacket2, .decryptedDataPacket:
 
                         //no different processing for decryptedDataPacket, we look at the firmware version of the bubble and sensortype to determine if data is decrypted or not
-                        
+
+                        // every Bubble data packet starts with a 4-byte protocol header
+                        guard value.count >= 4 else {
+                            trace("    received data packet shorter than the Bubble header, ignoring", log: log, category: ConstantsLog.categoryCGMBubble, type: .error)
+                            return
+                        }
+
                         rxBuffer.append(value.suffix(from: 4))
                         
                         if rxBuffer.count >= 352 {
