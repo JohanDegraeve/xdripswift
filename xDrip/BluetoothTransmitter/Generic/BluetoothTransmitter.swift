@@ -594,7 +594,9 @@ class BluetoothTransmitter: NSObject, CBCentralManagerDelegate, CBPeripheralDele
                     if let peripheral = peripheral {
                         trace("in retrievePeripherals, trying to connect", log: log, category: ConstantsLog.categoryBlueToothTransmitter, type: .info)
                         peripheral.delegate = self
-                        scheduleConnectTimeout(forgetDeviceOnTimeout: false)
+                        if shouldTimeoutStalledConnectionSetup() {
+                            scheduleConnectTimeout(forgetDeviceOnTimeout: false)
+                        }
                         central.connect(peripheral, options: connectOptions)
                         return true
                     } else {

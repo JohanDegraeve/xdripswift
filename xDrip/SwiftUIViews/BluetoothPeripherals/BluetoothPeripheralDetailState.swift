@@ -633,7 +633,12 @@ private extension BluetoothPeripheralDetailState {
                 if let bluetoothTransmitter = bluetoothPeripheralManager.getBluetoothTransmitter(for: bluetoothPeripheral, createANewOneIfNecesssary: true) {
                     bluetoothTransmitter.bluetoothTransmitterDelegate = self
                     configureSpecificDelegate(for: bluetoothTransmitter)
-                    bluetoothTransmitter.connect()
+
+                    if bluetoothPeripheral.bluetoothPeripheralType().needsNFCScanToConnect() {
+                        handleScanningResult(startScanningResult: bluetoothTransmitter.startScanning())
+                    } else {
+                        bluetoothTransmitter.connect()
+                    }
                 }
             }
         } else if expectedBluetoothPeripheralType.needsTransmitterId(), transmitterIdTempValue == nil {

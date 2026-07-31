@@ -134,7 +134,9 @@ struct BluetoothPeripheralsView: View {
                             .listRowBackground(row.connectionStatus.rowBackgroundColor)
                         }
                     } header: {
-                        BluetoothPeripheralSectionHeaderView(section: section)
+                        if section.showsHeader {
+                            BluetoothPeripheralSectionHeaderView(section: section)
+                        }
                     }
                 }
             }
@@ -358,8 +360,10 @@ private struct BluetoothPeripheralSectionHeaderView: View {
                 .foregroundStyle(ConstantsUI.settingsSectionHeaderIconColor)
                 .frame(width: 16)
 
-            Text(section.title)
-                .foregroundStyle(ConstantsUI.tableViewHeaderTextColor)
+            if let title = section.title {
+                Text(title)
+                    .foregroundStyle(ConstantsUI.tableViewHeaderTextColor)
+            }
         }
     }
 }

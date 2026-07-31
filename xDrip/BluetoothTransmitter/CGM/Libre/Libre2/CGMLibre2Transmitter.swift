@@ -111,9 +111,8 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
     // MARK: - overriden  BluetoothTransmitter functions
     
     override func startScanning() -> BluetoothTransmitter.startScanningResult {
-        // overriding startScanning, because it's the time to trigger NFC Scan
-        // when user clicks the scan button, an NFC read is initiated which will enable the bluetooth streaming
-        // meanwhile, the real scanning can start
+        // For Libre 2, a user-requested scan starts with NFC because the NFC read enables
+        // Bluetooth streaming and refreshes the unlock state before BLE reconnects.
         
         // create libreNFC instance and start session
         if NFCTagReaderSession.readingAvailable {
@@ -137,7 +136,7 @@ class CGMLibre2Transmitter: BluetoothTransmitter, CGMTransmitter {
         // start the NFC scan (not BLE scanning)
         return .nfcScanNeeded
     }
-    
+
     override func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         super.centralManager(central, didConnect: peripheral)
         

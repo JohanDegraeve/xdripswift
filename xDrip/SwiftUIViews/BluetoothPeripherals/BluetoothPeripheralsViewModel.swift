@@ -106,7 +106,7 @@ struct BluetoothPeripheralsRoute: Hashable {
             return
         }
 
-        sections = BluetoothPeripheralCategory.allCases.compactMap { category in
+        sections = BluetoothPeripheralCategory.allCases.flatMap { category -> [BluetoothPeripheralsSection] in
             let rows = bluetoothPeripheralManager.getBluetoothPeripherals()
                 .filter { $0.bluetoothPeripheralType().category() == category }
                 .enumerated()
@@ -136,10 +136,47 @@ struct BluetoothPeripheralsRoute: Hashable {
                 }
                 .map(\.row)
 
-            guard !rows.isEmpty else { return nil }
+            guard !rows.isEmpty else { return [] }
 
-            return BluetoothPeripheralsSection(id: category.rawValue, title: category.rawValue, category: category, rows: rows)
+            return makeSections(for: category, rows: rows)
         }
+    }
+
+    private func makeSections(for category: BluetoothPeripheralCategory, rows: [BluetoothPeripheralListRow]) -> [BluetoothPeripheralsSection] {
+        let activeRows = rows.filter(\.isActive)
+        guard !activeRows.isEmpty else {
+            return [
+                BluetoothPeripheralsSection(
+                    id: category.rawValue,
+                    title: category.rawValue,
+                    category: category,
+                    rows: rows
+                )
+            ]
+        }
+
+        let inactiveRows = rows.filter { !$0.isActive }
+        var categorySections = [
+            BluetoothPeripheralsSection(
+                id: category.rawValue + "-active",
+                title: category.rawValue,
+                category: category,
+                rows: activeRows
+            )
+        ]
+
+        if !inactiveRows.isEmpty {
+            categorySections.append(
+                BluetoothPeripheralsSection(
+                    id: category.rawValue + "-inactive",
+                    title: nil,
+                    category: category,
+                    rows: inactiveRows
+                )
+            )
+        }
+
+        return categorySections
     }
 
     /// Starts the lightweight status refresh used while the Bluetooth list is visible.
@@ -251,9 +288,13 @@ extension BluetoothPeripheralsViewModel: @preconcurrency BluetoothTransmitterDel
 /// One Bluetooth category and its currently configured peripherals.
 struct BluetoothPeripheralsSection: Identifiable {
     let id: String
-    let title: String
+    let title: String?
     let category: BluetoothPeripheralCategory
     let rows: [BluetoothPeripheralListRow]
+
+    var showsHeader: Bool {
+        title != nil
+    }
 
     var systemImage: String {
         category.systemImage()
@@ -269,6 +310,21 @@ struct BluetoothPeripheralListRow: Identifiable {
 
     var id: String {
         bluetoothPeripheral.blePeripheral.address
+    }
+
+    // Selected peripherals are promoted into the first category section.
+    // This keeps the active device visually separate from saved inactive devices.
+    var isActive: Bool {
+        if shouldConnect {
+            return true
+        }
+
+        switch connectionStatus {
+        case .connected:
+            return true
+        case .scanning, .notScanning:
+            return false
+        }
     }
 
     // The selected transmitter belongs at the top even when Bluetooth is between
